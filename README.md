@@ -14,7 +14,6 @@
 
 <!-- ## Table of Contents -->
 
-
 ## Contributing
 
 ### Getting started
