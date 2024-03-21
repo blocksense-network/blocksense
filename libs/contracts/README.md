@@ -4,10 +4,15 @@ This project demonstrates a basic Hardhat use case. It comes with a sample contr
 
 Try running some of the following tasks:
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
+```sh
+yarn hardhat help
+yarn clean
+yarn build
+yarn test
+yarn coverage
+yarn size
+
+# Run these two in separate shells:
+yarn hardhat node
+yarn deploy:local ./scripts/deploy-lock.ts
 ```

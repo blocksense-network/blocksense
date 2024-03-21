@@ -1,5 +1,13 @@
 {
   "name": "@blocksense/contracts",
+  "scripts": {
+    "clean": "git clean -fdx -e .env",
+    "build": "hardhat compile",
+    "test": "REPORT_GAS=true hardhat test",
+    "coverage": "hardhat coverage",
+    "deploy:local": "hardhat run --network localhost",
+    "size": "hardhat size-contracts"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
     "@nomicfoundation/hardhat-ethers": "^3.0.5",
