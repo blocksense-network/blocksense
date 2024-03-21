@@ -19,6 +19,7 @@ in
       ++ (with pkgs; [
         figlet
         clolcat
+        alejandra
       ]);
 
     shellHook = ''
