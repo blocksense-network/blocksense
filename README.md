@@ -4,8 +4,8 @@
       <h1>Blocksense Network <code>monorepo</code></h1>
       <pre>The ZK rollup for scaling oracle data to infinity.</pre>
     </td>
-    <td valign="top">
-      <img src="./docs/assets/img/blocksense-logo.jpg" align="right" width="120">
+    <td valign="center">
+      <img src="./docs/assets/img/blocksense-logo.jpg" align="center" width="120">
     </td>
   </tr>
 </table>
