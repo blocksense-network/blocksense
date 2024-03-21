@@ -4,6 +4,9 @@
   "workspaces": [
     "libs/*"
   ],
+  "scripts": {
+    "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -- $(git rev-parse --show-toplevel)"
+  },
   "devDependencies": {
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
