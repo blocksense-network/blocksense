@@ -5,7 +5,9 @@
     "libs/*"
   ],
   "scripts": {
-    "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -- $(git rev-parse --show-toplevel)"
+    "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -- $(git rev-parse --show-toplevel)",
+    "format:check": "prettier --check . && alejandra --exclude ./node_modules --exclude ./yarn-project.nix --check .",
+    "format:write": "prettier --write . && alejandra --exclude ./node_modules --exclude ./yarn-project.nix ."
   },
   "devDependencies": {
     "prettier": "^3.2.5",
