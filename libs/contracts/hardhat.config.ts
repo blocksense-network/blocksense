@@ -1,3 +1,5 @@
+import * as dotenv from "dotenv";
+
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-ethers';
 import 'ethers';
@@ -6,6 +8,8 @@ import 'solidity-coverage';
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
 // import "hardhat-tracer";
+
+dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -20,6 +24,11 @@ const config: HardhatUserConfig = {
   networks: {
     localhost: {
       url: 'http://localhost:8545/',
+    },
+    hardhat: {
+      forking: {
+        url: "" + process.env.MAINNET_KEY,
+      },
     },
   },
   gasReporter: {

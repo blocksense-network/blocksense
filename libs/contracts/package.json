@@ -18,6 +18,7 @@
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.30",
     "chai": "4",
+    "dotenv": "^16.4.5",
     "ethers": "^6.11.1",
     "hardhat": "^2.22.1",
     "hardhat-contract-sizer": "^2.10.0",
