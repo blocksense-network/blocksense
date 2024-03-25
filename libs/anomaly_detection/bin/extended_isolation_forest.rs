@@ -25,14 +25,25 @@ fn make_f64_forest() -> Forest<f64, 3> {
 }
 
 fn main() {
-    let forest = make_f64_forest();
+    
+}
 
-    // no anomaly
-    assert!(forest.score(&[1.0, 3.0, 25.0]) < 0.5);
-    assert!(forest.score(&[-1.0, 3.0, 25.0]) < 0.5);
 
-    // anomalies
-    assert!(forest.score(&[-12.0, 6.0, 25.0]) > 0.5);
-    assert!(forest.score(&[-1.0, 2.0, 60.0]) > 0.5);
-    assert!(forest.score(&[-1.0, 2.0, 0.0]) > 0.5);
+#[cfg(test)]
+mod extended_isolation_forest_tests {
+    use crate::make_f64_forest;
+
+    #[test]
+    fn mock_test() {
+        let forest = make_f64_forest();
+
+        // no anomaly
+        assert!(forest.score(&[1.0, 3.0, 25.0]) < 0.5);
+        assert!(forest.score(&[-1.0, 3.0, 25.0]) < 0.5);
+
+        // anomalies
+        assert!(forest.score(&[-12.0, 6.0, 25.0]) > 0.5);
+        assert!(forest.score(&[-1.0, 2.0, 60.0]) > 0.5);
+        assert!(forest.score(&[-1.0, 2.0, 0.0]) > 0.5);
+    }
 }

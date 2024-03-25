@@ -13,7 +13,7 @@ on:
       - main
 
 jobs:
-  CI:
+  Hardhat-CI:
     timeout-minutes: 360
     runs-on: ubuntu-latest
 
@@ -54,3 +54,30 @@ jobs:
 
       - name: Measure contract size
         run: nix develop -c yarn workspace @blocksense/contracts size
+
+  Rust-CI:
+    timeout-minutes: 360
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v10
+        with:
+          extra-conf:
+            accept-flake-config = true
+
+      - uses: cachix/cachix-action@v14
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: nix flake check
+        run: nix flake check
+
+      - name: Build the Nix Dev Shell
+        run: nix build .#devShells.x86_64-linux.default
+
+      - name: Build Rust workspace
+        run: nix develop -c cargo build
