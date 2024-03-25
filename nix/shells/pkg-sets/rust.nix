@@ -6,4 +6,6 @@
 with pkgs; [
   rustc
   cargo
+  openssl
+  pkg-config
 ]
