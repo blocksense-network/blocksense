@@ -7,7 +7,6 @@ import 'solidity-coverage';
 import "@typechain/hardhat";
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
-// import "hardhat-tracer";
 
 dotenv.config();
 
