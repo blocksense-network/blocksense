@@ -11,9 +11,14 @@ edition.workspace = true
 name = "extended_isolation_forest"
 path = "bin/extended_isolation_forest.rs"
 
+[[bin]]
+name = "hdbscan_detector"
+path = "bin/hdbscan_detector.rs"
+
 [dependencies]
 num = "0.4.1"
 rand = "0.8.5"
 rand_distr = "0.4.3"
 serde = "1.0.197"
 extended-isolation-forest = "0.2.3"
+hdbscan = "0.4.1"
