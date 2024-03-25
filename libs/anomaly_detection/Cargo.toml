@@ -7,4 +7,13 @@ edition.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[[bin]]
+name = "extended_isolation_forest"
+path = "bin/extended_isolation_forest.rs"
+
 [dependencies]
+num = "0.4.1"
+rand = "0.8.5"
+rand_distr = "0.4.3"
+serde = "1.0.197"
+extended-isolation-forest = "0.2.3"
