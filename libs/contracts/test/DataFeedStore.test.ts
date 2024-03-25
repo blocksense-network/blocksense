@@ -151,6 +151,32 @@ describe.only('DataFeedStore', function () {
             expect(res).to.be.eq(value);
         });
 
+        it('Should be able to set multiple v2 data feeds', async function () {
+            const keys = Array.from({ length: 10 }, (_, i) => i);
+            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
+            const selector = dataFeedStoreV2.interface.getFunction("setFeeds").selector;
+            await network.provider.send("eth_sendTransaction", [
+                {
+                    to: await dataFeedStoreV2.getAddress(),
+                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
+                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
+                },
+            ]);
+
+            for (let i = 0; i < keys.length; i++) {
+                const msgData = ethers.solidityPacked(["bytes4"], [`0x8000000${keys[i]}`])
+                const res = await network.provider.send("eth_call", [
+                    {
+                        to: await dataFeedStoreV2.getAddress(),
+                        data: msgData,
+                    },
+                    "latest",
+                ]);
+
+                expect(res).to.be.eq(values[i]);
+            }
+        });
+
         it('Should compare v2 with basic', async function () {
             const key = 3;
             const value = ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes("Hello, World!"), 32)]);
@@ -182,32 +208,6 @@ describe.only('DataFeedStore', function () {
             expect(parseInt(receipt.gasUsed, 16)).to.be.lt(receiptBasic?.gasUsed);
         });
 
-        it('Should be able to set multiple v2 data feeds', async function () {
-            const keys = Array.from({ length: 10 }, (_, i) => i);
-            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
-            const selector = dataFeedStoreV2.interface.getFunction("setFeeds").selector;
-            await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await dataFeedStoreV2.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
-                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
-                },
-            ]);
-
-            for (let i = 0; i < keys.length; i++) {
-                const msgData = ethers.solidityPacked(["bytes4"], [`0x8000000${keys[i]}`])
-                const res = await network.provider.send("eth_call", [
-                    {
-                        to: await dataFeedStoreV2.getAddress(),
-                        data: msgData,
-                    },
-                    "latest",
-                ]);
-
-                expect(res).to.be.eq(values[i]);
-            }
-        });
-
         it('Should compare v2 with basic multiple set', async function () {
             const keys = Array.from({ length: 10 }, (_, i) => i);
             const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
@@ -219,6 +219,39 @@ describe.only('DataFeedStore', function () {
                         [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
                 },
             ])
+
+            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
+
+            const receiptBasic = await (await dataFeedStoreBasic.setFeeds(keys, values)).wait();
+
+            console.log('[v2] gas used: ', parseInt(receipt.gasUsed, 16).toString());
+            console.log('[basic] gas used: ', receiptBasic?.gasUsed.toString());
+        });
+
+        it('Should compare v2 with basic for 100 set', async function () {
+            const keys = Array.from({ length: 100 }, (_, i) => i);
+            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
+            const selector = dataFeedStoreV2.interface.getFunction("setFeeds").selector;
+            const txHash = await network.provider.send("eth_sendTransaction", [
+                {
+                    to: await dataFeedStoreV2.getAddress(),
+                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
+                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
+                },
+            ])
+
+            for (let i = 0; i < keys.length; i++) {
+                const msgData = ethers.solidityPacked(["bytes4"], ['0x' + (0x80000000 + keys[i]).toString(16)])
+                const res = await network.provider.send("eth_call", [
+                    {
+                        to: await dataFeedStoreV2.getAddress(),
+                        data: msgData,
+                    },
+                    "latest",
+                ]);
+
+                expect(res).to.be.eq(values[i]);
+            }
 
             const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
 

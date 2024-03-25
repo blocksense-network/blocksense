@@ -31,9 +31,13 @@ contract DataFeedStoreV2 {
         switch selector
         case 0x1a2d80ac00000000000000000000000000000000000000000000000000000000 {
           // setFeeds(bytes)
+
           // bytes should be in the format of:
           // <key1><value1>...<keyN><valueN>
           // where key is uint32 and value is bytes32
+
+          // store mapping location in memory at location 0x08
+          mstore(0x08, DATA_FEED_LOCATION)
           let len := calldatasize()
           for {
             let i := 4
@@ -42,13 +46,9 @@ contract DataFeedStoreV2 {
           } {
             // store key in memory at location 0x04
             calldatacopy(4, i, 0x04)
-            // store mapping location in memory at location 0x08
-            mstore(0x08, DATA_FEED_LOCATION)
 
-            // store value in memory at location 0x10
-            calldatacopy(0x10, add(i, 0x04), 0x20)
             // store value in mapping at slot = keccak256(key, location)
-            sstore(keccak256(0x04, 0x09), mload(0x10))
+            sstore(keccak256(0x04, 0x09), calldataload(add(i, 0x04)))
           }
         }
       }
