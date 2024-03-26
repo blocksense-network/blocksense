@@ -228,7 +228,7 @@ describe.only('DataFeedStore', function () {
             console.log('[basic] gas used: ', receiptBasic?.gasUsed.toString());
         });
 
-        it('Should compare v2 with basic for 100 set', async function () {
+        it('Should compare v2 with basic for 100 smallest uint32 id set', async function () {
             const keys = Array.from({ length: 100 }, (_, i) => i);
             const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
             const selector = dataFeedStoreV2.interface.getFunction("setFeeds").selector;
@@ -241,7 +241,7 @@ describe.only('DataFeedStore', function () {
             ])
 
             for (let i = 0; i < keys.length; i++) {
-                const msgData = ethers.solidityPacked(["bytes4"], ['0x' + (0x80000000 + keys[i]).toString(16)])
+                const msgData = ethers.solidityPacked(["bytes4"], ['0x' + ((keys[i] | 0x80000000) >>> 0).toString(16).padStart(8, '0')])
                 const res = await network.provider.send("eth_call", [
                     {
                         to: await dataFeedStoreV2.getAddress(),
@@ -259,6 +259,62 @@ describe.only('DataFeedStore', function () {
 
             console.log('[v2] gas used: ', parseInt(receipt.gasUsed, 16).toString());
             console.log('[basic] gas used: ', receiptBasic?.gasUsed.toString());
+        });
+
+        it('Should compare v2 with basic for 100 biggest uint32 id set', async function () {
+            const keys = Array.from({ length: 100 }, (_, i) => i + 2147483548);
+            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
+            const selector = dataFeedStoreV2.interface.getFunction("setFeeds").selector;
+            const txHash = await network.provider.send("eth_sendTransaction", [
+                {
+                    to: await dataFeedStoreV2.getAddress(),
+                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
+                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
+                },
+            ])
+
+            for (let i = 0; i < keys.length; i++) {
+                const msgData = ethers.solidityPacked(["bytes4"], ['0x' + ((keys[i] | 0x80000000) >>> 0).toString(16)])
+                const res = await network.provider.send("eth_call", [
+                    {
+                        to: await dataFeedStoreV2.getAddress(),
+                        data: msgData,
+                    },
+                    "latest",
+                ]);
+
+                expect(res).to.be.eq(values[i]);
+            }
+
+            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
+
+            const receiptBasic = await (await dataFeedStoreBasic.setFeeds(keys, values)).wait();
+
+            console.log('[v2] gas used: ', parseInt(receipt.gasUsed, 16).toString());
+            console.log('[basic] gas used: ', receiptBasic?.gasUsed.toString());
+        });
+
+        it('Should test with the biggest possible id', async function () {
+            const key = 0x7fffffff;
+            const value = ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes("Hello, World!"), 32)]);
+            const selector = dataFeedStoreV2.interface.getFunction("setFeeds").selector;
+            await network.provider.send("eth_sendTransaction", [
+                {
+                    to: await dataFeedStoreV2.getAddress(),
+                    data: ethers.solidityPacked(["bytes4", "uint32", "bytes32"], [selector, key, value]),
+                },
+            ]);
+
+            const msgData = ethers.solidityPacked(["bytes4"], ['0xffffffff'])
+            const res = await network.provider.send("eth_call", [
+                {
+                    to: await dataFeedStoreV2.getAddress(),
+                    data: msgData,
+                },
+                "latest",
+            ]);
+
+            expect(res).to.be.eq(value);
         });
     });
 });
