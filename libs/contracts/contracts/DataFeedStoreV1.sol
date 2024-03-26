@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 contract DataFeedStoreV1 {
   bytes4 internal constant CONTRACT_MANAGEMENT_SELECTOR = 0x000000ff;
-  uint8 internal constant DATA_FEED_LOCATION = 0x01;
+  uint8 internal constant DATA_FEED_LOCATION = 0xf;
 
   // Fallback function to store dataFeeds
   fallback(bytes calldata data) external returns (bytes memory) {
@@ -13,7 +13,7 @@ contract DataFeedStoreV1 {
       assembly {
         calldatacopy(0, 0, 0x04)
         mstore(0x04, DATA_FEED_LOCATION)
-        mstore(0, sload(keccak256(0, 0x05)))
+        mstore(0, sload(keccak256(0, 5)))
         return(0, 0x20)
       }
     } else {
@@ -33,7 +33,7 @@ contract DataFeedStoreV1 {
             mstore(0x04, DATA_FEED_LOCATION)
 
             calldatacopy(0x10, add(i, 0x04), 0x20)
-            sstore(keccak256(0, 0x05), mload(0x10))
+            sstore(keccak256(0, 5), mload(0x10))
           }
         }
       }

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-contract DataFeedStoreV2 {
+contract DataFeedStoreV3 {
   address internal immutable owner;
   bytes32 internal constant CONTRACT_MANAGEMENT_SELECTOR =
-    0x0000000000000000000000000000000000000000000000000000000080000000;
+    0x8000000000000000000000000000000000000000000000000000000000000000;
   bytes32 internal constant DATA_FEED_LOCATION =
     0xf000000000000000000000000000000000000000000000000000000000000000;
 
@@ -19,21 +19,22 @@ contract DataFeedStoreV2 {
     // getters
     assembly {
       // store selector in memory at location 0
-      calldatacopy(28, 0, 4)
+      calldatacopy(0, 0, 0x04)
       selector := mload(0)
 
-      // getFeedById(uint32 key) returns (bytes32)
       if and(selector, CONTRACT_MANAGEMENT_SELECTOR) {
+        // getFeedById(uint32 key) returns (bytes32)
         // store key in memory
-        mstore(0x00, and(selector, not(CONTRACT_MANAGEMENT_SELECTOR)))
+        mstore(0x04, and(selector, not(CONTRACT_MANAGEMENT_SELECTOR)))
         // store mapping location in memory
-        mstore(0x20, DATA_FEED_LOCATION)
+        mstore(0x08, DATA_FEED_LOCATION)
         // store value from mapping[slot = keccak256(key, location)] at memory location 0
-        mstore(0, sload(keccak256(28, 5)))
+        mstore(0, sload(keccak256(0x04, 5)))
         // return value
         return(0, 0x20)
       }
     }
+    // setters
 
     address _owner = owner;
     // setters
@@ -43,14 +44,18 @@ contract DataFeedStoreV2 {
         revert(0, 0)
       }
 
-      // setFeeds(bytes)
-      if and(selector, 0x1a2d80ac) {
+      if and(
+        selector,
+        0x1a2d80ac00000000000000000000000000000000000000000000000000000000
+      ) {
+        // setFeeds(bytes)
+
         // bytes should be in the format of:
         // <key1><value1>...<keyN><valueN>
         // where key is uint32 and value is bytes32
 
         // store mapping location in memory at location 0x08
-        mstore(0x04, DATA_FEED_LOCATION)
+        mstore(0x08, DATA_FEED_LOCATION)
 
         let len := calldatasize()
         for {
@@ -59,9 +64,10 @@ contract DataFeedStoreV2 {
           i := add(i, 0x24)
         } {
           // store key in memory at location 0x04
-          calldatacopy(0x00, i, 0x04)
+          calldatacopy(4, i, 0x04)
+
           // store value in mapping at slot = keccak256(key, location)
-          sstore(keccak256(0x00, 5), calldataload(add(i, 0x04)))
+          sstore(keccak256(0x04, 5), calldataload(add(i, 0x04)))
         }
       }
     }

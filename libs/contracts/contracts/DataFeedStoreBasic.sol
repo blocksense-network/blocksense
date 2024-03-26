@@ -3,6 +3,11 @@ pragma solidity ^0.8.24;
 
 contract DataFeedStoreBasic {
   mapping(uint256 => bytes32) public dataFeeds;
+  address public immutable owner;
+
+  constructor() {
+    owner = msg.sender;
+  }
 
   function setFeedById(uint256 _key, bytes32 _value) external {
     dataFeeds[_key] = _value;
@@ -12,6 +17,7 @@ contract DataFeedStoreBasic {
     uint256[] calldata _keys,
     bytes32[] calldata _values
   ) external {
+    require(msg.sender == owner, 'DataFeedStoreBasic: sender is not owner');
     require(
       _keys.length == _values.length,
       'DataFeedStoreBasic: keys and values length mismatch'
