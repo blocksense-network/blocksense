@@ -2,7 +2,6 @@ import { expect } from "chai";
 import { ethers, network } from "hardhat";
 import { DataFeedStoreGeneric, IDataFeedStore } from "../typechain";
 
-
 describe('DataFeedStore', function () {
     let dataFeedStoreGeneric: DataFeedStoreGeneric;
 
@@ -19,6 +18,10 @@ describe('DataFeedStore', function () {
             const DataFeedStore = await ethers.getContractFactory('DataFeedStoreV1');
             const _dataFeedStore = await DataFeedStore.deploy();
             await _dataFeedStore.waitForDeployment();
+
+            const tx = await _dataFeedStore.deploymentTransaction()?.getTransaction()
+
+            console.log('DataFeedStoreV1 deployment gas used: ', +(await network.provider.send('eth_getTransactionReceipt', [tx?.hash])).gasUsed);
 
             dataFeedStoreV1 = await ethers.getContractAt('IDataFeedStore', await _dataFeedStore.getAddress());
         })
@@ -100,6 +103,8 @@ describe('DataFeedStore', function () {
 
             console.log('[v1] gas used: ', parseInt(receipt.gasUsed, 16).toString());
             console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
+
+            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
         });
 
         it('Should compare v1 with Generic multiple set', async function () {
@@ -120,6 +125,8 @@ describe('DataFeedStore', function () {
 
             console.log('[v1] gas used: ', parseInt(receipt.gasUsed, 16).toString());
             console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
+
+            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
         });
 
         it('Should compare v1 with Generic for max set', async function () {
@@ -153,6 +160,8 @@ describe('DataFeedStore', function () {
 
             console.log('[v1] gas used: ', parseInt(receipt.gasUsed, 16).toString());
             console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
+
+            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
         });
     });
 
@@ -166,6 +175,11 @@ describe('DataFeedStore', function () {
                 await _contract.waitForDeployment();
 
                 contract = await ethers.getContractAt('IDataFeedStore', await _contract.getAddress());
+
+                const tx = await _contract.deploymentTransaction()?.getTransaction()
+
+                console.log(`DataFeedStoreV${i} deployment gas used: `, +(await network.provider.send('eth_getTransactionReceipt', [tx?.hash])).gasUsed);
+
             });
 
             it('Should be able to set v2 data feed', async function () {
@@ -245,7 +259,7 @@ describe('DataFeedStore', function () {
                 console.log(`[v${i}] gas used: `, parseInt(receipt.gasUsed, 16).toString());
                 console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
 
-                expect(parseInt(receipt.gasUsed, 16)).to.be.lt(receiptGeneric?.gasUsed);
+                expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
             });
 
             it('Should compare v2 with Generic multiple set', async function () {
@@ -266,6 +280,8 @@ describe('DataFeedStore', function () {
 
                 console.log(`[v${i}] gas used: `, parseInt(receipt.gasUsed, 16).toString());
                 console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
+
+                expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
             });
 
             it('Should compare v2 with Generic for 100 smallest uint32 id set', async function () {
@@ -299,6 +315,8 @@ describe('DataFeedStore', function () {
 
                 console.log(`[v${i}] gas used: `, parseInt(receipt.gasUsed, 16).toString());
                 console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
+
+                expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
             });
 
             it('Should compare v2 with Generic for 100 biggest uint32 id set', async function () {
@@ -332,6 +350,8 @@ describe('DataFeedStore', function () {
 
                 console.log(`[v${i}] gas used: `, parseInt(receipt.gasUsed, 16).toString());
                 console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
+
+                expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
             });
 
             it('Should test with the biggest possible id', async function () {

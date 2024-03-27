@@ -2,11 +2,11 @@
 pragma solidity ^0.8.24;
 
 contract DataFeedStoreV3 {
-  address internal immutable owner;
   bytes32 internal constant CONTRACT_MANAGEMENT_SELECTOR =
     0x8000000000000000000000000000000000000000000000000000000000000000;
   bytes32 internal constant DATA_FEED_LOCATION =
     0xf000000000000000000000000000000000000000000000000000000000000000;
+  address internal immutable owner;
 
   constructor() {
     owner = msg.sender;

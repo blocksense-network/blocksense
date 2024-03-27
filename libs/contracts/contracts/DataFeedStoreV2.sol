@@ -2,17 +2,26 @@
 pragma solidity ^0.8.24;
 
 contract DataFeedStoreV2 {
-  address internal immutable owner;
+  /// @notice Mask for getFeedById(uint32 key)
+  /// @dev The key is 32 bits. This mask uses 1 bit to determine if the function is a getter.
+  /// The remaining 31 bits are used to store the key.
   bytes32 internal constant CONTRACT_MANAGEMENT_SELECTOR =
     0x0000000000000000000000000000000000000000000000000000000080000000;
+
+  /// @notice Location of the data feed mapping
+  /// @dev Each value is stored at a unique slot in the storage at keccak256(key, DATA_FEED_LOCATION)
   bytes32 internal constant DATA_FEED_LOCATION =
     0xf000000000000000000000000000000000000000000000000000000000000000;
+
+  /// @notice Owner of the contract
+  /// @dev The owner is the address that deployed the contract
+  address internal immutable owner;
 
   constructor() {
     owner = msg.sender;
   }
 
-  // Fallback function to store dataFeeds
+  // Fallback function to manage dataFeeds mapping
   fallback(bytes calldata) external returns (bytes memory) {
     bytes32 selector;
 
@@ -30,12 +39,13 @@ contract DataFeedStoreV2 {
         mstore(0x20, DATA_FEED_LOCATION)
         // store value from mapping[slot = keccak256(key, location)] at memory location 0
         mstore(0, sload(keccak256(28, 5)))
-        // return value
+        // return value stored at memory location 0
         return(0, 0x20)
       }
     }
 
     address _owner = owner;
+
     // setters
     assembly {
       // check if sender is owner
@@ -49,13 +59,15 @@ contract DataFeedStoreV2 {
         // <key1><value1>...<keyN><valueN>
         // where key is uint32 and value is bytes32
 
-        // store mapping location in memory at location 0x08
+        // store mapping location in memory at location 0x04
         mstore(0x04, DATA_FEED_LOCATION)
 
         let len := calldatasize()
         for {
+          // start at location 0x04 where first key is stored after the selector
           let i := 4
         } lt(i, len) {
+          // increment by 36 bytes (4 bytes for key and 32 bytes for value)
           i := add(i, 0x24)
         } {
           // store key in memory at location 0x04
