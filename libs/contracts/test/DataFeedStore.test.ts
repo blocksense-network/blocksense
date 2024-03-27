@@ -1,379 +1,140 @@
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
-import { DataFeedStoreGeneric, IDataFeedStore } from "../typechain";
+import { DataFeedStoreGeneric, IDataFeedStore, DataFeedStoreGenericV2 } from "../typechain";
+import { compareGasUsed, getV1Selector, getV2Selector, getter, setter } from "./uitls";
 
 describe('DataFeedStore', function () {
-    let dataFeedStoreGeneric: DataFeedStoreGeneric;
+    let dataFeedStoreGenericV1: DataFeedStoreGeneric;
+    let dataFeedStoreGenericV2: DataFeedStoreGenericV2;
+    let dataFeedStoreV1: IDataFeedStore;
+    let dataFeedStoreV2: IDataFeedStore;
 
     beforeEach(async function () {
         const DataFeedStoreGeneric = await ethers.getContractFactory('DataFeedStoreGeneric');
-        dataFeedStoreGeneric = await DataFeedStoreGeneric.deploy();
-        await dataFeedStoreGeneric.waitForDeployment();
+        dataFeedStoreGenericV1 = await DataFeedStoreGeneric.deploy();
+        await dataFeedStoreGenericV1.waitForDeployment();
+
+        const DataFeedStoreGenericV2 = await ethers.getContractFactory('DataFeedStoreGenericV2');
+        dataFeedStoreGenericV2 = await DataFeedStoreGenericV2.deploy();
+        await dataFeedStoreGenericV2.waitForDeployment();
+
+        const DataFeedStore = await ethers.getContractFactory('DataFeedStoreV1');
+        const _dataFeedStore = await DataFeedStore.deploy();
+        await _dataFeedStore.waitForDeployment();
+
+        const tx = await _dataFeedStore.deploymentTransaction()?.getTransaction()
+
+        console.log('DataFeedStoreV1 deployment gas used: ', +(await network.provider.send('eth_getTransactionReceipt', [tx?.hash])).gasUsed);
+
+        dataFeedStoreV1 = await ethers.getContractAt('IDataFeedStore', await _dataFeedStore.getAddress());
+
+
+        const DataFeedStoreV2 = await ethers.getContractFactory(`DataFeedStoreV2`);
+        const _contract = await DataFeedStoreV2.deploy();
+        await _contract.waitForDeployment();
+
+        dataFeedStoreV2 = await ethers.getContractAt('IDataFeedStore', await _contract.getAddress());
+
+        const tx2 = await _contract.deploymentTransaction()?.getTransaction()
+
+        console.log(`DataFeedStoreV2 deployment gas used: `, +(await network.provider.send('eth_getTransactionReceipt', [tx2?.hash])).gasUsed);
     })
 
     describe('DataFeedStoreV1', function () {
-        let dataFeedStoreV1: IDataFeedStore;
-
-        beforeEach(async function () {
-            const DataFeedStore = await ethers.getContractFactory('DataFeedStoreV1');
-            const _dataFeedStore = await DataFeedStore.deploy();
-            await _dataFeedStore.waitForDeployment();
-
-            const tx = await _dataFeedStore.deploymentTransaction()?.getTransaction()
-
-            console.log('DataFeedStoreV1 deployment gas used: ', +(await network.provider.send('eth_getTransactionReceipt', [tx?.hash])).gasUsed);
-
-            dataFeedStoreV1 = await ethers.getContractAt('IDataFeedStore', await _dataFeedStore.getAddress());
-        })
-
         it('Should be able to set v1 data feed', async function () {
             const key = 3;
             const value = ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes("Hello, World!"), 32)]);
-            const selector = dataFeedStoreV1.interface.getFunction("setFeeds").selector;
-            await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await dataFeedStoreV1.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", "uint32", "bytes32"], [selector, key, value]),
-                },
-            ])
+            await setter(dataFeedStoreV1, dataFeedStoreV1.interface.getFunction("setFeeds").selector, [key], [value]);
 
-            const msgData = ethers.solidityPacked(["bytes4"], ["0x00000003"])
-            const res = await network.provider.send("eth_call", [
-                {
-                    to: await dataFeedStoreV1.getAddress(),
-                    data: msgData,
-                },
-                "latest",
-            ]);
-
+            const res = await getter(dataFeedStoreV1, getV1Selector(key));
             expect(res).to.be.eq(value);
         });
 
         it('Should be able to set multiple v1 data feeds', async function () {
             const keys = Array.from({ length: 10 }, (_, i) => i);
             const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
-            const selector = dataFeedStoreV1.interface.getFunction("setFeeds").selector;
-            await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await dataFeedStoreV1.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
-                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
-                },
-            ])
+            await setter(dataFeedStoreV1, dataFeedStoreV1.interface.getFunction("setFeeds").selector, keys, values);
 
             for (let i = 0; i < keys.length; i++) {
-                const msgData = ethers.solidityPacked(["bytes4"], [`0x0000000${keys[i]}`])
-                const res = await network.provider.send("eth_call", [
-                    {
-                        to: await dataFeedStoreV1.getAddress(),
-                        data: msgData,
-                    },
-                    "latest",
-                ]);
-
+                const res = await getter(dataFeedStoreV1, getV1Selector(keys[i]));
                 expect(res).to.be.eq(values[i]);
             }
         })
 
-        it('Should compare v1 with Generic', async function () {
-            const key = 3;
-            const value = ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes("Hello, World!"), 32)]);
-            const selector = dataFeedStoreV1.interface.getFunction("setFeeds").selector;
-            const txHash = await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await dataFeedStoreV1.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", "uint32", "bytes32"], [selector, key, value]),
-                },
-            ])
-
-            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
-
-            const msgData = ethers.solidityPacked(["bytes4"], ["0x00000003"])
-            const res = await network.provider.send("eth_call", [
-                {
-                    to: await dataFeedStoreV1.getAddress(),
-                    data: msgData,
-                },
-                "latest",
-            ]);
-
-            expect(res).to.be.eq(value);
-
-            const receiptGeneric = await (await dataFeedStoreGeneric.setFeeds([key], [value])).wait();
-
-            console.log('[v1] gas used: ', parseInt(receipt.gasUsed, 16).toString());
-            console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
-
-            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
-        });
-
-        it('Should compare v1 with Generic multiple set', async function () {
-            const keys = Array.from({ length: 10 }, (_, i) => i);
-            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
-            const selector = dataFeedStoreV1.interface.getFunction("setFeeds").selector;
-            const txHash = await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await dataFeedStoreV1.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
-                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
-                },
-            ])
-
-            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
-
-            const receiptGeneric = await (await dataFeedStoreGeneric.setFeeds(keys, values)).wait();
-
-            console.log('[v1] gas used: ', parseInt(receipt.gasUsed, 16).toString());
-            console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
-
-            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
-        });
-
         it('Should compare v1 with Generic for max set', async function () {
-            const keys = Array.from({ length: 255 }, (_, i) => i);
-            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
-            const selector = dataFeedStoreV1.interface.getFunction("setFeeds").selector;
-            const txHash = await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await dataFeedStoreV1.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
-                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
-                },
-            ])
+            const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV1, [dataFeedStoreV1], dataFeedStoreV1.interface.getFunction("setFeeds").selector, 255);
+            expect(receipts[0].gasUsed).to.be.lt(receiptGeneric?.gasUsed);
+        });
 
-            for (let i = 0; i < keys.length; i++) {
-                const msgData = ethers.solidityPacked(["bytes4"], ['0x' + (keys[i] >>> 0).toString(16).padStart(8, '0')])
-                const res = await network.provider.send("eth_call", [
-                    {
-                        to: await dataFeedStoreV1.getAddress(),
-                        data: msgData,
-                    },
-                    "latest",
-                ]);
-
-                expect(res).to.be.eq(values[i]);
-            }
-
-            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
-
-            const receiptGeneric = await (await dataFeedStoreGeneric.setFeeds(keys, values)).wait();
-
-            console.log('[v1] gas used: ', parseInt(receipt.gasUsed, 16).toString());
-            console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
-
-            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
+        it('Should compare v1 with GenericV2 for max set', async function () {
+            const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV2, [dataFeedStoreV1], dataFeedStoreV1.interface.getFunction("setFeeds").selector, 255);
+            expect(receipts[0].gasUsed).to.be.lt(receiptGeneric?.gasUsed);
         });
     });
 
-    describe(`DataFeedStore v2`, function () {
-        let contract: IDataFeedStore;
-
-        beforeEach(async function () {
-            const DataFeedStore = await ethers.getContractFactory(`DataFeedStoreV2`);
-            const _contract = await DataFeedStore.deploy();
-            await _contract.waitForDeployment();
-
-            contract = await ethers.getContractAt('IDataFeedStore', await _contract.getAddress());
-
-            const tx = await _contract.deploymentTransaction()?.getTransaction()
-
-            console.log(`DataFeedStoreV2 deployment gas used: `, +(await network.provider.send('eth_getTransactionReceipt', [tx?.hash])).gasUsed);
-
-        });
-
+    describe('DataFeedStoreV2', function () {
         it('Should be able to set v2 data feed', async function () {
             const key = 3;
             const value = ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes("Hello, World!"), 32)]);
-            const selector = contract.interface.getFunction("setFeeds").selector;
-            await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await contract.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", "uint32", "bytes32"], [selector, key, value]),
-                },
-            ]);
+            await setter(dataFeedStoreV2, dataFeedStoreV2.interface.getFunction("setFeeds").selector, [key], [value]);
 
-            const msgData = ethers.solidityPacked(["bytes4"], ["0x80000003"])
-            const res = await network.provider.send("eth_call", [
-                {
-                    to: await contract.getAddress(),
-                    data: msgData,
-                },
-                "latest",
-            ]);
-
+            const res = await getter(dataFeedStoreV2, getV2Selector(key));
             expect(res).to.be.eq(value);
         });
 
         it('Should be able to set multiple v2 data feeds', async function () {
             const keys = Array.from({ length: 10 }, (_, i) => i);
             const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
-            const selector = contract.interface.getFunction("setFeeds").selector;
-            await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await contract.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
-                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
-                },
-            ]);
+            await setter(dataFeedStoreV2, dataFeedStoreV2.interface.getFunction("setFeeds").selector, keys, values);
 
             for (let i = 0; i < keys.length; i++) {
-                const msgData = ethers.solidityPacked(["bytes4"], [`0x8000000${keys[i]}`])
-                const res = await network.provider.send("eth_call", [
-                    {
-                        to: await contract.getAddress(),
-                        data: msgData,
-                    },
-                    "latest",
-                ]);
+                const res = await getter(dataFeedStoreV2, getV2Selector(keys[i]));
 
                 expect(res).to.be.eq(values[i]);
             }
-        });
-
-        it('Should compare v2 with Generic', async function () {
-            const key = 3;
-            const value = ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes("Hello, World!"), 32)]);
-            const selector = contract.interface.getFunction("setFeeds").selector;
-            const txHash = await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await contract.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", "uint32", "bytes32"], [selector, key, value]),
-                },
-            ])
-            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
-
-            const msgData = ethers.solidityPacked(["bytes4"], ["0x80000003"])
-            const res = await network.provider.send("eth_call", [
-                {
-                    to: await contract.getAddress(),
-                    data: msgData,
-                },
-                "latest",
-            ]);
-
-            expect(res).to.be.eq(value);
-
-            const receiptGeneric = await (await dataFeedStoreGeneric.setFeeds([key], [value])).wait();
-
-            console.log(`[v2] gas used: `, parseInt(receipt.gasUsed, 16).toString());
-            console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
-
-            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
-        });
-
-        it('Should compare v2 with Generic multiple set', async function () {
-            const keys = Array.from({ length: 10 }, (_, i) => i);
-            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
-            const selector = contract.interface.getFunction("setFeeds").selector;
-            const txHash = await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await contract.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
-                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
-                },
-            ])
-
-            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
-
-            const receiptGeneric = await (await dataFeedStoreGeneric.setFeeds(keys, values)).wait();
-
-            console.log(`[v2] gas used: `, parseInt(receipt.gasUsed, 16).toString());
-            console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
-
-            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
         });
 
         it('Should compare v2 with Generic for 100 smallest uint32 id set', async function () {
-            const keys = Array.from({ length: 100 }, (_, i) => i);
-            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
-            const selector = contract.interface.getFunction("setFeeds").selector;
-            const txHash = await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await contract.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
-                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
-                },
-            ])
-
-            for (let i = 0; i < keys.length; i++) {
-                const msgData = ethers.solidityPacked(["bytes4"], ['0x' + ((keys[i] | 0x80000000) >>> 0).toString(16).padStart(8, '0')])
-                const res = await network.provider.send("eth_call", [
-                    {
-                        to: await contract.getAddress(),
-                        data: msgData,
-                    },
-                    "latest",
-                ]);
-
-                expect(res).to.be.eq(values[i]);
-            }
-
-            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
-
-            const receiptGeneric = await (await dataFeedStoreGeneric.setFeeds(keys, values)).wait();
-
-            console.log(`[v2] gas used: `, parseInt(receipt.gasUsed, 16).toString());
-            console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
-
-            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
+            const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV1, [dataFeedStoreV2], dataFeedStoreV2.interface.getFunction("setFeeds").selector, 100);
+            expect(receipts[0].gasUsed).to.be.lt(receiptGeneric?.gasUsed);
         });
 
         it('Should compare v2 with Generic for 100 biggest uint32 id set', async function () {
-            const keys = Array.from({ length: 100 }, (_, i) => i + 2147483548);
-            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
-            const selector = contract.interface.getFunction("setFeeds").selector;
-            const txHash = await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await contract.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
-                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
-                },
-            ])
-
-            for (let i = 0; i < keys.length; i++) {
-                const msgData = ethers.solidityPacked(["bytes4"], ['0x' + ((keys[i] | 0x80000000) >>> 0).toString(16)])
-                const res = await network.provider.send("eth_call", [
-                    {
-                        to: await contract.getAddress(),
-                        data: msgData,
-                    },
-                    "latest",
-                ]);
-
-                expect(res).to.be.eq(values[i]);
-            }
-
-            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
-
-            const receiptGeneric = await (await dataFeedStoreGeneric.setFeeds(keys, values)).wait();
-
-            console.log(`[v2] gas used: `, parseInt(receipt.gasUsed, 16).toString());
-            console.log('[Generic] gas used: ', receiptGeneric?.gasUsed.toString());
-
-            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
+            const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV1, [dataFeedStoreV2], dataFeedStoreV2.interface.getFunction("setFeeds").selector, 100, 2147483548);
+            expect(receipts[0].gasUsed).to.be.lt(receiptGeneric?.gasUsed);
         });
 
         it('Should test with the biggest possible id', async function () {
-            const key = 0x7fffffff;
-            const value = ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes("Hello, World!"), 32)]);
-            const selector = contract.interface.getFunction("setFeeds").selector;
-            await network.provider.send("eth_sendTransaction", [
-                {
-                    to: await contract.getAddress(),
-                    data: ethers.solidityPacked(["bytes4", "uint32", "bytes32"], [selector, key, value]),
-                },
-            ]);
-
-            const msgData = ethers.solidityPacked(["bytes4"], ['0xffffffff'])
-            const res = await network.provider.send("eth_call", [
-                {
-                    to: await contract.getAddress(),
-                    data: msgData,
-                },
-                "latest",
-            ]);
-
-            expect(res).to.be.eq(value);
+            const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV1, [dataFeedStoreV2], dataFeedStoreV2.interface.getFunction("setFeeds").selector, 1, 0x7fffffff);
+            expect(receipts[0].gasUsed).to.be.lt(receiptGeneric?.gasUsed);
         });
+    });
+
+    it('Should compare v1 & v2 with Generic', async function () {
+        const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV1, [dataFeedStoreV1, dataFeedStoreV2], dataFeedStoreV1.interface.getFunction("setFeeds").selector, 1);
+        for (const receipt of receipts) {
+            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
+        }
+    });
+
+    it('Should compare v1 & v2 with Generic for 10 set', async function () {
+        const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV1, [dataFeedStoreV1, dataFeedStoreV2], dataFeedStoreV1.interface.getFunction("setFeeds").selector, 10);
+        for (const receipt of receipts) {
+            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
+        }
+    });
+
+    it('Should compare v1 & v2 with GenericV2', async function () {
+        const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV2, [dataFeedStoreV1, dataFeedStoreV2], dataFeedStoreV1.interface.getFunction("setFeeds").selector, 1);
+        for (const receipt of receipts) {
+            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
+        }
+    });
+
+    it('Should compare v1 & v2 with GenericV2 for 10 set', async function () {
+        const { receipts, receiptGeneric } = await compareGasUsed(dataFeedStoreGenericV2, [dataFeedStoreV1, dataFeedStoreV2], dataFeedStoreV1.interface.getFunction("setFeeds").selector, 10);
+        for (const receipt of receipts) {
+            expect(receipt.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
+        }
     });
 });

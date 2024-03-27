@@ -36,7 +36,7 @@ __metadata:
     chai: "npm:4"
     dotenv: "npm:^16.4.5"
     ethers: "npm:^6.11.1"
-    hardhat: "npm:^2.22.2"
+    hardhat: "npm:^2.22.1"
     hardhat-contract-sizer: "npm:^2.10.0"
     hardhat-gas-reporter: "npm:^2.0.2"
     solidity-coverage: "npm:^0.8.11"
@@ -2736,7 +2736,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat@npm:^2.22.2":
+"hardhat@npm:^2.22.1":
   version: 2.22.2
   resolution: "hardhat@npm:2.22.2"
   dependencies:

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-contract DataFeedConsumer {
+contract DataFeedV2Consumer {
   address public immutable dataFeedStore;
   mapping(uint32 => bytes32) public dataFeeds;
 
