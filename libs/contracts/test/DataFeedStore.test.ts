@@ -118,6 +118,39 @@ describe.only('DataFeedStore', function () {
             console.log('[v1] gas used: ', parseInt(receipt.gasUsed, 16).toString());
             console.log('[basic] gas used: ', receiptBasic?.gasUsed.toString());
         });
+
+        it('Should compare v1 with basic for max set', async function () {
+            const keys = Array.from({ length: 255 }, (_, i) => i);
+            const values = keys.map((key) => ethers.solidityPacked(["bytes32"], [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)]));
+            const selector = dataFeedStoreV1.interface.getFunction("setFeeds").selector;
+            const txHash = await network.provider.send("eth_sendTransaction", [
+                {
+                    to: await dataFeedStoreV1.getAddress(),
+                    data: ethers.solidityPacked(["bytes4", ...keys.map(() => ["uint32", "bytes32"]).flat()],
+                        [selector, ...keys.flatMap((key, i) => [key, values[i]])]),
+                },
+            ])
+
+            for (let i = 0; i < keys.length; i++) {
+                const msgData = ethers.solidityPacked(["bytes4"], ['0x' + (keys[i] >>> 0).toString(16).padStart(8, '0')])
+                const res = await network.provider.send("eth_call", [
+                    {
+                        to: await dataFeedStoreV1.getAddress(),
+                        data: msgData,
+                    },
+                    "latest",
+                ]);
+
+                expect(res).to.be.eq(values[i]);
+            }
+
+            const receipt = await network.provider.send("eth_getTransactionReceipt", [txHash])
+
+            const receiptBasic = await (await dataFeedStoreBasic.setFeeds(keys, values)).wait();
+
+            console.log('[v1] gas used: ', parseInt(receipt.gasUsed, 16).toString());
+            console.log('[basic] gas used: ', receiptBasic?.gasUsed.toString());
+        });
     });
 
     for (let i = 2; i <= 3; i++) {

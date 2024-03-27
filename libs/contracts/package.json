@@ -22,7 +22,7 @@
     "chai": "4",
     "dotenv": "^16.4.5",
     "ethers": "^6.11.1",
-    "hardhat": "^2.22.1",
+    "hardhat": "^2.22.2",
     "hardhat-contract-sizer": "^2.10.0",
     "hardhat-gas-reporter": "^2.0.2",
     "solidity-coverage": "^0.8.11",

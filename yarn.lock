@@ -36,7 +36,7 @@ __metadata:
     chai: "npm:4"
     dotenv: "npm:^16.4.5"
     ethers: "npm:^6.11.1"
-    hardhat: "npm:^2.22.1"
+    hardhat: "npm:^2.22.2"
     hardhat-contract-sizer: "npm:^2.10.0"
     hardhat-gas-reporter: "npm:^2.0.2"
     solidity-coverage: "npm:^0.8.11"
@@ -2736,9 +2736,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat@npm:^2.22.1":
-  version: 2.22.1
-  resolution: "hardhat@npm:2.22.1"
+"hardhat@npm:^2.22.2":
+  version: 2.22.2
+  resolution: "hardhat@npm:2.22.2"
   dependencies:
     "@ethersproject/abi": "npm:^5.1.2"
     "@metamask/eth-sig-util": "npm:^4.0.0"
@@ -2793,7 +2793,7 @@ __metadata:
       optional: true
   bin:
     hardhat: internal/cli/bootstrap.js
-  checksum: 10c0/c4c91e1bf6fc6c8a07dbc25bb58bcd0a7ae05a7edceb978f7d023cbd47131f7845163829c72184031052c693a7c9bbfab13bc752f9c5f367d77ff6c871e05a29
+  checksum: 10c0/ccff92f6064246f1cee46e70aed3bbf4dc4ce1069f88e38c8619d7c3c55f894f78fbd2abe860dcdae952da809f3a7908daaf8c0570d12865c268a1bc2fa37e81
   languageName: node
   linkType: hard
 

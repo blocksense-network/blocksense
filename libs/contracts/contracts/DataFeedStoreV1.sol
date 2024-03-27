@@ -3,13 +3,14 @@ pragma solidity ^0.8.24;
 
 contract DataFeedStoreV1 {
   bytes4 internal constant CONTRACT_MANAGEMENT_SELECTOR = 0x000000ff;
-  uint8 internal constant DATA_FEED_LOCATION = 0xf;
+  bytes32 internal constant DATA_FEED_LOCATION =
+    0xf000000000000000000000000000000000000000000000000000000000000000;
 
   // Fallback function to store dataFeeds
   fallback(bytes calldata data) external returns (bytes memory) {
     bytes4 selector = bytes4(data[:4]);
 
-    if (selector < CONTRACT_MANAGEMENT_SELECTOR) {
+    if (selector <= CONTRACT_MANAGEMENT_SELECTOR) {
       assembly {
         calldatacopy(0, 0, 0x04)
         mstore(0x04, DATA_FEED_LOCATION)
@@ -17,8 +18,8 @@ contract DataFeedStoreV1 {
         return(0, 0x20)
       }
     } else {
+      // setFeeds(bytes)
       if (selector == 0x1a2d80ac) {
-        // setFeeds(bytes)
         // bytes should be in the format of:
         // <key1><value1>...<keyN><valueN>
         // where key is uint32 and value is bytes32
