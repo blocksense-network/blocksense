@@ -134,3 +134,7 @@ dist
 # Nix & Direnv
 .direnv
 result
+
+# Rust cargo artifacts
+libs/*/target/
+/target/
