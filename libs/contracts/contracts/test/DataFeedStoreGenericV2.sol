@@ -23,7 +23,7 @@ contract DataFeedStoreGenericV2 is IDataFeedStoreGenericV2 {
     for (uint i = 0; i < data.length; ) {
       dataFeeds[uint32(bytes4(data[i:i + 4]))] = bytes32(data[i + 4:i + 36]);
       unchecked {
-        i = i + 36;
+        i += 36;
       }
     }
   }
