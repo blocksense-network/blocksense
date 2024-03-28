@@ -6,7 +6,7 @@ contract DataFeedStoreV1 {
   /// @dev The maximum length of the key is defined by the mask from the selector.
   /// If the selector is less than the mask, then the function is a getter and the selector holds the key.
   bytes32 internal constant CONTRACT_MANAGEMENT_SELECTOR =
-    0x00000000000000000000000000000000000000000000000000000000000001ff;
+    0x000000000000000000000000000000000000000000000000000000000001ffff;
 
   /// @notice Location of the data feed mapping
   /// @dev Each value is stored at a unique slot in the storage at keccak256(key, DATA_FEED_LOCATION)

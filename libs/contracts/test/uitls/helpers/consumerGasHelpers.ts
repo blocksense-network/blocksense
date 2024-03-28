@@ -5,7 +5,12 @@ import {
   DataFeedGenericConsumer,
   DataFeedGenericV2Consumer,
 } from '../../../typechain';
-import { DataFeedStore, IGenericDataFeedStore, setDataFeeds } from '.';
+import {
+  DataFeedStore,
+  IGenericDataFeedStore,
+  printGasUsage,
+  setDataFeeds,
+} from '.';
 import { contractVersionLogger } from '../logger';
 
 export type DataFeedConsumers = DataFeedV1Consumer | DataFeedV2Consumer;
@@ -55,17 +60,14 @@ export const compareConsumerGasUsed = async (
     });
   }
 
-  for (const { contract, receipt } of receipts) {
-    versionedLogger(contract, `gas used: ${Number(receipt?.gasUsed)}`);
-  }
-
-  for (const { contract, receipt } of receiptsGeneric) {
-    if (isGenericV1Consumer(contract)) {
-      console.log(`[Generic v1] gas used: ${Number(receipt?.gasUsed)}`);
-    } else {
-      console.log(`[Generic v2] gas used: ${Number(receipt?.gasUsed)}`);
-    }
-  }
+  printGasUsage(
+    versionedLogger,
+    receipts,
+    receiptsGeneric.map(({ receipt, contract }) => ({
+      receipt,
+      contractVersion: isGenericV1Consumer(contract) ? 1 : 2,
+    })),
+  );
 
   for (const { receipt } of receipts) {
     for (const { receipt: receiptGeneric } of receiptsGeneric) {

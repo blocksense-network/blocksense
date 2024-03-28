@@ -1,4 +1,4 @@
-import { DataFeedStore } from '.';
+import { DataFeedStore } from './helpers';
 
 export const contractVersionLogger = (contracts: {
   [key: string]: DataFeedStore;
@@ -8,6 +8,6 @@ export const contractVersionLogger = (contracts: {
     addresses[contracts[key].target.toString()] = key;
   }
 
-  return (contract: DataFeedStore, msg: string) =>
-    console.log(`[${addresses[contract.target.toString()]}] ${msg}`);
+  return (contract: DataFeedStore, msg: string, log: Function = console.log) =>
+    log(`[${addresses[contract.target.toString()]}] ${msg}`);
 };

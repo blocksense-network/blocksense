@@ -73,7 +73,7 @@ describe('DataFeedStore', function () {
     const tx3 = await contracts.V3.deploymentTransaction()?.getTransaction();
 
     console.log(
-      `DataFeedStoreV2 deployment gas used: `,
+      `DataFeedStoreV3 deployment gas used: `,
       +(await network.provider.send('eth_getTransactionReceipt', [tx3?.hash]))
         .gasUsed,
     );
@@ -94,7 +94,7 @@ describe('DataFeedStore', function () {
       expect(res).to.be.eq(value);
     });
 
-    it('Should be able to set multiple v1 data feeds', async function () {
+    it('Should be able to set 10 v1 data feeds', async function () {
       const keys = Array.from({ length: 10 }, (_, i) => i);
       const values = keys.map(key =>
         ethers.solidityPacked(
@@ -108,16 +108,6 @@ describe('DataFeedStore', function () {
         const res = await getter(contracts.V1, getV1Selector(keys[i]));
         expect(res).to.be.eq(values[i]);
       }
-    });
-
-    it('Should compare v1 with Generics for max set', async function () {
-      await compareGasUsed(
-        logger,
-        [dataFeedStoreGenericV1, dataFeedStoreGenericV2],
-        [contracts.V1],
-        selector,
-        255,
-      );
     });
   });
 
@@ -142,7 +132,7 @@ describe('DataFeedStore', function () {
         expect(res).to.be.eq(value);
       });
 
-      it(`Should be able to set multiple v${i} data feeds`, async function () {
+      it(`Should be able to set 10 v${i} data feeds`, async function () {
         const keys = Array.from({ length: 10 }, (_, i) => i);
         const values = keys.map(key =>
           ethers.solidityPacked(
@@ -162,16 +152,6 @@ describe('DataFeedStore', function () {
 
           expect(res).to.be.eq(values[i]);
         }
-      });
-
-      it(`Should compare v${i} with Generic for 100 smallest uint32 id set`, async function () {
-        await compareGasUsed(
-          logger,
-          [dataFeedStoreGenericV1, dataFeedStoreGenericV2],
-          [contract],
-          selector,
-          100,
-        );
       });
 
       it(`Should compare v${i} with Generic for 100 biggest uint32 id set`, async function () {
@@ -198,23 +178,15 @@ describe('DataFeedStore', function () {
     });
   }
 
-  it('Should compare versions with Generics', async function () {
-    await compareGasUsed(
-      logger,
-      [dataFeedStoreGenericV1, dataFeedStoreGenericV2],
-      Object.values(contracts),
-      selector,
-      1,
-    );
-  });
-
-  it('Should compare versions with Generics for 10 set', async function () {
-    await compareGasUsed(
-      logger,
-      [dataFeedStoreGenericV1, dataFeedStoreGenericV2],
-      Object.values(contracts),
-      selector,
-      10,
-    );
-  });
+  for (let i = 1; i <= 1000; i *= 10) {
+    it(`Should fetch and set ${i} feeds in a single transaction`, async function () {
+      await compareGasUsed(
+        logger,
+        [dataFeedStoreGenericV1, dataFeedStoreGenericV2],
+        Object.values(contracts),
+        selector,
+        i,
+      );
+    });
+  }
 });

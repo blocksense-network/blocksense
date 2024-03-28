@@ -1,5 +1,10 @@
 import { expect } from 'chai';
-import { DataFeedStore, IGenericDataFeedStore, setDataFeeds } from '.';
+import {
+  DataFeedStore,
+  IGenericDataFeedStore,
+  printGasUsage,
+  setDataFeeds,
+} from '.';
 import { contractVersionLogger } from '../logger';
 
 export const compareGasUsed = async (
@@ -18,15 +23,7 @@ export const compareGasUsed = async (
     start,
   );
 
-  for (const { receipt, contract } of receipts) {
-    versionedLogger(contract, `gas used: ${Number(receipt?.gasUsed)}`);
-  }
-  for (const { contractVersion, receipt } of receiptsGeneric) {
-    console.log(
-      `[Generic v${contractVersion}] gas used: `,
-      Number(receipt?.gasUsed),
-    );
-  }
+  printGasUsage(versionedLogger, receipts, receiptsGeneric);
 
   for (const data of receipts) {
     for (const dataGeneric of receiptsGeneric) {

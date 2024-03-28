@@ -122,52 +122,17 @@ describe('DataFeedConsumer', function () {
     });
   }
 
-  it('Should get the value from the DataFeedStore and store it in the contract', async function () {
-    await compareConsumerGasUsed(
-      logger,
-      Object.values(genericConsumers),
-      Object.values(consumers),
-      Object.values(genericContracts),
-      Object.values(contracts),
-      selector,
-      1,
-      3,
-    );
-  });
-
-  it('Should fetch and set 10 feeds in a single transaction', async function () {
-    await compareConsumerGasUsed(
-      logger,
-      Object.values(genericConsumers),
-      Object.values(consumers),
-      Object.values(genericContracts),
-      Object.values(contracts),
-      selector,
-      10,
-    );
-  });
-
-  it('Should fetch and set 100 feeds in a single transaction', async function () {
-    await compareConsumerGasUsed(
-      logger,
-      Object.values(genericConsumers),
-      Object.values(consumers),
-      Object.values(genericContracts),
-      Object.values(contracts),
-      selector,
-      100,
-    );
-  });
-
-  it('Should fetch and set 255 feeds in a single transaction', async function () {
-    await compareConsumerGasUsed(
-      logger,
-      Object.values(genericConsumers),
-      Object.values(consumers),
-      Object.values(genericContracts),
-      Object.values(contracts),
-      selector,
-      255,
-    );
-  });
+  for (let i = 1; i <= 1000; i *= 10) {
+    it(`Should fetch and set ${i} feeds in a single transaction`, async function () {
+      await compareConsumerGasUsed(
+        logger,
+        Object.values(genericConsumers),
+        Object.values(consumers),
+        Object.values(genericContracts),
+        Object.values(contracts),
+        selector,
+        i,
+      );
+    });
+  }
 });

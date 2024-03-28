@@ -9,6 +9,8 @@ import {
   IDataFeedStoreGeneric,
   IDataFeedStoreGenericV2,
 } from '../../../typechain';
+import { contractVersionLogger } from '../logger';
+import { DataFeedConsumers } from './consumerGasHelpers';
 
 export type IGenericDataFeedStore =
   | IDataFeedStoreGeneric
@@ -108,4 +110,35 @@ export const setDataFeeds = async (
   }
 
   return { receipts, receiptsGeneric };
+};
+
+export const printGasUsage = (
+  logger: ReturnType<typeof contractVersionLogger>,
+  receipts: { contract: DataFeedStore | DataFeedConsumers; receipt: any }[],
+  receiptsGeneric: { contractVersion: number; receipt: any }[],
+): void => {
+  const table: { [key: string]: { gas: number; diff: number; '%': number } } =
+    {};
+
+  for (const { receipt, contract } of receipts) {
+    const version = logger(contract, 'gas used', (data: string) => data);
+    table[version] = { gas: Number(receipt?.gasUsed), diff: 0, '%': 0 };
+  }
+  for (const { contractVersion, receipt } of receiptsGeneric) {
+    table[`[Generic V${contractVersion}] gas used`] = {
+      gas: Number(receipt?.gasUsed),
+      diff: 0,
+      '%': 0,
+    };
+  }
+
+  for (const key in table) {
+    table[key].diff = table[key].gas - table['[Generic V1] gas used'].gas;
+    table[key]['%'] = +(
+      (table[key].diff / table['[Generic V1] gas used'].gas) *
+      100
+    ).toFixed(2);
+  }
+
+  console.table(table);
 };
