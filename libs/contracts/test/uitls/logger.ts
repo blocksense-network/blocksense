@@ -1,4 +1,4 @@
-import { DataFeedStore } from './helpers';
+import { DataFeedStore } from '.';
 
 export const contractVersionLogger = (contracts: {
   [key: string]: DataFeedStore;

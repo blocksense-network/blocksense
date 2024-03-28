@@ -8,16 +8,15 @@ import {
   DataFeedStoreV2,
   DataFeedStoreV3,
 } from '../typechain';
-
+import { contractVersionLogger } from './uitls/logger';
 import {
   DataFeedStore,
   setter,
   getter,
   getV1Selector,
-  compareGasUsed,
   getV2Selector,
 } from './uitls/helpers';
-import { contractVersionLogger } from './uitls/logger';
+import { compareGasUsed } from './uitls/helpers/dataFeedGasHelpers';
 
 const contracts: {
   [key: string]: DataFeedStore;
@@ -29,9 +28,6 @@ describe('DataFeedStore', function () {
   let logger: ReturnType<typeof contractVersionLogger>;
   let dataFeedStoreGenericV1: DataFeedStoreGeneric;
   let dataFeedStoreGenericV2: DataFeedStoreGenericV2;
-  let dataFeedStoreV1: DataFeedStoreV1;
-  let dataFeedStoreV2: DataFeedStoreV2;
-  let dataFeedStoreV3: DataFeedStoreV3;
 
   beforeEach(async function () {
     const DataFeedStoreGeneric = await ethers.getContractFactory(
@@ -47,11 +43,10 @@ describe('DataFeedStore', function () {
     await dataFeedStoreGenericV2.waitForDeployment();
 
     const DataFeedStore = await ethers.getContractFactory('DataFeedStoreV1');
-    dataFeedStoreV1 = await DataFeedStore.deploy();
-    await dataFeedStoreV1.waitForDeployment();
+    contracts.V1 = await DataFeedStore.deploy();
+    await contracts.V1.waitForDeployment();
 
-    const tx = await dataFeedStoreV1.deploymentTransaction()?.getTransaction();
-    contracts.V1 = dataFeedStoreV1;
+    const tx = await contracts.V1.deploymentTransaction()?.getTransaction();
 
     console.log(
       'DataFeedStoreV1 deployment gas used: ',
@@ -60,11 +55,10 @@ describe('DataFeedStore', function () {
     );
 
     const DataFeedStoreV2 = await ethers.getContractFactory(`DataFeedStoreV2`);
-    dataFeedStoreV2 = await DataFeedStoreV2.deploy();
-    await dataFeedStoreV2.waitForDeployment();
+    contracts.V2 = await DataFeedStoreV2.deploy();
+    await contracts.V2.waitForDeployment();
 
-    const tx2 = await dataFeedStoreV2.deploymentTransaction()?.getTransaction();
-    contracts.V2 = dataFeedStoreV2;
+    const tx2 = await contracts.V2.deploymentTransaction()?.getTransaction();
 
     console.log(
       `DataFeedStoreV2 deployment gas used: `,
@@ -73,11 +67,10 @@ describe('DataFeedStore', function () {
     );
 
     const DataFeedStoreV3 = await ethers.getContractFactory(`DataFeedStoreV3`);
-    dataFeedStoreV3 = await DataFeedStoreV3.deploy();
-    await dataFeedStoreV3.waitForDeployment();
+    contracts.V3 = await DataFeedStoreV3.deploy();
+    await contracts.V3.waitForDeployment();
 
-    const tx3 = await dataFeedStoreV3.deploymentTransaction()?.getTransaction();
-    contracts.V3 = dataFeedStoreV3;
+    const tx3 = await contracts.V3.deploymentTransaction()?.getTransaction();
 
     console.log(
       `DataFeedStoreV2 deployment gas used: `,
@@ -95,9 +88,9 @@ describe('DataFeedStore', function () {
         ['bytes32'],
         [ethers.zeroPadBytes(ethers.toUtf8Bytes('Hello, World!'), 32)],
       );
-      await setter(dataFeedStoreV1, selector, [key], [value]);
+      await setter(contracts.V1, selector, [key], [value]);
 
-      const res = await getter(dataFeedStoreV1, getV1Selector(key));
+      const res = await getter(contracts.V1, getV1Selector(key));
       expect(res).to.be.eq(value);
     });
 
@@ -109,10 +102,10 @@ describe('DataFeedStore', function () {
           [ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World ${key}!`), 32)],
         ),
       );
-      await setter(dataFeedStoreV1, selector, keys, values);
+      await setter(contracts.V1, selector, keys, values);
 
       for (let i = 0; i < keys.length; i++) {
-        const res = await getter(dataFeedStoreV1, getV1Selector(keys[i]));
+        const res = await getter(contracts.V1, getV1Selector(keys[i]));
         expect(res).to.be.eq(values[i]);
       }
     });
@@ -121,7 +114,7 @@ describe('DataFeedStore', function () {
       await compareGasUsed(
         logger,
         [dataFeedStoreGenericV1, dataFeedStoreGenericV2],
-        [dataFeedStoreV1],
+        [contracts.V1],
         selector,
         255,
       );

@@ -1,15 +1,21 @@
 import { ethers } from 'ethers';
 import { network } from 'hardhat';
 import {
+  DataFeedStoreGeneric,
+  DataFeedStoreGenericV2,
   DataFeedStoreV1,
   DataFeedStoreV2,
+  DataFeedStoreV3,
   IDataFeedStoreGeneric,
   IDataFeedStoreGenericV2,
-} from '../../typechain';
-import { expect } from 'chai';
-import { DataFeedStoreV3 } from '../../typechain/DataFeedStoreV2.5.sol';
-import { contractVersionLogger } from './logger';
+} from '../../../typechain';
 
+export type IGenericDataFeedStore =
+  | IDataFeedStoreGeneric
+  | IDataFeedStoreGenericV2;
+export type GenericDataFeedStore =
+  | DataFeedStoreGeneric
+  | DataFeedStoreGenericV2;
 export type DataFeedStore = DataFeedStoreV1 | DataFeedStoreV2 | DataFeedStoreV3;
 
 export const getter = async (contract: DataFeedStore, selector: string) => {
@@ -50,9 +56,17 @@ export const getV2Selector = (key: number): string => {
   return '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
 };
 
-export const compareGasUsed = async (
-  versionedLogger: ReturnType<typeof contractVersionLogger>,
-  genericContracts: (IDataFeedStoreGeneric | IDataFeedStoreGenericV2)[],
+function isGenericV1(
+  contract: IDataFeedStoreGeneric | IDataFeedStoreGenericV2,
+): contract is IDataFeedStoreGeneric {
+  return (
+    (contract as IDataFeedStoreGeneric).interface.getFunction('setFeeds').inputs
+      .length === 2
+  );
+}
+
+export const setDataFeeds = async (
+  genericContracts: IGenericDataFeedStore[],
   contracts: DataFeedStore[],
   selector: string,
   valuesCount: number,
@@ -93,30 +107,5 @@ export const compareGasUsed = async (
     });
   }
 
-  for (const [index, { receipt, contract }] of receipts.entries()) {
-    versionedLogger(contract, `gas used: ${Number(receipt?.gasUsed)}`);
-  }
-  for (const { contractVersion, receipt } of receiptsGeneric) {
-    console.log(
-      `[Generic v${contractVersion}] gas used: `,
-      Number(receipt?.gasUsed),
-    );
-  }
-
-  for (const data of receipts) {
-    for (const dataGeneric of receiptsGeneric) {
-      expect(data.receipt.gasUsed).to.be.lt(dataGeneric.receipt?.gasUsed);
-    }
-  }
-
   return { receipts, receiptsGeneric };
 };
-
-function isGenericV1(
-  contract: IDataFeedStoreGeneric | IDataFeedStoreGenericV2,
-): contract is IDataFeedStoreGeneric {
-  return (
-    (contract as IDataFeedStoreGeneric).interface.getFunction('setFeeds').inputs
-      .length === 2
-  );
-}
