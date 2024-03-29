@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {IDataFeedStoreGeneric} from '../interfaces/IDataFeedStoreGeneric.sol';
+import {IDataFeedStoreGenericV1} from '../interfaces/IDataFeedStoreGenericV1.sol';
 
 contract DataFeedGenericConsumer {
-  IDataFeedStoreGeneric public immutable dataFeedStore;
+  IDataFeedStoreGenericV1 public immutable dataFeedStore;
   mapping(uint32 => bytes32) public dataFeeds;
 
   error GetFeedByIdFailed();
 
   constructor(address _dataFeedStore) {
-    dataFeedStore = IDataFeedStoreGeneric(_dataFeedStore);
+    dataFeedStore = IDataFeedStoreGenericV1(_dataFeedStore);
   }
 
   function getExternalFeedById(uint32 key) external view returns (bytes32) {
@@ -33,7 +33,7 @@ contract DataFeedGenericConsumer {
 
   function _getFeedById(uint32 key) internal view returns (bytes32) {
     (bool success, bytes memory returnData) = address(dataFeedStore).staticcall(
-      abi.encodeWithSelector(IDataFeedStoreGeneric.getDataFeed.selector, key)
+      abi.encodeWithSelector(IDataFeedStoreGenericV1.getDataFeed.selector, key)
     );
 
     if (!success) {

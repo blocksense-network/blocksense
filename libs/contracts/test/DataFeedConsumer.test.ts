@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { DataFeedStoreGeneric, IDataFeedStore__factory } from '../typechain';
+import { DataFeedStoreGenericV1, IDataFeedStore__factory } from '../typechain';
 import { expect } from 'chai';
 import { contractVersionLogger } from './uitls/logger';
 import {
@@ -33,10 +33,10 @@ describe('DataFeedConsumer', function () {
   let logger: ReturnType<typeof contractVersionLogger>;
 
   beforeEach(async function () {
-    genericContracts.V1 = await deployContract<DataFeedStoreGeneric>(
-      'DataFeedStoreGeneric',
+    genericContracts.V1 = await deployContract<DataFeedStoreGenericV1>(
+      'DataFeedStoreGenericV1',
     );
-    genericContracts.V2 = await deployContract<DataFeedStoreGeneric>(
+    genericContracts.V2 = await deployContract<DataFeedStoreGenericV1>(
       'DataFeedStoreGenericV2',
     );
 

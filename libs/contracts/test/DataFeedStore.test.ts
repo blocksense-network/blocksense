@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import {
-  DataFeedStoreGeneric,
+  DataFeedStoreGenericV1,
   DataFeedStoreGenericV2,
   IDataFeedStore__factory,
   DataFeedStoreV1,
@@ -26,8 +26,8 @@ describe('DataFeedStore', function () {
   let logger: ReturnType<typeof contractVersionLogger>;
 
   beforeEach(async function () {
-    genericContracts.V1 = await deployContract<DataFeedStoreGeneric>(
-      'DataFeedStoreGeneric',
+    genericContracts.V1 = await deployContract<DataFeedStoreGenericV1>(
+      'DataFeedStoreGenericV1',
     );
     genericContracts.V2 = await deployContract<DataFeedStoreGenericV2>(
       'DataFeedStoreGenericV2',

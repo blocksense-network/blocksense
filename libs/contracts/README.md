@@ -11,14 +11,14 @@ contracts
 │   |   └── ...
 │   ├── consumers
 │   |   └── ...
-│   ├── DataFeedStoreGeneric.sol
+│   ├── DataFeedStoreGenericV1.sol
 │   └── DataFeedStoreGenericV2.sol
 ├── DataFeedStoreV1.sol
 ├── DataFeedStoreV2.sol
 └── DataFeedStoreV3.sol
 ```
 
-The `test` folder contains example consumer contracts (under `consumers`) and reference implementations of data feed store - DataFeedStoreGeneric.sol and DataFeedStoreGenericV2.sol.
+The `test` folder contains example consumer contracts (under `consumers`) and reference implementations of data feed store - DataFeedStoreGenericV1.sol and DataFeedStoreGenericV2.sol.
 
 Each of the data feed store implementations (DataFeedStoreV1.sol, DataFeedStoreV2.sol, DataFeedStoreV3.sol) is a contract that stores data feed values for a specific data feed key. The data feed key is a maximum of 31 bit integer that uniquely identifies a data feed. The data feed value is stored as `bytes32`. The data feed value is updated by the data feed store contract owner.
 

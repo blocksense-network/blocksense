@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
 import { ethers as hre, network } from 'hardhat';
 import {
-  DataFeedStoreGeneric,
+  DataFeedStoreGenericV1,
   DataFeedStoreGenericV2,
   DataFeedStoreV1,
   DataFeedStoreV2,
   DataFeedStoreV3,
-  IDataFeedStoreGeneric,
+  IDataFeedStoreGenericV1,
   IDataFeedStoreGenericV2,
 } from '../../../typechain';
 import { contractVersionLogger } from '../logger';
@@ -14,10 +14,10 @@ import { DataFeedConsumer } from './consumerGasHelpers';
 import { expect } from 'chai';
 
 export type IGenericDataFeedStore =
-  | IDataFeedStoreGeneric
+  | IDataFeedStoreGenericV1
   | IDataFeedStoreGenericV2;
 export type GenericDataFeedStore =
-  | DataFeedStoreGeneric
+  | DataFeedStoreGenericV1
   | DataFeedStoreGenericV2;
 export type DataFeedStore = DataFeedStoreV1 | DataFeedStoreV2 | DataFeedStoreV3;
 
@@ -101,11 +101,11 @@ export const getV2Selector = (key: number): string => {
 };
 
 function isGenericV1(
-  contract: IDataFeedStoreGeneric | IDataFeedStoreGenericV2,
-): contract is IDataFeedStoreGeneric {
+  contract: IDataFeedStoreGenericV1 | IDataFeedStoreGenericV2,
+): contract is IDataFeedStoreGenericV1 {
   return (
-    (contract as IDataFeedStoreGeneric).interface.getFunction('setFeeds').inputs
-      .length === 2
+    (contract as IDataFeedStoreGenericV1).interface.getFunction('setFeeds')
+      .inputs.length === 2
   );
 }
 
