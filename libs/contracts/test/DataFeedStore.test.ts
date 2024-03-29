@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
 import {
   DataFeedStoreGeneric,
   DataFeedStoreGenericV2,
@@ -7,7 +9,7 @@ import {
   DataFeedStoreV3,
 } from '../typechain';
 import { contractVersionLogger } from './uitls/logger';
-import { DataFeedStore, GenericDataFeedStore } from './uitls/helpers';
+import { DataFeedStore, setter, GenericDataFeedStore } from './uitls/helpers';
 import { compareGasUsed } from './uitls/helpers/dataFeedGasHelpers';
 import { deployContract } from './uitls/helpers';
 
@@ -37,6 +39,25 @@ describe('DataFeedStore', function () {
 
     logger = contractVersionLogger([contracts]);
   });
+
+  for (let i = 1; i <= 3; i++) {
+    describe(`DataFeedStoreV${i}`, function () {
+      it('Should revert if the selector is not correct', async function () {
+        const value = ethers.zeroPadBytes('0xa0000000', 32);
+        await expect(setter(contracts[`V${i}`], '0x10000000', [1], [value])).to
+          .be.reverted;
+      });
+
+      it('Should revert if the caller is not the owner', async function () {
+        const value = ethers.zeroPadBytes('0xa0000000', 32);
+        await expect(
+          setter(contracts[`V${i}`], selector, [1], [value], {
+            from: await (await ethers.getSigners())[3].getAddress(),
+          }),
+        ).to.be.reverted;
+      });
+    });
+  }
 
   it(`Should compare v2 & v3 with Generic with 100 biggest uint32 id set`, async function () {
     await compareGasUsed(

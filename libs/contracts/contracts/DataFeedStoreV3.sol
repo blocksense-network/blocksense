@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
+/// @title Array Data Feed Storage
+/// @notice Stores data feeds in an array
+/// @dev This contract skips the usual function selector checks and uses a fallback function to set or get data feeds.
 contract DataFeedStoreV3 {
   /// @notice Mask for getFeedById(uint32 key)
   /// @dev The key is 32 bits. This mask uses 1 bit to determine if the function is a getter.
@@ -16,7 +19,8 @@ contract DataFeedStoreV3 {
     owner = msg.sender;
   }
 
-  // Fallback function to manage dataFeeds mapping
+  /// @notice Fallback function
+  /// @dev The fallback function is used to set or get data feeds according to the provided selector.
   fallback(bytes calldata) external returns (bytes memory) {
     bytes32 selector;
     // getters
@@ -45,8 +49,21 @@ contract DataFeedStoreV3 {
         revert(0, 0)
       }
 
+      // consumes less gas than a simple equality check
+      function compareSelectors(incomingSelector, predefinedSelector)
+        -> result
+      {
+        result := eq(
+          or(
+            lt(incomingSelector, predefinedSelector),
+            gt(incomingSelector, predefinedSelector)
+          ),
+          0
+        )
+      }
+
       // setFeeds(bytes)
-      if and(selector, 0x1a2d80ac) {
+      if compareSelectors(selector, 0x1a2d80ac) {
         // bytes should be in the format of:
         // <key1><value1>...<keyN><valueN>
         // where key is uint32 and value is bytes32
@@ -64,7 +81,9 @@ contract DataFeedStoreV3 {
           // store value in storage at slot key (index)
           sstore(mload(0x20), calldataload(add(i, 0x04)))
         }
+        return(0, 0)
       }
+      revert(0, 0)
     }
   }
 }
