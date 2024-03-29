@@ -2,6 +2,8 @@ import { expect } from 'chai';
 import {
   DataFeedStore,
   IGenericDataFeedStore,
+  checkGenericSetValues,
+  checkSetValues,
   printGasUsage,
   setDataFeeds,
 } from '.';
@@ -15,13 +17,16 @@ export const compareGasUsed = async (
   valuesCount: number,
   start: number = 0,
 ) => {
-  const { receipts, receiptsGeneric } = await setDataFeeds(
+  const { receipts, receiptsGeneric, keys, values } = await setDataFeeds(
     genericContracts,
     contracts,
     selector,
     valuesCount,
     start,
   );
+
+  await checkSetValues(contracts, versionedLogger, keys, values);
+  await checkGenericSetValues(genericContracts, keys, values);
 
   printGasUsage(versionedLogger, receipts, receiptsGeneric);
 

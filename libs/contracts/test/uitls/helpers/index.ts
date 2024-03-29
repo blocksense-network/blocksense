@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { network } from 'hardhat';
+import { ethers as hre, network } from 'hardhat';
 import {
   DataFeedStoreGeneric,
   DataFeedStoreGenericV2,
@@ -10,7 +10,8 @@ import {
   IDataFeedStoreGenericV2,
 } from '../../../typechain';
 import { contractVersionLogger } from '../logger';
-import { DataFeedConsumers } from './consumerGasHelpers';
+import { DataFeedConsumer } from './consumerGasHelpers';
+import { expect } from 'chai';
 
 export type IGenericDataFeedStore =
   | IDataFeedStoreGeneric
@@ -36,18 +37,59 @@ export const setter = async (
   selector: string,
   keys: number[],
   values: string[],
+  ...args: any[]
 ) => {
-  const txHash = await network.provider.send('eth_sendTransaction', [
-    {
-      to: await contract.getAddress(),
-      data: ethers.solidityPacked(
-        ['bytes4', ...keys.map(() => ['uint32', 'bytes32']).flat()],
-        [selector, ...keys.flatMap((key, i) => [key, values[i]])],
-      ),
-    },
-  ]);
+  const params: any = {};
+  params.to = await contract.getAddress();
+  params.data = ethers.solidityPacked(
+    ['bytes4', ...keys.map(() => ['uint32', 'bytes32']).flat()],
+    [selector, ...keys.flatMap((key, i) => [key, values[i]])],
+  );
+  for (const arg of args) {
+    Object.assign(params, arg);
+  }
+  const txHash = await network.provider.send('eth_sendTransaction', [params]);
 
   return network.provider.send('eth_getTransactionReceipt', [txHash]);
+};
+
+export const checkSetValues = async (
+  contracts: DataFeedStore[],
+  versionedLogger: ReturnType<typeof contractVersionLogger>,
+  keys: number[],
+  values: string[],
+) => {
+  for (const contract of contracts) {
+    const contractVersion = versionedLogger(
+      contract,
+      '',
+      (data: string) => data,
+    ) as string;
+    for (let i = 0; i < keys.length; i++) {
+      let selector;
+      if (contractVersion.includes('V1')) {
+        selector = getV1Selector(keys[i]);
+      } else {
+        selector = getV2Selector(keys[i]);
+      }
+
+      const value = await getter(contract, selector);
+      expect(value).to.be.eq(values[i]);
+    }
+  }
+};
+
+export const checkGenericSetValues = async (
+  genericContracts: IGenericDataFeedStore[],
+  keys: number[],
+  values: string[],
+) => {
+  for (const genericContract of genericContracts) {
+    for (let i = 0; i < keys.length; i++) {
+      const value = await genericContract.getDataFeed(keys[i]);
+      expect(value).to.be.eq(values[i]);
+    }
+  }
 };
 
 export const getV1Selector = (key: number): string => {
@@ -109,12 +151,12 @@ export const setDataFeeds = async (
     });
   }
 
-  return { receipts, receiptsGeneric };
+  return { receipts, receiptsGeneric, keys, values };
 };
 
 export const printGasUsage = (
   logger: ReturnType<typeof contractVersionLogger>,
-  receipts: { contract: DataFeedStore | DataFeedConsumers; receipt: any }[],
+  receipts: { contract: DataFeedStore | DataFeedConsumer; receipt: any }[],
   receiptsGeneric: { contractVersion: number; receipt: any }[],
 ): void => {
   const table: { [key: string]: { gas: number; diff: number; '%': number } } =
@@ -141,4 +183,23 @@ export const printGasUsage = (
   }
 
   console.table(table);
+};
+
+export const deployContract = async <T>(
+  contractName: string,
+  ...args: any[]
+): Promise<T> => {
+  const contractFactory = await hre.getContractFactory(contractName);
+  const contract = await contractFactory.deploy(...args);
+  await contract.waitForDeployment();
+
+  const tx2 = await contract.deploymentTransaction()?.getTransaction();
+
+  console.log(
+    `${contractName} deployment gas used: `,
+    +(await network.provider.send('eth_getTransactionReceipt', [tx2?.hash]))
+      .gasUsed,
+  );
+
+  return contract as T;
 };

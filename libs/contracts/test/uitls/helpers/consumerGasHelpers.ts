@@ -8,13 +8,15 @@ import {
 import {
   DataFeedStore,
   IGenericDataFeedStore,
+  checkGenericSetValues,
+  checkSetValues,
   printGasUsage,
   setDataFeeds,
 } from '.';
 import { contractVersionLogger } from '../logger';
 
-export type DataFeedConsumers = DataFeedV1Consumer | DataFeedV2Consumer;
-export type DataFeedGenericConsumers =
+export type DataFeedConsumer = DataFeedV1Consumer | DataFeedV2Consumer;
+export type GenericDataFeedConsumer =
   | DataFeedGenericConsumer
   | DataFeedGenericV2Consumer;
 
@@ -28,17 +30,21 @@ function isGenericV1Consumer(
 
 export const compareConsumerGasUsed = async (
   versionedLogger: ReturnType<typeof contractVersionLogger>,
-  dataFeedGenericConsumers: DataFeedGenericConsumers[],
-  dataFeedConsumers: DataFeedConsumers[],
+  dataFeedGenericConsumers: GenericDataFeedConsumer[],
+  dataFeedConsumers: DataFeedConsumer[],
   genericContracts: IGenericDataFeedStore[],
   contracts: DataFeedStore[],
   selector: string,
   valuesCount: number,
   start: number = 0,
 ) => {
-  await setDataFeeds(genericContracts, contracts, selector, valuesCount, start);
-
-  const keys = Array.from({ length: valuesCount }, (_, i) => i + start);
+  const { keys, values } = await setDataFeeds(
+    genericContracts,
+    contracts,
+    selector,
+    valuesCount,
+    start,
+  );
 
   const receipts = [];
   for (const consumer of dataFeedConsumers) {
@@ -59,6 +65,9 @@ export const compareConsumerGasUsed = async (
       receipt: await receipt.wait(),
     });
   }
+
+  await checkSetValues(contracts, versionedLogger, keys, values);
+  await checkGenericSetValues(genericContracts, keys, values);
 
   printGasUsage(
     versionedLogger,

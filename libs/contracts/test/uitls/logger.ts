@@ -1,13 +1,17 @@
-import { DataFeedStore } from './helpers';
+import { BaseContract } from 'ethers';
 
-export const contractVersionLogger = (contracts: {
-  [key: string]: DataFeedStore;
-}) => {
+export const contractVersionLogger = (
+  contractsData: {
+    [key: string]: BaseContract;
+  }[],
+) => {
   const addresses: { [key: string]: string } = {};
-  for (const key in contracts) {
-    addresses[contracts[key].target.toString()] = key;
+  for (const contracts of contractsData) {
+    for (const key in contracts) {
+      addresses[contracts[key].target.toString()] = key;
+    }
   }
 
-  return (contract: DataFeedStore, msg: string, log: Function = console.log) =>
+  return (contract: BaseContract, msg: string, log: Function = console.log) =>
     log(`[${addresses[contract.target.toString()]}] ${msg}`);
 };

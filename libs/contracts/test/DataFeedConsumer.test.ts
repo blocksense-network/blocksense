@@ -1,20 +1,16 @@
-import { ethers, network } from 'hardhat';
-import {
-  IDataFeedStore,
-  DataFeedV1Consumer,
-  DataFeedV2Consumer,
-  DataFeedGenericConsumer,
-  DataFeedStoreGeneric,
-  DataFeedGenericV2Consumer,
-  DataFeedStoreGenericV2,
-  IDataFeedStore__factory,
-} from '../typechain';
+import { ethers } from 'hardhat';
+import { DataFeedStoreGeneric, IDataFeedStore__factory } from '../typechain';
 import { expect } from 'chai';
 import { contractVersionLogger } from './uitls/logger';
-import { DataFeedStore, GenericDataFeedStore, setter } from './uitls/helpers';
 import {
-  DataFeedConsumers,
-  DataFeedGenericConsumers,
+  DataFeedStore,
+  GenericDataFeedStore,
+  deployContract,
+  setter,
+} from './uitls/helpers';
+import {
+  DataFeedConsumer,
+  GenericDataFeedConsumer,
   compareConsumerGasUsed,
 } from './uitls/helpers/consumerGasHelpers';
 
@@ -27,80 +23,56 @@ const genericContracts: {
   [key: string]: GenericDataFeedStore;
 } = {};
 const consumers: {
-  [key: string]: DataFeedConsumers;
+  [key: string]: DataFeedConsumer;
 } = {};
 const genericConsumers: {
-  [key: string]: DataFeedGenericConsumers;
+  [key: string]: GenericDataFeedConsumer;
 } = {};
 
 describe('DataFeedConsumer', function () {
   let logger: ReturnType<typeof contractVersionLogger>;
 
   beforeEach(async function () {
-    const DataFeedStoreGeneric = await ethers.getContractFactory(
+    genericContracts.V1 = await deployContract<DataFeedStoreGeneric>(
       'DataFeedStoreGeneric',
     );
-    genericContracts.V1 = await (
-      await DataFeedStoreGeneric.deploy()
-    ).waitForDeployment();
-
-    const DataFeedStoreGenericV2 = await ethers.getContractFactory(
+    genericContracts.V2 = await deployContract<DataFeedStoreGeneric>(
       'DataFeedStoreGenericV2',
     );
-    genericContracts.V2 = await (
-      await DataFeedStoreGenericV2.deploy()
-    ).waitForDeployment();
 
-    const DataFeedGenericConsumer = await ethers.getContractFactory(
+    genericConsumers.V1 = await deployContract<GenericDataFeedConsumer>(
       'DataFeedGenericConsumer',
+      genericContracts.V1.target,
     );
-    genericConsumers.V1 = await (
-      await DataFeedGenericConsumer.deploy(
-        await genericContracts.V1.getAddress(),
-      )
-    ).waitForDeployment();
-
-    const DataFeedGenericV2Consumer = await ethers.getContractFactory(
+    genericConsumers.V2 = await deployContract<GenericDataFeedConsumer>(
       'DataFeedGenericV2Consumer',
+      genericContracts.V2,
     );
-    genericConsumers.V2 = await (
-      await DataFeedGenericV2Consumer.deploy(
-        await genericContracts.V2.getAddress(),
-      )
-    ).waitForDeployment();
 
-    const DataFeedStore = await ethers.getContractFactory('DataFeedStoreV1');
-    contracts.V1 = await (await DataFeedStore.deploy()).waitForDeployment();
+    contracts.V1 = await deployContract<DataFeedStore>('DataFeedStoreV1');
+    contracts.V2 = await deployContract<DataFeedStore>('DataFeedStoreV2');
+    contracts.V3 = await deployContract<DataFeedStore>('DataFeedStoreV3');
 
-    const DataFeedV1Consumer =
-      await ethers.getContractFactory('DataFeedV1Consumer');
-    consumers.V1 = await (
-      await DataFeedV1Consumer.deploy(await contracts.V1.getAddress())
-    ).waitForDeployment();
+    consumers.V1 = await deployContract<DataFeedConsumer>(
+      'DataFeedV1Consumer',
+      contracts.V1.target,
+    );
+    consumers.V2 = await deployContract<DataFeedConsumer>(
+      'DataFeedV2Consumer',
+      contracts.V2.target,
+    );
+    consumers.V3 = await deployContract<DataFeedConsumer>(
+      'DataFeedV2Consumer',
+      contracts.V3.target,
+    );
 
-    const DataFeedStoreV2 = await ethers.getContractFactory(`DataFeedStoreV2`);
-    contracts.V2 = await (await DataFeedStoreV2.deploy()).waitForDeployment();
-
-    const DataFeedV2Consumer =
-      await ethers.getContractFactory('DataFeedV2Consumer');
-    consumers.V2 = await (
-      await DataFeedV2Consumer.deploy(await contracts.V2.getAddress())
-    ).waitForDeployment();
-
-    const DataFeedStoreV3 = await ethers.getContractFactory(`DataFeedStoreV3`);
-    contracts.V3 = await (await DataFeedStoreV3.deploy()).waitForDeployment();
-
-    consumers.V3 = await (
-      await DataFeedV2Consumer.deploy(await contracts.V3.getAddress())
-    ).waitForDeployment();
-
-    logger = contractVersionLogger(consumers);
+    logger = contractVersionLogger([contracts, consumers]);
   });
 
   for (let i = 0; i < 3; i++) {
     describe(`DataFeedStoreV${i + 1}`, function () {
       let contract: DataFeedStore;
-      let consumer: DataFeedConsumers;
+      let consumer: DataFeedConsumer;
 
       beforeEach(async function () {
         const keys = Object.keys(contracts);
