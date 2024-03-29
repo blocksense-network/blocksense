@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {IDataFeedStoreGeneric} from '../IDataFeedStoreGeneric.sol';
+import {IDataFeedStoreGeneric} from '../interfaces/IDataFeedStoreGeneric.sol';
 
 contract DataFeedGenericConsumer {
   IDataFeedStoreGeneric public immutable dataFeedStore;
