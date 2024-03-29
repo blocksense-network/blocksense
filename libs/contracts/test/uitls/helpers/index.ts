@@ -10,12 +10,12 @@ import {
   IDataFeedStoreGenericV2,
 } from '../../../typechain';
 import { contractVersionLogger } from '../logger';
-import { DataFeedConsumer } from './consumerGasHelpers';
+import {
+  DataFeedConsumer,
+  GenericDataFeedConsumer,
+} from './consumerGasHelpers';
 import { expect } from 'chai';
 
-export type IGenericDataFeedStore =
-  | IDataFeedStoreGenericV1
-  | IDataFeedStoreGenericV2;
 export type GenericDataFeedStore =
   | DataFeedStoreGenericV1
   | DataFeedStoreGenericV2;
@@ -80,7 +80,7 @@ export const checkSetValues = async (
 };
 
 export const checkGenericSetValues = async (
-  genericContracts: IGenericDataFeedStore[],
+  genericContracts: GenericDataFeedStore[],
   keys: number[],
   values: string[],
 ) => {
@@ -110,7 +110,7 @@ function isGenericV1(
 }
 
 export const setDataFeeds = async (
-  genericContracts: IGenericDataFeedStore[],
+  genericContracts: GenericDataFeedStore[],
   contracts: DataFeedStore[],
   selector: string,
   valuesCount: number,
@@ -132,11 +132,9 @@ export const setDataFeeds = async (
   let receiptsGeneric = [];
   for (const contract of genericContracts) {
     let receipt;
-    let version = 1;
     if (isGenericV1(contract)) {
       receipt = await contract.setFeeds(keys, values);
     } else {
-      version = 2;
       receipt = await contract.setFeeds(
         ethers.solidityPacked(
           keys.map(() => ['uint32', 'bytes32']).flat(),
@@ -146,7 +144,7 @@ export const setDataFeeds = async (
     }
 
     receiptsGeneric.push({
-      contractVersion: version,
+      contract,
       receipt: await receipt.wait(),
     });
   }
@@ -157,7 +155,10 @@ export const setDataFeeds = async (
 export const printGasUsage = (
   logger: ReturnType<typeof contractVersionLogger>,
   receipts: { contract: DataFeedStore | DataFeedConsumer; receipt: any }[],
-  receiptsGeneric: { contractVersion: number; receipt: any }[],
+  receiptsGeneric: {
+    contract: GenericDataFeedStore | GenericDataFeedConsumer;
+    receipt: any;
+  }[],
 ): void => {
   const table: { [key: string]: { gas: number; diff: number; '%': number } } =
     {};
@@ -166,8 +167,9 @@ export const printGasUsage = (
     const version = logger(contract, 'gas used', (data: string) => data);
     table[version] = { gas: Number(receipt?.gasUsed), diff: 0, '%': 0 };
   }
-  for (const { contractVersion, receipt } of receiptsGeneric) {
-    table[`[Generic V${contractVersion}] gas used`] = {
+  for (const { contract, receipt } of receiptsGeneric) {
+    const version = logger(contract, '', (data: string) => data);
+    table[`[Generic ${version}] gas used`] = {
       gas: Number(receipt?.gasUsed),
       diff: 0,
       '%': 0,

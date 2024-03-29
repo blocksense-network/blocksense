@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import {
   DataFeedStore,
-  IGenericDataFeedStore,
+  GenericDataFeedStore,
   checkGenericSetValues,
   checkSetValues,
   printGasUsage,
@@ -11,7 +11,7 @@ import { contractVersionLogger } from '../logger';
 
 export const compareGasUsed = async (
   versionedLogger: ReturnType<typeof contractVersionLogger>,
-  genericContracts: IGenericDataFeedStore[],
+  genericContracts: GenericDataFeedStore[],
   contracts: DataFeedStore[],
   selector: string,
   valuesCount: number,

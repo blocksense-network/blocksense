@@ -1,10 +1,10 @@
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv';
 
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
 import 'solidity-coverage';
-import "@typechain/hardhat";
+import '@typechain/hardhat';
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
 
@@ -21,8 +21,8 @@ const config: HardhatUserConfig = {
     },
   },
   typechain: {
-    outDir: "typechain",
-    target: "ethers-v6",
+    outDir: 'typechain',
+    target: 'ethers-v6',
   },
   networks: {
     localhost: {

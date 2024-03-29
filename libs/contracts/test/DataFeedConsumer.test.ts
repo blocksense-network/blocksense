@@ -66,7 +66,12 @@ describe('DataFeedConsumer', function () {
       contracts.V3.target,
     );
 
-    logger = contractVersionLogger([contracts, consumers]);
+    logger = contractVersionLogger([
+      contracts,
+      consumers,
+      genericContracts,
+      genericConsumers,
+    ]);
   });
 
   for (let i = 0; i < 3; i++) {

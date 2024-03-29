@@ -7,7 +7,7 @@ import {
 } from '../../../typechain';
 import {
   DataFeedStore,
-  IGenericDataFeedStore,
+  GenericDataFeedStore,
   checkGenericSetValues,
   checkSetValues,
   printGasUsage,
@@ -20,19 +20,11 @@ export type GenericDataFeedConsumer =
   | DataFeedGenericConsumer
   | DataFeedGenericV2Consumer;
 
-function isGenericV1Consumer(
-  contract: DataFeedGenericConsumer | DataFeedGenericV2Consumer,
-): contract is DataFeedGenericConsumer {
-  return (contract as DataFeedGenericConsumer).interface.hasFunction(
-    'dataFeedStore',
-  );
-}
-
 export const compareConsumerGasUsed = async (
   versionedLogger: ReturnType<typeof contractVersionLogger>,
   dataFeedGenericConsumers: GenericDataFeedConsumer[],
   dataFeedConsumers: DataFeedConsumer[],
-  genericContracts: IGenericDataFeedStore[],
+  genericContracts: GenericDataFeedStore[],
   contracts: DataFeedStore[],
   selector: string,
   valuesCount: number,
@@ -74,7 +66,7 @@ export const compareConsumerGasUsed = async (
     receipts,
     receiptsGeneric.map(({ receipt, contract }) => ({
       receipt,
-      contractVersion: isGenericV1Consumer(contract) ? 1 : 2,
+      contract,
     })),
   );
 

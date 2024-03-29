@@ -37,7 +37,7 @@ describe('DataFeedStore', function () {
     contracts.V2 = await deployContract<DataFeedStoreV2>('DataFeedStoreV2');
     contracts.V3 = await deployContract<DataFeedStoreV3>('DataFeedStoreV3');
 
-    logger = contractVersionLogger([contracts]);
+    logger = contractVersionLogger([contracts, genericContracts]);
   });
 
   for (let i = 1; i <= 3; i++) {

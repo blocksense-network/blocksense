@@ -12,6 +12,14 @@ export const contractVersionLogger = (
     }
   }
 
-  return (contract: BaseContract, msg: string, log: Function = console.log) =>
-    log(`[${addresses[contract.target.toString()]}] ${msg}`);
+  return (contract: BaseContract, msg: string, log: Function = console.log) => {
+    if (!addresses[contract.target.toString()]) {
+      throw new Error('Contract not found');
+    }
+    let logMsg = addresses[contract.target.toString()];
+    if (msg.length > 0) {
+      logMsg = log(`[${addresses[contract.target.toString()]}] ${msg}`);
+    }
+    return logMsg;
+  };
 };
