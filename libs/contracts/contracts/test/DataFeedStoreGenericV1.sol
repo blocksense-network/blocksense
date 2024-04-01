@@ -1,23 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
+import {DataFeedStoreGeneric} from './DataFeedStoreGeneric.sol';
 import {IDataFeedStoreGenericV1} from './interfaces/IDataFeedStoreGenericV1.sol';
 
-contract DataFeedStoreGenericV1 is IDataFeedStoreGenericV1 {
-  mapping(uint256 => bytes32) public dataFeeds;
-  address public immutable owner;
-
-  constructor() {
-    owner = msg.sender;
-  }
-
+contract DataFeedStoreGenericV1 is
+  DataFeedStoreGeneric,
+  IDataFeedStoreGenericV1
+{
   function setFeeds(
     uint256[] calldata keys,
     bytes32[] calldata values
-  ) external {
-    if (msg.sender != owner) {
-      revert NotAuthorized();
-    }
+  ) external onlyOwner {
     if (keys.length != values.length) {
       revert WrongInputLength();
     }

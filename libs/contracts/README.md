@@ -55,7 +55,10 @@ yarn size
 
 # Run these two in separate shells:
 yarn hardhat node
-yarn deploy:local ./scripts/deploy-lock.ts
+yarn deploy:local ./scripts/<script_name>.ts
+
+# To fork Mainnet:
+FORKING=true yarn hardhat run ./scripts/chainlink-event-fetcher.ts
 ```
 
 Running `yarn test` will output a gas cost comparison table between the different data feed store implementations and the reference implementations.

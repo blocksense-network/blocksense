@@ -28,11 +28,12 @@ const config: HardhatUserConfig = {
     localhost: {
       url: 'http://localhost:8545/',
     },
-    // hardhat: {
-    //   forking: {
-    //     url: "" + process.env.MAINNET_KEY,
-    //   },
-    // },
+    hardhat: {
+      forking: {
+        enabled: process.env.FORKING === 'true',
+        url: '' + process.env.MAINNET_KEY,
+      },
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS === 'true',
