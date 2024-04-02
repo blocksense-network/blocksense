@@ -9,6 +9,11 @@
     "format:check": "pre-commit run --all",
     "format:write": "pre-commit run --all || pre-commit run --all"
   },
+  "dependenciesMeta": {
+    "@openzeppelin/contracts@5.0.2": {
+      "unplugged": true
+    }
+  },
   "devDependencies": {
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
