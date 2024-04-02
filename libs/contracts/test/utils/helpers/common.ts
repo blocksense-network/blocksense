@@ -195,11 +195,11 @@ export const deployContract = async <T>(
   const contract = await contractFactory.deploy(...args);
   await contract.waitForDeployment();
 
-  const tx2 = await contract.deploymentTransaction()?.getTransaction();
+  const tx = await contract.deploymentTransaction()?.getTransaction();
 
   console.log(
     `${contractName} deployment gas used: `,
-    +(await network.provider.send('eth_getTransactionReceipt', [tx2?.hash]))
+    +(await network.provider.send('eth_getTransactionReceipt', [tx?.hash]))
       .gasUsed,
   );
 
