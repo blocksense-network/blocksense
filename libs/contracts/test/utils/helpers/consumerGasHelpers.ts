@@ -42,20 +42,14 @@ export const compareConsumerGasUsed = async (
   for (const consumer of dataFeedConsumers) {
     const receipt = await consumer.setMultipleFetchedFeedsById(keys);
 
-    receipts.push({
-      contract: consumer,
-      receipt: await receipt.wait(),
-    });
+    receipts.push(await receipt.wait());
   }
 
   const receiptsGeneric = [];
   for (const consumer of dataFeedGenericConsumers) {
     const receipt = await consumer.setMultipleFetchedFeedsById(keys);
 
-    receiptsGeneric.push({
-      contract: consumer,
-      receipt: await receipt.wait(),
-    });
+    receiptsGeneric.push(await receipt.wait());
   }
 
   for (let i = 0; i < keys.length; i++) {
@@ -77,17 +71,10 @@ export const compareConsumerGasUsed = async (
   await checkSetValues(contracts, versionedLogger, keys, values);
   await checkGenericSetValues(genericContracts, keys, values);
 
-  printGasUsage(
-    versionedLogger,
-    receipts,
-    receiptsGeneric.map(({ receipt, contract }) => ({
-      receipt,
-      contract,
-    })),
-  );
+  printGasUsage(versionedLogger, receipts, receiptsGeneric);
 
-  for (const { receipt } of receipts) {
-    for (const { receipt: receiptGeneric } of receiptsGeneric) {
+  for (const receipt of receipts) {
+    for (const receiptGeneric of receiptsGeneric) {
       expect(receipt?.gasUsed).to.be.lt(receiptGeneric?.gasUsed);
     }
   }

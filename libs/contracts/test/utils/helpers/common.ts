@@ -21,15 +21,20 @@ export type GenericDataFeedStore =
   | DataFeedStoreGenericV2;
 export type DataFeedStore = DataFeedStoreV1 | DataFeedStoreV2 | DataFeedStoreV3;
 
-export const getter = async (contract: DataFeedStore, selector: string) => {
-  const msgData = ethers.solidityPacked(['bytes4'], [selector]);
-  return network.provider.send('eth_call', [
-    {
-      to: await contract.getAddress(),
-      data: msgData,
-    },
-    'latest',
-  ]);
+export const getter = async (
+  contract: DataFeedStore,
+  selector: string,
+  ...args: any[]
+): Promise<string> => {
+  const params: any = {};
+  params.to = await contract.getAddress();
+  params.data = ethers.solidityPacked(['bytes4'], [selector]);
+
+  for (const arg of args) {
+    Object.assign(params, arg);
+  }
+
+  return network.provider.send('eth_call', [params, 'latest']);
 };
 
 export const setter = async (
@@ -45,9 +50,11 @@ export const setter = async (
     ['bytes4', ...keys.map(() => ['uint32', 'bytes32']).flat()],
     [selector, ...keys.flatMap((key, i) => [key, values[i]])],
   );
+
   for (const arg of args) {
     Object.assign(params, arg);
   }
+
   const txHash = await network.provider.send('eth_sendTransaction', [params]);
 
   return network.provider.send('eth_getTransactionReceipt', [txHash]);
@@ -61,7 +68,7 @@ export const checkSetValues = async (
 ) => {
   for (const contract of contracts) {
     const contractVersion = versionedLogger(
-      contract,
+      contract.target.toString(),
       '',
       (data: string) => data,
     ) as string;
@@ -123,10 +130,7 @@ export const setDataFeeds = async (
 
   const receipts = [];
   for (const contract of contracts) {
-    receipts.push({
-      contract,
-      receipt: await setter(contract, selector, keys, values),
-    });
+    receipts.push(await setter(contract, selector, keys, values));
   }
 
   let receiptsGeneric = [];
@@ -143,10 +147,7 @@ export const setDataFeeds = async (
       );
     }
 
-    receiptsGeneric.push({
-      contract,
-      receipt: await receipt.wait(),
-    });
+    receiptsGeneric.push(await receipt.wait());
   }
 
   return { receipts, receiptsGeneric, keys, values };
@@ -154,21 +155,18 @@ export const setDataFeeds = async (
 
 export const printGasUsage = (
   logger: ReturnType<typeof contractVersionLogger>,
-  receipts: { contract: DataFeedStore | DataFeedConsumer; receipt: any }[],
-  receiptsGeneric: {
-    contract: GenericDataFeedStore | GenericDataFeedConsumer;
-    receipt: any;
-  }[],
+  receipts: any[],
+  receiptsGeneric: any[],
 ): void => {
   const table: { [key: string]: { gas: number; diff: number; '%': number } } =
     {};
 
-  for (const { receipt, contract } of receipts) {
-    const version = logger(contract, 'gas used', (data: string) => data);
+  for (const receipt of receipts) {
+    const version = logger(receipt.to, 'gas used', (data: string) => data);
     table[version] = { gas: Number(receipt?.gasUsed), diff: 0, '%': 0 };
   }
-  for (const { contract, receipt } of receiptsGeneric) {
-    const version = logger(contract, '', (data: string) => data);
+  for (const receipt of receiptsGeneric) {
+    const version = logger(receipt.to, '', (data: string) => data);
     table[`[Generic ${version}] gas used`] = {
       gas: Number(receipt?.gasUsed),
       diff: 0,

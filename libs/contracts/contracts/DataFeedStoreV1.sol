@@ -29,6 +29,7 @@ contract DataFeedStoreV1 {
   fallback(bytes calldata) external returns (bytes memory) {
     bytes32 selector;
 
+    // getters
     assembly {
       // store selector in memory in the first memory slot
       calldatacopy(28, 0, 4)

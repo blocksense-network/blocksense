@@ -32,7 +32,7 @@ export const compareGasUsed = async (
 
   for (const data of receipts) {
     for (const dataGeneric of receiptsGeneric) {
-      expect(data.receipt.gasUsed).to.be.lt(dataGeneric.receipt?.gasUsed);
+      expect(data.gasUsed).to.be.lt(dataGeneric?.gasUsed);
     }
   }
 
