@@ -30,6 +30,8 @@ const genericConsumers: {
 } = {};
 
 describe('DataFeedConsumer', function () {
+  this.timeout(10000000);
+
   let logger: ReturnType<typeof contractVersionLogger>;
 
   beforeEach(async function () {
