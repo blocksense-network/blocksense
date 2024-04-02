@@ -140,3 +140,6 @@ result
 # Rust cargo artifacts
 libs/*/target/
 /target/
+
+# Solidity remappings
+**/*/remappings.txt
