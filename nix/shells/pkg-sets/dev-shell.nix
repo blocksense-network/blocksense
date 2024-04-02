@@ -19,5 +19,8 @@
       figlet -f smslant -t 'Monorepo'
       figlet -f smslant -t '${shellName} Dev Shell  $ _'
     } | clolcat
+
+    # Set up the environment for the Solidity compiler
+    ./nix/scripts/config_solidity_import_mapping.sh
   '';
 }
