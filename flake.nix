@@ -14,6 +14,7 @@
     mcl-blockchain.url = "github:metacraft-labs/nix-blockchain-development";
     nixpkgs.follows = "mcl-blockchain/nixpkgs";
     flake-parts.follows = "mcl-blockchain/flake-parts";
+    fenix.follows = "mcl-blockchain/fenix";
   };
 
   outputs = inputs @ {flake-parts, ...}:

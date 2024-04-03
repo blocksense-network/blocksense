@@ -1156,6 +1156,10 @@
     },
     "root": {
       "inputs": {
+        "fenix": [
+          "mcl-blockchain",
+          "fenix"
+        ],
         "flake-parts": [
           "mcl-blockchain",
           "flake-parts"
