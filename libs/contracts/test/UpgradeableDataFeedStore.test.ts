@@ -167,6 +167,18 @@ describe('UpgradeableProxy', function () {
     await expect(tx).to.be.reverted;
   });
 
+  it('Should revert if the new implementation is not a contract', async function () {
+    const tx = setter(upgradeableContractsImpl, upgradeSelector, [], [], {
+      from: await admin.getAddress(),
+      data: ethers.solidityPacked(
+        ['bytes4', 'address'],
+        [upgradeSelector, await admin.getAddress()],
+      ),
+    });
+
+    await expect(tx).to.be.reverted;
+  });
+
   describe('Compare gas usage', function () {
     const upgradeableContracts: {
       [key: string]: UpgradeableProxy;
