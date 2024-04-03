@@ -1,4 +1,6 @@
 import { Signer } from 'ethers';
+import { ethers } from 'hardhat';
+import { expect } from 'chai';
 import {
   DataFeedStoreV1,
   DataFeedStoreV2,
@@ -8,10 +10,13 @@ import {
   IDataFeedStore__factory,
   DataFeedStoreGenericV1,
   DataFeedStoreGenericV2,
-  DataFeedStoreGenericV1__factory,
 } from '../typechain';
+import { DataFeedStoreGenericV1Interface } from '../typechain/contracts/test/DataFeedStoreGenericV1';
+import { DataFeedStoreGenericV2Interface } from '../typechain/contracts/test/DataFeedStoreGenericV2';
 import {
   DataFeedStore,
+  GenericDataFeedStore,
+  checkSetValues,
   deployContract,
   getV1Selector,
   getV2Selector,
@@ -20,13 +25,12 @@ import {
   setter,
 } from './uitls/helpers';
 import { contractVersionLogger } from './uitls/logger';
-import { ethers } from 'hardhat';
-import { expect } from 'chai';
-import GenericV1ABI from '../artifacts/contracts/test/DataFeedStoreGenericV1.sol/DataFeedStoreGenericV1.json';
-import GenericV2ABI from '../artifacts/contracts/test/DataFeedStoreGenericV2.sol/DataFeedStoreGenericV2.json';
 
 const contractsImpl: {
   [key: string]: DataFeedStore;
+} = {};
+const contractsGenericImpl: {
+  [key: string]: GenericDataFeedStore;
 } = {};
 const selector =
   IDataFeedStore__factory.createInterface().getFunction('setFeeds').selector;
@@ -41,6 +45,13 @@ describe('UpgradableProxy', function () {
 
   beforeEach(async function () {
     admin = (await ethers.getSigners())[9];
+
+    contractsGenericImpl.V1 = await deployContract<DataFeedStoreGenericV1>(
+      'DataFeedStoreGenericV1',
+    );
+    contractsGenericImpl.V2 = await deployContract<DataFeedStoreGenericV2>(
+      'DataFeedStoreGenericV2',
+    );
 
     contractsImpl.V1 = await deployContract<DataFeedStoreV1>('DataFeedStoreV1');
     contractsImpl.V2 = await deployContract<DataFeedStoreV2>('DataFeedStoreV2');
@@ -158,14 +169,12 @@ describe('UpgradableProxy', function () {
     beforeEach(async function () {
       upgradableGenericContracts.V1 = await deployContract<UpgradableProxy>(
         'UpgradableProxy',
-        (await deployContract<DataFeedStoreGenericV1>('DataFeedStoreGenericV1'))
-          .target,
+        contractsGenericImpl.V1.target,
         await admin.getAddress(),
       );
       upgradableGenericContracts.V2 = await deployContract<UpgradableProxy>(
         'UpgradableProxy',
-        (await deployContract<DataFeedStoreGenericV2>('DataFeedStoreGenericV2'))
-          .target,
+        contractsGenericImpl.V2.target,
         await admin.getAddress(),
       );
 
@@ -195,7 +204,7 @@ describe('UpgradableProxy', function () {
       it(`Should set ${i} data feeds`, async function () {
         const keys = Array.from({ length: i }, (_, j) => j);
         const values = keys.map(key =>
-          ethers.encodeBytes32String('key-' + key),
+          ethers.encodeBytes32String(`Hello, World! ${key}`),
         );
 
         const receipts = [];
@@ -203,44 +212,58 @@ describe('UpgradableProxy', function () {
           receipts.push(await setter(contract, selector, keys, values));
         }
 
-        const genericV1Selector =
-          DataFeedStoreGenericV1__factory.createInterface().getFunction(
-            'setFeeds',
-          ).selector;
-        let iface = new ethers.Interface(GenericV1ABI.abi);
+        checkSetValues(
+          Object.values(upgradableContracts),
+          logger,
+          keys,
+          values,
+        );
+
+        const ifaceV1 = contractsGenericImpl.V1
+          .interface as DataFeedStoreGenericV1Interface;
         const txG1 = await setter(
           upgradableGenericContracts.V1,
-          genericV1Selector,
+          ifaceV1.getFunction('setFeeds')!.selector,
           [],
           [],
           {
-            data: iface.encodeFunctionData('setFeeds', [keys, values]),
+            data: ifaceV1.encodeFunctionData('setFeeds', [keys, values]),
           },
         );
 
-        iface = new ethers.Interface(GenericV2ABI.abi);
+        const ifaceV2 = contractsGenericImpl.V2
+          .interface as DataFeedStoreGenericV2Interface;
         const txG2 = await setter(
           upgradableGenericContracts.V2,
           selector,
           [],
           [],
           {
-            data: ethers.solidityPacked(
-              [
-                'bytes4',
-                'uint256',
-                'uint256',
-                ...keys.map(() => ['uint32', 'bytes32']).flat(),
-              ],
-              [
-                selector,
-                32,
-                36 * keys.length,
-                ...keys.flatMap((key, i) => [key, values[i]]),
-              ],
-            ),
+            data: ifaceV2.encodeFunctionData('setFeeds', [
+              ethers.solidityPacked(
+                [...keys.map(() => ['uint32', 'bytes32']).flat()],
+                [...keys.flatMap((key, i) => [key, values[i]])],
+              ),
+            ]),
           },
         );
+
+        for (const [index, contract] of Object.values(
+          upgradableGenericContracts,
+        ).entries()) {
+          const iface = Object.values(contractsGenericImpl)[index].interface;
+          for (let i = 0; i < keys.length; i++) {
+            const value = await getter(
+              contract,
+              iface.getFunction('getDataFeed')!.selector,
+              {
+                data: iface.encodeFunctionData('getDataFeed', [keys[i]]),
+              },
+            );
+
+            expect(value).to.be.equal(values[i]);
+          }
+        }
 
         let receiptsGeneric = [txG1, txG2];
 

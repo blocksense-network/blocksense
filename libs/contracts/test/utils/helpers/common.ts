@@ -8,12 +8,9 @@ import {
   DataFeedStoreV3,
   IDataFeedStoreGenericV1,
   IDataFeedStoreGenericV2,
+  UpgradableProxy,
 } from '../../../typechain';
 import { contractVersionLogger } from '../logger';
-import {
-  DataFeedConsumer,
-  GenericDataFeedConsumer,
-} from './consumerGasHelpers';
 import { expect } from 'chai';
 
 export type GenericDataFeedStore =
@@ -61,7 +58,7 @@ export const setter = async (
 };
 
 export const checkSetValues = async (
-  contracts: DataFeedStore[],
+  contracts: DataFeedStore[] | UpgradableProxy[],
   versionedLogger: ReturnType<typeof contractVersionLogger>,
   keys: number[],
   values: string[],
@@ -124,8 +121,8 @@ export const setDataFeeds = async (
   start: number = 0,
 ) => {
   const keys = Array.from({ length: valuesCount }, (_, i) => i + start);
-  const values = Array.from({ length: valuesCount }, (_, i) =>
-    ethers.zeroPadBytes(ethers.toUtf8Bytes(`Hello, World! ${i}`), 32),
+  const values = keys.map(key =>
+    ethers.encodeBytes32String(`Hello, World! ${key}`),
   );
 
   const receipts = [];
