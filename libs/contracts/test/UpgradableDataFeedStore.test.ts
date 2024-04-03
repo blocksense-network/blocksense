@@ -65,13 +65,21 @@ describe('UpgradableProxy', function () {
   });
 
   it('Should upgrade from V1 to V2', async function () {
-    await setter(upgradableContractsImpl, upgradeSelector, [], [], {
-      from: await admin.getAddress(),
-      data: ethers.solidityPacked(
-        ['bytes4', 'address'],
-        [upgradeSelector, contractsImpl.V2.target],
-      ),
-    });
+    const receipt = await setter(
+      upgradableContractsImpl,
+      upgradeSelector,
+      [],
+      [],
+      {
+        from: await admin.getAddress(),
+        data: ethers.solidityPacked(
+          ['bytes4', 'address'],
+          [upgradeSelector, contractsImpl.V2.target],
+        ),
+      },
+    );
+
+    console.log('Gas used: ', Number(receipt.gasUsed));
 
     const logs = await upgradableContractsImpl.queryFilter(
       upgradableContractsImpl.filters.Upgraded(),
@@ -94,6 +102,8 @@ describe('UpgradableProxy', function () {
         [upgradeSelector, contractsImpl.V2.target],
       ),
     });
+
+    console.log('Gas used: ', Number(tx.gasUsed));
 
     await expect(tx.transactionHash)
       .to.emit(upgradableContractsImpl, 'Upgraded')
