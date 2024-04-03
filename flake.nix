@@ -3,9 +3,11 @@
 
   nixConfig = {
     extra-substituters = [
+      "https://blocksense.cachix.org"
       "https://mcl-blockchain-packages.cachix.org"
     ];
     extra-trusted-public-keys = [
+      "blocksense.cachix.org-1:BGg+LtKwTRIBw3BxCWEV//IO7v6+5CiJVSGzBOQUY/4="
       "mcl-blockchain-packages.cachix.org-1:qoEiUyBgNXmgJTThjbjO//XA9/6tCmx/OohHHt9hWVY="
     ];
   };
