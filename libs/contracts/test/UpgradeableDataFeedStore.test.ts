@@ -5,7 +5,7 @@ import {
   DataFeedStoreV1,
   DataFeedStoreV2,
   DataFeedStoreV3,
-  UpgradableProxy,
+  UpgradeableProxy,
   ITransparentUpgradeableProxy__factory,
   IDataFeedStore__factory,
   DataFeedStoreGenericV1,
@@ -39,9 +39,9 @@ const upgradeSelector =
     'upgradeToAndCall',
   ).selector;
 
-describe('UpgradableProxy', function () {
+describe('UpgradeableProxy', function () {
   let admin: Signer;
-  let upgradableContractsImpl: UpgradableProxy;
+  let upgradeableContractsImpl: UpgradeableProxy;
 
   beforeEach(async function () {
     admin = (await ethers.getSigners())[9];
@@ -57,8 +57,8 @@ describe('UpgradableProxy', function () {
     contractsImpl.V2 = await deployContract<DataFeedStoreV2>('DataFeedStoreV2');
     contractsImpl.V3 = await deployContract<DataFeedStoreV3>('DataFeedStoreV3');
 
-    upgradableContractsImpl = await deployContract<UpgradableProxy>(
-      'UpgradableProxy',
+    upgradeableContractsImpl = await deployContract<UpgradeableProxy>(
+      'UpgradeableProxy',
       contractsImpl.V1.target,
       await admin.getAddress(),
     );
@@ -66,7 +66,7 @@ describe('UpgradableProxy', function () {
 
   it('Should upgrade from V1 to V2', async function () {
     const receipt = await setter(
-      upgradableContractsImpl,
+      upgradeableContractsImpl,
       upgradeSelector,
       [],
       [],
@@ -81,8 +81,8 @@ describe('UpgradableProxy', function () {
 
     console.log('Gas used: ', Number(receipt.gasUsed));
 
-    const logs = await upgradableContractsImpl.queryFilter(
-      upgradableContractsImpl.filters.Upgraded(),
+    const logs = await upgradeableContractsImpl.queryFilter(
+      upgradeableContractsImpl.filters.Upgraded(),
     );
     expect(logs.length).to.be.equal(2);
     expect(logs[0].args?.implementation).to.be.equal(contractsImpl.V1.target);
@@ -91,11 +91,11 @@ describe('UpgradableProxy', function () {
 
   it('Should preserve storage when implementation is changed', async function () {
     const value = ethers.encodeBytes32String('key');
-    await setter(upgradableContractsImpl, selector, [0], [value]);
+    await setter(upgradeableContractsImpl, selector, [0], [value]);
 
-    const valueV1 = await getter(upgradableContractsImpl, getV1Selector(0));
+    const valueV1 = await getter(upgradeableContractsImpl, getV1Selector(0));
 
-    const tx = await setter(upgradableContractsImpl, upgradeSelector, [], [], {
+    const tx = await setter(upgradeableContractsImpl, upgradeSelector, [], [], {
       from: await admin.getAddress(),
       data: ethers.solidityPacked(
         ['bytes4', 'address'],
@@ -106,17 +106,17 @@ describe('UpgradableProxy', function () {
     console.log('Gas used: ', Number(tx.gasUsed));
 
     await expect(tx.transactionHash)
-      .to.emit(upgradableContractsImpl, 'Upgraded')
+      .to.emit(upgradeableContractsImpl, 'Upgraded')
       .withArgs(contractsImpl.V2.target);
 
-    const valueV2 = await getter(upgradableContractsImpl, getV2Selector(0));
+    const valueV2 = await getter(upgradeableContractsImpl, getV2Selector(0));
 
     expect(valueV1).to.be.equal(value);
     expect(valueV1).to.be.equal(valueV2);
   });
 
   it('Should revert if upgrade is not called by the admin', async function () {
-    const tx = setter(upgradableContractsImpl, upgradeSelector, [], [], {
+    const tx = setter(upgradeableContractsImpl, upgradeSelector, [], [], {
       from: (await ethers.getSigners())[8].address,
       data: ethers.solidityPacked(
         ['bytes4', 'address'],
@@ -129,7 +129,7 @@ describe('UpgradableProxy', function () {
 
   it('Should revert if admin calls something other than upgrade', async function () {
     let tx = setter(
-      upgradableContractsImpl,
+      upgradeableContractsImpl,
       selector,
       [0],
       [ethers.encodeBytes32String('key')],
@@ -139,23 +139,23 @@ describe('UpgradableProxy', function () {
     );
 
     await expect(tx).to.be.revertedWithCustomError(
-      upgradableContractsImpl,
+      upgradeableContractsImpl,
       'ProxyDeniedAdminAccess',
     );
 
-    tx = getter(upgradableContractsImpl, getV1Selector(0), {
+    tx = getter(upgradeableContractsImpl, getV1Selector(0), {
       from: await admin.getAddress(),
     });
 
     await expect(tx).to.be.revertedWithCustomError(
-      upgradableContractsImpl,
+      upgradeableContractsImpl,
       'ProxyDeniedAdminAccess',
     );
   });
 
   it('Should revert if non-owner calls set feed', async function () {
     const tx = setter(
-      upgradableContractsImpl,
+      upgradeableContractsImpl,
       selector,
       [0],
       [ethers.encodeBytes32String('key')],
@@ -168,45 +168,45 @@ describe('UpgradableProxy', function () {
   });
 
   describe('Compare gas usage', function () {
-    const upgradableContracts: {
-      [key: string]: UpgradableProxy;
+    const upgradeableContracts: {
+      [key: string]: UpgradeableProxy;
     } = {};
-    const upgradableGenericContracts: {
-      [key: string]: UpgradableProxy;
+    const upgradeableGenericContracts: {
+      [key: string]: UpgradeableProxy;
     } = {};
     let logger: ReturnType<typeof contractVersionLogger>;
 
     beforeEach(async function () {
-      upgradableGenericContracts.V1 = await deployContract<UpgradableProxy>(
-        'UpgradableProxy',
+      upgradeableGenericContracts.V1 = await deployContract<UpgradeableProxy>(
+        'UpgradeableProxy',
         contractsGenericImpl.V1.target,
         await admin.getAddress(),
       );
-      upgradableGenericContracts.V2 = await deployContract<UpgradableProxy>(
-        'UpgradableProxy',
+      upgradeableGenericContracts.V2 = await deployContract<UpgradeableProxy>(
+        'UpgradeableProxy',
         contractsGenericImpl.V2.target,
         await admin.getAddress(),
       );
 
-      upgradableContracts.V1 = await deployContract<UpgradableProxy>(
-        'UpgradableProxy',
+      upgradeableContracts.V1 = await deployContract<UpgradeableProxy>(
+        'UpgradeableProxy',
         contractsImpl.V1.target,
         await admin.getAddress(),
       );
-      upgradableContracts.V2 = await deployContract<UpgradableProxy>(
-        'UpgradableProxy',
+      upgradeableContracts.V2 = await deployContract<UpgradeableProxy>(
+        'UpgradeableProxy',
         contractsImpl.V2.target,
         await admin.getAddress(),
       );
-      upgradableContracts.V3 = await deployContract<UpgradableProxy>(
-        'UpgradableProxy',
+      upgradeableContracts.V3 = await deployContract<UpgradeableProxy>(
+        'UpgradeableProxy',
         contractsImpl.V3.target,
         await admin.getAddress(),
       );
 
       logger = contractVersionLogger([
-        upgradableContracts,
-        upgradableGenericContracts,
+        upgradeableContracts,
+        upgradeableGenericContracts,
       ]);
     });
 
@@ -218,12 +218,12 @@ describe('UpgradableProxy', function () {
         );
 
         const receipts = [];
-        for (const contract of Object.values(upgradableContracts)) {
+        for (const contract of Object.values(upgradeableContracts)) {
           receipts.push(await setter(contract, selector, keys, values));
         }
 
         checkSetValues(
-          Object.values(upgradableContracts),
+          Object.values(upgradeableContracts),
           logger,
           keys,
           values,
@@ -232,7 +232,7 @@ describe('UpgradableProxy', function () {
         const ifaceV1 = contractsGenericImpl.V1
           .interface as DataFeedStoreGenericV1Interface;
         const txG1 = await setter(
-          upgradableGenericContracts.V1,
+          upgradeableGenericContracts.V1,
           ifaceV1.getFunction('setFeeds')!.selector,
           [],
           [],
@@ -244,7 +244,7 @@ describe('UpgradableProxy', function () {
         const ifaceV2 = contractsGenericImpl.V2
           .interface as DataFeedStoreGenericV2Interface;
         const txG2 = await setter(
-          upgradableGenericContracts.V2,
+          upgradeableGenericContracts.V2,
           selector,
           [],
           [],
@@ -259,7 +259,7 @@ describe('UpgradableProxy', function () {
         );
 
         for (const [index, contract] of Object.values(
-          upgradableGenericContracts,
+          upgradeableGenericContracts,
         ).entries()) {
           const iface = Object.values(contractsGenericImpl)[index].interface;
           for (let i = 0; i < keys.length; i++) {

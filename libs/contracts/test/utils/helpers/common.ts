@@ -8,7 +8,7 @@ import {
   DataFeedStoreV3,
   IDataFeedStoreGenericV1,
   IDataFeedStoreGenericV2,
-  UpgradableProxy,
+  UpgradeableProxy,
 } from '../../../typechain';
 import { contractVersionLogger } from '../logger';
 import { expect } from 'chai';
@@ -58,7 +58,7 @@ export const setter = async (
 };
 
 export const checkSetValues = async (
-  contracts: DataFeedStore[] | UpgradableProxy[],
+  contracts: DataFeedStore[] | UpgradeableProxy[],
   versionedLogger: ReturnType<typeof contractVersionLogger>,
   keys: number[],
   values: string[],
