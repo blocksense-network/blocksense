@@ -58,6 +58,22 @@ export const compareConsumerGasUsed = async (
     });
   }
 
+  for (let i = 0; i < keys.length; i++) {
+    for (const contract of dataFeedConsumers) {
+      const value = await contract.getFeedById(keys[i]);
+      const externalValue = await contract.getExternalFeedById(keys[i]);
+      expect(value).to.be.equal(values[i]);
+      expect(externalValue).to.be.equal(values[i]);
+    }
+
+    for (const contract of dataFeedGenericConsumers) {
+      const value = await contract.getFeedById(keys[i]);
+      const externalValue = await contract.getExternalFeedById(keys[i]);
+      expect(value).to.be.equal(values[i]);
+      expect(externalValue).to.be.equal(values[i]);
+    }
+  }
+
   await checkSetValues(contracts, versionedLogger, keys, values);
   await checkGenericSetValues(genericContracts, keys, values);
 

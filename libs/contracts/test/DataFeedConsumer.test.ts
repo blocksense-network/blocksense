@@ -30,7 +30,7 @@ const genericConsumers: {
 } = {};
 
 describe('DataFeedConsumer', function () {
-  this.timeout(10000000);
+  this.timeout(100000);
 
   let logger: ReturnType<typeof contractVersionLogger>;
 
