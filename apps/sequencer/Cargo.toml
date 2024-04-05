@@ -43,6 +43,7 @@ alloy = { git = "https://github.com/alloy-rs/alloy", rev = "bfd0fda492e560c3463d
     "pubsub",
 ] }
 
+reqwest = { version = "0.12", default-features = false }
 # async
 tokio = { version = "1.4.0", features = ["full"] }
 
@@ -56,3 +57,7 @@ once_cell = "1.19.0"
 serde_json = "1.0.115"
 serde = { version = "1.0.197", features = ["derive"]}
 futures = "0.3.30"
+
+[[bin]]
+name = "sequencer"
+path = "bin/sequencer_runner.rs"

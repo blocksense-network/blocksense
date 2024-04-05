@@ -3396,6 +3396,7 @@ dependencies = [
  "num_cpus",
  "once_cell",
  "openssl-sys",
+ "reqwest",
  "serde",
  "serde_json",
  "threadpool",
