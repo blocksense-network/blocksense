@@ -8,10 +8,14 @@ import {
   DataFeedStoreV2,
   DataFeedStoreV3,
 } from '../typechain';
-import { contractVersionLogger } from './uitls/logger';
-import { DataFeedStore, setter, GenericDataFeedStore } from './uitls/helpers';
-import { compareGasUsed } from './uitls/helpers/dataFeedGasHelpers';
-import { deployContract } from './uitls/helpers';
+import { contractVersionLogger } from './utils/logger';
+import {
+  DataFeedStore,
+  setter,
+  GenericDataFeedStore,
+} from './utils/helpers/common';
+import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
+import { deployContract } from './utils/helpers/common';
 
 const contracts: {
   [key: string]: DataFeedStore;

@@ -6,7 +6,7 @@ import {
   checkSetValues,
   printGasUsage,
   setDataFeeds,
-} from '.';
+} from './common';
 import { contractVersionLogger } from '../logger';
 
 export const compareGasUsed = async (

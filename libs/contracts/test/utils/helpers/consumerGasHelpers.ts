@@ -12,7 +12,7 @@ import {
   checkSetValues,
   printGasUsage,
   setDataFeeds,
-} from '.';
+} from './common';
 import { contractVersionLogger } from '../logger';
 
 export type DataFeedConsumer = DataFeedV1Consumer | DataFeedV2Consumer;

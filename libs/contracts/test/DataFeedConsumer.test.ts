@@ -1,18 +1,18 @@
 import { ethers } from 'hardhat';
 import { DataFeedStoreGenericV1, IDataFeedStore__factory } from '../typechain';
 import { expect } from 'chai';
-import { contractVersionLogger } from './uitls/logger';
+import { contractVersionLogger } from './utils/logger';
 import {
   DataFeedStore,
   GenericDataFeedStore,
   deployContract,
   setter,
-} from './uitls/helpers';
+} from './utils/helpers/common';
 import {
   DataFeedConsumer,
   GenericDataFeedConsumer,
   compareConsumerGasUsed,
-} from './uitls/helpers/consumerGasHelpers';
+} from './utils/helpers/consumerGasHelpers';
 
 const selector =
   IDataFeedStore__factory.createInterface().getFunction('setFeeds').selector;
