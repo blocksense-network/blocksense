@@ -28,7 +28,7 @@ export const compareGasUsed = async (
   await checkSetValues(contracts, versionedLogger, keys, values);
   await checkGenericSetValues(genericContracts, keys, values);
 
-  printGasUsage(versionedLogger, receipts, receiptsGeneric);
+  await printGasUsage(versionedLogger, receipts, receiptsGeneric);
 
   for (const data of receipts) {
     for (const dataGeneric of receiptsGeneric) {

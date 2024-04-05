@@ -60,6 +60,9 @@ yarn deploy:local ./scripts/<script_name>.ts
 
 # To fork Mainnet:
 FORKING=true yarn hardhat run ./scripts/chainlink-event-fetcher.ts
+
+# To run tests with opcodes & gas tracing:
+TRACE_TX=true yarn test
 ```
 
 ## Testing

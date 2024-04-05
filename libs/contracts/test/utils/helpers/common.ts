@@ -12,6 +12,7 @@ import {
 } from '../../../typechain';
 import { contractVersionLogger } from '../logger';
 import { expect } from 'chai';
+import { RpcStructLog } from 'hardhat/internal/hardhat-network/provider/output';
 
 export type GenericDataFeedStore =
   | DataFeedStoreGenericV1
@@ -150,11 +151,11 @@ export const setDataFeeds = async (
   return { receipts, receiptsGeneric, keys, values };
 };
 
-export const printGasUsage = (
+export const printGasUsage = async (
   logger: ReturnType<typeof contractVersionLogger>,
   receipts: any[],
   receiptsGeneric: any[],
-): void => {
+): Promise<void> => {
   const table: { [key: string]: { gas: number; diff: number; '%': number } } =
     {};
 
@@ -177,6 +178,26 @@ export const printGasUsage = (
       (table[key].diff / table['[Generic V1] gas used'].gas) *
       100
     ).toFixed(2);
+  }
+
+  if (process.env.TRACE_TX === 'true') {
+    for (const receipt of receipts.concat(receiptsGeneric)) {
+      const res = await network.provider.send('debug_traceTransaction', [
+        receipt.transactionHash,
+        {
+          disableMemory: true,
+          disableStorage: true,
+          disableStack: true,
+        },
+      ]);
+      const generic = receiptsGeneric.includes(receipt) ? 'Generic ' : '';
+      console.log(
+        `${[logger(receipt.to, `${generic}trace`, (data: string) => data)]}: `,
+        res.structLogs.filter((log: RpcStructLog) => {
+          return { op: log.op, gas: log.gas };
+        }),
+      );
+    }
   }
 
   console.table(table);

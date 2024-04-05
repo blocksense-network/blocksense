@@ -23,8 +23,8 @@ import {
   getter,
   printGasUsage,
   setter,
-} from './uitls/helpers';
-import { contractVersionLogger } from './uitls/logger';
+} from './utils/helpers/common';
+import { contractVersionLogger } from './utils/logger';
 
 const contractsImpl: {
   [key: string]: DataFeedStore;
@@ -289,7 +289,7 @@ describe('UpgradeableProxy', function () {
 
         let receiptsGeneric = [txG1, txG2];
 
-        printGasUsage(logger, receipts, receiptsGeneric);
+        await printGasUsage(logger, receipts, receiptsGeneric);
       });
     }
   });
