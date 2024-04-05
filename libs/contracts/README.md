@@ -46,14 +46,15 @@ All calls are handled by a fallback function based on the selector:
 Available scripts:
 
 ```sh
-yarn hardhat help
-yarn clean
-yarn build
-yarn test
-yarn coverage
-yarn size
+yarn hardhat help # Display Hardhat commands
+yarn clean # Clean all untracked files
+yarn build # Compile contracts
+yarn test # Run tests
+yarn coverage # Run tests and generate coverage report
+yarn size # Display size of contracts
 
 # Run these two in separate shells:
+# Run a local node
 yarn hardhat node
 yarn deploy:local ./scripts/<script_name>.ts
 
@@ -61,4 +62,18 @@ yarn deploy:local ./scripts/<script_name>.ts
 FORKING=true yarn hardhat run ./scripts/chainlink-event-fetcher.ts
 ```
 
-Running `yarn test` will output a gas cost comparison table between the different data feed store implementations and the reference implementations.
+## Testing
+
+To execute all tests simply run:
+
+```sh
+yarn test
+```
+
+This command will output a gas cost comparison table between the different data feed store implementations and the reference implementations.
+
+You can also run the tests and generate a coverage report by running:
+
+```sh
+yarn coverage
+```
