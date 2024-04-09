@@ -32,28 +32,28 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: nix flake check
-        run: nix flake check
+        run: nix flake check --impure
 
       - name: Build the Nix Dev Shell
-        run: nix build .#devShells.x86_64-linux.default
+        run: nix build --impure .#devShells.x86_64-linux.default
 
       - name: Install JS deps
-        run: nix develop -c yarn install
+        run: nix develop --impure -c yarn install
 
       - name: Check formatting
-        run: nix develop -c yarn format:check
+        run: nix develop --impure -c yarn format:check
 
       - name: Build all contracts
-        run: nix develop -c yarn workspace @blocksense/contracts build
+        run: nix develop --impure -c yarn workspace @blocksense/contracts build
 
       - name: Test all contracts
-        run: nix develop -c yarn workspace @blocksense/contracts test
+        run: nix develop --impure -c yarn workspace @blocksense/contracts test
 
       - name: Measure test coverage
-        run: nix develop -c yarn workspace @blocksense/contracts coverage
+        run: nix develop --impure -c yarn workspace @blocksense/contracts coverage
 
       - name: Measure contract size
-        run: nix develop -c yarn workspace @blocksense/contracts size
+        run: nix develop --impure -c yarn workspace @blocksense/contracts size
 
   Rust-CI:
     timeout-minutes: 360
@@ -74,10 +74,10 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: nix flake check
-        run: nix flake check
+        run: nix flake check --impure
 
       - name: Build the Nix Dev Shell
-        run: nix build .#devShells.x86_64-linux.default
+        run: nix build --impure .#devShells.x86_64-linux.default
 
       - name: Build Rust workspace
-        run: nix develop -c cargo build
+        run: nix develop --impure -c cargo build

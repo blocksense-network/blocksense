@@ -1,32 +1,21 @@
 {...}: {
-  perSystem = {
-    pkgs,
-    inputs',
-    ...
-  }: let
-    pkgSets = {
-      dev-shell = import ./pkg-sets/dev-shell.nix {inherit pkgs inputs';};
-      js = import ./pkg-sets/js.nix {inherit pkgs inputs';};
-      rust = import ./pkg-sets/rust.nix {inherit pkgs inputs';};
+  perSystem = {inputs', ...}: let
+    createShell = module: shellName: {
+      imports = [
+        {
+          _module.args = {
+            inherit inputs' shellName;
+          };
+        }
+        ./pkg-sets/dev-shell.nix
+        module
+      ];
     };
-
-    createShell = pkgSet: name:
-      pkgs.mkShell {
-        packages = pkgSets.dev-shell ++ pkgSet;
-
-        shellHook = ''
-          {
-            figlet -f smslant -t 'Blocksense'
-            figlet -f smslant -t 'Monorepo'
-            figlet -f smslant -t '${name} Dev Shell  $ _'
-          } | clolcat
-        '';
-      };
   in {
-    devShells = {
-      default = createShell (pkgSets.js ++ pkgSets.rust) "Main";
-      rust = createShell pkgSets.rust "Rust";
-      js = createShell pkgSets.js "JS";
+    devenv.shells = {
+      default = createShell ./pkg-sets/all.nix "Main";
+      rust = createShell ./pkg-sets/rust.nix "Rust";
+      js = createShell ./pkg-sets/js.nix "JS";
     };
   };
 }
