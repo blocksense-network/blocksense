@@ -1,5 +1,5 @@
 [workspace]
-members = ["libs/anomaly_detection"]
+members = [ "apps/example-wasi-nn","libs/anomaly_detection"]
 resolver = "2"
 
 [workspace.package]
