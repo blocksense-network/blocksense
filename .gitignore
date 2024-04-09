@@ -133,6 +133,7 @@ dist
 
 # Nix & Direnv
 .direnv
+.devenv
 result
 
 # Rust cargo artifacts
