@@ -17,11 +17,20 @@
     nixpkgs.follows = "mcl-blockchain/nixpkgs";
     flake-parts.follows = "mcl-blockchain/flake-parts";
     fenix.follows = "mcl-blockchain/fenix";
+    devenv.follows = "mcl-blockchain/devenv";
+    nix2container.follows = "mcl-blockchain/nix2container";
+    mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
   };
 
   outputs = inputs @ {flake-parts, ...}:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      imports = [./nix];
+      imports = [
+        # Third-party flake-parts modules
+        inputs.devenv.flakeModule
+
+        # Local flake-parts modules
+        ./nix
+      ];
       systems = ["x86_64-linux" "aarch64-darwin"];
     };
 }
