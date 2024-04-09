@@ -3,6 +3,8 @@
   inputs',
   ...
 }: {
+  imports = [./openvino.nix];
+
   packages = with pkgs; [
     (inputs'.fenix.packages.stable.withComponents [
       "cargo"
