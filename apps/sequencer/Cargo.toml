@@ -57,6 +57,7 @@ once_cell = "1.19.0"
 serde_json = "1.0.115"
 serde = { version = "1.0.197", features = ["derive"]}
 futures = "0.3.30"
+envload = "0.1.1"
 
 [[bin]]
 name = "sequencer"

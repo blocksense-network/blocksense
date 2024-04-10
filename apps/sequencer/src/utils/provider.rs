@@ -1,6 +1,7 @@
 use alloy::transports::http::Http;
 use alloy::{
     network::{Ethereum, EthereumSigner},
+    primitives::Address,
     providers::{
         layers::{ManagedNonceProvider, NonceManagerLayer, SignerProvider},
         ProviderBuilder, RootProvider,
@@ -9,7 +10,43 @@ use alloy::{
 };
 use reqwest::{Client, Url};
 
-use std::env::var;
+use envload::Envload;
+use envload::LoadEnv;
+
+use std::fs;
+
+#[derive(Envload)]
+pub struct SequencerConfig {
+    rpc_url: Url,
+    private_key: String,
+    contract_address: Option<String>,
+}
+
+pub fn get_wallet() -> LocalWallet {
+    let env = <SequencerConfig as LoadEnv>::load_env();
+    let priv_key = fs::read_to_string(env.private_key.clone())
+        .expect(format!("Failed to read private key from {}", env.private_key).as_str());
+
+    let wallet: LocalWallet = priv_key
+        .trim()
+        .parse()
+        .expect("Incorrect private key specified.");
+    wallet
+}
+
+pub fn get_contract_address() -> Address {
+    let env = <SequencerConfig as LoadEnv>::load_env();
+    let contract_address: Address = env
+        .contract_address
+        .expect("Contract address not provided in environment.")
+        .parse()
+        .expect("Contract address not found.");
+    contract_address
+}
+
+pub fn print_type<T>(_: &T) {
+    println!("{:?}", std::any::type_name::<T>());
+}
 
 // fn get_provider() -> RootProvider<Http<Client>> {
 //     let rpc_url = get_rpc_url();
@@ -29,7 +66,8 @@ pub fn get_provider() -> ManagedNonceProvider<
     Ethereum,
 > {
     // Create a provider with a signer.
-    let rpc_url = get_rpc_url();
+
+    let env = <SequencerConfig as LoadEnv>::load_env();
 
     let wallet = get_wallet();
 
@@ -37,25 +75,7 @@ pub fn get_provider() -> ManagedNonceProvider<
     let provider = ProviderBuilder::new()
         .layer(NonceManagerLayer)
         .signer(EthereumSigner::from(wallet))
-        .on_reqwest_http(rpc_url)
+        .on_reqwest_http(env.rpc_url)
         .unwrap();
     provider
-}
-
-pub fn get_rpc_url() -> Url {
-    var("RPC_URL")
-        .expect("$RPC_URL is not set")
-        .parse()
-        .expect("Non valid JSON rpc url provided.")
-}
-
-pub fn get_wallet() -> LocalWallet {
-    var("PRIVATE_KEY")
-        .expect("$PRIVATE_KEY is not set")
-        .parse()
-        .expect("Incorrect private key specified.")
-}
-
-pub fn print_type<T>(_: &T) {
-    println!("{:?}", std::any::type_name::<T>());
 }
