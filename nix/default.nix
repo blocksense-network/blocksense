@@ -1,5 +1,5 @@
 {lib, ...}: {
-  imports = [./shells];
+  imports = [./shells ./pkgs];
 
   flake.lib = {
     filesets = import ./filesets.nix {inherit lib;};
