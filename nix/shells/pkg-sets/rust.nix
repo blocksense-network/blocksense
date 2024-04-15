@@ -1,18 +1,14 @@
 {
   pkgs,
-  inputs',
+  self',
   ...
 }: {
-  packages = with pkgs; [
-    (inputs'.fenix.packages.stable.withComponents [
-      "cargo"
-      "clippy"
-      "rust-src"
-      "rust-analyzer"
-      "rustc"
-      "rustfmt"
-    ])
-    openssl
-    pkg-config
-  ];
+  packages =
+    [
+      self'.legacyPackages.rustToolchain
+    ]
+    ++ (with pkgs; [
+      openssl
+      pkg-config
+    ]);
 }

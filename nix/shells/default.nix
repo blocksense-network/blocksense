@@ -1,10 +1,14 @@
 {...}: {
-  perSystem = {inputs', ...}: let
+  perSystem = {
+    inputs',
+    self',
+    ...
+  }: let
     createShell = module: shellName: {
       imports = [
         {
           _module.args = {
-            inherit inputs' shellName;
+            inherit inputs' self' shellName;
           };
         }
         ./pkg-sets/dev-shell.nix
