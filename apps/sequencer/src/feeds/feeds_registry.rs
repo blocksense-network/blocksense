@@ -2,7 +2,9 @@
 use std::collections::hash_map::Keys;
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::cell::RefCell;
 
+#[derive(Debug)]
 pub struct FeedMetaData {
     name: String,
     report_interval: u64, // Consider oneshot feeds.
@@ -87,5 +89,32 @@ impl AllFeedsReports {
             report: HashMap::new(),
         });
         res.report.insert(reporter_id, data);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::feeds::feeds_registry::FeedMetaData;
+    use crate::feeds::feeds_registry::FeedMetaDataRegistry;
+
+    #[test]
+    fn basic_test() {
+        let fmd1 = FeedMetaData::new("BTS/USD", 1000, 0, 0);
+        let fmd2 = FeedMetaData::new("ETH/USD", 2000, 0, 0);
+
+        let mut fmdr = FeedMetaDataRegistry::new();
+
+        fmdr.push(1, fmd1);
+        fmdr.push(2, fmd2);
+
+        println!("fmdr.get_keys()={:?}", fmdr);
+        fmdr.get(1).borrow_mut().inc_slot();
+        assert!(fmdr.get(1).borrow_mut().get_slot() == 1);
+        println!("fmdr.get_keys()={:?}", fmdr);
+        fmdr.get(2).borrow_mut().inc_slot();
+        fmdr.get(2).borrow_mut().inc_slot();
+        fmdr.get(2).borrow_mut().inc_slot();
+        assert!(fmdr.get(1).borrow_mut().get_slot() == 1);
+        assert!(fmdr.get(2).borrow_mut().get_slot() == 3);
     }
 }
