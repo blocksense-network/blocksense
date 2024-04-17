@@ -9,15 +9,24 @@ use alloy::{
     sol,
 };
 use eyre::Result;
+use std::borrow::BorrowMut;
 use std::env;
+use std::sync::mpsc;
+use std::sync::{mpsc::channel, Arc, RwLock};
+use std::thread;
+
+use sequencer::feeds::feeds_registry::{
+    get_feed_id, AllFeedsReports, FeedMetaData, FeedMetaDataRegistry,
+};
 
 use actix_web::{error, rt::spawn, rt::time, Error};
 use actix_web::{get, web, App, HttpServer};
 use actix_web::{post, HttpResponse, Responder};
 use futures::StreamExt;
-use sequencer::utils::byte_utils::*;
+use sequencer::utils::byte_utils::to_hex_string;
 use sequencer::utils::provider::*;
 use serde::{Deserialize, Serialize};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time::Duration;
 
 #[derive(Serialize, Deserialize)]
@@ -182,9 +191,9 @@ const MAX_SIZE: usize = 262_144; // max payload size is 256k
 async fn index_post(
     name: web::Path<String>,
     mut payload: web::Payload,
+    app_state: web::Data<AppStateWithCounter>,
 ) -> Result<HttpResponse, Error> {
-    // payload is a stream of Bytes objects
-    println!("Called index_post {}!", name);
+    println!("Called index_post {}", name);
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
         let chunk = chunk?;
@@ -209,26 +218,164 @@ async fn index_post(
     result_bytes.resize(32, 0);
     let result_hex = to_hex_string(result_bytes);
 
-    eth_send_to_contract("00000000", result_hex.as_str())
-        .await
-        .unwrap();
+    let feed_id = get_feed_id(v["feed_id"].to_string().as_str());
 
-    Ok(HttpResponse::Ok().into()) // <- send response
+    let reporter_id = v["reporter_id"].to_string().parse::<u64>().unwrap();
+
+    let msg_timestamp = v["timestamp"].to_string().parse::<u128>().unwrap();
+
+    // println!("result = {:?}; feed_id = {:?}; reporter_id = {:?}", result_bytes, feed_id, reporter_id);
+    let feed;
+    {
+        let reg = app_state.registry.read().unwrap();
+        println!("getting feed_id = {}", &feed_id);
+        feed = match reg.get(feed_id.into()) {
+            Some(x) => x,
+            None => return Ok(HttpResponse::BadRequest().into()),
+        };
+    }
+
+    let current_time_as_ms = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards")
+        .as_millis();
+
+    // check if the time stamp in the msg is <= current_time_as_ms
+    // and check if it is inside the current active slot frame.
+    let mut accept_report = false;
+    {
+        let feed = feed.read().unwrap();
+
+        let start_of_voting_round = feed.get_first_report_start_time()
+            + (feed.get_slot() as u128 * feed.get_report_interval() as u128);
+        let end_of_voting_round = feed.get_first_report_start_time()
+            + ((feed.get_slot() + 1) as u128 * feed.get_report_interval() as u128);
+
+        if current_time_as_ms >= start_of_voting_round
+            && current_time_as_ms <= end_of_voting_round
+            && msg_timestamp >= start_of_voting_round
+            && msg_timestamp <= end_of_voting_round
+        {
+            accept_report = true;
+            println!("accepted!");
+        }
+
+        if msg_timestamp > current_time_as_ms {
+            println!(
+                "Clock skew with reporter {} detected! Report timestamp = {}; Recv time = {}",
+                reporter_id, msg_timestamp, current_time_as_ms
+            );
+        }
+    }
+
+    if accept_report {
+        let mut reports = app_state.reports.write().unwrap();
+        reports.push(feed_id.into(), reporter_id, result_hex);
+        // eth_send_to_contract(feed_id.as_str(), result_hex.as_str())
+        //     .await
+        //     .unwrap();
+        return Ok(HttpResponse::Ok().into()); // <- send response
+    } else {
+        println!("rejected!");
+    }
+    Ok(HttpResponse::BadRequest().into())
+}
+
+struct AppStateWithCounter {
+    registry: Arc<RwLock<FeedMetaDataRegistry>>,
+    reports: Arc<RwLock<AllFeedsReports>>,
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    spawn(async move {
-        let mut interval = time::interval(Duration::from_secs(10));
-        loop {
-            interval.tick().await;
-            println!("Tick.");
-        }
+    let app_state = web::Data::new(AppStateWithCounter {
+        registry: Arc::new(RwLock::new(FeedMetaDataRegistry::new_with_test_data())),
+        reports: Arc::new(RwLock::new(AllFeedsReports::new())),
     });
 
+    {
+        let reg = app_state.registry.write().unwrap();
+        let keys: Vec<u64> = reg.get_keys().copied().collect();
+        for key in keys {
+            let feed = reg.get(key).unwrap();
+            let feed = feed.read().unwrap();
+            let name = feed.get_name().clone();
+            let report_interval = feed.get_report_interval();
+            let first_report_start_time = feed.get_first_report_start_time();
+
+            println!("key = {} : value = {:?}", key, reg.get(key));
+
+            let app_state_clone: web::Data<AppStateWithCounter> = app_state.clone(); //This will be moved into the spawned timer below
+
+            spawn(async move {
+                let mut interval = time::interval(Duration::from_millis(report_interval));
+                interval.tick().await; // The first tick completes immediately.
+                loop {
+                    interval.tick().await;
+
+                    let feed: Arc<RwLock<FeedMetaData>>;
+                    {
+                        let reg = app_state_clone.registry.write().unwrap();
+                        feed = match reg.get(key) {
+                            Some(x) => x,
+                            None => panic!("Error timer for feed that was not registered."),
+                        };
+                    }
+                    let slot = feed.read().unwrap().get_slot();
+                    println!("processing votes for feed_id = {}, slot = {}", &key, &slot);
+
+                    let key = key;
+                    println!(
+                        "Tick from {} with id {} rep_interval {}.",
+                        name, key, report_interval
+                    );
+
+                    let reports = match app_state_clone.reports.read().unwrap().get(key) {
+                        Some(x) => x,
+                        None => {
+                            println!("No reports found!");
+                            feed.write().unwrap().inc_slot();
+                            continue;
+                        }
+                    };
+                    println!("found the following reports:");
+                    println!("reports = {:?}", reports);
+
+                    let mut reports = reports.write().unwrap();
+                    // Process the reports:
+                    let mut values: Vec<&String> = vec![];
+                    for kv in &reports.report {
+                        values.push(&kv.1);
+                    }
+
+                    if values.is_empty() {
+                        println!("No reports found for slot {}!", &slot);
+                        feed.write().unwrap().inc_slot();
+                        continue;
+                    }
+
+                    let result_post_to_contract =
+                        feed.read().unwrap().get_feed_type().process(values); // Dispatch to concreate FeedProcessing implementation.
+                    println!("result_post_to_contract = {:?}", result_post_to_contract);
+
+                    eth_send_to_contract(
+                        to_hex_string(key.to_be_bytes().to_vec()).as_str(),
+                        result_post_to_contract.as_str(),
+                    )
+                    .await
+                    .unwrap();
+
+                    reports.clear();
+                    feed.write().unwrap().inc_slot();
+                }
+            });
+        }
+    }
+
     let _init_provider = get_provider();
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         App::new()
+            .app_data(app_state.clone())
             .service(get_key)
             .service(index)
             .service(hello)
