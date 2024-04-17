@@ -1,5 +1,10 @@
-{...}: {
+{lib, ...}: {
   imports = [./shells];
+
+  flake.lib = {
+    filesets = import ./filesets.nix {inherit lib;};
+  };
+
   perSystem = {inputs', ...}: {
     legacyPackages = {
       rustToolchain = inputs'.fenix.packages.stable.withComponents [
