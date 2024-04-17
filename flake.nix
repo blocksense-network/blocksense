@@ -15,6 +15,7 @@
   inputs = {
     mcl-blockchain.url = "github:metacraft-labs/nix-blockchain-development";
     nixpkgs.follows = "mcl-blockchain/nixpkgs";
+    ethereum-nix.follows = "mcl-blockchain/nixos-modules/ethereum-nix";
     flake-parts.follows = "mcl-blockchain/flake-parts";
     fenix.follows = "mcl-blockchain/fenix";
     devenv.follows = "mcl-blockchain/devenv";

@@ -1180,6 +1180,11 @@
           "mcl-blockchain",
           "devenv"
         ],
+        "ethereum-nix": [
+          "mcl-blockchain",
+          "nixos-modules",
+          "ethereum-nix"
+        ],
         "fenix": [
           "mcl-blockchain",
           "fenix"
