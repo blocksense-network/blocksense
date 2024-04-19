@@ -1,0 +1,21 @@
+[package]
+name = "blocksense-macro"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+description = """
+Rust procedural macros for Blocksense and associated WIT files
+"""
+
+[lib]
+name = "blocksense_macro"
+proc-macro = true
+
+[dependencies]
+anyhow = "1"
+bytes = "1"
+proc-macro2 = "1"
+quote = "1.0"
+syn = { version = "1.0", features = [ "full" ]}

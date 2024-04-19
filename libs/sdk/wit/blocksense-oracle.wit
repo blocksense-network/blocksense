@@ -1,0 +1,27 @@
+package blocksense:oracle@2.0.0;
+
+interface oracle-types {
+  record settings {
+    id: string,
+  }
+
+  record payload {
+    body: option<u64>
+  }
+
+  variant error {
+    other(string),
+  }
+}
+
+world blocksense-oracle {
+  use oracle-types.{settings, payload, error};
+  import fermyon:spin/variables@2.0.0;
+  import wasi:http/outgoing-handler@0.2.0;
+  // import wasi:io/imports@0.2.0;
+  export handle-oracle-request: func(settings: settings) -> result<payload, error>;
+}
+
+world platform {
+  import fermyon:spin/variables@2.0.0;
+}
