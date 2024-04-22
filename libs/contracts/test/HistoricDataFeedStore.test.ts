@@ -1,0 +1,133 @@
+import { ethers } from 'hardhat';
+import {
+  HistoricDataFeedStoreGenericV1,
+  HistoricDataFeedStoreV1,
+  IDataFeedStore__factory,
+} from '../typechain';
+import {
+  HISTORIC_SELECTORS,
+  deployContract,
+  getHistoricSelector,
+  getV2Selector,
+  getter,
+  printGasUsage,
+  setDataFeeds,
+  setter,
+} from './utils/helpers/common';
+import { expect } from 'chai';
+import { contractVersionLogger } from './utils/logger';
+
+const contracts: {
+  [key: string]: any;
+} = {};
+const genericContracts: {
+  [key: string]: any;
+} = {};
+const selector =
+  IDataFeedStore__factory.createInterface().getFunction('setFeeds').selector;
+
+describe.only('DataFeedStore', function () {
+  let logger: ReturnType<typeof contractVersionLogger>;
+
+  beforeEach(async function () {
+    genericContracts.V1 = await deployContract<HistoricDataFeedStoreGenericV1>(
+      'HistoricDataFeedStoreGenericV1',
+    );
+
+    contracts.V4 = await deployContract<HistoricDataFeedStoreV1>(
+      'HistoricDataFeedStoreV1',
+    );
+
+    logger = contractVersionLogger([contracts, genericContracts]);
+  });
+
+  it('Should set and get correct values', async function () {
+    const key = 1;
+    const value = ethers.encodeBytes32String('value');
+
+    const receipt = await setter(contracts.V4, selector, [key], [value]);
+    const block = await ethers.provider.getBlock(receipt.blockNumber);
+    const storedValue = await getter(contracts.V4, getV2Selector(key));
+    const data = storedValue.slice(0, 48).padEnd(66, '0');
+    const timestamp = ethers.toNumber(
+      '0x' + storedValue.slice(48, storedValue.length),
+    );
+
+    expect(data).to.equal(value);
+    expect(timestamp).to.equal(block?.timestamp);
+  });
+
+  it('Should get the current counter', async function () {
+    const key = 1;
+    const value = ethers.encodeBytes32String('value');
+
+    await setter(contracts.V4, selector, [key], [value]);
+    const historicSelector = getHistoricSelector(
+      HISTORIC_SELECTORS.GET_LATEST_COUNTER,
+      key,
+    );
+    const counter = await getter(contracts.V4, historicSelector);
+
+    expect(+counter).to.equal(1);
+  });
+
+  it('Should get the current counter after 10 iterations', async function () {
+    const key = 1;
+    const value = ethers.encodeBytes32String('value');
+
+    for (let i = 0; i < 10; i++) {
+      await setter(contracts.V4, selector, [key], [value]);
+    }
+    const historicSelector = getHistoricSelector(
+      HISTORIC_SELECTORS.GET_LATEST_COUNTER,
+      key,
+    );
+    const counter = await getter(contracts.V4, historicSelector);
+
+    expect(+counter).to.equal(10);
+  });
+
+  it('Should get value at counter 5', async function () {
+    const key = 1;
+    let timestamp = 0;
+
+    for (let i = 1; i <= 10; i++) {
+      const value = ethers.encodeBytes32String('value ' + i);
+      await setter(contracts.V4, selector, [key], [value]);
+      if (i === 5) {
+        timestamp = (await ethers.provider.getBlock('latest'))?.timestamp || 0;
+      }
+    }
+    const historicSelector = getHistoricSelector(
+      HISTORIC_SELECTORS.GET_VALUE_AT_COUNTER,
+      key,
+    );
+    const data = await getter(contracts.V4, historicSelector, {
+      data: ethers.solidityPacked(['bytes4', 'uint256'], [historicSelector, 5]),
+    });
+    const value = data.slice(0, 48).padEnd(66, '0');
+    const timestampValue = ethers.toNumber('0x' + data.slice(48, data.length));
+
+    expect(value).to.equal(ethers.encodeBytes32String('value 5'));
+    expect(timestampValue).to.equal(timestamp);
+  });
+
+  for (let i = 1; i <= 100; i *= 10) {
+    it(`Should set ${i} feeds in a single transaction`, async function () {
+      const { receipts, receiptsGeneric } = await setDataFeeds(
+        Object.values(genericContracts),
+        Object.values(contracts),
+        selector,
+        i,
+      );
+
+      printGasUsage(logger, receipts, receiptsGeneric);
+
+      for (const receipt of receipts) {
+        for (const genericReceipt of receiptsGeneric) {
+          expect(receipt.gasUsed).to.be.lte(genericReceipt?.gasUsed);
+        }
+      }
+    });
+  }
+});

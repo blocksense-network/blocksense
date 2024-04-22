@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BytesLike, ethers } from 'ethers';
 import { ethers as hre, network } from 'hardhat';
 import {
   DataFeedStoreGenericV1,
@@ -103,6 +103,18 @@ export const getV1Selector = (key: number): string => {
 
 export const getV2Selector = (key: number): string => {
   return '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
+};
+
+export enum HISTORIC_SELECTORS {
+  GET_LATEST_VALUE = 0x80000000,
+  GET_LATEST_COUNTER = 0x40000000,
+  GET_VALUE_AT_COUNTER = 0x20000000,
+}
+export const getHistoricSelector = (
+  type: HISTORIC_SELECTORS,
+  key: number,
+): string => {
+  return '0x' + ((key | type) >>> 0).toString(16).padStart(8, '0');
 };
 
 function isGenericV1(
