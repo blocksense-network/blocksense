@@ -1,11 +1,12 @@
 [workspace]
 members = [
-  "libs/anomaly_detection",
   "apps/sequencer",
+  "libs/anomaly_detection",
+  "libs/cli",
+  "libs/data_feeds",
+  "libs/registry",
   "libs/sdk",
   "libs/sdk/trigger-oracle",
-  "libs/cli",
-  "libs/registry",
   "libs/sequencer-types"
 ]
 resolver = "2"
