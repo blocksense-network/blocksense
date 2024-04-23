@@ -1,7 +1,6 @@
 use crate::utils::byte_utils::to_hex_string;
 use std::collections::hash_map::Keys;
 use std::collections::HashMap;
-use std::sync::Mutex;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 

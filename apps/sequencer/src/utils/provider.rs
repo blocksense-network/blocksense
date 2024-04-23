@@ -76,6 +76,6 @@ pub fn get_provider() -> ManagedNonceProvider<
         .layer(NonceManagerLayer)
         .signer(EthereumSigner::from(wallet))
         .on_reqwest_http(env.rpc_url)
-        .unwrap();
+        .expect("Failed to create provider!");
     provider
 }

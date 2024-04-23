@@ -9,11 +9,8 @@ use alloy::{
     sol,
 };
 use eyre::Result;
-use std::borrow::BorrowMut;
 use std::env;
-use std::sync::mpsc;
-use std::sync::{mpsc::channel, Arc, RwLock};
-use std::thread;
+use std::sync::{Arc, RwLock};
 
 use sequencer::feeds::feeds_registry::{
     get_feed_id, AllFeedsReports, FeedMetaData, FeedMetaDataRegistry,
@@ -208,26 +205,41 @@ async fn index_post(
     // let obj = serde_json::from_slice::<MyObj>(&body)?;
     println!("body = {:?}!", body);
 
-    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body).unwrap())?;
-    let mut result_bytes = v["result"]
-        .to_string()
-        .parse::<f32>()
-        .unwrap()
-        .to_be_bytes()
-        .to_vec();
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
+    let mut result_bytes = match v["result"].to_string().parse::<f32>() {
+        Ok(x) => x,
+        Err(_) => {
+            return Ok(HttpResponse::BadRequest().into());
+        }
+    }
+    .to_be_bytes()
+    .to_vec();
     result_bytes.resize(32, 0);
     let result_hex = to_hex_string(result_bytes);
 
     let feed_id = get_feed_id(v["feed_id"].to_string().as_str());
 
-    let reporter_id = v["reporter_id"].to_string().parse::<u64>().unwrap();
+    let reporter_id = match v["reporter_id"].to_string().parse::<u64>() {
+        Ok(x) => x,
+        Err(_) => {
+            return Ok(HttpResponse::BadRequest().into());
+        }
+    };
 
-    let msg_timestamp = v["timestamp"].to_string().parse::<u128>().unwrap();
+    let msg_timestamp = match v["timestamp"].to_string().parse::<u128>() {
+        Ok(x) => x,
+        Err(_) => {
+            return Ok(HttpResponse::BadRequest().into());
+        }
+    };
 
     // println!("result = {:?}; feed_id = {:?}; reporter_id = {:?}", result_bytes, feed_id, reporter_id);
     let feed;
     {
-        let reg = app_state.registry.read().unwrap();
+        let reg = app_state
+            .registry
+            .read()
+            .expect("Error trying to lock Registry for read!");
         println!("getting feed_id = {}", &feed_id);
         feed = match reg.get(feed_id.into()) {
             Some(x) => x,
@@ -244,7 +256,7 @@ async fn index_post(
     // and check if it is inside the current active slot frame.
     let mut accept_report = false;
     {
-        let feed = feed.read().unwrap();
+        let feed = feed.read().expect("Error trying to lock Feed for read!");
 
         let start_of_voting_round = feed.get_first_report_start_time()
             + (feed.get_slot() as u128 * feed.get_report_interval() as u128);
@@ -269,11 +281,11 @@ async fn index_post(
     }
 
     if accept_report {
-        let mut reports = app_state.reports.write().unwrap();
+        let mut reports = app_state
+            .reports
+            .write()
+            .expect("Error trying to lock Reports for read!");
         reports.push(feed_id.into(), reporter_id, result_hex);
-        // eth_send_to_contract(feed_id.as_str(), result_hex.as_str())
-        //     .await
-        //     .unwrap();
         return Ok(HttpResponse::Ok().into()); // <- send response
     } else {
         println!("rejected!");
