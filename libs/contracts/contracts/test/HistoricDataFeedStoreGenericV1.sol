@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
+import {TransmissionUtils} from './libraries/TransmissionUtils.sol';
+
 contract HistoricDataFeedStoreGenericV1 {
   uint16 internal constant MAX_COUNTER = 0xFFFF;
 
-  struct Transmission {
-    bytes24 value;
-    uint64 timestamp;
-  }
-
-  mapping(uint256 => mapping(uint256 => Transmission))
+  mapping(uint256 => mapping(uint256 => TransmissionUtils.Data))
     internal historicDataFeeds;
   mapping(uint256 => uint256) internal counters;
   address internal immutable owner;
@@ -42,7 +39,7 @@ contract HistoricDataFeedStoreGenericV1 {
       if (counter == 0) {
         counter = 1;
       }
-      historicDataFeeds[keys[i]][counter] = Transmission({
+      historicDataFeeds[keys[i]][counter] = TransmissionUtils.Data({
         value: bytes24(values[i]),
         timestamp: uint64(block.timestamp)
       });
@@ -55,7 +52,7 @@ contract HistoricDataFeedStoreGenericV1 {
 
   function getDataFeed(
     uint256 key
-  ) external view returns (Transmission memory) {
+  ) external view returns (TransmissionUtils.Data memory) {
     return historicDataFeeds[key][counters[key]];
   }
 
@@ -66,7 +63,7 @@ contract HistoricDataFeedStoreGenericV1 {
   function getFeedAtCounter(
     uint256 key,
     uint256 counter
-  ) external view returns (Transmission memory) {
+  ) external view returns (TransmissionUtils.Data memory) {
     return historicDataFeeds[key][counter];
   }
 }
