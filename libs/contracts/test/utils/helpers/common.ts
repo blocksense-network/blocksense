@@ -6,6 +6,10 @@ import {
   DataFeedStoreV1,
   DataFeedStoreV2,
   DataFeedStoreV3,
+  HistoricDataFeedStoreGenericV1,
+  HistoricDataFeedStoreV1,
+  HistoricDataFeedStoreV2,
+  HistoricDataFeedStoreV3,
   IDataFeedStoreGenericV1,
   IDataFeedStoreGenericV2,
   UpgradeableProxy,
@@ -18,6 +22,12 @@ export type GenericDataFeedStore =
   | DataFeedStoreGenericV1
   | DataFeedStoreGenericV2;
 export type DataFeedStore = DataFeedStoreV1 | DataFeedStoreV2 | DataFeedStoreV3;
+
+export type HistoricDataFeedStore =
+  | HistoricDataFeedStoreV1
+  | HistoricDataFeedStoreV2
+  | HistoricDataFeedStoreV3;
+export type GenericHistoricDataFeedStore = HistoricDataFeedStoreGenericV1;
 
 export const getter = async (
   contract: DataFeedStore,
@@ -127,8 +137,8 @@ function isGenericV1(
 }
 
 export const setDataFeeds = async (
-  genericContracts: GenericDataFeedStore[],
-  contracts: DataFeedStore[],
+  genericContracts: GenericDataFeedStore[] | GenericHistoricDataFeedStore[],
+  contracts: DataFeedStore[] | HistoricDataFeedStore[],
   selector: string,
   valuesCount: number,
   start: number = 0,
@@ -146,13 +156,13 @@ export const setDataFeeds = async (
   let receiptsGeneric = [];
   for (const contract of genericContracts) {
     let receipt;
-    if (isGenericV1(contract)) {
+    if (isGenericV1(contract as any)) {
       receipt = await contract.setFeeds(keys, values);
     } else {
       receipt = await contract.setFeeds(
         ethers.solidityPacked(
           keys.map(() => ['uint32', 'bytes32']).flat(),
-          keys.flatMap((key, i) => [key, values[i]]),
+          keys.flatMap((key, i) => [key, values[i] as BytesLike]),
         ),
       );
     }
@@ -219,7 +229,21 @@ export const deployContract = async <T>(
   contractName: string,
   ...args: any[]
 ): Promise<T> => {
-  const contractFactory = await hre.getContractFactory(contractName);
+  let linkLibraries: any = {};
+  args = args.filter(arg => {
+    if (typeof arg === 'object' && arg.link) {
+      linkLibraries = arg.link;
+      return false;
+    }
+    return true;
+  });
+
+  const contractFactory = await hre.getContractFactory(
+    contractName,
+    Object.keys(linkLibraries).length > 0
+      ? { libraries: linkLibraries }
+      : undefined,
+  );
   const contract = await contractFactory.deploy(...args);
   await contract.waitForDeployment();
 
@@ -232,4 +256,11 @@ export const deployContract = async <T>(
   );
 
   return contract as T;
+};
+
+export const abiDecode = (types: string[], data: BytesLike) => {
+  expect(types.length).to.be.eq(data.length);
+
+  const abi = new ethers.AbiCoder();
+  return abi.decode(types, data);
 };

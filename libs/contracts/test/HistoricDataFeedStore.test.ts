@@ -2,13 +2,13 @@ import { ethers } from 'hardhat';
 import {
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreV1,
+  HistoricDataFeedStoreV3,
   IDataFeedStore__factory,
 } from '../typechain';
 import {
   HISTORIC_SELECTORS,
   deployContract,
   getHistoricSelector,
-  getV2Selector,
   getter,
   printGasUsage,
   setDataFeeds,
@@ -27,7 +27,7 @@ const genericContracts: {
 const selector =
   IDataFeedStore__factory.createInterface().getFunction('setFeeds').selector;
 
-describe.only('DataFeedStore', function () {
+describe('HistoricDataFeedStore', function () {
   let logger: ReturnType<typeof contractVersionLogger>;
 
   beforeEach(async function () {
@@ -41,11 +41,14 @@ describe.only('DataFeedStore', function () {
     contracts.V5 = await deployContract<HistoricDataFeedStoreV2>(
       'HistoricDataFeedStoreV2',
     );
+    contracts.V6 = await deployContract<HistoricDataFeedStoreV3>(
+      'HistoricDataFeedStoreV3',
+    );
 
     logger = contractVersionLogger([contracts, genericContracts]);
   });
 
-  for (let i = 5; i <= 5; i++) {
+  for (let i = 4; i <= 6; i++) {
     it('Should set and get correct values', async function () {
       const key = 1;
       const value = ethers.encodeBytes32String('value');
@@ -57,7 +60,10 @@ describe.only('DataFeedStore', function () {
         [value],
       );
       const block = await ethers.provider.getBlock(receipt.blockNumber);
-      const storedValue = await getter(contracts[`V${i}`], getV2Selector(key));
+      const storedValue = await getter(
+        contracts[`V${i}`],
+        getHistoricSelector(HISTORIC_SELECTORS.GET_LATEST_VALUE, key),
+      );
 
       const data = storedValue.slice(0, 48).padEnd(66, '0');
       const timestamp = ethers.toNumber(
@@ -132,12 +138,45 @@ describe.only('DataFeedStore', function () {
 
   for (let i = 1; i <= 100; i *= 10) {
     it(`Should set ${i} feeds in a single transaction`, async function () {
-      const { receipts, receiptsGeneric } = await setDataFeeds(
+      await setDataFeeds(
         Object.values(genericContracts),
         Object.values(contracts),
         selector,
         i,
       );
+      const { receipts, receiptsGeneric, keys, values } = await setDataFeeds(
+        Object.values(genericContracts),
+        Object.values(contracts),
+        selector,
+        i,
+      );
+
+      for (const [idx, dataFeed] of Object.values(contracts).entries()) {
+        for (const [index, key] of keys.entries()) {
+          const storedValue = await getter(
+            dataFeed,
+            getHistoricSelector(HISTORIC_SELECTORS.GET_LATEST_VALUE, key),
+          );
+
+          const data = storedValue.slice(0, 48).padEnd(66, '0');
+          const timestamp = ethers.toNumber(
+            '0x' + storedValue.slice(48, storedValue.length),
+          );
+
+          expect(data).to.equal(values[index]);
+          expect(timestamp).to.equal(
+            (await ethers.provider.getBlock(receipts[idx].blockNumber))
+              ?.timestamp,
+          );
+
+          const historicSelector = getHistoricSelector(
+            HISTORIC_SELECTORS.GET_LATEST_COUNTER,
+            key,
+          );
+          const counter = await getter(dataFeed, historicSelector);
+          expect(+counter).to.equal(2);
+        }
+      }
 
       printGasUsage(logger, receipts, receiptsGeneric);
 
