@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import './Consumer.sol';
+import './HistoricConsumer.sol';
 import {HistoricDataFeedStoreGenericV1} from '../../HistoricDataFeedStoreGenericV1.sol';
 
 contract HistoricDataFeedGenericConsumer is HistoricConsumer {
@@ -9,7 +9,7 @@ contract HistoricDataFeedGenericConsumer is HistoricConsumer {
 
   function _getFeedById(
     uint32 key
-  ) internal view override returns (TransmissionUtils.Data memory) {
+  ) internal view override returns (Transmission memory) {
     return HistoricDataFeedStoreGenericV1(dataFeedStore).getDataFeed(key);
   }
 
@@ -25,7 +25,7 @@ contract HistoricDataFeedGenericConsumer is HistoricConsumer {
   function _getFeedAtCounter(
     uint32 key,
     uint32 counter
-  ) internal view override returns (TransmissionUtils.Data memory) {
+  ) internal view override returns (Transmission memory) {
     return
       HistoricDataFeedStoreGenericV1(dataFeedStore).getFeedAtCounter(
         key,

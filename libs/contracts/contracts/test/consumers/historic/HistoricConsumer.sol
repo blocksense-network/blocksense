@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {HistoricDataFeedStoreGenericV1} from '../../HistoricDataFeedStoreGenericV1.sol';
-import {TransmissionUtils} from '../../libraries/TransmissionUtils.sol';
+import {IHistoricDataFeed} from '../../interfaces/IHistoricDataFeed.sol';
 
-abstract contract HistoricConsumer {
+abstract contract HistoricConsumer is IHistoricDataFeed {
   address public immutable dataFeedStore;
-  mapping(uint32 => mapping(uint32 => TransmissionUtils.Data))
-    internal dataFeeds;
+  mapping(uint32 => mapping(uint32 => Transmission)) internal dataFeeds;
   mapping(uint32 => uint32) public counters;
-  mapping(uint32 => TransmissionUtils.Data) public latestDataFeeds;
+  mapping(uint32 => Transmission) public latestDataFeeds;
 
   error GetFeedByIdFailed();
 
@@ -17,16 +15,14 @@ abstract contract HistoricConsumer {
     dataFeedStore = _dataFeedStore;
   }
 
-  function getFeedById(
-    uint32 key
-  ) external view returns (TransmissionUtils.Data memory) {
+  function getFeedById(uint32 key) external view returns (Transmission memory) {
     return dataFeeds[key][counters[key]];
   }
 
   function getFeedAtCounter(
     uint32 key,
     uint32 counter
-  ) external view returns (TransmissionUtils.Data memory) {
+  ) external view returns (Transmission memory) {
     return dataFeeds[key][counter];
   }
 
@@ -58,12 +54,12 @@ abstract contract HistoricConsumer {
 
   function _getFeedById(
     uint32 key
-  ) internal view virtual returns (TransmissionUtils.Data memory);
+  ) internal view virtual returns (Transmission memory);
 
   function _getLatestCounter(uint32 key) internal view virtual returns (uint32);
 
   function _getFeedAtCounter(
     uint32 key,
     uint32 counter
-  ) internal view virtual returns (TransmissionUtils.Data memory);
+  ) internal view virtual returns (Transmission memory);
 }

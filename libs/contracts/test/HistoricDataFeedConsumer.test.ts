@@ -1,9 +1,11 @@
 import { ethers } from 'hardhat';
 import {
+  HistoricConsumer,
+  HistoricDataFeedConsumer,
   HistoricDataFeedGenericConsumer,
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreV1,
-  HistoricDataFeedStoreV3,
+  HistoricDataFeedStoreV2,
   IDataFeedStore__factory,
 } from '../typechain';
 import { expect } from 'chai';
@@ -16,9 +18,6 @@ import {
   setDataFeeds,
   setter,
 } from './utils/helpers/common';
-import { HistoricDataFeedStoreV2 } from '../typechain/contracts/HistoricDataFeedStoreV2';
-import { HistoricDataFeedConsumer } from '../typechain/contracts/test/consumers/historic/HistoricDataFeedConsumer';
-import { HistoricConsumer } from '../typechain/contracts/test/consumers/historic/Consumer.sol';
 
 const selector =
   IDataFeedStore__factory.createInterface().getFunction('setFeeds').selector;
@@ -56,9 +55,6 @@ describe('HistoricDataFeedConsumer', function () {
     contracts.V5 = await deployContract<HistoricDataFeedStoreV2>(
       'HistoricDataFeedStoreV2',
     );
-    contracts.V6 = await deployContract<HistoricDataFeedStoreV3>(
-      'HistoricDataFeedStoreV3',
-    );
 
     consumers.V4 = await deployContract<HistoricDataFeedConsumer>(
       'HistoricDataFeedConsumer',
@@ -67,10 +63,6 @@ describe('HistoricDataFeedConsumer', function () {
     consumers.V5 = await deployContract<HistoricDataFeedConsumer>(
       'HistoricDataFeedConsumer',
       contracts.V5.target,
-    );
-    consumers.V6 = await deployContract<HistoricDataFeedConsumer>(
-      'HistoricDataFeedConsumer',
-      contracts.V6.target,
     );
 
     logger = contractVersionLogger([
@@ -81,9 +73,9 @@ describe('HistoricDataFeedConsumer', function () {
     ]);
   });
 
-  for (let i = 0; i < 3; i++) {
-    describe(`DataFeedStoreV${i + 1}`, function () {
-      let contract: any;
+  for (let i = 0; i < 2; i++) {
+    describe(`HistoricDataFeedConsumerV${i + 1}`, function () {
+      let contract: HistoricDataFeedStore;
       let consumer: HistoricConsumer;
 
       beforeEach(async function () {
@@ -135,6 +127,7 @@ describe('HistoricDataFeedConsumer', function () {
           [ethers.encodeBytes32String('Hello, World!')],
         );
         const receipt = await setter(contract, selector, [key], [value]);
+        await setter(contract, selector, [key], [value]);
 
         await consumer.setMultipleFeedsAtCounter([key], [counter]);
         const data = await consumer.getFeedAtCounter(key, counter);
@@ -171,42 +164,89 @@ describe('HistoricDataFeedConsumer', function () {
         const receipt = await consumer.setMultipleFetchedLatestFeedsById(keys);
         receipts.push(await receipt.wait());
 
-        for (const [i, key] of keys.entries()) {
-          const data = await consumer.getFeedById(key);
-          expect(data[0]).to.equal(values[i].slice(0, 50));
-          expect(data[1]).to.equal(
-            (
-              await ethers.provider.getBlock(
-                setReceipts[index].blockNumber || 0,
-              )
-            )?.timestamp,
-          );
-
-          const counter = await consumer.counters(key);
-          expect(counter).to.equal(2);
-        }
+        await checkLatestValues(consumer, setReceipts[index], keys, values, 2);
       }
 
       let receiptsGeneric = [];
       for (const consumer of Object.values(genericConsumers)) {
         const receipt = await consumer.setMultipleFetchedLatestFeedsById(keys);
-
-        for (const [i, key] of keys.entries()) {
-          const data = await consumer.getFeedById(key);
-          expect(data[0]).to.equal(values[i].slice(0, 50));
-          expect(data[1]).to.equal(
-            (
-              await ethers.provider.getBlock(
-                setReceiptsGeneric[0]?.blockNumber || 0,
-              )
-            )?.timestamp,
-          );
-
-          const counter = await consumer.counters(key);
-          expect(counter).to.equal(2);
-        }
-
         receiptsGeneric.push(await receipt.wait());
+
+        await checkLatestValues(
+          consumer,
+          setReceiptsGeneric[0],
+          keys,
+          values,
+          2,
+        );
+      }
+
+      printGasUsage(logger, receipts, receiptsGeneric);
+
+      for (const receipt of receipts) {
+        for (const genericReceipt of receiptsGeneric) {
+          expect(receipt?.gasUsed).to.be.lte(genericReceipt?.gasUsed);
+        }
+      }
+    });
+
+    it(`Should fetch ${i} feeds at 2/3 counter in a single transaction`, async function () {
+      await setDataFeeds(
+        Object.values(genericContracts),
+        Object.values(contracts),
+        selector,
+        i,
+      );
+      const {
+        receipts: setReceipts,
+        receiptsGeneric: setReceiptsGeneric,
+        keys,
+        values,
+      } = await setDataFeeds(
+        Object.values(genericContracts),
+        Object.values(contracts),
+        selector,
+        i,
+      );
+      await setDataFeeds(
+        Object.values(genericContracts),
+        Object.values(contracts),
+        selector,
+        i,
+      );
+
+      const receipts = [];
+      for (const [index, consumer] of Object.values(consumers).entries()) {
+        const receipt = await consumer.setMultipleFeedsAtCounter(
+          keys,
+          keys.map(_ => 2),
+        );
+        receipts.push(await receipt.wait());
+
+        await checkValuesAtCounter(
+          consumer,
+          setReceipts[index],
+          keys,
+          values,
+          2,
+        );
+      }
+
+      let receiptsGeneric = [];
+      for (const consumer of Object.values(genericConsumers)) {
+        const receipt = await consumer.setMultipleFeedsAtCounter(
+          keys,
+          keys.map(_ => 2),
+        );
+        receiptsGeneric.push(await receipt.wait());
+
+        await checkValuesAtCounter(
+          consumer,
+          setReceiptsGeneric[0],
+          keys,
+          values,
+          2,
+        );
       }
 
       printGasUsage(logger, receipts, receiptsGeneric);
@@ -219,3 +259,38 @@ describe('HistoricDataFeedConsumer', function () {
     });
   }
 });
+
+const checkLatestValues = async (
+  consumer: HistoricDataFeedConsumer | HistoricDataFeedGenericConsumer,
+  receipt: any,
+  keys: number[],
+  values: string[],
+  counter: number,
+) => {
+  for (const [i, key] of keys.entries()) {
+    const data = await consumer.getFeedById(key);
+    expect(data[0]).to.equal(values[i].slice(0, 50));
+    expect(data[1]).to.equal(
+      (await ethers.provider.getBlock(receipt.blockNumber || 0))?.timestamp,
+    );
+
+    const counter_ = await consumer.counters(key);
+    expect(counter_).to.equal(counter);
+  }
+};
+
+const checkValuesAtCounter = async (
+  consumer: HistoricDataFeedConsumer | HistoricDataFeedGenericConsumer,
+  receipt: any,
+  keys: number[],
+  values: string[],
+  counter: number,
+) => {
+  for (const [i, key] of keys.entries()) {
+    const data = await consumer.getFeedAtCounter(key, counter);
+    expect(data[0]).to.equal(values[i].slice(0, 50));
+    expect(data[1]).to.equal(
+      (await ethers.provider.getBlock(receipt.blockNumber || 0))?.timestamp,
+    );
+  }
+};

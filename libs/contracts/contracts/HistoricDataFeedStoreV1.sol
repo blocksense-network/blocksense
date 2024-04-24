@@ -5,6 +5,8 @@ pragma solidity ^0.8.24;
 
 /// @title Array of arrays Historic Data Feed Storage
 contract HistoricDataFeedStoreV1 {
+  bytes32 internal constant CONTRACT_MANAGEMENT_SELECTOR_GETTER =
+    0x00000000000000000000000000000000000000000000000000000000E0000000;
   bytes32 internal constant CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_LATEST =
     0x0000000000000000000000000000000000000000000000000000000080000000;
   bytes32 internal constant CONTRACT_MANAGEMENT_SELECTOR_GET_LATEST_COUNTER =
@@ -23,19 +25,18 @@ contract HistoricDataFeedStoreV1 {
 
   /// @notice Fallback function
   /// @dev The fallback function is used to set or get data feeds according to the provided selector.
-  fallback(bytes calldata) external returns (bytes memory) {
+  fallback() external {
     // getters
     assembly {
       // store selector in memory at location 28
       calldatacopy(0x1C, 0x00, 0x04)
       let selector := mload(0x00)
 
+      let key := and(selector, not(CONTRACT_MANAGEMENT_SELECTOR_GETTER))
+
       // getFeedById(uint32 key) returns (bytes32)
       if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_LATEST) {
-        let position := mul(
-          and(selector, not(CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_LATEST)),
-          MAX_COUNTER
-        )
+        let position := mul(key, MAX_COUNTER)
         mstore(0x00, sload(add(position, sload(position))))
 
         // return value stored at memory location 0
@@ -44,28 +45,14 @@ contract HistoricDataFeedStoreV1 {
       // getLatestCounter(uint32 key) returns (uint16)
       if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_LATEST_COUNTER) {
         // load value at array[key] and store it at memory location 0
-        mstore(
-          0x00,
-          sload(
-            mul(
-              and(
-                selector,
-                not(CONTRACT_MANAGEMENT_SELECTOR_GET_LATEST_COUNTER)
-              ),
-              MAX_COUNTER
-            )
-          )
-        )
+        mstore(0x00, sload(mul(key, MAX_COUNTER)))
 
         // return value stored at memory location 0
         return(0x00, 0x20)
       }
       // getFeedAtCounter(uint32 key, uint16 counter) returns (bytes32)
       if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_AT_COUNTER) {
-        let position := mul(
-          and(selector, not(CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_AT_COUNTER)),
-          MAX_COUNTER
-        )
+        let position := mul(key, MAX_COUNTER)
         // load value at array[key] and store it at memory location 0
         mstore(0x00, sload(add(position, calldataload(0x04))))
 
@@ -83,23 +70,10 @@ contract HistoricDataFeedStoreV1 {
         revert(0, 0)
       }
 
-      // consumes less gas than a simple equality check
-      function compareSelectors(incomingSelector, predefinedSelector)
-        -> result
-      {
-        result := eq(
-          or(
-            lt(incomingSelector, predefinedSelector),
-            gt(incomingSelector, predefinedSelector)
-          ),
-          0
-        )
-      }
-
       let selector := mload(0x00)
 
       // setFeeds(bytes)
-      if compareSelectors(selector, 0x1a2d80ac) {
+      if eq(selector, 0x1a2d80ac) {
         // bytes should be in the format of:
         // <key1><value1>...<keyN><valueN>
         // where key is uint32 and value is bytes32

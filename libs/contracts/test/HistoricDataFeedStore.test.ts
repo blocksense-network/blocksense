@@ -2,11 +2,13 @@ import { ethers } from 'hardhat';
 import {
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreV1,
-  HistoricDataFeedStoreV3,
+  HistoricDataFeedStoreV2,
   IDataFeedStore__factory,
 } from '../typechain';
 import {
+  GenericHistoricDataFeedStore,
   HISTORIC_SELECTORS,
+  HistoricDataFeedStore,
   deployContract,
   getHistoricSelector,
   getter,
@@ -16,13 +18,12 @@ import {
 } from './utils/helpers/common';
 import { expect } from 'chai';
 import { contractVersionLogger } from './utils/logger';
-import { HistoricDataFeedStoreV2 } from '../typechain/contracts/HistoricDataFeedStoreV2';
 
 const contracts: {
-  [key: string]: any;
+  [key: string]: HistoricDataFeedStore;
 } = {};
 const genericContracts: {
-  [key: string]: any;
+  [key: string]: GenericHistoricDataFeedStore;
 } = {};
 const selector =
   IDataFeedStore__factory.createInterface().getFunction('setFeeds').selector;
@@ -41,98 +42,100 @@ describe('HistoricDataFeedStore', function () {
     contracts.V5 = await deployContract<HistoricDataFeedStoreV2>(
       'HistoricDataFeedStoreV2',
     );
-    contracts.V6 = await deployContract<HistoricDataFeedStoreV3>(
-      'HistoricDataFeedStoreV3',
-    );
 
     logger = contractVersionLogger([contracts, genericContracts]);
   });
 
-  for (let i = 4; i <= 6; i++) {
-    it('Should set and get correct values', async function () {
-      const key = 1;
-      const value = ethers.encodeBytes32String('value');
+  for (let i = 0; i < 2; i++) {
+    describe(`HistoricDataFeedStoreV${i + 1}`, function () {
+      this.timeout(1000000);
+      let contract: any;
 
-      const receipt = await setter(
-        contracts[`V${i}`],
-        selector,
-        [key],
-        [value],
-      );
-      const block = await ethers.provider.getBlock(receipt.blockNumber);
-      const storedValue = await getter(
-        contracts[`V${i}`],
-        getHistoricSelector(HISTORIC_SELECTORS.GET_LATEST_VALUE, key),
-      );
-
-      const data = storedValue.slice(0, 48).padEnd(66, '0');
-      const timestamp = ethers.toNumber(
-        '0x' + storedValue.slice(48, storedValue.length),
-      );
-
-      expect(data).to.equal(value);
-      expect(timestamp).to.equal(block?.timestamp);
-    });
-
-    it('Should get the current counter', async function () {
-      const key = 1;
-      const value = ethers.encodeBytes32String('value');
-
-      await setter(contracts[`V${i}`], selector, [key], [value]);
-      const historicSelector = getHistoricSelector(
-        HISTORIC_SELECTORS.GET_LATEST_COUNTER,
-        key,
-      );
-      const counter = await getter(contracts[`V${i}`], historicSelector);
-
-      expect(+counter).to.equal(1);
-    });
-
-    it('Should get the current counter after 10 iterations', async function () {
-      const key = 1;
-      const value = ethers.encodeBytes32String('value');
-
-      for (let j = 0; j < 10; j++) {
-        await setter(contracts[`V${i}`], selector, [key], [value]);
-      }
-      const historicSelector = getHistoricSelector(
-        HISTORIC_SELECTORS.GET_LATEST_COUNTER,
-        key,
-      );
-      const counter = await getter(contracts[`V${i}`], historicSelector);
-
-      expect(+counter).to.equal(10);
-    });
-
-    it('Should get value at counter 5', async function () {
-      const key = 1;
-      let timestamp = 0;
-
-      for (let j = 1; j <= 10; j++) {
-        const value = ethers.encodeBytes32String('value ' + j);
-        await setter(contracts[`V${i}`], selector, [key], [value]);
-        if (j === 5) {
-          timestamp =
-            (await ethers.provider.getBlock('latest'))?.timestamp || 0;
-        }
-      }
-      const historicSelector = getHistoricSelector(
-        HISTORIC_SELECTORS.GET_VALUE_AT_COUNTER,
-        key,
-      );
-      const data = await getter(contracts[`V${i}`], historicSelector, {
-        data: ethers.solidityPacked(
-          ['bytes4', 'uint256'],
-          [historicSelector, 5],
-        ),
+      beforeEach(async function () {
+        const keys = Object.keys(contracts);
+        contract = contracts[keys[i]];
       });
-      const value = data.slice(0, 48).padEnd(66, '0');
-      const timestampValue = ethers.toNumber(
-        '0x' + data.slice(48, data.length),
-      );
 
-      expect(value).to.equal(ethers.encodeBytes32String('value 5'));
-      expect(timestampValue).to.equal(timestamp);
+      it('Should set and get correct values', async function () {
+        const key = 1;
+        const value = ethers.encodeBytes32String('value');
+
+        const receipt = await setter(contract, selector, [key], [value]);
+        const block = await ethers.provider.getBlock(receipt.blockNumber);
+        const storedValue = await getter(
+          contract,
+          getHistoricSelector(HISTORIC_SELECTORS.GET_LATEST_VALUE, key),
+        );
+
+        const data = storedValue.slice(0, 48).padEnd(66, '0');
+        const timestamp = ethers.toNumber(
+          '0x' + storedValue.slice(48, storedValue.length),
+        );
+
+        expect(data).to.equal(value);
+        expect(timestamp).to.equal(block?.timestamp);
+      });
+
+      it('Should get the current counter', async function () {
+        const key = 1;
+        const value = ethers.encodeBytes32String('value');
+
+        await setter(contract, selector, [key], [value]);
+        const historicSelector = getHistoricSelector(
+          HISTORIC_SELECTORS.GET_LATEST_COUNTER,
+          key,
+        );
+        const counter = await getter(contract, historicSelector);
+
+        expect(+counter).to.equal(1);
+      });
+
+      it('Should get the current counter after 10 iterations', async function () {
+        const key = 1;
+        const value = ethers.encodeBytes32String('value');
+
+        for (let j = 0; j < 10; j++) {
+          await setter(contract, selector, [key], [value]);
+        }
+        const historicSelector = getHistoricSelector(
+          HISTORIC_SELECTORS.GET_LATEST_COUNTER,
+          key,
+        );
+        const counter = await getter(contract, historicSelector);
+
+        expect(+counter).to.equal(10);
+      });
+
+      it('Should get value at counter 5', async function () {
+        const key = 1;
+        let timestamp = 0;
+
+        for (let j = 1; j <= 10; j++) {
+          const value = ethers.encodeBytes32String('value ' + j);
+          await setter(contract, selector, [key], [value]);
+          if (j === 5) {
+            timestamp =
+              (await ethers.provider.getBlock('latest'))?.timestamp || 0;
+          }
+        }
+        const historicSelector = getHistoricSelector(
+          HISTORIC_SELECTORS.GET_VALUE_AT_COUNTER,
+          key,
+        );
+        const data = await getter(contract, historicSelector, {
+          data: ethers.solidityPacked(
+            ['bytes4', 'uint256'],
+            [historicSelector, 5],
+          ),
+        });
+        const value = data.slice(0, 48).padEnd(66, '0');
+        const timestampValue = ethers.toNumber(
+          '0x' + data.slice(48, data.length),
+        );
+
+        expect(value).to.equal(ethers.encodeBytes32String('value 5'));
+        expect(timestampValue).to.equal(timestamp);
+      });
     });
   }
 
