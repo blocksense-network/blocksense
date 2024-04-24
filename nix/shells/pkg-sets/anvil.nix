@@ -3,7 +3,11 @@
   inputs',
   ...
 }: {
-  packages = with pkgs; [
-    inputs'.ethereum-nix.packages.foundry
-  ];
+  packages = with pkgs;
+    [
+      # ...
+    ]
+    ++ lib.optionals stdenv.isLinux [
+      inputs'.ethereum-nix.packages.foundry
+    ];
 }
