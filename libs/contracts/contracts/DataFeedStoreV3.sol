@@ -21,20 +21,17 @@ contract DataFeedStoreV3 {
 
   /// @notice Fallback function
   /// @dev The fallback function is used to set or get data feeds according to the provided selector.
-  fallback(bytes calldata) external returns (bytes memory) {
-    bytes32 selector;
+  fallback() external {
     // getters
     assembly {
       // store selector in memory at location 0
       calldatacopy(0x1C, 0x00, 0x04)
-      selector := mload(0x00)
+      let selector := mload(0x00)
 
       // getFeedById(uint32 key) returns (bytes32)
       if and(selector, CONTRACT_MANAGEMENT_SELECTOR) {
-        // store key in memory
-        mstore(0x20, and(selector, not(CONTRACT_MANAGEMENT_SELECTOR)))
         // load value at array[key] and store it at memory location 0
-        mstore(0x00, sload(mload(0x20)))
+        mstore(0x00, sload(and(selector, not(CONTRACT_MANAGEMENT_SELECTOR))))
         // return value stored at memory location 0
         return(0x00, 0x20)
       }
@@ -53,14 +50,15 @@ contract DataFeedStoreV3 {
       function compareSelectors(incomingSelector, predefinedSelector)
         -> result
       {
-        result := eq(
+        result := iszero(
           or(
             lt(incomingSelector, predefinedSelector),
             gt(incomingSelector, predefinedSelector)
-          ),
-          0
+          )
         )
       }
+
+      let selector := mload(0)
 
       // setFeeds(bytes)
       if compareSelectors(selector, 0x1a2d80ac) {

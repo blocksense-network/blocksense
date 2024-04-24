@@ -11,7 +11,7 @@ contract DataFeedV1Consumer {
     dataFeedStore = _dataFeedStore;
   }
   function getExternalFeedById(uint32 key) external view returns (bytes32) {
-    return bytes32(_getFeedById(key));
+    return _getFeedById(key);
   }
 
   function getFeedById(uint32 key) external view returns (bytes32) {
@@ -25,16 +25,21 @@ contract DataFeedV1Consumer {
   }
 
   function _setFetchedFeedById(uint32 key) internal {
-    dataFeeds[key] = bytes32(_getFeedById(key));
+    dataFeeds[key] = _getFeedById(key);
   }
 
-  function _getFeedById(uint32 key) internal view returns (bytes32) {
-    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
-      abi.encodeWithSelector(bytes4(key))
-    );
-    if (!success) {
-      revert GetFeedByIdFailed();
+  function _getFeedById(uint32 key) internal view returns (bytes32 returnData) {
+    address dataFeed = dataFeedStore;
+
+    // using assembly staticcall costs less gas than using a view function
+    assembly {
+      let ptr := mload(0x40) // get free memory pointer
+      mstore(0x00, shl(224, key))
+      let success := staticcall(gas(), dataFeed, 0x00, 4, ptr, 32)
+      if iszero(success) {
+        revert(0, 0)
+      }
+      returnData := mload(ptr)
     }
-    return abi.decode(returnData, (bytes32));
   }
 }
