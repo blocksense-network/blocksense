@@ -22,7 +22,7 @@
 2. Install Direnv and [hook it](https://direnv.net/docs/hook.html) with your shell
 3. Manually enter the dev shell to accept the suggested Nix substituters:
    ```
-   nix develop
+   nix develop --impure
    do you want to [..] (y/N)? # answer "y" to all questions like this
    ```
 4. Allow direnv to automatically manage your shell environment
