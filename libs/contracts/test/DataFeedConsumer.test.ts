@@ -43,7 +43,7 @@ describe('DataFeedConsumer', function () {
     );
 
     genericConsumers.V1 = await deployContract<GenericDataFeedConsumer>(
-      'DataFeedGenericConsumer',
+      'DataFeedGenericV1Consumer',
       genericContracts.V1.target,
     );
     genericConsumers.V2 = await deployContract<GenericDataFeedConsumer>(

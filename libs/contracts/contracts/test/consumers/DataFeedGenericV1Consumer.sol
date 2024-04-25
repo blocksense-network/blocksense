@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {IDataFeedStoreGenericV2} from '../interfaces/IDataFeedStoreGenericV2.sol';
+import {IDataFeedStoreGenericV1} from '../interfaces/IDataFeedStoreGenericV1.sol';
 import {Consumer} from './Consumer.sol';
 
-contract DataFeedGenericV2Consumer is Consumer {
+contract DataFeedGenericV1Consumer is Consumer {
   constructor(address _dataFeedStore) Consumer(_dataFeedStore) {}
 
   function _getFeedById(uint32 key) internal view override returns (bytes32) {
     (bool success, bytes memory returnData) = dataFeedStore.staticcall(
-      abi.encodeWithSelector(IDataFeedStoreGenericV2.getDataFeed.selector, key)
+      abi.encodeWithSelector(IDataFeedStoreGenericV1.getDataFeed.selector, key)
     );
 
     if (!success) {

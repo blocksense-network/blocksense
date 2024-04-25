@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import {
   DataFeedV1Consumer,
   DataFeedV2Consumer,
-  DataFeedGenericConsumer,
+  DataFeedGenericV1Consumer,
   DataFeedGenericV2Consumer,
 } from '../../../typechain';
 import {
@@ -17,7 +17,7 @@ import { contractVersionLogger } from '../logger';
 
 export type DataFeedConsumer = DataFeedV1Consumer | DataFeedV2Consumer;
 export type GenericDataFeedConsumer =
-  | DataFeedGenericConsumer
+  | DataFeedGenericV1Consumer
   | DataFeedGenericV2Consumer;
 
 export const compareConsumerGasUsed = async (
