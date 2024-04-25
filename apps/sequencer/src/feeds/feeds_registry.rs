@@ -82,6 +82,24 @@ impl FeedMetaData {
     pub fn get_feed_type(&self) -> &Box<dyn FeedProcessing> {
         &self.feed_type
     }
+    pub fn check_report_relevance(&self, current_time_as_ms: u128, msg_timestamp: u128) -> bool {
+        let start_of_voting_round = self.get_first_report_start_time()
+            + (self.get_slot() as u128 * self.get_report_interval() as u128);
+        let end_of_voting_round = self.get_first_report_start_time()
+            + ((self.get_slot() + 1) as u128 * self.get_report_interval() as u128);
+
+        if current_time_as_ms >= start_of_voting_round
+            && current_time_as_ms <= end_of_voting_round
+            && msg_timestamp >= start_of_voting_round
+            && msg_timestamp <= end_of_voting_round
+        {
+            println!("accepted!");
+            return true;
+        } else {
+            println!("rejected!");
+            return false;
+        }
+    }
 }
 
 // map representing feed_id -> FeedMetaData
@@ -177,21 +195,180 @@ pub fn get_reporters_for_feed_id_slot(feed_id: u32, slot: u64) -> Vec<u32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::feeds::feeds_registry::FeedMetaData;
+    use crate::feeds::feeds_registry::AllFeedsReports;
     use crate::feeds::feeds_registry::FeedMetaDataRegistry;
+    use std::sync::Arc;
+    use std::sync::RwLock;
+    use std::thread;
+    use std::time::SystemTime;
+    use std::time::UNIX_EPOCH;
 
     #[test]
     fn basic_test() {
-        let mut fmdr = FeedMetaDataRegistry::new_with_test_data();
+        let fmdr = FeedMetaDataRegistry::new_with_test_data();
 
         println!("fmdr.get_keys()={:?}", fmdr);
-        fmdr.get(0).write().unwrap().inc_slot();
-        assert!(fmdr.get(0).read().unwrap().get_slot() == 1);
+        fmdr.get(0)
+            .expect("ID not present in registry")
+            .write()
+            .unwrap()
+            .inc_slot();
+        assert!(
+            fmdr.get(0)
+                .expect("ID not present in registry")
+                .read()
+                .unwrap()
+                .get_slot()
+                == 1
+        );
         println!("fmdr.get_keys()={:?}", fmdr);
-        fmdr.get(1).write().unwrap().inc_slot();
-        fmdr.get(1).write().unwrap().inc_slot();
-        fmdr.get(1).write().unwrap().inc_slot();
-        assert!(fmdr.get(0).read().unwrap().get_slot() == 1);
-        assert!(fmdr.get(1).read().unwrap().get_slot() == 3);
+        fmdr.get(1)
+            .expect("ID not present in registry")
+            .write()
+            .unwrap()
+            .inc_slot();
+        fmdr.get(1)
+            .expect("ID not present in registry")
+            .write()
+            .unwrap()
+            .inc_slot();
+        fmdr.get(1)
+            .expect("ID not present in registry")
+            .write()
+            .unwrap()
+            .inc_slot();
+        assert!(
+            fmdr.get(0)
+                .expect("ID not present in registry")
+                .read()
+                .unwrap()
+                .get_slot()
+                == 1
+        );
+        assert!(
+            fmdr.get(1)
+                .expect("ID not present in registry")
+                .read()
+                .unwrap()
+                .get_slot()
+                == 3
+        );
+    }
+
+    #[test]
+    fn relevant_feed_check() {
+        const DATA_FEED_ID: u64 = 0;
+
+        let fmdr = FeedMetaDataRegistry::new_with_test_data();
+
+        let mut current_time_as_ms = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis();
+
+        let mut msg_timestamp = current_time_as_ms;
+
+        let feed = fmdr.get(DATA_FEED_ID).expect("ID not present in registry");
+
+        println!("fmdr.get_keys()={:?}", fmdr);
+        assert!(
+            feed.read()
+                .unwrap()
+                .check_report_relevance(current_time_as_ms, msg_timestamp)
+                == true
+        );
+
+        current_time_as_ms += 11 * 1000; // Advance time, the report will become obsolete
+
+        assert!(
+            feed.read()
+                .unwrap()
+                .check_report_relevance(current_time_as_ms, msg_timestamp)
+                == false
+        );
+
+        msg_timestamp += 11 * 1000; // Advance report time. It will still be obsolete, because we have not
+                                    // incremented the slot.
+
+        assert!(
+            feed.read()
+                .unwrap()
+                .check_report_relevance(current_time_as_ms, msg_timestamp)
+                == false
+        );
+
+        feed.write().unwrap().inc_slot(); // Increment the slot, the report will now be in the corect time frame of the new slot.
+
+        assert!(
+            feed.read()
+                .unwrap()
+                .check_report_relevance(current_time_as_ms, msg_timestamp)
+                == true
+        );
+    }
+    #[test]
+    fn chech_relevant_and_insert_mt() {
+        const NTHREADS: u32 = 10;
+        const DATA_FEED_ID: u64 = 1;
+
+        let fmdr = Arc::new(RwLock::new(FeedMetaDataRegistry::new_with_test_data()));
+        let reports = Arc::new(RwLock::new(AllFeedsReports::new()));
+
+        let mut children = vec![];
+
+        for i in 0..NTHREADS {
+            let fmdr = fmdr.clone();
+            let reports = reports.clone();
+
+            let msg_timestamp = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_millis();
+
+            children.push(thread::spawn(move || {
+                let feed = fmdr
+                    .read()
+                    .unwrap()
+                    .get(0)
+                    .expect("ID not present in registry");
+
+                let current_time_as_ms = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .expect("Time went backwards")
+                    .as_millis();
+
+                assert!(
+                    feed.read()
+                        .unwrap()
+                        .check_report_relevance(current_time_as_ms, msg_timestamp)
+                        == true
+                );
+
+                reports.write().unwrap().push(
+                    DATA_FEED_ID,
+                    i.into(),
+                    "0123456789abcdef".to_string(),
+                );
+
+                println!("this is thread number {}", i);
+            }));
+        }
+
+        for child in children {
+            // Wait for the thread to finish. Returns a result.
+            let _ = child.join();
+        }
+
+        let reports = reports.write().unwrap();
+        let reports = reports
+            .get(DATA_FEED_ID)
+            .expect("ID not present in registry");
+        let reports = reports.read().unwrap();
+        // Process the reports:
+        let mut values: Vec<&String> = vec![];
+        for kv in &reports.report {
+            values.push(&kv.1);
+        }
+        assert!(values.len() as u32 == NTHREADS);
     }
 }

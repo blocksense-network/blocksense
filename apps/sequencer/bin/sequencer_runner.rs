@@ -254,30 +254,11 @@ async fn index_post(
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
-    let mut accept_report = false;
+    let accept_report: bool;
     {
         let feed = feed.read().expect("Error trying to lock Feed for read!");
 
-        let start_of_voting_round = feed.get_first_report_start_time()
-            + (feed.get_slot() as u128 * feed.get_report_interval() as u128);
-        let end_of_voting_round = feed.get_first_report_start_time()
-            + ((feed.get_slot() + 1) as u128 * feed.get_report_interval() as u128);
-
-        if current_time_as_ms >= start_of_voting_round
-            && current_time_as_ms <= end_of_voting_round
-            && msg_timestamp >= start_of_voting_round
-            && msg_timestamp <= end_of_voting_round
-        {
-            accept_report = true;
-            println!("accepted!");
-        }
-
-        if msg_timestamp > current_time_as_ms {
-            println!(
-                "Clock skew with reporter {} detected! Report timestamp = {}; Recv time = {}",
-                reporter_id, msg_timestamp, current_time_as_ms
-            );
-        }
+        accept_report = feed.check_report_relevance(current_time_as_ms, msg_timestamp);
     }
 
     if accept_report {
@@ -287,8 +268,6 @@ async fn index_post(
             .expect("Error trying to lock Reports for read!");
         reports.push(feed_id.into(), reporter_id, result_hex);
         return Ok(HttpResponse::Ok().into()); // <- send response
-    } else {
-        println!("rejected!");
     }
     Ok(HttpResponse::BadRequest().into())
 }

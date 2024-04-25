@@ -79,3 +79,55 @@ pub fn get_provider() -> ManagedNonceProvider<
         .expect("Failed to create provider!");
     provider
 }
+
+#[cfg(test)]
+mod tests {
+    use std::{fs::File, io::Write};
+
+    use alloy::{
+        network::TransactionBuilder, node_bindings::Anvil, primitives::U256, providers::Provider,
+        rpc::types::eth::request::TransactionRequest,
+    };
+    use eyre::Result;
+    use std::env;
+
+    use crate::utils::provider::get_provider;
+
+    #[ignore]
+    #[tokio::test]
+    async fn basic_test_provider() -> Result<()> {
+        env::set_var("PRIVATE_KEY", "/tmp/key");
+        let mut file = File::create("/tmp/key")?;
+        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")?;
+
+        let anvil = Anvil::new().try_spawn()?;
+        env::set_var("RPC_URL", anvil.endpoint());
+        let provider = get_provider();
+
+        let alice = anvil.addresses()[7];
+        let bob = anvil.addresses()[0];
+
+        let tx = TransactionRequest::default()
+            .with_from(alice)
+            .with_to(bob.into())
+            .with_value(U256::from(100))
+            // Notice that without the `GasEstimatorLayer`, you need to set the gas related fields.
+            .with_gas_limit(U256::from(21000))
+            .with_max_fee_per_gas(U256::from(20e9))
+            .with_max_priority_fee_per_gas(U256::from(1e9))
+            // It is required to set the chain_id for EIP-1559 transactions.
+            .with_chain_id(anvil.chain_id());
+
+        // Send the transaction, the nonce (0) is automatically managed by the provider.
+        let builder = provider.send_transaction(tx.clone()).await?;
+        let node_hash = *builder.tx_hash();
+        let pending_tx = provider.get_transaction_by_hash(node_hash).await?;
+        assert_eq!(pending_tx.nonce, 0);
+
+        println!("Transaction sent with nonce: {}", pending_tx.nonce);
+
+        // Send the transaction, the nonce (1) is automatically managed by the provider.
+        let builder = provider.send_transaction(tx).await?;
+        Ok(())
+    }
+}
