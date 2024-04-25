@@ -7,39 +7,64 @@ The `contracts` folder has the following structure:
 ```text
 contracts
 ├── test
-│   ├── interfaces
-│   |   └── ...
 │   ├── consumers
-│   |   └── ...
+│   │   ├── historic
+│   │   │   └── ...
+│   │   └── ...
+│   ├── interfaces
+│   │   └── ...
+│   ├── DataFeedStoreGeneric.sol
 │   ├── DataFeedStoreGenericV1.sol
-│   └── DataFeedStoreGenericV2.sol
+│   ├── DataFeedStoreGenericV2.sol
+│   └── HistoricDataFeedStoreGenericV1.sol
 ├── DataFeedStoreV1.sol
 ├── DataFeedStoreV2.sol
-└── DataFeedStoreV3.sol
+├── DataFeedStoreV3.sol
+├── HistoricDataFeedStoreV1.sol
+├── HistoricDataFeedStoreV2.sol
+└── UpgradeableProxy.sol
 ```
 
-The `test` folder contains example consumer contracts (under `consumers`) and reference implementations of data feed store - DataFeedStoreGenericV1.sol and DataFeedStoreGenericV2.sol.
+The `test` folder contains example consumer contracts (under `consumers`) and reference implementations of data feed store - DataFeedStoreGenericV1.sol, DataFeedStoreGenericV2.sol and HistoricDataFeedStoreGenericV1.sol.
 
 Each of the data feed store implementations (DataFeedStoreV1.sol, DataFeedStoreV2.sol, DataFeedStoreV3.sol) is a contract that stores data feed values for a specific data feed key. The data feed key is a maximum of 31 bit integer that uniquely identifies a data feed. The data feed value is stored as `bytes32`. The data feed value is updated by the data feed store contract owner.
+
+The historic data feed contracts (HistoricDataFeedStoreV1.sol, HistoricDataFeedStoreV2.sol) store historic data feed values for a specific data feed key. The data feed key is a maximum of 29 bit integer that uniquely identifies a data feed. The data feed value is stored as packed `bytes32` which consists of `bytes24 value` and `uint64 timestamp`. When a new value is set, a counter representing the contiguous history of the stored values is incremented. The data feed value is updated by the data feed store contract owner.
 
 ### Calls
 
 All calls are handled by a fallback function based on the selector:
 
-- Getter:
-  - For `DataFeedStoreV1.sol` the selector is `0x00000000` + a key which should not be greater than a predefined constant `CONTRACT_MANAGEMENT_SELECTOR` (e.g. `0x00...0001ffff`);
-  - For `DataFeedStoreV2.sol` and `DataFeedStoreV3.sol` the selector is `0x80000000` + key which enables the key to be a 31 bit integer. The most significant bit of the selector defines the type of the call (getter or setter);
 - Setter:
   - All contracts have the same selector `0x1a2d80ac` which is the keccak256 hash of the string `setFeeds(bytes)`.
 
-> This way the gas cost of calls is reduced as the Solidity compiler will not generate `Linear If-Else Dispatcher` generated statements for the different selectors.
+#### DataFeedStore
+
+- Getter:
+  - For `DataFeedStoreV1.sol` the selector is `0x00000000` + a key which should not be greater than a predefined constant `CONTRACT_MANAGEMENT_SELECTOR` (e.g. `0x00...0001ffff`);
+  - For `DataFeedStoreV2.sol` and `DataFeedStoreV3.sol` the selector is `0x80000000` + key which enables the key to be a 31 bit integer. The most significant bit of the selector defines the type of the call (getter or setter);
+
+#### HistoricDataFeedStore
+
+- Getter:
+  - There are 3 types of selectors:
+    - `0x80000000` + key which returns the most recent value based on the latest counter from the feed with id `key`;
+    - `0x40000000` + key which returns the latest counter for the feed with id `key`;
+    - `0x20000000` + key followed by counter which returns the value at `counter` for the feed with id `key`;
+
+> This way the gas cost of calls is reduced as the Solidity compiler will not generate `Linear If-Else Dispatcher` statements for the different selectors.
 
 ### Storage layout representation
 
 - `DataFeedStoreV1.sol` and `DataFeedStoreV2.sol`:
-  - `mapping(uint32 => bytes32) dataFeed`
+  - `mapping(uint32 key => bytes32 value) dataFeed`
 - `DataFeedStoreV3.sol`:
   - `bytes32[] dataFeed`
+- `HistoricDataFeedStoreV1.sol`:
+  - array[key] -> array[counter] -> Transmission { value, timestamp }
+- `HistoricDataFeedStoreV2.sol`:
+  - `mapping(uint32 key => mapping(uint256 counter => Transmission { value, timestamp })) dataFeed`
+  - `uint256[] latestCounters`
 
 ## Development
 
