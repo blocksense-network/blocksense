@@ -135,6 +135,7 @@ dist
 .direnv
 .devenv
 result
+.pre-commit-config.yaml
 
 # Rust cargo artifacts
 libs/*/target/

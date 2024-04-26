@@ -3,6 +3,10 @@
   shellName,
   ...
 }: {
+  imports = [
+    ./pre-commit.nix
+  ];
+
   packages = with pkgs; [
     figlet
     clolcat

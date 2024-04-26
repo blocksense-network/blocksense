@@ -6,8 +6,8 @@
   ],
   "scripts": {
     "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -- $(git rev-parse --show-toplevel)",
-    "format:check": "prettier --check . && alejandra --exclude ./node_modules --exclude ./yarn-project.nix --check .",
-    "format:write": "prettier --write . && alejandra --exclude ./node_modules --exclude ./yarn-project.nix ."
+    "format:check": "pre-commit run --all",
+    "format:write": "pre-commit run --all || pre-commit run --all"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
