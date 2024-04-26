@@ -13,10 +13,8 @@ on:
       - main
 
 jobs:
-  Hardhat-CI:
-    timeout-minutes: 360
+  lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -37,11 +35,32 @@ jobs:
       - name: Build the Nix Dev Shell
         run: nix build --impure .#devShells.x86_64-linux.default
 
+      - name: Check formatting
+        run: nix develop --impure -c npm run format:write
+
+  hardhat:
+    timeout-minutes: 360
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v10
+        with:
+          extra-conf:
+            accept-flake-config = true
+
+      - uses: cachix/cachix-action@v14
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build the Nix Dev Shell
+        run: nix build --impure .#devShells.x86_64-linux.default
+
       - name: Install JS deps
         run: nix develop --impure -c yarn install
-
-      - name: Check formatting
-        run: nix develop --impure -c yarn format:check
 
       - name: Build all contracts
         run: nix develop --impure -c yarn workspace @blocksense/contracts build
@@ -55,7 +74,7 @@ jobs:
       - name: Measure contract size
         run: nix develop --impure -c yarn workspace @blocksense/contracts size
 
-  Rust-CI:
+  rust:
     timeout-minutes: 360
     runs-on: ubuntu-latest
 
