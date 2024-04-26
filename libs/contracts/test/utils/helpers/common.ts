@@ -9,7 +9,6 @@ import {
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreV1,
   HistoricDataFeedStoreV2,
-  HistoricDataFeedStoreV3,
   IDataFeedStoreGenericV1,
   IDataFeedStoreGenericV2,
   UpgradeableProxy,
@@ -17,6 +16,7 @@ import {
 import { contractVersionLogger } from '../logger';
 import { expect } from 'chai';
 import { RpcStructLog } from 'hardhat/internal/hardhat-network/provider/output';
+import { IWrapper } from '../wrappers/IWrapper';
 
 export type GenericDataFeedStore =
   | DataFeedStoreGenericV1
@@ -25,8 +25,7 @@ export type DataFeedStore = DataFeedStoreV1 | DataFeedStoreV2 | DataFeedStoreV3;
 
 export type HistoricDataFeedStore =
   | HistoricDataFeedStoreV1
-  | HistoricDataFeedStoreV2
-  | HistoricDataFeedStoreV3;
+  | HistoricDataFeedStoreV2;
 export type GenericHistoricDataFeedStore = HistoricDataFeedStoreGenericV1;
 
 export const getter = async (
@@ -136,10 +135,12 @@ function isGenericV1(
   );
 }
 
-export const setDataFeeds = async (
-  genericContracts: GenericDataFeedStore[] | GenericHistoricDataFeedStore[],
-  contracts: DataFeedStore[] | HistoricDataFeedStore[],
-  selector: string,
+export const setDataFeeds = async <
+  G extends ethers.BaseContract,
+  B extends ethers.BaseContract,
+>(
+  genericContractWrappers: IWrapper<G>[],
+  contractWrappers: IWrapper<B>[],
   valuesCount: number,
   start: number = 0,
 ) => {
@@ -149,32 +150,20 @@ export const setDataFeeds = async (
   );
 
   const receipts = [];
-  for (const contract of contracts) {
-    receipts.push(await setter(contract, selector, keys, values));
+  for (const contract of contractWrappers) {
+    receipts.push(await contract.setFeeds(keys, values));
   }
 
-  let receiptsGeneric = [];
-  for (const contract of genericContracts) {
-    let receipt;
-    if (isGenericV1(contract as any)) {
-      receipt = await contract.setFeeds(keys, values);
-    } else {
-      receipt = await contract.setFeeds(
-        ethers.solidityPacked(
-          keys.map(() => ['uint32', 'bytes32']).flat(),
-          keys.flatMap((key, i) => [key, values[i] as BytesLike]),
-        ),
-      );
-    }
-
-    receiptsGeneric.push(await receipt.wait());
+  const receiptsGeneric = [];
+  for (const contract of genericContractWrappers) {
+    receiptsGeneric.push(await contract.setFeeds(keys, values));
   }
 
   return { receipts, receiptsGeneric, keys, values };
 };
 
-export const printGasUsage = async (
-  logger: ReturnType<typeof contractVersionLogger>,
+export const printGasUsage = async <T extends ethers.BaseContract>(
+  map: Record<string, IWrapper<T>>,
   receipts: any[],
   receiptsGeneric: any[],
 ): Promise<void> => {
@@ -182,22 +171,24 @@ export const printGasUsage = async (
     {};
 
   for (const receipt of receipts) {
-    const version = logger(receipt.to, 'gas used', (data: string) => data);
+    const version = map[ethers.getAddress(receipt.to)].getName();
     table[version] = { gas: Number(receipt?.gasUsed), diff: 0, '%': 0 };
   }
+
+  const genericV1TableObj = {
+    gas: Number(receiptsGeneric[0]?.gasUsed),
+    diff: 0,
+    '%': 0,
+  };
   for (const receipt of receiptsGeneric) {
-    const version = logger(receipt.to, '', (data: string) => data);
-    table[`[Generic ${version}] gas used`] = {
-      gas: Number(receipt?.gasUsed),
-      diff: 0,
-      '%': 0,
-    };
+    const version = map[ethers.getAddress(receipt.to)].getName();
+    table[version] = { gas: Number(receipt?.gasUsed), diff: 0, '%': 0 };
   }
 
   for (const key in table) {
-    table[key].diff = table[key].gas - table['[Generic V1] gas used'].gas;
+    table[key].diff = table[key].gas - genericV1TableObj.gas;
     table[key]['%'] = +(
-      (table[key].diff / table['[Generic V1] gas used'].gas) *
+      (table[key].diff / genericV1TableObj.gas) *
       100
     ).toFixed(2);
   }
@@ -212,9 +203,8 @@ export const printGasUsage = async (
           disableStack: true,
         },
       ]);
-      const generic = receiptsGeneric.includes(receipt) ? 'Generic ' : '';
       console.log(
-        `${[logger(receipt.to, `${generic}trace`, (data: string) => data)]}: `,
+        `${map[ethers.getAddress(receipt.to)].getName()} trace:`,
         res.structLogs.filter((log: RpcStructLog) => {
           return { op: log.op, gas: log.gas };
         }),
@@ -223,6 +213,20 @@ export const printGasUsage = async (
   }
 
   console.table(table);
+};
+
+export const initWrappers = async <
+  U extends ethers.BaseContract,
+  T extends new (...args: any[]) => IWrapper<U>,
+>(
+  storage: IWrapper<U>[],
+  classes: T[],
+): Promise<void> => {
+  for (const c of classes) {
+    const contract = new c();
+    await contract.init();
+    storage.push(contract);
+  }
 };
 
 export const deployContract = async <T>(

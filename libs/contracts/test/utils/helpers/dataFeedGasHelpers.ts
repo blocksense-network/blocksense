@@ -1,38 +1,40 @@
 import { expect } from 'chai';
-import {
-  DataFeedStore,
-  GenericDataFeedStore,
-  checkGenericSetValues,
-  checkSetValues,
-  printGasUsage,
-  setDataFeeds,
-} from './common';
-import { contractVersionLogger } from '../logger';
+import { printGasUsage, setDataFeeds } from './common';
+import { IWrapper } from '../wrappers/IWrapper';
+import { ethers } from 'ethers';
 
-export const compareGasUsed = async (
-  versionedLogger: ReturnType<typeof contractVersionLogger>,
-  genericContracts: GenericDataFeedStore[],
-  contracts: DataFeedStore[],
-  selector: string,
+export const compareGasUsed = async <
+  G extends ethers.BaseContract,
+  B extends ethers.BaseContract,
+>(
+  genericContractWrappers: IWrapper<G>[],
+  contractWrappers: IWrapper<B>[],
   valuesCount: number,
   start: number = 0,
 ) => {
   const { receipts, receiptsGeneric, keys, values } = await setDataFeeds(
-    genericContracts,
-    contracts,
-    selector,
+    genericContractWrappers,
+    contractWrappers,
     valuesCount,
     start,
   );
 
-  await checkSetValues(contracts, versionedLogger, keys, values);
-  await checkGenericSetValues(genericContracts, keys, values);
+  for (const wrapper of [...contractWrappers, ...genericContractWrappers]) {
+    await wrapper.checkSetValues(keys, values);
+  }
 
-  await printGasUsage(versionedLogger, receipts, receiptsGeneric);
+  const map: Record<string, IWrapper<G | B>> = {};
+  for (const wrapper of [...contractWrappers, ...genericContractWrappers]) {
+    map[wrapper.contract.target.toString()] = wrapper;
+  }
+
+  await printGasUsage(map, receipts, receiptsGeneric);
 
   for (const data of receipts) {
     for (const dataGeneric of receiptsGeneric) {
-      expect(data.gasUsed).to.be.lt(dataGeneric?.gasUsed);
+      expect(Number(data?.gasUsed)).to.be.lessThan(
+        Number(dataGeneric?.gasUsed),
+      );
     }
   }
 

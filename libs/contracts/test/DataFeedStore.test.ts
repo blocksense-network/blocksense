@@ -1,62 +1,61 @@
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
-import {
-  DataFeedStoreGenericV1,
-  DataFeedStoreGenericV2,
-  IDataFeedStore__factory,
-  DataFeedStoreV1,
-  DataFeedStoreV2,
-  DataFeedStoreV3,
-} from '../typechain';
-import { contractVersionLogger } from './utils/logger';
+import { ethers as hre } from 'hardhat';
 import {
   DataFeedStore,
-  setter,
   GenericDataFeedStore,
+  initWrappers,
 } from './utils/helpers/common';
 import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
-import { deployContract } from './utils/helpers/common';
+import {
+  DataFeedStoreGenericV1Wrapper,
+  DataFeedStoreGenericV2Wrapper,
+  DataFeedStoreBaseWrapper,
+  DataFeedStoreV1Wrapper,
+  DataFeedStoreV2Wrapper,
+  DataFeedStoreV3Wrapper,
+  IWrapper,
+} from './utils/wrappers';
+import { ethers } from 'ethers';
 
-const contracts: {
-  [key: string]: DataFeedStore;
-} = {};
-const genericContracts: {
-  [key: string]: GenericDataFeedStore;
-} = {};
-const selector =
-  IDataFeedStore__factory.createInterface().getFunction('setFeeds').selector;
+let contracts: IWrapper<DataFeedStore>[] = [];
+let genericContracts: IWrapper<GenericDataFeedStore>[] = [];
 
-describe('DataFeedStore', function () {
-  let logger: ReturnType<typeof contractVersionLogger>;
-
+describe.only('DataFeedStore', function () {
   beforeEach(async function () {
-    genericContracts.V1 = await deployContract<DataFeedStoreGenericV1>(
-      'DataFeedStoreGenericV1',
-    );
-    genericContracts.V2 = await deployContract<DataFeedStoreGenericV2>(
-      'DataFeedStoreGenericV2',
-    );
+    contracts = [];
+    genericContracts = [];
 
-    contracts.V1 = await deployContract<DataFeedStoreV1>('DataFeedStoreV1');
-    contracts.V2 = await deployContract<DataFeedStoreV2>('DataFeedStoreV2');
-    contracts.V3 = await deployContract<DataFeedStoreV3>('DataFeedStoreV3');
+    await initWrappers(contracts, [
+      DataFeedStoreV1Wrapper,
+      DataFeedStoreV2Wrapper,
+      DataFeedStoreV3Wrapper,
+    ]);
 
-    logger = contractVersionLogger([contracts, genericContracts]);
+    await initWrappers(genericContracts, [
+      DataFeedStoreGenericV1Wrapper,
+      DataFeedStoreGenericV2Wrapper,
+    ]);
   });
 
-  for (let i = 1; i <= 3; i++) {
-    describe(`DataFeedStoreV${i}`, function () {
+  for (let i = 0; i < 3; i++) {
+    describe(`DataFeedStoreV${i + 1}`, function () {
       it('Should revert if the selector is not correct', async function () {
         const value = ethers.zeroPadBytes('0xa0000000', 32);
-        await expect(setter(contracts[`V${i}`], '0x10000000', [1], [value])).to
-          .be.reverted;
+        await expect(
+          (contracts[i] as DataFeedStoreBaseWrapper).customSetFeeds(
+            '0x10000000',
+            [1],
+            [value],
+          ),
+        ).to.be.reverted;
       });
 
       it('Should revert if the caller is not the owner', async function () {
         const value = ethers.zeroPadBytes('0xa0000000', 32);
+
         await expect(
-          setter(contracts[`V${i}`], selector, [1], [value], {
-            from: await (await ethers.getSigners())[3].getAddress(),
+          contracts[i].setFeeds([1], [value], {
+            from: await (await hre.getSigners())[3].getAddress(),
           }),
         ).to.be.reverted;
       });
@@ -64,22 +63,18 @@ describe('DataFeedStore', function () {
   }
 
   it(`Should compare v2 & v3 with Generic with 100 biggest uint32 id set`, async function () {
-    await compareGasUsed(
-      logger,
-      Object.values(genericContracts),
-      [contracts.V2, contracts.V3],
-      selector,
+    await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
+      genericContracts,
+      [contracts[1], contracts[2]],
       100,
       2147483548,
     );
   });
 
   it('Should compare v2 & v3 with Generic with the biggest possible id', async function () {
-    await compareGasUsed(
-      logger,
-      Object.values(genericContracts),
-      [contracts.V2, contracts.V3],
-      selector,
+    await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
+      genericContracts,
+      [contracts[1], contracts[2]],
       1,
       0x7fffffff,
     );
@@ -87,11 +82,9 @@ describe('DataFeedStore', function () {
 
   for (let i = 1; i <= 1000; i *= 10) {
     it(`Should get and set ${i} feeds in a single transaction`, async function () {
-      await compareGasUsed(
-        logger,
-        Object.values(genericContracts),
-        Object.values(contracts),
-        selector,
+      await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
+        genericContracts,
+        contracts,
         i,
       );
     });
