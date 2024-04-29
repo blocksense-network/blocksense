@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BaseContract, ethers } from 'ethers';
 import { ethers as hre, network } from 'hardhat';
 import {
   DataFeedStoreGenericV1,
@@ -14,12 +14,14 @@ import {
 import { contractVersionLogger } from '../logger';
 import { expect } from 'chai';
 import { RpcStructLog } from 'hardhat/internal/hardhat-network/provider/output';
-import { IWrapper } from '../wrappers/IWrapper';
+import { IBaseWrapper, IConsumerWrapper, IWrapper } from '../wrappers';
 
 export type GenericDataFeedStore =
   | DataFeedStoreGenericV1
   | DataFeedStoreGenericV2;
 export type DataFeedStore = DataFeedStoreV1 | DataFeedStoreV2 | DataFeedStoreV3;
+
+export type DataFeed = DataFeedStore | GenericDataFeedStore;
 
 export type HistoricDataFeedStore =
   | HistoricDataFeedStoreV1
@@ -91,19 +93,6 @@ export const checkSetValues = async (
   }
 };
 
-export const checkGenericSetValues = async (
-  genericContracts: GenericDataFeedStore[],
-  keys: number[],
-  values: string[],
-) => {
-  for (const genericContract of genericContracts) {
-    for (let i = 0; i < keys.length; i++) {
-      const value = await genericContract.getDataFeed(keys[i]);
-      expect(value).to.be.eq(values[i]);
-    }
-  }
-};
-
 export const getV1Selector = (key: number): string => {
   return '0x' + (key >>> 0).toString(16).padStart(8, '0');
 };
@@ -113,8 +102,8 @@ export const getV2Selector = (key: number): string => {
 };
 
 export const setDataFeeds = async <
-  G extends ethers.BaseContract,
-  B extends ethers.BaseContract,
+  G extends BaseContract,
+  B extends BaseContract,
 >(
   genericContractWrappers: IWrapper<G>[],
   contractWrappers: IWrapper<B>[],
@@ -139,11 +128,17 @@ export const setDataFeeds = async <
   return { receipts, receiptsGeneric, keys, values };
 };
 
-export const printGasUsage = async <T extends ethers.BaseContract>(
-  map: Record<string, IWrapper<T>>,
+export const printGasUsage = async <
+  G extends BaseContract,
+  B extends BaseContract,
+>(
+  genericWrappers: IBaseWrapper<G>[],
+  wrappers: IBaseWrapper<B>[],
   receipts: any[],
   receiptsGeneric: any[],
 ): Promise<void> => {
+  const map = createLogMap(genericWrappers, wrappers);
+
   const table: { [key: string]: { gas: number; diff: number; '%': number } } =
     {};
 
@@ -193,12 +188,27 @@ export const printGasUsage = async <T extends ethers.BaseContract>(
 };
 
 export const initWrappers = async <
-  U extends ethers.BaseContract,
-  T extends new (...args: any[]) => IWrapper<U>,
+  U extends BaseContract,
+  T extends new (...args: any[]) => IBaseWrapper<U>,
 >(
-  storage: IWrapper<U>[],
+  storage: IBaseWrapper<U>[],
   classes: T[],
 ): Promise<void> => {
+  for (const c of classes) {
+    const contract = new c();
+    await contract.init();
+    storage.push(contract);
+  }
+};
+
+export const initConsumerWrappers = async <
+  C extends BaseContract,
+  B extends BaseContract,
+  T extends new (...args: any[]) => IConsumerWrapper<C, B>,
+>(
+  storage: IConsumerWrapper<C, B>[],
+  classes: T[],
+) => {
   for (const c of classes) {
     const contract = new c();
     await contract.init();
@@ -237,4 +247,16 @@ export const deployContract = async <T>(
   );
 
   return contract as T;
+};
+
+export const createLogMap = <G extends BaseContract, B extends BaseContract>(
+  genericWrappers: IBaseWrapper<G>[],
+  wrappers: IBaseWrapper<B>[],
+) => {
+  const map: Record<string, IBaseWrapper<G | B>> = {};
+  for (const wrapper of [...genericWrappers, ...wrappers]) {
+    map[wrapper.contract.target.toString()] = wrapper;
+  }
+
+  return map;
 };

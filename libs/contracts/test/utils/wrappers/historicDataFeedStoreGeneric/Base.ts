@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { IWrapper } from '../IWrapper';
+import { IWrapper } from '../interfaces/IWrapper';
 import { GenericHistoricDataFeedStore } from '../../helpers/common';
 import { IHistoricDataFeed } from '../../../../typechain/contracts/test/HistoricDataFeedStoreGenericV1';
 

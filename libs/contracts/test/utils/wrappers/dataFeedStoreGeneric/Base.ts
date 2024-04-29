@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { GenericDataFeedStore } from '../../helpers/common';
-import { IWrapper } from '../IWrapper';
+import { IWrapper } from '../interfaces/IWrapper';
 
 export abstract class DataFeedStoreGenericBaseWrapper
   implements IWrapper<GenericDataFeedStore>
@@ -14,7 +14,7 @@ export abstract class DataFeedStoreGenericBaseWrapper
 
   public async checkSetValues(keys: number[], values: string[]) {
     for (let i = 0; i < keys.length; i++) {
-      const value = await this.contract.getDataFeed(keys[i]);
+      const value = await this.getValue(keys[i]);
       expect(value).to.be.eq(values[i]);
     }
   }

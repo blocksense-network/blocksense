@@ -5,15 +5,8 @@ import {
   DataFeedGenericV1Consumer,
   DataFeedGenericV2Consumer,
 } from '../../../typechain';
-import {
-  DataFeedStore,
-  GenericDataFeedStore,
-  checkGenericSetValues,
-  checkSetValues,
-  printGasUsage,
-  setDataFeeds,
-} from './common';
-import { contractVersionLogger } from '../logger';
+import { printGasUsage, setDataFeeds } from './common';
+import { DataFeedStoreConsumerBaseWrapper } from '../wrappers';
 
 export type DataFeedConsumer = DataFeedV1Consumer | DataFeedV2Consumer;
 export type GenericDataFeedConsumer =
@@ -21,19 +14,14 @@ export type GenericDataFeedConsumer =
   | DataFeedGenericV2Consumer;
 
 export const compareConsumerGasUsed = async (
-  versionedLogger: ReturnType<typeof contractVersionLogger>,
-  dataFeedGenericConsumers: GenericDataFeedConsumer[],
-  dataFeedConsumers: DataFeedConsumer[],
-  genericContracts: GenericDataFeedStore[],
-  contracts: DataFeedStore[],
-  selector: string,
+  dataFeedGenericConsumers: DataFeedStoreConsumerBaseWrapper[],
+  dataFeedConsumers: DataFeedStoreConsumerBaseWrapper[],
   valuesCount: number,
   start: number = 0,
 ) => {
   const { keys, values } = await setDataFeeds(
-    genericContracts,
-    contracts,
-    selector,
+    dataFeedGenericConsumers.map(c => c.wrapper),
+    dataFeedConsumers.map(c => c.wrapper),
     valuesCount,
     start,
   );
@@ -53,25 +41,20 @@ export const compareConsumerGasUsed = async (
   }
 
   for (let i = 0; i < keys.length; i++) {
-    for (const contract of dataFeedConsumers) {
-      const value = await contract.getFeedById(keys[i]);
-      const externalValue = await contract.getExternalFeedById(keys[i]);
-      expect(value).to.be.equal(values[i]);
-      expect(externalValue).to.be.equal(values[i]);
-    }
-
-    for (const contract of dataFeedGenericConsumers) {
-      const value = await contract.getFeedById(keys[i]);
-      const externalValue = await contract.getExternalFeedById(keys[i]);
-      expect(value).to.be.equal(values[i]);
-      expect(externalValue).to.be.equal(values[i]);
+    for (const consumer of [
+      ...dataFeedConsumers,
+      ...dataFeedGenericConsumers,
+    ]) {
+      await consumer.checkSetValues([keys[i]], [values[i]]);
     }
   }
 
-  await checkSetValues(contracts, versionedLogger, keys, values);
-  await checkGenericSetValues(genericContracts, keys, values);
-
-  await printGasUsage(versionedLogger, receipts, receiptsGeneric);
+  await printGasUsage(
+    dataFeedGenericConsumers,
+    dataFeedConsumers,
+    receipts,
+    receiptsGeneric,
+  );
 
   for (const receipt of receipts) {
     for (const receiptGeneric of receiptsGeneric) {

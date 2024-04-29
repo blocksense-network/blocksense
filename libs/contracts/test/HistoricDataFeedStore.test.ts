@@ -42,9 +42,10 @@ describe('HistoricDataFeedStore', function () {
         const receipt = await contractWrappers[i].setFeeds([key], [value]);
 
         await contractWrappers[i].checkSetValues([key], [value]);
-        await (
-          contractWrappers[i] as HistoricDataFeedStoreBaseWrapper
-        ).checkSetTimestamps([key], [receipt.blockNumber]);
+        await contractWrappers[i].checkSetTimestamps(
+          [key],
+          [receipt.blockNumber],
+        );
       });
 
       it('Should get the current counter', async function () {
@@ -52,9 +53,7 @@ describe('HistoricDataFeedStore', function () {
         const value = ethers.encodeBytes32String('value');
 
         await contractWrappers[i].setFeeds([key], [value]);
-        await (
-          contractWrappers[i] as HistoricDataFeedStoreBaseWrapper
-        ).checkLatestCounter(key, 1);
+        await contractWrappers[i].checkLatestCounter(key, 1);
       });
 
       it('Should get the current counter after 10 iterations', async function () {
@@ -65,9 +64,7 @@ describe('HistoricDataFeedStore', function () {
           await contractWrappers[i].setFeeds([key], [value]);
         }
 
-        await (
-          contractWrappers[i] as HistoricDataFeedStoreBaseWrapper
-        ).checkLatestCounter(key, 10);
+        await contractWrappers[i].checkLatestCounter(key, 10);
       });
 
       it('Should get value at counter 5', async function () {
@@ -82,9 +79,7 @@ describe('HistoricDataFeedStore', function () {
             blockNumber = receipt.blockNumber;
           }
         }
-        await (
-          contractWrappers[i] as HistoricDataFeedStoreBaseWrapper
-        ).checkValueAtCounter(
+        await contractWrappers[i].checkValueAtCounter(
           key,
           counter,
           ethers.encodeBytes32String('value ' + counter),

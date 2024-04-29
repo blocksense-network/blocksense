@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'ethers';
 import { network } from 'hardhat';
 import { DataFeedStore } from '../../helpers/common';
-import { IWrapper } from '../IWrapper';
+import { IWrapper } from '../interfaces/IWrapper';
 
 export abstract class DataFeedStoreBaseWrapper
   implements IWrapper<DataFeedStore>

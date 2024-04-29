@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { printGasUsage, setDataFeeds } from './common';
-import { IWrapper } from '../wrappers/IWrapper';
-import { ethers } from 'ethers';
+import { IWrapper } from '../wrappers';
+import { BaseContract } from 'ethers';
 
 export const compareGasUsed = async <
-  G extends ethers.BaseContract,
-  B extends ethers.BaseContract,
+  G extends BaseContract,
+  B extends BaseContract,
 >(
   genericContractWrappers: IWrapper<G>[],
   contractWrappers: IWrapper<B>[],
@@ -23,12 +23,12 @@ export const compareGasUsed = async <
     await wrapper.checkSetValues(keys, values);
   }
 
-  const map: Record<string, IWrapper<G | B>> = {};
-  for (const wrapper of [...contractWrappers, ...genericContractWrappers]) {
-    map[wrapper.contract.target.toString()] = wrapper;
-  }
-
-  await printGasUsage(map, receipts, receiptsGeneric);
+  await printGasUsage(
+    genericContractWrappers,
+    contractWrappers,
+    receipts,
+    receiptsGeneric,
+  );
 
   for (const data of receipts) {
     for (const dataGeneric of receiptsGeneric) {

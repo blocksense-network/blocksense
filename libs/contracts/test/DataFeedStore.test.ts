@@ -13,25 +13,25 @@ import {
   DataFeedStoreV1Wrapper,
   DataFeedStoreV2Wrapper,
   DataFeedStoreV3Wrapper,
-  IWrapper,
+  DataFeedStoreGenericBaseWrapper,
 } from './utils/wrappers';
 import { ethers } from 'ethers';
 
-let contracts: IWrapper<DataFeedStore>[] = [];
-let genericContracts: IWrapper<GenericDataFeedStore>[] = [];
+let contractWrappers: DataFeedStoreBaseWrapper[] = [];
+let genericContractWrappers: DataFeedStoreGenericBaseWrapper[] = [];
 
 describe('DataFeedStore', function () {
   beforeEach(async function () {
-    contracts = [];
-    genericContracts = [];
+    contractWrappers = [];
+    genericContractWrappers = [];
 
-    await initWrappers(contracts, [
+    await initWrappers(contractWrappers, [
       DataFeedStoreV1Wrapper,
       DataFeedStoreV2Wrapper,
       DataFeedStoreV3Wrapper,
     ]);
 
-    await initWrappers(genericContracts, [
+    await initWrappers(genericContractWrappers, [
       DataFeedStoreGenericV1Wrapper,
       DataFeedStoreGenericV2Wrapper,
     ]);
@@ -42,11 +42,7 @@ describe('DataFeedStore', function () {
       it('Should revert if the selector is not correct', async function () {
         const value = ethers.zeroPadBytes('0xa0000000', 32);
         await expect(
-          (contracts[i] as DataFeedStoreBaseWrapper).customSetFeeds(
-            '0x10000000',
-            [1],
-            [value],
-          ),
+          contractWrappers[i].customSetFeeds('0x10000000', [1], [value]),
         ).to.be.reverted;
       });
 
@@ -54,7 +50,7 @@ describe('DataFeedStore', function () {
         const value = ethers.zeroPadBytes('0xa0000000', 32);
 
         await expect(
-          contracts[i].setFeeds([1], [value], {
+          contractWrappers[i].setFeeds([1], [value], {
             from: await (await hre.getSigners())[3].getAddress(),
           }),
         ).to.be.reverted;
@@ -64,8 +60,8 @@ describe('DataFeedStore', function () {
 
   it(`Should compare v2 & v3 with Generic with 100 biggest uint32 id set`, async function () {
     await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
-      genericContracts,
-      [contracts[1], contracts[2]],
+      genericContractWrappers,
+      [contractWrappers[1], contractWrappers[2]],
       100,
       2147483548,
     );
@@ -73,8 +69,8 @@ describe('DataFeedStore', function () {
 
   it('Should compare v2 & v3 with Generic with the biggest possible id', async function () {
     await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
-      genericContracts,
-      [contracts[1], contracts[2]],
+      genericContractWrappers,
+      [contractWrappers[1], contractWrappers[2]],
       1,
       0x7fffffff,
     );
@@ -83,8 +79,8 @@ describe('DataFeedStore', function () {
   for (let i = 1; i <= 1000; i *= 10) {
     it(`Should get and set ${i} feeds in a single transaction`, async function () {
       await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
-        genericContracts,
-        contracts,
+        genericContractWrappers,
+        contractWrappers,
         i,
       );
     });
