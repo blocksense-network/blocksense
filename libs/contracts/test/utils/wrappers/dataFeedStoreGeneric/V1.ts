@@ -1,12 +1,11 @@
-import { Typed } from 'ethers';
 import {
   DataFeedStoreGenericV1,
   DataFeedStoreGenericV1__factory,
 } from '../../../../typechain';
-import { DataFeedStoreGenericWrapper } from './Base';
+import { DataFeedStoreGenericBaseWrapper } from './Base';
 import { deployContract } from '../../helpers/common';
 
-export class DataFeedStoreGenericV1Wrapper extends DataFeedStoreGenericWrapper {
+export class DataFeedStoreGenericV1Wrapper extends DataFeedStoreGenericBaseWrapper {
   constructor() {
     super(
       DataFeedStoreGenericV1__factory.createInterface().getFunction('setFeeds')

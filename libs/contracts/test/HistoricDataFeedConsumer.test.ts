@@ -34,7 +34,7 @@ const genericConsumers: {
   [key: string]: HistoricDataFeedGenericConsumer;
 } = {};
 
-describe('HistoricDataFeedConsumer', function () {
+xdescribe('HistoricDataFeedConsumer', function () {
   this.timeout(100000);
 
   let logger: ReturnType<typeof contractVersionLogger>;

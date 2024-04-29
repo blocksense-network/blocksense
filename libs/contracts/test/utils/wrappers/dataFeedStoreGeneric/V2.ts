@@ -3,10 +3,10 @@ import {
   DataFeedStoreGenericV2,
   DataFeedStoreGenericV2__factory,
 } from '../../../../typechain';
-import { DataFeedStoreGenericWrapper } from './Base';
+import { DataFeedStoreGenericBaseWrapper } from './Base';
 import { deployContract } from '../../helpers/common';
 
-export class DataFeedStoreGenericV2Wrapper extends DataFeedStoreGenericWrapper {
+export class DataFeedStoreGenericV2Wrapper extends DataFeedStoreGenericBaseWrapper {
   constructor() {
     super(
       DataFeedStoreGenericV2__factory.createInterface().getFunction('setFeeds')

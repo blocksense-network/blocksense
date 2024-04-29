@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { GenericDataFeedStore } from '../../helpers/common';
 import { IWrapper } from '../IWrapper';
 
-export abstract class DataFeedStoreGenericWrapper
+export abstract class DataFeedStoreGenericBaseWrapper
   implements IWrapper<GenericDataFeedStore>
 {
   public contract!: GenericDataFeedStore;

@@ -1,4 +1,4 @@
-import { BytesLike, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { ethers as hre, network } from 'hardhat';
 import {
   DataFeedStoreGenericV1,
@@ -9,8 +9,6 @@ import {
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreV1,
   HistoricDataFeedStoreV2,
-  IDataFeedStoreGenericV1,
-  IDataFeedStoreGenericV2,
   UpgradeableProxy,
 } from '../../../typechain';
 import { contractVersionLogger } from '../logger';
@@ -113,27 +111,6 @@ export const getV1Selector = (key: number): string => {
 export const getV2Selector = (key: number): string => {
   return '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
 };
-
-export enum HISTORIC_SELECTORS {
-  GET_LATEST_VALUE = 0x80000000,
-  GET_LATEST_COUNTER = 0x40000000,
-  GET_VALUE_AT_COUNTER = 0x20000000,
-}
-export const getHistoricSelector = (
-  type: HISTORIC_SELECTORS,
-  key: number,
-): string => {
-  return '0x' + ((key | type) >>> 0).toString(16).padStart(8, '0');
-};
-
-function isGenericV1(
-  contract: IDataFeedStoreGenericV1 | IDataFeedStoreGenericV2,
-): contract is IDataFeedStoreGenericV1 {
-  return (
-    (contract as IDataFeedStoreGenericV1).interface.getFunction('setFeeds')
-      .inputs.length === 2
-  );
-}
 
 export const setDataFeeds = async <
   G extends ethers.BaseContract,
@@ -260,11 +237,4 @@ export const deployContract = async <T>(
   );
 
   return contract as T;
-};
-
-export const abiDecode = (types: string[], data: BytesLike) => {
-  expect(types.length).to.be.eq(data.length);
-
-  const abi = new ethers.AbiCoder();
-  return abi.decode(types, data);
 };

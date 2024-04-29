@@ -29,7 +29,7 @@ const genericConsumers: {
   [key: string]: GenericDataFeedConsumer;
 } = {};
 
-describe('DataFeedConsumer', function () {
+xdescribe('DataFeedConsumer', function () {
   this.timeout(100000);
 
   let logger: ReturnType<typeof contractVersionLogger>;

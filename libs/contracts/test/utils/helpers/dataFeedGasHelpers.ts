@@ -38,5 +38,5 @@ export const compareGasUsed = async <
     }
   }
 
-  return { receipts, receiptsGeneric };
+  return { receipts, receiptsGeneric, keys, values };
 };

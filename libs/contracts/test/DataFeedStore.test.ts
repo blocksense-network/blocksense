@@ -20,7 +20,7 @@ import { ethers } from 'ethers';
 let contracts: IWrapper<DataFeedStore>[] = [];
 let genericContracts: IWrapper<GenericDataFeedStore>[] = [];
 
-describe.only('DataFeedStore', function () {
+describe('DataFeedStore', function () {
   beforeEach(async function () {
     contracts = [];
     genericContracts = [];
