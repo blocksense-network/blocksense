@@ -1,0 +1,5 @@
+name = "trigger-oracle"
+version = "0.1"
+spin_compatibility = ">=2.4"
+license = "Apache-2.0"
+package = "./target/release/trigger-oracle"
