@@ -13,12 +13,12 @@ import {
   DataFeedStoreV1Wrapper,
   DataFeedStoreV2Wrapper,
   DataFeedStoreV3Wrapper,
-  DataFeedStoreGenericBaseWrapper,
 } from './utils/wrappers';
 import { ethers } from 'ethers';
 
-let contractWrappers: DataFeedStoreBaseWrapper[] = [];
-let genericContractWrappers: DataFeedStoreGenericBaseWrapper[] = [];
+let contractWrappers: DataFeedStoreBaseWrapper<DataFeedStore>[] = [];
+let genericContractWrappers: DataFeedStoreBaseWrapper<GenericDataFeedStore>[] =
+  [];
 
 describe('DataFeedStore', function () {
   beforeEach(async function () {
@@ -42,7 +42,13 @@ describe('DataFeedStore', function () {
       it('Should revert if the selector is not correct', async function () {
         const value = ethers.zeroPadBytes('0xa0000000', 32);
         await expect(
-          contractWrappers[i].customSetFeeds('0x10000000', [1], [value]),
+          contractWrappers[i].setFeeds([1], [value], {
+            data: contractWrappers[i].customSetFeedsData(
+              '0x10000000',
+              [1],
+              [value],
+            ),
+          }),
         ).to.be.reverted;
       });
 
@@ -59,7 +65,7 @@ describe('DataFeedStore', function () {
   }
 
   it(`Should compare v2 & v3 with Generic with 100 biggest uint32 id set`, async function () {
-    await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
+    await compareGasUsed(
       genericContractWrappers,
       [contractWrappers[1], contractWrappers[2]],
       100,
@@ -68,7 +74,7 @@ describe('DataFeedStore', function () {
   });
 
   it('Should compare v2 & v3 with Generic with the biggest possible id', async function () {
-    await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
+    await compareGasUsed(
       genericContractWrappers,
       [contractWrappers[1], contractWrappers[2]],
       1,
@@ -78,11 +84,7 @@ describe('DataFeedStore', function () {
 
   for (let i = 1; i <= 1000; i *= 10) {
     it(`Should get and set ${i} feeds in a single transaction`, async function () {
-      await compareGasUsed<GenericDataFeedStore, DataFeedStore>(
-        genericContractWrappers,
-        contractWrappers,
-        i,
-      );
+      await compareGasUsed(genericContractWrappers, contractWrappers, i);
     });
   }
 });

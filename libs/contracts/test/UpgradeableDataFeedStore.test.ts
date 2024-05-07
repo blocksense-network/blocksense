@@ -2,135 +2,128 @@ import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import {
-  DataFeedStoreV1,
-  DataFeedStoreV2,
-  DataFeedStoreV3,
-  UpgradeableProxy,
-  ITransparentUpgradeableProxy__factory,
-  IDataFeedStore__factory,
-  DataFeedStoreGenericV1,
-  DataFeedStoreGenericV2,
-} from '../typechain';
-import { DataFeedStoreGenericV1Interface } from '../typechain/contracts/test/DataFeedStoreGenericV1';
-import { DataFeedStoreGenericV2Interface } from '../typechain/contracts/test/DataFeedStoreGenericV2';
-import {
   DataFeedStore,
   GenericDataFeedStore,
-  checkSetValues,
-  deployContract,
-  getV1Selector,
-  getV2Selector,
-  getter,
-  printGasUsage,
-  setter,
+  GenericHistoricDataFeedStore,
+  HistoricDataFeedStore,
+  initWrappers,
 } from './utils/helpers/common';
-import { contractVersionLogger } from './utils/logger';
+import {
+  DataFeedStoreBaseWrapper,
+  HistoricDataFeedStoreBaseWrapper,
+  HistoricDataFeedStoreGenericBaseWrapper,
+  UpgradeableProxyBaseWrapper,
+  UpgradeableProxyDataFeedStoreV1GenericWrapper,
+  UpgradeableProxyDataFeedStoreV1Wrapper,
+  UpgradeableProxyDataFeedStoreV2GenericWrapper,
+  UpgradeableProxyDataFeedStoreV2Wrapper,
+  UpgradeableProxyDataFeedStoreV3Wrapper,
+  UpgradeableProxyHistoricBaseWrapper,
+  UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper,
+  UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
+  UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
+} from './utils/wrappers';
+import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
+import { ITransparentUpgradeableProxy__factory } from '../typechain';
 
-const contractsImpl: {
-  [key: string]: DataFeedStore;
-} = {};
-const contractsGenericImpl: {
-  [key: string]: GenericDataFeedStore;
-} = {};
-const selector =
-  IDataFeedStore__factory.createInterface().getFunction('setFeeds').selector;
-const upgradeSelector =
-  ITransparentUpgradeableProxy__factory.createInterface().getFunction(
-    'upgradeToAndCall',
-  ).selector;
+let contractWrappers: UpgradeableProxyBaseWrapper<
+  DataFeedStore,
+  DataFeedStoreBaseWrapper<DataFeedStore>
+>[] = [];
+let contractGenericWrappers: UpgradeableProxyBaseWrapper<
+  GenericDataFeedStore,
+  DataFeedStoreBaseWrapper<GenericDataFeedStore>
+>[] = [];
 
-xdescribe('UpgradeableProxy', function () {
+describe('UpgradeableProxy', function () {
   let admin: Signer;
-  let upgradeableContractsImpl: UpgradeableProxy;
 
   beforeEach(async function () {
     admin = (await ethers.getSigners())[9];
+    contractWrappers = [];
+    contractGenericWrappers = [];
 
-    contractsGenericImpl.V1 = await deployContract<DataFeedStoreGenericV1>(
-      'DataFeedStoreGenericV1',
+    await initWrappers(
+      contractWrappers,
+      [
+        UpgradeableProxyDataFeedStoreV1Wrapper,
+        UpgradeableProxyDataFeedStoreV2Wrapper,
+        UpgradeableProxyDataFeedStoreV3Wrapper,
+      ],
+      ...Array(3).fill(await admin.getAddress()),
     );
-    contractsGenericImpl.V2 = await deployContract<DataFeedStoreGenericV2>(
-      'DataFeedStoreGenericV2',
-    );
 
-    contractsImpl.V1 = await deployContract<DataFeedStoreV1>('DataFeedStoreV1');
-    contractsImpl.V2 = await deployContract<DataFeedStoreV2>('DataFeedStoreV2');
-    contractsImpl.V3 = await deployContract<DataFeedStoreV3>('DataFeedStoreV3');
-
-    upgradeableContractsImpl = await deployContract<UpgradeableProxy>(
-      'UpgradeableProxy',
-      contractsImpl.V1.target,
-      await admin.getAddress(),
+    await initWrappers(
+      contractGenericWrappers,
+      [
+        UpgradeableProxyDataFeedStoreV1GenericWrapper,
+        UpgradeableProxyDataFeedStoreV2GenericWrapper,
+      ],
+      ...Array(2).fill(await admin.getAddress()),
     );
   });
 
   it('Should upgrade from V1 to V2', async function () {
-    const receipt = await setter(
-      upgradeableContractsImpl,
-      upgradeSelector,
-      [],
-      [],
+    const targetBefore = contractWrappers[0].implementation.contract.target;
+
+    const receipt = await contractWrappers[0].upgradeImplementation(
+      contractWrappers[1].implementation,
       {
         from: await admin.getAddress(),
-        data: ethers.solidityPacked(
-          ['bytes4', 'address'],
-          [upgradeSelector, contractsImpl.V2.target],
-        ),
       },
     );
 
     console.log('Gas used: ', Number(receipt.gasUsed));
 
-    const logs = await upgradeableContractsImpl.queryFilter(
-      upgradeableContractsImpl.filters.Upgraded(),
+    const logs = await contractWrappers[0].contract.queryFilter(
+      contractWrappers[0].contract.filters.Upgraded(),
     );
     expect(logs.length).to.be.equal(2);
-    expect(logs[0].args?.implementation).to.be.equal(contractsImpl.V1.target);
-    expect(logs[1].args?.implementation).to.be.equal(contractsImpl.V2.target);
+    expect(logs[0].args?.implementation).to.be.equal(targetBefore);
+    expect(logs[1].args?.implementation).to.be.equal(
+      contractWrappers[1].implementation.contract.target,
+    );
   });
 
   it('Should preserve storage when implementation is changed', async function () {
     const value = ethers.encodeBytes32String('key');
-    await setter(upgradeableContractsImpl, selector, [0], [value]);
+    await contractWrappers[0].setFeeds([0], [value]);
 
-    const valueV1 = await getter(upgradeableContractsImpl, getV1Selector(0));
+    const valueV1 = await contractWrappers[0].getValue(
+      contractWrappers[0].implementation.getLatestValueData(0),
+    );
 
-    const tx = await setter(upgradeableContractsImpl, upgradeSelector, [], [], {
-      from: await admin.getAddress(),
-      data: ethers.solidityPacked(
-        ['bytes4', 'address'],
-        [upgradeSelector, contractsImpl.V2.target],
-      ),
-    });
+    const tx = await contractWrappers[0].upgradeImplementation(
+      contractWrappers[1].implementation,
+      {
+        from: await admin.getAddress(),
+      },
+    );
 
     console.log('Gas used: ', Number(tx.gasUsed));
 
     await expect(tx.transactionHash)
-      .to.emit(upgradeableContractsImpl, 'Upgraded')
-      .withArgs(contractsImpl.V2.target);
+      .to.emit(contractWrappers[0].contract, 'Upgraded')
+      .withArgs(contractWrappers[1].implementation.contract);
 
-    const valueV2 = await getter(upgradeableContractsImpl, getV2Selector(0));
+    const valueV2 = await contractWrappers[0].getValue(
+      contractWrappers[1].implementation.getLatestValueData(0),
+    );
 
     expect(valueV1).to.be.equal(value);
     expect(valueV1).to.be.equal(valueV2);
   });
 
   it('Should revert if upgrade is not called by the admin', async function () {
-    const tx = setter(upgradeableContractsImpl, upgradeSelector, [], [], {
-      from: (await ethers.getSigners())[8].address,
-      data: ethers.solidityPacked(
-        ['bytes4', 'address'],
-        [upgradeSelector, contractsImpl.V2.target],
-      ),
-    });
+    const tx = contractWrappers[0].upgradeImplementation(
+      contractWrappers[1].implementation,
+    );
 
     await expect(tx).to.be.reverted;
   });
 
   it('Should revert if admin calls something other than upgrade', async function () {
-    let tx = setter(
-      upgradeableContractsImpl,
-      selector,
+    let tx = contractWrappers[0].setFeeds(
       [0],
       [ethers.encodeBytes32String('key')],
       {
@@ -139,24 +132,25 @@ xdescribe('UpgradeableProxy', function () {
     );
 
     await expect(tx).to.be.revertedWithCustomError(
-      upgradeableContractsImpl,
+      contractWrappers[0].contract,
       'ProxyDeniedAdminAccess',
     );
 
-    tx = getter(upgradeableContractsImpl, getV1Selector(0), {
-      from: await admin.getAddress(),
-    });
+    tx = contractWrappers[0].getValue(
+      contractWrappers[0].implementation.getLatestValueData(0),
+      {
+        from: await admin.getAddress(),
+      },
+    );
 
     await expect(tx).to.be.revertedWithCustomError(
-      upgradeableContractsImpl,
+      contractWrappers[0].contract,
       'ProxyDeniedAdminAccess',
     );
   });
 
   it('Should revert if non-owner calls set feed', async function () {
-    const tx = setter(
-      upgradeableContractsImpl,
-      selector,
+    const tx = contractWrappers[0].setFeeds(
       [0],
       [ethers.encodeBytes32String('key')],
       {
@@ -168,128 +162,170 @@ xdescribe('UpgradeableProxy', function () {
   });
 
   it('Should revert if the new implementation is not a contract', async function () {
-    const tx = setter(upgradeableContractsImpl, upgradeSelector, [], [], {
-      from: await admin.getAddress(),
-      data: ethers.solidityPacked(
-        ['bytes4', 'address'],
-        [upgradeSelector, await admin.getAddress()],
-      ),
-    });
+    const tx = contractWrappers[0].upgradeImplementation(
+      contractWrappers[1].implementation,
+      {
+        from: await admin.getAddress(),
+        data: ethers.solidityPacked(
+          ['bytes4', 'address'],
+          [
+            ITransparentUpgradeableProxy__factory.createInterface().getFunction(
+              'upgradeToAndCall',
+            ).selector,
+            await admin.getAddress(),
+          ],
+        ),
+      },
+    );
 
     await expect(tx).to.be.reverted;
   });
 
   describe('Compare gas usage', function () {
-    const upgradeableContracts: {
-      [key: string]: UpgradeableProxy;
-    } = {};
-    const upgradeableGenericContracts: {
-      [key: string]: UpgradeableProxy;
-    } = {};
-    let logger: ReturnType<typeof contractVersionLogger>;
+    for (let i = 1; i <= 1; i *= 10) {
+      it(`Should set ${i} data feeds`, async function () {
+        await compareGasUsed(contractGenericWrappers, contractWrappers, i);
+      });
+    }
+  });
+
+  describe('Compare gas usage for historic contracts', function () {
+    let historicContractWrappers: UpgradeableProxyHistoricBaseWrapper<
+      HistoricDataFeedStore,
+      HistoricDataFeedStoreBaseWrapper
+    >[] = [];
+    let historicContractGenericWrappers: UpgradeableProxyHistoricBaseWrapper<
+      GenericHistoricDataFeedStore,
+      HistoricDataFeedStoreGenericBaseWrapper
+    >[] = [];
 
     beforeEach(async function () {
-      upgradeableGenericContracts.V1 = await deployContract<UpgradeableProxy>(
-        'UpgradeableProxy',
-        contractsGenericImpl.V1.target,
-        await admin.getAddress(),
-      );
-      upgradeableGenericContracts.V2 = await deployContract<UpgradeableProxy>(
-        'UpgradeableProxy',
-        contractsGenericImpl.V2.target,
-        await admin.getAddress(),
+      historicContractWrappers = [];
+      historicContractGenericWrappers = [];
+
+      await initWrappers(
+        historicContractWrappers,
+        [
+          UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
+          UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
+        ],
+        ...Array(2).fill(await admin.getAddress()),
       );
 
-      upgradeableContracts.V1 = await deployContract<UpgradeableProxy>(
-        'UpgradeableProxy',
-        contractsImpl.V1.target,
-        await admin.getAddress(),
+      await initWrappers(
+        historicContractGenericWrappers,
+        [UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper],
+        ...Array(1).fill(await admin.getAddress()),
       );
-      upgradeableContracts.V2 = await deployContract<UpgradeableProxy>(
-        'UpgradeableProxy',
-        contractsImpl.V2.target,
-        await admin.getAddress(),
-      );
-      upgradeableContracts.V3 = await deployContract<UpgradeableProxy>(
-        'UpgradeableProxy',
-        contractsImpl.V3.target,
-        await admin.getAddress(),
-      );
-
-      logger = contractVersionLogger([
-        upgradeableContracts,
-        upgradeableGenericContracts,
-      ]);
     });
 
-    for (let i = 1; i <= 1000; i *= 10) {
-      it(`Should set ${i} data feeds`, async function () {
-        const keys = Array.from({ length: i }, (_, j) => j);
-        const values = keys.map(key =>
-          ethers.encodeBytes32String(`Hello, World! ${key}`),
-        );
+    for (let i = 0; i < 2; i++) {
+      describe(`Proxy HistoricDataFeedStoreV${i + 1}`, function () {
+        this.timeout(1000000);
 
-        const receipts = [];
-        for (const contract of Object.values(upgradeableContracts)) {
-          receipts.push(await setter(contract, selector, keys, values));
-        }
+        it('Should set and get correct values', async function () {
+          const key = 1;
+          const value = ethers.encodeBytes32String('value');
 
-        checkSetValues(
-          Object.values(upgradeableContracts),
-          logger,
-          keys,
-          values,
-        );
+          const receipt = await historicContractWrappers[i].setFeeds(
+            [key],
+            [value],
+          );
 
-        const ifaceV1 = contractsGenericImpl.V1
-          .interface as DataFeedStoreGenericV1Interface;
-        const txG1 = await setter(
-          upgradeableGenericContracts.V1,
-          ifaceV1.getFunction('setFeeds')!.selector,
-          [],
-          [],
-          {
-            data: ifaceV1.encodeFunctionData('setFeeds', [keys, values]),
-          },
-        );
+          await historicContractWrappers[i].checkSetValues([key], [value]);
+          await historicContractWrappers[i].checkSetTimestamps(
+            [key],
+            [receipt.blockNumber],
+          );
+        });
 
-        const ifaceV2 = contractsGenericImpl.V2
-          .interface as DataFeedStoreGenericV2Interface;
-        const txG2 = await setter(
-          upgradeableGenericContracts.V2,
-          selector,
-          [],
-          [],
-          {
-            data: ifaceV2.encodeFunctionData('setFeeds', [
-              ethers.solidityPacked(
-                [...keys.map(() => ['uint32', 'bytes32']).flat()],
-                [...keys.flatMap((key, i) => [key, values[i]])],
-              ),
-            ]),
-          },
-        );
+        it('Should get the current counter', async function () {
+          const key = 1;
+          const value = ethers.encodeBytes32String('value');
 
-        for (const [index, contract] of Object.values(
-          upgradeableGenericContracts,
-        ).entries()) {
-          const iface = Object.values(contractsGenericImpl)[index].interface;
-          for (let i = 0; i < keys.length; i++) {
-            const value = await getter(
-              contract,
-              iface.getFunction('getDataFeed')!.selector,
-              {
-                data: iface.encodeFunctionData('getDataFeed', [keys[i]]),
-              },
+          await historicContractWrappers[i].setFeeds([key], [value]);
+          await historicContractWrappers[i].checkLatestCounter(key, 1);
+        });
+
+        it('Should get the current counter after 10 iterations', async function () {
+          const key = 1;
+          const value = ethers.encodeBytes32String('value');
+
+          for (let j = 0; j < 10; j++) {
+            await historicContractWrappers[i].setFeeds([key], [value]);
+          }
+
+          await historicContractWrappers[i].checkLatestCounter(key, 10);
+        });
+
+        it('Should get value at counter 5', async function () {
+          const key = 1;
+          const counter = 5;
+          let blockNumber = 0;
+
+          for (let j = 1; j <= 10; j++) {
+            const value = ethers.encodeBytes32String('value ' + j);
+            const receipt = await historicContractWrappers[i].setFeeds(
+              [key],
+              [value],
             );
+            if (j === counter) {
+              blockNumber = receipt.blockNumber;
+            }
+          }
+          await historicContractWrappers[i].checkValueAtCounter(
+            key,
+            counter,
+            ethers.encodeBytes32String('value ' + counter),
+            blockNumber,
+          );
+        });
+      });
+    }
 
-            expect(value).to.be.equal(values[i]);
+    for (let i = 1; i <= 100; i *= 10) {
+      it(`Should set ${i} feeds in a single transaction`, async function () {
+        await compareGasUsed(
+          historicContractGenericWrappers,
+          historicContractWrappers,
+          i,
+        );
+        const { keys, values, receipts, receiptsGeneric } =
+          await compareGasUsed(
+            historicContractGenericWrappers,
+            historicContractWrappers,
+            i,
+          );
+
+        for (const [i, key] of keys.entries()) {
+          for (const [j, wrapper] of historicContractWrappers.entries()) {
+            await wrapper.checkLatestCounter(key, 2);
+            await wrapper.checkSetTimestamps([key], [receipts[j].blockNumber]);
+            await wrapper.checkValueAtCounter(
+              key,
+              2,
+              values[i],
+              receipts[j].blockNumber,
+            );
+          }
+
+          for (const [
+            j,
+            wrapper,
+          ] of historicContractGenericWrappers.entries()) {
+            await wrapper.checkLatestCounter(key, 2);
+            await wrapper.checkSetTimestamps(
+              [key],
+              [receiptsGeneric[j].blockNumber],
+            );
+            await wrapper.checkValueAtCounter(
+              key,
+              2,
+              values[i],
+              receiptsGeneric[j].blockNumber,
+            );
           }
         }
-
-        let receiptsGeneric = [txG1, txG2];
-
-        await printGasUsage(logger, receipts, receiptsGeneric);
       });
     }
   });

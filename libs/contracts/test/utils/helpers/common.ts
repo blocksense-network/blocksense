@@ -9,10 +9,7 @@ import {
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreV1,
   HistoricDataFeedStoreV2,
-  UpgradeableProxy,
 } from '../../../typechain';
-import { contractVersionLogger } from '../logger';
-import { expect } from 'chai';
 import { RpcStructLog } from 'hardhat/internal/hardhat-network/provider/output';
 import { IBaseWrapper, IConsumerWrapper, IWrapper } from '../wrappers';
 
@@ -65,40 +62,6 @@ export const setter = async (
   const txHash = await network.provider.send('eth_sendTransaction', [params]);
 
   return network.provider.send('eth_getTransactionReceipt', [txHash]);
-};
-
-export const checkSetValues = async (
-  contracts: DataFeedStore[] | UpgradeableProxy[],
-  versionedLogger: ReturnType<typeof contractVersionLogger>,
-  keys: number[],
-  values: string[],
-) => {
-  for (const contract of contracts) {
-    const contractVersion = versionedLogger(
-      contract.target.toString(),
-      '',
-      (data: string) => data,
-    ) as string;
-    for (let i = 0; i < keys.length; i++) {
-      let selector;
-      if (contractVersion.includes('V1')) {
-        selector = getV1Selector(keys[i]);
-      } else {
-        selector = getV2Selector(keys[i]);
-      }
-
-      const value = await getter(contract, selector);
-      expect(value).to.be.eq(values[i]);
-    }
-  }
-};
-
-export const getV1Selector = (key: number): string => {
-  return '0x' + (key >>> 0).toString(16).padStart(8, '0');
-};
-
-export const getV2Selector = (key: number): string => {
-  return '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
 };
 
 export const setDataFeeds = async <
@@ -193,10 +156,11 @@ export const initWrappers = async <
 >(
   storage: IBaseWrapper<U>[],
   classes: T[],
+  ...args: any[]
 ): Promise<void> => {
-  for (const c of classes) {
+  for (const [index, c] of classes.entries()) {
     const contract = new c();
-    await contract.init();
+    await contract.init(args[index]);
     storage.push(contract);
   }
 };

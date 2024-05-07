@@ -1,15 +1,14 @@
 import { expect } from 'chai';
 import { DataFeed } from '../../../helpers/common';
-import { DataFeedStoreBaseWrapper } from '../../dataFeedStore/Base';
-import { DataFeedStoreGenericBaseWrapper } from '../../dataFeedStoreGeneric/Base';
 import { IConsumerWrapper } from '../../interfaces/IConsumerWrapper';
 import { Consumer } from '../../../../../typechain';
+import { ISetWrapper } from '../../interfaces/ISetWrapper';
 
 export abstract class DataFeedStoreConsumerBaseWrapper
   implements IConsumerWrapper<Consumer, DataFeed>
 {
   public contract!: Consumer;
-  public wrapper!: DataFeedStoreBaseWrapper | DataFeedStoreGenericBaseWrapper;
+  public wrapper!: ISetWrapper<DataFeed>;
 
   public async setFeeds(
     keys: number[],

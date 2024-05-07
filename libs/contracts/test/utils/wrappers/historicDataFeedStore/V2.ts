@@ -3,9 +3,9 @@ import {
   IDataFeedStore__factory,
 } from '../../../../typechain';
 import { deployContract } from '../../helpers/common';
-import { HistoricDataFeedStoreBaseWrapper } from './Base';
+import { HistoricDataFeedStoreWrapper } from './WrapperBase';
 
-export class HistoricDataFeedStoreV2Wrapper extends HistoricDataFeedStoreBaseWrapper {
+export class HistoricDataFeedStoreV2Wrapper extends HistoricDataFeedStoreWrapper {
   constructor() {
     super(
       IDataFeedStore__factory.createInterface().getFunction('setFeeds')

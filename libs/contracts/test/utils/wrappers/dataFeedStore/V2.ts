@@ -5,7 +5,7 @@ import {
 import { deployContract } from '../../helpers/common';
 import { DataFeedStoreBaseWrapper } from './Base';
 
-export class DataFeedStoreV2Wrapper extends DataFeedStoreBaseWrapper {
+export class DataFeedStoreV2Wrapper extends DataFeedStoreBaseWrapper<DataFeedStoreV2> {
   constructor() {
     super(
       IDataFeedStore__factory.createInterface().getFunction('setFeeds')
@@ -17,7 +17,7 @@ export class DataFeedStoreV2Wrapper extends DataFeedStoreBaseWrapper {
     this.contract = await deployContract<DataFeedStoreV2>('DataFeedStoreV2');
   }
 
-  public override getLatestValueSelector(key: number): string {
+  public override getLatestValueData(key: number): string {
     return '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
   }
 

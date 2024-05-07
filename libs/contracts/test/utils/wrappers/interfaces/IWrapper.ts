@@ -1,8 +1,6 @@
 import { BaseContract } from 'ethers';
-import { IBaseWrapper } from './IBaseWrapper';
+import { ISetWrapper } from './ISetWrapper';
 
-export interface IWrapper<T extends BaseContract> extends IBaseWrapper<T> {
-  setterSelector: string;
-
-  setFeeds(keys: number[], values: string[], ...args: any[]): Promise<any>;
+export interface IWrapper<T extends BaseContract> extends ISetWrapper<T> {
+  getLatestValueData(key: number): string;
 }

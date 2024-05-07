@@ -1,13 +1,12 @@
 import { expect } from 'chai';
-import { ethers } from 'ethers';
+import { BaseContract, ethers } from 'ethers';
 import { network } from 'hardhat';
-import { DataFeedStore } from '../../helpers/common';
 import { IWrapper } from '../interfaces/IWrapper';
 
-export abstract class DataFeedStoreBaseWrapper
-  implements IWrapper<DataFeedStore>
+export abstract class DataFeedStoreBaseWrapper<T extends BaseContract>
+  implements IWrapper<T>
 {
-  public contract!: DataFeedStore;
+  public contract!: T;
   public readonly setterSelector: string;
 
   constructor(selector: string) {
@@ -15,21 +14,9 @@ export abstract class DataFeedStoreBaseWrapper
   }
 
   public async setFeeds(keys: number[], values: string[], ...args: any[]) {
-    return this.customSetFeeds(this.setterSelector, keys, values, ...args);
-  }
-
-  public async customSetFeeds(
-    selector: string,
-    keys: number[],
-    values: string[],
-    ...args: any[]
-  ): Promise<any> {
     const params: any = {};
     params.to = this.contract.target;
-    params.data = ethers.solidityPacked(
-      ['bytes4', ...keys.map(() => ['uint32', 'bytes32']).flat()],
-      [selector, ...keys.flatMap((key, i) => [key, values[i]])],
-    );
+    params.data = this.customSetFeedsData(this.setterSelector, keys, values);
 
     for (const arg of args) {
       Object.assign(params, arg);
@@ -40,17 +27,28 @@ export abstract class DataFeedStoreBaseWrapper
     return network.provider.send('eth_getTransactionReceipt', [txHash]);
   }
 
+  public customSetFeedsData(
+    selector: string,
+    keys: number[],
+    values: string[],
+  ): string {
+    return ethers.solidityPacked(
+      ['bytes4', ...keys.map(() => ['uint32', 'bytes32']).flat()],
+      [selector, ...keys.flatMap((key, i) => [key, values[i]])],
+    );
+  }
+
   public async checkSetValues(keys: number[], values: string[]): Promise<void> {
     for (let i = 0; i < keys.length; i++) {
-      const value = await this.getValue(this.getLatestValueSelector(keys[i]));
+      const value = await this.getValue(this.getLatestValueData(keys[i]));
       expect(value).to.be.eq(values[i]);
     }
   }
 
-  public async getValue(selector: string, ...args: any[]): Promise<string> {
+  public async getValue(data: string, ...args: any[]): Promise<string> {
     const params: any = {};
     params.to = this.contract.target;
-    params.data = ethers.solidityPacked(['bytes4'], [selector]);
+    params.data = data;
 
     for (const arg of args) {
       Object.assign(params, arg);
@@ -61,7 +59,7 @@ export abstract class DataFeedStoreBaseWrapper
 
   public abstract init(): Promise<void>;
 
-  public abstract getLatestValueSelector(key: number): string;
+  public abstract getLatestValueData(key: number): string;
 
   public abstract getName(): string;
 }

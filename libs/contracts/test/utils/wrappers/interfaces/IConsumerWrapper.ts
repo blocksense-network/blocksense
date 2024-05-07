@@ -1,12 +1,12 @@
 import { BaseContract } from 'ethers';
-import { IWrapper } from './IWrapper';
+import { ISetWrapper } from './ISetWrapper';
 import { IBaseWrapper } from './IBaseWrapper';
 
 export interface IConsumerWrapper<
   T extends BaseContract,
   W extends BaseContract,
 > extends IBaseWrapper<T> {
-  wrapper: IWrapper<W>;
+  wrapper: ISetWrapper<W>;
 
   getFeedById(key: number): Promise<any>;
 

@@ -2,7 +2,7 @@ import {
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreGenericV1__factory,
 } from '../../../../typechain';
-import { HistoricDataFeedStoreGenericBaseWrapper } from './Base';
+import { HistoricDataFeedStoreGenericBaseWrapper } from './WrapperGenericBase';
 import { deployContract } from '../../helpers/common';
 
 export class HistoricDataFeedStoreGenericV1Wrapper extends HistoricDataFeedStoreGenericBaseWrapper {
@@ -20,13 +20,16 @@ export class HistoricDataFeedStoreGenericV1Wrapper extends HistoricDataFeedStore
     );
   }
 
-  public override async setFeeds(
+  public override customSetFeedsData(
+    _: string,
     keys: number[],
     values: string[],
-  ): Promise<any> {
-    return (await this.contract.setFeeds(keys, values)).wait();
+  ): string {
+    return this.contract.interface.encodeFunctionData('setFeeds', [
+      keys,
+      values,
+    ]);
   }
-
   public override getName(): string {
     return 'HistoricDataFeedStoreGenericV1';
   }

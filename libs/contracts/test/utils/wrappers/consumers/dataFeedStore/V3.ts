@@ -8,6 +8,7 @@ export class DataFeedStoreConsumerV3Wrapper extends DataFeedStoreConsumerBaseWra
     this.wrapper = new DataFeedStoreV3Wrapper();
     await this.wrapper.init();
 
+    // ConsumerV2 is the same for v2 and v3 wrappers as they have the same interface
     this.contract = await deployContract<DataFeedV2Consumer>(
       'DataFeedV2Consumer',
       this.wrapper.contract.target,

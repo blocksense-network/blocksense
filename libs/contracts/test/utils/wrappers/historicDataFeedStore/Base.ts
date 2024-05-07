@@ -1,18 +1,22 @@
 import { ethers } from 'hardhat';
 import { DataFeedStoreBaseWrapper } from '../dataFeedStore/Base';
 import { expect } from 'chai';
+import { DataFeedStore } from '../../helpers/common';
+import { IHistoricWrapper } from '../interfaces/IHistoricWrapper';
 
-enum HISTORIC_SELECTORS {
-  GET_LATEST_VALUE = 0x80000000,
-  GET_LATEST_COUNTER = 0x40000000,
-  GET_VALUE_AT_COUNTER = 0x20000000,
-}
-
-export abstract class HistoricDataFeedStoreBaseWrapper extends DataFeedStoreBaseWrapper {
-  public async checkSetValues(keys: number[], values: string[]): Promise<void> {
+export abstract class HistoricDataFeedStoreBaseWrapper
+  extends DataFeedStoreBaseWrapper<DataFeedStore>
+  implements IHistoricWrapper<DataFeedStore>
+{
+  public async checkSetValues(
+    keys: number[],
+    values: string[],
+    ...args: any[]
+  ): Promise<void> {
     for (const [index, key] of keys.entries()) {
       const storedValue = await this.getValue(
-        this.getHistoricSelector(HISTORIC_SELECTORS.GET_LATEST_VALUE, key),
+        this.getLatestValueData(key),
+        ...args,
       );
 
       const data = storedValue.slice(0, 48).padEnd(66, '0');
@@ -23,10 +27,12 @@ export abstract class HistoricDataFeedStoreBaseWrapper extends DataFeedStoreBase
   public async checkSetTimestamps(
     keys: number[],
     blockNumbers: number[],
+    ...args: any[]
   ): Promise<void> {
     for (const [index, key] of keys.entries()) {
       const storedValue = await this.getValue(
-        this.getHistoricSelector(HISTORIC_SELECTORS.GET_LATEST_VALUE, key),
+        this.getLatestValueData(key),
+        ...args,
       );
 
       const timestamp = ethers.toNumber(
@@ -42,12 +48,12 @@ export abstract class HistoricDataFeedStoreBaseWrapper extends DataFeedStoreBase
   public async checkLatestCounter(
     key: number,
     expectedCounter: number,
+    ...args: any[]
   ): Promise<void> {
-    const historicSelector = this.getHistoricSelector(
-      HISTORIC_SELECTORS.GET_LATEST_COUNTER,
-      key,
+    const counter = await this.getValue(
+      this.getLatestCounterData(key),
+      ...args,
     );
-    const counter = await this.getValue(historicSelector);
 
     expect(+counter).to.equal(expectedCounter);
   }
@@ -57,17 +63,12 @@ export abstract class HistoricDataFeedStoreBaseWrapper extends DataFeedStoreBase
     counter: number,
     value: string,
     blockNumber: number,
+    ...args: any[]
   ): Promise<void> {
-    const historicSelector = this.getHistoricSelector(
-      HISTORIC_SELECTORS.GET_VALUE_AT_COUNTER,
-      key,
+    const storedValue = await this.getValue(
+      this.getValueAtCounterData(key, counter),
+      ...args,
     );
-    const storedValue = await this.getValue(historicSelector, {
-      data: ethers.solidityPacked(
-        ['bytes4', 'uint256'],
-        [historicSelector, counter],
-      ),
-    });
 
     const data = storedValue.slice(0, 48).padEnd(66, '0');
     const timestamp = ethers.toNumber(
@@ -80,25 +81,7 @@ export abstract class HistoricDataFeedStoreBaseWrapper extends DataFeedStoreBase
     );
   }
 
-  public override getLatestValueSelector(key: number): string {
-    return this.getHistoricSelector(HISTORIC_SELECTORS.GET_LATEST_VALUE, key);
-  }
+  public abstract getLatestCounterData(key: number): string;
 
-  public getLatestCounterSelector(key: number): string {
-    return this.getHistoricSelector(HISTORIC_SELECTORS.GET_LATEST_COUNTER, key);
-  }
-
-  public getValueAtCounterSelector(key: number): string {
-    return this.getHistoricSelector(
-      HISTORIC_SELECTORS.GET_VALUE_AT_COUNTER,
-      key,
-    );
-  }
-
-  protected getHistoricSelector = (
-    type: HISTORIC_SELECTORS,
-    key: number,
-  ): string => {
-    return '0x' + ((key | type) >>> 0).toString(16).padStart(8, '0');
-  };
+  public abstract getValueAtCounterData(key: number, counter: number): string;
 }

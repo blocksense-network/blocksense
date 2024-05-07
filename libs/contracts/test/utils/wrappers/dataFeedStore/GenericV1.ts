@@ -2,10 +2,10 @@ import {
   DataFeedStoreGenericV1,
   DataFeedStoreGenericV1__factory,
 } from '../../../../typechain';
-import { DataFeedStoreGenericBaseWrapper } from './Base';
 import { deployContract } from '../../helpers/common';
+import { DataFeedStoreBaseWrapper } from './Base';
 
-export class DataFeedStoreGenericV1Wrapper extends DataFeedStoreGenericBaseWrapper {
+export class DataFeedStoreGenericV1Wrapper extends DataFeedStoreBaseWrapper<DataFeedStoreGenericV1> {
   constructor() {
     super(
       DataFeedStoreGenericV1__factory.createInterface().getFunction('setFeeds')
@@ -19,11 +19,19 @@ export class DataFeedStoreGenericV1Wrapper extends DataFeedStoreGenericBaseWrapp
     );
   }
 
-  public override async setFeeds(
+  public override customSetFeedsData(
+    _: string,
     keys: number[],
     values: string[],
-  ): Promise<any> {
-    return (await this.contract.setFeeds(keys, values)).wait();
+  ): string {
+    return this.contract.interface.encodeFunctionData('setFeeds', [
+      keys,
+      values,
+    ]);
+  }
+
+  public override getLatestValueData(key: number): string {
+    return this.contract.interface.encodeFunctionData('getDataFeed', [key]);
   }
 
   public override getName(): string {

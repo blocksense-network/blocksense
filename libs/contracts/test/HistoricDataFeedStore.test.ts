@@ -1,9 +1,5 @@
 import { ethers } from 'hardhat';
-import {
-  GenericHistoricDataFeedStore,
-  HistoricDataFeedStore,
-  initWrappers,
-} from './utils/helpers/common';
+import { initWrappers } from './utils/helpers/common';
 import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
 import {
   HistoricDataFeedStoreBaseWrapper,
@@ -91,15 +87,12 @@ describe('HistoricDataFeedStore', function () {
 
   for (let i = 1; i <= 100; i *= 10) {
     it(`Should set ${i} feeds in a single transaction`, async function () {
-      await compareGasUsed<GenericHistoricDataFeedStore, HistoricDataFeedStore>(
+      await compareGasUsed(genericContractWrappers, contractWrappers, i);
+      const { keys, values, receipts, receiptsGeneric } = await compareGasUsed(
         genericContractWrappers,
         contractWrappers,
         i,
       );
-      const { keys, values, receipts, receiptsGeneric } = await compareGasUsed<
-        GenericHistoricDataFeedStore,
-        HistoricDataFeedStore
-      >(genericContractWrappers, contractWrappers, i);
 
       for (const [i, key] of keys.entries()) {
         for (const [j, wrapper] of contractWrappers.entries()) {
