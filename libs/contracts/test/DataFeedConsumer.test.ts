@@ -1,6 +1,10 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { initConsumerWrappers } from './utils/helpers/common';
+import {
+  DataFeed,
+  GenericDataFeedStore,
+  initConsumerWrappers,
+} from './utils/helpers/common';
 import { compareConsumerGasUsed } from './utils/helpers/consumerGasHelpers';
 import {
   DataFeedStoreConsumerBaseWrapper,
@@ -11,8 +15,9 @@ import {
   DataFeedStoreGenericConsumerV2Wrapper,
 } from './utils/wrappers';
 
-let contractWrappers: DataFeedStoreConsumerBaseWrapper[] = [];
-let genericContractWrappers: DataFeedStoreConsumerBaseWrapper[] = [];
+let contractWrappers: DataFeedStoreConsumerBaseWrapper<DataFeed>[] = [];
+let genericContractWrappers: DataFeedStoreConsumerBaseWrapper<GenericDataFeedStore>[] =
+  [];
 
 describe('DataFeedConsumer', function () {
   this.timeout(100000);
@@ -37,13 +42,12 @@ describe('DataFeedConsumer', function () {
     describe(`DataFeedStoreV${i + 1}`, function () {
       it('Should read the data feed with the fallback function', async function () {
         const key = 3;
-        const value = ethers.solidityPacked(
-          ['bytes32'],
-          [ethers.zeroPadBytes(ethers.toUtf8Bytes('Hello, World!'), 32)],
-        );
-        await contractWrappers[i].wrapper.setFeeds([key], [value]);
+        const value = ethers.encodeBytes32String('Hello, World!');
 
-        const feed = await contractWrappers[i].getExternalFeedById(key);
+        await contractWrappers[i].setFeeds([key], [value]);
+        await contractWrappers[i].setMultipleFetchedFeedsById([key]);
+
+        const feed = await contractWrappers[i].getFeedById(key);
         expect(feed).to.equal(value);
       });
     });

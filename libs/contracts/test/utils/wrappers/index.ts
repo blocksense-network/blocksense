@@ -14,12 +14,17 @@ import { HistoricDataFeedStoreV2Wrapper } from './historicDataFeedStore/V2';
 import { HistoricDataFeedStoreGenericBaseWrapper } from './historicDataFeedStore/WrapperGenericBase';
 import { HistoricDataFeedStoreGenericV1Wrapper } from './historicDataFeedStore/GenericV1';
 
-import { DataFeedStoreConsumerBaseWrapper } from './consumers/dataFeedStore/Base';
-import { DataFeedStoreConsumerV1Wrapper } from './consumers/dataFeedStore/V1';
-import { DataFeedStoreConsumerV2Wrapper } from './consumers/dataFeedStore/V2';
-import { DataFeedStoreConsumerV3Wrapper } from './consumers/dataFeedStore/V3';
-import { DataFeedStoreGenericConsumerV1Wrapper } from './consumers/dataFeedStore/GenericV1';
-import { DataFeedStoreGenericConsumerV2Wrapper } from './consumers/dataFeedStore/GenericV2';
+import { DataFeedStoreConsumerBaseWrapper } from './consumers/Base';
+import { DataFeedStoreConsumerV1Wrapper } from './consumers/V1';
+import { DataFeedStoreConsumerV2Wrapper } from './consumers/V2';
+import { DataFeedStoreConsumerV3Wrapper } from './consumers/V3';
+import { DataFeedStoreGenericConsumerV1Wrapper } from './consumers/GenericV1';
+import { DataFeedStoreGenericConsumerV2Wrapper } from './consumers/GenericV2';
+
+import { HistoricDataFeedStoreConsumerBaseWrapper } from './consumers/historic/Base';
+import { HistoricDataFeedStoreConsumerV1Wrapper } from './consumers/historic/V1';
+import { HistoricDataFeedStoreConsumerV2Wrapper } from './consumers/historic/V2';
+import { HistoricDataFeedStoreGenericConsumerV1Wrapper } from './consumers/historic/GenericV1';
 
 import { UpgradeableProxyBaseWrapper } from './upgradable/Base';
 import { UpgradeableProxyDataFeedStoreV1Wrapper } from './upgradable/V1';
@@ -35,6 +40,8 @@ import { UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper } from './upgrada
 import { IBaseWrapper } from './interfaces/IBaseWrapper';
 import { ISetWrapper } from './interfaces/ISetWrapper';
 import { IConsumerWrapper } from './interfaces/IConsumerWrapper';
+import { IHistoricConsumerWrapper } from './interfaces/IHistoricConsumerWrapper';
+import { IHistoricWrapper } from './interfaces/IHistoricWrapper';
 
 export {
   DataFeedStoreBaseWrapper,
@@ -60,6 +67,12 @@ export {
   DataFeedStoreGenericConsumerV1Wrapper,
   DataFeedStoreGenericConsumerV2Wrapper,
 
+  // historic consumers
+  HistoricDataFeedStoreConsumerBaseWrapper,
+  HistoricDataFeedStoreConsumerV1Wrapper,
+  HistoricDataFeedStoreConsumerV2Wrapper,
+  HistoricDataFeedStoreGenericConsumerV1Wrapper,
+
   // upgradable proxy
   UpgradeableProxyBaseWrapper,
   UpgradeableProxyDataFeedStoreV1Wrapper,
@@ -78,4 +91,6 @@ export {
   IBaseWrapper,
   ISetWrapper as IWrapper,
   IConsumerWrapper,
+  IHistoricConsumerWrapper,
+  IHistoricWrapper,
 };

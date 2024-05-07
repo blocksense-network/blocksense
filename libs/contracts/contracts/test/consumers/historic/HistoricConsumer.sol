@@ -26,7 +26,7 @@ abstract contract HistoricConsumer is IHistoricDataFeed {
     return dataFeeds[key][counter];
   }
 
-  function setMultipleFetchedLatestFeedsById(uint32[] calldata keys) external {
+  function setMultipleFetchedFeedsById(uint32[] calldata keys) external {
     for (uint i = 0; i < keys.length; i++) {
       uint32 counter = _getLatestCounter(keys[i]);
       dataFeeds[keys[i]][counter] = _getFeedById(keys[i]);

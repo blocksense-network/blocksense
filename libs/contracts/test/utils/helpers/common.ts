@@ -1,11 +1,13 @@
 import { BaseContract, ethers } from 'ethers';
 import { ethers as hre, network } from 'hardhat';
 import {
+  Consumer as BaseConsumer,
   DataFeedStoreGenericV1,
   DataFeedStoreGenericV2,
   DataFeedStoreV1,
   DataFeedStoreV2,
   DataFeedStoreV3,
+  HistoricConsumer,
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreV1,
   HistoricDataFeedStoreV2,
@@ -25,44 +27,12 @@ export type HistoricDataFeedStore =
   | HistoricDataFeedStoreV2;
 export type GenericHistoricDataFeedStore = HistoricDataFeedStoreGenericV1;
 
-export const getter = async (
-  contract: DataFeedStore,
-  selector: string,
-  ...args: any[]
-): Promise<string> => {
-  const params: any = {};
-  params.to = await contract.getAddress();
-  params.data = ethers.solidityPacked(['bytes4'], [selector]);
+export type Consumer = BaseConsumer | HistoricConsumer;
 
-  for (const arg of args) {
-    Object.assign(params, arg);
-  }
-
-  return network.provider.send('eth_call', [params, 'latest']);
-};
-
-export const setter = async (
-  contract: DataFeedStore,
-  selector: string,
-  keys: number[],
-  values: string[],
-  ...args: any[]
-) => {
-  const params: any = {};
-  params.to = await contract.getAddress();
-  params.data = ethers.solidityPacked(
-    ['bytes4', ...keys.map(() => ['uint32', 'bytes32']).flat()],
-    [selector, ...keys.flatMap((key, i) => [key, values[i]])],
-  );
-
-  for (const arg of args) {
-    Object.assign(params, arg);
-  }
-
-  const txHash = await network.provider.send('eth_sendTransaction', [params]);
-
-  return network.provider.send('eth_getTransactionReceipt', [txHash]);
-};
+export interface TransmissionData {
+  value: string;
+  timestamp: bigint;
+}
 
 export const setDataFeeds = async <
   G extends BaseContract,
@@ -154,14 +124,14 @@ export const initWrappers = async <
   U extends BaseContract,
   T extends new (...args: any[]) => IBaseWrapper<U>,
 >(
-  storage: IBaseWrapper<U>[],
+  wrappers: IBaseWrapper<U>[],
   classes: T[],
   ...args: any[]
 ): Promise<void> => {
   for (const [index, c] of classes.entries()) {
     const contract = new c();
     await contract.init(args[index]);
-    storage.push(contract);
+    wrappers.push(contract);
   }
 };
 
@@ -170,13 +140,13 @@ export const initConsumerWrappers = async <
   B extends BaseContract,
   T extends new (...args: any[]) => IConsumerWrapper<C, B>,
 >(
-  storage: IConsumerWrapper<C, B>[],
+  wrappers: IConsumerWrapper<C, B>[],
   classes: T[],
 ) => {
   for (const c of classes) {
     const contract = new c();
     await contract.init();
-    storage.push(contract);
+    wrappers.push(contract);
   }
 };
 

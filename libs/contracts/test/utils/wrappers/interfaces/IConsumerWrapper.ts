@@ -1,6 +1,7 @@
 import { BaseContract } from 'ethers';
 import { ISetWrapper } from './ISetWrapper';
 import { IBaseWrapper } from './IBaseWrapper';
+import { TransmissionData } from '../../helpers/common';
 
 export interface IConsumerWrapper<
   T extends BaseContract,
@@ -8,9 +9,7 @@ export interface IConsumerWrapper<
 > extends IBaseWrapper<T> {
   wrapper: ISetWrapper<W>;
 
-  getFeedById(key: number): Promise<any>;
-
-  getExternalFeedById(key: number): Promise<any>;
+  getFeedById(key: number): Promise<string | TransmissionData>;
 
   setMultipleFetchedFeedsById(keys: number[]): Promise<any>;
 }

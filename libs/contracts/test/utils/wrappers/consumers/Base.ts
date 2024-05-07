@@ -1,14 +1,14 @@
 import { expect } from 'chai';
-import { DataFeed } from '../../../helpers/common';
-import { IConsumerWrapper } from '../../interfaces/IConsumerWrapper';
-import { Consumer } from '../../../../../typechain';
-import { ISetWrapper } from '../../interfaces/ISetWrapper';
+import { IConsumerWrapper } from '../interfaces/IConsumerWrapper';
+import { ISetWrapper } from '../interfaces/ISetWrapper';
+import { BaseContract } from 'ethers';
+import { Consumer, TransmissionData } from '../../helpers/common';
 
-export abstract class DataFeedStoreConsumerBaseWrapper
-  implements IConsumerWrapper<Consumer, DataFeed>
+export abstract class DataFeedStoreConsumerBaseWrapper<U extends BaseContract>
+  implements IConsumerWrapper<Consumer, U>
 {
   public contract!: Consumer;
-  public wrapper!: ISetWrapper<DataFeed>;
+  public wrapper!: ISetWrapper<U>;
 
   public async setFeeds(
     keys: number[],
@@ -22,20 +22,14 @@ export abstract class DataFeedStoreConsumerBaseWrapper
     return this.contract.setMultipleFetchedFeedsById(keys);
   }
 
-  public async getFeedById(key: number): Promise<string> {
+  public async getFeedById(key: number): Promise<string | TransmissionData> {
     return this.contract.getFeedById(key);
-  }
-
-  public async getExternalFeedById(key: number): Promise<any> {
-    return this.contract.getExternalFeedById(key);
   }
 
   public async checkSetValues(keys: number[], values: string[]): Promise<void> {
     for (let i = 0; i < keys.length; i++) {
       const value = await this.contract.getFeedById(keys[i]);
-      const externalValue = await this.contract.getExternalFeedById(keys[i]);
       expect(value).to.be.eq(values[i]);
-      expect(externalValue).to.be.eq(values[i]);
     }
     await this.wrapper.checkSetValues(keys, values);
   }

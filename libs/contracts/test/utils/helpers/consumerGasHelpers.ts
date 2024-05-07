@@ -1,57 +1,47 @@
 import { expect } from 'chai';
-import {
-  DataFeedV1Consumer,
-  DataFeedV2Consumer,
-  DataFeedGenericV1Consumer,
-  DataFeedGenericV2Consumer,
-} from '../../../typechain';
-import { printGasUsage, setDataFeeds } from './common';
-import { DataFeedStoreConsumerBaseWrapper } from '../wrappers';
+import { printGasUsage, setDataFeeds, Consumer } from './common';
+import { IConsumerWrapper } from '../wrappers';
+import { BaseContract } from 'ethers';
 
-export type DataFeedConsumer = DataFeedV1Consumer | DataFeedV2Consumer;
-export type GenericDataFeedConsumer =
-  | DataFeedGenericV1Consumer
-  | DataFeedGenericV2Consumer;
-
-export const compareConsumerGasUsed = async (
-  dataFeedGenericConsumers: DataFeedStoreConsumerBaseWrapper[],
-  dataFeedConsumers: DataFeedStoreConsumerBaseWrapper[],
+export const compareConsumerGasUsed = async <
+  G extends BaseContract,
+  B extends BaseContract,
+>(
+  genericContractWrappers: IConsumerWrapper<Consumer, G>[],
+  contractWrappers: IConsumerWrapper<Consumer, B>[],
   valuesCount: number,
   start: number = 0,
 ) => {
   const { keys, values } = await setDataFeeds(
-    dataFeedGenericConsumers.map(c => c.wrapper),
-    dataFeedConsumers.map(c => c.wrapper),
+    genericContractWrappers.map(c => c.wrapper),
+    contractWrappers.map(c => c.wrapper),
     valuesCount,
     start,
   );
 
   const receipts = [];
-  for (const consumer of dataFeedConsumers) {
+  for (const consumer of contractWrappers) {
     const receipt = await consumer.setMultipleFetchedFeedsById(keys);
 
     receipts.push(await receipt.wait());
   }
 
   const receiptsGeneric = [];
-  for (const consumer of dataFeedGenericConsumers) {
+  for (const consumer of genericContractWrappers) {
     const receipt = await consumer.setMultipleFetchedFeedsById(keys);
 
     receiptsGeneric.push(await receipt.wait());
   }
 
   for (let i = 0; i < keys.length; i++) {
-    for (const consumer of [
-      ...dataFeedConsumers,
-      ...dataFeedGenericConsumers,
-    ]) {
+    for (const consumer of [...contractWrappers, ...genericContractWrappers]) {
       await consumer.checkSetValues([keys[i]], [values[i]]);
     }
   }
 
   await printGasUsage(
-    dataFeedGenericConsumers,
-    dataFeedConsumers,
+    genericContractWrappers,
+    contractWrappers,
     receipts,
     receiptsGeneric,
   );

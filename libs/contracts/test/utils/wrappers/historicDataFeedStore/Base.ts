@@ -1,12 +1,19 @@
 import { ethers } from 'hardhat';
 import { DataFeedStoreBaseWrapper } from '../dataFeedStore/Base';
 import { expect } from 'chai';
-import { DataFeedStore } from '../../helpers/common';
+import {
+  GenericHistoricDataFeedStore,
+  HistoricDataFeedStore,
+  TransmissionData,
+} from '../../helpers/common';
 import { IHistoricWrapper } from '../interfaces/IHistoricWrapper';
 
 export abstract class HistoricDataFeedStoreBaseWrapper
-  extends DataFeedStoreBaseWrapper<DataFeedStore>
-  implements IHistoricWrapper<DataFeedStore>
+  extends DataFeedStoreBaseWrapper<
+    HistoricDataFeedStore | GenericHistoricDataFeedStore
+  >
+  implements
+    IHistoricWrapper<HistoricDataFeedStore | GenericHistoricDataFeedStore>
 {
   public async checkSetValues(
     keys: number[],
@@ -19,8 +26,8 @@ export abstract class HistoricDataFeedStoreBaseWrapper
         ...args,
       );
 
-      const data = storedValue.slice(0, 48).padEnd(66, '0');
-      expect(data).to.equal(values[index]);
+      const data = this.getParsedData(storedValue);
+      expect(data.value).to.equal(values[index]);
     }
   }
 
@@ -35,11 +42,9 @@ export abstract class HistoricDataFeedStoreBaseWrapper
         ...args,
       );
 
-      const timestamp = ethers.toNumber(
-        '0x' + storedValue.slice(48, storedValue.length),
-      );
+      const data = this.getParsedData(storedValue);
 
-      expect(timestamp).to.equal(
+      expect(data.timestamp).to.equal(
         (await ethers.provider.getBlock(blockNumbers[index]))?.timestamp,
       );
     }
@@ -70,15 +75,19 @@ export abstract class HistoricDataFeedStoreBaseWrapper
       ...args,
     );
 
-    const data = storedValue.slice(0, 48).padEnd(66, '0');
-    const timestamp = ethers.toNumber(
-      '0x' + storedValue.slice(48, storedValue.length),
-    );
+    const data = this.getParsedData(storedValue);
 
-    expect(data).to.equal(value);
-    expect(timestamp).to.equal(
+    expect(data.value).to.equal(value);
+    expect(data.timestamp).to.equal(
       (await ethers.provider.getBlock(blockNumber))?.timestamp,
     );
+  }
+
+  public getParsedData(data: string): TransmissionData {
+    const value = data.slice(0, 48).padEnd(66, '0');
+    const timestamp = ethers.toBigInt('0x' + data.slice(48, data.length));
+
+    return { value, timestamp };
   }
 
   public abstract getLatestCounterData(key: number): string;

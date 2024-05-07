@@ -10,9 +10,6 @@ abstract contract Consumer {
   constructor(address _dataFeedStore) {
     dataFeedStore = _dataFeedStore;
   }
-  function getExternalFeedById(uint32 key) external view returns (bytes32) {
-    return _getFeedById(key);
-  }
 
   function getFeedById(uint32 key) external view returns (bytes32) {
     return dataFeeds[key];

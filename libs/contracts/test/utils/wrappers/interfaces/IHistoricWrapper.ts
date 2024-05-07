@@ -1,5 +1,6 @@
 import { BaseContract } from 'ethers';
 import { IWrapper } from './IWrapper';
+import { TransmissionData } from '../../helpers/common';
 
 export interface IHistoricWrapper<T extends BaseContract> extends IWrapper<T> {
   checkSetTimestamps(
@@ -21,6 +22,8 @@ export interface IHistoricWrapper<T extends BaseContract> extends IWrapper<T> {
     blockNumber: number,
     ...args: any[]
   ): Promise<void>;
+
+  getParsedData(data: string): TransmissionData;
 
   getLatestCounterData(key: number): string;
 

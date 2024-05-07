@@ -1,9 +1,9 @@
-import { DataFeedV2Consumer } from '../../../../../typechain';
-import { deployContract } from '../../../helpers/common';
-import { DataFeedStoreV3Wrapper } from '../../dataFeedStore/V3';
+import { DataFeedV2Consumer } from '../../../../typechain';
+import { DataFeed, deployContract } from '../../helpers/common';
+import { DataFeedStoreV3Wrapper } from '../dataFeedStore/V3';
 import { DataFeedStoreConsumerBaseWrapper } from './Base';
 
-export class DataFeedStoreConsumerV3Wrapper extends DataFeedStoreConsumerBaseWrapper {
+export class DataFeedStoreConsumerV3Wrapper extends DataFeedStoreConsumerBaseWrapper<DataFeed> {
   public override async init() {
     this.wrapper = new DataFeedStoreV3Wrapper();
     await this.wrapper.init();
