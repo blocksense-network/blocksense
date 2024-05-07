@@ -3,8 +3,8 @@ use alloy::{
     network::{Ethereum, EthereumSigner},
     primitives::Address,
     providers::{
-        layers::{ManagedNonceProvider, NonceManagerLayer, SignerProvider},
-        ProviderBuilder, RootProvider,
+        fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, SignerFiller},
+        Identity, ProviderBuilder, RootProvider,
     },
     signers::wallet::LocalWallet,
 };
@@ -60,9 +60,13 @@ pub fn print_type<T>(_: &T) {
 //     provider
 // }
 
-pub fn get_provider() -> ManagedNonceProvider<
+pub fn get_provider() -> FillProvider<
+    JoinFill<
+        JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
+        SignerFiller<EthereumSigner>,
+    >,
+    RootProvider<Http<Client>>,
     Http<Client>,
-    SignerProvider<Http<Client>, RootProvider<Http<Client>, Ethereum>, EthereumSigner, Ethereum>,
     Ethereum,
 > {
     // Create a provider with a signer.
@@ -73,10 +77,10 @@ pub fn get_provider() -> ManagedNonceProvider<
 
     // Set up the HTTP provider with the `reqwest` crate.
     let provider = ProviderBuilder::new()
-        .layer(NonceManagerLayer)
+        .with_recommended_fillers()
         .signer(EthereumSigner::from(wallet))
-        .on_reqwest_http(env.rpc_url)
-        .expect("Failed to create provider!");
+        .on_http(env.rpc_url);
+
     provider
 }
 

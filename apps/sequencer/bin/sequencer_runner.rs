@@ -3,7 +3,7 @@
 use alloy::{
     hex::FromHex,
     network::TransactionBuilder,
-    primitives::{Bytes, U256},
+    primitives::Bytes,
     providers::Provider,
     rpc::{types::eth::BlockNumberOrTag, types::eth::TransactionRequest},
     sol,
@@ -51,12 +51,12 @@ async fn deploy_contract() -> Result<String> {
     // Get the base fee for the block.
     let base_fee = provider.get_gas_price().await?;
 
-    let nonce: u64 = provider
-        .get_transaction_count(wallet.address(), Some(BlockNumberOrTag::Latest.into()))
-        .await
-        .unwrap()
-        .try_into()
-        .unwrap();
+    // let nonce: u64 = provider
+    //     .get_transaction_count(wallet.address(), BlockNumberOrTag::Latest.into())
+    //     .await
+    //     .unwrap()
+    //     .try_into()
+    //     .unwrap();
 
     // Deploy the contract.
     let contract_builder = DataFeedStoreV1::deploy_builder(&provider);
@@ -64,7 +64,7 @@ async fn deploy_contract() -> Result<String> {
     let contract_address = contract_builder
         .gas(estimate)
         .gas_price(base_fee)
-        .nonce(nonce)
+        // .nonce(nonce)
         .deploy()
         .await?;
 
@@ -89,12 +89,12 @@ async fn eth_send_to_contract(key: &str, val: &str) -> Result<String> {
     println!("sending data to contract_address `{}`", contract_address);
 
     let provider = get_provider();
-    let nonce: u64 = provider
-        .get_transaction_count(wallet.address(), Some(BlockNumberOrTag::Latest.into()))
-        .await
-        .unwrap()
-        .try_into()
-        .unwrap();
+    // let nonce: u64 = provider
+    //     .get_transaction_count(wallet.address(), BlockNumberOrTag::Latest.into())
+    //     .await
+    //     .unwrap()
+    //     .try_into()
+    //     .unwrap();
 
     let selector = "0x1a2d80ac";
 
@@ -109,13 +109,13 @@ async fn eth_send_to_contract(key: &str, val: &str) -> Result<String> {
     // let receipt = builder.send().await?.get_receipt().await?;
 
     let tx = TransactionRequest::default()
-        .to(Some(contract_address))
+        .to(contract_address)
         .from(wallet.address())
-        .with_nonce(nonce)
-        .with_gas_limit(U256::from(2e5))
+        // .with_nonce(nonce)
+        .with_gas_limit(2e5 as u128)
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
-        .with_chain_id(provider.get_chain_id().await?.to())
+        .with_chain_id(provider.get_chain_id().await?)
         .input(Some(input).into());
 
     println!("tx =  {:?}", tx);
@@ -140,15 +140,15 @@ async fn get_key_from_contract() -> Result<String> {
     // key: 0x00000000
     let input = Bytes::from_hex("0x00000000").unwrap();
     let tx = TransactionRequest::default()
-        .to(Some(contract_address))
+        .to(contract_address)
         .from(wallet.address())
-        .with_gas_limit(U256::from(2e5))
+        .with_gas_limit(2e5 as u128)
         .with_max_fee_per_gas(base_fee + base_fee)
-        .with_max_priority_fee_per_gas(U256::from(1e9))
-        .with_chain_id(provider.get_chain_id().await?.to())
+        .with_max_priority_fee_per_gas(1e9 as u128)
+        .with_chain_id(provider.get_chain_id().await?)
         .input(Some(input).into());
 
-    let result = provider.call(&tx, None).await?;
+    let result = provider.call(&tx).await?;
     println!("Call result: {:?}", result);
 
     Ok(result.to_string())
