@@ -1,0 +1,24 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Antoni Dikov"]
+name = "Blocksense Oracle Example"
+version = "0.1.0"
+
+[application.trigger.settings]
+sequencer = "http://gpu-server-001:8877/1"
+
+[[trigger.oracle]]
+interval_secs = 10
+component = "revolut-api-fetcher"
+data_feed = "USD/BTC"
+
+[[trigger.oracle]]
+interval_secs = 15
+component = "revolut-api-fetcher"
+data_feed = "USD/ETH"
+
+[component.revolut-api-fetcher]
+source = "target/wasm32-wasi/release/oracle_app_example.wasm"
+[component.revolut-api-fetcher.build]
+command = "cargo build --target wasm32-wasi --release"
