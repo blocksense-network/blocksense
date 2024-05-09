@@ -9,9 +9,6 @@ import {
   initWrappers,
 } from './utils/helpers/common';
 import {
-  DataFeedStoreBaseWrapper,
-  HistoricDataFeedStoreBaseWrapper,
-  HistoricDataFeedStoreGenericBaseWrapper,
   UpgradeableProxyBaseWrapper,
   UpgradeableProxyDataFeedStoreV1GenericWrapper,
   UpgradeableProxyDataFeedStoreV1Wrapper,
@@ -26,14 +23,9 @@ import {
 import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
 import { ITransparentUpgradeableProxy__factory } from '../typechain';
 
-let contractWrappers: UpgradeableProxyBaseWrapper<
-  DataFeedStore,
-  DataFeedStoreBaseWrapper<DataFeedStore>
->[] = [];
-let contractGenericWrappers: UpgradeableProxyBaseWrapper<
-  GenericDataFeedStore,
-  DataFeedStoreBaseWrapper<GenericDataFeedStore>
->[] = [];
+let contractWrappers: UpgradeableProxyBaseWrapper<DataFeedStore>[] = [];
+let contractGenericWrappers: UpgradeableProxyBaseWrapper<GenericDataFeedStore>[] =
+  [];
 
 describe('UpgradeableProxy', function () {
   let admin: Signer;
@@ -190,14 +182,10 @@ describe('UpgradeableProxy', function () {
   });
 
   describe('Compare gas usage for historic contracts', function () {
-    let historicContractWrappers: UpgradeableProxyHistoricBaseWrapper<
-      HistoricDataFeedStore,
-      HistoricDataFeedStoreBaseWrapper
-    >[] = [];
-    let historicContractGenericWrappers: UpgradeableProxyHistoricBaseWrapper<
-      GenericHistoricDataFeedStore,
-      HistoricDataFeedStoreGenericBaseWrapper
-    >[] = [];
+    let historicContractWrappers: UpgradeableProxyHistoricBaseWrapper<HistoricDataFeedStore>[] =
+      [];
+    let historicContractGenericWrappers: UpgradeableProxyHistoricBaseWrapper<GenericHistoricDataFeedStore>[] =
+      [];
 
     beforeEach(async function () {
       historicContractWrappers = [];

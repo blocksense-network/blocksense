@@ -1,11 +1,13 @@
 import { BaseContract } from 'ethers';
 import { UpgradeableProxyBaseWrapper } from '../Base';
 import { IHistoricWrapper } from '../../interfaces/IHistoricWrapper';
+import { IWrapper } from '../../interfaces/IWrapper';
 
 export abstract class UpgradeableProxyHistoricBaseWrapper<
   U extends BaseContract,
-  T extends IHistoricWrapper<U>,
-> extends UpgradeableProxyBaseWrapper<U, T> {
+> extends UpgradeableProxyBaseWrapper<U> {
+  public override implementation!: IHistoricWrapper<U>;
+
   public async checkSetTimestamps(
     keys: number[],
     blockNumbers: number[],

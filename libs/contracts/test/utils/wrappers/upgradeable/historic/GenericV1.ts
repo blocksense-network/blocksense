@@ -6,10 +6,7 @@ import { deployContract } from '../../../helpers/common';
 import { HistoricDataFeedStoreGenericV1Wrapper } from '../../historic/GenericV1';
 import { UpgradeableProxyHistoricBaseWrapper } from './Base';
 
-export class UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper extends UpgradeableProxyHistoricBaseWrapper<
-  HistoricDataFeedStoreGenericV1,
-  HistoricDataFeedStoreGenericV1Wrapper
-> {
+export class UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper extends UpgradeableProxyHistoricBaseWrapper<HistoricDataFeedStoreGenericV1> {
   public override async init(...args: any[]) {
     this.implementation = new HistoricDataFeedStoreGenericV1Wrapper();
     await this.implementation.init();

@@ -1,14 +1,11 @@
-import { DataFeedStoreV3, UpgradeableProxy } from '../../../../typechain';
+import { DataFeedStoreV1, UpgradeableProxy } from '../../../../typechain';
 import { deployContract } from '../../helpers/common';
-import { DataFeedStoreV3Wrapper } from '../basic/V3';
+import { DataFeedStoreV1Wrapper } from '../basic/V1';
 import { UpgradeableProxyBaseWrapper } from './Base';
 
-export class UpgradeableProxyDataFeedStoreV3Wrapper extends UpgradeableProxyBaseWrapper<
-  DataFeedStoreV3,
-  DataFeedStoreV3Wrapper
-> {
+export class UpgradeableProxyDataFeedStoreV1Wrapper extends UpgradeableProxyBaseWrapper<DataFeedStoreV1> {
   public override async init(...args: any[]) {
-    this.implementation = new DataFeedStoreV3Wrapper();
+    this.implementation = new DataFeedStoreV1Wrapper();
     await this.implementation.init();
 
     this.contract = await deployContract<UpgradeableProxy>(
@@ -19,6 +16,6 @@ export class UpgradeableProxyDataFeedStoreV3Wrapper extends UpgradeableProxyBase
   }
 
   public override getName(): string {
-    return 'UpgradeableProxyDataFeedStoreV3';
+    return 'UpgradeableProxyDataFeedStoreV1';
   }
 }

@@ -26,16 +26,16 @@ import { HistoricDataFeedStoreConsumerV1Wrapper } from './consumers/historic/V1'
 import { HistoricDataFeedStoreConsumerV2Wrapper } from './consumers/historic/V2';
 import { HistoricDataFeedStoreGenericConsumerV1Wrapper } from './consumers/historic/GenericV1';
 
-import { UpgradeableProxyBaseWrapper } from './upgradable/Base';
-import { UpgradeableProxyDataFeedStoreV1Wrapper } from './upgradable/V1';
-import { UpgradeableProxyDataFeedStoreV2Wrapper } from './upgradable/V2';
-import { UpgradeableProxyDataFeedStoreV3Wrapper } from './upgradable/V3';
-import { UpgradeableProxyDataFeedStoreV1GenericWrapper } from './upgradable/GenericV1';
-import { UpgradeableProxyDataFeedStoreV2GenericWrapper } from './upgradable/GenericV2';
-import { UpgradeableProxyHistoricBaseWrapper } from './upgradable/historic/Base';
-import { UpgradeableProxyHistoricDataFeedStoreV1Wrapper } from './upgradable/historic/V1';
-import { UpgradeableProxyHistoricDataFeedStoreV2Wrapper } from './upgradable/historic/V2';
-import { UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper } from './upgradable/historic/GenericV1';
+import { UpgradeableProxyBaseWrapper } from './upgradeable/Base';
+import { UpgradeableProxyDataFeedStoreV1Wrapper } from './upgradeable/V1';
+import { UpgradeableProxyDataFeedStoreV2Wrapper } from './upgradeable/V2';
+import { UpgradeableProxyDataFeedStoreV3Wrapper } from './upgradeable/V3';
+import { UpgradeableProxyDataFeedStoreV1GenericWrapper } from './upgradeable/GenericV1';
+import { UpgradeableProxyDataFeedStoreV2GenericWrapper } from './upgradeable/GenericV2';
+import { UpgradeableProxyHistoricBaseWrapper } from './upgradeable/historic/Base';
+import { UpgradeableProxyHistoricDataFeedStoreV1Wrapper } from './upgradeable/historic/V1';
+import { UpgradeableProxyHistoricDataFeedStoreV2Wrapper } from './upgradeable/historic/V2';
+import { UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper } from './upgradeable/historic/GenericV1';
 
 import { IBaseWrapper } from './interfaces/IBaseWrapper';
 import { ISetWrapper } from './interfaces/ISetWrapper';

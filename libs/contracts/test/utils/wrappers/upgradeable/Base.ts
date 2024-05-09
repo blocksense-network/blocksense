@@ -1,20 +1,18 @@
 import { expect } from 'chai';
 import { BaseContract, ethers } from 'ethers';
 import { network } from 'hardhat';
-import { IBaseWrapper } from '../interfaces/IBaseWrapper';
 import {
   ITransparentUpgradeableProxy__factory,
   UpgradeableProxy,
 } from '../../../../typechain';
 import { IWrapper } from '../interfaces/IWrapper';
+import { IUpgradeableWrapper } from '../interfaces/IUpgradeableWrapper';
 
-export abstract class UpgradeableProxyBaseWrapper<
-  U extends BaseContract,
-  T extends IWrapper<U>,
-> implements IBaseWrapper<UpgradeableProxy>
+export abstract class UpgradeableProxyBaseWrapper<U extends BaseContract>
+  implements IUpgradeableWrapper<UpgradeableProxy, U>
 {
   public contract!: UpgradeableProxy;
-  public implementation!: T;
+  public implementation!: IWrapper<U>;
 
   public async setFeeds(
     keys: number[],
@@ -32,7 +30,7 @@ export abstract class UpgradeableProxyBaseWrapper<
   }
 
   public async upgradeImplementation(
-    newImplementation: T,
+    newImplementation: IWrapper<U>,
     ...args: any[]
   ): Promise<any> {
     const params: any = {};
