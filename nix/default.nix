@@ -7,14 +7,17 @@
 
   perSystem = {inputs', ...}: {
     legacyPackages = {
-      rustToolchain = inputs'.fenix.packages.stable.withComponents [
-        "cargo"
-        "clippy"
-        "rust-src"
-        "rust-analyzer"
-        "rustc"
-        "rustfmt"
-      ];
+      rustToolchain = with inputs'.fenix.packages;
+      with latest;
+        combine [
+          cargo
+          clippy
+          rust-analyzer
+          rust-src
+          rustc
+          rustfmt
+          targets.wasm32-wasi.latest.rust-std
+        ];
     };
   };
 }
