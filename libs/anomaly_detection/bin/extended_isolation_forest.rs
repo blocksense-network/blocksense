@@ -7,6 +7,7 @@ use rand::Rng;
 Reference implementation - https://github.com/sahandha/eif
 */
 
+#[allow(dead_code)]
 fn make_f64_forest() -> Forest<f64, 3> {
     let rng = &mut rand::thread_rng();
     let distribution = Uniform::new(-4., 4.);
