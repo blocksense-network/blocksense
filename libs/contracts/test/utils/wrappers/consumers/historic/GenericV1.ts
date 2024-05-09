@@ -3,7 +3,7 @@ import {
   GenericHistoricDataFeedStore,
   deployContract,
 } from '../../../helpers/common';
-import { HistoricDataFeedStoreGenericV1Wrapper } from '../../historicDataFeedStore/GenericV1';
+import { HistoricDataFeedStoreGenericV1Wrapper } from '../../historic/GenericV1';
 import { HistoricDataFeedStoreConsumerBaseWrapper } from './Base';
 
 export class HistoricDataFeedStoreGenericConsumerV1Wrapper extends HistoricDataFeedStoreConsumerBaseWrapper<GenericHistoricDataFeedStore> {

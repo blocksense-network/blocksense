@@ -1,18 +1,18 @@
-import { DataFeedStoreBaseWrapper } from './dataFeedStore/Base';
-import { DataFeedStoreV1Wrapper } from './dataFeedStore/V1';
-import { DataFeedStoreV2Wrapper } from './dataFeedStore/V2';
-import { DataFeedStoreV3Wrapper } from './dataFeedStore/V3';
+import { DataFeedStoreBaseWrapper } from './basic/Base';
+import { DataFeedStoreV1Wrapper } from './basic/V1';
+import { DataFeedStoreV2Wrapper } from './basic/V2';
+import { DataFeedStoreV3Wrapper } from './basic/V3';
 
-import { DataFeedStoreGenericV1Wrapper } from './dataFeedStore/GenericV1';
-import { DataFeedStoreGenericV2Wrapper } from './dataFeedStore/GenericV2';
+import { DataFeedStoreGenericV1Wrapper } from './basic/GenericV1';
+import { DataFeedStoreGenericV2Wrapper } from './basic/GenericV2';
 
-import { HistoricDataFeedStoreBaseWrapper } from './historicDataFeedStore/Base';
-import { HistoricDataFeedStoreWrapper } from './historicDataFeedStore/WrapperBase';
-import { HistoricDataFeedStoreV1Wrapper } from './historicDataFeedStore/V1';
-import { HistoricDataFeedStoreV2Wrapper } from './historicDataFeedStore/V2';
+import { HistoricDataFeedStoreBaseWrapper } from './historic/Base';
+import { HistoricDataFeedStoreWrapper } from './historic/WrapperBase';
+import { HistoricDataFeedStoreV1Wrapper } from './historic/V1';
+import { HistoricDataFeedStoreV2Wrapper } from './historic/V2';
 
-import { HistoricDataFeedStoreGenericBaseWrapper } from './historicDataFeedStore/WrapperGenericBase';
-import { HistoricDataFeedStoreGenericV1Wrapper } from './historicDataFeedStore/GenericV1';
+import { HistoricDataFeedStoreGenericBaseWrapper } from './historic/WrapperGenericBase';
+import { HistoricDataFeedStoreGenericV1Wrapper } from './historic/GenericV1';
 
 import { DataFeedStoreConsumerBaseWrapper } from './consumers/Base';
 import { DataFeedStoreConsumerV1Wrapper } from './consumers/V1';

@@ -1,6 +1,6 @@
 import { HistoricDataFeedConsumer } from '../../../../../typechain';
 import { HistoricDataFeedStore, deployContract } from '../../../helpers/common';
-import { HistoricDataFeedStoreV2Wrapper } from '../../historicDataFeedStore/V2';
+import { HistoricDataFeedStoreV2Wrapper } from '../../historic/V2';
 import { HistoricDataFeedStoreConsumerBaseWrapper } from './Base';
 
 export class HistoricDataFeedStoreConsumerV2Wrapper extends HistoricDataFeedStoreConsumerBaseWrapper<HistoricDataFeedStore> {

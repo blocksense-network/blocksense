@@ -1,6 +1,6 @@
 import { DataFeedV2Consumer } from '../../../../typechain';
 import { DataFeed, deployContract } from '../../helpers/common';
-import { DataFeedStoreV3Wrapper } from '../dataFeedStore/V3';
+import { DataFeedStoreV3Wrapper } from '../basic/V3';
 import { DataFeedStoreConsumerBaseWrapper } from './Base';
 
 export class DataFeedStoreConsumerV3Wrapper extends DataFeedStoreConsumerBaseWrapper<DataFeed> {

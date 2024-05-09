@@ -1,6 +1,6 @@
 import { DataFeedStoreV3, UpgradeableProxy } from '../../../../typechain';
 import { deployContract } from '../../helpers/common';
-import { DataFeedStoreV3Wrapper } from '../dataFeedStore/V3';
+import { DataFeedStoreV3Wrapper } from '../basic/V3';
 import { UpgradeableProxyBaseWrapper } from './Base';
 
 export class UpgradeableProxyDataFeedStoreV3Wrapper extends UpgradeableProxyBaseWrapper<

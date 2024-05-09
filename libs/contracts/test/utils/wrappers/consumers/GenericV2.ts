@@ -1,6 +1,6 @@
 import { DataFeedGenericV2Consumer } from '../../../../typechain';
 import { GenericDataFeedStore, deployContract } from '../../helpers/common';
-import { DataFeedStoreGenericV2Wrapper } from '../dataFeedStore/GenericV2';
+import { DataFeedStoreGenericV2Wrapper } from '../basic/GenericV2';
 import { DataFeedStoreConsumerBaseWrapper } from './Base';
 
 export class DataFeedStoreGenericConsumerV2Wrapper extends DataFeedStoreConsumerBaseWrapper<GenericDataFeedStore> {

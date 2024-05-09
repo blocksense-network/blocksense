@@ -3,7 +3,7 @@ import {
   UpgradeableProxy,
 } from '../../../../../typechain';
 import { deployContract } from '../../../helpers/common';
-import { HistoricDataFeedStoreV1Wrapper } from '../../historicDataFeedStore/V1';
+import { HistoricDataFeedStoreV1Wrapper } from '../../historic/V1';
 import { UpgradeableProxyHistoricBaseWrapper } from './Base';
 
 export class UpgradeableProxyHistoricDataFeedStoreV1Wrapper extends UpgradeableProxyHistoricBaseWrapper<

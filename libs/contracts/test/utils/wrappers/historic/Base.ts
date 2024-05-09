@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { DataFeedStoreBaseWrapper } from '../dataFeedStore/Base';
+import { DataFeedStoreBaseWrapper } from '../basic/Base';
 import { expect } from 'chai';
 import {
   GenericHistoricDataFeedStore,

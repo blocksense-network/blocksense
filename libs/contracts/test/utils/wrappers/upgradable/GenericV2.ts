@@ -1,7 +1,7 @@
 import { GenericDataFeedStore, deployContract } from '../../helpers/common';
 import { UpgradeableProxyBaseWrapper } from './Base';
 import { UpgradeableProxy } from '../../../../typechain';
-import { DataFeedStoreGenericV2Wrapper } from '../dataFeedStore/GenericV2';
+import { DataFeedStoreGenericV2Wrapper } from '../basic/GenericV2';
 
 export class UpgradeableProxyDataFeedStoreV2GenericWrapper extends UpgradeableProxyBaseWrapper<
   GenericDataFeedStore,

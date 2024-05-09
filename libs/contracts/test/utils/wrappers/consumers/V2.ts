@@ -1,6 +1,6 @@
 import { DataFeedV2Consumer } from '../../../../typechain';
 import { deployContract } from '../../helpers/common';
-import { DataFeedStoreV2Wrapper } from '../dataFeedStore/V2';
+import { DataFeedStoreV2Wrapper } from '../basic/V2';
 import { DataFeed } from '../../helpers/common';
 import { DataFeedStoreConsumerBaseWrapper } from './Base';
 
