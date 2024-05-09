@@ -130,7 +130,7 @@ export const initWrappers = async <
 ): Promise<void> => {
   for (const [index, c] of classes.entries()) {
     const contract = new c();
-    await contract.init(args[index]);
+    await contract.init(...(args[index] || []));
     wrappers.push(contract);
   }
 };

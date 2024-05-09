@@ -37,6 +37,10 @@ import { UpgradeableProxyHistoricDataFeedStoreV1Wrapper } from './upgradeable/hi
 import { UpgradeableProxyHistoricDataFeedStoreV2Wrapper } from './upgradeable/historic/V2';
 import { UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper } from './upgradeable/historic/GenericV1';
 
+import { ChainlinkBaseWrapper } from './chainlink/Base';
+import { ChainlinkV1Wrapper } from './chainlink/V1';
+import { ChainlinkV2Wrapper } from './chainlink/V2';
+
 import { IBaseWrapper } from './interfaces/IBaseWrapper';
 import { ISetWrapper } from './interfaces/ISetWrapper';
 import { IConsumerWrapper } from './interfaces/IConsumerWrapper';
@@ -86,6 +90,11 @@ export {
   UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
   UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper,
+
+  // chainlink proxy interface
+  ChainlinkBaseWrapper,
+  ChainlinkV1Wrapper,
+  ChainlinkV2Wrapper,
 
   // interfaces
   IBaseWrapper,

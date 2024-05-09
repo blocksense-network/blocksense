@@ -6,6 +6,8 @@ export interface IUpgradeableWrapper<
   T extends BaseContract,
   U extends BaseContract,
 > extends ISetWrapper<T> {
+  implementation: IWrapper<U>;
+
   upgradeImplementation(
     newImplementation: IWrapper<U>,
     ...args: any[]

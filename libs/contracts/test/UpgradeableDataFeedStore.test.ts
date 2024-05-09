@@ -42,7 +42,7 @@ describe('UpgradeableProxy', function () {
         UpgradeableProxyDataFeedStoreV2Wrapper,
         UpgradeableProxyDataFeedStoreV3Wrapper,
       ],
-      ...Array(3).fill(await admin.getAddress()),
+      ...Array(3).fill([await admin.getAddress()]),
     );
 
     await initWrappers(
@@ -51,7 +51,7 @@ describe('UpgradeableProxy', function () {
         UpgradeableProxyDataFeedStoreV1GenericWrapper,
         UpgradeableProxyDataFeedStoreV2GenericWrapper,
       ],
-      ...Array(2).fill(await admin.getAddress()),
+      ...Array(2).fill([await admin.getAddress()]),
     );
   });
 
@@ -197,13 +197,13 @@ describe('UpgradeableProxy', function () {
           UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
           UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
         ],
-        ...Array(2).fill(await admin.getAddress()),
+        ...Array(2).fill([await admin.getAddress()]),
       );
 
       await initWrappers(
         historicContractGenericWrappers,
         [UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper],
-        ...Array(1).fill(await admin.getAddress()),
+        ...Array(1).fill([await admin.getAddress()]),
       );
     });
 
