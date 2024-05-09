@@ -1,0 +1,18 @@
+spin_manifest_version = 2
+
+[application]
+name = "{{project-name}}"
+version = "0.1.0"
+authors = ["{{authors}}"]
+description = "{{project-description}}"
+
+[[trigger.oracle]]
+component = "{{project-name | kebab_case}}"
+interval_secs = 6
+
+[component.{{project-name | kebab_case}}]
+source = "target/wasm32-wasi/release/{{project-name | snake_case}}.wasm"
+allowed_outbound_hosts = []
+[component.{{project-name | kebab_case}}.build]
+command = "cargo build --target wasm32-wasi --release"
+watch = ["src/**/*.rs", "Cargo.toml"]
