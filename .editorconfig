@@ -29,3 +29,11 @@ indent_style = space
 # and `indent_size` is not enforcable because ordered and unordered lists use
 # different indentation:
 indent_size = unset
+
+[**/Cargo.lock]
+indent_style = space
+indent_size = unset
+
+[*.wit]
+indent_style = space
+indent_size = 2
