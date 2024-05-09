@@ -1,0 +1,8 @@
+[package]
+name = "factor_noir"
+type = "bin"
+authors = [""]
+compiler_version = ">=0.29.0"
+
+[dependencies]
+
