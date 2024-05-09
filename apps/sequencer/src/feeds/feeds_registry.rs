@@ -120,13 +120,15 @@ impl FeedMetaDataRegistry {
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards");
 
-        let fmd1 = FeedMetaData::new("BTS/USD", 10000, since_the_epoch.as_millis(), 0);
-        let fmd2 = FeedMetaData::new("ETH/USD", 20000, since_the_epoch.as_millis(), 0);
+        let fmd1 = FeedMetaData::new("DOGE/USD", 20000, since_the_epoch.as_millis(), 0);
+        let fmd2 = FeedMetaData::new("BTS/USD", 10000, since_the_epoch.as_millis(), 0);
+        let fmd3 = FeedMetaData::new("ETH/USD", 20000, since_the_epoch.as_millis(), 0);
 
         let mut fmdr = FeedMetaDataRegistry::new();
 
         fmdr.push(0, fmd1);
         fmdr.push(1, fmd2);
+        fmdr.push(2, fmd3);
 
         fmdr
     }
@@ -183,6 +185,11 @@ impl AllFeedsReports {
 }
 
 pub fn get_feed_id(name: &str) -> u32 {
+    if name.contains("YahooFinance.BTC/USD") {
+        return 1;
+    } else if name.contains("YahooFinance.ETH/USD") {
+        return 2;
+    }
     0 // TODO: get from registry
 }
 

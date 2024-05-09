@@ -3289,6 +3289,7 @@ dependencies = [
  "envload",
  "eyre",
  "futures",
+ "once_cell",
  "openssl-sys",
  "reqwest",
  "serde",

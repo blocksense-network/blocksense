@@ -12,6 +12,7 @@ use reqwest::{Client, Url};
 
 use envload::Envload;
 use envload::LoadEnv;
+use std::sync::{Arc, Mutex};
 
 use std::fs;
 
@@ -59,6 +60,22 @@ pub fn print_type<T>(_: &T) {
 //     let provider = ReqwestProvider::<Ethereum>::new(rpc_client);
 //     provider
 // }
+
+pub fn get_shared_provider() -> Arc<
+    Mutex<
+        FillProvider<
+            JoinFill<
+                JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
+                SignerFiller<EthereumSigner>,
+            >,
+            RootProvider<Http<Client>>,
+            Http<Client>,
+            Ethereum,
+        >,
+    >,
+> {
+    Arc::new(Mutex::new(get_provider()))
+}
 
 pub fn get_provider() -> FillProvider<
     JoinFill<

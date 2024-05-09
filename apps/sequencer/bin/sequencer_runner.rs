@@ -1,16 +1,23 @@
 //! Example of deploying a contract from an artifact to Anvil and interacting with it.
 
+use alloy::providers::Identity;
+use alloy::transports::http::Http;
 use alloy::{
     hex::FromHex,
-    network::TransactionBuilder,
+    network::{Ethereum, EthereumSigner, TransactionBuilder},
     primitives::Bytes,
-    providers::Provider,
+    providers::{
+        fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, SignerFiller},
+        Provider, RootProvider,
+    },
     rpc::{types::eth::BlockNumberOrTag, types::eth::TransactionRequest},
     sol,
 };
+use reqwest::{Client, Url};
+
 use eyre::Result;
-use std::env;
 use std::sync::{Arc, RwLock};
+use std::{env, ops::DerefMut};
 
 use sequencer::feeds::feeds_registry::{
     get_feed_id, AllFeedsReports, FeedMetaData, FeedMetaDataRegistry,
@@ -32,6 +39,23 @@ struct MyObj {
     number: i32,
 }
 
+use once_cell::sync::Lazy;
+use std::sync::Mutex;
+static PROVIDER: Lazy<
+    Arc<
+        Mutex<
+            FillProvider<
+                JoinFill<
+                    JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
+                    SignerFiller<EthereumSigner>,
+                >,
+                RootProvider<Http<Client>>,
+                Http<Client>,
+                Ethereum,
+            >,
+        >,
+    >,
+> = Lazy::new(|| get_shared_provider());
 // Codegen from embedded Solidity code and precompiled bytecode.
 sol! {
     #[allow(missing_docs)]
@@ -43,7 +67,7 @@ sol! {
 }
 
 async fn deploy_contract() -> Result<String> {
-    let provider = get_provider();
+    let mut provider = PROVIDER.lock().unwrap();
     let wallet = get_wallet();
 
     println!("Anvil running at `{:?}`", provider);
@@ -59,7 +83,7 @@ async fn deploy_contract() -> Result<String> {
     //     .unwrap();
 
     // Deploy the contract.
-    let contract_builder = DataFeedStoreV1::deploy_builder(&provider);
+    let contract_builder = DataFeedStoreV1::deploy_builder(provider.deref_mut());
     let estimate = contract_builder.estimate_gas().await?;
     let contract_address = contract_builder
         .gas(estimate)
@@ -82,13 +106,13 @@ async fn deploy_contract() -> Result<String> {
 }
 
 async fn eth_send_to_contract(key: &str, val: &str) -> Result<String> {
-    println!("eth_send_to_contract");
+    println!("eth_send_to_contract {} : {}", key, val);
 
     let wallet = get_wallet(); // Get the contract address.
     let contract_address = get_contract_address();
     println!("sending data to contract_address `{}`", contract_address);
 
-    let provider = get_provider();
+    let provider = PROVIDER.lock().unwrap();
     // let nonce: u64 = provider
     //     .get_transaction_count(wallet.address(), BlockNumberOrTag::Latest.into())
     //     .await
@@ -133,7 +157,7 @@ async fn get_key_from_contract() -> Result<String> {
     let contract_address = get_contract_address();
     println!("sending data to contract_address `{}`", contract_address);
 
-    let provider = get_provider();
+    let provider = PROVIDER.lock().unwrap();
 
     let base_fee = provider.get_gas_price().await?;
 
@@ -363,7 +387,6 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
-    let _init_provider = get_provider();
     HttpServer::new(move || {
         App::new()
             .app_data(app_state.clone())
