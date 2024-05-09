@@ -1,7 +1,10 @@
 {...}: {
   pre-commit.hooks = {
     alejandra.enable = true;
-    editorconfig-checker.enable = true;
+    editorconfig-checker = {
+      excludes = ["libs/sdk/wit/deps"];
+      enable = true;
+    };
     cargo-check.enable = true;
     rustfmt.enable = true;
     prettier.enable = true;
