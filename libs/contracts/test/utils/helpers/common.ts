@@ -72,11 +72,19 @@ export const printGasUsage = async <
 ): Promise<void> => {
   const map = createLogMap(genericWrappers, wrappers);
 
+  await logTable(map, receipts, receiptsGeneric);
+};
+
+export const logTable = async (
+  map: Record<string, string>,
+  receipts: any[],
+  receiptsGeneric: any[],
+) => {
   const table: { [key: string]: { gas: number; diff: number; '%': number } } =
     {};
 
   for (const receipt of receipts) {
-    const version = map[ethers.getAddress(receipt.to)].getName();
+    const version = map[ethers.getAddress(receipt.to)];
     table[version] = { gas: Number(receipt?.gasUsed), diff: 0, '%': 0 };
   }
 
@@ -86,7 +94,7 @@ export const printGasUsage = async <
     '%': 0,
   };
   for (const receipt of receiptsGeneric) {
-    const version = map[ethers.getAddress(receipt.to)].getName();
+    const version = map[ethers.getAddress(receipt.to)];
     table[version] = { gas: Number(receipt?.gasUsed), diff: 0, '%': 0 };
   }
 
@@ -109,7 +117,7 @@ export const printGasUsage = async <
         },
       ]);
       console.log(
-        `${map[ethers.getAddress(receipt.to)].getName()} trace:`,
+        `${map[ethers.getAddress(receipt.to)]} trace:`,
         res.structLogs.filter((log: RpcStructLog) => {
           return { op: log.op, gas: log.gas };
         }),
@@ -187,9 +195,9 @@ export const createLogMap = <G extends BaseContract, B extends BaseContract>(
   genericWrappers: IBaseWrapper<G>[],
   wrappers: IBaseWrapper<B>[],
 ) => {
-  const map: Record<string, IBaseWrapper<G | B>> = {};
+  const map: Record<string, string> = {};
   for (const wrapper of [...genericWrappers, ...wrappers]) {
-    map[wrapper.contract.target.toString()] = wrapper;
+    map[wrapper.contract.target.toString()] = wrapper.getName();
   }
 
   return map;

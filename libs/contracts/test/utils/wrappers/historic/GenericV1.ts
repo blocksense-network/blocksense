@@ -3,7 +3,8 @@ import {
   HistoricDataFeedStoreGenericV1__factory,
 } from '../../../../typechain';
 import { HistoricDataFeedStoreGenericBaseWrapper } from './WrapperGenericBase';
-import { deployContract } from '../../helpers/common';
+import { TransmissionData, deployContract } from '../../helpers/common';
+import { ethers } from 'hardhat';
 
 export class HistoricDataFeedStoreGenericV1Wrapper extends HistoricDataFeedStoreGenericBaseWrapper {
   constructor() {
@@ -30,7 +31,15 @@ export class HistoricDataFeedStoreGenericV1Wrapper extends HistoricDataFeedStore
       values,
     ]);
   }
+
   public override getName(): string {
     return 'HistoricDataFeedStoreGenericV1';
+  }
+
+  public override getParsedData(data: string): TransmissionData {
+    const value = data.slice(0, 48).padEnd(66, '0');
+    const timestamp = ethers.toBigInt('0x' + data.slice(48, data.length));
+
+    return { value, timestamp };
   }
 }

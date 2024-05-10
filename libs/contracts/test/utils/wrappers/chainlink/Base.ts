@@ -1,8 +1,7 @@
-import { ChainlinkProxy, IChainlinkAggregator } from '../../../../typechain';
+import { IChainlinkAggregator } from '../../../../typechain';
 import { BaseContract } from 'ethers';
 import { expect } from 'chai';
 import { UpgradeableProxyHistoricBaseWrapper } from '../upgradeable/historic/Base';
-import { IBaseWrapper } from '../interfaces/IBaseWrapper';
 import { ethers } from 'hardhat';
 
 export abstract class ChainlinkBaseWrapper<T extends BaseContract> {

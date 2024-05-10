@@ -41,6 +41,8 @@ import { ChainlinkBaseWrapper } from './chainlink/Base';
 import { ChainlinkV1Wrapper } from './chainlink/V1';
 import { ChainlinkV2Wrapper } from './chainlink/V2';
 
+import { OracleWrapper } from './Oracle';
+
 import { IBaseWrapper } from './interfaces/IBaseWrapper';
 import { ISetWrapper } from './interfaces/ISetWrapper';
 import { IConsumerWrapper } from './interfaces/IConsumerWrapper';
@@ -95,6 +97,9 @@ export {
   ChainlinkBaseWrapper,
   ChainlinkV1Wrapper,
   ChainlinkV2Wrapper,
+
+  // oracle
+  OracleWrapper,
 
   // interfaces
   IBaseWrapper,

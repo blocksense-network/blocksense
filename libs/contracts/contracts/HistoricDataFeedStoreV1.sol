@@ -41,42 +41,47 @@ contract HistoricDataFeedStoreV1 {
   /// @notice Fallback function
   /// @dev The fallback function is used to set or get data feeds according to the provided selector.
   fallback() external {
+    bytes32 selector;
+
     // getters
     assembly {
       // Store selector in memory at location 28
-      calldatacopy(0x1C, 0x00, 0x04)
-      let selector := mload(0x00)
+      let ptr := mload(0x40)
+      calldatacopy(add(ptr, 28), 0x00, 0x04)
+      selector := mload(ptr)
 
-      // Key is the first 4 bytes of the calldata after the selector
-      let key := and(selector, not(CONTRACT_MANAGEMENT_SELECTOR_GETTER))
+      if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GETTER) {
+        // Key is the first 4 bytes of the calldata after the selector
+        let key := and(selector, not(CONTRACT_MANAGEMENT_SELECTOR_GETTER))
 
-      // getFeedById(uint32 key) returns (bytes32 value)
-      if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_LATEST) {
+        // getFeedAtCounter(uint32 key, uint256 counter) returns (bytes32 value)
+        if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_AT_COUNTER) {
+          let position := mul(key, MAX_COUNTER)
+          // providedCounter is the bytes of the calldata after the selector (first 4 bytes)
+          // Load value at array[key][providedCounter] and store it at memory location 0
+          mstore(0x00, sload(add(position, calldataload(0x04))))
+
+          return(0x00, 0x20)
+        }
+
         let position := mul(key, MAX_COUNTER)
         // Load the latest counter at array[key]
-        // Then load the value at array[key][counter] and store it at memory location 0
-        mstore(0x00, sload(add(position, sload(position))))
+        let counter := sload(position)
+
+        // getFeedById(uint32 key) returns (bytes32 value)
+        if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_LATEST) {
+          // Then load the value at array[key][counter] and store it at memory location 0
+          mstore(0x00, sload(add(position, counter)))
+        }
+
+        // getLatestCounter(uint32 key) returns (uint256 counter)
+        if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_LATEST_COUNTER) {
+          // Load value at array[key] and store it at memory location 0
+          mstore(0x20, counter)
+        }
 
         // Return value stored at memory location 0
-        return(0x00, 0x20)
-      }
-      // getLatestCounter(uint32 key) returns (uint256 counter)
-      if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_LATEST_COUNTER) {
-        // Load value at array[key] and store it at memory location 0
-        mstore(0x00, sload(mul(key, MAX_COUNTER)))
-
-        // Return value stored at memory location 0
-        return(0x00, 0x20)
-      }
-      // getFeedAtCounter(uint32 key, uint256 counter) returns (bytes32 value)
-      if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_AT_COUNTER) {
-        let position := mul(key, MAX_COUNTER)
-        // providedCounter is the bytes of the calldata after the selector (first 4 bytes)
-        // Load value at array[key][providedCounter] and store it at memory location 0
-        mstore(0x00, sload(add(position, calldataload(0x04))))
-
-        // Return value stored at memory location 0
-        return(0x00, 0x20)
+        return(0x00, 0x40)
       }
     }
 
@@ -88,8 +93,6 @@ contract HistoricDataFeedStoreV1 {
       if iszero(eq(_owner, caller())) {
         revert(0, 0)
       }
-
-      let selector := mload(0x00)
 
       // setFeeds(bytes)
       if eq(selector, 0x1a2d80ac) {

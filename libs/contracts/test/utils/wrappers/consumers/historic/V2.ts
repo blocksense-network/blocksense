@@ -1,4 +1,4 @@
-import { HistoricDataFeedConsumer } from '../../../../../typechain';
+import { HistoricDataFeedConsumerV2 } from '../../../../../typechain';
 import { HistoricDataFeedStore, deployContract } from '../../../helpers/common';
 import { HistoricDataFeedStoreV2Wrapper } from '../../historic/V2';
 import { HistoricDataFeedStoreConsumerBaseWrapper } from './Base';
@@ -8,8 +8,8 @@ export class HistoricDataFeedStoreConsumerV2Wrapper extends HistoricDataFeedStor
     this.wrapper = new HistoricDataFeedStoreV2Wrapper();
     await this.wrapper.init();
 
-    this.contract = await deployContract<HistoricDataFeedConsumer>(
-      'HistoricDataFeedConsumer',
+    this.contract = await deployContract<HistoricDataFeedConsumerV2>(
+      'HistoricDataFeedConsumerV2',
       this.wrapper.contract.target,
     );
   }

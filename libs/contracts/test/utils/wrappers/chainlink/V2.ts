@@ -1,5 +1,5 @@
 import {
-  ChainlinkProxy,
+  ChainlinkProxyV2,
   HistoricDataFeedStoreV2,
   IChainlinkAggregator,
 } from '../../../../typechain';
@@ -30,8 +30,8 @@ export class ChainlinkV2Wrapper extends ChainlinkBaseWrapper<HistoricDataFeedSto
       proxy = proxyData;
     }
 
-    this.contract = (await deployContract<ChainlinkProxy>(
-      'ChainlinkProxy',
+    this.contract = (await deployContract<ChainlinkProxyV2>(
+      'ChainlinkProxyV2',
       description,
       decimals,
       key,

@@ -85,7 +85,7 @@ export abstract class HistoricDataFeedStoreBaseWrapper
 
   public getParsedData(data: string): TransmissionData {
     const value = data.slice(0, 48).padEnd(66, '0');
-    const timestamp = ethers.toBigInt('0x' + data.slice(48, data.length));
+    const timestamp = ethers.toBigInt('0x' + data.slice(48, 66));
 
     return { value, timestamp };
   }
