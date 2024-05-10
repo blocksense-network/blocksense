@@ -40,7 +40,7 @@ struct MyObj {
 }
 
 use once_cell::sync::Lazy;
-use std::sync::Mutex;
+use tokio::sync::Mutex;
 static PROVIDER: Lazy<
     Arc<
         Mutex<
@@ -67,7 +67,7 @@ sol! {
 }
 
 async fn deploy_contract() -> Result<String> {
-    let mut provider = PROVIDER.lock().unwrap();
+    let mut provider = PROVIDER.lock().await;
     let wallet = get_wallet();
 
     println!("Anvil running at `{:?}`", provider);
@@ -112,7 +112,7 @@ async fn eth_send_to_contract(key: &str, val: &str) -> Result<String> {
     let contract_address = get_contract_address();
     println!("sending data to contract_address `{}`", contract_address);
 
-    let provider = PROVIDER.lock().unwrap();
+    let provider = PROVIDER.lock().await;
     // let nonce: u64 = provider
     //     .get_transaction_count(wallet.address(), BlockNumberOrTag::Latest.into())
     //     .await
@@ -157,7 +157,7 @@ async fn get_key_from_contract() -> Result<String> {
     let contract_address = get_contract_address();
     println!("sending data to contract_address `{}`", contract_address);
 
-    let provider = PROVIDER.lock().unwrap();
+    let provider = PROVIDER.lock().await;
 
     let base_fee = provider.get_gas_price().await?;
 
@@ -328,60 +328,63 @@ async fn main() -> std::io::Result<()> {
                 loop {
                     interval.tick().await;
 
-                    let feed: Arc<RwLock<FeedMetaData>>;
+                    let mut result_post_to_contract: String = String::new();
+                    let key_post: u64;
                     {
-                        let reg = app_state_clone.registry.write().unwrap();
-                        feed = match reg.get(key) {
+                        let feed: Arc<RwLock<FeedMetaData>>;
+                        {
+                            let reg = app_state_clone.registry.write().unwrap();
+                            feed = match reg.get(key) {
+                                Some(x) => x,
+                                None => panic!("Error timer for feed that was not registered."),
+                            };
+                        }
+                        let slot = feed.read().unwrap().get_slot();
+                        println!("processing votes for feed_id = {}, slot = {}", &key, &slot);
+
+                        println!(
+                            "Tick from {} with id {} rep_interval {}.",
+                            name, key, report_interval
+                        );
+
+                        let reports = match app_state_clone.reports.read().unwrap().get(key) {
                             Some(x) => x,
-                            None => panic!("Error timer for feed that was not registered."),
+                            None => {
+                                println!("No reports found!");
+                                feed.write().unwrap().inc_slot();
+                                continue;
+                            }
                         };
-                    }
-                    let slot = feed.read().unwrap().get_slot();
-                    println!("processing votes for feed_id = {}, slot = {}", &key, &slot);
+                        println!("found the following reports:");
+                        println!("reports = {:?}", reports);
 
-                    let key = key;
-                    println!(
-                        "Tick from {} with id {} rep_interval {}.",
-                        name, key, report_interval
-                    );
+                        let mut reports = reports.write().unwrap();
+                        // Process the reports:
+                        let mut values: Vec<&String> = vec![];
+                        for kv in &reports.report {
+                            values.push(&kv.1);
+                        }
 
-                    let reports = match app_state_clone.reports.read().unwrap().get(key) {
-                        Some(x) => x,
-                        None => {
-                            println!("No reports found!");
+                        if values.is_empty() {
+                            println!("No reports found for slot {}!", &slot);
                             feed.write().unwrap().inc_slot();
                             continue;
                         }
-                    };
-                    println!("found the following reports:");
-                    println!("reports = {:?}", reports);
 
-                    let mut reports = reports.write().unwrap();
-                    // Process the reports:
-                    let mut values: Vec<&String> = vec![];
-                    for kv in &reports.report {
-                        values.push(&kv.1);
-                    }
-
-                    if values.is_empty() {
-                        println!("No reports found for slot {}!", &slot);
+                        key_post = key;
+                        result_post_to_contract =
+                            feed.read().unwrap().get_feed_type().process(values); // Dispatch to concreate FeedProcessing implementation.
+                        println!("result_post_to_contract = {:?}", result_post_to_contract);
                         feed.write().unwrap().inc_slot();
-                        continue;
+                        reports.clear();
                     }
-
-                    let result_post_to_contract =
-                        feed.read().unwrap().get_feed_type().process(values); // Dispatch to concreate FeedProcessing implementation.
-                    println!("result_post_to_contract = {:?}", result_post_to_contract);
 
                     eth_send_to_contract(
-                        to_hex_string(key.to_be_bytes().to_vec()).as_str(),
+                        to_hex_string(key_post.to_be_bytes().to_vec()).as_str(),
                         result_post_to_contract.as_str(),
                     )
                     .await
                     .unwrap();
-
-                    reports.clear();
-                    feed.write().unwrap().inc_slot();
                 }
             });
         }
