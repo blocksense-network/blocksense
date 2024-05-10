@@ -11,17 +11,13 @@ import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 
 export class ChainlinkV2Wrapper extends ChainlinkBaseWrapper<HistoricDataFeedStoreV2> {
   public override async init(
-    ...args: [
-      description: string,
-      decimals: number,
-      key: number,
-      proxyData:
-        | UpgradeableProxyHistoricBaseWrapper<HistoricDataFeedStoreV2>
-        | HardhatEthersSigner,
-    ]
+    description: string,
+    decimals: number,
+    key: number,
+    proxyData:
+      | UpgradeableProxyHistoricBaseWrapper<HistoricDataFeedStoreV2>
+      | HardhatEthersSigner,
   ) {
-    const [description, decimals, key, proxyData] = args;
-
     let proxy;
     if (proxyData instanceof HardhatEthersSigner) {
       proxy = new UpgradeableProxyHistoricDataFeedStoreV2Wrapper();

@@ -1,15 +1,22 @@
 import { ethers } from 'hardhat';
-import { logTable } from './utils/helpers/common';
 import { ChainlinkV1Wrapper, ChainlinkV2Wrapper } from './utils/wrappers';
 import { OracleWrapper } from './utils/wrappers';
+import { callAndCompareOracles } from './utils/helpers/oracleGasHelper';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 
 describe('Gas usage comparison between Chainlink and Blocksense @fork', async function () {
-  let oracleV1: OracleWrapper;
-  let oracleV2: OracleWrapper;
+  let oracles: OracleWrapper[];
   let chainlinkOracle: OracleWrapper;
 
   let proxyV1: ChainlinkV1Wrapper;
   let proxyV2: ChainlinkV2Wrapper;
+
+  let data: {
+    description: string;
+    decimals: number;
+    key: number;
+    proxyData: HardhatEthersSigner;
+  };
 
   before(async function () {
     if (process.env.FORKING !== 'true') {
@@ -17,7 +24,7 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
     }
 
     const signer = (await ethers.getSigners())[5];
-    const data = {
+    data = {
       description: 'ETH / USD',
       decimals: 8,
       key: 0,
@@ -25,10 +32,20 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
     };
 
     proxyV1 = new ChainlinkV1Wrapper();
-    await proxyV1.init(...Object.values(data));
+    await proxyV1.init(
+      data.description,
+      data.decimals,
+      data.key,
+      data.proxyData,
+    );
 
     proxyV2 = new ChainlinkV2Wrapper();
-    await proxyV2.init(...Object.values(data));
+    await proxyV2.init(
+      data.description,
+      data.decimals,
+      data.key,
+      data.proxyData,
+    );
 
     const value = ethers.encodeBytes32String('312343354');
     await proxyV1.setFeed(value);
@@ -38,42 +55,33 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
       'IChainlinkAggregator',
       '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
     );
-    oracleV1 = new OracleWrapper('Blocksense V1', proxyV1.contract);
-    oracleV2 = new OracleWrapper('Blocksense V2', proxyV2.contract);
+
+    const oracleV1 = new OracleWrapper('Blocksense V1', proxyV1.contract);
+    const oracleV2 = new OracleWrapper('Blocksense V2', proxyV2.contract);
     chainlinkOracle = new OracleWrapper('Chainlink', chainlinkProxy);
 
     await oracleV1.init(await proxyV1.contract.getAddress());
     await oracleV2.init(await proxyV2.contract.getAddress());
     await chainlinkOracle.init(await chainlinkProxy.getAddress());
+
+    oracles = [oracleV1, oracleV2];
   });
 
   it('Should compare setDecimals', async () => {
-    await callAndCompare(
-      [oracleV1, oracleV2],
-      [chainlinkOracle],
-      'setDecimals',
-    );
+    await callAndCompareOracles(oracles, [chainlinkOracle], 'setDecimals');
   });
 
   it('Should compare setDescription', async () => {
-    await callAndCompare(
-      [oracleV1, oracleV2],
-      [chainlinkOracle],
-      'setDescription',
-    );
+    await callAndCompareOracles(oracles, [chainlinkOracle], 'setDescription');
   });
 
   it('Should compare setLatestAnswer', async () => {
-    await callAndCompare(
-      [oracleV1, oracleV2],
-      [chainlinkOracle],
-      'setLatestAnswer',
-    );
+    await callAndCompareOracles(oracles, [chainlinkOracle], 'setLatestAnswer');
   });
 
   it('Should compare setLatestRoundData', async () => {
-    await callAndCompare(
-      [oracleV1, oracleV2],
+    await callAndCompareOracles(
+      oracles,
       [chainlinkOracle],
       'setLatestRoundData',
     );
@@ -96,38 +104,6 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
     await proxyV1.setFeed(value4);
     await proxyV2.setFeed(value4);
 
-    await callAndCompare(
-      [oracleV1, oracleV2],
-      [chainlinkOracle],
-      'setRoundData',
-      3,
-    );
+    await callAndCompareOracles(oracles, [chainlinkOracle], 'setRoundData', 3);
   });
 });
-
-const callAndCompare = async (
-  oracleWrappers: OracleWrapper[],
-  chainlinkOracleWrappers: OracleWrapper[],
-  functionName: string,
-  ...args: any[]
-) => {
-  const map: Record<string, string> = {};
-  for (const wrapper of [...oracleWrappers, ...chainlinkOracleWrappers]) {
-    map[wrapper.contract.target as string] = wrapper.getName();
-  }
-
-  const txs = await Promise.all(
-    oracleWrappers.map(wrapper => wrapper.call(functionName, ...args)),
-  );
-
-  const chainlinkTxs = await Promise.all(
-    chainlinkOracleWrappers.map(wrapper => {
-      if (args.length === 1) {
-        return wrapper.call(functionName, '110680464442257326420');
-      }
-      return wrapper.call(functionName);
-    }),
-  );
-
-  await logTable(map, txs, chainlinkTxs);
-};

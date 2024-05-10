@@ -36,6 +36,7 @@ const config: HardhatUserConfig = {
     },
     hardhat: {
       forking: {
+        blockNumber: 19839670,
         enabled: process.env.FORKING === 'true',
         url: '' + process.env.MAINNET_KEY,
       },
