@@ -17,6 +17,18 @@ export abstract class ChainlinkBaseWrapper<T extends BaseContract> {
     return this.proxy.checkSetValues([this.key], [value]);
   }
 
+  public async checkLatestRoundId(roundId: number): Promise<void> {
+    const latestRoundId = await this.contract.latestRound();
+    const counter = BigInt(
+      await this.proxy.getValue(
+        this.proxy.implementation.getLatestCounterData(this.key),
+      ),
+    );
+
+    expect(latestRoundId).to.be.eq(roundId);
+    expect(latestRoundId).to.be.eq(counter);
+  }
+
   public async checkDecimals(decimals: number): Promise<void> {
     expect(await this.contract.decimals()).to.be.eq(decimals);
   }
@@ -25,17 +37,22 @@ export abstract class ChainlinkBaseWrapper<T extends BaseContract> {
     expect(await this.contract.description()).to.be.eq(description);
   }
 
-  public async checkLatestAnswer(): Promise<void> {
+  public async checkLatestAnswer(answer: bigint): Promise<void> {
     const latestAnswer = await this.contract.latestAnswer();
     const data = await this.proxy.getValue(
       this.proxy.implementation.getLatestValueData(this.key),
     );
     const parsedData = this.proxy.implementation.getParsedData(data);
 
+    expect(parsedData.value).to.be.eq(this.getHexAnswer(answer));
     expect(this.getHexAnswer(latestAnswer)).to.be.eq(parsedData.value);
   }
 
-  public async checkLatestRoundData(): Promise<void> {
+  public async checkLatestRoundData(res: {
+    answer: bigint;
+    startedAt: number;
+    roundId: bigint;
+  }): Promise<void> {
     const roundData = await this.contract.latestRoundData();
     const data = await this.proxy.getValue(
       this.proxy.implementation.getLatestValueData(this.key),
@@ -47,6 +64,10 @@ export abstract class ChainlinkBaseWrapper<T extends BaseContract> {
     );
     const parsedData = this.proxy.implementation.getParsedData(data);
 
+    expect(roundData[0]).to.be.eq(res.roundId);
+    expect(roundData[1]).to.be.eq(res.answer);
+    expect(roundData[2]).to.be.eq(res.startedAt);
+
     expect(roundData[0]).to.be.eq(counter);
     expect(this.getHexAnswer(roundData[1])).to.be.eq(parsedData.value);
     expect(roundData[2].toString()).to.be.eq(parsedData.timestamp);
@@ -54,12 +75,18 @@ export abstract class ChainlinkBaseWrapper<T extends BaseContract> {
     expect(roundData[4]).to.be.eq(counter);
   }
 
-  public async checkRoundData(roundId: number): Promise<void> {
+  public async checkRoundData(
+    roundId: number,
+    res: { answer: bigint; startedAt: number },
+  ): Promise<void> {
     const roundData = await this.contract.getRoundData(roundId);
     const data = await this.proxy.getValue(
       this.proxy.implementation.getValueAtCounterData(this.key, roundId),
     );
     const parsedData = this.proxy.implementation.getParsedData(data);
+
+    expect(roundData[1]).to.be.eq(res.answer);
+    expect(roundData[2]).to.be.eq(res.startedAt);
 
     expect(roundData[0]).to.be.eq(roundId);
     expect(this.getHexAnswer(roundData[1])).to.be.eq(parsedData.value);

@@ -27,6 +27,10 @@ contract Oracle {
     price = uint256(dataFeedStore.latestAnswer());
   }
 
+  function setLatestRoundId() external {
+    roundId = uint80(dataFeedStore.latestRound());
+  }
+
   function setLatestRoundData() external {
     (uint80 _roundId, int256 _price, uint256 _lastUpdate, , ) = dataFeedStore
       .latestRoundData();

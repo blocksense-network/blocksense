@@ -83,7 +83,7 @@ describe('ChainlinkProxy', function () {
           await wrappers[version].setFeed(value);
 
           await wrappers[version].checkSetValue(value);
-          await wrappers[version].checkLatestAnswer();
+          await wrappers[version].checkLatestAnswer(BigInt(value));
 
           const newValue = ethers.encodeBytes32String('1234');
           await wrappers[version].proxy.setFeeds(
@@ -92,17 +92,17 @@ describe('ChainlinkProxy', function () {
           );
 
           await wrappers[version].checkSetValue(newValue);
-          await wrappers[version].checkLatestAnswer();
+          await wrappers[version].checkLatestAnswer(BigInt(newValue));
         });
 
-        it(`Should get latest round data for ${proxyData[i].description} v${+version + 1}`, async function () {
+        it(`Should get latest round id for ${proxyData[i].description} v${+version + 1}`, async function () {
           const wrappers = contractWrappers[version];
 
           const value = ethers.encodeBytes32String('3132');
           await wrappers[version].setFeed(value);
 
           await wrappers[version].checkSetValue(value);
-          await wrappers[version].checkLatestRoundData();
+          await wrappers[version].checkLatestRoundId(1);
 
           const newValue = ethers.encodeBytes32String('1234');
           await wrappers[version].proxy.setFeeds(
@@ -111,29 +111,71 @@ describe('ChainlinkProxy', function () {
           );
 
           await wrappers[version].checkSetValue(newValue);
-          await wrappers[version].checkLatestRoundData();
+          await wrappers[version].checkLatestRoundId(2);
+        });
+
+        it(`Should get latest round data for ${proxyData[i].description} v${+version + 1}`, async function () {
+          const wrappers = contractWrappers[version];
+
+          const value = ethers.encodeBytes32String('3132');
+          const tx = await wrappers[version].setFeed(value);
+
+          await wrappers[version].checkSetValue(value);
+          await wrappers[version].checkLatestRoundData({
+            answer: ethers.toBigInt(value.slice(0, 50)),
+            roundId: 1n,
+            startedAt: (await ethers.provider.getBlock(tx.blockNumber))
+              ?.timestamp!,
+          });
+
+          const newValue = ethers.encodeBytes32String('1234');
+          const tx2 = await wrappers[version].proxy.setFeeds(
+            [proxyData[i].key],
+            [newValue],
+          );
+
+          await wrappers[version].checkSetValue(newValue);
+          await wrappers[version].checkLatestRoundData({
+            answer: BigInt(newValue.slice(0, 50)),
+            roundId: 2n,
+            startedAt: (await ethers.provider.getBlock(tx2.blockNumber))
+              ?.timestamp!,
+          });
         });
 
         it(`Should get historical data for ${proxyData[i].description} v${+version + 1}`, async function () {
           const wrappers = contractWrappers[version];
 
           const value = ethers.encodeBytes32String('3132');
-          await wrappers[version].setFeed(value);
+          const tx1 = await wrappers[version].setFeed(value);
           const newValue = ethers.encodeBytes32String('1234');
-          await wrappers[version].setFeed(newValue);
+          const tx2 = await wrappers[version].setFeed(newValue);
 
           await wrappers[version].checkSetValue(newValue);
-          await wrappers[version].checkRoundData(0);
-          await wrappers[version].checkRoundData(1);
+          await wrappers[version].checkRoundData(1, {
+            answer: BigInt(value.slice(0, 50)),
+            startedAt: (await ethers.provider.getBlock(tx1.blockNumber))
+              ?.timestamp!,
+          });
+
+          await wrappers[version].checkRoundData(2, {
+            answer: BigInt(newValue.slice(0, 50)),
+            startedAt: (await ethers.provider.getBlock(tx2.blockNumber))
+              ?.timestamp!,
+          });
 
           const newValue2 = ethers.encodeBytes32String('12348747364');
-          await wrappers[version].proxy.setFeeds(
+          const tx3 = await wrappers[version].proxy.setFeeds(
             [proxyData[i].key],
             [newValue2],
           );
 
           await wrappers[version].checkSetValue(newValue2);
-          await wrappers[version].checkRoundData(2);
+          await wrappers[version].checkRoundData(3, {
+            answer: BigInt(newValue2.slice(0, 50)),
+            startedAt: (await ethers.provider.getBlock(tx3.blockNumber))
+              ?.timestamp!,
+          });
         });
       }
     }
