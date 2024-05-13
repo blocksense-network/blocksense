@@ -34,26 +34,29 @@ pub trait DataFeed {
     // fn host_connect(&self);
 }
 
-pub fn feed_selector<'a>(
+fn feed_selector(
     feeds: Vec<(DataFeedAPI, String)>,
-    connection_cache: &'a mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
     batch_size: usize,
-) -> Vec<(Rc<dyn DataFeed>, String)> {
+) -> Vec<(DataFeedAPI, String)> {
     let mut rng = thread_rng();
-    let selected = (0..feeds.len()).choose_multiple(&mut rng, batch_size);
 
-    let mut selected_feeds: Vec<(Rc<dyn DataFeed>, String)> = Vec::with_capacity(batch_size);
-
-    for &i in &selected {
-        let (api, asset) = &feeds[i];
-        let feed = handle_connection_cache(api, connection_cache);
-        selected_feeds.push((feed, asset.to_owned()));
-    }
+    let selected_feeds_idx = (0..feeds.len()).choose_multiple(&mut rng, batch_size);
+    let mut selected_feeds = selected_feeds_idx
+        .iter()
+        .map(|&idx| feeds[idx].clone())
+        .collect();
 
     selected_feeds
 }
 
-pub fn handle_connection_cache<'a>(
+fn resolve_feed<'a>(
+    feed_api: DataFeedAPI,
+    connection_cache: &'a mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
+) -> Rc<dyn DataFeed> {
+    handle_connection_cache(&feed_api, connection_cache)
+}
+
+fn handle_connection_cache<'a>(
     api: &DataFeedAPI,
     connection_cache: &'a mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
 ) -> Rc<dyn DataFeed> {
@@ -65,7 +68,7 @@ pub fn handle_connection_cache<'a>(
     connection_cache.get(&api).unwrap().clone()
 }
 
-pub fn feed_builder(api: &DataFeedAPI) -> Rc<dyn DataFeed> {
+fn feed_builder(api: &DataFeedAPI) -> Rc<dyn DataFeed> {
     match api {
         DataFeedAPI::EmptyAPI => todo!(),
         DataFeedAPI::YahooFinance => Rc::new(YahooDataFeed::new()),
@@ -80,9 +83,10 @@ pub async fn dispatch(
 ) -> () {
     let all_feeds = DataFeedAPI::get_all_feeds();
 
-    let feed_subset = feed_selector(all_feeds, connection_cache, batch_size);
+    let feed_subset = feed_selector(all_feeds, batch_size);
 
-    for (data_feed, asset) in feed_subset {
+    for (api, asset) in feed_subset {
+        let data_feed = resolve_feed(api, connection_cache);
         post_api_response(sequencer_url, data_feed, &asset).await;
     }
 }
