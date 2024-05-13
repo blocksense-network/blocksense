@@ -1,19 +1,26 @@
 use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
     io::{stdout, Write},
     rc::Rc,
 };
 
+use crate::connector::data_feed::DataFeed;
+use crate::utils::generate_string_hash;
 use curl::easy::Easy;
 use serde_json::{json, Value};
-use crate::connector::data_feed::DataFeed;
 
-
-pub async fn post_api_response(url: &str, data_feed: Rc<dyn DataFeed>, asset: &str) {
+pub async fn post_api_response(base_url: &str, data_feed: Rc<dyn DataFeed>, asset: &str) {
     let (result, timestamp) = data_feed.poll(asset).await.unwrap();
+
+    let feed_name = data_feed.api().as_str().to_owned() + &"." + &asset;
+
+    let feed_hash = generate_string_hash(&feed_name);
 
     let payload_json = json!({
         "reporter_id": 0,
-        "feed_id": data_feed.api().as_str().to_owned() + &'.'.to_string() + &asset.to_string().clone(),
+        "feed_name": feed_name,
+        "feed_id": feed_hash,
         "timestamp": timestamp,
         "result": result,
     });
@@ -21,7 +28,8 @@ pub async fn post_api_response(url: &str, data_feed: Rc<dyn DataFeed>, asset: &s
     println!("Payload: {:?}", payload_json);
 
     // Comment out if you want to test API availability & aggregation
-    post_request(url,payload_json);
+    let feed_url = base_url.to_string() + &"/feed/" + &feed_hash.to_string();
+    post_request(&feed_url, payload_json);
 }
 
 pub fn post_request(url: &str, payload_json: Value) {

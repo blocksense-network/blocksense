@@ -2,7 +2,11 @@ use async_trait::async_trait;
 use cmc::Cmc;
 use serde::Serialize;
 
-use crate::{connector::data_feed::{DataFeed, Payload}, types::{ConsensusMetric, DataFeedAPI}, utils::{current_unix_time, get_env_var}};
+use crate::{
+    connector::data_feed::{DataFeed, Payload},
+    types::{ConsensusMetric, DataFeedAPI},
+    utils::{current_unix_time, get_env_var},
+};
 
 #[derive(Serialize)]
 pub struct CMCPayload {
@@ -31,7 +35,6 @@ impl CoinMarketCapDataFeed {
 
 #[async_trait(?Send)]
 impl DataFeed for CoinMarketCapDataFeed {
-    
     fn api(&self) -> DataFeedAPI {
         DataFeedAPI::CoinMarketCap
     }
@@ -49,7 +52,6 @@ impl DataFeed for CoinMarketCapDataFeed {
     }
 
     async fn poll(&self, asset: &str) -> Result<(Box<dyn Payload>, u64), anyhow::Error> {
-
         let response = self.api_connector.price(asset);
         let payload: Box<dyn Payload> = Box::new(CMCPayload {
             result: response.unwrap(),
@@ -62,4 +64,3 @@ impl DataFeed for CoinMarketCapDataFeed {
         self.history_buffer.push((response, timestamp))
     }
 }
-
