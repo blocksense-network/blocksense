@@ -4,7 +4,10 @@ use yahoo_finance_api::YahooConnector;
 
 use crate::connector::data_feed::Payload;
 use crate::utils::current_unix_time;
-use crate::{connector::data_feed::DataFeed, types::{ConsensusMetric, DataFeedAPI}};
+use crate::{
+    connector::data_feed::DataFeed,
+    types::{ConsensusMetric, DataFeedAPI},
+};
 
 #[derive(Serialize)]
 pub struct YfPayload {
@@ -15,7 +18,6 @@ impl Payload for YfPayload {}
 
 #[async_trait(?Send)]
 impl DataFeed for YahooDataFeed {
-
     fn api(&self) -> DataFeedAPI {
         DataFeedAPI::YahooFinance
     }
@@ -33,7 +35,8 @@ impl DataFeed for YahooDataFeed {
     }
 
     async fn poll(&self, ticker: &str) -> Result<(Box<dyn Payload>, u64), anyhow::Error> {
-        let response = self.api_connector
+        let response = self
+            .api_connector
             .get_latest_quotes(ticker, "1d")
             .await?
             .last_quote()
@@ -43,13 +46,12 @@ impl DataFeed for YahooDataFeed {
             result: response.close,
         });
 
-        Ok((payload,current_unix_time()))
+        Ok((payload, current_unix_time()))
     }
 
     fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64) {
         self.history_buffer.push((response, timestamp))
     }
-
 }
 
 pub struct YahooDataFeed {
@@ -59,12 +61,11 @@ pub struct YahooDataFeed {
 }
 
 impl YahooDataFeed {
-    
     pub fn new() -> Self {
         Self {
             api_connector: YahooConnector::new(),
             is_connected: true,
             history_buffer: Vec::new(),
         }
-    }   
+    }
 }

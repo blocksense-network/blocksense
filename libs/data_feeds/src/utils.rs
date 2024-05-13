@@ -1,5 +1,6 @@
 use std::{
     env,
+    hash::{DefaultHasher, Hash, Hasher},
     time::{SystemTime, UNIX_EPOCH},
 };
 
@@ -18,4 +19,12 @@ pub fn get_env_var(var: &str) -> String {
             std::process::exit(1);
         }
     }
+}
+
+pub fn generate_string_hash(string: &String) -> u64 {
+    let mut hasher = DefaultHasher::new();
+
+    string.as_str().hash(&mut hasher);
+
+    hasher.finish()
 }

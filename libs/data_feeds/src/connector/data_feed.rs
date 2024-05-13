@@ -28,7 +28,7 @@ pub trait DataFeed {
     fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64);
 
     //TODO: Implement abstraction for publishing
-    
+
     // async fn publish(destination: String, payload: Box<dyn Payload>) -> Result<(),anyhow::Error>;
 
     // fn host_connect(&self);
@@ -80,16 +80,9 @@ pub async fn dispatch(
 ) -> () {
     let all_feeds = DataFeedAPI::get_all_feeds();
 
-    let feed_subset = feed_selector(
-        all_feeds, 
-        connection_cache, 
-        batch_size);
+    let feed_subset = feed_selector(all_feeds, connection_cache, batch_size);
 
     for (data_feed, asset) in feed_subset {
-        post_api_response(
-            sequencer_url, 
-            data_feed, 
-            &asset
-        ).await;
+        post_api_response(sequencer_url, data_feed, &asset).await;
     }
 }
