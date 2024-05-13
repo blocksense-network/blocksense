@@ -13,11 +13,9 @@ use data_feeds::{
 
 #[tokio::main]
 async fn main() {
-    let poll_period = 5;
-    let batch_size = 3;
-
     let sequencer_url = get_env_var("SEQUENCER_URL");
     let poll_period_ms = get_env_var("POLL_PERIOD_MS").parse::<u64>().unwrap();
+    let batch_size = get_env_var("BATCH_SIZE").parse::<usize>().unwrap();
 
     let mut batch_no = 0;
 
