@@ -10,17 +10,18 @@ use alloy::{
         fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, SignerFiller},
         Provider, RootProvider,
     },
-    rpc::{types::eth::BlockNumberOrTag, types::eth::TransactionRequest},
+    rpc::types::eth::TransactionRequest,
     sol,
 };
-use reqwest::{Client, Url};
+use reqwest::Client;
 
 use eyre::Result;
 use std::sync::{Arc, RwLock};
 use std::{env, ops::DerefMut};
 
 use sequencer::feeds::feeds_registry::{
-    get_feed_id, AllFeedsReports, FeedMetaData, FeedMetaDataRegistry,
+    get_feed_id, new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaData,
+    FeedMetaDataRegistry,
 };
 
 use actix_web::{error, rt::spawn, rt::time, Error};
@@ -68,7 +69,6 @@ sol! {
 
 async fn deploy_contract() -> Result<String> {
     let mut provider = PROVIDER.lock().await;
-    let wallet = get_wallet();
 
     println!("Anvil running at `{:?}`", provider);
 
@@ -181,9 +181,7 @@ async fn get_key_from_contract() -> Result<String> {
 #[get("/deploy")]
 async fn index() -> impl Responder {
     println!("Deploying ...");
-    let _var = deploy_contract().await.unwrap();
-
-    "Hello, World!"
+    deploy_contract().await.unwrap()
 }
 
 #[get("/get_key")]
@@ -212,7 +210,7 @@ const MAX_SIZE: usize = 262_144; // max payload size is 256k
 async fn index_post(
     name: web::Path<String>,
     mut payload: web::Payload,
-    app_state: web::Data<AppStateWithCounter>,
+    app_state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
     println!("Called index_post {}", name);
     let mut body = web::BytesMut::new();
@@ -229,17 +227,27 @@ async fn index_post(
     // let obj = serde_json::from_slice::<MyObj>(&body)?;
     println!("body = {:?}!", body);
 
+    let report_hex_syze = 64;
+
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
-    let mut result_bytes = match v["result"].to_string().parse::<f32>() {
-        Ok(x) => x,
-        Err(_) => {
-            return Ok(HttpResponse::BadRequest().into());
+    let result_hex = match v["result"].to_string().parse::<f32>() {
+        Ok(x) => {
+            let mut res = x.to_be_bytes().to_vec();
+            res.resize(report_hex_syze, 0);
+            to_hex_string(res)
         }
-    }
-    .to_be_bytes()
-    .to_vec();
-    result_bytes.resize(32, 0);
-    let result_hex = to_hex_string(result_bytes);
+        Err(_) => {
+            let value = v["result"].to_string();
+            if value.len() != report_hex_syze
+                || !value
+                    .chars()
+                    .all(|arg0: char| char::is_ascii_hexdigit(&arg0))
+            {
+                return Ok(HttpResponse::BadRequest().into());
+            }
+            value
+        }
+    };
 
     let feed_id = get_feed_id(v["feed_id"].to_string().as_str());
 
@@ -278,12 +286,10 @@ async fn index_post(
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
-    let accept_report: bool;
-    {
+    let accept_report = {
         let feed = feed.read().expect("Error trying to lock Feed for read!");
-
-        accept_report = feed.check_report_relevance(current_time_as_ms, msg_timestamp);
-    }
+        feed.check_report_relevance(current_time_as_ms, msg_timestamp)
+    };
 
     if accept_report {
         let mut reports = app_state
@@ -296,31 +302,31 @@ async fn index_post(
     Ok(HttpResponse::BadRequest().into())
 }
 
-struct AppStateWithCounter {
+struct AppState {
     registry: Arc<RwLock<FeedMetaDataRegistry>>,
     reports: Arc<RwLock<AllFeedsReports>>,
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let app_state = web::Data::new(AppStateWithCounter {
-        registry: Arc::new(RwLock::new(FeedMetaDataRegistry::new_with_test_data())),
+    let app_state = web::Data::new(AppState {
+        registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data())),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
     });
 
     {
         let reg = app_state.registry.write().unwrap();
-        let keys: Vec<u64> = reg.get_keys().copied().collect();
+        let keys = reg.get_keys();
         for key in keys {
             let feed = reg.get(key).unwrap();
             let feed = feed.read().unwrap();
             let name = feed.get_name().clone();
             let report_interval = feed.get_report_interval();
-            let first_report_start_time = feed.get_first_report_start_time();
+            let first_report_start_time = feed.get_first_report_start_time_ms();
 
             println!("key = {} : value = {:?}", key, reg.get(key));
 
-            let app_state_clone: web::Data<AppStateWithCounter> = app_state.clone(); //This will be moved into the spawned timer below
+            let app_state_clone: web::Data<AppState> = app_state.clone(); //This will be moved into the spawned timer below
 
             spawn(async move {
                 let mut interval = time::interval(Duration::from_millis(report_interval));
@@ -328,7 +334,7 @@ async fn main() -> std::io::Result<()> {
                 loop {
                     interval.tick().await;
 
-                    let mut result_post_to_contract: String = String::new();
+                    let result_post_to_contract: String;
                     let key_post: u64;
                     {
                         let feed: Arc<RwLock<FeedMetaData>>;
