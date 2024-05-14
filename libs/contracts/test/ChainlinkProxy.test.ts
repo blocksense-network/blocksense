@@ -27,7 +27,7 @@ const proxyData = [
   },
 ];
 
-describe('ChainlinkProxy', function () {
+describe('Chainlink proxy interface', function () {
   let admin: Signer;
 
   beforeEach(async function () {

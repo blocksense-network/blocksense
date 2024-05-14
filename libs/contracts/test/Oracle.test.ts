@@ -52,9 +52,9 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
       '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
     );
 
-    const oracleV1 = new OracleWrapper('Blocksense V1', proxyV1.contract);
-    const oracleV2 = new OracleWrapper('Blocksense V2', proxyV2.contract);
-    chainlinkOracle = new OracleWrapper('Chainlink', chainlinkProxy);
+    const oracleV1 = new OracleWrapper('Blocksense V1', [proxyV1.contract]);
+    const oracleV2 = new OracleWrapper('Blocksense V2', [proxyV2.contract]);
+    chainlinkOracle = new OracleWrapper('Chainlink', [chainlinkProxy]);
 
     await oracleV1.init(await proxyV1.contract.getAddress());
     await oracleV2.init(await proxyV2.contract.getAddress());

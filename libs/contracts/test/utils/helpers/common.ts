@@ -202,3 +202,28 @@ export const createLogMap = <G extends BaseContract, B extends BaseContract>(
 
   return map;
 };
+
+///////////////////////////
+// Registry
+///////////////////////////
+
+export enum TOKENS {
+  'ETH' = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+  'BTC' = '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+  'USD' = '0x0000000000000000000000000000000000000348',
+}
+
+export async function assertRegistry<T>(
+  thisArgs: T,
+  callbackFn: (this: T, ...args: any[]) => any,
+  description: string,
+  ...args: any[]
+): Promise<void> {
+  const parsed = description.split('/');
+  callbackFn.call(
+    thisArgs,
+    TOKENS[parsed[0] as keyof typeof TOKENS],
+    TOKENS[parsed[1] as keyof typeof TOKENS],
+    ...args,
+  );
+}
