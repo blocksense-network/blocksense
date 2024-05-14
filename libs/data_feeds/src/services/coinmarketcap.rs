@@ -35,8 +35,8 @@ impl CoinMarketCapDataFeed {
 
 #[async_trait(?Send)]
 impl DataFeed for CoinMarketCapDataFeed {
-    fn api(&self) -> DataFeedAPI {
-        DataFeedAPI::CoinMarketCap
+    fn api(&self) -> &DataFeedAPI {
+        &DataFeedAPI::CoinMarketCap
     }
 
     fn api_connect(&self) -> Box<dyn DataFeed> {

@@ -19,7 +19,7 @@ pub trait DataFeed {
 
     fn is_connected(&self) -> bool;
 
-    fn api(&self) -> DataFeedAPI;
+    fn api(&self) -> &DataFeedAPI;
 
     fn score_by(&self) -> ConsensusMetric;
 
@@ -35,13 +35,13 @@ pub trait DataFeed {
 }
 
 fn feed_selector(
-    feeds: Vec<(DataFeedAPI, String)>,
+    feeds: &Vec<(DataFeedAPI, String)>,
     batch_size: usize,
 ) -> Vec<(DataFeedAPI, String)> {
     let mut rng = thread_rng();
 
     let selected_feeds_idx = (0..feeds.len()).choose_multiple(&mut rng, batch_size);
-    let mut selected_feeds = selected_feeds_idx
+    let selected_feeds = selected_feeds_idx
         .iter()
         .map(|&idx| feeds[idx].clone())
         .collect();
@@ -79,11 +79,10 @@ fn feed_builder(api: &DataFeedAPI) -> Rc<dyn DataFeed> {
 pub async fn dispatch(
     sequencer_url: &str,
     batch_size: usize,
+    feeds: &Vec<(DataFeedAPI, String)>,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
 ) -> () {
-    let all_feeds = DataFeedAPI::get_all_feeds();
-
-    let feed_subset = feed_selector(all_feeds, batch_size);
+    let feed_subset = feed_selector(feeds, batch_size);
 
     for (api, asset) in feed_subset {
         let data_feed = resolve_feed(api, connection_cache);

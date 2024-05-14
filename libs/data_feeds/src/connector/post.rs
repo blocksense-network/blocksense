@@ -1,20 +1,17 @@
 use std::{
-    collections::hash_map::DefaultHasher,
-    hash::{Hash, Hasher},
     io::{stdout, Write},
     rc::Rc,
 };
 
-use crate::connector::data_feed::DataFeed;
 use crate::utils::generate_string_hash;
+use crate::{connector::data_feed::DataFeed, types::DataFeedAPI};
 use curl::easy::Easy;
 use serde_json::{json, Value};
 
 pub async fn post_api_response(base_url: &str, data_feed: Rc<dyn DataFeed>, asset: &str) {
     let (result, timestamp) = data_feed.poll(asset).await.unwrap();
 
-    let feed_name = data_feed.api().as_str().to_owned() + &"." + &asset;
-
+    let feed_name = DataFeedAPI::feed_asset_str(data_feed.api(), &asset.to_string());
     let feed_hash = generate_string_hash(&feed_name);
 
     let payload_json = json!({

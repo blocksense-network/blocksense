@@ -30,6 +30,17 @@ impl DataFeedAPI {
             .collect()
     }
 
+    pub fn feed_asset_str(api: &DataFeedAPI, asset: &String) -> String {
+        api.as_str().to_owned() + &"." + &asset
+    }
+
+    pub fn get_all_feeds_str() -> Vec<String> {
+        DataFeedAPI::get_all_feeds()
+            .iter()
+            .map(|(api, asset)| DataFeedAPI::feed_asset_str(api, asset))
+            .collect()
+    }
+
     pub fn as_str(&self) -> &'static str {
         match *self {
             DataFeedAPI::EmptyAPI => "None",
