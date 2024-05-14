@@ -47,6 +47,7 @@ import { ChainlinkRegistryV2Wrapper } from './chainlink/registry/V2';
 
 import { OracleBaseWrapper } from './oracle/Base';
 import { OracleWrapper } from './oracle/Oracle';
+import { RegistryWrapper } from './oracle/Registry';
 
 import { IBaseWrapper } from './interfaces/IBaseWrapper';
 import { ISetWrapper } from './interfaces/ISetWrapper';
@@ -111,6 +112,7 @@ export {
   // oracle
   OracleBaseWrapper,
   OracleWrapper,
+  RegistryWrapper,
 
   // interfaces
   IBaseWrapper,

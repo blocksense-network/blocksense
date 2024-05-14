@@ -5,43 +5,31 @@ import { callAndCompareOracles } from './utils/helpers/oracleGasHelper';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 
+let oracles: OracleWrapper[];
+let chainlinkOracle: OracleWrapper;
+
+let proxyV1: ChainlinkV1Wrapper;
+let proxyV2: ChainlinkV2Wrapper;
+
+let data = {
+  description: 'ETH / USD',
+  decimals: 8,
+  key: 15,
+};
+
 describe('Gas usage comparison between Chainlink and Blocksense @fork', async function () {
-  let oracles: OracleWrapper[];
-  let chainlinkOracle: OracleWrapper;
-
-  let proxyV1: ChainlinkV1Wrapper;
-  let proxyV2: ChainlinkV2Wrapper;
-
-  let data = {
-    description: 'ETH / USD',
-    decimals: 8,
-    key: 15,
-    proxyData: {} as HardhatEthersSigner,
-  };
-
   before(async function () {
     if (process.env.FORKING !== 'true') {
       this.skip();
     }
 
     const signer = (await ethers.getSigners())[5];
-    data.proxyData = signer;
 
     proxyV1 = new ChainlinkV1Wrapper();
-    await proxyV1.init(
-      data.description,
-      data.decimals,
-      data.key,
-      data.proxyData,
-    );
+    await proxyV1.init(data.description, data.decimals, data.key, signer);
 
     proxyV2 = new ChainlinkV2Wrapper();
-    await proxyV2.init(
-      data.description,
-      data.decimals,
-      data.key,
-      data.proxyData,
-    );
+    await proxyV2.init(data.description, data.decimals, data.key, signer);
 
     const value = ethers.encodeBytes32String('312343354');
     await proxyV1.setFeed(value);

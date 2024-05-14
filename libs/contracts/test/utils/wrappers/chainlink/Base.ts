@@ -96,7 +96,7 @@ export abstract class ChainlinkBaseWrapper<T extends BaseContract> {
   }
 
   protected getHexAnswer(value: bigint): string {
-    return ethers.toBeHex(value.toString()).padEnd(66, '0');
+    return '0x' + value.toString(16).padStart(48, '0').padEnd(64, '0');
   }
 
   public abstract init(...args: any[]): Promise<void>;

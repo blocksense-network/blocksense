@@ -62,11 +62,11 @@ export abstract class ChainlinkRegistryBaseWrapper<T extends BaseContract> {
     },
   ) {
     const roundData = await this.contract.latestRoundData(base, quote);
-    expect(res.answer).to.be.equal(roundData.answer);
-    expect(res.startedAt).to.be.equal(roundData.startedAt);
-    expect(res.startedAt).to.be.equal(roundData.updatedAt);
-    expect(res.roundId).to.be.equal(roundData.roundId);
-    expect(res.roundId).to.be.equal(roundData.answeredInRound);
+    expect(res.roundId).to.be.equal(roundData[0]);
+    expect(res.answer).to.be.equal(roundData[1]);
+    expect(res.startedAt).to.be.equal(roundData[2]);
+    expect(res.startedAt).to.be.equal(roundData[3]);
+    expect(res.roundId).to.be.equal(roundData[4]);
 
     await this.map[base][quote].checkLatestRoundData(res);
   }
@@ -78,11 +78,11 @@ export abstract class ChainlinkRegistryBaseWrapper<T extends BaseContract> {
     res: { answer: bigint; startedAt: number },
   ) {
     const roundData = await this.contract.getRoundData(base, quote, roundId);
-    expect(res.answer).to.be.equal(roundData.answer);
-    expect(res.startedAt).to.be.equal(roundData.startedAt);
-    expect(res.startedAt).to.be.equal(roundData.updatedAt);
-    expect(roundId).to.be.equal(roundData.roundId);
-    expect(roundId).to.be.equal(roundData.answeredInRound);
+    expect(roundId).to.be.equal(roundData[0]);
+    expect(res.answer).to.be.equal(roundData[1]);
+    expect(res.startedAt).to.be.equal(roundData[2]);
+    expect(res.startedAt).to.be.equal(roundData[3]);
+    expect(roundId).to.be.equal(roundData[4]);
 
     await this.map[base][quote].checkRoundData(roundId, res);
   }

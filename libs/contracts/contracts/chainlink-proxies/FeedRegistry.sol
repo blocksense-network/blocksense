@@ -32,18 +32,7 @@ contract FeedRegistry is IFeedRegistry {
   function latestRoundData(
     address base,
     address quote
-  )
-    external
-    view
-    override
-    returns (
-      uint80 roundId,
-      int256 answer,
-      uint256 startedAt,
-      uint256 updatedAt,
-      uint80 answeredInRound
-    )
-  {
+  ) external view override returns (uint80, int256, uint256, uint256, uint80) {
     return registry[base][quote].latestRoundData();
   }
 
@@ -58,18 +47,7 @@ contract FeedRegistry is IFeedRegistry {
     address base,
     address quote,
     uint80 _roundId
-  )
-    external
-    view
-    override
-    returns (
-      uint80 roundId,
-      int256 answer,
-      uint256 startedAt,
-      uint256 updatedAt,
-      uint80 answeredInRound
-    )
-  {
+  ) external view override returns (uint80, int256, uint256, uint256, uint80) {
     return registry[base][quote].getRoundData(_roundId);
   }
 
