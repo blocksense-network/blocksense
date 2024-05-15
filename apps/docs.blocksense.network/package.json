@@ -1,6 +1,10 @@
 {
   "name": "@blocksense/docs.blocksense.network",
   "version": "0.0.0",
+  "scripts": {
+    "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
+    "test": "yarn vitest -w false"
+  },
   "types": "./src/index.ts",
   "devDependencies": {
     "@types/node": "^20.12.12",
