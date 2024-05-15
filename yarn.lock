@@ -46,6 +46,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/monorepo@workspace:.":
   version: 0.0.0-use.local
   resolution: "@blocksense/monorepo@workspace:."
