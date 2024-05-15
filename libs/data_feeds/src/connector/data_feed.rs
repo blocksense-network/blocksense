@@ -4,14 +4,19 @@ use crate::{
     types::{ConsensusMetric, DataFeedAPI},
 };
 use async_trait::async_trait;
+use prometheus::{register_int_gauge_vec, IntGaugeVec};
 use rand::{seq::IteratorRandom, thread_rng};
-use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashMap, rc::Rc, time::Instant};
 
 use erased_serde::serialize_trait_object;
 
 serialize_trait_object!(Payload);
 
 pub trait Payload: erased_serde::Serialize {}
+
+lazy_static::lazy_static! {
+    static ref DATA_FEEDS_PARSE_TIME_GAUGE: IntGaugeVec = register_int_gauge_vec!("DATA_FEEDS_PARSE_TIME_GAUGE", "Time(ms) to parse current feed",&["None"]).unwrap();
+}
 
 #[async_trait(?Send)]
 pub trait DataFeed {
@@ -50,7 +55,7 @@ fn feed_selector(
 }
 
 fn resolve_feed<'a>(
-    feed_api: DataFeedAPI,
+    feed_api: &DataFeedAPI,
     connection_cache: &'a mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
 ) -> Rc<dyn DataFeed> {
     handle_connection_cache(&feed_api, connection_cache)
@@ -86,7 +91,22 @@ pub async fn dispatch(
     let feed_subset = feed_selector(feeds, batch_size);
 
     for (api, asset) in feed_subset {
-        let data_feed = resolve_feed(api, connection_cache);
-        post_api_response(&reporter_id, sequencer_url, data_feed, &asset).await;
+        let start_time = Instant::now();
+
+        let data_feed = resolve_feed(&api, connection_cache);
+        let feed_name = DataFeedAPI::feed_asset_str(&api, &asset);
+
+        post_api_response(&reporter_id, sequencer_url, data_feed, &feed_name, &asset).await;
+
+        let elapsed_time = start_time.elapsed().as_millis();
+        DATA_FEEDS_PARSE_TIME_GAUGE
+            .with_label_values(&[feed_name.as_str()])
+            .set(elapsed_time as i64);
+        println!(
+            "DATA_FEEDS_PARSE_TIME_GAUGE: {}",
+            DATA_FEEDS_PARSE_TIME_GAUGE
+                .with_label_values(&[feed_name.as_str()])
+                .get()
+        );
     }
 }

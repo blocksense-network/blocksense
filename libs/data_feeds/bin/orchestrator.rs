@@ -12,8 +12,7 @@ use data_feeds::{
 };
 
 use prometheus::{
-    register_counter, register_int_counter, register_int_gauge, register_int_gauge_vec, Counter,
-    IntCounter, IntGauge, IntGaugeVec,
+    register_counter, register_int_counter, register_int_gauge, Counter, IntCounter, IntGauge,
 };
 
 lazy_static::lazy_static! {
@@ -70,11 +69,6 @@ async fn main() {
             let remaining_time_ms = poll_period_ms - (elapsed_time as u64);
             sleep(Duration::from_millis(remaining_time_ms));
         }
-
-        // DATA_FEEDS_PARSE_TIME_GAUGE.with_label_values(&["a"]).set(10);
-        // DATA_FEEDS_PARSE_TIME_GAUGE.with_label_values(&["b"]).set(100);
-        // println!("DATA_FEEDS_PARSE_TIME_GAUGE: {}", DATA_FEEDS_PARSE_TIME_GAUGE.with_label_values(&["a"]).get());
-        // println!("DATA_FEEDS_PARSE_TIME_GAUGE: {}", DATA_FEEDS_PARSE_TIME_GAUGE.with_label_values(&["b"]).get());
 
         UPTIME_COUNTER.inc_by(poll_period_ms as f64 / 1000.);
         BATCH_PARSE_TIME_GAUGE.set(elapsed_time as i64);
