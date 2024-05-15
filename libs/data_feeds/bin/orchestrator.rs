@@ -36,9 +36,11 @@ lazy_static::lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    let sequencer_url = get_env_var("SEQUENCER_URL");
-    let poll_period_ms = get_env_var("POLL_PERIOD_MS").parse::<u64>().unwrap();
-    let batch_size = get_env_var("BATCH_SIZE").parse::<usize>().unwrap();
+    let batch_size: usize = get_env_var("BATCH_SIZE").unwrap_or_else(|_| 5);
+    let reporter_id: u64 = get_env_var("REPORTER_ID").unwrap_or_else(|_| 0);
+
+    let sequencer_url: String = get_env_var("SEQUENCER_URL").unwrap();
+    let poll_period_ms: u64 = get_env_var("POLL_PERIOD_MS").unwrap();
 
     let mut connection_cache = HashMap::<DataFeedAPI, Rc<dyn DataFeed>>::new();
 
@@ -53,8 +55,9 @@ async fn main() {
         let start_time = Instant::now();
 
         dispatch(
+            &reporter_id,
             sequencer_url.as_str(),
-            batch_size,
+            &batch_size,
             &all_feeds,
             &mut connection_cache,
         )

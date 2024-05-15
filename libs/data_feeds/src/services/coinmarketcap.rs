@@ -23,7 +23,7 @@ pub struct CoinMarketCapDataFeed {
 
 impl CoinMarketCapDataFeed {
     pub fn new() -> Self {
-        let cmc_api_key = get_env_var("CMC_API_KEY");
+        let cmc_api_key: String = get_env_var("CMC_API_KEY").unwrap();
 
         Self {
             api_connector: Cmc::new(cmc_api_key),
