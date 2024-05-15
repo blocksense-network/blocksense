@@ -1,6 +1,5 @@
 use crate::feeds::average_feed_processor::AverageFeedProcessor;
 use crate::feeds::feeds_processing::FeedProcessing;
-use std::collections::hash_map::Keys;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -74,7 +73,7 @@ impl FeedMetaData {
 // map representing feed_id -> FeedMetaData
 #[derive(Debug)]
 pub struct FeedMetaDataRegistry {
-    registered_feeds: HashMap<u64, Arc<RwLock<FeedMetaData>>>,
+    registered_feeds: HashMap<u32, Arc<RwLock<FeedMetaData>>>,
 }
 
 impl FeedMetaDataRegistry {
@@ -83,13 +82,13 @@ impl FeedMetaDataRegistry {
             registered_feeds: HashMap::new(),
         }
     }
-    pub fn push(&mut self, id: u64, fd: FeedMetaData) {
+    pub fn push(&mut self, id: u32, fd: FeedMetaData) {
         self.registered_feeds.insert(id, Arc::new(RwLock::new(fd)));
     }
-    pub fn get(&self, id: u64) -> Option<Arc<RwLock<FeedMetaData>>> {
+    pub fn get(&self, id: u32) -> Option<Arc<RwLock<FeedMetaData>>> {
         self.registered_feeds.get(&id).cloned()
     }
-    pub fn get_keys(&self) -> Vec<u64> {
+    pub fn get_keys(&self) -> Vec<u32> {
         self.registered_feeds.keys().copied().collect()
     }
 }
@@ -125,7 +124,7 @@ impl FeedReports {
 // This struct holds all the Feeds by ID (the key in the map) and the received votes for them
 #[derive(Debug)]
 pub struct AllFeedsReports {
-    reports: HashMap<u64, Arc<RwLock<FeedReports>>>,
+    reports: HashMap<u32, Arc<RwLock<FeedReports>>>,
 }
 
 impl AllFeedsReports {
@@ -134,7 +133,7 @@ impl AllFeedsReports {
             reports: HashMap::new(),
         }
     }
-    pub fn push(&mut self, feed_id: u64, reporter_id: u64, data: String) {
+    pub fn push(&mut self, feed_id: u32, reporter_id: u64, data: String) {
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
@@ -146,7 +145,7 @@ impl AllFeedsReports {
             res.report.insert(reporter_id, data);
         }
     }
-    pub fn get(&self, feed_id: u64) -> Option<Arc<RwLock<FeedReports>>> {
+    pub fn get(&self, feed_id: u32) -> Option<Arc<RwLock<FeedReports>>> {
         self.reports.get(&feed_id).cloned()
     }
 }

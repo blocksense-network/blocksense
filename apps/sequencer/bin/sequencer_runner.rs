@@ -1,23 +1,12 @@
 //! Example of deploying a contract from an artifact to Anvil and interacting with it.
 
-use alloy::providers::Identity;
-use alloy::transports::http::Http;
 use alloy::{
-    hex::FromHex,
-    network::{Ethereum, EthereumSigner, TransactionBuilder},
-    primitives::Bytes,
-    providers::{
-        fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, SignerFiller},
-        Provider, RootProvider,
-    },
+    hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
     rpc::types::eth::TransactionRequest,
-    sol,
 };
-use reqwest::Client;
 
 use eyre::Result;
 use std::sync::{Arc, RwLock};
-use std::{env, ops::DerefMut};
 
 use sequencer::feeds::feeds_registry::{
     get_feed_id, new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaData,
@@ -28,9 +17,14 @@ use actix_web::{error, rt::spawn, rt::time, Error};
 use actix_web::{get, web, App, HttpServer};
 use actix_web::{post, HttpResponse, Responder};
 use futures::StreamExt;
+use sequencer::feeds::feeds_processing::REPORT_HEX_SIZE;
 use sequencer::utils::byte_utils::to_hex_string;
+use sequencer::utils::eth_send_to_contract::{
+    eth_batch_send_to_all_contracts, eth_send_to_contract, DataFeedStoreV1,
+};
 use sequencer::utils::provider::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time::Duration;
 
@@ -42,112 +36,43 @@ struct MyObj {
 
 use once_cell::sync::Lazy;
 use tokio::sync::Mutex;
-static PROVIDER: Lazy<
-    Arc<
-        Mutex<
-            FillProvider<
-                JoinFill<
-                    JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
-                    SignerFiller<EthereumSigner>,
-                >,
-                RootProvider<Http<Client>>,
-                Http<Client>,
-                Ethereum,
-            >,
-        >,
-    >,
-> = Lazy::new(|| get_shared_provider());
-// Codegen from embedded Solidity code and precompiled bytecode.
-sol! {
-    #[allow(missing_docs)]
-    // solc v0.8.24; solc a.sol --via-ir --optimize --bin
-    #[sol(rpc, bytecode="0x60a060405234801561001057600080fd5b503360805260805160e761002d60003960006045015260e76000f3fe6080604052348015600f57600080fd5b506000366060600060046000601c37506000516201ffff811015604357600f60fc1b6020526005601c205460005260206000f35b7f0000000000000000000000000000000000000000000000000000000000000000338114606f57600080fd5b631a2d80ac8281109083101760ac57600f60fc1b6004523660045b8181101560aa57600481600037600560002060048201359055602401608a565b005b600080fdfea264697066735822122015800ed562cf954d8d71346ded5d44d9d6c459e49b37d67049ba43a5524b430764736f6c63430008180033")]
-    contract DataFeedStoreV1 {
-        function setFeeds(bytes calldata) external;
+static PROVIDER: Lazy<Arc<Mutex<ProviderType>>> = Lazy::new(|| get_shared_provider());
+static PROVIDERS: Lazy<SharedRpcProviders> = Lazy::new(|| get_shared_rpc_providers());
+
+async fn deploy_contract(network: &String) -> Result<String> {
+    let providers = PROVIDERS.lock().await;
+
+    let provider = providers.get(network);
+    if let Some(p) = provider.cloned() {
+        drop(providers);
+        let mut p = p.lock().await;
+        let provider = &p.provider;
+
+        // Get the base fee for the block.
+        let base_fee = provider.get_gas_price().await?;
+
+        // Deploy the contract.
+        let contract_builder = DataFeedStoreV1::deploy_builder(provider);
+        let estimate = contract_builder.estimate_gas().await?;
+        let contract_address = contract_builder
+            .gas(estimate)
+            .gas_price(base_fee)
+            .deploy()
+            .await?;
+
+        println!(
+            "Deployed contract at address: {:?}\n",
+            contract_address.to_string()
+        );
+
+        p.contract_address = Some(contract_address);
+
+        return Ok(format!(
+            "CONTRACT_ADDRESS set to {}",
+            contract_address.to_string()
+        ));
     }
-}
-
-async fn deploy_contract() -> Result<String> {
-    let mut provider = PROVIDER.lock().await;
-
-    println!("Anvil running at `{:?}`", provider);
-
-    // Get the base fee for the block.
-    let base_fee = provider.get_gas_price().await?;
-
-    // let nonce: u64 = provider
-    //     .get_transaction_count(wallet.address(), BlockNumberOrTag::Latest.into())
-    //     .await
-    //     .unwrap()
-    //     .try_into()
-    //     .unwrap();
-
-    // Deploy the contract.
-    let contract_builder = DataFeedStoreV1::deploy_builder(provider.deref_mut());
-    let estimate = contract_builder.estimate_gas().await?;
-    let contract_address = contract_builder
-        .gas(estimate)
-        .gas_price(base_fee)
-        // .nonce(nonce)
-        .deploy()
-        .await?;
-
-    println!(
-        "Deployed contract at address: {:?}\n",
-        contract_address.to_string()
-    );
-
-    env::set_var("CONTRACT_ADDRESS", contract_address.to_string());
-
-    Ok(format!(
-        "CONTRACT_ADDRESS set to {}",
-        contract_address.to_string()
-    ))
-}
-
-async fn eth_send_to_contract(key: &str, val: &str) -> Result<String> {
-    println!("eth_send_to_contract {} : {}", key, val);
-
-    let wallet = get_wallet(); // Get the contract address.
-    let contract_address = get_contract_address();
-    println!("sending data to contract_address `{}`", contract_address);
-
-    let provider = PROVIDER.lock().await;
-    // let nonce: u64 = provider
-    //     .get_transaction_count(wallet.address(), BlockNumberOrTag::Latest.into())
-    //     .await
-    //     .unwrap()
-    //     .try_into()
-    //     .unwrap();
-
-    let selector = "0x1a2d80ac";
-
-    let input = Bytes::from_hex((selector.to_owned() + key + val).as_str()).unwrap();
-
-    let base_fee = provider.get_gas_price().await?;
-    let max_priority_fee_per_gas = provider.get_max_priority_fee_per_gas().await?;
-
-    // let contract = DataFeedStoreV1::new(contract_address, &provider);
-    // let estimate = contract.setFeeds(input.clone()).from(wallet.address()).estimate_gas().await?;
-    // let builder = contract.setFeeds(input.clone()).from(wallet.address()).nonce(nonce).gas(estimate).gas_price(base_fee);
-    // let receipt = builder.send().await?.get_receipt().await?;
-
-    let tx = TransactionRequest::default()
-        .to(contract_address)
-        .from(wallet.address())
-        // .with_nonce(nonce)
-        .with_gas_limit(2e5 as u128)
-        .with_max_fee_per_gas(base_fee + base_fee)
-        .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
-        .with_chain_id(provider.get_chain_id().await?)
-        .input(Some(input).into());
-
-    println!("tx =  {:?}", tx);
-
-    let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
-    println!("Transaction receipt: {:?}", receipt);
-
-    Ok(receipt.status().to_string())
+    return Ok(format!("No provider for network {}", network));
 }
 
 async fn get_key_from_contract() -> Result<String> {
@@ -178,10 +103,14 @@ async fn get_key_from_contract() -> Result<String> {
     Ok(result.to_string())
 }
 
-#[get("/deploy")]
-async fn index() -> impl Responder {
-    println!("Deploying ...");
-    deploy_contract().await.unwrap()
+#[get("/deploy/{network}")]
+async fn deploy(path: web::Path<String>) -> impl Responder {
+    let network = path.into_inner();
+    println!("Deploying contract for network `{}` ...", network);
+    match deploy_contract(&network).await {
+        Ok(result) => return result,
+        Err(_) => return format!("Could not depoloy contract for {network}").to_string(),
+    };
 }
 
 #[get("/get_key")]
@@ -196,6 +125,7 @@ async fn hello(name: web::Path<String>) -> impl Responder {
         "{} {}",
         name,
         eth_send_to_contract(
+            PROVIDER.clone(),
             "00000000",
             "48656c6c6f2c20576f726c642120300000000000000000000000000000000000"
         )
@@ -227,18 +157,16 @@ async fn index_post(
     // let obj = serde_json::from_slice::<MyObj>(&body)?;
     println!("body = {:?}!", body);
 
-    let report_hex_syze = 64;
-
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
     let result_hex = match v["result"].to_string().parse::<f32>() {
         Ok(x) => {
             let mut res = x.to_be_bytes().to_vec();
-            res.resize(report_hex_syze, 0);
+            res.resize(REPORT_HEX_SIZE / 2, 0);
             to_hex_string(res)
         }
         Err(_) => {
             let value = v["result"].to_string();
-            if value.len() != report_hex_syze
+            if value.len() != REPORT_HEX_SIZE
                 || !value
                     .chars()
                     .all(|arg0: char| char::is_ascii_hexdigit(&arg0))
@@ -314,10 +242,13 @@ async fn main() -> std::io::Result<()> {
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
     });
 
+    let (s, r) = async_channel::unbounded();
+
     {
         let reg = app_state.registry.write().unwrap();
         let keys = reg.get_keys();
         for key in keys {
+            let send_channel = s.clone();
             let feed = reg.get(key).unwrap();
             let feed = feed.read().unwrap();
             let name = feed.get_name().clone();
@@ -335,7 +266,7 @@ async fn main() -> std::io::Result<()> {
                     interval.tick().await;
 
                     let result_post_to_contract: String;
-                    let key_post: u64;
+                    let key_post: u32;
                     {
                         let feed: Arc<RwLock<FeedMetaData>>;
                         {
@@ -385,22 +316,59 @@ async fn main() -> std::io::Result<()> {
                         reports.clear();
                     }
 
-                    eth_send_to_contract(
-                        to_hex_string(key_post.to_be_bytes().to_vec()).as_str(),
-                        result_post_to_contract.as_str(),
-                    )
-                    .await
-                    .unwrap();
+                    send_channel
+                        .send((
+                            to_hex_string(key_post.to_be_bytes().to_vec()),
+                            result_post_to_contract,
+                        ))
+                        .await
+                        .unwrap();
                 }
             });
         }
     }
 
+    spawn(async move {
+        let max_keys_to_batch = 2;
+        loop {
+            let mut updates: HashMap<String, String> = Default::default();
+            let mut send_to_contract = false;
+            while !send_to_contract {
+                let var = actix_web::rt::time::timeout(Duration::from_millis(1000), async {
+                    r.recv().await
+                })
+                .await;
+                match var {
+                    Ok(Ok((key, val))) => {
+                        println!("adding {} => {} to updates", key, val);
+                        updates.insert(key, val);
+                        send_to_contract = updates.keys().len() >= max_keys_to_batch;
+                    }
+                    Err(e) => {
+                        println!("Flushing batched updates, {}", e.to_string());
+                        send_to_contract = true;
+                    }
+                    Ok(Err(err)) => {
+                        println!("RecvError: {}", err.to_string());
+                        send_to_contract = true;
+                    }
+                };
+            }
+            println!("sending updates to contract:");
+            if updates.keys().len() > 0 {
+                eth_batch_send_to_all_contracts(PROVIDERS.clone(), updates)
+                    .await
+                    .unwrap();
+            }
+            println!("Sending updates complete.");
+        }
+    });
+
     HttpServer::new(move || {
         App::new()
             .app_data(app_state.clone())
             .service(get_key)
-            .service(index)
+            .service(deploy)
             .service(hello)
             .service(index_post)
     })

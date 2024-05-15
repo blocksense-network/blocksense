@@ -1,4 +1,5 @@
 use crate::feeds::feeds_processing::FeedProcessing;
+use crate::feeds::feeds_processing::REPORT_HEX_SIZE;
 use crate::utils::byte_utils::to_hex_string;
 
 #[derive(Debug)]
@@ -22,7 +23,9 @@ impl FeedProcessing for AverageFeedProcessor {
             .sum();
         let result: f64 = total / num_elements;
 
-        to_hex_string(result.to_be_bytes().to_vec())
+        let mut result_bytes = result.to_be_bytes().to_vec();
+        result_bytes.resize(REPORT_HEX_SIZE / 2, 0);
+        to_hex_string(result_bytes)
     }
 }
 

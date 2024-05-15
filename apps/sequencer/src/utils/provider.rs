@@ -12,10 +12,22 @@ use reqwest::{Client, Url};
 
 use envload::Envload;
 use envload::LoadEnv;
+use std::collections::HashMap;
+use std::env;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
 use std::fs;
+
+pub type ProviderType = FillProvider<
+    JoinFill<
+        JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
+        SignerFiller<EthereumSigner>,
+    >,
+    RootProvider<Http<Client>>,
+    Http<Client>,
+    Ethereum,
+>;
 
 #[derive(Envload)]
 pub struct SequencerConfig {
@@ -46,6 +58,79 @@ pub fn get_contract_address() -> Address {
     contract_address
 }
 
+pub fn parse_contract_address(addr: &str) -> Option<Address> {
+    let contract_address: Option<Address> = addr.parse().ok();
+    contract_address
+}
+
+#[derive(Debug)]
+pub struct RpcProvider {
+    pub provider: ProviderType,
+    pub wallet: LocalWallet,
+    pub contract_address: Option<Address>,
+}
+
+pub type SharedRpcProviders = Arc<Mutex<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
+
+pub fn get_shared_rpc_providers() -> SharedRpcProviders {
+    Arc::new(Mutex::new(get_rpc_providers()))
+}
+
+pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
+    let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
+    let mut urls: HashMap<String, String> = HashMap::new();
+    let mut keys: HashMap<String, String> = HashMap::new();
+    let mut contract_addresses: HashMap<String, String> = HashMap::new();
+
+    for (key, value) in env::vars() {
+        if let Some(name) = key.strip_prefix("WEB3_URL_") {
+            urls.insert(name.to_string(), value);
+        } else if let Some(name) = key.strip_prefix("WEB3_PRIVATE_KEY_") {
+            keys.insert(name.to_string(), value);
+        } else if let Some(name) = key.strip_prefix("WEB3_CONTRACT_ADDRESS_") {
+            contract_addresses.insert(name.to_string(), value);
+        }
+    }
+
+    for (key, value) in &urls {
+        let rpc_url: Url = value
+            .parse()
+            .expect(format!("Not a valid url provided for {key}!").as_str());
+        let priv_key = keys
+            .get(key)
+            .expect(format!("No key provided for {key}!").as_str());
+        let priv_key = fs::read_to_string(priv_key)
+            .expect(format!("Failed to read private key for {} from {}", key, priv_key).as_str());
+        let wallet: LocalWallet = priv_key
+            .trim()
+            .parse()
+            .expect("Incorrect private key specified.");
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .signer(EthereumSigner::from(wallet.clone()))
+            .on_http(rpc_url);
+        let address = match contract_addresses.get(key) {
+            Some(x) => parse_contract_address(x),
+            None => None,
+        };
+        providers.insert(
+            key.to_string(),
+            Arc::new(Mutex::new(RpcProvider {
+                contract_address: address,
+                provider,
+                wallet: wallet,
+            })),
+        );
+    }
+
+    println!("List of providers:");
+    for (key, value) in &providers {
+        println!("{}: {:?}", key, value);
+    }
+
+    providers
+}
+
 pub fn print_type<T>(_: &T) {
     println!("{:?}", std::any::type_name::<T>());
 }
@@ -62,31 +147,11 @@ pub fn print_type<T>(_: &T) {
 //     provider
 // }
 
-pub fn get_shared_provider() -> Arc<
-    Mutex<
-        FillProvider<
-            JoinFill<
-                JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
-                SignerFiller<EthereumSigner>,
-            >,
-            RootProvider<Http<Client>>,
-            Http<Client>,
-            Ethereum,
-        >,
-    >,
-> {
+pub fn get_shared_provider() -> Arc<Mutex<ProviderType>> {
     Arc::new(Mutex::new(get_provider()))
 }
 
-pub fn get_provider() -> FillProvider<
-    JoinFill<
-        JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
-        SignerFiller<EthereumSigner>,
-    >,
-    RootProvider<Http<Client>>,
-    Http<Client>,
-    Ethereum,
-> {
+pub fn get_provider() -> ProviderType {
     // Create a provider with a signer.
 
     let env = <SequencerConfig as LoadEnv>::load_env();
