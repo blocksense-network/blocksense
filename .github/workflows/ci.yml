@@ -76,6 +76,37 @@ jobs:
       - name: Measure contract size
         run: yarn workspace @blocksense/contracts size
 
+  docs_website:
+    timeout-minutes: 360
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v11
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v14
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default)"
+          env >> "$GITHUB_ENV"
+
+      - name: Install JS deps
+        run: yarn install
+
+      - name: Build
+        run: yarn workspace @blocksense/docs.blocksense.network build:tsc
+
+      - name: Test
+        run: yarn workspace @blocksense/docs.blocksense.network test
+
   rust:
     timeout-minutes: 360
     runs-on: ubuntu-latest
