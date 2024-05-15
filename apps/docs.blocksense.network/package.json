@@ -6,12 +6,16 @@
     "README.md"
   ],
   "scripts": {
+    "build": "yarn build:tsc && vite build",
+    "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
     "clean": "yarn clean:normal",
     "clean:normal": "EXCL_NM='-e node_modules' yarn clean:untracked_artifacts",
     "clean:all": "EXCL_NM='' yarn clean:untracked_artifacts",
     "clean:untracked_artifacts": "git clean -fdx -e .env -e .direnv -e .yarn -e .netlify -e .vscode -e .pre-commit-config.yaml $EXCL_NM -- $(git rev-parse --show-toplevel)",
+    "dev": "NODE_ENV=development vite",
     "format:check": "prettier --check .",
-    "format:write": "prettier --write ."
+    "format:write": "prettier --write .",
+    "test": "yarn vitest -w false"
   },
   "types": "./src/index.ts",
   "devDependencies": {
