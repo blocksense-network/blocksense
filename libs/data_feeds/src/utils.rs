@@ -1,6 +1,8 @@
 use std::{
     env,
+    fmt::{Debug, Display},
     hash::{DefaultHasher, Hash, Hasher},
+    str::FromStr,
     time::{SystemTime, UNIX_EPOCH},
 };
 
@@ -11,14 +13,15 @@ pub fn current_unix_time() -> u64 {
         .as_secs()
 }
 
-pub fn get_env_var(var: &str) -> String {
-    match env::var(var) {
-        Ok(key) => key,
-        Err(err) => {
-            eprintln!("Error: {}\n{} environment variable is not set.", err, var);
-            std::process::exit(1);
-        }
-    }
+pub fn get_env_var<T>(key: &str) -> Result<T, String>
+where
+    T: FromStr,
+    T::Err: Debug + Display,
+{
+    let value_str = env::var(key).map_err(|_| format!("Environment variable '{}' not set", key))?;
+    value_str
+        .parse()
+        .map_err(|err| format!("Failed to parse environment variable '{}': {}", key, err))
 }
 
 pub fn generate_string_hash(string: &String) -> u64 {

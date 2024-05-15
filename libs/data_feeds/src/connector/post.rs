@@ -8,14 +8,19 @@ use crate::{connector::data_feed::DataFeed, types::DataFeedAPI};
 use curl::easy::Easy;
 use serde_json::{json, Value};
 
-pub async fn post_api_response(base_url: &str, data_feed: Rc<dyn DataFeed>, asset: &str) {
+pub async fn post_api_response(
+    reporter_id: &u64,
+    base_url: &str,
+    data_feed: Rc<dyn DataFeed>,
+    asset: &str,
+) {
     let (result, timestamp) = data_feed.poll(asset).await.unwrap();
 
     let feed_name = DataFeedAPI::feed_asset_str(data_feed.api(), &asset.to_string());
     let feed_hash = generate_string_hash(&feed_name);
 
     let payload_json = json!({
-        "reporter_id": 0,
+        "reporter_id": reporter_id,
         "feed_name": feed_name,
         "feed_id": feed_hash,
         "timestamp": timestamp,

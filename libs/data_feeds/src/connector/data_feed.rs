@@ -36,11 +36,11 @@ pub trait DataFeed {
 
 fn feed_selector(
     feeds: &Vec<(DataFeedAPI, String)>,
-    batch_size: usize,
+    batch_size: &usize,
 ) -> Vec<(DataFeedAPI, String)> {
     let mut rng = thread_rng();
 
-    let selected_feeds_idx = (0..feeds.len()).choose_multiple(&mut rng, batch_size);
+    let selected_feeds_idx = (0..feeds.len()).choose_multiple(&mut rng, *batch_size);
     let selected_feeds = selected_feeds_idx
         .iter()
         .map(|&idx| feeds[idx].clone())
@@ -77,8 +77,9 @@ fn feed_builder(api: &DataFeedAPI) -> Rc<dyn DataFeed> {
 }
 
 pub async fn dispatch(
+    reporter_id: &u64,
     sequencer_url: &str,
-    batch_size: usize,
+    batch_size: &usize,
     feeds: &Vec<(DataFeedAPI, String)>,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
 ) -> () {
@@ -86,6 +87,6 @@ pub async fn dispatch(
 
     for (api, asset) in feed_subset {
         let data_feed = resolve_feed(api, connection_cache);
-        post_api_response(sequencer_url, data_feed, &asset).await;
+        post_api_response(&reporter_id, sequencer_url, data_feed, &asset).await;
     }
 }
