@@ -2,6 +2,7 @@
   "name": "@blocksense/monorepo",
   "packageManager": "yarn@4.1.1",
   "workspaces": [
+    "apps/*",
     "libs/*"
   ],
   "scripts": {
