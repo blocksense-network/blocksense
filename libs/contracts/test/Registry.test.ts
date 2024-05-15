@@ -1,11 +1,13 @@
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   ChainlinkBaseWrapper,
   ChainlinkRegistryBaseWrapper,
   ChainlinkRegistryV1Wrapper,
+  ChainlinkRegistryV2Wrapper,
   ChainlinkV1Wrapper,
   ChainlinkV2Wrapper,
   RegistryWrapper,
+  RegistryWrapperV1,
+  RegistryWrapperV2,
   UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
 } from './utils/wrappers';
@@ -18,11 +20,13 @@ import {
 import { expect } from 'chai';
 import { HistoricDataFeedStoreV1, HistoricDataFeedStoreV2 } from '../typechain';
 
-let contractWrapperV1: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV1>;
-let contractWrapperV2: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV2>;
+let registryWrapperV1: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV1>;
+let registryWrapperV2: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV2>;
 
-let contractWrappersV1: ChainlinkBaseWrapper<HistoricDataFeedStore>[] = [];
-let contractWrappersV2: ChainlinkBaseWrapper<HistoricDataFeedStore>[] = [];
+let chainlinkProxyWrappersV1: ChainlinkBaseWrapper<HistoricDataFeedStore>[] =
+  [];
+let chainlinkProxyWrappersV2: ChainlinkBaseWrapper<HistoricDataFeedStore>[] =
+  [];
 
 let data = [
   {
@@ -33,7 +37,7 @@ let data = [
   {
     description: 'BTC/USD',
     decimals: 6,
-    key: 15,
+    key: 18,
   },
 ];
 
@@ -54,15 +58,15 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
     await proxyV2.init(admin);
 
     for (const d of data) {
-      contractWrappersV1.push(new ChainlinkV1Wrapper());
-      contractWrappersV2.push(new ChainlinkV2Wrapper());
+      chainlinkProxyWrappersV1.push(new ChainlinkV1Wrapper());
+      chainlinkProxyWrappersV2.push(new ChainlinkV2Wrapper());
 
-      await contractWrappersV1[contractWrappersV1.length - 1].init(
+      await chainlinkProxyWrappersV1[chainlinkProxyWrappersV1.length - 1].init(
         ...Object.values(d),
         proxyV1,
       );
 
-      await contractWrappersV2[contractWrappersV2.length - 1].init(
+      await chainlinkProxyWrappersV2[chainlinkProxyWrappersV2.length - 1].init(
         ...Object.values(d),
         proxyV2,
       );
@@ -72,59 +76,66 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       .zeroPadValue(ethers.toUtf8Bytes('312343354'), 24)
       .padEnd(66, '0');
     const valueBTC = ethers
-      .zeroPadValue(ethers.toUtf8Bytes('312343354'), 24)
+      .zeroPadValue(ethers.toUtf8Bytes('3123434'), 24)
       .padEnd(66, '0');
     for (const [i, value] of [valueETH, valueBTC].entries()) {
-      await contractWrappersV1[i].setFeed(value);
-      await contractWrappersV2[i].setFeed(value);
+      await chainlinkProxyWrappersV1[i].setFeed(value);
+      await chainlinkProxyWrappersV2[i].setFeed(value);
     }
 
     const owner = (await ethers.getSigners())[2];
 
-    contractWrapperV1 = new ChainlinkRegistryV1Wrapper();
-    await contractWrapperV1.init(owner);
+    registryWrapperV1 = new ChainlinkRegistryV1Wrapper();
+    await registryWrapperV1.init(owner);
 
-    contractWrapperV2 = new ChainlinkRegistryV1Wrapper();
-    await contractWrapperV2.init(owner);
+    registryWrapperV2 = new ChainlinkRegistryV2Wrapper();
+    await registryWrapperV2.init(owner);
 
-    const registryV1 = new RegistryWrapper(
+    const registryV1 = new RegistryWrapperV1(
       'Blocksense V1',
-      contractWrappersV1.map(wrapper => wrapper.contract),
+      chainlinkProxyWrappersV1.map(wrapper => wrapper.contract),
     );
     await registryV1.init(
       owner.address,
-      contractWrapperV1.contract.target as string,
+      registryWrapperV1.contract.target as string,
     );
 
-    const registryV2 = new RegistryWrapper(
+    const registryV2 = new RegistryWrapperV2(
       'Blocksense V2',
-      contractWrappersV2.map(wrapper => wrapper.contract),
+      chainlinkProxyWrappersV2.map(wrapper => wrapper.contract),
     );
     await registryV2.init(
       owner.address,
-      contractWrapperV2.contract.target as string,
+      registryWrapperV2.contract.target as string,
     );
 
-    await contractWrapperV1.setFeed(
+    await registryWrapperV1.setFeed(
       TOKENS.ETH,
       TOKENS.USD,
-      contractWrappersV1[0],
+      chainlinkProxyWrappersV1[0],
     );
-    await contractWrapperV1.setFeed(
+    await registryWrapperV1.setFeed(
       TOKENS.BTC,
       TOKENS.USD,
-      contractWrappersV1[1],
+      chainlinkProxyWrappersV1[1],
     );
 
-    await contractWrapperV2.setFeed(
+    await registryWrapperV2.setFeed(
       TOKENS.ETH,
       TOKENS.USD,
-      contractWrappersV2[0],
+      chainlinkProxyWrappersV2[0],
     );
-    await contractWrapperV2.setFeed(
+    await registryWrapperV2.setFeed(
       TOKENS.BTC,
       TOKENS.USD,
-      contractWrappersV2[1],
+      chainlinkProxyWrappersV2[1],
+    );
+
+    registryV1.underliers = chainlinkProxyWrappersV1.map(
+      wrapper => wrapper.contract,
+    );
+    registryV2.underliers = chainlinkProxyWrappersV2.map(
+      wrapper => wrapper.contract,
     );
 
     const chainlinkFeedRegistry = await ethers.getContractAt(
@@ -137,9 +148,6 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       chainlinkFeedRegistry.target as string,
       chainlinkFeedRegistry.target as string,
     );
-
-    registryV1.underliers = contractWrappersV1.map(wrapper => wrapper.contract);
-    registryV2.underliers = contractWrappersV2.map(wrapper => wrapper.contract);
 
     const ethAddress = await chainlinkFeedRegistry.getFeed(
       TOKENS.ETH,
@@ -175,8 +183,8 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       ),
     );
 
-    await contractWrapperV1.checkFeed(TOKENS.ETH, TOKENS.USD, feeds[0]);
-    await contractWrapperV2.checkFeed(TOKENS.ETH, TOKENS.USD, feeds[1]);
+    await registryWrapperV1.checkFeed(TOKENS.ETH, TOKENS.USD, feeds[0]);
+    await registryWrapperV2.checkFeed(TOKENS.ETH, TOKENS.USD, feeds[1]);
 
     expect(feeds[2]).to.be.equal(
       await chainlinkRegistryWrappers[0].registry.getFeed(
@@ -201,12 +209,12 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       ),
     );
 
-    await contractWrapperV1.checkDecimals(
+    await registryWrapperV1.checkDecimals(
       TOKENS.ETH,
       TOKENS.USD,
       Number(decimals[0]),
     );
-    await contractWrapperV2.checkDecimals(
+    await registryWrapperV2.checkDecimals(
       TOKENS.ETH,
       TOKENS.USD,
       Number(decimals[1]),
@@ -235,12 +243,12 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       ),
     );
 
-    await contractWrapperV1.checkDescription(
+    await registryWrapperV1.checkDescription(
       TOKENS.ETH,
       TOKENS.USD,
       descriptions[0],
     );
-    await contractWrapperV2.checkDescription(
+    await registryWrapperV2.checkDescription(
       TOKENS.ETH,
       TOKENS.USD,
       descriptions[1],
@@ -269,12 +277,12 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       ),
     );
 
-    await contractWrapperV1.checkLatestAnswer(
+    await registryWrapperV1.checkLatestAnswer(
       TOKENS.ETH,
       TOKENS.USD,
       latestAnswers[0],
     );
-    await contractWrapperV2.checkLatestAnswer(
+    await registryWrapperV2.checkLatestAnswer(
       TOKENS.ETH,
       TOKENS.USD,
       latestAnswers[1],
@@ -302,12 +310,12 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       ),
     );
 
-    await contractWrapperV1.checkLatestRound(
+    await registryWrapperV1.checkLatestRound(
       TOKENS.ETH,
       TOKENS.USD,
       Number(latestRounds[0]),
     );
-    await contractWrapperV2.checkLatestRound(
+    await registryWrapperV2.checkLatestRound(
       TOKENS.ETH,
       TOKENS.USD,
       Number(latestRounds[1]),
@@ -351,12 +359,12 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       startedAt: Number(updates[i]),
     }));
 
-    await contractWrapperV1.checkLatestRoundData(
+    await registryWrapperV1.checkLatestRoundData(
       TOKENS.ETH,
       TOKENS.USD,
       roundData[0],
     );
-    await contractWrapperV2.checkLatestRoundData(
+    await registryWrapperV2.checkLatestRoundData(
       TOKENS.ETH,
       TOKENS.USD,
       roundData[1],
@@ -395,11 +403,11 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       ),
     );
 
-    await contractWrapperV1.checkRoundData(TOKENS.ETH, TOKENS.USD, 1, {
+    await registryWrapperV1.checkRoundData(TOKENS.ETH, TOKENS.USD, 1, {
       answer: answers[0],
       startedAt: Number(updates[0]),
     });
-    await contractWrapperV2.checkRoundData(TOKENS.ETH, TOKENS.USD, 1, {
+    await registryWrapperV2.checkRoundData(TOKENS.ETH, TOKENS.USD, 1, {
       answer: answers[1],
       startedAt: Number(updates[1]),
     });

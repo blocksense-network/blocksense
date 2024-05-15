@@ -89,7 +89,7 @@ export const logTable = async (
   }
 
   const genericV1TableObj = {
-    gas: Number(receiptsGeneric[0]?.gasUsed),
+    gas: Number(receiptsGeneric[0]?.gasUsed) || 1,
     diff: 0,
     '%': 0,
   };
@@ -109,7 +109,7 @@ export const logTable = async (
   if (process.env.TRACE_TX === 'true') {
     for (const receipt of receipts.concat(receiptsGeneric)) {
       const res = await network.provider.send('debug_traceTransaction', [
-        receipt.transactionHash,
+        receipt.hash,
         {
           disableMemory: true,
           disableStorage: true,

@@ -12,8 +12,6 @@ contract ChainlinkProxyV1 is ChainlinkProxy {
   ) ChainlinkProxy(_description, _decimals, _key, _dataFeedStore) {}
 
   function latestRound() external view override returns (uint256 roundId) {
-    // address ptr = _callMultipleData(abi.encodePacked(0x40000000 | key));
-
     address dataFeed = dataFeedStore;
     uint32 _key = key;
 

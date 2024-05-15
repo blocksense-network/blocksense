@@ -5,8 +5,8 @@ import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
 
 abstract contract ChainlinkProxy is IChainlinkAggregator {
   uint8 public immutable override decimals;
-  uint32 internal immutable key;
-  address internal immutable dataFeedStore;
+  uint32 public immutable override key;
+  address public immutable override dataFeedStore;
 
   string public override description;
 
