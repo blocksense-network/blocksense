@@ -19,6 +19,7 @@ import {
 } from './utils/helpers/common';
 import { expect } from 'chai';
 import { HistoricDataFeedStoreV1, HistoricDataFeedStoreV2 } from '../typechain';
+import { callAndCompareRegistries } from './utils/helpers/registryGasHelper';
 
 let registryWrapperV1: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV1>;
 let registryWrapperV2: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV2>;
@@ -168,297 +169,270 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
     registries = [registryV1, registryV2];
   });
 
-  it('Should compare getFeed', async () => {
-    await callAndCompareRegistries(
-      registries,
-      chainlinkRegistryWrappers,
-      'setFeed',
-      TOKENS.ETH,
-      TOKENS.USD,
-    );
-
-    const feeds = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.feed(),
-      ),
-    );
-
-    await registryWrapperV1.checkFeed(TOKENS.ETH, TOKENS.USD, feeds[0]);
-    await registryWrapperV2.checkFeed(TOKENS.ETH, TOKENS.USD, feeds[1]);
-
-    expect(feeds[2]).to.be.equal(
-      await chainlinkRegistryWrappers[0].registry.getFeed(
-        TOKENS.ETH,
-        TOKENS.USD,
-      ),
-    );
-  });
-
-  it('Should compare setDecimals', async () => {
-    await callAndCompareRegistries(
-      registries,
-      chainlinkRegistryWrappers,
-      'setDecimals',
-      TOKENS.ETH,
-      TOKENS.USD,
-    );
-
-    const decimals = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.decimals(),
-      ),
-    );
-
-    await registryWrapperV1.checkDecimals(
-      TOKENS.ETH,
-      TOKENS.USD,
-      Number(decimals[0]),
-    );
-    await registryWrapperV2.checkDecimals(
-      TOKENS.ETH,
-      TOKENS.USD,
-      Number(decimals[1]),
-    );
-
-    expect(decimals[2]).to.be.equal(
-      await chainlinkRegistryWrappers[0].registry.decimals(
-        TOKENS.ETH,
-        TOKENS.USD,
-      ),
-    );
-  });
-
-  it('Should compare setDescription', async () => {
-    await callAndCompareRegistries(
-      registries,
-      chainlinkRegistryWrappers,
-      'setDescription',
-      TOKENS.ETH,
-      TOKENS.USD,
-    );
-
-    const descriptions = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.description(),
-      ),
-    );
-
-    await registryWrapperV1.checkDescription(
-      TOKENS.ETH,
-      TOKENS.USD,
-      descriptions[0],
-    );
-    await registryWrapperV2.checkDescription(
-      TOKENS.ETH,
-      TOKENS.USD,
-      descriptions[1],
-    );
-
-    expect(descriptions[2]).to.be.equal(
-      await chainlinkRegistryWrappers[0].registry.description(
-        TOKENS.ETH,
-        TOKENS.USD,
-      ),
-    );
-  });
-
-  it('Should compare setLatestAnswer', async () => {
-    await callAndCompareRegistries(
-      registries,
-      chainlinkRegistryWrappers,
-      'setLatestAnswer',
-      TOKENS.ETH,
-      TOKENS.USD,
-    );
-
-    const latestAnswers = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.price(),
-      ),
-    );
-
-    await registryWrapperV1.checkLatestAnswer(
-      TOKENS.ETH,
-      TOKENS.USD,
-      latestAnswers[0],
-    );
-    await registryWrapperV2.checkLatestAnswer(
-      TOKENS.ETH,
-      TOKENS.USD,
-      latestAnswers[1],
-    );
-    expect(latestAnswers[2]).to.be.equal(
-      await chainlinkRegistryWrappers[0].registry.latestAnswer(
-        TOKENS.ETH,
-        TOKENS.USD,
-      ),
-    );
-  });
-
-  it('Should compare setLatestRoundId', async () => {
-    await callAndCompareRegistries(
-      registries,
-      chainlinkRegistryWrappers,
-      'setLatestRoundId',
-      TOKENS.ETH,
-      TOKENS.USD,
-    );
-
-    const latestRounds = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.roundId(),
-      ),
-    );
-
-    await registryWrapperV1.checkLatestRound(
-      TOKENS.ETH,
-      TOKENS.USD,
-      Number(latestRounds[0]),
-    );
-    await registryWrapperV2.checkLatestRound(
-      TOKENS.ETH,
-      TOKENS.USD,
-      Number(latestRounds[1]),
-    );
-    expect(latestRounds[2]).to.be.equal(
-      await chainlinkRegistryWrappers[0].registry.latestRound(
-        TOKENS.ETH,
-        TOKENS.USD,
-      ),
-    );
-  });
-
-  it('Should compare setLatestRoundData', async () => {
-    await callAndCompareRegistries(
-      registries,
-      chainlinkRegistryWrappers,
-      'setLatestRoundData',
-      TOKENS.ETH,
-      TOKENS.USD,
-    );
-
-    const roundIds = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.roundId(),
-      ),
-    );
-    const answers = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.price(),
-      ),
-    );
-    const updates = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.lastUpdate(),
-      ),
-    );
-
-    const roundData = roundIds.map((roundId, i) => ({
-      roundId: roundId,
-      answer: answers[i],
-      startedAt: Number(updates[i]),
-    }));
-
-    await registryWrapperV1.checkLatestRoundData(
-      TOKENS.ETH,
-      TOKENS.USD,
-      roundData[0],
-    );
-    await registryWrapperV2.checkLatestRoundData(
-      TOKENS.ETH,
-      TOKENS.USD,
-      roundData[1],
-    );
-
-    const chainlinkRoundData =
-      await chainlinkRegistryWrappers[0].registry.latestRoundData(
+  describe('Chainlink vs Blocksense registry base functions', async function () {
+    it('Should compare getFeed', async () => {
+      await callAndCompareRegistries(
+        registries,
+        chainlinkRegistryWrappers,
+        'setFeed',
         TOKENS.ETH,
         TOKENS.USD,
       );
-    expect(roundData[2].roundId).to.be.equal(chainlinkRoundData[0]);
-    expect(roundData[2].answer).to.be.equal(chainlinkRoundData[1]);
-    expect(roundData[2].startedAt).to.be.equal(chainlinkRoundData[2]);
-    expect(roundData[2].startedAt).to.be.equal(chainlinkRoundData[3]);
-    expect(roundData[2].roundId).to.be.equal(chainlinkRoundData[4]);
-  });
 
-  it('Should compare setRoundData', async () => {
-    await callAndCompareRegistries(
-      registries,
-      chainlinkRegistryWrappers,
-      'setRoundData',
-      TOKENS.ETH,
-      TOKENS.USD,
-      1,
-    );
+      const feeds = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.feed(),
+        ),
+      );
 
-    const answers = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.price(),
-      ),
-    );
-    const updates = await Promise.all(
-      [...registries, ...chainlinkRegistryWrappers].map(registry =>
-        registry.contract.lastUpdate(),
-      ),
-    );
+      await registryWrapperV1.checkFeed(TOKENS.ETH, TOKENS.USD, feeds[0]);
+      await registryWrapperV2.checkFeed(TOKENS.ETH, TOKENS.USD, feeds[1]);
 
-    await registryWrapperV1.checkRoundData(TOKENS.ETH, TOKENS.USD, 1, {
-      answer: answers[0],
-      startedAt: Number(updates[0]),
-    });
-    await registryWrapperV2.checkRoundData(TOKENS.ETH, TOKENS.USD, 1, {
-      answer: answers[1],
-      startedAt: Number(updates[1]),
+      expect(feeds[2]).to.be.equal(
+        await chainlinkRegistryWrappers[0].registry.getFeed(
+          TOKENS.ETH,
+          TOKENS.USD,
+        ),
+      );
     });
 
-    const roundId =
-      (await chainlinkRegistryWrappers[0].registry.latestRound(
+    it('Should compare setDecimals', async () => {
+      await callAndCompareRegistries(
+        registries,
+        chainlinkRegistryWrappers,
+        'setDecimals',
         TOKENS.ETH,
         TOKENS.USD,
-      )) - 4n;
-    const roundData = await chainlinkRegistryWrappers[0].registry.getRoundData(
-      TOKENS.ETH,
-      TOKENS.USD,
-      roundId,
-    );
+      );
 
-    expect(roundData[0]).to.be.equal(roundId);
-    expect(roundData[1]).to.be.equal(answers[2]);
-    expect(roundData[2]).to.be.equal(updates[2]);
-    expect(roundData[2]).to.be.equal(updates[2]);
-    expect(roundData[4]).to.be.equal(roundId);
+      const decimals = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.decimals(),
+        ),
+      );
+
+      await registryWrapperV1.checkDecimals(
+        TOKENS.ETH,
+        TOKENS.USD,
+        Number(decimals[0]),
+      );
+      await registryWrapperV2.checkDecimals(
+        TOKENS.ETH,
+        TOKENS.USD,
+        Number(decimals[1]),
+      );
+
+      expect(decimals[2]).to.be.equal(
+        await chainlinkRegistryWrappers[0].registry.decimals(
+          TOKENS.ETH,
+          TOKENS.USD,
+        ),
+      );
+    });
+
+    it('Should compare setDescription', async () => {
+      await callAndCompareRegistries(
+        registries,
+        chainlinkRegistryWrappers,
+        'setDescription',
+        TOKENS.ETH,
+        TOKENS.USD,
+      );
+
+      const descriptions = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.description(),
+        ),
+      );
+
+      await registryWrapperV1.checkDescription(
+        TOKENS.ETH,
+        TOKENS.USD,
+        descriptions[0],
+      );
+      await registryWrapperV2.checkDescription(
+        TOKENS.ETH,
+        TOKENS.USD,
+        descriptions[1],
+      );
+
+      expect(descriptions[2]).to.be.equal(
+        await chainlinkRegistryWrappers[0].registry.description(
+          TOKENS.ETH,
+          TOKENS.USD,
+        ),
+      );
+    });
+
+    it('Should compare setLatestAnswer', async () => {
+      await callAndCompareRegistries(
+        registries,
+        chainlinkRegistryWrappers,
+        'setLatestAnswer',
+        TOKENS.ETH,
+        TOKENS.USD,
+      );
+
+      const latestAnswers = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.price(),
+        ),
+      );
+
+      await registryWrapperV1.checkLatestAnswer(
+        TOKENS.ETH,
+        TOKENS.USD,
+        latestAnswers[0],
+      );
+      await registryWrapperV2.checkLatestAnswer(
+        TOKENS.ETH,
+        TOKENS.USD,
+        latestAnswers[1],
+      );
+      expect(latestAnswers[2]).to.be.equal(
+        await chainlinkRegistryWrappers[0].registry.latestAnswer(
+          TOKENS.ETH,
+          TOKENS.USD,
+        ),
+      );
+    });
+
+    it('Should compare setLatestRoundId', async () => {
+      await callAndCompareRegistries(
+        registries,
+        chainlinkRegistryWrappers,
+        'setLatestRoundId',
+        TOKENS.ETH,
+        TOKENS.USD,
+      );
+
+      const latestRounds = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.roundId(),
+        ),
+      );
+
+      await registryWrapperV1.checkLatestRound(
+        TOKENS.ETH,
+        TOKENS.USD,
+        Number(latestRounds[0]),
+      );
+      await registryWrapperV2.checkLatestRound(
+        TOKENS.ETH,
+        TOKENS.USD,
+        Number(latestRounds[1]),
+      );
+      expect(latestRounds[2]).to.be.equal(
+        await chainlinkRegistryWrappers[0].registry.latestRound(
+          TOKENS.ETH,
+          TOKENS.USD,
+        ),
+      );
+    });
+  });
+
+  describe('Chainlink vs Blocksense registry historic functions', async function () {
+    it('Should compare setLatestRoundData', async () => {
+      await callAndCompareRegistries(
+        registries,
+        chainlinkRegistryWrappers,
+        'setLatestRoundData',
+        TOKENS.ETH,
+        TOKENS.USD,
+      );
+
+      const roundIds = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.roundId(),
+        ),
+      );
+      const answers = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.price(),
+        ),
+      );
+      const updates = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.lastUpdate(),
+        ),
+      );
+
+      const roundData = roundIds.map((roundId, i) => ({
+        roundId: roundId,
+        answer: answers[i],
+        startedAt: Number(updates[i]),
+      }));
+
+      await registryWrapperV1.checkLatestRoundData(
+        TOKENS.ETH,
+        TOKENS.USD,
+        roundData[0],
+      );
+      await registryWrapperV2.checkLatestRoundData(
+        TOKENS.ETH,
+        TOKENS.USD,
+        roundData[1],
+      );
+
+      const chainlinkRoundData =
+        await chainlinkRegistryWrappers[0].registry.latestRoundData(
+          TOKENS.ETH,
+          TOKENS.USD,
+        );
+      expect(roundData[2].roundId).to.be.equal(chainlinkRoundData[0]);
+      expect(roundData[2].answer).to.be.equal(chainlinkRoundData[1]);
+      expect(roundData[2].startedAt).to.be.equal(chainlinkRoundData[2]);
+      expect(roundData[2].startedAt).to.be.equal(chainlinkRoundData[3]);
+      expect(roundData[2].roundId).to.be.equal(chainlinkRoundData[4]);
+    });
+
+    it('Should compare setRoundData', async () => {
+      await callAndCompareRegistries(
+        registries,
+        chainlinkRegistryWrappers,
+        'setRoundData',
+        TOKENS.ETH,
+        TOKENS.USD,
+        1,
+      );
+
+      const answers = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.price(),
+        ),
+      );
+      const updates = await Promise.all(
+        [...registries, ...chainlinkRegistryWrappers].map(registry =>
+          registry.contract.lastUpdate(),
+        ),
+      );
+
+      await registryWrapperV1.checkRoundData(TOKENS.ETH, TOKENS.USD, 1, {
+        answer: answers[0],
+        startedAt: Number(updates[0]),
+      });
+      await registryWrapperV2.checkRoundData(TOKENS.ETH, TOKENS.USD, 1, {
+        answer: answers[1],
+        startedAt: Number(updates[1]),
+      });
+
+      const roundId =
+        (await chainlinkRegistryWrappers[0].registry.latestRound(
+          TOKENS.ETH,
+          TOKENS.USD,
+        )) - 4n;
+      const roundData =
+        await chainlinkRegistryWrappers[0].registry.getRoundData(
+          TOKENS.ETH,
+          TOKENS.USD,
+          roundId,
+        );
+
+      expect(roundData[0]).to.be.equal(roundId);
+      expect(roundData[1]).to.be.equal(answers[2]);
+      expect(roundData[2]).to.be.equal(updates[2]);
+      expect(roundData[2]).to.be.equal(updates[2]);
+      expect(roundData[4]).to.be.equal(roundId);
+    });
   });
 });
-
-const callAndCompareRegistries = async (
-  registryWrappers: RegistryWrapper[],
-  chainlinkRegistryWrappers: RegistryWrapper[],
-  functionName: string,
-  ...args: any[]
-) => {
-  const map: Record<string, string> = {};
-  for (const wrapper of [...registryWrappers, ...chainlinkRegistryWrappers]) {
-    map[wrapper.contract.target as string] = wrapper.getName();
-  }
-
-  const txs = await Promise.all(
-    registryWrappers.map(wrapper => wrapper.call(functionName, ...args)),
-  );
-
-  let chainlinkTxs = [];
-  for (const wrapper of chainlinkRegistryWrappers) {
-    if (functionName === 'setRoundData') {
-      const roundId = await wrapper.registry.latestRound(...args.slice(0, 2));
-      chainlinkTxs.push(
-        wrapper.call(functionName, ...args.slice(0, 2), roundId - 4n),
-      );
-    } else {
-      chainlinkTxs.push(wrapper.call(functionName, ...args));
-    }
-  }
-
-  chainlinkTxs = await Promise.all(chainlinkTxs);
-
-  await logTable(map, txs, chainlinkTxs);
-};
