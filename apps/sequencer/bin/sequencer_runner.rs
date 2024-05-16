@@ -14,20 +14,19 @@ use sequencer::feeds::feeds_registry::{
 };
 
 use actix_web::{error, rt::spawn, rt::time, Error};
-use actix_web::{get, web, App, HttpServer};
+use actix_web::{get, web, App, HttpRequest, HttpServer};
 use actix_web::{post, HttpResponse, Responder};
 use futures::StreamExt;
 use sequencer::feeds::feeds_processing::REPORT_HEX_SIZE;
 use sequencer::utils::byte_utils::to_hex_string;
-use sequencer::utils::eth_send_to_contract::{
-    eth_batch_send_to_all_contracts, eth_send_to_contract, DataFeedStoreV1,
-};
+use sequencer::utils::eth_send_to_contract::{eth_batch_send_to_all_contracts, DataFeedStoreV1};
 use sequencer::utils::provider::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time::Duration;
 
+//TODO: add schema for feed update
 #[derive(Serialize, Deserialize)]
 struct MyObj {
     name: String,
@@ -35,8 +34,6 @@ struct MyObj {
 }
 
 use once_cell::sync::Lazy;
-use tokio::sync::Mutex;
-static PROVIDER: Lazy<Arc<Mutex<ProviderType>>> = Lazy::new(|| get_shared_provider());
 static PROVIDERS: Lazy<SharedRpcProviders> = Lazy::new(|| get_shared_rpc_providers());
 
 async fn deploy_contract(network: &String) -> Result<String> {
@@ -75,32 +72,41 @@ async fn deploy_contract(network: &String) -> Result<String> {
     return Ok(format!("No provider for network {}", network));
 }
 
-async fn get_key_from_contract() -> Result<String> {
-    println!("eth_send_to_contract");
+async fn get_key_from_contract(network: &String, key: &String) -> Result<String> {
+    let providers = PROVIDERS.lock().await;
 
-    let wallet = get_wallet(); // Get the contract address.
-    let contract_address = get_contract_address();
-    println!("sending data to contract_address `{}`", contract_address);
+    let provider = providers.get(network);
 
-    let provider = PROVIDER.lock().await;
+    if let Some(p) = provider.cloned() {
+        drop(providers);
+        let p = p.lock().await;
 
-    let base_fee = provider.get_gas_price().await?;
+        let wallet = &p.wallet;
+        let provider = &p.provider;
+        let contract_address = &p.contract_address;
+        if let Some(addr) = contract_address {
+            println!("sending data to contract_address `{}`", addr);
 
-    // key: 0x00000000
-    let input = Bytes::from_hex("0x00000000").unwrap();
-    let tx = TransactionRequest::default()
-        .to(contract_address)
-        .from(wallet.address())
-        .with_gas_limit(2e5 as u128)
-        .with_max_fee_per_gas(base_fee + base_fee)
-        .with_max_priority_fee_per_gas(1e9 as u128)
-        .with_chain_id(provider.get_chain_id().await?)
-        .input(Some(input).into());
+            let base_fee = provider.get_gas_price().await?;
 
-    let result = provider.call(&tx).await?;
-    println!("Call result: {:?}", result);
+            // key: 0x00000000
+            let input = Bytes::from_hex(key).unwrap();
+            let tx = TransactionRequest::default()
+                .to(*addr)
+                .from(wallet.address())
+                .with_gas_limit(2e5 as u128)
+                .with_max_fee_per_gas(base_fee + base_fee)
+                .with_max_priority_fee_per_gas(1e9 as u128)
+                .with_chain_id(provider.get_chain_id().await?)
+                .input(Some(input).into());
 
-    Ok(result.to_string())
+            let result = provider.call(&tx).await?;
+            println!("Call result: {:?}", result);
+            return Ok(result.to_string());
+        }
+        return Ok(format!("No contract found for network {}", network));
+    }
+    return Ok(format!("No provider found for network {}", network));
 }
 
 #[get("/deploy/{network}")]
@@ -113,25 +119,12 @@ async fn deploy(path: web::Path<String>) -> impl Responder {
     };
 }
 
-#[get("/get_key")]
-async fn get_key() -> impl Responder {
-    println!("getting key ...");
-    get_key_from_contract().await.unwrap()
-}
-
-#[get("/{name}")]
-async fn hello(name: web::Path<String>) -> impl Responder {
-    format!(
-        "{} {}",
-        name,
-        eth_send_to_contract(
-            PROVIDER.clone(),
-            "00000000",
-            "48656c6c6f2c20576f726c642120300000000000000000000000000000000000"
-        )
-        .await
-        .unwrap()
-    )
+#[get("/get_key/{network}/{key}")] // network is the name provided in config, key is hex string
+async fn get_key(req: HttpRequest) -> impl Responder {
+    let network: String = req.match_info().get("network").unwrap().parse().unwrap();
+    let key: String = req.match_info().query("key").parse().unwrap();
+    println!("getting key {} for network {} ...", key, network);
+    get_key_from_contract(&network, &key).await.unwrap()
 }
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
@@ -369,7 +362,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(app_state.clone())
             .service(get_key)
             .service(deploy)
-            .service(hello)
             .service(index_post)
     })
     .bind(("0.0.0.0", 8877))?
