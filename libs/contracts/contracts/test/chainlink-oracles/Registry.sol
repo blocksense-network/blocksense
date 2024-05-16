@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {IFeedRegistry} from '../../interfaces/IChainlinkFeedRegistry.sol';
+import {IFeedRegistry} from '../../interfaces/IFeedRegistry.sol';
 import {IChainlinkAggregator} from '../../interfaces/IChainlinkAggregator.sol';
 
 contract Registry {
