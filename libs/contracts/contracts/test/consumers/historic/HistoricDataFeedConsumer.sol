@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import './HistoricConsumer.sol';
+import {ProxyCall} from '../../../libraries/ProxyCall.sol';
 
 abstract contract HistoricDataFeedConsumer is HistoricConsumer {
   constructor(address _dataFeedStore) HistoricConsumer(_dataFeedStore) {}
@@ -10,7 +11,12 @@ abstract contract HistoricDataFeedConsumer is HistoricConsumer {
     uint32 key
   ) internal view override returns (Transmission memory) {
     return
-      decodeTransmission(_callDataFeed(abi.encodePacked(0x80000000 | key)));
+      decodeTransmission(
+        ProxyCall._callDataFeed(
+          dataFeedStore,
+          abi.encodePacked(0x80000000 | key)
+        )
+      );
   }
 
   function _getFeedAtCounter(
@@ -19,35 +25,11 @@ abstract contract HistoricDataFeedConsumer is HistoricConsumer {
   ) internal view override returns (Transmission memory) {
     return
       decodeTransmission(
-        _callDataFeed(abi.encodeWithSelector(bytes4(0x20000000 | key), counter))
+        ProxyCall._callDataFeed(
+          dataFeedStore,
+          abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
+        )
       );
-  }
-
-  function _callDataFeed(
-    bytes memory data
-  ) internal view returns (bytes32 returnData) {
-    address dataFeed = dataFeedStore;
-
-    // using assembly staticcall costs less gas than using a view function
-    assembly {
-      // get free memory pointer
-      let ptr := mload(0x40)
-      // call dataFeed with data and store return value at memory location ptr
-      let success := staticcall(
-        gas(),
-        dataFeed,
-        add(data, 32),
-        mload(data),
-        ptr,
-        32
-      )
-      // revert if call failed
-      if iszero(success) {
-        revert(0, 0)
-      }
-      // assign return value to returnData
-      returnData := mload(ptr)
-    }
   }
 
   function decodeTransmission(

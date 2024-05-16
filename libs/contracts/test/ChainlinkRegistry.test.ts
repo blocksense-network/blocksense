@@ -8,12 +8,12 @@ import {
   UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
 } from './utils/wrappers';
-import { ethers } from 'hardhat';
 import {
   HistoricDataFeedStore,
   TOKENS,
   assertRegistry,
 } from './utils/helpers/common';
+import { ethers } from 'hardhat';
 
 let contractWrapperV1: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV1>;
 let contractWrapperV2: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV2>;

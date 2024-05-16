@@ -2,7 +2,6 @@ import { ethers } from 'hardhat';
 import { ChainlinkV1Wrapper, ChainlinkV2Wrapper } from './utils/wrappers';
 import { OracleWrapper } from './utils/wrappers';
 import { callAndCompareOracles } from './utils/helpers/oracleGasHelper';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 
 let oracles: OracleWrapper[];

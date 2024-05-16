@@ -19,7 +19,7 @@ export const callAndCompareOracles = async (
   let chainlinkTxs = [];
 
   for (const wrapper of chainlinkOracleWrappers) {
-    if (args.length === 1) {
+    if (functionName === 'setRoundData') {
       const res = await wrapper.underliers[0].latestRoundData();
       chainlinkTxs.push(wrapper.call(functionName, res.roundId - 4n));
     } else {

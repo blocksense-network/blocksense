@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { HistoricDataFeedStore } from './utils/helpers/common';
 import {
   ChainlinkBaseWrapper,
@@ -77,7 +76,9 @@ describe('Chainlink proxy interface', function () {
   describe('Assert storage', function () {
     for (const version in contractWrappers) {
       for (let i = 0; i < proxyData.length; i++) {
-        it(`Should get latest answer for ${proxyData[i].description} v${+version + 1}`, async function () {
+        it(`Should get latest answer for ${proxyData[i].description} v${
+          +version + 1
+        }`, async function () {
           const wrappers = contractWrappers[version];
           const value = ethers.encodeBytes32String('3132');
           await wrappers[version].setFeed(value);
@@ -95,7 +96,9 @@ describe('Chainlink proxy interface', function () {
           await wrappers[version].checkLatestAnswer(BigInt(newValue));
         });
 
-        it(`Should get latest round id for ${proxyData[i].description} v${+version + 1}`, async function () {
+        it(`Should get latest round id for ${proxyData[i].description} v${
+          +version + 1
+        }`, async function () {
           const wrappers = contractWrappers[version];
 
           const value = ethers.encodeBytes32String('3132');
@@ -114,7 +117,9 @@ describe('Chainlink proxy interface', function () {
           await wrappers[version].checkLatestRoundId(2);
         });
 
-        it(`Should get latest round data for ${proxyData[i].description} v${+version + 1}`, async function () {
+        it(`Should get latest round data for ${proxyData[i].description} v${
+          +version + 1
+        }`, async function () {
           const wrappers = contractWrappers[version];
 
           const value = ethers.encodeBytes32String('3132');
@@ -143,7 +148,9 @@ describe('Chainlink proxy interface', function () {
           });
         });
 
-        it(`Should get historical data for ${proxyData[i].description} v${+version + 1}`, async function () {
+        it(`Should get historical data for ${proxyData[i].description} v${
+          +version + 1
+        }`, async function () {
           const wrappers = contractWrappers[version];
 
           const value = ethers.encodeBytes32String('3132');

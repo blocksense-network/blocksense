@@ -10,7 +10,7 @@ export class RegistryWrapper extends OracleBaseWrapper<Registry> {
   public async init(_: string, registryAddress?: string) {
     if (registryAddress) {
       this.registry = await ethers.getContractAt(
-        'FeedRegistryV1',
+        'FeedRegistry',
         registryAddress,
       );
     }

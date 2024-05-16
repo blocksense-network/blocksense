@@ -11,15 +11,11 @@ import {
   UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
 } from './utils/wrappers';
-import { ethers } from 'hardhat';
-import {
-  HistoricDataFeedStore,
-  TOKENS,
-  logTable,
-} from './utils/helpers/common';
-import { expect } from 'chai';
 import { HistoricDataFeedStoreV1, HistoricDataFeedStoreV2 } from '../typechain';
 import { callAndCompareRegistries } from './utils/helpers/registryGasHelper';
+import { HistoricDataFeedStore, TOKENS } from './utils/helpers/common';
+import { ethers } from 'hardhat';
+import { expect } from 'chai';
 
 let registryWrapperV1: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV1>;
 let registryWrapperV2: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV2>;
