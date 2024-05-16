@@ -36,7 +36,7 @@ jobs:
         run: nix build --impure .#devShells.x86_64-linux.default
 
       - name: Check formatting
-        run: nix develop --impure -c npm run format:write
+        run: nix develop --impure -c npm run format:check
 
   hardhat:
     timeout-minutes: 360
