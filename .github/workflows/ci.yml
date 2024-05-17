@@ -100,3 +100,6 @@ jobs:
 
       - name: Build Rust workspace
         run: nix develop --impure -c cargo build
+
+      - name: Build Rust workspace
+        run: nix develop --impure -c cargo test
