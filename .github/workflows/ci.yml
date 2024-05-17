@@ -29,14 +29,14 @@ jobs:
           name: ${{ vars.CACHIX_CACHE }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: nix flake check
-        run: nix flake check --impure
-
       - name: Build the Nix Dev Shell
         run: nix build --impure .#devShells.x86_64-linux.default
 
       - name: Check formatting
         run: nix develop --impure -c npm run format:check
+
+      - name: nix flake check
+        run: nix flake check --impure
 
   hardhat:
     timeout-minutes: 360
@@ -91,9 +91,6 @@ jobs:
         with:
           name: ${{ vars.CACHIX_CACHE }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: nix flake check
-        run: nix flake check --impure
 
       - name: Build the Nix Dev Shell
         run: nix build --impure .#devShells.x86_64-linux.default
