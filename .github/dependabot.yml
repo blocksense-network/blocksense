@@ -1,6 +1,24 @@
 version: 2
 updates:
 
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: '00:00'
+    timezone: UTC
+  commit-message:
+      prefix: "chore"
+      include: "scope"
+- package-ecosystem: cargo
+  directory: "/"
+  schedule:
+    interval: daily
+    time: '00:00'
+    timezone: UTC
+  commit-message:
+      prefix: "chore"
+      include: "scope"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
