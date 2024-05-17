@@ -2009,9 +2009,9 @@ dependencies = [
 
 [[package]]
 name = "hdbscan"
-version = "0.4.1"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a312f0b553df786015137e42850641596d7e2e18bc80278ac9ccd8e0e232eaa5"
+checksum = "f7498aaf2866ea67073adc92702ce4c79e945c0fd0275b88007d4ff72b7226d7"
 dependencies = [
  "kdtree",
  "num-traits",
