@@ -29,11 +29,13 @@ jobs:
           name: ${{ vars.CACHIX_CACHE }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Build the Nix Dev Shell
-        run: nix build --impure .#devShells.x86_64-linux.default
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default)"
+          env >> "$GITHUB_ENV"
 
       - name: Check formatting
-        run: nix develop --impure -c npm run format:check
+        run: npm run format:check
 
       - name: nix flake check
         run: nix flake check --impure
@@ -56,23 +58,25 @@ jobs:
           name: ${{ vars.CACHIX_CACHE }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Build the Nix Dev Shell
-        run: nix build --impure .#devShells.x86_64-linux.default
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default)"
+          env >> "$GITHUB_ENV"
 
       - name: Install JS deps
-        run: nix develop --impure -c yarn install
+        run: yarn install
 
       - name: Build all contracts
-        run: nix develop --impure -c yarn workspace @blocksense/contracts build
+        run: yarn workspace @blocksense/contracts build
 
       - name: Test all contracts
-        run: nix develop --impure -c yarn workspace @blocksense/contracts test
+        run: yarn workspace @blocksense/contracts test
 
       - name: Measure test coverage
-        run: nix develop --impure -c yarn workspace @blocksense/contracts coverage
+        run: yarn workspace @blocksense/contracts coverage
 
       - name: Measure contract size
-        run: nix develop --impure -c yarn workspace @blocksense/contracts size
+        run: yarn workspace @blocksense/contracts size
 
   rust:
     timeout-minutes: 360
@@ -92,11 +96,13 @@ jobs:
           name: ${{ vars.CACHIX_CACHE }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Build the Nix Dev Shell
-        run: nix build --impure .#devShells.x86_64-linux.default
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default)"
+          env >> "$GITHUB_ENV"
 
       - name: Build Rust workspace
-        run: nix develop --impure -c cargo build
+        run: cargo build
 
       - name: Build Rust workspace
-        run: nix develop --impure -c cargo test
+        run: cargo test
