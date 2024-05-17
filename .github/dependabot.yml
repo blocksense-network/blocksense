@@ -8,8 +8,19 @@ updates:
     time: '00:00'
     timezone: UTC
   commit-message:
-      prefix: "chore"
+      prefix: "build"
       include: "scope"
+  groups:
+    version-updates:
+      applies-to: version-updates
+      update-types:
+      - "minor"
+      - "patch"
+    security-updates:
+      applies-to: security-updates
+      update-types:
+      - "patch"
+
 - package-ecosystem: cargo
   directory: "/"
   schedule:
@@ -17,8 +28,19 @@ updates:
     time: '00:00'
     timezone: UTC
   commit-message:
-      prefix: "chore"
+      prefix: "build"
       include: "scope"
+  groups:
+    version-updates:
+      applies-to: version-updates
+      update-types:
+      - "minor"
+      - "patch"
+    security-updates:
+      applies-to: security-updates
+      update-types:
+      - "patch"
+
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
@@ -26,5 +48,5 @@ updates:
     time: '00:00'
     timezone: UTC
   commit-message:
-      prefix: "chore"
+      prefix: "ci"
       include: "scope"
