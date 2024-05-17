@@ -16,9 +16,9 @@ name = "hdbscan_detector"
 path = "bin/hdbscan_detector.rs"
 
 [dependencies]
-num = "0.4.1"
+num = "0.4.2"
 rand = "0.8.5"
 rand_distr = "0.4.3"
-serde = "1.0.197"
+serde = "1.0.202"
 extended-isolation-forest = "0.2.3"
-hdbscan = "0.4.1"
+hdbscan = "0.6.0"

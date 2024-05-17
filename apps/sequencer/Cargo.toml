@@ -51,8 +51,8 @@ tokio = { version = "1.4.0", features = ["full"] }
 eyre = "0.6.12"
 openssl-sys = "0.9.102"
 actix-web = "4.5.1"
-serde_json = "1.0.115"
-serde = { version = "1.0.197", features = ["derive"]}
+serde_json = "1.0.117"
+serde = { version = "1.0.202", features = ["derive"]}
 futures = "0.3.30"
 envload = "0.1.1"
 
