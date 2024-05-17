@@ -106,3 +106,24 @@ jobs:
 
       - name: Build Rust workspace
         run: cargo test
+
+  rust-nix-build:
+    timeout-minutes: 360
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v11
+        with:
+          extra-conf:
+            accept-flake-config = true
+
+      - uses: cachix/cachix-action@v14
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Nix build Rust workspace
+        run: nix build --impure .#blocksense-rs
