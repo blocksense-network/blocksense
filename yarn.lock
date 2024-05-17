@@ -36,7 +36,7 @@ __metadata:
     "@types/node": "npm:^20.11.30"
     chai: "npm:4"
     dotenv: "npm:^16.4.5"
-    ethers: "npm:^6.11.1"
+    ethers: "npm:^6.12.1"
     hardhat: "npm:^2.22.1"
     hardhat-contract-sizer: "npm:^2.10.0"
     hardhat-gas-reporter: "npm:^2.0.2"
@@ -2260,9 +2260,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^6.11.1":
-  version: 6.11.1
-  resolution: "ethers@npm:6.11.1"
+"ethers@npm:^6.12.1":
+  version: 6.12.1
+  resolution: "ethers@npm:6.12.1"
   dependencies:
     "@adraffy/ens-normalize": "npm:1.10.1"
     "@noble/curves": "npm:1.2.0"
@@ -2271,7 +2271,7 @@ __metadata:
     aes-js: "npm:4.0.0-beta.5"
     tslib: "npm:2.4.0"
     ws: "npm:8.5.0"
-  checksum: 10c0/97a920e0244ba6cd1622b58a448c87f26dad20bad242777abb2e583d045bf7752218477bd7367ba6518c2a5e2b16030afff15e87b705526d0ea667498c27ac89
+  checksum: 10c0/7686e1efdb0a831578f35d69188783c225de5a6fbb1b422327bc45cee04d49a2707e73c9342a6a5eb2870ce35668c71372737439ec3993d31d83f4a0e2446cc7
   languageName: node
   linkType: hard
 
