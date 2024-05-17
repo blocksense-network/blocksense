@@ -235,13 +235,13 @@ async fn main() -> std::io::Result<()> {
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
     });
 
-    let (s, r) = async_channel::unbounded();
+    let (vote_send, vote_recv) = async_channel::unbounded();
 
     {
         let reg = app_state.registry.write().unwrap();
         let keys = reg.get_keys();
         for key in keys {
-            let send_channel = s.clone();
+            let send_channel = vote_send.clone();
             let feed = reg.get(key).unwrap();
             let feed = feed.read().unwrap();
             let name = feed.get_name().clone();
@@ -321,14 +321,16 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
+    let (batched_votes_send, batched_votes_recv) = async_channel::unbounded();
+
     spawn(async move {
         let max_keys_to_batch = 2;
         loop {
             let mut updates: HashMap<String, String> = Default::default();
             let mut send_to_contract = false;
             while !send_to_contract {
-                let var = actix_web::rt::time::timeout(Duration::from_millis(1000), async {
-                    r.recv().await
+                let var = actix_web::rt::time::timeout(Duration::from_millis(500), async {
+                    vote_recv.recv().await
                 })
                 .await;
                 match var {
@@ -342,21 +344,34 @@ async fn main() -> std::io::Result<()> {
                         send_to_contract = true;
                     }
                     Ok(Err(err)) => {
-                        println!("RecvError: {}", err.to_string());
+                        println!("Batcher got RecvError: {}", err.to_string());
                         send_to_contract = true;
                     }
                 };
             }
-            println!("sending updates to contract:");
             if updates.keys().len() > 0 {
-                eth_batch_send_to_all_contracts(PROVIDERS.clone(), updates)
-                    .await
-                    .unwrap();
+                batched_votes_send.send(updates).await.unwrap();
             }
-            println!("Sending updates complete.");
         }
     });
 
+    spawn(async move {
+        loop {
+            let recvd = batched_votes_recv.recv().await;
+            match recvd {
+                Ok(updates) => {
+                    println!("sending updates to contract:");
+                    eth_batch_send_to_all_contracts(PROVIDERS.clone(), updates)
+                        .await
+                        .unwrap();
+                    println!("Sending updates complete.");
+                }
+                Err(err) => {
+                    println!("Sender got RecvError: {}", err.to_string());
+                }
+            }
+        }
+    });
     HttpServer::new(move || {
         App::new()
             .app_data(app_state.clone())
