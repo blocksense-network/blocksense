@@ -8,23 +8,23 @@ use alloy::{
 use eyre::Result;
 use std::sync::{Arc, RwLock};
 
-use sequencer::feeds::feeds_registry::{
-    get_feed_id, new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaData,
-    FeedMetaDataRegistry, FeedSlotTimeTracker,
-};
-
 use actix_web::{error, rt::spawn, Error};
 use actix_web::{get, web, App, HttpRequest, HttpServer};
 use actix_web::{post, HttpResponse, Responder};
 use futures::StreamExt;
 use sequencer::feeds::feeds_processing::REPORT_HEX_SIZE;
-use sequencer::utils::byte_utils::to_hex_string;
-use sequencer::utils::eth_send_to_contract::{eth_batch_send_to_all_contracts, DataFeedStoreV1};
-use sequencer::utils::provider::*;
+use sequencer::feeds::feeds_registry::{
+    get_feed_id, new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaData,
+    FeedMetaDataRegistry, FeedSlotTimeTracker,
+};
+use sequencer::feeds::{
+    votes_result_batcher::VotesResultBatcher, votes_result_sender::VotesResultSender,
+};
+use sequencer::utils::{
+    byte_utils::to_hex_string, eth_send_to_contract::DataFeedStoreV1, provider::*,
+};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
-use tokio::time::Duration;
 
 //TODO: add schema for feed update
 #[derive(Serialize, Deserialize)]
@@ -327,55 +327,10 @@ async fn main() -> std::io::Result<()> {
 
     let (batched_votes_send, batched_votes_recv) = async_channel::unbounded();
 
-    spawn(async move {
-        let max_keys_to_batch = 2;
-        loop {
-            let mut updates: HashMap<String, String> = Default::default();
-            let mut send_to_contract = false;
-            while !send_to_contract {
-                let var = actix_web::rt::time::timeout(Duration::from_millis(500), async {
-                    vote_recv.recv().await
-                })
-                .await;
-                match var {
-                    Ok(Ok((key, val))) => {
-                        println!("adding {} => {} to updates", key, val);
-                        updates.insert(key, val);
-                        send_to_contract = updates.keys().len() >= max_keys_to_batch;
-                    }
-                    Err(e) => {
-                        println!("Flushing batched updates, {}", e.to_string());
-                        send_to_contract = true;
-                    }
-                    Ok(Err(err)) => {
-                        println!("Batcher got RecvError: {}", err.to_string());
-                        send_to_contract = true;
-                    }
-                };
-            }
-            if updates.keys().len() > 0 {
-                batched_votes_send.send(updates).await.unwrap();
-            }
-        }
-    });
+    let _votes_batcher = VotesResultBatcher::new(vote_recv, batched_votes_send);
 
-    spawn(async move {
-        loop {
-            let recvd = batched_votes_recv.recv().await;
-            match recvd {
-                Ok(updates) => {
-                    println!("sending updates to contract:");
-                    eth_batch_send_to_all_contracts(PROVIDERS.clone(), updates)
-                        .await
-                        .unwrap();
-                    println!("Sending updates complete.");
-                }
-                Err(err) => {
-                    println!("Sender got RecvError: {}", err.to_string());
-                }
-            }
-        }
-    });
+    let _votes_sender = VotesResultSender::new(batched_votes_recv, PROVIDERS.clone());
+
     HttpServer::new(move || {
         App::new()
             .app_data(app_state.clone())
