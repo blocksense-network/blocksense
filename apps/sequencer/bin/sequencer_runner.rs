@@ -10,10 +10,10 @@ use std::sync::{Arc, RwLock};
 
 use sequencer::feeds::feeds_registry::{
     get_feed_id, new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaData,
-    FeedMetaDataRegistry,
+    FeedMetaDataRegistry, FeedSlotTimeTracker,
 };
 
-use actix_web::{error, rt::spawn, rt::time, Error};
+use actix_web::{error, rt::spawn, Error};
 use actix_web::{get, web, App, HttpRequest, HttpServer};
 use actix_web::{post, HttpResponse, Responder};
 use futures::StreamExt;
@@ -253,10 +253,11 @@ async fn main() -> std::io::Result<()> {
             let app_state_clone: web::Data<AppState> = app_state.clone(); //This will be moved into the spawned timer below
 
             spawn(async move {
-                let mut interval = time::interval(Duration::from_millis(report_interval));
-                interval.tick().await; // The first tick completes immediately.
+                let feed_slots_tracker =
+                    FeedSlotTimeTracker::new(report_interval, first_report_start_time);
+
                 loop {
-                    interval.tick().await;
+                    feed_slots_tracker.await_end_of_current_slot().await;
 
                     let result_post_to_contract: String;
                     let key_post: u32;
@@ -269,7 +270,13 @@ async fn main() -> std::io::Result<()> {
                                 None => panic!("Error timer for feed that was not registered."),
                             };
                         }
-                        let slot = feed.read().unwrap().get_slot();
+
+                        let current_time_as_ms = SystemTime::now()
+                            .duration_since(UNIX_EPOCH)
+                            .expect("Time went backwards")
+                            .as_millis();
+
+                        let slot = feed.read().unwrap().get_slot(current_time_as_ms);
                         println!("processing votes for feed_id = {}, slot = {}", &key, &slot);
 
                         println!(
@@ -281,7 +288,6 @@ async fn main() -> std::io::Result<()> {
                             Some(x) => x,
                             None => {
                                 println!("No reports found!");
-                                feed.write().unwrap().inc_slot();
                                 continue;
                             }
                         };
@@ -297,7 +303,6 @@ async fn main() -> std::io::Result<()> {
 
                         if values.is_empty() {
                             println!("No reports found for slot {}!", &slot);
-                            feed.write().unwrap().inc_slot();
                             continue;
                         }
 
@@ -305,7 +310,6 @@ async fn main() -> std::io::Result<()> {
                         result_post_to_contract =
                             feed.read().unwrap().get_feed_type().process(values); // Dispatch to concreate FeedProcessing implementation.
                         println!("result_post_to_contract = {:?}", result_post_to_contract);
-                        feed.write().unwrap().inc_slot();
                         reports.clear();
                     }
 

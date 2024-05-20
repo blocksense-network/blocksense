@@ -1,15 +1,16 @@
 use crate::feeds::average_feed_processor::AverageFeedProcessor;
 use crate::feeds::feeds_processing::FeedProcessing;
+use actix_web::rt::time;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
+use tokio::time::Duration;
 
 #[derive(Debug)]
 pub struct FeedMetaData {
     name: String,
     report_interval: u64, // Consider oneshot feeds.
     first_report_start_time: SystemTime,
-    slot: u64,
     feed_type: Box<dyn FeedProcessing>,
 }
 
@@ -18,13 +19,11 @@ impl FeedMetaData {
         n: &str,
         r: u64, // Consider oneshot feeds.
         f: SystemTime,
-        s: u64,
     ) -> FeedMetaData {
         FeedMetaData {
             name: n.to_string(),
             report_interval: r,
             first_report_start_time: f,
-            slot: s,
             feed_type: Box::new(AverageFeedProcessor::new()),
         }
     }
@@ -41,20 +40,17 @@ impl FeedMetaData {
             .expect("Time went backwards");
         since_the_epoch.as_millis()
     }
-    pub fn get_slot(&self) -> u64 {
-        self.slot
-    }
-    pub fn inc_slot(&mut self) {
-        self.slot += 1;
+    pub fn get_slot(&self, current_time_as_ms: u128) -> u64 {
+        ((current_time_as_ms - self.get_first_report_start_time_ms())
+            / self.report_interval as u128) as u64
     }
     pub fn get_feed_type(&self) -> &dyn FeedProcessing {
         self.feed_type.as_ref()
     }
     pub fn check_report_relevance(&self, current_time_as_ms: u128, msg_timestamp: u128) -> bool {
         let start_of_voting_round = self.get_first_report_start_time_ms()
-            + (self.get_slot() as u128 * self.get_report_interval() as u128);
-        let end_of_voting_round = self.get_first_report_start_time_ms()
-            + ((self.get_slot() + 1) as u128 * self.get_report_interval() as u128);
+            + (self.get_slot(current_time_as_ms) as u128 * self.get_report_interval() as u128);
+        let end_of_voting_round = start_of_voting_round + self.get_report_interval() as u128;
 
         if current_time_as_ms >= start_of_voting_round
             && current_time_as_ms <= end_of_voting_round
@@ -67,6 +63,48 @@ impl FeedMetaData {
             println!("rejected!");
             return false;
         }
+    }
+}
+
+pub struct FeedSlotTimeTracker {
+    report_interval: u64, // Consider oneshot feeds.
+    first_report_start_time_ms: u128,
+}
+
+impl FeedSlotTimeTracker {
+    pub fn new(
+        r: u64, // Consider oneshot feeds.
+        f: u128,
+    ) -> FeedSlotTimeTracker {
+        FeedSlotTimeTracker {
+            report_interval: r,
+            first_report_start_time_ms: f,
+        }
+    }
+    pub async fn await_end_of_current_slot(&self) {
+        let current_time_as_ms = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis();
+        let slots_count =
+            (current_time_as_ms - self.first_report_start_time_ms) / self.report_interval as u128;
+        let current_slot_start_time =
+            self.first_report_start_time_ms + slots_count * self.report_interval as u128;
+        let current_slot_end_time = current_slot_start_time + self.report_interval as u128;
+
+        //TODO: might be put those logs in TRACE level.
+        // println!("current_time_as_ms      = {}", current_time_as_ms);
+        // println!("slots_count             = {}", slots_count);
+        // println!("current_slot_start_time = {}", current_slot_start_time);
+        // println!("current_slot_end_time      = {}", current_slot_end_time);
+        // println!("uncorrected sleep time  = {}", current_time_as_ms + self.report_interval as u128);
+        // println!("diff                    = {}", current_time_as_ms + self.report_interval as u128 - current_slot_end_time);
+
+        let mut interval = time::interval(Duration::from_millis(
+            (current_slot_end_time - current_time_as_ms) as u64,
+        ));
+        interval.tick().await; // The first tick completes immediately.
+        interval.tick().await;
     }
 }
 
@@ -96,9 +134,9 @@ impl FeedMetaDataRegistry {
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let start = SystemTime::now();
 
-    let fmd1 = FeedMetaData::new("DOGE/USD", 20000, start, 0);
-    let fmd2 = FeedMetaData::new("BTS/USD", 10000, start, 0);
-    let fmd3 = FeedMetaData::new("ETH/USD", 20000, start, 0);
+    let fmd1 = FeedMetaData::new("DOGE/USD", 20000, start);
+    let fmd2 = FeedMetaData::new("BTS/USD", 10000, start);
+    let fmd3 = FeedMetaData::new("ETH/USD", 20000, start);
 
     let mut fmdr = FeedMetaDataRegistry::new();
 
@@ -181,34 +219,72 @@ mod tests {
     fn basic_test() {
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
+        let mut current_time_as_ms = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis();
+
         println!("fmdr.get_keys()={:?}", fmdr);
-        fmdr.get(0)
-            .expect("ID not present in registry")
-            .write()
-            .unwrap()
-            .inc_slot();
-        println!("fmdr.get_keys()={:?}", fmdr);
-        fmdr.get(1)
-            .expect("ID not present in registry")
-            .write()
-            .unwrap()
-            .inc_slot();
-        fmdr.get(1)
-            .expect("ID not present in registry")
-            .write()
-            .unwrap()
-            .inc_slot();
-        fmdr.get(1)
-            .expect("ID not present in registry")
-            .write()
-            .unwrap()
-            .inc_slot();
         assert!(
             fmdr.get(0)
                 .expect("ID not present in registry")
                 .read()
                 .unwrap()
-                .get_slot()
+                .get_slot(current_time_as_ms)
+                == 0
+        );
+        assert!(
+            fmdr.get(1)
+                .expect("ID not present in registry")
+                .read()
+                .unwrap()
+                .get_slot(current_time_as_ms)
+                == 0
+        );
+
+        assert!(
+            fmdr.get(0).expect("ID not present in registry").read().unwrap().get_report_interval() as u128 ==
+            fmdr.get(1).expect("ID not present in registry").read().unwrap().get_report_interval() as u128 * 2,
+            "The test expects that Feed ID 0 has twice longer report interval compared to Feed ID 1"
+        );
+
+        current_time_as_ms += fmdr
+            .get(1)
+            .expect("ID not present in registry")
+            .read()
+            .unwrap()
+            .get_report_interval() as u128
+            + 1u128;
+        assert!(
+            fmdr.get(0)
+                .expect("ID not present in registry")
+                .read()
+                .unwrap()
+                .get_slot(current_time_as_ms)
+                == 0
+        );
+        assert!(
+            fmdr.get(1)
+                .expect("ID not present in registry")
+                .read()
+                .unwrap()
+                .get_slot(current_time_as_ms)
+                == 1
+        );
+        current_time_as_ms += fmdr
+            .get(1)
+            .expect("ID not present in registry")
+            .read()
+            .unwrap()
+            .get_report_interval() as u128
+            + 1u128;
+
+        assert!(
+            fmdr.get(0)
+                .expect("ID not present in registry")
+                .read()
+                .unwrap()
+                .get_slot(current_time_as_ms)
                 == 1
         );
         assert!(
@@ -216,14 +292,14 @@ mod tests {
                 .expect("ID not present in registry")
                 .read()
                 .unwrap()
-                .get_slot()
-                == 3
+                .get_slot(current_time_as_ms)
+                == 2
         );
     }
 
     #[test]
     fn relevant_feed_check() {
-        const DATA_FEED_ID: u64 = 1;
+        const DATA_FEED_ID: u32 = 1;
 
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
@@ -253,17 +329,7 @@ mod tests {
                 == false
         );
 
-        msg_timestamp += 11 * 1000; // Advance report time. It will still be obsolete, because we have not
-                                    // incremented the slot.
-
-        assert!(
-            feed.read()
-                .unwrap()
-                .check_report_relevance(current_time_as_ms, msg_timestamp)
-                == false
-        );
-
-        feed.write().unwrap().inc_slot(); // Increment the slot, the report will now be in the corect time frame of the new slot.
+        msg_timestamp += 11 * 1000; // Advance report time to make it relevant
 
         assert!(
             feed.read()
@@ -275,7 +341,7 @@ mod tests {
     #[test]
     fn chech_relevant_and_insert_mt() {
         const NTHREADS: u32 = 10;
-        const DATA_FEED_ID: u64 = 1;
+        const DATA_FEED_ID: u32 = 1;
 
         let fmdr = Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data()));
         let reports = Arc::new(RwLock::new(AllFeedsReports::new()));
