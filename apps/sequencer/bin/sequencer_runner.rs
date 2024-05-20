@@ -8,15 +8,16 @@ use alloy::{
 use eyre::Result;
 use std::sync::{Arc, RwLock};
 
-use actix_web::{error, rt::spawn, Error};
+use actix_web::{error, Error};
 use actix_web::{get, web, App, HttpRequest, HttpServer};
 use actix_web::{post, HttpResponse, Responder};
 use futures::StreamExt;
+use sequencer::feeds::feed_slots_manager::FeedSlotsManager;
 use sequencer::feeds::feeds_processing::REPORT_HEX_SIZE;
 use sequencer::feeds::feeds_registry::{
-    get_feed_id, new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaData,
-    FeedMetaDataRegistry, FeedSlotTimeTracker,
+    get_feed_id, new_feeds_meta_data_reg_with_test_data, AllFeedsReports,
 };
+use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::feeds::{
     votes_result_batcher::VotesResultBatcher, votes_result_sender::VotesResultSender,
 };
@@ -133,7 +134,7 @@ const MAX_SIZE: usize = 262_144; // max payload size is 256k
 async fn index_post(
     name: web::Path<String>,
     mut payload: web::Payload,
-    app_state: web::Data<AppState>,
+    app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
     println!("Called index_post {}", name);
     let mut body = web::BytesMut::new();
@@ -223,17 +224,14 @@ async fn index_post(
     Ok(HttpResponse::BadRequest().into())
 }
 
-struct AppState {
-    registry: Arc<RwLock<FeedMetaDataRegistry>>,
-    reports: Arc<RwLock<AllFeedsReports>>,
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let app_state = web::Data::new(AppState {
+    let app_state = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data())),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
     });
+
+    let mut feed_managers = Vec::new();
 
     let (vote_send, vote_recv) = async_channel::unbounded();
 
@@ -242,86 +240,33 @@ async fn main() -> std::io::Result<()> {
         let keys = reg.get_keys();
         for key in keys {
             let send_channel = vote_send.clone();
-            let feed = reg.get(key).unwrap();
-            let feed = feed.read().unwrap();
-            let name = feed.get_name().clone();
-            let report_interval = feed.get_report_interval();
-            let first_report_start_time = feed.get_first_report_start_time_ms();
 
             println!("key = {} : value = {:?}", key, reg.get(key));
 
-            let app_state_clone: web::Data<AppState> = app_state.clone(); //This will be moved into the spawned timer below
+            let app_state_clone: web::Data<FeedsState> = app_state.clone(); //This will be moved into the spawned timer below
 
-            spawn(async move {
-                let feed_slots_tracker =
-                    FeedSlotTimeTracker::new(report_interval, first_report_start_time);
+            let feed = match reg.get(key) {
+                Some(x) => x,
+                None => panic!("Error timer for feed that was not registered."),
+            };
 
-                loop {
-                    feed_slots_tracker.await_end_of_current_slot().await;
+            let lock_err_msg = "Could not lock feeds meta data registry for read";
+            let name = feed.read().expect(lock_err_msg).get_name().clone();
+            let report_interval = feed.read().expect(lock_err_msg).get_report_interval();
+            let first_report_start_time = feed
+                .read()
+                .expect(lock_err_msg)
+                .get_first_report_start_time_ms();
 
-                    let result_post_to_contract: String;
-                    let key_post: u32;
-                    {
-                        let feed: Arc<RwLock<FeedMetaData>>;
-                        {
-                            let reg = app_state_clone.registry.write().unwrap();
-                            feed = match reg.get(key) {
-                                Some(x) => x,
-                                None => panic!("Error timer for feed that was not registered."),
-                            };
-                        }
-
-                        let current_time_as_ms = SystemTime::now()
-                            .duration_since(UNIX_EPOCH)
-                            .expect("Time went backwards")
-                            .as_millis();
-
-                        let slot = feed.read().unwrap().get_slot(current_time_as_ms);
-                        println!("processing votes for feed_id = {}, slot = {}", &key, &slot);
-
-                        println!(
-                            "Tick from {} with id {} rep_interval {}.",
-                            name, key, report_interval
-                        );
-
-                        let reports = match app_state_clone.reports.read().unwrap().get(key) {
-                            Some(x) => x,
-                            None => {
-                                println!("No reports found!");
-                                continue;
-                            }
-                        };
-                        println!("found the following reports:");
-                        println!("reports = {:?}", reports);
-
-                        let mut reports = reports.write().unwrap();
-                        // Process the reports:
-                        let mut values: Vec<&String> = vec![];
-                        for kv in &reports.report {
-                            values.push(&kv.1);
-                        }
-
-                        if values.is_empty() {
-                            println!("No reports found for slot {}!", &slot);
-                            continue;
-                        }
-
-                        key_post = key;
-                        result_post_to_contract =
-                            feed.read().unwrap().get_feed_type().process(values); // Dispatch to concreate FeedProcessing implementation.
-                        println!("result_post_to_contract = {:?}", result_post_to_contract);
-                        reports.clear();
-                    }
-
-                    send_channel
-                        .send((
-                            to_hex_string(key_post.to_be_bytes().to_vec()),
-                            result_post_to_contract,
-                        ))
-                        .await
-                        .unwrap();
-                }
-            });
+            feed_managers.push(FeedSlotsManager::new(
+                send_channel,
+                feed,
+                name,
+                report_interval,
+                first_report_start_time,
+                app_state_clone,
+                key,
+            ));
         }
     }
 
