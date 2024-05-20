@@ -12,12 +12,12 @@
 rustPlatform.buildRustPackage rec {
   pname = "blocksense";
   version = "alpha";
-  src = filesets.rustSrc.src;
+  inherit (filesets.rustSrc) src;
 
   cargoLock = {
     lockFile = "${src}/Cargo.lock";
     outputHashes = {
-      "alloy-0.1.0" = "sha256-EfAVOlseCweeDYwX5iy+K3DUJNQXUmUbIFSRfWAYBqk=";
+      "alloy-0.1.0" = "sha256-eNAj0hvaB9IYXBnXP6OgUtyGZf6BzZWRBVAr1E4TEGY=";
     };
   };
   nativeBuildInputs = [
