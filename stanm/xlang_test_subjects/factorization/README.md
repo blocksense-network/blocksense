@@ -2,8 +2,8 @@ Subject program for comparison of the debugging experience from different
 toolchains. Related to task
 https://coda.io/d/_d6vM0kjfQP6#Task-DB_tuk5j/r698&view=modal .
 
-To run C++ code: just compile and run normally, e.g. `g++ factor.cpp &&
-./a.out`.
+To run C++ code: just compile and run normally, e.g.
+`cd factor_cpp ; g++ factor.cpp main.cpp && ./a.out 1337`.
 
 To run the Noir code:
 
