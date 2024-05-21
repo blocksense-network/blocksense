@@ -4,6 +4,7 @@ use std::env;
 use std::fmt::Debug;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
+use tracing::{debug, error, info};
 
 pub struct VotesResultBatcher {}
 
@@ -29,7 +30,7 @@ impl VotesResultBatcher {
                     .expect(format!("{} should be an unsigned integer.", batch_size_env).as_str()),
                 Err(_) => 1,
             };
-            println!(
+            info!(
                 "VotesResultBatcher: max_keys_to_batch set to {}",
                 max_keys_to_batch
             );
@@ -44,7 +45,7 @@ impl VotesResultBatcher {
                 ),
                 Err(_) => 500,
             };
-            println!(
+            info!(
                 "VotesResultBatcher: timeout_duration set to {}",
                 timeout_duration
             );
@@ -70,11 +71,11 @@ impl VotesResultBatcher {
                             send_to_contract = updates.keys().len() >= max_keys_to_batch;
                         }
                         Ok(None) => {
-                            println!("Woke up on empty channel. Flushing batched updates.");
+                            debug!("Woke up on empty channel. Flushing batched updates.");
                             send_to_contract = true;
                         }
                         Err(err) => {
-                            println!(
+                            debug!(
                                 "Woke up due to: {}. Flushing batched updates",
                                 err.to_string()
                             );

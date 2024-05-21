@@ -29,6 +29,9 @@ use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::mpsc;
 
+use tracing::{debug, error, info, trace};
+use tracing::{span, Level};
+
 //TODO: add schema for feed update
 #[derive(Serialize, Deserialize)]
 struct MyObj {
@@ -62,7 +65,7 @@ async fn deploy_contract(network: &String) -> Result<(bool, String)> {
             .deploy()
             .await?;
 
-        println!(
+        info!(
             "Deployed contract at address: {:?}\n",
             contract_address.to_string()
         );
@@ -92,7 +95,7 @@ async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, 
         let provider = &p.provider;
         let contract_address = &p.contract_address;
         if let Some(addr) = contract_address {
-            println!("sending data to contract_address `{}`", addr);
+            info!("sending data to contract_address `{}`", addr);
 
             let base_fee = provider.get_gas_price().await?;
 
@@ -108,7 +111,7 @@ async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, 
                 .input(Some(input).into());
 
             let result = provider.call(&tx).await?;
-            println!("Call result: {:?}", result);
+            info!("Call result: {:?}", result);
             return Ok((true, result.to_string()));
         }
         return Ok((false, format!("No contract found for network {}", network)));
@@ -118,22 +121,32 @@ async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, 
 
 #[get("/deploy/{network}")]
 async fn deploy(path: web::Path<String>) -> Result<HttpResponse, Error> {
+    let span = span!(Level::INFO, "deploy");
+    let _guard = span.enter();
     let network = path.into_inner();
-    println!("Deploying contract for network `{}` ...", network);
+    info!("Deploying contract for network `{}` ...", network);
     match deploy_contract(&network).await {
         Ok((true, result)) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
-        Ok((false, result)) => Err(error::ErrorBadRequest(result)),
-        Err(e) => Err(error::ErrorBadRequest(e.to_string())),
+        Ok((false, result)) => {
+            error!("Failed to deploy due to {}", result);
+            Err(error::ErrorBadRequest(result))
+        }
+        Err(e) => {
+            error!("Failed to deploy due to {}", e.to_string());
+            Err(error::ErrorBadRequest(e.to_string()))
+        }
     }
 }
 
 #[get("/get_key/{network}/{key}")] // network is the name provided in config, key is hex string
 async fn get_key(req: HttpRequest) -> impl Responder {
+    let span = span!(Level::INFO, "get_key");
+    let _guard = span.enter();
     let network: String = req.match_info().get("network").unwrap().parse().unwrap();
     let key: String = req.match_info().query("key").parse().unwrap();
-    println!("getting key {} for network {} ...", key, network);
+    info!("getting key {} for network {} ...", key, network);
     match get_key_from_contract(&network, &key).await {
         Ok((true, result)) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
@@ -151,7 +164,7 @@ async fn index_post(
     mut payload: web::Payload,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
-    println!("Called index_post {}", name);
+    debug!("Called index_post {}", name);
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
         let chunk = chunk?;
@@ -164,7 +177,7 @@ async fn index_post(
 
     // body is loaded, now we can deserialize serde-json
     // let obj = serde_json::from_slice::<MyObj>(&body)?;
-    println!("body = {:?}!", body);
+    debug!("body = {:?}!", body);
 
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
     let result_hex = match v["result"].to_string().parse::<f32>() {
@@ -202,14 +215,19 @@ async fn index_post(
         }
     };
 
-    // println!("result = {:?}; feed_id = {:?}; reporter_id = {:?}", result_bytes, feed_id, reporter_id);
+    trace!(
+        "result = {:?}; feed_id = {:?}; reporter_id = {:?}",
+        result_hex,
+        feed_id,
+        reporter_id
+    );
     let feed;
     {
         let reg = app_state
             .registry
             .read()
             .expect("Error trying to lock Registry for read!");
-        println!("getting feed_id = {}", &feed_id);
+        debug!("getting feed_id = {}", &feed_id);
         feed = match reg.get(feed_id.into()) {
             Some(x) => x,
             None => return Ok(HttpResponse::BadRequest().into()),
@@ -241,6 +259,10 @@ async fn index_post(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    tracing_subscriber::fmt()
+        .with_max_level(Level::DEBUG)
+        .init();
+
     let app_state = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data())),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
@@ -256,7 +278,7 @@ async fn main() -> std::io::Result<()> {
         for key in keys {
             let send_channel: mpsc::UnboundedSender<(String, String)> = vote_send.clone();
 
-            println!("key = {} : value = {:?}", key, reg.get(key));
+            debug!("key = {} : value = {:?}", key, reg.get(key));
 
             let feed = match reg.get(key) {
                 Some(x) => x,

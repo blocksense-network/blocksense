@@ -15,6 +15,7 @@ use actix_web::rt::spawn;
 use eyre::Report;
 use futures::stream::FuturesUnordered;
 use std::fmt::Debug;
+use tracing::{debug, error, info};
 
 // Codegen from embedded Solidity code and precompiled bytecode.
 sol! {
@@ -31,7 +32,7 @@ pub async fn eth_send_to_contract(
     key: &str,
     val: &str,
 ) -> Result<String> {
-    println!("eth_send_to_contract {} : {}", key, val);
+    debug!("eth_send_to_contract {} : {}", key, val);
 
     let mut updates = HashMap::new();
     updates.insert(key.to_string(), val.to_string());
@@ -42,7 +43,7 @@ pub async fn eth_batch_send_to_contract(
     provider: Arc<Mutex<ProviderType>>,
     updates: HashMap<String, String>,
 ) -> Result<String> {
-    println!("eth_batch_send_to_contract updates: {:?}", updates);
+    debug!("eth_batch_send_to_contract updates: {:?}", updates);
 
     let collected_futures: FuturesUnordered<
         tokio::task::JoinHandle<std::prelude::v1::Result<String, Report>>,
@@ -51,7 +52,7 @@ pub async fn eth_batch_send_to_contract(
     collected_futures.push(spawn(async move {
         let wallet = get_wallet(); // Get the contract address.
         let contract_address = get_contract_address();
-        println!("sending data to contract_address `{}`", contract_address);
+        info!("sending data to contract_address `{}`", contract_address);
 
         let provider = provider.lock().await;
 
@@ -78,10 +79,10 @@ pub async fn eth_batch_send_to_contract(
             .with_chain_id(provider.get_chain_id().await?)
             .input(Some(input).into());
 
-        println!("tx =  {:?}", tx);
+        info!("tx =  {:?}", tx);
 
         let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
-        println!("Transaction receipt: {:?}", receipt);
+        info!("Transaction receipt: {:?}", receipt);
 
         Ok(receipt.status().to_string())
     }));
@@ -93,7 +94,11 @@ pub async fn eth_batch_send_to_contract(
             Ok(res) => {
                 all_results += &match res {
                     Ok(x) => x,
-                    Err(e) => "ReportError:".to_owned() + &e.to_string(),
+                    Err(e) => {
+                        let err = "ReportError:".to_owned() + &e.to_string();
+                        error!(err);
+                        err
+                    }
                 }
             }
             Err(e) => {
@@ -113,7 +118,7 @@ pub async fn eth_batch_send_to_all_contracts<
     providers: SharedRpcProviders,
     updates: HashMap<K, V>,
 ) -> Result<String> {
-    println!("eth_batch_send_to_contract updates: {:?}", updates);
+    debug!("eth_batch_send_to_contract updates: {:?}", updates);
 
     let providers = providers
         .read()
@@ -138,7 +143,7 @@ pub async fn eth_batch_send_to_all_contracts<
                 .contract_address
                 .expect(format!("Contract address not set for network {}.", net).as_str());
 
-            println!("sending data to contract_address `{}`", contract_address);
+            info!("sending data to contract_address `{}`", contract_address);
 
             let provider = &provider.provider;
 
@@ -166,10 +171,10 @@ pub async fn eth_batch_send_to_all_contracts<
                 .with_chain_id(provider.get_chain_id().await?)
                 .input(Some(input).into());
 
-            println!("tx =  {:?}", tx);
+            info!("tx =  {:?}", tx);
 
             let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
-            println!("Transaction receipt: {:?}", receipt);
+            info!("Transaction receipt: {:?}", receipt);
 
             Ok(receipt.status().to_string())
         }));
@@ -184,7 +189,11 @@ pub async fn eth_batch_send_to_all_contracts<
             Ok(res) => {
                 all_results += &match res {
                     Ok(x) => x,
-                    Err(e) => "ReportError:".to_owned() + &e.to_string(),
+                    Err(e) => {
+                        let err = "ReportError:".to_owned() + &e.to_string();
+                        error!(err);
+                        err
+                    }
                 }
             }
             Err(e) => {

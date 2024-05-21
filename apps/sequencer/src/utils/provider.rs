@@ -14,10 +14,10 @@ use envload::Envload;
 use envload::LoadEnv;
 use std::collections::HashMap;
 use std::env;
+use std::fs;
 use std::sync::Arc;
 use tokio::sync::Mutex;
-
-use std::fs;
+use tracing::info;
 
 pub type ProviderType = FillProvider<
     JoinFill<
@@ -123,9 +123,9 @@ pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
         );
     }
 
-    println!("List of providers:");
+    info!("List of providers:");
     for (key, value) in &providers {
-        println!("{}: {:?}", key, value);
+        info!("{}: {:?}", key, value);
     }
 
     providers

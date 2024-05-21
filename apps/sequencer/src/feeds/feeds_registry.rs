@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time::Duration;
+use tracing::{debug, trace};
 
 #[derive(Debug)]
 pub struct FeedMetaData {
@@ -57,10 +58,10 @@ impl FeedMetaData {
             && msg_timestamp >= start_of_voting_round
             && msg_timestamp <= end_of_voting_round
         {
-            println!("accepted!");
+            debug!("accepted!");
             return true;
         } else {
-            println!("rejected!");
+            debug!("rejected!");
             return false;
         }
     }
@@ -92,13 +93,18 @@ impl FeedSlotTimeTracker {
             self.first_report_start_time_ms + slots_count * self.report_interval_ms as u128;
         let current_slot_end_time = current_slot_start_time + self.report_interval_ms as u128;
 
-        //TODO: might be put those logs in TRACE level.
-        // println!("current_time_as_ms      = {}", current_time_as_ms);
-        // println!("slots_count             = {}", slots_count);
-        // println!("current_slot_start_time = {}", current_slot_start_time);
-        // println!("current_slot_end_time      = {}", current_slot_end_time);
-        // println!("uncorrected sleep time  = {}", current_time_as_ms + self.report_interval_ms as u128);
-        // println!("diff                    = {}", current_time_as_ms + self.report_interval_ms as u128 - current_slot_end_time);
+        trace!("current_time_as_ms      = {}", current_time_as_ms);
+        trace!("slots_count             = {}", slots_count);
+        trace!("current_slot_start_time = {}", current_slot_start_time);
+        trace!("current_slot_end_time   = {}", current_slot_end_time);
+        trace!(
+            "uncorrected sleep time  = {}",
+            current_time_as_ms + self.report_interval_ms as u128
+        );
+        trace!(
+            "diff                    = {}",
+            current_time_as_ms + self.report_interval_ms as u128 - current_slot_end_time
+        );
 
         let mut interval = time::interval(Duration::from_millis(
             (current_slot_end_time - current_time_as_ms) as u64,

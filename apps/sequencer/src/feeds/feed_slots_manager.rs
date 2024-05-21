@@ -7,6 +7,7 @@ use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::mpsc::UnboundedSender;
+use tracing::{debug, info};
 
 pub struct FeedSlotsManager {}
 
@@ -39,23 +40,22 @@ impl FeedSlotsManager {
                         .as_millis();
 
                     let slot = feed.read().unwrap().get_slot(current_time_as_ms);
-                    println!("processing votes for feed_id = {}, slot = {}", &key, &slot);
 
-                    println!(
-                        "Tick from {} with id {} rep_interval {}.",
-                        name, key, report_interval_ms
+                    info!(
+                        "Processing votes for {} with id {} for slot {} rep_interval {}.",
+                        name, key, slot, report_interval_ms
                     );
 
                     let reports: Arc<RwLock<crate::feeds::feeds_registry::FeedReports>> =
                         match app_state_clone.reports.read().unwrap().get(key) {
                             Some(x) => x,
                             None => {
-                                println!("No reports found!");
+                                info!("No reports found!");
                                 continue;
                             }
                         };
-                    println!("found the following reports:");
-                    println!("reports = {:?}", reports);
+                    debug!("found the following reports:");
+                    debug!("reports = {:?}", reports);
 
                     let mut reports = reports.write().unwrap();
                     // Process the reports:
@@ -65,13 +65,13 @@ impl FeedSlotsManager {
                     }
 
                     if values.is_empty() {
-                        println!("No reports found for slot {}!", &slot);
+                        info!("No reports found for slot {}!", &slot);
                         continue;
                     }
 
                     key_post = key;
                     result_post_to_contract = feed.read().unwrap().get_feed_type().process(values); // Dispatch to concreate FeedProcessing implementation.
-                    println!("result_post_to_contract = {:?}", result_post_to_contract);
+                    info!("result_post_to_contract = {:?}", result_post_to_contract);
                     reports.clear();
                 }
 
