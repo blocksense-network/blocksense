@@ -62,7 +62,7 @@ impl VotesResultBatcher {
                         .await;
                     match var {
                         Ok(Some((key, val))) => {
-                            println!(
+                            info!(
                                 "adding {} => {} to updates",
                                 key.to_string(),
                                 val.to_string()
