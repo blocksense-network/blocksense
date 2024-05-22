@@ -1,11 +1,11 @@
 use crate::feeds::feeds_registry::{FeedMetaData, FeedSlotTimeTracker};
 use crate::feeds::feeds_state::FeedsState;
 use crate::utils::byte_utils::to_hex_string;
+use crate::utils::time_utils::get_ms_since_epoch;
 use actix_web::rt::spawn;
 use actix_web::web;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
-use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::{debug, info};
 
@@ -34,10 +34,7 @@ impl FeedSlotsManager {
                 let result_post_to_contract: String;
                 let key_post: u32;
                 {
-                    let current_time_as_ms = SystemTime::now()
-                        .duration_since(UNIX_EPOCH)
-                        .expect("Time went backwards")
-                        .as_millis();
+                    let current_time_as_ms = get_ms_since_epoch();
 
                     let slot = feed.read().unwrap().get_slot(current_time_as_ms);
 

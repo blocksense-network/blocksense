@@ -6,6 +6,7 @@ use alloy::{
 };
 
 use eyre::Result;
+use sequencer::utils::time_utils::{get_ms_since_epoch, TimeIntervalMeasure};
 use std::sync::{Arc, RwLock};
 
 use actix_web::http::header::ContentType;
@@ -26,9 +27,9 @@ use sequencer::utils::{
     byte_utils::to_hex_string, eth_send_to_contract::DataFeedStoreV1, provider::*,
 };
 use serde::{Deserialize, Serialize};
-use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::mpsc;
 
+use sequencer::utils::logging::{get_shared_logging_handle, SharedLoggingHandle};
 use tracing::{debug, error, info, trace};
 use tracing::{span, Level};
 
@@ -41,6 +42,7 @@ struct MyObj {
 
 use once_cell::sync::Lazy;
 static PROVIDERS: Lazy<SharedRpcProviders> = Lazy::new(|| get_shared_rpc_providers());
+static GLOBAL_LOG_HANDLE: Lazy<SharedLoggingHandle> = Lazy::new(|| get_shared_logging_handle());
 
 async fn deploy_contract(network: &String) -> Result<(bool, String)> {
     let providers = PROVIDERS
@@ -59,6 +61,7 @@ async fn deploy_contract(network: &String) -> Result<(bool, String)> {
         // Deploy the contract.
         let contract_builder = DataFeedStoreV1::deploy_builder(provider);
         let estimate = contract_builder.estimate_gas().await?;
+        let deploy_time = TimeIntervalMeasure::new();
         let contract_address = contract_builder
             .gas(estimate)
             .gas_price(base_fee)
@@ -66,8 +69,9 @@ async fn deploy_contract(network: &String) -> Result<(bool, String)> {
             .await?;
 
         info!(
-            "Deployed contract at address: {:?}\n",
-            contract_address.to_string()
+            "Deployed contract at address: {:?} took {}ms\n",
+            contract_address.to_string(),
+            deploy_time.measure()
         );
 
         p.contract_address = Some(contract_address);
@@ -95,12 +99,18 @@ async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, 
         let provider = &p.provider;
         let contract_address = &p.contract_address;
         if let Some(addr) = contract_address {
-            info!("sending data to contract_address `{}`", addr);
+            info!(
+                "sending data to contract_address `{}` in network `{}`",
+                addr, network
+            );
 
             let base_fee = provider.get_gas_price().await?;
 
             // key: 0x00000000
-            let input = Bytes::from_hex(key).unwrap();
+            let input = match Bytes::from_hex(key) {
+                Err(e) => return Ok((false, format!("Key is not valid hex string: {}", e))),
+                Ok(x) => x,
+            };
             let tx = TransactionRequest::default()
                 .to(*addr)
                 .from(wallet.address())
@@ -154,6 +164,24 @@ async fn get_key(req: HttpRequest) -> impl Responder {
         Ok((false, result)) => Err(error::ErrorBadRequest(result)),
         Err(e) => Err(error::ErrorBadRequest(e.to_string())),
     }
+}
+
+#[post("/main_log_level/{log_level}")]
+async fn set_log_level(req: HttpRequest) -> Result<HttpResponse, Error> {
+    let log_level: String = req.match_info().get("log_level").unwrap().parse().unwrap();
+    info!("set_log_level called with {}", log_level);
+    if let Some(val) = req.connection_info().realip_remote_addr() {
+        if val == "127.0.0.1" {
+            if GLOBAL_LOG_HANDLE
+                .lock()
+                .expect("Could not acquire GLOBAL_LOG_HANDLE's mutex")
+                .set_logging_level(log_level.as_str())
+            {
+                return Ok(HttpResponse::Ok().into());
+            }
+        }
+    }
+    Ok(HttpResponse::BadRequest().into())
 }
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
@@ -234,10 +262,7 @@ async fn index_post(
         };
     }
 
-    let current_time_as_ms = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards")
-        .as_millis();
+    let current_time_as_ms = get_ms_since_epoch();
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
@@ -259,9 +284,12 @@ async fn index_post(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    tracing_subscriber::fmt()
-        .with_max_level(Level::DEBUG)
-        .init();
+    // init global logger.
+    drop(
+        GLOBAL_LOG_HANDLE
+            .lock()
+            .expect("Could not acquire GLOBAL_LOG_HANDLE's mutex"),
+    );
 
     let app_state = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data())),
@@ -273,7 +301,10 @@ async fn main() -> std::io::Result<()> {
     let (vote_send, vote_recv) = mpsc::unbounded_channel();
 
     {
-        let reg = app_state.registry.write().unwrap();
+        let reg = app_state
+            .registry
+            .write()
+            .expect("Could not lock all feeds meta data registry.");
         let keys = reg.get_keys();
         for key in keys {
             let send_channel: mpsc::UnboundedSender<(String, String)> = vote_send.clone();
@@ -285,7 +316,7 @@ async fn main() -> std::io::Result<()> {
                 None => panic!("Error timer for feed that was not registered."),
             };
 
-            let lock_err_msg = "Could not lock feeds meta data registry for read";
+            let lock_err_msg = "Could not lock feed meta data registry for read";
             let name = feed.read().expect(lock_err_msg).get_name().clone();
             let report_interval_ms = feed.read().expect(lock_err_msg).get_report_interval_ms();
             let first_report_start_time = feed
@@ -317,6 +348,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_key)
             .service(deploy)
             .service(index_post)
+            .service(set_log_level)
     })
     .bind(("0.0.0.0", 8877))?
     .run()

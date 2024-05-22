@@ -1,5 +1,6 @@
 use crate::feeds::average_feed_processor::AverageFeedProcessor;
 use crate::feeds::feeds_processing::FeedProcessing;
+use crate::utils::time_utils::get_ms_since_epoch;
 use actix_web::rt::time;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -83,10 +84,7 @@ impl FeedSlotTimeTracker {
         }
     }
     pub async fn await_end_of_current_slot(&self) {
-        let current_time_as_ms = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_millis();
+        let current_time_as_ms = get_ms_since_epoch();
         let slots_count = (current_time_as_ms - self.first_report_start_time_ms)
             / self.report_interval_ms as u128;
         let current_slot_start_time =
@@ -215,6 +213,7 @@ mod tests {
     use crate::feeds::feeds_registry::{
         new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaDataRegistry,
     };
+    use crate::utils::time_utils::get_ms_since_epoch;
     use std::sync::Arc;
     use std::sync::RwLock;
     use std::thread;
@@ -225,10 +224,7 @@ mod tests {
     fn basic_test() {
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
-        let mut current_time_as_ms = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_millis();
+        let mut current_time_as_ms = get_ms_since_epoch();
 
         println!("fmdr.get_keys()={:?}", fmdr);
         assert!(
@@ -309,10 +305,7 @@ mod tests {
 
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
-        let mut current_time_as_ms = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_millis();
+        let mut current_time_as_ms = get_ms_since_epoch();
 
         let mut msg_timestamp = current_time_as_ms;
 
@@ -358,10 +351,7 @@ mod tests {
             let fmdr = fmdr.clone();
             let reports = reports.clone();
 
-            let msg_timestamp = SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .expect("Time went backwards")
-                .as_millis();
+            let msg_timestamp = get_ms_since_epoch();
 
             children.push(thread::spawn(move || {
                 let feed = fmdr

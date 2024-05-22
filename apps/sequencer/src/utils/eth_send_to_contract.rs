@@ -11,6 +11,7 @@ use tokio::sync::Mutex;
 use crate::utils::provider::{
     get_contract_address, get_wallet, ProviderType, RpcProvider, SharedRpcProviders,
 };
+use crate::utils::time_utils::TimeIntervalMeasure;
 use actix_web::rt::spawn;
 use eyre::Report;
 use futures::stream::FuturesUnordered;
@@ -143,7 +144,10 @@ pub async fn eth_batch_send_to_all_contracts<
                 .contract_address
                 .expect(format!("Contract address not set for network {}.", net).as_str());
 
-            info!("sending data to contract_address `{}`", contract_address);
+            info!(
+                "sending data to contract_address `{}` in network `{}`",
+                contract_address, net
+            );
 
             let provider = &provider.provider;
 
@@ -171,10 +175,16 @@ pub async fn eth_batch_send_to_all_contracts<
                 .with_chain_id(provider.get_chain_id().await?)
                 .input(Some(input).into());
 
-            info!("tx =  {:?}", tx);
+            info!("Sending to `{}` tx =  {:?}", net, tx);
+            let tx_time = TimeIntervalMeasure::new();
 
             let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
-            info!("Transaction receipt: {:?}", receipt);
+            info!(
+                "Recvd transaction receipt that took {}ms from `{}`: {:?}",
+                tx_time.measure(),
+                net,
+                receipt
+            );
 
             Ok(receipt.status().to_string())
         }));
