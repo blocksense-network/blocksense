@@ -28,6 +28,49 @@ sol! {
     }
 }
 
+pub async fn deploy_contract(
+    network: &String,
+    providers: &SharedRpcProviders,
+) -> Result<(bool, String)> {
+    let providers = providers
+        .read()
+        .expect("Could not lock all providers' lock");
+
+    let provider = providers.get(network);
+    if let Some(p) = provider.cloned() {
+        drop(providers);
+        let mut p = p.lock().await;
+        let provider = &p.provider;
+
+        // Get the base fee for the block.
+        let base_fee = provider.get_gas_price().await?;
+
+        // Deploy the contract.
+        let contract_builder = DataFeedStoreV1::deploy_builder(provider);
+        let estimate = contract_builder.estimate_gas().await?;
+        let deploy_time = TimeIntervalMeasure::new();
+        let contract_address = contract_builder
+            .gas(estimate)
+            .gas_price(base_fee)
+            .deploy()
+            .await?;
+
+        info!(
+            "Deployed contract at address: {:?} took {}ms\n",
+            contract_address.to_string(),
+            deploy_time.measure()
+        );
+
+        p.contract_address = Some(contract_address);
+
+        return Ok((
+            true,
+            format!("CONTRACT_ADDRESS set to {}", contract_address.to_string()),
+        ));
+    }
+    return Ok((false, format!("No provider for network {}", network)));
+}
+
 pub async fn eth_send_to_contract(
     provider: Arc<Mutex<ProviderType>>,
     key: &str,

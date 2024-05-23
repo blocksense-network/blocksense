@@ -1,4 +1,4 @@
-use crate::utils::eth_send_to_contract::eth_batch_send_to_all_contracts;
+use crate::utils::eth_send_utils::eth_batch_send_to_all_contracts;
 use crate::utils::provider::SharedRpcProviders;
 use actix_web::rt::spawn;
 use std::collections::HashMap;

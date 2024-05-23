@@ -6,7 +6,7 @@ use alloy::{
 };
 
 use eyre::Result;
-use sequencer::utils::time_utils::{get_ms_since_epoch, TimeIntervalMeasure};
+use sequencer::utils::time_utils::get_ms_since_epoch;
 use std::sync::{Arc, RwLock};
 
 use actix_web::http::header::ContentType;
@@ -23,9 +23,7 @@ use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::feeds::{
     votes_result_batcher::VotesResultBatcher, votes_result_sender::VotesResultSender,
 };
-use sequencer::utils::{
-    byte_utils::to_hex_string, eth_send_to_contract::DataFeedStoreV1, provider::*,
-};
+use sequencer::utils::{byte_utils::to_hex_string, eth_send_utils::deploy_contract, provider::*};
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 
@@ -44,50 +42,10 @@ use once_cell::sync::Lazy;
 static PROVIDERS: Lazy<SharedRpcProviders> = Lazy::new(|| get_shared_rpc_providers());
 static GLOBAL_LOG_HANDLE: Lazy<SharedLoggingHandle> = Lazy::new(|| get_shared_logging_handle());
 
-async fn deploy_contract(network: &String) -> Result<(bool, String)> {
-    let providers = PROVIDERS
-        .read()
-        .expect("Error locking all providers mutex.");
-
-    let provider = providers.get(network);
-    if let Some(p) = provider.cloned() {
-        drop(providers);
-        let mut p = p.lock().await;
-        let provider = &p.provider;
-
-        // Get the base fee for the block.
-        let base_fee = provider.get_gas_price().await?;
-
-        // Deploy the contract.
-        let contract_builder = DataFeedStoreV1::deploy_builder(provider);
-        let estimate = contract_builder.estimate_gas().await?;
-        let deploy_time = TimeIntervalMeasure::new();
-        let contract_address = contract_builder
-            .gas(estimate)
-            .gas_price(base_fee)
-            .deploy()
-            .await?;
-
-        info!(
-            "Deployed contract at address: {:?} took {}ms\n",
-            contract_address.to_string(),
-            deploy_time.measure()
-        );
-
-        p.contract_address = Some(contract_address);
-
-        return Ok((
-            true,
-            format!("CONTRACT_ADDRESS set to {}", contract_address.to_string()),
-        ));
-    }
-    return Ok((false, format!("No provider for network {}", network)));
-}
-
 async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, String)> {
     let providers = PROVIDERS
         .read()
-        .expect("Error locking all providers mutex.");
+        .expect("Could not lock all providers' lock");
 
     let provider = providers.get(network);
 
@@ -135,7 +93,7 @@ async fn deploy(path: web::Path<String>) -> Result<HttpResponse, Error> {
     let _guard = span.enter();
     let network = path.into_inner();
     info!("Deploying contract for network `{}` ...", network);
-    match deploy_contract(&network).await {
+    match deploy_contract(&network, &PROVIDERS).await {
         Ok((true, result)) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
