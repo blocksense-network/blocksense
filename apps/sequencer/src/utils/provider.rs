@@ -10,6 +10,7 @@ use alloy::{
 };
 use reqwest::{Client, Url};
 
+use super::provider_metrics::ProviderMetrics;
 use envload::Envload;
 use envload::LoadEnv;
 use std::collections::HashMap;
@@ -68,6 +69,7 @@ pub struct RpcProvider {
     pub provider: ProviderType,
     pub wallet: LocalWallet,
     pub contract_address: Option<Address>,
+    pub provider_metrics: ProviderMetrics,
 }
 
 pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
@@ -113,12 +115,14 @@ pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
             Some(x) => parse_contract_address(x),
             None => None,
         };
+
         providers.insert(
             key.to_string(),
             Arc::new(Mutex::new(RpcProvider {
                 contract_address: address,
                 provider,
                 wallet: wallet,
+                provider_metrics: ProviderMetrics::new(key),
             })),
         );
     }

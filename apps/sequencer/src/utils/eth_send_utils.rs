@@ -8,9 +8,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
-use crate::utils::provider::{
-    get_contract_address, get_wallet, ProviderType, RpcProvider, SharedRpcProviders,
-};
+use crate::utils::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::spawn;
 use eyre::eyre;
 use eyre::Report;
@@ -69,88 +67,63 @@ pub async fn deploy_contract(network: &String, providers: &SharedRpcProviders) -
     Err(eyre!("No provider for network {}", network))
 }
 
-pub async fn eth_send_to_contract(
-    provider: Arc<Mutex<ProviderType>>,
-    key: &str,
-    val: &str,
+pub async fn eth_batch_send_to_contract<
+    K: Debug + Clone + std::string::ToString + 'static,
+    V: Debug + Clone + std::string::ToString + 'static,
+>(
+    net: String,
+    provider: Arc<Mutex<RpcProvider>>,
+    updates: HashMap<K, V>,
 ) -> Result<String> {
-    debug!("eth_send_to_contract {} : {}", key, val);
+    let provider = provider.lock().await;
+    let wallet = &provider.wallet;
+    let contract_address = provider
+        .contract_address
+        .expect(format!("Contract address not set for network {}.", net).as_str());
 
-    let mut updates = HashMap::new();
-    updates.insert(key.to_string(), val.to_string());
-    eth_batch_send_to_contract(provider, updates).await
-}
+    info!(
+        "sending data to contract_address `{}` in network `{}`",
+        contract_address, net
+    );
 
-pub async fn eth_batch_send_to_contract(
-    provider: Arc<Mutex<ProviderType>>,
-    updates: HashMap<String, String>,
-) -> Result<String> {
-    debug!("eth_batch_send_to_contract updates: {:?}", updates);
+    let provider_metrix = &provider.provider_metrics;
+    let provider = &provider.provider;
 
-    let collected_futures: FuturesUnordered<
-        tokio::task::JoinHandle<std::prelude::v1::Result<String, Report>>,
-    > = FuturesUnordered::new();
+    let selector = "0x1a2d80ac";
 
-    collected_futures.push(spawn(async move {
-        let wallet = get_wallet(); // Get the contract address.
-        let contract_address = get_contract_address();
-        info!("sending data to contract_address `{}`", contract_address);
+    let mut keys_vals: String = Default::default();
 
-        let provider = provider.lock().await;
-
-        let selector = "0x1a2d80ac";
-
-        let mut keys_vals: String = Default::default();
-
-        for (key, val) in updates.into_iter() {
-            keys_vals += &key;
-            keys_vals += &val;
-        }
-
-        let input = Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()).unwrap();
-
-        let base_fee = provider.get_gas_price().await?;
-        let max_priority_fee_per_gas = provider.get_max_priority_fee_per_gas().await?;
-
-        let tx = TransactionRequest::default()
-            .to(contract_address)
-            .from(wallet.address())
-            .with_gas_limit(2e5 as u128)
-            .with_max_fee_per_gas(base_fee + base_fee)
-            .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
-            .with_chain_id(provider.get_chain_id().await?)
-            .input(Some(input).into());
-
-        info!("tx =  {:?}", tx);
-
-        let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
-        info!("Transaction receipt: {:?}", receipt);
-
-        Ok(receipt.status().to_string())
-    }));
-
-    let result = futures::future::join_all(collected_futures).await;
-    let mut all_results = String::new();
-    for v in result {
-        match v {
-            Ok(res) => {
-                all_results += &match res {
-                    Ok(x) => x,
-                    Err(e) => {
-                        let err = "ReportError:".to_owned() + &e.to_string();
-                        error!(err);
-                        err
-                    }
-                }
-            }
-            Err(e) => {
-                all_results += "JoinError:";
-                all_results += &e.to_string()
-            }
-        }
-        all_results += " "
+    for (key, val) in updates.into_iter() {
+        keys_vals += key.to_string().as_str();
+        keys_vals += val.to_string().as_str();
     }
-    Ok(all_results)
+
+    let input = Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()).unwrap();
+
+    let base_fee = provider.get_gas_price().await?;
+    let max_priority_fee_per_gas = provider.get_max_priority_fee_per_gas().await?;
+
+    let tx = TransactionRequest::default()
+        .to(contract_address)
+        .from(wallet.address())
+        .with_gas_limit(2e5 as u128)
+        .with_max_fee_per_gas(base_fee + base_fee)
+        .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
+        .with_chain_id(provider.get_chain_id().await?)
+        .input(Some(input).into());
+
+    info!("Sending to `{}` tx =  {:?}", net, tx);
+    let tx_time = Instant::now();
+
+    let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
+    info!(
+        "Recvd transaction receipt that took {}ms from `{}`: {:?}",
+        tx_time.elapsed().as_millis(),
+        net,
+        receipt
+    );
+    provider_metrix.total_tx_sent.inc();
+    Ok(receipt.status().to_string())
 }
 
 pub async fn eth_batch_send_to_all_contracts<
@@ -160,7 +133,7 @@ pub async fn eth_batch_send_to_all_contracts<
     providers: SharedRpcProviders,
     updates: HashMap<K, V>,
 ) -> Result<String> {
-    debug!("eth_batch_send_to_contract updates: {:?}", updates);
+    debug!("eth_batch_send_to_all_contracts updates: {:?}", updates);
 
     let providers = providers
         .read()
@@ -179,55 +152,7 @@ pub async fn eth_batch_send_to_all_contracts<
         let updates = updates.clone();
         let provider = p.clone();
         collected_futures.push(spawn(async move {
-            let provider = provider.lock().await;
-            let wallet = &provider.wallet;
-            let contract_address = provider
-                .contract_address
-                .expect(format!("Contract address not set for network {}.", net).as_str());
-
-            info!(
-                "sending data to contract_address `{}` in network `{}`",
-                contract_address, net
-            );
-
-            let provider = &provider.provider;
-
-            let selector = "0x1a2d80ac";
-
-            let mut keys_vals: String = Default::default();
-
-            for (key, val) in updates.into_iter() {
-                keys_vals += &key.to_string();
-                keys_vals += &val.to_string();
-            }
-
-            let input =
-                Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()).unwrap();
-
-            let base_fee = provider.get_gas_price().await?;
-            let max_priority_fee_per_gas = provider.get_max_priority_fee_per_gas().await?;
-
-            let tx = TransactionRequest::default()
-                .to(contract_address)
-                .from(wallet.address())
-                .with_gas_limit(2e5 as u128)
-                .with_max_fee_per_gas(base_fee + base_fee)
-                .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
-                .with_chain_id(provider.get_chain_id().await?)
-                .input(Some(input).into());
-
-            info!("Sending to `{}` tx =  {:?}", net, tx);
-            let tx_time = Instant::now();
-
-            let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
-            info!(
-                "Recvd transaction receipt that took {}ms from `{}`: {:?}",
-                tx_time.elapsed().as_millis(),
-                net,
-                receipt
-            );
-
-            Ok(receipt.status().to_string())
+            eth_batch_send_to_contract(net.clone(), provider, updates).await
         }));
     }
 
