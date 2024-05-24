@@ -8,11 +8,12 @@ use std::{
 use data_feeds::{
     connector::data_feed::{dispatch, DataFeed},
     types::DataFeedAPI,
-    utils::get_env_var,
+    utils::{get_env_var, handle_prometheus_metrics},
 };
 
 use prometheus::{
     register_counter, register_int_counter, register_int_gauge, Counter, IntCounter, IntGauge,
+    TextEncoder,
 };
 
 lazy_static::lazy_static! {
@@ -29,8 +30,6 @@ lazy_static::lazy_static! {
         register_counter!("UPTIME_COUNTER", "Runtime(sec) duration of reporter").unwrap();
 
     static ref BATCH_PARSE_TIME_GAUGE: IntGauge = register_int_gauge!("BATCH_PARSE_TIME_GAUGE", "Time(ms) to parse current batch").unwrap();
-
-
 }
 
 #[tokio::main]
@@ -43,10 +42,16 @@ async fn main() {
 
     let mut connection_cache = HashMap::<DataFeedAPI, Rc<dyn DataFeed>>::new();
 
+    let encoder = TextEncoder::new();
+
     let all_feeds = DataFeedAPI::get_all_feeds();
 
     FEED_COUNTER.inc_by((&all_feeds).len() as u64);
-    println!("Available feed count: {}", FEED_COUNTER.get());
+    println!("Available feed count: {}\n", FEED_COUNTER.get());
+
+    let prometheus_server = reqwest::Client::new();
+    let prometheus_url =
+        get_env_var::<String>("PROMETHEUS_URL").unwrap_or("127.0.0.1:8080".to_string());
 
     loop {
         BATCH_COUNTER.inc();
@@ -62,7 +67,7 @@ async fn main() {
         )
         .await;
 
-        println!("Finished with {}-th batch..", BATCH_COUNTER.get());
+        println!("Finished with {}-th batch..\n", BATCH_COUNTER.get());
 
         let elapsed_time = start_time.elapsed().as_millis();
         if elapsed_time < poll_period_ms.into() {
@@ -72,5 +77,8 @@ async fn main() {
 
         UPTIME_COUNTER.inc_by(poll_period_ms as f64 / 1000.);
         BATCH_PARSE_TIME_GAUGE.set(elapsed_time as i64);
+
+        let _ =
+            handle_prometheus_metrics(&prometheus_server, prometheus_url.as_str(), &encoder).await;
     }
 }

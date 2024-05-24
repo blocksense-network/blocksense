@@ -12,6 +12,7 @@ serde_json = "1.0.115"
 serde = "1.0.197"
 erased-serde = "0.4.4"
 ringbuf = "0.4.0"
+reqwest = "0.12.4"
 
 yahoo_finance_api = "2.1.0"
 cmc = "0.4.4"
@@ -29,7 +30,12 @@ lazy_static = "1.4.0"
 async-trait = "0.1.74"
 
 prometheus = "0.13.4"
+actix-web = "4.5.1"
 
 [[bin]]
 name = "orchestrator"
 path = "bin/orchestrator.rs"
+
+[[bin]]
+name = "launch_prometheus_server"
+path = "bin/actix_server.rs"
