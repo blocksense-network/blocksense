@@ -6,6 +6,9 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
+use prometheus::{Registry, TextEncoder};
+use reqwest::Client;
+
 pub fn current_unix_time() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -30,4 +33,23 @@ pub fn generate_string_hash(string: &String) -> u64 {
     string.as_str().hash(&mut hasher);
 
     hasher.finish()
+}
+
+pub async fn handle_prometheus_metrics(
+    client: &Client,
+    url: &str,
+    encoder: &TextEncoder,
+) -> Result<(), anyhow::Error> {
+    let mut buffer = String::new();
+
+    let metric_families = prometheus::gather();
+    encoder.encode_utf8(&metric_families, &mut buffer).unwrap();
+
+    client.post(url).body(buffer.to_string()).send().await?;
+
+    println! {"{}", buffer};
+
+    // buffer.clear();
+
+    Ok(())
 }
