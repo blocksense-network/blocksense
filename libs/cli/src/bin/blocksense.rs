@@ -1,6 +1,6 @@
 use anyhow::*;
 use blocksense_cli::build_info::*;
-use blocksense_cli::commands::{dev::DevCommands, node::NodeCommands};
+use blocksense_cli::commands::{dev::DevCommands, node::NodeCommands, plugin::PluginCommands};
 use clap::Parser;
 use lazy_static::lazy_static;
 lazy_static! {
@@ -22,6 +22,9 @@ enum BlocksenseApp {
     /// Interface for configuring node operator.
     #[command(subcommand)]
     Node(NodeCommands),
+    /// Manage oracle plugin development
+    #[command(subcommand)]
+    Plugin(PluginCommands),
 }
 
 impl BlocksenseApp {
@@ -29,6 +32,7 @@ impl BlocksenseApp {
         match self {
             Self::Dev(cmd) => cmd.run().await,
             Self::Node(cmd) => cmd.run().await,
+            Self::Plugin(cmd) => cmd.run().await,
         }
     }
 }

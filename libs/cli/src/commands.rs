@@ -8,3 +8,5 @@ pub mod dev;
 pub mod node;
 /// Commands for working with oracle scripts.
 pub mod oracle;
+/// Commands for managing oracle plugin development
+pub mod plugin;
