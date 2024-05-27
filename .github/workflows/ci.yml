@@ -102,7 +102,7 @@ jobs:
         run: yarn install
 
       - name: Build
-        run: yarn workspace @blocksense/docs.blocksense.network build:tsc
+        run: yarn workspace @blocksense/docs.blocksense.network build
 
       - name: Test
         run: yarn workspace @blocksense/docs.blocksense.network test
