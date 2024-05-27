@@ -182,7 +182,7 @@ mod tests {
     use eyre::Result;
     use std::env;
 
-    use crate::utils::provider::get_provider;
+    use crate::providers::provider::get_provider;
 
     #[ignore]
     #[tokio::test]

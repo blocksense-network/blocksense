@@ -26,7 +26,11 @@ use sequencer::feeds::{
     votes_result_batcher::VotesResultBatcher, votes_result_sender::VotesResultSender,
 };
 use sequencer::plugin_registry;
-use sequencer::utils::{byte_utils::to_hex_string, eth_send_utils::deploy_contract, provider::*};
+use sequencer::providers::{
+    eth_send_utils::deploy_contract,
+    provider::{init_shared_rpc_providers, SharedRpcProviders},
+};
+use sequencer::utils::byte_utils::to_hex_string;
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 
