@@ -1,4 +1,5 @@
 use std::{
+    cell::RefCell,
     collections::HashMap,
     rc::Rc,
     thread::sleep,
@@ -40,7 +41,7 @@ async fn main() {
     let sequencer_url: String = get_env_var("SEQUENCER_URL").unwrap();
     let poll_period_ms: u64 = get_env_var("POLL_PERIOD_MS").unwrap();
 
-    let mut connection_cache = HashMap::<DataFeedAPI, Rc<dyn DataFeed>>::new();
+    let mut connection_cache = HashMap::<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>::new();
 
     let encoder = TextEncoder::new();
 
@@ -78,7 +79,7 @@ async fn main() {
         UPTIME_COUNTER.inc_by(poll_period_ms as f64 / 1000.);
         BATCH_PARSE_TIME_GAUGE.set(elapsed_time as i64);
 
-        let _ =
+        let result =
             handle_prometheus_metrics(&prometheus_server, prometheus_url.as_str(), &encoder).await;
     }
 }

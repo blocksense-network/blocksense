@@ -6,7 +6,7 @@ use crate::{
 use async_trait::async_trait;
 use prometheus::{register_int_gauge_vec, IntGaugeVec};
 use rand::{seq::IteratorRandom, thread_rng};
-use std::{collections::HashMap, rc::Rc, time::Instant};
+use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
 use erased_serde::serialize_trait_object;
 
@@ -28,9 +28,14 @@ pub trait DataFeed {
 
     fn score_by(&self) -> ConsensusMetric;
 
-    async fn poll(&self, asset: &str) -> Result<(Box<dyn Payload>, u64), anyhow::Error>;
+    async fn poll(&mut self, asset: &str)
+        -> Result<(Rc<RefCell<dyn Payload>>, u64), anyhow::Error>;
 
-    fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64);
+    fn collect_history(
+        &mut self,
+        response: Rc<RefCell<dyn Payload>>,
+        timestamp: u64,
+    ) -> Option<(Rc<RefCell<dyn Payload>>, u64)>;
 
     //TODO: Implement abstraction for publishing
 
@@ -56,15 +61,15 @@ fn feed_selector(
 
 fn resolve_feed<'a>(
     feed_api: &DataFeedAPI,
-    connection_cache: &'a mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
-) -> Rc<dyn DataFeed> {
+    connection_cache: &'a mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
+) -> Rc<RefCell<dyn DataFeed>> {
     handle_connection_cache(&feed_api, connection_cache)
 }
 
 fn handle_connection_cache<'a>(
     api: &DataFeedAPI,
-    connection_cache: &'a mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
-) -> Rc<dyn DataFeed> {
+    connection_cache: &'a mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
+) -> Rc<RefCell<dyn DataFeed>> {
     if !connection_cache.contains_key(&api) {
         let feed = feed_builder(&api);
         connection_cache.insert(api.to_owned(), feed);
@@ -73,11 +78,11 @@ fn handle_connection_cache<'a>(
     connection_cache.get(&api).unwrap().clone()
 }
 
-fn feed_builder(api: &DataFeedAPI) -> Rc<dyn DataFeed> {
+fn feed_builder(api: &DataFeedAPI) -> Rc<RefCell<dyn DataFeed>> {
     match api {
         DataFeedAPI::EmptyAPI => todo!(),
-        DataFeedAPI::YahooFinance => Rc::new(YahooDataFeed::new()),
-        DataFeedAPI::CoinMarketCap => Rc::new(CoinMarketCapDataFeed::new()),
+        DataFeedAPI::YahooFinance => Rc::new(RefCell::new(YahooDataFeed::new())),
+        DataFeedAPI::CoinMarketCap => Rc::new(RefCell::new(CoinMarketCapDataFeed::new())),
     }
 }
 
@@ -86,7 +91,7 @@ pub async fn dispatch(
     sequencer_url: &str,
     batch_size: &usize,
     feeds: &Vec<(DataFeedAPI, String)>,
-    connection_cache: &mut HashMap<DataFeedAPI, Rc<dyn DataFeed>>,
+    connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
 ) -> () {
     let feed_subset = feed_selector(feeds, batch_size);
 
