@@ -470,7 +470,7 @@ async fn main() -> std::io::Result<()> {
             encoder.encode(&metric_families, &mut buffer).unwrap();
 
             let output = String::from_utf8(buffer.clone()).unwrap();
-            info!(output);
+            info!("Prometheus metrics:\n{}", output);
 
             interval.tick().await;
         }
