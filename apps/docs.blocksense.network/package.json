@@ -2,7 +2,10 @@
   "name": "@blocksense/docs.blocksense.network",
   "version": "0.0.0",
   "scripts": {
+    "build": "yarn build:tsc && next build",
     "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
+    "dev": "next",
+    "start": "next start",
     "test": "yarn vitest -w false"
   },
   "types": "./src/index.ts",
