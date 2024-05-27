@@ -99,8 +99,28 @@ pub async fn eth_batch_send_to_contract<
 
     let input = Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()).unwrap();
 
-    let base_fee = provider.get_gas_price().await?;
-    let max_priority_fee_per_gas = provider.get_max_priority_fee_per_gas().await?;
+    let base_fee = match provider.get_gas_price().await {
+        Ok(res) => res,
+        Err(e) => {
+            provider_metrix.failed_get_gas_price.inc();
+            return Err(e.into());
+        }
+    };
+    provider_metrix.gas_price.observe(base_fee as f64);
+    let max_priority_fee_per_gas = match provider.get_max_priority_fee_per_gas().await {
+        Ok(res) => res,
+        Err(e) => {
+            provider_metrix.failed_get_max_priority_fee_per_gas.inc();
+            return Err(e.into());
+        }
+    };
+    let chain_id = match provider.get_chain_id().await {
+        Ok(res) => res,
+        Err(e) => {
+            provider_metrix.failed_get_chain_id.inc();
+            return Err(e.into());
+        }
+    };
 
     let tx = TransactionRequest::default()
         .to(contract_address)
@@ -108,20 +128,40 @@ pub async fn eth_batch_send_to_contract<
         .with_gas_limit(2e5 as u128)
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
-        .with_chain_id(provider.get_chain_id().await?)
+        .with_chain_id(chain_id)
         .input(Some(input).into());
 
     info!("Sending to `{}` tx =  {:?}", net, tx);
     let tx_time = Instant::now();
 
-    let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
+    let receipt_future = match provider.send_transaction(tx).await {
+        Ok(res) => res,
+        Err(e) => {
+            provider_metrix.failed_send_tx.inc();
+            return Err(e.into());
+        }
+    };
+
+    let receipt = match receipt_future.get_receipt().await {
+        Ok(res) => res,
+        Err(e) => {
+            provider_metrix.failed_get_receipt.inc();
+            return Err(e.into());
+        }
+    };
+    let transaction_time = tx_time.elapsed().as_millis();
     info!(
         "Recvd transaction receipt that took {}ms from `{}`: {:?}",
-        tx_time.elapsed().as_millis(),
-        net,
-        receipt
+        transaction_time, net, receipt
     );
     provider_metrix.total_tx_sent.inc();
+    provider_metrix.gas_used.inc_by(receipt.gas_used as u64);
+    provider_metrix
+        .effective_gas_price
+        .inc_by(receipt.effective_gas_price as u64);
+    provider_metrix
+        .transaction_confirmation_times
+        .observe(transaction_time as f64);
     Ok(receipt.status().to_string())
 }
 
