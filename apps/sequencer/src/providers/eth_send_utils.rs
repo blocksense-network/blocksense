@@ -4,17 +4,16 @@ use alloy::{
 };
 use eyre::Result;
 // use reqwest::Client;
-use std::collections::HashMap;
-use std::sync::Arc;
-use tokio::sync::Mutex;
-
-use crate::utils::provider::{RpcProvider, SharedRpcProviders};
+use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::spawn;
 use eyre::eyre;
 use eyre::Report;
 use futures::stream::FuturesUnordered;
+use std::collections::HashMap;
 use std::fmt::Debug;
+use std::sync::Arc;
 use std::time::Instant;
+use tokio::sync::Mutex;
 use tracing::{debug, error, info};
 
 // Codegen from embedded Solidity code and precompiled bytecode.
