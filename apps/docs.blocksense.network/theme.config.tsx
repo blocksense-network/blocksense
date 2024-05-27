@@ -1,5 +1,7 @@
+import { LogoHeader } from './components/LogoHeader';
+
 export default {
-  logo: <span>Blocksense Network Documentation</span>,
+  logo: LogoHeader,
   project: {
     link: 'https://github.com/blocksense-network/blocksense',
   },
