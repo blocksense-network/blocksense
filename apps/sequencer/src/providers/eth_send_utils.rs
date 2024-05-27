@@ -4,16 +4,17 @@ use alloy::{
 };
 use eyre::Result;
 // use reqwest::Client;
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+
 use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::spawn;
 use eyre::eyre;
 use eyre::Report;
 use futures::stream::FuturesUnordered;
-use std::collections::HashMap;
 use std::fmt::Debug;
-use std::sync::Arc;
 use std::time::Instant;
-use tokio::sync::Mutex;
 use tracing::{debug, error, info};
 
 // Codegen from embedded Solidity code and precompiled bytecode.
@@ -66,6 +67,18 @@ pub async fn deploy_contract(network: &String, providers: &SharedRpcProviders) -
     Err(eyre!("No provider for network {}", network))
 }
 
+macro_rules! process_geter (
+    ($_get: expr, $_provider_metrix: ident, $_metric: ident) => (
+        match $_get {
+            Ok(res) => res,
+            Err(e) => {
+                $_provider_metrix.$_metric.inc();
+                return Err(e.into());
+            },
+        }
+    );
+);
+
 pub async fn eth_batch_send_to_contract<
     K: Debug + Clone + std::string::ToString + 'static,
     V: Debug + Clone + std::string::ToString + 'static,
@@ -99,28 +112,26 @@ pub async fn eth_batch_send_to_contract<
 
     let input = Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()).unwrap();
 
-    let base_fee = match provider.get_gas_price().await {
-        Ok(res) => res,
-        Err(e) => {
-            provider_metrix.failed_get_gas_price.inc();
-            return Err(e.into());
-        }
-    };
+    let base_fee = process_geter!(
+        provider.get_gas_price().await,
+        provider_metrix,
+        failed_get_gas_price
+    );
+
+    debug!("Observed gas price (base_fee) = {}", base_fee);
     provider_metrix.gas_price.observe(base_fee as f64);
-    let max_priority_fee_per_gas = match provider.get_max_priority_fee_per_gas().await {
-        Ok(res) => res,
-        Err(e) => {
-            provider_metrix.failed_get_max_priority_fee_per_gas.inc();
-            return Err(e.into());
-        }
-    };
-    let chain_id = match provider.get_chain_id().await {
-        Ok(res) => res,
-        Err(e) => {
-            provider_metrix.failed_get_chain_id.inc();
-            return Err(e.into());
-        }
-    };
+
+    let max_priority_fee_per_gas = process_geter!(
+        provider.get_max_priority_fee_per_gas().await,
+        provider_metrix,
+        failed_get_max_priority_fee_per_gas
+    );
+
+    let chain_id = process_geter!(
+        provider.get_chain_id().await,
+        provider_metrix,
+        failed_get_chain_id
+    );
 
     let tx = TransactionRequest::default()
         .to(contract_address)
@@ -134,21 +145,18 @@ pub async fn eth_batch_send_to_contract<
     info!("Sending to `{}` tx =  {:?}", net, tx);
     let tx_time = Instant::now();
 
-    let receipt_future = match provider.send_transaction(tx).await {
-        Ok(res) => res,
-        Err(e) => {
-            provider_metrix.failed_send_tx.inc();
-            return Err(e.into());
-        }
-    };
+    let receipt_future = process_geter!(
+        provider.send_transaction(tx).await,
+        provider_metrix,
+        failed_send_tx
+    );
 
-    let receipt = match receipt_future.get_receipt().await {
-        Ok(res) => res,
-        Err(e) => {
-            provider_metrix.failed_get_receipt.inc();
-            return Err(e.into());
-        }
-    };
+    let receipt = process_geter!(
+        receipt_future.get_receipt().await,
+        provider_metrix,
+        failed_get_receipt
+    );
+
     let transaction_time = tx_time.elapsed().as_millis();
     info!(
         "Recvd transaction receipt that took {}ms from `{}`: {:?}",
