@@ -45,9 +45,7 @@ pub async fn handle_prometheus_metrics(
     let metric_families = prometheus::gather();
     encoder.encode_utf8(&metric_families, &mut buffer).unwrap();
 
-    client.post(url).body(buffer.to_string()).send().await?;
-
-    println! {"{}", buffer};
+    let _ = client.post(url).body(buffer.to_string()).send().await?;
 
     // buffer.clear();
 

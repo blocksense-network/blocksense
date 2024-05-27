@@ -1,9 +1,14 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use async_trait::async_trait;
+use ringbuf::traits::RingBuffer;
+use ringbuf::HeapRb;
 use serde::Serialize;
 use yahoo_finance_api::YahooConnector;
 
 use crate::connector::data_feed::Payload;
-use crate::utils::current_unix_time;
+use crate::utils::{current_unix_time, get_env_var};
 use crate::{
     connector::data_feed::DataFeed,
     types::{ConsensusMetric, DataFeedAPI},
@@ -34,7 +39,10 @@ impl DataFeed for YahooDataFeed {
         ConsensusMetric::Mean
     }
 
-    async fn poll(&self, ticker: &str) -> Result<(Box<dyn Payload>, u64), anyhow::Error> {
+    async fn poll(
+        &mut self,
+        ticker: &str,
+    ) -> Result<(Rc<RefCell<dyn Payload>>, u64), anyhow::Error> {
         let response = self
             .api_connector
             .get_latest_quotes(ticker, "1d")
@@ -42,22 +50,26 @@ impl DataFeed for YahooDataFeed {
             .last_quote()
             .unwrap();
 
-        let payload: Box<dyn Payload> = Box::new(YfPayload {
+        let payload: Rc<RefCell<dyn Payload>> = Rc::new(RefCell::new(YfPayload {
             result: response.close,
-        });
+        }));
 
         Ok((payload, current_unix_time()))
     }
 
-    fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64) {
-        self.history_buffer.push((response, timestamp))
+    fn collect_history(
+        &mut self,
+        response: Rc<RefCell<dyn Payload>>,
+        timestamp: u64,
+    ) -> Option<(Rc<RefCell<dyn Payload>>, u64)> {
+        self.history_buffer.push_overwrite((response, timestamp))
     }
 }
 
 pub struct YahooDataFeed {
     api_connector: YahooConnector,
     is_connected: bool,
-    history_buffer: Vec<(Box<dyn Payload>, u64)>,
+    history_buffer: HeapRb<(Rc<RefCell<dyn Payload>>, u64)>,
 }
 
 impl YahooDataFeed {
@@ -65,7 +77,9 @@ impl YahooDataFeed {
         Self {
             api_connector: YahooConnector::new(),
             is_connected: true,
-            history_buffer: Vec::new(),
+            history_buffer: HeapRb::<(Rc<RefCell<dyn Payload>>, u64)>::new(
+                get_env_var("HISTORY_BUFFER_SIZE").unwrap_or(10_000),
+            ),
         }
     }
 }

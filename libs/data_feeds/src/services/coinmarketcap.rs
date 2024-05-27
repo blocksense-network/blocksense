@@ -1,6 +1,10 @@
+use std::{cell::RefCell, rc::Rc};
+
 use async_trait::async_trait;
 use cmc::Cmc;
+use ringbuf::{self, traits::RingBuffer, HeapRb};
 use serde::Serialize;
+use time::serde::timestamp;
 
 use crate::{
     connector::data_feed::{DataFeed, Payload},
@@ -18,7 +22,7 @@ impl Payload for CMCPayload {}
 pub struct CoinMarketCapDataFeed {
     api_connector: Cmc,
     is_connected: bool,
-    history_buffer: Vec<(Box<dyn Payload>, u64)>,
+    history_buffer: HeapRb<(Rc<RefCell<dyn Payload>>, u64)>,
 }
 
 impl CoinMarketCapDataFeed {
@@ -28,7 +32,9 @@ impl CoinMarketCapDataFeed {
         Self {
             api_connector: Cmc::new(cmc_api_key),
             is_connected: true,
-            history_buffer: Vec::new(),
+            history_buffer: HeapRb::<(Rc<RefCell<dyn Payload>>, u64)>::new(
+                get_env_var("HISTORY_BUFFER_SIZE").unwrap_or(10_000),
+            ),
         }
     }
 }
@@ -51,16 +57,26 @@ impl DataFeed for CoinMarketCapDataFeed {
         ConsensusMetric::Mean
     }
 
-    async fn poll(&self, asset: &str) -> Result<(Box<dyn Payload>, u64), anyhow::Error> {
+    async fn poll(
+        &mut self,
+        asset: &str,
+    ) -> Result<(Rc<RefCell<dyn Payload>>, u64), anyhow::Error> {
         let response = self.api_connector.price(asset);
-        let payload: Box<dyn Payload> = Box::new(CMCPayload {
+        let payload = Rc::new(RefCell::new(CMCPayload {
             result: response.unwrap(),
-        });
+        }));
 
-        Ok((payload, current_unix_time()))
+        let unix_ts = current_unix_time();
+
+        self.collect_history(payload.clone(), unix_ts);
+        Ok((payload, unix_ts))
     }
 
-    fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64) {
-        self.history_buffer.push((response, timestamp))
+    fn collect_history(
+        &mut self,
+        response: Rc<RefCell<dyn Payload>>,
+        timestamp: u64,
+    ) -> Option<(Rc<RefCell<dyn Payload>>, u64)> {
+        self.history_buffer.push_overwrite((response, timestamp))
     }
 }

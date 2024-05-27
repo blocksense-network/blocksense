@@ -1,30 +1,35 @@
 use std::{
+    cell::RefCell,
     io::{stdout, Write},
     rc::Rc,
 };
 
-use crate::connector::data_feed::DataFeed;
+use crate::connector::data_feed::{DataFeed, Payload};
 use crate::utils::generate_string_hash;
+use actix_web::web::Json;
 use curl::easy::Easy;
+use erased_serde::Serialize;
 use serde_json::{json, Value};
 
 pub async fn post_api_response(
     reporter_id: &u64,
     base_url: &str,
-    data_feed: Rc<dyn DataFeed>,
+    data_feed: Rc<RefCell<dyn DataFeed>>,
     data_feed_name: &String,
     asset: &str,
 ) {
-    let (result, timestamp) = data_feed.poll(asset).await.unwrap();
+    let (result, timestamp) = data_feed.borrow_mut().poll(asset).await.unwrap();
 
     let feed_hash = generate_string_hash(&data_feed_name);
+
+    let result_cast = result.as_ref();
 
     let payload_json = json!({
         "reporter_id": reporter_id,
         "feed_name": data_feed_name,
         "feed_id": feed_hash,
         "timestamp": timestamp,
-        "result": result,
+        "result": result_cast,
     });
 
     println!("Payload: {:?}", payload_json);
