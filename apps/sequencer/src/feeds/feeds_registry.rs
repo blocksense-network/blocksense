@@ -16,6 +16,13 @@ pub struct FeedMetaData {
     feed_type: Box<dyn FeedProcessing>,
 }
 
+#[derive(PartialEq)]
+pub enum ReportRelevance {
+    Relevant,
+    NonRelevantOld,
+    NonRelevantInFuture,
+}
+
 impl FeedMetaData {
     pub fn new(
         n: &str,
@@ -49,22 +56,25 @@ impl FeedMetaData {
     pub fn get_feed_type(&self) -> &dyn FeedProcessing {
         self.feed_type.as_ref()
     }
-    pub fn check_report_relevance(&self, current_time_as_ms: u128, msg_timestamp: u128) -> bool {
+    pub fn check_report_relevance(
+        &self,
+        current_time_as_ms: u128,
+        msg_timestamp: u128,
+    ) -> ReportRelevance {
         let start_of_voting_round = self.get_first_report_start_time_ms()
             + (self.get_slot(current_time_as_ms) as u128 * self.get_report_interval_ms() as u128);
         let end_of_voting_round = start_of_voting_round + self.get_report_interval_ms() as u128;
 
-        if current_time_as_ms >= start_of_voting_round
-            && current_time_as_ms <= end_of_voting_round
-            && msg_timestamp >= start_of_voting_round
-            && msg_timestamp <= end_of_voting_round
-        {
-            debug!("accepted!");
-            return true;
-        } else {
-            debug!("rejected!");
-            return false;
+        if msg_timestamp < start_of_voting_round {
+            debug!("Rejected report, time stamp is in a past slot!");
+            return ReportRelevance::NonRelevantOld;
         }
+        if msg_timestamp > end_of_voting_round {
+            debug!("Rejected report, time stamp is in a future slot!");
+            return ReportRelevance::NonRelevantInFuture;
+        }
+        debug!("Accepted report!");
+        return ReportRelevance::Relevant;
     }
 }
 
@@ -210,7 +220,9 @@ pub fn get_reporters_for_feed_id_slot(_feed_id: u32, _slot: u64) -> Vec<u32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_with_test_data, AllFeedsReports};
+    use crate::feeds::feeds_registry::{
+        new_feeds_meta_data_reg_with_test_data, AllFeedsReports, ReportRelevance,
+    };
     use crate::utils::time_utils::get_ms_since_epoch;
     use std::sync::Arc;
     use std::sync::RwLock;
@@ -312,7 +324,7 @@ mod tests {
             feed.read()
                 .unwrap()
                 .check_report_relevance(current_time_as_ms, msg_timestamp)
-                == true
+                == ReportRelevance::Relevant
         );
 
         current_time_as_ms += 11 * 1000; // Advance time, the report will become obsolete
@@ -321,7 +333,7 @@ mod tests {
             feed.read()
                 .unwrap()
                 .check_report_relevance(current_time_as_ms, msg_timestamp)
-                == false
+                == ReportRelevance::NonRelevantOld
         );
 
         msg_timestamp += 11 * 1000; // Advance report time to make it relevant
@@ -330,7 +342,7 @@ mod tests {
             feed.read()
                 .unwrap()
                 .check_report_relevance(current_time_as_ms, msg_timestamp)
-                == true
+                == ReportRelevance::Relevant
         );
     }
     #[test]
@@ -362,7 +374,7 @@ mod tests {
                     feed.read()
                         .unwrap()
                         .check_report_relevance(current_time_as_ms, msg_timestamp)
-                        == true
+                        == ReportRelevance::Relevant
                 );
 
                 reports.write().unwrap().push(
