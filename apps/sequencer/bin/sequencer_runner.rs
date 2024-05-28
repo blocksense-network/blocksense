@@ -11,6 +11,7 @@ use sequencer::plugin_registry;
 use sequencer::providers::provider::{init_shared_rpc_providers, SharedRpcProviders};
 use tokio::sync::mpsc;
 
+use sequencer::reporters::reporter::get_shared_reporters;
 use tracing::debug;
 
 use sequencer::http_handlers::http_handlers::{
@@ -39,6 +40,7 @@ async fn main() -> std::io::Result<()> {
         plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
         providers: PROVIDERS.clone(),
         log_handle: GLOBAL_LOG_HANDLE.clone(),
+        reporters: get_shared_reporters(),
     });
 
     let mut feed_managers = Vec::new();

@@ -78,7 +78,7 @@ pub fn init_shared_rpc_providers() -> SharedRpcProviders {
     Arc::new(std::sync::RwLock::new(get_rpc_providers()))
 }
 
-pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
+fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
     let mut urls: HashMap<String, String> = HashMap::new();
     let mut keys: HashMap<String, String> = HashMap::new();
