@@ -3,6 +3,7 @@ use crate::feeds::feeds_registry::AllFeedsReports;
 use crate::feeds::feeds_registry::FeedMetaDataRegistry;
 use crate::plugin_registry::CappedHashMap;
 use crate::providers::provider::SharedRpcProviders;
+use crate::reporters::reporter::SharedReporters;
 use std::sync::{Arc, RwLock};
 
 pub struct FeedsState {
@@ -11,4 +12,5 @@ pub struct FeedsState {
     pub plugin_registry: Arc<RwLock<CappedHashMap>>,
     pub providers: SharedRpcProviders,
     pub log_handle: SharedLoggingHandle,
+    pub reporters: SharedReporters,
 }
