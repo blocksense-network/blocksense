@@ -19,9 +19,8 @@ use futures::StreamExt;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
 use super::super::utils::byte_utils::to_hex_string;
-
 use tracing::info_span;
-use tracing::{debug, error, info, trace};
+use tracing::{debug, error, info, trace, warn};
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
 
@@ -74,6 +73,23 @@ pub async fn index_post(
             return Ok(HttpResponse::BadRequest().into());
         }
     };
+
+    {
+        let reporters = app_state.reporters.read().unwrap();
+        let reporter = reporters.get_key_value(&reporter_id);
+        match reporter {
+            Some(_x) => {
+                //TODO: Check signature of vote!
+            }
+            None => {
+                warn!(
+                    "Recvd vote from reporter with unregistered ID = {}!",
+                    reporter_id
+                );
+                return Ok(HttpResponse::BadRequest().into());
+            }
+        }
+    }
 
     let msg_timestamp = match v["timestamp"].to_string().parse::<u128>() {
         Ok(x) => x,
