@@ -81,7 +81,7 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
                       4: 'ltr:nx-pl-8 rtl:nx-pr-8',
                       5: 'ltr:nx-pl-12 rtl:nx-pr-12',
                       6: 'ltr:nx-pl-16 rtl:nx-pr-16',
-                    }[depth as Exclude<typeof depth, 1>],
+                    }[depth as Exclude<typeof depth, 1> as number],
                     'nx-inline-block',
                     activeAnchor[id]?.isActive
                       ? 'nx-text-primary-600 nx-subpixel-antialiased contrast-more:!nx-text-primary-600'
