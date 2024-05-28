@@ -119,7 +119,9 @@ pub async fn eth_batch_send_to_contract<
     );
 
     debug!("Observed gas price (base_fee) = {}", base_fee);
-    provider_metrix.gas_price.observe(base_fee as f64);
+    provider_metrix
+        .gas_price
+        .observe((base_fee as f64) / 1000000000.0);
 
     let max_priority_fee_per_gas = process_geter!(
         provider.get_max_priority_fee_per_gas().await,

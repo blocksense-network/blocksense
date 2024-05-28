@@ -39,13 +39,7 @@ use sequencer::utils::logging::{init_shared_logging_handle, SharedLoggingHandle}
 use tracing::info_span;
 use tracing::{debug, error, info, trace};
 
-//TODO:rm when refactored
-use actix_web::rt::spawn;
-use actix_web::rt::time;
-use prometheus::Encoder;
-use prometheus::TextEncoder;
-use tokio::time::Duration;
-//ENDTODO
+use sequencer::metrics_collector::metrics_collector::MetricsCollector;
 
 //TODO: add schema for feed update
 #[derive(Serialize, Deserialize)]
@@ -457,24 +451,7 @@ async fn main() -> std::io::Result<()> {
 
     let _votes_sender = VotesResultSender::new(batched_votes_recv, PROVIDERS.clone());
 
-    spawn(async move {
-        let mut interval = time::interval(Duration::from_millis(5000));
-        interval.tick().await;
-        loop {
-            let mut buffer = Vec::new();
-            let encoder = TextEncoder::new();
-
-            // Gather the metrics.
-            let metric_families = prometheus::gather();
-            // Encode them to send.
-            encoder.encode(&metric_families, &mut buffer).unwrap();
-
-            let output = String::from_utf8(buffer.clone()).unwrap();
-            info!("Prometheus metrics:\n{}", output);
-
-            interval.tick().await;
-        }
-    });
+    let _metrics_collector = MetricsCollector::new();
 
     HttpServer::new(move || {
         App::new()
