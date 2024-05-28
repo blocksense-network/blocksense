@@ -20,6 +20,7 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v11
+        if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
 
@@ -48,6 +49,7 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v11
+        if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
 
@@ -85,6 +87,7 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v11
+        if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
 
@@ -116,6 +119,7 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v11
+        if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
 
@@ -144,6 +148,7 @@ jobs:
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v11
+        if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
 
