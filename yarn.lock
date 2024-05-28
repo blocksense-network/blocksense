@@ -310,9 +310,36 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blocksense/blocksense.network.docs.theme@workspace:libs/blocksense.network.docs.theme":
+"@blocksense/contracts@workspace:libs/contracts":
   version: 0.0.0-use.local
-  resolution: "@blocksense/blocksense.network.docs.theme@workspace:libs/blocksense.network.docs.theme"
+  resolution: "@blocksense/contracts@workspace:libs/contracts"
+  dependencies:
+    "@nomicfoundation/hardhat-chai-matchers": "npm:^2.0.6"
+    "@nomicfoundation/hardhat-ethers": "npm:^3.0.6"
+    "@nomicfoundation/hardhat-network-helpers": "npm:^1.0.10"
+    "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
+    "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
+    "@openzeppelin/contracts": "npm:^5.0.2"
+    "@typechain/ethers-v6": "npm:^0.5.1"
+    "@typechain/hardhat": "npm:^9.1.0"
+    "@types/chai": "npm:4"
+    "@types/mocha": "npm:^10.0.6"
+    "@types/node": "npm:^20.12.12"
+    chai: "npm:4"
+    dotenv: "npm:^16.4.5"
+    ethers: "npm:^6.12.1"
+    hardhat: "npm:^2.22.4"
+    hardhat-contract-sizer: "npm:^2.10.0"
+    hardhat-gas-reporter: "npm:^2.1.1"
+    solidity-coverage: "npm:^0.8.12"
+    ts-node: "npm:^10.9.2"
+    typechain: "npm:^8.3.2"
+  languageName: unknown
+  linkType: soft
+
+"@blocksense/docs-theme@workspace:*, @blocksense/docs-theme@workspace:libs/docs-theme":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/docs-theme@workspace:libs/docs-theme"
   dependencies:
     "@headlessui/react": "npm:^1.7.17"
     "@popperjs/core": "npm:^2.11.8"
@@ -356,42 +383,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/contracts@workspace:libs/contracts":
-  version: 0.0.0-use.local
-  resolution: "@blocksense/contracts@workspace:libs/contracts"
-  dependencies:
-    "@nomicfoundation/hardhat-chai-matchers": "npm:^2.0.6"
-    "@nomicfoundation/hardhat-ethers": "npm:^3.0.6"
-    "@nomicfoundation/hardhat-network-helpers": "npm:^1.0.10"
-    "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
-    "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
-    "@openzeppelin/contracts": "npm:^5.0.2"
-    "@typechain/ethers-v6": "npm:^0.5.1"
-    "@typechain/hardhat": "npm:^9.1.0"
-    "@types/chai": "npm:4"
-    "@types/mocha": "npm:^10.0.6"
-    "@types/node": "npm:^20.12.12"
-    chai: "npm:4"
-    dotenv: "npm:^16.4.5"
-    ethers: "npm:^6.12.1"
-    hardhat: "npm:^2.22.4"
-    hardhat-contract-sizer: "npm:^2.10.0"
-    hardhat-gas-reporter: "npm:^2.1.1"
-    solidity-coverage: "npm:^0.8.12"
-    ts-node: "npm:^10.9.2"
-    typechain: "npm:^8.3.2"
-  languageName: unknown
-  linkType: soft
-
 "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network":
   version: 0.0.0-use.local
   resolution: "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network"
   dependencies:
+    "@blocksense/docs-theme": "workspace:*"
     "@types/node": "npm:^20.12.12"
     "@types/react": "npm:^18.3.3"
     next: "npm:^14.2.3"
     nextra: "npm:^2.13.4"
-    nextra-theme-docs: "npm:^2.13.4"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     tslib: "npm:^2.6.2"
@@ -8637,32 +8637,6 @@ __metadata:
   bin:
     next: dist/bin/next
   checksum: 10c0/2c409154720846d07a7a995cc3bfba24b9ee73c87360ce3266528c8a217f5f1ab6f916cffbe1be83509b4e8d7b1d713921bb5c69338b4ecaa57df3212f79a8c5
-  languageName: node
-  linkType: hard
-
-"nextra-theme-docs@npm:^2.13.4":
-  version: 2.13.4
-  resolution: "nextra-theme-docs@npm:2.13.4"
-  dependencies:
-    "@headlessui/react": "npm:^1.7.17"
-    "@popperjs/core": "npm:^2.11.8"
-    clsx: "npm:^2.0.0"
-    escape-string-regexp: "npm:^5.0.0"
-    flexsearch: "npm:^0.7.31"
-    focus-visible: "npm:^5.2.0"
-    git-url-parse: "npm:^13.1.0"
-    intersection-observer: "npm:^0.12.2"
-    match-sorter: "npm:^6.3.1"
-    next-seo: "npm:^6.0.0"
-    next-themes: "npm:^0.2.1"
-    scroll-into-view-if-needed: "npm:^3.1.0"
-    zod: "npm:^3.22.3"
-  peerDependencies:
-    next: ">=9.5.3"
-    nextra: 2.13.4
-    react: ">=16.13.1"
-    react-dom: ">=16.13.1"
-  checksum: 10c0/3c8711391a771878370db9e71296d700f30fdcc31a1c739eac1f586b12b0d7960326f5e4a75e1b7c3ffc16734bc2c98347b001734e6e607f0f89efa2ac0e84d2
   languageName: node
   linkType: hard
 
