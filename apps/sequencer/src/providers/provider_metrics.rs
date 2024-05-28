@@ -29,7 +29,7 @@ impl ProviderMetrics {
             .unwrap(),
             effective_gas_price: register_int_counter!(
                 format!("{}_effective_gas_price", net),
-                format!("Total amount of wei spend for network {}", net)
+                format!("Total amount of Wei spend for network {}", net)
             )
             .unwrap(),
             transaction_confirmation_times: register_histogram!(
@@ -37,15 +37,17 @@ impl ProviderMetrics {
                 format!(
                     "Histogram tracking the time it took for update transaction to be confirmed {}",
                     net
-                )
+                ),
+                (1..).take(40).map(|x| x as f64 * 15000.0).collect()
             )
             .unwrap(),
             gas_price: register_histogram!(
                 format!("{}_gas_price", net),
                 format!(
-                    "Histogram tracking the gas price reported by the provider {}",
+                    "Histogram tracking the gas price in Giga Wei reported by the provider {}",
                     net
-                )
+                ),
+                (1..).take(40).map(|x| x as f64).collect()
             )
             .unwrap(),
             failed_send_tx: register_int_counter!(
