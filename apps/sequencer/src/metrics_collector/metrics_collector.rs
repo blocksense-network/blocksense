@@ -11,7 +11,7 @@ pub struct MetricsCollector {}
 impl MetricsCollector {
     pub fn new() -> MetricsCollector {
         spawn(async move {
-            let mut interval = time::interval(Duration::from_millis(5000));
+            let mut interval = time::interval(Duration::from_millis(60000));
             interval.tick().await;
             loop {
                 let mut buffer = Vec::new();
