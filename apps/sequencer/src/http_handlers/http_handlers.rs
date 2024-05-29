@@ -22,6 +22,8 @@ use super::super::utils::byte_utils::to_hex_string;
 use tracing::info_span;
 use tracing::{debug, error, info, trace, warn};
 
+use crate::inc_reporter_metric;
+
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
 
 #[post("/{name}")]
@@ -46,6 +48,34 @@ pub async fn index_post(
     debug!("body = {:?}!", body);
 
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
+
+    let reporter_id = match v["reporter_id"].to_string().parse::<u64>() {
+        Ok(x) => x,
+        Err(_) => {
+            return Ok(HttpResponse::BadRequest().into());
+        }
+    };
+
+    let feed_id = get_feed_id(v["feed_id"].to_string().as_str());
+
+    let reporter = {
+        let reporters = app_state.reporters.read().unwrap();
+        let reporter = reporters.get_key_value(&reporter_id);
+        match reporter {
+            Some(x) => {
+                //TODO: Check signature of vote!
+                x.1.clone()
+            }
+            None => {
+                warn!(
+                    "Recvd vote from reporter with unregistered ID = {}!",
+                    reporter_id
+                );
+                return Ok(HttpResponse::BadRequest().into());
+            }
+        }
+    };
+
     let result_hex = match v["result"].to_string().parse::<f32>() {
         Ok(x) => {
             let mut res = x.to_be_bytes().to_vec();
@@ -59,41 +89,17 @@ pub async fn index_post(
                     .chars()
                     .all(|arg0: char| char::is_ascii_hexdigit(&arg0))
             {
+                inc_reporter_metric!(reporter, unrecognized_result_format);
                 return Ok(HttpResponse::BadRequest().into());
             }
             value
         }
     };
 
-    let feed_id = get_feed_id(v["feed_id"].to_string().as_str());
-
-    let reporter_id = match v["reporter_id"].to_string().parse::<u64>() {
-        Ok(x) => x,
-        Err(_) => {
-            return Ok(HttpResponse::BadRequest().into());
-        }
-    };
-
-    {
-        let reporters = app_state.reporters.read().unwrap();
-        let reporter = reporters.get_key_value(&reporter_id);
-        match reporter {
-            Some(_x) => {
-                //TODO: Check signature of vote!
-            }
-            None => {
-                warn!(
-                    "Recvd vote from reporter with unregistered ID = {}!",
-                    reporter_id
-                );
-                return Ok(HttpResponse::BadRequest().into());
-            }
-        }
-    }
-
     let msg_timestamp = match v["timestamp"].to_string().parse::<u128>() {
         Ok(x) => x,
         Err(_) => {
+            inc_reporter_metric!(reporter, json_scheme_error);
             return Ok(HttpResponse::BadRequest().into());
         }
     };
@@ -104,18 +110,21 @@ pub async fn index_post(
         feed_id,
         reporter_id
     );
-    let feed;
-    {
+    let feed = {
         let reg = app_state
             .registry
             .read()
             .expect("Error trying to lock Registry for read!");
         debug!("getting feed_id = {}", &feed_id);
-        feed = match reg.get(feed_id.into()) {
+        match reg.get(feed_id.into()) {
             Some(x) => x,
-            None => return Ok(HttpResponse::BadRequest().into()),
-        };
-    }
+            None => {
+                drop(reg);
+                inc_reporter_metric!(reporter, non_valid_feed_id_reports);
+                return Ok(HttpResponse::BadRequest().into());
+            }
+        }
+    };
 
     let current_time_as_ms = get_ms_since_epoch();
 
@@ -132,14 +141,18 @@ pub async fn index_post(
                 .reports
                 .write()
                 .expect("Error trying to lock Reports for read!");
-            reports.push(feed_id.into(), reporter_id, result_hex);
+            if reports.push(feed_id.into(), reporter_id, result_hex) {
+                inc_reporter_metric!(reporter, total_accepted_feed_votes);
+            } else {
+                inc_reporter_metric!(reporter, total_revotes_for_same_slot);
+            }
             return Ok(HttpResponse::Ok().into()); // <- send response
         }
         ReportRelevance::NonRelevantOld => {
-            //TODO: update metric
+            inc_reporter_metric!(reporter, late_reports);
         }
         ReportRelevance::NonRelevantInFuture => {
-            //TODO: update metric
+            inc_reporter_metric!(reporter, reports_in_future);
         }
     }
     Ok(HttpResponse::BadRequest().into())

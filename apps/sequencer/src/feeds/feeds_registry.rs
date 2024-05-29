@@ -185,17 +185,19 @@ impl AllFeedsReports {
             reports: HashMap::new(),
         }
     }
-    pub fn push(&mut self, feed_id: u32, reporter_id: u64, data: String) {
+    pub fn push(&mut self, feed_id: u32, reporter_id: u64, data: String) -> bool {
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
             }))
         }); //TODO: Reject votes for unregistered feed ID-s
-        let mut res: std::sync::RwLockWriteGuard<'_, FeedReports> = res.write().unwrap();
+        let mut res = res.write().unwrap();
         if !res.report.contains_key(&reporter_id) {
             // Stick to first vote from a reporter.
             res.report.insert(reporter_id, data);
+            return true;
         }
+        false
     }
     pub fn get(&self, feed_id: u32) -> Option<Arc<RwLock<FeedReports>>> {
         self.reports.get(&feed_id).cloned()
