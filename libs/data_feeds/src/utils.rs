@@ -45,9 +45,15 @@ pub async fn handle_prometheus_metrics(
     let metric_families = prometheus::gather();
     encoder.encode_utf8(&metric_families, &mut buffer).unwrap();
 
-    let _ = client.post(url).body(buffer.to_string()).send().await?;
-
-    // buffer.clear();
+    let _ = client
+        .post(format!(
+            "{}{}/push",
+            "http://",
+            get_env_var("PROMETHEUS_URL_CLIENT").unwrap_or("127.0.0.1:8080".to_string())
+        ))
+        .body(buffer.to_string())
+        .send()
+        .await?;
 
     Ok(())
 }
