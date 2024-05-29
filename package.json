@@ -1,6 +1,6 @@
 {
   "name": "@blocksense/monorepo",
-  "packageManager": "yarn@4.1.1",
+  "packageManager": "yarn@4.2.2",
   "workspaces": [
     "apps/*",
     "libs/*"
