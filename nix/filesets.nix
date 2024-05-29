@@ -8,7 +8,7 @@ in
       fileset = unions [
         (root + "/Cargo.toml")
         (root + "/Cargo.lock")
-        (fileFilter (file: builtins.any file.hasExt ["rs" "toml"]) root)
+        (fileFilter (file: builtins.any file.hasExt ["rs" "toml" "wit"]) root)
       ];
       src = toSource {
         inherit root fileset;

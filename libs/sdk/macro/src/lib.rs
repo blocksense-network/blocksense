@@ -48,15 +48,14 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 fn preamble() -> proc_macro2::TokenStream {
-    let world = quote!("blocksense-oracle");
-    let export_decl = quote!(world: BlocksenseOracle);
+    let world = "blocksense-oracle";
     quote! {
         #![allow(missing_docs)]
         ::blocksense_sdk::wit_bindgen::generate!({
             world: #world,
             path: #WIT_PATH,
             exports: {
-                #export_decl
+                world: BlocksenseOracle
             }
         });
         pub struct BlocksenseOracle;
