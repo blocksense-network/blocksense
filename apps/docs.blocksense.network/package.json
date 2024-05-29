@@ -6,6 +6,7 @@
     "build": "yarn build:tsc && yarn build:deps && next build",
     "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
     "dev": "next",
+    "ready-dev-go": "yarn build && yarn dev",
     "start": "next start",
     "test": "yarn vitest -w false"
   },
