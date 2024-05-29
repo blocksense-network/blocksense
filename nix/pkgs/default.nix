@@ -19,7 +19,7 @@
 
     blocksense-rs = pkgs.callPackage ./blocksense-rs {
       inherit (self.lib) filesets;
-      inherit rustPlatform;
+      inherit craneLib;
     };
 
     mkApp = package: exeName: {
