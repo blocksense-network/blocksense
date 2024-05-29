@@ -52,7 +52,7 @@ async fn main() {
 
     let prometheus_server = reqwest::Client::new();
     let prometheus_url =
-        get_env_var::<String>("PROMETHEUS_URL").unwrap_or("127.0.0.1:8080".to_string());
+        get_env_var::<String>("PROMETHEUS_URL_CLIENT").unwrap_or("127.0.0.1:8080".to_string());
 
     loop {
         BATCH_COUNTER.inc();

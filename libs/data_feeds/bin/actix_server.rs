@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
             .service(push_to_buffer)
             .service(pull_buffer)
     })
-    .bind(get_env_var::<String>("PROMETHEUS_URL").unwrap_or("127.0.0.1:8080".to_string()))?
+    .bind(get_env_var::<String>("PROMETHEUS_URL_SERVER").unwrap_or("0.0.0.0:8080".to_string()))?
     .run()
     .await
 }
