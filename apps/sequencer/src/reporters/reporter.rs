@@ -20,6 +20,19 @@ macro_rules! inc_reporter_metric (
     );
 );
 
+#[macro_export]
+macro_rules! inc_reporter_vec_metric (
+    ($_reporter: ident, $_metric: ident, $_index: ident) => (
+        $_reporter
+        .read() // Holding a read lock here suffice, since the counters are atomic.
+        .unwrap()
+        .reporter_metrics
+        .$_metric
+        .with_label_values(&[&$_index.to_string()])
+        .inc();
+    );
+);
+
 pub type SharedReporters = Arc<RwLock<HashMap<u64, Arc<RwLock<Reporter>>>>>;
 
 pub fn get_shared_reporters() -> SharedReporters {

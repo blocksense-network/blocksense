@@ -1,14 +1,17 @@
-use prometheus::{self, register_histogram, register_int_counter, Histogram, IntCounter};
+use prometheus::{
+    self, register_histogram, register_int_counter, register_int_counter_vec, Histogram,
+    IntCounter, IntCounterVec,
+};
 
 #[derive(Debug)]
 pub struct ReporterMetrics {
     pub unrecognized_result_format: IntCounter,
     pub json_scheme_error: IntCounter,
-    pub late_reports: IntCounter,
-    pub reports_in_future: IntCounter,
     pub non_valid_feed_id_reports: IntCounter,
-    pub total_accepted_feed_votes: IntCounter,
-    pub total_revotes_for_same_slot: IntCounter,
+    pub timely_reports_per_feed: IntCounterVec,
+    pub late_reports_per_feed: IntCounterVec,
+    pub in_future_reports_per_feed: IntCounterVec,
+    pub total_revotes_for_same_slot_per_feed: IntCounterVec,
 }
 
 impl ReporterMetrics {
@@ -30,22 +33,6 @@ impl ReporterMetrics {
                 ),
             )
             .unwrap(),
-            late_reports: register_int_counter!(
-                format!("reporter_{}_num_late_reports", id),
-                format!(
-                    "Total recvd reports for a past slot from reporter id {}",
-                    id
-                ),
-            )
-            .unwrap(),
-            reports_in_future: register_int_counter!(
-                format!("reporter_{}_num_reports_in_future", id),
-                format!(
-                    "Total recvd reports for a future slot from reporter id {}",
-                    id
-                ),
-            )
-            .unwrap(),
             non_valid_feed_id_reports: register_int_counter!(
                 format!("reporter_{}_non_valid_feed_id_reports", id),
                 format!(
@@ -54,20 +41,40 @@ impl ReporterMetrics {
                 ),
             )
             .unwrap(),
-            total_accepted_feed_votes: register_int_counter!(
-                format!("reporter_{}_total_accepted_feed_votes", id),
+            timely_reports_per_feed: register_int_counter_vec!(
+                format!("reporter_{}_timely_reports_per_feed", id),
                 format!(
-                    "Total accepted (valid) feed reports from reporter id {}",
+                    "Per feed accepted (valid) feed reports from reporter id {}",
                     id
                 ),
+                &["FeedId"]
             )
             .unwrap(),
-            total_revotes_for_same_slot: register_int_counter!(
-                format!("reporter_{}_total_revotes_for_same_slot", id),
+            late_reports_per_feed: register_int_counter_vec!(
+                format!("reporter_{}_late_reporte_per_feed", id),
                 format!(
-                    "Total recvd votes for the same slot from reporter id {}",
+                    "Per feed recvd reports for a past slot from reporter id {}",
                     id
                 ),
+                &["FeedId"]
+            )
+            .unwrap(),
+            in_future_reports_per_feed: register_int_counter_vec!(
+                format!("reporter_{}_in_future_reports_per_feed", id),
+                format!(
+                    "Per feed recvd reports for a future slot from reporter id {}",
+                    id
+                ),
+                &["FeedId"]
+            )
+            .unwrap(),
+            total_revotes_for_same_slot_per_feed: register_int_counter_vec!(
+                format!("reporter_{}_total_revotes_for_same_slot_per_feed", id),
+                format!(
+                    "Total recvd revotes for the same slot from reporter id {}",
+                    id
+                ),
+                &["FeedId"]
             )
             .unwrap(),
         }
