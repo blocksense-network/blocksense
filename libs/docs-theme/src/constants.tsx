@@ -229,23 +229,23 @@ export const DEFAULT_THEME: DocsThemeConfig = {
   },
   footer: {
     component: Footer,
-    text: `MIT ${new Date().getFullYear()} © Nextra.`,
+    text: `${new Date().getFullYear()} © Blocksense`,
   },
-  gitTimestamp: function GitTimestamp({ timestamp }) {
-    const { locale = DEFAULT_LOCALE } = useRouter();
-    return (
-      <>
-        Last updated on{' '}
-        <time dateTime={timestamp.toISOString()}>
-          {timestamp.toLocaleDateString(locale, {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}
-        </time>
-      </>
-    );
-  },
+  // gitTimestamp: function GitTimestamp({ timestamp }) {
+  //   const { locale = DEFAULT_LOCALE } = useRouter();
+  //   return (
+  //     <>
+  //       Last updated on{' '}
+  //       <time dateTime={timestamp.toISOString()}>
+  //         {timestamp.toLocaleDateString(locale, {
+  //           day: 'numeric',
+  //           month: 'long',
+  //           year: 'numeric',
+  //         })}
+  //       </time>
+  //     </>
+  //   );
+  // },
   head: (
     <>
       <meta name="msapplication-TileColor" content="#fff" />
@@ -335,7 +335,7 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     toggleButton: false,
   },
   themeSwitch: {
-    component: ThemeSwitch,
+    // component: ThemeSwitch,
     useOptions() {
       const { locale } = useRouter();
 
