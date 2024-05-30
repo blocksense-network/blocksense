@@ -6,7 +6,7 @@ export default {
     link: 'https://github.com/blocksense-network/blocksense',
   },
   docsRepositoryBase: 'https://github.com/blocksense-network/blocksense',
-  editLink: '',
+  // editLink: '',
 
   // ... other theme options
 };
