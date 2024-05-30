@@ -23,6 +23,7 @@ use tracing::info_span;
 use tracing::{debug, error, info, trace, warn};
 
 use crate::inc_reporter_metric;
+use crate::inc_reporter_vec_metric;
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
 
@@ -116,7 +117,7 @@ pub async fn index_post(
             .read()
             .expect("Error trying to lock Registry for read!");
         debug!("getting feed_id = {}", &feed_id);
-        match reg.get(feed_id.into()) {
+        match reg.get(feed_id) {
             Some(x) => x,
             None => {
                 drop(reg);
@@ -141,18 +142,34 @@ pub async fn index_post(
                 .reports
                 .write()
                 .expect("Error trying to lock Reports for read!");
-            if reports.push(feed_id.into(), reporter_id, result_hex) {
-                inc_reporter_metric!(reporter, total_accepted_feed_votes);
+            if reports.push(feed_id, reporter_id, result_hex) {
+                debug!(
+                    "Recvd timely vote from reporter_id = {} for feed_id = {}",
+                    reporter_id, feed_id
+                );
+                inc_reporter_vec_metric!(reporter, timely_reports_per_feed, feed_id);
             } else {
-                inc_reporter_metric!(reporter, total_revotes_for_same_slot);
+                debug!(
+                    "Recvd revote from reporter_id = {} for feed_id = {}",
+                    reporter_id, feed_id
+                );
+                inc_reporter_vec_metric!(reporter, total_revotes_for_same_slot_per_feed, feed_id);
             }
             return Ok(HttpResponse::Ok().into()); // <- send response
         }
         ReportRelevance::NonRelevantOld => {
-            inc_reporter_metric!(reporter, late_reports);
+            debug!(
+                "Recvd late vote from reporter_id = {} for feed_id = {}",
+                reporter_id, feed_id
+            );
+            inc_reporter_vec_metric!(reporter, late_reports_per_feed, feed_id);
         }
         ReportRelevance::NonRelevantInFuture => {
-            inc_reporter_metric!(reporter, reports_in_future);
+            debug!(
+                "Recvd vote for future slot from reporter_id = {} for feed_id = {}",
+                reporter_id, feed_id
+            );
+            inc_reporter_vec_metric!(reporter, in_future_reports_per_feed, feed_id);
         }
     }
     Ok(HttpResponse::BadRequest().into())
