@@ -2,10 +2,7 @@ use anyhow::Result;
 use blocksense_sdk::{
     oracle::{Payload, Settings},
     oracle_component,
-    spin::{
-        http::{send, Method, Request, Response},
-        variables,
-    },
+    spin::http::{send, Method, Request, Response},
 };
 use serde::Deserialize;
 use url::Url;

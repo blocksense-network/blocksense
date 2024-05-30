@@ -8,7 +8,7 @@ DIR="$ROOT/libs/sdk/trigger-oracle"
 (cd "$DIR"; cargo build --release)
 
 tar czf "$DIR/trigger-oracle.tar.gz" -C "$ROOT/target/release" ./trigger-oracle
-HASH=$(shasum -a 256 $DIR/trigger-oracle.tar.gz | cut -d' ' -f 1)
+HASH=$(sha256sum $DIR/trigger-oracle.tar.gz | cut -d' ' -f 1)
 
 cat > $DIR/trigger-oracle.json << EOF
 {
