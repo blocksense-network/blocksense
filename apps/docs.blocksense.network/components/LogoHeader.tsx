@@ -8,7 +8,7 @@ export const LogoHeader = () => {
         alt="Blocksense Logo"
         style={styles.logo}
       />
-      <h1 style={styles.text}>Blocksense Network Documentation</h1>
+      <h1 style={styles.text}>Blocksense</h1>
     </div>
   );
 };
