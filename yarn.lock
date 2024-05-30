@@ -324,13 +324,13 @@ __metadata:
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4"
     "@types/mocha": "npm:^10.0.6"
-    "@types/node": "npm:^20.12.12"
+    "@types/node": "npm:^20.12.13"
     chai: "npm:4"
     dotenv: "npm:^16.4.5"
     ethers: "npm:^6.12.1"
     hardhat: "npm:^2.22.4"
     hardhat-contract-sizer: "npm:^2.10.0"
-    hardhat-gas-reporter: "npm:^2.1.1"
+    hardhat-gas-reporter: "npm:^2.2.0"
     solidity-coverage: "npm:^0.8.12"
     ts-node: "npm:^10.9.2"
     typechain: "npm:^8.3.2"
@@ -361,7 +361,7 @@ __metadata:
     match-sorter: "npm:^6.3.1"
     next: "npm:^13.5.6"
     next-seo: "npm:^6.0.0"
-    next-themes: "npm:^0.2.1"
+    next-themes: "npm:^0.3.0"
     nextra: "npm:^2.13.4"
     postcss: "npm:^8.4.31"
     postcss-cli: "npm:^10.1.0"
@@ -372,7 +372,7 @@ __metadata:
     scroll-into-view-if-needed: "npm:^3.1.0"
     tailwindcss: "npm:^3.3.3"
     tsup: "npm:7.2.0"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.4.5"
     vitest: "npm:^0.34.0"
     zod: "npm:^3.22.3"
   peerDependencies:
@@ -388,7 +388,7 @@ __metadata:
   resolution: "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network"
   dependencies:
     "@blocksense/docs-theme": "workspace:*"
-    "@types/node": "npm:^20.12.12"
+    "@types/node": "npm:^20.12.13"
     "@types/react": "npm:^18.3.3"
     next: "npm:^14.2.3"
     nextra: "npm:^2.13.4"
@@ -2496,12 +2496,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.12.12":
-  version: 20.12.12
-  resolution: "@types/node@npm:20.12.12"
+"@types/node@npm:^20.12.13":
+  version: 20.12.13
+  resolution: "@types/node@npm:20.12.13"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/f374b763c744e8f16e4f38cf6e2c0eef31781ec9228c9e43a6f267880fea420fab0a238b59f10a7cb3444e49547c5e3785787e371fc242307310995b21988812
+  checksum: 10c0/2ac92bb631dbddfb560eb3ba4eedbb1c688044a0130bc1ef032f5c0f20148ac7c9aa3c5aaa5a9787b6c4c6299847d754b96ee8c9def951481ba6628c46b683f5
   languageName: node
   linkType: hard
 
@@ -5778,9 +5778,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat-gas-reporter@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "hardhat-gas-reporter@npm:2.1.1"
+"hardhat-gas-reporter@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "hardhat-gas-reporter@npm:2.2.0"
   dependencies:
     "@ethersproject/abi": "npm:^5.7.0"
     "@ethersproject/bytes": "npm:^5.7.0"
@@ -5799,7 +5799,7 @@ __metadata:
     viem: "npm:2.7.14"
   peerDependencies:
     hardhat: ^2.16.0
-  checksum: 10c0/5bd5b937e7af3507b7d29f99c17fc0648da1d72c4190ea26ef3be05b78c576a765cb5aa400703b51d0bf0a232a8383ec7fc100aed7571ac65825fce29ceed0e3
+  checksum: 10c0/50081277ab219b6c9748ef4f87b5a4bffc3e7b6293029e3c54ef105ec993204745b9eb86c6488afd321a8143c03210a7664a7206603fe8d229b5af42b0b492f7
   languageName: node
   linkType: hard
 
@@ -8516,14 +8516,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-themes@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "next-themes@npm:0.2.1"
+"next-themes@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "next-themes@npm:0.3.0"
   peerDependencies:
-    next: "*"
-    react: "*"
-    react-dom: "*"
-  checksum: 10c0/979dec0a2de049ce7d1b5da835e7f7dc3b7ec83ba9e464348f497a52a6a6e5b5c395c97f071f66a63f50f22cce89fb6d19061ec7e75643b0eab215b21794bde7
+    react: ^16.8 || ^17 || ^18
+    react-dom: ^16.8 || ^17 || ^18
+  checksum: 10c0/72bd670ad6b9f547dc18cece340dfd1ac41e3e7b37eb321d4767db90bfa2c239f937011cd0efe35ca0081f1ea260051bc0868808ef39b0fbff2ddefd7146cec6
   languageName: node
   linkType: hard
 
@@ -11215,17 +11214,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.3.3":
-  version: 5.3.3
-  resolution: "typescript@npm:5.3.3"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10c0/e33cef99d82573624fc0f854a2980322714986bc35b9cb4d1ce736ed182aeab78e2cb32b385efa493b2a976ef52c53e20d6c6918312353a91850e2b76f1ea44f
-  languageName: node
-  linkType: hard
-
-"typescript@npm:^5.4.5":
+"typescript@npm:5.4.5, typescript@npm:^5.4.5":
   version: 5.4.5
   resolution: "typescript@npm:5.4.5"
   bin:
@@ -11235,17 +11224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>":
-  version: 5.3.3
-  resolution: "typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10c0/1d0a5f4ce496c42caa9a30e659c467c5686eae15d54b027ee7866744952547f1be1262f2d40de911618c242b510029d51d43ff605dba8fb740ec85ca2d3f9500
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@npm%3A^5.4.5#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.4.5#optional!builtin<compat/typescript>":
   version: 5.4.5
   resolution: "typescript@patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=5adc0c"
   bin:
