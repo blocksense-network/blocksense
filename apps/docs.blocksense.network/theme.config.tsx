@@ -1,7 +1,7 @@
-import { LogoHeader } from './components/LogoHeader';
+import { Logo } from './components/Logo';
 
 export default {
-  logo: LogoHeader,
+  logo: Logo,
   project: {
     link: 'https://github.com/blocksense-network/blocksense',
   },
