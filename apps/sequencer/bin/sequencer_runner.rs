@@ -239,7 +239,7 @@ async fn main() -> std::io::Result<()> {
         let reg = app_state.registry.write().unwrap();
         let keys = reg.get_keys();
         for key in keys {
-            let send_channel = vote_send.clone();
+            let send_channel: async_channel::Sender<(String, String)> = vote_send.clone();
 
             println!("key = {} : value = {:?}", key, reg.get(key));
 

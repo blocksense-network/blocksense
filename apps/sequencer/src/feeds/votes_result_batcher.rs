@@ -2,14 +2,24 @@ use actix_web::rt::spawn;
 use async_channel::{Receiver, Sender};
 use std::collections::HashMap;
 use std::env;
+use std::fmt::Debug;
 use tokio::time::Duration;
 
 pub struct VotesResultBatcher {}
 
 impl VotesResultBatcher {
-    pub fn new(
-        vote_recv: Receiver<(String, String)>,
-        batched_votes_send: Sender<HashMap<String, String>>,
+    pub fn new<
+        K: Debug
+            + Clone
+            + std::string::ToString
+            + 'static
+            + std::cmp::Eq
+            + PartialEq
+            + std::hash::Hash,
+        V: Debug + Clone + std::string::ToString + 'static,
+    >(
+        vote_recv: Receiver<(K, V)>,
+        batched_votes_send: Sender<HashMap<K, V>>,
     ) -> VotesResultBatcher {
         spawn(async move {
             let batch_size_env = "SEQUENCER_MAX_KEYS_TO_BATCH";
@@ -40,7 +50,7 @@ impl VotesResultBatcher {
             );
 
             loop {
-                let mut updates: HashMap<String, String> = Default::default();
+                let mut updates: HashMap<K, V> = Default::default();
                 let mut send_to_contract = false;
                 while !send_to_contract {
                     let var: Result<Result<(_, _), _>, tokio::time::error::Elapsed> =
@@ -51,7 +61,7 @@ impl VotesResultBatcher {
                         .await;
                     match var {
                         Ok(Ok((key, val))) => {
-                            println!("adding {} => {} to updates", key, val);
+                            println!("adding {:?} => {:?} to updates", key, val);
                             updates.insert(key, val);
                             send_to_contract = updates.keys().len() >= max_keys_to_batch;
                         }

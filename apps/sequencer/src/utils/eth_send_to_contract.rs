@@ -14,6 +14,7 @@ use crate::utils::provider::{
 use actix_web::rt::spawn;
 use eyre::Report;
 use futures::stream::FuturesUnordered;
+use std::fmt::Debug;
 
 // Codegen from embedded Solidity code and precompiled bytecode.
 sol! {
@@ -105,9 +106,12 @@ pub async fn eth_batch_send_to_contract(
     Ok(all_results)
 }
 
-pub async fn eth_batch_send_to_all_contracts(
+pub async fn eth_batch_send_to_all_contracts<
+    K: Debug + Clone + std::string::ToString + 'static,
+    V: Debug + Clone + std::string::ToString + 'static,
+>(
     providers: SharedRpcProviders,
-    updates: HashMap<String, String>,
+    updates: HashMap<K, V>,
 ) -> Result<String> {
     println!("eth_batch_send_to_contract updates: {:?}", updates);
 
@@ -123,7 +127,7 @@ pub async fn eth_batch_send_to_all_contracts(
         )
         .into_iter()
     {
-        let updates: HashMap<String, String> = updates.clone();
+        let updates = updates.clone();
         let provider = p.clone();
         collected_futures.push(spawn(async move {
             let provider = provider.lock().await;
@@ -141,8 +145,8 @@ pub async fn eth_batch_send_to_all_contracts(
             let mut keys_vals: String = Default::default();
 
             for (key, val) in updates.into_iter() {
-                keys_vals += &key;
-                keys_vals += &val;
+                keys_vals += &key.to_string();
+                keys_vals += &val.to_string();
             }
 
             let input =

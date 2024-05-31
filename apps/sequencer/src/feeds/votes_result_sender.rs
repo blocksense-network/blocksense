@@ -3,11 +3,15 @@ use crate::utils::provider::SharedRpcProviders;
 use actix_web::rt::spawn;
 use async_channel::Receiver;
 use std::collections::HashMap;
+use std::fmt::Debug;
 pub struct VotesResultSender {}
 
 impl VotesResultSender {
-    pub fn new(
-        batched_votes_recv: Receiver<HashMap<String, String>>,
+    pub fn new<
+        K: Debug + Clone + std::string::ToString + 'static,
+        V: Debug + Clone + std::string::ToString + 'static,
+    >(
+        batched_votes_recv: Receiver<HashMap<K, V>>,
         providers: SharedRpcProviders,
     ) -> VotesResultSender {
         spawn(async move {

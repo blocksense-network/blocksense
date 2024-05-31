@@ -4,14 +4,18 @@ use crate::utils::byte_utils::to_hex_string;
 use actix_web::rt::spawn;
 use actix_web::web;
 use async_channel::Sender;
+use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 pub struct FeedSlotsManager {}
 
 impl FeedSlotsManager {
-    pub fn new(
-        result_send: Sender<(String, String)>,
+    pub fn new<
+        K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
+        V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
+    >(
+        result_send: Sender<(K, V)>,
         feed: Arc<RwLock<FeedMetaData>>,
         name: String,
         report_interval: u64,
@@ -73,8 +77,8 @@ impl FeedSlotsManager {
 
                 result_send
                     .send((
-                        to_hex_string(key_post.to_be_bytes().to_vec()),
-                        result_post_to_contract,
+                        to_hex_string(key_post.to_be_bytes().to_vec()).into(),
+                        result_post_to_contract.into(),
                     ))
                     .await
                     .unwrap();
