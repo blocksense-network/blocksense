@@ -4,7 +4,6 @@ use async_trait::async_trait;
 use cmc::Cmc;
 use ringbuf::{self, traits::RingBuffer, HeapRb};
 use serde::Serialize;
-use time::serde::timestamp;
 
 use crate::{
     connector::data_feed::{DataFeed, Payload},
@@ -62,9 +61,16 @@ impl DataFeed for CoinMarketCapDataFeed {
         asset: &str,
     ) -> Result<(Rc<RefCell<dyn Payload>>, u64), anyhow::Error> {
         let response = self.api_connector.price(asset);
-        let payload = Rc::new(RefCell::new(CMCPayload {
-            result: response.unwrap(),
-        }));
+
+        let response = match response {
+            Ok(response) => response,
+            Err(e) => {
+                eprintln!("API failed with err - {}", e);
+                -1.
+            }
+        };
+
+        let payload = Rc::new(RefCell::new(CMCPayload { result: response }));
 
         let unix_ts = current_unix_time();
 

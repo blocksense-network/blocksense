@@ -6,7 +6,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use prometheus::{Registry, TextEncoder};
+use prometheus::TextEncoder;
 use reqwest::Client;
 
 pub fn current_unix_time() -> u64 {
@@ -46,11 +46,7 @@ pub async fn handle_prometheus_metrics(
     encoder.encode_utf8(&metric_families, &mut buffer).unwrap();
 
     let _ = client
-        .post(format!(
-            "{}{}/push",
-            "http://",
-            get_env_var("PROMETHEUS_URL_CLIENT").unwrap_or("127.0.0.1:8080".to_string())
-        ))
+        .post(format!("{}{}/push", "http://", url))
         .body(buffer.to_string())
         .send()
         .await?;

@@ -79,7 +79,8 @@ async fn main() {
         UPTIME_COUNTER.inc_by(poll_period_ms as f64 / 1000.);
         BATCH_PARSE_TIME_GAUGE.set(elapsed_time as i64);
 
-        let result =
-            handle_prometheus_metrics(&prometheus_server, prometheus_url.as_str(), &encoder).await;
+        handle_prometheus_metrics(&prometheus_server, prometheus_url.as_str(), &encoder)
+            .await
+            .unwrap();
     }
 }
