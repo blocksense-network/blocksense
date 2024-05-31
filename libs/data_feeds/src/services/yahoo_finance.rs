@@ -1,6 +1,3 @@
-use std::cell::RefCell;
-use std::rc::Rc;
-
 use async_trait::async_trait;
 use ringbuf::traits::RingBuffer;
 use ringbuf::HeapRb;
@@ -14,7 +11,7 @@ use crate::{
     types::{ConsensusMetric, DataFeedAPI},
 };
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Copy)]
 pub struct YfPayload {
     result: f64,
 }
@@ -39,16 +36,7 @@ impl DataFeed for YahooDataFeed {
         ConsensusMetric::Mean
     }
 
-    async fn poll(
-        &mut self,
-        ticker: &str,
-    ) -> Result<(Rc<RefCell<dyn Payload>>, u64), anyhow::Error> {
-        // let response = self
-        //     .api_connector
-        //     .get_latest_quotes(ticker, "1d")
-        //     .await?
-        //     .last_quote();
-
+    async fn poll(&mut self, ticker: &str) -> Result<(Box<dyn Payload>, u64), anyhow::Error> {
         let response = self.api_connector.get_latest_quotes(ticker, "1d").await;
 
         let result = match response {
@@ -59,24 +47,22 @@ impl DataFeed for YahooDataFeed {
             }
         };
 
-        let payload: Rc<RefCell<dyn Payload>> = Rc::new(RefCell::new(YfPayload { result: result }));
+        let payload = Box::new(YfPayload { result: result });
 
-        Ok((payload, current_unix_time()))
+        let unix_ts = current_unix_time();
+        self.collect_history(Box::new(*payload), unix_ts);
+        Ok((payload, unix_ts))
     }
 
-    fn collect_history(
-        &mut self,
-        response: Rc<RefCell<dyn Payload>>,
-        timestamp: u64,
-    ) -> Option<(Rc<RefCell<dyn Payload>>, u64)> {
-        self.history_buffer.push_overwrite((response, timestamp))
+    fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64) {
+        self.history_buffer.push_overwrite((response, timestamp));
     }
 }
 
 pub struct YahooDataFeed {
     api_connector: YahooConnector,
     is_connected: bool,
-    history_buffer: HeapRb<(Rc<RefCell<dyn Payload>>, u64)>,
+    history_buffer: HeapRb<(Box<dyn Payload>, u64)>,
 }
 
 impl YahooDataFeed {
@@ -84,7 +70,7 @@ impl YahooDataFeed {
         Self {
             api_connector: YahooConnector::new(),
             is_connected: true,
-            history_buffer: HeapRb::<(Rc<RefCell<dyn Payload>>, u64)>::new(
+            history_buffer: HeapRb::<(Box<dyn Payload>, u64)>::new(
                 get_env_var("HISTORY_BUFFER_SIZE").unwrap_or(10_000),
             ),
         }

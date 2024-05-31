@@ -11,7 +11,6 @@ lazy_static::lazy_static! {
 
         map
     };
-
 }
 
 impl DataFeedAPI {

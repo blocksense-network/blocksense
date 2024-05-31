@@ -28,14 +28,9 @@ pub trait DataFeed {
 
     fn score_by(&self) -> ConsensusMetric;
 
-    async fn poll(&mut self, asset: &str)
-        -> Result<(Rc<RefCell<dyn Payload>>, u64), anyhow::Error>;
+    async fn poll(&mut self, asset: &str) -> Result<(Box<dyn Payload>, u64), anyhow::Error>;
 
-    fn collect_history(
-        &mut self,
-        response: Rc<RefCell<dyn Payload>>,
-        timestamp: u64,
-    ) -> Option<(Rc<RefCell<dyn Payload>>, u64)>;
+    fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64);
 
     //TODO: Implement abstraction for publishing
 
@@ -92,20 +87,27 @@ pub async fn dispatch(
     batch_size: &usize,
     feeds: &Vec<(DataFeedAPI, String)>,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
-) -> () {
+) {
     let feed_subset = feed_selector(feeds, batch_size);
 
     for (api, asset) in feed_subset {
         let start_time = Instant::now();
 
         let data_feed = resolve_feed(&api, connection_cache);
-        let feed_name = DataFeedAPI::feed_asset_str(&api, &asset);
+        let feed_asset_name = DataFeedAPI::feed_asset_str(&api, &asset);
 
-        post_api_response(&reporter_id, sequencer_url, data_feed, &feed_name, &asset).await;
+        post_api_response(
+            &reporter_id,
+            sequencer_url,
+            data_feed,
+            &feed_asset_name,
+            &asset,
+        )
+        .await;
 
         let elapsed_time = start_time.elapsed().as_millis();
         DATA_FEED_PARSE_TIME_GAUGE
-            .with_label_values(&[feed_name.as_str()])
+            .with_label_values(&[feed_asset_name.as_str()])
             .set(elapsed_time as i64);
     }
 }
