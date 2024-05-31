@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Logo = () => {
+export const Header = () => {
   return (
     <aside className="blocksense-header" style={styles.container}>
       <img
