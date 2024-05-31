@@ -9,27 +9,23 @@ use crate::utils::generate_string_hash;
 use curl::easy::Easy;
 use serde_json::{json, Value};
 
-use super::data_feed::Payload;
-
 pub async fn post_api_response(
     reporter_id: &u64,
     base_url: &str,
     data_feed: Rc<RefCell<dyn DataFeed>>,
-    data_feed_name: &String,
+    feed_asset_name: &String,
     asset: &str,
 ) {
     let (result, timestamp) = data_feed.borrow_mut().poll(asset).await.unwrap();
 
-    let feed_hash = generate_string_hash(&data_feed_name);
-
-    let result_cast = result.as_ref();
+    let feed_hash = generate_string_hash(&feed_asset_name);
 
     let payload_json = json!({
         "reporter_id": reporter_id,
-        "feed_name": data_feed_name,
+        "feed_name": feed_asset_name,
         "feed_id": feed_hash,
         "timestamp": timestamp,
-        "result": result_cast,
+        "result": result.as_ref(),
     });
 
     println!("\nPayload: {:?}", payload_json);
