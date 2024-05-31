@@ -4,12 +4,12 @@ use std::{
     rc::Rc,
 };
 
-use crate::connector::data_feed::{DataFeed, Payload};
+use crate::connector::data_feed::DataFeed;
 use crate::utils::generate_string_hash;
-use actix_web::web::Json;
 use curl::easy::Easy;
-use erased_serde::Serialize;
 use serde_json::{json, Value};
+
+use super::data_feed::Payload;
 
 pub async fn post_api_response(
     reporter_id: &u64,
@@ -32,10 +32,11 @@ pub async fn post_api_response(
         "result": result_cast,
     });
 
-    println!("Payload: {:?}", payload_json);
+    println!("\nPayload: {:?}", payload_json);
+
+    let feed_url = base_url.to_string() + &"/feed/" + &feed_hash.to_string();
 
     // Comment out if you want to test API availability & aggregation
-    let feed_url = base_url.to_string() + &"/feed/" + &feed_hash.to_string();
     post_request(&feed_url, payload_json);
 }
 

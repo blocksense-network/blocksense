@@ -43,16 +43,23 @@ impl DataFeed for YahooDataFeed {
         &mut self,
         ticker: &str,
     ) -> Result<(Rc<RefCell<dyn Payload>>, u64), anyhow::Error> {
-        let response = self
-            .api_connector
-            .get_latest_quotes(ticker, "1d")
-            .await?
-            .last_quote()
-            .unwrap();
+        // let response = self
+        //     .api_connector
+        //     .get_latest_quotes(ticker, "1d")
+        //     .await?
+        //     .last_quote();
 
-        let payload: Rc<RefCell<dyn Payload>> = Rc::new(RefCell::new(YfPayload {
-            result: response.close,
-        }));
+        let response = self.api_connector.get_latest_quotes(ticker, "1d").await;
+
+        let result = match response {
+            Ok(response) => response.last_quote().unwrap().close,
+            Err(e) => {
+                eprint!("API Failed with err: {}", e);
+                -1.
+            }
+        };
+
+        let payload: Rc<RefCell<dyn Payload>> = Rc::new(RefCell::new(YfPayload { result: result }));
 
         Ok((payload, current_unix_time()))
     }
