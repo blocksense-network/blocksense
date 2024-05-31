@@ -1,34 +1,16 @@
 import React from 'react';
+import { config } from '../../config';
 
 export const Header = () => {
   return (
-    <aside className="blocksense-header" style={styles.container}>
-      <img
-        className="blocksense-header__graphic"
-        src="/images/blocksense-header__graphic.jpg"
-        style={styles.header__graphic}
-        alt="Blocksense Logo"
-      />
-      <p className="blocksense-header__text" style={styles.text}>
-        Blocksense
+    <aside className="flex items-center">
+      <video width="70" height="70" loop autoPlay muted className="pb-1 mr-4">
+        <source src="/videos/blocksense-logo-video.mp4" type="video/mp4" />
+        {config.videoNotSupportedMsg}
+      </video>
+      <p className="font-bold font-mono text-gray-900 sm:text-lg md:text-2xl lg:text-3xl">
+        {config.blocksenseText}
       </p>
     </aside>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  header__graphic: {
-    height: '70px',
-    marginRight: '5px',
-  },
-  text: {
-    fontSize: '22px',
-    fontWeight: 700,
-    fontFamily: '"Space Mono", monospace',
-    color: 'rgb(30, 30, 30)',
-  },
 };
