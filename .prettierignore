@@ -5,3 +5,4 @@ node_modules
 .pnp.loader.mjs
 *.json
 flake.lock
+*.mdx
