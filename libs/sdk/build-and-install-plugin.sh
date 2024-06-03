@@ -17,11 +17,6 @@ tar czf "$DIR/trigger-oracle.tar.gz" -C "$ROOT/target/release" ./trigger-oracle
 # Calculate the hash of the tar.gz file
 HASH=$(sha256sum $DIR/trigger-oracle.tar.gz | cut -d' ' -f 1)
 
-# Determine the architecture
-ARCH=$(uname -m)
-if [[ "$ARCH" == "arm64" ]]; then
-    ARCH="aarch64"
-fi
 
 # Generate the trigger-oracle.json file
 cat > $DIR/trigger-oracle.json << EOF
@@ -41,7 +36,7 @@ cat > $DIR/trigger-oracle.json << EOF
         },
         {
             "os": "macos",
-            "arch": "$ARCH",
+            "arch": "aarch64",
             "url": "file://$SCRIPT_DIR/trigger-oracle.tar.gz",
             "sha256": "$HASH"
         }
