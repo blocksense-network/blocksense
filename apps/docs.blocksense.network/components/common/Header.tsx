@@ -3,14 +3,32 @@ import { config } from '../../config';
 
 export const Header = () => {
   return (
-    <aside className="flex items-center">
-      <video width="70" height="70" loop autoPlay muted className="pb-1 mr-4">
-        <source src="/videos/blocksense-logo-video.mp4" type="video/mp4" />
+    <header className="header__media flex items-center z-50">
+      <video
+        className="header-media__video header-media__video--interactive pb-1 mr-2"
+        width="70"
+        height="70"
+        loop
+        muted
+        autoPlay
+      >
+        <source
+          className="header-media__source header-media__source--interactive"
+          src="/videos/blocksense-logo-video.mp4"
+          type="video/mp4"
+        />
+        <track
+          className="header-media__track header-media__track--interactive"
+          kind="captions"
+          src=""
+          srcLang="en"
+          label="Blocksense"
+        />
         {config.videoNotSupportedMsg}
       </video>
-      <p className="font-bold font-mono text-gray-900 sm:text-lg md:text-2xl lg:text-3xl">
+      <span className="header-media__description font-bold font-mono text-gray-900 text-lg">
         {config.blocksenseText}
-      </p>
-    </aside>
+      </span>
+    </header>
   );
 };
