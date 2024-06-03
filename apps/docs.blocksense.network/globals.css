@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+main {
+  margin-top: 20px;
+}
+
+span {
+  @apply block;
+}
+
+#__next {
+  margin-top: calc(-1 * var(--nextra-navbar-height));
+}
