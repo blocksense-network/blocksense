@@ -147,3 +147,7 @@ libs/*/target/
 # Vercel build output
 .vercel
 _vercel-deployment-url
+
+# MacOS specific files
+**/*/.DS_Store
+.DS_Store
