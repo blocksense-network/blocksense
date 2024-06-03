@@ -1,14 +1,30 @@
 import { ethers } from 'hardhat';
-import { FeedRegistryV1, FeedRegistryV2 } from '../../../../../typechain';
+import {
+  ChainlinkProxy,
+  FeedRegistry,
+  IChainlinkAggregator,
+} from '../../../../../typechain';
 import { Registry } from '../../../../../typechain';
 import { OracleBaseWrapper } from '../Base';
 import { deployContract } from '../../../helpers/common';
 
 export class RegistryWrapper extends OracleBaseWrapper<Registry> {
-  public registry!: FeedRegistryV1 | FeedRegistryV2;
+  public registry!: FeedRegistry;
 
-  public async init(_: string, registryAddress?: string) {
-    if (registryAddress) {
+  constructor(
+    name: string,
+    underliers: (ChainlinkProxy | IChainlinkAggregator)[],
+  ) {
+    super(name, underliers);
+  }
+
+  public async init(address: string, registryAddress?: string) {
+    if (!registryAddress) {
+      this.registry = await deployContract<FeedRegistry>(
+        'FeedRegistry',
+        address,
+      );
+    } else {
       this.registry = await ethers.getContractAt(
         'FeedRegistry',
         registryAddress,

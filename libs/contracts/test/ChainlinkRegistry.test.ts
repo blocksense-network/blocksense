@@ -1,8 +1,6 @@
-import { HistoricDataFeedStoreV1, HistoricDataFeedStoreV2 } from '../typechain';
 import {
   ChainlinkBaseWrapper,
   ChainlinkRegistryBaseWrapper,
-  ChainlinkRegistryV1Wrapper,
   ChainlinkV1Wrapper,
   ChainlinkV2Wrapper,
   UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
@@ -15,8 +13,8 @@ import {
 } from './utils/helpers/common';
 import { ethers } from 'hardhat';
 
-let contractWrapperV1: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV1>;
-let contractWrapperV2: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV2>;
+let contractWrapperV1: ChainlinkRegistryBaseWrapper;
+let contractWrapperV2: ChainlinkRegistryBaseWrapper;
 
 let contractWrappersV1: ChainlinkBaseWrapper<HistoricDataFeedStore>[] = [];
 let contractWrappersV2: ChainlinkBaseWrapper<HistoricDataFeedStore>[] = [];
@@ -64,10 +62,10 @@ describe('Chainlink registry interface', async () => {
 
     const owner = (await ethers.getSigners())[2];
 
-    contractWrapperV1 = new ChainlinkRegistryV1Wrapper();
+    contractWrapperV1 = new ChainlinkRegistryBaseWrapper('ChainlinkRegistryV1');
     await contractWrapperV1.init(owner);
 
-    contractWrapperV2 = new ChainlinkRegistryV1Wrapper();
+    contractWrapperV2 = new ChainlinkRegistryBaseWrapper('ChainlinkRegistryV2');
     await contractWrapperV2.init(owner);
 
     await contractWrapperV1.setFeed(

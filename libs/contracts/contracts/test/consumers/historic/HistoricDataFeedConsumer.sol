@@ -4,14 +4,14 @@ pragma solidity ^0.8.24;
 import './HistoricConsumer.sol';
 import {ProxyCall} from '../../../libraries/ProxyCall.sol';
 
-abstract contract HistoricDataFeedConsumer is HistoricConsumer {
+contract HistoricDataFeedConsumer is HistoricConsumer {
   constructor(address _dataFeedStore) HistoricConsumer(_dataFeedStore) {}
 
   function _getFeedById(
     uint32 key
   ) internal view override returns (Transmission memory) {
     return
-      decodeTransmission(
+      _decodeTransmission(
         ProxyCall._callDataFeed(
           dataFeedStore,
           abi.encodePacked(0x80000000 | key)
@@ -24,7 +24,7 @@ abstract contract HistoricDataFeedConsumer is HistoricConsumer {
     uint32 counter
   ) internal view override returns (Transmission memory) {
     return
-      decodeTransmission(
+      _decodeTransmission(
         ProxyCall._callDataFeed(
           dataFeedStore,
           abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
@@ -32,10 +32,16 @@ abstract contract HistoricDataFeedConsumer is HistoricConsumer {
       );
   }
 
-  function decodeTransmission(
+  function _decodeTransmission(
     bytes32 data
   ) internal pure returns (Transmission memory data_) {
     data_.value = bytes24(data);
     data_.timestamp = uint64(uint256(data));
+  }
+
+  function _getLatestCounter(
+    uint32 key
+  ) internal view override returns (uint32 counter) {
+    return uint32(ProxyCall._latestRound(key, dataFeedStore));
   }
 }

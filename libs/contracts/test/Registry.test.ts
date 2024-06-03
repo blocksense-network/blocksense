@@ -1,24 +1,19 @@
 import {
   ChainlinkBaseWrapper,
   ChainlinkRegistryBaseWrapper,
-  ChainlinkRegistryV1Wrapper,
-  ChainlinkRegistryV2Wrapper,
   ChainlinkV1Wrapper,
   ChainlinkV2Wrapper,
   RegistryWrapper,
-  RegistryWrapperV1,
-  RegistryWrapperV2,
   UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
 } from './utils/wrappers';
-import { HistoricDataFeedStoreV1, HistoricDataFeedStoreV2 } from '../typechain';
 import { callAndCompareRegistries } from './utils/helpers/registryGasHelper';
 import { HistoricDataFeedStore, TOKENS } from './utils/helpers/common';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
-let registryWrapperV1: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV1>;
-let registryWrapperV2: ChainlinkRegistryBaseWrapper<HistoricDataFeedStoreV2>;
+let registryWrapperV1: ChainlinkRegistryBaseWrapper;
+let registryWrapperV2: ChainlinkRegistryBaseWrapper;
 
 let chainlinkProxyWrappersV1: ChainlinkBaseWrapper<HistoricDataFeedStore>[] =
   [];
@@ -82,13 +77,13 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
 
     const owner = (await ethers.getSigners())[2];
 
-    registryWrapperV1 = new ChainlinkRegistryV1Wrapper();
+    registryWrapperV1 = new ChainlinkRegistryBaseWrapper('ChainlinkRegistryV1');
     await registryWrapperV1.init(owner);
 
-    registryWrapperV2 = new ChainlinkRegistryV2Wrapper();
+    registryWrapperV2 = new ChainlinkRegistryBaseWrapper('ChainlinkRegistryV2');
     await registryWrapperV2.init(owner);
 
-    const registryV1 = new RegistryWrapperV1(
+    const registryV1 = new RegistryWrapper(
       'Blocksense V1',
       chainlinkProxyWrappersV1.map(wrapper => wrapper.contract),
     );
@@ -97,7 +92,7 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       registryWrapperV1.contract.target as string,
     );
 
-    const registryV2 = new RegistryWrapperV2(
+    const registryV2 = new RegistryWrapper(
       'Blocksense V2',
       chainlinkProxyWrappersV2.map(wrapper => wrapper.contract),
     );

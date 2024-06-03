@@ -9,19 +9,13 @@ contracts
 ├── chainlink-proxies
 │   ├── registries
 │   │   ├── FeedRegistry.sol
-│   │   ├── FeedRegistryV1.sol
-│   │   └── FeedRegistryV2.sol
 │   ├── ChainlinkProxy.sol
-│   ├── ChainlinkProxyV1.sol
-│   └── ChainlinkProxyV2.sol
 ├── interfaces
 │   ├── IAggregator.sol
 │   ├── IChainlinkAggregator.sol
 │   └── IFeedRegistry.sol
 ├── libraries
 │   ├── ProxyCall.sol
-│   ├── ProxyCallV1.sol
-│   └── ProxyCallV2.sol
 ├── test
 │   ├── consumers
 │   │   ├── historic
@@ -41,7 +35,7 @@ contracts
 └── UpgradeableProxy.sol
 ```
 
-The `chainlink-proxies` folder contains the Chainlink proxy contracts - ChainlinkProxyV1.sol and ChainlinkProxyV2.sol. The Chainlink proxy contracts implement the Chainlink aggregator interface. They interact with the UpgradeabilityProxy contract to make calls to the data feed store contracts. The `registries` folder contains the FeedRegistry contract which is used to register data feed keys and their corresponding data feed store contracts and make static calls to the Chainlink proxy contracts based on `base` and `quote` token addresses.
+The `chainlink-proxies` folder contains the Chainlink proxy contract - ChainlinkProxy.sol. The Chainlink proxy contract implements the Chainlink aggregator interface. It interacts with the UpgradeabilityProxy contract to make calls to the data feed store contracts. The `registries` folder contains the FeedRegistry contract which is used to register data feed keys and their corresponding data feed store contracts and make static calls to the Chainlink proxy contract based on `base` and `quote` token addresses.
 
 The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - IFeedRegistry.sol and the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - IAggregator.sol.
 

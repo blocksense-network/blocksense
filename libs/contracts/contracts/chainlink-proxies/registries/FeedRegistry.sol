@@ -6,7 +6,7 @@ import {IAggregator} from '../../interfaces/IAggregator.sol';
 import {IFeedRegistry} from '../../interfaces/IFeedRegistry.sol';
 import {ProxyCall} from '../../libraries/ProxyCall.sol';
 
-abstract contract FeedRegistry is IFeedRegistry {
+contract FeedRegistry is IFeedRegistry {
   struct Feed {
     address dataFeedStore;
     uint32 key;
@@ -71,5 +71,21 @@ abstract contract FeedRegistry is IFeedRegistry {
       IAggregator(feed).dataFeedStore(),
       IAggregator(feed).key()
     );
+  }
+
+  function latestRound(
+    address base,
+    address quote
+  ) external view override returns (uint256) {
+    Feed memory feed = dataFeedStore[base][quote];
+    return ProxyCall._latestRound(feed.key, feed.dataFeedStore);
+  }
+
+  function latestRoundData(
+    address base,
+    address quote
+  ) external view override returns (uint80, int256, uint256, uint256, uint80) {
+    Feed memory feed = dataFeedStore[base][quote];
+    return ProxyCall._latestRoundData(feed.key, feed.dataFeedStore);
   }
 }

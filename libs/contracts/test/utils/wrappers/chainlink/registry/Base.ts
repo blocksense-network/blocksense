@@ -1,18 +1,26 @@
-import { BaseContract } from 'ethers';
 import { FeedRegistry } from '../../../../../typechain';
 import { ChainlinkBaseWrapper } from '../Base';
 import { expect } from 'chai';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { HistoricDataFeedStore, deployContract } from '../../../helpers/common';
 
-export abstract class ChainlinkRegistryBaseWrapper<T extends BaseContract> {
+export class ChainlinkRegistryBaseWrapper {
+  public name!: string;
   public contract!: FeedRegistry;
   public owner!: HardhatEthersSigner;
-  public map: Record<string, Record<string, ChainlinkBaseWrapper<T>>> = {};
+  public map: Record<
+    string,
+    Record<string, ChainlinkBaseWrapper<HistoricDataFeedStore>>
+  > = {};
+
+  constructor(name: string) {
+    this.name = name;
+  }
 
   public async setFeed(
     base: string,
     quote: string,
-    feed: ChainlinkBaseWrapper<T>,
+    feed: ChainlinkBaseWrapper<HistoricDataFeedStore>,
   ) {
     this.map[base] = {};
     this.map[base][quote] = feed;
@@ -87,7 +95,15 @@ export abstract class ChainlinkRegistryBaseWrapper<T extends BaseContract> {
     await this.map[base][quote].checkRoundData(roundId, res);
   }
 
-  public abstract init(owner: HardhatEthersSigner): Promise<void>;
+  public async init(owner: HardhatEthersSigner) {
+    this.owner = owner;
+    this.contract = (await deployContract<FeedRegistry>(
+      'FeedRegistry',
+      owner.address,
+    )) as FeedRegistry;
+  }
 
-  public abstract getName(): string;
+  public getName(): string {
+    return this.name;
+  }
 }
