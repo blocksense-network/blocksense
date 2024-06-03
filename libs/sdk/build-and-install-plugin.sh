@@ -15,7 +15,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)/trig
 tar czf "$DIR/trigger-oracle.tar.gz" -C "$ROOT/target/release" ./trigger-oracle
 
 # Calculate the hash of the tar.gz file
-HASH=$(shasum -a 256 $DIR/trigger-oracle.tar.gz | cut -d' ' -f 1)
+HASH=$(sha256sum $DIR/trigger-oracle.tar.gz | cut -d' ' -f 1)
 
 # Determine the architecture
 ARCH=$(uname -m)
