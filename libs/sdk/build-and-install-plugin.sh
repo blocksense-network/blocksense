@@ -5,11 +5,25 @@ set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 DIR="$ROOT/libs/sdk/trigger-oracle"
 
-(cd "$DIR"; cargo build --release)
+# Initialize the script directory
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)/trigger-oracle
 
+# Build the project
+(cd $SCRIPT_DIR && cargo build --release)
+
+# Create the tar.gz file
 tar czf "$DIR/trigger-oracle.tar.gz" -C "$ROOT/target/release" ./trigger-oracle
-HASH=$(sha256sum $DIR/trigger-oracle.tar.gz | cut -d' ' -f 1)
 
+# Calculate the hash of the tar.gz file
+HASH=$(shasum -a 256 $DIR/trigger-oracle.tar.gz | cut -d' ' -f 1)
+
+# Determine the architecture
+ARCH=$(uname -m)
+if [[ "$ARCH" == "arm64" ]]; then
+    ARCH="aarch64"
+fi
+
+# Generate the trigger-oracle.json file
 cat > $DIR/trigger-oracle.json << EOF
 {
     "name": "trigger-oracle",
@@ -24,10 +38,18 @@ cat > $DIR/trigger-oracle.json << EOF
             "arch": "amd64",
             "url": "file://$DIR/trigger-oracle.tar.gz",
             "sha256": "$HASH"
+        },
+        {
+            "os": "macos",
+            "arch": "$ARCH",
+            "url": "file://$SCRIPT_DIR/trigger-oracle.tar.gz",
+            "sha256": "$HASH"
         }
     ]
 }
 EOF
 
+# Install the plugin
 set -x
 spin plugin install --file $DIR/trigger-oracle.json --yes
+
