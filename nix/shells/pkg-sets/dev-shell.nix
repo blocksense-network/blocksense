@@ -11,6 +11,8 @@
     figlet
     clolcat
     alejandra
+    jq
+    curl
   ];
 
   enterShell = ''
