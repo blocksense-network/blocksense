@@ -1,5 +1,11 @@
 [workspace]
-members = ["libs/anomaly_detection", "apps/sequencer", "libs/sdk", "libs/sdk/trigger-oracle"]
+members = [
+  "libs/anomaly_detection",
+  "apps/sequencer",
+  "libs/sdk",
+  "libs/sdk/trigger-oracle",
+  "libs/sequencer-types"
+]
 resolver = "2"
 
 [workspace.package]

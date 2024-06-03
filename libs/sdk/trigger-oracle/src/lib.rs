@@ -1,6 +1,5 @@
 use clap::Args;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use spin_app::MetadataKey;
 use spin_core::{async_trait, InstancePre};
 use spin_trigger::{TriggerAppEngine, TriggerExecutor};
@@ -10,6 +9,8 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::mpsc::{channel, Receiver, Sender};
+
+use sequencer_types::sequencer::PostDataFeedPayload;
 
 wasmtime::component::bindgen!({
     path: "../wit",
@@ -229,13 +230,12 @@ impl OracleTrigger {
         sequencer: String,
     ) -> TerminationReason {
         while let Some((feed_id, payload)) = rx.recv().await {
-            let timestamp = current_unix_time();
-            let payload_json = json!({
-                "reporter_id": 1,
-                "feed_id": feed_id,
-                "timestamp": timestamp,
-                "result": payload.body.unwrap(),
-            });
+            let payload_json = PostDataFeedPayload {
+                reporter_id: 1,
+                feed_id,
+                timestamp: current_unix_time(),
+                result: payload.body.unwrap(),
+            };
 
             let client = reqwest::Client::new();
             match client

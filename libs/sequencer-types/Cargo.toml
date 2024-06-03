@@ -1,0 +1,18 @@
+[package]
+name = "sequencer-types"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+description = """
+Types for working with the Blocksense sequencer
+"""
+
+[lib]
+name = "sequencer_types"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.117"
+blocksense-registry  = { path = "../registry/" }

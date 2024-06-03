@@ -1659,6 +1659,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "blocksense-registry"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "reqwest 0.12.4",
+ "serde 1.0.203",
+ "serde_json",
+ "tracing",
+ "url",
+]
+
+[[package]]
 name = "blocksense-sdk"
 version = "0.0.1"
 dependencies = [
@@ -7137,6 +7149,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "sequencer-types"
+version = "0.0.1"
+dependencies = [
+ "blocksense-registry",
+ "serde 1.0.203",
+ "serde_json",
+]
+
+[[package]]
 name = "serde"
 version = "0.8.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8807,6 +8828,7 @@ dependencies = [
  "is-terminal",
  "log",
  "reqwest 0.12.4",
+ "sequencer-types",
  "serde 1.0.203",
  "serde_json",
  "spin-app",
