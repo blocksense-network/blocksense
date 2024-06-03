@@ -171,15 +171,22 @@ const InnerLayout = ({
     : config.direction === 'rtl';
 
   const direction = isRTL ? 'rtl' : 'ltr';
+  const lang = 'en';
 
   return (
     // This makes sure that selectors like `[dir=ltr] .nextra-container` work
     // before hydration as Tailwind expects the `dir` attribute to exist on the
-    // `html` element.
+    // `html` element. `lang` attribite is additionally set to the `html`.
     <div dir={direction}>
       <script
         dangerouslySetInnerHTML={{
-          __html: `document.documentElement.setAttribute('dir','${direction}')`,
+          __html: `
+          document.documentElement.setAttribute('dir','${direction}')`,
+        }}
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.setAttribute('lang','${lang}')`,
         }}
       />
       <Head />
