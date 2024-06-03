@@ -1648,6 +1648,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "blocksense-cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-registry",
+ "camino",
+ "clap 4.5.4",
+ "indexmap 1.9.3",
+ "is-terminal",
+ "lazy_static 1.4.0",
+ "log",
+ "reqwest 0.12.4",
+ "serde 1.0.203",
+ "serde_json",
+ "spin-manifest 2.5.0",
+ "spin-serde 2.5.0",
+ "tokio",
+ "toml 0.8.13",
+ "toml_edit 0.22.13",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+]
+
+[[package]]
 name = "blocksense-macro"
 version = "0.0.1"
 dependencies = [
@@ -1836,6 +1861,12 @@ dependencies = [
  "thiserror",
  "zip",
 ]
+
+[[package]]
+name = "camino"
+version = "1.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0ec6b951b160caa93cc0c7b209e5a3bff7aae9062213451ac99493cd844c239"
 
 [[package]]
 name = "cap-fs-ext"
@@ -5488,7 +5519,7 @@ dependencies = [
  "spin-outbound-networking",
  "spin-telemetry",
  "spin-world",
- "terminal",
+ "terminal 2.6.0-pre0",
  "tracing",
  "url",
 ]
@@ -7571,7 +7602,7 @@ dependencies = [
  "serde_json",
  "spin-core",
  "spin-locked-app",
- "spin-serde",
+ "spin-serde 2.6.0-pre0",
  "thiserror",
 ]
 
@@ -7768,10 +7799,10 @@ dependencies = [
  "shellexpand 3.1.0",
  "spin-common",
  "spin-locked-app",
- "spin-manifest",
+ "spin-manifest 2.6.0-pre0",
  "spin-outbound-networking",
  "tempfile",
- "terminal",
+ "terminal 2.6.0-pre0",
  "thiserror",
  "tokio",
  "tokio-util 0.6.10",
@@ -7791,7 +7822,7 @@ dependencies = [
  "ouroboros",
  "serde 1.0.203",
  "serde_json",
- "spin-serde",
+ "spin-serde 2.6.0-pre0",
  "thiserror",
 ]
 
@@ -7810,6 +7841,21 @@ dependencies = [
 
 [[package]]
 name = "spin-manifest"
+version = "2.5.0"
+source = "git+https://github.com/fermyon/spin?tag=v2.5.0#83eb68d49d32f1ebf6890e892c4c952af4b3df04"
+dependencies = [
+ "anyhow",
+ "indexmap 1.9.3",
+ "serde 1.0.203",
+ "spin-serde 2.5.0",
+ "terminal 2.5.0",
+ "thiserror",
+ "toml 0.8.13",
+ "url",
+]
+
+[[package]]
+name = "spin-manifest"
 version = "2.6.0-pre0"
 source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
 dependencies = [
@@ -7817,8 +7863,8 @@ dependencies = [
  "indexmap 1.9.3",
  "semver 1.0.22",
  "serde 1.0.203",
- "spin-serde",
- "terminal",
+ "spin-serde 2.6.0-pre0",
+ "terminal 2.6.0-pre0",
  "thiserror",
  "toml 0.8.13",
  "url",
@@ -7834,7 +7880,7 @@ dependencies = [
  "ipnet",
  "spin-expressions",
  "spin-locked-app",
- "terminal",
+ "terminal 2.6.0-pre0",
  "url",
  "urlencoding",
 ]
@@ -7859,6 +7905,15 @@ dependencies = [
  "spin-macro",
  "thiserror",
  "wit-bindgen",
+]
+
+[[package]]
+name = "spin-serde"
+version = "2.5.0"
+source = "git+https://github.com/fermyon/spin?tag=v2.5.0#83eb68d49d32f1ebf6890e892c4c952af4b3df04"
+dependencies = [
+ "base64 0.21.7",
+ "serde 1.0.203",
 ]
 
 [[package]]
@@ -7929,7 +7984,7 @@ dependencies = [
  "opentelemetry-otlp",
  "opentelemetry-semantic-conventions",
  "opentelemetry_sdk",
- "terminal",
+ "terminal 2.6.0-pre0",
  "tracing",
  "tracing-appender",
  "tracing-opentelemetry",
@@ -7970,7 +8025,7 @@ dependencies = [
  "spin-llm",
  "spin-llm-remote-http",
  "spin-loader",
- "spin-manifest",
+ "spin-manifest 2.6.0-pre0",
  "spin-outbound-networking",
  "spin-sqlite",
  "spin-sqlite-inproc",
@@ -7978,7 +8033,7 @@ dependencies = [
  "spin-telemetry",
  "spin-variables",
  "spin-world",
- "terminal",
+ "terminal 2.6.0-pre0",
  "tokio",
  "toml 0.5.11",
  "tracing",
@@ -8243,6 +8298,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "terminal"
+version = "2.5.0"
+source = "git+https://github.com/fermyon/spin?tag=v2.5.0#83eb68d49d32f1ebf6890e892c4c952af4b3df04"
+dependencies = [
+ "atty",
+ "once_cell",
+ "termcolor",
 ]
 
 [[package]]

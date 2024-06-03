@@ -37,3 +37,6 @@ indent_size = unset
 [*.wit]
 indent_style = space
 indent_size = 2
+
+[*.rs]
+indent_size = unset

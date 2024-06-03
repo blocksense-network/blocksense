@@ -1,0 +1,16 @@
+{
+  "oracles": [{
+    "id": "revolut-example",
+    "name": "revolut-example",
+    "oracle_script_wasm": "revolut-example.wasm",
+    "data_feeds": [{
+        "id": "USD/BTC",
+        "interval": 10
+      }, {
+        "id": "USD/ETH",
+        "interval": 15
+    }],
+    "capabilities": []
+  }],
+  "capabilities": []
+}

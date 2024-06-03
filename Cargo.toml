@@ -4,6 +4,8 @@ members = [
   "apps/sequencer",
   "libs/sdk",
   "libs/sdk/trigger-oracle",
+  "libs/cli",
+  "libs/registry",
   "libs/sequencer-types"
 ]
 resolver = "2"
