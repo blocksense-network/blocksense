@@ -60,9 +60,9 @@ async fn main() {
         let start_time = Instant::now();
 
         dispatch(
-            &reporter_id,
+            reporter_id,
             sequencer_url.as_str(),
-            &batch_size,
+            batch_size,
             &all_feeds,
             &mut connection_cache,
         )
