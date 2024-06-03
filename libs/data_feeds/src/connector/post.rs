@@ -10,7 +10,7 @@ use curl::easy::Easy;
 use serde_json::{json, Value};
 
 pub async fn post_api_response(
-    reporter_id: &u64,
+    reporter_id: u64,
     base_url: &str,
     data_feed: Rc<RefCell<dyn DataFeed>>,
     feed_asset_name: &String,
