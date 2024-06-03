@@ -165,3 +165,64 @@ jobs:
 
       - name: Nix build Rust workspace
         run: nix build --impure .#blocksense-rs
+
+  docs_website_deploy:
+    timeout-minutes: 360
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v11
+        if: ${{ runner.environment == 'github-hosted' }}
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v15
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default)"
+          env >> "$GITHUB_ENV"
+
+      - name: Set node linker
+        run: |
+          echo "nodeLinker: node-modules" >> .yarnrc.yml
+
+      - name: Install JS deps
+        run: yarn install
+
+      - name: Pull Vercel configuration
+        run: yarn vercel link --scope blocksense --project docs.blocksense.network --yes --token ${{ secrets.vercel_token }}
+
+      - name: Vercel Build
+        run: yarn vercel build --yes --token ${{ secrets.vercel_token }}
+
+      - name: Deploy to Vercel
+        run: yarn vercel deploy --prebuilt --scope blocksense --token ${{ secrets.vercel_token }} > _vercel-deployment-url
+
+      - name: Read deployment URL
+        id: read-deployment-url
+        run: |
+          deploymentUrl=$(cat _vercel-deployment-url)
+          echo "::set-output name=deploymentUrl::${deploymentUrl}"
+
+      - name: Comment on the PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq --raw-output .number "$GITHUB_EVENT_PATH")
+          DEPLOYMENT_URL=${{ steps.read-deployment-url.outputs.deploymentUrl }}
+          COMMENT_BODY="Deployed to ${DEPLOYMENT_URL}"
+          curl -s -L \
+            -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -d "{\"body\": \"${COMMENT_BODY}\"}" \
+            https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments
