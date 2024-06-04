@@ -1,3 +1,5 @@
+use std::{fs, io::prelude::*};
+
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
@@ -30,14 +32,18 @@ impl NodeCommands {
 
 #[derive(Parser, Debug)]
 pub struct Init {
-    /// Specifies entities to add
-    #[arg(short = 'o')]
-    pub oracles: Vec<String>,
+    /// Specifies if you directly want to build the cofiguration.
+    #[arg(short = 'b')]
+    // TODO(adikov): Implement
+    pub build: bool,
 }
 
 impl Init {
     pub async fn run(self) -> Result<()> {
-        let _config = blocksense_registry::registry::Registry::get_config().await?;
+        let config = blocksense_registry::registry::Registry::get_config().await?;
+        let mut file = fs::File::create("blocksense-config.json")?;
+        let json = serde_json::to_string_pretty(&config)?;
+        file.write_all(json.as_bytes())?;
         Ok(())
     }
 }

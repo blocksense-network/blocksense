@@ -23,6 +23,4 @@ toml_edit = "0.22.13"
 tracing = { version = "0.1.40" , features=["log"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 url = "2.5.0"
-spin-manifest = { git = "https://github.com/fermyon/spin", tag="v2.5.0"}
-spin-serde = { git = "https://github.com/fermyon/spin", tag="v2.5.0"}
 blocksense-registry = { path = "../registry" }
