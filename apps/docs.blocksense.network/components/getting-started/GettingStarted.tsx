@@ -18,9 +18,9 @@ export const GettingStarted = () => {
             <LinkButton
               label="Get Started"
               target="_blank"
-              link="/getting-started"
+              link="/docs/overview/getting-started"
             />
-            <LinkButton label="Roadmap" target="_blank" link="/roadmap" />
+            <LinkButton label="Roadmap" link="/docs/overview/roadmap" />
           </span>
         </article>
         <aside className="getting-started__image hidden lg:mt-0 lg:col-span-3 lg:flex">

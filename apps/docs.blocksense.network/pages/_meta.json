@@ -1,8 +1,14 @@
 {
   "index": {
-    "title": "intro",
+    "title": "Introduction",
     "type": "page",
     "href": "/getting-started",
+    "display": "hidden"
+  },
+  "docs": {
+    "title": "Docs",
+    "type": "page",
+    "href": "/docs",
     "display": "hidden"
   }
 }
