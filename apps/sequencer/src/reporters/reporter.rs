@@ -35,11 +35,11 @@ macro_rules! inc_reporter_vec_metric (
 
 pub type SharedReporters = Arc<RwLock<HashMap<u64, Arc<RwLock<Reporter>>>>>;
 
-pub fn get_shared_reporters() -> SharedReporters {
-    Arc::new(RwLock::new(get_reporters()))
+pub fn init_shared_reporters() -> SharedReporters {
+    Arc::new(RwLock::new(init_reporters()))
 }
 
-fn get_reporters() -> HashMap<u64, Arc<RwLock<Reporter>>> {
+fn init_reporters() -> HashMap<u64, Arc<RwLock<Reporter>>> {
     let mut reporters = HashMap::new();
     for i in 0..30 {
         reporters.insert(

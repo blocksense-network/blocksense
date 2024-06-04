@@ -8,10 +8,10 @@ use sequencer::feeds::{
     votes_result_batcher::VotesResultBatcher, votes_result_sender::VotesResultSender,
 };
 use sequencer::plugin_registry;
-use sequencer::providers::provider::{init_shared_rpc_providers, SharedRpcProviders};
+use sequencer::providers::provider::init_shared_rpc_providers;
 use tokio::sync::mpsc;
 
-use sequencer::reporters::reporter::get_shared_reporters;
+use sequencer::reporters::reporter::init_shared_reporters;
 use tracing::debug;
 
 use sequencer::http_handlers::http_handlers::{
@@ -19,28 +19,19 @@ use sequencer::http_handlers::http_handlers::{
     set_log_level,
 };
 use sequencer::metrics_collector::metrics_collector::MetricsCollector;
-use sequencer::utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
-
-use once_cell::sync::Lazy;
-static PROVIDERS: Lazy<SharedRpcProviders> = Lazy::new(|| init_shared_rpc_providers());
-static GLOBAL_LOG_HANDLE: Lazy<SharedLoggingHandle> = Lazy::new(|| init_shared_logging_handle());
+use sequencer::utils::logging::init_shared_logging_handle;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // init global logger.
-    drop(
-        GLOBAL_LOG_HANDLE
-            .lock()
-            .expect("Could not acquire GLOBAL_LOG_HANDLE's mutex"),
-    );
+    let providers = init_shared_rpc_providers();
 
     let app_state = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data())),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
         plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
-        providers: PROVIDERS.clone(),
-        log_handle: GLOBAL_LOG_HANDLE.clone(),
-        reporters: get_shared_reporters(),
+        providers: providers.clone(),
+        log_handle: init_shared_logging_handle(),
+        reporters: init_shared_reporters(),
     });
 
     let mut feed_managers = Vec::new();
@@ -87,7 +78,7 @@ async fn main() -> std::io::Result<()> {
 
     let _votes_batcher = VotesResultBatcher::new(vote_recv, batched_votes_send);
 
-    let _votes_sender = VotesResultSender::new(batched_votes_recv, PROVIDERS.clone());
+    let _votes_sender = VotesResultSender::new(batched_votes_recv, providers);
 
     let _metrics_collector = MetricsCollector::new();
 
