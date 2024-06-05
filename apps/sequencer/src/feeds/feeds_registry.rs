@@ -9,7 +9,7 @@ use tokio::time::Duration;
 #[derive(Debug)]
 pub struct FeedMetaData {
     name: String,
-    report_interval: u64, // Consider oneshot feeds.
+    report_interval_ms: u64, // Consider oneshot feeds.
     first_report_start_time: SystemTime,
     feed_type: Box<dyn FeedProcessing>,
 }
@@ -22,7 +22,7 @@ impl FeedMetaData {
     ) -> FeedMetaData {
         FeedMetaData {
             name: n.to_string(),
-            report_interval: r,
+            report_interval_ms: r,
             first_report_start_time: f,
             feed_type: Box::new(AverageFeedProcessor::new()),
         }
@@ -30,8 +30,8 @@ impl FeedMetaData {
     pub fn get_name(&self) -> &String {
         &self.name
     }
-    pub fn get_report_interval(&self) -> u64 {
-        self.report_interval
+    pub fn get_report_interval_ms(&self) -> u64 {
+        self.report_interval_ms
     }
     pub fn get_first_report_start_time_ms(&self) -> u128 {
         let since_the_epoch = self
@@ -42,15 +42,15 @@ impl FeedMetaData {
     }
     pub fn get_slot(&self, current_time_as_ms: u128) -> u64 {
         ((current_time_as_ms - self.get_first_report_start_time_ms())
-            / self.report_interval as u128) as u64
+            / self.report_interval_ms as u128) as u64
     }
     pub fn get_feed_type(&self) -> &dyn FeedProcessing {
         self.feed_type.as_ref()
     }
     pub fn check_report_relevance(&self, current_time_as_ms: u128, msg_timestamp: u128) -> bool {
         let start_of_voting_round = self.get_first_report_start_time_ms()
-            + (self.get_slot(current_time_as_ms) as u128 * self.get_report_interval() as u128);
-        let end_of_voting_round = start_of_voting_round + self.get_report_interval() as u128;
+            + (self.get_slot(current_time_as_ms) as u128 * self.get_report_interval_ms() as u128);
+        let end_of_voting_round = start_of_voting_round + self.get_report_interval_ms() as u128;
 
         if current_time_as_ms >= start_of_voting_round
             && current_time_as_ms <= end_of_voting_round
@@ -67,7 +67,7 @@ impl FeedMetaData {
 }
 
 pub struct FeedSlotTimeTracker {
-    report_interval: u64, // Consider oneshot feeds.
+    report_interval_ms: u64, // Consider oneshot feeds.
     first_report_start_time_ms: u128,
 }
 
@@ -77,7 +77,7 @@ impl FeedSlotTimeTracker {
         f: u128,
     ) -> FeedSlotTimeTracker {
         FeedSlotTimeTracker {
-            report_interval: r,
+            report_interval_ms: r,
             first_report_start_time_ms: f,
         }
     }
@@ -86,19 +86,19 @@ impl FeedSlotTimeTracker {
             .duration_since(UNIX_EPOCH)
             .expect("Time went backwards")
             .as_millis();
-        let slots_count =
-            (current_time_as_ms - self.first_report_start_time_ms) / self.report_interval as u128;
+        let slots_count = (current_time_as_ms - self.first_report_start_time_ms)
+            / self.report_interval_ms as u128;
         let current_slot_start_time =
-            self.first_report_start_time_ms + slots_count * self.report_interval as u128;
-        let current_slot_end_time = current_slot_start_time + self.report_interval as u128;
+            self.first_report_start_time_ms + slots_count * self.report_interval_ms as u128;
+        let current_slot_end_time = current_slot_start_time + self.report_interval_ms as u128;
 
         //TODO: might be put those logs in TRACE level.
         // println!("current_time_as_ms      = {}", current_time_as_ms);
         // println!("slots_count             = {}", slots_count);
         // println!("current_slot_start_time = {}", current_slot_start_time);
         // println!("current_slot_end_time      = {}", current_slot_end_time);
-        // println!("uncorrected sleep time  = {}", current_time_as_ms + self.report_interval as u128);
-        // println!("diff                    = {}", current_time_as_ms + self.report_interval as u128 - current_slot_end_time);
+        // println!("uncorrected sleep time  = {}", current_time_as_ms + self.report_interval_ms as u128);
+        // println!("diff                    = {}", current_time_as_ms + self.report_interval_ms as u128 - current_slot_end_time);
 
         let mut interval = time::interval(Duration::from_millis(
             (current_slot_end_time - current_time_as_ms) as u64,
@@ -243,8 +243,8 @@ mod tests {
         );
 
         assert!(
-            fmdr.get(0).expect("ID not present in registry").read().unwrap().get_report_interval() as u128 ==
-            fmdr.get(1).expect("ID not present in registry").read().unwrap().get_report_interval() as u128 * 2,
+            fmdr.get(0).expect("ID not present in registry").read().unwrap().get_report_interval_ms() as u128 ==
+            fmdr.get(1).expect("ID not present in registry").read().unwrap().get_report_interval_ms() as u128 * 2,
             "The test expects that Feed ID 0 has twice longer report interval compared to Feed ID 1"
         );
 
@@ -253,7 +253,7 @@ mod tests {
             .expect("ID not present in registry")
             .read()
             .unwrap()
-            .get_report_interval() as u128
+            .get_report_interval_ms() as u128
             + 1u128;
         assert!(
             fmdr.get(0)
@@ -276,7 +276,7 @@ mod tests {
             .expect("ID not present in registry")
             .read()
             .unwrap()
-            .get_report_interval() as u128
+            .get_report_interval_ms() as u128
             + 1u128;
 
         assert!(

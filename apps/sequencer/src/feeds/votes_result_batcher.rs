@@ -1,8 +1,8 @@
 use actix_web::rt::spawn;
-use async_channel::{Receiver, Sender};
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Debug;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
 
 pub struct VotesResultBatcher {}
@@ -18,8 +18,8 @@ impl VotesResultBatcher {
             + std::hash::Hash,
         V: Debug + Clone + std::string::ToString + 'static,
     >(
-        vote_recv: Receiver<(K, V)>,
-        batched_votes_send: Sender<HashMap<K, V>>,
+        mut vote_recv: UnboundedReceiver<(K, V)>,
+        batched_votes_send: UnboundedSender<HashMap<K, V>>,
     ) -> VotesResultBatcher {
         spawn(async move {
             let batch_size_env = "SEQUENCER_MAX_KEYS_TO_BATCH";
@@ -53,30 +53,37 @@ impl VotesResultBatcher {
                 let mut updates: HashMap<K, V> = Default::default();
                 let mut send_to_contract = false;
                 while !send_to_contract {
-                    let var: Result<Result<(_, _), _>, tokio::time::error::Elapsed> =
+                    let var: Result<Option<(K, V)>, tokio::time::error::Elapsed> =
                         actix_web::rt::time::timeout(
                             Duration::from_millis(timeout_duration),
-                            async { vote_recv.recv().await },
+                            vote_recv.recv(),
                         )
                         .await;
                     match var {
-                        Ok(Ok((key, val))) => {
-                            println!("adding {:?} => {:?} to updates", key, val);
+                        Ok(Some((key, val))) => {
+                            println!(
+                                "adding {} => {} to updates",
+                                key.to_string(),
+                                val.to_string()
+                            );
                             updates.insert(key, val);
                             send_to_contract = updates.keys().len() >= max_keys_to_batch;
                         }
-                        Err(e) => {
-                            println!("Flushing batched updates, {}", e.to_string());
+                        Ok(None) => {
+                            println!("Woke up on empty channel. Flushing batched updates.");
                             send_to_contract = true;
                         }
-                        Ok(Err(err)) => {
-                            println!("Batcher got RecvError: {}", err.to_string());
+                        Err(err) => {
+                            println!(
+                                "Woke up due to: {}. Flushing batched updates",
+                                err.to_string()
+                            );
                             send_to_contract = true;
                         }
                     };
                 }
                 if updates.keys().len() > 0 {
-                    batched_votes_send.send(updates).await.unwrap();
+                    let _ = batched_votes_send.send(updates); //TODO: handle when integrating anyhow::Result
                 }
             }
         });

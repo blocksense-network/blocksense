@@ -3,10 +3,10 @@ use crate::feeds::feeds_state::FeedsState;
 use crate::utils::byte_utils::to_hex_string;
 use actix_web::rt::spawn;
 use actix_web::web;
-use async_channel::Sender;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
+use tokio::sync::mpsc::UnboundedSender;
 
 pub struct FeedSlotsManager {}
 
@@ -15,17 +15,17 @@ impl FeedSlotsManager {
         K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
         V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
     >(
-        result_send: Sender<(K, V)>,
+        result_send: UnboundedSender<(K, V)>,
         feed: Arc<RwLock<FeedMetaData>>,
         name: String,
-        report_interval: u64,
+        report_interval_ms: u64,
         first_report_start_time: u128,
         app_state_clone: web::Data<FeedsState>,
         key: u32,
     ) -> FeedSlotsManager {
         spawn(async move {
             let feed_slots_time_tracker =
-                FeedSlotTimeTracker::new(report_interval, first_report_start_time);
+                FeedSlotTimeTracker::new(report_interval_ms, first_report_start_time);
 
             loop {
                 feed_slots_time_tracker.await_end_of_current_slot().await;
@@ -43,7 +43,7 @@ impl FeedSlotsManager {
 
                     println!(
                         "Tick from {} with id {} rep_interval {}.",
-                        name, key, report_interval
+                        name, key, report_interval_ms
                     );
 
                     let reports: Arc<RwLock<crate::feeds::feeds_registry::FeedReports>> =
@@ -77,10 +77,9 @@ impl FeedSlotsManager {
 
                 result_send
                     .send((
-                        to_hex_string(key_post.to_be_bytes().to_vec()).into(),
+                        to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
                         result_post_to_contract.into(),
                     ))
-                    .await
                     .unwrap();
             }
         });

@@ -115,7 +115,9 @@ pub async fn eth_batch_send_to_all_contracts<
 ) -> Result<String> {
     println!("eth_batch_send_to_contract updates: {:?}", updates);
 
-    let providers = providers.lock().await;
+    let providers = providers
+        .read()
+        .expect("Error locking all providers mutex.");
 
     let collected_futures: FuturesUnordered<
         tokio::task::JoinHandle<std::prelude::v1::Result<String, Report>>,

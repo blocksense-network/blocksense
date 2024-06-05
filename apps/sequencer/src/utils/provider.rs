@@ -70,10 +70,10 @@ pub struct RpcProvider {
     pub contract_address: Option<Address>,
 }
 
-pub type SharedRpcProviders = Arc<Mutex<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
+pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
 pub fn get_shared_rpc_providers() -> SharedRpcProviders {
-    Arc::new(Mutex::new(get_rpc_providers()))
+    Arc::new(std::sync::RwLock::new(get_rpc_providers()))
 }
 
 pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {

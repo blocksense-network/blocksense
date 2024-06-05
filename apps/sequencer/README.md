@@ -46,7 +46,7 @@ export WEB3_CONTRACT_ADDRESS_ETH1=0xef11d1c2aa48826d4c41e54ab82d1ff5ad8a64ca
 [john@doe:~/blocksense]$ cargo run --bin sequencer
 ```
 
-Note: the sequencer needs to send transactions to a deployed contract. If you have deployed the contract you can provide its address in the environment variable CONTRACT_ADDRESS. If not send a GET HTTP request to the sequencer as follows: `curl http://127.0.0.1:8877/deploy/<network name>`.
+Note: the sequencer needs to send transactions to a deployed contract. If you have deployed the contract you can provide its address in the environment variable WEB3_CONTRACT_ADDRESS. If not send a GET HTTP request to the sequencer as follows: `curl http://127.0.0.1:8877/deploy/<network name>`.
 For example:
 
 ```

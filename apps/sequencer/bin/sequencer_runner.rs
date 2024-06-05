@@ -8,6 +8,7 @@ use alloy::{
 use eyre::Result;
 use std::sync::{Arc, RwLock};
 
+use actix_web::http::header::ContentType;
 use actix_web::{error, Error};
 use actix_web::{get, web, App, HttpRequest, HttpServer};
 use actix_web::{post, HttpResponse, Responder};
@@ -26,6 +27,7 @@ use sequencer::utils::{
 };
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
+use tokio::sync::mpsc;
 
 //TODO: add schema for feed update
 #[derive(Serialize, Deserialize)]
@@ -37,8 +39,10 @@ struct MyObj {
 use once_cell::sync::Lazy;
 static PROVIDERS: Lazy<SharedRpcProviders> = Lazy::new(|| get_shared_rpc_providers());
 
-async fn deploy_contract(network: &String) -> Result<String> {
-    let providers = PROVIDERS.lock().await;
+async fn deploy_contract(network: &String) -> Result<(bool, String)> {
+    let providers = PROVIDERS
+        .read()
+        .expect("Error locking all providers mutex.");
 
     let provider = providers.get(network);
     if let Some(p) = provider.cloned() {
@@ -65,16 +69,18 @@ async fn deploy_contract(network: &String) -> Result<String> {
 
         p.contract_address = Some(contract_address);
 
-        return Ok(format!(
-            "CONTRACT_ADDRESS set to {}",
-            contract_address.to_string()
+        return Ok((
+            true,
+            format!("CONTRACT_ADDRESS set to {}", contract_address.to_string()),
         ));
     }
-    return Ok(format!("No provider for network {}", network));
+    return Ok((false, format!("No provider for network {}", network)));
 }
 
-async fn get_key_from_contract(network: &String, key: &String) -> Result<String> {
-    let providers = PROVIDERS.lock().await;
+async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, String)> {
+    let providers = PROVIDERS
+        .read()
+        .expect("Error locking all providers mutex.");
 
     let provider = providers.get(network);
 
@@ -103,21 +109,24 @@ async fn get_key_from_contract(network: &String, key: &String) -> Result<String>
 
             let result = provider.call(&tx).await?;
             println!("Call result: {:?}", result);
-            return Ok(result.to_string());
+            return Ok((true, result.to_string()));
         }
-        return Ok(format!("No contract found for network {}", network));
+        return Ok((false, format!("No contract found for network {}", network)));
     }
-    return Ok(format!("No provider found for network {}", network));
+    return Ok((false, format!("No provider found for network {}", network)));
 }
 
 #[get("/deploy/{network}")]
-async fn deploy(path: web::Path<String>) -> impl Responder {
+async fn deploy(path: web::Path<String>) -> Result<HttpResponse, Error> {
     let network = path.into_inner();
     println!("Deploying contract for network `{}` ...", network);
     match deploy_contract(&network).await {
-        Ok(result) => return result,
-        Err(_) => return format!("Could not depoloy contract for {network}").to_string(),
-    };
+        Ok((true, result)) => Ok(HttpResponse::Ok()
+            .content_type(ContentType::plaintext())
+            .body(result)),
+        Ok((false, result)) => Err(error::ErrorBadRequest(result)),
+        Err(e) => Err(error::ErrorBadRequest(e.to_string())),
+    }
 }
 
 #[get("/get_key/{network}/{key}")] // network is the name provided in config, key is hex string
@@ -125,7 +134,13 @@ async fn get_key(req: HttpRequest) -> impl Responder {
     let network: String = req.match_info().get("network").unwrap().parse().unwrap();
     let key: String = req.match_info().query("key").parse().unwrap();
     println!("getting key {} for network {} ...", key, network);
-    get_key_from_contract(&network, &key).await.unwrap()
+    match get_key_from_contract(&network, &key).await {
+        Ok((true, result)) => Ok(HttpResponse::Ok()
+            .content_type(ContentType::plaintext())
+            .body(result)),
+        Ok((false, result)) => Err(error::ErrorBadRequest(result)),
+        Err(e) => Err(error::ErrorBadRequest(e.to_string())),
+    }
 }
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
@@ -156,7 +171,7 @@ async fn index_post(
         Ok(x) => {
             let mut res = x.to_be_bytes().to_vec();
             res.resize(REPORT_HEX_SIZE / 2, 0);
-            to_hex_string(res)
+            to_hex_string(res, None)
         }
         Err(_) => {
             let value = v["result"].to_string();
@@ -233,17 +248,15 @@ async fn main() -> std::io::Result<()> {
 
     let mut feed_managers = Vec::new();
 
-    let (vote_send, vote_recv) = async_channel::unbounded();
+    let (vote_send, vote_recv) = mpsc::unbounded_channel();
 
     {
         let reg = app_state.registry.write().unwrap();
         let keys = reg.get_keys();
         for key in keys {
-            let send_channel: async_channel::Sender<(String, String)> = vote_send.clone();
+            let send_channel: mpsc::UnboundedSender<(String, String)> = vote_send.clone();
 
             println!("key = {} : value = {:?}", key, reg.get(key));
-
-            let app_state_clone: web::Data<FeedsState> = app_state.clone(); //This will be moved into the spawned timer below
 
             let feed = match reg.get(key) {
                 Some(x) => x,
@@ -252,7 +265,7 @@ async fn main() -> std::io::Result<()> {
 
             let lock_err_msg = "Could not lock feeds meta data registry for read";
             let name = feed.read().expect(lock_err_msg).get_name().clone();
-            let report_interval = feed.read().expect(lock_err_msg).get_report_interval();
+            let report_interval_ms = feed.read().expect(lock_err_msg).get_report_interval_ms();
             let first_report_start_time = feed
                 .read()
                 .expect(lock_err_msg)
@@ -262,15 +275,15 @@ async fn main() -> std::io::Result<()> {
                 send_channel,
                 feed,
                 name,
-                report_interval,
+                report_interval_ms,
                 first_report_start_time,
-                app_state_clone,
+                app_state.clone(),
                 key,
             ));
         }
     }
 
-    let (batched_votes_send, batched_votes_recv) = async_channel::unbounded();
+    let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
 
     let _votes_batcher = VotesResultBatcher::new(vote_recv, batched_votes_send);
 

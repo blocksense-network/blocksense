@@ -23,9 +23,7 @@ impl FeedProcessing for AverageFeedProcessor {
             .sum();
         let result: f64 = total / num_elements;
 
-        let mut result_bytes = result.to_be_bytes().to_vec();
-        result_bytes.resize(REPORT_HEX_SIZE / 2, 0);
-        to_hex_string(result_bytes)
+        to_hex_string(result.to_be_bytes().to_vec(), Some(REPORT_HEX_SIZE / 2))
     }
 }
 
