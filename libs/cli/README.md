@@ -4,11 +4,7 @@
 
 ## Installation
 
-TODO: Currently the CLI is not a cargo package, so you need to build and then use it.
-
-```sh
-(cd ../../ && cargo build)
-```
+TODO: The CLI depends on spin and cargo being installed.
 
 ## Examples
 
@@ -16,13 +12,15 @@ There is an example configuration in `/test`.
 
 ```sh
 # Build blocksense node reporter using the blocksense configuration json.
-(cd test/ && ../../../target/debug/blocksense node build --from ./test-config.json)
+cargo run --bin blocksense node build --from ./test-config.json
 
-# Provide up as parameter to directly start the runtime.
-(cd test/ && ../../../target/debug/blocksense node build --from ./test-config.json --up)
+# Build blocksense node reporter using the blocksense configuration folder.
+# You can also provide up as parameter to directly start the runtime.
+# *The first json in the directory is treated as the configuration*
+cargo run --bin blocksense node build --from ./test --up
 
 # Use an oracle script template for bootstraping Oracle script development.
-../../target/debug/blocksense dev oracle init
+cargo run --bin blocksense dev oracle init
 
 # TODO Add commands for using the registry.
 ```

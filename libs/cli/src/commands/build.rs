@@ -1,6 +1,6 @@
-use std::{convert::From, fs, io::prelude::*, path::PathBuf};
+use std::{convert::From, path::PathBuf};
 
-use tokio::process::Command;
+use tokio::{fs, io::AsyncWriteExt, process::Command};
 
 use anyhow::Result;
 use clap::Parser;
@@ -11,6 +11,9 @@ use blocksense_registry::config::BlocksenseConfig;
 use crate::opts::{APP_MANIFEST_FILE_OPT, BUILD_UP_OPT};
 
 use crate::spin_manifest::AppManifest as SpinConfigToml;
+
+static JSON: &str = "json";
+static SPIN: &str = "spin.toml";
 
 #[derive(Debug, Parser)]
 #[command(about = "Build the Blocksense application", allow_hyphen_values = true)]
@@ -32,17 +35,41 @@ pub struct BuildConfig {
 
 impl BuildConfig {
     pub async fn run(self) -> Result<()> {
-        let contents = fs::read_to_string(self.file_path)?;
+        let mut contents = String::new();
+        if self.file_path.is_file() {
+            contents = fs::read_to_string(&self.file_path).await?;
+        } else if self.file_path.is_dir() {
+            let mut entries = fs::read_dir(&self.file_path).await?;
+            while let Some(entry) = entries.next_entry().await? {
+                let path = entry.path();
+                if let Some(extension) = path.extension() {
+                    if extension == JSON {
+                        contents = fs::read_to_string(path).await?;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if contents.is_empty() {
+            anyhow::bail!(
+                "No blocksense configuration existing at file path: {}",
+                &self.file_path.display()
+            );
+        }
+
         let config: BlocksenseConfig = serde_json::from_str(&contents)?;
         let spin_config = SpinConfigToml::from(config);
         let toml = toml::to_string_pretty(&spin_config)?;
-        let mut file = fs::File::create("spin.toml")?;
-        file.write_all(toml.as_bytes())?;
+        let mut file = fs::File::create(PathBuf::from(&self.file_path).join(SPIN)).await?;
+        file.write_all(toml.as_bytes()).await?;
 
         if self.up {
             // TODO(adikov): Change the way we depend on spin being installed.
             Command::new("spin")
                 .arg("up")
+                .arg("-f")
+                .arg(self.file_path)
                 .stdout(Stdio::inherit())
                 .stderr(Stdio::inherit())
                 .spawn()?

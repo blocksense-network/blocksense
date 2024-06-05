@@ -1686,11 +1686,8 @@ name = "blocksense-registry"
 version = "0.0.1"
 dependencies = [
  "anyhow",
- "reqwest 0.12.4",
  "serde 1.0.203",
  "serde_json",
- "tracing",
- "url",
 ]
 
 [[package]]

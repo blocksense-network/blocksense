@@ -1,4 +1,4 @@
-use std::{fs, io::prelude::*};
+use tokio::{fs, io::AsyncWriteExt};
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
@@ -41,9 +41,9 @@ pub struct Init {
 impl Init {
     pub async fn run(self) -> Result<()> {
         let config = blocksense_registry::registry::Registry::get_config().await?;
-        let mut file = fs::File::create("blocksense-config.json")?;
+        let mut file = fs::File::create("blocksense-config.json").await?;
         let json = serde_json::to_string_pretty(&config)?;
-        file.write_all(json.as_bytes())?;
+        file.write_all(json.as_bytes()).await?;
         Ok(())
     }
 }

@@ -9,8 +9,7 @@
       }, {
         "id": "USD/ETH",
         "interval": 15
-    }],
-    "capabilities": []
+    }]
   }],
   "capabilities": []
 }
