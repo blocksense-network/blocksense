@@ -1,0 +1,29 @@
+{
+  "name": "@blocksense/sol-reflector",
+  "version": "0.0.0",
+  "keywords": [
+    "solidity",
+    "documentation"
+  ],
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "ts": "yarn node --import tsx"
+  },
+  "devDependencies": {
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^20.12.13",
+    "code-style": "github:OpenZeppelin/code-style",
+    "hardhat": "^2.22.4",
+    "solidity-ast": "^0.4.56",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.5"
+  }
+}
