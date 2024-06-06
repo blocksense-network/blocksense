@@ -2782,7 +2782,7 @@ dependencies = [
  "erased-serde",
  "fred-rs",
  "lazy_static 1.4.0",
- "prometheus",
+ "prometheus 0.0.1",
  "rand 0.8.5",
  "reqwest 0.12.4",
  "ringbuf",
@@ -2791,6 +2791,7 @@ dependencies = [
  "thiserror",
  "time",
  "tokio 1.37.0",
+ "utils",
  "weer_api",
  "yahoo_finance_api",
 ]
@@ -6588,6 +6589,18 @@ dependencies = [
 
 [[package]]
 name = "prometheus"
+version = "0.0.1"
+dependencies = [
+ "actix-web",
+ "anyhow",
+ "lazy_static 1.4.0",
+ "prometheus 0.13.4",
+ "reqwest 0.12.4",
+ "utils",
+]
+
+[[package]]
+name = "prometheus"
 version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d33c28a30771f7f96db69893f78b857f7450d7e0237e9c8fc6427a81bae7ed1"
@@ -9737,6 +9750,10 @@ name = "utf8parse"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
+
+[[package]]
+name = "utils"
+version = "0.0.1"
 
 [[package]]
 name = "uuid"

@@ -9,29 +9,14 @@ use std::{
 use data_feeds::{
     connector::data_feed::{dispatch, DataFeed},
     types::DataFeedAPI,
-    utils::{get_env_var, handle_prometheus_metrics},
 };
 
 use prometheus::{
-    register_counter, register_int_counter, register_int_gauge, Counter, IntCounter, IntGauge,
+    actix_server::handle_prometheus_metrics,
+    metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-
-lazy_static::lazy_static! {
-    static ref BATCH_COUNTER: IntCounter =
-        register_int_counter!("BATCH_COUNTER", "number of batches served").unwrap();
-
-    static ref BATCH_SIZE: IntCounter =
-        register_int_counter!("FEED_COUNTER", "Available feed count").unwrap();
-
-    static ref FEED_COUNTER: IntCounter =
-        register_int_counter!("FEED_COUNTER", "Available feed count").unwrap();
-
-    static ref UPTIME_COUNTER: Counter =
-        register_counter!("UPTIME_COUNTER", "Runtime(sec) duration of reporter").unwrap();
-
-    static ref BATCH_PARSE_TIME_GAUGE: IntGauge = register_int_gauge!("BATCH_PARSE_TIME_GAUGE", "Time(ms) to parse current batch").unwrap();
-}
+use utils::get_env_var;
 
 #[tokio::main]
 async fn main() {
