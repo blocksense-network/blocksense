@@ -6,10 +6,11 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
+thiserror = "1.0.61"
 anyhow = "1.0.81"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 serde_json = "1.0.115"
-serde = "1.0.197"
+serde = { version = "1.0.197", features = ["derive"]}
 erased-serde = "0.4.4"
 ringbuf = "0.4.0"
 reqwest = "0.12.4"
