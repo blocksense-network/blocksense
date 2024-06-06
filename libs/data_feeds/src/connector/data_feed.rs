@@ -3,15 +3,10 @@ use crate::{
     types::{Bytes32, ConsensusMetric, DataFeedAPI, Timestamp},
 };
 use async_trait::async_trait;
-use prometheus::{register_int_gauge_vec, IntGaugeVec};
+use erased_serde::serialize_trait_object;
+use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
-
-lazy_static::lazy_static! {
-    static ref DATA_FEED_PARSE_TIME_GAUGE: IntGaugeVec = register_int_gauge_vec!("DATA_FEED_PARSE_TIME_GAUGE", "Time(ms) to parse current feed",&["Feed"]).unwrap();
-}
-
-use erased_serde::serialize_trait_object;
 
 use super::{
     error::{ConversionError, FeedError},

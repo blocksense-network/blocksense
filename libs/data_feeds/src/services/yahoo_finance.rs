@@ -2,13 +2,13 @@ use async_trait::async_trait;
 use ringbuf::traits::RingBuffer;
 use ringbuf::HeapRb;
 use serde::Serialize;
+use utils::{current_unix_time, get_env_var};
 use yahoo_finance_api::{YahooConnector, YahooError};
 
 use crate::connector::bytes::f64_to_bytes32;
 use crate::connector::data_feed::Payload;
 use crate::connector::error::{ConversionError, FeedError};
 use crate::types::{Bytes32, Timestamp};
-use crate::utils::{current_unix_time, get_env_var};
 use crate::{
     connector::data_feed::DataFeed,
     types::{ConsensusMetric, DataFeedAPI},
