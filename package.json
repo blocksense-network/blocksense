@@ -16,12 +16,12 @@
     }
   },
   "devDependencies": {
-    "@vercel/build-utils": "^8.2.0",
-    "@vercel/next": "^4.2.14",
-    "@vercel/nft": "^0.27.1",
-    "prettier": "^3.2.5",
+    "@vercel/build-utils": "^8.2.1",
+    "@vercel/next": "^4.2.15",
+    "@vercel/nft": "^0.27.2",
+    "prettier": "^3.3.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
-    "vercel": "^34.2.4"
+    "vercel": "^34.2.5"
   }
 }
