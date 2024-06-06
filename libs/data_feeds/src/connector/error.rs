@@ -3,12 +3,15 @@ use thiserror::Error;
 
 #[derive(Error, Debug, Serialize)]
 pub enum FeedError {
-    #[error("API error ocurred: {0}")]
+    #[error("Reqwest error ocurred: {0}")]
     #[serde(serialize_with = "serialize_reqwest_error")]
     RequestError(#[from] reqwest::Error),
 
     #[error("Error ocurred - can't retrieve timestamp")]
     TimestampError,
+
+    #[error("API error ocurred: {0}")]
+    APIError(String),
 
     #[error("Undefined error ocurred")]
     UndefinedError,

@@ -81,6 +81,10 @@ impl DataFeed for CoinMarketCapDataFeed {
 
 impl From<CmcErrors> for FeedError {
     fn from(error: CmcErrors) -> Self {
-        FeedError::UndefinedError
+        match error {
+            // CmcErrors::RequestError(reqwest_error) => FeedError::RequestError(reqwest_error),
+            CmcErrors::ApiError(api_error) => FeedError::APIError(api_error),
+            _ => FeedError::UndefinedError,
+        }
     }
 }

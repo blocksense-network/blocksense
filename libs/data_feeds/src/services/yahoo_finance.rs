@@ -64,10 +64,13 @@ impl DataFeed for YahooDataFeed {
 
 impl From<YahooError> for FeedError {
     fn from(error: YahooError) -> Self {
-        FeedError::UndefinedError
+        match error {
+            // YahooError::ConnectionFailed(err) => FeedError::RequestError(err),
+            YahooError::FetchFailed(message) => FeedError::APIError(message),
+            _ => FeedError::UndefinedError,
+        }
     }
 }
-
 pub struct YahooDataFeed {
     api_connector: YahooConnector,
     is_connected: bool,
