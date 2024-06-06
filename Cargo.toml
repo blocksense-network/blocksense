@@ -4,6 +4,7 @@ members = [
   "libs/anomaly_detection",
   "libs/cli",
   "libs/data_feeds",
+  "libs/prometheus",
   "libs/registry",
   "libs/sdk",
   "libs/sdk/trigger-oracle",
