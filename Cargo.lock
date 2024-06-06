@@ -1704,7 +1704,6 @@ checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
 name = "data_feeds"
 version = "0.0.1"
 dependencies = [
- "actix-web",
  "anyhow",
  "async-std",
  "async-trait",
@@ -1713,7 +1712,7 @@ dependencies = [
  "erased-serde",
  "fred-rs",
  "lazy_static",
- "prometheus",
+ "prometheus 0.0.1",
  "rand",
  "reqwest 0.12.4",
  "ringbuf",
@@ -1722,6 +1721,7 @@ dependencies = [
  "thiserror",
  "time",
  "tokio 1.37.0",
+ "utils",
  "weer_api",
  "yahoo_finance_api",
 ]
@@ -3723,6 +3723,18 @@ dependencies = [
 
 [[package]]
 name = "prometheus"
+version = "0.0.1"
+dependencies = [
+ "actix-web",
+ "anyhow",
+ "lazy_static",
+ "prometheus 0.13.4",
+ "reqwest 0.12.4",
+ "utils",
+]
+
+[[package]]
+name = "prometheus"
 version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d33c28a30771f7f96db69893f78b857f7450d7e0237e9c8fc6427a81bae7ed1"
@@ -5166,6 +5178,10 @@ name = "utf-8"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09cc8ee72d2a9becf2f2febe0205bbed8fc6615b7cb429ad062dc7b7ddd036a9"
+
+[[package]]
+name = "utils"
+version = "0.0.1"
 
 [[package]]
 name = "uuid"

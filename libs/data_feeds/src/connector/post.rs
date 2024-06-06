@@ -5,9 +5,9 @@ use std::{
 };
 
 use crate::connector::{data_feed::DataFeed, error::FeedError};
-use crate::utils::generate_string_hash;
 use curl::easy::Easy;
 use serde_json::{json, Value};
+use utils::generate_string_hash;
 
 use super::data_feed::Payload;
 

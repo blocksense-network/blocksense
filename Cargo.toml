@@ -1,5 +1,5 @@
 [workspace]
-members = ["apps/sequencer", "libs/anomaly_detection", "libs/data_feeds","libs/prometheus"]
+members = ["apps/sequencer", "libs/anomaly_detection", "libs/data_feeds","libs/prometheus", "libs/utils"]
 resolver = "2"
 
 [workspace.package]

@@ -6,6 +6,9 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
+prometheus = { path = "../prometheus" }
+utils = { path = "../utils" }
+
 thiserror = "1.0.61"
 anyhow = "1.0.81"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
@@ -29,9 +32,6 @@ rand = "0.8.5"
 curl = "0.4.46"
 lazy_static = "1.4.0"
 async-trait = "0.1.74"
-
-prometheus = "0.13.4"
-actix-web = "4.5.1"
 
 [[bin]]
 name = "orchestrator"

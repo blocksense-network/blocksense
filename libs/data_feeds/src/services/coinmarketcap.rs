@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use cmc::{errors::CmcErrors, Cmc};
 use ringbuf::{self, traits::RingBuffer, HeapRb};
 use serde::Serialize;
+use utils::{current_unix_time, get_env_var};
 
 use crate::{
     connector::{
@@ -10,7 +11,6 @@ use crate::{
         error::{ConversionError, FeedError},
     },
     types::{Bytes32, ConsensusMetric, DataFeedAPI, Timestamp},
-    utils::{current_unix_time, get_env_var},
 };
 
 #[derive(Serialize, Clone, Copy)]
