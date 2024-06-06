@@ -1,21 +1,30 @@
 use crate::{
-    connector::post::post_api_response,
     services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooDataFeed},
-    types::{ConsensusMetric, DataFeedAPI},
+    types::{Bytes32, ConsensusMetric, DataFeedAPI, Timestamp},
+    utils::current_unix_time,
 };
+use actix_web::web::Bytes;
 use async_trait::async_trait;
 use prometheus::{register_int_gauge_vec, IntGaugeVec};
 use rand::{seq::IteratorRandom, thread_rng};
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
-
-use erased_serde::serialize_trait_object;
-
-serialize_trait_object!(Payload);
-
-pub trait Payload: erased_serde::Serialize {}
+use time::Time;
 
 lazy_static::lazy_static! {
     static ref DATA_FEED_PARSE_TIME_GAUGE: IntGaugeVec = register_int_gauge_vec!("DATA_FEED_PARSE_TIME_GAUGE", "Time(ms) to parse current feed",&["Feed"]).unwrap();
+}
+
+use erased_serde::serialize_trait_object;
+
+use super::{
+    error::{ConversionError, FeedError},
+    post::post_feed_response,
+};
+
+serialize_trait_object!(Payload);
+
+pub trait Payload: erased_serde::Serialize {
+    fn to_bytes32(&self) -> Result<Bytes32, ConversionError>;
 }
 
 #[async_trait(?Send)]
@@ -28,7 +37,7 @@ pub trait DataFeed {
 
     fn score_by(&self) -> ConsensusMetric;
 
-    async fn poll(&mut self, asset: &str) -> Result<(Box<dyn Payload>, u64), anyhow::Error>;
+    async fn poll(&mut self, asset: &str) -> (Result<Box<dyn Payload>, FeedError>, Timestamp);
 
     fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64);
 
@@ -96,7 +105,7 @@ pub async fn dispatch(
         let data_feed = resolve_feed(&api, connection_cache);
         let feed_asset_name = DataFeedAPI::feed_asset_str(&api, &asset);
 
-        post_api_response(
+        post_feed_response(
             reporter_id,
             sequencer_url,
             data_feed,
