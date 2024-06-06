@@ -1,0 +1,10 @@
+[package]
+name = "prometheus"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+[dependencies]
+prometheus = "0.13.4"
+actix-web = "4.5.1"
