@@ -1,0 +1,22 @@
+[package]
+name = "reporter"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+data_feeds = { path = "../../libs/data_feeds"}
+prometheus = { path = "../../libs/prometheus" }
+
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[[bin]]
+name = "launch_reporter"
+path = "bin/launch_reporter.rs"
+
+[[bin]]
+name = "launch_prometheus_server"
+path = "bin/prometheus_server.rs"
