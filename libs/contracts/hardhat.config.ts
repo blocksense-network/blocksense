@@ -7,10 +7,15 @@ import 'solidity-coverage';
 import '@typechain/hardhat';
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
+import '@blocksense/solidity-docsgen';
 
 dotenv.config();
 
 const config: HardhatUserConfig = {
+  docgen: {
+    outputDir: 'artifacts/docs',
+    exclude: ['test'],
+  },
   solidity: {
     version: '0.8.24',
     settings: {
