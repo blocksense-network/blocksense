@@ -363,6 +363,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/contracts@workspace:libs/contracts"
   dependencies:
+    "@blocksense/solidity-docsgen": "workspace:*"
     "@nomicfoundation/hardhat-chai-matchers": "npm:^2.0.6"
     "@nomicfoundation/hardhat-ethers": "npm:^3.0.6"
     "@nomicfoundation/hardhat-network-helpers": "npm:^1.0.10"
@@ -474,7 +475,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/solidity-docsgen@workspace:libs/solidity-docsgen":
+"@blocksense/solidity-docsgen@workspace:*, @blocksense/solidity-docsgen@workspace:libs/solidity-docsgen":
   version: 0.0.0-use.local
   resolution: "@blocksense/solidity-docsgen@workspace:libs/solidity-docsgen"
   dependencies:
