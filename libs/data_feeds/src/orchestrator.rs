@@ -6,11 +6,6 @@ use std::{
     time::{Duration, Instant},
 };
 
-use data_feeds::{
-    connector::data_feed::{dispatch, DataFeed},
-    types::DataFeedAPI,
-};
-
 use prometheus::{
     actix_server::handle_prometheus_metrics,
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
@@ -18,8 +13,12 @@ use prometheus::{
 };
 use utils::get_env_var;
 
-#[tokio::main]
-async fn main() {
+use crate::{
+    connector::data_feed::{dispatch, DataFeed},
+    types::DataFeedAPI,
+};
+
+pub async fn orchestrator() {
     let batch_size: usize = get_env_var("BATCH_SIZE").unwrap_or_else(|_| 5);
     let reporter_id: u64 = get_env_var("REPORTER_ID").unwrap_or_else(|_| 0);
 
