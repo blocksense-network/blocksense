@@ -14,11 +14,14 @@ export const GettingStarted = () => {
           <span className="getting-started__description max-w-2xl mb-6 font-light text-gray-800 lg:mb-8 md:text-lg lg:text-xl">
             {gettingStartedConfig.description}
           </span>
-          <LinkButton
-            label="Get Started"
-            target="_blank"
-            link="/getting-started"
-          />
+          <span className="lg:ml-auto">
+            <LinkButton
+              label="Get Started"
+              target="_blank"
+              link="/getting-started"
+            />
+            <LinkButton label="Roadmap" target="_blank" link="/roadmap" />
+          </span>
         </article>
         <aside className="getting-started__image hidden lg:mt-0 lg:col-span-3 lg:flex">
           <img

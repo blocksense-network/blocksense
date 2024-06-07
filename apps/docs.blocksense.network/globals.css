@@ -13,3 +13,17 @@ span {
 #__next {
   margin-top: calc(-1 * var(--nextra-navbar-height));
 }
+
+@media only screen and (min-width: 1170px) {
+  .vertical-timeline--two-columns {
+    @apply w-full !important;
+  }
+
+  .vertical-timeline-element {
+    @apply p-8;
+  }
+
+  .vertical-timeline-element-date {
+    @apply text-slate-800;
+  }
+}
