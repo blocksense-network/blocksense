@@ -477,7 +477,7 @@ __metadata:
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4"
     "@types/mocha": "npm:^10.0.6"
-    "@types/node": "npm:^20.12.13"
+    "@types/node": "npm:^20.14.2"
     chai: "npm:4"
     dotenv: "npm:^16.4.5"
     ethers: "npm:^6.12.1"
@@ -523,7 +523,7 @@ __metadata:
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     scroll-into-view-if-needed: "npm:^3.1.0"
-    tailwindcss: "npm:^3.3.3"
+    tailwindcss: "npm:^3.4.4"
     tsup: "npm:7.2.0"
     typescript: "npm:5.4.5"
     vitest: "npm:^0.34.0"
@@ -543,7 +543,7 @@ __metadata:
     "@blocksense/docs-theme": "workspace:*"
     "@emotion/react": "npm:^11.11.4"
     "@emotion/styled": "npm:^11.11.5"
-    "@types/node": "npm:^20.12.13"
+    "@types/node": "npm:^20.14.2"
     "@types/react": "npm:^18.3.3"
     autoprefixer: "npm:^10.4.19"
     next: "npm:^14.2.3"
@@ -552,8 +552,8 @@ __metadata:
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-vertical-timeline-component: "npm:^3.6.0"
-    tailwindcss: "npm:^3.4.3"
-    tslib: "npm:^2.6.2"
+    tailwindcss: "npm:^3.4.4"
+    tslib: "npm:^2.6.3"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -564,13 +564,13 @@ __metadata:
   resolution: "@blocksense/monorepo@workspace:."
   dependencies:
     "@vercel/build-utils": "npm:^8.2.0"
-    "@vercel/next": "npm:^4.2.14"
-    "@vercel/nft": "npm:^0.27.1"
-    prettier: "npm:^3.2.5"
+    "@vercel/next": "npm:^4.2.15"
+    "@vercel/nft": "npm:^0.27.2"
+    prettier: "npm:^3.3.1"
     react: "npm:^18.3.1"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.4.5"
-    vercel: "npm:^34.2.4"
+    vercel: "npm:^34.2.5"
   dependenciesMeta:
     "@openzeppelin/contracts@5.0.2":
       unplugged: true
@@ -2893,7 +2893,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^20.12.13":
+"@types/node@npm:*":
   version: 20.14.1
   resolution: "@types/node@npm:20.14.1"
   dependencies:
@@ -2913,6 +2913,15 @@ __metadata:
   version: 18.15.13
   resolution: "@types/node@npm:18.15.13"
   checksum: 10c0/6e5f61c559e60670a7a8fb88e31226ecc18a21be103297ca4cf9848f0a99049dae77f04b7ae677205f2af494f3701b113ba8734f4b636b355477a6534dbb8ada
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.14.2":
+  version: 20.14.2
+  resolution: "@types/node@npm:20.14.2"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10c0/2d86e5f2227aaa42212e82ea0affe72799111b888ff900916376450b02b09b963ca888b20d9c332d8d2b833ed4781987867a38eaa2e4863fa8439071468b0a6f
   languageName: node
   linkType: hard
 
@@ -3077,12 +3086,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vercel/next@npm:4.2.14, @vercel/next@npm:^4.2.14":
-  version: 4.2.14
-  resolution: "@vercel/next@npm:4.2.14"
+"@vercel/next@npm:4.2.15, @vercel/next@npm:^4.2.15":
+  version: 4.2.15
+  resolution: "@vercel/next@npm:4.2.15"
   dependencies:
     "@vercel/nft": "npm:0.27.0"
-  checksum: 10c0/27ef48093d1a6c3d7e79ae2de900aa8ff47519014556d5c46824822f48a5366b7ba1d203521330f1072d4152900227ce30221364656b7cff8dfbf9f61cc98ea8
+  checksum: 10c0/7b252479c59c32d9ec598c36636672f96ef20d91dcb1241f867b2df16e43f90a0fee37e1fe0bfa89980b36fc15a1c101789a43bc358b7a05f848c657e2e86e96
   languageName: node
   linkType: hard
 
@@ -3108,9 +3117,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vercel/nft@npm:^0.27.1":
-  version: 0.27.1
-  resolution: "@vercel/nft@npm:0.27.1"
+"@vercel/nft@npm:^0.27.2":
+  version: 0.27.2
+  resolution: "@vercel/nft@npm:0.27.2"
   dependencies:
     "@mapbox/node-pre-gyp": "npm:^1.0.5"
     "@rollup/pluginutils": "npm:^4.0.0"
@@ -3126,7 +3135,7 @@ __metadata:
     resolve-from: "npm:^5.0.0"
   bin:
     nft: out/cli.js
-  checksum: 10c0/f0f0741791743adfc048c57de013fe45da1b5d90c8bcca7a4d697b719c8ac2cfd890841b209b3ff76ca47263ccfec450a773448407404cf47b09360d05980ee1
+  checksum: 10c0/5eee9034a0a75fcaa972a143a4f34085532f781cf12898fb14ec0dc344aa98a1e5076481f3d8f516663b23379b7d666d5c67a6bb70cc734f87547642aa82ffc3
   languageName: node
   linkType: hard
 
@@ -10648,12 +10657,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.2.5":
-  version: 3.3.0
-  resolution: "prettier@npm:3.3.0"
+"prettier@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "prettier@npm:3.3.1"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10c0/d033c356320aa2e468bf29c931b094ac730d2f4defd5eb2989d8589313dec901d2fc866e3788f3d161e420b142ea4ec3dda535dbe0169ef4d0026397a68ba9cf
+  checksum: 10c0/c25a709c9f0be670dc6bcb190b622347e1dbeb6c3e7df8b0711724cb64d8647c60b839937a4df4df18e9cfb556c2b08ca9d24d9645eb5488a7fc032a2c4d5cb3
   languageName: node
   linkType: hard
 
@@ -12190,9 +12199,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwindcss@npm:^3.3.3, tailwindcss@npm:^3.4.3":
-  version: 3.4.3
-  resolution: "tailwindcss@npm:3.4.3"
+"tailwindcss@npm:^3.4.4":
+  version: 3.4.4
+  resolution: "tailwindcss@npm:3.4.4"
   dependencies:
     "@alloc/quick-lru": "npm:^5.2.0"
     arg: "npm:^5.0.2"
@@ -12219,7 +12228,7 @@ __metadata:
   bin:
     tailwind: lib/cli.js
     tailwindcss: lib/cli.js
-  checksum: 10c0/11e5546494f2888f693ebaa271b218b3a8e52fe59d7b629e54f2dffd6eaafd5ded2e9f0c37ad04e6a866dffb2b116d91becebad77e1441beee8bf016bb2392f9
+  checksum: 10c0/e4f7e1a2e1897871a4744f421ccb5639e8d51012e3644b0c35cf723527fdc8f9cddd3fa3b0fc28c198b0ea6ce44ead21c89cfec549d80bad9b1f3dd9d8bf2d54
   languageName: node
   linkType: hard
 
@@ -12578,10 +12587,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2":
+"tslib@npm:^2.1.0, tslib@npm:^2.4.0":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 10c0/e03a8a4271152c8b26604ed45535954c0a45296e32445b4b87f8a5abdb2421f40b59b4ca437c4346af0f28179780d604094eb64546bee2019d903d01c6c19bdb
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.6.3":
+  version: 2.6.3
+  resolution: "tslib@npm:2.6.3"
+  checksum: 10c0/2598aef53d9dbe711af75522464b2104724d6467b26a60f2bdac8297d2b5f1f6b86a71f61717384aa8fd897240467aaa7bcc36a0700a0faf751293d1331db39a
   languageName: node
   linkType: hard
 
@@ -13140,15 +13156,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vercel@npm:^34.2.4":
-  version: 34.2.4
-  resolution: "vercel@npm:34.2.4"
+"vercel@npm:^34.2.5":
+  version: 34.2.5
+  resolution: "vercel@npm:34.2.5"
   dependencies:
     "@vercel/build-utils": "npm:8.2.1"
     "@vercel/fun": "npm:1.1.0"
     "@vercel/go": "npm:3.1.1"
     "@vercel/hydrogen": "npm:1.0.2"
-    "@vercel/next": "npm:4.2.14"
+    "@vercel/next": "npm:4.2.15"
     "@vercel/node": "npm:3.1.6"
     "@vercel/python": "npm:4.3.0"
     "@vercel/redwood": "npm:2.0.9"
@@ -13159,7 +13175,7 @@ __metadata:
   bin:
     vc: dist/index.js
     vercel: dist/index.js
-  checksum: 10c0/25436cde01227d94b9625cec7caeb60d3b726f13af1e9ed29a8794384da9be7f9ce1d073c72cfec971a3645c84a656776de4b121344085386b3872542199dc7d
+  checksum: 10c0/3b770b067e6e32cdcb4aa2fdeeda47947f2f60b9c2b9d98f4a1f2e3aaa31784771ae8a0ffed2af1c928516df4f4bd7e0e4cc3f740e40c7e2038b9953dd76c303
   languageName: node
   linkType: hard
 
