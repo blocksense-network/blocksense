@@ -1860,7 +1860,6 @@ dependencies = [
  "blocksense-registry",
  "camino",
  "clap 4.5.16",
- "feed_registry",
  "indexmap 2.5.0",
  "is-terminal",
  "lazy_static 1.5.0",

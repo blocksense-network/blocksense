@@ -33,7 +33,7 @@ use data_feeds::connector::post::generate_signature;
 use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 
 wasmtime::component::bindgen!({
-    path: "../wit",
+    path: "../../libs/sdk/wit",
     world: "blocksense-oracle",
     async: true
 });

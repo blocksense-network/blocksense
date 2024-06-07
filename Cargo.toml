@@ -1,19 +1,20 @@
 [workspace]
 members = [
+  "apps/cli",
   "apps/reporter",
   "apps/sequencer",
   "apps/sequencer_tests",
+  "apps/trigger-oracle",
   "libs/anomaly_detection",
-  "libs/cli",
   "libs/data_feeds",
   "libs/derive",
   "libs/prometheus",
   "libs/registry",
   "libs/sdk",
-  "libs/sdk/trigger-oracle",
   "libs/utils",
-  "libs/config"
-, "libs/crypto", "libs/feed_registry"]
+  "libs/config",
+  "libs/crypto",
+  "libs/feed_registry"]
 resolver = "2"
 
 [workspace.package]

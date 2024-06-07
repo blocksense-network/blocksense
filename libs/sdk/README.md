@@ -1,22 +1,63 @@
 # Initial implementation for the Blocksense SDK
 
-## How to build and install the oracle trigger to spin
+- [Helper Scripts](../../scripts/sdk/README.md)
+- [Revolut API Example](./examples/README.md)
 
-You need to call `build-and-install-plugin.sh`. In the future we will use spin puginify.
+## SDK Macro
 
+The oracle macro main purpose is to wrap everything related to WASM and WIT, so that implementing
+oracle scripts using rust is more straight forward.
+
+Usage:
+
+```rust
+use blocksense_sdk::{
+    oracle::{Payload, Settings},
+    oracle_component,
+}
+#[oracle_component]
+async fn my_function(settings: Settings) -> Result<Payload> {
+    unimplemented!()
+}
 ```
-./build-and-install-plugin.sh
 
-```
+## Oracle types
 
-## How to run the example
+Currently we support request/response oracle scripts that receive `Settings` as parameter and should return
+`Result<Payload>`
 
-```
-./start-oracle-example.sh example_folder_name
-```
+- `Settings` provide you with an array of data feed IDs and resources.
+- `Payload` is the Oracle result which which is an array of data feed results .
 
-## How to install our Oracle template
+## HTTP library
 
-```
-spin templates install --dir ./
+For a HTTP library we are using the [The Spin Rust SDK](https://github.com/fermyon/spin-rust-sdk/tree/main)
+
+Usage:
+
+```rust
+use blocksense_sdk::{
+    oracle::{Payload, Settings},
+    oracle_component,
+    spin::http::{send, Method, Request, Response},
+};
+
+#[oracle_component]
+async fn my_function(_settings: Settings) -> Result<Payload> {
+    // Create the outbound request object
+    let req = Request::builder()
+        .method(Method::Get)
+        .uri("https://random-data-api.fermyon.app/animals/json")
+        .build();
+
+    // Send the request and await the response
+    let res: Response = send(req).await?;
+
+    println!("{:?}", res);  // log the response
+    // TODO(oracle developer): Properly transform the response into an array of data feeds results
+    // that are going to be stored on the oracle smart contract.
+    Ok(Payload {
+        values: vec![],
+    })
+}
 ```

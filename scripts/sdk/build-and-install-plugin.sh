@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT="$(git rev-parse --show-toplevel)"
-DIR="$ROOT/libs/sdk/trigger-oracle"
+DIR="$ROOT/apps/trigger-oracle"
 
 (cd "$DIR"; cargo build --release)
 
@@ -14,7 +14,7 @@ cat > $DIR/trigger-oracle.json << EOF
 {
     "name": "trigger-oracle",
     "description": "Run Blocksense oracle components at timed intervals",
-    "homepage": "https://github.com/blocksense-network/blocksense/tree/main/libs/sdk/trigger-oracle",
+    "homepage": "https://github.com/blocksense-network/blocksense/tree/main/apps/trigger-oracle",
     "version": "0.1.0",
     "spinCompatibility": ">=2.2",
     "license": "Apache-2.0",

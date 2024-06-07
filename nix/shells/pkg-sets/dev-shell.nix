@@ -13,6 +13,7 @@
     alejandra
     jq
     curl
+    oras
   ];
 
   enterShell = ''
