@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "apps/reporter",
   "apps/sequencer",
   "libs/anomaly_detection",
   "libs/cli",
