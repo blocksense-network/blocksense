@@ -72,7 +72,7 @@ pub struct RpcProvider {
 
 pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
-pub fn get_shared_rpc_providers() -> SharedRpcProviders {
+pub fn init_shared_rpc_providers() -> SharedRpcProviders {
     Arc::new(std::sync::RwLock::new(get_rpc_providers()))
 }
 
@@ -147,7 +147,7 @@ pub fn print_type<T>(_: &T) {
 //     provider
 // }
 
-pub fn get_shared_provider() -> Arc<Mutex<ProviderType>> {
+pub fn init_shared_provider() -> Arc<Mutex<ProviderType>> {
     Arc::new(Mutex::new(get_provider()))
 }
 

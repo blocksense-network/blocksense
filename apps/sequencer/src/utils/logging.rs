@@ -1,17 +1,36 @@
+use std::env;
 use std::sync::Arc;
 use std::sync::Mutex;
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::{filter, fmt, prelude::*, reload, Registry};
 
-type Hanlde = tracing_subscriber::reload::Handle<LevelFilter, Registry>;
+type Handle = tracing_subscriber::reload::Handle<LevelFilter, Registry>;
 pub type SharedLoggingHandle = Arc<Mutex<LoggingHandle>>;
 
-pub fn get_shared_logging_handle() -> Arc<Mutex<LoggingHandle>> {
-    Arc::new(Mutex::new(get_logging_handle()))
+pub fn init_shared_logging_handle() -> Arc<Mutex<LoggingHandle>> {
+    Arc::new(Mutex::new(init_logging_handle()))
 }
 
-pub fn get_logging_handle() -> LoggingHandle {
-    let filter = filter::LevelFilter::DEBUG;
+fn str_to_filter_level(log_level: &str) -> Option<LevelFilter> {
+    match log_level {
+        "TRACE" => Some(filter::LevelFilter::TRACE),
+        "DEBUG" => Some(filter::LevelFilter::DEBUG),
+        "INFO" => Some(filter::LevelFilter::INFO),
+        "WARN" => Some(filter::LevelFilter::WARN),
+        "ERROR" => Some(filter::LevelFilter::ERROR),
+        _ => None,
+    }
+}
+
+pub fn init_logging_handle() -> LoggingHandle {
+    let filter = match env::var("SEQUENCER_LOGGING_LEVEL") {
+        Ok(logging_level) => match str_to_filter_level(logging_level.as_str()) {
+            Some(f) => f,
+            None => filter::LevelFilter::INFO,
+        },
+        Err(_) => filter::LevelFilter::INFO,
+    };
+
     let (filter, reload_handle) = reload::Layer::new(filter);
     tracing_subscriber::registry()
         .with(filter)
@@ -23,17 +42,13 @@ pub fn get_logging_handle() -> LoggingHandle {
 }
 
 pub struct LoggingHandle {
-    handle: Hanlde,
+    handle: Handle,
 }
 
 impl LoggingHandle {
     pub fn set_logging_level(&self, log_level: &str) -> bool {
-        let level = match log_level {
-            "TRACE" => filter::LevelFilter::TRACE,
-            "DEBUG" => filter::LevelFilter::DEBUG,
-            "INFO" => filter::LevelFilter::INFO,
-            "WARN" => filter::LevelFilter::WARN,
-            "ERROR" => filter::LevelFilter::ERROR,
+        let level = match str_to_filter_level(log_level) {
+            Some(l) => l,
             _ => {
                 return false;
             }

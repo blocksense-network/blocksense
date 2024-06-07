@@ -11,11 +11,12 @@ use tokio::sync::Mutex;
 use crate::utils::provider::{
     get_contract_address, get_wallet, ProviderType, RpcProvider, SharedRpcProviders,
 };
-use crate::utils::time_utils::TimeIntervalMeasure;
 use actix_web::rt::spawn;
+use eyre::eyre;
 use eyre::Report;
 use futures::stream::FuturesUnordered;
 use std::fmt::Debug;
+use std::time::Instant;
 use tracing::{debug, error, info};
 
 // Codegen from embedded Solidity code and precompiled bytecode.
@@ -28,10 +29,7 @@ sol! {
     }
 }
 
-pub async fn deploy_contract(
-    network: &String,
-    providers: &SharedRpcProviders,
-) -> Result<(bool, String)> {
+pub async fn deploy_contract(network: &String, providers: &SharedRpcProviders) -> Result<String> {
     let providers = providers
         .read()
         .expect("Could not lock all providers' lock");
@@ -48,7 +46,7 @@ pub async fn deploy_contract(
         // Deploy the contract.
         let contract_builder = DataFeedStoreV1::deploy_builder(provider);
         let estimate = contract_builder.estimate_gas().await?;
-        let deploy_time = TimeIntervalMeasure::new();
+        let deploy_time = Instant::now();
         let contract_address = contract_builder
             .gas(estimate)
             .gas_price(base_fee)
@@ -58,17 +56,17 @@ pub async fn deploy_contract(
         info!(
             "Deployed contract at address: {:?} took {}ms\n",
             contract_address.to_string(),
-            deploy_time.measure()
+            deploy_time.elapsed().as_millis()
         );
 
         p.contract_address = Some(contract_address);
 
-        return Ok((
-            true,
-            format!("CONTRACT_ADDRESS set to {}", contract_address.to_string()),
+        return Ok(format!(
+            "CONTRACT_ADDRESS set to {}",
+            contract_address.to_string()
         ));
     }
-    return Ok((false, format!("No provider for network {}", network)));
+    Err(eyre!("No provider for network {}", network))
 }
 
 pub async fn eth_send_to_contract(
@@ -219,12 +217,12 @@ pub async fn eth_batch_send_to_all_contracts<
                 .input(Some(input).into());
 
             info!("Sending to `{}` tx =  {:?}", net, tx);
-            let tx_time = TimeIntervalMeasure::new();
+            let tx_time = Instant::now();
 
             let receipt = provider.send_transaction(tx).await?.get_receipt().await?;
             info!(
                 "Recvd transaction receipt that took {}ms from `{}`: {:?}",
-                tx_time.measure(),
+                tx_time.elapsed().as_millis(),
                 net,
                 receipt
             );

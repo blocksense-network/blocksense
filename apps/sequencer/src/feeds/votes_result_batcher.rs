@@ -4,7 +4,7 @@ use std::env;
 use std::fmt::Debug;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
-use tracing::{debug, error, info};
+use tracing::{debug, info};
 
 pub struct VotesResultBatcher {}
 

@@ -27,9 +27,10 @@ use sequencer::utils::{byte_utils::to_hex_string, eth_send_utils::deploy_contrac
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 
-use sequencer::utils::logging::{get_shared_logging_handle, SharedLoggingHandle};
+use eyre::eyre;
+use sequencer::utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
+use tracing::info_span;
 use tracing::{debug, error, info, trace};
-use tracing::{span, Level};
 
 //TODO: add schema for feed update
 #[derive(Serialize, Deserialize)]
@@ -39,10 +40,10 @@ struct MyObj {
 }
 
 use once_cell::sync::Lazy;
-static PROVIDERS: Lazy<SharedRpcProviders> = Lazy::new(|| get_shared_rpc_providers());
-static GLOBAL_LOG_HANDLE: Lazy<SharedLoggingHandle> = Lazy::new(|| get_shared_logging_handle());
+static PROVIDERS: Lazy<SharedRpcProviders> = Lazy::new(|| init_shared_rpc_providers());
+static GLOBAL_LOG_HANDLE: Lazy<SharedLoggingHandle> = Lazy::new(|| init_shared_logging_handle());
 
-async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, String)> {
+async fn get_key_from_contract(network: &String, key: &String) -> Result<String> {
     let providers = PROVIDERS
         .read()
         .expect("Could not lock all providers' lock");
@@ -66,7 +67,7 @@ async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, 
 
             // key: 0x00000000
             let input = match Bytes::from_hex(key) {
-                Err(e) => return Ok((false, format!("Key is not valid hex string: {}", e))),
+                Err(e) => return Err(eyre!("Key is not valid hex string: {}", e)),
                 Ok(x) => x,
             };
             let tx = TransactionRequest::default()
@@ -80,29 +81,25 @@ async fn get_key_from_contract(network: &String, key: &String) -> Result<(bool, 
 
             let result = provider.call(&tx).await?;
             info!("Call result: {:?}", result);
-            return Ok((true, result.to_string()));
+            return Ok(result.to_string());
         }
-        return Ok((false, format!("No contract found for network {}", network)));
+        return Err(eyre!("No contract found for network {}", network));
     }
-    return Ok((false, format!("No provider found for network {}", network)));
+    return Err(eyre!("No provider found for network {}", network));
 }
 
 #[get("/deploy/{network}")]
 async fn deploy(path: web::Path<String>) -> Result<HttpResponse, Error> {
-    let span = span!(Level::INFO, "deploy");
+    let span = info_span!("deploy");
     let _guard = span.enter();
     let network = path.into_inner();
     info!("Deploying contract for network `{}` ...", network);
     match deploy_contract(&network, &PROVIDERS).await {
-        Ok((true, result)) => Ok(HttpResponse::Ok()
+        Ok(result) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
-        Ok((false, result)) => {
-            error!("Failed to deploy due to {}", result);
-            Err(error::ErrorBadRequest(result))
-        }
         Err(e) => {
-            error!("Failed to deploy due to {}", e.to_string());
+            error!("Failed to deploy due to: {}", e.to_string());
             Err(error::ErrorBadRequest(e.to_string()))
         }
     }
@@ -110,23 +107,28 @@ async fn deploy(path: web::Path<String>) -> Result<HttpResponse, Error> {
 
 #[get("/get_key/{network}/{key}")] // network is the name provided in config, key is hex string
 async fn get_key(req: HttpRequest) -> impl Responder {
-    let span = span!(Level::INFO, "get_key");
+    let span = info_span!("get_key");
     let _guard = span.enter();
-    let network: String = req.match_info().get("network").unwrap().parse().unwrap();
-    let key: String = req.match_info().query("key").parse().unwrap();
+    let bad_input = error::ErrorBadRequest("Incorrect input.");
+    let network: String = req.match_info().get("network").ok_or(bad_input)?.parse()?;
+    let key: String = req.match_info().query("key").parse()?;
     info!("getting key {} for network {} ...", key, network);
     match get_key_from_contract(&network, &key).await {
-        Ok((true, result)) => Ok(HttpResponse::Ok()
+        Ok(result) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
-        Ok((false, result)) => Err(error::ErrorBadRequest(result)),
         Err(e) => Err(error::ErrorBadRequest(e.to_string())),
     }
 }
 
 #[post("/main_log_level/{log_level}")]
 async fn set_log_level(req: HttpRequest) -> Result<HttpResponse, Error> {
-    let log_level: String = req.match_info().get("log_level").unwrap().parse().unwrap();
+    let bad_input = error::ErrorBadRequest("Incorrect input.");
+    let log_level: String = req
+        .match_info()
+        .get("log_level")
+        .ok_or(bad_input)?
+        .parse()?;
     info!("set_log_level called with {}", log_level);
     if let Some(val) = req.connection_info().realip_remote_addr() {
         if val == "127.0.0.1" {

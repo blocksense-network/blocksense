@@ -1,7 +1,7 @@
 use crate::feeds::feeds_processing::FeedProcessing;
 use crate::feeds::feeds_processing::REPORT_HEX_SIZE;
 use crate::utils::byte_utils::to_hex_string;
-use tracing::{debug, span, Level};
+use tracing::{debug, info_span};
 
 #[derive(Debug)]
 pub struct AverageFeedProcessor {}
@@ -14,7 +14,7 @@ impl AverageFeedProcessor {
 use alloy::hex;
 impl FeedProcessing for AverageFeedProcessor {
     fn process(&self, values: Vec<&String>) -> String {
-        let span = span!(Level::INFO, "AverageFeedProcessor::process");
+        let span = info_span!("AverageFeedProcessor::process");
         let _guard = span.enter();
         let num_elements = values.len() as f64;
         for v in &values {

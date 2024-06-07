@@ -58,3 +58,16 @@ The sequencer will deploy the contract and use it from there on. To send a data 
 ```
 curl -X POST 127.0.0.1:8877/test -H 'Content-Type: application/json' -d '{"feed_id":"YahooFinance.BTC/USD","reporter_id":0,"result":70000.5,"timestamp":'$((($(date +%s%N | cut -b1-13))))'}'
 ```
+
+To set the logging level, you can provide an environment variable before running the sequencer as follows:
+
+```
+export SEQUENCER_LOGGING_LEVEL=DEBUG
+```
+
+This environment variable is not mandatory, and the default value is `INFO`. All supported logging levels are in apps/sequencer/src/utils/logging.rs
+Logging level can be changed at runtime as well by posting an HTTP request only from localhost, for example:
+
+```
+curl http://127.0.0.1:8877/main_log_level/DEBUG -X POST
+```
