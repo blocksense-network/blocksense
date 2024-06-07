@@ -19,8 +19,8 @@ use crate::{
 };
 
 pub async fn orchestrator() {
-    let batch_size: usize = get_env_var("BATCH_SIZE").unwrap_or_else(|_| 5);
-    let reporter_id: u64 = get_env_var("REPORTER_ID").unwrap_or_else(|_| 0);
+    let batch_size: usize = get_env_var("BATCH_SIZE").unwrap_or(5);
+    let reporter_id: u64 = get_env_var("REPORTER_ID").unwrap_or(0);
 
     let sequencer_url: String = get_env_var("SEQUENCER_URL").unwrap();
     let poll_period_ms: u64 = get_env_var("POLL_PERIOD_MS").unwrap();
@@ -31,7 +31,7 @@ pub async fn orchestrator() {
 
     let all_feeds = DataFeedAPI::get_all_feeds();
 
-    FEED_COUNTER.inc_by((&all_feeds).len() as u64);
+    FEED_COUNTER.inc_by((all_feeds).len() as u64);
     println!("Available feed count: {}\n", FEED_COUNTER.get());
 
     let prometheus_server = reqwest::Client::new();
