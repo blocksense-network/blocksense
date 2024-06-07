@@ -32,18 +32,9 @@ pub trait DataFeed {
     async fn poll(&mut self, asset: &str) -> (Result<Box<dyn Payload>, FeedError>, Timestamp);
 
     fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64);
-
-    //TODO: Implement abstraction for publishing
-
-    // async fn publish(destination: String, payload: Box<dyn Payload>) -> Result<(),anyhow::Error>;
-
-    // fn host_connect(&self);
 }
 
-fn feed_selector(
-    feeds: &Vec<(DataFeedAPI, String)>,
-    batch_size: usize,
-) -> Vec<(DataFeedAPI, String)> {
+fn feed_selector(feeds: &[(DataFeedAPI, String)], batch_size: usize) -> Vec<(DataFeedAPI, String)> {
     let mut rng = thread_rng();
 
     let selected_feeds_idx = (0..feeds.len()).choose_multiple(&mut rng, batch_size);
@@ -55,23 +46,23 @@ fn feed_selector(
     selected_feeds
 }
 
-fn resolve_feed<'a>(
+fn resolve_feed(
     feed_api: &DataFeedAPI,
-    connection_cache: &'a mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
+    connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
 ) -> Rc<RefCell<dyn DataFeed>> {
-    handle_connection_cache(&feed_api, connection_cache)
+    handle_connection_cache(feed_api, connection_cache)
 }
 
-fn handle_connection_cache<'a>(
+fn handle_connection_cache(
     api: &DataFeedAPI,
-    connection_cache: &'a mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
+    connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
 ) -> Rc<RefCell<dyn DataFeed>> {
-    if !connection_cache.contains_key(&api) {
-        let feed = feed_builder(&api);
+    if !connection_cache.contains_key(api) {
+        let feed = feed_builder(api);
         connection_cache.insert(api.to_owned(), feed);
     }
 
-    connection_cache.get(&api).unwrap().clone()
+    connection_cache.get(api).unwrap().clone()
 }
 
 fn feed_builder(api: &DataFeedAPI) -> Rc<RefCell<dyn DataFeed>> {

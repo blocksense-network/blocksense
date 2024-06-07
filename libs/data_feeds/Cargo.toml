@@ -26,12 +26,3 @@ yahoo_finance_api = "2.1.0"
 cmc = "0.4.4"
 fred-rs = "0.1.1"
 weer_api = "0.1.1"
-
-
-# [[bin]]
-# name = "orchestrator"
-# path = "bin/orchestrator.rs"
-
-# [[bin]]
-# name = "launch_prometheus_server"
-# path = "bin/actix_server.rs"
