@@ -77,10 +77,16 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
 
     const owner = (await ethers.getSigners())[2];
 
-    registryWrapperV1 = new ChainlinkRegistryBaseWrapper('ChainlinkRegistryV1');
+    registryWrapperV1 = new ChainlinkRegistryBaseWrapper(
+      'ChainlinkRegistryV1',
+      proxyV1.contract,
+    );
     await registryWrapperV1.init(owner);
 
-    registryWrapperV2 = new ChainlinkRegistryBaseWrapper('ChainlinkRegistryV2');
+    registryWrapperV2 = new ChainlinkRegistryBaseWrapper(
+      'ChainlinkRegistryV2',
+      proxyV2.contract,
+    );
     await registryWrapperV2.init(owner);
 
     const registryV1 = new RegistryWrapper(

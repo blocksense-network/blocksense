@@ -1,4 +1,4 @@
-import { FeedRegistry } from '../../../../../typechain';
+import { FeedRegistry, UpgradeableProxy } from '../../../../../typechain';
 import { ChainlinkBaseWrapper } from '../Base';
 import { expect } from 'chai';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
@@ -12,9 +12,11 @@ export class ChainlinkRegistryBaseWrapper {
     string,
     Record<string, ChainlinkBaseWrapper<HistoricDataFeedStore>>
   > = {};
+  public dataFeedStore!: UpgradeableProxy;
 
-  constructor(name: string) {
+  constructor(name: string, _dataFeedStore: UpgradeableProxy) {
     this.name = name;
+    this.dataFeedStore = _dataFeedStore;
   }
 
   public async setFeed(
@@ -100,6 +102,7 @@ export class ChainlinkRegistryBaseWrapper {
     this.contract = (await deployContract<FeedRegistry>(
       'FeedRegistry',
       owner.address,
+      this.dataFeedStore.target,
     )) as FeedRegistry;
   }
 

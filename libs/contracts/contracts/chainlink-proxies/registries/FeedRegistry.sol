@@ -8,41 +8,44 @@ import {ProxyCall} from '../../libraries/ProxyCall.sol';
 
 contract FeedRegistry is IFeedRegistry {
   struct Feed {
-    address dataFeedStore;
+    IChainlinkAggregator aggregator;
     uint32 key;
+    uint8 decimals;
+    string description;
   }
 
+  address internal immutable dataFeedStore;
+
   address public immutable owner;
-  mapping(address => mapping(address => IChainlinkAggregator))
-    internal registry;
-  mapping(address => mapping(address => Feed)) internal dataFeedStore;
+
+  mapping(address => mapping(address => Feed)) internal feedData;
 
   error OnlyOwner();
 
-  constructor(address _owner) {
+  constructor(address _owner, address _dataFeedStore) {
     owner = _owner;
+    dataFeedStore = _dataFeedStore;
   }
 
   function decimals(
     address base,
     address quote
   ) external view override returns (uint8) {
-    return registry[base][quote].decimals();
+    return feedData[base][quote].decimals;
   }
 
   function description(
     address base,
     address quote
   ) external view override returns (string memory) {
-    return registry[base][quote].description();
+    return feedData[base][quote].description;
   }
 
   function latestAnswer(
     address base,
     address quote
   ) external view override returns (int256) {
-    Feed memory feed = dataFeedStore[base][quote];
-    return ProxyCall._latestAnswer(feed.key, feed.dataFeedStore);
+    return ProxyCall._latestAnswer(feedData[base][quote].key, dataFeedStore);
   }
 
   function getRoundData(
@@ -50,15 +53,19 @@ contract FeedRegistry is IFeedRegistry {
     address quote,
     uint80 _roundId
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
-    Feed memory feed = dataFeedStore[base][quote];
-    return ProxyCall._getRoundData(_roundId, feed.key, feed.dataFeedStore);
+    return
+      ProxyCall._getRoundData(
+        _roundId,
+        feedData[base][quote].key,
+        dataFeedStore
+      );
   }
 
   function getFeed(
     address base,
     address quote
   ) external view override returns (IChainlinkAggregator) {
-    return registry[base][quote];
+    return feedData[base][quote].aggregator;
   }
 
   function setFeed(address base, address quote, address feed) external {
@@ -66,10 +73,11 @@ contract FeedRegistry is IFeedRegistry {
       revert OnlyOwner();
     }
 
-    registry[base][quote] = IChainlinkAggregator(feed);
-    dataFeedStore[base][quote] = Feed(
-      IAggregator(feed).dataFeedStore(),
-      IAggregator(feed).key()
+    feedData[base][quote] = Feed(
+      IChainlinkAggregator(feed),
+      IAggregator(feed).key(),
+      IAggregator(feed).decimals(),
+      IAggregator(feed).description()
     );
   }
 
@@ -77,15 +85,13 @@ contract FeedRegistry is IFeedRegistry {
     address base,
     address quote
   ) external view override returns (uint256) {
-    Feed memory feed = dataFeedStore[base][quote];
-    return ProxyCall._latestRound(feed.key, feed.dataFeedStore);
+    return ProxyCall._latestRound(feedData[base][quote].key, dataFeedStore);
   }
 
   function latestRoundData(
     address base,
     address quote
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
-    Feed memory feed = dataFeedStore[base][quote];
-    return ProxyCall._latestRoundData(feed.key, feed.dataFeedStore);
+    return ProxyCall._latestRoundData(feedData[base][quote].key, dataFeedStore);
   }
 }

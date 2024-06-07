@@ -62,10 +62,16 @@ describe('Chainlink registry interface', async () => {
 
     const owner = (await ethers.getSigners())[2];
 
-    contractWrapperV1 = new ChainlinkRegistryBaseWrapper('ChainlinkRegistryV1');
+    contractWrapperV1 = new ChainlinkRegistryBaseWrapper(
+      'ChainlinkRegistryV1',
+      proxyV1.contract,
+    );
     await contractWrapperV1.init(owner);
 
-    contractWrapperV2 = new ChainlinkRegistryBaseWrapper('ChainlinkRegistryV2');
+    contractWrapperV2 = new ChainlinkRegistryBaseWrapper(
+      'ChainlinkRegistryV2',
+      proxyV2.contract,
+    );
     await contractWrapperV2.init(owner);
 
     await contractWrapperV1.setFeed(
