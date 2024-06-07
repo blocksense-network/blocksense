@@ -50,14 +50,14 @@ pub async fn post_feed_response(
 ) {
     let (result, timestamp) = data_feed.borrow_mut().poll(asset).await;
 
-    let feed_hash = generate_string_hash(&feed_asset_name);
+    let feed_hash = generate_string_hash(feed_asset_name);
 
     let payload_json =
         handle_feed_response(reporter_id, feed_asset_name, feed_hash, timestamp, result);
 
     println!("\nPayload: {:?}", payload_json);
 
-    let feed_url = base_url.to_string() + &"/feed/" + &feed_hash.to_string();
+    let feed_url = base_url.to_string() + "/feed/" + &feed_hash.to_string();
 
     // Comment out if you want to test API availability & aggregation
     post_request(&feed_url, payload_json);
@@ -68,7 +68,7 @@ pub fn post_request(url: &str, payload_json: Value) {
     easy.url(url).unwrap();
     easy.post(true).unwrap();
 
-    easy.post_fields_copy(&payload_json.to_string().as_bytes())
+    easy.post_fields_copy(payload_json.to_string().as_bytes())
         .unwrap();
 
     // Set a closure to handle the response

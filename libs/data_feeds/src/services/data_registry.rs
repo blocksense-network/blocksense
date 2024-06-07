@@ -30,7 +30,7 @@ impl DataFeedAPI {
     }
 
     pub fn feed_asset_str(api: &DataFeedAPI, asset: &String) -> String {
-        api.as_str().to_owned() + &"." + &asset
+        api.as_str().to_owned() + "." + &asset
     }
 
     pub fn get_all_feeds_str() -> Vec<String> {
