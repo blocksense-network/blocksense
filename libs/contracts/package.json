@@ -1,8 +1,10 @@
 {
   "name": "@blocksense/contracts",
   "scripts": {
+    "build:deps": "yarn workspace @blocksense/solidity-docsgen build",
     "clean": "git clean -fdx -e .env",
     "build": "hardhat compile",
+    "docgen": "yarn build:deps && yarn hardhat docgen",
     "test": "hardhat test",
     "test:fork": "FORKING=true hardhat test --grep '@fork'",
     "coverage": "hardhat coverage",
