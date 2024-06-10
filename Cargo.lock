@@ -6225,9 +6225,9 @@ dependencies = [
 
 [[package]]
 name = "paste"
-version = "1.0.14"
+version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
+checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
 name = "path-absolutize"
@@ -7880,6 +7880,7 @@ dependencies = [
  "futures-util",
  "once_cell",
  "openssl-sys",
+ "paste",
  "prometheus 0.13.4",
  "rand 0.8.5",
  "reqwest 0.12.4",

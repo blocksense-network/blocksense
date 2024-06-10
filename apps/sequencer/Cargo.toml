@@ -66,6 +66,7 @@ bytes = "1.6.0"
 futures-util = "0.3.30"
 rand = "0.8.5"
 prometheus = "0.13.4"
+paste = "1.0.15"
 
 [[bin]]
 name = "sequencer"
