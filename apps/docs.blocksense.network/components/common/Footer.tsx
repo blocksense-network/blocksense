@@ -27,7 +27,7 @@ export const Footer = () => {
             >
               <img
                 className="footer__social-icon-img w-6 h-6"
-                src="icons/blocksense-telegram.svg"
+                src="/icons/blocksense-telegram.svg"
                 alt={config.social_media.telegram._alt}
                 loading="lazy"
               />
@@ -45,7 +45,7 @@ export const Footer = () => {
             >
               <img
                 className="footer__social-icon-img w-6 h-6"
-                src="icons/blocksense-x.svg"
+                src="/icons/blocksense-x.svg"
                 alt={config.social_media.x._alt}
                 loading="lazy"
               />
@@ -63,7 +63,7 @@ export const Footer = () => {
             >
               <img
                 className="footer__social-icon-img w-6 h-6"
-                src="icons/blocksense-discord.svg"
+                src="/icons/blocksense-discord.svg"
                 alt={config.social_media.discord._alt}
                 loading="lazy"
               />

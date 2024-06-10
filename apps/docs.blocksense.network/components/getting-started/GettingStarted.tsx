@@ -17,7 +17,6 @@ export const GettingStarted = () => {
           <span className="lg:ml-auto">
             <LinkButton
               label="Get Started"
-              target="_blank"
               link="/docs/overview/getting-started"
             />
             <LinkButton label="Roadmap" link="/docs/overview/roadmap" />
