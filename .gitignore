@@ -147,3 +147,8 @@ libs/*/target/
 # Vercel build output
 .vercel
 _vercel-deployment-url
+
+# RustRover
+/.idea
+/foundry
+
