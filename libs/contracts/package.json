@@ -20,7 +20,7 @@
     "@typechain/hardhat": "^9.1.0",
     "@types/chai": "4",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.12.13",
+    "@types/node": "^20.14.2",
     "chai": "4",
     "dotenv": "^16.4.5",
     "ethers": "^6.12.1",
