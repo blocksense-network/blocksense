@@ -133,9 +133,9 @@ dependencies = [
 
 [[package]]
 name = "actix-web"
-version = "4.6.0"
+version = "4.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1cf67dadb19d7c95e5a299e2dda24193b89d5d4f33a3b9800888ede9e19aa32"
+checksum = "5d6316df3fa569627c98b12557a8b6ff0674e5be4bb9b5e4ae2550ddb4964ed6"
 dependencies = [
  "actix-codec",
  "actix-http",
@@ -174,9 +174,9 @@ dependencies = [
 
 [[package]]
 name = "actix-web-codegen"
-version = "4.2.2"
+version = "4.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb1f50ebbb30eca122b188319a4398b3f7bb4a8cdf50ecfb73bfc6a3c3ce54f5"
+checksum = "f591380e2e68490b5dfaf1dd1aa0ebe78d84ba7067078512b4ea6e4492d622b8"
 dependencies = [
  "actix-router",
  "proc-macro2",
@@ -1663,8 +1663,8 @@ dependencies = [
  "serde 1.0.203",
  "serde_json",
  "tokio",
- "toml 0.8.13",
- "toml_edit 0.22.13",
+ "toml 0.8.14",
+ "toml_edit 0.22.14",
  "tracing",
  "tracing-subscriber",
  "url",
@@ -7802,7 +7802,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-util 0.6.10",
- "toml 0.8.13",
+ "toml 0.8.14",
  "tracing",
  "walkdir",
  "wasm-pkg-loader",
@@ -7847,7 +7847,7 @@ dependencies = [
  "spin-serde",
  "terminal",
  "thiserror",
- "toml 0.8.13",
+ "toml 0.8.14",
  "url",
 ]
 
@@ -8430,9 +8430,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.37.0"
+version = "1.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1adbebffeca75fcfd058afa480fb6c0b81e165a0323f9c9d39c9697e37c46787"
+checksum = "ba4f4a02a7a80d6f274636f0aa95c7e383b912d41fe721a31f29e29698585a4a"
 dependencies = [
  "backtrace",
  "bytes",
@@ -8459,9 +8459,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-macros"
-version = "2.2.0"
+version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b8a1e28f2deaa14e508979454cb3a223b10b938b45af148bc0986de36f1923b"
+checksum = "5f5ae998a069d4b5aba8ee9dad856af7d520c3699e6159b185c2acd48155d39a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -8613,15 +8613,15 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.8.13"
+version = "0.8.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4e43f8cc456c9704c851ae29c67e17ef65d2c30017c17a9765b89c382dc8bba"
+checksum = "6f49eb2ab21d2f26bd6db7bf383edc527a7ebaee412d17af4d40fdccd442f335"
 dependencies = [
  "indexmap 2.2.6",
  "serde 1.0.203",
  "serde_spanned",
  "toml_datetime",
- "toml_edit 0.22.13",
+ "toml_edit 0.22.14",
 ]
 
 [[package]]
@@ -8657,9 +8657,9 @@ dependencies = [
 
 [[package]]
 name = "toml_edit"
-version = "0.22.13"
+version = "0.22.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c127785850e8c20836d49732ae6abfa47616e60bf9d9f57c43c250361a9db96c"
+checksum = "f21c7aaf97f1bd9ca9d4f9e73b0a6c74bd5afef56f2bc931943a6e1c37e04e38"
 dependencies = [
  "indexmap 2.2.6",
  "serde 1.0.203",
@@ -9537,7 +9537,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "tokio-util 0.7.10",
- "toml 0.8.13",
+ "toml 0.8.14",
  "tracing",
  "tracing-subscriber",
  "url",
@@ -9703,7 +9703,7 @@ dependencies = [
  "serde 1.0.203",
  "serde_derive",
  "sha2",
- "toml 0.8.13",
+ "toml 0.8.14",
  "windows-sys 0.52.0",
  "zstd 0.13.1",
 ]
