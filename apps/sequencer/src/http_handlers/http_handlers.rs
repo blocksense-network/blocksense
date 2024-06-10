@@ -57,22 +57,29 @@ pub async fn index_post(
         }
     };
 
-    let feed_id = get_feed_id(v["feed_id"].to_string().as_str());
-
+    let feed_id;
     let reporter = {
         let reporters = app_state.reporters.read().unwrap();
         let reporter = reporters.get_key_value(&reporter_id);
         match reporter {
             Some(x) => {
+                let reporter = x.1;
+                feed_id = match get_feed_id(v["feed_id"].to_string().as_str()) {
+                    Some(f) => f,
+                    None => {
+                        inc_reporter_metric!(reporter, votes_for_nonexistent_feed);
+                        return Ok(HttpResponse::BadRequest().into());
+                    }
+                };
                 //TODO: Check signature of vote!
-                x.1.clone()
+                reporter.clone()
             }
             None => {
                 warn!(
                     "Recvd vote from reporter with unregistered ID = {}!",
                     reporter_id
                 );
-                return Ok(HttpResponse::BadRequest().into());
+                return Ok(HttpResponse::Unauthorized().into());
             }
         }
     };
