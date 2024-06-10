@@ -1,4 +1,23 @@
+use paste::paste;
 use prometheus::{self, register_histogram, register_int_counter, Histogram, IntCounter};
+
+#[macro_export]
+macro_rules! process_provider_geter {
+    ($_get: expr, $_provider_metrix: ident, $_metric: ident) => {
+        paste! {
+            match $_get {
+                Ok(res) => {
+                    $_provider_metrix.[<success_ $_metric>].inc();
+                    res
+                },
+                Err(e) => {
+                    $_provider_metrix.[<failed_ $_metric>].inc();
+                    return Err(e.into());
+                },
+            }
+        }
+    };
+}
 
 #[derive(Debug)]
 pub struct ProviderMetrics {
@@ -12,6 +31,11 @@ pub struct ProviderMetrics {
     pub failed_get_gas_price: IntCounter,
     pub failed_get_max_priority_fee_per_gas: IntCounter,
     pub failed_get_chain_id: IntCounter,
+    pub success_send_tx: IntCounter,
+    pub success_get_receipt: IntCounter,
+    pub success_get_gas_price: IntCounter,
+    pub success_get_max_priority_fee_per_gas: IntCounter,
+    pub success_get_chain_id: IntCounter,
 }
 
 impl ProviderMetrics {
@@ -44,7 +68,7 @@ impl ProviderMetrics {
             gas_price: register_histogram!(
                 format!("{}_gas_price", net),
                 format!(
-                    "Histogram tracking the gas price in Giga Wei reported by the provider {}",
+                    "Histogram tracking the gas price in Gwei reported by the provider {}",
                     net
                 ),
                 (1..).take(40).map(|x| x as f64).collect()
@@ -83,6 +107,43 @@ impl ProviderMetrics {
                 format!("{}_failed_get_chain_id", net),
                 format!(
                     "Total number of failed get_chain_id req-s for network {}",
+                    net
+                )
+            )
+            .unwrap(),
+            success_send_tx: register_int_counter!(
+                format!("{}_success_send_tx", net),
+                format!("Total number of successful tx for network {}", net)
+            )
+            .unwrap(),
+            success_get_receipt: register_int_counter!(
+                format!("{}_success_get_receipt", net),
+                format!(
+                    "Total number of successful get_receipt req-s for network {}",
+                    net
+                )
+            )
+            .unwrap(),
+            success_get_gas_price: register_int_counter!(
+                format!("{}_success_get_gas_price", net),
+                format!(
+                    "Total number of successful get_gas_price req-s for network {}",
+                    net
+                )
+            )
+            .unwrap(),
+            success_get_max_priority_fee_per_gas: register_int_counter!(
+                format!("{}_success_get_max_priority_fee_per_gas", net),
+                format!(
+                    "Total number of successful get_max_priority_fee_per_gas req-s for network {}",
+                    net
+                )
+            )
+            .unwrap(),
+            success_get_chain_id: register_int_counter!(
+                format!("{}_success_get_chain_id", net),
+                format!(
+                    "Total number of successful get_chain_id req-s for network {}",
                     net
                 )
             )

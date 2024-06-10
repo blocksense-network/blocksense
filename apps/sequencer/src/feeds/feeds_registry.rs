@@ -204,13 +204,16 @@ impl AllFeedsReports {
     }
 }
 
-pub fn get_feed_id(name: &str) -> u32 {
-    if name.contains("YahooFinance.BTC/USD") {
-        return 1;
+pub fn get_feed_id(name: &str) -> Option<u32> {
+    if name.contains("YahooFinance.DOGE/USDC") {
+        return Some(0);
+    } else if name.contains("YahooFinance.BTC/USD") {
+        return Some(1);
     } else if name.contains("YahooFinance.ETH/USD") {
-        return 2;
+        return Some(2);
     }
-    0 // TODO: get from registry
+    None
+    // TODO: get from registry
 }
 
 pub fn get_reporters_for_feed_id_slot(_feed_id: u32, _slot: u64) -> Vec<u32> {
