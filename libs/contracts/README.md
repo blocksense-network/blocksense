@@ -99,7 +99,9 @@ Available scripts:
 ```sh
 yarn hardhat help # Display Hardhat commands
 yarn clean # Clean all untracked files
+yarn build:deps # Build workspace dependencies
 yarn build # Compile contracts
+yarn sol-reflect # Generate smart contracts's documentation
 yarn test # Run tests
 yarn test:fork # Run tests with forking enabled only for tests marked with `@fork` in the description
 yarn coverage # Run tests and generate coverage report
@@ -138,3 +140,15 @@ You can also run the tests and generate a coverage report by running:
 ```sh
 yarn coverage
 ```
+
+## Documentation generation
+
+We use [@blocksense/sol-reflector](../../libs/sol-reflector/README.md) - a tool designed to enhance the documentation extraction process for Solidity smart contracts.
+
+To generate the documentation for the smart contracts, run:
+
+```sh
+yarn sol-reflect
+```
+
+The documentation will be generated in the `artifacts/docs` folder.
