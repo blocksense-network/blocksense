@@ -1,7 +1,4 @@
-use prometheus::{
-    self, register_histogram, register_int_counter, register_int_counter_vec, Histogram,
-    IntCounter, IntCounterVec,
-};
+use prometheus::{self, register_int_counter, register_int_counter_vec, IntCounter, IntCounterVec};
 
 #[macro_export]
 macro_rules! inc_reporter_metric (
