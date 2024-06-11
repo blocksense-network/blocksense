@@ -10,6 +10,7 @@ edition.workspace = true
 [dev-dependencies]
 once_cell = "1.10"
 tempfile = "3.10.1"
+assert_cmd = "2.0"
 
 [dependencies]
 anyhow = "1.0.68"

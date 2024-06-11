@@ -69,12 +69,10 @@ async fn run_cargo_component_new(name: &str) -> Result<()> {
         .output()
         .await
         .expect("failed to execute process");
-
     if !output.status.success() {
         eprintln!("Failed to write to stderr");
         return Err(anyhow::anyhow!("cargo component new command failed"));
     }
-
     Ok(())
 }
 

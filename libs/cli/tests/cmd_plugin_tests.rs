@@ -2,6 +2,7 @@ extern crate blocksense_cli;
 
 use blocksense_cli::commands::plugin;
 
+use assert_cmd::Command;
 use std::fs;
 use std::path::PathBuf;
 use tempfile::TempDir;
@@ -141,4 +142,22 @@ async fn test_update_cargo_toml_creates_valid_toml() {
     let contents = fs::read_to_string(&file_to_test).expect("Could not read Cargo.toml");
     let parsed: Result<toml::Value, toml::de::Error> = toml::from_str(&contents);
     assert!(parsed.is_ok(), "Cargo.toml is not valid TOML");
+}
+
+#[test]
+fn test_blocksense_plugin_init_command_success() {
+    // Setup
+    let temp_dir = TempDir::new().expect("Failed to create temp directory");
+    let dir = temp_dir.path().to_path_buf();
+
+    // Run
+    let mut cmd = Command::cargo_bin("blocksense").expect("blocksense binary does not exists");
+    cmd.current_dir(&dir)
+        .arg("dev")
+        .arg("plugin")
+        .arg("init")
+        .arg("test_plugin")
+        .assert()
+        .success();
+    // Assert
 }

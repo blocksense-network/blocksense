@@ -22,9 +22,9 @@ enum BlocksenseApp {
     /// Interface for configuring node operator.
     #[command(subcommand)]
     Node(NodeCommands),
-    /// Manage oracle plugin development
-    #[command(subcommand)]
-    Plugin(PluginCommands),
+    // Manage oracle plugin development
+    // #[command(subcommand)]
+    // Plugin(PluginCommands),
 }
 
 impl BlocksenseApp {
@@ -32,7 +32,7 @@ impl BlocksenseApp {
         match self {
             Self::Dev(cmd) => cmd.run().await,
             Self::Node(cmd) => cmd.run().await,
-            Self::Plugin(cmd) => cmd.run().await,
+            // Self::Plugin(cmd) => cmd.run().await,
         }
     }
 }
