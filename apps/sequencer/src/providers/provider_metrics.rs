@@ -1,17 +1,16 @@
-use paste::paste;
 use prometheus::{self, register_histogram, register_int_counter, Histogram, IntCounter};
 
 #[macro_export]
-macro_rules! process_provider_geter {
-    ($_get: expr, $_provider_metrix: ident, $_metric: ident) => {
+macro_rules! process_provider_getter {
+    ($_get: expr, $_provider_metrics: ident, $_metric: ident) => {
         paste! {
             match $_get {
                 Ok(res) => {
-                    $_provider_metrix.[<success_ $_metric>].inc();
+                    $_provider_metrics.[<success_ $_metric>].inc();
                     res
                 },
                 Err(e) => {
-                    $_provider_metrix.[<failed_ $_metric>].inc();
+                    $_provider_metrics.[<failed_ $_metric>].inc();
                     return Err(e.into());
                 },
             }

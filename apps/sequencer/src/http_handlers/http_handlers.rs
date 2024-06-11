@@ -68,7 +68,7 @@ pub async fn index_post(
                     Some(f) => f,
                     None => {
                         inc_reporter_metric!(reporter, votes_for_nonexistent_feed);
-                        return Ok(HttpResponse::BadRequest().into());
+                        return Ok(HttpResponse::NotFound().into());
                     }
                 };
                 //TODO: Check signature of vote!
