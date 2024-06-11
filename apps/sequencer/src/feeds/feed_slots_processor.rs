@@ -10,9 +10,9 @@ use std::time::Duration;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::{debug, info};
 
-pub struct FeedSlotsManager {}
+pub struct FeedSlotsProcessor {}
 
-impl FeedSlotsManager {
+impl FeedSlotsProcessor {
     pub fn new<
         K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
         V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
@@ -24,7 +24,7 @@ impl FeedSlotsManager {
         first_report_start_time: u128,
         app_state_clone: web::Data<FeedsState>,
         key: u32,
-    ) -> FeedSlotsManager {
+    ) -> FeedSlotsProcessor {
         spawn(async move {
             let feed_slots_time_tracker = SlotTimeTracker::new(
                 Duration::from_millis(report_interval_ms),
@@ -83,6 +83,6 @@ impl FeedSlotsManager {
                     .unwrap();
             }
         });
-        FeedSlotsManager {}
+        FeedSlotsProcessor {}
     }
 }

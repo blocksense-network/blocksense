@@ -1,7 +1,7 @@
 use std::sync::{Arc, RwLock};
 
 use actix_web::{web, App, HttpServer};
-use sequencer::feeds::feed_slots_manager::FeedSlotsManager;
+use sequencer::feeds::feed_slots_processor::FeedSlotsProcessor;
 use sequencer::feeds::feeds_registry::{new_feeds_meta_data_reg_with_test_data, AllFeedsReports};
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::feeds::{
@@ -63,7 +63,7 @@ async fn main() -> std::io::Result<()> {
                 .expect(lock_err_msg)
                 .get_first_report_start_time_ms();
 
-            feed_managers.push(FeedSlotsManager::new(
+            feed_managers.push(FeedSlotsProcessor::new(
                 send_channel,
                 feed,
                 name,
