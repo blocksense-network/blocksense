@@ -1,16 +1,20 @@
 use async_trait::async_trait;
+use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
-use ringbuf::HeapRb;
+use ringbuf::{HeapRb, SharedRb};
 use serde::Serialize;
 use utils::{current_unix_time, get_env_var};
 use yahoo_finance_api::{YahooConnector, YahooError};
 
+extern crate derive;
+use derive::Historical;
+
 use crate::connector::bytes::f64_to_bytes32;
-use crate::connector::data_feed::Payload;
 use crate::connector::error::{ConversionError, FeedError};
+use crate::connector::payload::Payload;
 use crate::types::{Bytes32, Timestamp};
 use crate::{
-    connector::data_feed::DataFeed,
+    connector::{data_feed::DataFeed, historical::Historical},
     types::{ConsensusMetric, DataFeedAPI},
 };
 
@@ -56,10 +60,6 @@ impl DataFeed for YahooDataFeed {
             Err(err) => (Err(FeedError::from(err)), current_unix_time()),
         }
     }
-
-    fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: Timestamp) {
-        self.history_buffer.push_overwrite((response, timestamp));
-    }
 }
 
 impl From<YahooError> for FeedError {
@@ -71,6 +71,8 @@ impl From<YahooError> for FeedError {
         }
     }
 }
+
+#[derive(Historical)]
 pub struct YahooDataFeed {
     api_connector: YahooConnector,
     is_connected: bool,

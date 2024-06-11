@@ -1,0 +1,19 @@
+[package]
+name = "derive"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+proc-macro2 = "1.0.85"
+quote = "1.0.36"
+syn = "2.0.66"
+
+[lib]
+proc-macro=true
+
+[proc-macro]
+path = "historical.rs"

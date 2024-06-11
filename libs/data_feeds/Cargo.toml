@@ -5,8 +5,11 @@ authors.workspace = true
 license.workspace = true
 edition.workspace = true
 
+
+
 [dependencies]
 prometheus = { path = "../prometheus" }
+derive = { path = "../derive"}
 utils = { path = "../utils" }
 
 thiserror = "1.0.61"

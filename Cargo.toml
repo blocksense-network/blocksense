@@ -5,6 +5,7 @@ members = [
   "libs/anomaly_detection",
   "libs/cli",
   "libs/data_feeds",
+  "libs/derive",
   "libs/prometheus",
   "libs/registry",
   "libs/sdk",
