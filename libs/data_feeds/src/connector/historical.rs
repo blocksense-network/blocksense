@@ -1,5 +1,5 @@
 use ringbuf::traits::RingBuffer;
-use ringbuf::{storage::Heap, HeapRb, SharedRb};
+use ringbuf::{storage::Heap, SharedRb};
 
 use crate::types::Timestamp;
 

@@ -16,4 +16,4 @@ syn = "2.0.66"
 proc-macro=true
 
 [proc-macro]
-path = "historical.rs"
+path = "lib.rs"
