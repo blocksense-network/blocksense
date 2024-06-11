@@ -1,18 +1,13 @@
 use crate::{
     services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooDataFeed},
-    types::{Bytes32, ConsensusMetric, DataFeedAPI, Timestamp},
+    types::{ConsensusMetric, DataFeedAPI, Timestamp},
 };
 use async_trait::async_trait;
-use erased_serde::serialize_trait_object;
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
-use super::{
-    error::{ConversionError, FeedError},
-    payload::Payload,
-    post::post_feed_response,
-};
+use super::{error::FeedError, payload::Payload, post::post_feed_response};
 
 #[async_trait(?Send)]
 pub trait DataFeed {
@@ -61,8 +56,8 @@ fn handle_connection_cache(
 fn feed_builder(api: &DataFeedAPI) -> Rc<RefCell<dyn DataFeed>> {
     match api {
         DataFeedAPI::EmptyAPI => todo!(),
-        DataFeedAPI::YahooFinance => Rc::new(RefCell::new(YahooDataFeed::new())),
-        DataFeedAPI::CoinMarketCap => Rc::new(RefCell::new(CoinMarketCapDataFeed::new())),
+        DataFeedAPI::YahooDataFeed => Rc::new(RefCell::new(YahooDataFeed::new())),
+        DataFeedAPI::CoinMarketCapDataFeed => Rc::new(RefCell::new(CoinMarketCapDataFeed::new())),
     }
 }
 
