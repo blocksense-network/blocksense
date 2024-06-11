@@ -1,1 +1,99 @@
-# Overview
+## Introduction
+
+This document provides a quick-guide to smart contracts as part of our Blocksense protocol. You may explore the structure and functionality of these contracts, and unlock a deeper understanding of our cutting-edge data feed storage mechanism.
+
+## Folder Structure
+
+Smart `contracts` for Blocksense network are stored inside our public GitHub repository. The contracts folder is organized as presented below:
+
+```code
+📁 chainlink-proxies
+│   📁 registries
+│   │   └── FeedRegistry.sol
+│   └── ChainlinkProxy.sol
+📁 interfaces
+│   ├── IAggregator.sol
+│   ├── IChainlinkAggregator.sol
+│   └── IFeedRegistry.sol
+📁 libraries
+│   └── ProxyCall.sol
+📁 test
+│   📁 consumers
+│   │   📁 historic
+│   │   │   └── ...
+│   │   └── ...
+│   📁 interfaces
+│   │   └── ...
+│   ├── DataFeedStoreGeneric.sol
+│   ├── DataFeedStoreGenericV1.sol
+│   ├── DataFeedStoreGenericV2.sol
+│   └── HistoricDataFeedStoreGenericV1.sol
+├── DataFeedStoreV1.sol
+├── DataFeedStoreV2.sol
+├── DataFeedStoreV3.sol
+├── HistoricDataFeedStoreV1.sol
+├── HistoricDataFeedStoreV2.sol
+└── UpgradeableProxy.sol
+```
+
+# Chainlink Proxies
+
+The `chainlink-proxies` folder contains Chainlink proxy contract (`ChainlinkProxy.sol`) and the FeedRegistry contract (`FeedRegistry.sol`). The Chainlink proxy contract implements the Chainlink aggregator interface, enabling it to interact with the UpgradeableProxy contract to fetch stored data. The idea is that the `UpgradeableProxy` holds the storage in itself and only uses the DataFeedStore contract functions to know how to read or write to its own storage.
+
+## Interfaces
+
+The `interfaces` folder includes the following key interfaces:
+
+- `IAggregator.sol`: Extends the functionality of `IChainlinkAggregator.sol`.
+- `IChainlinkAggregator.sol`: Defines the interface for the Chainlink aggregator contract.
+- `IFeedRegistry.sol`: Defines the interface for the data feed registry contract.
+
+## Libraries
+
+The `libraries` folder contains `ProxyCall.sol` - used as an internal library in `FeedRegistry`, `ChainlinkProxy`, and some of the test consumer contracts to call `UpgradeableProxy` or the storage contracts themselves. It provides utilities for low-level static calls to the mentioned contracts to ensure maximum gas optimizations. Moreover, it enables historical data parsing handlers for decoding raw data from the storage.
+`UpgradeableProxy.sol` is a slightly modified version of the Openzeppelin's `TransparentProxy` contract. It stores data in itself and calls its "implementation" contract (i.e. HistoricDataFeedStore) to know how to read or write to its storage. It enables upgradeability of the implementation contract for future fixes or optimizations.
+
+## Test Contracts
+
+The `test` folder includes example consumer contracts and reference implementations primarily for gas comparison purposes during testing. These examples provide a basis evaluation for the gas efficiency.
+
+## Data Feed Store Contracts
+
+The main data feed store contracts include:
+
+- `DataFeedStoreV1.sol`
+- `DataFeedStoreV2.sol`
+- `DataFeedStoreV3.sol`
+
+These contracts store data feed values associated with specific keys. Each version of a contract includes optimization improvements to how data is stored and accessed. This evolution not only amplifies performance, reduces gas costs, but, moreover, it improves the way the contract reads from its storage, as well.
+
+## Historic Data Feed Store Contracts
+
+The historic data feed store contracts include:
+
+- `HistoricDataFeedStoreV1.sol`
+- `HistoricDataFeedStoreV2.sol`
+
+These contracts store historical data feed values, allowing users to retrieve past data points for specific data feed keys.
+
+## Call Handling Mechanism
+
+### General Fallback Function
+
+All calls are managed by a fallback function based on the selector, ensuring efficient handling of setter and getter operations.
+
+# Prologue Optimization in Smart Contracts
+
+## Overview
+
+Prologue optimization aims to reduce gas costs associated with smart contract calls by skipping the Solidity dispatching prologue and instead using the selector as a data feed ID. This approach is intended to demonstrate potential cost savings compared to traditional methods like Chainlink.
+
+## Key Points
+
+- A custom entry point, that bypasses the Solidity dispatching prologue.
+- Selectors use reserved bits to decide which function they should call, and the rest of the bits tell them which data feed they're supposed to work with.
+- The optimization reduces gas costs by eliminating the need for the Solidity compiler to generate "Linear If-Else Dispatcher" statements for different selectors.
+
+## Benefits
+
+- Reduced gas costs for smart contract calls.

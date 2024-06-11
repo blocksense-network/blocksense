@@ -1,1 +1,54 @@
 # Reference documentation
+
+## Display Hardhat commands
+
+```code
+  yarn hardhat help
+```
+## Clean all untracked files
+
+```code
+yarn clean
+```
+## Compile contracts
+
+```code
+yarn build
+```
+## Run tests
+
+```code
+yarn test
+```
+
+## Run tests with forking enabled only for tests marked with `@fork` in the description
+
+```code
+yarn test:fork
+```
+## Run tests and generate coverage report
+
+```code
+yarn coverage
+```
+## Display size of contracts
+
+```code
+yarn size
+```
+
+## Run local nodes in separate shells
+
+```code
+yarn hardhat node
+yarn deploy:local ./scripts/<script_name>.ts
+```
+
+## To fork Mainnet
+```code
+FORKING=true yarn hardhat run ./scripts/{script-name}.ts
+```
+## To run tests with opcodes & gas tracing
+```code
+TRACE_TX=true yarn test
+```
