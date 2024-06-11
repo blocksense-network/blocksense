@@ -1,14 +1,11 @@
 use crate::{
     services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooDataFeed},
     types::{Bytes32, ConsensusMetric, DataFeedAPI, Timestamp},
-    utils::current_unix_time,
 };
-use actix_web::web::Bytes;
 use async_trait::async_trait;
 use prometheus::{register_int_gauge_vec, IntGaugeVec};
 use rand::{seq::IteratorRandom, thread_rng};
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
-use time::Time;
 
 lazy_static::lazy_static! {
     static ref DATA_FEED_PARSE_TIME_GAUGE: IntGaugeVec = register_int_gauge_vec!("DATA_FEED_PARSE_TIME_GAUGE", "Time(ms) to parse current feed",&["Feed"]).unwrap();

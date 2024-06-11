@@ -13,9 +13,10 @@ pub fn string_to_bytes32(x: String) -> Result<Bytes32, ConversionError> {
     }
 }
 
+/// Convert the f64 to bytes in little-endian order
 pub fn f64_to_bytes32(x: f64) -> Result<Bytes32, ConversionError> {
     let mut bytes = [0u8; 32];
-    let float_bytes = x.to_le_bytes(); // Convert the f64 to bytes in little-endian order
+    let float_bytes = x.to_le_bytes();
     bytes[..float_bytes.len()].copy_from_slice(&float_bytes);
     Ok(Bytes32(bytes))
 }
