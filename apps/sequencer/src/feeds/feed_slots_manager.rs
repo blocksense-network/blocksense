@@ -1,11 +1,12 @@
-use crate::feeds::feeds_registry::{FeedMetaData, FeedSlotTimeTracker};
+use crate::feeds::feeds_registry::FeedMetaData;
 use crate::feeds::feeds_state::FeedsState;
 use crate::utils::byte_utils::to_hex_string;
-use crate::utils::time_utils::get_ms_since_epoch;
+use crate::utils::time_utils::{get_ms_since_epoch, SlotTimeTracker};
 use actix_web::rt::spawn;
 use actix_web::web;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
+use std::time::Duration;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::{debug, info};
 
@@ -25,8 +26,10 @@ impl FeedSlotsManager {
         key: u32,
     ) -> FeedSlotsManager {
         spawn(async move {
-            let feed_slots_time_tracker =
-                FeedSlotTimeTracker::new(report_interval_ms, first_report_start_time);
+            let feed_slots_time_tracker = SlotTimeTracker::new(
+                Duration::from_millis(report_interval_ms),
+                first_report_start_time,
+            );
 
             loop {
                 feed_slots_time_tracker.await_end_of_current_slot().await;
