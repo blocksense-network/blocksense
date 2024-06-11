@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
-use crate::process_provider_geter;
+use crate::process_provider_getter;
 use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::spawn;
 use eyre::eyre;
@@ -78,8 +78,6 @@ pub async fn eth_batch_send_to_contract<
     provider: Arc<Mutex<RpcProvider>>,
     updates: HashMap<K, V>,
 ) -> Result<String> {
-    let span = info_span!("eth_batch_send_to_contract");
-    let _guard = span.enter();
     let provider = provider.lock().await;
     let wallet = &provider.wallet;
     let contract_address = provider
@@ -105,7 +103,7 @@ pub async fn eth_batch_send_to_contract<
 
     let input = Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()).unwrap();
 
-    let base_fee = process_provider_geter!(
+    let base_fee = process_provider_getter!(
         provider.get_gas_price().await,
         provider_metrix,
         get_gas_price
@@ -116,14 +114,14 @@ pub async fn eth_batch_send_to_contract<
         .gas_price
         .observe((base_fee as f64) / 1000000000.0);
 
-    let max_priority_fee_per_gas = process_provider_geter!(
+    let max_priority_fee_per_gas = process_provider_getter!(
         provider.get_max_priority_fee_per_gas().await,
         provider_metrix,
         get_max_priority_fee_per_gas
     );
 
     let chain_id =
-        process_provider_geter!(provider.get_chain_id().await, provider_metrix, get_chain_id);
+        process_provider_getter!(provider.get_chain_id().await, provider_metrix, get_chain_id);
 
     let tx = TransactionRequest::default()
         .to(contract_address)
@@ -137,13 +135,13 @@ pub async fn eth_batch_send_to_contract<
     info!("Sending to `{}` tx =  {:?}", net, tx);
     let tx_time = Instant::now();
 
-    let receipt_future = process_provider_geter!(
+    let receipt_future = process_provider_getter!(
         provider.send_transaction(tx).await,
         provider_metrix,
         send_tx
     );
 
-    let receipt = process_provider_geter!(
+    let receipt = process_provider_getter!(
         receipt_future.get_receipt().await,
         provider_metrix,
         get_receipt
@@ -172,7 +170,9 @@ pub async fn eth_batch_send_to_all_contracts<
     providers: SharedRpcProviders,
     updates: HashMap<K, V>,
 ) -> Result<String> {
-    debug!("eth_batch_send_to_all_contracts updates: {:?}", updates);
+    let span = info_span!("eth_batch_send_to_all_contracts");
+    let _guard = span.enter();
+    debug!("updates: {:?}", updates);
 
     let providers = providers
         .read()

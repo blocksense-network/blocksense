@@ -8,7 +8,11 @@ pub struct Reporter {
     pub reporter_metrics: ReporterMetrics,
 }
 
-pub type SharedReporters = Arc<RwLock<HashMap<u64, Arc<RwLock<Reporter>>>>>;
+pub type SharedReporter = Arc<RwLock<Reporter>>;
+
+pub type Reporters = HashMap<u64, SharedReporter>;
+
+pub type SharedReporters = Arc<RwLock<Reporters>>;
 
 pub fn init_shared_reporters() -> SharedReporters {
     Arc::new(RwLock::new(init_reporters()))
