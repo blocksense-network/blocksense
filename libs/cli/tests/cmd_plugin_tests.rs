@@ -34,8 +34,8 @@ fn is_valid_json_syntax(path: &PathBuf) -> bool {
     json.is_object()
 }
 
-#[test]
-fn test_create_blocksense_config_json_creates_file() {
+#[tokio::test]
+async fn test_create_blocksense_config_json_creates_file() {
     // Setup
     let cargo_target_tmpdir = std::env::var("CARGO_MANIFEST_DIR")
         .expect("CARGO_MANIFEST_DIR environment variable is not set");
@@ -43,7 +43,9 @@ fn test_create_blocksense_config_json_creates_file() {
     let dir = temp_dir.path().to_path_buf();
 
     // Run
-    plugin::create_blocksense_config_json(&dir);
+    plugin::create_blocksense_config_json(&dir)
+        .await
+        .expect("Failed to create file");
 
     // Assert
     let file_to_test = dir.join("blocksense").join("config.json");
@@ -51,8 +53,8 @@ fn test_create_blocksense_config_json_creates_file() {
     assert!(file_to_test.is_file());
 }
 
-#[test]
-fn test_create_blocksense_config_json_creates_valid_json() {
+#[tokio::test]
+async fn test_create_blocksense_config_json_creates_valid_json() {
     // Setup
     let cargo_target_tmpdir = std::env::var("CARGO_MANIFEST_DIR")
         .expect("CARGO_MANIFEST_DIR environment variable is not set");
@@ -60,7 +62,9 @@ fn test_create_blocksense_config_json_creates_valid_json() {
     let dir = temp_dir.path().to_path_buf();
 
     // Run
-    plugin::create_blocksense_config_json(&dir);
+    plugin::create_blocksense_config_json(&dir)
+        .await
+        .expect("Failed to create file");
 
     // Assert
     let file_to_test = dir.join("blocksense").join("config.json");
@@ -70,8 +74,8 @@ fn test_create_blocksense_config_json_creates_valid_json() {
     assert!(is_valid_json, "File contains invalid Json syntax"); //TODO: Return serde_json output on failure
 }
 
-#[test]
-fn test_get_requirements_rs_content_creates_file() {
+#[tokio::test]
+async fn test_get_requirements_rs_content_creates_file() {
     // Setup
     let cargo_target_tmpdir = std::env::var("CARGO_MANIFEST_DIR")
         .expect("CARGO_MANIFEST_DIR environment variable is not set");
@@ -79,7 +83,9 @@ fn test_get_requirements_rs_content_creates_file() {
     let dir = temp_dir.path().to_path_buf();
 
     // Run
-    plugin::create_src_requirements_rs(&dir);
+    plugin::create_src_requirements_rs(&dir)
+        .await
+        .expect("Failed to create file");
 
     // Assert
     let file_to_test = dir.join("src").join("requirements.rs");
@@ -87,8 +93,8 @@ fn test_get_requirements_rs_content_creates_file() {
     assert!(file_to_test.is_file());
 }
 
-#[test]
-fn test_get_requirements_rs_content_creates_valid_rust_file() {
+#[tokio::test]
+async fn test_get_requirements_rs_content_creates_valid_rust_file() {
     // Setup
     let cargo_target_tmpdir = std::env::var("CARGO_MANIFEST_DIR")
         .expect("CARGO_MANIFEST_DIR environment variable is not set");
@@ -96,7 +102,9 @@ fn test_get_requirements_rs_content_creates_valid_rust_file() {
     let dir = temp_dir.path().to_path_buf();
 
     // Run
-    plugin::create_src_requirements_rs(&dir);
+    plugin::create_src_requirements_rs(&dir)
+        .await
+        .expect("Failed to create file");
 
     // Assert
     let file_to_test = dir.join("src").join("requirements.rs");
@@ -106,8 +114,8 @@ fn test_get_requirements_rs_content_creates_valid_rust_file() {
     assert!(is_valid_rust, "File contains invalid Rust syntax"); //TODO: Return rustc output on failure
 }
 
-#[test]
-fn test_update_cargo_toml_creates_valid_toml() {
+#[tokio::test]
+async fn test_update_cargo_toml_creates_valid_toml() {
     // Setup
     let cargo_target_tmpdir = std::env::var("CARGO_MANIFEST_DIR")
         .expect("CARGO_MANIFEST_DIR environment variable is not set");
@@ -120,7 +128,9 @@ fn test_update_cargo_toml_creates_valid_toml() {
     assert!(file_to_test.is_file());
 
     // Run
-    plugin::update_cargo_toml(&dir);
+    plugin::update_cargo_toml(&dir)
+        .await
+        .expect("Failed to create file");
 
     // Assert
     let file_to_test = dir.join("Cargo.toml");

@@ -7,6 +7,8 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::{env, fs, io};
 
+use tokio::fs as TokioFS;
+use tokio::process::Command as TokioCommand;
 #[derive(Debug, Subcommand)]
 pub enum PluginCommands {
     /// Initialize a new plugin development directory
@@ -29,54 +31,54 @@ pub struct PluginInitArgs {
 
 impl PluginInitArgs {
     pub async fn run(self) -> Result<()> {
-        if let Err(e) = process_plugin_init_command(&self.name) {
-            eprintln!("Error: {}", e);
-            Err(e)
-        } else {
-            Ok(())
+        match process_plugin_init_command(&self.name).await {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                eprintln!("Error: {}", e);
+                Err(e)
+            }
         }
     }
 }
 
-fn process_plugin_init_command(plugin_name: &str) -> Result<()> {
+async fn process_plugin_init_command(plugin_name: &str) -> Result<()> {
     // cargo component new --lib <name>
-    run_cargo_component_new(plugin_name)?;
+    run_cargo_component_new(plugin_name).await?;
 
     let current_dir = env::current_dir().context("Could not get current directory")?;
     let plugin_dir = current_dir.join(plugin_name);
     // Create blocksense/config.json
-    create_blocksense_config_json(&plugin_dir)?;
+    create_blocksense_config_json(&plugin_dir).await?;
 
     // Update Cargo.toml
-    update_cargo_toml(&plugin_dir)?;
+    update_cargo_toml(&plugin_dir).await?;
 
     // Create src/plugin_requirements.rs
-    create_src_requirements_rs(&plugin_dir)?;
+    create_src_requirements_rs(&plugin_dir).await?;
     Ok(())
 }
 
-fn run_cargo_component_new(name: &str) -> Result<()> {
+async fn run_cargo_component_new(name: &str) -> Result<()> {
     println!("Initializing directory {}", name);
     // TODO: Validate current dir is not cargo workspace
-    let output = Command::new("cargo")
+    let output = TokioCommand::new("cargo")
         .arg("component")
         .arg("new")
         .arg("--lib")
         .arg(name)
         .output()
-        .context("failed to execute process")?;
+        .await
+        .expect("failed to execute process");
 
     if !output.status.success() {
-        io::stderr()
-            .write_all(&output.stderr)
-            .context("Failed to write to stderr")?;
+        eprintln!("Failed to write to stderr");
         return Err(anyhow::anyhow!("cargo component new command failed"));
     }
 
     Ok(())
 }
 
-pub fn create_blocksense_config_json(plugin_dir: &PathBuf) -> Result<()> {
+pub async fn create_blocksense_config_json(plugin_dir: &PathBuf) -> Result<()> {
     let config_dir = plugin_dir.join("blocksense");
     let config_file_path = config_dir.join("config.json");
     let config_file_content = get_default_config_json_content();
@@ -90,7 +92,9 @@ pub fn create_blocksense_config_json(plugin_dir: &PathBuf) -> Result<()> {
         }
     }
 
-    fs::write(&config_file_path, config_file_content).context("Failed to create file")?;
+    TokioFS::write(&config_file_path, config_file_content)
+        .await
+        .context("Failed to create file")?;
 
     Ok(())
 }
@@ -134,7 +138,7 @@ fn get_default_config_json_content() -> String {
     content
 }
 
-pub fn update_cargo_toml(plugin_dir: &PathBuf) -> Result<()> {
+pub async fn update_cargo_toml(plugin_dir: &PathBuf) -> Result<()> {
     let cargo_toml_file = plugin_dir.join("Cargo.toml");
     println!("Updating {:?}", cargo_toml_file);
 
@@ -144,7 +148,7 @@ pub fn update_cargo_toml(plugin_dir: &PathBuf) -> Result<()> {
 [workspace]
 "#;
 
-    if let Err(e) = append_to_cargo_toml(&cargo_toml_file, new_lines) {
+    if let Err(e) = append_to_cargo_toml(&cargo_toml_file, new_lines).await {
         eprintln!("Error updating file: {}", e);
         return Err(anyhow::anyhow!("Error updating file: {}", e));
     }
@@ -152,18 +156,18 @@ pub fn update_cargo_toml(plugin_dir: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-fn append_to_cargo_toml(file_path: &PathBuf, content: &str) -> io::Result<()> {
+async fn append_to_cargo_toml(file_path: &PathBuf, content: &str) -> io::Result<()> {
     let mut file = OpenOptions::new().append(true).open(file_path)?;
-    writeln!(file, "\n{}", content)?;
+    writeln!(file, "\n{}", content);
     Ok(())
 }
 
-pub fn create_src_requirements_rs(plugin_dir: &PathBuf) -> Result<()> {
+pub async fn create_src_requirements_rs(plugin_dir: &PathBuf) -> Result<()> {
     let src_dir = plugin_dir.join("src");
     let requirements_rs_file_path = src_dir.join("requirements.rs");
     let requirements_file_content = get_requirements_rs_content();
 
-    if let Err(e) = fs::create_dir_all(&src_dir) {
+    if let Err(e) = TokioFS::create_dir_all(&src_dir).await {
         if e.kind() != io::ErrorKind::AlreadyExists {
             eprintln!("Failed to create directory {}:", e);
             return Err(anyhow::anyhow!("Failed to create directory: {}", e));
@@ -172,7 +176,8 @@ pub fn create_src_requirements_rs(plugin_dir: &PathBuf) -> Result<()> {
 
     println!("Creating {:?}", requirements_rs_file_path);
 
-    fs::write(&requirements_rs_file_path, requirements_file_content)
+    TokioFS::write(&requirements_rs_file_path, requirements_file_content)
+        .await
         .context("Error writing to file")?;
 
     Ok(())
