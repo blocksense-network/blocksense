@@ -10,8 +10,8 @@ pub enum ConsensusMetric {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DataFeedAPI {
     EmptyAPI,
-    YahooFinance,
-    CoinMarketCap,
+    YahooDataFeed,
+    CoinMarketCapDataFeed,
     // OpenWeather,
 }
 

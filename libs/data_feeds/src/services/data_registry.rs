@@ -4,10 +4,10 @@ use std::collections::HashMap;
 lazy_static::lazy_static! {
     static ref ASSETS_MAP: HashMap<DataFeedAPI, Vec<&'static str>> = {
         let mut map = HashMap::new();
-        map.insert(DataFeedAPI::YahooFinance, vec![
+        map.insert(DataFeedAPI::YahooDataFeed, vec![
             "AAPL","GOOGL","TSLA","IBKR","NVDA","TLRY", "AMD",
             ]);
-        map.insert(DataFeedAPI::CoinMarketCap, vec!["BTC", "ETH","SOL", "DOT", "XRP"]);
+        map.insert(DataFeedAPI::CoinMarketCapDataFeed, vec!["BTC", "ETH","SOL", "DOT", "XRP"]);
 
         map
     };
@@ -43,8 +43,8 @@ impl DataFeedAPI {
     pub fn as_str(&self) -> &'static str {
         match *self {
             DataFeedAPI::EmptyAPI => "None",
-            DataFeedAPI::YahooFinance => "YahooFinance",
-            DataFeedAPI::CoinMarketCap => "CoinMarketCap",
+            DataFeedAPI::YahooDataFeed => "YahooFinance",
+            DataFeedAPI::CoinMarketCapDataFeed => "CoinMarketCap",
         }
     }
 }

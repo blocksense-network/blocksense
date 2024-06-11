@@ -32,7 +32,7 @@ impl Payload for YfPayload {
 #[async_trait(?Send)]
 impl DataFeed for YahooDataFeed {
     fn api(&self) -> &DataFeedAPI {
-        &DataFeedAPI::YahooFinance
+        &DataFeedAPI::YahooDataFeed
     }
 
     fn api_connect(&self) -> Box<dyn DataFeed> {
