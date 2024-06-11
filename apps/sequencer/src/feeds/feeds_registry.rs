@@ -1,12 +1,9 @@
 use crate::feeds::average_feed_processor::AverageFeedProcessor;
 use crate::feeds::feeds_processing::FeedProcessing;
-use crate::utils::time_utils::get_ms_since_epoch;
-use actix_web::rt::time;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
-use tokio::time::Duration;
-use tracing::{debug, trace};
+use tracing::debug;
 
 #[derive(Debug)]
 pub struct FeedMetaData {
@@ -75,50 +72,6 @@ impl FeedMetaData {
         }
         debug!("Accepted report!");
         return ReportRelevance::Relevant;
-    }
-}
-
-pub struct FeedSlotTimeTracker {
-    report_interval_ms: u64, // Consider oneshot feeds.
-    first_report_start_time_ms: u128,
-}
-
-impl FeedSlotTimeTracker {
-    pub fn new(
-        r: u64, // Consider oneshot feeds.
-        f: u128,
-    ) -> FeedSlotTimeTracker {
-        FeedSlotTimeTracker {
-            report_interval_ms: r,
-            first_report_start_time_ms: f,
-        }
-    }
-    pub async fn await_end_of_current_slot(&self) {
-        let current_time_as_ms = get_ms_since_epoch();
-        let slots_count = (current_time_as_ms - self.first_report_start_time_ms)
-            / self.report_interval_ms as u128;
-        let current_slot_start_time =
-            self.first_report_start_time_ms + slots_count * self.report_interval_ms as u128;
-        let current_slot_end_time = current_slot_start_time + self.report_interval_ms as u128;
-
-        trace!("current_time_as_ms      = {}", current_time_as_ms);
-        trace!("slots_count             = {}", slots_count);
-        trace!("current_slot_start_time = {}", current_slot_start_time);
-        trace!("current_slot_end_time   = {}", current_slot_end_time);
-        trace!(
-            "uncorrected sleep time  = {}",
-            current_time_as_ms + self.report_interval_ms as u128
-        );
-        trace!(
-            "diff                    = {}",
-            current_time_as_ms + self.report_interval_ms as u128 - current_slot_end_time
-        );
-
-        let mut interval = time::interval(Duration::from_millis(
-            (current_slot_end_time - current_time_as_ms) as u64,
-        ));
-        interval.tick().await; // The first tick completes immediately.
-        interval.tick().await;
     }
 }
 
