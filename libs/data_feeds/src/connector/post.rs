@@ -9,7 +9,7 @@ use curl::easy::Easy;
 use serde_json::{json, Value};
 use utils::generate_string_hash;
 
-use super::data_feed::Payload;
+use super::payload::Payload;
 
 fn handle_feed_response(
     reporter_id: u64,
