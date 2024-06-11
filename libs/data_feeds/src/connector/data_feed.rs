@@ -10,14 +10,9 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
 use super::{
     error::{ConversionError, FeedError},
+    payload::Payload,
     post::post_feed_response,
 };
-
-serialize_trait_object!(Payload);
-
-pub trait Payload: erased_serde::Serialize {
-    fn to_bytes32(&self) -> Result<Bytes32, ConversionError>;
-}
 
 #[async_trait(?Send)]
 pub trait DataFeed {
@@ -30,8 +25,6 @@ pub trait DataFeed {
     fn score_by(&self) -> ConsensusMetric;
 
     async fn poll(&mut self, asset: &str) -> (Result<Box<dyn Payload>, FeedError>, Timestamp);
-
-    fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: u64);
 }
 
 fn feed_selector(feeds: &[(DataFeedAPI, String)], batch_size: usize) -> Vec<(DataFeedAPI, String)> {
