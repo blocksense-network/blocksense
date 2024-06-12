@@ -13,10 +13,7 @@ use prometheus::{
 };
 use utils::get_env_var;
 
-use crate::{
-    connector::data_feed::{dispatch, DataFeed},
-    types::DataFeedAPI,
-};
+use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed, types::DataFeedAPI};
 
 pub async fn orchestrator() {
     let batch_size: usize = get_env_var("BATCH_SIZE").unwrap_or(5);
