@@ -1,7 +1,6 @@
 use std::sync::{Arc, RwLock};
 
 use actix_web::{web, App, HttpServer};
-use sequencer::feeds::feed_slots_processor::feed_slots_processor_loop;
 use sequencer::feeds::feeds_registry::{new_feeds_meta_data_reg_with_test_data, AllFeedsReports};
 use sequencer::feeds::feeds_slots_manager;
 use sequencer::feeds::feeds_state::FeedsState;
@@ -12,9 +11,8 @@ use sequencer::plugin_registry;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use tokio::sync::mpsc;
 
-use crate::feeds_slots_manager::FeedsSlotsManager;
+use crate::feeds_slots_manager::feeds_slots_manager_loop;
 use sequencer::reporters::reporter::init_shared_reporters;
-use tracing::debug;
 
 use sequencer::http_handlers::http_handlers::{
     deploy, get_key, index_post, registry_plugin_get, registry_plugin_size, registry_plugin_upload,
@@ -39,7 +37,7 @@ async fn main() -> std::io::Result<()> {
     let (vote_send, vote_recv) = mpsc::unbounded_channel();
 
     let send_channel: mpsc::UnboundedSender<(String, String)> = vote_send.clone();
-    let _feeds_slots_manager = FeedsSlotsManager::new(app_state.clone(), send_channel);
+    let _feeds_slots_manager_loop = feeds_slots_manager_loop(app_state.clone(), send_channel);
 
     let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
 

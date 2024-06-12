@@ -1,9 +1,7 @@
 use crate::feeds::feeds_registry::AllFeedsReports;
 use crate::feeds::feeds_registry::FeedMetaData;
-use crate::feeds::feeds_state::FeedsState;
 use crate::utils::byte_utils::to_hex_string;
 use crate::utils::time_utils::{get_ms_since_epoch, SlotTimeTracker};
-use actix_web::web;
 use eyre::Report;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
