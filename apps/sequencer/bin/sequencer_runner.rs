@@ -1,8 +1,8 @@
 use std::sync::{Arc, RwLock};
 
 use actix_web::{web, App, HttpServer};
-use sequencer::feeds::feed_slots_processor::FeedSlotsProcessor;
 use sequencer::feeds::feeds_registry::{new_feeds_meta_data_reg_with_test_data, AllFeedsReports};
+use sequencer::feeds::feeds_slots_manager;
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::feeds::{
     votes_result_batcher::VotesResultBatcher, votes_result_sender::VotesResultSender,
@@ -11,8 +11,8 @@ use sequencer::plugin_registry;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use tokio::sync::mpsc;
 
+use crate::feeds_slots_manager::feeds_slots_manager_loop;
 use sequencer::reporters::reporter::init_shared_reporters;
-use tracing::debug;
 
 use sequencer::http_handlers::admin::{deploy, get_key, set_log_level};
 use sequencer::http_handlers::data_feeds::post_report;
@@ -35,45 +35,10 @@ async fn main() -> std::io::Result<()> {
         reporters: init_shared_reporters(),
     });
 
-    let mut feed_managers = Vec::new();
-
     let (vote_send, vote_recv) = mpsc::unbounded_channel();
 
-    {
-        let reg = app_state
-            .registry
-            .write()
-            .expect("Could not lock all feeds meta data registry.");
-        let keys = reg.get_keys();
-        for key in keys {
-            let send_channel: mpsc::UnboundedSender<(String, String)> = vote_send.clone();
-
-            debug!("key = {} : value = {:?}", key, reg.get(key));
-
-            let feed = match reg.get(key) {
-                Some(x) => x,
-                None => panic!("Error timer for feed that was not registered."),
-            };
-
-            let lock_err_msg = "Could not lock feed meta data registry for read";
-            let name = feed.read().expect(lock_err_msg).get_name().clone();
-            let report_interval_ms = feed.read().expect(lock_err_msg).get_report_interval_ms();
-            let first_report_start_time = feed
-                .read()
-                .expect(lock_err_msg)
-                .get_first_report_start_time_ms();
-
-            feed_managers.push(FeedSlotsProcessor::new(
-                send_channel,
-                feed,
-                name,
-                report_interval_ms,
-                first_report_start_time,
-                app_state.clone(),
-                key,
-            ));
-        }
-    }
+    let send_channel: mpsc::UnboundedSender<(String, String)> = vote_send.clone();
+    let _feeds_slots_manager_loop = feeds_slots_manager_loop(app_state.clone(), send_channel);
 
     let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
 
