@@ -4,18 +4,17 @@ use ringbuf::{self, storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use serde::Serialize;
 use utils::{current_unix_time, get_env_var};
 
-use derive::Historical;
-
 use crate::{
     connector::{
         bytes::f64_to_bytes32,
-        data_feed::DataFeed,
         error::{ConversionError, FeedError},
-        historical::Historical,
-        payload::Payload,
+    },
+    interfaces::{
+        api_connect::ApiConnect, data_feed::DataFeed, historical::Historical, payload::Payload,
     },
     types::{Bytes32, ConsensusMetric, DataFeedAPI, Timestamp},
 };
+use derive::{ApiConnect, Historical};
 
 #[derive(Serialize, Clone, Copy)]
 pub struct CMCPayload {
@@ -28,7 +27,7 @@ impl Payload for CMCPayload {
     }
 }
 
-#[derive(Historical)]
+#[derive(ApiConnect, Historical)]
 pub struct CoinMarketCapDataFeed {
     api_connector: Cmc,
     is_connected: bool,
@@ -51,18 +50,6 @@ impl CoinMarketCapDataFeed {
 
 #[async_trait(?Send)]
 impl DataFeed for CoinMarketCapDataFeed {
-    fn api(&self) -> &DataFeedAPI {
-        &DataFeedAPI::CoinMarketCapDataFeed
-    }
-
-    fn api_connect(&self) -> Box<dyn DataFeed> {
-        Box::new(CoinMarketCapDataFeed::new())
-    }
-
-    fn is_connected(&self) -> bool {
-        self.is_connected
-    }
-
     fn score_by(&self) -> ConsensusMetric {
         ConsensusMetric::Mean
     }

@@ -7,16 +7,13 @@ use utils::{current_unix_time, get_env_var};
 use yahoo_finance_api::{YahooConnector, YahooError};
 
 extern crate derive;
-use derive::Historical;
+use derive::{ApiConnect, Historical};
 
 use crate::connector::bytes::f64_to_bytes32;
 use crate::connector::error::{ConversionError, FeedError};
-use crate::connector::payload::Payload;
-use crate::types::{Bytes32, Timestamp};
-use crate::{
-    connector::{data_feed::DataFeed, historical::Historical},
-    types::{ConsensusMetric, DataFeedAPI},
-};
+use crate::interfaces::payload::Payload;
+use crate::interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical};
+use crate::types::{Bytes32, ConsensusMetric, DataFeedAPI, Timestamp};
 
 #[derive(Serialize, Clone, Copy)]
 pub struct YfPayload {
@@ -31,18 +28,6 @@ impl Payload for YfPayload {
 
 #[async_trait(?Send)]
 impl DataFeed for YahooDataFeed {
-    fn api(&self) -> &DataFeedAPI {
-        &DataFeedAPI::YahooDataFeed
-    }
-
-    fn api_connect(&self) -> Box<dyn DataFeed> {
-        Box::new(YahooDataFeed::new())
-    }
-
-    fn is_connected(&self) -> bool {
-        self.is_connected
-    }
-
     fn score_by(&self) -> ConsensusMetric {
         ConsensusMetric::Mean
     }
@@ -72,7 +57,7 @@ impl From<YahooError> for FeedError {
     }
 }
 
-#[derive(Historical)]
+#[derive(ApiConnect, Historical)]
 pub struct YahooDataFeed {
     api_connector: YahooConnector,
     is_connected: bool,

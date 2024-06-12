@@ -1,26 +1,15 @@
-use crate::{
-    services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooDataFeed},
-    types::{ConsensusMetric, DataFeedAPI, Timestamp},
-};
-use async_trait::async_trait;
-use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
-use rand::{seq::IteratorRandom, thread_rng};
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
-use super::{error::FeedError, payload::Payload, post::post_feed_response};
+use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
+use rand::{seq::IteratorRandom, thread_rng};
 
-#[async_trait(?Send)]
-pub trait DataFeed {
-    fn api_connect(&self) -> Box<dyn DataFeed>;
+use crate::{
+    interfaces::data_feed::DataFeed,
+    services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooDataFeed},
+    types::DataFeedAPI,
+};
 
-    fn is_connected(&self) -> bool;
-
-    fn api(&self) -> &DataFeedAPI;
-
-    fn score_by(&self) -> ConsensusMetric;
-
-    async fn poll(&mut self, asset: &str) -> (Result<Box<dyn Payload>, FeedError>, Timestamp);
-}
+use super::post::post_feed_response;
 
 fn feed_selector(feeds: &[(DataFeedAPI, String)], batch_size: usize) -> Vec<(DataFeedAPI, String)> {
     let mut rng = thread_rng();

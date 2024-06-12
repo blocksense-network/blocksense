@@ -4,12 +4,13 @@ use std::{
     rc::Rc,
 };
 
-use crate::connector::{data_feed::DataFeed, error::FeedError};
+use crate::{
+    connector::error::FeedError,
+    interfaces::{data_feed::DataFeed, payload::Payload},
+};
 use curl::easy::Easy;
 use serde_json::{json, Value};
 use utils::generate_string_hash;
-
-use super::payload::Payload;
 
 fn handle_feed_response(
     reporter_id: u64,
