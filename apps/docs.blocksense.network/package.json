@@ -8,7 +8,8 @@
     "dev": "next",
     "ready-dev-go": "yarn build:deps && yarn dev",
     "start": "next start",
-    "test": "yarn vitest -w false"
+    "test": "yarn vitest -w false",
+    "ts": "yarn node --import tsx"
   },
   "types": "./src/index.ts",
   "devDependencies": {
