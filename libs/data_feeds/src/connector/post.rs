@@ -34,7 +34,7 @@ fn handle_feed_response(
                 "feed_name": feed_name,
                 "feed_id": feed_hash,
                 "timestamp": timestamp,
-                "api_error_message": FeedError::stringify(&err)
+                "api_error_message": err.to_string()
 
             })
         }
