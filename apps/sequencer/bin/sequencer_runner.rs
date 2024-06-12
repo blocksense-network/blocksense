@@ -9,6 +9,7 @@ use eyre::Result;
 use sequencer::utils::time_utils::get_ms_since_epoch;
 use std::sync::{Arc, RwLock};
 
+use actix_multipart::Multipart;
 use actix_web::http::header::ContentType;
 use actix_web::{error, Error};
 use actix_web::{get, web, App, HttpRequest, HttpServer};
@@ -24,6 +25,7 @@ use sequencer::feeds::{
     votes_result_batcher::VotesResultBatcher, votes_result_sender::VotesResultSender,
 };
 use sequencer::utils::{byte_utils::to_hex_string, eth_send_utils::deploy_contract, provider::*};
+use sequencer::plugin_registry;
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 
@@ -242,6 +244,135 @@ async fn index_post(
     Ok(HttpResponse::BadRequest().into())
 }
 
+/// Uploads a WebAssembly plugin to the registry.
+///
+/// This endpoint accepts a multipart/form-data POST request with the following fields:
+/// - `name`: The name of the plugin (string).
+/// - `namespace`: The namespace of the plugin (string).
+/// - `wasm`: The WebAssembly file to be uploaded (file, max size 1MB).
+///
+/// Example `curl` request:
+/// ```sh
+/// curl -X POST http://localhost:8080/registry/plugin/upload \
+///   -F "name=plugin_name" \
+///   -F "namespace=plugin_namespace" \
+///   -F "wasm=@path/to/your/file.wasm"
+/// ```
+///
+/// # Errors
+/// Returns HTTP 400 if any of the fields are missing or if the file size exceeds the limit.
+#[post("/registry/plugin/upload")]
+async fn registry_plugin_upload(
+    mut payload: Multipart,
+    app_state: web::Data<FeedsState>,
+) -> Result<HttpResponse, Error> {
+    println!("Called registry_plugin_upload");
+
+    let mut name = String::new();
+    let mut namespace = String::new();
+    let mut wasm_file = None;
+
+    while let Some(Ok(mut field)) = payload.next().await {
+        // let content_disposition = field.content_disposition().unwrap();
+        // let field_name = content_disposition.get_name().unwrap();
+        let field_name = field.name();
+
+        if field_name == "name" {
+            while let Some(chunk) = field.next().await {
+                name.push_str(&String::from_utf8(chunk?.to_vec()).unwrap());
+            }
+        } else if field_name == "namespace" {
+            while let Some(chunk) = field.next().await {
+                namespace.push_str(&String::from_utf8(chunk?.to_vec()).unwrap());
+            }
+        } else if field_name == "wasm" {
+            let mut file_bytes = web::BytesMut::new();
+            while let Some(chunk) = field.next().await {
+                let chunk = chunk?;
+                if (file_bytes.len() + chunk.len()) > MAX_SIZE {
+                    return Err(error::ErrorBadRequest("File size exceeds the limit of 1MB"));
+                }
+                file_bytes.extend_from_slice(&chunk);
+            }
+            wasm_file = Some(file_bytes);
+        }
+    }
+
+    // TODO: Validate name, namespace and wasm present. Return http 400 otherwise.
+    // TODO: Sanitize string for dangerous characters
+    {
+        let mut reg = app_state.plugin_registry.write().unwrap();
+        let registry_key = format!("{}:{}", namespace, name);
+        let wasm_file_bytes = wasm_file.unwrap();
+        let wasm_file_str = std::str::from_utf8(&wasm_file_bytes)
+            .map_err(|_| error::ErrorBadRequest("Invalid UTF-8 sequence"))?
+            .to_string();
+        reg.insert(registry_key, wasm_file_str)
+            .expect("TODO: panic message");
+    }
+
+    Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(""))
+}
+
+/// Retrieves a WebAssembly plugin from the registry.
+///
+/// This endpoint accepts a GET request with the following path parameters:
+/// - `namespace`: The namespace of the plugin (string).
+/// - `name`: The name of the plugin (string).
+///
+/// Example `curl` request:
+/// ```sh
+/// curl -X GET "http://localhost:8080/registry/plugin/get/plugin_namespace/plugin_name"
+/// ```
+///
+/// # Errors
+/// Returns HTTP 404 if the specified plugin is not found.
+#[get("/registry/plugin/get/{namespace}/{name}")]
+async fn registry_plugin_get(
+    namespace: web::Path<String>,
+    name: web::Path<String>,
+    app_state: web::Data<FeedsState>,
+) -> Result<HttpResponse, Error> {
+    // curl -X GET "http://localhost:8080/registry/plugin/get/plugin_namespace/plugin_name"
+    println!("Called registry_plugin_get {}:{}", namespace, name);
+    let plugin_file;
+    {
+        let mut reg = app_state.plugin_registry.write().unwrap();
+        let registry_key = format!("{}:{}", namespace, name);
+        plugin_file = reg.get(&registry_key).expect("TODO: panic message");
+    }
+    Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body("TODO: Return actual bytes"))
+}
+
+/// Retrieves the current memory usage of the plugin registry.
+///
+/// This endpoint accepts a GET request and returns the current memory usage in bytes.
+///
+/// Example `curl` request:
+/// ```sh
+/// curl -X GET http://localhost:8080/registry/plugin/size
+/// ```
+///
+/// # Returns
+/// - The current memory usage of the plugin registry in bytes as a plain text response.
+#[get("/registry/plugin/size")]
+async fn registry_plugin_size(app_state: web::Data<FeedsState>) -> Result<HttpResponse, Error> {
+    // curl -X GET http://localhost:8080/registry/plugin/size
+    println!("Called registry_plugin_size");
+    let registry_size;
+    {
+        let mut reg = app_state.plugin_registry.write().unwrap();
+        registry_size = reg.current_memory_usage;
+    }
+    Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(registry_size.to_string()))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // init global logger.
@@ -254,6 +385,7 @@ async fn main() -> std::io::Result<()> {
     let app_state = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data())),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+        plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
     });
 
     let mut feed_managers = Vec::new();
@@ -309,6 +441,9 @@ async fn main() -> std::io::Result<()> {
             .service(deploy)
             .service(index_post)
             .service(set_log_level)
+            .service(registry_plugin_upload)
+            .service(registry_plugin_get)
+            .service(registry_plugin_size)
     })
     .bind(("0.0.0.0", 8877))?
     .run()
