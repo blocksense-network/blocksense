@@ -4,17 +4,18 @@ use actix_web::rt::spawn;
 use actix_web::web;
 use futures::stream::FuturesUnordered;
 use std::fmt::Debug;
+use std::io::Error;
 use tokio::sync::mpsc;
 use tracing::debug;
 use tracing::error;
 
-pub fn feeds_slots_manager_loop<
+pub async fn feeds_slots_manager_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
     V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
 >(
     app_state: web::Data<FeedsState>,
     vote_send: mpsc::UnboundedSender<(K, V)>,
-) -> eyre::Result<String> {
+) -> tokio::task::JoinHandle<Result<(), Error>> {
     let reports_clone = app_state.reports.clone();
     spawn(async move {
         let collected_futures = FuturesUnordered::new();
@@ -80,6 +81,6 @@ pub fn feeds_slots_manager_loop<
             }
             all_results += " "
         }
-    });
-    Ok("feeds_slots_manager_loop done".into())
+        Ok({})
+    })
 }
