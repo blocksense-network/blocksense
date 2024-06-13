@@ -1,0 +1,39 @@
+.nextra-hamburger svg g {
+  transform-origin: 50%;
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.nextra-hamburger svg path {
+  opacity: 1;
+  transition:
+    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1) 0.2s,
+    opacity 0.2s 0.2s;
+}
+.nextra-hamburger svg.open path {
+  transition:
+    transform 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0s 0.2s;
+}
+.nextra-hamburger svg.open g {
+  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1) 0.2s;
+}
+.nextra-hamburger svg.open > path {
+  opacity: 0;
+}
+.nextra-hamburger svg.open > g:first-of-type {
+  --tw-rotate: 45deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
+    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.nextra-hamburger svg.open > g:first-of-type path {
+  transform: translateY(6px);
+}
+.nextra-hamburger svg.open > g:nth-of-type(2) {
+  --tw-rotate: -45deg;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+    rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y))
+    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.nextra-hamburger svg.open > g:nth-of-type(2) path {
+  transform: translateY(-6px);
+}

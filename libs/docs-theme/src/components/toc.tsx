@@ -14,7 +14,7 @@ export type TOCProps = {
 };
 
 const linkClassName = cn(
-  'nx-text-xs nx-font-medium nx-text-gray-500 hover:nx-text-gray-900 dark:nx-text-gray-400 dark:hover:nx-text-gray-100',
+  'nx-text-s nx-font-semibold nx-text-gray-600 hover:nx-text-gray-900',
   'contrast-more:nx-text-gray-800 contrast-more:dark:nx-text-gray-50',
 );
 
@@ -71,22 +71,25 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
           </p>
           <ul>
             {items.map(({ id, value, depth }) => (
-              <li className="nx-my-2 nx-scroll-my-6 nx-scroll-py-6" key={id}>
+              <li
+                className="nx-mt-2 nx-scroll-my-6 nx-scroll-py-6 nx-px-2 nx-py-2 nx-border-b nx-border-gray-200 hover:nx-bg-gray-100"
+                key={id}
+              >
                 <a
                   href={`#${id}`}
                   className={cn(
                     {
-                      2: 'nx-font-semibold',
-                      3: 'ltr:nx-pl-4 rtl:nx-pr-4',
-                      4: 'ltr:nx-pl-8 rtl:nx-pr-8',
-                      5: 'ltr:nx-pl-12 rtl:nx-pr-12',
-                      6: 'ltr:nx-pl-16 rtl:nx-pr-16',
+                      2: 'nx-text-sm',
+                      3: 'ltr:nx-pl-4 rtl:nx-pr-2',
+                      4: 'ltr:nx-pl-8 rtl:nx-pr-4',
+                      5: 'ltr:nx-pl-12 rtl:nx-pr-6',
+                      6: 'ltr:nx-pl-16 rtl:nx-pr-8',
                     }[depth as Exclude<typeof depth, 1> as number],
                     'nx-inline-block',
                     activeAnchor[id]?.isActive
                       ? 'nx-text-primary-600 nx-subpixel-antialiased contrast-more:!nx-text-primary-600'
-                      : 'nx-text-gray-500 hover:nx-text-gray-900 dark:nx-text-gray-400 dark:hover:nx-text-gray-300',
-                    'contrast-more:nx-text-gray-900 contrast-more:nx-underline contrast-more:dark:nx-text-gray-50 nx-w-full nx-break-words',
+                      : 'nx-text-gray-700 hover:nx-text-gray-900 dark:nx-text-gray-400 dark:hover:nx-text-gray-300',
+                    'contrast-more:nx-text-gray-900 contrast-more:nx-underline',
                   )}
                 >
                   {config.toc.headingComponent?.({
@@ -103,9 +106,9 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
       {hasMetaInfo && (
         <div
           className={cn(
-            hasHeadings &&
-              'nx-mt-8 nx-border-t nx-bg-white nx-pt-8 nx-shadow-[0_-12px_16px_white] dark:nx-bg-dark dark:nx-shadow-[0_-12px_16px_#111]',
-            'nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-2 nx-pb-8 dark:nx-border-neutral-800',
+            hasHeadings && 'nextra-toc__info-section',
+            'nx-mt-10 nx-bg-gray-50 nx-rounded-lg nx-border nx-px-4 nx-py-0 nx-border-gray-200 nx-pt-4',
+            'nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 nx-pb-4 dark:nx-border-neutral-800',
             'contrast-more:nx-border-t contrast-more:nx-border-neutral-400 contrast-more:nx-shadow-none contrast-more:dark:nx-border-neutral-400',
           )}
         >

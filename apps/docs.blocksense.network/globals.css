@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  border: none;
+}
+
 main {
   margin-top: 20px;
 }

@@ -1,0 +1,117 @@
+.nx-list-decimal {
+  list-style-type: decimal;
+}
+.nx-list-disc {
+  list-style-type: disc;
+}
+.nx-list-none {
+  list-style-type: none;
+}
+.nx-appearance-none {
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+}
+.nx-flex-col {
+  flex-direction: column;
+}
+.nx-flex-wrap {
+  flex-wrap: wrap;
+}
+.nx-items-start {
+  align-items: flex-start;
+}
+.nx-items-center {
+  align-items: center;
+}
+.nx-justify-start {
+  justify-content: flex-start;
+}
+.nx-justify-end {
+  justify-content: flex-end;
+}
+.nx-justify-center {
+  justify-content: center;
+}
+.nx-justify-between {
+  justify-content: space-between;
+}
+.nx-gap-1 {
+  gap: 0.25rem;
+}
+.nx-gap-1\.5 {
+  gap: 0.375rem;
+}
+.nx-gap-2 {
+  gap: 0.5rem;
+}
+.nx-gap-4 {
+  gap: 1rem;
+}
+.nx-overflow-auto {
+  overflow: auto;
+}
+.nx-overflow-hidden {
+  overflow: hidden;
+}
+.nx-overflow-x-auto {
+  overflow-x: auto;
+}
+.nx-overflow-y-auto {
+  overflow-y: auto;
+}
+.nx-overflow-x-hidden {
+  overflow-x: hidden;
+}
+.nx-overflow-y-hidden {
+  overflow-y: hidden;
+}
+.nx-overflow-x-scroll {
+  overflow-x: scroll;
+}
+.nx-overscroll-contain {
+  overscroll-behavior: contain;
+}
+.nx-overscroll-x-contain {
+  overscroll-behavior-x: contain;
+}
+.nx-truncate {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.nx-text-ellipsis {
+  text-overflow: ellipsis;
+}
+.nx-whitespace-nowrap {
+  white-space: nowrap;
+}
+.nx-break-words {
+  overflow-wrap: break-word;
+}
+.nx-rounded {
+  border-radius: 0.25rem;
+}
+.nx-rounded-full {
+  border-radius: 9999px;
+}
+.nx-rounded-lg {
+  border-radius: 0.5rem;
+}
+.nx-rounded-md {
+  border-radius: 0.375rem;
+}
+.nx-rounded-sm {
+  border-radius: 0.125rem;
+}
+.nx-rounded-xl {
+  border-radius: 0.75rem;
+}
+.nx-rounded-t {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+.nx-rounded-t-xl {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}

@@ -1,0 +1,213 @@
+.nx-sr-only {
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  position: absolute;
+  overflow: hidden;
+}
+.nx-pointer-events-none {
+  pointer-events: none;
+}
+.nx-invisible {
+  visibility: hidden;
+}
+.nx-fixed {
+  position: fixed;
+}
+.nx-absolute {
+  position: absolute;
+}
+.nx-relative {
+  position: relative;
+}
+.nx-sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
+.nx-inset-0 {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.nx-inset-x-0 {
+  left: 0;
+  right: 0;
+}
+.nx-inset-y-0 {
+  top: 0;
+  bottom: 0;
+}
+.nx-bottom-0 {
+  bottom: 0;
+}
+.nx-right-0 {
+  right: 0;
+}
+.nx-top-0 {
+  top: 0;
+}
+.nx-top-16 {
+  top: 4rem;
+}
+.nx-top-8 {
+  top: 2rem;
+}
+.nx-top-full {
+  top: 100%;
+}
+.nx-z-10 {
+  z-index: 10;
+}
+.nx-z-20 {
+  z-index: 20;
+}
+.nx-z-\[-1\] {
+  z-index: -1;
+}
+.nx-z-\[1\] {
+  z-index: 1;
+}
+.nx-order-last {
+  order: 9999;
+}
+.nx-m-0 {
+  margin: 0;
+}
+.nx-m-\[11px\] {
+  margin: 11px;
+}
+.-nx-mx-6 {
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+}
+.nx-mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+.nx-mx-2\.5 {
+  margin-left: 0.625rem;
+  margin-right: 0.625rem;
+}
+.nx-mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+.nx-mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.nx-my-1 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.nx-my-1\.5 {
+  margin-top: 0.375rem;
+  margin-bottom: 0.375rem;
+}
+.nx-my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.nx-my-4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.nx-my-8 {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+.-nx-mb-0 {
+  margin-bottom: 0;
+}
+.-nx-mb-0\.5 {
+  margin-bottom: -0.125rem;
+}
+.-nx-ml-2 {
+  margin-left: -0.5rem;
+}
+.-nx-mr-2 {
+  margin-right: -0.5rem;
+}
+.nx-mb-12 {
+  margin-bottom: 3rem;
+}
+.nx-mb-2 {
+  margin-bottom: 0.5rem;
+}
+.nx-mb-4 {
+  margin-bottom: 1rem;
+}
+.nx-mb-8 {
+  margin-bottom: 2rem;
+}
+.nx-ml-1 {
+  margin-left: 0.25rem;
+}
+.nx-ml-2 {
+  margin-left: 0.5rem;
+}
+.nx-ml-4 {
+  margin-left: 1rem;
+}
+.nx-mr-2 {
+  margin-right: 0.5rem;
+}
+.nx-mt-1 {
+  margin-top: 0.25rem;
+}
+.nx-mt-1\.5 {
+  margin-top: 0.375rem;
+}
+.nx-mt-10 {
+  margin-top: 2.5rem;
+}
+.nx-mt-12 {
+  margin-top: 3rem;
+}
+.nx-mt-16 {
+  margin-top: 4rem;
+}
+.nx-mt-2 {
+  margin-top: 0.5rem;
+}
+.nx-mt-4 {
+  margin-top: 1rem;
+}
+.nx-mt-5 {
+  margin-top: 1.25rem;
+}
+.nx-mt-6 {
+  margin-top: 1.5rem;
+}
+.nx-mt-8 {
+  margin-top: 2rem;
+}
+.nx-mt-10 {
+  margin-top: 2.5rem;
+}
+.nx-block {
+  display: block;
+}
+.nx-inline-block {
+  display: inline-block;
+}
+.nx-inline {
+  display: inline;
+}
+.nx-flex {
+  display: flex;
+}
+.nx-inline-flex {
+  display: inline-flex;
+}
+.nx-grid {
+  display: grid;
+}
+.nx-hidden {
+  display: none;
+}

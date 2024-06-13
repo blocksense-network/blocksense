@@ -1,0 +1,31 @@
+.nextra-steps h3 {
+  counter-increment: step;
+}
+.nextra-steps h3:before {
+  --tw-border-opacity: 1;
+  border-width: 4px;
+  border-color: rgba(255, 255, 255, var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: rgba(243, 244, 246, var(--tw-bg-opacity));
+  width: 33px;
+  height: 33px;
+  position: absolute;
+}
+:is(html[class~='dark'] .nextra-steps h3):before {
+  --tw-border-opacity: 1;
+  border-color: rgba(17, 17, 17, var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: rgba(38, 38, 38, var(--tw-bg-opacity));
+}
+.nextra-steps h3:before {
+  text-align: center;
+  text-indent: -1px;
+  --tw-text-opacity: 1;
+  color: rgba(163, 163, 163, var(--tw-text-opacity));
+  content: counter(step);
+  border-radius: 9999px;
+  margin-top: 3px;
+  margin-left: -41px;
+  font-size: 1rem;
+  font-weight: 400;
+}
