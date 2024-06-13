@@ -10,6 +10,7 @@ use sequencer::utils::time_utils::get_ms_since_epoch;
 use std::sync::{Arc, RwLock};
 
 use actix_multipart::Multipart;
+use actix_web::error::ErrorBadRequest;
 use actix_web::http::header::ContentType;
 use actix_web::{error, Error};
 use actix_web::{get, web, App, HttpRequest, HttpServer};
@@ -244,6 +245,8 @@ async fn index_post(
     Ok(HttpResponse::BadRequest().into())
 }
 
+const MAX_PlUGIN_SIZE: usize = 1_000_000; // max payload size is 900kb
+
 /// Uploads a WebAssembly plugin to the registry.
 ///
 /// This endpoint accepts a multipart/form-data POST request with the following fields:
@@ -253,7 +256,7 @@ async fn index_post(
 ///
 /// Example `curl` request:
 /// ```sh
-/// curl -X POST http://localhost:8080/registry/plugin/upload \
+/// curl -X POST http://localhost:8877/registry/plugin/upload \
 ///   -F "name=plugin_name" \
 ///   -F "namespace=plugin_namespace" \
 ///   -F "wasm=@path/to/your/file.wasm"
@@ -273,8 +276,6 @@ async fn registry_plugin_upload(
     let mut wasm_file = None;
 
     while let Some(Ok(mut field)) = payload.next().await {
-        // let content_disposition = field.content_disposition().unwrap();
-        // let field_name = content_disposition.get_name().unwrap();
         let field_name = field.name();
 
         if field_name == "name" {
@@ -289,7 +290,7 @@ async fn registry_plugin_upload(
             let mut file_bytes = web::BytesMut::new();
             while let Some(chunk) = field.next().await {
                 let chunk = chunk?;
-                if (file_bytes.len() + chunk.len()) > MAX_SIZE {
+                if (file_bytes.len() + chunk.len()) > MAX_PlUGIN_SIZE {
                     return Err(error::ErrorBadRequest("File size exceeds the limit of 1MB"));
                 }
                 file_bytes.extend_from_slice(&chunk);
@@ -298,17 +299,25 @@ async fn registry_plugin_upload(
         }
     }
 
-    // TODO: Validate name, namespace and wasm present. Return http 400 otherwise.
-    // TODO: Sanitize string for dangerous characters
+    // TODO (Dilyan Dokov): Validate name, namespace and wasm present. Return http 400 otherwise.
+    // TODO (Dilyan Dokov): Sanitize string for dangerous characters
     {
-        let mut reg = app_state.plugin_registry.write().unwrap();
+        let mut reg = app_state
+            .plugin_registry
+            .write()
+            .unwrap_or_else(|poisoned| {
+                // Handle mutex poisoning
+                let guard = poisoned.into_inner();
+                guard
+            });
         let registry_key = format!("{}:{}", namespace, name);
+        if wasm_file.is_none() {
+            return Err(ErrorBadRequest("No file sent"));
+        }
         let wasm_file_bytes = wasm_file.unwrap();
-        let wasm_file_str = std::str::from_utf8(&wasm_file_bytes)
-            .map_err(|_| error::ErrorBadRequest("Invalid UTF-8 sequence"))?
-            .to_string();
-        reg.insert(registry_key, wasm_file_str)
-            .expect("TODO: panic message");
+        reg.insert(registry_key, wasm_file_bytes.to_vec())
+            .map_err(|e| ErrorBadRequest("Plugin registry capacity reached"))?;
+        // Releasing plugin_registry rwlock
     }
 
     Ok(HttpResponse::Ok()
@@ -324,28 +333,31 @@ async fn registry_plugin_upload(
 ///
 /// Example `curl` request:
 /// ```sh
-/// curl -X GET "http://localhost:8080/registry/plugin/get/plugin_namespace/plugin_name"
+/// curl -X GET "http://localhost:8877/registry/plugin/get/plugin_namespace/plugin_name" -o downloaded_plugin.wasm
 /// ```
 ///
 /// # Errors
 /// Returns HTTP 404 if the specified plugin is not found.
 #[get("/registry/plugin/get/{namespace}/{name}")]
 async fn registry_plugin_get(
-    namespace: web::Path<String>,
-    name: web::Path<String>,
+    path: web::Path<(String, String)>,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
-    // curl -X GET "http://localhost:8080/registry/plugin/get/plugin_namespace/plugin_name"
+    let (namespace, name) = path.into_inner();
     println!("Called registry_plugin_get {}:{}", namespace, name);
+
     let plugin_file;
     {
-        let mut reg = app_state.plugin_registry.write().unwrap();
+        let reg = app_state.plugin_registry.read().unwrap();
         let registry_key = format!("{}:{}", namespace, name);
-        plugin_file = reg.get(&registry_key).expect("TODO: panic message");
+        plugin_file = reg
+            .get(&registry_key)
+            .ok_or_else(|| actix_web::error::ErrorNotFound("Plugin not found"))?;
+
+        Ok(HttpResponse::Ok()
+            .content_type("application/wasm")
+            .body(plugin_file.clone()))
     }
-    Ok(HttpResponse::Ok()
-        .content_type(ContentType::plaintext())
-        .body("TODO: Return actual bytes"))
 }
 
 /// Retrieves the current memory usage of the plugin registry.
@@ -354,14 +366,13 @@ async fn registry_plugin_get(
 ///
 /// Example `curl` request:
 /// ```sh
-/// curl -X GET http://localhost:8080/registry/plugin/size
+/// curl -X GET http://localhost:8877/registry/plugin/size
 /// ```
 ///
 /// # Returns
 /// - The current memory usage of the plugin registry in bytes as a plain text response.
 #[get("/registry/plugin/size")]
 async fn registry_plugin_size(app_state: web::Data<FeedsState>) -> Result<HttpResponse, Error> {
-    // curl -X GET http://localhost:8080/registry/plugin/size
     println!("Called registry_plugin_size");
     let registry_size;
     {

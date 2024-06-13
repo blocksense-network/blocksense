@@ -4,7 +4,7 @@ use std::mem;
 const MAX_MEMORY: usize = 100 * 1024 * 1024; // 100 MB
 
 pub struct CappedHashMap {
-    pub map: HashMap<String, String>,
+    pub map: HashMap<String, Vec<u8>>,
     pub current_memory_usage: usize,
 }
 
@@ -16,11 +16,11 @@ impl CappedHashMap {
         }
     }
 
-    pub fn calculate_memory_usage(key: &str, value: &str) -> usize {
-        mem::size_of::<String>() * 2 + key.len() + value.len()
+    pub fn calculate_memory_usage(key: &str, value: &[u8]) -> usize {
+        mem::size_of::<String>() + mem::size_of::<Vec<u8>>() + key.len() + value.len()
     }
 
-    pub fn insert(&mut self, key: String, value: String) -> Result<(), &'static str> {
+    pub fn insert(&mut self, key: String, value: Vec<u8>) -> Result<(), &'static str> {
         let entry_size = Self::calculate_memory_usage(&key, &value);
 
         if self.current_memory_usage + entry_size > MAX_MEMORY {
@@ -39,11 +39,11 @@ impl CappedHashMap {
         Ok(())
     }
 
-    pub fn get(&self, key: &str) -> Option<&String> {
+    pub fn get(&self, key: &str) -> Option<&Vec<u8>> {
         self.map.get(key)
     }
 
-    pub fn remove(&mut self, key: &str) -> Option<String> {
+    pub fn remove(&mut self, key: &str) -> Option<Vec<u8>> {
         if let Some(value) = self.map.remove(key) {
             let entry_size = Self::calculate_memory_usage(key, &value);
             self.current_memory_usage -= entry_size;
@@ -66,28 +66,26 @@ mod tests {
     fn test_insert() {
         let mut capped_map = CappedHashMap::new();
         assert!(capped_map
-            .insert("key1".to_string(), "value1".to_string())
+            .insert("key1".to_string(), b"value1".to_vec())
             .is_ok());
         assert!(capped_map.get("key1").is_some());
-        assert_eq!(capped_map.get("key1").unwrap(), "value1");
+        assert_eq!(capped_map.get("key1").unwrap(), &b"value1".to_vec());
     }
 
     #[test]
     fn test_insert_exceeding_limit() {
         let mut capped_map = CappedHashMap::new();
-        let large_value = "a".repeat(MAX_MEMORY);
-        assert!(capped_map
-            .insert("key1".to_string(), large_value.clone())
-            .is_err());
+        let large_value = vec![0; MAX_MEMORY];
+        assert!(capped_map.insert("key1".to_string(), large_value).is_err());
     }
 
     #[test]
     fn test_get() {
         let mut capped_map = CappedHashMap::new();
         capped_map
-            .insert("key1".to_string(), "value1".to_string())
+            .insert("key1".to_string(), b"value1".to_vec())
             .unwrap();
-        assert_eq!(capped_map.get("key1"), Some(&"value1".to_string()));
+        assert_eq!(capped_map.get("key1"), Some(&b"value1".to_vec()));
         assert_eq!(capped_map.get("nonexistent_key"), None);
     }
 
@@ -95,9 +93,9 @@ mod tests {
     fn test_remove() {
         let mut capped_map = CappedHashMap::new();
         capped_map
-            .insert("key1".to_string(), "value1".to_string())
+            .insert("key1".to_string(), b"value1".to_vec())
             .unwrap();
-        assert_eq!(capped_map.remove("key1"), Some("value1".to_string()));
+        assert_eq!(capped_map.remove("key1"), Some(b"value1".to_vec()));
         assert_eq!(capped_map.get("key1"), None);
     }
 
@@ -105,7 +103,7 @@ mod tests {
     fn test_current_memory_usage() {
         let mut capped_map = CappedHashMap::new();
         let key = "key1".to_string();
-        let value = "value1".to_string();
+        let value = b"value1".to_vec();
         let entry_size = CappedHashMap::calculate_memory_usage(&key, &value);
         capped_map.insert(key, value).unwrap();
         assert_eq!(capped_map.current_memory_usage(), entry_size);
@@ -114,8 +112,9 @@ mod tests {
     #[test]
     fn test_calculate_memory_usage() {
         let key = "key1";
-        let value = "value1";
-        let expected_size = mem::size_of::<String>() * 2 + key.len() + value.len();
+        let value = b"value1";
+        let expected_size =
+            mem::size_of::<String>() + mem::size_of::<Vec<u8>>() + key.len() + value.len();
         assert_eq!(
             CappedHashMap::calculate_memory_usage(key, value),
             expected_size
