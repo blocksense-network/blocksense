@@ -201,7 +201,7 @@ pub fn get_feed_id(name: &str) -> u32 {
     0 // TODO: get from registry
 }
 
-pub fn get_reporters_for_feed_id_slot(feed_id: u32, slot: u64) -> Vec<u32> {
+pub fn get_reporters_for_feed_id_slot(_feed_id: u32, _slot: u64) -> Vec<u32> {
     (0..10).collect()
     // TODO: this will be a subset of the reporters that have been assigned
     // to vote for this feed for the given sequence id.
@@ -210,15 +210,11 @@ pub fn get_reporters_for_feed_id_slot(feed_id: u32, slot: u64) -> Vec<u32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::feeds::feeds_registry::{
-        new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaDataRegistry,
-    };
+    use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_with_test_data, AllFeedsReports};
     use crate::utils::time_utils::get_ms_since_epoch;
     use std::sync::Arc;
     use std::sync::RwLock;
     use std::thread;
-    use std::time::SystemTime;
-    use std::time::UNIX_EPOCH;
 
     #[test]
     fn basic_test() {

@@ -2773,6 +2773,7 @@ checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
 name = "data_feeds"
 version = "0.0.1"
 dependencies = [
+ "actix-web",
  "anyhow",
  "async-std",
  "async-trait",
@@ -2783,6 +2784,7 @@ dependencies = [
  "lazy_static 1.4.0",
  "prometheus",
  "rand 0.8.5",
+ "reqwest 0.12.4",
  "ringbuf",
  "serde 1.0.203",
  "serde_json",
