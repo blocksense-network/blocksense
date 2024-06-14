@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
 use actix_web::{web, App, HttpServer};
-use prometheus::TextEncoder;
+use prometheus_framework::TextEncoder;
 use reqwest::Client;
 use utils::get_env_var;
 
@@ -33,7 +33,7 @@ pub async fn handle_prometheus_metrics(
 ) -> Result<(), anyhow::Error> {
     let mut buffer = String::new();
 
-    let metric_families = prometheus::gather();
+    let metric_families = prometheus_framework::gather();
     encoder.encode_utf8(&metric_families, &mut buffer).unwrap();
 
     let _ = client

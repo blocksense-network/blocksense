@@ -1,4 +1,4 @@
-use prometheus::{
+use prometheus_framework::{
     register_counter, register_int_counter, register_int_gauge, register_int_gauge_vec, Counter,
     IntCounter, IntGauge, IntGaugeVec,
 };

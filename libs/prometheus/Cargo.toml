@@ -9,7 +9,9 @@ edition.workspace = true
 
 [dependencies]
 utils = { path = "../utils" }
-prometheus = "0.13.4"
+# Note(stanm): Stefan really wanted to keep the library called the same, so we
+# alias the framework.
+prometheus_framework = { package = "prometheus", version = "0.13.4" }
 actix-web = "4.5.1"
 reqwest = "0.12.4"
 anyhow = "1.0.81"
