@@ -25,8 +25,8 @@ use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::feeds::{
     votes_result_batcher::VotesResultBatcher, votes_result_sender::VotesResultSender,
 };
-use sequencer::utils::{byte_utils::to_hex_string, eth_send_utils::deploy_contract, provider::*};
 use sequencer::plugin_registry;
+use sequencer::utils::{byte_utils::to_hex_string, eth_send_utils::deploy_contract, provider::*};
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 

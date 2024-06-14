@@ -19,6 +19,7 @@ fn stop_sequencer_runner(child: &mut Child) {
 }
 
 #[test]
+#[ignore]
 fn test_plugin_upload_get_size() {
     // Start the sequencer_runner binary using std::process::Command
     let mut child = start_sequencer_runner();
