@@ -12,6 +12,7 @@ use alloy::{
 use eyre::eyre;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
+use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{error, info};
 
@@ -93,11 +94,17 @@ async fn get_key(req: HttpRequest, app_state: web::Data<FeedsState>) -> impl Res
     let network: String = req.match_info().get("network").ok_or(bad_input)?.parse()?;
     let key: String = req.match_info().query("key").parse()?;
     info!("getting key {} for network {} ...", key, network);
-    match get_key_from_contract(&app_state.providers, &network, &key).await {
-        Ok(result) => Ok(HttpResponse::Ok()
+    let result = actix_web::rt::time::timeout(
+        Duration::from_secs(7),
+        get_key_from_contract(&app_state.providers, &network, &key),
+    )
+    .await;
+    match result {
+        Ok(Ok(result)) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
-        Err(e) => Err(error::ErrorBadRequest(e.to_string())),
+        Ok(Err(e)) => Err(error::ErrorInternalServerError(e.to_string())),
+        Err(e) => Err(error::ErrorInternalServerError(e.to_string())),
     }
 }
 

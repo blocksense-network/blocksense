@@ -20,10 +20,13 @@ pub async fn votes_result_sender_loop<
             match recvd {
                 Some(updates) => {
                     info!("sending updates to contract:");
-                    eth_batch_send_to_all_contracts(providers.clone(), updates)
-                        .await
-                        .unwrap();
-                    info!("Sending updates complete.");
+                    let providers_clone = providers.clone();
+                    spawn(async move {
+                        match eth_batch_send_to_all_contracts(providers_clone, updates).await {
+                            Ok(res) => info!("Sending updates complete {}.", res),
+                            Err(err) => error!("ERROR Sending updates {}", err),
+                        };
+                    });
                 }
                 None => {
                     error!("Sender got RecvError");
