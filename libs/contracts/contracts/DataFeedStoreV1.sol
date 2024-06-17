@@ -20,6 +20,8 @@ contract DataFeedStoreV1 {
   /// @dev The owner is the address that deployed the contract
   address internal immutable owner;
 
+  /// @notice Constructor
+  /// @dev Sets the owner of the contract - the address that deployed the contract
   constructor() {
     owner = msg.sender;
   }
@@ -27,72 +29,65 @@ contract DataFeedStoreV1 {
   /// @notice Fallback function
   /// @dev The fallback function is used to set or get data feeds according to the provided selector.
   fallback() external {
-    // getters
+    // Getters
     assembly {
-      // store selector in memory in the first memory slot
-      calldatacopy(28, 0, 4)
-      // load selector from memory
-      let selector := mload(0)
+      // Store selector in memory in the first memory slot
+      calldatacopy(0x1C, 0x00, 0x04)
+
+      // Load selector from memory
+      let selector := mload(0x00)
 
       // getFeedById(uint32 key) returns (bytes32)
       if lt(selector, CONTRACT_MANAGEMENT_SELECTOR) {
-        // store mapping location in memory
+        // Store mapping location in memory
         mstore(0x20, DATA_FEED_LOCATION)
-        // store value from mapping[slot = keccak256(key, location)] at memory location 0
-        mstore(0x00, sload(keccak256(28, 5)))
-        // return value stored at memory location 0
+
+        // Store value from mapping[slot = keccak256(key, location)] at memory location 0
+        mstore(0x00, sload(keccak256(0x1C, 0x05)))
+
+        // Return value stored at memory location 0
         return(0x00, 0x20)
       }
     }
 
     address _owner = owner;
 
-    // setters
+    // Setters
     assembly {
-      // check if sender is owner
+      // Check if sender is owner
       if iszero(eq(_owner, caller())) {
-        revert(0, 0)
+        revert(0x00, 0x00)
       }
 
-      // consumes less gas than a simple equality check
-      function compareSelectors(incomingSelector, predefinedSelector)
-        -> result
-      {
-        result := iszero(
-          or(
-            lt(incomingSelector, predefinedSelector),
-            gt(incomingSelector, predefinedSelector)
-          )
-        )
-      }
-
-      let selector := mload(0)
+      // Load selector from memory
+      let selector := mload(0x00)
 
       // setFeeds(bytes)
-      if compareSelectors(selector, 0x1a2d80ac) {
-        // bytes should be in the format of:
+      if eq(selector, 0x1a2d80ac) {
+        // Bytes should be in the format of:
         // <key1><value1>...<keyN><valueN>
         // where key is uint32 and value is bytes32
 
-        // store mapping location in memory at location 0x04
+        // Store mapping location in memory at location 0x04
         mstore(0x04, DATA_FEED_LOCATION)
 
         let len := calldatasize()
         for {
-          // start at location 0x04 where first key is stored after the selector
-          let i := 4
+          // Start at location 0x04 where first key is stored after the selector
+          let i := 0x04
         } lt(i, len) {
-          // increment by 36 bytes (4 bytes for key and 32 bytes for value)
+          // Increment by 36 bytes (4 bytes for key and 32 bytes for value)
           i := add(i, 0x24)
         } {
-          // store key in memory at location 0x00
-          calldatacopy(0, i, 0x04)
-          // store value in mapping at slot = keccak256(key, location)
-          sstore(keccak256(0, 5), calldataload(add(i, 0x04)))
+          // Store key in memory at location 0x00
+          calldatacopy(0x00, i, 0x04)
+
+          // Store value in mapping at slot = keccak256(key, location)
+          sstore(keccak256(0x00, 0x05), calldataload(add(i, 0x04)))
         }
-        return(0, 0)
+        return(0x00, 0x00)
       }
-      revert(0, 0)
+      revert(0x00, 0x00)
     }
   }
 }
