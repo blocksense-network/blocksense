@@ -35,6 +35,7 @@ pub struct ProviderMetrics {
     pub success_get_gas_price: IntCounter,
     pub success_get_max_priority_fee_per_gas: IntCounter,
     pub success_get_chain_id: IntCounter,
+    pub total_timed_out_tx: IntCounter,
 }
 
 impl ProviderMetrics {
@@ -145,6 +146,11 @@ impl ProviderMetrics {
                     "Total number of successful get_chain_id req-s for network {}",
                     net
                 )
+            )
+            .unwrap(),
+            total_timed_out_tx: register_int_counter!(
+                format!("{}_total_timed_out_tx", net),
+                format!("Total number of tx sent that reached the configured timeout before completion for network {}", net)
             )
             .unwrap(),
         }
