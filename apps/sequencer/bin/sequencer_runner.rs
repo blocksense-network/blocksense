@@ -316,7 +316,7 @@ async fn registry_plugin_upload(
         }
         let wasm_file_bytes = wasm_file.unwrap();
         reg.insert(registry_key, wasm_file_bytes.to_vec())
-            .map_err(|e| ErrorBadRequest("Plugin registry capacity reached"))?;
+            .map_err(|_e| ErrorBadRequest("Plugin registry capacity reached"))?;
         // Releasing plugin_registry rwlock
     }
 
