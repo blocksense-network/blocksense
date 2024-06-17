@@ -36,6 +36,15 @@ Smart `contracts` for Blocksense network are stored inside our public GitHub rep
 └── UpgradeableProxy.sol
 ```
 
+```mermaid
+graph TD
+    A[Client] -->|invoke| E
+    A -->|invoke| B
+    B[FeedRegistry] -->|staticcall| C[UpgradeableProxy]
+    C -->|delegatecall| D[HistoricDataFeedStore]
+    E[ChainlinkProxy] -->|staticcall| C
+```
+
 # Chainlink Proxies
 
 The `chainlink-proxies` folder contains Chainlink proxy contract (`ChainlinkProxy.sol`) and the FeedRegistry contract (`FeedRegistry.sol`). The Chainlink proxy contract implements the Chainlink aggregator interface, enabling it to interact with the UpgradeableProxy contract to fetch stored data. The idea is that the `UpgradeableProxy` holds the storage in itself and only uses the DataFeedStore contract functions to know how to read or write to its own storage.
@@ -97,3 +106,4 @@ Prologue optimization aims to reduce gas costs associated with smart contract ca
 ## Benefits
 
 - Reduced gas costs for smart contract calls.
+
