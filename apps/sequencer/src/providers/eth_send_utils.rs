@@ -7,12 +7,13 @@ use eyre::Result;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use tokio::time::Duration;
 
 use crate::process_provider_getter;
 use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::spawn;
 use eyre::eyre;
-use eyre::Report;
+
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use std::fmt::Debug;
@@ -181,9 +182,7 @@ pub async fn eth_batch_send_to_all_contracts<
         .read()
         .expect("Error locking all providers mutex.");
 
-    let collected_futures: FuturesUnordered<
-        tokio::task::JoinHandle<std::prelude::v1::Result<String, Report>>,
-    > = FuturesUnordered::new();
+    let collected_futures = FuturesUnordered::new();
 
     for (net, p) in
         <HashMap<std::string::String, Arc<tokio::sync::Mutex<RpcProvider>>> as Clone>::clone(
@@ -194,7 +193,11 @@ pub async fn eth_batch_send_to_all_contracts<
         let updates = updates.clone();
         let provider = p.clone();
         collected_futures.push(spawn(async move {
-            eth_batch_send_to_contract(net.clone(), provider, updates).await
+            actix_web::rt::time::timeout(
+                Duration::from_secs(7), //TODO: get from configuration.
+                eth_batch_send_to_contract(net.clone(), provider, updates),
+            )
+            .await
         }));
     }
 
@@ -204,16 +207,14 @@ pub async fn eth_batch_send_to_all_contracts<
     let mut all_results = String::new();
     for v in result {
         match v {
-            Ok(res) => {
-                all_results += &match res {
-                    Ok(x) => x,
-                    Err(e) => {
-                        let err = "ReportError:".to_owned() + &e.to_string();
-                        error!(err);
-                        err
-                    }
+            Ok(res) => match res {
+                Ok(x) => all_results += &format!("success {:?}", x),
+                Err(e) => {
+                    let err = "ReportError:".to_owned() + &e.to_string();
+                    error!(err);
+                    all_results += &err;
                 }
-            }
+            },
             Err(e) => {
                 all_results += "JoinError:";
                 all_results += &e.to_string()
