@@ -21,7 +21,7 @@ fred-rs = "0.1.1"
 
 weer_api = "0.1.1"
 
-time = "0.3.34"
+time = "0.3.36"
 async-std = { version = "1", features = ["attributes", "tokio1"] }
 
 rand = "0.8.5"
@@ -31,7 +31,7 @@ lazy_static = "1.4.0"
 async-trait = "0.1.74"
 
 prometheus = "0.13.4"
-actix-web = "4.5.1"
+actix-web = "4.7.0"
 
 [[bin]]
 name = "orchestrator"
