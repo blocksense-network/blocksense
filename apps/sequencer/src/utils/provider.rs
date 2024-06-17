@@ -214,7 +214,7 @@ mod tests {
         println!("Transaction sent with nonce: {}", pending_tx.nonce);
 
         // Send the transaction, the nonce (1) is automatically managed by the provider.
-        let builder = provider.send_transaction(tx).await?;
+        let _builder = provider.send_transaction(tx).await?;
         Ok(())
     }
 }
