@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   shellName,
   ...
@@ -24,5 +25,7 @@
 
     # Set up the environment for the Solidity compiler
     ./nix/scripts/config_solidity_import_mapping.sh
+
+    export LD_LIBRARY_PATH="${lib.makeLibraryPath [pkgs.openssl pkgs.curl]}:$LD_LIBRARY_PATH"
   '';
 }
