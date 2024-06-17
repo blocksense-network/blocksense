@@ -1,30 +1,20 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IChainlinkAggregator} from '../../interfaces/IChainlinkAggregator.sol';
+import {IChainlinkAggregator} from '../../interfaces/chainlink/IChainlinkAggregator.sol';
 import {IAggregator} from '../../interfaces/IAggregator.sol';
 import {IFeedRegistry} from '../../interfaces/IFeedRegistry.sol';
 import {ProxyCall} from '../../libraries/ProxyCall.sol';
 
 contract FeedRegistry is IFeedRegistry {
-  struct Feed {
-    IChainlinkAggregator aggregator;
-    uint32 key;
-    uint8 decimals;
-    string description;
-  }
-
-  address internal immutable dataFeedStore;
-
-  address public immutable owner;
+  address internal immutable DATA_FEED_STORE;
+  address public immutable override OWNER;
 
   mapping(address => mapping(address => Feed)) internal feedData;
 
-  error OnlyOwner();
-
   constructor(address _owner, address _dataFeedStore) {
-    owner = _owner;
-    dataFeedStore = _dataFeedStore;
+    OWNER = _owner;
+    DATA_FEED_STORE = _dataFeedStore;
   }
 
   function decimals(
@@ -45,7 +35,7 @@ contract FeedRegistry is IFeedRegistry {
     address base,
     address quote
   ) external view override returns (int256) {
-    return ProxyCall._latestAnswer(feedData[base][quote].key, dataFeedStore);
+    return ProxyCall._latestAnswer(feedData[base][quote].key, DATA_FEED_STORE);
   }
 
   function getRoundData(
@@ -57,7 +47,7 @@ contract FeedRegistry is IFeedRegistry {
       ProxyCall._getRoundData(
         _roundId,
         feedData[base][quote].key,
-        dataFeedStore
+        DATA_FEED_STORE
       );
   }
 
@@ -69,7 +59,7 @@ contract FeedRegistry is IFeedRegistry {
   }
 
   function setFeed(address base, address quote, address feed) external {
-    if (msg.sender != owner) {
+    if (msg.sender != OWNER) {
       revert OnlyOwner();
     }
 
@@ -85,13 +75,14 @@ contract FeedRegistry is IFeedRegistry {
     address base,
     address quote
   ) external view override returns (uint256) {
-    return ProxyCall._latestRound(feedData[base][quote].key, dataFeedStore);
+    return ProxyCall._latestRound(feedData[base][quote].key, DATA_FEED_STORE);
   }
 
   function latestRoundData(
     address base,
     address quote
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
-    return ProxyCall._latestRoundData(feedData[base][quote].key, dataFeedStore);
+    return
+      ProxyCall._latestRoundData(feedData[base][quote].key, DATA_FEED_STORE);
   }
 }

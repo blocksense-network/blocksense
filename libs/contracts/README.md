@@ -138,3 +138,7 @@ You can also run the tests and generate a coverage report by running:
 ```sh
 yarn coverage
 ```
+
+## License
+
+See the [LICENSE](LICENSE.md) file for license rights and limitations (MIT).

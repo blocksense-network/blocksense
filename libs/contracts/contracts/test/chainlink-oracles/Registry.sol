@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 import {IFeedRegistry} from '../../interfaces/IFeedRegistry.sol';
-import {IChainlinkAggregator} from '../../interfaces/IChainlinkAggregator.sol';
+import {IChainlinkAggregator} from '../../interfaces/chainlink/IChainlinkAggregator.sol';
 
 contract Registry {
   IFeedRegistry public immutable registry;
