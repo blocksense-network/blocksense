@@ -191,13 +191,13 @@ pub async fn eth_batch_send_to_all_contracts<
         .into_iter()
     {
         let updates = updates.clone();
-        let provider = p.clone();
         collected_futures.push(spawn(async move {
-            actix_web::rt::time::timeout(
+            let result = actix_web::rt::time::timeout(
                 Duration::from_secs(7), //TODO: get from configuration.
-                eth_batch_send_to_contract(net.clone(), provider, updates),
+                eth_batch_send_to_contract(net.clone(), p.clone(), updates),
             )
-            .await
+            .await;
+            (result, net.clone(), p.clone())
         }));
     }
 
@@ -208,15 +208,22 @@ pub async fn eth_batch_send_to_all_contracts<
     for v in result {
         match v {
             Ok(res) => match res {
-                Ok(x) => all_results += &format!("success {:?}", x),
-                Err(e) => {
-                    let err = "ReportError:".to_owned() + &e.to_string();
+                (Ok(x), net, provider) => {
+                    all_results += &format!("success from {} -> {:?}", net, x);
+                }
+                (Err(e), net, provider) => {
+                    let err = format!(
+                        "Timed out transaction for network {} -> {}",
+                        net,
+                        e.to_string()
+                    );
                     error!(err);
                     all_results += &err;
                 }
             },
             Err(e) => {
                 all_results += "JoinError:";
+                error!("JoinError: {}", e.to_string());
                 all_results += &e.to_string()
             }
         }
