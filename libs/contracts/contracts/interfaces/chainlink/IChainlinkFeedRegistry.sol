@@ -4,23 +4,48 @@ pragma solidity ^0.8.24;
 import {IChainlinkAggregator} from './IChainlinkAggregator.sol';
 
 interface IChainlinkFeedRegistry {
+  /// @notice Get decimals for a feed pair
+  /// @param base The base asset of the feed
+  /// @param quote The quote asset of the feed
+  /// @return The decimals of the feed pair
   function decimals(address base, address quote) external view returns (uint8);
 
+  /// @notice Get description for a feed pair
+  /// @param base The base asset of the feed
+  /// @param quote The quote asset of the feed
+  /// @return The description of the feed pair
   function description(
     address base,
     address quote
   ) external view returns (string memory);
 
+  /// @notice Get the latest answer for a feed pair
+  /// @param base The base asset of the feed
+  /// @param quote The quote asset of the feed
+  /// @return answer The value sotred for the feed pair
   function latestAnswer(
     address base,
     address quote
   ) external view returns (int256 answer);
 
+  /// @notice Get the latest round ID for a feed pair
+  /// @param base The base asset of the feed
+  /// @param quote The quote asset of the feed
+  /// @return roundId The latest round ID
   function latestRound(
     address base,
     address quote
   ) external view returns (uint256 roundId);
 
+  /// @notice Get the round data for a feed pair at a given round ID
+  /// @param base The base asset of the feed
+  /// @param quote The quote asset of the feed
+  /// @param _roundId The round ID to retrieve data for
+  /// @return roundId The round ID
+  /// @return answer The value stored for the feed at the given round ID
+  /// @return startedAt The timestamp when the value was stored
+  /// @return updatedAt Same as startedAt
+  /// @return answeredInRound Same as roundId
   function getRoundData(
     address base,
     address quote,
@@ -36,6 +61,14 @@ interface IChainlinkFeedRegistry {
       uint80 answeredInRound
     );
 
+  /// @notice Get the latest round data for a feed pair
+  /// @param base The base asset of the feed
+  /// @param quote The quote asset of the feed
+  /// @return roundId The latest round ID stored for the feed pair
+  /// @return answer The latest value stored for the feed pair
+  /// @return startedAt The timestamp when the value was stored
+  /// @return updatedAt Same as startedAt
+  /// @return answeredInRound Same as roundId
   function latestRoundData(
     address base,
     address quote
@@ -50,6 +83,10 @@ interface IChainlinkFeedRegistry {
       uint80 answeredInRound
     );
 
+  /// @notice Get the ChainlinkProxy contract for a feed pair
+  /// @param base The base asset of the feed
+  /// @param quote The quote asset of the feed
+  /// @return aggregator The ChainlinkProxy contract given pair
   function getFeed(
     address base,
     address quote
