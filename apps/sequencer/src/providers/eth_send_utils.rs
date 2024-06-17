@@ -208,7 +208,7 @@ pub async fn eth_batch_send_to_all_contracts<
     for v in result {
         match v {
             Ok(res) => match res {
-                (Ok(x), net, provider) => {
+                (Ok(x), net, _provider) => {
                     all_results += &format!("success from {} -> {:?}", net, x);
                 }
                 (Err(e), net, provider) => {
@@ -219,6 +219,8 @@ pub async fn eth_batch_send_to_all_contracts<
                     );
                     error!(err);
                     all_results += &err;
+                    let provider = provider.lock().await;
+                    provider.provider_metrics.total_timed_out_tx.inc();
                 }
             },
             Err(e) => {
