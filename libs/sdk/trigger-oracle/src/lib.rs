@@ -1,19 +1,31 @@
 use clap::Args;
-use crypto::JsonSerializableSignature;
-use data_feeds::connector::post::generate_signature;
-use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use serde::{Deserialize, Serialize};
-use spin_app::MetadataKey;
-use spin_core::{async_trait, InstancePre};
-use spin_trigger::{TriggerAppEngine, TriggerExecutor};
+
 use std::{
     collections::HashMap,
     sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
 };
-use tokio::sync::mpsc::{channel, Receiver, Sender};
 
-const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
+use http::uri::Scheme;
+use hyper::Request;
+use tokio::sync::mpsc::{channel, Receiver, Sender};
+use tracing::Instrument;
+
+use outbound_http::OutboundHttpComponent;
+use spin_app::MetadataKey;
+use spin_core::{async_trait, InstancePre, OutboundWasiHttpHandler};
+use spin_outbound_networking::{AllowedHostsConfig, OutboundUrl};
+use spin_trigger::{TriggerAppEngine, TriggerExecutor};
+
+use wasmtime_wasi_http::{
+    bindings::wasi::http::types::ErrorCode, body::HyperOutgoingBody,
+    types::HostFutureIncomingResponse, HttpResult,
+};
+
+use crypto::JsonSerializableSignature;
+use data_feeds::connector::post::generate_signature;
+use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 
 wasmtime::component::bindgen!({
     path: "../wit",
@@ -23,7 +35,10 @@ wasmtime::component::bindgen!({
 
 use blocksense::oracle::oracle_types as oracle;
 
-pub(crate) type RuntimeData = ();
+//TODO(adikov): Remove
+const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
+
+pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
 
 #[derive(Args)]
@@ -283,6 +298,20 @@ impl OracleTrigger {
         let component_id = component.id.clone();
         let (instance, mut store) = engine.prepare_instance(&component_id).await?;
         let instance = BlocksenseOracle::new(&mut store, &instance)?;
+
+        // We are getting the spin configuration from the Outbound HTTP host component similar to
+        // `set_http_origin_from_request` in spin http trigger.
+        if let Some(outbound_http_handle) = engine
+            .engine
+            .find_host_component_handle::<Arc<OutboundHttpComponent>>()
+        {
+            let outbound_http_data = store
+                .host_components_data()
+                .get_or_insert(outbound_http_handle);
+            store.as_mut().data_mut().as_mut().allowed_hosts =
+                outbound_http_data.allowed_hosts.clone();
+        }
+
         // ...and call the entry point
         tracing::trace!(
             "Triggering application: {}; component_id: {}; data_feed: {}",
@@ -307,6 +336,82 @@ impl OracleTrigger {
                 Err(anyhow::anyhow!("Error executing component {component_id}"))
             }
         }
+    }
+}
+
+#[derive(Default)]
+pub struct HttpRuntimeData {
+    /// The hosts this app is allowed to make outbound requests to
+    allowed_hosts: AllowedHostsConfig,
+}
+
+// This implementation is similar to how http trigger implements allow hosts.
+impl OutboundWasiHttpHandler for HttpRuntimeData {
+    fn send_request(
+        data: &mut spin_core::Data<Self>,
+        request: Request<HyperOutgoingBody>,
+        config: wasmtime_wasi_http::types::OutgoingRequestConfig,
+    ) -> HttpResult<wasmtime_wasi_http::types::HostFutureIncomingResponse> {
+        let this = data.as_mut();
+
+        let uri = request.uri();
+        let uri_string = uri.to_string();
+        let unallowed = !this.allowed_hosts.allows(
+            &OutboundUrl::parse(uri_string, "https")
+                .map_err(|_| ErrorCode::HttpRequestUriInvalid)?,
+        );
+        if unallowed {
+            tracing::error!("Destination not allowed: {}", request.uri());
+            let host = if unallowed {
+                // Safe to unwrap because absolute urls have a host by definition.
+                let host = uri.authority().map(|a| a.host()).unwrap();
+                let port = uri.authority().map(|a| a.port()).unwrap();
+                let port = match port {
+                    Some(port_str) => port_str.to_string(),
+                    None => uri
+                        .scheme()
+                        .and_then(|s| (s == &Scheme::HTTP).then_some(80))
+                        .unwrap_or(443)
+                        .to_string(),
+                };
+                terminal::warn!(
+                    "A component tried to make a HTTP request to non-allowed host '{host}'."
+                );
+                let scheme = uri.scheme().unwrap_or(&Scheme::HTTPS);
+                format!("{scheme}://{host}:{port}")
+            } else {
+                terminal::warn!("A component tried to make a HTTP request to the same component but it does not have permission.");
+                "self".into()
+            };
+            eprintln!("To allow requests, add 'allowed_outbound_hosts = [\"{}\"]' to the manifest component section.", host);
+            return Err(ErrorCode::HttpRequestDenied.into());
+        }
+
+        let current_span = tracing::Span::current();
+        let uri = request.uri();
+        if let Some(authority) = uri.authority() {
+            current_span.record("server.address", authority.host());
+            if let Some(port) = authority.port() {
+                current_span.record("server.port", port.as_u16());
+            }
+        }
+
+        // TODO: This is a temporary workaround to make sure that outbound task is instrumented.
+        // Once Wasmtime gives us the ability to do the spawn ourselves we can just call .instrument
+        // and won't have to do this workaround.
+        let response_handle = async move {
+            let res =
+                wasmtime_wasi_http::types::default_send_request_handler(request, config).await;
+            if let Ok(res) = &res {
+                tracing::Span::current()
+                    .record("http.response.status_code", res.resp.status().as_u16());
+            }
+            Ok(res)
+        }
+        .in_current_span();
+        Ok(HostFutureIncomingResponse::Pending(
+            wasmtime_wasi::runtime::spawn(response_handle),
+        ))
     }
 }
 

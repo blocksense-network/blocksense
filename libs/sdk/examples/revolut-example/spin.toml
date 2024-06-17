@@ -20,5 +20,8 @@ data_feed = "USD/ETH"
 
 [component.revolut-api-fetcher]
 source = "target/wasm32-wasi/release/oracle_app_example.wasm"
+allowed_outbound_hosts = [
+  "https://www.revolut.com",
+]
 [component.revolut-api-fetcher.build]
 command = "cargo build --target wasm32-wasi --release"

@@ -23,8 +23,16 @@ serde_json = "1.0"
 spin-app = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 spin-core = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 spin-trigger = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
+spin-outbound-networking = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
+terminal = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
+outbound-http = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
+
 tokio = { version = "1.11", features = ["full"] }
 tokio-scoped = "0.2.0"
 tracing = { version = "0.1.40" , features=["log"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-wasmtime = "21.0.1"
+http = "1.1.0"
+hyper = "1.3.1"
+wasmtime = "22.0.0"
+wasmtime-wasi = "22.0.0"
+wasmtime-wasi-http = "22.0.0"
