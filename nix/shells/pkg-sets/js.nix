@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  nodejs = pkgs.nodejs_21;
+  nodejs = pkgs.nodejs_22;
   oldYarn = pkgs.yarn.override {inherit nodejs;};
   yarn = pkgs.yarn-berry.override {
     inherit nodejs;
