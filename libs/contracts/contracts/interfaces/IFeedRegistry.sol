@@ -1,57 +1,17 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IChainlinkAggregator} from './IChainlinkAggregator.sol';
+import {IChainlinkFeedRegistry, IChainlinkAggregator} from './chainlink/IChainlinkFeedRegistry.sol';
 
-interface IFeedRegistry {
-  function decimals(address base, address quote) external view returns (uint8);
+interface IFeedRegistry is IChainlinkFeedRegistry {
+  struct Feed {
+    IChainlinkAggregator aggregator;
+    uint32 key;
+    uint8 decimals;
+    string description;
+  }
 
-  function description(
-    address base,
-    address quote
-  ) external view returns (string memory);
+  error OnlyOwner();
 
-  function latestAnswer(
-    address base,
-    address quote
-  ) external view returns (int256 answer);
-
-  function latestRound(
-    address base,
-    address quote
-  ) external view returns (uint256 roundId);
-
-  function getRoundData(
-    address base,
-    address quote,
-    uint80 _roundId
-  )
-    external
-    view
-    returns (
-      uint80 roundId,
-      int256 answer,
-      uint256 startedAt,
-      uint256 updatedAt,
-      uint80 answeredInRound
-    );
-
-  function latestRoundData(
-    address base,
-    address quote
-  )
-    external
-    view
-    returns (
-      uint80 roundId,
-      int256 answer,
-      uint256 startedAt,
-      uint256 updatedAt,
-      uint80 answeredInRound
-    );
-
-  function getFeed(
-    address base,
-    address quote
-  ) external view returns (IChainlinkAggregator aggregator);
+  function OWNER() external view returns (address);
 }
