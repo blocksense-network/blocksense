@@ -6,16 +6,24 @@ import {
 import 'react-vertical-timeline-component/style.min.css';
 import ArrowRoundedIcon from '../IconComponents/ArrowRoundedIcon';
 import ArrowPathIcon from '../IconComponents/ArrowPathIcon';
-import { roadMapConfig } from '../../config';
 
-export const RoadMap = () => {
+export type Stage = {
+  date: string;
+  title: string;
+  subTitle: string;
+  description: string;
+};
+
+export type RoadMapConfig = Record<string, Stage>;
+
+export const RoadMap = ({ roadMapConfig }: RoadMapConfig) => {
   return (
     <VerticalTimeline className="roadmap bg-gray-100">
       <VerticalTimelineElement
         className="roadmap__timeline-item vertical-timeline-element--work"
         contentStyle={{ background: 'rgb(31, 41, 55)', color: '#fff' }}
         contentArrowStyle={{ borderRight: '10px solid  rgb(31, 41, 55)' }}
-        date={roadMapConfig.finalStage.date}
+        date={roadMapConfig['finalStage'].date}
         iconStyle={{
           innerHeight: '70px',
           innerWidth: '70px',
@@ -30,20 +38,20 @@ export const RoadMap = () => {
         icon={<ArrowPathIcon />}
       >
         <h3 className="roadmap__timeline-item-title vertical-timeline-element-title text-xl font-bold text-white transition">
-          {roadMapConfig.finalStage.title}
+          {roadMapConfig['finalStage'].title}
         </h3>
         <h4 className="roadmap__timeline-item-subtitle vertical-timeline-element-subtitle font-semibold text-gray-300">
-          {roadMapConfig.finalStage.subTitle}
+          {roadMapConfig['finalStage'].subTitle}
         </h4>
         <span className="mt-6 font-normal text-white tracking-tight">
-          {roadMapConfig.finalStage.description}
+          {roadMapConfig['finalStage'].description}
         </span>
       </VerticalTimelineElement>
       <VerticalTimelineElement
         className="roadmap__timeline-item vertical-timeline-element--work"
         contentStyle={{ background: 'rgb(31, 41, 55)', color: '#fff' }}
         contentArrowStyle={{ borderRight: '7px solid  rgb(31, 41, 55)' }}
-        date={roadMapConfig.fifthStage.date}
+        date={roadMapConfig['fifthStage'].date}
         iconStyle={{
           background: '#fff',
           color: '#fff',
@@ -56,20 +64,20 @@ export const RoadMap = () => {
         icon={<ArrowRoundedIcon />}
       >
         <h3 className="roadmap__timeline-item-title vertical-timeline-element-title text-xl font-bold text-white transition">
-          {roadMapConfig.fifthStage.title}
+          {roadMapConfig['fifthStage'].title}
         </h3>
         <h4 className="roadmap__timeline-item-subtitle vertical-timeline-element-subtitle font-semibold text-gray-300">
-          {roadMapConfig.fifthStage.subTitle}
+          {roadMapConfig['fifthStage'].subTitle}
         </h4>
         <span className="mt-6 font-normal text-white tracking-tight">
-          {roadMapConfig.fifthStage.description}
+          {roadMapConfig['fifthStage'].description}
         </span>
       </VerticalTimelineElement>
       <VerticalTimelineElement
         className="roadmap__timeline-item vertical-timeline-element--work"
         contentStyle={{ background: 'rgb(31, 41, 55)', color: '#fff' }}
         contentArrowStyle={{ borderRight: '7px solid rgb(31, 41, 55)' }}
-        date={roadMapConfig.fourthStage.date}
+        date={roadMapConfig['fourthStage'].date}
         iconStyle={{
           background: '#fff',
           color: '#fff',
@@ -82,20 +90,20 @@ export const RoadMap = () => {
         icon={<ArrowPathIcon />}
       >
         <h3 className="roadmap__timeline-item-title vertical-timeline-element-title text-xl font-bold text-white transition">
-          {roadMapConfig.fourthStage.title}
+          {roadMapConfig['fourthStage'].title}
         </h3>
         <h4 className="roadmap__timeline-item-subtitle vertical-timeline-element-subtitle font-semibold text-gray-300">
-          {roadMapConfig.fourthStage.subTitle}
+          {roadMapConfig['fourthStage'].subTitle}
         </h4>
         <span className="mt-6 font-normal text-white tracking-tight">
-          {roadMapConfig.fourthStage.description}
+          {roadMapConfig['fourthStage'].description}
         </span>
       </VerticalTimelineElement>
       <VerticalTimelineElement
         className="roadmap__timeline-item vertical-timeline-element--work"
         contentStyle={{ background: 'rgb(31, 41, 55)', color: '#fff' }}
         contentArrowStyle={{ borderRight: '7px solid rgb(31, 41, 55)' }}
-        date={roadMapConfig.thirdStage.date}
+        date={roadMapConfig['thirdStage'].date}
         iconStyle={{
           background: '#fff',
           color: '#fff',
@@ -108,20 +116,20 @@ export const RoadMap = () => {
         icon={<ArrowRoundedIcon />}
       >
         <h3 className="roadmap__timeline-item-title vertical-timeline-element-title text-xl font-bold text-white transition">
-          {roadMapConfig.thirdStage.title}
+          {roadMapConfig['thirdStage'].title}
         </h3>
         <h4 className="roadmap__timeline-item-subtitle vertical-timeline-element-subtitle font-semibold text-gray-300">
-          {roadMapConfig.thirdStage.subTitle}
+          {roadMapConfig['thirdStage'].subTitle}
         </h4>
         <span className="mt-6 font-normal text-white tracking-tight">
-          {roadMapConfig.thirdStage.description}
+          {roadMapConfig['thirdStage'].description}
         </span>
       </VerticalTimelineElement>
       <VerticalTimelineElement
         className="roadmap__timeline-item vertical-timeline-element--work"
         contentStyle={{ background: 'rgb(31, 41, 55)', color: '#fff' }}
         contentArrowStyle={{ borderRight: '7px solid rgb(31, 41, 55)' }}
-        date={roadMapConfig.secondStage.date}
+        date={roadMapConfig['secondStage'].date}
         iconStyle={{
           background: '#fff',
           color: '#fff',
@@ -134,20 +142,20 @@ export const RoadMap = () => {
         icon={<ArrowPathIcon />}
       >
         <h3 className="roadmap__timeline-item-title vertical-timeline-element-title text-xl font-bold text-white transition">
-          {roadMapConfig.secondStage.title}
+          {roadMapConfig['secondStage'].title}
         </h3>
         <h4 className="roadmap__timeline-item-subtitle vertical-timeline-element-subtitle font-semibold text-gray-300">
-          {roadMapConfig.secondStage.subTitle}
+          {roadMapConfig['secondStage'].subTitle}
         </h4>
         <span className="mt-6 font-normal text-white tracking-tight">
-          {roadMapConfig.secondStage.description}
+          {roadMapConfig['secondStage'].description}
         </span>
       </VerticalTimelineElement>
       <VerticalTimelineElement
         className="roadmap__timeline-item vertical-timeline-element--work"
         contentStyle={{ background: 'rgb(31, 41, 55)', color: '#fff' }}
         contentArrowStyle={{ borderRight: '7px solid rgb(31, 41, 55)' }}
-        date={roadMapConfig.secondStage.date}
+        date={roadMapConfig['secondStage'].date}
         iconStyle={{
           background: '#fff',
           color: '#fff',
@@ -160,13 +168,13 @@ export const RoadMap = () => {
         icon={<ArrowRoundedIcon />}
       >
         <h3 className="roadmap__timeline-item-title vertical-timeline-element-title text-xl font-bold text-white transition">
-          {roadMapConfig.firstStage.title}
+          {roadMapConfig['firstStage'].title}
         </h3>
         <h4 className="roadmap__timeline-item-subtitle vertical-timeline-element-subtitle font-semibold text-gray-300">
-          {roadMapConfig.firstStage.subTitle}
+          {roadMapConfig['firstStage'].subTitle}
         </h4>
         <span className="mt-6 font-normal text-white tracking-tight">
-          {roadMapConfig.firstStage.description}
+          {roadMapConfig['firstStage'].description}
         </span>
       </VerticalTimelineElement>
     </VerticalTimeline>
