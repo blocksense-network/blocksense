@@ -193,7 +193,7 @@ pub async fn eth_batch_send_to_all_contracts<
         let updates = updates.clone();
         collected_futures.push(spawn(async move {
             let result = actix_web::rt::time::timeout(
-                Duration::from_secs(7), //TODO: get from configuration.
+                Duration::from_secs(50), //TODO: get from configuration.
                 eth_batch_send_to_contract(net.clone(), p.clone(), updates),
             )
             .await;

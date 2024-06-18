@@ -48,10 +48,7 @@ async fn get_key_from_contract(
     let base_fee = provider.get_gas_price().await?;
 
     // key: 0x00000000
-    let input = match Bytes::from_hex(key) {
-        Err(e) => return Err(eyre!("Key is not valid hex string: {}", e)),
-        Ok(x) => x,
-    };
+    let input = Bytes::from_hex(key).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
     let tx = TransactionRequest::default()
         .to(*addr)
         .from(wallet.address())
