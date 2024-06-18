@@ -1,5 +1,11 @@
 {
   "name": "@blocksense/contracts",
+  "exports": {
+    "./docs/*": {
+      "require": "./artifacts/docs/*.json",
+      "import": "./artifacts/docs/*.json"
+    }
+  },
   "scripts": {
     "build:deps": "yarn workspace @blocksense/sol-reflector build",
     "clean": "git clean -fdx -e .env",
