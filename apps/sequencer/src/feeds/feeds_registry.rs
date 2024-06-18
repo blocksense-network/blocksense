@@ -101,9 +101,9 @@ impl FeedMetaDataRegistry {
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let start = SystemTime::now();
 
-    let fmd1 = FeedMetaData::new("DOGE/USD", 20000, start);
-    let fmd2 = FeedMetaData::new("BTS/USD", 10000, start);
-    let fmd3 = FeedMetaData::new("ETH/USD", 20000, start);
+    let fmd1 = FeedMetaData::new("DOGE/USD", 60000, start);
+    let fmd2 = FeedMetaData::new("BTS/USD", 30000, start);
+    let fmd3 = FeedMetaData::new("ETH/USD", 60000, start);
 
     let mut fmdr = FeedMetaDataRegistry::new();
 
