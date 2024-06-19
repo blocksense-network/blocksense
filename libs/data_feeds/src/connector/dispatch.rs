@@ -5,7 +5,7 @@ use rand::{seq::IteratorRandom, thread_rng};
 
 use crate::{
     interfaces::data_feed::DataFeed,
-    services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooDataFeed},
+    services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooFinanceDataFeed},
     types::DataFeedAPI,
 };
 
@@ -45,7 +45,7 @@ fn handle_connection_cache(
 fn feed_builder(api: &DataFeedAPI) -> Rc<RefCell<dyn DataFeed>> {
     match api {
         DataFeedAPI::EmptyAPI => todo!(),
-        DataFeedAPI::YahooDataFeed => Rc::new(RefCell::new(YahooDataFeed::new())),
+        DataFeedAPI::YahooFinanceDataFeed => Rc::new(RefCell::new(YahooFinanceDataFeed::new())),
         DataFeedAPI::CoinMarketCapDataFeed => Rc::new(RefCell::new(CoinMarketCapDataFeed::new())),
     }
 }

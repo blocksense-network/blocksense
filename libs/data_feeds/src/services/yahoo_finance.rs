@@ -27,7 +27,7 @@ impl Payload for YfPayload {
 }
 
 #[async_trait(?Send)]
-impl DataFeed for YahooDataFeed {
+impl DataFeed for YahooFinanceDataFeed {
     fn score_by(&self) -> ConsensusMetric {
         ConsensusMetric::Mean
     }
@@ -58,13 +58,13 @@ impl From<YahooError> for FeedError {
 }
 
 #[derive(ApiConnect, Historical)]
-pub struct YahooDataFeed {
+pub struct YahooFinanceDataFeed {
     api_connector: YahooConnector,
     is_connected: bool,
     history_buffer: HeapRb<(Box<dyn Payload>, Timestamp)>,
 }
 
-impl YahooDataFeed {
+impl YahooFinanceDataFeed {
     pub fn new() -> Self {
         Self {
             api_connector: YahooConnector::new(),
