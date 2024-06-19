@@ -4,8 +4,10 @@ use async_curl::CurlActor;
 use curl_http_client::*;
 use eyre::Result;
 use http::{Method, Request};
+use port_scanner::scan_port;
 use std::process::Command;
 use std::thread;
+use std::time::SystemTime;
 use std::{fs::File, io::Write};
 use tokio::time;
 use tokio::time::Duration;
@@ -34,6 +36,28 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
 
         sequencer.status().expect("process failed to execute");
     })
+}
+
+async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
+    let now = SystemTime::now();
+    while !scan_port(8877) {
+        let mut interval = time::interval(Duration::from_millis(500));
+        interval.tick().await; // The first tick completes immediately.
+        interval.tick().await;
+        match now.elapsed() {
+            Ok(elapsed) => {
+                if elapsed.as_secs() > max_time_to_wait_secs {
+                    panic!(
+                        "Sequencer took more than {} seconds to start listening for reports",
+                        max_time_to_wait_secs
+                    );
+                }
+            }
+            Err(e) => {
+                panic!("Error: {e:?}");
+            }
+        }
+    }
 }
 
 fn cleanup_spawned_processes() {
@@ -76,11 +100,7 @@ async fn main() -> Result<()> {
 
     let seq = spawn_sequencer(PROVIDERS_PORTS);
 
-    {
-        let mut interval = time::interval(Duration::from_millis(20000));
-        interval.tick().await; // The first tick completes immediately.
-        interval.tick().await;
-    }
+    wait_for_sequencer_to_accept_votes(5 * 60).await;
 
     let request1 = Request::builder()
         .uri("http://127.0.0.1:8877/deploy/ETH1")
