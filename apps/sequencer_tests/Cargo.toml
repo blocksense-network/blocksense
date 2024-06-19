@@ -57,6 +57,7 @@ curl-http-client = "2.3.3"
 async-curl = "0.4.3"
 http = "1.1.0"
 url = "2.5.2"
+port_scanner = "0.1.5"
 
 [[bin]]
 name = "sequencer_tests"
