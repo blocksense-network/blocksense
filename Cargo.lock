@@ -2894,6 +2894,7 @@ dependencies = [
  "erased-serde",
  "fred-rs",
  "lazy_static 1.4.0",
+ "log",
  "prometheus 0.0.1",
  "rand 0.8.5",
  "reqwest 0.12.4",
