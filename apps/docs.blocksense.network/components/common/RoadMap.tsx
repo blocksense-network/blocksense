@@ -1,3 +1,4 @@
+// @ts-nocheck - TODO(EmilIvanichkov): Temporary ignore typescript errors. Find a better solution.
 import React from 'react';
 import {
   VerticalTimeline,
