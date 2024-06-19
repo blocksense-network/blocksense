@@ -1,3 +1,4 @@
+use log::error;
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -60,8 +61,13 @@ pub async fn orchestrator() {
         UPTIME_COUNTER.inc_by(poll_period_ms as f64 / 1000.);
         BATCH_PARSE_TIME_GAUGE.set(elapsed_time as i64);
 
-        handle_prometheus_metrics(&prometheus_server, prometheus_url.as_str(), &encoder)
-            .await
-            .unwrap();
+        let metrics_result =
+            handle_prometheus_metrics(&prometheus_server, prometheus_url.as_str(), &encoder).await;
+        match metrics_result {
+            Ok(_) => {}
+            Err(e) => {
+                error!("Error handling Prometheus metrics: {:?}", e);
+            }
+        };
     }
 }
