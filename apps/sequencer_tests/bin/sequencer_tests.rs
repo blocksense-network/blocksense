@@ -1,6 +1,8 @@
 use alloy::hex::ToHexExt;
 use alloy::node_bindings::Anvil;
-use curl::easy::Easy;
+use curl::easy::Handler;
+use curl::easy::WriteError;
+use curl::easy::{Easy, Easy2};
 use eyre::Result;
 use port_scanner::scan_port;
 use serde_json::json;
@@ -11,6 +13,15 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs::File, io::Write};
 use tokio::time;
 use tokio::time::Duration;
+
+struct Collector(Vec<u8>);
+
+impl Handler for Collector {
+    fn write(&mut self, data: &[u8]) -> Result<usize, WriteError> {
+        self.0.extend_from_slice(data);
+        Ok(data.len())
+    }
+}
 
 fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
     thread::spawn(move || {
@@ -62,19 +73,16 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
 
 fn deploy_contract_to_networks(networks: Vec<&str>) {
     for net in networks {
-        send_get_request(format!("http://127.0.0.1:8877/deploy/{}", net).as_str())
+        send_get_request(format!("http://127.0.0.1:8877/deploy/{}", net).as_str());
     }
 }
 
-fn send_get_request(request: &str) {
-    let mut easy = Easy::new();
+fn send_get_request(request: &str) -> String {
+    let mut easy = Easy2::new(Collector(Vec::new()));
+    easy.get(true).unwrap();
     easy.url(request).unwrap();
-    easy.write_function(|data| {
-        stdout().write_all(data).unwrap();
-        Ok(data.len())
-    })
-    .unwrap();
     easy.perform().unwrap();
+    format!("{}", String::from_utf8_lossy(&easy.get_ref().0))
 }
 
 fn send_report(payload_json: serde_json::Value) {
@@ -110,6 +118,7 @@ fn cleanup_spawned_processes() {
 }
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
+const REPORT_VAL: &str = "47a0284000000000000000000000000000000000000000000000000000000000";
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -142,14 +151,30 @@ async fn main() -> Result<()> {
         "reporter_id": 0,
         "feed_id": "YahooFinance.BTC/USD",
         "timestamp": timestamp,
-        "result": "47a0284000000000000000000000000000000000000000000000000000000000"
+        "result": REPORT_VAL
     }));
 
     {
-        let mut interval = time::interval(Duration::from_millis(120000));
+        let mut interval = time::interval(Duration::from_millis(65000));
         interval.tick().await; // The first tick completes immediately.
         interval.tick().await;
     }
+
+    println!(
+        "ETH1 value = {}",
+        send_get_request("127.0.0.1:8877/get_key/ETH1/00000001")
+    );
+    println!(
+        "ETH2 value = {}",
+        send_get_request("127.0.0.1:8877/get_key/ETH2/00000001")
+    );
+
+    assert!(
+        send_get_request("127.0.0.1:8877/get_key/ETH1/00000001") == "0x".to_string() + REPORT_VAL
+    );
+    assert!(
+        send_get_request("127.0.0.1:8877/get_key/ETH2/00000001") == "0x".to_string() + REPORT_VAL
+    );
 
     cleanup_spawned_processes();
 
