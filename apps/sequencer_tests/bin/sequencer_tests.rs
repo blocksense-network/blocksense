@@ -3,10 +3,11 @@ use alloy::node_bindings::Anvil;
 use curl::easy::Easy;
 use eyre::Result;
 use port_scanner::scan_port;
+use serde_json::json;
 use std::io::stdout;
 use std::process::Command;
 use std::thread;
-use std::time::SystemTime;
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs::File, io::Write};
 use tokio::time;
 use tokio::time::Duration;
@@ -59,6 +60,38 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
     }
 }
 
+fn deploy_contract_to_networks(networks: Vec<&str>) {
+    for net in networks {
+        send_get_request(format!("http://127.0.0.1:8877/deploy/{}", net).as_str())
+    }
+}
+
+fn send_get_request(request: &str) {
+    let mut easy = Easy::new();
+    easy.url(request).unwrap();
+    easy.write_function(|data| {
+        stdout().write_all(data).unwrap();
+        Ok(data.len())
+    })
+    .unwrap();
+    easy.perform().unwrap();
+}
+
+fn send_report(payload_json: serde_json::Value) {
+    let mut easy = Easy::new();
+    easy.url("127.0.0.1:8877/post_report").unwrap();
+    easy.post(true).unwrap();
+
+    easy.post_fields_copy(&payload_json.to_string().as_bytes())
+        .unwrap();
+
+    // Set a closure to handle the response
+    easy.write_function(|data| Ok(stdout().write(data).unwrap()))
+        .unwrap();
+
+    easy.perform().unwrap();
+}
+
 fn cleanup_spawned_processes() {
     let mut children = vec![];
     for process in vec!["sequencer"] {
@@ -98,20 +131,22 @@ async fn main() -> Result<()> {
 
     wait_for_sequencer_to_accept_votes(5 * 60).await;
 
-    for net in vec!["ETH1", "ETH2"] {
-        let mut easy = Easy::new();
-        easy.url(format!("http://127.0.0.1:8877/deploy/{}", net).as_str())
-            .unwrap();
-        easy.write_function(|data| {
-            stdout().write_all(data).unwrap();
-            Ok(data.len())
-        })
-        .unwrap();
-        easy.perform().unwrap();
-    }
+    deploy_contract_to_networks(vec!["ETH1", "ETH2"]);
+
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("System clock set before EPOCH")
+        .as_millis();
+
+    send_report(json!({
+        "reporter_id": 0,
+        "feed_id": "YahooFinance.BTC/USD",
+        "timestamp": timestamp,
+        "result": "47a0284000000000000000000000000000000000000000000000000000000000"
+    }));
 
     {
-        let mut interval = time::interval(Duration::from_millis(20000));
+        let mut interval = time::interval(Duration::from_millis(120000));
         interval.tick().await; // The first tick completes immediately.
         interval.tick().await;
     }
