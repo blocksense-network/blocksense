@@ -79,7 +79,7 @@ pub async fn post_report(
             to_hex_string(res, None)
         }
         Err(_) => {
-            let value = v["result"].to_string();
+            let value = v["result"].to_string().trim_matches('"').to_string();
             if value.len() != REPORT_HEX_SIZE
                 || !value
                     .chars()
