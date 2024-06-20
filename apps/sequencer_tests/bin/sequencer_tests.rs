@@ -1,10 +1,9 @@
 use alloy::hex::ToHexExt;
 use alloy::node_bindings::Anvil;
-use async_curl::CurlActor;
-use curl_http_client::*;
+use curl::easy::Easy;
 use eyre::Result;
-use http::{Method, Request};
 use port_scanner::scan_port;
+use std::io::stdout;
 use std::process::Command;
 use std::thread;
 use std::time::SystemTime;
@@ -81,9 +80,6 @@ const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let actor = CurlActor::new();
-    let collector = Collector::Ram(Vec::new());
-
     let mut providers = Vec::new();
 
     for port in PROVIDERS_PORTS {
@@ -102,34 +98,17 @@ async fn main() -> Result<()> {
 
     wait_for_sequencer_to_accept_votes(5 * 60).await;
 
-    let request1 = Request::builder()
-        .uri("http://127.0.0.1:8877/deploy/ETH1")
-        .method(Method::GET)
-        .body(None)
+    for net in vec!["ETH1", "ETH2"] {
+        let mut easy = Easy::new();
+        easy.url(format!("http://127.0.0.1:8877/deploy/{}", net).as_str())
+            .unwrap();
+        easy.write_function(|data| {
+            stdout().write_all(data).unwrap();
+            Ok(data.len())
+        })
         .unwrap();
-
-    let request2 = Request::builder()
-        .uri("http://127.0.0.1:8877/deploy/ETH2")
-        .method(Method::GET)
-        .body(None)
-        .unwrap();
-
-    let response1 = HttpClient::new(collector.clone())
-        .request(request1)
-        .unwrap()
-        .nonblocking(actor.clone())
-        .perform()
-        .await;
-
-    let response2 = HttpClient::new(collector)
-        .request(request2)
-        .unwrap()
-        .nonblocking(actor)
-        .perform()
-        .await;
-
-    println!("Response: {:?}", response1);
-    println!("Response: {:?}", response2);
+        easy.perform().unwrap();
+    }
 
     {
         let mut interval = time::interval(Duration::from_millis(20000));
@@ -138,6 +117,7 @@ async fn main() -> Result<()> {
     }
 
     cleanup_spawned_processes();
+
     match seq.join() {
         Ok(_) => {
             println!("Sequencer thread done.");
