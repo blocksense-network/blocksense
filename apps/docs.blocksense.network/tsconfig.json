@@ -10,7 +10,11 @@
     "allowJs": true,
     "incremental": true,
     "module": "esnext",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "files": [],
   "include": [],
