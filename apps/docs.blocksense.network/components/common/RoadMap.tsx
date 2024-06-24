@@ -5,8 +5,9 @@ import {
   VerticalTimelineElement,
 } from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
-import ArrowRoundedIcon from '../IconComponents/ArrowRoundedIcon';
-import ArrowPathIcon from '../IconComponents/ArrowPathIcon';
+
+import ArrowRoundedIcon from '@/components/IconComponents/ArrowRoundedIcon';
+import ArrowPathIcon from '@/components/IconComponents/ArrowPathIcon';
 
 export type Stage = {
   date: string;

@@ -1,6 +1,7 @@
 import React from 'react';
-import { config } from '../../config';
-import { LinkButton } from '../../components/common/LinkButton.tsx';
+
+import { config } from '@/config';
+import { LinkButton } from '@/components/common/LinkButton';
 
 export const Footer = () => {
   return (

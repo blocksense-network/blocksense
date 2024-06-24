@@ -1,7 +1,8 @@
 import React from 'react';
-import { gettingStartedConfig } from '../../config';
-import { LinkButton } from '../common/LinkButton';
-import { FigureBackdrop } from '../common/FigureBackdrop';
+
+import { gettingStartedConfig } from '@/config';
+import { LinkButton } from '@/components/common/LinkButton';
+import { FigureBackdrop } from '@/components/common/FigureBackdrop';
 
 export const GettingStarted = () => {
   return (
