@@ -4814,7 +4814,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c2a198fb6b0eada2a8df47933734e6d35d350665a33a3593d7164fa52c75c19"
 dependencies = [
  "cfg-if 1.0.0",
- "windows-targets 0.48.5",
+ "windows-targets 0.52.4",
 ]
 
 [[package]]
@@ -5941,6 +5941,7 @@ dependencies = [
  "ordered-float 4.2.0",
  "percent-encoding",
  "rand 0.8.5",
+ "serde_json",
  "thiserror",
  "tokio 1.37.0",
  "tokio-stream",
@@ -6014,7 +6015,7 @@ dependencies = [
 [[package]]
 name = "outbound-http"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "http 0.2.12",
@@ -6034,7 +6035,7 @@ dependencies = [
 [[package]]
 name = "outbound-mqtt"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "rumqttc",
@@ -6051,7 +6052,7 @@ dependencies = [
 [[package]]
 name = "outbound-mysql"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "flate2",
@@ -6071,7 +6072,7 @@ dependencies = [
 [[package]]
 name = "outbound-pg"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "native-tls",
@@ -6090,7 +6091,7 @@ dependencies = [
 [[package]]
 name = "outbound-redis"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "redis",
@@ -8312,7 +8313,7 @@ dependencies = [
 [[package]]
 name = "spin-app"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8328,7 +8329,7 @@ dependencies = [
 [[package]]
 name = "spin-common"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "dirs 4.0.0",
@@ -8341,7 +8342,7 @@ dependencies = [
 [[package]]
 name = "spin-componentize"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "wasm-encoder 0.200.0",
@@ -8353,7 +8354,7 @@ dependencies = [
 [[package]]
 name = "spin-core"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8388,7 +8389,7 @@ dependencies = [
 [[package]]
 name = "spin-expressions"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8402,7 +8403,7 @@ dependencies = [
 [[package]]
 name = "spin-key-value"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "lru 0.9.0",
@@ -8417,7 +8418,7 @@ dependencies = [
 [[package]]
 name = "spin-key-value-azure"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "azure_data_cosmos",
@@ -8433,7 +8434,7 @@ dependencies = [
 [[package]]
 name = "spin-key-value-redis"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "redis",
@@ -8448,7 +8449,7 @@ dependencies = [
 [[package]]
 name = "spin-key-value-sqlite"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "once_cell",
@@ -8463,7 +8464,7 @@ dependencies = [
 [[package]]
 name = "spin-llm"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "bytesize",
@@ -8476,7 +8477,7 @@ dependencies = [
 [[package]]
 name = "spin-llm-remote-http"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "http 0.2.12",
@@ -8494,7 +8495,7 @@ dependencies = [
 [[package]]
 name = "spin-loader"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8534,7 +8535,7 @@ dependencies = [
 [[package]]
 name = "spin-locked-app"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8561,7 +8562,7 @@ dependencies = [
 [[package]]
 name = "spin-manifest"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "indexmap 1.9.3",
@@ -8577,7 +8578,7 @@ dependencies = [
 [[package]]
 name = "spin-outbound-networking"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -8614,7 +8615,7 @@ dependencies = [
 [[package]]
 name = "spin-serde"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "base64 0.21.7",
  "serde 1.0.203",
@@ -8623,7 +8624,7 @@ dependencies = [
 [[package]]
 name = "spin-sqlite"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8638,7 +8639,7 @@ dependencies = [
 [[package]]
 name = "spin-sqlite-inproc"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8654,7 +8655,7 @@ dependencies = [
 [[package]]
 name = "spin-sqlite-libsql"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8670,7 +8671,7 @@ dependencies = [
 [[package]]
 name = "spin-telemetry"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "http 0.2.12",
@@ -8690,7 +8691,7 @@ dependencies = [
 [[package]]
 name = "spin-trigger"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8741,7 +8742,7 @@ dependencies = [
 [[package]]
 name = "spin-variables"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -8764,7 +8765,7 @@ dependencies = [
 [[package]]
 name = "spin-world"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "wasmtime",
 ]
@@ -8975,7 +8976,7 @@ dependencies = [
 [[package]]
 name = "table"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 
 [[package]]
 name = "tap"
@@ -9035,7 +9036,7 @@ dependencies = [
 [[package]]
 name = "terminal"
 version = "2.6.0-pre0"
-source = "git+https://github.com/blocksense-network/spin?branch=blocksense#43727295116300c6ae2b5c417b55c2408b7151a0"
+source = "git+https://github.com/blocksense-network/spin?branch=blocksense#3d32bc812dc7b41677ffb611e4d035dfe88a2d83"
 dependencies = [
  "atty",
  "once_cell",
@@ -9718,7 +9719,7 @@ version = "1.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "rand 0.8.5",
  "static_assertions",
 ]
@@ -10368,7 +10369,7 @@ dependencies = [
 [[package]]
 name = "wasm-pkg-loader"
 version = "0.3.0"
-source = "git+https://github.com/bytecodealliance/wasm-pkg-tools/?rev=ce7d12deab6a36403bfd90ab3e80e6714748be52#ce7d12deab6a36403bfd90ab3e80e6714748be52"
+source = "git+https://github.com/bytecodealliance/wasm-pkg-tools/?rev=5384205af449179de07ad82ecf4bd42b171a2e40#5384205af449179de07ad82ecf4bd42b171a2e40"
 dependencies = [
  "anyhow",
  "async-trait",
