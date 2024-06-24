@@ -49,7 +49,7 @@ alloy = { git = "https://github.com/alloy-rs/alloy", rev = "6f4e397f7cf71812160a
     "pubsub",
 ] }
 
-
+prometheus = { path = "../../libs/prometheus" }
 
 reqwest = { version = "0.12", features = ["multipart", "blocking"] }
 # async
@@ -72,7 +72,6 @@ tracing-subscriber = { version = "0.3.18", features = ["json"] }
 bytes = "1.6.0"
 futures-util = "0.3.30"
 rand = "0.8.5"
-prometheus = "0.13.4"
 paste = "1.0.15"
 regex = "1.10.4"
 tempfile = "3.10.1"

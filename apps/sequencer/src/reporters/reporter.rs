@@ -1,5 +1,5 @@
-use crate::reporters::reporter_metrics::ReporterMetrics;
 use crypto::{deserialize_public_key, PublicKey, MULTIFORMATS_BLS_PUBKYE_PREFIX};
+use prometheus::metrics::ReporterMetrics;
 use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};

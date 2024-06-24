@@ -11,7 +11,7 @@ use alloy::{
 };
 use reqwest::{Client, Url};
 
-use super::provider_metrics::ProviderMetrics;
+use prometheus::metrics::ProviderMetrics;
 use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
 use std::fs;

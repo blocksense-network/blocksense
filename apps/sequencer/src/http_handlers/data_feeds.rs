@@ -11,12 +11,12 @@ use futures::StreamExt;
 
 use tracing::{debug, info, trace, warn};
 
-use crate::inc_reporter_metric;
-use crate::inc_reporter_vec_metric;
 use crypto::verify_signature;
 use crypto::Signature;
 use data_feeds::types::Timestamp;
 use data_feeds::types::{DataFeedPayload, FeedResult};
+use prometheus::inc_reporter_metric;
+use prometheus::inc_reporter_vec_metric;
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
 

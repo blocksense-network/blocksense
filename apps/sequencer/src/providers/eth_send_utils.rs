@@ -9,10 +9,10 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::Duration;
 
-use crate::process_provider_getter;
 use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::spawn;
 use eyre::eyre;
+use prometheus::process_provider_getter;
 
 use crate::feeds::feeds_registry::Repeatability;
 use crate::feeds::feeds_registry::Repeatability::Periodic;

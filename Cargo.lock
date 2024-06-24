@@ -7977,7 +7977,7 @@ dependencies = [
  "once_cell",
  "openssl-sys",
  "paste",
- "prometheus 0.13.4",
+ "prometheus 0.0.1",
  "rand 0.8.5",
  "regex",
  "reqwest 0.12.4",

@@ -14,7 +14,7 @@ use eyre::eyre;
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
 use crate::feeds::feeds_registry::Repeatability;
 use data_feeds::types::FeedType;
-use prometheus::{Encoder, TextEncoder};
+use prometheus::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
@@ -196,20 +196,10 @@ async fn get_feed_report_interval(
 
 #[get("/metrics")]
 async fn metrics() -> Result<HttpResponse, Error> {
-    let mut buffer = Vec::new();
-    let encoder = TextEncoder::new();
-
-    // Gather the metrics.
-    let metric_families = prometheus::gather();
-    // Encode them to send.
-    if let Err(e) = encoder.encode(&metric_families, &mut buffer) {
-        return Err(error::ErrorBadRequest(e.to_string()));
-    }
-
-    let output = match String::from_utf8(buffer.clone()) {
+    let output = match gather_and_dump_metrics() {
         Ok(result) => result,
         Err(e) => {
-            return Err(error::ErrorBadRequest(e.to_string()));
+            return Err(error::ErrorInternalServerError(e.to_string()));
         }
     };
 
