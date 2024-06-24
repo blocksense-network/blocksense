@@ -155,7 +155,9 @@ async fn main() -> Result<()> {
     }));
 
     {
-        let mut interval = time::interval(Duration::from_millis(65000));
+        let report_time_interval_ms: u64 =
+            send_get_request("http://127.0.0.1:8877/get_feed_report_interval/1").parse()?;
+        let mut interval = time::interval(Duration::from_millis(report_time_interval_ms + 1000)); // give 1 second tolerance
         interval.tick().await; // The first tick completes immediately.
         interval.tick().await;
     }

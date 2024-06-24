@@ -15,8 +15,8 @@ use crate::feeds_slots_manager::feeds_slots_manager_loop;
 use sequencer::reporters::reporter::init_shared_reporters;
 
 use sequencer::http_handlers::http_handlers::{
-    deploy, get_key, index_post, registry_plugin_get, registry_plugin_size, registry_plugin_upload,
-    set_log_level,
+    deploy, get_feed_report_interval, get_key, index_post, registry_plugin_get,
+    registry_plugin_size, registry_plugin_upload, set_log_level,
 };
 
 use sequencer::metrics_collector::metrics_collector::metrics_collector_loop;
@@ -71,6 +71,7 @@ async fn main() -> std::io::Result<()> {
                 .service(registry_plugin_upload)
                 .service(registry_plugin_get)
                 .service(registry_plugin_size)
+                .service(get_feed_report_interval)
         })
         .bind(("0.0.0.0", 8877))
         .expect("HTTP server could not bind to port.")
