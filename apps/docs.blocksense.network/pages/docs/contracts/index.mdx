@@ -41,14 +41,36 @@ Smart `contracts` for Blocksense network are stored inside our public GitHub rep
 This diagram illustrates the role of smart contracts in ensuring data integrity and enabling trustless interactions. Blocksense leverages a protocol where clients interact with smart contracts deployed on the blockchain. These contracts utilize proxy patterns to allow seamless upgradeability and employ historical data feeds for transparent data sourcing and verification.
 
 ```mermaid
+---
+config:
+    rightAngles: true
+    theme: neutral
+    primaryColor: "#d0d0d0"
+    signalColor: "FF0000"
+    signalTextColor: "#808080"
+---
 graph TD
+    classDef clientNode fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888,width:180px;
+    classDef feedNode fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888,width:200px;
+    classDef proxyNode fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888,width:200px;
+    classDef dataNode fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888,width:300px;
+
+    linkStyle default fill:none,stroke-width:1px,stroke:#1c1917
+
     A[Client] -->|invoke| E
     A -->|invoke| B
     B[FeedRegistry] -->|staticcall| C[UpgradeableProxy]
     C -->|delegatecall| D[HistoricDataFeedStore]
     E[ChainlinkProxy] -->|staticcall| C
-```
 
+    class A clientNode
+    class B,E feedNode
+    class C proxyNode
+    class D dataNode
+    class A,B,E invokeEdge
+    class B,C,E staticcallEdge
+    class C,D delegatecallEdge
+```
 ### Components Overview
 
 - **Client**: Represents users and external systems interacting with Blocksense protocol.
