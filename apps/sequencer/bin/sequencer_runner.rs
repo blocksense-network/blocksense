@@ -245,7 +245,7 @@ async fn index_post(
     Ok(HttpResponse::BadRequest().into())
 }
 
-const MAX_PlUGIN_SIZE: usize = 1_000_000; // max payload size is 900kb
+const MAX_PLUGIN_SIZE: usize = 1_000_000; // max payload size is 900kb
 
 /// Uploads a WebAssembly plugin to the registry.
 ///
@@ -290,7 +290,7 @@ async fn registry_plugin_upload(
             let mut file_bytes = web::BytesMut::new();
             while let Some(chunk) = field.next().await {
                 let chunk = chunk?;
-                if (file_bytes.len() + chunk.len()) > MAX_PlUGIN_SIZE {
+                if (file_bytes.len() + chunk.len()) > MAX_PLUGIN_SIZE {
                     return Err(error::ErrorBadRequest("File size exceeds the limit of 1MB"));
                 }
                 file_bytes.extend_from_slice(&chunk);
@@ -376,7 +376,7 @@ async fn registry_plugin_size(app_state: web::Data<FeedsState>) -> Result<HttpRe
     println!("Called registry_plugin_size");
     let registry_size;
     {
-        let mut reg = app_state.plugin_registry.write().unwrap();
+        let reg = app_state.plugin_registry.write().unwrap();
         registry_size = reg.current_memory_usage;
     }
     Ok(HttpResponse::Ok()
