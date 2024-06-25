@@ -285,7 +285,7 @@ mod tests {
                 == ReportRelevance::Relevant
         );
 
-        current_time_as_ms += 11 * 1000; // Advance time, the report will become obsolete
+        current_time_as_ms += feed.read().unwrap().report_interval_ms as u128 + 1; // Advance time, the report will become obsolete
 
         assert!(
             feed.read()
@@ -294,7 +294,7 @@ mod tests {
                 == ReportRelevance::NonRelevantOld
         );
 
-        msg_timestamp += 11 * 1000; // Advance report time to make it relevant
+        msg_timestamp += feed.read().unwrap().report_interval_ms as u128 + 1; // Advance report time to make it relevant
 
         assert!(
             feed.read()

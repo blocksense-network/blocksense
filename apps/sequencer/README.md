@@ -56,7 +56,7 @@ curl http://127.0.0.1:8877/deploy/ETH1
 The sequencer will deploy the contract and use it from there on. To send a data feed you can use the following test HTTP request:
 
 ```
-curl -X POST 127.0.0.1:8877/test -H 'Content-Type: application/json' -d '{"feed_id":"YahooFinance.BTC/USD","reporter_id":0,"result":70000.5,"timestamp":'$((($(date +%s%N | cut -b1-13))))'}'
+curl -X POST 127.0.0.1:8877/post_report -H 'Content-Type: application/json' -d '{"feed_id":"YahooFinance.BTC/USD","reporter_id":0,"result":70000.5,"timestamp":'$((($(date +%s%N | cut -b1-13))))'}'
 ```
 
 To set the logging level, you can provide an environment variable before running the sequencer as follows:

@@ -36,38 +36,38 @@ pub async fn deploy_contract(network: &String, providers: &SharedRpcProviders) -
         .expect("Could not lock all providers' lock");
 
     let provider = providers.get(network);
-    if let Some(p) = provider.cloned() {
-        drop(providers);
-        let mut p = p.lock().await;
-        let provider = &p.provider;
+    let Some(p) = provider.cloned() else {
+        return Err(eyre!("No provider for network {}", network));
+    };
+    drop(providers);
+    let mut p = p.lock().await;
+    let provider = &p.provider;
 
-        // Get the base fee for the block.
-        let base_fee = provider.get_gas_price().await?;
+    // Get the base fee for the block.
+    let base_fee = provider.get_gas_price().await?;
 
-        // Deploy the contract.
-        let contract_builder = DataFeedStoreV1::deploy_builder(provider);
-        let estimate = contract_builder.estimate_gas().await?;
-        let deploy_time = Instant::now();
-        let contract_address = contract_builder
-            .gas(estimate)
-            .gas_price(base_fee)
-            .deploy()
-            .await?;
+    // Deploy the contract.
+    let contract_builder = DataFeedStoreV1::deploy_builder(provider);
+    let estimate = contract_builder.estimate_gas().await?;
+    let deploy_time = Instant::now();
+    let contract_address = contract_builder
+        .gas(estimate)
+        .gas_price(base_fee)
+        .deploy()
+        .await?;
 
-        info!(
-            "Deployed contract at address: {:?} took {}ms\n",
-            contract_address.to_string(),
-            deploy_time.elapsed().as_millis()
-        );
+    info!(
+        "Deployed contract at address: {:?} took {}ms\n",
+        contract_address.to_string(),
+        deploy_time.elapsed().as_millis()
+    );
 
-        p.contract_address = Some(contract_address);
+    p.contract_address = Some(contract_address);
 
-        return Ok(format!(
-            "CONTRACT_ADDRESS set to {}",
-            contract_address.to_string()
-        ));
-    }
-    Err(eyre!("No provider for network {}", network))
+    return Ok(format!(
+        "CONTRACT_ADDRESS set to {}",
+        contract_address.to_string()
+    ));
 }
 
 pub async fn eth_batch_send_to_contract<
@@ -101,7 +101,10 @@ pub async fn eth_batch_send_to_contract<
         keys_vals += val.to_string().as_str();
     }
 
-    let input = Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()).unwrap();
+    let input = match Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()) {
+        Err(e) => panic!("Key is not valid hex string: {}", e), // We panic here, because the http handler on the recv side must filter out wrong input.
+        Ok(x) => x,
+    };
 
     let base_fee = process_provider_getter!(
         provider.get_gas_price().await,
@@ -216,7 +219,7 @@ pub async fn eth_batch_send_to_all_contracts<
                 all_results += &e.to_string()
             }
         }
-        all_results += " "
+        all_results += "\n"
     }
     Ok(all_results)
 }

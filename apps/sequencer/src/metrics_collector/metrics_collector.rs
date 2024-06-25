@@ -12,8 +12,8 @@ impl MetricsCollector {
     pub fn new() -> MetricsCollector {
         spawn(async move {
             let mut interval = time::interval(Duration::from_millis(60000));
-            interval.tick().await;
             loop {
+                interval.tick().await;
                 let mut buffer = Vec::new();
                 let encoder = TextEncoder::new();
 
@@ -24,8 +24,6 @@ impl MetricsCollector {
 
                 let output = String::from_utf8(buffer.clone()).unwrap();
                 info!("Prometheus metrics:\n{}", output);
-
-                interval.tick().await;
             }
         });
         MetricsCollector {}

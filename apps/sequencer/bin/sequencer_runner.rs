@@ -14,9 +14,10 @@ use tokio::sync::mpsc;
 use sequencer::reporters::reporter::init_shared_reporters;
 use tracing::debug;
 
-use sequencer::http_handlers::http_handlers::{
-    deploy, get_key, index_post, registry_plugin_get, registry_plugin_size, registry_plugin_upload,
-    set_log_level,
+use sequencer::http_handlers::admin::{deploy, get_key, set_log_level};
+use sequencer::http_handlers::data_feeds::post_report;
+use sequencer::http_handlers::registry::{
+    registry_plugin_get, registry_plugin_size, registry_plugin_upload,
 };
 use sequencer::metrics_collector::metrics_collector::MetricsCollector;
 use sequencer::utils::logging::init_shared_logging_handle;
@@ -87,7 +88,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(app_state.clone())
             .service(get_key)
             .service(deploy)
-            .service(index_post)
+            .service(post_report)
             .service(set_log_level)
             .service(registry_plugin_upload)
             .service(registry_plugin_get)
