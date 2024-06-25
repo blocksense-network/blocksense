@@ -1,4 +1,5 @@
 use clap::Args;
+use data_feeds::types::DataFeedPayload;
 use serde::{Deserialize, Serialize};
 use spin_app::MetadataKey;
 use spin_core::{async_trait, InstancePre};
@@ -9,8 +10,6 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::mpsc::{channel, Receiver, Sender};
-
-use sequencer_types::sequencer::PostDataFeedPayload;
 
 wasmtime::component::bindgen!({
     path: "../wit",
@@ -230,7 +229,7 @@ impl OracleTrigger {
         sequencer: String,
     ) -> TerminationReason {
         while let Some((feed_id, payload)) = rx.recv().await {
-            let payload_json = PostDataFeedPayload {
+            let payload_json = DataFeedPayload { //TODO(snikolov): Replace with new struct.
                 reporter_id: 1,
                 feed_id,
                 timestamp: current_unix_time(),

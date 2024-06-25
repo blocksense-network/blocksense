@@ -2485,6 +2485,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 
 [[package]]
+name = "conv"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "78ff10625fd0ac447827aa30ea8b861fead473bb60aeb73af6c1c58caf0d1299"
+dependencies = [
+ "custom_derive",
+]
+
+[[package]]
 name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2792,6 +2801,12 @@ dependencies = [
  "vcpkg",
  "windows-sys 0.52.0",
 ]
+
+[[package]]
+name = "custom_derive"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef8ae57c4978a2acd8b869ce6b9ca1dfe817bff704c220209fdef2c0b75a01b9"
 
 [[package]]
 name = "darling"
@@ -7880,6 +7895,8 @@ dependencies = [
  "assert_cmd",
  "async-channel 2.3.1",
  "bytes 1.6.0",
+ "conv",
+ "data_feeds",
  "envload",
  "eyre",
  "futures",
@@ -7898,15 +7915,6 @@ dependencies = [
  "tokio 1.37.0",
  "tracing",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "sequencer-types"
-version = "0.0.1"
-dependencies = [
- "blocksense-registry",
- "serde 1.0.203",
- "serde_json",
 ]
 
 [[package]]
@@ -9708,11 +9716,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap 3.2.25",
+ "data_feeds",
  "futures",
  "is-terminal",
  "log",
  "reqwest 0.12.4",
- "sequencer-types",
  "serde 1.0.203",
  "serde_json",
  "spin-app",

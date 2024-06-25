@@ -14,6 +14,7 @@ log = "0.4.21"
 reqwest = { version = "0.12", features=["json"] }
 serde = "1.0"
 serde_json = "1.0"
+data_feeds = { path = "../../data_feeds"}
 
 spin-app = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 spin-core = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
@@ -23,4 +24,3 @@ tokio-scoped = "0.2.0"
 tracing = { version = "0.1.40" , features=["log"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 wasmtime = "21.0.1"
-sequencer-types = { path = "../../sequencer-types"}

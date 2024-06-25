@@ -8,6 +8,8 @@ use std::sync::{Arc, RwLock};
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::{debug, info};
+use data_feeds::types::FeedType;
+use crate::feeds::feeds_processing::naive_packing;
 
 pub async fn feed_slots_processor_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
@@ -29,7 +31,7 @@ pub async fn feed_slots_processor_loop<
     loop {
         feed_slots_time_tracker.await_end_of_current_slot().await;
 
-        let result_post_to_contract: String;
+        let result_post_to_contract: FeedType; //TODO(snikolov): This needs to be enforced as Bytes32
         let key_post: u32;
         {
             let current_time_as_ms = get_ms_since_epoch();
@@ -54,7 +56,7 @@ pub async fn feed_slots_processor_loop<
 
             let mut reports = reports.write().unwrap();
             // Process the reports:
-            let mut values: Vec<&String> = vec![];
+            let mut values: Vec<&FeedType> = vec![];
             for kv in &reports.report {
                 values.push(&kv.1);
             }
@@ -65,7 +67,8 @@ pub async fn feed_slots_processor_loop<
             }
 
             key_post = key;
-            result_post_to_contract = feed.read().unwrap().get_feed_type().process(values); // Dispatch to concreate FeedProcessing implementation.
+            result_post_to_contract = feed.read().unwrap().get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
+                    info!("result_post_to_contract = {:?}", result_post_to_contract);
             info!("result_post_to_contract = {:?}", result_post_to_contract);
             reports.clear();
         }
@@ -73,7 +76,7 @@ pub async fn feed_slots_processor_loop<
         result_send
             .send((
                 to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
-                result_post_to_contract.into(),
+                naive_packing(result_post_to_contract).into()
             ))
             .unwrap();
     }

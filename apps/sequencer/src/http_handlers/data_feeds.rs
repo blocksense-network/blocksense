@@ -14,6 +14,8 @@ use tracing::{debug, trace, warn};
 
 use crate::inc_reporter_metric;
 use crate::inc_reporter_vec_metric;
+use data_feeds::types::FeedType;
+use serde_json::from_value;
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
 
@@ -72,23 +74,11 @@ pub async fn post_report(
         }
     };
 
-    let result_hex = match v["result"].to_string().parse::<f32>() {
-        Ok(x) => {
-            let mut res = x.to_be_bytes().to_vec();
-            res.resize(REPORT_HEX_SIZE / 2, 0);
-            to_hex_string(res, None)
-        }
+    let result: FeedType = match from_value(v["result"].clone()) {
+        Ok(x) => x,
         Err(_) => {
-            let value = v["result"].to_string().trim_matches('"').to_string();
-            if value.len() != REPORT_HEX_SIZE
-                || !value
-                    .chars()
-                    .all(|arg0: char| char::is_ascii_hexdigit(&arg0))
-            {
-                inc_reporter_metric!(reporter, unrecognized_result_format);
-                return Ok(HttpResponse::BadRequest().into());
-            }
-            value
+            inc_reporter_metric!(reporter, unrecognized_result_format);
+            return Ok(HttpResponse::BadRequest().into());
         }
     };
 
@@ -102,7 +92,7 @@ pub async fn post_report(
 
     trace!(
         "result = {:?}; feed_id = {:?}; reporter_id = {:?}",
-        result_hex,
+        result,
         feed_id,
         reporter_id
     );
@@ -137,7 +127,7 @@ pub async fn post_report(
                 .reports
                 .write()
                 .expect("Error trying to lock Reports for read!");
-            if reports.push(feed_id, reporter_id, result_hex) {
+            if reports.push(feed_id, reporter_id, result) {
                 debug!(
                     "Recvd timely vote from reporter_id = {} for feed_id = {}",
                     reporter_id, feed_id

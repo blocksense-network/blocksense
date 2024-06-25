@@ -11,10 +11,9 @@ edition.workspace = true
 prometheus = { path = "../prometheus" }
 derive = { path = "../derive"}
 utils = { path = "../utils" }
-
 log = "0.4.21"
-thiserror = "1.0.61"
 anyhow = "1.0.81"
+thiserror = "1.0.61"
 serde_json = "1.0.115"
 serde = { version = "1.0.197", features = ["derive"] }
 erased-serde = "0.4.4"

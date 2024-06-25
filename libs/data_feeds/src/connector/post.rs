@@ -4,42 +4,33 @@ use std::{
     rc::Rc,
 };
 
-use crate::{
-    connector::error::FeedError,
-    interfaces::{data_feed::DataFeed, payload::Payload},
-};
+use crate::{interfaces::data_feed::DataFeed, types::{DataFeedPayload, FeedError, FeedResult, FeedType, PayloadMetaData, Timestamp}};
 use curl::easy::Easy;
 use serde_json::{json, Value};
 use utils::generate_string_hash;
 
 fn handle_feed_response(
     reporter_id: u64,
-    feed_name: &String,
-    feed_hash: u64,
-    timestamp: u64,
-    result: Result<Box<dyn Payload>, FeedError>,
+    feed_id: String,
+    timestamp: Timestamp,
+    result: FeedResult,
 ) -> Value {
-    match result {
-        Ok(result) => {
-            json!({
-                "reporter_id": reporter_id,
-                "feed_name": feed_name,
-                "feed_id": feed_hash,
-                "timestamp": timestamp,
-                "result": result.as_ref().to_bytes32().unwrap(),
-            })
-        }
-        Err(err) => {
-            json!({
-                "reporter_id": reporter_id,
-                "feed_name": feed_name,
-                "feed_id": feed_hash,
-                "timestamp": timestamp,
-                "api_error_message": err.to_string()
 
-            })
-        }
+    let payload = DataFeedPayload {
+        payload_metadata: PayloadMetaData {
+            reporter_id,
+            feed_id,
+            timestamp,
+        },
+        result
+    };
+    let serialized_payload = serde_json::to_value(&payload);
+
+    match serialized_payload {
+        Ok(payload) => payload,
+        Err(_) => panic!("Failed serialization of payload!") //TODO(snikolov): Handle without panic
     }
+
 }
 
 pub async fn post_feed_response(
@@ -54,7 +45,7 @@ pub async fn post_feed_response(
     let feed_hash = generate_string_hash(feed_asset_name);
 
     let payload_json =
-        handle_feed_response(reporter_id, feed_asset_name, feed_hash, timestamp, result);
+        handle_feed_response(reporter_id, feed_hash.to_string(), timestamp, result);
 
     println!("\nPayload: {:?}", payload_json);
 

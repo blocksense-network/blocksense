@@ -1,6 +1,6 @@
 use erased_serde::serialize_trait_object;
 
-use crate::{connector::error::ConversionError, types::Bytes32};
+use crate::{connector::bytes::ConversionError, types::Bytes32};
 
 serialize_trait_object!(Payload);
 

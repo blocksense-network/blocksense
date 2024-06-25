@@ -1,17 +1,14 @@
 use async_trait::async_trait;
 
-use crate::{
-    connector::error::FeedError,
-    types::{ConsensusMetric, Timestamp},
-};
+use crate::types::{ConsensusMetric, FeedResult, Timestamp};
 
-use super::{api_connect::ApiConnect, historical::Historical, payload::Payload};
+use super::{api_connect::ApiConnect, historical::Historical};
 
 #[async_trait(?Send)]
 pub trait DataFeed: ApiConnect + Historical {
     fn score_by(&self) -> ConsensusMetric;
 
-    async fn poll(&mut self, asset: &str) -> (Result<Box<dyn Payload>, FeedError>, Timestamp);
+    async fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp);
 
     //TODO: Implement abstraction for publishing
 

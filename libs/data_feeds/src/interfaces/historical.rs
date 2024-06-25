@@ -1,14 +1,12 @@
 use ringbuf::traits::RingBuffer;
 use ringbuf::{storage::Heap, SharedRb};
 
-use crate::types::Timestamp;
-
-use super::payload::Payload;
+use crate::types::{FeedType, Timestamp};
 
 pub trait Historical {
-    fn collect_history(&mut self, response: Box<dyn Payload>, timestamp: Timestamp) {
+    fn collect_history(&mut self, response: FeedType, timestamp: Timestamp) {
         self.history_buffer().push_overwrite((response, timestamp));
     }
 
-    fn history_buffer(&mut self) -> &mut SharedRb<Heap<(Box<dyn Payload>, Timestamp)>>;
+    fn history_buffer(&mut self) -> &mut SharedRb<Heap<(FeedType, Timestamp)>>;
 }

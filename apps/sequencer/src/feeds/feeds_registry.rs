@@ -1,5 +1,5 @@
-use crate::feeds::average_feed_processor::AverageFeedProcessor;
-use crate::feeds::feeds_processing::FeedProcessing;
+use data_feeds::services::aggregate::{AverageAggregator, FeedAggregate};
+use data_feeds::types::FeedType;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -10,7 +10,7 @@ pub struct FeedMetaData {
     name: String,
     report_interval_ms: u64, // Consider oneshot feeds.
     first_report_start_time: SystemTime,
-    feed_type: Box<dyn FeedProcessing>,
+    feed_type: Box<dyn FeedAggregate>,
 }
 
 #[derive(PartialEq)]
@@ -30,7 +30,7 @@ impl FeedMetaData {
             name: n.to_string(),
             report_interval_ms: r,
             first_report_start_time: f,
-            feed_type: Box::new(AverageFeedProcessor::new()),
+            feed_type: Box::new(AverageAggregator {}), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
         }
     }
     pub fn get_name(&self) -> &String {
@@ -50,7 +50,7 @@ impl FeedMetaData {
         ((current_time_as_ms - self.get_first_report_start_time_ms())
             / self.report_interval_ms as u128) as u64
     }
-    pub fn get_feed_type(&self) -> &dyn FeedProcessing {
+    pub fn get_feed_type(&self) -> &dyn FeedAggregate {
         self.feed_type.as_ref()
     }
     pub fn check_report_relevance(
@@ -117,7 +117,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
 // For a given Feed this struct represents the received votes from different reporters.
 #[derive(Debug)]
 pub struct FeedReports {
-    pub report: HashMap<u64, String>,
+    pub report: HashMap<u64, FeedType>,
 }
 
 impl FeedReports {
@@ -138,7 +138,7 @@ impl AllFeedsReports {
             reports: HashMap::new(),
         }
     }
-    pub fn push(&mut self, feed_id: u32, reporter_id: u64, data: String) -> bool {
+    pub fn push(&mut self, feed_id: u32, reporter_id: u64, data: FeedType) -> bool {
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
@@ -178,6 +178,8 @@ pub fn get_reporters_for_feed_id_slot(_feed_id: u32, _slot: u64) -> Vec<u32> {
 
 #[cfg(test)]
 mod tests {
+    use data_feeds::types::FeedType;
+
     use crate::feeds::feeds_registry::{
         new_feeds_meta_data_reg_with_test_data, AllFeedsReports, ReportRelevance,
     };
@@ -335,11 +337,10 @@ mod tests {
                         == ReportRelevance::Relevant
                 );
 
-                reports.write().unwrap().push(
-                    DATA_FEED_ID,
-                    i.into(),
-                    "0123456789abcdef".to_string(),
-                );
+                reports
+                    .write()
+                    .unwrap()
+                    .push(DATA_FEED_ID, i.into(), FeedType::Numerical(0.1));
 
                 println!("this is thread number {}", i);
             }));
@@ -356,7 +357,7 @@ mod tests {
             .expect("ID not present in registry");
         let reports = reports.read().unwrap();
         // Process the reports:
-        let mut values: Vec<&String> = vec![];
+        let mut values: Vec<&FeedType> = vec![];
         for kv in &reports.report {
             values.push(&kv.1);
         }

@@ -1,6 +1,6 @@
-use crate::types::Bytes32;
+use thiserror::Error;
 
-use super::error::ConversionError;
+use crate::types::Bytes32;
 
 pub fn string_to_bytes32(x: String) -> Result<Bytes32, ConversionError> {
     let string_bytes = x.as_bytes();
@@ -19,4 +19,10 @@ pub fn f64_to_bytes32(x: f64) -> Result<Bytes32, ConversionError> {
     let float_bytes = x.to_le_bytes();
     bytes[..float_bytes.len()].copy_from_slice(&float_bytes);
     Ok(Bytes32(bytes))
+}
+
+#[derive(Error, Debug)]
+pub enum ConversionError {
+    #[error("String larger than Bytes32")]
+    StringTooLong,
 }
