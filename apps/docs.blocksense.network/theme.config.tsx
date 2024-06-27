@@ -10,4 +10,16 @@ export default {
   footer: {
     component: Footer,
   },
+  useNextSeoProps() {
+    return {
+      titleTemplate: 'Blocksense - %s',
+    };
+  },
+  head: (
+    <link
+      rel="icon"
+      href="/images/blocksense-favicon.png"
+      type="image/png"
+    ></link>
+  ),
 };
