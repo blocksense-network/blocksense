@@ -4,6 +4,7 @@ import { Build, SolReflection } from './types';
 import './hardhat/type-extensions';
 import { filterRelevantFiles, writeDocFiles } from './utils/common';
 import { addNatspec, convertSourceUnit } from './utils/convertors';
+import { appendInheritedNatspec } from './utils/natspec';
 
 if ('extendConfig' in global && 'task' in global) {
   // Assume Hardhat.
@@ -21,6 +22,8 @@ export async function main(build: Build, userConfig?: Config): Promise<void> {
     const fineData = convertSourceUnit(rawData);
     solReflection.push({ rawData, fineData });
   });
+
+  appendInheritedNatspec(solReflection);
 
   await writeDocFiles(solReflection, userConfig);
 }

@@ -1,4 +1,4 @@
-import { ASTNode, NatSpec } from '../types';
+import { ASTNode, ContractDocItem, NatSpec, SolReflection } from '../types';
 
 // The possible tags we support
 const tags = [
@@ -135,6 +135,55 @@ export function parseNatspec(node: ASTNode): NatSpec {
   if (natSpec.notice) natSpec.notice = natSpec.notice.trim();
 
   return natSpec;
+}
+
+export function appendInheritedNatspec(data: SolReflection) {
+  const source = data.map(x => x.fineData).flatMap(su => su.contracts || []);
+
+  data.forEach(({ fineData }) => {
+    fineData.contracts?.forEach(contract => {
+      contract.functions?.forEach(f => {
+        f.natspec = getNatspecWithInheritDoc(f.natspec, source);
+      });
+      contract.variables?.forEach(v => {
+        v.natspec = getNatspecWithInheritDoc(v.natspec, source);
+      });
+    });
+  });
+}
+
+export function getNatspecWithInheritDoc(
+  natspec: NatSpec,
+  source: ContractDocItem[],
+): NatSpec {
+  if (natspec.inheritdoc) {
+    const { name, sourceContract } = natspec.inheritdoc;
+    const inheritedDoc = deriveInheritedNatspec(sourceContract, name, source);
+    return {
+      ...natspec,
+      ...inheritedDoc,
+    };
+  } else {
+    return natspec;
+  }
+}
+
+export function deriveInheritedNatspec(
+  contractName: string,
+  fieldName: string,
+  source: ContractDocItem[],
+): NatSpec {
+  const contract = source?.find(c => c.name === contractName);
+  if (!contract) {
+    throw new Error(`Contract ${contractName} not found`);
+  }
+  const field =
+    contract!['functions']?.find(f => f.name === fieldName) ||
+    contract!['variables']?.find(v => v.name === fieldName);
+  if (!field) {
+    throw new Error(`Field ${fieldName} not found in contract ${contractName}`);
+  }
+  return field.natspec;
 }
 
 class ItemError extends Error {
