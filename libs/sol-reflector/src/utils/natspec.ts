@@ -44,26 +44,23 @@ export function parseNatspec(node: ASTNode): NatSpec {
     const tag = tagLines[i];
     const content = tagLines[i + 1];
 
+    if (!content)
+      throw new ItemError(`Found empty content of tag ${tag}`, node);
+
     switch (tag) {
       case '@title':
       case '@author':
       case '@notice':
       case '@dev':
-        if (!content)
-          throw new ItemError(`Found empty content of tag ${tag}`, node);
         natSpec[tag.replace('@', '')] = content;
         break;
       case '@param':
-        if (!content)
-          throw new ItemError(`Found empty content of tag ${tag}`, node);
         const paramMatches = content.match(/(\w+) ([^]*)/);
         const [, name, description] = paramMatches as [string, string, string];
         natSpec.params ??= [];
         natSpec.params.push({ name, description: description.trim() });
         break;
       case '@return':
-        if (!content)
-          throw new ItemError(`Found empty content of tag ${tag}`, node);
         if (!('returnParameters' in node)) {
           throw new ItemError(`Item does not contain return parameters`, node);
         }
@@ -95,8 +92,6 @@ export function parseNatspec(node: ASTNode): NatSpec {
         }
         break;
       case '@custom':
-        if (!content)
-          throw new ItemError(`Found empty content of tag ${tag}`, node);
         const [customTag, ...customDesc] = content.replace(':', '').split(' ');
         if (!customTag) {
           throw new ItemError('Custom tag must be defined', node);
@@ -106,8 +101,6 @@ export function parseNatspec(node: ASTNode): NatSpec {
         natSpec.custom[customTag] += customDesc.join(' ');
         break;
       case '@inheritdoc':
-        if (!content)
-          throw new ItemError(`Found empty content of tag ${tag}`, node);
         if (
           !(
             node.nodeType === 'FunctionDefinition' ||
