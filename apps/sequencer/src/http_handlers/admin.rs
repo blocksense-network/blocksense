@@ -14,7 +14,7 @@ use eyre::eyre;
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
 use tokio::time::Duration;
 use tracing::info_span;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 async fn get_key_from_contract(
     providers: &SharedRpcProviders,
@@ -129,4 +129,42 @@ async fn set_log_level(
         }
     }
     Ok(HttpResponse::BadRequest().into())
+}
+
+#[get("/get_feed_report_interval/{feed_id}")]
+async fn get_feed_report_interval(
+    req: HttpRequest,
+    app_state: web::Data<FeedsState>,
+) -> Result<HttpResponse, Error> {
+    let bad_input = error::ErrorBadRequest("Incorrect input.");
+    let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
+
+    let feed_id: u32 = match feed_id.parse() {
+        Ok(r) => r,
+        Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
+    };
+
+    let feed = {
+        let reg = app_state
+            .registry
+            .read()
+            .expect("Error trying to lock Registry for read!");
+        debug!("getting feed_id = {}", &feed_id);
+        match reg.get(feed_id) {
+            Some(x) => x,
+            None => {
+                drop(reg);
+                return Ok(HttpResponse::BadRequest().into());
+            }
+        }
+    };
+
+    return Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(format!(
+            "{}",
+            feed.read()
+                .expect("Error trying to lock Feed for read!")
+                .get_report_interval_ms()
+        )));
 }

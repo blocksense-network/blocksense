@@ -14,7 +14,7 @@ use tokio::sync::mpsc;
 use crate::feeds_slots_manager::feeds_slots_manager_loop;
 use sequencer::reporters::reporter::init_shared_reporters;
 
-use sequencer::http_handlers::admin::{deploy, get_key, set_log_level};
+use sequencer::http_handlers::admin::{deploy, get_feed_report_interval, get_key, set_log_level};
 use sequencer::http_handlers::data_feeds::post_report;
 use sequencer::http_handlers::registry::{
     registry_plugin_get, registry_plugin_size, registry_plugin_upload,
@@ -71,6 +71,7 @@ async fn main() -> std::io::Result<()> {
                 .service(registry_plugin_upload)
                 .service(registry_plugin_get)
                 .service(registry_plugin_size)
+                .service(get_feed_report_interval)
         })
         .bind(("0.0.0.0", 8877))
         .expect("HTTP server could not bind to port.")
