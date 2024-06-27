@@ -1,19 +1,24 @@
 import { ethers } from 'hardhat';
-import { SportsDataFeedStoreV1 } from '../typechain';
+import { SportsDataFeedStoreV1, SportsDataFeedStoreV2 } from '../typechain';
 import {
   IWrapper,
   SportsDataFeedStoreBaseWrapper,
   SportsDataFeedStoreV1Wrapper,
+  SportsDataFeedStoreV2Wrapper,
 } from './utils/wrappers';
 import { initWrappers, printGasUsage } from './utils/helpers/common';
 import { BaseContract } from 'ethers';
 
-let contractWrappers: SportsDataFeedStoreBaseWrapper<SportsDataFeedStoreV1>[] =
-  [];
+let contractWrappers: SportsDataFeedStoreBaseWrapper<
+  SportsDataFeedStoreV1 | SportsDataFeedStoreV2
+>[] = [];
 
 describe.only('SportsDataFeedStore', () => {
   beforeEach(async () => {
-    await initWrappers(contractWrappers, [SportsDataFeedStoreV1Wrapper]);
+    await initWrappers(contractWrappers, [
+      SportsDataFeedStoreV1Wrapper,
+      SportsDataFeedStoreV2Wrapper,
+    ]);
   });
 
   it('Should set data correctly', async () => {
@@ -21,11 +26,13 @@ describe.only('SportsDataFeedStore', () => {
       [],
       contractWrappers,
       [2, 3],
+      123,
     );
 
-    contractWrappers[0].checkEvents(receipts[0], keys, descriptions);
-
-    await contractWrappers[0].checkSetValues(keys, values);
+    for (const [i, contractWrapper] of contractWrappers.entries()) {
+      await contractWrapper.checkSetValues(keys, values);
+      contractWrapper.checkEvents(receipts[i], keys, descriptions);
+    }
 
     await printGasUsage([], contractWrappers, receipts, []);
   });
@@ -49,7 +56,7 @@ const prepareData = async <G extends BaseContract, B extends BaseContract>(
   for (const valuesPerKey of valuesPerKeysCount) {
     const parsedValues: string[] = [];
     for (let i = 0; i < valuesPerKey; i++) {
-      parsedValues.push(encodeData([i]));
+      parsedValues.push(encodeData([i + start]));
     }
     values.push(parsedValues.join(';'));
   }

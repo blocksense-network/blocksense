@@ -28,6 +28,7 @@ import { HistoricDataFeedStoreGenericConsumerV1Wrapper } from './consumers/histo
 
 import { SportsDataFeedStoreBaseWrapper } from './sports/Base';
 import { SportsDataFeedStoreV1Wrapper } from './sports/V1';
+import { SportsDataFeedStoreV2Wrapper } from './sports/V2';
 
 import { UpgradeableProxyBaseWrapper } from './upgradeable/Base';
 import { UpgradeableProxyDataFeedStoreV1Wrapper } from './upgradeable/V1';
@@ -89,6 +90,7 @@ export {
   // sports
   SportsDataFeedStoreBaseWrapper,
   SportsDataFeedStoreV1Wrapper,
+  SportsDataFeedStoreV2Wrapper,
 
   // upgradable proxy
   UpgradeableProxyBaseWrapper,
