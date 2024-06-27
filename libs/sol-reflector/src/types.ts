@@ -72,6 +72,10 @@ export interface NatSpec {
   custom?: {
     [tag: string]: string;
   };
+  inheritdoc?: {
+    name: string;
+    sourceContract: string;
+  };
 }
 
 export type WithNatspec<T> = T & { natspec?: NatSpec };

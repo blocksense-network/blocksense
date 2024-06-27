@@ -9,6 +9,7 @@ const tags = [
   '@param',
   '@return',
   '@custom',
+  '@inheritdoc',
 ];
 
 /**
@@ -104,8 +105,29 @@ export function parseNatspec(node: ASTNode): NatSpec {
         natSpec.custom[customTag] ??= '';
         natSpec.custom[customTag] += customDesc.join(' ');
         break;
+      case '@inheritdoc':
+        if (!content)
+          throw new ItemError(`Found empty content of tag ${tag}`, node);
+        if (
+          !(
+            node.nodeType === 'FunctionDefinition' ||
+            node.nodeType === 'VariableDeclaration'
+          )
+        ) {
+          throw new ItemError(
+            `Expected function or variable but saw ${node.nodeType}. ` +
+              `Only functions and variables can inherit documentation`,
+            node,
+          );
+        }
+        const parentContractName = content.trim();
+        natSpec.inheritdoc = {
+          name: node.name,
+          sourceContract: parentContractName,
+        };
+        break;
       default:
-        console.log('Unknown tag:', tag);
+        console.error('Unknown tag:', tag);
     }
   }
 
