@@ -13,7 +13,8 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/sol-contracts-components/*": ["components/sol-contracts/*"],
     }
   },
   "files": [],
