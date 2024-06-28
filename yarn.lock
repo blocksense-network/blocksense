@@ -359,7 +359,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blocksense/contracts@workspace:libs/contracts":
+"@blocksense/contracts@workspace:*, @blocksense/contracts@workspace:libs/contracts":
   version: 0.0.0-use.local
   resolution: "@blocksense/contracts@workspace:libs/contracts"
   dependencies:
@@ -437,7 +437,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network"
   dependencies:
+    "@blocksense/contracts": "workspace:*"
     "@blocksense/docs-theme": "workspace:*"
+    "@blocksense/sol-reflector": "workspace:*"
     "@emotion/react": "npm:^11.11.4"
     "@emotion/styled": "npm:^11.11.5"
     "@types/node": "npm:^20.14.2"

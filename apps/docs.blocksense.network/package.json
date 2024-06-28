@@ -20,7 +20,9 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@blocksense/contracts": "workspace:*",
     "@blocksense/docs-theme": "workspace:*",
+    "@blocksense/sol-reflector": "workspace:*",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "autoprefixer": "^10.4.19",
