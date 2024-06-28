@@ -1,6 +1,6 @@
-use crate::types::FeedType;
-use assert_cmd::assert;
 use utils::to_hex_string;
+
+use crate::types::FeedType;
 
 pub const REPORT_HEX_SIZE: usize = 64;
 
@@ -15,8 +15,6 @@ pub fn naive_packing(feed_result: FeedType) -> String {
 #[cfg(test)]
 mod tests {
     use alloy::hex;
-    use data_feeds::types::FeedType;
-
     use super::*;
 
     #[test]

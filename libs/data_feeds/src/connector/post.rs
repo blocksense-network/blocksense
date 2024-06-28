@@ -6,10 +6,10 @@ use std::{
 
 use crate::{
     interfaces::data_feed::DataFeed,
-    types::{DataFeedPayload, FeedError, FeedResult, FeedType, PayloadMetaData, Timestamp},
+    types::{DataFeedPayload, FeedResult, PayloadMetaData, Timestamp},
 };
 use curl::easy::Easy;
-use serde_json::{json, Value};
+use serde_json::Value;
 use utils::generate_string_hash;
 
 fn handle_feed_response(
