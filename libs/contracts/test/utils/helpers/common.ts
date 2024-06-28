@@ -34,6 +34,15 @@ export interface TransmissionData {
   timestamp: bigint;
 }
 
+const encodeData = (data: number[]) => {
+  return ethers
+    .solidityPacked(
+      data.map(() => 'uint32'),
+      data,
+    )
+    .padEnd(66, '0');
+};
+
 export const setDataFeeds = async <
   G extends BaseContract,
   B extends BaseContract,
@@ -59,6 +68,45 @@ export const setDataFeeds = async <
   }
 
   return { receipts, receiptsGeneric, keys, values };
+};
+
+export const setSportsDataFeeds = async <
+  G extends BaseContract,
+  B extends BaseContract,
+>(
+  genericContractWrappers: IWrapper<G>[],
+  contractWrappers: IWrapper<B>[],
+  valuesPerKeysCount: number[],
+  start: number = 0,
+) => {
+  const keys = Array.from(
+    { length: valuesPerKeysCount.length },
+    (_, i) => i + (i > 0 ? valuesPerKeysCount[i - 1] : 0) + start,
+  );
+  const values: string[] = [];
+  const descriptions: string[] = keys.map(key =>
+    ethers.encodeBytes32String(`Hello, World! ${key}`),
+  );
+
+  for (const valuesPerKey of valuesPerKeysCount) {
+    const parsedValues: string[] = [];
+    for (let i = 0; i < valuesPerKey; i++) {
+      parsedValues.push(encodeData([i + start]));
+    }
+    values.push(parsedValues.join(';'));
+  }
+
+  const receipts = [];
+  for (const contract of contractWrappers) {
+    receipts.push(await contract.setFeeds(keys, values, descriptions));
+  }
+
+  const receiptsGeneric = [];
+  for (const contract of genericContractWrappers) {
+    receiptsGeneric.push(await contract.setFeeds(keys, values, descriptions));
+  }
+
+  return { receipts, receiptsGeneric, keys, values, descriptions };
 };
 
 export const printGasUsage = async <
