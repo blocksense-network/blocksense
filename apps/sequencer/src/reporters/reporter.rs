@@ -25,7 +25,8 @@ fn init_reporters() -> HashMap<u64, Arc<RwLock<Reporter>>> {
             i as u64,
             Arc::new(RwLock::new(Reporter {
                 pub_key: "".to_string(),
-                reporter_metrics: ReporterMetrics::new(i),
+                reporter_metrics: ReporterMetrics::new(i)
+                    .expect("Failed to allocate ReporterMetrics."),
             })),
         );
     }

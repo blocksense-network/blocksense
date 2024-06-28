@@ -120,7 +120,8 @@ pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
                 contract_address: address,
                 provider,
                 wallet,
-                provider_metrics: ProviderMetrics::new(key),
+                provider_metrics: ProviderMetrics::new(key)
+                    .expect("Failed to allocate ProviderMetrics"),
             })),
         );
     }
