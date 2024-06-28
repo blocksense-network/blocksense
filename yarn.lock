@@ -444,6 +444,7 @@ __metadata:
     "@emotion/styled": "npm:^11.11.5"
     "@types/node": "npm:^20.14.2"
     "@types/react": "npm:^18.3.3"
+    "@types/react-dom": "npm:^18.3.0"
     autoprefixer: "npm:^10.4.19"
     next: "npm:^14.2.3"
     nextra: "npm:^2.13.4"
@@ -3005,7 +3006,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.2.7":
+"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.2.7, @types/react-dom@npm:^18.3.0":
   version: 18.3.0
   resolution: "@types/react-dom@npm:18.3.0"
   dependencies:
