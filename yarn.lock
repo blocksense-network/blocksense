@@ -449,6 +449,7 @@ __metadata:
     next: "npm:^14.2.3"
     nextra: "npm:^2.13.4"
     postcss: "npm:^8.4.38"
+    prettier: "npm:^3.3.1"
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-vertical-timeline-component: "npm:^3.6.0"
