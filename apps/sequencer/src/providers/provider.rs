@@ -121,7 +121,7 @@ fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
             Arc::new(Mutex::new(RpcProvider {
                 contract_address: address,
                 provider,
-                wallet: wallet,
+                wallet,
                 provider_metrics: ProviderMetrics::new(key),
             })),
         );

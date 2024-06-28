@@ -44,20 +44,18 @@ pub async fn feeds_slots_manager_loop<
                 .expect(lock_err_msg)
                 .get_first_report_start_time_ms();
 
-            collected_futures.push(spawn(
-                async move {
-                    feed_slots_processor_loop(
-                        send_channel,
-                        feed,
-                        name,
-                        report_interval_ms,
-                        first_report_start_time,
-                        rc,
-                        key,
-                    )
-                }
-                .await,
-            ));
+            collected_futures.push(spawn(async move {
+                feed_slots_processor_loop(
+                    send_channel,
+                    feed,
+                    name,
+                    report_interval_ms,
+                    first_report_start_time,
+                    rc,
+                    key,
+                )
+                .await
+            }));
         }
         drop(reg);
         let result = futures::future::join_all(collected_futures).await;

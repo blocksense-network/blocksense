@@ -71,7 +71,7 @@ impl FeedMetaData {
             return ReportRelevance::NonRelevantInFuture;
         }
         debug!("Accepted report!");
-        return ReportRelevance::Relevant;
+        ReportRelevance::Relevant
     }
 }
 

@@ -60,7 +60,7 @@ async fn get_key_from_contract(
 
     let result = provider.call(&tx).await?;
     info!("Call result: {:?}", result);
-    return Ok(result.to_string());
+    Ok(result.to_string())
 }
 
 #[get("/deploy/{network}")]
@@ -118,15 +118,14 @@ async fn set_log_level(
         .parse()?;
     info!("set_log_level called with {}", log_level);
     if let Some(val) = req.connection_info().realip_remote_addr() {
-        if val == "127.0.0.1" {
-            if app_state
+        if val == "127.0.0.1"
+            && app_state
                 .log_handle
                 .lock()
                 .expect("Could not acquire GLOBAL_LOG_HANDLE's mutex")
                 .set_logging_level(log_level.as_str())
-            {
-                return Ok(HttpResponse::Ok().into());
-            }
+        {
+            return Ok(HttpResponse::Ok().into());
         }
     }
     Ok(HttpResponse::BadRequest().into())
