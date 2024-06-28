@@ -3,6 +3,8 @@ use alloy::node_bindings::Anvil;
 use curl::easy::Handler;
 use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
+use data_feeds::feeds_processing::naive_packing;
+use data_feeds::types::FeedType;
 use eyre::Result;
 use port_scanner::scan_port;
 use serde_json::json;
@@ -118,7 +120,7 @@ fn cleanup_spawned_processes() {
 }
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
-const REPORT_VAL: &str = "47a0284000000000000000000000000000000000000000000000000000000000";
+const REPORT_VAL: FeedType = FeedType::Numerical(80100.5);
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -172,10 +174,12 @@ async fn main() -> Result<()> {
     );
 
     assert!(
-        send_get_request("127.0.0.1:8877/get_key/ETH1/00000001") == "0x".to_string() + REPORT_VAL
+        send_get_request("127.0.0.1:8877/get_key/ETH1/00000001")
+            == "0x".to_string() + naive_packing(REPORT_VAL).as_str()
     );
     assert!(
-        send_get_request("127.0.0.1:8877/get_key/ETH2/00000001") == "0x".to_string() + REPORT_VAL
+        send_get_request("127.0.0.1:8877/get_key/ETH2/00000001")
+            == "0x".to_string() + naive_packing(REPORT_VAL).as_str()
     );
 
     cleanup_spawned_processes();

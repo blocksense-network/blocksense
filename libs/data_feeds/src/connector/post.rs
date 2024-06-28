@@ -4,7 +4,10 @@ use std::{
     rc::Rc,
 };
 
-use crate::{interfaces::data_feed::DataFeed, types::{DataFeedPayload, FeedError, FeedResult, FeedType, PayloadMetaData, Timestamp}};
+use crate::{
+    interfaces::data_feed::DataFeed,
+    types::{DataFeedPayload, FeedError, FeedResult, FeedType, PayloadMetaData, Timestamp},
+};
 use curl::easy::Easy;
 use serde_json::{json, Value};
 use utils::generate_string_hash;
@@ -15,22 +18,20 @@ fn handle_feed_response(
     timestamp: Timestamp,
     result: FeedResult,
 ) -> Value {
-
     let payload = DataFeedPayload {
         payload_metadata: PayloadMetaData {
             reporter_id,
             feed_id,
             timestamp,
         },
-        result
+        result,
     };
     let serialized_payload = serde_json::to_value(&payload);
 
     match serialized_payload {
         Ok(payload) => payload,
-        Err(_) => panic!("Failed serialization of payload!") //TODO(snikolov): Handle without panic
+        Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
     }
-
 }
 
 pub async fn post_feed_response(
@@ -44,8 +45,7 @@ pub async fn post_feed_response(
 
     let feed_hash = generate_string_hash(feed_asset_name);
 
-    let payload_json =
-        handle_feed_response(reporter_id, feed_hash.to_string(), timestamp, result);
+    let payload_json = handle_feed_response(reporter_id, feed_hash.to_string(), timestamp, result);
 
     println!("\nPayload: {:?}", payload_json);
 

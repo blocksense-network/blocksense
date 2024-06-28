@@ -1,15 +1,15 @@
 use crate::feeds::feeds_registry::AllFeedsReports;
 use crate::feeds::feeds_registry::FeedMetaData;
-use crate::utils::byte_utils::to_hex_string;
 use crate::utils::time_utils::{get_ms_since_epoch, SlotTimeTracker};
+use data_feeds::feeds_processing::naive_packing;
+use data_feeds::types::FeedType;
 use eyre::Report;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::{debug, info};
-use data_feeds::types::FeedType;
-use crate::feeds::feeds_processing::naive_packing;
+use utils::to_hex_string;
 
 pub async fn feed_slots_processor_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
@@ -68,7 +68,6 @@ pub async fn feed_slots_processor_loop<
 
             key_post = key;
             result_post_to_contract = feed.read().unwrap().get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
-                    info!("result_post_to_contract = {:?}", result_post_to_contract);
             info!("result_post_to_contract = {:?}", result_post_to_contract);
             reports.clear();
         }
@@ -76,7 +75,7 @@ pub async fn feed_slots_processor_loop<
         result_send
             .send((
                 to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
-                naive_packing(result_post_to_contract).into()
+                naive_packing(result_post_to_contract).into(),
             ))
             .unwrap();
     }

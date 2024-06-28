@@ -14,7 +14,6 @@ impl Display for AverageAggregator {
     }
 }
 
-
 impl FeedAggregate for AverageAggregator {
     fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
         let num_elements = values.len() as f64;

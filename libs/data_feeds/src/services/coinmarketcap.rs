@@ -4,9 +4,7 @@ use ringbuf::{self, storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use utils::{current_unix_time, get_env_var};
 
 use crate::{
-    interfaces::{
-        api_connect::ApiConnect, data_feed::DataFeed, historical::Historical,
-    },
+    interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical},
     types::{ConsensusMetric, DataFeedAPI, FeedError, FeedResult, FeedType, Timestamp},
 };
 use derive::{ApiConnect, Historical};
@@ -57,11 +55,16 @@ impl DataFeed for CoinMarketCapDataFeed {
         println!("{:?}", response);
         match response {
             Ok(response) => (
-                FeedResult::Result {result: FeedType::Numerical(response)},
+                FeedResult::Result {
+                    result: FeedType::Numerical(response),
+                },
                 current_unix_time(),
             ),
             Err(_) => (
-                FeedResult::Error { error: FeedError::APIError("CoinMarketCap poll failed!".to_string())}, current_unix_time()
+                FeedResult::Error {
+                    error: FeedError::APIError("CoinMarketCap poll failed!".to_string()),
+                },
+                current_unix_time(),
             ),
         }
     }

@@ -229,7 +229,8 @@ impl OracleTrigger {
         sequencer: String,
     ) -> TerminationReason {
         while let Some((feed_id, payload)) = rx.recv().await {
-            let payload_json = DataFeedPayload { //TODO(snikolov): Replace with new struct.
+            let payload_json = DataFeedPayload {
+                //TODO(snikolov): Replace with new struct.
                 reporter_id: 1,
                 feed_id,
                 timestamp: current_unix_time(),

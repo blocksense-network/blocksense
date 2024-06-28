@@ -1,15 +1,14 @@
 use super::super::utils::time_utils::get_ms_since_epoch;
 use eyre::Result;
 
-use super::super::feeds::feeds_processing::REPORT_HEX_SIZE;
 use super::super::feeds::feeds_registry::{get_feed_id, ReportRelevance};
 use super::super::feeds::feeds_state::FeedsState;
 use actix_web::web;
 use actix_web::{error, Error};
 use actix_web::{post, HttpResponse};
+use data_feeds::feeds_processing::REPORT_HEX_SIZE;
 use futures::StreamExt;
 
-use super::super::utils::byte_utils::to_hex_string;
 use tracing::{debug, trace, warn};
 
 use crate::inc_reporter_metric;

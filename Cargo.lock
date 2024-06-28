@@ -2902,6 +2902,7 @@ name = "data_feeds"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "assert_cmd",
  "async-trait",
  "cmc",
  "curl",
@@ -7892,7 +7893,6 @@ dependencies = [
  "actix-test",
  "actix-web",
  "alloy",
- "assert_cmd",
  "async-channel 2.3.1",
  "bytes 1.6.0",
  "conv",
@@ -7915,6 +7915,7 @@ dependencies = [
  "tokio 1.37.0",
  "tracing",
  "tracing-subscriber",
+ "utils",
 ]
 
 [[package]]
@@ -7923,6 +7924,7 @@ version = "0.0.1"
 dependencies = [
  "alloy",
  "curl",
+ "data_feeds",
  "eyre",
  "futures",
  "port_scanner",
