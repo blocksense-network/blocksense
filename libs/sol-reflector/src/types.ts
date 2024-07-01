@@ -58,6 +58,7 @@ export type FunctionModifierKind =
   | 'baseConstructorSpecifier';
 
 export interface NatSpec {
+  author?: string;
   title?: string;
   notice?: string;
   dev?: string;

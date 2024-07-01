@@ -144,7 +144,10 @@ export function extractFields<T extends {}, U extends Partial<T>>(
 
   for (const key of keysOf(result)) {
     if (key in obj) {
-      result[key] = obj[key as string];
+      result[key] = obj[key as unknown as keyof T] as unknown as U[Extract<
+        keyof U,
+        string
+      >];
     }
   }
   return result;

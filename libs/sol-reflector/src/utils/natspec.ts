@@ -52,7 +52,8 @@ export function parseNatspec(node: ASTNode): NatSpec {
       case '@author':
       case '@notice':
       case '@dev':
-        natSpec[tag.replace('@', '')] = content;
+        type NatSpecField = 'title' | 'author' | 'notice' | 'dev';
+        natSpec[tag.replace('@', '') as NatSpecField] = content;
         break;
       case '@param':
         const paramMatches = content.match(/(\w+) ([^]*)/);

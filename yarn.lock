@@ -481,7 +481,6 @@ __metadata:
   dependencies:
     "@types/mocha": "npm:^7.0.2"
     "@types/node": "npm:^20.12.13"
-    code-style: "github:OpenZeppelin/code-style"
     hardhat: "npm:^2.22.4"
     solidity-ast: "npm:^0.4.56"
     ts-node: "npm:^10.9.2"
@@ -4477,13 +4476,6 @@ __metadata:
   version: 10.1.1
   resolution: "code-block-writer@npm:10.1.1"
   checksum: 10c0/8573816797ac20256b22d0c9c72743f6dcbcef2cb7e08e7761b3f7a3f2cdd3abe1c66ed9dda123f7c1e5e3746a5528fe3c09473758f1d1555fe4c69add334b28
-  languageName: node
-  linkType: hard
-
-"code-style@github:OpenZeppelin/code-style":
-  version: 0.1.0
-  resolution: "code-style@https://github.com/OpenZeppelin/code-style.git#commit=a6cd128e6f5225b15d76704708c5def97caa8176"
-  checksum: 10c0/c52348766268954f79e8a4962064dbec8625486c43d45f211e23a2d3296dc2c339c7ec0b86918ed9655abf72c184452041dfb23b980ae43e5052f159d3a0d506
   languageName: node
   linkType: hard
 

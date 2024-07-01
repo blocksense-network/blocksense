@@ -190,7 +190,7 @@ function deriveEnums(node: ASTNode): EnumDocItem[] | undefined {
     (n, parsed) => {
       return {
         ...parsed,
-        _members: n.members.map(m => m.name),
+        _members: n.members.map((m: EnumDefinition) => m.name),
       };
     },
   );
@@ -293,6 +293,9 @@ function getSignature(node: ASTNode): string | undefined {
 
     case 'VariableDeclaration':
       return formatVariable(node);
+
+    default:
+      return undefined;
   }
 }
 
