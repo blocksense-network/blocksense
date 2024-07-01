@@ -150,3 +150,6 @@ _vercel-deployment-url
 
 # RustRover
 .idea/
+
+# Auto-generated doc files
+apps/docs.blocksense.network/pages/docs/contracts/reference-documentation/*.mdx

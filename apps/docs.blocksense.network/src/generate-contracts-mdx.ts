@@ -31,7 +31,7 @@ const getFileName = (absolutePath: string) => {
     const fileName = getFileName(sourceUnit.absolutePath);
     const filePath = path.join(
       __dirname,
-      `../pages/docs/contracts/${fileName}`,
+      `../pages/docs/contracts/reference-documentation/${fileName}`,
     );
 
     try {
