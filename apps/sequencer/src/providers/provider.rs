@@ -10,15 +10,14 @@ use alloy::{
 };
 use reqwest::{Client, Url};
 
+use super::super::config::config::SequencerConfig;
 use super::provider_metrics::ProviderMetrics;
-use envload::Envload;
-use envload::LoadEnv;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use tracing::info;
+use tracing::debug;
 
 pub type ProviderType = FillProvider<
     JoinFill<
@@ -29,35 +28,6 @@ pub type ProviderType = FillProvider<
     Http<Client>,
     Ethereum,
 >;
-
-#[derive(Envload)]
-pub struct SequencerConfig {
-    rpc_url: Url,
-    private_key: String,
-    contract_address: Option<String>,
-}
-
-pub fn get_wallet() -> LocalWallet {
-    let env = <SequencerConfig as LoadEnv>::load_env();
-    let priv_key = fs::read_to_string(env.private_key.clone())
-        .expect(format!("Failed to read private key from {}", env.private_key).as_str());
-
-    let wallet: LocalWallet = priv_key
-        .trim()
-        .parse()
-        .expect("Incorrect private key specified.");
-    wallet
-}
-
-pub fn get_contract_address() -> Address {
-    let env = <SequencerConfig as LoadEnv>::load_env();
-    let contract_address: Address = env
-        .contract_address
-        .expect("Contract address not provided in environment.")
-        .parse()
-        .expect("Contract address not found.");
-    contract_address
-}
 
 pub fn parse_contract_address(addr: &str) -> Option<Address> {
     let contract_address: Option<Address> = addr.parse().ok();
@@ -74,34 +44,26 @@ pub struct RpcProvider {
 
 pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
-pub fn init_shared_rpc_providers() -> SharedRpcProviders {
-    Arc::new(std::sync::RwLock::new(get_rpc_providers()))
+pub fn init_shared_rpc_providers(conf: &SequencerConfig) -> SharedRpcProviders {
+    Arc::new(std::sync::RwLock::new(get_rpc_providers(conf)))
 }
 
-pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
+fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
-    let mut urls: HashMap<String, String> = HashMap::new();
-    let mut keys: HashMap<String, String> = HashMap::new();
-    let mut contract_addresses: HashMap<String, String> = HashMap::new();
 
-    for (key, value) in env::vars() {
-        if let Some(name) = key.strip_prefix("WEB3_URL_") {
-            urls.insert(name.to_string(), value);
-        } else if let Some(name) = key.strip_prefix("WEB3_PRIVATE_KEY_") {
-            keys.insert(name.to_string(), value);
-        } else if let Some(name) = key.strip_prefix("WEB3_CONTRACT_ADDRESS_") {
-            contract_addresses.insert(name.to_string(), value);
-        }
-    }
-    for (key, value) in &urls {
-        let rpc_url: Url = value
+    for (key, p) in &conf.providers {
+        let rpc_url: Url = p
+            .url
             .parse()
             .expect(format!("Not a valid url provided for {key}!").as_str());
-        let priv_key = keys
-            .get(key)
-            .expect(format!("No key provided for {key}!").as_str());
-        let priv_key = fs::read_to_string(priv_key)
-            .expect(format!("Failed to read private key for {} from {}", key, priv_key).as_str());
+        let priv_key_path = &p.private_key_path;
+        let priv_key = fs::read_to_string(priv_key_path.clone()).expect(
+            format!(
+                "Failed to read private key for {} from {}",
+                key, priv_key_path
+            )
+            .as_str(),
+        );
         let wallet: LocalWallet = priv_key
             .trim()
             .parse()
@@ -110,25 +72,25 @@ pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
             .with_recommended_fillers()
             .signer(EthereumSigner::from(wallet.clone()))
             .on_http(rpc_url);
-        let address = match contract_addresses.get(key) {
-            Some(x) => parse_contract_address(x),
+        let address = match &p.contract_address {
+            Some(x) => parse_contract_address(x.as_str()),
             None => None,
         };
         providers.insert(
-            key.to_string(),
+            key.clone(),
             Arc::new(Mutex::new(RpcProvider {
                 contract_address: address,
                 provider,
                 wallet,
-                provider_metrics: ProviderMetrics::new(key)
+                provider_metrics: ProviderMetrics::new(&key)
                     .expect("Failed to allocate ProviderMetrics"),
             })),
         );
     }
 
-    info!("List of providers:");
+    debug!("List of providers:");
     for (key, value) in &providers {
-        info!("{}: {:?}", key, value);
+        debug!("{}: {:?}", key, value);
     }
 
     providers
@@ -137,38 +99,6 @@ pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
 // pub fn print_type<T>(_: &T) {
 //     println!("{:?}", std::any::type_name::<T>());
 // }
-
-// fn get_provider() -> RootProvider<Http<Client>> {
-//     let rpc_url = get_rpc_url();
-
-//     // Create the RPC client.
-//     let rpc_client = RpcClient::new_http(rpc_url);
-
-//     // Provider can then be instantiated using the RPC client, ReqwestProvider is an alias
-//     // RootProvider. RootProvider requires two generics N: Network and T: Transport
-//     let provider = ReqwestProvider::<Ethereum>::new(rpc_client);
-//     provider
-// }
-
-// pub fn init_shared_provider() -> Arc<Mutex<ProviderType>> {
-//     Arc::new(Mutex::new(get_provider()))
-// }
-
-pub fn get_provider() -> ProviderType {
-    // Create a provider with a signer.
-
-    let env = <SequencerConfig as LoadEnv>::load_env();
-
-    let wallet = get_wallet();
-
-    // Set up the HTTP provider with the `reqwest` crate.
-    let provider = ProviderBuilder::new()
-        .with_recommended_fillers()
-        .signer(EthereumSigner::from(wallet))
-        .on_http(env.rpc_url);
-
-    provider
-}
 
 #[cfg(test)]
 mod tests {
