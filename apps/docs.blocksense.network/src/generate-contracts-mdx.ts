@@ -4,8 +4,10 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
-import { SourceUnit } from '@/components/smart-contracts/source-unit/SourceUnit';
 import SOURCE_UNITS_JSON from '@blocksense/contracts/docs/fine';
+
+import { SourceUnit } from '@/sol-contracts-components/SourceUnit';
+import { pagesContractRefDocFolder } from './constants';
 
 const generateMarkdownContent = (sourceUnit: SourceUnitDocItem) => {
   const sourceUnitComponent = React.createElement(SourceUnit, { sourceUnit });
@@ -29,10 +31,7 @@ const getFileName = (absolutePath: string) => {
   (sourceUnit: SourceUnitDocItem) => {
     const content = generateMarkdownContent(sourceUnit);
     const fileName = getFileName(sourceUnit.absolutePath);
-    const filePath = path.join(
-      __dirname,
-      `../pages/docs/contracts/reference-documentation/${fileName}`,
-    );
+    const filePath = path.join(pagesContractRefDocFolder + fileName);
 
     try {
       fs.writeFileSync(filePath, content);

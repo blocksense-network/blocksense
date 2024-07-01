@@ -1,9 +1,11 @@
 import React from 'react';
 
+import { ghContractFolder } from '@/src/constants';
+
 type AbsolutePathProps = {
   absolutePath: string;
 };
 
 export const AbsolutePath = ({ absolutePath }: AbsolutePathProps) => {
-  return <span>{absolutePath}</span>;
+  return <span>{ghContractFolder + absolutePath}</span>;
 };
