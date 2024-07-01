@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import {
   DataFeed,
   GenericDataFeedStore,
-  initConsumerWrappers,
+  initWrappers,
 } from './utils/helpers/common';
 import { compareConsumerGasUsed } from './utils/helpers/consumerGasHelpers';
 import {
@@ -26,13 +26,13 @@ describe('DataFeedConsumer', function () {
     contractWrappers = [];
     genericContractWrappers = [];
 
-    await initConsumerWrappers(contractWrappers, [
+    await initWrappers(contractWrappers, [
       DataFeedStoreConsumerV1Wrapper,
       DataFeedStoreConsumerV2Wrapper,
       DataFeedStoreConsumerV3Wrapper,
     ]);
 
-    await initConsumerWrappers(genericContractWrappers, [
+    await initWrappers(genericContractWrappers, [
       DataFeedStoreGenericConsumerV1Wrapper,
       DataFeedStoreGenericConsumerV2Wrapper,
     ]);

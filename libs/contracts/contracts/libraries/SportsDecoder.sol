@@ -4,41 +4,93 @@ pragma solidity ^0.8.24;
 import './BytesLib.sol';
 
 library SportsDecoder {
+  struct FootballData {
+    uint32 homeScore;
+    uint32 awayScore;
+    uint32 homeShots;
+    uint32 awayShots;
+    uint32 homePenalties;
+    uint32 awayPenalties;
+    uint32 homeSaves;
+    uint32 awaySaves;
+    uint32 homeFirstHalfTimeScore;
+    uint32 awayFirstHalfTimeScore;
+  }
+
+  struct BasketballData {
+    uint32 homeScore;
+    uint32 awayScore;
+    uint32 homeShots;
+    uint32 awayShots;
+    uint32 homeBlocks;
+    uint32 awayBlocks;
+    uint32 homeSteals;
+    uint32 awaySteals;
+    uint32 homeTurnovers;
+    uint32 awayTurnovers;
+    uint32 homeFirstQtrScore;
+    uint32 awayFirstQtrScore;
+    uint32 homeSecondQtrScore;
+    uint32 awaySecondQtrScore;
+    uint32 homeThirdQtrScore;
+    uint32 awayThirdQtrScore;
+    uint32 homeFourthQtrScore;
+    uint32 awayFourthQtrScore;
+  }
+
   function decodeFootballData(
     uint32 key,
     address dataFeedStore
-  )
-    internal
-    view
-    returns (
-      uint32,
-      uint32,
-      uint32,
-      uint32,
-      uint32,
-      uint32,
-      uint32,
-      uint32,
-      uint32,
-      uint32
-    )
-  {
+  ) internal returns (FootballData memory) {
     bytes memory data = fetchData(key, 2, dataFeedStore);
 
     uint256 decoded1 = BytesLib.toUint256(data, 0);
-    uint64 decoded2 = BytesLib.toUint64(data, 32);
-    return (
-      uint32(decoded1 >> 224),
-      uint32(decoded1 >> 192),
-      uint32(decoded1 >> 160),
-      uint32(decoded1 >> 128),
-      uint32(decoded1 >> 96),
-      uint32(decoded1 >> 64),
-      uint32(decoded1 >> 32),
-      uint32(decoded1),
-      uint32(decoded2 >> 32),
-      uint32(decoded2)
-    );
+    uint256 decoded2 = BytesLib.toUint256(data, 32);
+    return
+      FootballData(
+        uint32(decoded1 >> 224),
+        uint32(decoded1 >> 192),
+        uint32(decoded1 >> 160),
+        uint32(decoded1 >> 128),
+        uint32(decoded1 >> 96),
+        uint32(decoded1 >> 64),
+        uint32(decoded1 >> 32),
+        uint32(decoded1),
+        uint32(decoded2 >> 32),
+        uint32(decoded2)
+      );
+  }
+
+  function decodeBasketballData(
+    uint32 key,
+    address dataFeedStore
+  ) internal returns (BasketballData memory) {
+    bytes memory data = fetchData(key, 3, dataFeedStore);
+    uint256 decoded1 = BytesLib.toUint256(data, 0);
+    uint256 decoded2 = BytesLib.toUint256(data, 32);
+    uint256 decoded3 = BytesLib.toUint256(data, 64);
+
+    return
+      BasketballData(
+        uint32(decoded1 >> 224),
+        uint32(decoded1 >> 192),
+        uint32(decoded1 >> 160),
+        uint32(decoded1 >> 128),
+        uint32(decoded1 >> 96),
+        uint32(decoded1 >> 64),
+        uint32(decoded1 >> 32),
+        uint32(decoded1),
+        uint32(decoded2 >> 224),
+        uint32(decoded2 >> 192),
+        uint32(decoded2 >> 160),
+        uint32(decoded2 >> 128),
+        uint32(decoded2 >> 96),
+        uint32(decoded2 >> 64),
+        uint32(decoded2 >> 32),
+        uint32(decoded2),
+        uint32(decoded3 >> 32),
+        uint32(decoded3)
+      );
   }
 
   function fetchData(

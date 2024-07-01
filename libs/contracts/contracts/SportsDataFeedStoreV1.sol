@@ -19,8 +19,6 @@ contract SportsDataFeedStoreV1 {
   /// @dev The owner is the address that deployed the contract
   address internal immutable owner;
 
-  mapping(uint => uint[]) public slots;
-
   /// @notice Constructor
   /// @dev Sets the owner of the contract - the address that deployed the contract
   constructor() {

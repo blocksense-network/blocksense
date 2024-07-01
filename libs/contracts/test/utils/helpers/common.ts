@@ -11,9 +11,11 @@ import {
   HistoricDataFeedStoreGenericV1,
   HistoricDataFeedStoreV1,
   HistoricDataFeedStoreV2,
+  SportsConsumer as BaseSportsConsumer,
+  SportsGenericConsumer,
 } from '../../../typechain';
 import { RpcStructLog } from 'hardhat/internal/hardhat-network/provider/output';
-import { IBaseWrapper, IConsumerWrapper, IWrapper } from '../wrappers';
+import { IBaseWrapper, IWrapper } from '../wrappers';
 
 export type GenericDataFeedStore =
   | DataFeedStoreGenericV1
@@ -29,18 +31,24 @@ export type GenericHistoricDataFeedStore = HistoricDataFeedStoreGenericV1;
 
 export type Consumer = BaseConsumer | HistoricConsumer;
 
+export type SportsConsumer = BaseSportsConsumer | SportsGenericConsumer;
+
 export interface TransmissionData {
   value: string;
   timestamp: bigint;
 }
 
-const encodeData = (data: number[]) => {
-  return ethers
-    .solidityPacked(
-      data.map(() => 'uint32'),
-      data,
-    )
-    .padEnd(66, '0');
+export const encodeData = (data: number[]) => {
+  return (
+    '0x' +
+    ethers
+      .solidityPacked(
+        data.map(() => 'uint32'),
+        data,
+      )
+      .slice(2)
+      .padStart(64, '0')
+  );
 };
 
 export const setDataFeeds = async <
@@ -76,19 +84,19 @@ export const setSportsDataFeeds = async <
 >(
   genericContractWrappers: IWrapper<G>[],
   contractWrappers: IWrapper<B>[],
-  valuesPerKeysCount: number[],
+  valuesPerKeyCount: number[],
   start: number = 0,
 ) => {
   const keys = Array.from(
-    { length: valuesPerKeysCount.length },
-    (_, i) => i + (i > 0 ? valuesPerKeysCount[i - 1] : 0) + start,
+    { length: valuesPerKeyCount.length },
+    (_, i) => i + (i > 0 ? valuesPerKeyCount[i - 1] : 0) + start,
   );
   const values: string[] = [];
   const descriptions: string[] = keys.map(key =>
     ethers.encodeBytes32String(`Hello, World! ${key}`),
   );
 
-  for (const valuesPerKey of valuesPerKeysCount) {
+  for (const valuesPerKey of valuesPerKeyCount) {
     const parsedValues: string[] = [];
     for (let i = 0; i < valuesPerKey; i++) {
       parsedValues.push(encodeData([i + start]));
@@ -141,6 +149,7 @@ export const logTable = async (
     diff: 0,
     '%': 0,
   };
+
   for (const receipt of receiptsGeneric) {
     const version = map[ethers.getAddress(receipt.to)];
     table[version] = { gas: Number(receipt?.gasUsed), diff: 0, '%': 0 };
@@ -187,21 +196,6 @@ export const initWrappers = async <
   for (const [index, c] of classes.entries()) {
     const contract = new c();
     await contract.init(...(args[index] || []));
-    wrappers.push(contract);
-  }
-};
-
-export const initConsumerWrappers = async <
-  C extends BaseContract,
-  B extends BaseContract,
-  T extends new (...args: any[]) => IConsumerWrapper<C, B>,
->(
-  wrappers: IConsumerWrapper<C, B>[],
-  classes: T[],
-) => {
-  for (const c of classes) {
-    const contract = new c();
-    await contract.init();
     wrappers.push(contract);
   }
 };

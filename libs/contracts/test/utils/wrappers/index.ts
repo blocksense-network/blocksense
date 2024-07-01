@@ -32,6 +32,12 @@ import { SportsDataFeedStoreV2Wrapper } from './sports/V2';
 import { SportsDataFeedStoreGenericV1Wrapper } from './sports/GenericV1';
 import { SportsDataFeedStoreGenericV2Wrapper } from './sports/GenericV2';
 
+import { SportsDataFeedStoreConsumerBaseWrapper } from './consumers/sports/Base';
+import { SportsDataFeedStoreConsumerV1Wrapper } from './consumers/sports/V1';
+import { SportsDataFeedStoreConsumerV2Wrapper } from './consumers/sports/V2';
+import { SportsDataFeedStoreGenericConsumerV1Wrapper } from './consumers/sports/GenericV1';
+import { SportsDataFeedStoreGenericConsumerV2Wrapper } from './consumers/sports/GenericV2';
+
 import { UpgradeableProxyBaseWrapper } from './upgradeable/Base';
 import { UpgradeableProxyDataFeedStoreV1Wrapper } from './upgradeable/V1';
 import { UpgradeableProxyDataFeedStoreV2Wrapper } from './upgradeable/V2';
@@ -59,6 +65,7 @@ import { IConsumerWrapper } from './interfaces/IConsumerWrapper';
 import { IHistoricConsumerWrapper } from './interfaces/IHistoricConsumerWrapper';
 import { IHistoricWrapper } from './interfaces/IHistoricWrapper';
 import { ISportsWrapper } from './interfaces/ISportsWrapper';
+import { ISportsConsumerWrapper } from './interfaces/ISportsConsumerWrapper';
 
 export {
   DataFeedStoreBaseWrapper,
@@ -97,6 +104,13 @@ export {
   SportsDataFeedStoreGenericV1Wrapper,
   SportsDataFeedStoreGenericV2Wrapper,
 
+  // sports consumers
+  SportsDataFeedStoreConsumerBaseWrapper,
+  SportsDataFeedStoreConsumerV1Wrapper,
+  SportsDataFeedStoreConsumerV2Wrapper,
+  SportsDataFeedStoreGenericConsumerV1Wrapper,
+  SportsDataFeedStoreGenericConsumerV2Wrapper,
+
   // upgradable proxy
   UpgradeableProxyBaseWrapper,
   UpgradeableProxyDataFeedStoreV1Wrapper,
@@ -133,4 +147,5 @@ export {
   IHistoricConsumerWrapper,
   IHistoricWrapper,
   ISportsWrapper,
+  ISportsConsumerWrapper,
 };
