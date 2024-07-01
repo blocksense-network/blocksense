@@ -14,29 +14,13 @@ pub async fn votes_result_batcher_loop<
 >(
     mut vote_recv: UnboundedReceiver<(K, V)>,
     batched_votes_send: UnboundedSender<HashMap<K, V>>,
+    max_keys_to_batch: usize,
+    timeout_duration: u64,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     spawn(async move {
         let span = info_span!("VotesResultBatcher");
         let _guard = span.enter();
-        let batch_size_env = "SEQUENCER_MAX_KEYS_TO_BATCH";
-        let max_keys_to_batch = match env::var(batch_size_env) {
-            Ok(batch_size) => batch_size
-                .parse::<usize>()
-                .expect(format!("{} should be an unsigned integer.", batch_size_env).as_str()),
-            Err(_) => 1,
-        };
         info!("max_keys_to_batch set to {}", max_keys_to_batch);
-        let duration_env = "SEQUENCER_KEYS_BATCH_DURATION";
-        let timeout_duration = match env::var(duration_env) {
-            Ok(duration_env) => duration_env.parse::<u64>().expect(
-                format!(
-                    "{} should be an unsigned integer in milliseconds.",
-                    duration_env
-                )
-                .as_str(),
-            ),
-            Err(_) => 500,
-        };
         info!("timeout_duration set to {}", timeout_duration);
 
         let mut stt = SlotTimeTracker::new(

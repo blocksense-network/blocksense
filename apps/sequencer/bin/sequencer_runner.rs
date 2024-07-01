@@ -24,9 +24,13 @@ use sequencer::utils::logging::init_shared_logging_handle;
 
 use actix_web::rt::spawn;
 use futures::stream::FuturesUnordered;
+use sequencer::config::config::init_sequencer_config;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let log_handle = init_shared_logging_handle();
+    let sequencer_config = init_sequencer_config();
+
     // This trigger spawns threads, which Ctrl+C does not kill.  So
     // for this case we need to detect Ctrl+C and shut those threads
     // down.  For simplicity, we do this by terminating the process.
@@ -35,14 +39,14 @@ async fn main() -> std::io::Result<()> {
         std::process::exit(0);
     });
 
-    let providers = init_shared_rpc_providers();
+    let providers = init_shared_rpc_providers(&sequencer_config);
 
     let app_state = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data())),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
         plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
         providers: providers.clone(),
-        log_handle: init_shared_logging_handle(),
+        log_handle,
         reporters: init_shared_reporters(),
     });
 
@@ -54,7 +58,13 @@ async fn main() -> std::io::Result<()> {
 
     let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
 
-    let votes_batcher = votes_result_batcher_loop(vote_recv, batched_votes_send).await;
+    let votes_batcher = votes_result_batcher_loop(
+        vote_recv,
+        batched_votes_send,
+        sequencer_config.max_keys_to_batch,
+        sequencer_config.keys_batch_duration,
+    )
+    .await;
 
     let votes_sender = votes_result_sender_loop(batched_votes_recv, providers).await;
 
