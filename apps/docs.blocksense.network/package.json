@@ -2,8 +2,8 @@
   "name": "@blocksense/docs.blocksense.network",
   "version": "0.0.0",
   "scripts": {
-    "build:deps": "yarn workspace @blocksense/docs-theme build",
-    "build": "yarn build:tsc && yarn build:deps && next build",
+    "build:deps": "yarn workspace @blocksense/docs-theme build && yarn workspace @blocksense/contracts sol-reflect",
+    "build": "yarn build:deps && yarn build:tsc && next build",
     "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
     "dev": "next",
     "ready-dev-go": "yarn build:deps && yarn dev",
