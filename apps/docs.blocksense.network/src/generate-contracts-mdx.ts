@@ -1,36 +1,29 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
 
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
-import SOURCE_UNITS_JSON from '@blocksense/contracts/docs/fine';
 
 import { SourceUnit } from '@/sol-contracts-components/SourceUnit';
 import { pagesContractRefDocFolder } from './constants';
+import { createStaticComponent } from './utils';
 
-const generateMarkdownContent = (sourceUnit: SourceUnitDocItem) => {
+import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
+const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
+
+function generateMarkdownContent(sourceUnit: SourceUnitDocItem): string {
   const sourceUnitComponent = React.createElement(SourceUnit, { sourceUnit });
-  let componentString =
-    ReactDOMServer.renderToStaticMarkup(sourceUnitComponent);
+  const staticComponent = createStaticComponent(sourceUnitComponent);
 
-  componentString = componentString.replace(/class="/g, 'className="');
+  return staticComponent;
+}
 
-  return componentString;
-};
-
-const getFileName = (absolutePath: string) => {
-  const absolutePathParts = absolutePath.split('/');
-  const fileNameWithExtension = `${absolutePathParts[absolutePathParts.length - 1]}.mdx`;
-  const fileName = fileNameWithExtension.split('.')[0] + '.mdx';
-
-  return fileName;
-};
-
-(SOURCE_UNITS_JSON as SourceUnitDocItem[]).forEach(
-  (sourceUnit: SourceUnitDocItem) => {
+function generateSolRefDocFiles() {
+  solReflection.forEach((sourceUnit: SourceUnitDocItem) => {
     const content = generateMarkdownContent(sourceUnit);
-    const fileName = getFileName(sourceUnit.absolutePath);
+    const fileName = path
+      .basename(sourceUnit.absolutePath)
+      .replace('.sol', '.mdx');
     const filePath = path.join(pagesContractRefDocFolder + fileName);
 
     try {
@@ -39,5 +32,7 @@ const getFileName = (absolutePath: string) => {
     } catch (err) {
       console.error(`Error writing ${fileName}:`, err);
     }
-  },
-);
+  });
+}
+
+generateSolRefDocFiles();
