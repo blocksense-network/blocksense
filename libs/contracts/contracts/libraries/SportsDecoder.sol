@@ -3,7 +3,13 @@ pragma solidity ^0.8.24;
 
 import './BytesLib.sol';
 
+/// @title SportsDecoder
+/// @notice Decoder for stored packed sports data
 library SportsDecoder {
+  // TODO update structs when data layout is available
+
+  /// @notice Example football data struct
+  /// @dev Using structs avoids hitting the EVM stack limit
   struct FootballData {
     uint32 homeScore;
     uint32 awayScore;
@@ -17,6 +23,7 @@ library SportsDecoder {
     uint32 awayFirstHalfTimeScore;
   }
 
+  /// @notice Example basketball data struct
   struct BasketballData {
     uint32 homeScore;
     uint32 awayScore;
@@ -38,10 +45,14 @@ library SportsDecoder {
     uint32 awayFourthQtrScore;
   }
 
+  /// @notice Decode packed football data
+  /// @param key The key of the data feed to fetch
+  /// @param dataFeedStore The address of the data feed store
+  /// @return _footballData The decoded football data
   function decodeFootballData(
     uint32 key,
     address dataFeedStore
-  ) internal returns (FootballData memory) {
+  ) internal view returns (FootballData memory) {
     bytes memory data = fetchData(key, 2, dataFeedStore);
 
     uint256 decoded1 = BytesLib.toUint256(data, 0);
@@ -61,10 +72,14 @@ library SportsDecoder {
       );
   }
 
+  /// @notice Decode packed basketball data
+  /// @param key The key of the data feed to fetch
+  /// @param dataFeedStore The address of the data feed store
+  /// @return _basketballData The decoded basketball data
   function decodeBasketballData(
     uint32 key,
     address dataFeedStore
-  ) internal returns (BasketballData memory) {
+  ) internal view returns (BasketballData memory) {
     bytes memory data = fetchData(key, 3, dataFeedStore);
     uint256 decoded1 = BytesLib.toUint256(data, 0);
     uint256 decoded2 = BytesLib.toUint256(data, 32);
@@ -93,6 +108,11 @@ library SportsDecoder {
       );
   }
 
+  /// @notice Fetch data from the data feed store
+  /// @param key The key of the data feed to fetch
+  /// @param slotsCount The number of slots to read from the data feed storage
+  /// @param dataFeedStore The address of the data feed store
+  /// @return returnData The data read from the data feed store
   function fetchData(
     uint32 key,
     uint256 slotsCount,

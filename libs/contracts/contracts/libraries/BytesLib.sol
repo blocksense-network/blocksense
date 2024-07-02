@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: MIT
-/*
- * @title Solidity Bytes Arrays Utils
- * @author Gonçalo Sá <goncalo.sa@consensys.net>
- *
- * @dev Bytes tightly packed arrays utility library for ethereum contracts written in Solidity.
- *      The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
- */
 pragma solidity ^0.8.24;
 
+/// @title Solidity Bytes Arrays Utils
+/// @author Gonçalo Sá <goncalo.sa@consensys.net>
+/// @dev Bytes tightly packed arrays utility library for ethereum contracts written in Solidity.
+/// The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
 library BytesLib {
+  /// @notice Concatenates two byte arrays.
+  /// @dev Works for memory byte arrays.
+  /// It is optimized via inline assembly.
+  /// @param _preBytes The first byte array.
+  /// @param _postBytes The second byte array.
+  /// @return _newBytes The concatenation of the two byte arrays.
   function concat(
     bytes memory _preBytes,
     bytes memory _postBytes
@@ -86,6 +89,9 @@ library BytesLib {
     return tempBytes;
   }
 
+  /// @notice Concatenates two byte arrays in storage.
+  /// @param _preBytes The first storage byte array.
+  /// @param _postBytes The second memory byte array which will be appended to the first one.
   function concatStorage(
     bytes storage _preBytes,
     bytes memory _postBytes
@@ -229,6 +235,12 @@ library BytesLib {
     }
   }
 
+  /// @notice Returns a slice from a byte array.
+  /// @dev Will revert if the length extends beyond the length of the array.
+  /// @param _bytes The byte array to extract the slice from.
+  /// @param _start The starting position of the slice.
+  /// @param _length The length of the slice.
+  /// @return _slice The slice from the byte array.
   function slice(
     bytes memory _bytes,
     uint256 _start,
@@ -297,6 +309,11 @@ library BytesLib {
     return tempBytes;
   }
 
+  /// @notice Converts a slice of bytes array to an address.
+  /// @dev Takes 20 bytes from _start and converts them to an address.
+  /// @param _bytes The byte array containing the address.
+  /// @param _start The start position of the address.
+  /// @return _address The address extracted from the byte array.
   function toAddress(
     bytes memory _bytes,
     uint256 _start
@@ -314,6 +331,11 @@ library BytesLib {
     return tempAddress;
   }
 
+  /// @notice Converts a slice of bytes to a uint8.
+  /// @dev Takes a single byte from _start and returns it as a uint8.
+  /// @param _bytes The byte array containing the uint8 value.
+  /// @param _start The start position of the byte.
+  /// @return _uint8 The uint8 converted from the slice.
   function toUint8(
     bytes memory _bytes,
     uint256 _start
@@ -328,6 +350,11 @@ library BytesLib {
     return tempUint;
   }
 
+  /// @notice Converts a slice of bytes to a uint16.
+  /// @dev Takes 2 bytes from _start and returns them as a uint16.
+  /// @param _bytes The byte array containing the uint16 value.
+  /// @param _start The start position of the bytes.
+  /// @return _uint16 The uint16 converted from the slice.
   function toUint16(
     bytes memory _bytes,
     uint256 _start
@@ -342,6 +369,11 @@ library BytesLib {
     return tempUint;
   }
 
+  /// @notice Converts a slice of bytes to a uint32.
+  /// @dev Takes 4 bytes from _start and returns them as a uint32.
+  /// @param _bytes The byte array containing the uint32 value.
+  /// @param _start The start position of the bytes.
+  /// @return _uint32 The uint32 converted from the slice.
   function toUint32(
     bytes memory _bytes,
     uint256 _start
@@ -356,6 +388,11 @@ library BytesLib {
     return tempUint;
   }
 
+  /// @notice Converts a slice of bytes to a uint64.
+  /// @dev Takes 8 bytes from _start and returns them as a uint64.
+  /// @param _bytes The byte array containing the uint64 value.
+  /// @param _start The start position of the bytes.
+  /// @return _uint64 The uint64 converted from the slice.
   function toUint64(
     bytes memory _bytes,
     uint256 _start
@@ -370,6 +407,11 @@ library BytesLib {
     return tempUint;
   }
 
+  /// @notice Converts a slice of bytes to a uint96.
+  /// @dev Takes 12 bytes from _start and returns them as a uint96.
+  /// @param _bytes The byte array containing the uint96 value.
+  /// @param _start The start position of the bytes.
+  /// @return _uint96 The uint96 converted from the slice.
   function toUint96(
     bytes memory _bytes,
     uint256 _start
@@ -384,6 +426,11 @@ library BytesLib {
     return tempUint;
   }
 
+  /// @notice Converts a slice of bytes to a uint128.
+  /// @dev Takes 16 bytes from _start and returns them as a uint128.
+  /// @param _bytes The byte array containing the uint128 value.
+  /// @param _start The start position of the bytes.
+  /// @return _uint128 The uint128 converted from the slice.
   function toUint128(
     bytes memory _bytes,
     uint256 _start
@@ -398,6 +445,11 @@ library BytesLib {
     return tempUint;
   }
 
+  /// @notice Converts a slice of bytes to a uint256.
+  /// @dev Takes 32 bytes from _start and returns them as a uint256.
+  /// @param _bytes The byte array containing the uint256 value.
+  /// @param _start The start position of the bytes.
+  /// @return _uint256 The uint256 converted from the slice.
   function toUint256(
     bytes memory _bytes,
     uint256 _start
@@ -412,6 +464,11 @@ library BytesLib {
     return tempUint;
   }
 
+  /// @notice Converts a slice of bytes to a bytes32.
+  /// @dev Takes 32 bytes from _start and returns them as a bytes32.
+  /// @param _bytes The byte array containing the bytes32 value.
+  /// @param _start The start position of the bytes.
+  /// @return _bytes32 The bytes32 converted from the slice.
   function toBytes32(
     bytes memory _bytes,
     uint256 _start
@@ -426,6 +483,10 @@ library BytesLib {
     return tempBytes32;
   }
 
+  /// @notice Checks if two byte arrays in memory are equal.
+  /// @param _preBytes The first byte array to compare.
+  /// @param _postBytes The second byte array to compare.
+  /// @return _equal True if the byte arrays are equal. False otherwise.
   function equal(
     bytes memory _preBytes,
     bytes memory _postBytes
@@ -472,6 +533,11 @@ library BytesLib {
     return success;
   }
 
+  /// @notice Checks if two byte arrays in memory are equal.
+  /// The arrays may have tail data which is not a multiple of 32 bytes, i.e. being nonaligned.
+  /// @param _preBytes The first byte array to compare.
+  /// @param _postBytes The second byte array to compare.
+  /// @return _equal True if the byte arrays are equal. False otherwise.
   function equal_nonAligned(
     bytes memory _preBytes,
     bytes memory _postBytes
@@ -541,6 +607,10 @@ library BytesLib {
     return success;
   }
 
+  /// @notice Checks if a storage byte array is equal to a byte array in memory.
+  /// @param _preBytes The storage byte array to compare.
+  /// @param _postBytes The byte array in memory to compare.
+  /// @return _equal True if the byte arrays are equal. False otherwise.
   function equalStorage(
     bytes storage _preBytes,
     bytes memory _postBytes
