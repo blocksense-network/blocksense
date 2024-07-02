@@ -1,26 +1,44 @@
 import React from 'react';
 
 import { ContractDocItem } from '@blocksense/sol-reflector';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 
 export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
   return (
-    <div>
-      <h2>{contract.name}</h2>
-      <span>Kind: {contract.contractKind}</span>
-      <span>Abstract: {contract.abstract.toString()}</span>
-      <NatSpec natspec={contract.natspec} />
+    <Card>
+      <CardHeader>
+        <CardTitle>### {contract.name}</CardTitle>
+        <CardDescription>
+          <span>Kind: {contract.contractKind}</span>
+          <span>Abstract: {contract.abstract.toString()}</span>
+        </CardDescription>
+      </CardHeader>
       {contract._baseContracts.length > 0 && (
-        <div>
-          <h4>Base Contracts</h4>
-          <ul>
-            {contract._baseContracts.map(baseContract => (
-              <li key={baseContract}>{baseContract}</li>
-            ))}
-          </ul>
-        </div>
+        <CardContent>
+          <div>
+            <span className="text-sm text-muted-foreground">
+              Base Contracts
+            </span>
+            <ul className="ml-6 list-disc">
+              {contract._baseContracts.map(baseContract => (
+                <li key={baseContract}>{baseContract}</li>
+              ))}
+            </ul>
+          </div>
+        </CardContent>
       )}
-    </div>
+      <CardFooter>
+        <NatSpec natspec={contract.natspec} />
+      </CardFooter>
+    </Card>
   );
 };
