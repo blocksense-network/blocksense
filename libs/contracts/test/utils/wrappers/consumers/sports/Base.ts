@@ -41,7 +41,7 @@ export abstract class SportsDataFeedStoreConsumerBaseWrapper<
 
       const { data } = await this.decodeData(types[i], keys[i]);
 
-      const dataTypes = Object.keys(data).map(key => 'uint32');
+      const dataTypes = Object.keys(data).map(() => 'uint32');
       const dataValues = Object.values(data);
 
       for (const [i, parsedValue] of parsedValues.entries()) {

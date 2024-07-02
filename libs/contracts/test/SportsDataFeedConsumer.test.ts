@@ -16,6 +16,9 @@ let genericContractWrappers: SportsDataFeedStoreConsumerBaseWrapper<SportsGeneri
 
 describe('SportsDataFeedConsumer', function () {
   beforeEach(async function () {
+    contractWrappers = [];
+    genericContractWrappers = [];
+
     await initWrappers(contractWrappers, [
       SportsDataFeedStoreConsumerV1Wrapper,
       SportsDataFeedStoreConsumerV2Wrapper,
@@ -27,11 +30,19 @@ describe('SportsDataFeedConsumer', function () {
     ]);
   });
 
-  it('Should compare gas when decoding data', async function () {
+  it('Should compare gas when decoding basketball data', async function () {
     await compareSportsConsumerGasUsed(
       genericContractWrappers,
       contractWrappers,
-      ['basketball', 'football'],
+      ['basketball'],
+    );
+  });
+
+  it('Should compare gas when decoding football data', async function () {
+    await compareSportsConsumerGasUsed(
+      genericContractWrappers,
+      contractWrappers,
+      ['football'],
     );
   });
 });

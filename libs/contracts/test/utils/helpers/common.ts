@@ -87,10 +87,12 @@ export const setSportsDataFeeds = async <
   valuesPerKeyCount: number[],
   start: number = 0,
 ) => {
-  const keys = Array.from(
-    { length: valuesPerKeyCount.length },
-    (_, i) => i + (i > 0 ? valuesPerKeyCount[i - 1] : 0) + start,
-  );
+  let prevKey = 0;
+  const keys = Array.from({ length: valuesPerKeyCount.length }, (_, i) => {
+    const res = prevKey + (i > 0 ? valuesPerKeyCount[i - 1] : 0) + start;
+    prevKey = res;
+    return res;
+  });
   const values: string[] = [];
   const descriptions: string[] = keys.map(key =>
     ethers.encodeBytes32String(`Hello, World! ${key}`),
