@@ -4,8 +4,11 @@ use curl::easy::Handler;
 use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
 use eyre::Result;
+use json_patch::merge;
 use port_scanner::scan_port;
+use sequencer_config::get_sequencer_config_file_path;
 use serde_json::json;
+use std::fs;
 use std::io::stdout;
 use std::process::Command;
 use std::thread;
@@ -13,6 +16,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs::File, io::Write};
 use tokio::time;
 use tokio::time::Duration;
+use utils::read_file;
+
+const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
+const REPORT_VAL: &str = "47a0284000000000000000000000000000000000000000000000000000000000";
 
 struct Collector(Vec<u8>);
 
@@ -24,26 +31,32 @@ impl Handler for Collector {
 }
 
 fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
+    let config_patch = json!(
+    {
+        "providers": {
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0])},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1])}
+        }
+    });
+
+    let config_file_path = get_sequencer_config_file_path();
+
+    let data = read_file(config_file_path.as_str());
+
+    let mut sequencer_config =
+        serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
+
+    merge(&mut sequencer_config, &config_patch);
+
+    fs::write("/tmp/sequencer_config.json", sequencer_config.to_string())
+        .expect("Unable to write config file");
+
     thread::spawn(move || {
         let mut command = Command::new("cargo");
         let command = command.args(["run", "--bin", "sequencer"]);
         let sequencer = command
-            .env(
-                "WEB3_PRIVATE_KEY_ETH1",
-                format!("/tmp/key_{}", eth_networks_ports[0]),
-            )
-            .env(
-                "WEB3_PRIVATE_KEY_ETH2",
-                format!("/tmp/key_{}", eth_networks_ports[1]),
-            )
-            .env(
-                "WEB3_URL_ETH1",
-                format!("http://127.0.0.1:{}", eth_networks_ports[0]),
-            )
-            .env(
-                "WEB3_URL_ETH2",
-                format!("http://127.0.0.1:{}", eth_networks_ports[1]),
-            );
+            .env("SEQUENCER_LOGGING_LEVEL", "INFO")
+            .env("SEQUENCER_CONFIG_DIR", "/tmp");
 
         sequencer.status().expect("process failed to execute");
     })
@@ -116,9 +129,6 @@ fn cleanup_spawned_processes() {
         let _ = child.join();
     }
 }
-
-const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
-const REPORT_VAL: &str = "47a0284000000000000000000000000000000000000000000000000000000000";
 
 #[tokio::main]
 async fn main() -> Result<()> {

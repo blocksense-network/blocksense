@@ -12,7 +12,8 @@ members = [
   "libs/sdk",
   "libs/sdk/trigger-oracle",
   "libs/sequencer-types",
-  "libs/utils"
+  "libs/utils",
+  "libs/sequencer_config"
 ]
 resolver = "2"
 

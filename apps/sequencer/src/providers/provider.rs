@@ -10,10 +10,9 @@ use alloy::{
 };
 use reqwest::{Client, Url};
 
-use super::super::config::config::SequencerConfig;
 use super::provider_metrics::ProviderMetrics;
+use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
-use std::env;
 use std::fs;
 use std::sync::Arc;
 use tokio::sync::Mutex;

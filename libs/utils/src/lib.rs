@@ -1,7 +1,9 @@
 use std::{
     env,
     fmt::{Debug, Display},
+    fs::File,
     hash::{DefaultHasher, Hash, Hasher},
+    io::Read,
     str::FromStr,
     time::{SystemTime, UNIX_EPOCH},
 };
@@ -30,4 +32,12 @@ pub fn generate_string_hash(string: &str) -> u64 {
     string.hash(&mut hasher);
 
     hasher.finish()
+}
+
+pub fn read_file(path: &str) -> String {
+    let mut file = File::open(path).expect(format!("File not found in {}", path).as_str());
+    let mut data = String::new();
+    file.read_to_string(&mut data)
+        .expect(format!("File {} read failure! ", path).as_str());
+    data
 }
