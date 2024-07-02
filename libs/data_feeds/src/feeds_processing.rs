@@ -14,6 +14,8 @@ pub fn naive_packing(feed_result: FeedType) -> String {
 
 #[cfg(test)]
 mod tests {
+    use data_feeds::types::FeedType;
+
     use super::*;
     use alloy::hex;
 

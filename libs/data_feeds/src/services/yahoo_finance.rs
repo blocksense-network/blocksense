@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
 use ringbuf::{HeapRb, SharedRb};
+use tracing::info;
 use utils::{current_unix_time, get_env_var};
 use yahoo_finance_api::YahooConnector;
 
@@ -34,12 +35,28 @@ impl DataFeed for YahooFinanceDataFeed {
         let response = self.api_connector.get_latest_quotes(ticker, "1d").await;
 
         match response {
-            Ok(response) => (
-                FeedResult::Result {
-                    result: FeedType::Numerical(response.last_quote().unwrap().close),
-                },
-                current_unix_time(),
-            ),
+            Ok(response) => {
+                let response_result = response.last_quote();
+                match response_result {
+                    Ok(res) => (
+                        FeedResult::Result {
+                            result: FeedType::Numerical(res.close),
+                        },
+                        current_unix_time(),
+                    ),
+                    Err(e) => {
+                        info!("YahooFinance API failed: {}", e);
+                        (
+                            FeedResult::Error {
+                                error: FeedError::from(FeedError::APIError(
+                                    "CoinMarketCap poll failed!".to_string(),
+                                )),
+                            },
+                            current_unix_time(),
+                        )
+                    }
+                }
+            }
             Err(_) => (
                 FeedResult::Error {
                     error: FeedError::from(FeedError::APIError(

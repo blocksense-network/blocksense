@@ -52,7 +52,6 @@ impl DataFeed for CoinMarketCapDataFeed {
     async fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
         let response = self.api_connector.price(asset);
 
-        println!("{:?}", response);
         match response {
             Ok(response) => (
                 FeedResult::Result {

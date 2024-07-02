@@ -10,6 +10,7 @@ use crate::{
 };
 use curl::easy::Easy;
 use serde_json::Value;
+use tracing::{debug, info};
 use utils::generate_string_hash;
 
 fn handle_feed_response(
@@ -47,7 +48,7 @@ pub async fn post_feed_response(
 
     let payload_json = handle_feed_response(reporter_id, feed_hash.to_string(), timestamp, result);
 
-    println!("\nPayload: {:?}", payload_json);
+    info!("\nPayload: {:?}", payload_json);
 
     let feed_url = base_url.to_string() + "/feed/" + &feed_hash.to_string();
 
@@ -57,15 +58,24 @@ pub async fn post_feed_response(
 
 pub fn post_request(url: &str, payload_json: Value) {
     let mut easy = Easy::new();
-    easy.url(url).unwrap();
-    easy.post(true).unwrap();
+
+    debug!("Posting to: {}", url);
+    if let Err(e) = easy.url(url) {
+        panic!("Failed to set URL: {}", e);
+    }
+
+    if let Err(e) = easy.post(true) {
+        panic!("Failed enabling post: {}", e);
+    }
 
     easy.post_fields_copy(payload_json.to_string().as_bytes())
         .unwrap();
 
-    // Set a closure to handle the response
-    easy.write_function(|data| Ok(stdout().write(data).unwrap()))
-        .unwrap();
+    if let Err(e) = easy.write_function(|data| Ok(stdout().write(data).unwrap())) {
+        panic!("Could not write response from server: {}", e);
+    }
 
-    easy.perform().unwrap();
+    if let Err(e) = easy.perform() {
+        panic!("Could not perform POST request: {}", e);
+    }
 }

@@ -2,6 +2,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
+use tracing::debug;
 
 use crate::{
     interfaces::data_feed::DataFeed,
@@ -15,10 +16,13 @@ fn feed_selector(feeds: &[(DataFeedAPI, String)], batch_size: usize) -> Vec<(Dat
     let mut rng = thread_rng();
 
     let selected_feeds_idx = (0..feeds.len()).choose_multiple(&mut rng, batch_size);
+    debug!("Selected feeds indices {:?}", selected_feeds_idx);
+
     let selected_feeds = selected_feeds_idx
         .iter()
         .map(|&idx| feeds[idx].clone())
         .collect();
+    debug!("Selected feeds {:?}", selected_feeds);
 
     selected_feeds
 }
@@ -39,7 +43,10 @@ fn handle_connection_cache(
         connection_cache.insert(api.to_owned(), feed);
     }
 
-    connection_cache.get(api).unwrap().clone()
+    connection_cache
+        .get(api)
+        .expect("Failed to get DataFeed from connection cache")
+        .clone()
 }
 
 fn feed_builder(api: &DataFeedAPI) -> Rc<RefCell<dyn DataFeed>> {
