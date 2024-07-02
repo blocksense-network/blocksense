@@ -29,7 +29,9 @@ impl FeedSlotsManager {
                 FeedSlotTimeTracker::new(report_interval_ms, first_report_start_time);
 
             loop {
-                feed_slots_time_tracker.await_end_of_current_slot().await;
+                feed_slots_time_tracker
+                    .await_end_of_current_slot(get_ms_since_epoch)
+                    .await;
 
                 let result_post_to_contract: String;
                 let key_post: u32;

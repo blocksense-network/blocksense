@@ -1,6 +1,5 @@
 use crate::feeds::average_feed_processor::AverageFeedProcessor;
 use crate::feeds::feeds_processing::FeedProcessing;
-use crate::utils::time_utils::get_ms_since_epoch;
 use actix_web::rt::time;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -54,11 +53,7 @@ impl FeedMetaData {
             + (self.get_slot(current_time_as_ms) as u128 * self.get_report_interval_ms() as u128);
         let end_of_voting_round = start_of_voting_round + self.get_report_interval_ms() as u128;
 
-        if current_time_as_ms >= start_of_voting_round
-            && current_time_as_ms <= end_of_voting_round
-            && msg_timestamp >= start_of_voting_round
-            && msg_timestamp <= end_of_voting_round
-        {
+        if msg_timestamp >= start_of_voting_round && msg_timestamp <= end_of_voting_round {
             debug!("accepted!");
             return true;
         } else {
@@ -83,14 +78,24 @@ impl FeedSlotTimeTracker {
             first_report_start_time_ms: f,
         }
     }
-    pub async fn await_end_of_current_slot(&self) {
-        let current_time_as_ms = get_ms_since_epoch();
+    pub async fn await_end_of_current_slot(&self, current_time_function: fn() -> u128) {
+        let current_time_as_ms = current_time_function();
+        let mut interval = self.get_time_to_slot_end(current_time_as_ms);
+
+        interval.tick().await; // The first tick completes immediately.
+        interval.tick().await;
+    }
+
+    /// Calculate the time left until the current slot based on current time
+    fn get_time_to_slot_end(&self, current_time_as_ms: u128) -> time::Interval {
         let slots_count = (current_time_as_ms - self.first_report_start_time_ms)
             / self.report_interval_ms as u128;
         let current_slot_start_time =
             self.first_report_start_time_ms + slots_count * self.report_interval_ms as u128;
         let current_slot_end_time = current_slot_start_time + self.report_interval_ms as u128;
-
+        let interval = time::interval(Duration::from_millis(
+            (current_slot_end_time - current_time_as_ms) as u64,
+        ));
         trace!("current_time_as_ms      = {}", current_time_as_ms);
         trace!("slots_count             = {}", slots_count);
         trace!("current_slot_start_time = {}", current_slot_start_time);
@@ -103,12 +108,7 @@ impl FeedSlotTimeTracker {
             "diff                    = {}",
             current_time_as_ms + self.report_interval_ms as u128 - current_slot_end_time
         );
-
-        let mut interval = time::interval(Duration::from_millis(
-            (current_slot_end_time - current_time_as_ms) as u64,
-        ));
-        interval.tick().await; // The first tick completes immediately.
-        interval.tick().await;
+        interval
     }
 }
 
@@ -215,6 +215,7 @@ mod tests {
     use std::sync::Arc;
     use std::sync::RwLock;
     use std::thread;
+    use std::time::Instant;
 
     #[test]
     fn basic_test() {
@@ -391,5 +392,63 @@ mod tests {
             values.push(&kv.1);
         }
         assert!(values.len() as u32 == NTHREADS);
+    }
+
+    #[tokio::test]
+    async fn get_time_to_slot_end() {
+        // setup
+        let time_tracker: super::FeedSlotTimeTracker = super::FeedSlotTimeTracker::new(50, 100);
+        let result = time_tracker.get_time_to_slot_end(140);
+
+        // run
+        let time_left_ms = result.period().as_millis();
+
+        // validate
+        assert_eq!(time_left_ms, 10);
+    }
+
+    #[tokio::test]
+    async fn get_time_to_slot_end_on_border() {
+        // setup
+        let time_tracker: super::FeedSlotTimeTracker = super::FeedSlotTimeTracker::new(50, 100);
+        let result = time_tracker.get_time_to_slot_end(150);
+
+        // run
+        let time_left_ms = result.period().as_millis();
+
+        // validate
+        assert_eq!(time_left_ms, 50);
+    }
+
+    #[tokio::test]
+    async fn get_time_to_slot_end_first_report_zero() {
+        // setup
+        let time_tracker: super::FeedSlotTimeTracker = super::FeedSlotTimeTracker::new(50, 0);
+        let result = time_tracker.get_time_to_slot_end(140);
+
+        // run
+        let time_left_ms = result.period().as_millis();
+
+        // validate
+        assert_eq!(time_left_ms, 10);
+    }
+
+    #[tokio::test]
+    async fn await_end_of_current_slot_correct() {
+        // setup
+        let time_tracker: super::FeedSlotTimeTracker = super::FeedSlotTimeTracker::new(50, 100);
+        fn time_always_140_ms() -> u128 {
+            140
+        }
+        let snapshot = Instant::now();
+
+        // run
+        time_tracker
+            .await_end_of_current_slot(time_always_140_ms)
+            .await;
+
+        // assert
+        let elapsed_time = snapshot.elapsed().as_millis();
+        assert!(elapsed_time >= 10);
     }
 }
