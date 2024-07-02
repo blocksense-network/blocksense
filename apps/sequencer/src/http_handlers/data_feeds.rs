@@ -1,19 +1,18 @@
 use super::super::utils::time_utils::get_ms_since_epoch;
 use eyre::Result;
 
-use super::super::feeds::feeds_registry::{get_feed_id, ReportRelevance};
+use super::super::feeds::feeds_registry::ReportRelevance;
 use super::super::feeds::feeds_state::FeedsState;
 use actix_web::web;
 use actix_web::{error, Error};
 use actix_web::{post, HttpResponse};
 use futures::StreamExt;
 
-use tracing::{debug, trace, warn};
+use tracing::{debug, info, trace, warn};
 
 use crate::inc_reporter_metric;
 use crate::inc_reporter_vec_metric;
-use data_feeds::types::FeedType;
-use serde_json::from_value;
+use data_feeds::types::{DataFeedPayload, FeedResult};
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
 
@@ -37,28 +36,26 @@ pub async fn post_report(
     debug!("body = {:?}!", body);
 
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
+    let data_feed: DataFeedPayload = serde_json::from_value(v)?;
 
-    let reporter_id = match v["reporter_id"].to_string().parse::<u64>() {
-        Ok(x) => x,
-        Err(_) => {
-            return Ok(HttpResponse::BadRequest().into());
-        }
-    };
+    let reporter_id = data_feed.payload_metadata.reporter_id;
 
-    let feed_id;
+    let feed_id: u32;
     let reporter = {
         let reporters = app_state.reporters.read().unwrap();
         let reporter = reporters.get_key_value(&reporter_id);
         match reporter {
             Some(x) => {
                 let reporter = x.1;
-                feed_id = match get_feed_id(v["feed_id"].to_string().as_str()) {
-                    Some(f) => f,
-                    None => {
-                        inc_reporter_metric!(reporter, votes_for_nonexistent_feed);
-                        return Ok(HttpResponse::NotFound().into());
+                feed_id = match data_feed.payload_metadata.feed_id.parse::<u32>() {
+                    Ok(val) => val,
+                    Err(e) => {
+                        inc_reporter_metric!(reporter, non_valid_feed_id_reports);
+                        debug!("Error parsing input's feed_id: {}", e);
+                        return Ok(HttpResponse::BadRequest().into());
                     }
                 };
+
                 //TODO: Check signature of vote!
                 reporter.clone()
             }
@@ -72,21 +69,17 @@ pub async fn post_report(
         }
     };
 
-    let result: FeedType = match from_value(v["result"].clone()) {
-        Ok(x) => x,
-        Err(_) => {
-            inc_reporter_metric!(reporter, unrecognized_result_format);
-            return Ok(HttpResponse::BadRequest().into());
+    let result = match data_feed.result {
+        FeedResult::Result { result } => result,
+        FeedResult::Error { error } => {
+            info!("Error parsing recvd result of vote: {}", error);
+            // TODO: Handle Error vote
+
+            return Ok(HttpResponse::Ok().into());
         }
     };
 
-    let msg_timestamp = match v["timestamp"].to_string().parse::<u128>() {
-        Ok(x) => x,
-        Err(_) => {
-            inc_reporter_metric!(reporter, json_scheme_error);
-            return Ok(HttpResponse::BadRequest().into());
-        }
-    };
+    let msg_timestamp = data_feed.payload_metadata.timestamp;
 
     trace!(
         "result = {:?}; feed_id = {:?}; reporter_id = {:?}",

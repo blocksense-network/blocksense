@@ -45,6 +45,8 @@ alloy = { git = "https://github.com/alloy-rs/alloy", rev = "6f4e397f7cf71812160a
     "pubsub",
 ] }
 
+sequencer_config = { path = "../../libs/sequencer_config" }
+
 reqwest = { version = "0.12", features = ["multipart", "blocking"] }
 # async
 tokio = { version = "1.4.0", features = ["full"] }
