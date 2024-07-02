@@ -34,3 +34,7 @@ span {
     @apply text-slate-800;
   }
 }
+
+code > span > span {
+  display: inline;
+}
