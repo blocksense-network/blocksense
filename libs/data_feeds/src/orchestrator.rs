@@ -1,11 +1,10 @@
-use log::error;
 use std::{
-    cell::RefCell,
     collections::HashMap,
-    rc::Rc,
+    sync::Arc,
     thread::sleep,
     time::{Duration, Instant},
 };
+use tokio::sync::Mutex;
 
 use prometheus::{
     actix_server::handle_prometheus_metrics,
@@ -13,6 +12,8 @@ use prometheus::{
     TextEncoder,
 };
 use utils::get_env_var;
+
+use tracing::error;
 
 use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed, types::DataFeedAPI};
 
@@ -23,7 +24,7 @@ pub async fn orchestrator() {
     let sequencer_url: String = get_env_var("SEQUENCER_URL").unwrap();
     let poll_period_ms: u64 = get_env_var("POLL_PERIOD_MS").unwrap();
 
-    let mut connection_cache = HashMap::<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>::new();
+    let mut connection_cache = HashMap::<DataFeedAPI, Arc<Mutex<dyn DataFeed>>>::new();
 
     let encoder = TextEncoder::new();
 
@@ -43,7 +44,7 @@ pub async fn orchestrator() {
 
         dispatch(
             reporter_id,
-            sequencer_url.as_str(),
+            sequencer_url.clone(),
             batch_size,
             &all_feeds,
             &mut connection_cache,

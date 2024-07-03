@@ -12,6 +12,7 @@ data_feeds = { path = "../../libs/data_feeds"}
 prometheus = { path = "../../libs/prometheus" }
 
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+actix-web = "4.6.0"
 
 [[bin]]
 name = "launch_reporter"

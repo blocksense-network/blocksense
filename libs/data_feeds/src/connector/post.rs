@@ -1,7 +1,6 @@
 use std::{
-    cell::RefCell,
     io::{stdout, Write},
-    rc::Rc,
+    sync::Arc,
 };
 
 use crate::{
@@ -36,12 +35,12 @@ fn handle_feed_response(
 
 pub async fn post_feed_response(
     reporter_id: u64,
-    base_url: &str,
-    data_feed: Rc<RefCell<dyn DataFeed>>,
-    feed_asset_name: &String,
+    base_url: String,
+    data_feed: Arc<tokio::sync::Mutex<dyn DataFeed>>,
+    feed_asset_name: String,
     asset: &str,
 ) {
-    let (result, timestamp) = data_feed.borrow_mut().poll(asset).await;
+    let (result, timestamp) = data_feed.lock().await.poll(asset).await;
 
     let feed_hash = generate_string_hash(feed_asset_name);
 

@@ -37,7 +37,7 @@ impl Display for ConsensusMetric {
         match self {
             ConsensusMetric::Median => write!(f, "TODO(snikolov): Median"),
             ConsensusMetric::Mean(x) => write!(f, "{}", x),
-            _ => write!(f, "Display not implemented for ConsensusMetric!"),
+            // _ => write!(f, "Display not implemented for ConsensusMetric!"),
         }
     }
 }

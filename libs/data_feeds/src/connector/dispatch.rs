@@ -1,7 +1,8 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
+use std::{collections::HashMap, sync::Arc, time::Instant};
 
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
+use tokio::sync::Mutex;
 
 use crate::{
     interfaces::data_feed::DataFeed,
@@ -10,6 +11,7 @@ use crate::{
 };
 
 use super::post::post_feed_response;
+use actix_web::rt::spawn;
 
 fn feed_selector(feeds: &[(DataFeedAPI, String)], batch_size: usize) -> Vec<(DataFeedAPI, String)> {
     let mut rng = thread_rng();
@@ -25,15 +27,15 @@ fn feed_selector(feeds: &[(DataFeedAPI, String)], batch_size: usize) -> Vec<(Dat
 
 fn resolve_feed(
     feed_api: &DataFeedAPI,
-    connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
-) -> Rc<RefCell<dyn DataFeed>> {
+    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed>>>,
+) -> Arc<Mutex<dyn DataFeed>> {
     handle_connection_cache(feed_api, connection_cache)
 }
 
 fn handle_connection_cache(
     api: &DataFeedAPI,
-    connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
-) -> Rc<RefCell<dyn DataFeed>> {
+    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed>>>,
+) -> Arc<Mutex<dyn DataFeed>> {
     if !connection_cache.contains_key(api) {
         let feed = feed_builder(api);
         connection_cache.insert(api.to_owned(), feed);
@@ -42,20 +44,20 @@ fn handle_connection_cache(
     connection_cache.get(api).unwrap().clone()
 }
 
-fn feed_builder(api: &DataFeedAPI) -> Rc<RefCell<dyn DataFeed>> {
+fn feed_builder(api: &DataFeedAPI) -> Arc<Mutex<dyn DataFeed>> {
     match api {
         DataFeedAPI::EmptyAPI => todo!(),
-        DataFeedAPI::YahooFinanceDataFeed => Rc::new(RefCell::new(YahooFinanceDataFeed::new())),
-        DataFeedAPI::CoinMarketCapDataFeed => Rc::new(RefCell::new(CoinMarketCapDataFeed::new())),
+        DataFeedAPI::YahooFinanceDataFeed => Arc::new(Mutex::new(YahooFinanceDataFeed::new())),
+        DataFeedAPI::CoinMarketCapDataFeed => Arc::new(Mutex::new(CoinMarketCapDataFeed::new())),
     }
 }
 
 pub async fn dispatch(
     reporter_id: u64,
-    sequencer_url: &str,
+    sequencer_url: String,
     batch_size: usize,
     feeds: &Vec<(DataFeedAPI, String)>,
-    connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
+    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed>>>,
 ) {
     let feed_subset = feed_selector(feeds, batch_size);
 
@@ -65,14 +67,18 @@ pub async fn dispatch(
         let data_feed = resolve_feed(&api, connection_cache);
         let feed_asset_name = DataFeedAPI::feed_asset_str(&api, &asset);
 
-        post_feed_response(
-            reporter_id,
-            sequencer_url,
-            data_feed,
-            &feed_asset_name,
-            &asset,
-        )
-        .await;
+        let seq_url_mv = sequencer_url.clone();
+        let feed_asset_name_mv = feed_asset_name.clone();
+        spawn(async move {
+            post_feed_response(
+                reporter_id,
+                seq_url_mv,
+                data_feed,
+                feed_asset_name_mv,
+                &asset,
+            )
+            .await
+        });
 
         let elapsed_time = start_time.elapsed().as_millis();
         DATA_FEED_PARSE_TIME_GAUGE

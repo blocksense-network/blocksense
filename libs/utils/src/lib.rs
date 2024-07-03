@@ -24,7 +24,7 @@ where
         .map_err(|err| format!("Failed to parse environment variable '{}': {}", key, err))
 }
 
-pub fn generate_string_hash(string: &str) -> u64 {
+pub fn generate_string_hash(string: String) -> u64 {
     let mut hasher = DefaultHasher::new();
 
     string.hash(&mut hasher);
