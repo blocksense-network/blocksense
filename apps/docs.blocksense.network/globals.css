@@ -13,10 +13,6 @@ main {
   margin-top: 20px;
 }
 
-span {
-  @apply block;
-}
-
 #__next {
   margin-top: calc(-1 * var(--nextra-navbar-height));
 }
@@ -33,8 +29,4 @@ span {
   .vertical-timeline-element-date {
     @apply text-slate-800;
   }
-}
-
-code > span > span {
-  display: inline;
 }
