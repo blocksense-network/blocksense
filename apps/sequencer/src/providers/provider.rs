@@ -106,25 +106,43 @@ mod tests {
     use std::{fs::File, io::Write};
 
     use alloy::{
-        network::TransactionBuilder, node_bindings::Anvil, primitives::U256, providers::Provider,
+        network::TransactionBuilder, node_bindings::Anvil, primitives::U256,
         rpc::types::eth::request::TransactionRequest,
     };
     use eyre::Result;
     use std::env;
 
-    use crate::providers::provider::get_provider;
+    use crate::providers::provider::get_rpc_providers;
+    use alloy::providers::Provider as AlloyProvider;
+    use sequencer_config::Provider;
+    use sequencer_config::SequencerConfig;
+    use std::collections::HashMap;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
-        env::set_var("PRIVATE_KEY", "/tmp/key");
-        let configured_contract_address = "0xef11D1c2aA48826D4c41e54ab82D1Ff5Ad8A64Ca";
-        env::set_var("CONTRACT_ADDRESS", configured_contract_address);
+        let private_key_path = "/tmp/key".to_string();
+        let network = "ETH".to_string();
+
         let mut file = File::create("/tmp/key")?;
         file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")?;
 
         let anvil = Anvil::new().try_spawn()?;
-        env::set_var("RPC_URL", anvil.endpoint());
-        let provider = get_provider();
+
+        let cfg = SequencerConfig {
+            max_keys_to_batch: 1,
+            keys_batch_duration: 500,
+            providers: HashMap::from([(
+                network.clone(),
+                Provider {
+                    private_key_path,
+                    url: anvil.endpoint(),
+                    contract_address: None,
+                },
+            )]),
+        };
+
+        let providers = get_rpc_providers(&cfg);
+        let provider = &providers.get(&network).unwrap().lock().await.provider;
 
         let alice = anvil.addresses()[7];
         let bob = anvil.addresses()[0];
