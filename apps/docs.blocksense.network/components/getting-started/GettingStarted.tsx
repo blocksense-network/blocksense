@@ -12,9 +12,9 @@ export const GettingStarted = () => {
           <h1 className="getting-started__title max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
             {gettingStartedConfig.title}
           </h1>
-          <span className="getting-started__description max-w-2xl mb-6 font-light text-gray-800 lg:mb-8 md:text-lg lg:text-xl">
+          <p className="getting-started__description max-w-2xl mb-6 font-light text-gray-800 lg:mb-8 md:text-lg lg:text-xl">
             {gettingStartedConfig.description}
-          </span>
+          </p>
           <span className="lg:ml-auto">
             <LinkButton
               label="Get Started"
