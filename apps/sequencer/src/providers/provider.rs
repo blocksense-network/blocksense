@@ -110,7 +110,6 @@ mod tests {
         rpc::types::eth::request::TransactionRequest,
     };
     use eyre::Result;
-    use std::env;
 
     use crate::providers::provider::get_rpc_providers;
     use alloy::providers::Provider as AlloyProvider;
