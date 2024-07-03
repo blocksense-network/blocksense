@@ -1,5 +1,6 @@
 use data_feeds::services::aggregate::{AverageAggregator, FeedAggregate};
 use data_feeds::types::FeedType;
+use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -152,6 +153,23 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     fmdr.push(0, fmd1);
     fmdr.push(1, fmd2);
     fmdr.push(2, fmd3);
+
+    fmdr
+}
+
+pub fn new_feeds_meta_data_reg_from_config(conf: &SequencerConfig) -> FeedMetaDataRegistry {
+    let mut fmdr = FeedMetaDataRegistry::new();
+
+    for feed in &conf.feeds {
+        fmdr.push(
+            feed.id,
+            FeedMetaData::new(
+                &feed.name,
+                feed.report_interval_ms,
+                feed.first_report_start_time,
+            ),
+        );
+    }
 
     fmdr
 }

@@ -1,7 +1,7 @@
 use std::sync::{Arc, RwLock};
 
 use actix_web::{web, App, HttpServer};
-use sequencer::feeds::feeds_registry::{new_feeds_meta_data_reg_with_test_data, AllFeedsReports};
+use sequencer::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
 use sequencer::feeds::feeds_slots_manager;
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::feeds::{
@@ -42,7 +42,9 @@ async fn main() -> std::io::Result<()> {
     let providers = init_shared_rpc_providers(&sequencer_config);
 
     let app_state = web::Data::new(FeedsState {
-        registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data())),
+        registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
+            &sequencer_config,
+        ))),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
         plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
         providers: providers.clone(),
