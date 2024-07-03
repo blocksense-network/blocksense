@@ -26,7 +26,7 @@ export const Contracts = ({ contracts }: ContractsProps) => {
             <Errors errors={contract.errors} />
             <Events events={contract.events} />
             <Modifiers modifiers={contract.modifiers} />
-            <Variables variables={contract.variables} />
+            <Variables variables={contract.variables} title="### Variables" />
             <Enums enums={contract.enums} />
             <Structs structs={contract.structs} />
           </div>

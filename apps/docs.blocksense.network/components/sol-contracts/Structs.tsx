@@ -4,7 +4,7 @@ import { StructDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variable } from '@/sol-contracts-components/Variable';
+import { Variables } from '@/sol-contracts-components/Variables';
 
 type StructsProps = {
   structs?: StructDocItem[];
@@ -17,9 +17,7 @@ export const Structs = ({ structs }: StructsProps) => {
         <div key={index}>
           <h3>{struct.name}</h3>
           <span>Visibility: {struct.visibility}</span>
-          {struct?._members?.map((structMember, index) => (
-            <Variable key={index} variable={structMember} />
-          ))}
+          <Variables variables={struct?._members} title="Members" />
           <NatSpec natspec={struct.natspec} />
         </div>
       ))}

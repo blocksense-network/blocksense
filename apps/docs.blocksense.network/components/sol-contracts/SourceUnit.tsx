@@ -30,7 +30,7 @@ export const SourceUnit = ({
       <Errors errors={sourceUnit.errors} />
       <Functions functions={sourceUnit.functions} />
       <Structs structs={sourceUnit.structs} />
-      <Variables variables={sourceUnit.variables} />
+      <Variables variables={sourceUnit.variables} title="## Variables" />
     </div>
   );
 };

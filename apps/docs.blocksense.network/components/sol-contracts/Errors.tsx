@@ -4,7 +4,7 @@ import { ErrorDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variable } from '@/sol-contracts-components/Variable';
+import { Variables } from '@/sol-contracts-components/Variables';
 
 type ErrorsProps = {
   errors?: ErrorDocItem[];
@@ -18,9 +18,7 @@ export const Errors = ({ errors }: ErrorsProps) => {
           <h3>{error.name}</h3>
           <span>Error Selector: {error.errorSelector}</span>
           {error.signature && <span>Signature{error.signature}</span>}
-          {error?._parameters?.map((errorParameter, index) => (
-            <Variable key={index} variable={errorParameter} />
-          ))}
+          <Variables variables={error?._parameters} title="Parameters" />
           <NatSpec natspec={error.natspec} />
         </div>
       ))}

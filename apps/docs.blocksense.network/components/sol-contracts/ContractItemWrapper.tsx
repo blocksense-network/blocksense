@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 type ContractItemWrapperProps = {
   itemsLength: number | undefined;
-  title: string;
+  title?: string;
   children: ReactNode;
 };
 

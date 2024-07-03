@@ -4,7 +4,7 @@ import { EventDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variable } from '@/sol-contracts-components/Variable';
+import { Variables } from '@/sol-contracts-components/Variables';
 
 type EventsProps = {
   events?: EventDocItem[];
@@ -19,9 +19,7 @@ export const Events = ({ events }: EventsProps) => {
           <span>Event Selector: {event.eventSelector}</span>
           {event.signature && <span>Signature: {event.signature}</span>}
           <span>Anonymous: {event.anonymous.toString()}</span>
-          {event?._parameters?.map((eventParameter, index) => (
-            <Variable key={index} variable={eventParameter} />
-          ))}
+          <Variables variables={event?._parameters} title="Parameters" />
           <NatSpec natspec={event.natspec} />
         </div>
       ))}
