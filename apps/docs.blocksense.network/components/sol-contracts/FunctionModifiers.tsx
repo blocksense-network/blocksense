@@ -2,6 +2,17 @@ import React from 'react';
 
 import { FunctionModifierDocItem } from '@blocksense/sol-reflector';
 
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
+
 type FunctionModifiersProps = {
   functionModifiers?: FunctionModifierDocItem[];
 };
@@ -10,20 +21,24 @@ export const FunctionModifiers = ({
   functionModifiers,
 }: FunctionModifiersProps) => {
   return (
-    <>
-      {functionModifiers && functionModifiers.length > 0 && (
-        <>
-          <h4>Modifiers</h4>
-          <div>
-            {functionModifiers.map((functionModifier, index) => (
-              <div key={index}>
-                <span>Modifier Name: {functionModifier._modifierName}</span>
-                <span>Kind: {functionModifier.kind}</span>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </>
+    <ContractItemWrapper itemsLength={functionModifiers?.length}>
+      <Table>
+        <TableCaption>Function Modifiers</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Modifier Name</TableHead>
+            <TableHead>Kind</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {functionModifiers?.map((functionModifier, index) => (
+            <TableRow key={index}>
+              <TableCell>{functionModifier._modifierName}</TableCell>
+              <TableCell>{functionModifier.kind}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </ContractItemWrapper>
   );
 };

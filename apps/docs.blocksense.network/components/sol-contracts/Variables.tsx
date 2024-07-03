@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 
 type VariablesProps = {
