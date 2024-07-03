@@ -18,8 +18,30 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
       <CardHeader>
         <CardTitle>### {contract.name}</CardTitle>
         <CardDescription>
-          <span>Kind: {contract.contractKind}</span>
-          <span>Abstract: {contract.abstract.toString()}</span>
+          <aside className="p-4 contract-details">
+            <section className="flex space-x-4 contract-details__content">
+              <section className="flex-shrink-0 contract-details__item">
+                <section className="flex items-center">
+                  <dt className="text-sm text-gray-600 contract-details__label">
+                    Kind:
+                  </dt>
+                  <dd className="ml-2 font-semibold text-black contract-details__value">
+                    {contract.contractKind}
+                  </dd>
+                </section>
+              </section>
+              <section className="flex-shrink-0 contract-details__item">
+                <section className="flex items-center">
+                  <dt className="text-sm text-gray-600 contract-details__label">
+                    Abstract:
+                  </dt>
+                  <dd className="ml-2 font-semibold text-black contract-details__value">
+                    {contract.abstract.toString()}
+                  </dd>
+                </section>
+              </section>
+            </section>
+          </aside>
         </CardDescription>
       </CardHeader>
       {contract._baseContracts.length > 0 && (

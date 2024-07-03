@@ -105,10 +105,15 @@ code > span > span {
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border border-2;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  .bg-card {
+    border: 1px solid;
+    @apply border-slate-200 max-w-96 mt-10;
   }
 }
 
