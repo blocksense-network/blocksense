@@ -10,5 +10,6 @@
     ++ (with pkgs; [
       openssl
       pkg-config
+      cargo-tarpaulin
     ]);
 }
