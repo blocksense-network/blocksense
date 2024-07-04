@@ -1,0 +1,10 @@
+[package]
+name = "crypto"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+[dependencies]
+blst = "0.3.12"
+hex = "0.4.3"

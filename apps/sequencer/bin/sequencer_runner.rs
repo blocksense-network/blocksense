@@ -49,7 +49,7 @@ async fn main() -> std::io::Result<()> {
         plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
         providers: providers.clone(),
         log_handle,
-        reporters: init_shared_reporters(),
+        reporters: init_shared_reporters(&sequencer_config),
     });
 
     let (vote_send, vote_recv) = mpsc::unbounded_channel();

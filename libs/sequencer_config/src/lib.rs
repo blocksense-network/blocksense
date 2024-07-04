@@ -22,11 +22,18 @@ pub struct Provider {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct Reporter {
+    pub id: u32,
+    pub pub_key: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct SequencerConfig {
     pub max_keys_to_batch: usize,
     pub keys_batch_duration: u64,
     pub providers: HashMap<String, Provider>,
     pub feeds: Vec<FeedMetaData>,
+    pub reporters: Vec<Reporter>,
 }
 
 pub fn get_sequencer_config_file_path() -> String {
@@ -65,5 +72,6 @@ pub fn get_test_config_with_single_provider(
             },
         )]),
         feeds: Vec::new(),
+        reporters: Vec::new(),
     }
 }
