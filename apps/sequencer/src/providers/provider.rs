@@ -39,6 +39,7 @@ pub struct RpcProvider {
     pub wallet: LocalWallet,
     pub contract_address: Option<Address>,
     pub provider_metrics: ProviderMetrics,
+    pub transcation_timeout_secs: u32,
 }
 
 pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
@@ -83,6 +84,7 @@ fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcPro
                 wallet,
                 provider_metrics: ProviderMetrics::new(&key)
                     .expect("Failed to allocate ProviderMetrics"),
+                transcation_timeout_secs: p.transcation_timeout_secs,
             })),
         );
     }
@@ -136,8 +138,10 @@ mod tests {
                     private_key_path,
                     url: anvil.endpoint(),
                     contract_address: None,
+                    transcation_timeout_secs: 50,
                 },
             )]),
+            feeds: Vec::new(),
         };
 
         let providers = get_rpc_providers(&cfg);

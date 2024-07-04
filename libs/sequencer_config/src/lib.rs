@@ -16,6 +16,7 @@ pub struct Provider {
     pub private_key_path: String,
     pub url: String,
     pub contract_address: Option<String>,
+    pub transcation_timeout_secs: u32,
 }
 
 #[derive(Debug, Deserialize)]
