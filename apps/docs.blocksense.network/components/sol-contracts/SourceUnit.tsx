@@ -21,16 +21,18 @@ export const SourceUnit = ({
 }: SourceUnitProps) => {
   const sourceUnit: SourceUnitDocItem = JSON.parse(sourceUnitJson);
   return (
-    <div>
-      <AbsolutePath absolutePath={sourceUnit.absolutePath} />
-      <License license={sourceUnit.license} />
-      <Pragmas pragmas={sourceUnit.pragmas} />
+    <section className="mt-6">
+      <section className="flex space-x-4">
+        <AbsolutePath absolutePath={sourceUnit.absolutePath} />
+        <License license={sourceUnit.license} />
+        <Pragmas pragmas={sourceUnit.pragmas} />
+      </section>
       <Contracts contracts={sourceUnit.contracts} />
       <Enums enums={sourceUnit.enums} />
       <Errors errors={sourceUnit.errors} />
       <Functions functions={sourceUnit.functions} />
       <Structs structs={sourceUnit.structs} />
       <Variables variables={sourceUnit.variables} title="## Variables" />
-    </div>
+    </section>
   );
 };
