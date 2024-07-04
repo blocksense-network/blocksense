@@ -8,12 +8,19 @@ use tracing::debug;
 #[derive(Debug)]
 pub struct FeedMetaData {
     name: String,
+    voting_repeatability: Repeatability,
     report_interval_ms: u64, // Consider oneshot feeds.
     first_report_start_time: SystemTime,
     feed_type: Box<dyn FeedAggregate>,
 }
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
+pub enum Repeatability {
+    Periodic, // Has infinite number of voting slots
+    Oneshot,  // Has only one voting slot
+}
+
+#[derive(Debug, PartialEq)]
 pub enum ReportRelevance {
     Relevant,
     NonRelevantOld,
@@ -21,6 +28,20 @@ pub enum ReportRelevance {
 }
 
 impl FeedMetaData {
+    pub fn new_oneshot(
+        n: &str,
+        r: u64, // Consider oneshot feeds.
+        f: SystemTime,
+    ) -> FeedMetaData {
+        FeedMetaData {
+            name: n.to_string(),
+            voting_repeatability: Repeatability::Oneshot,
+            report_interval_ms: r,
+            first_report_start_time: f,
+            feed_type: Box::new(AverageAggregator {}),
+        }
+    }
+
     pub fn new(
         n: &str,
         r: u64, // Consider oneshot feeds.
@@ -28,11 +49,13 @@ impl FeedMetaData {
     ) -> FeedMetaData {
         FeedMetaData {
             name: n.to_string(),
+            voting_repeatability: Repeatability::Periodic,
             report_interval_ms: r,
             first_report_start_time: f,
             feed_type: Box::new(AverageAggregator {}), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
         }
     }
+
     pub fn get_name(&self) -> &String {
         &self.name
     }
@@ -47,6 +70,10 @@ impl FeedMetaData {
         since_the_epoch.as_millis()
     }
     pub fn get_slot(&self, current_time_as_ms: u128) -> u64 {
+        if self.voting_repeatability == Repeatability::Oneshot {
+            // Oneshots only have the zero slot
+            return 0;
+        }
         ((current_time_as_ms - self.get_first_report_start_time_ms())
             / self.report_interval_ms as u128) as u64
     }
@@ -63,15 +90,30 @@ impl FeedMetaData {
         let end_of_voting_round = start_of_voting_round + self.get_report_interval_ms() as u128;
 
         if msg_timestamp < start_of_voting_round {
-            debug!("Rejected report, time stamp is in a past slot!");
+            debug!("Rejected report, time stamp is in a past slot.");
             return ReportRelevance::NonRelevantOld;
         }
         if msg_timestamp > end_of_voting_round {
-            debug!("Rejected report, time stamp is in a future slot!");
+            debug!("Rejected report, time stamp is in a future slot.");
             return ReportRelevance::NonRelevantInFuture;
         }
         debug!("Accepted report!");
         ReportRelevance::Relevant
+    }
+
+    // Return time to slot end. Can be negative for Oneshot feeds in the past.
+    pub fn time_to_slot_end_ms(feed_meta_data: &FeedMetaData, timestamp_as_ms: u128) -> i128 {
+        let start_of_voting_round = feed_meta_data.get_first_report_start_time_ms()
+            + (feed_meta_data.get_slot(timestamp_as_ms) as u128
+                * feed_meta_data.get_report_interval_ms() as u128);
+        let end_of_voting_round =
+            start_of_voting_round + feed_meta_data.get_report_interval_ms() as u128;
+        end_of_voting_round as i128 - timestamp_as_ms as i128
+    }
+
+    // Return if this Feed is Oneshot.
+    pub fn is_oneshot(&self) -> bool {
+        self.voting_repeatability == Repeatability::Oneshot
     }
 }
 
@@ -169,28 +211,29 @@ pub fn get_feed_id(name: &str) -> Option<u32> {
     // TODO: get from registry
 }
 
-pub fn get_reporters_for_feed_id_slot(_feed_id: u32, _slot: u64) -> Vec<u32> {
-    (0..10).collect()
-    // TODO: this will be a subset of the reporters that have been assigned
-    // to vote for this feed for the given sequence id.
-    // Initially we will have all reporters vote for all feeds.
-}
-
 #[cfg(test)]
 mod tests {
     use data_feeds::types::FeedType;
 
     use crate::feeds::feeds_registry::{
-        new_feeds_meta_data_reg_with_test_data, AllFeedsReports, ReportRelevance,
+        new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaData, ReportRelevance,
     };
     use crate::utils::time_utils::get_ms_since_epoch;
     use std::sync::Arc;
     use std::sync::RwLock;
     use std::thread;
+    use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
     #[test]
     fn basic_test() {
         let fmdr = new_feeds_meta_data_reg_with_test_data();
+
+        let mut expected_keys_vec = vec![0, 1, 2];
+        let mut actual_keys_vec = fmdr.get_keys().clone();
+
+        expected_keys_vec.sort();
+        actual_keys_vec.sort();
+        assert_eq!(actual_keys_vec, expected_keys_vec);
 
         let mut current_time_as_ms = get_ms_since_epoch();
 
@@ -305,6 +348,161 @@ mod tests {
                 == ReportRelevance::Relevant
         );
     }
+
+    #[test]
+    fn test_relevant_oneshot_feed_check() {
+        // setup
+        let current_system_time = SystemTime::now();
+
+        // voting will start in 60 seconds
+        let voting_start_time = current_system_time
+            .checked_add(Duration::from_secs(60))
+            .unwrap();
+
+        // voting will be 30 seconds long
+        let voting_wait_duration_ms = 30000;
+
+        let feed =
+            FeedMetaData::new_oneshot("TestFeed", voting_wait_duration_ms, voting_start_time);
+
+        assert_eq!(feed.get_name(), "TestFeed");
+
+        let mut current_time_as_ms = get_ms_since_epoch();
+        let mut msg_timestamp_as_ms = current_time_as_ms;
+
+        // test
+        // Note: current_time passed is irrelevant for Oneshot feeds because in those feeds there is only one slot.
+        let irrelevant_current_timestamp = current_time_as_ms;
+
+        // test old message for oneshot feed
+        // NOW                            MESSAGE
+        //  |                                |
+        //  v                                v
+        // 0s -------|-------|-------|-------|-------|-------|-------|-------|-------|-------|---
+        //           10s     20s     30s     40s     50s     60s     70s     80s     90s    100s
+        //                                                   [===== VOTING SLOT =====]
+
+        let message_with_old_timestamp = msg_timestamp_as_ms + 40000;
+        assert_eq!(
+            feed.check_report_relevance(irrelevant_current_timestamp, message_with_old_timestamp),
+            ReportRelevance::NonRelevantOld
+        );
+
+        // test relevant message for oneshot feed
+        // NOW                                                    MESSAGE
+        //  |                                                        |
+        //  v                                                        v
+        // 0s -------|-------|-------|-------|-------|-------|-------|-------|-------|-------|---
+        //           10s     20s     30s     40s     50s     60s     70s     80s     90s    100s
+        //                                                   [===== VOTING SLOT =====]
+
+        let message_with_current_timestamp = voting_start_time
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis()
+            + 10000;
+        assert_eq!(
+            feed.check_report_relevance(
+                irrelevant_current_timestamp,
+                message_with_current_timestamp
+            ),
+            ReportRelevance::Relevant
+        );
+
+        // test future message for oneshot feed
+        // NOW                                                                            MESSAGE
+        //  |                                                                                |
+        //  v                                                                                v
+        // 0s -------|-------|-------|-------|-------|-------|-------|-------|-------|-------|---
+        //           10s     20s     30s     40s     50s     60s     70s     80s     90s    100s
+        //                                                   [===== VOTING SLOT =====]
+
+        let message_with_future_timestamp = voting_start_time
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis()
+            + 40000;
+        assert_eq!(
+            feed.check_report_relevance(
+                irrelevant_current_timestamp,
+                message_with_future_timestamp
+            ),
+            ReportRelevance::NonRelevantInFuture
+        );
+    }
+
+    #[test]
+    fn test_time_to_slot_end_ms() {
+        // setup
+        let current_system_time = SystemTime::now();
+        let mut current_time_as_ms = current_system_time
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+
+        // voting will start in 60 seconds
+        let voting_start_time = current_system_time
+            .checked_add(Duration::from_secs(60))
+            .unwrap();
+
+        // voting will be 30 seconds long
+        let voting_wait_duration_ms = 30000;
+
+        let oneshot_feed =
+            FeedMetaData::new_oneshot("TestFeed", voting_wait_duration_ms, voting_start_time);
+        let regular_feed =
+            FeedMetaData::new("TestFeed", voting_wait_duration_ms, current_system_time);
+
+        // setup messages
+        let message_with_old_timestamp = current_time_as_ms + 40000;
+        let message_with_current_timestamp = voting_start_time
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis()
+            + 10000;
+        let message_with_future_timestamp = voting_start_time
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis()
+            + 40000;
+
+        // test oneshot feeds
+        assert_eq!(
+            FeedMetaData::time_to_slot_end_ms(&oneshot_feed, message_with_old_timestamp),
+            50000
+        );
+        assert_eq!(
+            FeedMetaData::time_to_slot_end_ms(&oneshot_feed, message_with_current_timestamp),
+            20000
+        );
+        assert_eq!(
+            FeedMetaData::time_to_slot_end_ms(&oneshot_feed, message_with_future_timestamp),
+            -10000
+        );
+
+        // test regular feeds can never return negative time_to_slot_end_ms
+        assert_eq!(
+            FeedMetaData::time_to_slot_end_ms(&regular_feed, message_with_old_timestamp),
+            20000
+        );
+        assert_eq!(
+            FeedMetaData::time_to_slot_end_ms(&regular_feed, message_with_current_timestamp),
+            20000
+        );
+        assert_eq!(
+            FeedMetaData::time_to_slot_end_ms(&regular_feed, message_with_future_timestamp),
+            20000
+        );
+    }
+
+    #[test]
+    fn test_get_feed_id() {
+        assert_eq!(super::get_feed_id("YahooFinance.DOGE/USDC"), Some(0));
+        assert_eq!(super::get_feed_id("YahooFinance.BTC/USD"), Some(1));
+        assert_eq!(super::get_feed_id("YahooFinance.ETH/USD"), Some(2));
+        assert_eq!(super::get_feed_id("NonExistentName"), None);
+    }
+
     #[test]
     fn chech_relevant_and_insert_mt() {
         const NTHREADS: u32 = 10;
