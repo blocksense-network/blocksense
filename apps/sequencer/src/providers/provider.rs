@@ -78,7 +78,7 @@ pub fn init_shared_rpc_providers() -> SharedRpcProviders {
     Arc::new(std::sync::RwLock::new(get_rpc_providers()))
 }
 
-fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
+pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
     let mut urls: HashMap<String, String> = HashMap::new();
     let mut keys: HashMap<String, String> = HashMap::new();
@@ -93,7 +93,6 @@ fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
             contract_addresses.insert(name.to_string(), value);
         }
     }
-
     for (key, value) in &urls {
         let rpc_url: Url = value
             .parse()
@@ -249,14 +248,17 @@ mod tests {
     }
 
     #[test]
-    fn test_get_rpc_providers() {
+    fn test_get_rpc_providers_returns_single_provider() {
         // setup
-        env::set_var("WEB3_URL_ETH1", "http://127.0.0.1:8545");
+        let env_var_url = "WEB3_URL_ETH11";
+        let env_var_contract_address = "WEB3_CONTRACT_ADDRESS_ETH11";
+        let env_var_private_key = "WEB3_PRIVATE_KEY_ETH11";
+        env::set_var(env_var_url, "http://127.0.0.1:8545");
         env::set_var(
-            "WEB3_CONTRACT_ADDRESS_ETH1",
+            env_var_contract_address,
             "0xef11d1c2aa48826d4c41e54ab82d1ff5ad8a64ca",
         );
-        env::set_var("WEB3_PRIVATE_KEY_ETH1", "/tmp/priv_key_test");
+        env::set_var(env_var_private_key, "/tmp/priv_key_test");
         let mut file = File::create("/tmp/priv_key_test").unwrap();
         file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
             .unwrap();
@@ -264,6 +266,11 @@ mod tests {
         // test
         let binding = init_shared_rpc_providers();
         let result = binding.read().unwrap();
+
+        // cleanup
+        env::remove_var(env_var_url);
+        env::remove_var(env_var_contract_address);
+        env::remove_var(env_var_private_key);
 
         // assert
         assert_eq!(result.len(), 1);

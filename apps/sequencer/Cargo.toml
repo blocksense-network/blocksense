@@ -67,7 +67,9 @@ futures-util = "0.3.30"
 rand = "0.8.5"
 prometheus = "0.13.4"
 paste = "1.0.15"
+regex = "1.10.4"
 tempfile = "3.10.1"
+time = "0.3.36"
 
 [[bin]]
 name = "sequencer"

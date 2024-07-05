@@ -233,3 +233,51 @@ pub async fn eth_batch_send_to_all_contracts<
     }
     Ok(all_results)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::providers::provider::init_shared_rpc_providers;
+    use alloy::{node_bindings::Anvil, providers::Provider};
+    use regex::Regex;
+    use std::{env, fs::File, io::Write};
+
+    fn extract_address(message: &str) -> Option<String> {
+        let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
+        if let Some(mat) = re.find(message) {
+            return Some(mat.as_str().to_string());
+        }
+        None
+    }
+
+    #[tokio::test]
+    async fn test_deploy_contract_returns_valid_address() {
+        // setup
+        // let target_deploy_address = generate_random_eth_address();
+        let anvil = Anvil::new().try_spawn().unwrap();
+        env::set_var("WEB3_URL_ETH131", anvil.endpoint());
+        env::set_var("WEB3_PRIVATE_KEY_ETH131", "/tmp/priv_key_test");
+        let mut file = File::create("/tmp/priv_key_test").unwrap();
+        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
+            .unwrap();
+
+        // give some time for cleanup env variables
+        let five_seconds = Duration::from_secs(5);
+        tokio::time::sleep(five_seconds).await;
+        let providers = init_shared_rpc_providers();
+
+        // run
+        let result = deploy_contract(&String::from("ETH131"), &providers).await;
+        // assert
+        // validate contract was deployed at expected address
+        if let Ok(msg) = result {
+            let extracted_address = extract_address(&msg);
+            assert!(
+                extracted_address.is_some(),
+                "Did not return valid eth address"
+            );
+        } else {
+            panic!("contract deployment failed")
+        }
+    }
+}
