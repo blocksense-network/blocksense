@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Signature } from '@/sol-contracts-components/Signature';
 import { FunctionDocItem } from '@blocksense/sol-reflector';
 
 import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers';
@@ -22,6 +22,7 @@ export const Functions = ({ functions }: FunctionsProps) => {
             <span>Selector: {_function.functionSelector}</span>
           )}
           {_function.signature && <span>Signature: {_function.signature}</span>}
+          <Signature signature="## Signature" />
           <span>Visibility: {_function.visibility}</span>
           <span>State Mutability: {_function.stateMutability}</span>
           <span>Virtual: {_function.virtual.toString()}</span>

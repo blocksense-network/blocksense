@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Signature } from '@/sol-contracts-components/Signature';
 import { ModifierDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
@@ -18,6 +18,7 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
           <h3>{modifier.name}</h3>
           <span>Visibility: {modifier.visibility}</span>
           {modifier.signature && <span>Signature: {modifier.signature}</span>}
+          <Signature signature="## Modifier Signature" />
           <Variables
             key={index}
             variables={modifier?._parameters}

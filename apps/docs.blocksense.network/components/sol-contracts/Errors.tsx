@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Signature } from '@/sol-contracts-components/Signature';
 import { ErrorDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
@@ -18,6 +18,7 @@ export const Errors = ({ errors }: ErrorsProps) => {
           <h3>{error.name}</h3>
           <span>Error Selector: {error.errorSelector}</span>
           {error.signature && <span>Signature{error.signature}</span>}
+          <Signature signature="## Error Signature" />
           <Variables variables={error?._parameters} title="Parameters" />
           <NatSpec natspec={error.natspec} />
         </div>

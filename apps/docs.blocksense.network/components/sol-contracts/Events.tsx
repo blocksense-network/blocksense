@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Signature } from '@/sol-contracts-components/Signature';
 import { EventDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
@@ -18,6 +18,7 @@ export const Events = ({ events }: EventsProps) => {
           <h3>{event.name}</h3>
           <span>Event Selector: {event.eventSelector}</span>
           {event.signature && <span>Signature: {event.signature}</span>}
+          <Signature signature="## Event Signature" />
           <span>Anonymous: {event.anonymous.toString()}</span>
           <Variables variables={event?._parameters} title="Parameters" />
           <NatSpec natspec={event.natspec} />
