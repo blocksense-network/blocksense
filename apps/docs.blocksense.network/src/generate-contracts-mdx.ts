@@ -1,22 +1,34 @@
 import * as path from 'path';
-import React from 'react';
 
 import { pagesContractRefDocFolder } from './constants';
 
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 
-import { SourceUnit } from '@/sol-contracts-components/SourceUnit';
 import { createFsIOForDir } from './fs-IO-for-dir';
-import { createStaticComponent } from './utils';
 
 import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
 const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
 
-function generateMarkdownContent(sourceUnit: SourceUnitDocItem): string {
-  const sourceUnitComponent = React.createElement(SourceUnit, { sourceUnit });
-  const staticComponent = createStaticComponent(sourceUnitComponent);
+function stringifyObject(obj: any): string {
+  return JSON.stringify(obj)
+    .replace(/\\n/g, '\\\\n')
+    .replace(/\\'/g, "\\\\'")
+    .replace(/\\"/g, '\\\\"')
+    .replace(/\\&/g, '\\\\&')
+    .replace(/\\r/g, '\\\\r')
+    .replace(/\\t/g, '\\\\t')
+    .replace(/\\b/g, '\\\\b')
+    .replace(/\\f/g, '\\\\f');
+}
 
-  return staticComponent;
+function generateMarkdownContent(sourceUnit: SourceUnitDocItem): string {
+  const content = `
+import { SourceUnit } from '@/sol-contracts-components/SourceUnit';
+
+<SourceUnit sourceUnitJsonString={'${stringifyObject(sourceUnit)}'} />
+`;
+
+  return content;
 }
 
 function generateSolRefDocFiles(): Promise<void[]> {

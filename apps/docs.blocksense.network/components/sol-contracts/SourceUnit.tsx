@@ -13,10 +13,13 @@ import { Structs } from '@/sol-contracts-components/Structs';
 import { Variables } from '@/sol-contracts-components/Variables';
 
 type SourceUnitProps = {
-  sourceUnit: SourceUnitDocItem;
+  sourceUnitJsonString: string;
 };
 
-export const SourceUnit = ({ sourceUnit }: SourceUnitProps) => {
+export const SourceUnit = ({
+  sourceUnitJsonString: sourceUnitJson,
+}: SourceUnitProps) => {
+  const sourceUnit: SourceUnitDocItem = JSON.parse(sourceUnitJson);
   return (
     <div>
       <AbsolutePath absolutePath={sourceUnit.absolutePath} />
