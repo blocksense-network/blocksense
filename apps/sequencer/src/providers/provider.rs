@@ -184,7 +184,6 @@ mod tests {
 
     use crate::providers::provider::get_provider;
 
-    #[ignore]
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
         env::set_var("PRIVATE_KEY", "/tmp/key");
