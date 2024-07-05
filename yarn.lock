@@ -445,7 +445,6 @@ __metadata:
     "@radix-ui/react-slot": "npm:^1.1.0"
     "@types/node": "npm:^20.14.2"
     "@types/react": "npm:^18.3.3"
-    "@types/react-dom": "npm:^18.3.0"
     autoprefixer: "npm:^10.4.19"
     class-variance-authority: "npm:^0.7.0"
     clsx: "npm:^2.1.1"
@@ -457,6 +456,7 @@ __metadata:
     react: "npm:^18.3.1"
     react-dom: "npm:^18.3.1"
     react-vertical-timeline-component: "npm:^3.6.0"
+    shiki: "npm:^1.10.1"
     tailwind-merge: "npm:^2.3.0"
     tailwindcss: "npm:^3.4.4"
     tailwindcss-animate: "npm:^1.0.7"
@@ -2491,6 +2491,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@shikijs/core@npm:1.10.1":
+  version: 1.10.1
+  resolution: "@shikijs/core@npm:1.10.1"
+  checksum: 10c0/586711b6485833323937f1193635e1d7ffc63ac9e664aa3fef16c7583dfdbaf4362bb268712ebaba9113a96f871e6e1f993f1c8eb3f558353880a54e436002a9
+  languageName: node
+  linkType: hard
+
 "@sinclair/typebox@npm:0.25.24":
   version: 0.25.24
   resolution: "@sinclair/typebox@npm:0.25.24"
@@ -3041,7 +3048,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.2.7, @types/react-dom@npm:^18.3.0":
+"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.2.7":
   version: 18.3.0
   resolution: "@types/react-dom@npm:18.3.0"
   dependencies:
@@ -12225,6 +12232,15 @@ __metadata:
     vscode-oniguruma: "npm:^1.7.0"
     vscode-textmate: "npm:^8.0.0"
   checksum: 10c0/5c7fcbb870d0facccc7ae2f3410a28121f8e0b3f298e4e956de817ad6ab60a4c7e20a9184edfe50a93447addbb88b95b69e6ef88ac16ac6ca3e94c50771a6459
+  languageName: node
+  linkType: hard
+
+"shiki@npm:^1.10.1":
+  version: 1.10.1
+  resolution: "shiki@npm:1.10.1"
+  dependencies:
+    "@shikijs/core": "npm:1.10.1"
+  checksum: 10c0/ba0fbb6ffc1e08b4089c679a84e8c2800a7e6609519ada3892831b691d35e73cface539c486e888fc77aa48a70310ceded990158d2153a963efc2d1b084a4e5f
   languageName: node
   linkType: hard
 
