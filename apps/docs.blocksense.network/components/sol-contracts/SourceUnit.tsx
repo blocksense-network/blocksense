@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 
@@ -32,7 +32,7 @@ export const SourceUnit = ({
       <Errors errors={sourceUnit.errors} />
       <Functions functions={sourceUnit.functions} />
       <Structs structs={sourceUnit.structs} />
-      <Variables variables={sourceUnit.variables} title="## Variables" />
+      <Variables variables={sourceUnit.variables} title="Variables" />
     </section>
   );
 };

@@ -15,8 +15,8 @@ export const ContractItemWrapper = ({
     <>
       {Boolean(itemsLength) && (
         <div className="mt-4">
-          {title}
-          {children}
+          <p>{title}</p>
+          <div>{children}</div>
         </div>
       )}
     </>

@@ -13,7 +13,7 @@ type FunctionsProps = {
 
 export const Functions = ({ functions }: FunctionsProps) => {
   return (
-    <ContractItemWrapper title="## Functions" itemsLength={functions?.length}>
+    <ContractItemWrapper title="Functions" itemsLength={functions?.length}>
       {functions?.map((_function, index) => (
         <div key={index}>
           <h3>{_function.name}</h3>
@@ -21,8 +21,7 @@ export const Functions = ({ functions }: FunctionsProps) => {
           {_function.functionSelector && (
             <span>Selector: {_function.functionSelector}</span>
           )}
-          {_function.signature && <span>Signature: {_function.signature}</span>}
-          <Signature signature="## Signature" />
+          <Signature signature={_function.signature} />
           <span>Visibility: {_function.visibility}</span>
           <span>State Mutability: {_function.stateMutability}</span>
           <span>Virtual: {_function.virtual.toString()}</span>

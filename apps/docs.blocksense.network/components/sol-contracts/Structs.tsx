@@ -12,7 +12,7 @@ type StructsProps = {
 
 export const Structs = ({ structs }: StructsProps) => {
   return (
-    <ContractItemWrapper title="## Structs" itemsLength={structs?.length}>
+    <ContractItemWrapper title="Structs" itemsLength={structs?.length}>
       {structs?.map((struct, index) => (
         <div key={index}>
           <h3>{struct.name}</h3>

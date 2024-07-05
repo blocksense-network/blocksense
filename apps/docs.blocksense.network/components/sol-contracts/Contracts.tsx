@@ -17,7 +17,7 @@ type ContractsProps = {
 
 export const Contracts = ({ contracts }: ContractsProps) => {
   return (
-    <ContractItemWrapper title="## Contracts" itemsLength={contracts?.length}>
+    <ContractItemWrapper title="Contracts" itemsLength={contracts?.length}>
       {contracts?.map((contract, index) => {
         return (
           <div key={index}>
@@ -26,7 +26,7 @@ export const Contracts = ({ contracts }: ContractsProps) => {
             <Errors errors={contract.errors} />
             <Events events={contract.events} />
             <Modifiers modifiers={contract.modifiers} />
-            <Variables variables={contract.variables} title="### Variables" />
+            <Variables variables={contract.variables} title="Variables" />
             <Enums enums={contract.enums} />
             <Structs structs={contract.structs} />
           </div>

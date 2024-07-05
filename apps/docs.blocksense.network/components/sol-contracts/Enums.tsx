@@ -11,7 +11,7 @@ type EnumsProps = {
 
 export const Enums = ({ enums }: EnumsProps) => {
   return (
-    <ContractItemWrapper title="## Enums" itemsLength={enums?.length}>
+    <ContractItemWrapper title="Enums" itemsLength={enums?.length}>
       {enums?.map((_enum, index) => (
         <div key={index}>
           <h3>{_enum.name}</h3>

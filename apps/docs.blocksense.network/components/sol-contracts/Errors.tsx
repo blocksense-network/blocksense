@@ -12,13 +12,13 @@ type ErrorsProps = {
 
 export const Errors = ({ errors }: ErrorsProps) => {
   return (
-    <ContractItemWrapper title="## Errors" itemsLength={errors?.length}>
+    <ContractItemWrapper title="Errors" itemsLength={errors?.length}>
       {errors?.map((error, index) => (
         <div key={index}>
           <h3>{error.name}</h3>
           <span>Error Selector: {error.errorSelector}</span>
           {error.signature && <span>Signature{error.signature}</span>}
-          <Signature signature="## Error Signature" />
+          <Signature signature="Error Signature" />
           <Variables variables={error?._parameters} title="Parameters" />
           <NatSpec natspec={error.natspec} />
         </div>

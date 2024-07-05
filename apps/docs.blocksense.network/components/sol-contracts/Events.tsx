@@ -12,13 +12,13 @@ type EventsProps = {
 
 export const Events = ({ events }: EventsProps) => {
   return (
-    <ContractItemWrapper title="## Events" itemsLength={events?.length}>
+    <ContractItemWrapper title="Events" itemsLength={events?.length}>
       {events?.map((event, index) => (
         <div key={index}>
           <h3>{event.name}</h3>
           <span>Event Selector: {event.eventSelector}</span>
           {event.signature && <span>Signature: {event.signature}</span>}
-          <Signature signature="## Event Signature" />
+          <Signature signature="Event Signature" />
           <span>Anonymous: {event.anonymous.toString()}</span>
           <Variables variables={event?._parameters} title="Parameters" />
           <NatSpec natspec={event.natspec} />
