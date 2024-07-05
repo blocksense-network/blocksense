@@ -1,5 +1,3 @@
-import { github } from './src/constants';
-
 export const config = {
   blocksenseText: 'Blocksense',
   github: 'View it on GitHub',
