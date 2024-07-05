@@ -186,6 +186,7 @@ mod tests {
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
+        assert_eq!(2, 3);
         env::set_var("PRIVATE_KEY", "/tmp/key");
         let mut file = File::create("/tmp/key")?;
         file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")?;
