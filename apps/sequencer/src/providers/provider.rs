@@ -115,7 +115,6 @@ fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
             Some(x) => parse_contract_address(x),
             None => None,
         };
-
         providers.insert(
             key.to_string(),
             Arc::new(Mutex::new(RpcProvider {
@@ -135,9 +134,9 @@ fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     providers
 }
 
-pub fn print_type<T>(_: &T) {
-    println!("{:?}", std::any::type_name::<T>());
-}
+// pub fn print_type<T>(_: &T) {
+//     println!("{:?}", std::any::type_name::<T>());
+// }
 
 // fn get_provider() -> RootProvider<Http<Client>> {
 //     let rpc_url = get_rpc_url();
@@ -151,9 +150,9 @@ pub fn print_type<T>(_: &T) {
 //     provider
 // }
 
-pub fn init_shared_provider() -> Arc<Mutex<ProviderType>> {
-    Arc::new(Mutex::new(get_provider()))
-}
+// pub fn init_shared_provider() -> Arc<Mutex<ProviderType>> {
+//     Arc::new(Mutex::new(get_provider()))
+// }
 
 pub fn get_provider() -> ProviderType {
     // Create a provider with a signer.
@@ -173,6 +172,8 @@ pub fn get_provider() -> ProviderType {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use std::fs::write;
     use std::{fs::File, io::Write};
 
     use alloy::{
@@ -184,10 +185,11 @@ mod tests {
 
     use crate::providers::provider::get_provider;
 
-    #[ignore]
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
         env::set_var("PRIVATE_KEY", "/tmp/key");
+        let configured_contract_address = "0xef11D1c2aA48826D4c41e54ab82D1Ff5Ad8A64Ca";
+        env::set_var("CONTRACT_ADDRESS", configured_contract_address);
         let mut file = File::create("/tmp/key")?;
         file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")?;
 
@@ -217,8 +219,53 @@ mod tests {
 
         println!("Transaction sent with nonce: {}", pending_tx.nonce);
 
+        assert_eq!(
+            get_contract_address().to_string(),
+            configured_contract_address
+        );
+
         // Send the transaction, the nonce (1) is automatically managed by the provider.
         let _builder = provider.send_transaction(tx).await?;
         Ok(())
+    }
+
+    #[test]
+    fn test_get_wallet_success() {
+        // Create a temporary file with a valid private key
+        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
+        let expected_wallet_address = "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955"; // generated as hash of private_key
+
+        write("/tmp/key", private_key).expect("Failed to write to temp file");
+
+        // Set the environment variables
+        env::set_var("PRIVATE_KEY", "/tmp/key");
+        env::set_var("RPC_URL", "http://localhost:8545"); // Dummy URL for testing
+
+        // Call the function
+        let wallet = get_wallet();
+
+        // Check if the wallet's address matches the expected address
+        assert_eq!(wallet.address().to_string(), expected_wallet_address);
+    }
+
+    #[test]
+    fn test_get_rpc_providers() {
+        // setup
+        env::set_var("WEB3_URL_ETH1", "http://127.0.0.1:8545");
+        env::set_var(
+            "WEB3_CONTRACT_ADDRESS_ETH1",
+            "0xef11d1c2aa48826d4c41e54ab82d1ff5ad8a64ca",
+        );
+        env::set_var("WEB3_PRIVATE_KEY_ETH1", "/tmp/priv_key_test");
+        let mut file = File::create("/tmp/priv_key_test").unwrap();
+        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
+            .unwrap();
+
+        // test
+        let binding = init_shared_rpc_providers();
+        let result = binding.read().unwrap();
+
+        // assert
+        assert_eq!(result.len(), 1);
     }
 }

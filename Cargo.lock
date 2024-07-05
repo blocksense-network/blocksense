@@ -7892,6 +7892,7 @@ dependencies = [
  "reqwest 0.12.4",
  "serde 1.0.203",
  "serde_json",
+ "tempfile",
  "tokio 1.37.0",
  "tracing",
  "tracing-subscriber",
