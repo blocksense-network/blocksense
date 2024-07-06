@@ -1,4 +1,6 @@
 import React from 'react';
+import { Badge } from '@/components/ui/badge';
+
 import { Signature } from '@/sol-contracts-components/Signature';
 import { FunctionDocItem } from '@blocksense/sol-reflector';
 
@@ -15,16 +17,28 @@ export const Functions = ({ functions }: FunctionsProps) => {
   return (
     <ContractItemWrapper title="Functions" itemsLength={functions?.length}>
       {functions?.map((_function, index) => (
-        <div key={index}>
-          <h3>{_function.name}</h3>
-          <span>Kind: {_function.kind}</span>
+        <div key={index} className="space-y-4">
+          {_function.name && (
+            <Badge variant="accentary">{_function.name}</Badge>
+          )}
+          <Badge>
+            <span>Kind: {_function.kind}</span>
+          </Badge>
           {_function.functionSelector && (
-            <span>Selector: {_function.functionSelector}</span>
+            <Badge variant="secondary">
+              <span>Selector: {_function.functionSelector}</span>
+            </Badge>
           )}
           <Signature signature={_function.signature} />
-          <span>Visibility: {_function.visibility}</span>
-          <span>State Mutability: {_function.stateMutability}</span>
-          <span>Virtual: {_function.virtual.toString()}</span>
+          <Badge>
+            <span>Visibility: {_function.visibility}</span>
+          </Badge>
+          <Badge>
+            <span>State Mutability: {_function.stateMutability}</span>
+          </Badge>
+          <Badge>
+            <span>Virtual: {_function.virtual.toString()}</span>
+          </Badge>
           <Variables variables={_function._parameters} title="Parameters" />
           <Variables
             variables={_function._returnParameters}

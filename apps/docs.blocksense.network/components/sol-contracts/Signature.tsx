@@ -11,11 +11,16 @@ export const Signature = ({ signature }: SignatureProps) => {
   React.useEffect(() => {
     codeToHtml(signature!, {
       lang: 'solidity',
-      theme: 'catppuccin-mocha',
+      theme: 'github-light-default',
     })
       .then((htmlString: any) => setHtml(htmlString))
       .finally(() => console.log(html));
   }, []);
 
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return (
+    <div
+      className="bg-white border border-gray-800 mt-2 mb-2 py-2"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
 };
