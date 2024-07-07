@@ -21,18 +21,37 @@ export const SourceUnit = ({
 }: SourceUnitProps) => {
   const sourceUnit: SourceUnitDocItem = JSON.parse(sourceUnitJson);
   return (
-    <section className="mt-6">
-      <section className="flex space-x-4">
-        <AbsolutePath absolutePath={sourceUnit.absolutePath} />
-        <License license={sourceUnit.license} />
-        <Pragmas pragmas={sourceUnit.pragmas} />
+    <section className="source-unit mt-6">
+      <section className="source-unit__header flex space-x-4">
+        <AbsolutePath
+          className="source-unit__absolute-path"
+          absolutePath={sourceUnit.absolutePath}
+        />
+        <License
+          className="source-unit__license"
+          license={sourceUnit.license}
+        />
+        <Pragmas
+          className="source-unit__pragmas"
+          pragmas={sourceUnit.pragmas}
+        />
       </section>
-      <Contracts contracts={sourceUnit.contracts} />
-      <Enums enums={sourceUnit.enums} />
-      <Errors errors={sourceUnit.errors} />
-      <Functions functions={sourceUnit.functions} />
-      <Structs structs={sourceUnit.structs} />
-      <Variables variables={sourceUnit.variables} title="Variables" />
+      <Contracts
+        className="source-unit__contracts"
+        contracts={sourceUnit.contracts}
+      />
+      <Enums className="source-unit__enums" enums={sourceUnit.enums} />
+      <Errors className="source-unit__errors" errors={sourceUnit.errors} />
+      <Functions
+        className="source-unit__functions"
+        functions={sourceUnit.functions}
+      />
+      <Structs className="source-unit__structs" structs={sourceUnit.structs} />
+      <Variables
+        className="source-unit__variables"
+        variables={sourceUnit.variables}
+        title="Variables"
+      />
     </section>
   );
 };

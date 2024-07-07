@@ -9,7 +9,7 @@ type PragmasProps = {
 
 export const Pragmas = ({ pragmas }: PragmasProps) => {
   return (
-    <Badge variant="secondary">
+    <Badge className="pragmas" variant="secondary">
       {pragmas.map(
         pragma => `pragma ${pragma.literals.map(literal => literal).join('')}`,
       )}

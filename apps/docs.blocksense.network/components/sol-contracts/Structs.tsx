@@ -14,11 +14,20 @@ export const Structs = ({ structs }: StructsProps) => {
   return (
     <ContractItemWrapper title="Structs" itemsLength={structs?.length}>
       {structs?.map((struct, index) => (
-        <div key={index}>
-          <h3>{struct.name}</h3>
-          <span>Visibility: {struct.visibility}</span>
-          <Variables variables={struct?._members} title="Members" />
-          <NatSpec natspec={struct.natspec} />
+        <div className="contract-item-wrapper__struct" key={index}>
+          <h3 className="contract-item-wrapper__struct-title">{struct.name}</h3>
+          <span className="contract-item-wrapper__struct-visibility">
+            Visibility: {struct.visibility}
+          </span>
+          <Variables
+            className="contract-item-wrapper__struct-members"
+            variables={struct?._members}
+            title="Members"
+          />
+          <NatSpec
+            className="contract-item-wrapper__struct-natspec"
+            natspec={struct.natspec}
+          />
         </div>
       ))}
     </ContractItemWrapper>

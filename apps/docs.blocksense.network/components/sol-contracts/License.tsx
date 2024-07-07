@@ -5,5 +5,5 @@ type LicenseProps = {
 };
 
 export const License = ({ license }: LicenseProps) => {
-  return license && <span>{license}</span>;
+  return license && <span className="license__text">{license}</span>;
 };

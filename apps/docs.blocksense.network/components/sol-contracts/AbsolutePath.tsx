@@ -11,9 +11,9 @@ type AbsolutePathProps = {
 
 export const AbsolutePath = ({ absolutePath }: AbsolutePathProps) => {
   return (
-    <Button asChild>
+    <Button className="absolute-path__button" asChild>
       <Link
-        className="font-semibold"
+        className="absolute-path__link font-semibold"
         href={`${ghContractFolder}${absolutePath}`}
       >
         {config.github}

@@ -19,32 +19,49 @@ type VariablesProps = {
 
 export const Variables = ({ variables, title }: VariablesProps) => {
   return (
-    <ContractItemWrapper itemsLength={variables?.length}>
-      <Table>
-        <TableCaption>{title}</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Type Identifier</TableHead>
-            <TableHead>Type String</TableHead>
-            <TableHead>Signature</TableHead>
-            <TableHead>Mutability</TableHead>
-            <TableHead>Value</TableHead>
-            <TableHead>Indexed</TableHead>
-            <TableHead>Constant</TableHead>
+    <ContractItemWrapper
+      className="contract-item-wrapper"
+      itemsLength={variables?.length}
+    >
+      <Table className="variables__table">
+        <TableCaption className="variables__caption">{title}</TableCaption>
+        <TableHeader className="variables__table-header">
+          <TableRow className="variables__header-row">
+            <TableHead className="variables__header">Name</TableHead>
+            <TableHead className="variables__header">Type Identifier</TableHead>
+            <TableHead className="variables__header">Type String</TableHead>
+            <TableHead className="variables__header">Signature</TableHead>
+            <TableHead className="variables__header">Mutability</TableHead>
+            <TableHead className="variables__header">Value</TableHead>
+            <TableHead className="variables__header">Indexed</TableHead>
+            <TableHead className="variables__header">Constant</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="variables__body">
           {variables?.map((variable, index) => (
-            <TableRow key={index}>
-              <TableCell>{variable.name}</TableCell>
-              <TableCell>{variable.typeDescriptions.typeIdentifier}</TableCell>
-              <TableCell>{variable.typeDescriptions.typeString}</TableCell>
-              <TableCell>{variable.signature}</TableCell>
-              <TableCell>{variable.mutability}</TableCell>
-              <TableCell>{variable._value}</TableCell>
-              <TableCell>{variable.indexed.toString()}</TableCell>
-              <TableCell>{variable.constant.toString()}</TableCell>
+            <TableRow className="variables__row" key={index}>
+              <TableCell className="variables__cell">{variable.name}</TableCell>
+              <TableCell className="variables__cell">
+                {variable.typeDescriptions.typeIdentifier}
+              </TableCell>
+              <TableCell className="variables__cell">
+                {variable.typeDescriptions.typeString}
+              </TableCell>
+              <TableCell className="variables__cell">
+                {variable.signature}
+              </TableCell>
+              <TableCell className="variables__cell">
+                {variable.mutability}
+              </TableCell>
+              <TableCell className="variables__cell">
+                {variable._value}
+              </TableCell>
+              <TableCell className="variables__cell">
+                {variable.indexed.toString()}
+              </TableCell>
+              <TableCell className="variables__cell">
+                {variable.constant.toString()}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
