@@ -1,10 +1,13 @@
 use data_feeds::services::aggregate::{AverageAggregator, FeedAggregate};
 use data_feeds::types::FeedType;
 use sequencer_config::SequencerConfig;
+use ringbuf::storage::Heap;
+use ringbuf::traits::RingBuffer;
+use ringbuf::{HeapRb, SharedRb};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
-use tracing::debug;
+use tracing::{debug, info};
 
 #[derive(Debug)]
 pub struct FeedMetaData {
@@ -183,6 +186,40 @@ pub struct FeedReports {
 impl FeedReports {
     pub fn clear(&mut self) {
         self.report.clear();
+    }
+}
+
+pub struct FeedAggregateHistory {
+    aggregate_history: HashMap<u32, HeapRb<FeedType>>,
+}
+
+impl FeedAggregateHistory {
+    pub fn new() -> Self {
+        Self {
+            aggregate_history: HashMap::new(),
+        }
+    }
+
+    pub fn register_feed(&mut self, feed_id: u32, buf_size: usize) {
+        let shared_rb = SharedRb::new(buf_size);
+
+        self.aggregate_history.insert(feed_id, shared_rb);
+    }
+
+    pub fn collect(&self, feed_id: u32) -> Option<&SharedRb<Heap<FeedType>>> {
+        self.aggregate_history.get(&feed_id)
+    }
+
+    pub fn push(&mut self, feed_id: u32, aggregate_result: FeedType) {
+        if let Some(rb) = self.aggregate_history.get_mut(&feed_id) {
+            // Push the aggregate_result into the ring buffer
+            rb.push_overwrite(aggregate_result);
+        } else {
+            info!(
+                "Feed Id: {}, not registered in FeedAggregateHistory!",
+                feed_id
+            );
+        }
     }
 }
 

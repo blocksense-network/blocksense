@@ -1,10 +1,13 @@
 use crate::feeds::feed_slots_processor::feed_slots_processor_loop;
+use crate::feeds::feeds_registry::FeedAggregateHistory;
 use crate::feeds::feeds_state::FeedsState;
 use actix_web::rt::spawn;
 use actix_web::web;
 use futures::stream::FuturesUnordered;
 use std::fmt::Debug;
 use std::io::Error;
+use std::sync::Arc;
+use std::sync::RwLock;
 use tokio::sync::mpsc;
 use tracing::debug;
 use tracing::error;
@@ -24,12 +27,19 @@ pub async fn feeds_slots_manager_loop<
             .registry
             .write()
             .expect("Could not lock all feeds meta data registry.");
+
         let keys = reg.get_keys();
+
+        let mut feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
+            Arc::new(RwLock::new(FeedAggregateHistory::new()));
+
         for key in keys {
             let send_channel: mpsc::UnboundedSender<(K, V)> = vote_send.clone();
             let rc = reports_clone.clone();
 
             debug!("key = {} : value = {:?}", key, reg.get(key));
+
+            // feed_aggregate_history.write().unwrap().register_feed(key.clone(), 10_000); //TODO(snikolov): How to avoid borrow?
 
             let feed = match reg.get(key) {
                 Some(x) => x,
@@ -52,6 +62,7 @@ pub async fn feeds_slots_manager_loop<
                     report_interval_ms,
                     first_report_start_time,
                     rc,
+                    // feed_aggregate_history,
                     key,
                 )
                 .await

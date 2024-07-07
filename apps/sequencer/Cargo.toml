@@ -76,6 +76,7 @@ time = "0.3.36"
 conv = "0.3.3"
 uuid = { version = "1.8.0", features = ["v4"] }
 chrono = "0.4.38"
+ringbuf = "0.4.0"
 
 [[bin]]
 name = "sequencer"
