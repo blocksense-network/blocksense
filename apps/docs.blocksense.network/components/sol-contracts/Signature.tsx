@@ -11,7 +11,7 @@ export const Signature = ({ signature }: SignatureProps) => {
   React.useEffect(() => {
     codeToHtml(signature!, {
       lang: 'solidity',
-      theme: 'github-light-default',
+      theme: 'material-theme-lighter',
     })
       .then((htmlString: any) => setHtml(htmlString))
       .finally(() => console.log(html));
