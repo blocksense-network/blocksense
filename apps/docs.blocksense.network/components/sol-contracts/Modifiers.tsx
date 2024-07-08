@@ -25,14 +25,9 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
           <span className="contract-item-wrapper__modifier-visibility">
             Visibility: {modifier.visibility}
           </span>
-          {modifier.signature && (
-            <span className="contract-item-wrapper__modifier-label">
-              Signature: {modifier.signature}
-            </span>
-          )}
           <Signature
             className="contract-item-wrapper__modifier-signature"
-            signature="Modifier Signature"
+            signature={modifier.signature}
           />
           <Variables
             className="contract-item-wrapper__modifier-parameters"

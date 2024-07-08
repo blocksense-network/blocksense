@@ -1,13 +1,13 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 
-import { Signature } from '@/sol-contracts-components/Signature';
 import { FunctionDocItem } from '@blocksense/sol-reflector';
 
+import { Signature } from '@/sol-contracts-components/Signature';
 import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variables } from './Variables';
+import { Variables } from '@/sol-contracts-components/Variables';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];

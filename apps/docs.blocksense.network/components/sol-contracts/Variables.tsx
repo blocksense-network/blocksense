@@ -28,11 +28,8 @@ export const Variables = ({ variables, title }: VariablesProps) => {
         <TableHeader className="variables__table-header">
           <TableRow className="variables__header-row">
             <TableHead className="variables__header">Name</TableHead>
-            <TableHead className="variables__header">Type Identifier</TableHead>
-            <TableHead className="variables__header">Type String</TableHead>
-            <TableHead className="variables__header">Signature</TableHead>
+            <TableHead className="variables__header">Type</TableHead>
             <TableHead className="variables__header">Mutability</TableHead>
-            <TableHead className="variables__header">Value</TableHead>
             <TableHead className="variables__header">Indexed</TableHead>
             <TableHead className="variables__header">Constant</TableHead>
           </TableRow>
@@ -42,19 +39,10 @@ export const Variables = ({ variables, title }: VariablesProps) => {
             <TableRow className="variables__row" key={index}>
               <TableCell className="variables__cell">{variable.name}</TableCell>
               <TableCell className="variables__cell">
-                {variable.typeDescriptions.typeIdentifier}
-              </TableCell>
-              <TableCell className="variables__cell">
                 {variable.typeDescriptions.typeString}
               </TableCell>
               <TableCell className="variables__cell">
-                {variable.signature}
-              </TableCell>
-              <TableCell className="variables__cell">
                 {variable.mutability}
-              </TableCell>
-              <TableCell className="variables__cell">
-                {variable._value}
               </TableCell>
               <TableCell className="variables__cell">
                 {variable.indexed.toString()}

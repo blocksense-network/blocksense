@@ -19,16 +19,10 @@ export const Events = ({ events }: EventsProps) => {
     >
       {events?.map((event, index) => (
         <div className="contract-item-wrapper__event" key={index}>
-          <h3 className="contract-item-wrapper__event-title">{event.name}</h3>
-          <span className="contract-item-wrapper__event-selector">
-            Event Selector: {event.eventSelector}
-          </span>
-          {event.signature && (
-            <span className="contract-item-wrapper__event-signature">
-              Signature: {event.signature}
-            </span>
-          )}
-          <Signature signature="Event Signature" />
+          <h3 className="contract-item-wrapper__event-title">
+            {event.name} {event.eventSelector}
+          </h3>
+          <Signature signature={event.signature} />
           <span className="contract-item-wrapper__event-anonymous">
             Anonymous: {event.anonymous.toString()}
           </span>

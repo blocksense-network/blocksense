@@ -19,12 +19,10 @@ export const Errors = ({ errors }: ErrorsProps) => {
     >
       {errors?.map((error, index) => (
         <div className="contract-item-wrapper__error" key={index}>
-          <h3 className="contract-item-wrapper__error-title">{error.name}</h3>
-          <span className="contract-item-wrapper__error-selector">
-            Error Selector: {error.errorSelector}
-          </span>
-          {error.signature && <span>Signature{error.signature}</span>}
-          <Signature signature="Error Signature" />
+          <h3 className="contract-item-wrapper__error-title">
+            {error.name} {error.errorSelector}
+          </h3>
+          <Signature signature={error.signature} />
           <Variables variables={error?._parameters} title="Parameters" />
           <NatSpec
             className="contract-item-wrapper__error-natspec"
