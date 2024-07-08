@@ -8,6 +8,7 @@ import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers'
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Variables } from '@/sol-contracts-components/Variables';
+import { Selector } from '@/sol-contracts-components/Selector';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];
@@ -27,20 +28,13 @@ export const Functions = ({ functions }: FunctionsProps) => {
               className="contract-item-wrapper__function-name"
               variant="accentary"
             >
-              {_function.name}
+              {_function.name}{' '}
+              <Selector selector={_function.functionSelector} />
             </Badge>
           )}
           <Badge className="contract-item-wrapper__function-kind">
             <span>Kind: {_function.kind}</span>
           </Badge>
-          {_function.functionSelector && (
-            <Badge
-              className="contract-item-wrapper__function-selector"
-              variant="secondary"
-            >
-              <span>Selector: {_function.functionSelector}</span>
-            </Badge>
-          )}
           <Signature
             className="contract-item-wrapper__function-signature"
             signature={_function.signature}
