@@ -30,7 +30,7 @@ pub async fn feeds_slots_manager_loop<
 
         let keys = reg.get_keys();
 
-        let mut feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
+        let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
             Arc::new(RwLock::new(FeedAggregateHistory::new()));
 
         for key in keys {
@@ -39,7 +39,10 @@ pub async fn feeds_slots_manager_loop<
 
             debug!("key = {} : value = {:?}", key, reg.get(key));
 
-            // feed_aggregate_history.write().unwrap().register_feed(key.clone(), 10_000); //TODO(snikolov): How to avoid borrow?
+            feed_aggregate_history
+                .write()
+                .unwrap()
+                .register_feed(key.clone(), 10_000); //TODO(snikolov): How to avoid borrow?
 
             let feed = match reg.get(key) {
                 Some(x) => x,
@@ -54,6 +57,8 @@ pub async fn feeds_slots_manager_loop<
                 .expect(lock_err_msg)
                 .get_first_report_start_time_ms();
 
+            let feed_aggregate_history_cp = feed_aggregate_history.clone();
+
             collected_futures.push(spawn(async move {
                 feed_slots_processor_loop(
                     send_channel,
@@ -62,7 +67,7 @@ pub async fn feeds_slots_manager_loop<
                     report_interval_ms,
                     first_report_start_time,
                     rc,
-                    // feed_aggregate_history,
+                    feed_aggregate_history_cp,
                     key,
                 )
                 .await

@@ -23,7 +23,7 @@ pub async fn feed_slots_processor_loop<
     report_interval_ms: u64,
     first_report_start_time: u128,
     reports: Arc<RwLock<AllFeedsReports>>,
-    // mut history: Arc<RwLock<FeedAggregateHistory>>,
+    history: Arc<RwLock<FeedAggregateHistory>>,
     key: u32,
 ) -> Result<String, Report> {
     let feed_slots_time_tracker = SlotTimeTracker::new(
@@ -71,11 +71,12 @@ pub async fn feed_slots_processor_loop<
 
             key_post = key;
             result_post_to_contract = feed.read().unwrap().get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
-                                                                                              // {
-                                                                                              //     //TODO(snikolov): Is this thread-safe?
-                                                                                              //     let mut history_guard = history.write().unwrap();
-                                                                                              //     history_guard.push(key, result_post_to_contract.clone())
-                                                                                              // }
+
+            {
+                //TODO(snikolov): Is this thread-safe?
+                let mut history_guard = history.write().unwrap();
+                history_guard.push(key, result_post_to_contract.clone())
+            }
 
             info!("result_post_to_contract = {:?}", result_post_to_contract);
             reports.clear();
@@ -110,6 +111,7 @@ mod tests {
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
+        let history = Arc::new(RwLock::new(FeedAggregateHistory::new()));
 
         let (tx, mut rx) = unbounded_channel::<(String, String)>();
 
@@ -143,6 +145,7 @@ mod tests {
                     .unwrap()
                     .as_millis(),
                 all_feeds_reports_arc_clone,
+                history,
                 feed_id,
             )
             .await

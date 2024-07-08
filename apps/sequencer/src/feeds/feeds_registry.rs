@@ -1,9 +1,9 @@
 use data_feeds::services::aggregate::{AverageAggregator, FeedAggregate};
 use data_feeds::types::FeedType;
-use sequencer_config::SequencerConfig;
 use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
 use ringbuf::{HeapRb, SharedRb};
+use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::time::{SystemTime, UNIX_EPOCH};
