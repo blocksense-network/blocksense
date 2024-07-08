@@ -37,7 +37,7 @@
     "react-dom": ">=16.13.1"
   },
   "dependencies": {
-    "@headlessui/react": "^2.0.4",
+    "@headlessui/react": "^2.1.2",
     "@popperjs/core": "^2.11.8",
     "clsx": "^2.0.0",
     "escape-string-regexp": "^5.0.0",
@@ -61,9 +61,9 @@
     "@vitejs/plugin-react": "^4.3.1",
     "concurrently": "^8.0.0",
     "jsdom": "^24.1.0",
-    "next": "^14.2.3",
+    "next": "^14.2.4",
     "nextra": "^2.13.4",
-    "postcss": "^8.4.31",
+    "postcss": "^8.4.39",
     "postcss-cli": "^10.1.0",
     "postcss-import": "^15.1.0",
     "postcss-lightningcss": "^1.0.0",
@@ -71,7 +71,7 @@
     "react-dom": "^18.2.0",
     "tailwindcss": "^3.4.4",
     "tsup": "8.1.0",
-    "typescript": "5.4.5",
+    "typescript": "5.5.3",
     "vitest": "^0.34.0"
   },
   "sideEffects": [
