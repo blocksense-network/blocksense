@@ -78,3 +78,84 @@ pub async fn feed_slots_processor_loop<
             .unwrap();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::feeds::feeds_registry::{AllFeedsReports, FeedMetaData};
+    use std::sync::{Arc, RwLock};
+    use std::time::{Duration, SystemTime, UNIX_EPOCH};
+    use tokio::sync::mpsc::unbounded_channel;
+
+    #[tokio::test]
+    async fn test_feed_slots_processor_loop() {
+        // setup
+        let name = "test_feed";
+        let report_interval_ms = 1000; // 1 second interval
+        let first_report_start_time = SystemTime::now();
+        let feed_metadata = FeedMetaData::new(name, report_interval_ms, first_report_start_time);
+        let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
+        let all_feeds_reports = AllFeedsReports::new();
+        let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
+
+        let (tx, mut rx) = unbounded_channel::<(String, String)>();
+        let original_report_data =
+            "3ff0000000000000000000000000000000000000000000000000000000000000";
+
+        // we are specifically sending only one report message as we don't want to test the average processor
+        {
+            let feed_id = 1;
+            let reporter_id = 42;
+            let report_data = original_report_data.clone();
+            all_feeds_reports_arc.write().unwrap().push(
+                feed_id,
+                reporter_id,
+                original_report_data.to_string(),
+            );
+        }
+
+        // run
+        let feed_id = 1;
+        let name = name.to_string();
+        let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
+        let all_feeds_reports_arc_clone = Arc::clone(&all_feeds_reports_arc);
+
+        tokio::spawn(async move {
+            feed_slots_processor_loop(
+                tx,
+                feed_metadata_arc_clone,
+                name,
+                report_interval_ms,
+                first_report_start_time
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_millis(),
+                all_feeds_reports_arc_clone,
+                feed_id,
+            )
+            .await
+            .unwrap();
+        });
+
+        // Attempt to receive with a timeout of 2 seconds
+        let received = tokio::time::timeout(Duration::from_secs(2), rx.recv()).await;
+
+        match received {
+            Ok(Some((key, result))) => {
+                // assert the received data
+                assert_eq!(
+                    key,
+                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
+                    "The key does not match the expected value"
+                );
+                assert_eq!(result, original_report_data);
+            }
+            Ok(None) => {
+                panic!("The channel was closed before receiving any data");
+            }
+            Err(_) => {
+                panic!("The channel did not receive any data within the timeout period");
+            }
+        }
+    }
+}
