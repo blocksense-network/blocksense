@@ -13,11 +13,7 @@ type ErrorsProps = {
 
 export const Errors = ({ errors }: ErrorsProps) => {
   return (
-    <ContractItemWrapper
-      className="contract-item-wrapper"
-      title="Errors"
-      itemsLength={errors?.length}
-    >
+    <ContractItemWrapper title="Errors" itemsLength={errors?.length}>
       {errors?.map((error, index) => (
         <div className="contract-item-wrapper__error" key={index}>
           <h3 className="contract-item-wrapper__error-title">
@@ -25,10 +21,7 @@ export const Errors = ({ errors }: ErrorsProps) => {
           </h3>
           <Signature signature={error.signature} />
           <Variables variables={error?._parameters} title="Parameters" />
-          <NatSpec
-            className="contract-item-wrapper__error-natspec"
-            natspec={error.natspec}
-          />
+          <NatSpec natspec={error.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

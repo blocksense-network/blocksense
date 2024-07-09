@@ -11,27 +11,23 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
   return (
     <>
       {Object.keys(natspec).length > 0 && (
-        <div className="natspec mt-4 bg-white text-black">
+        <div className="natspec py-2 px-4 mt-2 bg-white text-black">
           <span className="natspec__title text-xl font-semibold text-gray-800">
-            Natspec
+            Description
           </span>
-          <hr className="natspec__divider h-px mt-2 mb-0 bg-gray-200 border-0" />
           <br />
           {natspec.author && (
-            <h3
-              className="natspec__author text-xl font-semibold mb-1"
-              variant="descriptive"
-            >
+            <h3 className="natspec__author text-xl mb-1 text-gray-700">
               {natspec.author}
             </h3>
           )}
           {natspec.notice && (
-            <span className="natspec__notice text-base mb-2 font-bold">
+            <span className="natspec__notice mb-2 text-base text-gray-700">
               {natspec.notice}
             </span>
           )}
           {natspec.dev && (
-            <div className="natspec__dev text-base text-slate-600 mb-2">
+            <div className="natspec__dev text-base  text-slate-600 mb-2">
               {natspec.dev
                 .replace(/\n/g, ' ')
                 .replace(/{/g, '`{`')
@@ -39,11 +35,11 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
             </div>
           )}
           {natspec.params?.map((param, index) => (
-            <div className="natspec__param mb-5 mt-4" key={index}>
+            <div className="natspec__param" key={index}>
               <span className="natspec__param-name text-base text-slate-600 font-bold">
                 {param.name}:
               </span>{' '}
-              <span className="natspec__param-description text-base text-slate-600">
+              <span className="natspec__param-description text-base  text-slate-600">
                 {param.description}
               </span>
             </div>

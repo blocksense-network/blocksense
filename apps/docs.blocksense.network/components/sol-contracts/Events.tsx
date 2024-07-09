@@ -13,11 +13,7 @@ type EventsProps = {
 
 export const Events = ({ events }: EventsProps) => {
   return (
-    <ContractItemWrapper
-      className="contract-item-wrapper"
-      title="Events"
-      itemsLength={events?.length}
-    >
+    <ContractItemWrapper title="Events" itemsLength={events?.length}>
       {events?.map((event, index) => (
         <div className="contract-item-wrapper__event" key={index}>
           <h3 className="contract-item-wrapper__event-title">
@@ -28,10 +24,7 @@ export const Events = ({ events }: EventsProps) => {
             Anonymous: {event.anonymous.toString()}
           </span>
           <Variables variables={event?._parameters} title="Parameters" />
-          <NatSpec
-            className="contract-item-wrapper__event-natspec"
-            natspec={event.natspec}
-          />
+          <NatSpec natspec={event.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

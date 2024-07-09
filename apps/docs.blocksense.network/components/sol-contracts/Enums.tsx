@@ -11,11 +11,7 @@ type EnumsProps = {
 
 export const Enums = ({ enums }: EnumsProps) => {
   return (
-    <ContractItemWrapper
-      className="contract-item-wrapper"
-      title="Enums"
-      itemsLength={enums?.length}
-    >
+    <ContractItemWrapper title="Enums" itemsLength={enums?.length}>
       {enums?.map((_enum, index) => (
         <div className="contract-item-wrapper__enum" key={index}>
           <h3 className="contract-item-wrapper__enum-title">{_enum.name}</h3>
@@ -26,10 +22,7 @@ export const Enums = ({ enums }: EnumsProps) => {
               </span>
             </div>
           ))}
-          <NatSpec
-            className="contract-item-wrapper__enum-natspec"
-            natspec={_enum.natspec}
-          />
+          <NatSpec natspec={_enum.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

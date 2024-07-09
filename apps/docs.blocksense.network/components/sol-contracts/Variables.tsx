@@ -19,10 +19,7 @@ type VariablesProps = {
 
 export const Variables = ({ variables, title }: VariablesProps) => {
   return (
-    <ContractItemWrapper
-      className="contract-item-wrapper"
-      itemsLength={variables?.length}
-    >
+    <ContractItemWrapper itemsLength={variables?.length}>
       <Table className="variables__table">
         <TableCaption className="variables__caption">{title}</TableCaption>
         <TableHeader className="variables__table-header">
@@ -37,7 +34,9 @@ export const Variables = ({ variables, title }: VariablesProps) => {
         <TableBody className="variables__body">
           {variables?.map((variable, index) => (
             <TableRow className="variables__row" key={index}>
-              <TableCell className="variables__cell">{variable.name}</TableCell>
+              <TableCell className="variables__cell">
+                {variable.name ? variable.name : 'unnamed'}
+              </TableCell>
               <TableCell className="variables__cell">
                 {variable.typeDescriptions.typeString}
               </TableCell>

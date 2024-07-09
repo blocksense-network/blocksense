@@ -19,15 +19,8 @@ export const Structs = ({ structs }: StructsProps) => {
           <span className="contract-item-wrapper__struct-visibility">
             Visibility: {struct.visibility}
           </span>
-          <Variables
-            className="contract-item-wrapper__struct-members"
-            variables={struct?._members}
-            title="Members"
-          />
-          <NatSpec
-            className="contract-item-wrapper__struct-natspec"
-            natspec={struct.natspec}
-          />
+          <Variables variables={struct?._members} title="Members" />
+          <NatSpec natspec={struct.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

@@ -16,11 +16,7 @@ type FunctionsProps = {
 
 export const Functions = ({ functions }: FunctionsProps) => {
   return (
-    <ContractItemWrapper
-      className="contract-item-wrapper"
-      title="Functions"
-      itemsLength={functions?.length}
-    >
+    <ContractItemWrapper title="Functions" itemsLength={functions?.length}>
       {functions?.map((_function, index) => (
         <div className="contract-item-wrapper__function space-y-4" key={index}>
           {_function.name && (
@@ -35,10 +31,6 @@ export const Functions = ({ functions }: FunctionsProps) => {
           <Badge className="contract-item-wrapper__function-kind">
             <span>Kind: {_function.kind}</span>
           </Badge>
-          <Signature
-            className="contract-item-wrapper__function-signature"
-            signature={_function.signature}
-          />
           <Badge className="contract-item-wrapper__function-visibility">
             <span>Visibility: {_function.visibility}</span>
           </Badge>
@@ -48,24 +40,14 @@ export const Functions = ({ functions }: FunctionsProps) => {
           <Badge className="contract-item-wrapper__function-virtual">
             <span>Virtual: {_function.virtual.toString()}</span>
           </Badge>
+          <Signature signature={_function.signature} />
+          <Variables variables={_function._parameters} title="Parameters" />
           <Variables
-            className="contract-item-wrapper__function-parameters"
-            variables={_function._parameters}
-            title="Parameters"
-          />
-          <Variables
-            className="contract-item-wrapper__function-return-parameters"
             variables={_function._returnParameters}
             title="Return Parameters"
           />
-          <FunctionModifiers
-            className="contract-item-wrapper__function-modifiers"
-            functionModifiers={_function._modifiers}
-          />
-          <NatSpec
-            className="contract-item-wrapper__function-natspec"
-            natspec={_function.natspec}
-          />
+          <FunctionModifiers functionModifiers={_function._modifiers} />
+          <NatSpec natspec={_function.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

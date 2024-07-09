@@ -12,11 +12,7 @@ type ModifiersProps = {
 
 export const Modifiers = ({ modifiers }: ModifiersProps) => {
   return (
-    <ContractItemWrapper
-      className="contract-item-wrapper"
-      title="Modifiers"
-      itemsLength={modifiers?.length}
-    >
+    <ContractItemWrapper title="Modifiers" itemsLength={modifiers?.length}>
       {modifiers?.map((modifier, index) => (
         <div className="contract-item-wrapper__modifier" key={index}>
           <h3 className="contract-item-wrapper__modifier-title">
@@ -25,20 +21,13 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
           <span className="contract-item-wrapper__modifier-visibility">
             Visibility: {modifier.visibility}
           </span>
-          <Signature
-            className="contract-item-wrapper__modifier-signature"
-            signature={modifier.signature}
-          />
+          <Signature signature={modifier.signature} />
           <Variables
-            className="contract-item-wrapper__modifier-parameters"
             key={index}
             variables={modifier?._parameters}
             title="Parameters"
           />
-          <NatSpec
-            className="contract-item-wrapper__modifier-natspec"
-            natspec={modifier.natspec}
-          />
+          <NatSpec natspec={modifier.natspec} />
         </div>
       ))}
     </ContractItemWrapper>
