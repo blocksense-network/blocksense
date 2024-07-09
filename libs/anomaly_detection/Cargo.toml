@@ -8,12 +8,12 @@ edition.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [[bin]]
-name = "extended_isolation_forest"
-path = "bin/extended_isolation_forest.rs"
+name = "extended_isolation_forest_test"
+path = "bin/extended_isolation_forest_test.rs"
 
 [[bin]]
-name = "hdbscan_detector"
-path = "bin/hdbscan_detector.rs"
+name = "hdbscan_detector_test"
+path = "bin/hdbscan_detector_test.rs"
 
 [dependencies]
 num = "0.4.3"
@@ -22,3 +22,4 @@ rand_distr = "0.4.3"
 serde = "1.0.203"
 extended-isolation-forest = "0.2.3"
 hdbscan = "0.6.0"
+csv = "1.3.0"
