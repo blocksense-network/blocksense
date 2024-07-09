@@ -142,6 +142,11 @@ main {
     @apply border-gray-200;
   }
 
+  .cn-table th {
+    font-weight: bold;
+    @apply text-slate-700;
+  }
+
   code {
     -webkit-box-decoration-break: slice;
     box-decoration-break: slice;
