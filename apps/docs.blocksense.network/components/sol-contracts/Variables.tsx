@@ -78,10 +78,16 @@ export const Variables = ({ variables, title }: VariablesProps) => {
                                   Name
                                 </TableHead>
                                 <TableHead className="variables__table-head">
+                                  Type Identifier
+                                </TableHead>
+                                <TableHead className="variables__table-head">
                                   Type
                                 </TableHead>
                                 <TableHead className="variables__table-head">
                                   Mutability
+                                </TableHead>
+                                <TableHead className="variables__table-head">
+                                  Value
                                 </TableHead>
                                 <TableHead className="variables__table-head">
                                   Indexed
@@ -97,10 +103,16 @@ export const Variables = ({ variables, title }: VariablesProps) => {
                                   {variable.name ? variable.name : 'unnamed'}
                                 </TableCell>
                                 <TableCell className="variables__table-cell variables__table-cell--type">
+                                  {variable.typeDescriptions.typeIdentifier}
+                                </TableCell>
+                                <TableCell className="variables__table-cell variables__table-cell--type">
                                   {variable.typeDescriptions.typeString}
                                 </TableCell>
                                 <TableCell className="variables__table-cell variables__table-cell--mutability">
                                   {variable.mutability}
+                                </TableCell>
+                                <TableCell className="variables__table-cell variables__table-cell--value">
+                                  {variable._value}
                                 </TableCell>
                                 <TableCell className="variables__table-cell variables__table-cell--indexed">
                                   {variable.indexed.toString()}
