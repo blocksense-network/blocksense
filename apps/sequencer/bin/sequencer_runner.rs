@@ -39,7 +39,7 @@ async fn main() -> std::io::Result<()> {
         std::process::exit(0);
     });
 
-    let providers = init_shared_rpc_providers(&sequencer_config);
+    let providers = init_shared_rpc_providers(&sequencer_config).await;
 
     let app_state = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(

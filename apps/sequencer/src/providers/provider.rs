@@ -1,3 +1,4 @@
+use alloy::providers::Provider;
 use alloy::transports::http::Http;
 use alloy::{
     network::{Ethereum, EthereumSigner},
@@ -15,8 +16,10 @@ use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
 use std::fs;
 use std::sync::Arc;
+use tokio::spawn;
 use tokio::sync::Mutex;
-use tracing::debug;
+use tokio::time::Duration;
+use tracing::{debug, error, info, warn};
 
 pub type ProviderType = FillProvider<
     JoinFill<
@@ -44,11 +47,29 @@ pub struct RpcProvider {
 
 pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
-pub fn init_shared_rpc_providers(conf: &SequencerConfig) -> SharedRpcProviders {
-    Arc::new(std::sync::RwLock::new(get_rpc_providers(conf)))
+async fn chech_if_contract_exists(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
+    let latest_block = provider
+        .lock()
+        .await
+        .provider
+        .get_block_number()
+        .await
+        .expect("Could not lock provider mutex!");
+    let bytecode = provider
+        .lock()
+        .await
+        .provider
+        .get_code_at(*addr, latest_block.into())
+        .await
+        .expect("Could not get bytecode of contract from provider!");
+    bytecode.to_string() != "0x"
 }
 
-fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
+pub async fn init_shared_rpc_providers(conf: &SequencerConfig) -> SharedRpcProviders {
+    Arc::new(std::sync::RwLock::new(get_rpc_providers(conf).await))
+}
+
+async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
 
     for (key, p) in &conf.providers {
@@ -76,17 +97,68 @@ fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcPro
             Some(x) => parse_contract_address(x.as_str()),
             None => None,
         };
-        providers.insert(
-            key.clone(),
-            Arc::new(Mutex::new(RpcProvider {
-                contract_address: address,
-                provider,
-                wallet,
-                provider_metrics: ProviderMetrics::new(&key)
-                    .expect("Failed to allocate ProviderMetrics"),
-                transcation_timeout_secs: p.transcation_timeout_secs,
-            })),
-        );
+
+        let rpc_provider = Arc::new(Mutex::new(RpcProvider {
+            contract_address: address,
+            provider,
+            wallet,
+            provider_metrics: ProviderMetrics::new(&key)
+                .expect("Failed to allocate ProviderMetrics"),
+            transcation_timeout_secs: p.transcation_timeout_secs,
+        }));
+
+        providers.insert(key.clone(), rpc_provider.clone());
+
+        match &p.contract_address {
+            Some(x) => {
+                match parse_contract_address(x.as_str()) {
+                    Some(addr) => {
+                        info!("Contract address for network {} set to {}. Checking if contract exists ...", key, addr);
+                        match spawn(async move {
+                            let result = actix_web::rt::time::timeout(
+                                Duration::from_secs(5),
+                                chech_if_contract_exists(rpc_provider, &addr),
+                            )
+                            .await;
+                            result
+                        })
+                        .await
+                        {
+                            Ok(result) => match result {
+                                Ok(exists) => {
+                                    if exists {
+                                        info!(
+                                            "Contract for network {} exists on address {}",
+                                            key, addr
+                                        );
+                                    } else {
+                                        warn!(
+                                            "No contract for network {} exists on address {}",
+                                            key, addr
+                                        )
+                                    }
+                                }
+                                Err(e) => {
+                                    warn!("JSON rpc request to verify contract existence timed out: {}", e);
+                                }
+                            },
+                            Err(e) => {
+                                error!("Task join error: {}", e)
+                            }
+                        };
+                    }
+                    None => {
+                        error!(
+                            "Set contract address for network {} is not a valid Ethereum contract address!",
+                            key
+                        );
+                    }
+                }
+            }
+            None => {
+                warn!("No contract address set for network {}", key);
+            }
+        };
     }
 
     debug!("List of providers:");
