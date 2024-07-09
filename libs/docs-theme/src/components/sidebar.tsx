@@ -413,7 +413,7 @@ export function Sidebar({
           'md:nx-top-16 md:nx-shrink-0 motion-reduce:nx-transform-none',
           'nx-transform-gpu nx-transition-all nx-ease-in-out',
           'print:nx-hidden',
-          showSidebar ? 'md:nx-w-64' : 'md:nx-w-20',
+          showSidebar ? 'md:nx-w-66' : 'md:nx-w-20',
           asPopover ? 'md:nx-hidden' : 'md:nx-sticky md:nx-self-start',
           menu
             ? 'max-md:[transform:translate3d(0,0,0)]'
