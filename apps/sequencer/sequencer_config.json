@@ -2,8 +2,8 @@
   "max_keys_to_batch": 1,
   "keys_batch_duration": 500,
   "providers": {
-      "ETH1": {"private_key_path": "/tmp/priv_key_test", "url": "http://127.0.0.1:8545", "transcation_timeout_secs": 50},
-      "ETH2": {"private_key_path": "/tmp/priv_key_test", "url": "http://127.0.0.1:8546", "transcation_timeout_secs": 50}
+      "ETH1": {"private_key_path": "/tmp/priv_key_test", "url": "http://127.0.0.1:8545", "transcation_timeout_secs": 50, "contract_address": "0x663F3ad617193148711d28f5334eE4Ed07016602"},
+      "ETH2": {"private_key_path": "/tmp/priv_key_test", "url": "http://127.0.0.1:8546", "transcation_timeout_secs": 50, "contract_address": "0x663F3ad617193148711d28f5334eE4Ed07016602"}
   },
   "feeds" : [
     {"id": 0, "name": "DOGE/USD", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
