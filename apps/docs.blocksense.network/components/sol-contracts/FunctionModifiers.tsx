@@ -21,7 +21,11 @@ export const FunctionModifiers = ({
   functionModifiers,
 }: FunctionModifiersProps) => {
   return (
-    <ContractItemWrapper itemsLength={functionModifiers?.length}>
+    <ContractItemWrapper
+      title="Function Modifiers"
+      titleLevel={4}
+      itemsLength={functionModifiers?.length}
+    >
       <Table className="contract-item-wrapper__table-component">
         <TableCaption className="contract-item-wrapper__table-caption">
           Function Modifiers

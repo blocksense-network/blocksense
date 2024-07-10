@@ -6,6 +6,7 @@ import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Variables } from '@/sol-contracts-components/Variables';
 import { Selector } from '@/sol-contracts-components/Selector';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
 type ErrorsProps = {
   errors?: ErrorDocItem[];
@@ -21,9 +22,11 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
     >
       {errors?.map((error, index) => (
         <div className="contract-item-wrapper__error" key={index}>
-          <h3 className="contract-item-wrapper__error-title">
-            {error.name} <Selector selector={error.errorSelector} />
-          </h3>
+          <AnchorLinkTitle
+            title={error.name}
+            titleLevel={isFromSourceUnit ? 3 : 4}
+          />
+          <Selector selector={error.errorSelector} />
           <Signature signature={error.signature} />
           <Variables
             variables={error?._parameters}

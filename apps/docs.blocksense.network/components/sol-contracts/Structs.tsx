@@ -5,6 +5,7 @@ import { StructDocItem } from '@blocksense/sol-reflector';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Variables } from '@/sol-contracts-components/Variables';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
 type StructsProps = {
   structs?: StructDocItem[];
@@ -20,7 +21,10 @@ export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
     >
       {structs?.map((struct, index) => (
         <div className="contract-item-wrapper__struct" key={index}>
-          <h3 className="contract-item-wrapper__struct-title">{struct.name}</h3>
+          <AnchorLinkTitle
+            title={struct.name}
+            titleLevel={isFromSourceUnit ? 3 : 4}
+          />
           <span className="contract-item-wrapper__struct-visibility">
             Visibility: {struct.visibility}
           </span>

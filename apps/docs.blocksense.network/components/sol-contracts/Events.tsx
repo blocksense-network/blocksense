@@ -6,6 +6,7 @@ import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Variables } from '@/sol-contracts-components/Variables';
 import { Selector } from '@/sol-contracts-components/Selector';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
 type EventsProps = {
   events?: EventDocItem[];
@@ -13,12 +14,15 @@ type EventsProps = {
 
 export const Events = ({ events }: EventsProps) => {
   return (
-    <ContractItemWrapper title="Events" itemsLength={events?.length}>
+    <ContractItemWrapper
+      title="Events"
+      titleLevel={3}
+      itemsLength={events?.length}
+    >
       {events?.map((event, index) => (
         <div className="contract-item-wrapper__event" key={index}>
-          <h3 className="contract-item-wrapper__event-title">
-            {event.name} <Selector selector={event.eventSelector} />
-          </h3>
+          <AnchorLinkTitle title={event.name} titleLevel={3} />
+          <Selector selector={event.eventSelector} />
           <Signature signature={event.signature} />
           <span className="contract-item-wrapper__event-anonymous">
             Anonymous: {event.anonymous.toString()}

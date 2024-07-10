@@ -9,6 +9,7 @@ import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Variables } from '@/sol-contracts-components/Variables';
 import { Selector } from '@/sol-contracts-components/Selector';
+import { AnchorLinkTitle } from './AnchorLinkTitle';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];
@@ -24,15 +25,11 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
     >
       {functions?.map((_function, index) => (
         <div className="contract-item-wrapper__function space-y-4" key={index}>
-          {_function.name && (
-            <Badge
-              className="contract-item-wrapper__function-name"
-              variant="accentary"
-            >
-              {_function.name}{' '}
-              <Selector selector={_function.functionSelector} />
-            </Badge>
-          )}
+          <AnchorLinkTitle
+            title={_function.name}
+            titleLevel={isFromSourceUnit ? 3 : 4}
+          />
+          <Selector selector={_function.functionSelector} />
           <Badge className="contract-item-wrapper__function-kind">
             <span>Kind: {_function.kind}</span>
           </Badge>

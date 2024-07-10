@@ -19,6 +19,7 @@ export const Contracts = ({ contracts }: ContractsProps) => {
   return (
     <ContractItemWrapper
       title={contracts?.[0]?.name ?? ''}
+      titleLevel={2}
       itemsLength={contracts?.length}
     >
       {contracts?.map((contract, index) => {

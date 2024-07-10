@@ -12,7 +12,11 @@ type ModifiersProps = {
 
 export const Modifiers = ({ modifiers }: ModifiersProps) => {
   return (
-    <ContractItemWrapper title="Modifiers" itemsLength={modifiers?.length}>
+    <ContractItemWrapper
+      title="Modifiers"
+      titleLevel={3}
+      itemsLength={modifiers?.length}
+    >
       {modifiers?.map((modifier, index) => (
         <div className="contract-item-wrapper__modifier" key={index}>
           <h3 className="contract-item-wrapper__modifier-title">

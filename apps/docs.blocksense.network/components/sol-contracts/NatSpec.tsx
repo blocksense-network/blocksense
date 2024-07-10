@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 
 import { NatSpec as NatSpecType } from '@blocksense/sol-reflector';
 

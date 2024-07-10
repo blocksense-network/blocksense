@@ -1,14 +1,11 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 
 import { ContractDocItem } from '@blocksense/sol-reflector';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
