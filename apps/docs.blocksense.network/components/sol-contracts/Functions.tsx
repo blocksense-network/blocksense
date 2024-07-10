@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 
-import { FunctionDocItem } from '@blocksense/sol-reflector';
+import { FunctionDocItem, FunctionType } from '@blocksense/sol-reflector';
 
 import { Signature } from '@/sol-contracts-components/Signature';
 import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers';
@@ -26,7 +26,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
       {functions?.map((_function, index) => (
         <div className="contract-item-wrapper__function space-y-4" key={index}>
           <AnchorLinkTitle
-            title={_function.name}
+            title={_function.name || _function.kind}
             titleLevel={isFromSourceUnit ? 3 : 4}
           />
           <Selector selector={_function.functionSelector} />
@@ -46,12 +46,12 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
           <Variables
             variables={_function._parameters}
             title="Parameters"
-            titleLevel={4}
+            titleLevel={isFromSourceUnit ? 4 : 5}
           />
           <Variables
             variables={_function._returnParameters}
             title="Return Parameters"
-            titleLevel={4}
+            titleLevel={isFromSourceUnit ? 4 : 5}
           />
           <FunctionModifiers functionModifiers={_function._modifiers} />
           <NatSpec natspec={_function.natspec} />

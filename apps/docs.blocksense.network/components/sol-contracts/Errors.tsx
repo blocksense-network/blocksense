@@ -31,7 +31,7 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
           <Variables
             variables={error?._parameters}
             title="Parameters"
-            titleLevel={4}
+            titleLevel={isFromSourceUnit ? 4 : 5}
           />
           <NatSpec natspec={error.natspec} />
         </div>

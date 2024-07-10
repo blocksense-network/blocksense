@@ -31,7 +31,7 @@ export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
           <Variables
             variables={struct?._members}
             title="Members"
-            titleLevel={4}
+            titleLevel={isFromSourceUnit ? 4 : 5}
           />
           <NatSpec natspec={struct.natspec} />
         </div>

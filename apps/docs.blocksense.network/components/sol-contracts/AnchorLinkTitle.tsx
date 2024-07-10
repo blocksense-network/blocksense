@@ -23,7 +23,7 @@ export const AnchorLinkTitle = ({
     createElement(
       `h${titleLevel}`,
       {
-        className: `${titleStyles[titleLevel]} nx-font-semibold nx-tracking-tight nx-text-slate-900 dark:nx-text-slate-100 nx-mt-10 nx-border-b nx-pb-1 nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400`,
+        className: `${titleStyles[titleLevel]} nx-font-semibold nx-tracking-tight nx-text-slate-900 dark:nx-text-slate-100 nx-mt-4 nx-border-b nx-pb-4 nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400`,
       },
       <>
         {title}
