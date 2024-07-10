@@ -51,12 +51,12 @@ export const Variables = ({ variables, title, titleLevel }: VariablesProps) => {
         <TableBody className="variables__table-body">
           {variables?.map((variable, index) => (
             <TableRow className="variables__table-row" key={index}>
-              <TableCell className="variables__table-cell variables__table-cell--name w-[140px]">
+              <TableCell className="variables__table-cell variables__table-cell--name">
                 <Drawer>
                   <DrawerTrigger asChild>
                     <Button
                       variant="secondary"
-                      className="variables__button w-[140px] font-bold"
+                      className="variables__button font-bold"
                     >
                       {variable.name ? variable.name : 'unnamed'}
                     </Button>
