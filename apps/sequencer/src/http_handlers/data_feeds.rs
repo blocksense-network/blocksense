@@ -6,7 +6,6 @@ use super::super::feeds::feeds_state::FeedsState;
 use actix_web::web;
 use actix_web::{error, Error};
 use actix_web::{post, HttpResponse};
-use data_feeds::feeds_processing::REPORT_HEX_SIZE;
 use futures::StreamExt;
 
 use tracing::{debug, trace, warn};

@@ -31,6 +31,7 @@ pub enum ConsensusMetric {
     Mean(AverageAggregator),
 }
 
+#[allow(unreachable_patterns)]
 impl Display for ConsensusMetric {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
