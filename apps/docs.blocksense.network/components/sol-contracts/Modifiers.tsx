@@ -26,13 +26,13 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
             Visibility: {modifier.visibility}
           </span>
           <Signature signature={modifier.signature} />
+          <NatSpec natspec={modifier.natspec} />
           <Variables
             key={index}
             variables={modifier?._parameters}
             title="Parameters"
             titleLevel={4}
           />
-          <NatSpec natspec={modifier.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

@@ -28,12 +28,12 @@ export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
           <span className="contract-item-wrapper__struct-visibility">
             Visibility: {struct.visibility}
           </span>
+          <NatSpec natspec={struct.natspec} />
           <Variables
             variables={struct?._members}
             title="Members"
             titleLevel={isFromSourceUnit ? 4 : 5}
           />
-          <NatSpec natspec={struct.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

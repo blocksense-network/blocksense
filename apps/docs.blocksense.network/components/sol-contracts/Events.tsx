@@ -27,12 +27,12 @@ export const Events = ({ events }: EventsProps) => {
           <span className="contract-item-wrapper__event-anonymous">
             Anonymous: {event.anonymous.toString()}
           </span>
+          <NatSpec natspec={event.natspec} />
           <Variables
             variables={event?._parameters}
             title="Parameters"
             titleLevel={4}
           />
-          <NatSpec natspec={event.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

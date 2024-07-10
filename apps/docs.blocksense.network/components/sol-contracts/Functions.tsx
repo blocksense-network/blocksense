@@ -43,6 +43,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
             <span>Virtual: {_function.virtual.toString()}</span>
           </Badge>
           <Signature signature={_function.signature} />
+          <NatSpec natspec={_function.natspec} />
           <Variables
             variables={_function._parameters}
             title="Parameters"
@@ -54,7 +55,6 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
             titleLevel={isFromSourceUnit ? 4 : 5}
           />
           <FunctionModifiers functionModifiers={_function._modifiers} />
-          <NatSpec natspec={_function.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

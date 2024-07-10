@@ -24,6 +24,7 @@ export const Enums = ({ enums, isFromSourceUnit }: EnumsProps) => {
             title={_enum.name}
             titleLevel={isFromSourceUnit ? 3 : 4}
           />
+          <NatSpec natspec={_enum.natspec} />
           {_enum._members?.map((member, index) => (
             <div className="contract-item-wrapper__enum-member" key={index}>
               <span className="contract-item-wrapper__enum-member-name">
@@ -31,7 +32,6 @@ export const Enums = ({ enums, isFromSourceUnit }: EnumsProps) => {
               </span>
             </div>
           ))}
-          <NatSpec natspec={_enum.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

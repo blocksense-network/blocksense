@@ -28,12 +28,12 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
           />
           <Selector selector={error.errorSelector} />
           <Signature signature={error.signature} />
+          <NatSpec natspec={error.natspec} />
           <Variables
             variables={error?._parameters}
             title="Parameters"
             titleLevel={isFromSourceUnit ? 4 : 5}
           />
-          <NatSpec natspec={error.natspec} />
         </div>
       ))}
     </ContractItemWrapper>

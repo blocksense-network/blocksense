@@ -56,7 +56,7 @@ export const Variables = ({ variables, title, titleLevel }: VariablesProps) => {
                   <DrawerTrigger asChild>
                     <Button
                       variant="secondary"
-                      className="variables__button font-bold"
+                      className="variables__button font-bold min-w-[140px]"
                     >
                       {variable.name ? variable.name : 'unnamed'}
                     </Button>
