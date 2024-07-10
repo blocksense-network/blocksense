@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
 } from '@/components/ui/card';
 
@@ -41,10 +42,12 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
                   </li>
                 ))}
               </ul>
-              <NatSpec natspec={contract.natspec} />
             </div>
           </CardContent>
         )}
+        <CardFooter>
+          <NatSpec natspec={contract.natspec} />
+        </CardFooter>
       </Card>
     </div>
   );

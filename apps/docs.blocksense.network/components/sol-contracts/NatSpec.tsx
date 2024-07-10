@@ -27,10 +27,7 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
           )}
           {natspec.dev && (
             <div className="natspec__dev text-base  text-slate-600 mb-2">
-              {natspec.dev
-                .replace(/\n/g, ' ')
-                .replace(/{/g, '`{`')
-                .replace(/}/g, '`}`')}
+              {natspec.dev}
             </div>
           )}
           {natspec.params?.map((param, index) => (
