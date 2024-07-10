@@ -251,24 +251,27 @@ mod tests {
         None
     }
 
+    use sequencer_config::get_test_config_with_single_provider;
+
     #[tokio::test]
     async fn test_deploy_contract_returns_valid_address() {
         // setup
         // let target_deploy_address = generate_random_eth_address();
         let anvil = Anvil::new().try_spawn().unwrap();
-        env::set_var("WEB3_URL_ETH131", anvil.endpoint());
-        env::set_var("WEB3_PRIVATE_KEY_ETH131", "/tmp/priv_key_test");
-        let mut file = File::create("/tmp/priv_key_test").unwrap();
+        let key_path = "/tmp/priv_key_test";
+        let network = "ETH131";
+        let mut file = File::create(key_path).unwrap();
         file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
             .unwrap();
 
+        let cfg =
+            get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
+
         // give some time for cleanup env variables
-        let five_seconds = Duration::from_secs(5);
-        tokio::time::sleep(five_seconds).await;
-        let providers = init_shared_rpc_providers();
+        let providers = init_shared_rpc_providers(&cfg).await;
 
         // run
-        let result = deploy_contract(&String::from("ETH131"), &providers).await;
+        let result = deploy_contract(&String::from(network), &providers).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
