@@ -25,11 +25,16 @@ import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrap
 type VariablesProps = {
   variables?: VariableDocItem[];
   title?: string;
+  titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 };
 
-export const Variables = ({ variables, title }: VariablesProps) => {
+export const Variables = ({ variables, title, titleLevel }: VariablesProps) => {
   return (
-    <ContractItemWrapper itemsLength={variables?.length}>
+    <ContractItemWrapper
+      itemsLength={variables?.length}
+      title={title}
+      titleLevel={titleLevel}
+    >
       <Table className="variables__table">
         <TableCaption className="variables__table-caption">
           {title}

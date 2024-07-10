@@ -12,9 +12,7 @@ export const Signature = ({ signature = '' }: SignatureProps) => {
     codeToHtml(signature!, {
       lang: 'solidity',
       theme: 'material-theme-lighter',
-    })
-      .then((htmlString: any) => setHtml(htmlString))
-      .finally(() => console.log(html));
+    }).then((htmlString: any) => setHtml(htmlString));
   }, []);
 
   return (

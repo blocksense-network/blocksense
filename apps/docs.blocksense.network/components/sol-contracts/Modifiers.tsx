@@ -26,6 +26,7 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
             key={index}
             variables={modifier?._parameters}
             title="Parameters"
+            titleLevel={4}
           />
           <NatSpec natspec={modifier.natspec} />
         </div>

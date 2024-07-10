@@ -28,11 +28,15 @@ export const SourceUnit = ({
         <Pragmas pragmas={sourceUnit.pragmas} />
       </section>
       <Contracts contracts={sourceUnit.contracts} />
-      <Enums enums={sourceUnit.enums} />
-      <Errors errors={sourceUnit.errors} />
-      <Functions functions={sourceUnit.functions} />
-      <Structs structs={sourceUnit.structs} />
-      <Variables variables={sourceUnit.variables} title="Variables" />
+      <Enums enums={sourceUnit.enums} isFromSourceUnit />
+      <Errors errors={sourceUnit.errors} isFromSourceUnit />
+      <Functions functions={sourceUnit.functions} isFromSourceUnit />
+      <Structs structs={sourceUnit.structs} isFromSourceUnit />
+      <Variables
+        variables={sourceUnit.variables}
+        title="Variables"
+        titleLevel={2}
+      />
     </section>
   );
 };

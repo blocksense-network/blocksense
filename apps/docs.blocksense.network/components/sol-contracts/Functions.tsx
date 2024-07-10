@@ -12,11 +12,16 @@ import { Selector } from '@/sol-contracts-components/Selector';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];
+  isFromSourceUnit?: boolean;
 };
 
-export const Functions = ({ functions }: FunctionsProps) => {
+export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
   return (
-    <ContractItemWrapper title="Functions" itemsLength={functions?.length}>
+    <ContractItemWrapper
+      title="Functions"
+      titleLevel={isFromSourceUnit ? 2 : 3}
+      itemsLength={functions?.length}
+    >
       {functions?.map((_function, index) => (
         <div className="contract-item-wrapper__function space-y-4" key={index}>
           {_function.name && (
@@ -41,10 +46,15 @@ export const Functions = ({ functions }: FunctionsProps) => {
             <span>Virtual: {_function.virtual.toString()}</span>
           </Badge>
           <Signature signature={_function.signature} />
-          <Variables variables={_function._parameters} title="Parameters" />
+          <Variables
+            variables={_function._parameters}
+            title="Parameters"
+            titleLevel={4}
+          />
           <Variables
             variables={_function._returnParameters}
             title="Return Parameters"
+            titleLevel={4}
           />
           <FunctionModifiers functionModifiers={_function._modifiers} />
           <NatSpec natspec={_function.natspec} />

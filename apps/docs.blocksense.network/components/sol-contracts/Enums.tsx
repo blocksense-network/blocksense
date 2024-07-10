@@ -7,11 +7,16 @@ import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrap
 
 type EnumsProps = {
   enums?: EnumDocItem[];
+  isFromSourceUnit?: boolean;
 };
 
-export const Enums = ({ enums }: EnumsProps) => {
+export const Enums = ({ enums, isFromSourceUnit }: EnumsProps) => {
   return (
-    <ContractItemWrapper title="Enums" itemsLength={enums?.length}>
+    <ContractItemWrapper
+      title="Enums"
+      titleLevel={isFromSourceUnit ? 2 : 3}
+      itemsLength={enums?.length}
+    >
       {enums?.map((_enum, index) => (
         <div className="contract-item-wrapper__enum" key={index}>
           <h3 className="contract-item-wrapper__enum-title">{_enum.name}</h3>
