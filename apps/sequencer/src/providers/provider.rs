@@ -88,7 +88,7 @@ async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<
         let wallet: LocalWallet = priv_key
             .trim()
             .parse()
-            .expect("Incorrect private key specified.");
+            .expect(format!("Incorrect private key specified {}.", priv_key).as_str());
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()
             .signer(EthereumSigner::from(wallet.clone()))
@@ -187,37 +187,21 @@ mod tests {
 
     use crate::providers::provider::get_rpc_providers;
     use alloy::providers::Provider as AlloyProvider;
+    use sequencer_config::get_test_config_with_single_provider;
     use sequencer_config::Provider;
     use sequencer_config::SequencerConfig;
     use std::collections::HashMap;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
-        let private_key_path = "/tmp/key".to_string();
-        let network = "ETH".to_string();
-
-        let mut file = File::create("/tmp/key")?;
-        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")?;
+        let network = "ETH";
 
         let anvil = Anvil::new().try_spawn()?;
 
-        let cfg = SequencerConfig {
-            max_keys_to_batch: 1,
-            keys_batch_duration: 500,
-            providers: HashMap::from([(
-                network.clone(),
-                Provider {
-                    private_key_path,
-                    url: anvil.endpoint(),
-                    contract_address: None,
-                    transcation_timeout_secs: 50,
-                },
-            )]),
-            feeds: Vec::new(),
-        };
+        let cfg = get_test_config_with_single_provider(network, "/tmp/key", &anvil.endpoint());
 
-        let providers = get_rpc_providers(&cfg);
-        let provider = &providers.get(&network).unwrap().lock().await.provider;
+        let providers = get_rpc_providers(&cfg).await;
+        let provider = &providers.get(network).unwrap().lock().await.provider;
 
         let alice = anvil.addresses()[7];
         let bob = anvil.addresses()[0];
@@ -241,59 +225,48 @@ mod tests {
 
         println!("Transaction sent with nonce: {}", pending_tx.nonce);
 
-        assert_eq!(
-            get_contract_address().to_string(),
-            configured_contract_address
-        );
-
         // Send the transaction, the nonce (1) is automatically managed by the provider.
         let _builder = provider.send_transaction(tx).await?;
         Ok(())
     }
 
-    #[test]
-    fn test_get_wallet_success() {
+    #[tokio::test]
+    async fn test_get_wallet_success() {
+        let network = "ETH1";
         // Create a temporary file with a valid private key
         let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
         let expected_wallet_address = "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955"; // generated as hash of private_key
 
-        write("/tmp/key", private_key).expect("Failed to write to temp file");
+        let key_path = "/tmp/key";
 
-        // Set the environment variables
-        env::set_var("PRIVATE_KEY", "/tmp/key");
-        env::set_var("RPC_URL", "http://localhost:8545"); // Dummy URL for testing
+        write(key_path, private_key).expect("Failed to write to temp file");
+
+        let cfg = get_test_config_with_single_provider(network, key_path, "http://localhost:8545");
+        let providers = get_rpc_providers(&cfg).await;
 
         // Call the function
-        let wallet = get_wallet();
+        let wallet = &providers[network].lock().await.wallet;
 
         // Check if the wallet's address matches the expected address
         assert_eq!(wallet.address().to_string(), expected_wallet_address);
     }
 
-    #[test]
-    fn test_get_rpc_providers_returns_single_provider() {
+    #[tokio::test]
+    async fn test_get_rpc_providers_returns_single_provider() {
         // setup
-        let env_var_url = "WEB3_URL_ETH11";
-        let env_var_contract_address = "WEB3_CONTRACT_ADDRESS_ETH11";
-        let env_var_private_key = "WEB3_PRIVATE_KEY_ETH11";
-        env::set_var(env_var_url, "http://127.0.0.1:8545");
-        env::set_var(
-            env_var_contract_address,
-            "0xef11d1c2aa48826d4c41e54ab82d1ff5ad8a64ca",
-        );
-        env::set_var(env_var_private_key, "/tmp/priv_key_test");
-        let mut file = File::create("/tmp/priv_key_test").unwrap();
-        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-            .unwrap();
+        let network = "ETH2";
+        // Create a temporary file with a valid private key
+        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
+        let expected_wallet_address = "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955"; // generated as hash of private_key
+
+        let key_path = "/tmp/key";
+
+        write(key_path, private_key).expect("Failed to write to temp file");
+        let cfg = get_test_config_with_single_provider(network, key_path, "http://localhost:8545");
 
         // test
-        let binding = init_shared_rpc_providers();
+        let binding = init_shared_rpc_providers(&cfg).await;
         let result = binding.read().unwrap();
-
-        // cleanup
-        env::remove_var(env_var_url);
-        env::remove_var(env_var_contract_address);
-        env::remove_var(env_var_private_key);
 
         // assert
         assert_eq!(result.len(), 1);

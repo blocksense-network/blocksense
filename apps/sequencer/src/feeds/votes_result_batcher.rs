@@ -85,11 +85,8 @@ mod tests {
     #[actix_web::test]
     async fn test_votes_result_batcher_loop() {
         // Setup
-        let batch_size_env = "SEQUENCER_MAX_KEYS_TO_BATCH";
-        env::set_var(batch_size_env, "3");
-
-        let duration_env = "SEQUENCER_KEYS_BATCH_DURATION";
-        env::set_var(duration_env, "100");
+        let batch_size = 3;
+        let duration = 100;
 
         let (vote_send, vote_recv): (
             UnboundedSender<(&str, &str)>,
@@ -100,7 +97,7 @@ mod tests {
             UnboundedReceiver<HashMap<&str, &str>>,
         ) = mpsc::unbounded_channel();
 
-        super::votes_result_batcher_loop(vote_recv, batched_votes_send).await;
+        super::votes_result_batcher_loop(vote_recv, batched_votes_send, batch_size, duration).await;
 
         // Send test votes
         let k1 = "test_key_1";
