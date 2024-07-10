@@ -1,11 +1,11 @@
-use std::{error::Error, fs::File};
+use std::{error::Error, fs::File, path::Path};
 
 use csv::ReaderBuilder;
 
 use crate::{extended_isolation_forest::make_f64_forest, hdbscan_detector::make_f64_hdbscan};
 
 pub fn read_csv_to_vec(file_path: &str, column: &str) -> Result<Vec<f64>, Box<dyn Error>> {
-    let file = File::open(file_path)?;
+    let file = File::open(Path::new(file_path))?;
     let mut rdr = ReaderBuilder::new().has_headers(true).from_reader(file);
 
     let headers = rdr.headers()?.clone();
