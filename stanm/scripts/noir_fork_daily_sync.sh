@@ -4,6 +4,14 @@
 # select the correct Rust version that is necessary for the builds to pass.
 #
 # Please, don't try to automate this behavior, just allow it.
+#
+# I run this script like so:
+#
+# ```
+# cd ~/code/repos/noir
+# git checkout plonky2 # if necessary
+# ~/code/repos/blocksense/stanm/scripts/noir_fork_daily_sync.sh ~/code/repos/noir
+# ```
 
 set -xeuo pipefail
 
