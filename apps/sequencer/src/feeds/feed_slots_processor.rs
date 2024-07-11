@@ -1,5 +1,5 @@
-use crate::feeds::feeds_registry::AllFeedsReports;
 use crate::feeds::feeds_registry::FeedMetaData;
+use crate::feeds::feeds_registry::{AllFeedsReports, Repeatability};
 use crate::utils::time_utils::{get_ms_since_epoch, SlotTimeTracker};
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
@@ -37,8 +37,22 @@ pub async fn feed_slots_processor_loop<
         first_report_start_time,
     );
 
+    let is_oneshot = feed.read().unwrap().is_oneshot();
+    let mut is_processed = false;
+    let repeatability = if is_oneshot {
+        Repeatability::Oneshot
+    } else {
+        Repeatability::Periodic
+    };
+
     loop {
-        feed_slots_time_tracker.await_end_of_current_slot().await;
+        if is_oneshot && is_processed {
+            return Ok(String::from("Oneshot feed processed"));
+        }
+        feed_slots_time_tracker
+            .await_end_of_current_slot(&repeatability)
+            .await;
+        is_processed = true;
 
         let result_post_to_contract: FeedType; //TODO(snikolov): This needs to be enforced as Bytes32
         let key_post: u32;
@@ -78,44 +92,49 @@ pub async fn feed_slots_processor_loop<
             key_post = key;
             result_post_to_contract = feed.read().unwrap().get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
 
-            {
-                let mut history_guard = history.write().unwrap();
-                history_guard.push(key, result_post_to_contract.clone())
-            }
+            // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
+            if !is_oneshot {
+                {
+                    let mut history_guard = history.write().unwrap();
+                    history_guard.push(key, result_post_to_contract.clone())
+                }
 
-            let history_lock = history.read().unwrap();
+                let history_lock = history.read().unwrap();
 
-            // The first slice is from the current read position to the end of the array
-            // // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
-            let (first, last) = history_lock
-                .collect(key)
-                .expect("Missing key from History!")
-                .as_slices();
+                // The first slice is from the current read position to the end of the array
+                // // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
+                let (first, last) = history_lock
+                    .collect(key)
+                    .expect("Missing key from History!")
+                    .as_slices();
 
-            let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
-            let numerical_vec: Vec<f64> = history_vec
-                .iter()
-                .filter_map(|feed| {
-                    if let FeedType::Numerical(value) = feed {
-                        Some(*value)
-                    } else if let FeedType::Text(_) = feed {
-                        warn!("Anomaly Detection not implemented for FeedType::Text, skipping...");
-                        None
-                    } else {
-                        warn!("Anomaly Detection does not recognize FeedType, skipping...");
-                        None
-                    }
-                })
-                .collect();
+                let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
+                let numerical_vec: Vec<f64> = history_vec
+                    .iter()
+                    .filter_map(|feed| {
+                        if let FeedType::Numerical(value) = feed {
+                            Some(*value)
+                        } else if let FeedType::Text(_) = feed {
+                            warn!(
+                                "Anomaly Detection not implemented for FeedType::Text, skipping..."
+                            );
+                            None
+                        } else {
+                            warn!("Anomaly Detection does not recognize FeedType, skipping...");
+                            None
+                        }
+                    })
+                    .collect();
 
-            // Get AD prediction only if enough data is present
-            if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
-                match anomaly_detector_aggregate(numerical_vec) {
-                    Ok(ad_score) => {
-                        info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
-                    }
-                    Err(e) => {
-                        error!("Anomaly Detection failed with error - {}", e);
+                // Get AD prediction only if enough data is present
+                if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
+                    match anomaly_detector_aggregate(numerical_vec) {
+                        Ok(ad_score) => {
+                            info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
+                        }
+                        Err(e) => {
+                            error!("Anomaly Detection failed with error - {}", e);
+                        }
                     }
                 }
             }
@@ -123,7 +142,6 @@ pub async fn feed_slots_processor_loop<
             info!("result_post_to_contract = {:?}", result_post_to_contract);
             reports.clear();
         }
-
         result_send
             .send((
                 to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
@@ -141,8 +159,8 @@ mod tests {
     use std::sync::{Arc, RwLock};
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::mpsc::unbounded_channel;
+    use tokio::time::error::Elapsed;
 
-    //TODO(snikolov): Fix test after PR125 is merged
     #[tokio::test]
     async fn test_feed_slots_processor_loop() {
         // setup
@@ -218,6 +236,120 @@ mod tests {
             }
             Err(_) => {
                 panic!("The channel did not receive any data within the timeout period");
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_process_oneshot_feed() {
+        // setup
+        let current_system_time = SystemTime::now();
+
+        // voting will start in 60 seconds
+        let voting_start_time = current_system_time
+            .checked_add(Duration::from_secs(6))
+            .unwrap();
+
+        // voting will be 3 seconds long
+        let voting_wait_duration_ms = 3000;
+
+        let feed =
+            FeedMetaData::new_oneshot("TestFeed", voting_wait_duration_ms, voting_start_time);
+
+        let name = "test_feed";
+        let feed_metadata =
+            FeedMetaData::new_oneshot(name, voting_wait_duration_ms, voting_start_time);
+        let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
+        let all_feeds_reports = AllFeedsReports::new();
+        let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
+
+        let (tx, mut rx) = unbounded_channel::<(String, String)>();
+
+        let original_report_data = FeedType::Numerical(13.0);
+
+        // we are specifically sending only one report message as we don't want to test the average processor
+        {
+            let feed_id = 1;
+            let reporter_id = 42;
+            all_feeds_reports_arc.write().unwrap().push(
+                feed_id,
+                reporter_id,
+                original_report_data.clone(),
+            );
+        }
+
+        // run
+        let feed_id = 1;
+        let name = name.to_string();
+        let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
+        let all_feeds_reports_arc_clone = Arc::clone(&all_feeds_reports_arc);
+        let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
+            Arc::new(RwLock::new(FeedAggregateHistory::new()));
+        let feed_aggregate_history_clone = Arc::clone(&feed_aggregate_history);
+        tokio::spawn(async move {
+            feed_slots_processor_loop(
+                tx,
+                feed_metadata_arc_clone,
+                name,
+                voting_wait_duration_ms,
+                voting_start_time
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_millis(),
+                all_feeds_reports_arc_clone,
+                feed_aggregate_history_clone,
+                feed_id,
+            )
+            .await
+            .unwrap();
+        });
+
+        // Attempt to receive with a timeout of 2 seconds
+        let received = tokio::time::timeout(Duration::from_secs(10), rx.recv()).await;
+
+        match received {
+            Ok(Some((key, result))) => {
+                /// assert the received data
+                assert_eq!(
+                    key,
+                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
+                    "The key does not match the expected value"
+                );
+                assert_eq!(result, naive_packing(original_report_data.clone()));
+            }
+            Ok(None) => {
+                panic!("The channel was closed before receiving any data");
+            }
+            Err(_) => {
+                panic!("The channel did not receive any data within the timeout period");
+            }
+        }
+
+        tokio::time::sleep(Duration::from_millis(2000)).await;
+
+        {
+            let feed_id = 1;
+            let reporter_id = 42;
+            all_feeds_reports_arc.write().unwrap().push(
+                feed_id,
+                reporter_id,
+                original_report_data.clone(),
+            );
+        }
+
+        // Attempt to receive with a timeout of 2 seconds
+        let received = tokio::time::timeout(Duration::from_secs(20), rx.recv()).await;
+
+        // Assert that the result is an error of type Elapsed
+        match received {
+            Ok(Some(_)) => {
+                panic!("Received unexpected data");
+            }
+            Ok(None) => {
+                println!("Channel closed as expected");
+            }
+            Err(e) => {
+                println!("Timeout as expected");
             }
         }
     }

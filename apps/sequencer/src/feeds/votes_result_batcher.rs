@@ -1,3 +1,4 @@
+use crate::feeds::feeds_registry::Repeatability;
 use crate::utils::time_utils::{get_ms_since_epoch, SlotTimeTracker};
 use actix_web::rt::spawn;
 use std::collections::HashMap;
@@ -31,12 +32,17 @@ pub async fn votes_result_batcher_loop<
             let mut updates: HashMap<K, V> = Default::default();
             let mut send_to_contract = false;
             while !send_to_contract {
+                let end_of_voting_slot_ms: i128 =
+                    stt.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
+                // Cannot await negative amount of milliseconds; Turn negative to zero;
+                let time_to_await_ms: u64 = if end_of_voting_slot_ms > 0 {
+                    end_of_voting_slot_ms as u64
+                } else {
+                    0
+                };
+                let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
                 let var: Result<Option<(K, V)>, tokio::time::error::Elapsed> =
-                    actix_web::rt::time::timeout(
-                        stt.get_duration_until_end_of_current_slot(),
-                        vote_recv.recv(),
-                    )
-                    .await;
+                    actix_web::rt::time::timeout(time_to_await, vote_recv.recv()).await;
                 match var {
                     Ok(Some((key, val))) => {
                         info!(
