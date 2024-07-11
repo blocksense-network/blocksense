@@ -325,3 +325,35 @@ main {
   --shiki-token-punctuation: #bbb;
   --shiki-token-link: #ffab70;
 }
+
+/* Add custom Fonts */
+
+/* Space Mono */
+
+@font-face {
+  font-family: 'Space Mono ';
+  src: url('/fonts/SpaceMono-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Mono Bold';
+  src: url('/fonts/SpaceMono-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Mono BoldItalic';
+  src: url('/fonts/SpaceMono-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Space Mono Italic';
+  src: url('/fonts/SpaceMono-Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}

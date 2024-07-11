@@ -1,5 +1,5 @@
 export const config = {
-  blocksenseText: 'Blocksense',
+  blocksenseText: 'blocksense',
   github: 'View it on GitHub',
   videoNotSupportedMsg: 'Your browser does not support the video.',
   adoptersTextLink: 'https://airtable.com/apphcztjkgfgFU8PZ/shrmhAObEV2rbbe89',
