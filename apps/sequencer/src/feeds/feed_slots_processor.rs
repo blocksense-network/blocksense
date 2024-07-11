@@ -85,12 +85,12 @@ pub async fn feed_slots_processor_loop<
 mod tests {
     use super::*;
     use crate::feeds::feeds_registry::{AllFeedsReports, FeedMetaData};
+    use data_feeds::feeds_processing::naive_packing;
     use std::sync::{Arc, RwLock};
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::mpsc::unbounded_channel;
 
     //TODO(snikolov): Fix test after PR125 is merged
-    #[ignore]
     #[tokio::test]
     async fn test_feed_slots_processor_loop() {
         // setup
@@ -104,19 +104,17 @@ mod tests {
 
         let (tx, mut rx) = unbounded_channel::<(String, String)>();
 
-        let original_report_data_str =
-            "3ff0000000000000000000000000000000000000000000000000000000000000";
-        let original_report_data = FeedType::Text(original_report_data_str.to_string());
+        let original_report_data = FeedType::Numerical(13.0);
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
             let feed_id = 1;
             let reporter_id = 42;
-            let report_data = original_report_data.clone();
-            all_feeds_reports_arc
-                .write()
-                .unwrap()
-                .push(feed_id, reporter_id, original_report_data);
+            all_feeds_reports_arc.write().unwrap().push(
+                feed_id,
+                reporter_id,
+                original_report_data.clone(),
+            );
         }
 
         // run
@@ -153,7 +151,7 @@ mod tests {
                     to_hex_string(feed_id.to_be_bytes().to_vec(), None),
                     "The key does not match the expected value"
                 );
-                assert_eq!(result, original_report_data_str);
+                assert_eq!(result, naive_packing(original_report_data));
             }
             Ok(None) => {
                 panic!("The channel was closed before receiving any data");
