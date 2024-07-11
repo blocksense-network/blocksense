@@ -42,7 +42,7 @@ pub fn init_logging_handle() -> LoggingHandle {
 }
 
 pub struct LoggingHandle {
-    handle: Handle,
+    pub handle: Handle,
 }
 
 impl LoggingHandle {
@@ -55,5 +55,45 @@ impl LoggingHandle {
         };
         let _ = self.handle.modify(|filter| *filter = level);
         true
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+
+    #[test]
+    fn test_set_logging_levels() {
+        // Test env variable sets up the logging level
+        env::set_var("SEQUENCER_LOGGING_LEVEL", "TRACE");
+        let logging_handle = init_logging_handle();
+        logging_handle
+            .handle
+            .modify(|filter| assert_eq!(filter.to_string(), "trace"))
+            .unwrap();
+
+        // Test all logging levels are set up correctly
+        let levels = ["DEBUG", "INFO", "WARN", "ERROR"];
+        for level in levels {
+            logging_handle.set_logging_level(level);
+            logging_handle
+                .handle
+                .modify(|filter| assert_eq!(filter.to_string(), level.to_lowercase()))
+                .unwrap();
+        }
+
+        // Test unknown logging level does not change current one
+        logging_handle.set_logging_level("ERROR");
+        logging_handle
+            .handle
+            .modify(|filter| assert_eq!(filter.to_string(), "error"))
+            .unwrap();
+
+        logging_handle.set_logging_level("Unknown-Level");
+        logging_handle
+            .handle
+            .modify(|filter| assert_eq!(filter.to_string(), "error"))
+            .unwrap();
     }
 }
