@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 
@@ -27,16 +27,16 @@ export const SourceUnit = ({
         <License license={sourceUnit.license} />
         <Pragmas pragmas={sourceUnit.pragmas} />
       </section>
-      <Contracts contracts={sourceUnit.contracts} />
       <Enums enums={sourceUnit.enums} isFromSourceUnit />
-      <Errors errors={sourceUnit.errors} isFromSourceUnit />
-      <Functions functions={sourceUnit.functions} isFromSourceUnit />
       <Structs structs={sourceUnit.structs} isFromSourceUnit />
       <Variables
         variables={sourceUnit.variables}
         title="Variables"
         titleLevel={2}
       />
+      <Errors errors={sourceUnit.errors} isFromSourceUnit />
+      <Functions functions={sourceUnit.functions} isFromSourceUnit />
+      <Contracts contracts={sourceUnit.contracts} />
     </section>
   );
 };

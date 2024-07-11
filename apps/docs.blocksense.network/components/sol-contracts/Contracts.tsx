@@ -26,17 +26,17 @@ export const Contracts = ({ contracts }: ContractsProps) => {
         return (
           <div className="contract-item-wrapper__item" key={index}>
             <ContractBaseInfo {...contract} />
-            <Functions functions={contract.functions} />
-            <Errors errors={contract.errors} />
-            <Events events={contract.events} />
-            <Modifiers modifiers={contract.modifiers} />
+            <Enums enums={contract.enums} />
+            <Structs structs={contract.structs} />
             <Variables
               variables={contract.variables}
               title="Variables"
               titleLevel={3}
             />
-            <Enums enums={contract.enums} />
-            <Structs structs={contract.structs} />
+            <Errors errors={contract.errors} />
+            <Events events={contract.events} />
+            <Modifiers modifiers={contract.modifiers} />
+            <Functions functions={contract.functions} />
           </div>
         );
       })}
