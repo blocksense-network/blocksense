@@ -1,4 +1,6 @@
 use clap::Args;
+use crypto::JsonSerializableSignature;
+use data_feeds::connector::post::generate_signature;
 use data_feeds::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use serde::{Deserialize, Serialize};
 use spin_app::MetadataKey;
@@ -10,6 +12,8 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::mpsc::{channel, Receiver, Sender};
+
+const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
 
 wasmtime::component::bindgen!({
     path: "../wit",
@@ -233,15 +237,20 @@ impl OracleTrigger {
         sequencer: String,
     ) -> TerminationReason {
         while let Some((feed_id, payload)) = rx.recv().await {
+            let timestamp = current_unix_time();
+            let result = FeedResult::Result {
+                result: FeedType::Numerical(payload.body.unwrap() as f64),
+            };
+            let signature =
+                generate_signature(SECRET_KEY.to_string(), feed_id.as_str(), timestamp, &result);
             let payload_json = DataFeedPayload {
                 payload_metadata: PayloadMetaData {
                     reporter_id: 1,
-                    feed_id: feed_id,
-                    timestamp: current_unix_time(),
+                    feed_id,
+                    timestamp,
+                    signature: JsonSerializableSignature { sig: signature },
                 },
-                result: FeedResult::Result {
-                    result: FeedType::Numerical(payload.body.unwrap() as f64),
-                },
+                result,
             };
 
             let client = reqwest::Client::new();

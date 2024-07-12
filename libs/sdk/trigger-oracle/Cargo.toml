@@ -15,6 +15,7 @@ reqwest = { version = "0.12", features=["json"] }
 serde = "1.0"
 serde_json = "1.0"
 data_feeds = { path = "../../data_feeds"}
+crypto = { path = "../../crypto"}
 
 spin-app = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 spin-core = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}

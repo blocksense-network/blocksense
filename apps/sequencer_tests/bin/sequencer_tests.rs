@@ -1,8 +1,10 @@
 use alloy::hex::ToHexExt;
 use alloy::node_bindings::Anvil;
+use crypto::JsonSerializableSignature;
 use curl::easy::Handler;
 use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
+use data_feeds::connector::post::generate_signature;
 use data_feeds::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use eyre::Result;
 use json_patch::merge;
@@ -22,6 +24,7 @@ use utils::read_file;
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
+const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
 
 struct Collector(Vec<u8>);
 
@@ -159,15 +162,19 @@ async fn main() -> Result<()> {
         .expect("System clock set before EPOCH")
         .as_millis();
 
+    let result = FeedResult::Result {
+        result: FeedType::Numerical(REPORT_VAL),
+    };
+    let signature = generate_signature(SECRET_KEY.to_string(), FEED_ID, timestamp, &result);
+
     let payload = DataFeedPayload {
         payload_metadata: PayloadMetaData {
             reporter_id: 0,
             feed_id: FEED_ID.to_string(),
-            timestamp: timestamp.try_into().expect("timestamp overflow"),
+            timestamp,
+            signature: JsonSerializableSignature { sig: signature },
         },
-        result: FeedResult::Result {
-            result: FeedType::Numerical(REPORT_VAL),
-        },
+        result,
     };
 
     let serialized_payload = match serde_json::to_value(&payload) {

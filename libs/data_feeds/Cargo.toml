@@ -11,6 +11,7 @@ edition.workspace = true
 prometheus = { path = "../prometheus" }
 derive = { path = "../derive"}
 utils = { path = "../utils" }
+crypto = { path = "../crypto" }
 
 alloy = { git = "https://github.com/alloy-rs/alloy", rev = "6f4e397f7cf71812160a165bdcebf40cac814fef", features = [
     # "dyn-abi",
@@ -64,6 +65,7 @@ curl = "0.4.46"
 lazy_static = "1.4.0"
 async-trait = "0.1.74"
 assert_cmd = "2.0.14"
+dirs = "5.0.1"
 
 # Service APIs
 yahoo_finance_api = "2.1.0"

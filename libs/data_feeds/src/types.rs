@@ -3,6 +3,7 @@ use std::fmt::{self, Display};
 use thiserror::Error;
 
 use crate::services::aggregate::AverageAggregator;
+use crypto::JsonSerializableSignature;
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub enum FeedType {
@@ -106,14 +107,13 @@ pub enum FeedResult {
 #[serde(deny_unknown_fields)]
 pub struct PayloadMetaData {
     /// reported id
-    #[serde(default)]
     pub reporter_id: u64,
     /// data feed id
-    #[serde(default)]
     pub feed_id: String,
     /// timestamp from when the data feed was gathered
-    #[serde(default)]
     pub timestamp: Timestamp,
+    /// signature of feed_id + timestamp + result
+    pub signature: JsonSerializableSignature,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

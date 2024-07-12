@@ -1863,6 +1863,7 @@ checksum = "62dc83a094a71d43eeadd254b1ec2d24cb6a0bb6cadce00df51f0db594711a32"
 dependencies = [
  "cc",
  "glob",
+ "serde 1.0.203",
  "threadpool",
  "zeroize",
 ]
@@ -2737,6 +2738,7 @@ version = "0.0.1"
 dependencies = [
  "blst",
  "hex",
+ "serde 1.0.203",
 ]
 
 [[package]]
@@ -2914,8 +2916,10 @@ dependencies = [
  "assert_cmd",
  "async-trait",
  "cmc",
+ "crypto",
  "curl",
  "derive",
+ "dirs 5.0.1",
  "erased-serde",
  "fred-rs",
  "lazy_static 1.4.0",
@@ -7979,6 +7983,7 @@ name = "sequencer_tests"
 version = "0.0.1"
 dependencies = [
  "alloy",
+ "crypto",
  "curl",
  "data_feeds",
  "eyre",
@@ -9777,6 +9782,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap 3.2.25",
+ "crypto",
  "data_feeds",
  "futures",
  "is-terminal",
@@ -10030,6 +10036,9 @@ checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
 [[package]]
 name = "utils"
 version = "0.0.1"
+dependencies = [
+ "hex",
+]
 
 [[package]]
 name = "uuid"
