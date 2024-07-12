@@ -1,4 +1,5 @@
 use super::super::utils::time_utils::get_ms_since_epoch;
+use crypto::PublicKey;
 use eyre::Result;
 
 use super::super::feeds::feeds_registry::ReportRelevance;
@@ -12,9 +13,37 @@ use tracing::{debug, info, trace, warn};
 
 use crate::inc_reporter_metric;
 use crate::inc_reporter_vec_metric;
+use crypto::verify_signature;
+use crypto::Signature;
+use data_feeds::types::Timestamp;
 use data_feeds::types::{DataFeedPayload, FeedResult};
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
+
+pub fn check_signature(
+    signature: &Signature,
+    pub_key: &PublicKey,
+    feed_id: &str,
+    timestamp: Timestamp,
+    feed_result: &FeedResult,
+) -> bool {
+    let mut byte_buffer: Vec<u8> = feed_id
+        .as_bytes()
+        .to_vec()
+        .into_iter()
+        .chain((timestamp as u128).to_be_bytes().to_vec())
+        .collect();
+
+    match feed_result {
+        FeedResult::Result { result } => {
+            byte_buffer.extend(result.as_bytes());
+        }
+        FeedResult::Error { error } => {
+            warn!("Reported error for feed_id {} : {}", feed_id, error);
+        }
+    };
+    verify_signature(&pub_key, &signature, &byte_buffer)
+}
 
 #[post("/post_report")]
 pub async fn post_report(
@@ -39,6 +68,8 @@ pub async fn post_report(
     let data_feed: DataFeedPayload = serde_json::from_value(v)?;
 
     let reporter_id = data_feed.payload_metadata.reporter_id;
+    let signature = data_feed.payload_metadata.signature;
+    let msg_timestamp = data_feed.payload_metadata.timestamp;
 
     let feed_id: u32;
     let reporter = {
@@ -55,8 +86,23 @@ pub async fn post_report(
                         return Ok(HttpResponse::BadRequest().into());
                     }
                 };
-
-                //TODO: Check signature of vote!
+                {
+                    let reporter = reporter.read().expect("Could not acquire reporter lock!");
+                    if check_signature(
+                        &signature.sig,
+                        &reporter.pub_key,
+                        data_feed.payload_metadata.feed_id.as_str(),
+                        msg_timestamp,
+                        &data_feed.result,
+                    ) == false
+                    {
+                        warn!(
+                            "Signature check failed for feed_id: {} from reporter_id: {}",
+                            feed_id, reporter_id
+                        );
+                        return Ok(HttpResponse::Unauthorized().into());
+                    }
+                }
                 reporter.clone()
             }
             None => {
@@ -78,8 +124,6 @@ pub async fn post_report(
             return Ok(HttpResponse::Ok().into());
         }
     };
-
-    let msg_timestamp = data_feed.payload_metadata.timestamp;
 
     trace!(
         "result = {:?}; feed_id = {:?}; reporter_id = {:?}",
