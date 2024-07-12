@@ -1,1 +1,60 @@
-# Blockchain Integration
+import { DiagramImage } from '@/components/common/DiagramImage'
+
+# Blocksense Blockchain Integration
+
+## Overview
+
+Blocksense integrates seamlessly with multiple blockchain networks and provides reliable, validated oracle data feeds to decentralized applications (dApps) and smart contracts. This integration is achieved through a combination of smart contracts, representation layer, proxies, and data management techniques. Our smart contracts are written to be interoperable with Chainlink integrated dApps.
+
+<DiagramImage className="blocksense__diagram mt-10 mb-6" src="/diagrams/BlocksenseIntegration.jpg" alt="Blocksense Integration"/>
+
+## Blocksense Smart Contracts
+
+The core of Blocksense integration with blockchain networks lies in its smart contracts. These smart contracts are deployed on EVM-compatible blockchains such as Ethereum, Gnosis, and Polygon, enhancing the interaction between the Blocksense protocol and dApps.
+
+Blocksense supports the storage and retrieval of historical data feeds, providing dApps with access to past data for analysis and decision-making.
+
+- **Historical Contracts:**
+  - **Function:** These contracts receive validated data feeds from the Blocksense sequencer, making them available for on-chain consumption.
+  - **Features:** Ensures data integrity and enables dApps to access the latest oracle da
+- **Access Control:**
+  - **Function:** Manage permissions for managing historical data feeds.
+
+## ChainLink Representation Layer
+
+To enhance interoperability and provide a wider range of data access, Blocksense includes a Chainlink representation layer. This layer allows dApps to integrate with Blocksense protocol using the same interface as Chainlink.
+
+- **Chainlink Proxies:** Implements Chainlink AggregatorV3Interface interface to provide access to historical data for a given data feed.
+- **Feeds Registry:** Implements Chainlink FeedRegistryInterface interface to provide access to Chainlink proxies through a given pair of tokens (‘base’, ‘quote’).
+
+## Delegate Calls and Static Calls
+
+BlockSense employs advanced functionalities to enhance contract interactions and security.
+
+- **Delegate Calls:**
+  - **Function:** Enable the execution of functions from one contract in the context of another contract.
+  - **Features:** Allow for modular contract design and the dynamic upgrading of contract logic while maintaining state consistency.
+- **Static Calls:**
+  - **Function:** Enable read-only calls to smart contracts, ensuring no state changes will occur.
+  - **Features:** Enhance security by allowing functions to be executed without the risk of altering contract state, useful for retrieving data and performing checks.
+- **Upgradeable Proxy:**
+  - **Function:** Supports the deployment of upgradeable smart contracts, allowing for protocol updates and improvements without disruption of ongoing services by maintaining the address of the contract.
+  - **Features:** Ensures backwards compatibility and future-proofing of the Blocksense protocol by allowing the underlying logic of smart contracts to be upgraded.
+
+## Data Flow Diagram
+
+- **Data Collection and Reporting:**
+  - Reporters collect data from various internet sources and process it using predefined scripts.
+  - Anomaly detection ensures data integrity before reporting to the Blocksense protocol.
+- **Sequencing and Validation:**
+  - The Blocksense sequencer aggregates reports, validates them using cryptographic techniques, and creates transactions for publication on the blockchain.
+- **Publication on Blockchains:**
+  - Validated data feeds are published on EVM-compatible blockchains via Blocksense smart contracts.
+- **Data Consumption:**
+  - dApps and smart contracts access the latest and historical data feeds through Blocksense smart contracts.
+
+## Summary
+
+The Blocksense blockchain integration leverages smart contracts, implementing Chainlink interfaces, and robust data management techniques to provide reliable and accurate oracle data feeds.
+
+With the use of delegate calls, static calls, and core EVM data feed contracts, Blocksense ensures a highly efficient, secure, and modular oracle solution for the decentralized ecosystem.
