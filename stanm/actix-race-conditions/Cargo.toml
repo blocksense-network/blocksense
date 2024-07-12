@@ -1,0 +1,11 @@
+[workspace]
+members = [
+  "apps/server",
+  "apps/client",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.0.1"
+authors = ["The Blocksense team"]
+edition = "2021"
