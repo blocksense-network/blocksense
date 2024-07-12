@@ -83,13 +83,15 @@ mod tests {
                 .unwrap();
         }
 
-        // Test unknown logging level does not change current one
+        // Test unknown logging level does not change the current one
+        // Let's first set the logging level to something valid
         logging_handle.set_logging_level("ERROR");
         logging_handle
             .handle
             .modify(|filter| assert_eq!(filter.to_string(), "error"))
             .unwrap();
 
+        // And then try to set it to unknown logging level
         logging_handle.set_logging_level("Unknown-Level");
         logging_handle
             .handle
