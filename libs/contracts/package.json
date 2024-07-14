@@ -30,6 +30,7 @@
     "@types/chai": "4",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.14.2",
+    "@types/semver": "^7",
     "chai": "4",
     "dotenv": "^16.4.5",
     "ethers": "^6.12.1",
@@ -39,5 +40,8 @@
     "solidity-coverage": "^0.8.12",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2"
+  },
+  "dependencies": {
+    "semver": "^7.6.2"
   }
 }
