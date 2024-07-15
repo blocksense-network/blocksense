@@ -2919,6 +2919,8 @@ dependencies = [
  "serde 1.0.203",
  "serde_json",
  "thiserror",
+ "tracing",
+ "tracing-subscriber",
  "utils",
  "weer_api",
  "yahoo_finance_api",
