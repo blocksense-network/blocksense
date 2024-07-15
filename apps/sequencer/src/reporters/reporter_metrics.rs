@@ -28,10 +28,10 @@ macro_rules! inc_reporter_vec_metric (
 
 #[derive(Debug)]
 pub struct ReporterMetrics {
-    pub unrecognized_result_format: IntCounter,
+    pub errors_reported_for_feed: IntCounter,
     pub json_scheme_error: IntCounter,
-    pub votes_for_nonexistent_feed: IntCounter,
     pub non_valid_feed_id_reports: IntCounter,
+    pub non_valid_signature: IntCounter,
     pub timely_reports_per_feed: IntCounterVec,
     pub late_reports_per_feed: IntCounterVec,
     pub in_future_reports_per_feed: IntCounterVec,
@@ -41,10 +41,10 @@ pub struct ReporterMetrics {
 impl ReporterMetrics {
     pub fn new(id: u64) -> Result<ReporterMetrics> {
         Ok(ReporterMetrics {
-            unrecognized_result_format: register_int_counter!(
-                format!("reporter_{}_unrecognized_result_format", id),
+            errors_reported_for_feed: register_int_counter!(
+                format!("reporter_{}_errors_reported_for_feed", id),
                 format!(
-                    "Total received votes with wrong result format from reporter id {}",
+                    "Total received votes indicating error from reporter id {}",
                     id
                 )
             )?,
@@ -55,17 +55,17 @@ impl ReporterMetrics {
                     id
                 ),
             )?,
-            votes_for_nonexistent_feed: register_int_counter!(
-                format!("reporter_{}_votes_for_nonexistent_feed", id),
-                format!(
-                    "Total times the specified feed name was nonexistent in a vote from reporter id {}",
-                    id
-                ),
-            )?,
             non_valid_feed_id_reports: register_int_counter!(
                 format!("reporter_{}_non_valid_feed_id_reports", id),
                 format!(
                     "Total recvd reports for a non registered feed from reporter id {}",
+                    id
+                ),
+            )?,
+            non_valid_signature: register_int_counter!(
+                format!("reporter_{}_non_valid_signature", id),
+                format!(
+                    "Total recvd reports with non valid signature from reporter id {}",
                     id
                 ),
             )?,

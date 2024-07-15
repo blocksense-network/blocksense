@@ -87,19 +87,22 @@ pub async fn post_report(
                     }
                 };
                 {
-                    let reporter = reporter.read().expect("Could not acquire reporter lock!");
+                    let rlocked_reporter =
+                        reporter.read().expect("Could not acquire reporter lock!");
                     if check_signature(
                         &signature.sig,
-                        &reporter.pub_key,
+                        &rlocked_reporter.pub_key,
                         data_feed.payload_metadata.feed_id.as_str(),
                         msg_timestamp,
                         &data_feed.result,
                     ) == false
                     {
+                        drop(rlocked_reporter);
                         warn!(
                             "Signature check failed for feed_id: {} from reporter_id: {}",
                             feed_id, reporter_id
                         );
+                        inc_reporter_metric!(reporter, non_valid_signature);
                         return Ok(HttpResponse::Unauthorized().into());
                     }
                 }
@@ -119,6 +122,7 @@ pub async fn post_report(
         FeedResult::Result { result } => result,
         FeedResult::Error { error } => {
             info!("Error parsing recvd result of vote: {}", error);
+            inc_reporter_metric!(reporter, errors_reported_for_feed);
             // TODO: Handle Error vote
 
             return Ok(HttpResponse::Ok().into());

@@ -211,7 +211,7 @@ mod tests {
             plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(),
+            reporters: init_shared_reporters(&sequencer_config),
         });
 
         let app = test::init_service(
