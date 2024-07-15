@@ -2901,6 +2901,7 @@ checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
 name = "data_feeds"
 version = "0.0.1"
 dependencies = [
+ "actix-web",
  "alloy",
  "anyhow",
  "assert_cmd",
@@ -2919,6 +2920,9 @@ dependencies = [
  "serde 1.0.203",
  "serde_json",
  "thiserror",
+ "tokio 1.37.0",
+ "tracing",
+ "tracing-subscriber",
  "utils",
  "weer_api",
  "yahoo_finance_api",
@@ -7220,6 +7224,7 @@ checksum = "adad44e29e4c806119491a7f06f03de4d1af22c3a680dd47f1e6e179439d1f56"
 name = "reporter"
 version = "0.0.1"
 dependencies = [
+ "actix-web",
  "data_feeds",
  "prometheus 0.0.1",
  "tokio 1.37.0",
