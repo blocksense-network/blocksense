@@ -49,7 +49,7 @@ pub fn get_test_config_with_single_provider(
 ) -> SequencerConfig {
     let mut file = File::create(private_key_path)
         .expect(format!("Could not create file {}", private_key_path).as_str());
-    file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
+    file.write_all(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
         .expect(format!("Could not write to file {}", private_key_path).as_str());
 
     SequencerConfig {
