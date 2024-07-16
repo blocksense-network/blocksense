@@ -3,6 +3,7 @@ import React, { createElement } from 'react';
 type AnchorLinkTitleProps = {
   title?: string;
   titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
+  accordion?: boolean;
 };
 
 const titleStyles = {
@@ -14,16 +15,22 @@ const titleStyles = {
   6: 'text-base',
 };
 
+const accordionStyles = 'text-gray-900';
+
+const borderStyles =
+  'nx-border-b nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400';
+
 export const AnchorLinkTitle = ({
   title,
   titleLevel,
+  accordion,
 }: AnchorLinkTitleProps) => {
   return (
     titleLevel &&
     createElement(
       `h${titleLevel}`,
       {
-        className: `${titleStyles[titleLevel]} nx-font-semibold nx-tracking-tight nx-text-slate-900 dark:nx-text-slate-100 nx-mt-4 nx-border-b nx-pb-4 nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400`,
+        className: `${titleStyles[titleLevel]} ${accordion ? accordionStyles : ''} nx-font-semibold nx-tracking-tight nx-text-slate-900 dark:nx-text-slate-100 nx-mt-4 nx-pb-4 ${accordion ? '' : borderStyles}`,
       },
       <>
         {title}
