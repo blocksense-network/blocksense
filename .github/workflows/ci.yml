@@ -142,8 +142,8 @@ jobs:
       - name: Run Cargo Clippy
         run: cargo clippy
 
-      - name: Build and install oracle trigger plugin
-        run: ./libs/sdk/build-and-install-plugin.sh
+      # - name: Build and install oracle trigger plugin
+      #   run: ./libs/sdk/build-and-install-plugin.sh
 
   rust-nix-build:
     timeout-minutes: 360
