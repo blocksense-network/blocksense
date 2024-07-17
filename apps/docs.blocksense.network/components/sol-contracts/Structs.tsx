@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -10,6 +10,7 @@ import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Variables } from '@/sol-contracts-components/Variables';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
+import { useHashChange } from '@/hooks/useHashChange';
 
 type StructsProps = {
   structs?: StructDocItem[];
@@ -17,37 +18,7 @@ type StructsProps = {
 };
 
 export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
-  const [expanded, setExpanded] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = decodeURIComponent(window.location.hash.slice(1).trim());
-
-      if (hash) {
-        setExpanded(prevExpanded => {
-          if (prevExpanded === hash) return prevExpanded;
-          return hash;
-        });
-
-        const element = document.getElementById(hash);
-        if (element) {
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        }
-      } else {
-        setExpanded(null);
-      }
-    };
-
-    handleHashChange();
-
-    window.addEventListener('hashchange', handleHashChange);
-
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []);
+  const { expanded, setExpanded } = useHashChange();
 
   return (
     <ContractItemWrapper

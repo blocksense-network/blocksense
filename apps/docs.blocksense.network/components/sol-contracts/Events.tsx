@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -12,43 +12,14 @@ import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrap
 import { Variables } from '@/sol-contracts-components/Variables';
 import { Selector } from '@/sol-contracts-components/Selector';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
+import { useHashChange } from '@/hooks/useHashChange';
 
 type EventsProps = {
   events?: EventDocItem[];
 };
 
 export const Events = ({ events }: EventsProps) => {
-  const [expanded, setExpanded] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = decodeURIComponent(window.location.hash.slice(1).trim());
-
-      if (hash) {
-        setExpanded(prevExpanded => {
-          if (prevExpanded === hash) return prevExpanded;
-          return hash;
-        });
-
-        const element = document.getElementById(hash);
-        if (element) {
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        }
-      } else {
-        setExpanded(null);
-      }
-    };
-
-    handleHashChange();
-
-    window.addEventListener('hashchange', handleHashChange);
-
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []);
+  const { expanded, setExpanded } = useHashChange();
 
   return (
     <ContractItemWrapper

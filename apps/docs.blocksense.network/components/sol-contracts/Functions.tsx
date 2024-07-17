@@ -41,6 +41,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
     toggleAccordion(id);
     setExpanded(null);
   };
+  const { expanded, setExpanded } = useHashChange();
 
   return (
     <ContractItemWrapper

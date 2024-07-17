@@ -10,7 +10,8 @@ import { VariableDocItem } from '@blocksense/sol-reflector';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Signature } from '@/sol-contracts-components/Signature';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
-import { AnchorLinkTitle } from './AnchorLinkTitle';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
+import { useHashChange } from '@/hooks/useHashChange';
 
 type VariablesProps = {
   variables?: VariableDocItem[];
@@ -19,37 +20,7 @@ type VariablesProps = {
 };
 
 export const Variables = ({ variables, title, titleLevel }: VariablesProps) => {
-  const [expanded, setExpanded] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = decodeURIComponent(window.location.hash.slice(1).trim());
-
-      if (hash) {
-        setExpanded(prevExpanded => {
-          if (prevExpanded === hash) return prevExpanded;
-          return hash;
-        });
-
-        const element = document.getElementById(hash);
-        if (element) {
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        }
-      } else {
-        setExpanded(null);
-      }
-    };
-
-    handleHashChange();
-
-    window.addEventListener('hashchange', handleHashChange);
-
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []);
+  const { expanded, setExpanded } = useHashChange();
 
   return (
     <ContractItemWrapper
