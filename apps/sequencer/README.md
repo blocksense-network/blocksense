@@ -2,7 +2,7 @@
 
 ## How to build the sequencer
 
-You need to call `cargo build` from the root blocksense project folder.
+You need to call `cargo build --bin sequencer` from the root blocksense project folder.
 
 ```
 [john@doe:~/blocksense]$ cargo build
@@ -10,34 +10,31 @@ You need to call `cargo build` from the root blocksense project folder.
 
 ## How to configure the sequencer
 
-You need to set the following environment variables:
+The configuration for the sequencer is in blocksense/apps/sequencer/sequencer_config.json
 
-1. The private keys of all providers we want to send updates to.
-   The format is as follows: `WEB3_PRIVATE_KEY_<network name>`. It is a path to the file containing the sequencer's private key for posting transactions to the specified Ethereum network.
-   For example:
+By default on linux systems the sequencer looks for its "sequencer_config.json" file
+under `$HOME`/.config according to the XDG Base Directory Specification.
 
-```
-export WEB3_PRIVATE_KEY_ETH1=/tmp/priv_key_test
-```
+The config path where the sequencer's config file is present can also be provided by
+an environment variable - SEQUENCER_CONFIG_DIR, which will be considered instead of
+the default XDG config folder path.
 
-where the contents of the file are
+Another way to specify the config folder is through the command line argument which can
+be passed to the sequencer followed by the path. This will overwrite the SEQUENCER_CONFIG_DIR
+environment variable.
+`-c, --config-file-path     specify sequencer's config file path`
 
-```
-0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
-```
+By default in the nix environment of the sequencer, the SEQUENCER_CONFIG_DIR will be set
+accordingly.
 
-2. `WEB3_URL_<network name>` - the JRPC url of each ethereum node that the sequencer will communicate with. For testing `anvil` is recommended.
-   For example:
-
-```
-export WEB3_URL_ETH1=http://127.0.0.1:8545
-```
-
-3. `WEB3_CONTRACT_ADDRESS_<network name>` - optional parameter. If it is present, the sequencer will send updates to this smart contract address. If this parameter is not set, the sequencer can accept HTTP requests to deploy and use a smart contract.
-   For example:
+In the test config file we have 2 providers configured (JSON RPC-s to Ethereum test validators)
+They require a private key holding Ethereum tokens in order to post transactions. For our test
+purposes we use anvil and instantiate 2 anvil instances on different ports. You need to start them
+by `anvil & anvil -p8546`. The key path in the test configuration is set to `/tmp/priv_key_test`
+therefore this file needs to be created with the following command:
 
 ```
-export WEB3_CONTRACT_ADDRESS_ETH1=0xef11d1c2aa48826d4c41e54ab82d1ff5ad8a64ca
+echo -n 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a > /tmp/priv_key_test
 ```
 
 ## How to run the sequencer
@@ -46,17 +43,21 @@ export WEB3_CONTRACT_ADDRESS_ETH1=0xef11d1c2aa48826d4c41e54ab82d1ff5ad8a64ca
 [john@doe:~/blocksense]$ cargo run --bin sequencer
 ```
 
-Note: the sequencer needs to send transactions to a deployed contract. If you have deployed the contract you can provide its address in the environment variable WEB3_CONTRACT_ADDRESS. If not send a GET HTTP request to the sequencer as follows: `curl http://127.0.0.1:8877/deploy/<network name>`.
+Note: the sequencer needs to send transactions to a deployed contract. If you have deployed the contract you can provide its
+address in the configuration json file. If not send a GET HTTP request to the sequencer as follows: `curl http://127.0.0.1:8877/deploy/<network name>`.
 For example:
 
 ```
 curl http://127.0.0.1:8877/deploy/ETH1
 ```
 
-The sequencer will deploy the contract and use it from there on. To send a data feed you can use the following test HTTP request:
+The sequencer will deploy the contract and use it from there on. We provide an end to end integration test that starts
+the sequencer process, starts the 2 anvil Eth providers, deploys contracts on the providers, generates signed HTTP requests
+to the sequencer and waits fot the sequencer to posts data to the contracts. It can be found in
+`blocksense/sequencer_tests`. To run it from the main project folder:
 
 ```
-curl -X POST 127.0.0.1:8877/post_report -H 'Content-Type: application/json' -d '{"feed_id":"YahooFinance.BTC/USD","reporter_id":0,"result":70000.5,"timestamp":'$((($(date +%s%N | cut -b1-13))))'}'
+[john@doe:~/blocksense]$ cargo run --bin sequencer_tests
 ```
 
 To set the logging level, you can provide an environment variable before running the sequencer as follows:
