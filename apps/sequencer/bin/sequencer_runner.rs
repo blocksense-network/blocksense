@@ -26,9 +26,47 @@ use actix_web::rt::spawn;
 use futures::stream::FuturesUnordered;
 use sequencer::config::config::init_sequencer_config;
 use sequencer::http_handlers::admin::metrics;
+use std::env;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let mut start_metrix_server = true;
+
+    let mut args = env::args().skip(1);
+    while let Some(arg) = args.next() {
+        match &arg[..] {
+            "-c" | "--config-file-path" => {
+                if let Some(arg_config) = args.next() {
+                    env::set_var("SEQUENCER_CONFIG_DIR", arg_config);
+                } else {
+                    panic!("No value specified for parameter --config-file-path.");
+                }
+            }
+            "--no-metrics-server" => {
+                start_metrix_server = false;
+            }
+            "--help" => {
+                println!(
+                    "Usage:
+sequencer [options] [args]
+
+OPTIONS
+  --help                     show list of command-line options
+  -c, --config-file-path     specify sequencer's config file path
+  --no-metrics-server        do not start prometheus metric server"
+                );
+                return Ok({});
+            }
+            _ => {
+                if arg.starts_with('-') {
+                    println!("Unkown argument {}", arg);
+                } else {
+                    println!("Unkown positional argument {}", arg);
+                }
+            }
+        }
+    }
+
     let sequencer_config = init_sequencer_config();
     let log_handle = init_shared_logging_handle();
 
@@ -99,14 +137,16 @@ async fn main() -> std::io::Result<()> {
     collected_futures.push(votes_sender);
     collected_futures.push(metrics_collector);
 
-    let prometheus_http_server_fut = spawn(async move {
-        HttpServer::new(move || App::new().service(metrics))
-            .bind(("0.0.0.0", sequencer_config.prometheus_port))
-            .expect("Prometheus HTTP server could not bind to port.")
-            .run()
-            .await
-    });
-    collected_futures.push(prometheus_http_server_fut);
+    if start_metrix_server {
+        let prometheus_http_server_fut = spawn(async move {
+            HttpServer::new(move || App::new().service(metrics))
+                .bind(("0.0.0.0", sequencer_config.prometheus_port))
+                .expect("Prometheus HTTP server could not bind to port.")
+                .run()
+                .await
+        });
+        collected_futures.push(prometheus_http_server_fut);
+    }
 
     let result = futures::future::join_all(collected_futures).await;
     for v in result {
