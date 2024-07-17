@@ -12,11 +12,11 @@ pub fn make_f64_hdbscan(data: Vec<Vec<f64>>) -> Result<Vec<i32>, HdbscanError> {
 }
 
 #[cfg(test)]
-mod hdbscan_tests {
+mod tests {
     use crate::hdbscan_detector::make_f64_hdbscan;
 
     #[test]
-    fn test1() {
+    fn hdbscan_can_detect_1_in_10_anomaly() {
         let data: Vec<Vec<f64>> = vec![
             vec![1.5, 2.2],
             vec![1.0, 1.1],
@@ -33,8 +33,7 @@ mod hdbscan_tests {
 
         let result = make_f64_hdbscan(data).unwrap();
 
-        println!("{:?}", result);
-
+        // Expecting one single anomaly - marked as -1
         let anomaly_count = result.iter().filter(|&&x| x == -1).count();
 
         assert_eq!(anomaly_count, 1);

@@ -25,10 +25,12 @@ pub fn read_csv_to_vec(file_path: &str, column: &str) -> Result<Vec<f64>, Box<dy
 }
 
 /// Takes in Vec<f64> passes it through several Anomaly Detection algos and returns a score
+/// The last value of `values` will be checked for anomalies
+/// Sending an empty `values` vector will result in a panic!
 pub fn anomaly_detector_aggregate(values: Vec<f64>) -> f64 {
     const DIM: usize = 1; // Dimensionality of data
 
-    let values_array: Vec<[f64; 1]> = values.iter().map(|&x| [x]).collect();
+    let values_array: Vec<[f64; DIM]> = values.iter().map(|&x| [x]).collect();
     let last_value = values_array.last().unwrap().clone();
 
     let forest = make_f64_forest::<DIM>(values_array);
