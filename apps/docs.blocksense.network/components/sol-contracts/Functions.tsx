@@ -1,15 +1,15 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 
-import { FunctionDocItem, FunctionType } from '@blocksense/sol-reflector';
+import { Badge } from '@/components/ui/badge';
+import { FunctionDocItem } from '@blocksense/sol-reflector';
 
 import { Signature } from '@/sol-contracts-components/Signature';
 import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variables } from '@/sol-contracts-components/Variables';
 import { Selector } from '@/sol-contracts-components/Selector';
-import { AnchorLinkTitle } from './AnchorLinkTitle';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
+import { FunctionParameters } from '@/sol-contracts-components/FunctionParameters';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];
@@ -44,15 +44,17 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
           </Badge>
           <Signature signature={_function.signature} />
           <NatSpec natspec={_function.natspec} />
-          <Variables
-            variables={_function._parameters}
+          <FunctionParameters
+            parameters={_function._parameters}
             title="Parameters"
             titleLevel={isFromSourceUnit ? 4 : 5}
+            functionNatSpec={_function.natspec}
           />
-          <Variables
-            variables={_function._returnParameters}
+          <FunctionParameters
+            parameters={_function._returnParameters}
             title="Return Parameters"
             titleLevel={isFromSourceUnit ? 4 : 5}
+            functionNatSpec={_function.natspec}
           />
           <FunctionModifiers functionModifiers={_function._modifiers} />
         </div>
