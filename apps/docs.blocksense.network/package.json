@@ -5,17 +5,19 @@
     "build:deps": "yarn workspace @blocksense/docs-theme build && yarn workspace @blocksense/contracts sol-reflect",
     "build": "yarn build:deps && yarn build:tsc && yarn generate-contracts-mdx && next build",
     "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
-    "dev": "next",
+    "dev": "yarn watch:docs-theme & next",
     "ready-dev-go": "yarn build:deps && yarn dev",
     "start": "next start",
     "test": "yarn vitest -w false",
     "ts": "yarn node --import tsx",
-    "generate-contracts-mdx": "yarn ts ./src/generate-contracts-mdx.ts && yarn prettier --write ./pages/docs/contracts --log-level silent"
+    "generate-contracts-mdx": "yarn ts ./src/generate-contracts-mdx.ts && yarn prettier --write ./pages/docs/contracts --log-level silent",
+    "watch:docs-theme": "nodemon -w ../../libs/docs-theme -e js,jsx,ts,tsx,css --exec 'yarn build:deps'"
   },
   "types": "./src/index.ts",
   "devDependencies": {
     "@types/node": "^20.14.2",
     "@types/react": "^18.3.3",
+    "nodemon": "^3.1.4",
     "prettier": "^3.3.1",
     "shiki": "^1.10.1",
     "tslib": "^2.6.3",
