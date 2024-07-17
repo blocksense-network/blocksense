@@ -29,6 +29,8 @@ pub struct Reporter {
 
 #[derive(Debug, Deserialize)]
 pub struct SequencerConfig {
+    pub main_port: u16,
+    pub prometheus_port: u16,
     pub max_keys_to_batch: usize,
     pub keys_batch_duration: u64,
     pub providers: HashMap<String, Provider>,
@@ -60,6 +62,8 @@ pub fn get_test_config_with_single_provider(
         .expect(format!("Could not write to file {}", private_key_path).as_str());
 
     SequencerConfig {
+        main_port: 8877,
+        prometheus_port: 5555,
         max_keys_to_batch: 1,
         keys_batch_duration: 500,
         providers: HashMap::from([(

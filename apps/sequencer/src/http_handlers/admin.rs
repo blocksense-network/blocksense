@@ -13,6 +13,7 @@ use eyre::eyre;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
 use data_feeds::types::FeedType;
+use prometheus::{Encoder, TextEncoder};
 use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
@@ -177,6 +178,30 @@ async fn get_feed_report_interval(
                 .expect("Error trying to lock Feed for read!")
                 .get_report_interval_ms()
         )));
+}
+
+#[get("/metrics")]
+async fn metrics() -> Result<HttpResponse, Error> {
+    let mut buffer = Vec::new();
+    let encoder = TextEncoder::new();
+
+    // Gather the metrics.
+    let metric_families = prometheus::gather();
+    // Encode them to send.
+    if let Err(e) = encoder.encode(&metric_families, &mut buffer) {
+        return Err(error::ErrorBadRequest(e.to_string()));
+    }
+
+    let output = match String::from_utf8(buffer.clone()) {
+        Ok(result) => result,
+        Err(e) => {
+            return Err(error::ErrorBadRequest(e.to_string()));
+        }
+    };
+
+    return Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(output));
 }
 
 #[cfg(test)]

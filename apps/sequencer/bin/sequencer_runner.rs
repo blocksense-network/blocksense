@@ -25,11 +25,12 @@ use sequencer::utils::logging::init_shared_logging_handle;
 use actix_web::rt::spawn;
 use futures::stream::FuturesUnordered;
 use sequencer::config::config::init_sequencer_config;
+use sequencer::http_handlers::admin::metrics;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let log_handle = init_shared_logging_handle();
     let sequencer_config = init_sequencer_config();
+    let log_handle = init_shared_logging_handle();
 
     // This trigger spawns threads, which Ctrl+C does not kill.  So
     // for this case we need to detect Ctrl+C and shut those threads
@@ -72,7 +73,7 @@ async fn main() -> std::io::Result<()> {
 
     let metrics_collector = metrics_collector_loop().await;
 
-    let http_server_fut = spawn(async move {
+    let main_http_server_fut = spawn(async move {
         HttpServer::new(move || {
             App::new()
                 .app_data(app_state.clone())
@@ -85,18 +86,27 @@ async fn main() -> std::io::Result<()> {
                 .service(registry_plugin_size)
                 .service(get_feed_report_interval)
         })
-        .bind(("0.0.0.0", 8877))
-        .expect("HTTP server could not bind to port.")
+        .bind(("0.0.0.0", sequencer_config.main_port))
+        .expect("Main HTTP server could not bind to port.")
         .run()
         .await
     });
 
     let collected_futures = FuturesUnordered::new();
     collected_futures.push(feeds_slots_manager_loop_fut);
-    collected_futures.push(http_server_fut);
+    collected_futures.push(main_http_server_fut);
     collected_futures.push(votes_batcher);
     collected_futures.push(votes_sender);
     collected_futures.push(metrics_collector);
+
+    let prometheus_http_server_fut = spawn(async move {
+        HttpServer::new(move || App::new().service(metrics))
+            .bind(("0.0.0.0", sequencer_config.prometheus_port))
+            .expect("Prometheus HTTP server could not bind to port.")
+            .run()
+            .await
+    });
+    collected_futures.push(prometheus_http_server_fut);
 
     let result = futures::future::join_all(collected_futures).await;
     for v in result {

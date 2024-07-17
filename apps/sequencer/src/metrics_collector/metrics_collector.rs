@@ -5,7 +5,7 @@ use prometheus::TextEncoder;
 use std::io::Error;
 use tokio::time::Duration;
 
-use tracing::info;
+use tracing::debug;
 
 pub async fn metrics_collector_loop() -> tokio::task::JoinHandle<Result<(), Error>> {
     spawn(async move {
@@ -21,7 +21,7 @@ pub async fn metrics_collector_loop() -> tokio::task::JoinHandle<Result<(), Erro
             encoder.encode(&metric_families, &mut buffer).unwrap();
 
             let output = String::from_utf8(buffer.clone()).unwrap();
-            info!("Prometheus metrics:\n{}", output);
+            debug!("Prometheus metrics:\n{}", output);
         }
     })
 }
