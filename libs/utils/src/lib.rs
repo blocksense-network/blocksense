@@ -1,16 +1,18 @@
 use std::{
     env,
     fmt::{Debug, Display},
+    fs::File,
     hash::{DefaultHasher, Hash, Hasher},
+    io::Read,
     str::FromStr,
     time::{SystemTime, UNIX_EPOCH},
 };
 
-pub fn current_unix_time() -> u64 {
+pub fn current_unix_time() -> u128 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .expect("SystemTime before UNIX EPOCH!")
-        .as_secs()
+        .as_secs() as u128
 }
 
 pub fn get_env_var<T>(key: &str) -> Result<T, String>
@@ -42,4 +44,12 @@ pub fn to_hex_string(mut bytes: Vec<u8>, padding_to: Option<usize>) -> String {
         .map(|b| format!("{:02x}", b))
         .collect::<Vec<_>>()
         .join("")
+}
+
+pub fn read_file(path: &str) -> String {
+    let mut file = File::open(path).expect(format!("File not found in {}", path).as_str());
+    let mut data = String::new();
+    file.read_to_string(&mut data)
+        .expect(format!("File {} read failure! ", path).as_str());
+    data
 }

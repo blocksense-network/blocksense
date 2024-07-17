@@ -12,6 +12,7 @@ use alloy::{
 use eyre::eyre;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
+use data_feeds::types::FeedType;
 use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
@@ -60,7 +61,16 @@ async fn get_key_from_contract(
 
     let result = provider.call(&tx).await?;
     info!("Call result: {:?}", result);
-    Ok(result.to_string())
+    // TODO: get from metadata the type of the value.
+    // TODO: Refector to not use dummy argument
+    let return_val = match FeedType::from_bytes(result.to_vec(), FeedType::Numerical(0.0)) {
+        Ok(val) => val,
+        Err(e) => {
+            return Err(eyre!("Could not deserialize feed from bytes {}", e));
+        }
+    };
+    info!("Call result: {:?}", return_val);
+    Ok(return_val.to_string())
 }
 
 #[get("/deploy/{network}")]

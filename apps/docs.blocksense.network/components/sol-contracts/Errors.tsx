@@ -1,27 +1,39 @@
 import React from 'react';
-
+import { Signature } from '@/sol-contracts-components/Signature';
 import { ErrorDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variable } from '@/sol-contracts-components/Variable';
+import { Variables } from '@/sol-contracts-components/Variables';
+import { Selector } from '@/sol-contracts-components/Selector';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
 type ErrorsProps = {
   errors?: ErrorDocItem[];
+  isFromSourceUnit?: boolean;
 };
 
-export const Errors = ({ errors }: ErrorsProps) => {
+export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
   return (
-    <ContractItemWrapper title="## Errors" itemsLength={errors?.length}>
+    <ContractItemWrapper
+      title="Errors"
+      titleLevel={isFromSourceUnit ? 2 : 3}
+      itemsLength={errors?.length}
+    >
       {errors?.map((error, index) => (
-        <div key={index}>
-          <h3>{error.name}</h3>
-          <span>Error Selector: {error.errorSelector}</span>
-          {error.signature && <span>Signature{error.signature}</span>}
-          {error?._parameters?.map((errorParameter, index) => (
-            <Variable key={index} variable={errorParameter} />
-          ))}
+        <div className="contract-item-wrapper__error" key={index}>
+          <AnchorLinkTitle
+            title={error.name}
+            titleLevel={isFromSourceUnit ? 3 : 4}
+          />
+          <Selector selector={error.errorSelector} />
+          <Signature signature={error.signature} />
           <NatSpec natspec={error.natspec} />
+          <Variables
+            variables={error?._parameters}
+            title="Parameters"
+            titleLevel={isFromSourceUnit ? 4 : 5}
+          />
         </div>
       ))}
     </ContractItemWrapper>

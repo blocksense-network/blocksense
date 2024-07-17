@@ -1,5 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
+import { config } from '@/config';
 import { ghContractFolder } from '@/src/constants';
 
 type AbsolutePathProps = {
@@ -7,5 +10,14 @@ type AbsolutePathProps = {
 };
 
 export const AbsolutePath = ({ absolutePath }: AbsolutePathProps) => {
-  return <span>{ghContractFolder + absolutePath}</span>;
+  return (
+    <Button className="absolute-path__button" asChild>
+      <Link
+        className="absolute-path__link font-semibold"
+        href={`${ghContractFolder}${absolutePath}`}
+      >
+        {config.github}
+      </Link>
+    </Button>
+  );
 };

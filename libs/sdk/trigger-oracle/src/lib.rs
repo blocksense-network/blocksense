@@ -300,9 +300,9 @@ impl OracleTrigger {
     }
 }
 
-pub fn current_unix_time() -> u64 {
+pub fn current_unix_time() -> u128 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .expect("SystemTime before UNIX EPOCH!")
-        .as_secs()
+        .as_secs() as u128
 }

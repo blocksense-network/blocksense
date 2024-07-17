@@ -56,3 +56,52 @@ impl SlotTimeTracker {
         self.start_time_ms = get_ms_since_epoch();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::SlotTimeTracker;
+    use std::time::{Duration, Instant};
+
+    #[tokio::test]
+    async fn test_await_end_of_current_slot() {
+        // setup
+        const SLOT_INTERVAL: Duration = Duration::from_secs(1);
+        const START_TIME_MS: u128 = 0;
+        let mut time_tracker = SlotTimeTracker::new(SLOT_INTERVAL, START_TIME_MS);
+
+        // run
+        let start_time = Instant::now();
+        time_tracker.await_end_of_current_slot().await;
+        let elapsed_time = start_time.elapsed();
+
+        // assert
+        assert!(
+            elapsed_time
+                < SLOT_INTERVAL
+                    .checked_add(Duration::from_millis(100))
+                    .unwrap()
+        );
+    }
+
+    #[tokio::test]
+    async fn test_get_duration_until_end_of_current_slot() {
+        // setup
+        const SLOT_INTERVAL: Duration = Duration::from_secs(1);
+        const START_TIME_MS: u128 = 0;
+        let mut time_tracker = SlotTimeTracker::new(SLOT_INTERVAL, START_TIME_MS);
+
+        // run
+        let duration = time_tracker.get_duration_until_end_of_current_slot();
+
+        // assert
+        assert!(duration.as_secs() < SLOT_INTERVAL.as_secs());
+
+        // setup
+        time_tracker.reset_report_start_time();
+        let duration = time_tracker.get_duration_until_end_of_current_slot();
+
+        // assert
+        // Should be ideally exactly SLOT_INTERVAL ms, but we cannot count on exactness
+        assert!(duration.as_millis() > (SLOT_INTERVAL.as_millis() - 100));
+    }
+}

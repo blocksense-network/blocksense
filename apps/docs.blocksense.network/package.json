@@ -16,8 +16,8 @@
   "devDependencies": {
     "@types/node": "^20.14.2",
     "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
     "prettier": "^3.3.1",
+    "shiki": "^1.10.1",
     "tslib": "^2.6.3",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
@@ -28,14 +28,22 @@
     "@blocksense/sol-reflector": "workspace:*",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@radix-ui/react-dialog": "^1.1.1",
+    "@radix-ui/react-slot": "^1.1.0",
     "autoprefixer": "^10.4.19",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.400.0",
     "next": "^14.2.3",
     "nextra": "^2.13.4",
     "postcss": "^8.4.38",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-vertical-timeline-component": "^3.6.0",
+    "tailwind-merge": "^2.3.0",
     "tailwindcss": "^3.4.4",
-    "tsx": "^4.7.1"
+    "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.7.1",
+    "vaul": "^0.9.1"
   }
 }

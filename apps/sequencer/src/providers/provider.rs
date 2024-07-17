@@ -1,3 +1,4 @@
+use alloy::providers::Provider;
 use alloy::transports::http::Http;
 use alloy::{
     network::{Ethereum, EthereumSigner},
@@ -11,14 +12,14 @@ use alloy::{
 use reqwest::{Client, Url};
 
 use super::provider_metrics::ProviderMetrics;
-use envload::Envload;
-use envload::LoadEnv;
+use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
-use std::env;
 use std::fs;
 use std::sync::Arc;
+use tokio::spawn;
 use tokio::sync::Mutex;
-use tracing::info;
+use tokio::time::Duration;
+use tracing::{debug, error, info, warn};
 
 pub type ProviderType = FillProvider<
     JoinFill<
@@ -29,35 +30,6 @@ pub type ProviderType = FillProvider<
     Http<Client>,
     Ethereum,
 >;
-
-#[derive(Envload)]
-pub struct SequencerConfig {
-    rpc_url: Url,
-    private_key: String,
-    contract_address: Option<String>,
-}
-
-pub fn get_wallet() -> LocalWallet {
-    let env = <SequencerConfig as LoadEnv>::load_env();
-    let priv_key = fs::read_to_string(env.private_key.clone())
-        .expect(format!("Failed to read private key from {}", env.private_key).as_str());
-
-    let wallet: LocalWallet = priv_key
-        .trim()
-        .parse()
-        .expect("Incorrect private key specified.");
-    wallet
-}
-
-pub fn get_contract_address() -> Address {
-    let env = <SequencerConfig as LoadEnv>::load_env();
-    let contract_address: Address = env
-        .contract_address
-        .expect("Contract address not provided in environment.")
-        .parse()
-        .expect("Contract address not found.");
-    contract_address
-}
 
 pub fn parse_contract_address(addr: &str) -> Option<Address> {
     let contract_address: Option<Address> = addr.parse().ok();
@@ -70,64 +42,128 @@ pub struct RpcProvider {
     pub wallet: LocalWallet,
     pub contract_address: Option<Address>,
     pub provider_metrics: ProviderMetrics,
+    pub transcation_timeout_secs: u32,
 }
 
 pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
-pub fn init_shared_rpc_providers() -> SharedRpcProviders {
-    Arc::new(std::sync::RwLock::new(get_rpc_providers()))
+async fn chech_if_contract_exists(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
+    let latest_block = provider
+        .lock()
+        .await
+        .provider
+        .get_block_number()
+        .await
+        .expect("Could not lock provider mutex!");
+    let bytecode = provider
+        .lock()
+        .await
+        .provider
+        .get_code_at(*addr, latest_block.into())
+        .await
+        .expect("Could not get bytecode of contract from provider!");
+    bytecode.to_string() != "0x"
 }
 
-pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
-    let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
-    let mut urls: HashMap<String, String> = HashMap::new();
-    let mut keys: HashMap<String, String> = HashMap::new();
-    let mut contract_addresses: HashMap<String, String> = HashMap::new();
+pub async fn init_shared_rpc_providers(conf: &SequencerConfig) -> SharedRpcProviders {
+    Arc::new(std::sync::RwLock::new(get_rpc_providers(conf).await))
+}
 
-    for (key, value) in env::vars() {
-        if let Some(name) = key.strip_prefix("WEB3_URL_") {
-            urls.insert(name.to_string(), value);
-        } else if let Some(name) = key.strip_prefix("WEB3_PRIVATE_KEY_") {
-            keys.insert(name.to_string(), value);
-        } else if let Some(name) = key.strip_prefix("WEB3_CONTRACT_ADDRESS_") {
-            contract_addresses.insert(name.to_string(), value);
-        }
-    }
-    for (key, value) in &urls {
-        let rpc_url: Url = value
+async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
+    let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
+
+    for (key, p) in &conf.providers {
+        let rpc_url: Url = p
+            .url
             .parse()
             .expect(format!("Not a valid url provided for {key}!").as_str());
-        let priv_key = keys
-            .get(key)
-            .expect(format!("No key provided for {key}!").as_str());
-        let priv_key = fs::read_to_string(priv_key)
-            .expect(format!("Failed to read private key for {} from {}", key, priv_key).as_str());
+        let priv_key_path = &p.private_key_path;
+        let priv_key = fs::read_to_string(priv_key_path.clone()).expect(
+            format!(
+                "Failed to read private key for {} from {}",
+                key, priv_key_path
+            )
+            .as_str(),
+        );
         let wallet: LocalWallet = priv_key
             .trim()
             .parse()
-            .expect("Incorrect private key specified.");
+            .expect(format!("Incorrect private key specified {}.", priv_key).as_str());
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()
             .signer(EthereumSigner::from(wallet.clone()))
             .on_http(rpc_url);
-        let address = match contract_addresses.get(key) {
-            Some(x) => parse_contract_address(x),
+        let address = match &p.contract_address {
+            Some(x) => parse_contract_address(x.as_str()),
             None => None,
         };
-        providers.insert(
-            key.to_string(),
-            Arc::new(Mutex::new(RpcProvider {
-                contract_address: address,
-                provider,
-                wallet,
-                provider_metrics: ProviderMetrics::new(key),
-            })),
-        );
+
+        let rpc_provider = Arc::new(Mutex::new(RpcProvider {
+            contract_address: address,
+            provider,
+            wallet,
+            provider_metrics: ProviderMetrics::new(&key)
+                .expect("Failed to allocate ProviderMetrics"),
+            transcation_timeout_secs: p.transcation_timeout_secs,
+        }));
+
+        providers.insert(key.clone(), rpc_provider.clone());
+
+        match &p.contract_address {
+            Some(x) => {
+                match parse_contract_address(x.as_str()) {
+                    Some(addr) => {
+                        info!("Contract address for network {} set to {}. Checking if contract exists ...", key, addr);
+                        match spawn(async move {
+                            let result = actix_web::rt::time::timeout(
+                                Duration::from_secs(5),
+                                chech_if_contract_exists(rpc_provider, &addr),
+                            )
+                            .await;
+                            result
+                        })
+                        .await
+                        {
+                            Ok(result) => match result {
+                                Ok(exists) => {
+                                    if exists {
+                                        info!(
+                                            "Contract for network {} exists on address {}",
+                                            key, addr
+                                        );
+                                    } else {
+                                        warn!(
+                                            "No contract for network {} exists on address {}",
+                                            key, addr
+                                        )
+                                    }
+                                }
+                                Err(e) => {
+                                    warn!("JSON rpc request to verify contract existence timed out: {}", e);
+                                }
+                            },
+                            Err(e) => {
+                                error!("Task join error: {}", e)
+                            }
+                        };
+                    }
+                    None => {
+                        error!(
+                            "Set contract address for network {} is not a valid Ethereum contract address!",
+                            key
+                        );
+                    }
+                }
+            }
+            None => {
+                warn!("No contract address set for network {}", key);
+            }
+        };
     }
 
-    info!("List of providers:");
+    debug!("List of providers:");
     for (key, value) in &providers {
-        info!("{}: {:?}", key, value);
+        debug!("{}: {:?}", key, value);
     }
 
     providers
@@ -137,38 +173,6 @@ pub fn get_rpc_providers() -> HashMap<String, Arc<Mutex<RpcProvider>>> {
 //     println!("{:?}", std::any::type_name::<T>());
 // }
 
-// fn get_provider() -> RootProvider<Http<Client>> {
-//     let rpc_url = get_rpc_url();
-
-//     // Create the RPC client.
-//     let rpc_client = RpcClient::new_http(rpc_url);
-
-//     // Provider can then be instantiated using the RPC client, ReqwestProvider is an alias
-//     // RootProvider. RootProvider requires two generics N: Network and T: Transport
-//     let provider = ReqwestProvider::<Ethereum>::new(rpc_client);
-//     provider
-// }
-
-// pub fn init_shared_provider() -> Arc<Mutex<ProviderType>> {
-//     Arc::new(Mutex::new(get_provider()))
-// }
-
-pub fn get_provider() -> ProviderType {
-    // Create a provider with a signer.
-
-    let env = <SequencerConfig as LoadEnv>::load_env();
-
-    let wallet = get_wallet();
-
-    // Set up the HTTP provider with the `reqwest` crate.
-    let provider = ProviderBuilder::new()
-        .with_recommended_fillers()
-        .signer(EthereumSigner::from(wallet))
-        .on_http(env.rpc_url);
-
-    provider
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -176,25 +180,28 @@ mod tests {
     use std::{fs::File, io::Write};
 
     use alloy::{
-        network::TransactionBuilder, node_bindings::Anvil, primitives::U256, providers::Provider,
+        network::TransactionBuilder, node_bindings::Anvil, primitives::U256,
         rpc::types::eth::request::TransactionRequest,
     };
     use eyre::Result;
-    use std::env;
 
-    use crate::providers::provider::get_provider;
+    use crate::providers::provider::get_rpc_providers;
+    use alloy::providers::Provider as AlloyProvider;
+    use sequencer_config::get_test_config_with_single_provider;
+    use sequencer_config::Provider;
+    use sequencer_config::SequencerConfig;
+    use std::collections::HashMap;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
-        env::set_var("PRIVATE_KEY", "/tmp/key");
-        let configured_contract_address = "0xef11D1c2aA48826D4c41e54ab82D1Ff5Ad8A64Ca";
-        env::set_var("CONTRACT_ADDRESS", configured_contract_address);
-        let mut file = File::create("/tmp/key")?;
-        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")?;
+        let network = "ETH";
 
         let anvil = Anvil::new().try_spawn()?;
-        env::set_var("RPC_URL", anvil.endpoint());
-        let provider = get_provider();
+
+        let cfg = get_test_config_with_single_provider(network, "/tmp/key", &anvil.endpoint());
+
+        let providers = get_rpc_providers(&cfg).await;
+        let provider = &providers.get(network).unwrap().lock().await.provider;
 
         let alice = anvil.addresses()[7];
         let bob = anvil.addresses()[0];
@@ -218,59 +225,48 @@ mod tests {
 
         println!("Transaction sent with nonce: {}", pending_tx.nonce);
 
-        assert_eq!(
-            get_contract_address().to_string(),
-            configured_contract_address
-        );
-
         // Send the transaction, the nonce (1) is automatically managed by the provider.
         let _builder = provider.send_transaction(tx).await?;
         Ok(())
     }
 
-    #[test]
-    fn test_get_wallet_success() {
+    #[tokio::test]
+    async fn test_get_wallet_success() {
+        let network = "ETH1";
         // Create a temporary file with a valid private key
         let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
         let expected_wallet_address = "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955"; // generated as hash of private_key
 
-        write("/tmp/key", private_key).expect("Failed to write to temp file");
+        let key_path = "/tmp/key";
 
-        // Set the environment variables
-        env::set_var("PRIVATE_KEY", "/tmp/key");
-        env::set_var("RPC_URL", "http://localhost:8545"); // Dummy URL for testing
+        write(key_path, private_key).expect("Failed to write to temp file");
+
+        let cfg = get_test_config_with_single_provider(network, key_path, "http://localhost:8545");
+        let providers = get_rpc_providers(&cfg).await;
 
         // Call the function
-        let wallet = get_wallet();
+        let wallet = &providers[network].lock().await.wallet;
 
         // Check if the wallet's address matches the expected address
         assert_eq!(wallet.address().to_string(), expected_wallet_address);
     }
 
-    #[test]
-    fn test_get_rpc_providers_returns_single_provider() {
+    #[tokio::test]
+    async fn test_get_rpc_providers_returns_single_provider() {
         // setup
-        let env_var_url = "WEB3_URL_ETH11";
-        let env_var_contract_address = "WEB3_CONTRACT_ADDRESS_ETH11";
-        let env_var_private_key = "WEB3_PRIVATE_KEY_ETH11";
-        env::set_var(env_var_url, "http://127.0.0.1:8545");
-        env::set_var(
-            env_var_contract_address,
-            "0xef11d1c2aa48826d4c41e54ab82d1ff5ad8a64ca",
-        );
-        env::set_var(env_var_private_key, "/tmp/priv_key_test");
-        let mut file = File::create("/tmp/priv_key_test").unwrap();
-        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-            .unwrap();
+        let network = "ETH2";
+        // Create a temporary file with a valid private key
+        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
+        let expected_wallet_address = "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955"; // generated as hash of private_key
+
+        let key_path = "/tmp/key";
+
+        write(key_path, private_key).expect("Failed to write to temp file");
+        let cfg = get_test_config_with_single_provider(network, key_path, "http://localhost:8545");
 
         // test
-        let binding = init_shared_rpc_providers();
+        let binding = init_shared_rpc_providers(&cfg).await;
         let result = binding.read().unwrap();
-
-        // cleanup
-        env::remove_var(env_var_url);
-        env::remove_var(env_var_contract_address);
-        env::remove_var(env_var_private_key);
 
         // assert
         assert_eq!(result.len(), 1);

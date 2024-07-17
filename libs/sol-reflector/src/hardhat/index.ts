@@ -2,15 +2,12 @@ import { extendConfig, task } from 'hardhat/config';
 
 import './type-extensions';
 import { Build } from '../types';
+import { relative } from 'path';
 
 extendConfig(config => {
-  const path = require('path') as typeof import('path');
   config.reflect ??= {};
   config.reflect.root = config.paths.root;
-  config.reflect.sourcesDir = path
-    .relative(config.paths.root, config.paths.sources)
-    .split(path.sep)
-    .join(path.posix.sep);
+  config.reflect.sourcesDir = relative(config.paths.root, config.paths.sources);
 });
 
 task('reflect', async (_, hre) => {

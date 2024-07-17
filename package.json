@@ -13,6 +13,9 @@
   "dependenciesMeta": {
     "@openzeppelin/contracts@5.0.2": {
       "unplugged": true
+    },
+    "next@14.2.3": {
+      "unplugged": true
     }
   },
   "devDependencies": {

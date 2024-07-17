@@ -4,23 +4,36 @@ import { StructDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variable } from '@/sol-contracts-components/Variable';
+import { Variables } from '@/sol-contracts-components/Variables';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
 type StructsProps = {
   structs?: StructDocItem[];
+  isFromSourceUnit?: boolean;
 };
 
-export const Structs = ({ structs }: StructsProps) => {
+export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
   return (
-    <ContractItemWrapper title="## Structs" itemsLength={structs?.length}>
+    <ContractItemWrapper
+      title="Structs"
+      titleLevel={isFromSourceUnit ? 2 : 3}
+      itemsLength={structs?.length}
+    >
       {structs?.map((struct, index) => (
-        <div key={index}>
-          <h3>{struct.name}</h3>
-          <span>Visibility: {struct.visibility}</span>
-          {struct?._members?.map((structMember, index) => (
-            <Variable key={index} variable={structMember} />
-          ))}
+        <div className="contract-item-wrapper__struct" key={index}>
+          <AnchorLinkTitle
+            title={struct.name}
+            titleLevel={isFromSourceUnit ? 3 : 4}
+          />
+          <span className="contract-item-wrapper__struct-visibility">
+            Visibility: {struct.visibility}
+          </span>
           <NatSpec natspec={struct.natspec} />
+          <Variables
+            variables={struct?._members}
+            title="Members"
+            titleLevel={isFromSourceUnit ? 4 : 5}
+          />
         </div>
       ))}
     </ContractItemWrapper>

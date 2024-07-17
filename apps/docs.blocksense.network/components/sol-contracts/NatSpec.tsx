@@ -10,35 +10,52 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
   return (
     <>
       {Object.keys(natspec).length > 0 && (
-        <div>
-          <span>NatSpec</span>
-          {natspec.title && <h3>{natspec.title}</h3>}
-          {natspec.author && <h3>{natspec.author}</h3>}
-          {natspec.notice && <span>{natspec.notice}</span>}
+        <div className="natspec px-4 bg-white text-black">
+          <p className="natspec__title text-lg font-semibold text-slate-600">
+            Description
+          </p>
+          <br />
+          {natspec.author && (
+            <h3 className="natspec__author text-xl mb-1  text-slate-600">
+              {natspec.author}
+            </h3>
+          )}
+          {natspec.notice && (
+            <p className="natspec__notice mb-4 text-slate-600">
+              {natspec.notice}
+            </p>
+          )}
           {natspec.dev && (
-            <div>
-              {natspec.dev
-                .replace(/\n/g, ' ')
-                .replace(/{/g, '`{`')
-                .replace(/}/g, '`}`')}
+            <div className="natspec__dev  text-slate-600 mb-6">
+              {natspec.dev}
             </div>
           )}
           {natspec.params?.map((param, index) => (
-            <div key={index} className="mb-5">
-              <span>{param.name}</span>
-              <span>{param.description}</span>
+            <div className="natspec__param" key={index}>
+              <span className="natspec__param-name text-base text-slate-600 font-bold">
+                {param.name || 'unnamed'}:
+              </span>{' '}
+              <span className="natspec__param-description text-base  text-slate-600">
+                {param.description}
+              </span>
             </div>
           ))}
           {natspec.returns?.map((ret, index) => (
-            <div key={index} className="mb-5">
-              <span>{ret.name}</span>
-              <span>{ret.description}</span>
+            <div className="natspec__return" key={index}>
+              <span className="natspec__return-name text-base font-semibold">
+                {ret.name || 'unnamed'}:
+              </span>{' '}
+              <span className="natspec__return-description text-base text-slate-600">
+                {ret.description}
+              </span>
             </div>
           ))}
           {Object.entries(natspec.custom || {}).map(([key, value], index) => (
-            <div key={index} className="mb-5">
-              <span>{key}</span>
-              <span>{value}</span>
+            <div className="natspec__custom mb-5" key={index}>
+              <span className="natspec__custom-key text-base font-semibold">
+                {key}:
+              </span>{' '}
+              <span className="natspec__custom-value">{value}</span>
             </div>
           ))}
         </div>

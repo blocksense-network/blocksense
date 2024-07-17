@@ -202,10 +202,20 @@ jobs:
       - name: Pull Vercel configuration
         run: yarn vercel link --scope blocksense --project docs.blocksense.network --yes --token ${{ secrets.vercel_token }}
 
-      - name: Vercel Build
+      - name: Vercel Build - Prod
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: yarn vercel build --prod --yes --token ${{ secrets.vercel_token }}
+
+      - name: Vercel Build - Preview
+        if: github.ref != format('refs/heads/{0}', github.event.repository.default_branch)
         run: yarn vercel build --yes --token ${{ secrets.vercel_token }}
 
-      - name: Deploy to Vercel
+      - name: Deploy to Vercel - Prod
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: yarn vercel deploy --prod --prebuilt --scope blocksense --token ${{ secrets.vercel_token }} > _vercel-deployment-url
+
+      - name: Deploy to Vercel - Preview
+        if: github.ref != format('refs/heads/{0}', github.event.repository.default_branch)
         run: yarn vercel deploy --prebuilt --scope blocksense --token ${{ secrets.vercel_token }} > _vercel-deployment-url
 
       - name: Read deployment URL
@@ -215,14 +225,8 @@ jobs:
           echo "::set-output name=deploymentUrl::${deploymentUrl}"
 
       - name: Comment on the PR
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUMBER=$(jq --raw-output .number "$GITHUB_EVENT_PATH")
-          DEPLOYMENT_URL=${{ steps.read-deployment-url.outputs.deploymentUrl }}
-          COMMENT_BODY="Deployed to ${DEPLOYMENT_URL}"
-          curl -s -L \
-            -X POST \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            -d "{\"body\": \"${COMMENT_BODY}\"}" \
-            https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments
+        uses: marocchino/sticky-pull-request-comment@v2.9.0
+        with:
+          recreate: true
+          message: |
+            Deployed to ${{ steps.read-deployment-url.outputs.deploymentUrl }} 🌱

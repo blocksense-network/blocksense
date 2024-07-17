@@ -149,14 +149,14 @@ export class EventDocItem {
 export class FunctionDocItem {
   name: string = '';
   kind: FunctionType = 'function';
-  functionSelector?: string;
+  functionSelector: string = '';
   signature?: string;
   visibility: Visibility = 'external';
   stateMutability: StateMutability = 'payable';
   virtual: boolean = true;
   _parameters?: VariableDocItem[];
   _returnParameters?: VariableDocItem[];
-  _modifiers: FunctionModifierDocItem[] = [];
+  _modifiers?: FunctionModifierDocItem[];
   natspec: NatSpec = {};
 }
 

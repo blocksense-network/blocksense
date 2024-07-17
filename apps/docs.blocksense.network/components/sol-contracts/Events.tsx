@@ -1,10 +1,12 @@
 import React from 'react';
-
+import { Signature } from '@/sol-contracts-components/Signature';
 import { EventDocItem } from '@blocksense/sol-reflector';
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variable } from '@/sol-contracts-components/Variable';
+import { Variables } from '@/sol-contracts-components/Variables';
+import { Selector } from '@/sol-contracts-components/Selector';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
 type EventsProps = {
   events?: EventDocItem[];
@@ -12,17 +14,25 @@ type EventsProps = {
 
 export const Events = ({ events }: EventsProps) => {
   return (
-    <ContractItemWrapper title="## Events" itemsLength={events?.length}>
+    <ContractItemWrapper
+      title="Events"
+      titleLevel={3}
+      itemsLength={events?.length}
+    >
       {events?.map((event, index) => (
-        <div key={index}>
-          <h3>{event.name}</h3>
-          <span>Event Selector: {event.eventSelector}</span>
-          {event.signature && <span>Signature: {event.signature}</span>}
-          <span>Anonymous: {event.anonymous.toString()}</span>
-          {event?._parameters?.map((eventParameter, index) => (
-            <Variable key={index} variable={eventParameter} />
-          ))}
+        <div className="contract-item-wrapper__event" key={index}>
+          <AnchorLinkTitle title={event.name} titleLevel={3} />
+          <Selector selector={event.eventSelector} />
+          <Signature signature={event.signature} />
+          <span className="contract-item-wrapper__event-anonymous">
+            Anonymous: {event.anonymous.toString()}
+          </span>
           <NatSpec natspec={event.natspec} />
+          <Variables
+            variables={event?._parameters}
+            title="Parameters"
+            titleLevel={4}
+          />
         </div>
       ))}
     </ContractItemWrapper>

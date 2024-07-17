@@ -24,6 +24,30 @@ impl FeedType {
             FeedType::Text(s) => s.as_bytes().to_vec(),
         }
     }
+
+    pub fn to_string(&self) -> String {
+        match self {
+            FeedType::Numerical(val) => format!("{}", val),
+            FeedType::Text(s) => s.clone(),
+        }
+    }
+
+    pub fn from_bytes(bytes: Vec<u8>, variant: FeedType) -> Result<FeedType, String> {
+        match variant {
+            FeedType::Numerical(_) => {
+                let arr: [u8; 8] = bytes[..8]
+                    .try_into()
+                    .map_err(|_| "Failed to convert to array".to_string())?;
+                let val = f64::from_be_bytes(arr);
+                Ok(FeedType::Numerical(val))
+            }
+            FeedType::Text(_) => {
+                let s =
+                    String::from_utf8(bytes).map_err(|_| "Invalid UTF-8 sequence".to_string())?;
+                Ok(FeedType::Text(s))
+            }
+        }
+    }
 }
 
 pub enum ConsensusMetric {
@@ -50,7 +74,7 @@ pub enum DataFeedAPI {
     // OpenWeather,
 }
 
-pub type Timestamp = u64;
+pub type Timestamp = u128;
 
 #[derive(Debug, Serialize)]
 pub struct Bytes32(pub [u8; 32]);
@@ -89,7 +113,7 @@ pub struct PayloadMetaData {
     pub feed_id: String,
     /// timestamp from when the data feed was gathered
     #[serde(default)]
-    pub timestamp: u64,
+    pub timestamp: Timestamp,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

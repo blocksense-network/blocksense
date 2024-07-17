@@ -3,11 +3,13 @@ use alloy::node_bindings::Anvil;
 use curl::easy::Handler;
 use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
-use data_feeds::feeds_processing::naive_packing;
-use data_feeds::types::FeedType;
+use data_feeds::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use eyre::Result;
+use json_patch::merge;
 use port_scanner::scan_port;
+use sequencer_config::get_sequencer_config_file_path;
 use serde_json::json;
+use std::fs;
 use std::io::stdout;
 use std::process::Command;
 use std::thread;
@@ -15,6 +17,11 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs::File, io::Write};
 use tokio::time;
 use tokio::time::Duration;
+use utils::read_file;
+
+const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
+const REPORT_VAL: f64 = 80000.8;
+const FEED_ID: &str = "1";
 
 struct Collector(Vec<u8>);
 
@@ -26,26 +33,32 @@ impl Handler for Collector {
 }
 
 fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
+    let config_patch = json!(
+    {
+        "providers": {
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0])},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1])}
+        }
+    });
+
+    let config_file_path = get_sequencer_config_file_path();
+
+    let data = read_file(config_file_path.as_str());
+
+    let mut sequencer_config =
+        serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
+
+    merge(&mut sequencer_config, &config_patch);
+
+    fs::write("/tmp/sequencer_config.json", sequencer_config.to_string())
+        .expect("Unable to write config file");
+
     thread::spawn(move || {
         let mut command = Command::new("cargo");
         let command = command.args(["run", "--bin", "sequencer"]);
         let sequencer = command
-            .env(
-                "WEB3_PRIVATE_KEY_ETH1",
-                format!("/tmp/key_{}", eth_networks_ports[0]),
-            )
-            .env(
-                "WEB3_PRIVATE_KEY_ETH2",
-                format!("/tmp/key_{}", eth_networks_ports[1]),
-            )
-            .env(
-                "WEB3_URL_ETH1",
-                format!("http://127.0.0.1:{}", eth_networks_ports[0]),
-            )
-            .env(
-                "WEB3_URL_ETH2",
-                format!("http://127.0.0.1:{}", eth_networks_ports[1]),
-            );
+            .env("SEQUENCER_LOGGING_LEVEL", "INFO")
+            .env("SEQUENCER_CONFIG_DIR", "/tmp");
 
         sequencer.status().expect("process failed to execute");
     })
@@ -119,9 +132,6 @@ fn cleanup_spawned_processes() {
     }
 }
 
-const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
-const REPORT_VAL: FeedType = FeedType::Numerical(80100.5);
-
 #[tokio::main]
 async fn main() -> Result<()> {
     let mut providers = Vec::new();
@@ -149,16 +159,31 @@ async fn main() -> Result<()> {
         .expect("System clock set before EPOCH")
         .as_millis();
 
-    send_report(json!({
-        "reporter_id": 0,
-        "feed_id": "YahooFinance.BTC/USD",
-        "timestamp": timestamp,
-        "result": REPORT_VAL
-    }));
+    let payload = DataFeedPayload {
+        payload_metadata: PayloadMetaData {
+            reporter_id: 0,
+            feed_id: FEED_ID.to_string(),
+            timestamp: timestamp.try_into().expect("timestamp overflow"),
+        },
+        result: FeedResult::Result {
+            result: FeedType::Numerical(REPORT_VAL),
+        },
+    };
+
+    let serialized_payload = match serde_json::to_value(&payload) {
+        Ok(payload) => payload,
+        Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
+    };
+
+    println!("serialized_payload={}", serialized_payload);
+
+    send_report(serialized_payload);
 
     {
-        let report_time_interval_ms: u64 =
-            send_get_request("http://127.0.0.1:8877/get_feed_report_interval/1").parse()?;
+        let report_time_interval_ms: u64 = send_get_request(
+            format!("http://127.0.0.1:8877/get_feed_report_interval/{}", FEED_ID).as_str(),
+        )
+        .parse()?;
         let mut interval = time::interval(Duration::from_millis(report_time_interval_ms + 1000)); // give 1 second tolerance
         interval.tick().await; // The first tick completes immediately.
         interval.tick().await;
@@ -173,14 +198,8 @@ async fn main() -> Result<()> {
         send_get_request("127.0.0.1:8877/get_key/ETH2/00000001")
     );
 
-    assert!(
-        send_get_request("127.0.0.1:8877/get_key/ETH1/00000001")
-            == "0x".to_string() + naive_packing(REPORT_VAL).as_str()
-    );
-    assert!(
-        send_get_request("127.0.0.1:8877/get_key/ETH2/00000001")
-            == "0x".to_string() + naive_packing(REPORT_VAL).as_str()
-    );
+    assert!(send_get_request("127.0.0.1:8877/get_key/ETH1/00000001") == format!("{}", REPORT_VAL));
+    assert!(send_get_request("127.0.0.1:8877/get_key/ETH2/00000001") == format!("{}", REPORT_VAL));
 
     cleanup_spawned_processes();
 
