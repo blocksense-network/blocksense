@@ -13,9 +13,10 @@ import { Signature } from '@/sol-contracts-components/Signature';
 import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variables } from '@/sol-contracts-components/Variables';
-import { Selector } from '@/sol-contracts-components/Selector';
-import { AnchorLinkTitle } from './AnchorLinkTitle';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
+import { FunctionParameters } from '@/sol-contracts-components/FunctionParameters';
+import { useExpandCollapse } from '@/hooks/useExpandCollapse';
+import { useHashChange } from '@/hooks/useHashChange';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];
