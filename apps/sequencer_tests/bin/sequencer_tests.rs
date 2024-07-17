@@ -25,6 +25,7 @@ const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
 const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
+const SEQUENCER_MAIN_PORT: u16 = 8777;
 
 struct Collector(Vec<u8>);
 
@@ -38,6 +39,7 @@ impl Handler for Collector {
 fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
     let config_patch = json!(
     {
+        "main_port": SEQUENCER_MAIN_PORT,
         "providers": {
             "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0])},
             "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1])}
@@ -69,7 +71,7 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
 
 async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
     let now = SystemTime::now();
-    while !scan_port(8877) {
+    while !scan_port(SEQUENCER_MAIN_PORT) {
         let mut interval = time::interval(Duration::from_millis(500));
         interval.tick().await; // The first tick completes immediately.
         interval.tick().await;
@@ -91,7 +93,9 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
 
 fn deploy_contract_to_networks(networks: Vec<&str>) {
     for net in networks {
-        send_get_request(format!("http://127.0.0.1:8877/deploy/{}", net).as_str());
+        send_get_request(
+            format!("http://127.0.0.1:{}/deploy/{}", SEQUENCER_MAIN_PORT, net).as_str(),
+        );
     }
 }
 
@@ -105,7 +109,8 @@ fn send_get_request(request: &str) -> String {
 
 fn send_report(payload_json: serde_json::Value) {
     let mut easy = Easy::new();
-    easy.url("127.0.0.1:8877/post_report").unwrap();
+    easy.url(format!("127.0.0.1:{}/post_report", SEQUENCER_MAIN_PORT).as_str())
+        .unwrap();
     easy.post(true).unwrap();
 
     easy.post_fields_copy(&payload_json.to_string().as_bytes())
@@ -188,7 +193,11 @@ async fn main() -> Result<()> {
 
     {
         let report_time_interval_ms: u64 = send_get_request(
-            format!("http://127.0.0.1:8877/get_feed_report_interval/{}", FEED_ID).as_str(),
+            format!(
+                "http://127.0.0.1:{}/get_feed_report_interval/{}",
+                SEQUENCER_MAIN_PORT, FEED_ID
+            )
+            .as_str(),
         )
         .parse()?;
         let mut interval = time::interval(Duration::from_millis(report_time_interval_ms + 1000)); // give 1 second tolerance
@@ -198,15 +207,27 @@ async fn main() -> Result<()> {
 
     println!(
         "ETH1 value = {}",
-        send_get_request("127.0.0.1:8877/get_key/ETH1/00000001")
+        send_get_request(
+            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_MAIN_PORT).as_str()
+        )
     );
     println!(
         "ETH2 value = {}",
-        send_get_request("127.0.0.1:8877/get_key/ETH2/00000001")
+        send_get_request(
+            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_MAIN_PORT).as_str()
+        )
     );
 
-    assert!(send_get_request("127.0.0.1:8877/get_key/ETH1/00000001") == format!("{}", REPORT_VAL));
-    assert!(send_get_request("127.0.0.1:8877/get_key/ETH2/00000001") == format!("{}", REPORT_VAL));
+    assert!(
+        send_get_request(
+            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_MAIN_PORT).as_str()
+        ) == format!("{}", REPORT_VAL)
+    );
+    assert!(
+        send_get_request(
+            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_MAIN_PORT).as_str()
+        ) == format!("{}", REPORT_VAL)
+    );
 
     cleanup_spawned_processes();
 
