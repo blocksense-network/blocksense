@@ -18,6 +18,7 @@ use tracing::{debug, info};
 use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed, types::DataFeedAPI};
 
 pub async fn orchestrator() {
+    // Initializes a tracing subscriber that displays runtime information based on the RUST_LOG env variable
     tracing_subscriber::fmt::init();
 
     let batch_size: usize = get_env_var("BATCH_SIZE").expect("BATCH_SIZE not set");

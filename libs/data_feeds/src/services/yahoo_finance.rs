@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
 use ringbuf::{HeapRb, SharedRb};
-use tracing::info;
+use tracing::{trace, warn};
 use utils::{current_unix_time, get_env_var};
 use yahoo_finance_api::YahooConnector;
 
@@ -14,17 +14,6 @@ use crate::types::{ConsensusMetric, DataFeedAPI, FeedError, FeedResult, FeedType
 
 use super::aggregate::AverageAggregator;
 
-// #[derive(Serialize, Clone, Copy)]
-// pub struct YfPayload {
-//     result: f64,
-// }
-
-// impl Payload for YfPayload {
-//     fn to_bytes32(&self) -> Result<Bytes32, ConversionError> {
-//         f64_to_bytes32(self.result)
-//     }
-// }
-
 #[async_trait(?Send)]
 impl DataFeed for YahooFinanceDataFeed {
     fn score_by(&self) -> ConsensusMetric {
@@ -33,6 +22,8 @@ impl DataFeed for YahooFinanceDataFeed {
 
     async fn poll(&mut self, ticker: &str) -> (FeedResult, Timestamp) {
         let response = self.api_connector.get_latest_quotes(ticker, "1d").await;
+
+        trace!("response = {:?}", response);
 
         match response {
             Ok(response) => {
@@ -45,7 +36,7 @@ impl DataFeed for YahooFinanceDataFeed {
                         current_unix_time(),
                     ),
                     Err(e) => {
-                        info!("YahooFinance API failed: {}", e);
+                        warn!("YahooFinance API failed: {}", e);
                         (
                             FeedResult::Error {
                                 error: FeedError::from(FeedError::APIError(
@@ -59,9 +50,7 @@ impl DataFeed for YahooFinanceDataFeed {
             }
             Err(_) => (
                 FeedResult::Error {
-                    error: FeedError::from(FeedError::APIError(
-                        "CoinMarketCap poll failed!".to_string(),
-                    )),
+                    error: FeedError::APIError("CoinMarketCap poll failed!".to_string()),
                 },
                 current_unix_time(),
             ),

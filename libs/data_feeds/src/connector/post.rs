@@ -71,7 +71,9 @@ pub fn post_request(url: &str, payload_json: Value) {
     easy.post_fields_copy(payload_json.to_string().as_bytes())
         .unwrap();
 
-    if let Err(e) = easy.write_function(|data| Ok(stdout().write(data).unwrap())) {
+    if let Err(e) =
+        easy.write_function(|data| Ok(stdout().write(data).expect("Failed to read from STDOUT!")))
+    {
         panic!("Could not write response from server: {}", e);
     }
 
