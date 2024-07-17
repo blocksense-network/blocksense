@@ -178,3 +178,59 @@ async fn get_feed_report_interval(
                 .get_report_interval_ms()
         )));
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::config::init_sequencer_config;
+    use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
+    use crate::plugin_registry;
+    use crate::providers::provider::init_shared_rpc_providers;
+    use crate::reporters::reporter::init_shared_reporters;
+    use crate::utils::logging::init_shared_logging_handle;
+    use actix_web::{http::header::ContentType, test, App};
+    use std::env;
+    use std::path::PathBuf;
+    use std::sync::{Arc, RwLock};
+
+    #[actix_web::test]
+    async fn test_get_feed_report_interval() {
+        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
+        env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
+        let log_handle = init_shared_logging_handle();
+        let sequencer_config = init_sequencer_config();
+
+        let providers = init_shared_rpc_providers(&sequencer_config).await;
+
+        let app_state = web::Data::new(FeedsState {
+            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
+                &sequencer_config,
+            ))),
+            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+            plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
+            providers: providers.clone(),
+            log_handle,
+            reporters: init_shared_reporters(),
+        });
+
+        let app = test::init_service(
+            App::new()
+                .app_data(app_state.clone())
+                .service(get_feed_report_interval),
+        )
+        .await;
+
+        let req = test::TestRequest::get()
+            .uri("/get_feed_report_interval/1")
+            .to_request();
+
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), 200);
+
+        let body = test::read_body(resp).await;
+        let body_str = std::str::from_utf8(&body).expect("Failed to read body");
+        assert_eq!(body_str, "30000");
+    }
+}

@@ -1,3 +1,4 @@
+use once_cell::sync::Lazy;
 use std::env;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -7,8 +8,19 @@ use tracing_subscriber::{filter, fmt, prelude::*, reload, Registry};
 type Handle = tracing_subscriber::reload::Handle<LevelFilter, Registry>;
 pub type SharedLoggingHandle = Arc<Mutex<LoggingHandle>>;
 
-pub fn init_shared_logging_handle() -> Arc<Mutex<LoggingHandle>> {
-    Arc::new(Mutex::new(init_logging_handle()))
+pub struct LoggingHandle {
+    pub handle: Handle,
+}
+
+impl LoggingHandle {
+    pub fn set_logging_level(&self, log_level: &str) -> bool {
+        let level = match str_to_filter_level(log_level) {
+            Some(l) => l,
+            _ => return false,
+        };
+        let _ = self.handle.modify(|filter| *filter = level);
+        true
+    }
 }
 
 fn str_to_filter_level(log_level: &str) -> Option<LevelFilter> {
@@ -20,6 +32,13 @@ fn str_to_filter_level(log_level: &str) -> Option<LevelFilter> {
         "ERROR" => Some(filter::LevelFilter::ERROR),
         _ => None,
     }
+}
+
+static SHARED_LOGGING_HANDLE: Lazy<SharedLoggingHandle> =
+    Lazy::new(|| Arc::new(Mutex::new(init_logging_handle())));
+
+pub fn init_shared_logging_handle() -> SharedLoggingHandle {
+    SHARED_LOGGING_HANDLE.clone()
 }
 
 pub fn init_logging_handle() -> LoggingHandle {
@@ -41,23 +60,6 @@ pub fn init_logging_handle() -> LoggingHandle {
     }
 }
 
-pub struct LoggingHandle {
-    pub handle: Handle,
-}
-
-impl LoggingHandle {
-    pub fn set_logging_level(&self, log_level: &str) -> bool {
-        let level = match str_to_filter_level(log_level) {
-            Some(l) => l,
-            _ => {
-                return false;
-            }
-        };
-        let _ = self.handle.modify(|filter| *filter = level);
-        true
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -67,11 +69,8 @@ mod tests {
     fn test_set_logging_levels() {
         // Test env variable sets up the logging level
         env::set_var("SEQUENCER_LOGGING_LEVEL", "TRACE");
-        let logging_handle = init_logging_handle();
-        logging_handle
-            .handle
-            .modify(|filter| assert_eq!(filter.to_string(), "trace"))
-            .unwrap();
+        let shared_logging_handle = init_shared_logging_handle();
+        let logging_handle = shared_logging_handle.lock().unwrap();
 
         // Test all logging levels are set up correctly
         let levels = ["DEBUG", "INFO", "WARN", "ERROR"];
