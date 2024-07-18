@@ -26,6 +26,7 @@ const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
 const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
 const SEQUENCER_MAIN_PORT: u16 = 8777;
+const SEQUENCER_ADMIN_PORT: u16 = 5557;
 
 struct Collector(Vec<u8>);
 
@@ -40,6 +41,7 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
     let config_patch = json!(
     {
         "main_port": SEQUENCER_MAIN_PORT,
+        "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
             "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0])},
             "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1])}
@@ -94,7 +96,7 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
 fn deploy_contract_to_networks(networks: Vec<&str>) {
     for net in networks {
         send_get_request(
-            format!("http://127.0.0.1:{}/deploy/{}", SEQUENCER_MAIN_PORT, net).as_str(),
+            format!("http://127.0.0.1:{}/deploy/{}", SEQUENCER_ADMIN_PORT, net).as_str(),
         );
     }
 }
@@ -195,7 +197,7 @@ async fn main() -> Result<()> {
         let report_time_interval_ms: u64 = send_get_request(
             format!(
                 "http://127.0.0.1:{}/get_feed_report_interval/{}",
-                SEQUENCER_MAIN_PORT, FEED_ID
+                SEQUENCER_ADMIN_PORT, FEED_ID
             )
             .as_str(),
         )
@@ -208,24 +210,24 @@ async fn main() -> Result<()> {
     println!(
         "ETH1 value = {}",
         send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_MAIN_PORT).as_str()
+            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_ADMIN_PORT).as_str()
         )
     );
     println!(
         "ETH2 value = {}",
         send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_MAIN_PORT).as_str()
+            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_ADMIN_PORT).as_str()
         )
     );
 
     assert!(
         send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_MAIN_PORT).as_str()
+            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_ADMIN_PORT).as_str()
         ) == format!("{}", REPORT_VAL)
     );
     assert!(
         send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_MAIN_PORT).as_str()
+            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_ADMIN_PORT).as_str()
         ) == format!("{}", REPORT_VAL)
     );
 

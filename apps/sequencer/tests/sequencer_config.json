@@ -1,5 +1,6 @@
 {
   "main_port": 8877,
+  "admin_port": 5556,
   "prometheus_port": 5555,
   "max_keys_to_batch": 1,
   "keys_batch_duration": 500,

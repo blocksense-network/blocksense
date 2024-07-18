@@ -30,6 +30,7 @@ pub struct Reporter {
 #[derive(Debug, Deserialize)]
 pub struct SequencerConfig {
     pub main_port: u16,
+    pub admin_port: u16,
     pub prometheus_port: u16,
     pub max_keys_to_batch: usize,
     pub keys_batch_duration: u64,
@@ -63,6 +64,7 @@ pub fn get_test_config_with_single_provider(
 
     SequencerConfig {
         main_port: 8877,
+        admin_port: 5556,
         prometheus_port: 5555,
         max_keys_to_batch: 1,
         keys_batch_duration: 500,

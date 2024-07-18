@@ -90,7 +90,7 @@ pub async fn eth_batch_send_to_contract<
         contract_address, net
     );
 
-    let provider_metrix = &provider.provider_metrics;
+    let provider_metrics = &provider.provider_metrics;
     let provider = &provider.provider;
 
     let selector = "0x1a2d80ac";
@@ -109,23 +109,26 @@ pub async fn eth_batch_send_to_contract<
 
     let base_fee = process_provider_getter!(
         provider.get_gas_price().await,
-        provider_metrix,
+        provider_metrics,
         get_gas_price
     );
 
     debug!("Observed gas price (base_fee) = {}", base_fee);
-    provider_metrix
+    provider_metrics
         .gas_price
         .observe((base_fee as f64) / 1000000000.0);
 
     let max_priority_fee_per_gas = process_provider_getter!(
         provider.get_max_priority_fee_per_gas().await,
-        provider_metrix,
+        provider_metrics,
         get_max_priority_fee_per_gas
     );
 
-    let chain_id =
-        process_provider_getter!(provider.get_chain_id().await, provider_metrix, get_chain_id);
+    let chain_id = process_provider_getter!(
+        provider.get_chain_id().await,
+        provider_metrics,
+        get_chain_id
+    );
 
     let tx = TransactionRequest::default()
         .to(contract_address)
@@ -141,13 +144,13 @@ pub async fn eth_batch_send_to_contract<
 
     let receipt_future = process_provider_getter!(
         provider.send_transaction(tx).await,
-        provider_metrix,
+        provider_metrics,
         send_tx
     );
 
     let receipt = process_provider_getter!(
         receipt_future.get_receipt().await,
-        provider_metrix,
+        provider_metrics,
         get_receipt
     );
 
@@ -156,12 +159,12 @@ pub async fn eth_batch_send_to_contract<
         "Recvd transaction receipt that took {}ms from `{}`: {:?}",
         transaction_time, net, receipt
     );
-    provider_metrix.total_tx_sent.inc();
-    provider_metrix.gas_used.inc_by(receipt.gas_used as u64);
-    provider_metrix
+    provider_metrics.total_tx_sent.inc();
+    provider_metrics.gas_used.inc_by(receipt.gas_used as u64);
+    provider_metrics
         .effective_gas_price
         .inc_by(receipt.effective_gas_price as u64);
-    provider_metrix
+    provider_metrics
         .transaction_confirmation_times
         .observe(transaction_time as f64);
     Ok(receipt.status().to_string())

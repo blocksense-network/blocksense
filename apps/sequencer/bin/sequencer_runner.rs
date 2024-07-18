@@ -30,7 +30,7 @@ use std::env;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let mut start_metrix_server = true;
+    let mut start_metrics_server = true;
 
     let mut args = env::args().skip(1);
     while let Some(arg) = args.next() {
@@ -43,7 +43,7 @@ async fn main() -> std::io::Result<()> {
                 }
             }
             "--no-metrics-server" => {
-                start_metrix_server = false;
+                start_metrics_server = false;
             }
             "--help" => {
                 println!(
@@ -111,18 +111,12 @@ OPTIONS
 
     let metrics_collector = metrics_collector_loop().await;
 
+    let main_app_state = app_state.clone();
     let main_http_server_fut = spawn(async move {
         HttpServer::new(move || {
             App::new()
-                .app_data(app_state.clone())
-                .service(get_key)
-                .service(deploy)
+                .app_data(main_app_state.clone())
                 .service(post_report)
-                .service(set_log_level)
-                .service(registry_plugin_upload)
-                .service(registry_plugin_get)
-                .service(registry_plugin_size)
-                .service(get_feed_report_interval)
         })
         .bind(("0.0.0.0", sequencer_config.main_port))
         .expect("Main HTTP server could not bind to port.")
@@ -130,16 +124,38 @@ OPTIONS
         .await
     });
 
+    let admin_app_state = app_state.clone();
+    let admin_http_server_fut = spawn(async move {
+        HttpServer::new(move || {
+            App::new()
+                .app_data(admin_app_state.clone())
+                .service(get_key)
+                .service(deploy)
+                .service(set_log_level)
+                .service(registry_plugin_upload)
+                .service(registry_plugin_get)
+                .service(registry_plugin_size)
+                .service(get_feed_report_interval)
+        })
+        .workers(1)
+        .bind(("0.0.0.0", sequencer_config.admin_port))
+        .expect("Admin HTTP server could not bind to port.")
+        .run()
+        .await
+    });
+
     let collected_futures = FuturesUnordered::new();
     collected_futures.push(feeds_slots_manager_loop_fut);
     collected_futures.push(main_http_server_fut);
+    collected_futures.push(admin_http_server_fut);
     collected_futures.push(votes_batcher);
     collected_futures.push(votes_sender);
     collected_futures.push(metrics_collector);
 
-    if start_metrix_server {
+    if start_metrics_server {
         let prometheus_http_server_fut = spawn(async move {
             HttpServer::new(move || App::new().service(metrics))
+                .workers(1)
                 .bind(("0.0.0.0", sequencer_config.prometheus_port))
                 .expect("Prometheus HTTP server could not bind to port.")
                 .run()
