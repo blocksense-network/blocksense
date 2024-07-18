@@ -90,13 +90,11 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                   parameters={_function._parameters}
                   title="Parameters"
                   titleLevel={isFromSourceUnit ? 4 : 5}
-                  functionNatSpec={_function.natspec}
                 />
                 <FunctionParameters
                   parameters={_function._returnParameters}
                   title="Return Parameters"
                   titleLevel={isFromSourceUnit ? 4 : 5}
-                  functionNatSpec={_function.natspec}
                 />
                 <FunctionModifiers functionModifiers={_function._modifiers} />
               </AccordionContent>
