@@ -159,7 +159,6 @@ mod tests {
     use std::sync::{Arc, RwLock};
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::mpsc::unbounded_channel;
-    use tokio::time::error::Elapsed;
 
     #[tokio::test]
     async fn test_feed_slots_processor_loop() {
@@ -223,7 +222,7 @@ mod tests {
 
         match received {
             Ok(Some((key, result))) => {
-                /// assert the received data
+                // assert the received data
                 assert_eq!(
                     key,
                     to_hex_string(feed_id.to_be_bytes().to_vec(), None),
@@ -309,7 +308,7 @@ mod tests {
 
         match received {
             Ok(Some((key, result))) => {
-                /// assert the received data
+                // assert the received data
                 assert_eq!(
                     key,
                     to_hex_string(feed_id.to_be_bytes().to_vec(), None),

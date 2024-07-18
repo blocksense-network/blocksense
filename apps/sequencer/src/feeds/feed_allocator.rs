@@ -209,7 +209,7 @@ mod tests {
     #[test]
     fn test_allocation_get_free_index() {
         // setup
-        let allocator: Allocator = Allocator::new((1..=5));
+        let allocator: Allocator = Allocator::new(1..=5);
 
         // run
         let free_index = allocator.get_free_index();
@@ -227,7 +227,7 @@ mod tests {
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
-        let mut allocator: Allocator = Allocator::new((1..=5));
+        let mut allocator: Allocator = Allocator::new(1..=5);
         let allocation1 = allocator.allocate(
             contract_address,
             number_of_slots,
@@ -254,7 +254,7 @@ mod tests {
     #[test]
     fn test_allocation_num_free_and_allocated_indexes() {
         // setup
-        let mut allocator: Allocator = Allocator::new((1..=5));
+        let mut allocator: Allocator = Allocator::new(1..=5);
 
         // assert
         assert_eq!(allocator.space_size(), 5);
@@ -327,7 +327,7 @@ mod tests {
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
-        let mut allocator: Allocator = Allocator::new((1..=5));
+        let mut allocator: Allocator = Allocator::new(1..=5);
 
         // run
         let result = allocator.allocate(
@@ -351,7 +351,7 @@ mod tests {
         // Then allocator correctly returns expired slot.
 
         // setup
-        let mut allocator: Allocator = Allocator::new((1..=5));
+        let mut allocator: Allocator = Allocator::new(1..=5);
 
         // assert
         assert_eq!(allocator.space_size(), 5);

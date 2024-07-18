@@ -14,6 +14,8 @@ use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::spawn;
 use eyre::eyre;
 
+use crate::feeds::feeds_registry::Repeatability;
+use crate::feeds::feeds_registry::Repeatability::Periodic;
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use std::fmt::Debug;
@@ -22,6 +24,7 @@ use tracing::info_span;
 use tracing::{debug, error, info};
 
 // Codegen from embedded Solidity code and precompiled bytecode.
+// Price Feed Solidity Contract
 sol! {
     #[allow(missing_docs)]
     // solc v0.8.24; solc a.sol --via-ir --optimize --bin
@@ -31,7 +34,21 @@ sol! {
     }
 }
 
-pub async fn deploy_contract(network: &String, providers: &SharedRpcProviders) -> Result<String> {
+// Sport Events Solidity Contract used for Oneshot metadata feeds
+sol! {
+    #[allow(missing_docs)]
+    // solc v0.8.24; solc a.sol --via-ir --optimize --bin
+    #[sol(rpc, bytecode="60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033")]
+    contract SportsDataFeedStoreV2 {
+        function setFeeds(bytes calldata) external;
+    }
+}
+
+pub async fn deploy_contract(
+    network: &String,
+    providers: &SharedRpcProviders,
+    feed_type: Repeatability,
+) -> Result<String> {
     let providers = providers
         .read()
         .expect("Could not lock all providers' lock");
@@ -48,7 +65,11 @@ pub async fn deploy_contract(network: &String, providers: &SharedRpcProviders) -
     let base_fee = provider.get_gas_price().await?;
 
     // Deploy the contract.
-    let contract_builder = DataFeedStoreV1::deploy_builder(provider);
+    let contract_builder = if feed_type == Periodic {
+        DataFeedStoreV1::deploy_builder(provider)
+    } else {
+        SportsDataFeedStoreV2::deploy_builder(provider)
+    };
     let estimate = contract_builder.estimate_gas().await?;
     let deploy_time = Instant::now();
     let contract_address = contract_builder
@@ -58,12 +79,17 @@ pub async fn deploy_contract(network: &String, providers: &SharedRpcProviders) -
         .await?;
 
     info!(
-        "Deployed contract at address: {:?} took {}ms\n",
+        "Deployed {:?} contract at address: {:?} took {}ms\n",
+        feed_type,
         contract_address.to_string(),
         deploy_time.elapsed().as_millis()
     );
 
-    p.contract_address = Some(contract_address);
+    if feed_type == Periodic {
+        p.contract_address = Some(contract_address);
+    } else {
+        p.event_contract_address = Some(contract_address);
+    }
 
     return Ok(format!(
         "CONTRACT_ADDRESS set to {}",
@@ -78,15 +104,22 @@ pub async fn eth_batch_send_to_contract<
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
     updates: HashMap<K, V>,
+    feed_type: Repeatability,
 ) -> Result<String> {
     let provider = provider.lock().await;
     let wallet = &provider.wallet;
-    let contract_address = provider
-        .contract_address
-        .expect(format!("Contract address not set for network {}.", net).as_str());
+    let contract_address = if feed_type == Periodic {
+        provider
+            .contract_address
+            .expect(format!("Contract address not set for network {}.", net).as_str())
+    } else {
+        provider
+            .event_contract_address
+            .expect(format!("Event contract address not set for network {}.", net).as_str())
+    };
 
     info!(
-        "sending data to contract_address `{}` in network `{}`",
+        "sending data to address `{}` in network `{}`",
         contract_address, net
     );
 
@@ -102,7 +135,9 @@ pub async fn eth_batch_send_to_contract<
         keys_vals += val.to_string().as_str();
     }
 
-    let input = match Bytes::from_hex((selector.to_owned() + keys_vals.as_str()).as_str()) {
+    let calldata_str = (selector.to_owned() + keys_vals.as_str()).to_string();
+
+    let input = match Bytes::from_hex(calldata_str) {
         Err(e) => panic!("Key is not valid hex string: {}", e), // We panic here, because the http handler on the recv side must filter out wrong input.
         Ok(x) => x,
     };
@@ -139,7 +174,6 @@ pub async fn eth_batch_send_to_contract<
         .with_chain_id(chain_id)
         .input(Some(input).into());
 
-    info!("Sending to `{}` tx =  {:?}", net, tx);
     let tx_time = Instant::now();
 
     let receipt_future = process_provider_getter!(
@@ -176,6 +210,7 @@ pub async fn eth_batch_send_to_all_contracts<
 >(
     providers: SharedRpcProviders,
     updates: HashMap<K, V>,
+    feed_type: Repeatability,
 ) -> Result<String> {
     let span = info_span!("eth_batch_send_to_all_contracts");
     let _guard = span.enter();
@@ -198,7 +233,7 @@ pub async fn eth_batch_send_to_all_contracts<
         collected_futures.push(spawn(async move {
             let result = actix_web::rt::time::timeout(
                 Duration::from_secs(timeout),
-                eth_batch_send_to_contract(net.clone(), p.clone(), updates),
+                eth_batch_send_to_contract(net.clone(), p.clone(), updates, feed_type),
             )
             .await;
             (result, net.clone(), p.clone())
@@ -241,9 +276,19 @@ pub async fn eth_batch_send_to_all_contracts<
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::providers::provider::init_shared_rpc_providers;
+    use crate::feeds::feed_slots_processor::feed_slots_processor_loop;
+    use crate::feeds::feeds_registry::Repeatability::Oneshot;
+    use crate::providers::provider::{can_read_contract_bytecode, init_shared_rpc_providers};
+    use alloy::primitives::{address, Address};
     use alloy::{node_bindings::Anvil, providers::Provider};
     use regex::Regex;
+    use sequencer_config::{
+        get_test_config_with_multiple_providers, get_test_config_with_single_provider,
+    };
+    use std::collections::HashMap;
+    use std::io::{self, Read};
+    use std::str::FromStr;
+    use std::time::UNIX_EPOCH;
     use std::{env, fs::File, io::Write};
 
     fn extract_address(message: &str) -> Option<String> {
@@ -254,12 +299,9 @@ mod tests {
         None
     }
 
-    use sequencer_config::get_test_config_with_single_provider;
-
     #[tokio::test]
     async fn test_deploy_contract_returns_valid_address() {
         // setup
-        // let target_deploy_address = generate_random_eth_address();
         let anvil = Anvil::new().try_spawn().unwrap();
         let key_path = "/tmp/priv_key_test";
         let network = "ETH131";
@@ -274,7 +316,49 @@ mod tests {
         let providers = init_shared_rpc_providers(&cfg).await;
 
         // run
-        let result = deploy_contract(&String::from(network), &providers).await;
+        let result = deploy_contract(&String::from(network), &providers, Periodic).await;
+        // assert
+        // validate contract was deployed at expected address
+        if let Ok(msg) = result {
+            let extracted_address = extract_address(&msg);
+            // Assert address was returned
+            assert!(
+                extracted_address.is_some(),
+                "Did not return valid eth address"
+            );
+            // Assert we can read bytecode from that address
+            let extracted_address = Address::from_str(&extracted_address.unwrap()).ok().unwrap();
+            let provider = providers.read().unwrap().get(network).unwrap().clone();
+            let can_get_bytecode = can_read_contract_bytecode(provider, &extracted_address).await;
+            assert!(can_get_bytecode);
+        } else {
+            panic!("contract deployment failed")
+        }
+    }
+
+    #[tokio::test]
+    async fn test_eth_batch_send_to_oneshot_contract() {
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
+        /////////////////////////////////////////////////////////////////////
+
+        // setup
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = "/tmp/priv_key_test";
+        let network = "ETH333";
+        let mut file = File::create(key_path).unwrap();
+        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
+            .unwrap();
+
+        let cfg =
+            get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
+
+        let first_secret_key = anvil.keys().first().unwrap();
+        let secret_key_bytes = first_secret_key.to_bytes();
+        let providers = init_shared_rpc_providers(&cfg).await;
+
+        // run
+        let result = deploy_contract(&String::from(network), &providers, Oneshot).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -286,5 +370,100 @@ mod tests {
         } else {
             panic!("contract deployment failed")
         }
+
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP TWO - Prepare sample updates and write to the contract
+        /////////////////////////////////////////////////////////////////////
+
+        let net = "ETH333".to_string();
+
+        let providers = providers
+            .read()
+            .expect("Could not lock all providers' lock");
+
+        let provider = providers.get("ETH333").unwrap();
+
+        // Updates for Oneshot
+        let slot1 =
+            String::from("0404040404040404040404040404040404040404040404040404040404040404");
+        let slot2 =
+            String::from("0505050505050505050505050505050505050505050505050505050505050505");
+        let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
+        let mut updates_oneshot: HashMap<String, String> = HashMap::new();
+        updates_oneshot.insert(String::from("00000003"), value1);
+        let result =
+            eth_batch_send_to_contract(net.clone(), provider.clone(), updates_oneshot, Oneshot)
+                .await;
+        assert!(result.is_ok());
+    }
+
+    #[actix_web::test]
+    async fn test_eth_batch_send_to_all_oneshot_contracts() {
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
+        /////////////////////////////////////////////////////////////////////
+
+        // setup
+        let key_path = "/tmp/priv_key_test";
+        let mut file = File::create(key_path).unwrap();
+        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
+            .unwrap();
+        let anvil_network1 = Anvil::new().try_spawn().unwrap();
+        let network1 = "ETH374";
+        let anvil_network2 = Anvil::new().try_spawn().unwrap();
+        let network2 = "ETH375";
+
+        let cfg = get_test_config_with_multiple_providers(vec![
+            (network1, key_path, anvil_network1.endpoint().as_str()),
+            (network2, key_path, anvil_network2.endpoint().as_str()),
+        ]);
+
+        let providers = init_shared_rpc_providers(&cfg).await;
+
+        // run
+        let result = deploy_contract(&String::from(network1), &providers, Oneshot).await;
+        // assert
+        // validate contract was deployed at expected address
+        if let Ok(msg) = result {
+            let extracted_address = extract_address(&msg);
+            assert!(
+                extracted_address.is_some(),
+                "Did not return valid eth address"
+            );
+        } else {
+            panic!("contract deployment failed")
+        }
+
+        let result = deploy_contract(&String::from(network2), &providers, Oneshot).await;
+        // assert
+        // validate contract was deployed at expected address
+        if let Ok(msg) = result {
+            let extracted_address = extract_address(&msg);
+            assert!(
+                extracted_address.is_some(),
+                "Did not return valid eth address"
+            );
+        } else {
+            panic!("contract deployment failed")
+        }
+
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP TWO - Prepare sample updates and write to the contract
+        /////////////////////////////////////////////////////////////////////
+
+        // Updates for Oneshot
+        let slot1 =
+            String::from("0404040404040404040404040404040404040404040404040404040404040404");
+        let slot2 =
+            String::from("0505050505050505050505050505050505050505050505050505050505050505");
+        let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
+        let mut updates_oneshot: HashMap<String, String> = HashMap::new();
+        updates_oneshot.insert(String::from("00000003"), value1);
+
+        let result = eth_batch_send_to_all_contracts(providers, updates_oneshot, Oneshot).await;
+        // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
+        // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
+        // followups
+        assert!(result.is_ok());
     }
 }

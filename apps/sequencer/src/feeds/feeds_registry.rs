@@ -18,7 +18,7 @@ pub struct FeedMetaData {
     feed_type: Box<dyn FeedAggregate>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Repeatability {
     Periodic, // Has infinite number of voting slots
     Oneshot,  // Has only one voting slot

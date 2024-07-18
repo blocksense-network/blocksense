@@ -1,3 +1,4 @@
+use crate::feeds::feeds_registry::Repeatability::Periodic;
 use crate::providers::eth_send_utils::eth_batch_send_to_all_contracts;
 use crate::providers::provider::SharedRpcProviders;
 use actix_web::rt::spawn;
@@ -22,7 +23,9 @@ pub async fn votes_result_sender_loop<
                     info!("sending updates to contract:");
                     let providers_clone = providers.clone();
                     spawn(async move {
-                        match eth_batch_send_to_all_contracts(providers_clone, updates).await {
+                        match eth_batch_send_to_all_contracts(providers_clone, updates, Periodic)
+                            .await
+                        {
                             Ok(res) => info!("Sending updates complete {}.", res),
                             Err(err) => error!("ERROR Sending updates {}", err),
                         };

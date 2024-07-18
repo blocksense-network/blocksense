@@ -12,6 +12,7 @@ use alloy::{
 use eyre::eyre;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
+use crate::feeds::feeds_registry::Repeatability;
 use data_feeds::types::FeedType;
 use prometheus::{Encoder, TextEncoder};
 use tokio::time::Duration;
@@ -74,16 +75,29 @@ async fn get_key_from_contract(
     Ok(return_val.to_string())
 }
 
-#[get("/deploy/{network}")]
+#[get("/deploy/{network}/{feed_type}")]
 async fn deploy(
-    path: web::Path<String>,
+    path: web::Path<(String, String)>,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
     let span = info_span!("deploy");
     let _guard = span.enter();
-    let network = path.into_inner();
-    info!("Deploying contract for network `{}` ...", network);
-    match deploy_contract(&network, &app_state.providers).await {
+    let (network, feed_type) = path.into_inner();
+    info!(
+        "Deploying contract for network `{}` and feed type `{}` ...",
+        network, feed_type
+    );
+
+    let repeatability = match feed_type.as_str() {
+        "price_feed" => Repeatability::Periodic,
+        "event_feed" => Repeatability::Oneshot,
+        _ => {
+            let error_msg = format!("Invalid feed type: {}", feed_type);
+            error!("{}", error_msg);
+            return Err(error::ErrorBadRequest(error_msg));
+        }
+    };
+    match deploy_contract(&network, &app_state.providers, repeatability).await {
         Ok(result) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
@@ -214,7 +228,12 @@ mod tests {
     use crate::reporters::reporter::init_shared_reporters;
     use crate::utils::logging::init_shared_logging_handle;
     use actix_web::{http::header::ContentType, test, App};
+    use alloy::node_bindings::Anvil;
+    use regex::Regex;
+    use sequencer_config::get_test_config_with_single_provider;
     use std::env;
+    use std::fs::File;
+    use std::io::Write;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};
 
@@ -257,5 +276,79 @@ mod tests {
         let body = test::read_body(resp).await;
         let body_str = std::str::from_utf8(&body).expect("Failed to read body");
         assert_eq!(body_str, "30000");
+    }
+
+    async fn create_app_state_from_sequencer_config(
+        network: &str,
+        key_path: &str,
+        anvil_endpoint: &str,
+    ) -> web::Data<FeedsState> {
+        let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
+
+        let providers = init_shared_rpc_providers(&cfg).await;
+
+        let log_handle = init_shared_logging_handle();
+
+        web::Data::new(FeedsState {
+            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(&cfg))),
+            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+            plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
+            providers: providers.clone(),
+            log_handle,
+            reporters: init_shared_reporters(&cfg),
+        })
+    }
+
+    #[actix_web::test]
+    async fn test_deploy_endpoint_success() {
+        const HTTP_STATUS_SUCCESS: u16 = 200;
+
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = "/tmp/priv_key_test";
+        let network = "ETH137";
+
+        let cfg =
+            get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
+
+        let app_state =
+            create_app_state_from_sequencer_config(network, key_path, anvil.endpoint().as_str())
+                .await;
+
+        // Initialize the service
+        let app = test::init_service(App::new().app_data(app_state.clone()).service(deploy)).await;
+
+        fn extract_eth_address(message: &str) -> Option<String> {
+            let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
+            if let Some(mat) = re.find(message) {
+                return Some(mat.as_str().to_string());
+            }
+            None
+        }
+
+        let feed_types = vec!["price_feed", "event_feed"];
+
+        for feed_type in feed_types {
+            // Test deploy contract
+            let req = test::TestRequest::get()
+                .uri(&format!("/deploy/{}/{}", network, feed_type))
+                .to_request();
+
+            let resp = test::call_service(&app, req).await;
+            assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+            let body = test::read_body(resp).await;
+            let body_str = std::str::from_utf8(&body).expect("Failed to read body");
+            println!("body_str: {:?}", body_str);
+            let contract_address = extract_eth_address(body_str).unwrap();
+            println!("contract_address: {:?}", contract_address);
+            assert_eq!(body_str.len(), 66);
+        }
+
+        // Test deploy unknown feed type returns 400
+        let req = test::TestRequest::get()
+            .uri(&format!("/deploy/{}/unknown_feed", network))
+            .to_request();
+
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), 400);
     }
 }

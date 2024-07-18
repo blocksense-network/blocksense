@@ -54,7 +54,7 @@ impl SlotTimeTracker {
         let current_slot_start_time =
             self.start_time_ms + slot_number * self.slot_interval.as_millis();
         let current_slot_end_time = current_slot_start_time + self.slot_interval.as_millis();
-        let result_ms = (current_slot_end_time as i128 - current_time_as_ms as i128);
+        let result_ms = current_slot_end_time as i128 - current_time_as_ms as i128;
 
         trace!("current_time_as_ms      = {}", current_time_as_ms);
         trace!("slots_count             = {}", slot_number);

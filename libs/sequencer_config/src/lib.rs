@@ -18,6 +18,7 @@ pub struct Provider {
     pub private_key_path: String,
     pub url: String,
     pub contract_address: Option<String>,
+    pub event_contract_address: Option<String>,
     pub transcation_timeout_secs: u32,
 }
 
@@ -74,9 +75,45 @@ pub fn get_test_config_with_single_provider(
                 private_key_path: private_key_path.to_string(),
                 url: url.to_string(),
                 contract_address: None,
+                event_contract_address: None,
                 transcation_timeout_secs: 50,
             },
         )]),
+        feeds: Vec::new(),
+        reporters: Vec::new(),
+    }
+}
+
+pub fn get_test_config_with_multiple_providers(
+    provider_details: Vec<(&str, &str, &str)>,
+) -> SequencerConfig {
+    let mut providers = HashMap::new();
+
+    for (network, private_key_path, url) in provider_details {
+        let mut file = File::create(private_key_path)
+            .expect(format!("Could not create file {}", private_key_path).as_str());
+        file.write_all(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
+            .expect(format!("Could not write to file {}", private_key_path).as_str());
+
+        providers.insert(
+            network.to_string(),
+            Provider {
+                private_key_path: private_key_path.to_string(),
+                url: url.to_string(),
+                contract_address: None,
+                event_contract_address: None,
+                transcation_timeout_secs: 50,
+            },
+        );
+    }
+
+    SequencerConfig {
+        main_port: 8877,
+        admin_port: 5556,
+        prometheus_port: 5555,
+        max_keys_to_batch: 1,
+        keys_batch_duration: 500,
+        providers,
         feeds: Vec::new(),
         reporters: Vec::new(),
     }

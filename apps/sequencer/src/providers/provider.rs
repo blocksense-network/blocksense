@@ -41,13 +41,14 @@ pub struct RpcProvider {
     pub provider: ProviderType,
     pub wallet: LocalWallet,
     pub contract_address: Option<Address>,
+    pub event_contract_address: Option<Address>,
     pub provider_metrics: ProviderMetrics,
     pub transcation_timeout_secs: u32,
 }
 
 pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
-async fn chech_if_contract_exists(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
+pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
     let latest_block = provider
         .lock()
         .await
@@ -67,6 +68,57 @@ async fn chech_if_contract_exists(provider: Arc<Mutex<RpcProvider>>, addr: &Addr
 
 pub async fn init_shared_rpc_providers(conf: &SequencerConfig) -> SharedRpcProviders {
     Arc::new(std::sync::RwLock::new(get_rpc_providers(conf).await))
+}
+
+async fn verify_contract_exists(
+    key: &str,
+    address: &Option<String>,
+    rpc_provider: Arc<Mutex<RpcProvider>>,
+) {
+    if let Some(addr_str) = address {
+        if let Some(addr) = parse_contract_address(addr_str.as_str()) {
+            info!(
+                "Contract address for network {} set to {}. Checking if contract exists ...",
+                key, addr
+            );
+            match spawn(async move {
+                let result = actix_web::rt::time::timeout(
+                    Duration::from_secs(5),
+                    can_read_contract_bytecode(rpc_provider, &addr),
+                )
+                .await;
+                result
+            })
+            .await
+            {
+                Ok(result) => match result {
+                    Ok(exists) => {
+                        if exists {
+                            info!("Contract for network {} exists on address {}", key, addr);
+                        } else {
+                            warn!("No contract for network {} exists on address {}", key, addr);
+                        }
+                    }
+                    Err(e) => {
+                        warn!(
+                            "JSON rpc request to verify contract existence timed out: {}",
+                            e
+                        );
+                    }
+                },
+                Err(e) => {
+                    error!("Task join error: {}", e)
+                }
+            };
+        } else {
+            error!(
+                "Set contract address for network {} is not a valid Ethereum contract address!",
+                key
+            );
+        }
+    } else {
+        warn!("No contract address set for network {}", key);
+    }
 }
 
 async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
@@ -97,9 +149,14 @@ async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<
             Some(x) => parse_contract_address(x.as_str()),
             None => None,
         };
+        let event_address = match &p.event_contract_address {
+            Some(x) => parse_contract_address(x.as_str()),
+            None => None,
+        };
 
         let rpc_provider = Arc::new(Mutex::new(RpcProvider {
             contract_address: address,
+            event_contract_address: event_address,
             provider,
             wallet,
             provider_metrics: ProviderMetrics::new(&key)
@@ -109,56 +166,13 @@ async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<
 
         providers.insert(key.clone(), rpc_provider.clone());
 
-        match &p.contract_address {
-            Some(x) => {
-                match parse_contract_address(x.as_str()) {
-                    Some(addr) => {
-                        info!("Contract address for network {} set to {}. Checking if contract exists ...", key, addr);
-                        match spawn(async move {
-                            let result = actix_web::rt::time::timeout(
-                                Duration::from_secs(5),
-                                chech_if_contract_exists(rpc_provider, &addr),
-                            )
-                            .await;
-                            result
-                        })
-                        .await
-                        {
-                            Ok(result) => match result {
-                                Ok(exists) => {
-                                    if exists {
-                                        info!(
-                                            "Contract for network {} exists on address {}",
-                                            key, addr
-                                        );
-                                    } else {
-                                        warn!(
-                                            "No contract for network {} exists on address {}",
-                                            key, addr
-                                        )
-                                    }
-                                }
-                                Err(e) => {
-                                    warn!("JSON rpc request to verify contract existence timed out: {}", e);
-                                }
-                            },
-                            Err(e) => {
-                                error!("Task join error: {}", e)
-                            }
-                        };
-                    }
-                    None => {
-                        error!(
-                            "Set contract address for network {} is not a valid Ethereum contract address!",
-                            key
-                        );
-                    }
-                }
-            }
-            None => {
-                warn!("No contract address set for network {}", key);
-            }
-        };
+        // Verify contract_address
+        // If contract does not exist statements are logged and the process continues
+        verify_contract_exists(key, &p.contract_address, rpc_provider.clone()).await;
+
+        // Verify event_contract_address
+        // If contract does not exist statements are logged and the process continues
+        verify_contract_exists(key, &p.event_contract_address, rpc_provider.clone()).await;
     }
 
     debug!("List of providers:");
