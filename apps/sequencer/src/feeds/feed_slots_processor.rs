@@ -1,17 +1,22 @@
 use crate::feeds::feeds_registry::AllFeedsReports;
 use crate::feeds::feeds_registry::FeedMetaData;
 use crate::utils::time_utils::{get_ms_since_epoch, SlotTimeTracker};
+use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
 use data_feeds::types::FeedType;
 use eyre::Report;
+use ringbuf::traits::Consumer;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedSender;
+use tracing::warn;
 use tracing::{debug, info};
 use utils::to_hex_string;
 
 use super::feeds_registry::FeedAggregateHistory;
+
+const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
 pub async fn feed_slots_processor_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
@@ -73,9 +78,39 @@ pub async fn feed_slots_processor_loop<
             result_post_to_contract = feed.read().unwrap().get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
 
             {
-                //TODO(snikolov): Is this thread-safe?
                 let mut history_guard = history.write().unwrap();
                 history_guard.push(key, result_post_to_contract.clone())
+            }
+
+            let history_lock = history.read().unwrap();
+
+            // The first slice is from the current read position to the end of the array
+            // // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
+            let (first, last) = history_lock
+                .collect(key)
+                .expect("Missing key from History!")
+                .as_slices();
+
+            let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
+            let numerical_vec: Vec<f64> = history_vec
+                .iter()
+                .filter_map(|feed| {
+                    if let FeedType::Numerical(value) = feed {
+                        Some(*value)
+                    } else if let FeedType::Text(_) = feed {
+                        warn!("Anomaly Detection not implemented for FeedType::Text, skipping...");
+                        None
+                    } else {
+                        warn!("Anomaly Detection does not recognize FeedType, skipping...");
+                        None
+                    }
+                })
+                .collect();
+
+            // Get AD prediction only if enough data is present
+            if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
+                let ad_score = anomaly_detector_aggregate(numerical_vec);
+                info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
             }
 
             info!("result_post_to_contract = {:?}", result_post_to_contract);
