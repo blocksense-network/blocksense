@@ -10,6 +10,7 @@ use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedSender;
+use tracing::error;
 use tracing::warn;
 use tracing::{debug, info};
 use utils::to_hex_string;
@@ -109,8 +110,14 @@ pub async fn feed_slots_processor_loop<
 
             // Get AD prediction only if enough data is present
             if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
-                let ad_score = anomaly_detector_aggregate(numerical_vec);
-                info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
+                match anomaly_detector_aggregate(numerical_vec) {
+                    Ok(ad_score) => {
+                        info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
+                    }
+                    Err(e) => {
+                        error!("Anomaly Detection failed with error - {}", e);
+                    }
+                }
             }
 
             info!("result_post_to_contract = {:?}", result_post_to_contract);

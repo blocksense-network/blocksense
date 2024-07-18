@@ -928,6 +928,7 @@ dependencies = [
 name = "anomaly_detection"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "csv",
  "extended-isolation-forest",
  "hdbscan",
