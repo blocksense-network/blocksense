@@ -45,7 +45,11 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
         "providers": {
             "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0])},
             "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1])}
-        }
+        },
+        "feeds": [
+            {"id": 0, "name": "DOGE", "report_interval_ms": 7000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
+            {"id": 1, "name": "BTC", "report_interval_ms": 7000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
+        ]
     });
 
     let config_file_path = get_sequencer_config_file_path();
