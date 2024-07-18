@@ -1,0 +1,1 @@
+import './multichain-deploy';
