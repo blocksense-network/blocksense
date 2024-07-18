@@ -24,8 +24,9 @@
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
   };
 
-  outputs = inputs @ {flake-parts, ...}:
-    flake-parts.lib.mkFlake {inherit inputs;} {
+  outputs =
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         # Third-party flake-parts modules
         inputs.devenv.flakeModule
@@ -33,6 +34,9 @@
         # Local flake-parts modules
         ./nix
       ];
-      systems = ["x86_64-linux" "aarch64-darwin"];
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
     };
 }

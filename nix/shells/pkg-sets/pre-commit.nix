@@ -1,8 +1,12 @@
-{...}: {
+{ pkgs, ... }:
+{
   pre-commit.hooks = {
-    alejandra.enable = true;
+    nixfmt = {
+      enable = true;
+      package = pkgs.nixfmt-rfc-style;
+    };
     editorconfig-checker = {
-      excludes = ["libs/sdk/wit/deps"];
+      excludes = [ "libs/sdk/wit/deps" ];
       enable = true;
     };
     cargo-check.enable = true;

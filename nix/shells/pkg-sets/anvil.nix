@@ -1,13 +1,9 @@
+{ pkgs, inputs', ... }:
 {
-  pkgs,
-  inputs',
-  ...
-}: {
-  packages = with pkgs;
+  packages =
+    with pkgs;
     [
       # ...
     ]
-    ++ lib.optionals stdenv.isLinux [
-      inputs'.ethereum-nix.packages.foundry
-    ];
+    ++ lib.optionals stdenv.isLinux [ inputs'.ethereum-nix.packages.foundry ];
 }

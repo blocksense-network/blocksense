@@ -8,21 +8,20 @@
   stdenv,
   darwin,
   filesets,
-}: let
+}:
+let
   sharedAttrs = {
     pname = "blocksense";
     version = "alpha";
     inherit (filesets.rustSrc) src;
 
-    nativeBuildInputs = [pkg-config];
+    nativeBuildInputs = [ pkg-config ];
 
-    buildInputs =
-      [
-        libusb
-        openssl
-        zstd
-      ]
-      ++ lib.optionals stdenv.isDarwin [darwin.apple_sdk.frameworks.Security];
+    buildInputs = [
+      libusb
+      openssl
+      zstd
+    ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
 
     env = {
       ZSTD_SYS_USE_PKG_CONFIG = true;
@@ -34,6 +33,5 @@
 
   cargoArtifacts = craneLib.buildDepsOnly sharedAttrs;
 in
-  craneLib.buildPackage (sharedAttrs // {inherit cargoArtifacts;})
+craneLib.buildPackage (sharedAttrs // { inherit cargoArtifacts; })
 # craneLib.buildPackage sharedAttrs
-
