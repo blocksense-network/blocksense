@@ -393,6 +393,8 @@ __metadata:
     "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
     "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.0.2"
+    "@safe-global/protocol-kit": "npm:^4.0.2"
+    "@safe-global/safe-core-sdk-types": "npm:^5.0.2"
     "@typechain/ethers-v6": "npm:^0.5.1"
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4"
@@ -1802,7 +1804,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:^1.4.0":
+"@noble/hashes@npm:^1.3.3, @noble/hashes@npm:^1.4.0":
   version: 1.4.0
   resolution: "@noble/hashes@npm:1.4.0"
   checksum: 10c0/8c3f005ee72e7b8f9cff756dfae1241485187254e3f743873e22073d63906863df5d4f13d441b7530ea614b7a093f0d889309f28b59850f33b66cb26a779a4a5
@@ -3249,6 +3251,39 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@safe-global/protocol-kit@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "@safe-global/protocol-kit@npm:4.0.2"
+  dependencies:
+    "@noble/hashes": "npm:^1.3.3"
+    "@safe-global/safe-core-sdk-types": "npm:^5.0.2"
+    "@safe-global/safe-deployments": "npm:^1.37.0"
+    abitype: "npm:^1.0.2"
+    ethereumjs-util: "npm:^7.1.5"
+    ethers: "npm:^6.13.1"
+    semver: "npm:^7.6.2"
+  checksum: 10c0/9fdb29f6d1425cec8d18c7fa32eedcd7304751befe81db23d44b48ac1aadad43fdc6f0ca216eb8e0fd07c5775e6419f6493820d5b260c53ad56fe93431d798be
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-core-sdk-types@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "@safe-global/safe-core-sdk-types@npm:5.0.2"
+  dependencies:
+    abitype: "npm:^1.0.2"
+  checksum: 10c0/c3eb63d9a4e5fa7eba26f11b91ae39bc83e1eefeaf5f0e508ae5fa7dfb6de54a644b5a922f82de25c240ebc0e6e148927f0de91a59c0ace0de21c68a8201326d
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-deployments@npm:^1.37.0":
+  version: 1.37.1
+  resolution: "@safe-global/safe-deployments@npm:1.37.1"
+  dependencies:
+    semver: "npm:^7.6.2"
+  checksum: 10c0/626de8376dabd08cc9088e62299e404569cc4660211b96d1b50163e9944503f874788a8fe5b862ae78734a09c1e0317d904d588293fd3de05e92e9aeddc76dcd
+  languageName: node
+  linkType: hard
+
 "@scure/base@npm:~1.1.0, @scure/base@npm:~1.1.2, @scure/base@npm:~1.1.4":
   version: 1.1.6
   resolution: "@scure/base@npm:1.1.6"
@@ -4499,6 +4534,21 @@ __metadata:
     zod:
       optional: true
   checksum: 10c0/d685351a725c49f81bdc588e2f3825c28ad96c59048d4f36bf5e4ef30935c31f7e60b5553c70177b77a9e4d8b04290eea43d3d9c1c2562cb130381c88b15d39f
+  languageName: node
+  linkType: hard
+
+"abitype@npm:^1.0.2":
+  version: 1.0.5
+  resolution: "abitype@npm:1.0.5"
+  peerDependencies:
+    typescript: ">=5.0.4"
+    zod: ^3 >=3.22.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+    zod:
+      optional: true
+  checksum: 10c0/dc954877fba19e2b7a70f1025807d69fa5aabec8bd58ce94e68d1a5ec1697fff3fe5214b4392508db7191762150f19a2396cf66ffb1d3ba8c1f37a89fd25e598
   languageName: node
   linkType: hard
 
@@ -7617,7 +7667,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethereumjs-util@npm:^7.1.4":
+"ethereumjs-util@npm:^7.1.4, ethereumjs-util@npm:^7.1.5":
   version: 7.1.5
   resolution: "ethereumjs-util@npm:7.1.5"
   dependencies:
@@ -7627,6 +7677,21 @@ __metadata:
     ethereum-cryptography: "npm:^0.1.3"
     rlp: "npm:^2.2.4"
   checksum: 10c0/8b9487f35ecaa078bf9af6858eba6855fc61c73cc2b90c8c37486fcf94faf4fc1c5cda9758e6769f9ef2658daedaf2c18b366312ac461f8c8a122b392e3041eb
+  languageName: node
+  linkType: hard
+
+"ethers@npm:^6.13.1":
+  version: 6.13.1
+  resolution: "ethers@npm:6.13.1"
+  dependencies:
+    "@adraffy/ens-normalize": "npm:1.10.1"
+    "@noble/curves": "npm:1.2.0"
+    "@noble/hashes": "npm:1.3.2"
+    "@types/node": "npm:18.15.13"
+    aes-js: "npm:4.0.0-beta.5"
+    tslib: "npm:2.4.0"
+    ws: "npm:8.17.1"
+  checksum: 10c0/a5af271c9b51f8f968da7ab011d6956f64541731468557e9204344bc2ff43f16f52e6ed846e2b88479524bf8219cefb960fc4a1ac6f4a9340926142ba39caf90
   languageName: node
   linkType: hard
 
@@ -13798,7 +13863,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.3.4, semver@npm:^7.3.5":
+"semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.6.2":
   version: 7.6.2
   resolution: "semver@npm:7.6.2"
   bin:
