@@ -168,6 +168,12 @@ mod tests {
         let name = name.to_string();
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
         let all_feeds_reports_arc_clone = Arc::clone(&all_feeds_reports_arc);
+        {
+            let mut history_guard = history.write().unwrap();
+            history_guard.register_feed(feed_id, 10_000);
+        }
+
+        let history_cp = history.clone();
 
         tokio::spawn(async move {
             feed_slots_processor_loop(
@@ -180,7 +186,7 @@ mod tests {
                     .unwrap()
                     .as_millis(),
                 all_feeds_reports_arc_clone,
-                history,
+                history_cp,
                 feed_id,
             )
             .await
