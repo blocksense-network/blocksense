@@ -7,7 +7,7 @@ lazy_static::lazy_static! {
         map.insert(DataFeedAPI::YahooFinanceDataFeed, vec![
             "AAPL","GOOGL","TSLA","IBKR","NVDA","TLRY", "AMD",
             ]);
-        map.insert(DataFeedAPI::CoinMarketCapDataFeed, vec!["BTC", "ETH","SOL", "DOT", "XRP"]);
+        map.insert(DataFeedAPI::CoinMarketCapDataFeed, vec!["BTC", "ETH","SOL", "DOT", "XRP", "DOGE", "SHIB"]);
 
         map
     };
