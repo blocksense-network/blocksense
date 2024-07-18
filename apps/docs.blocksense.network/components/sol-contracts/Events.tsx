@@ -5,6 +5,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+
 import { EventDocItem } from '@blocksense/sol-reflector';
 import { Signature } from '@/sol-contracts-components/Signature';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
@@ -12,14 +15,23 @@ import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrap
 import { Variables } from '@/sol-contracts-components/Variables';
 import { Selector } from '@/sol-contracts-components/Selector';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
-import { useHashChange } from '@/hooks/useHashChange';
+import { useExpandCollapse } from '@/hooks/useExpandCollapse';
 
 type EventsProps = {
   events?: EventDocItem[];
 };
 
+const getEventNames = (events: EventDocItem[] = []) => {
+  return events.map((event, index) => event.name || `event-${index}`) || [];
+};
+
 export const Events = ({ events }: EventsProps) => {
-  const { expanded, setExpanded } = useHashChange();
+  const { accordionStates, expandAll, collapseAll, toggleAccordion } =
+    useExpandCollapse(getEventNames(events));
+
+  const allExpanded = Object.values(accordionStates).every(
+    accordion => accordion === true,
+  );
 
   return (
     <ContractItemWrapper
@@ -27,26 +39,35 @@ export const Events = ({ events }: EventsProps) => {
       titleLevel={3}
       itemsLength={events?.length}
     >
-      {events?.map((event, index) => {
-        const id = event.name || `event-${index}`;
-        return (
-          <Accordion
-            type="single"
-            collapsible
-            className="contract-item-wrapper__event w-full space-y-4"
-            key={index}
-            value={expanded === id ? id : undefined}
-            onValueChange={value => setExpanded(value)}
-          >
-            <AccordionItem value={id} id={id}>
-              <AccordionTrigger>
+      <aside className="flex items-center justify-end mt-4 mb-4">
+        <Label htmlFor="expand-collapse-toggle" className="mr-2 ml-2 font-bold">
+          {allExpanded ? 'Collapse All' : 'Expand All'}
+        </Label>
+        <Switch
+          id="expand-collapse-toggle"
+          checked={allExpanded}
+          onCheckedChange={checked => (checked ? expandAll() : collapseAll())}
+        />
+      </aside>
+      <Accordion
+        type="multiple"
+        value={Object.keys(accordionStates).filter(k => accordionStates[k])}
+        className="contract-item-wrapper__event w-full space-y-4"
+      >
+        {events?.map((event, index) => {
+          const id = event.name || `event-${index}`;
+          return (
+            <AccordionItem key={id} value={id}>
+              <AccordionTrigger onClick={() => toggleAccordion(id)}>
                 <AnchorLinkTitle
-                  accordion={true}
-                  title={event.name}
+                  accordion
+                  title={event.name || `Event ${index + 1}`}
                   titleLevel={6}
                 />
               </AccordionTrigger>
-              <AccordionContent id={id}>
+              <AccordionContent
+                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
+              >
                 <Selector selector={event.eventSelector} />
                 <Signature signature={event.signature} />
                 <span className="contract-item-wrapper__event-anonymous">
@@ -54,15 +75,15 @@ export const Events = ({ events }: EventsProps) => {
                 </span>
                 <NatSpec natspec={event.natspec} />
                 <Variables
-                  variables={event?._parameters}
+                  variables={event._parameters}
                   title="Parameters"
                   titleLevel={4}
                 />
               </AccordionContent>
             </AccordionItem>
-          </Accordion>
-        );
-      })}
+          );
+        })}
+      </Accordion>
     </ContractItemWrapper>
   );
 };

@@ -5,20 +5,32 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+
 import { StructDocItem } from '@blocksense/sol-reflector';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Variables } from '@/sol-contracts-components/Variables';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
-import { useHashChange } from '@/hooks/useHashChange';
+import { useExpandCollapse } from '@/hooks/useExpandCollapse';
 
 type StructsProps = {
   structs?: StructDocItem[];
   isFromSourceUnit?: boolean;
 };
 
+const getStructNames = (structs: StructDocItem[] = []) => {
+  return structs.map((struct, index) => struct.name || `struct-${index}`) || [];
+};
+
 export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
-  const { expanded, setExpanded } = useHashChange();
+  const { accordionStates, expandAll, collapseAll, toggleAccordion } =
+    useExpandCollapse(getStructNames(structs));
+
+  const allExpanded = Object.values(accordionStates).every(
+    accordion => accordion === true,
+  );
 
   return (
     <ContractItemWrapper
@@ -26,40 +38,49 @@ export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
       titleLevel={isFromSourceUnit ? 2 : 3}
       itemsLength={structs?.length}
     >
-      {structs?.map((struct, index) => {
-        const id = struct.name || `struct-${index}`;
-        return (
-          <Accordion
-            type="single"
-            collapsible
-            className="contract-item-wrapper__struct w-full space-y-4"
-            key={index}
-            value={expanded === id ? id : undefined}
-            onValueChange={value => setExpanded(value)}
-          >
-            <AccordionItem value={id} id={id}>
-              <AccordionTrigger>
+      <aside className="flex items-center justify-end mt-4 mb-4">
+        <Label htmlFor="expand-collapse-toggle" className="mr-2 ml-2 font-bold">
+          {allExpanded ? 'Collapse All' : 'Expand All'}
+        </Label>
+        <Switch
+          id="expand-collapse-toggle"
+          checked={allExpanded}
+          onCheckedChange={checked => (checked ? expandAll() : collapseAll())}
+        />
+      </aside>
+      <Accordion
+        type="multiple"
+        value={Object.keys(accordionStates).filter(k => accordionStates[k])}
+        className="contract-item-wrapper__struct w-full space-y-4"
+      >
+        {structs?.map((struct, index) => {
+          const id = struct.name || `struct-${index}`;
+          return (
+            <AccordionItem key={id} value={id}>
+              <AccordionTrigger onClick={() => toggleAccordion(id)}>
                 <AnchorLinkTitle
-                  accordion={true}
-                  title={struct.name}
+                  accordion
+                  title={struct.name || `Struct ${index + 1}`}
                   titleLevel={isFromSourceUnit ? 5 : 6}
                 />
               </AccordionTrigger>
-              <AccordionContent id={id}>
+              <AccordionContent
+                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
+              >
                 <span className="contract-item-wrapper__struct-visibility">
                   Visibility: {struct.visibility}
                 </span>
                 <NatSpec natspec={struct.natspec} />
                 <Variables
-                  variables={struct?._members}
+                  variables={struct._members}
                   title="Members"
                   titleLevel={isFromSourceUnit ? 4 : 5}
                 />
               </AccordionContent>
             </AccordionItem>
-          </Accordion>
-        );
-      })}
+          );
+        })}
+      </Accordion>
     </ContractItemWrapper>
   );
 };

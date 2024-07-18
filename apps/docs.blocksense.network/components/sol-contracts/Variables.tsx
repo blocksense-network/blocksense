@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import {
   Accordion,
@@ -6,12 +6,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+
 import { VariableDocItem } from '@blocksense/sol-reflector';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Signature } from '@/sol-contracts-components/Signature';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
-import { useHashChange } from '@/hooks/useHashChange';
+import { useExpandCollapse } from '@/hooks/useExpandCollapse';
 
 type VariablesProps = {
   variables?: VariableDocItem[];
@@ -19,8 +22,24 @@ type VariablesProps = {
   titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 };
 
-export const Variables = ({ variables, title, titleLevel }: VariablesProps) => {
-  const { expanded, setExpanded } = useHashChange();
+const getVariableNames = (variables: VariableDocItem[] = []) => {
+  return (
+    variables.map((variable, index) => variable.name || `variable-${index}`) ||
+    []
+  );
+};
+
+export const Variables = ({
+  variables = [],
+  title,
+  titleLevel,
+}: VariablesProps) => {
+  const { accordionStates, expandAll, collapseAll, toggleAccordion } =
+    useExpandCollapse(getVariableNames(variables));
+
+  const allExpanded = Object.values(accordionStates).every(
+    accordion => accordion === true,
+  );
 
   return (
     <ContractItemWrapper
@@ -28,26 +47,35 @@ export const Variables = ({ variables, title, titleLevel }: VariablesProps) => {
       title={title}
       titleLevel={titleLevel}
     >
-      {variables?.map((variable, index) => {
-        const id = variable.name || `variable-${index}`;
-        return (
-          <Accordion
-            type="single"
-            collapsible
-            className="contract-item-wrapper__variable w-full space-y-4"
-            key={index}
-            value={expanded === id ? id : undefined}
-            onValueChange={value => setExpanded(value)}
-          >
-            <AccordionItem value={id} id={id}>
-              <AccordionTrigger>
+      <aside className="flex items-center justify-end mt-4 mb-4">
+        <Label htmlFor="expand-collapse-toggle" className="mr-2 ml-2 font-bold">
+          {allExpanded ? 'Collapse All' : 'Expand All'}
+        </Label>
+        <Switch
+          id="expand-collapse-toggle"
+          checked={allExpanded}
+          onCheckedChange={checked => (checked ? expandAll() : collapseAll())}
+        />
+      </aside>
+      <Accordion
+        type="multiple"
+        value={Object.keys(accordionStates).filter(k => accordionStates[k])}
+        className="contract-item-wrapper__variable w-full space-y-4"
+      >
+        {variables?.map((variable, index) => {
+          const id = variable.name || `variable-${index}`;
+          return (
+            <AccordionItem key={id} value={id}>
+              <AccordionTrigger onClick={() => toggleAccordion(id)}>
                 <AnchorLinkTitle
-                  accordion={true}
+                  accordion
                   title={variable.name ? variable.name : 'unnamed'}
                   titleLevel={6}
                 />
               </AccordionTrigger>
-              <AccordionContent id={id}>
+              <AccordionContent
+                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
+              >
                 <Badge className="contract-item-wrapper__variable-mutability">
                   <span>Mutability: {variable.mutability}</span>
                 </Badge>
@@ -55,9 +83,9 @@ export const Variables = ({ variables, title, titleLevel }: VariablesProps) => {
                 <NatSpec natspec={variable.natspec} />
               </AccordionContent>
             </AccordionItem>
-          </Accordion>
-        );
-      })}
+          );
+        })}
+      </Accordion>
     </ContractItemWrapper>
   );
 };
