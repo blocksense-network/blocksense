@@ -9,6 +9,8 @@ import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
 import '@blocksense/sol-reflector';
 
+import './tasks';
+
 dotenv.config();
 
 const config: HardhatUserConfig = {
