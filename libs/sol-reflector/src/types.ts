@@ -57,19 +57,18 @@ export type FunctionModifierKind =
   | 'modifierInvocation'
   | 'baseConstructorSpecifier';
 
+export type NatSpecParam = {
+  name?: string;
+  description: string;
+};
+
 export interface NatSpec {
   author?: string;
   title?: string;
   notice?: string;
   dev?: string;
-  params?: {
-    name: string;
-    description: string;
-  }[];
-  returns?: {
-    name?: string;
-    description: string;
-  }[];
+  params?: NatSpecParam[];
+  returns?: NatSpecParam[];
   custom?: {
     [tag: string]: string;
   };
@@ -182,6 +181,8 @@ export class VariableDocItem {
   indexed: boolean = false;
   constant: boolean = false;
   natspec: NatSpec = {};
+  _natspecDescription?: string;
+  _natspecName?: string;
 }
 
 export class EnumDocItem {

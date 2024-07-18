@@ -1,4 +1,12 @@
-import { ASTNode, ContractDocItem, NatSpec, SolReflection } from '../types';
+import {
+  ASTNode,
+  ContractDocItem,
+  NatSpec,
+  NatSpecParam,
+  SolReflection,
+  SourceUnitDocItem,
+  VariableDocItem,
+} from '../types';
 
 // The possible tags we support
 const tags = [
@@ -188,4 +196,66 @@ class ItemError extends Error {
       super(msg);
     }
   }
+}
+
+export function appendNatspecDetailsToParams(data: SolReflection) {
+  data.forEach(({ fineData }) => {
+    // apply for source unit
+    applyPopulateParamsWithNatSpecData(fineData);
+    // apply for contracts
+    fineData.contracts?.forEach(applyPopulateParamsWithNatSpecData);
+  });
+}
+
+function applyPopulateParamsWithNatSpecData(
+  data: SourceUnitDocItem | ContractDocItem,
+) {
+  data.errors?.forEach(error => {
+    populateParamsWithNatSpecData(error._parameters, error.natspec?.params);
+  });
+
+  data.functions?.forEach(func => {
+    populateParamsWithNatSpecData(func._parameters, func.natspec?.params);
+    populateParamsWithNatSpecData(
+      func._returnParameters,
+      func.natspec?.returns,
+    );
+  });
+
+  data.structs?.forEach(struct => {
+    populateParamsWithNatSpecData(struct._members, struct.natspec?.params);
+  });
+
+  if ('events' in data) {
+    data.events?.forEach(event => {
+      populateParamsWithNatSpecData(event._parameters, event.natspec?.params);
+    });
+  }
+
+  if ('modifiers' in data) {
+    data.modifiers?.forEach(modifier => {
+      populateParamsWithNatSpecData(
+        modifier._parameters,
+        modifier.natspec?.params,
+      );
+    });
+  }
+}
+
+function populateParamsWithNatSpecData(
+  params: VariableDocItem[] = [],
+  natspecParams: NatSpecParam[] = [],
+) {
+  params.forEach((param, index) => {
+    // Some param might not have a name, so we need to find the corresponding param by index
+    const natspecParameter =
+      natspecParams.find(p => p.name === param.name) || natspecParams[index];
+
+    if (natspecParameter?.name) {
+      param._natspecName = natspecParameter.name;
+    }
+    if (natspecParameter?.description) {
+      param._natspecDescription = natspecParameter.description;
+    }
+  });
 }
