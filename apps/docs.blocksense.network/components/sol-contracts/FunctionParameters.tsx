@@ -59,7 +59,7 @@ export const FunctionParameters = ({
       title={title}
       titleLevel={titleLevel}
     >
-      <Table className="variables__table mt-6">
+      <Table className="variables__table mt-6 mb-4">
         <TableHeader className="variables__table-header">
           <TableRow className="variables__table-header-row">
             <TableHead className="variables__table-head">Type</TableHead>

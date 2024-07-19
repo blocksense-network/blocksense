@@ -18,7 +18,7 @@ export const Signature = ({ signature = '' }: SignatureProps) => {
   return (
     signature && (
       <div
-        className="signature__content bg-white border border-gray-800 mt-2 mb-2 py-2"
+        className="signature__content border border-gray-800 mb-2 py-2"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     )

@@ -16,7 +16,7 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
   return (
     <>
       <AnchorLinkTitle title={contract.name} titleLevel={2} />
-      <div className="contract-base-info bg-gray-50 py-3 lg:px-6  mt-6 flex items-start space-y-4">
+      <div className="contract-base-info border-solid border border-slate-100 bg-gray-50 py-3 lg:px-6  mt-6 flex items-start space-y-4">
         <Card className="contract-base-info__card w-full bg-white shadow-md rounded-lg mt-4 mb-4 py-3 px-3">
           <CardHeader className="contract-base-info__header">
             <CardDescription className="contract-base-info__description bg-gray-50 rounded-lg font-bold px-3 py-2 flex items-center">

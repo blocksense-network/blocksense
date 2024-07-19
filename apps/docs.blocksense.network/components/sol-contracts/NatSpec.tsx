@@ -10,7 +10,7 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
   return (
     <>
       {Object.keys(natspec).length > 0 && (
-        <div className="natspec px-4 bg-white text-black">
+        <div className="natspec px-4 py-4 mb-4 border-solid border border-slate-200 bg-slate-50 rounded-lg text-black">
           <p className="natspec__title text-lg font-semibold text-slate-600">
             Description
           </p>
