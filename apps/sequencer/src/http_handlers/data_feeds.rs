@@ -15,8 +15,7 @@ use crypto::verify_signature;
 use crypto::Signature;
 use data_feeds::types::Timestamp;
 use data_feeds::types::{DataFeedPayload, FeedResult};
-use prometheus::inc_reporter_metric;
-use prometheus::inc_reporter_vec_metric;
+use prometheus::{inc_metric, inc_vec_metric};
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
 
@@ -78,10 +77,11 @@ pub async fn post_report(
         match reporter {
             Some(x) => {
                 let reporter = x.1;
+                let reporter_metrics = reporter.read().unwrap().reporter_metrics.clone();
                 feed_id = match data_feed.payload_metadata.feed_id.parse::<u32>() {
                     Ok(val) => val,
                     Err(e) => {
-                        inc_reporter_metric!(reporter, non_valid_feed_id_reports);
+                        inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
                         debug!("Error parsing input's feed_id: {}", e);
                         return Ok(HttpResponse::BadRequest().into());
                     }
@@ -102,7 +102,7 @@ pub async fn post_report(
                             "Signature check failed for feed_id: {} from reporter_id: {}",
                             feed_id, reporter_id
                         );
-                        inc_reporter_metric!(reporter, non_valid_signature);
+                        inc_metric!(reporter_metrics, reporter_id, non_valid_signature);
                         return Ok(HttpResponse::Unauthorized().into());
                     }
                 }
@@ -117,12 +117,13 @@ pub async fn post_report(
             }
         }
     };
+    let reporter_metrics = reporter.read().unwrap().reporter_metrics.clone();
 
     let result = match data_feed.result {
         FeedResult::Result { result } => result,
         FeedResult::Error { error } => {
             info!("Error parsing recvd result of vote: {}", error);
-            inc_reporter_metric!(reporter, errors_reported_for_feed);
+            inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
             // TODO: Handle Error vote
 
             return Ok(HttpResponse::Ok().into());
@@ -145,7 +146,7 @@ pub async fn post_report(
             Some(x) => x,
             None => {
                 drop(reg);
-                inc_reporter_metric!(reporter, non_valid_feed_id_reports);
+                inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
                 return Ok(HttpResponse::BadRequest().into());
             }
         }
@@ -171,13 +172,23 @@ pub async fn post_report(
                     "Recvd timely vote from reporter_id = {} for feed_id = {}",
                     reporter_id, feed_id
                 );
-                inc_reporter_vec_metric!(reporter, timely_reports_per_feed, feed_id);
+                inc_vec_metric!(
+                    reporter_metrics,
+                    reporter_id,
+                    timely_reports_per_feed,
+                    feed_id
+                );
             } else {
                 debug!(
                     "Recvd revote from reporter_id = {} for feed_id = {}",
                     reporter_id, feed_id
                 );
-                inc_reporter_vec_metric!(reporter, total_revotes_for_same_slot_per_feed, feed_id);
+                inc_vec_metric!(
+                    reporter_metrics,
+                    reporter_id,
+                    total_revotes_for_same_slot_per_feed,
+                    feed_id
+                );
             }
             return Ok(HttpResponse::Ok().into()); // <- send response
         }
@@ -186,14 +197,24 @@ pub async fn post_report(
                 "Recvd late vote from reporter_id = {} for feed_id = {}",
                 reporter_id, feed_id
             );
-            inc_reporter_vec_metric!(reporter, late_reports_per_feed, feed_id);
+            inc_vec_metric!(
+                reporter_metrics,
+                reporter_id,
+                late_reports_per_feed,
+                feed_id
+            );
         }
         ReportRelevance::NonRelevantInFuture => {
             debug!(
                 "Recvd vote for future slot from reporter_id = {} for feed_id = {}",
                 reporter_id, feed_id
             );
-            inc_reporter_vec_metric!(reporter, in_future_reports_per_feed, feed_id);
+            inc_vec_metric!(
+                reporter_metrics,
+                reporter_id,
+                in_future_reports_per_feed,
+                feed_id
+            );
         }
     }
     Ok(HttpResponse::BadRequest().into())

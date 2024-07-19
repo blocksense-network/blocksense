@@ -7,7 +7,7 @@ use std::sync::{Arc, RwLock};
 #[derive(Debug)]
 pub struct Reporter {
     pub pub_key: PublicKey,
-    pub reporter_metrics: ReporterMetrics,
+    pub reporter_metrics: Arc<RwLock<ReporterMetrics>>,
 }
 
 pub type SharedReporter = Arc<RwLock<Reporter>>;
@@ -22,6 +22,9 @@ pub fn init_shared_reporters(conf: &SequencerConfig) -> SharedReporters {
 
 fn init_reporters(conf: &SequencerConfig) -> HashMap<u64, Arc<RwLock<Reporter>>> {
     let mut reporters = HashMap::new();
+    let reporter_metrics = Arc::new(std::sync::RwLock::new(
+        ReporterMetrics::new().expect("Failed to allocate ReporterMetrics."),
+    ));
     for r in &conf.reporters {
         reporters.insert(
             r.id.into(),
@@ -32,8 +35,7 @@ fn init_reporters(conf: &SequencerConfig) -> HashMap<u64, Arc<RwLock<Reporter>>>
                         .expect("Multiformats key prefix error. Only BLS is currently supported."),
                 )
                 .expect("Pub key format error: "),
-                reporter_metrics: ReporterMetrics::new(r.id.into())
-                    .expect("Failed to allocate ReporterMetrics."),
+                reporter_metrics: reporter_metrics.clone(),
             })),
         );
     }

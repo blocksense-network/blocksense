@@ -18,6 +18,7 @@ use crate::feeds::feeds_registry::Repeatability;
 use crate::feeds::feeds_registry::Repeatability::Periodic;
 use futures::stream::FuturesUnordered;
 use paste::paste;
+use prometheus::{inc_metric, inc_metric_by};
 use std::fmt::Debug;
 use std::time::Instant;
 use tracing::info_span;
@@ -144,23 +145,29 @@ pub async fn eth_batch_send_to_contract<
 
     let base_fee = process_provider_getter!(
         provider.get_gas_price().await,
+        net,
         provider_metrics,
         get_gas_price
     );
 
     debug!("Observed gas price (base_fee) = {}", base_fee);
     provider_metrics
+        .read()
+        .unwrap()
         .gas_price
+        .with_label_values(&[net.as_str()])
         .observe((base_fee as f64) / 1000000000.0);
 
     let max_priority_fee_per_gas = process_provider_getter!(
         provider.get_max_priority_fee_per_gas().await,
+        net,
         provider_metrics,
         get_max_priority_fee_per_gas
     );
 
     let chain_id = process_provider_getter!(
         provider.get_chain_id().await,
+        net,
         provider_metrics,
         get_chain_id
     );
@@ -178,12 +185,14 @@ pub async fn eth_batch_send_to_contract<
 
     let receipt_future = process_provider_getter!(
         provider.send_transaction(tx).await,
+        net,
         provider_metrics,
         send_tx
     );
 
     let receipt = process_provider_getter!(
         receipt_future.get_receipt().await,
+        net,
         provider_metrics,
         get_receipt
     );
@@ -193,13 +202,22 @@ pub async fn eth_batch_send_to_contract<
         "Recvd transaction receipt that took {}ms from `{}`: {:?}",
         transaction_time, net, receipt
     );
-    provider_metrics.total_tx_sent.inc();
-    provider_metrics.gas_used.inc_by(receipt.gas_used as u64);
+    inc_metric!(provider_metrics, net, total_tx_sent);
+    let gas_used_inc = receipt.gas_used;
+    inc_metric_by!(provider_metrics, net, gas_used, gas_used_inc);
+    let effective_gas_price_inc = receipt.effective_gas_price;
+    inc_metric_by!(
+        provider_metrics,
+        net,
+        effective_gas_price,
+        effective_gas_price_inc
+    );
+
     provider_metrics
-        .effective_gas_price
-        .inc_by(receipt.effective_gas_price as u64);
-    provider_metrics
+        .read()
+        .unwrap()
         .transaction_confirmation_times
+        .with_label_values(&[net.as_str()])
         .observe(transaction_time as f64);
     Ok(receipt.status().to_string())
 }
@@ -259,7 +277,8 @@ pub async fn eth_batch_send_to_all_contracts<
                     error!(err);
                     all_results += &err;
                     let provider = provider.lock().await;
-                    provider.provider_metrics.total_timed_out_tx.inc();
+                    let provider_metrics = provider.provider_metrics.clone();
+                    inc_metric!(provider_metrics, net, total_timed_out_tx);
                 }
             },
             Err(e) => {

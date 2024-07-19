@@ -42,7 +42,7 @@ pub struct RpcProvider {
     pub wallet: LocalWallet,
     pub contract_address: Option<Address>,
     pub event_contract_address: Option<Address>,
-    pub provider_metrics: ProviderMetrics,
+    pub provider_metrics: Arc<std::sync::RwLock<ProviderMetrics>>,
     pub transcation_timeout_secs: u32,
 }
 
@@ -130,6 +130,10 @@ async fn verify_contract_exists(
 async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
 
+    let provider_metrics = Arc::new(std::sync::RwLock::new(
+        ProviderMetrics::new().expect("Failed to allocate ProviderMetrics"),
+    ));
+
     for (key, p) in &conf.providers {
         let rpc_url: Url = p
             .url
@@ -165,8 +169,7 @@ async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<
             event_contract_address: event_address,
             provider,
             wallet,
-            provider_metrics: ProviderMetrics::new(&key)
-                .expect("Failed to allocate ProviderMetrics"),
+            provider_metrics: provider_metrics.clone(),
             transcation_timeout_secs: p.transcation_timeout_secs,
         }));
 
