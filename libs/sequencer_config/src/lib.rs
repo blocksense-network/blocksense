@@ -1,15 +1,21 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Write;
 use std::time::SystemTime;
 use std::{collections::HashMap, env, fmt::Debug};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct FeedMetaData {
     pub id: u32,
     pub name: String,
     pub report_interval_ms: u64,
     pub first_report_start_time: SystemTime,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ReporterConfig {
+    pub reporter: Reporter,
+    pub feeds: Vec<FeedMetaData>,
 }
 
 #[derive(Debug, Deserialize)]
