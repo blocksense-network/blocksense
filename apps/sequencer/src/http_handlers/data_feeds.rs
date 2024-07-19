@@ -198,3 +198,86 @@ pub async fn post_report(
     }
     Ok(HttpResponse::BadRequest().into())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::config::init_sequencer_config;
+    use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
+    use crate::plugin_registry;
+    use crate::providers::provider::init_shared_rpc_providers;
+    use crate::reporters::reporter::init_shared_reporters;
+    use crate::utils::logging::init_shared_logging_handle;
+    use actix_web::{test, App};
+    use crypto::JsonSerializableSignature;
+    use data_feeds::connector::post::generate_signature;
+    use data_feeds::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
+    use std::env;
+    use std::path::PathBuf;
+    use std::sync::{Arc, RwLock};
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[actix_web::test]
+    async fn post_report_from_unknown_reporter_fails_with_401() {
+        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
+        env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
+        let log_handle = init_shared_logging_handle();
+        let sequencer_config = init_sequencer_config();
+
+        let providers = init_shared_rpc_providers(&sequencer_config).await;
+
+        let app_state = web::Data::new(FeedsState {
+            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
+                &sequencer_config,
+            ))),
+            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+            plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
+            providers: providers.clone(),
+            log_handle,
+            reporters: init_shared_reporters(&sequencer_config),
+        });
+
+        let app =
+            test::init_service(App::new().app_data(app_state.clone()).service(post_report)).await;
+
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("System clock set before EPOCH")
+            .as_millis();
+
+        const FEED_ID: &str = "1";
+        const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
+        const REPORT_VAL: f64 = 80000.8;
+        let result = FeedResult::Result {
+            result: FeedType::Numerical(REPORT_VAL),
+        };
+        let signature = generate_signature(SECRET_KEY.to_string(), FEED_ID, timestamp, &result);
+
+        let payload = DataFeedPayload {
+            payload_metadata: PayloadMetaData {
+                reporter_id: 0,
+                feed_id: FEED_ID.to_string(),
+                timestamp,
+                signature: JsonSerializableSignature { sig: signature },
+            },
+            result,
+        };
+
+        let serialized_payload = match serde_json::to_value(&payload) {
+            Ok(payload) => payload,
+            Err(_) => panic!("Failed serialization of payload!"),
+        };
+
+        let payload_as_string = serialized_payload.to_string();
+
+        let req = test::TestRequest::post()
+            .uri("/post_report")
+            .set_payload(payload_as_string)
+            .to_request();
+
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), 401);
+    }
+}
