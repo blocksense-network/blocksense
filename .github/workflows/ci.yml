@@ -136,7 +136,7 @@ jobs:
       - name: Build Rust workspace
         run: cargo build
 
-      - name: Build Rust workspace
+      - name: Test Rust workspace
         run: cargo test
 
       - name: Run Cargo Clippy
