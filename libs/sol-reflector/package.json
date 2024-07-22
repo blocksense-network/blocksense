@@ -18,11 +18,11 @@
   },
   "devDependencies": {
     "@types/mocha": "^7.0.2",
-    "@types/node": "^20.12.13",
-    "hardhat": "^2.22.4",
+    "@types/node": "^20.14.11",
+    "hardhat": "^2.22.6",
     "solidity-ast": "^0.4.56",
     "ts-node": "^10.9.2",
-    "tsx": "^4.7.1",
-    "typescript": "^5.4.5"
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
   }
 }
