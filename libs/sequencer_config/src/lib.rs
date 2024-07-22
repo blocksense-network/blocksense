@@ -14,6 +14,10 @@ pub struct FeedMetaData {
 
 #[derive(Debug, Deserialize)]
 pub struct ReporterConfig {
+    pub batch_size: usize,
+    pub sequencer_url: String,
+    pub prometheus_url: String,
+
     pub reporter: Reporter,
     pub feeds: Vec<FeedMetaData>,
 }
@@ -50,6 +54,19 @@ pub fn get_sequencer_config_file_path() -> String {
     let config_file_name = "/sequencer_config.json";
 
     let config_file_path = env::var("SEQUENCER_CONFIG_DIR").unwrap_or_else(|_| {
+        let conf_dir = dirs::config_dir().expect("Configuration file path not specified.");
+        conf_dir
+            .to_str()
+            .expect("Configuration file path not valid.")
+            .to_string()
+    });
+    config_file_path + config_file_name
+}
+
+pub fn get_reporter_config_file_path() -> String {
+    let config_file_name = "/reporter_config.json";
+
+    let config_file_path = env::var("REPORTER_CONFIG_DIR").unwrap_or_else(|_| {
         let conf_dir = dirs::config_dir().expect("Configuration file path not specified.");
         conf_dir
             .to_str()

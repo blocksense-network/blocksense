@@ -13,6 +13,7 @@ use crypto::sign_message;
 use crypto::{JsonSerializableSignature, Signature};
 use curl::easy::Easy;
 use log::warn;
+use sequencer_config::FeedMetaData;
 use serde_json::Value;
 use std::env;
 use tracing::{debug, info};
@@ -43,7 +44,7 @@ fn handle_feed_response(
     }
 }
 
-pub fn get_reporter_config_file_path() -> String {
+pub fn get_reporter_secret_config_file_path() -> String {
     let config_file_name = "/reporter_secret_key";
 
     let secret_key_file_path = env::var("REPORTER_SECRET_KEY_FILE_PATH").unwrap_or_else(|_| {
@@ -93,7 +94,7 @@ pub async fn post_feed_response(
 
     let feed_hash = generate_string_hash(feed_asset_name);
 
-    let secret_key_file_path = get_reporter_config_file_path();
+    let secret_key_file_path = get_reporter_secret_config_file_path();
     let secret_key = read_file(secret_key_file_path.as_str()).trim().to_string();
 
     let signature = generate_signature(

@@ -47,4 +47,13 @@ impl DataFeedAPI {
             DataFeedAPI::CoinMarketCapDataFeed => "CoinMarketCap",
         }
     }
+
+    pub fn from_str(string: &str) -> Self {
+        match string {
+            "YahooFinance" => DataFeedAPI::YahooFinanceDataFeed,
+            "CoinMarketCap" => DataFeedAPI::CoinMarketCapDataFeed,
+            // "OpenWeather" => DataFeedAPI::OpenWeather,
+            _ => DataFeedAPI::EmptyAPI,
+        }
+    }
 }

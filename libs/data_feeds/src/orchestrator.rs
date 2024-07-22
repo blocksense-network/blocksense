@@ -11,11 +11,25 @@ use prometheus::{
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-use utils::get_env_var;
+use sequencer_config::{get_reporter_config_file_path, ReporterConfig};
+use utils::{get_env_var, read_file};
 
 use tracing::{debug, info};
 
 use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed, types::DataFeedAPI};
+
+pub fn init_reporter_config() -> ReporterConfig {
+    let config_file_path = get_reporter_config_file_path();
+
+    let data = read_file(config_file_path.as_str());
+
+    info!("Using config file: {}", config_file_path.as_str());
+
+    let reporter_config: ReporterConfig =
+        serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
+
+    reporter_config
+}
 
 pub async fn orchestrator() {
     // Initializes a tracing subscriber that displays runtime information based on the RUST_LOG env variable

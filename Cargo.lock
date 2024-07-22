@@ -2951,6 +2951,7 @@ dependencies = [
  "rand 0.8.5",
  "reqwest 0.12.4",
  "ringbuf",
+ "sequencer_config",
  "serde 1.0.203",
  "serde_json",
  "thiserror",
