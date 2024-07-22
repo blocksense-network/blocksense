@@ -30,26 +30,6 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
               {natspec.dev}
             </div>
           )}
-          {natspec.params?.map((param, index) => (
-            <div className="natspec__param" key={index}>
-              <span className="natspec__param-name text-base text-slate-600 font-bold">
-                {param.name || 'unnamed'}:
-              </span>{' '}
-              <span className="natspec__param-description text-base  text-slate-600">
-                {param.description}
-              </span>
-            </div>
-          ))}
-          {natspec.returns?.map((ret, index) => (
-            <div className="natspec__return" key={index}>
-              <span className="natspec__return-name text-base font-semibold">
-                {ret.name || 'unnamed'}:
-              </span>{' '}
-              <span className="natspec__return-description text-base text-slate-600">
-                {ret.description}
-              </span>
-            </div>
-          ))}
           {Object.entries(natspec.custom || {}).map(([key, value], index) => (
             <div className="natspec__custom mb-5" key={index}>
               <span className="natspec__custom-key text-base font-semibold">
