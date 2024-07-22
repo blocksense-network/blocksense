@@ -12,7 +12,7 @@ import { EventDocItem } from '@blocksense/sol-reflector';
 import { Signature } from '@/sol-contracts-components/Signature';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variables } from '@/sol-contracts-components/Variables';
+import { Parameters } from '@/sol-contracts-components/Parameters';
 import { Selector } from '@/sol-contracts-components/Selector';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
@@ -74,11 +74,7 @@ export const Events = ({ events }: EventsProps) => {
                   Anonymous: {event.anonymous.toString()}
                 </span>
                 <NatSpec natspec={event.natspec} />
-                <Variables
-                  variables={event._parameters}
-                  title="Parameters"
-                  titleLevel={4}
-                />
+                <Parameters parameters={event._parameters} />
               </AccordionContent>
             </AccordionItem>
           );

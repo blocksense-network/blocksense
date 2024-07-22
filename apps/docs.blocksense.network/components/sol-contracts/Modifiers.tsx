@@ -12,7 +12,7 @@ import { Signature } from '@/sol-contracts-components/Signature';
 import { ModifierDocItem } from '@blocksense/sol-reflector';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variables } from '@/sol-contracts-components/Variables';
+import { Parameters } from '@/sol-contracts-components/Parameters';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
@@ -72,11 +72,7 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
                 </span>
                 <Signature signature={modifier.signature} />
                 <NatSpec natspec={modifier.natspec} />
-                <Variables
-                  variables={modifier?._parameters}
-                  title="Parameters"
-                  titleLevel={4}
-                />
+                <Parameters parameters={modifier?._parameters} />
               </AccordionContent>
             </AccordionItem>
           );

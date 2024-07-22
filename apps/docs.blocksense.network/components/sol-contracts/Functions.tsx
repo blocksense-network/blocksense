@@ -16,7 +16,7 @@ import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers'
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
-import { FunctionParameters } from '@/sol-contracts-components/FunctionParameters';
+import { Parameters } from '@/sol-contracts-components/Parameters';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
 
 type FunctionsProps = {
@@ -86,12 +86,11 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                 </Badge>
                 <Signature signature={_function.signature} />
                 <NatSpec natspec={_function.natspec} />
-                <FunctionParameters
+                <Parameters
                   parameters={_function._parameters}
-                  title="Parameters"
                   titleLevel={isFromSourceUnit ? 4 : 5}
                 />
-                <FunctionParameters
+                <Parameters
                   parameters={_function._returnParameters}
                   title="Return Parameters"
                   titleLevel={isFromSourceUnit ? 4 : 5}

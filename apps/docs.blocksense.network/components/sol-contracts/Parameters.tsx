@@ -12,17 +12,17 @@ import {
 
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 
-type FunctionParametersProps = {
+type ParametersProps = {
   parameters?: VariableDocItem[];
   title?: string;
   titleLevel?: 4 | 5;
 };
 
-export const FunctionParameters = ({
+export const Parameters = ({
   parameters,
-  title = '',
-  titleLevel,
-}: FunctionParametersProps) => {
+  title = 'Parameters',
+  titleLevel = 4,
+}: ParametersProps) => {
   return (
     <ContractItemWrapper
       itemsLength={parameters?.length}

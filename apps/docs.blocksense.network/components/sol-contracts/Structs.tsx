@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { StructDocItem } from '@blocksense/sol-reflector';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variables } from '@/sol-contracts-components/Variables';
+import { Parameters } from '@/sol-contracts-components/Parameters';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
 
@@ -71,8 +71,8 @@ export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
                   Visibility: {struct.visibility}
                 </span>
                 <NatSpec natspec={struct.natspec} />
-                <Variables
-                  variables={struct._members}
+                <Parameters
+                  parameters={struct._members}
                   title="Members"
                   titleLevel={isFromSourceUnit ? 4 : 5}
                 />

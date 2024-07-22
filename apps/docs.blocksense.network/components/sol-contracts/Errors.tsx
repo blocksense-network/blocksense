@@ -12,7 +12,7 @@ import { ErrorDocItem } from '@blocksense/sol-reflector';
 import { Signature } from '@/sol-contracts-components/Signature';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Variables } from '@/sol-contracts-components/Variables';
+import { Parameters } from '@/sol-contracts-components/Parameters';
 import { Selector } from '@/sol-contracts-components/Selector';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
@@ -72,9 +72,8 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
                 <Selector selector={error.errorSelector} />
                 <Signature signature={error.signature} />
                 <NatSpec natspec={error.natspec} />
-                <Variables
-                  variables={error._parameters}
-                  title="Parameters"
+                <Parameters
+                  parameters={error._parameters}
                   titleLevel={isFromSourceUnit ? 4 : 5}
                 />
               </AccordionContent>
