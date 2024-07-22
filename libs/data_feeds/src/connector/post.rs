@@ -13,15 +13,14 @@ use crypto::sign_message;
 use crypto::{JsonSerializableSignature, Signature};
 use curl::easy::Easy;
 use log::warn;
-use sequencer_config::FeedMetaData;
+use sequencer_config::Reporter;
 use serde_json::Value;
 use std::env;
 use tracing::{debug, info};
-use utils::generate_string_hash;
 use utils::read_file;
 
 fn handle_feed_response(
-    reporter_id: u64,
+    reporter_id: u32,
     feed_id: String,
     timestamp: Timestamp,
     result: FeedResult,
@@ -29,7 +28,7 @@ fn handle_feed_response(
 ) -> Value {
     let payload = DataFeedPayload {
         payload_metadata: PayloadMetaData {
-            reporter_id,
+            reporter_id: (reporter_id as u64),
             feed_id,
             timestamp,
             signature: JsonSerializableSignature { sig: signature },
@@ -84,29 +83,27 @@ pub fn generate_signature(
 }
 
 pub async fn post_feed_response(
-    reporter_id: u64,
-    base_url: &str,
+    reporter: &Reporter,
     data_feed: Rc<RefCell<dyn DataFeed>>,
-    feed_asset_name: &String,
+    feed_id: u32,
     asset: &str,
+    sequencer_url: &str,
 ) {
     let (result, timestamp) = data_feed.borrow_mut().poll(asset).await;
-
-    let feed_hash = generate_string_hash(feed_asset_name);
 
     let secret_key_file_path = get_reporter_secret_config_file_path();
     let secret_key = read_file(secret_key_file_path.as_str()).trim().to_string();
 
     let signature = generate_signature(
         secret_key,
-        format!("{}", feed_hash).as_str(),
+        format!("{}", feed_id).as_str(),
         timestamp,
         &result,
     );
 
     let payload_json = handle_feed_response(
-        reporter_id,
-        feed_hash.to_string(),
+        reporter.id,
+        feed_id.to_string(),
         timestamp,
         result,
         signature,
@@ -114,7 +111,7 @@ pub async fn post_feed_response(
 
     info!("\nPayload: {:?}", payload_json);
 
-    let feed_url = base_url.to_string() + "/feed/" + &feed_hash.to_string();
+    let feed_url = sequencer_url.to_string() + "/feed/" + &feed_id.to_string();
 
     // Comment out if you want to test API availability & aggregation
     post_request(&feed_url, payload_json);

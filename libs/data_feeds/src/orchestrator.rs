@@ -11,8 +11,8 @@ use prometheus::{
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-use sequencer_config::{get_reporter_config_file_path, ReporterConfig};
-use utils::{get_env_var, read_file};
+use sequencer_config::{get_reporter_config_file_path, FeedMetaData, ReporterConfig};
+use utils::read_file;
 
 use tracing::{debug, info};
 
@@ -31,16 +31,18 @@ pub fn init_reporter_config() -> ReporterConfig {
     reporter_config
 }
 
+fn find_feed_meta_data_by_name<'a>(
+    feeds: &'a Vec<FeedMetaData>,
+    feed_name: &String,
+) -> Option<&'a FeedMetaData> {
+    feeds.iter().find(|&feed| feed.name == *feed_name)
+}
+
 pub async fn orchestrator() {
     // Initializes a tracing subscriber that displays runtime information based on the RUST_LOG env variable
     tracing_subscriber::fmt::init();
 
-    let batch_size: usize = get_env_var("BATCH_SIZE").expect("BATCH_SIZE not set");
-    let reporter_id: u64 = get_env_var("REPORTER_ID").expect("REPORTER_ID not set");
-
-    let sequencer_url: String = get_env_var("SEQUENCER_URL").expect("SEQUENCER_URL not set");
-    let poll_period_ms: u64 =
-        get_env_var("POLL_PERIOD_MS").expect("POLL_PERIOD_MS env_variable not set");
+    let reporter_config = init_reporter_config();
 
     let mut connection_cache = HashMap::<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>::new();
 
@@ -49,12 +51,23 @@ pub async fn orchestrator() {
     let all_feeds = DataFeedAPI::get_all_feeds();
     debug!("All feeds dump - {:?}", all_feeds);
 
-    FEED_COUNTER.inc_by((all_feeds).len() as u64);
+    /// Initialize feed_id_map so we can resolve the id of each feed during dispatch
+    let mut feed_id_map = HashMap::<String, &FeedMetaData>::new();
+    for (api, asset) in &all_feeds {
+        let feed_name = DataFeedAPI::feed_asset_str(&api, &asset);
+
+        match find_feed_meta_data_by_name(&reporter_config.feeds, &feed_name) {
+            Some(feed_meta_data) => {
+                feed_id_map.insert(feed_name, feed_meta_data);
+            }
+            None => panic!("Feed with name {} not found!", feed_name),
+        }
+    }
+
+    FEED_COUNTER.inc_by(all_feeds.len() as u64);
     info!("Available feed count: {}\n", FEED_COUNTER.get());
 
     let prometheus_server = reqwest::Client::new();
-    let prometheus_url =
-        get_env_var::<String>("PROMETHEUS_URL_CLIENT").unwrap_or("127.0.0.1:8080".to_string());
 
     loop {
         BATCH_COUNTER.inc();
@@ -62,10 +75,9 @@ pub async fn orchestrator() {
         let start_time = Instant::now();
 
         dispatch(
-            reporter_id,
-            sequencer_url.as_str(),
-            batch_size,
+            &reporter_config,
             &all_feeds,
+            &feed_id_map,
             &mut connection_cache,
         )
         .await;
@@ -73,18 +85,24 @@ pub async fn orchestrator() {
         info!("Finished with {}-th batch..\n", BATCH_COUNTER.get());
 
         let elapsed_time = start_time.elapsed().as_millis();
-        if elapsed_time < poll_period_ms.into() {
-            let remaining_time_ms = poll_period_ms - (elapsed_time as u64);
+
+        //TODO(snikolov): `poll_period_ms` is dependent on the feed, we should ship payload ASAP and sleep this feed only.
+        if elapsed_time < reporter_config.poll_period_ms.into() {
+            let remaining_time_ms = reporter_config.poll_period_ms - (elapsed_time as u64);
             sleep(Duration::from_millis(remaining_time_ms));
         }
 
-        UPTIME_COUNTER.inc_by(poll_period_ms as f64 / 1000.);
+        UPTIME_COUNTER.inc_by((reporter_config.poll_period_ms as f64) / 1000.0);
         BATCH_PARSE_TIME_GAUGE.set(elapsed_time as i64);
 
-        let metrics_result =
-            handle_prometheus_metrics(&prometheus_server, prometheus_url.as_str(), &encoder).await;
+        let metrics_result = handle_prometheus_metrics(
+            &prometheus_server,
+            reporter_config.prometheus_url.as_str(),
+            &encoder,
+        )
+        .await;
         if let Err(e) = metrics_result {
             debug!("Error handling Prometheus metrics: {:?}", e);
-        };
+        }
     }
 }
