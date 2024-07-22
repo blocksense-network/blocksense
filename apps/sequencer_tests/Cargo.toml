@@ -50,17 +50,17 @@ alloy = { git = "https://github.com/alloy-rs/alloy", rev = "6f4e397f7cf71812160a
 
 reqwest = { version = "0.12", default-features = false }
 # async
-tokio = { version = "1.4.0", features = ["full"] }
+tokio = { version = "1.38.1", features = ["full"] }
 
 # misc
 eyre = "0.6.12"
-serde = { version = "1.0.203", features = ["derive"]}
+serde = { version = "1.0.204", features = ["derive"]}
 futures = "0.3.30"
 tracing = { version = "0.1.40", features = ["async-await", "log"] }
 url = "2.5.2"
 port_scanner = "0.1.5"
 curl = "0.4.46"
-serde_json = "1.0.117"
+serde_json = "1.0.120"
 json-patch = "2.0.0"
 
 [[bin]]
