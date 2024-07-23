@@ -6,34 +6,49 @@ This document provides a quick-guide to smart contracts as part of our Blocksens
 
 Smart `contracts` for Blocksense network are stored inside our public GitHub repository. The contracts folder is organized as presented below:
 
+
 ```code
 📁 chainlink-proxies
 │   📁 registries
-│   │   └── FeedRegistry.sol
-│   └── ChainlinkProxy.sol
+│   │   📄── FeedRegistry.sol
+│   📄── ChainlinkProxy.sol
 📁 interfaces
-│   ├── IAggregator.sol
-│   ├── IChainlinkAggregator.sol
-│   └── IFeedRegistry.sol
+│   📁chainlink
+│   │   📄── IChainlinkAggregator.sol
+│   │   📄── IChainlinkFeedRegistry.sol
+│   📄── IAggregator.sol
+│   📄── IFeedRegistry.sol
 📁 libraries
-│   └── ProxyCall.sol
+│   📄── ProxyCall.sol
 📁 test
+│   📁 chainlink-oracles
+│   │   📄── Oracle.sol
+│   │   📄── Registry.sol
 │   📁 consumers
 │   │   📁 historic
-│   │   │   └── ...
-│   │   └── ...
+│   │   │   📄── HistoricConsumer.sol
+│   │   │   📄── HistoricDataFeedConsumer.sol
+│   │   │   📄── HistoricDataFeedGenericConsumer.sol
+│   │   📄── Consumer.sol
+│   │   📄── DataFeedGenericV1Consumer.sol
+│   │   📄── DataFeedGenericV2Consumer.sol
+│   │   📄── DataFeedV1Consumer.sol
+│   │   📄── DataFeedV2Consumer.sol
 │   📁 interfaces
-│   │   └── ...
-│   ├── DataFeedStoreGeneric.sol
-│   ├── DataFeedStoreGenericV1.sol
-│   ├── DataFeedStoreGenericV2.sol
-│   └── HistoricDataFeedStoreGenericV1.sol
-├── DataFeedStoreV1.sol
-├── DataFeedStoreV2.sol
-├── DataFeedStoreV3.sol
-├── HistoricDataFeedStoreV1.sol
-├── HistoricDataFeedStoreV2.sol
-└── UpgradeableProxy.sol
+│   │   📄── IDataFeedStoreGenericV1.sol
+│   │   📄── IDataFeedStoreGenericV2.sol
+│   │   📄── IDataFeedStore.sol
+│   │   📄── IHistoricDataFeed.sol
+│   📄── DataFeedStoreGeneric.sol
+│   📄── DataFeedStoreGenericV1.sol
+│   📄── DataFeedStoreGenericV2.sol
+│   📄── HistoricDataFeedStoreGenericV1.sol
+📄── DataFeedStoreV1.sol
+📄── DataFeedStoreV2.sol
+📄── DataFeedStoreV3.sol
+📄── HistoricDataFeedStoreV1.sol
+📄── HistoricDataFeedStoreV2.sol
+📄── UpgradeableProxy.sol
 ```
 
 ## Smart Contract Architecture
