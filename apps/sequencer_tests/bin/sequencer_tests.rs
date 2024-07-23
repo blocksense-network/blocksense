@@ -100,7 +100,11 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
 fn deploy_contract_to_networks(networks: Vec<&str>) {
     for net in networks {
         send_get_request(
-            format!("http://127.0.0.1:{}/deploy/{}", SEQUENCER_ADMIN_PORT, net).as_str(),
+            format!(
+                "http://127.0.0.1:{}/deploy/{}/price_feed",
+                SEQUENCER_ADMIN_PORT, net
+            )
+            .as_str(),
         );
     }
 }
