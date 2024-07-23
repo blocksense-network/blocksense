@@ -1,21 +1,25 @@
+import fs from 'fs/promises';
+import path from 'path';
 import { task } from 'hardhat/config';
+import { Artifacts } from 'hardhat/types';
+import { JsonRpcProvider, Network, Wallet, ethers } from 'ethers';
 import Safe, {
   SafeAccountConfig,
   SafeFactory,
 } from '@safe-global/protocol-kit';
-import { HDNodeWallet, JsonRpcProvider, ethers } from 'ethers';
 import {
   OperationType,
   SafeTransaction,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-import { Artifacts } from 'hardhat/types';
+import { getCreateCallDeployment } from '@safe-global/safe-deployments';
 
 interface NetworkConfig {
   rpc: string;
   provider: JsonRpcProvider;
-  signer: HDNodeWallet;
-  owners: HDNodeWallet[];
+  network: Network;
+  signer: Wallet;
+  owners: string[];
   safeAddresses: {
     multiSendAddress: string;
     multiSendCallOnlyAddress: string;
@@ -26,117 +30,112 @@ interface NetworkConfig {
     signMessageLibAddress: string;
     simulateTxAccessorAddress: string;
   };
+  threshold: number;
 }
-
-const RPC_SEPOLIA = 'https://rpc.buildbear.io/certain-ghostrider-6ad8ba7c';
-const RPC_AMOY = 'https://rpc.buildbear.io/middle-husk-f5ddcb92';
-const SEPOLIA_MNEMONIC =
-  'climb trap document virtual interest zebra mirror tired debate sample road involve';
-const AMOY_MNEMONIC =
-  'climb trap document virtual interest zebra mirror tired debate sample road involve';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
-  .addOptionalParam('snapshot', 'Take a snapshot before deploying')
-  .addOptionalParam('revert', 'Revert to snapshot')
-  .setAction(async (args, { ethers, network, artifacts }) => {
-    const sepoliaConfig = await initSepolia();
-    const amoyConfig = await initAmoy();
-
-    if (args.snapshot) {
-      const snapshotIdSepolia = await sepoliaConfig.provider.send(
-        'evm_snapshot',
-        [],
-      );
-      const snapshotIdAmoy = await amoyConfig.provider.send('evm_snapshot', []);
-      console.log('snapshot id', snapshotIdSepolia, snapshotIdAmoy);
-      return;
+  .setAction(async (args, { ethers, artifacts }) => {
+    const networks = args.networks.split(',');
+    const configs: NetworkConfig[] = [];
+    for (const network of networks) {
+      switch (network) {
+        case 'sepolia':
+          configs.push(await initSepolia());
+          break;
+        case 'amoy':
+          configs.push(await initAmoy());
+          break;
+        default:
+          throw new Error(`Unknown network ${network}`);
+      }
     }
 
-    if (args.revert) {
-      await sepoliaConfig.provider.send('evm_revert', [args.revert]);
-      await amoyConfig.provider.send('evm_revert', [args.revert]);
+    const multisigs: Safe[] = [];
+    let contractAddresses: string[][] = [];
+    for (const config of configs) {
+      console.log(`\n\n// ChainId: ${config.network.chainId} //`);
+      const multisig = await deployMultisig(config);
+      multisigs.push(multisig);
 
-      const snapshotIdSepolia = await sepoliaConfig.provider.send(
-        'evm_snapshot',
-        [],
+      const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+      const artifact = artifacts.readArtifactSync('HistoricDataFeedStoreV2');
+      const bytecode = ethers.solidityPacked(
+        ['bytes', 'bytes'],
+        [
+          artifact.bytecode,
+          abiCoder.encode(['address'], [config.signer.address]),
+        ],
       );
-      const snapshotIdAmoy = await amoyConfig.provider.send('evm_snapshot', []);
-      console.log('snapshot id', snapshotIdSepolia, snapshotIdAmoy);
-      return;
+
+      const dataFeedStoreAddress = ethers.getCreate2Address(
+        config.safeAddresses.createCallAddress,
+        ethers.id('dataFeedStore'),
+        ethers.keccak256(bytecode),
+      );
+
+      const addresses = await deployContracts(config, multisig, artifacts, [
+        {
+          name: 'HistoricDataFeedStoreV2',
+          encodedArgs: abiCoder.encode(['address'], [config.signer.address]),
+          salt: ethers.id('dataFeedStore'),
+          value: 0n,
+        },
+        {
+          name: 'UpgradeableProxy',
+          encodedArgs: abiCoder.encode(
+            ['address', 'address'],
+            [dataFeedStoreAddress, config.signer.address],
+          ),
+          salt: ethers.id('proxy'),
+          value: 0n,
+        },
+        {
+          name: 'ChainlinkProxy',
+          encodedArgs: abiCoder.encode(
+            ['string', 'uint8', 'uint32', 'address'],
+            ['ETH/USD', 18, 1, dataFeedStoreAddress],
+          ),
+          salt: ethers.id('aggregator'),
+          value: 0n,
+        },
+        {
+          name: 'FeedRegistry',
+          encodedArgs: abiCoder.encode(
+            ['address', 'address'],
+            [config.signer.address, dataFeedStoreAddress],
+          ),
+          salt: ethers.id('registry'),
+          value: 0n,
+        },
+      ]);
+      contractAddresses.push(addresses);
     }
 
-    console.log(
-      'sepolia signer',
-      sepoliaConfig.signer.address,
-      await sepoliaConfig.provider.getBalance(sepoliaConfig.signer.address),
-    );
-    console.log(
-      'amoy signer   ',
-      amoyConfig.signer.address,
-      await amoyConfig.provider.getBalance(amoyConfig.signer.address),
-    );
+    const file = process.cwd() + '/deployments/deploymentV1.json';
+    try {
+      await fs.open(file, 'r');
+    } catch {
+      await fs.mkdir(path.dirname(file), { recursive: true });
+      await fs.writeFile(file, '{}');
+    }
+    const jsonData = await fs.readFile(file, 'utf8');
+    const parsedData = JSON.parse(jsonData);
 
-    // console.log(
-    //   'contract address deployed',
-    //   (
-    //     await sepoliaProvider.getTransactionReceipt(
-    //       '0x04c0220084770933c98851ddc9c0c63f2851e11814b219345ad5a7a00d1deed7',
-    //     )
-    //   )?.contractAddress,
-    // );
+    for (const [index, config] of configs.entries()) {
+      parsedData[config.network.chainId.toString()] = {
+        SafeMultisig: await multisigs[index].getAddress(),
+        HistoricDataFeedStoreV2: contractAddresses[index][0],
+        UpgradeableProxy: contractAddresses[index][1],
+        ChainlinkProxy: contractAddresses[index][2],
+        FeedRegistry: contractAddresses[index][3],
+      };
+    }
 
-    /*
-    tx hash obj 0x81d728763dfd9cf486d6899f594669322ab46175f8f482d8d6fbfd3335e31fae
-    tx hash 0xc572d3504576704c4cc0d08659af70ec903e1ecbf672320a814cdf00861d1cce */
-    // const trace = await sepoliaConfig.provider.send('debug_tracetransaction', [
-    //   '0xc572d3504576704c4cc0d08659af70ec903e1ecbf672320a814cdf00861d1cce',
-    // ]);
-
-    const sepoliaMultisig = await deployMultisig(sepoliaConfig, 1);
-
-    const amoyMultisig = await deployMultisig(amoyConfig, 1);
-
-    console.log('sepolia multisig', await sepoliaMultisig.getAddress());
-    console.log('amoy multisig', await amoyMultisig.getAddress());
-
-    // const implementationArtifact = artifacts.readArtifactSync(
-    //   'HistoricDataFeedStoreV2',
-    // );
-
-    // const ImplementationFactorySepolia = new ethers.ContractFactory(
-    //   implementationArtifact.abi,
-    //   implementationArtifact.bytecode,
-    //   sepoliaConfig.signer,
-    // );
-    // const deployTx = await ImplementationFactorySepolia.getDeployTransaction(
-    //   await sepoliaMultisig.getAddress(),
-    // );
-    // await deployHistoric(deployTx.data, sepoliaConfig, sepoliaMultisig);
-
-    // const ImplementationFactoryAmoy = new ethers.ContractFactory(
-    //   implementationArtifact.abi,
-    //   implementationArtifact.bytecode,
-    //   amoyConfig.signer,
-    // );
-    // const deployTxAmoy = await ImplementationFactoryAmoy.getDeployTransaction(
-    //   await amoyMultisig.getAddress(),
-    // );
-    // await deployHistoric(deployTxAmoy.data, amoyConfig, amoyMultisig);
-
-    await ownerDeployHistoric(
-      artifacts,
-      sepoliaConfig,
-      await sepoliaMultisig.getAddress(),
-    );
-    await ownerDeployHistoric(
-      artifacts,
-      amoyConfig,
-      await amoyMultisig.getAddress(),
-    );
+    await fs.writeFile(file, JSON.stringify(parsedData, null, 2), 'utf8');
   });
 
-const deployMultisig = async (config: NetworkConfig, threshold: number) => {
+const deployMultisig = async (config: NetworkConfig) => {
   const safeVersion = '1.4.1';
 
   // Create SafeFactory instance
@@ -145,24 +144,15 @@ const deployMultisig = async (config: NetworkConfig, threshold: number) => {
     signer: config.signer.privateKey,
     safeVersion,
     contractNetworks: {
-      [config.provider._network.chainId.toString()]: {
-        multiSendAddress: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
-        multiSendCallOnlyAddress: '0x9641d764fc13c8B624c04430C7356C1C7C8102e2',
-        createCallAddress: '0x9b35Af71d77eaf8d7e40252370304687390A1A52',
-        safeSingletonAddress: '0x41675C099F32341bf84BFc5382aF534df5C7461a',
-        safeProxyFactoryAddress: '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
-        fallbackHandlerAddress: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
-        signMessageLibAddress: '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9',
-        simulateTxAccessorAddress: '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
-      },
+      [config.network.chainId.toString()]: config.safeAddresses,
     },
   });
 
-  console.log('SafeFactory address:', await safeFactory.getAddress());
+  console.log('\nSafeFactory address:', await safeFactory.getAddress());
 
   const safeAccountConfig: SafeAccountConfig = {
-    owners: config.owners.map(owner => owner.address),
-    threshold: threshold,
+    owners: config.owners,
+    threshold: config.threshold,
   };
   const saltNonce = '150000';
 
@@ -175,7 +165,7 @@ const deployMultisig = async (config: NetworkConfig, threshold: number) => {
   console.log('Predicted deployed Safe address:', predictedDeploySafeAddress);
 
   function callback(txHash: string) {
-    console.log('Transaction hash:', txHash);
+    console.log('-> Safe deployment tx hash:', txHash);
   }
 
   // Deploy Safe
@@ -184,40 +174,19 @@ const deployMultisig = async (config: NetworkConfig, threshold: number) => {
     saltNonce,
     callback,
   });
-
-  // return Safe.init({
-  //   provider: config.rpc,
-  //   signer: config.signer.privateKey,
-  //   predictedSafe: {
-  //     safeAccountConfig: {
-  //       owners: config.owners.map(owner => owner.address),
-  //       threshold,
-  //     },
-  //   },
-  //   contractNetworks: {
-  //     [config.provider._network.chainId.toString()]: {
-  //       multiSendAddress: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
-  //       multiSendCallOnlyAddress: '0x9641d764fc13c8B624c04430C7356C1C7C8102e2',
-  //       createCallAddress: '0x9b35Af71d77eaf8d7e40252370304687390A1A52',
-  //       safeSingletonAddress: '0x41675C099F32341bf84BFc5382aF534df5C7461a',
-  //       safeProxyFactoryAddress: '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
-  //       fallbackHandlerAddress: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
-  //       signMessageLibAddress: '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9',
-  //       simulateTxAccessorAddress: '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
-  //     },
-  //   },
-  // });
 };
 
 const initSepolia = async (): Promise<NetworkConfig> => {
-  const provider = new ethers.JsonRpcProvider(RPC_SEPOLIA);
-  const wallet = ethers.Wallet.fromPhrase(SEPOLIA_MNEMONIC, provider);
+  const provider = new ethers.JsonRpcProvider(process.env.RPC_SEPOLIA);
+  const wallet = new Wallet(process.env.SEPOLIA_PK!, provider);
+  const owners: string[] = process.env.SEPOLIA_OWNERS?.split(',') || [];
 
   return {
-    rpc: RPC_SEPOLIA,
+    rpc: process.env.RPC_SEPOLIA!,
     provider,
+    network: await provider.getNetwork(),
     signer: wallet,
-    owners: [wallet.deriveChild(0).connect(provider), wallet],
+    owners: [...owners, wallet.address],
     safeAddresses: {
       multiSendAddress: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
       multiSendCallOnlyAddress: '0x9641d764fc13c8B624c04430C7356C1C7C8102e2',
@@ -228,18 +197,22 @@ const initSepolia = async (): Promise<NetworkConfig> => {
       signMessageLibAddress: '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9',
       simulateTxAccessorAddress: '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
     },
+    threshold: 1,
   };
 };
 
 const initAmoy = async (): Promise<NetworkConfig> => {
-  const provider = new ethers.JsonRpcProvider(RPC_AMOY);
-  const wallet = ethers.Wallet.fromPhrase(AMOY_MNEMONIC, provider);
+  const provider = new ethers.JsonRpcProvider(process.env.RPC_AMOY);
+  // const wallet = ethers.Wallet.fromPhrase(process.env.AMOY_MNEMONIC!, provider);
+  const wallet = new Wallet(process.env.AMOY_PK!, provider);
+  const owners: string[] = process.env.AMOY_OWNERS?.split(',') || [];
 
   return {
-    rpc: RPC_AMOY,
+    rpc: process.env.RPC_AMOY!,
     provider,
+    network: await provider.getNetwork(),
     signer: wallet,
-    owners: [wallet.deriveChild(0).connect(provider), wallet],
+    owners: [...owners, wallet.address],
     safeAddresses: {
       multiSendAddress: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
       multiSendCallOnlyAddress: '0x9641d764fc13c8B624c04430C7356C1C7C8102e2',
@@ -250,123 +223,80 @@ const initAmoy = async (): Promise<NetworkConfig> => {
       signMessageLibAddress: '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9',
       simulateTxAccessorAddress: '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
     },
+    threshold: 1,
   };
 };
 
-const deploySameAddress = async (
-  artifacts: Artifacts,
-  sepoliaConfig: NetworkConfig,
-  amoyConfig: NetworkConfig,
-) => {
-  const proxyArtifact = artifacts.readArtifactSync('UpgradeableProxy');
-  const implementationArtifact = artifacts.readArtifactSync(
-    'HistoricDataFeedStoreV2',
-  );
-
-  const ImplementationFactorySepolia = new ethers.ContractFactory(
-    implementationArtifact.abi,
-    implementationArtifact.bytecode,
-    sepoliaConfig.signer,
-  );
-
-  const deployTx = await ImplementationFactorySepolia.getDeployTransaction(
-    sepoliaConfig.signer.address,
-  );
-  deployTx.nonce = await sepoliaConfig.provider.getTransactionCount(
-    sepoliaConfig.signer.address,
-  );
-
-  const tx1 = await sepoliaConfig.signer.sendTransaction(deployTx);
-  console.log('v1 contract address', (await tx1.wait())?.contractAddress);
-
-  console.log(await tx1.wait());
-};
-
-const deployHistoric = async (
-  data: string,
-  config: NetworkConfig,
+const multisigTxExec = async (
+  transactions: SafeTransactionDataPartial[],
   safe: Safe,
 ) => {
-  const safeTransactionData: SafeTransactionDataPartial = {
-    to: '0x0000000000000000000000000000000000000000', // should be create2 address for contract
-    value: '0',
-    data,
-    operation: OperationType.DelegateCall,
-  };
   const tx: SafeTransaction = await safe.createTransaction({
-    transactions: [safeTransactionData],
+    transactions,
   });
-  const safeTxHash: string = await safe.getTransactionHash(tx);
 
-  const senderSignature = await safe.signTransaction(tx);
+  const safeTransaction = await safe.signTransaction(tx);
 
-  console.log('Proposing transaction:');
-  console.log('  - network:', await config.provider.getNetwork());
-  console.log(`  - safeTxHash: ${safeTxHash}`);
-  console.log('  - signature:', senderSignature.data.to);
+  console.log('\nProposing transaction...');
 
-  const txResponse = await safe.executeTransaction(senderSignature);
-  // console.log('tx', txResponse.transactionResponse);
+  const txResponse = await safe.executeTransaction(safeTransaction);
 
-  console.log('tx hash obj', safeTxHash);
-  console.log('tx hash', txResponse.hash);
-
-  console.log(
-    'tx receipt',
-    await config.provider.getTransactionReceipt(txResponse.hash),
-    await config.provider.getTransaction(txResponse.hash),
-  );
-
-  // await multisig.kit.proposeTransaction({
-  //   safeAddress: await multisig.safe.getAddress(),
-  //   safeTransactionData: tx.data,
-  //   safeTxHash,
-  //   senderAddress: config.signer.address,
-  //   senderSignature: senderSignature.data.data,
-  // });
+  console.log('-> tx hash', txResponse.hash);
 };
 
-const ownerDeployHistoric = async (
-  artifacts: Artifacts,
+const deployContracts = async (
   config: NetworkConfig,
-  safeAddress: string,
+  multisig: Safe,
+  artifacts: Artifacts,
+  contracts: {
+    name: string;
+    encodedArgs: string;
+    salt: string;
+    value: bigint;
+  }[],
 ) => {
-  const implementationArtifact = artifacts.readArtifactSync(
-    'HistoricDataFeedStoreV2',
-  );
+  const createCallAddress = config.safeAddresses.createCallAddress;
 
-  const ImplementationFactorySepolia = new ethers.ContractFactory(
-    implementationArtifact.abi,
-    implementationArtifact.bytecode,
-    config.signer,
-  );
-  let deployTx =
-    await ImplementationFactorySepolia.getDeployTransaction(safeAddress);
-
-  deployTx.nonce = await config.provider.getTransactionCount(
-    config.signer.address,
-  );
-  const tx1 = await config.signer.sendTransaction(deployTx);
-  const implementationAddress = (await tx1.wait())?.contractAddress;
-  console.log('-> contract address', implementationAddress);
-
-  const proxyArtifact = artifacts.readArtifactSync('UpgradeableProxy');
-  const proxyFactory = new ethers.ContractFactory(
-    proxyArtifact.abi,
-    proxyArtifact.bytecode,
+  const createCall = new ethers.Contract(
+    createCallAddress,
+    getCreateCallDeployment()?.abi!,
     config.signer,
   );
 
-  deployTx = await proxyFactory.getDeployTransaction(
-    implementationAddress,
-    safeAddress,
-  );
+  const contractAddresses: string[] = [];
 
-  deployTx.nonce = await config.provider.getTransactionCount(
-    config.signer.address,
-  );
+  const transactions: SafeTransactionDataPartial[] = [];
+  for (const contract of contracts) {
+    const artifact = artifacts.readArtifactSync(contract.name);
+    const bytecode = ethers.solidityPacked(
+      ['bytes', 'bytes'],
+      [artifact.bytecode, contract.encodedArgs],
+    );
 
-  const tx2 = await config.signer.sendTransaction(deployTx);
-  const proxyAddress = (await tx2.wait())?.contractAddress;
-  console.log('-> proxy address', proxyAddress);
+    const contractAddress = ethers.getCreate2Address(
+      createCallAddress,
+      contract.salt,
+      ethers.keccak256(bytecode),
+    );
+    console.log(`\nPredicted ${contract.name} address`, contractAddress);
+
+    const encodedData = createCall.interface.encodeFunctionData(
+      'performCreate2',
+      [0n, bytecode, contract.salt],
+    );
+
+    const safeTransactionData: SafeTransactionDataPartial = {
+      to: createCallAddress,
+      value: '0',
+      data: encodedData,
+      operation: OperationType.Call,
+    };
+    transactions.push(safeTransactionData);
+
+    contractAddresses.push(contractAddress);
+  }
+
+  await multisigTxExec(transactions, multisig);
+
+  return contractAddresses;
 };
