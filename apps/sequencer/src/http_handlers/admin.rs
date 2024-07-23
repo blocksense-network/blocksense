@@ -223,7 +223,6 @@ mod tests {
     use super::*;
     use crate::config::config::init_sequencer_config;
     use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
-    use crate::plugin_registry;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
     use crate::utils::logging::init_shared_logging_handle;
@@ -252,7 +251,6 @@ mod tests {
                 &sequencer_config,
             ))),
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
             providers: providers.clone(),
             log_handle,
             reporters: init_shared_reporters(&sequencer_config),
@@ -292,7 +290,6 @@ mod tests {
         web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(&cfg))),
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
             providers: providers.clone(),
             log_handle,
             reporters: init_shared_reporters(&cfg),

@@ -7,7 +7,6 @@ use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::feeds::{
     votes_result_batcher::votes_result_batcher_loop, votes_result_sender::votes_result_sender_loop,
 };
-use sequencer::plugin_registry;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use tokio::sync::mpsc;
 
@@ -16,9 +15,6 @@ use sequencer::reporters::reporter::init_shared_reporters;
 
 use sequencer::http_handlers::admin::{deploy, get_feed_report_interval, get_key, set_log_level};
 use sequencer::http_handlers::data_feeds::post_report;
-use sequencer::http_handlers::registry::{
-    registry_plugin_get, registry_plugin_size, registry_plugin_upload,
-};
 use sequencer::metrics_collector::metrics_collector::metrics_collector_loop;
 use sequencer::utils::logging::init_shared_logging_handle;
 
@@ -85,7 +81,6 @@ OPTIONS
             &sequencer_config,
         ))),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-        plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
         providers: providers.clone(),
         log_handle,
         reporters: init_shared_reporters(&sequencer_config),
@@ -132,9 +127,6 @@ OPTIONS
                 .service(get_key)
                 .service(deploy)
                 .service(set_log_level)
-                .service(registry_plugin_upload)
-                .service(registry_plugin_get)
-                .service(registry_plugin_size)
                 .service(get_feed_report_interval)
         })
         .workers(1)

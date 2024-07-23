@@ -104,17 +104,15 @@ mod tests {
     use super::*;
     use crate::config::config::init_sequencer_config;
     use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
-    use crate::plugin_registry;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
     use crate::utils::logging::init_shared_logging_handle;
-    use actix_web::{http::header::ContentType, test, App};
     use data_feeds::feeds_processing::naive_packing;
     use data_feeds::types::FeedType;
     use std::env;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};
-    use std::time::{Duration, SystemTime, UNIX_EPOCH};
+    use std::time::Duration;
     use tokio::sync::mpsc::unbounded_channel;
     use utils::to_hex_string;
 
@@ -145,7 +143,6 @@ mod tests {
                 &sequencer_config,
             ))),
             reports: all_feeds_reports_arc,
-            plugin_registry: Arc::new(RwLock::new(plugin_registry::CappedHashMap::new())),
             providers: providers.clone(),
             log_handle,
             reporters: init_shared_reporters(&sequencer_config),
@@ -160,7 +157,7 @@ mod tests {
 
         match received {
             Ok(Some((key, result))) => {
-                /// assert the received data
+                // assert the received data
                 assert_eq!(
                     key,
                     to_hex_string(feed_id.to_be_bytes().to_vec(), None),

@@ -82,7 +82,6 @@ pub async fn votes_result_batcher_loop<
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
-    use std::env;
     use std::time::Duration;
     use tokio::sync::mpsc;
     use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
