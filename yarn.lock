@@ -394,7 +394,8 @@ __metadata:
     "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.0.2"
     "@safe-global/protocol-kit": "npm:^4.0.2"
-    "@safe-global/safe-core-sdk-types": "npm:^5.0.2"
+    "@safe-global/safe-core-sdk-types": "npm:^5.0.3"
+    "@safe-global/safe-deployments": "npm:^1.37.2"
     "@typechain/ethers-v6": "npm:^0.5.1"
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4"
@@ -3275,12 +3276,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@safe-global/safe-core-sdk-types@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "@safe-global/safe-core-sdk-types@npm:5.0.3"
+  dependencies:
+    abitype: "npm:^1.0.2"
+  checksum: 10c0/d4568f718dd2edbd849b4061ad6eafef2b2881efb70dabb7033eed227fc84344bbe0ee74108d800c500899720d032bd4ff9888a35c3878c4ad882f74fbed0a32
+  languageName: node
+  linkType: hard
+
 "@safe-global/safe-deployments@npm:^1.37.0":
   version: 1.37.1
   resolution: "@safe-global/safe-deployments@npm:1.37.1"
   dependencies:
     semver: "npm:^7.6.2"
   checksum: 10c0/626de8376dabd08cc9088e62299e404569cc4660211b96d1b50163e9944503f874788a8fe5b862ae78734a09c1e0317d904d588293fd3de05e92e9aeddc76dcd
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-deployments@npm:^1.37.2":
+  version: 1.37.2
+  resolution: "@safe-global/safe-deployments@npm:1.37.2"
+  dependencies:
+    semver: "npm:^7.6.2"
+  checksum: 10c0/05cf72951715639252c290353c6bbc66192c2585084912d1ee8868a397a1ec26e30d5831e23cd4c0dd9d6d9c556eeef9b239cebdd936ad7fc5f5c9676bd3166c
   languageName: node
   linkType: hard
 

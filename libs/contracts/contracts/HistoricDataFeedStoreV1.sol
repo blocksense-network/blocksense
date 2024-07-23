@@ -42,8 +42,8 @@ contract HistoricDataFeedStoreV1 {
 
   /// @notice Constructor
   /// @dev Sets the owner of the contract - the address that deployed the contract
-  constructor() {
-    owner = msg.sender;
+  constructor(address owner_) {
+    owner = owner_;
   }
 
   /// @notice Fallback function
