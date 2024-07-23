@@ -105,7 +105,6 @@ The `interfaces` folder includes the following key interfaces:
 ### Libraries
 
 The `libraries` folder contains `ProxyCall.sol` - used as an internal library in `FeedRegistry`, `ChainlinkProxy`, and some of the test consumer contracts to call `UpgradeableProxy` or the storage contracts themselves. It provides utilities for low-level static calls to the mentioned contracts to ensure maximum gas optimizations. Moreover, it enables historical data parsing handlers for decoding raw data from the storage.
-`UpgradeableProxy.sol` is a slightly modified version of the Openzeppelin's `TransparentProxy` contract. It stores data in itself and calls its "implementation" contract (i.e. HistoricDataFeedStore) to know how to read or write to its storage. It enables upgradeability of the implementation contract for future fixes or optimizations.
 
 ### Data Feed Store Contracts
 
