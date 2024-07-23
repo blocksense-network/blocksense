@@ -11,7 +11,7 @@ use prometheus::{
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-use sequencer_config::{get_reporter_config_file_path, FeedMetaData, ReporterConfig};
+use sequencer_config::{get_config_file_path, FeedMetaData, ReporterConfig};
 use utils::read_file;
 
 use tracing::{debug, info};
@@ -19,7 +19,7 @@ use tracing::{debug, info};
 use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed, types::DataFeedAPI};
 
 pub fn init_reporter_config() -> ReporterConfig {
-    let config_file_path = get_reporter_config_file_path();
+    let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "/reporter_config.json");
 
     let data = read_file(config_file_path.as_str());
 
@@ -51,7 +51,7 @@ pub async fn orchestrator() {
     let all_feeds = DataFeedAPI::get_all_feeds();
     debug!("All feeds dump - {:?}", all_feeds);
 
-    /// Initialize feed_id_map so we can resolve the id of each feed during dispatch
+    // Initialize feed_id_map so we can resolve the id of each feed during dispatch
     let mut feed_id_map = HashMap::<String, &FeedMetaData>::new();
     for (api, asset) in &all_feeds {
         let feed_name = DataFeedAPI::feed_asset_str(&api, &asset);

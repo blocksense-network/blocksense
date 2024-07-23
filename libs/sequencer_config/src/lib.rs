@@ -51,23 +51,8 @@ pub struct SequencerConfig {
     pub reporters: Vec<Reporter>,
 }
 
-pub fn get_sequencer_config_file_path() -> String {
-    let config_file_name = "/sequencer_config.json";
-
-    let config_file_path = env::var("SEQUENCER_CONFIG_DIR").unwrap_or_else(|_| {
-        let conf_dir = dirs::config_dir().expect("Configuration file path not specified.");
-        conf_dir
-            .to_str()
-            .expect("Configuration file path not valid.")
-            .to_string()
-    });
-    config_file_path + config_file_name
-}
-
-pub fn get_reporter_config_file_path() -> String {
-    let config_file_name = "/reporter_config.json";
-
-    let config_file_path = env::var("REPORTER_CONFIG_DIR").unwrap_or_else(|_| {
+pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) -> String {
+    let config_file_path = env::var(base_path_from_env).unwrap_or_else(|_| {
         let conf_dir = dirs::config_dir().expect("Configuration file path not specified.");
         conf_dir
             .to_str()

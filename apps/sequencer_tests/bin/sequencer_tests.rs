@@ -9,7 +9,7 @@ use data_feeds::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use eyre::Result;
 use json_patch::merge;
 use port_scanner::scan_port;
-use sequencer_config::get_sequencer_config_file_path;
+use sequencer_config::get_config_file_path;
 use serde_json::json;
 use std::fs;
 use std::io::stdout;
@@ -52,7 +52,7 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
         ]
     });
 
-    let config_file_path = get_sequencer_config_file_path();
+    let config_file_path = get_config_file_path("SEQUENCER_CONFIG_DIR", "/sequencer_config.json");
 
     let data = read_file(config_file_path.as_str());
 
