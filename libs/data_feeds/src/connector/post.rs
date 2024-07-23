@@ -15,9 +15,7 @@ use curl::easy::Easy;
 use log::warn;
 use sequencer_config::Reporter;
 use serde_json::Value;
-use std::env;
 use tracing::{debug, info};
-use utils::read_file;
 
 fn handle_feed_response(
     reporter_id: u32,
@@ -43,21 +41,14 @@ fn handle_feed_response(
     }
 }
 
-pub fn get_reporter_secret_config_file_path() -> String {
+pub fn get_reporter_secret_config_file_path(secret_key_file_path: String) -> String {
     let config_file_name = "/reporter_secret_key";
 
-    let secret_key_file_path = env::var("REPORTER_SECRET_KEY_FILE_PATH").unwrap_or_else(|_| {
-        let conf_dir = dirs::config_dir().expect("Configuration file path not specified.");
-        conf_dir
-            .to_str()
-            .expect("Configuration file path not valid.")
-            .to_string()
-    });
     secret_key_file_path + config_file_name
 }
 
 pub fn generate_signature(
-    priv_key_hex: String,
+    priv_key_hex: &String,
     feed_id: &str,
     timestamp: Timestamp,
     feed_result: &FeedResult,
@@ -84,6 +75,7 @@ pub fn generate_signature(
 
 pub async fn post_feed_response(
     reporter: &Reporter,
+    secret_key: &String,
     data_feed: Rc<RefCell<dyn DataFeed>>,
     feed_id: u32,
     asset: &str,
@@ -91,11 +83,8 @@ pub async fn post_feed_response(
 ) {
     let (result, timestamp) = data_feed.borrow_mut().poll(asset).await;
 
-    let secret_key_file_path = get_reporter_secret_config_file_path();
-    let secret_key = read_file(secret_key_file_path.as_str()).trim().to_string();
-
     let signature = generate_signature(
-        secret_key,
+        &secret_key,
         format!("{}", feed_id).as_str(),
         timestamp,
         &result,

@@ -241,8 +241,12 @@ impl OracleTrigger {
             let result = FeedResult::Result {
                 result: FeedType::Numerical(payload.body.unwrap() as f64),
             };
-            let signature =
-                generate_signature(SECRET_KEY.to_string(), feed_id.as_str(), timestamp, &result);
+            let signature = generate_signature(
+                &SECRET_KEY.to_string(),
+                feed_id.as_str(),
+                timestamp,
+                &result,
+            );
             let payload_json = DataFeedPayload {
                 payload_metadata: PayloadMetaData {
                     reporter_id: 1,

@@ -180,7 +180,7 @@ async fn main() -> Result<()> {
     let result = FeedResult::Result {
         result: FeedType::Numerical(REPORT_VAL),
     };
-    let signature = generate_signature(SECRET_KEY.to_string(), FEED_ID, timestamp, &result);
+    let signature = generate_signature(&SECRET_KEY.to_string(), FEED_ID, timestamp, &result);
 
     let payload = DataFeedPayload {
         payload_metadata: PayloadMetaData {

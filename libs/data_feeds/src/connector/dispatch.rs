@@ -4,6 +4,7 @@ use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
 use sequencer_config::{FeedMetaData, ReporterConfig};
 use tracing::debug;
+use utils::read_file;
 
 use crate::{
     interfaces::data_feed::DataFeed,
@@ -66,6 +67,10 @@ pub async fn dispatch(
 ) {
     let feed_subset = feed_selector(feeds, reporter_config.batch_size);
 
+    let secret_key = read_file(reporter_config.secret_key_path.as_str())
+        .trim()
+        .to_string();
+
     for (api, asset) in feed_subset {
         let start_time = Instant::now();
 
@@ -78,6 +83,7 @@ pub async fn dispatch(
 
         post_feed_response(
             &reporter_config.reporter,
+            &secret_key,
             data_feed,
             feed_id,
             &asset,

@@ -18,6 +18,7 @@ pub struct ReporterConfig {
     pub sequencer_url: String,
     pub prometheus_url: String,
     pub poll_period_ms: u64, // TODO(snikolov): Remove once different poll periods are handled in reporter
+    pub secret_key_path: String,
 
     pub reporter: Reporter,
     pub feeds: Vec<FeedMetaData>,
