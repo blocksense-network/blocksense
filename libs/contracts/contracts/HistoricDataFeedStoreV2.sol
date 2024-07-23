@@ -87,11 +87,11 @@ contract HistoricDataFeedStoreV2 {
         // getFeedById(uint32 key) returns (bytes32 value)
         if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_FEED_LATEST) {
           // Store key in memory at the last 4 bytes of the second slot 60-64
-          mstore(0x20, key)
+          mstore(0x00, key)
 
           // keccak256(key) gives the address of the counters mapping
           // then load the value at counters[latest counter] and store it at memory location 0
-          mstore(0x00, sload(add(keccak256(0x3C, 0x04), counter)))
+          mstore(0x00, sload(add(keccak256(0x1C, 0x04), counter)))
         }
         // getLatestCounter(uint32 key) returns (uint256 counter)
         if and(selector, CONTRACT_MANAGEMENT_SELECTOR_GET_LATEST_COUNTER) {
