@@ -89,11 +89,13 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                 <Parameters
                   parameters={_function._parameters}
                   titleLevel={isFromSourceUnit ? 4 : 5}
+                  columns={['type', 'name', 'dataLocation', 'description']}
                 />
                 <Parameters
                   parameters={_function._returnParameters}
                   title="Return Parameters"
                   titleLevel={isFromSourceUnit ? 4 : 5}
+                  columns={['type', 'name', 'dataLocation', 'description']}
                 />
                 <FunctionModifiers functionModifiers={_function._modifiers} />
               </AccordionContent>

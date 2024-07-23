@@ -74,7 +74,10 @@ export const Events = ({ events }: EventsProps) => {
                   Anonymous: {event.anonymous.toString()}
                 </span>
                 <NatSpec natspec={event.natspec} />
-                <Parameters parameters={event._parameters} />
+                <Parameters
+                  parameters={event._parameters}
+                  columns={['type', 'name', 'indexed', 'description']}
+                />
               </AccordionContent>
             </AccordionItem>
           );
