@@ -11,6 +11,7 @@ import { Errors } from '@/sol-contracts-components/Errors';
 import { Functions } from '@/sol-contracts-components/Functions';
 import { Structs } from '@/sol-contracts-components/Structs';
 import { Variables } from '@/sol-contracts-components/Variables';
+import { filterConstants, filterVariables } from '@/utils';
 
 type SourceUnitProps = {
   sourceUnitJsonString: string;
@@ -30,7 +31,12 @@ export const SourceUnit = ({
       <Enums enums={sourceUnit.enums} isFromSourceUnit />
       <Structs structs={sourceUnit.structs} isFromSourceUnit />
       <Variables
-        variables={sourceUnit.variables}
+        variables={filterConstants(sourceUnit.variables)}
+        title="Constants"
+        titleLevel={2}
+      />
+      <Variables
+        variables={filterVariables(sourceUnit.variables)}
         title="Variables"
         titleLevel={2}
       />

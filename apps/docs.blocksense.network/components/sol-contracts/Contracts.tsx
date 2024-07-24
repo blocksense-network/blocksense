@@ -10,6 +10,7 @@ import { Structs } from '@/sol-contracts-components/Structs';
 import { Variables } from '@/sol-contracts-components/Variables';
 import { ContractBaseInfo } from '@/sol-contracts-components/ContractBaseInfo';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
+import { filterConstants, filterVariables } from '@/utils';
 
 type ContractsProps = {
   contracts?: ContractDocItem[];
@@ -25,7 +26,12 @@ export const Contracts = ({ contracts }: ContractsProps) => {
             <Enums enums={contract.enums} />
             <Structs structs={contract.structs} />
             <Variables
-              variables={contract.variables}
+              variables={filterConstants(contract.variables)}
+              title="Constants"
+              titleLevel={3}
+            />
+            <Variables
+              variables={filterVariables(contract.variables)}
               title="Variables"
               titleLevel={3}
             />
