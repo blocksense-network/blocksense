@@ -14,7 +14,7 @@ interface IFeedRegistry is IChainlinkFeedRegistry {
   error OnlyOwner();
 
   /// @notice Contract owner
-  /// @return The address of the owner
+  /// @return owner The address of the owner
   function OWNER() external view returns (address);
 
   /// @notice Set the feed for a given pair

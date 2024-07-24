@@ -8,7 +8,7 @@ library ProxyCall {
   /// @notice Gets the latest answer from the dataFeedStore
   /// @param key The key ID for the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @return The latest stored value after being decoded
+  /// @return answer The latest stored value after being decoded
   function _latestAnswer(
     uint32 key,
     address dataFeedStore

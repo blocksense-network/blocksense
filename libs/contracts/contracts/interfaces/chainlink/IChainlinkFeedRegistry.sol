@@ -7,13 +7,13 @@ interface IChainlinkFeedRegistry {
   /// @notice Get decimals for a feed pair
   /// @param base The base asset of the feed
   /// @param quote The quote asset of the feed
-  /// @return The decimals of the feed pair
+  /// @return decimals The decimals of the feed pair
   function decimals(address base, address quote) external view returns (uint8);
 
   /// @notice Get description for a feed pair
   /// @param base The base asset of the feed
   /// @param quote The quote asset of the feed
-  /// @return The description of the feed pair
+  /// @return description The description of the feed pair
   function description(
     address base,
     address quote

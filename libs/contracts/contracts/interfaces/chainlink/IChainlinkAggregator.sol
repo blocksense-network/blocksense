@@ -3,19 +3,19 @@ pragma solidity ^0.8.24;
 
 interface IChainlinkAggregator {
   /// @notice Decimals for the feed data
-  /// @return The decimals of the feed
+  /// @return decimals The decimals of the feed
   function decimals() external view returns (uint8);
 
   /// @notice Description text for the feed data
-  /// @return The description of the feed
+  /// @return description The description of the feed
   function description() external view returns (string memory);
 
   /// @notice Get the latest answer for the feed
-  /// @return The latest value stored
+  /// @return answer The latest value stored
   function latestAnswer() external view returns (int256);
 
   /// @notice Get the latest round ID for the feed
-  /// @return The latest round ID
+  /// @return roundId The latest round ID
   function latestRound() external view returns (uint256);
 
   /// @notice Get the data for a round at a given round ID
