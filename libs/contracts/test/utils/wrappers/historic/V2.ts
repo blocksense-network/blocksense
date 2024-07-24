@@ -1,3 +1,4 @@
+import { ethers } from 'hardhat';
 import {
   HistoricDataFeedStoreV2,
   IDataFeedStore__factory,
@@ -16,6 +17,7 @@ export class HistoricDataFeedStoreV2Wrapper extends HistoricDataFeedStoreWrapper
   public override async init() {
     this.contract = await deployContract<HistoricDataFeedStoreV2>(
       'HistoricDataFeedStoreV2',
+      (await ethers.getSigners())[0].address,
     );
   }
 
