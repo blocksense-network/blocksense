@@ -13,8 +13,8 @@ use tracing::{debug, info, trace, warn};
 
 use crypto::verify_signature;
 use crypto::Signature;
-use feed_registry::types::{DataFeedPayload, FeedResult, Timestamp};
 use prometheus::{inc_metric, inc_vec_metric};
+use feed_registry::types::{DataFeedPayload, FeedResult, Timestamp};
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
 
