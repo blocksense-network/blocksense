@@ -9,7 +9,7 @@ use eyre::Result;
 use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use json_patch::merge;
 use port_scanner::scan_port;
-use sequencer_config::get_config_file_path;
+use sequencer_config::{get_config_file_path, SequencerConfig};
 use serde_json::json;
 use std::fs;
 use std::io::stdout;
@@ -22,9 +22,11 @@ use tokio::time::Duration;
 use utils::read_file;
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
+const PROVIDERS_KEY_PREFIX: &str = "/tmp/key_";
 const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
-const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
+const REPORTER_SECRET_KEY: &str =
+    "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
 const SEQUENCER_MAIN_PORT: u16 = 8777;
 const SEQUENCER_ADMIN_PORT: u16 = 5557;
 
@@ -43,8 +45,8 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
         "main_port": SEQUENCER_MAIN_PORT,
         "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
-            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0])},
-            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1])}
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0])},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1])}
         },
     });
 
@@ -57,13 +59,17 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
 
     merge(&mut sequencer_config, &config_patch);
 
+    // Check for correctness after patch is applied:
+    let _: SequencerConfig = serde_json::from_str(sequencer_config.to_string().as_str())
+        .expect("Error after patching the config file!");
+
     fs::write("/tmp/sequencer_config.json", sequencer_config.to_string())
         .expect("Unable to write sequencer config file");
 
     let feeds = json!({
         "feeds": [
-            {"id": 0, "name": "DOGE", "report_interval_ms": 7000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-            {"id": 1, "name": "BTC", "report_interval_ms": 7000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
+            {"id": 0, "name": "DOGE", "report_interval_ms": 7000,  "quorum_percentage": 0.006,"first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
+            {"id": 1, "name": "BTC", "report_interval_ms": 7000,  "quorum_percentage": 0.006,"first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
         ]
     });
 
@@ -187,7 +193,12 @@ async fn main() -> Result<()> {
     let result = FeedResult::Result {
         result: FeedType::Numerical(REPORT_VAL),
     };
-    let signature = generate_signature(&SECRET_KEY.to_string(), FEED_ID, timestamp, &result);
+    let signature = generate_signature(
+        &REPORTER_SECRET_KEY.to_string(),
+        FEED_ID,
+        timestamp,
+        &result,
+    );
 
     let payload = DataFeedPayload {
         payload_metadata: PayloadMetaData {

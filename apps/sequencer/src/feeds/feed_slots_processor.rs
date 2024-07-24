@@ -1,7 +1,9 @@
+use crate::reporters::reporter::SharedReporters;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
 use eyre::Report;
 use feed_registry::registry::{AllFeedsReports, SlotTimeTracker};
+use feed_registry::types::FeedResult;
 use feed_registry::types::FeedType;
 use feed_registry::types::{FeedMetaData, Repeatability};
 use ringbuf::traits::Consumer;
@@ -26,18 +28,26 @@ pub async fn feed_slots_processor_loop<
     result_send: UnboundedSender<(K, V)>,
     feed: Arc<RwLock<FeedMetaData>>,
     name: String,
-    report_interval_ms: u64,
-    first_report_start_time: u128,
     reports: Arc<RwLock<AllFeedsReports>>,
     history: Arc<RwLock<FeedAggregateHistory>>,
     key: u32,
+    reporters: SharedReporters,
 ) -> Result<String, Report> {
+    let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
+        let datafeed = feed.read().unwrap();
+        (
+            datafeed.is_oneshot(),
+            datafeed.get_report_interval_ms(),
+            datafeed.get_first_report_start_time_ms(),
+            datafeed.get_quorum_percentage(),
+        )
+    };
+
     let feed_slots_time_tracker = SlotTimeTracker::new(
         Duration::from_millis(report_interval_ms),
         first_report_start_time,
     );
 
-    let is_oneshot = feed.read().unwrap().is_oneshot();
     let mut is_processed = false;
     let repeatability = if is_oneshot {
         Repeatability::Oneshot
@@ -81,11 +91,27 @@ pub async fn feed_slots_processor_loop<
             // Process the reports:
             let mut values: Vec<&FeedType> = vec![];
             for kv in &reports.report {
-                values.push(&kv.1);
+                match kv.1 {
+                    FeedResult::Result { result } => values.push(result),
+                    FeedResult::Error { .. } => todo!(),
+                }
             }
 
             if values.is_empty() {
-                info!("No reports found for slot {}!", &slot);
+                info!("No reports found for feed: {} slot: {}!", name, &slot);
+                continue;
+            }
+
+            let total_votes_count = values.len();
+
+            if (total_votes_count as f32)
+                < (quorum_percentage * reporters.read().unwrap().len() as f32)
+            {
+                info!(
+                    "Insufficient quorum of reports to post to contract for feed: {} slot: {}!",
+                    name, &slot
+                );
+                reports.clear();
                 continue;
             }
 
@@ -157,6 +183,7 @@ mod tests {
     use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::AllFeedsReports;
     use feed_registry::types::FeedMetaData;
+    use std::collections::HashMap;
     use std::sync::{Arc, RwLock};
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::mpsc::unbounded_channel;
@@ -166,8 +193,14 @@ mod tests {
         // setup
         let name = "test_feed";
         let report_interval_ms = 1000; // 1 second interval
+        let quorum_percentage = 0.001;
         let first_report_start_time = SystemTime::now();
-        let feed_metadata = FeedMetaData::new(name, report_interval_ms, first_report_start_time);
+        let feed_metadata = FeedMetaData::new(
+            name,
+            report_interval_ms,
+            quorum_percentage,
+            first_report_start_time,
+        );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
@@ -184,7 +217,9 @@ mod tests {
             all_feeds_reports_arc.write().unwrap().push(
                 feed_id,
                 reporter_id,
-                original_report_data.clone(),
+                FeedResult::Result {
+                    result: original_report_data.clone(),
+                },
             );
         }
 
@@ -205,14 +240,10 @@ mod tests {
                 tx,
                 feed_metadata_arc_clone,
                 name,
-                report_interval_ms,
-                first_report_start_time
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_millis(),
                 all_feeds_reports_arc_clone,
                 history_cp,
                 feed_id,
+                Arc::new(RwLock::new(HashMap::new())),
             )
             .await
             .unwrap();
@@ -253,12 +284,16 @@ mod tests {
         // voting will be 3 seconds long
         let voting_wait_duration_ms = 3000;
 
-        let _feed =
-            FeedMetaData::new_oneshot("TestFeed", voting_wait_duration_ms, voting_start_time);
+        let _feed = FeedMetaData::new_oneshot(
+            "TestFeed",
+            voting_wait_duration_ms,
+            0.001,
+            voting_start_time,
+        );
 
         let name = "test_feed";
         let feed_metadata =
-            FeedMetaData::new_oneshot(name, voting_wait_duration_ms, voting_start_time);
+            FeedMetaData::new_oneshot(name, voting_wait_duration_ms, 0.001, voting_start_time);
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
@@ -274,7 +309,9 @@ mod tests {
             all_feeds_reports_arc.write().unwrap().push(
                 feed_id,
                 reporter_id,
-                original_report_data.clone(),
+                FeedResult::Result {
+                    result: original_report_data.clone(),
+                },
             );
         }
 
@@ -291,14 +328,10 @@ mod tests {
                 tx,
                 feed_metadata_arc_clone,
                 name,
-                voting_wait_duration_ms,
-                voting_start_time
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap()
-                    .as_millis(),
                 all_feeds_reports_arc_clone,
                 feed_aggregate_history_clone,
                 feed_id,
+                Arc::new(RwLock::new(HashMap::new())),
             )
             .await
             .unwrap();
@@ -333,7 +366,9 @@ mod tests {
             all_feeds_reports_arc.write().unwrap().push(
                 feed_id,
                 reporter_id,
-                original_report_data.clone(),
+                FeedResult::Result {
+                    result: original_report_data.clone(),
+                },
             );
         }
 
@@ -353,4 +388,6 @@ mod tests {
             }
         }
     }
+
+    //TODO: Add a test that with quorum 0.6 and one of two reporters only reported then nothing should be written.
 }

@@ -4,14 +4,13 @@ use std::{
     time::{Duration, SystemTime},
 };
 
+use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use sequencer_config::{get_config_file_path, FeedConfig};
 use serde::Deserialize;
 use tokio::time;
 use tracing::{info, trace};
 use utils::{read_file, time::current_unix_time};
-
-use crate::types::{FeedMetaData, FeedType, Repeatability};
 
 pub fn init_feeds_config() -> AllFeedsConfig {
     let config_file_path = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
@@ -57,9 +56,9 @@ impl FeedMetaDataRegistry {
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let start = SystemTime::now();
 
-    let fmd1 = FeedMetaData::new("DOGE/USD", 60000, start);
-    let fmd2 = FeedMetaData::new("BTS/USD", 30000, start);
-    let fmd3 = FeedMetaData::new("ETH/USD", 60000, start);
+    let fmd1 = FeedMetaData::new("DOGE/USD", 60000, 0.6, start);
+    let fmd2 = FeedMetaData::new("BTS/USD", 30000, 0.6, start);
+    let fmd3 = FeedMetaData::new("ETH/USD", 60000, 0.6, start);
 
     let mut fmdr = FeedMetaDataRegistry::new();
 
@@ -79,6 +78,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
             FeedMetaData::new(
                 &feed.name,
                 feed.report_interval_ms,
+                feed.quorum_percentage,
                 feed.first_report_start_time,
             ),
         );
@@ -90,7 +90,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
 // For a given Feed this struct represents the received votes from different reporters.
 #[derive(Debug)]
 pub struct FeedReports {
-    pub report: HashMap<u64, FeedType>,
+    pub report: HashMap<u64, FeedResult>,
 }
 
 impl FeedReports {
@@ -145,7 +145,7 @@ impl AllFeedsReports {
             reports: HashMap::new(),
         }
     }
-    pub fn push(&mut self, feed_id: u32, reporter_id: u64, data: FeedType) -> bool {
+    pub fn push(&mut self, feed_id: u32, reporter_id: u64, data: FeedResult) -> bool {
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
@@ -243,13 +243,13 @@ impl SlotTimeTracker {
 
 #[cfg(test)]
 mod tests {
-
     use utils::time::current_unix_time;
 
     use crate::registry::new_feeds_meta_data_reg_with_test_data;
     use crate::registry::AllFeedsReports;
     use crate::registry::SlotTimeTracker;
     use crate::types::FeedMetaData;
+    use crate::types::FeedResult;
     use crate::types::FeedType;
     use crate::types::Repeatability;
     use crate::types::ReportRelevance;
@@ -397,8 +397,12 @@ mod tests {
         // voting will be 30 seconds long
         let voting_wait_duration_ms = 30000;
 
-        let feed =
-            FeedMetaData::new_oneshot("TestFeed", voting_wait_duration_ms, voting_start_time);
+        let feed = FeedMetaData::new_oneshot(
+            "TestFeed",
+            voting_wait_duration_ms,
+            0.001,
+            voting_start_time,
+        );
 
         assert_eq!(feed.get_name(), "TestFeed");
 
@@ -483,10 +487,18 @@ mod tests {
         // voting will be 30 seconds long
         let voting_wait_duration_ms = 30000;
 
-        let oneshot_feed =
-            FeedMetaData::new_oneshot("TestFeed", voting_wait_duration_ms, voting_start_time);
-        let regular_feed =
-            FeedMetaData::new("TestFeed", voting_wait_duration_ms, current_system_time);
+        let oneshot_feed = FeedMetaData::new_oneshot(
+            "TestFeed",
+            voting_wait_duration_ms,
+            0.001,
+            voting_start_time,
+        );
+        let regular_feed = FeedMetaData::new(
+            "TestFeed",
+            voting_wait_duration_ms,
+            0.001,
+            current_system_time,
+        );
 
         // setup messages
         let message_with_old_timestamp = current_time_as_ms + 40000;
@@ -570,10 +582,13 @@ mod tests {
                         == ReportRelevance::Relevant
                 );
 
-                reports
-                    .write()
-                    .unwrap()
-                    .push(DATA_FEED_ID, i.into(), FeedType::Numerical(0.1));
+                reports.write().unwrap().push(
+                    DATA_FEED_ID,
+                    i.into(),
+                    FeedResult::Result {
+                        result: FeedType::Numerical(0.1),
+                    },
+                );
 
                 println!("this is thread number {}", i);
             }));
@@ -590,9 +605,9 @@ mod tests {
             .expect("ID not present in registry");
         let reports = reports.read().unwrap();
         // Process the reports:
-        let mut values: Vec<&FeedType> = vec![];
+        let mut values: Vec<&FeedResult> = vec![];
         for kv in &reports.report {
-            values.push(&kv.1);
+            values.push(kv.1);
         }
         assert!(values.len() as u32 == NTHREADS);
     }

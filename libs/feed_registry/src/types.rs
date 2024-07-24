@@ -29,6 +29,7 @@ pub struct FeedMetaData {
     name: String,
     voting_repeatability: Repeatability,
     pub report_interval_ms: u64, // Consider oneshot feeds.
+    quorum_percentage: f32,
     first_report_start_time: SystemTime,
     feed_type: Box<dyn FeedAggregate>,
 }
@@ -37,12 +38,14 @@ impl FeedMetaData {
     pub fn new_oneshot(
         n: &str,
         r: u64, // Consider oneshot feeds.
+        q: f32,
         f: SystemTime,
     ) -> FeedMetaData {
         FeedMetaData {
             name: n.to_string(),
             voting_repeatability: Repeatability::Oneshot,
             report_interval_ms: r,
+            quorum_percentage: q,
             first_report_start_time: f,
             feed_type: Box::new(AverageAggregator {}),
         }
@@ -51,12 +54,14 @@ impl FeedMetaData {
     pub fn new(
         n: &str,
         r: u64, // Consider oneshot feeds.
+        q: f32,
         f: SystemTime,
     ) -> FeedMetaData {
         FeedMetaData {
             name: n.to_string(),
             voting_repeatability: Repeatability::Periodic,
             report_interval_ms: r,
+            quorum_percentage: q,
             first_report_start_time: f,
             feed_type: Box::new(AverageAggregator {}), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
         }
@@ -67,6 +72,9 @@ impl FeedMetaData {
     }
     pub fn get_report_interval_ms(&self) -> u64 {
         self.report_interval_ms
+    }
+    pub fn get_quorum_percentage(&self) -> f32 {
+        self.quorum_percentage
     }
     pub fn get_first_report_start_time_ms(&self) -> u128 {
         let since_the_epoch = self

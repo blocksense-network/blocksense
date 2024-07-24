@@ -51,24 +51,18 @@ pub async fn feeds_slots_manager_loop<
 
             let lock_err_msg = "Could not lock feed meta data registry for read";
             let name = feed.read().expect(lock_err_msg).get_name().clone();
-            let report_interval_ms = feed.read().expect(lock_err_msg).get_report_interval_ms();
-            let first_report_start_time = feed
-                .read()
-                .expect(lock_err_msg)
-                .get_first_report_start_time_ms();
-
             let feed_aggregate_history_cp = feed_aggregate_history.clone();
+            let reporters_cp = app_state.reporters.clone();
 
             collected_futures.push(spawn(async move {
                 feed_slots_processor_loop(
                     send_channel,
                     feed,
                     name,
-                    report_interval_ms,
-                    first_report_start_time,
                     rc,
                     feed_aggregate_history_cp,
                     key,
+                    reporters_cp,
                 )
                 .await
             }));
@@ -141,7 +135,9 @@ mod tests {
         all_feeds_reports_arc.write().unwrap().push(
             feed_id,
             reporter_id,
-            original_report_data.clone(),
+            FeedResult::Result {
+                result: original_report_data.clone(),
+            },
         );
         let (vote_send, mut vote_recv): (
             UnboundedSender<(String, String)>,

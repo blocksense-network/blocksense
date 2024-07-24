@@ -127,14 +127,15 @@ pub async fn post_report(
     };
     let reporter_metrics = reporter.read().unwrap().reporter_metrics.clone();
 
-    let result = match data_feed.result {
-        FeedResult::Result { result } => result,
+    let result = match &data_feed.result {
+        FeedResult::Result { result } => {
+            debug!("Recvd result from reporter[{}]: {:?}", reporter_id, result);
+            data_feed.result
+        }
         FeedResult::Error { error } => {
-            info!("Error parsing recvd result of vote: {}", error);
+            info!("Reported error from reporter[{}]: {}", reporter_id, error);
             inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
-            // TODO: Handle Error vote
-
-            return Ok(HttpResponse::Ok().into());
+            data_feed.result
         }
     };
 
@@ -234,6 +235,7 @@ struct RegisterFeedRequest {
     schema_id: String,
     num_slots: u8, // Number of solidity slots needed for this schema
     repeatability: String,
+    quorum_percentage: f32,
     voting_start_time: u128, // Milliseconds since EPOCH
     voting_end_time: u128,   // Milliseconds since EPOCH
 }
@@ -253,9 +255,9 @@ pub async fn register_feed(
     let schema_id = register_request.schema_id.clone();
     let num_slots = register_request.num_slots.clone();
     let repeatability = register_request.repeatability.clone();
+    let quorum_percentage = register_request.quorum_percentage; //TODO: reconsider what impact this field will have on one-shot feeds
     let voting_start_time_ms: u128 = register_request.voting_start_time.clone();
     let voting_end_time_ms: u128 = register_request.voting_end_time.clone();
-
     // STEP 2 - Validate request
     // Validate schema_id is valid UUID
     let schema_id: Uuid = Uuid::parse_str(&schema_id).unwrap();
@@ -292,9 +294,13 @@ pub async fn register_feed(
     // get valid id
     // update data feed registry
     let voting_start_system_time = UNIX_EPOCH + Duration::from_millis(voting_start_time_ms as u64);
-    let mut report_interval_ms = voting_end_time_ms - voting_start_time_ms;
-    let new_feed_metadata =
-        FeedMetaData::new_oneshot(&name, report_interval_ms as u64, voting_start_system_time);
+    let report_interval_ms = voting_end_time_ms - voting_start_time_ms;
+    let new_feed_metadata = FeedMetaData::new_oneshot(
+        &name,
+        report_interval_ms as u64,
+        quorum_percentage,
+        voting_start_system_time,
+    );
     //let voting_start_timestamp = Utc.timestamp_millis(voting_start_time_ms as i64);
     let voting_start_timestamp = Utc
         .timestamp_millis_opt(voting_start_time_ms as i64)
@@ -325,18 +331,17 @@ pub async fn register_feed(
     let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
         Arc::new(RwLock::new(FeedAggregateHistory::new()));
 
-    report_interval_ms = voting_end_time_ms - voting_start_time_ms;
+    let reporters = app_state.reporters.clone();
 
     actix_web::rt::spawn(async move {
         feed_slots_processor_loop(
             app_state.voting_send_channel.clone(),
             registered_feed_metadata,
             name,
-            report_interval_ms as u64,
-            voting_start_time_ms as u128,
             app_state.reports.clone(),
             feed_aggregate_history,
             feed_id,
+            reporters,
         )
         .await
     });
@@ -586,6 +591,7 @@ mod tests {
             schema_id: "de82dccb-953f-4e48-b830-71b820347b12".to_string(),
             num_slots: 2 as u8,
             repeatability: "event_feed".to_string(),
+            quorum_percentage: 0 as f32,
             voting_start_time: SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards")

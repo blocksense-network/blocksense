@@ -25,6 +25,7 @@ pub struct FeedConfig {
     pub script: String,
     pub pair: AssetPair,
     pub report_interval_ms: u64,
+    pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
     pub first_report_start_time: SystemTime,
     pub chainlink_compatiblity: Option<ChainlinkCompatibility>,
 }

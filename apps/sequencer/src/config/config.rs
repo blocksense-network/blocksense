@@ -9,8 +9,13 @@ pub fn init_sequencer_config() -> SequencerConfig {
 
     info!("Using config file: {}", config_file_path.as_str());
 
-    let sequencer_config: SequencerConfig =
-        serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
+    let sequencer_config: SequencerConfig = serde_json::from_str(data.as_str()).expect(
+        format!(
+            "Config file ({}) is not valid JSON!",
+            config_file_path.as_str()
+        )
+        .as_str(),
+    );
 
     sequencer_config
 }
