@@ -33,22 +33,34 @@ interface NetworkConfig {
   threshold: number;
 }
 
+enum NetworkNames {
+  sepolia = 'ETH_SEPOLIA',
+  holesky = 'ETH_HOLESKY',
+  amoy = 'POLYGON_AMOY',
+  manta = 'MANTA_SEPOLIA',
+  fuji = 'AVAX_FUJI',
+  chiado = 'GNOSIS_CHIADO',
+  opSepolia = 'OPTIMISM_SEPOLIA',
+  zkSyncSepolia = 'ZKSYNC_SEPOLIA',
+  baseSepolia = 'BASE_SEPOLIA',
+  specular = 'SPECULAR',
+  scrollSepolia = 'SCROLL_SEPOLIA',
+  arbSepolia = 'ARBITRUM_SEPOLIA',
+  artio = 'BERA_ARTIO',
+  hekla = 'TAIKO_HEKLA',
+}
+
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
   .setAction(async (args, { ethers, artifacts }) => {
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
+    const testNetworks = Object.keys(NetworkNames);
     for (const network of networks) {
-      switch (network) {
-        case 'sepolia':
-          configs.push(await initSepolia());
-          break;
-        case 'amoy':
-          configs.push(await initAmoy());
-          break;
-        default:
-          throw new Error(`Unknown network ${network}`);
+      if (!testNetworks.includes(network)) {
+        throw new Error(`Invalid network: ${network}`);
       }
+      configs.push(await initChain(network));
     }
 
     const multisigs: Safe[] = [];
@@ -176,39 +188,18 @@ const deployMultisig = async (config: NetworkConfig) => {
   });
 };
 
-const initSepolia = async (): Promise<NetworkConfig> => {
-  const provider = new ethers.JsonRpcProvider(process.env.RPC_SEPOLIA);
-  const wallet = new Wallet(process.env.SEPOLIA_PK!, provider);
-  const owners: string[] = process.env.SEPOLIA_OWNERS?.split(',') || [];
+const initChain = async (
+  chianName: keyof typeof NetworkNames,
+): Promise<NetworkConfig> => {
+  const envName = NetworkNames[chianName];
+  const rpc = process.env['RPC_URL_' + envName]!;
+  const provider = new ethers.JsonRpcProvider(rpc);
+  const wallet = new Wallet(process.env['PRIV_KEY_' + envName]!, provider);
+  const owners: string[] =
+    process.env['OWNER_ADDRESSES_' + envName]?.split(',') || [];
 
   return {
-    rpc: process.env.RPC_SEPOLIA!,
-    provider,
-    network: await provider.getNetwork(),
-    signer: wallet,
-    owners: [...owners, wallet.address],
-    safeAddresses: {
-      multiSendAddress: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
-      multiSendCallOnlyAddress: '0x9641d764fc13c8B624c04430C7356C1C7C8102e2',
-      createCallAddress: '0x9b35Af71d77eaf8d7e40252370304687390A1A52',
-      safeSingletonAddress: '0x41675C099F32341bf84BFc5382aF534df5C7461a',
-      safeProxyFactoryAddress: '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
-      fallbackHandlerAddress: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
-      signMessageLibAddress: '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9',
-      simulateTxAccessorAddress: '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
-    },
-    threshold: 1,
-  };
-};
-
-const initAmoy = async (): Promise<NetworkConfig> => {
-  const provider = new ethers.JsonRpcProvider(process.env.RPC_AMOY);
-  // const wallet = ethers.Wallet.fromPhrase(process.env.AMOY_MNEMONIC!, provider);
-  const wallet = new Wallet(process.env.AMOY_PK!, provider);
-  const owners: string[] = process.env.AMOY_OWNERS?.split(',') || [];
-
-  return {
-    rpc: process.env.RPC_AMOY!,
+    rpc,
     provider,
     network: await provider.getNetwork(),
     signer: wallet,
