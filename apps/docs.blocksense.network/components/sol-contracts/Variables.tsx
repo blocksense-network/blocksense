@@ -29,6 +29,19 @@ const getVariableNames = (variables: VariableDocItem[] = []) => {
   );
 };
 
+function getVariableSignature(variable: VariableDocItem): string {
+  const signature: string = variable.signature || '';
+
+  if (variable.constant) {
+    const signatureParts: string[] = signature.split(' ');
+
+    signatureParts.splice(signatureParts.length - 1, 0, 'constant');
+    return signatureParts.join(' ');
+  }
+
+  return signature;
+}
+
 export const Variables = ({
   variables = [],
   title,
@@ -79,7 +92,7 @@ export const Variables = ({
                 <Badge className="contract-item-wrapper__variable-mutability">
                   <span>Mutability: {variable.mutability}</span>
                 </Badge>
-                <Signature signature={variable.signature} />
+                <Signature signature={getVariableSignature(variable)} />
                 <NatSpec natspec={variable.natspec} />
               </AccordionContent>
             </AccordionItem>
