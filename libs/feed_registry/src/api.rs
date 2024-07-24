@@ -1,4 +1,3 @@
-use crate::types::DataFeedAPI;
 use std::collections::HashMap;
 
 lazy_static::lazy_static! {
@@ -11,6 +10,14 @@ lazy_static::lazy_static! {
 
         map
     };
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DataFeedAPI {
+    EmptyAPI,
+    YahooFinanceDataFeed,
+    CoinMarketCapDataFeed,
+    // OpenWeather,
 }
 
 impl DataFeedAPI {

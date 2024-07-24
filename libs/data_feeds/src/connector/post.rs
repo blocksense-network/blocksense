@@ -4,10 +4,10 @@ use std::{
     rc::Rc,
 };
 
-use crate::{
-    interfaces::data_feed::DataFeed,
-    types::{DataFeedPayload, FeedResult, PayloadMetaData, Timestamp},
-};
+use crate::interfaces::data_feed::DataFeed;
+
+use feed_registry::types::{DataFeedPayload, FeedResult, PayloadMetaData, Timestamp};
+
 use crypto::deserialize_priv_key;
 use crypto::sign_message;
 use crypto::{JsonSerializableSignature, Signature};

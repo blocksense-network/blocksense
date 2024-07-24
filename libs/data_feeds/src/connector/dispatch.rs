@@ -1,5 +1,6 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
+use feed_registry::api::DataFeedAPI;
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
 use sequencer_config::{FeedMetaData, ReporterConfig};
@@ -9,7 +10,6 @@ use utils::read_file;
 use crate::{
     interfaces::data_feed::DataFeed,
     services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooFinanceDataFeed},
-    types::DataFeedAPI,
 };
 
 use super::post::post_feed_response;

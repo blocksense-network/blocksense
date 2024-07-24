@@ -1,5 +1,5 @@
 use data_feeds::services::aggregate::{AverageAggregator, FeedAggregate};
-use data_feeds::types::FeedType;
+use feed_registry::types::FeedType;
 use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
 use ringbuf::{HeapRb, SharedRb};

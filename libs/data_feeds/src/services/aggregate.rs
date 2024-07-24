@@ -1,6 +1,22 @@
 use std::fmt::{Debug, Display};
 
-use crate::types::FeedType;
+use feed_registry::types::FeedType;
+
+pub enum ConsensusMetric {
+    Median,
+    Mean(AverageAggregator),
+}
+
+#[allow(unreachable_patterns)]
+impl Display for ConsensusMetric {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            ConsensusMetric::Median => write!(f, "TODO(snikolov): Median"),
+            ConsensusMetric::Mean(x) => write!(f, "{}", x),
+            _ => write!(f, "Display not implemented for ConsensusMetric!"),
+        }
+    }
+}
 
 pub trait FeedAggregate: Send + Sync {
     fn aggregate(&self, values: Vec<&FeedType>) -> FeedType;

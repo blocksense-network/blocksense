@@ -13,7 +13,7 @@ use eyre::eyre;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
 use crate::feeds::feeds_registry::Repeatability;
-use data_feeds::types::FeedType;
+use feed_registry::types::FeedType;
 use prometheus::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
 use tracing::info_span;

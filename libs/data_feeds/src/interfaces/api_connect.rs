@@ -1,4 +1,4 @@
-use crate::types::DataFeedAPI;
+use feed_registry::types::DataFeedAPI;
 
 use super::data_feed::DataFeed;
 

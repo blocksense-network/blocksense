@@ -6,3 +6,8 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
+crypto = { path = "../crypto" }
+
+lazy_static = "1.4.0"
+serde = { version = "1.0.197", features = ["derive"] }
+thiserror = "1.0.61"

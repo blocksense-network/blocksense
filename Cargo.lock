@@ -2944,8 +2944,8 @@ dependencies = [
  "derive",
  "dirs 5.0.1",
  "erased-serde",
+ "feed_registry",
  "fred-rs",
- "lazy_static 1.4.0",
  "log",
  "prometheus 0.0.1",
  "rand 0.8.5",
@@ -3548,6 +3548,12 @@ dependencies = [
 [[package]]
 name = "feed_registry"
 version = "0.0.1"
+dependencies = [
+ "crypto",
+ "lazy_static 1.4.0",
+ "serde 1.0.203",
+ "thiserror",
+]
 
 [[package]]
 name = "ff"
@@ -7977,6 +7983,7 @@ dependencies = [
  "data_feeds",
  "envload",
  "eyre",
+ "feed_registry",
  "futures",
  "futures-util",
  "once_cell",
@@ -8016,6 +8023,7 @@ dependencies = [
  "curl",
  "data_feeds",
  "eyre",
+ "feed_registry",
  "futures",
  "json-patch",
  "port_scanner",
@@ -9813,6 +9821,7 @@ dependencies = [
  "clap 3.2.25",
  "crypto",
  "data_feeds",
+ "feed_registry",
  "futures",
  "is-terminal",
  "log",

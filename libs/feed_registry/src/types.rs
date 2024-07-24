@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
 use thiserror::Error;
 
-use crate::services::aggregate::AverageAggregator;
 use crypto::JsonSerializableSignature;
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
@@ -50,22 +49,6 @@ impl FeedType {
                     String::from_utf8(bytes).map_err(|_| "Invalid UTF-8 sequence".to_string())?;
                 Ok(FeedType::Text(s))
             }
-        }
-    }
-}
-
-pub enum ConsensusMetric {
-    Median,
-    Mean(AverageAggregator),
-}
-
-#[allow(unreachable_patterns)]
-impl Display for ConsensusMetric {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            ConsensusMetric::Median => write!(f, "TODO(snikolov): Median"),
-            ConsensusMetric::Mean(x) => write!(f, "{}", x),
-            _ => write!(f, "Display not implemented for ConsensusMetric!"),
         }
     }
 }

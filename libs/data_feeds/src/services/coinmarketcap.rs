@@ -1,16 +1,15 @@
 use async_trait::async_trait;
 use cmc::Cmc;
+use feed_registry::types::{DataFeedAPI, FeedError, FeedResult, FeedType, Timestamp};
 use ringbuf::{self, storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use tracing::{trace, warn};
 use utils::{current_unix_time, get_env_var, read_file};
 
-use crate::{
-    interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical},
-    types::{ConsensusMetric, DataFeedAPI, FeedError, FeedResult, FeedType, Timestamp},
-};
 use derive::{ApiConnect, Historical};
 
-use super::aggregate::AverageAggregator;
+use crate::interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical};
+
+use super::aggregate::{AverageAggregator, ConsensusMetric};
 
 #[derive(ApiConnect, Historical)]
 pub struct CoinMarketCapDataFeed {
@@ -63,13 +62,3 @@ impl DataFeed for CoinMarketCapDataFeed {
         }
     }
 }
-
-// impl From<CmcErrors> for FeedError {
-//     fn from(error: CmcErrors) -> Self {
-//         match error {
-//             // CmcErrors::RequestError(reqwest_error) => FeedError::RequestError(reqwest_error),
-//             CmcErrors::ApiError(api_error) => FeedError::APIError(api_error),
-//             _ => FeedError::UndefinedError,
-//         }
-//     }
-// }

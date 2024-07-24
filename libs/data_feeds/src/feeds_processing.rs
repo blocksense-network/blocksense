@@ -1,6 +1,6 @@
 use utils::to_hex_string;
 
-use crate::types::FeedType;
+use feed_registry::types::FeedType;
 
 pub const REPORT_HEX_SIZE: usize = 64;
 

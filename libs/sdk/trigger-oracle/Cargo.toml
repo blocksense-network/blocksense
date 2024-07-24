@@ -6,6 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+data_feeds = { path = "../../data_feeds"}
+feed_registry = { path = "../../feed_registry"}
+crypto = { path = "../../crypto"}
+
 anyhow = "1.0.68"
 clap = { version = "3.1.15", features = ["derive", "env"] }
 futures = "0.3"
@@ -14,8 +18,7 @@ log = "0.4.21"
 reqwest = { version = "0.12", features=["json"] }
 serde = "1.0"
 serde_json = "1.0"
-data_feeds = { path = "../../data_feeds"}
-crypto = { path = "../../crypto"}
+
 
 spin-app = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 spin-core = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}

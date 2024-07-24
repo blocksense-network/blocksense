@@ -1,7 +1,7 @@
 use clap::Args;
 use crypto::JsonSerializableSignature;
 use data_feeds::connector::post::generate_signature;
-use data_feeds::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
+use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use serde::{Deserialize, Serialize};
 use spin_app::MetadataKey;
 use spin_core::{async_trait, InstancePre};

@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::types::Bytes32;
+use feed_registry::types::Bytes32;
 
 pub fn string_to_bytes32(x: String) -> Result<Bytes32, ConversionError> {
     let string_bytes = x.as_bytes();

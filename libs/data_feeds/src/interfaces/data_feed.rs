@@ -1,6 +1,8 @@
 use async_trait::async_trait;
 
-use crate::types::{ConsensusMetric, FeedResult, Timestamp};
+use feed_registry::types::{FeedResult, Timestamp};
+
+use crate::services::aggregate::ConsensusMetric;
 
 use super::{api_connect::ApiConnect, historical::Historical};
 

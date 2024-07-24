@@ -10,9 +10,9 @@ extern crate derive;
 use derive::{ApiConnect, Historical};
 
 use crate::interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical};
-use crate::types::{ConsensusMetric, DataFeedAPI, FeedError, FeedResult, FeedType, Timestamp};
+use feed_registry::types::{DataFeedAPI, FeedError, FeedResult, FeedType, Timestamp};
 
-use super::aggregate::AverageAggregator;
+use super::aggregate::{AverageAggregator, ConsensusMetric};
 
 #[async_trait(?Send)]
 impl DataFeed for YahooFinanceDataFeed {

@@ -13,8 +13,7 @@ use tracing::{debug, info, trace, warn};
 
 use crypto::verify_signature;
 use crypto::Signature;
-use data_feeds::types::Timestamp;
-use data_feeds::types::{DataFeedPayload, FeedResult};
+use feed_registry::types::{DataFeedPayload, FeedResult, Timestamp};
 use prometheus::{inc_metric, inc_vec_metric};
 
 const MAX_SIZE: usize = 262_144; // max payload size is 256k
@@ -231,7 +230,7 @@ mod tests {
     use actix_web::{test, App};
     use crypto::JsonSerializableSignature;
     use data_feeds::connector::post::generate_signature;
-    use data_feeds::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
+    use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
     use std::env;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};

@@ -16,7 +16,8 @@ use utils::read_file;
 
 use tracing::{debug, info};
 
-use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed, types::DataFeedAPI};
+use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed};
+use feed_registry::api::DataFeedAPI;
 
 pub fn init_reporter_config() -> ReporterConfig {
     let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "/reporter_config.json");
