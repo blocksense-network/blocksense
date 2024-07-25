@@ -72,8 +72,14 @@ pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr:
     bytecode.to_string() != "0x"
 }
 
-pub async fn init_shared_rpc_providers(conf: &SequencerConfig) -> SharedRpcProviders {
-    Arc::new(std::sync::RwLock::new(get_rpc_providers(conf).await))
+pub async fn init_shared_rpc_providers(
+    conf: &SequencerConfig,
+    prefix: Option<&str>,
+) -> SharedRpcProviders {
+    let prefix = prefix.unwrap_or("");
+    Arc::new(std::sync::RwLock::new(
+        get_rpc_providers(conf, prefix).await,
+    ))
 }
 
 async fn verify_contract_exists(
@@ -127,11 +133,14 @@ async fn verify_contract_exists(
     }
 }
 
-async fn get_rpc_providers(conf: &SequencerConfig) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
+async fn get_rpc_providers(
+    conf: &SequencerConfig,
+    prefix: &str,
+) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
 
     let provider_metrics = Arc::new(std::sync::RwLock::new(
-        ProviderMetrics::new().expect("Failed to allocate ProviderMetrics"),
+        ProviderMetrics::new(prefix).expect("Failed to allocate ProviderMetrics"),
     ));
 
     for (key, p) in &conf.providers {
@@ -223,7 +232,7 @@ mod tests {
 
         let cfg = get_test_config_with_single_provider(network, "/tmp/key", &anvil.endpoint());
 
-        let providers = get_rpc_providers(&cfg).await;
+        let providers = get_rpc_providers(&cfg, "basic_test_provider_").await;
         let provider = &providers.get(network).unwrap().lock().await.provider;
 
         let alice = anvil.addresses()[7];
@@ -265,7 +274,7 @@ mod tests {
         write(key_path, private_key).expect("Failed to write to temp file");
 
         let cfg = get_test_config_with_single_provider(network, key_path, "http://localhost:8545");
-        let providers = get_rpc_providers(&cfg).await;
+        let providers = get_rpc_providers(&cfg, "test_get_wallet_success_").await;
 
         // Call the function
         let wallet = &providers[network].lock().await.wallet;
@@ -288,7 +297,11 @@ mod tests {
         let cfg = get_test_config_with_single_provider(network, key_path, "http://localhost:8545");
 
         // test
-        let binding = init_shared_rpc_providers(&cfg).await;
+        let binding = init_shared_rpc_providers(
+            &cfg,
+            Some("test_get_rpc_providers_returns_single_provider_"),
+        )
+        .await;
         let result = binding.read().unwrap();
 
         // assert

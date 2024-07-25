@@ -332,7 +332,9 @@ mod tests {
             get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
 
         // give some time for cleanup env variables
-        let providers = init_shared_rpc_providers(&cfg).await;
+        let providers =
+            init_shared_rpc_providers(&cfg, Some("test_deploy_contract_returns_valid_address_"))
+                .await;
 
         // run
         let result = deploy_contract(&String::from(network), &providers, Periodic).await;
@@ -374,7 +376,8 @@ mod tests {
 
         let first_secret_key = anvil.keys().first().unwrap();
         let secret_key_bytes = first_secret_key.to_bytes();
-        let providers = init_shared_rpc_providers(&cfg).await;
+        let providers =
+            init_shared_rpc_providers(&cfg, Some("test_eth_batch_send_to_oneshot_contract_")).await;
 
         // run
         let result = deploy_contract(&String::from(network), &providers, Oneshot).await;
@@ -437,7 +440,9 @@ mod tests {
             (network2, key_path, anvil_network2.endpoint().as_str()),
         ]);
 
-        let providers = init_shared_rpc_providers(&cfg).await;
+        let providers =
+            init_shared_rpc_providers(&cfg, Some("test_eth_batch_send_to_all_oneshot_contracts_"))
+                .await;
 
         // run
         let result = deploy_contract(&String::from(network1), &providers, Oneshot).await;

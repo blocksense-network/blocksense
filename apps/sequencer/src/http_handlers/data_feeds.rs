@@ -245,7 +245,11 @@ mod tests {
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config();
 
-        let providers = init_shared_rpc_providers(&sequencer_config).await;
+        let providers = init_shared_rpc_providers(
+            &sequencer_config,
+            Some("post_report_from_unknown_reporter_fails_with_401_"),
+        )
+        .await;
 
         let app_state = web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -254,7 +258,10 @@ mod tests {
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(&sequencer_config),
+            reporters: init_shared_reporters(
+                &sequencer_config,
+                Some("post_report_from_unknown_reporter_fails_with_401_"),
+            ),
         });
 
         let app =

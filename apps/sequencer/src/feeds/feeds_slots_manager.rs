@@ -125,7 +125,9 @@ mod tests {
         let sequencer_config = init_sequencer_config();
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
-        let providers = init_shared_rpc_providers(&sequencer_config).await;
+        let providers =
+            init_shared_rpc_providers(&sequencer_config, Some("test_feed_slots_manager_loop_"))
+                .await;
 
         let original_report_data = FeedType::Numerical(13.0);
 
@@ -145,7 +147,10 @@ mod tests {
             reports: all_feeds_reports_arc,
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(&sequencer_config),
+            reporters: init_shared_reporters(
+                &sequencer_config,
+                Some("test_feed_slots_manager_loop_"),
+            ),
         });
 
         let (tx, mut rx) = unbounded_channel::<(String, String)>();

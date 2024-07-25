@@ -74,7 +74,7 @@ OPTIONS
         std::process::exit(0);
     });
 
-    let providers = init_shared_rpc_providers(&sequencer_config).await;
+    let providers = init_shared_rpc_providers(&sequencer_config, None).await;
 
     let app_state = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -83,7 +83,7 @@ OPTIONS
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
         providers: providers.clone(),
         log_handle,
-        reporters: init_shared_reporters(&sequencer_config),
+        reporters: init_shared_reporters(&sequencer_config, None),
     });
 
     let (vote_send, vote_recv) = mpsc::unbounded_channel();

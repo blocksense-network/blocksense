@@ -16,14 +16,15 @@ pub type Reporters = HashMap<u64, SharedReporter>;
 
 pub type SharedReporters = Arc<RwLock<Reporters>>;
 
-pub fn init_shared_reporters(conf: &SequencerConfig) -> SharedReporters {
-    Arc::new(RwLock::new(init_reporters(conf)))
+pub fn init_shared_reporters(conf: &SequencerConfig, prefix: Option<&str>) -> SharedReporters {
+    let prefix = prefix.unwrap_or("");
+    Arc::new(RwLock::new(init_reporters(conf, prefix)))
 }
 
-fn init_reporters(conf: &SequencerConfig) -> HashMap<u64, Arc<RwLock<Reporter>>> {
+fn init_reporters(conf: &SequencerConfig, prefix: &str) -> HashMap<u64, Arc<RwLock<Reporter>>> {
     let mut reporters = HashMap::new();
     let reporter_metrics = Arc::new(std::sync::RwLock::new(
-        ReporterMetrics::new().expect("Failed to allocate ReporterMetrics."),
+        ReporterMetrics::new(prefix).expect("Failed to allocate ReporterMetrics."),
     ));
     for r in &conf.reporters {
         reporters.insert(

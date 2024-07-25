@@ -234,7 +234,9 @@ mod tests {
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config();
 
-        let providers = init_shared_rpc_providers(&sequencer_config).await;
+        let providers =
+            init_shared_rpc_providers(&sequencer_config, Some("test_get_feed_report_interval_"))
+                .await;
 
         let app_state = web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -243,7 +245,10 @@ mod tests {
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(&sequencer_config),
+            reporters: init_shared_reporters(
+                &sequencer_config,
+                Some("test_get_feed_report_interval_"),
+            ),
         });
 
         let app = test::init_service(
@@ -273,7 +278,8 @@ mod tests {
     ) -> web::Data<FeedsState> {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
 
-        let providers = init_shared_rpc_providers(&cfg).await;
+        let providers =
+            init_shared_rpc_providers(&cfg, Some("create_app_state_from_sequencer_config_")).await;
 
         let log_handle = init_shared_logging_handle();
 
@@ -282,7 +288,7 @@ mod tests {
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(&cfg),
+            reporters: init_shared_reporters(&cfg, Some("create_app_state_from_sequencer_config_")),
         })
     }
 
