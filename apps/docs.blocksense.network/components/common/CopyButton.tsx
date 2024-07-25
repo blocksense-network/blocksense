@@ -12,7 +12,7 @@ export const CopyButton = ({ textToCopy }: CopyButtonProps) => {
     setIsCopied(true);
     setTimeout(() => {
       setIsCopied(false);
-    }, 1500);
+    }, 2000);
   };
 
   return isCopied ? (
