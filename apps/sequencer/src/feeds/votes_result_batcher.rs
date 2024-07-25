@@ -4,6 +4,7 @@ use feed_registry::types::Repeatability;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::io::Error;
+// use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
 use tracing::{debug, error, info, info_span};
@@ -81,6 +82,7 @@ pub async fn votes_result_batcher_loop<
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    // use std::sync::{Arc, RwLock};
     use std::time::Duration;
     use tokio::sync::mpsc;
     use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
@@ -101,7 +103,14 @@ mod tests {
             UnboundedReceiver<HashMap<&str, &str>>,
         ) = mpsc::unbounded_channel();
 
-        super::votes_result_batcher_loop(vote_recv, batched_votes_send, batch_size, duration).await;
+        super::votes_result_batcher_loop(
+            //Arc::new(RwLock::new(vote_recv)),
+            vote_recv,
+            batched_votes_send,
+            batch_size,
+            duration,
+        )
+        .await;
 
         // Send test votes
         let k1 = "test_key_1";

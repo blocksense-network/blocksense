@@ -112,6 +112,7 @@ mod tests {
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};
     use std::time::Duration;
+    use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
     use tokio::sync::mpsc::unbounded_channel;
     use utils::logging::init_shared_logging_handle;
     use utils::to_hex_string;
@@ -139,7 +140,10 @@ mod tests {
             reporter_id,
             original_report_data.clone(),
         );
-
+        let (vote_send, mut vote_recv): (
+            UnboundedSender<(String, String)>,
+            UnboundedReceiver<(String, String)>,
+        ) = mpsc::unbounded_channel();
         let app_state = web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &sequencer_config,
@@ -151,14 +155,14 @@ mod tests {
                 &sequencer_config,
                 Some("test_feed_slots_manager_loop_"),
             ),
+            feed_id_allocator: Arc::new(RwLock::new(None)),
+            voting_send_channel: vote_send.clone(),
         });
 
-        let (tx, mut rx) = unbounded_channel::<(String, String)>();
-
-        let future = feeds_slots_manager_loop(app_state, tx).await;
+        let _future = feeds_slots_manager_loop(app_state, vote_send.clone()).await;
 
         // Attempt to receive with a timeout of 2 seconds
-        let received = tokio::time::timeout(Duration::from_secs(60), rx.recv()).await;
+        let received = tokio::time::timeout(Duration::from_secs(60), vote_recv.recv()).await;
 
         match received {
             Ok(Some((key, result))) => {

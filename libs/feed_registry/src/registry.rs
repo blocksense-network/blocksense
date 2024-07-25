@@ -451,7 +451,7 @@ mod tests {
     fn test_time_to_slot_end_ms() {
         // setup
         let current_system_time = SystemTime::now();
-        let mut current_time_as_ms = current_system_time
+        let current_time_as_ms = current_system_time
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_millis();

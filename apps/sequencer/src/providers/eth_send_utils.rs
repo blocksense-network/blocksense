@@ -42,6 +42,7 @@ sol! {
     #[sol(rpc, bytecode="60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033")]
     contract SportsDataFeedStoreV2 {
         function setFeeds(bytes calldata) external;
+        function getFeedById(uint32 key, uint256 len) external view returns (bytes32);
     }
 }
 
@@ -300,15 +301,17 @@ mod tests {
     use alloy::primitives::{address, Address};
     use alloy::{node_bindings::Anvil, providers::Provider};
     use feed_registry::types::Repeatability::Oneshot;
+    use actix_web::Handler;
+    use alloy::node_bindings::Anvil;
+    use alloy::primitives::{Address, TxKind};
+    use alloy::rpc::types::eth::TransactionInput;
     use regex::Regex;
     use sequencer_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,
     };
     use std::collections::HashMap;
-    use std::io::{self, Read};
     use std::str::FromStr;
-    use std::time::UNIX_EPOCH;
-    use std::{env, fs::File, io::Write};
+    use std::{fs::File, io::Write};
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -406,17 +409,60 @@ mod tests {
         let provider = providers.get("ETH333").unwrap();
 
         // Updates for Oneshot
+        /*
+        struct FootballData {
+             uint32 homeScore;
+             uint32 awayScore;
+             uint32 homeShots;
+             uint32 awayShots;
+             uint32 homePenalties;
+             uint32 awayPenalties;
+             uint32 homeSaves;
+             uint32 awaySaves;
+             uint32 homeFirstHalfTimeScore;
+             uint32 awayFirstHalfTimeScore;
+        }
+        */
+        let result_key = String::from("00000003"); // 4 bytes of zeroes in hex
+        let number_of_slots: String = String::from("0002"); // number 2 in two-bytes hex
         let slot1 =
-            String::from("0404040404040404040404040404040404040404040404040404040404040404");
+            String::from("0000000100000002000000030000000400000005000000060000000700000008");
         let slot2 =
-            String::from("0505050505050505050505050505050505050505050505050505050505050505");
-        let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
+            String::from("0000000900000001000000000000000000000000000000000000000000000000");
+        let payload: String = format!("{}{}", slot1, slot2);
+        let description =
+            String::from("0000000000000000000000000000000000000000000000000000000000000000");
+        let result_value = format!("{}{}{}", number_of_slots, payload, description);
         let mut updates_oneshot: HashMap<String, String> = HashMap::new();
-        updates_oneshot.insert(String::from("00000003"), value1);
+        updates_oneshot.insert(result_key, result_value);
         let result =
             eth_batch_send_to_contract(net.clone(), provider.clone(), updates_oneshot, Oneshot)
                 .await;
         assert!(result.is_ok());
+        // getter calldata will be:
+        // 0x800000030000000000000000000000000000000000000000000000000000000000000002
+        let calldata = String::from(
+            "0x800000030000000000000000000000000000000000000000000000000000000000000002",
+        );
+        let calldata_bytes = Bytes::from_hex(calldata).expect("Invalid calldata");
+        let address_to_send = provider.lock().await.event_contract_address.unwrap();
+        let result = provider
+            .lock()
+            .await
+            .provider
+            .call(&TransactionRequest {
+                to: Some(TxKind::Call(address_to_send)),
+                input: TransactionInput {
+                    input: Some(calldata_bytes.clone()),
+                    data: Some(calldata_bytes.clone()),
+                },
+                ..Default::default()
+            })
+            .await;
+        println!("@@0b result: {:?}", result);
+        assert!(result.is_ok(), "Call to getFeedById failed");
+        let output = result.unwrap();
+        assert_eq!(output.len(), 64, "Invalid output length");
     }
 
     #[actix_web::test]

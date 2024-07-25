@@ -209,7 +209,6 @@ async fn get_rpc_providers(
 mod tests {
     use super::*;
     use std::fs::write;
-    use std::{fs::File, io::Write};
 
     use alloy::{
         network::TransactionBuilder, node_bindings::Anvil, primitives::U256,
@@ -220,9 +219,6 @@ mod tests {
     use crate::providers::provider::get_rpc_providers;
     use alloy::providers::Provider as AlloyProvider;
     use sequencer_config::get_test_config_with_single_provider;
-    use sequencer_config::Provider;
-    use sequencer_config::SequencerConfig;
-    use std::collections::HashMap;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
@@ -289,7 +285,6 @@ mod tests {
         let network = "ETH2";
         // Create a temporary file with a valid private key
         let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
-        let expected_wallet_address = "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955"; // generated as hash of private_key
 
         let key_path = "/tmp/key";
 

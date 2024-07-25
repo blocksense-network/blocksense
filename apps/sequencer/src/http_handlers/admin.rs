@@ -76,7 +76,7 @@ async fn get_key_from_contract(
 }
 
 #[get("/deploy/{network}/{feed_type}")]
-async fn deploy(
+pub async fn deploy(
     path: web::Path<(String, String)>,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
@@ -109,7 +109,7 @@ async fn deploy(
 }
 
 #[get("/get_key/{network}/{key}")] // network is the name provided in config, key is hex string
-async fn get_key(req: HttpRequest, app_state: web::Data<FeedsState>) -> impl Responder {
+pub async fn get_key(req: HttpRequest, app_state: web::Data<FeedsState>) -> impl Responder {
     let span = info_span!("get_key");
     let _guard = span.enter();
     let bad_input = error::ErrorBadRequest("Incorrect input.");
@@ -131,7 +131,7 @@ async fn get_key(req: HttpRequest, app_state: web::Data<FeedsState>) -> impl Res
 }
 
 #[post("/main_log_level/{log_level}")]
-async fn set_log_level(
+pub async fn set_log_level(
     req: HttpRequest,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
@@ -157,7 +157,7 @@ async fn set_log_level(
 }
 
 #[get("/get_feed_report_interval/{feed_id}")]
-async fn get_feed_report_interval(
+pub async fn get_feed_report_interval(
     req: HttpRequest,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
@@ -214,16 +214,17 @@ mod tests {
     use crate::config::config::init_sequencer_config;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
+    use crate::utils::logging::init_shared_logging_handle;
     use actix_web::{http::header::ContentType, test, App};
     use alloy::node_bindings::Anvil;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use regex::Regex;
     use sequencer_config::get_test_config_with_single_provider;
     use std::env;
-    use std::fs::File;
-    use std::io::Write;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};
+    use tokio::sync::mpsc;
+    use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
     use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
@@ -238,6 +239,10 @@ mod tests {
             init_shared_rpc_providers(&sequencer_config, Some("test_get_feed_report_interval_"))
                 .await;
 
+        let (vote_send, _vote_recv): (
+            UnboundedSender<(String, String)>,
+            UnboundedReceiver<(String, String)>,
+        ) = mpsc::unbounded_channel();
         let app_state = web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &sequencer_config,
@@ -249,6 +254,8 @@ mod tests {
                 &sequencer_config,
                 Some("test_get_feed_report_interval_"),
             ),
+            feed_id_allocator: Arc::new(RwLock::new(None)),
+            voting_send_channel: vote_send,
         });
 
         let app = test::init_service(
@@ -283,12 +290,20 @@ mod tests {
 
         let log_handle = init_shared_logging_handle();
 
+        let (vote_send, _vote_recv): (
+            UnboundedSender<(String, String)>,
+            UnboundedReceiver<(String, String)>,
+        ) = mpsc::unbounded_channel();
+        let send_channel: UnboundedSender<(String, String)> = vote_send.clone();
+
         web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(&cfg))),
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
             log_handle,
             reporters: init_shared_reporters(&cfg, Some("create_app_state_from_sequencer_config_")),
+            feed_id_allocator: Arc::new(RwLock::new(None)),
+            voting_send_channel: send_channel,
         })
     }
 
@@ -299,9 +314,6 @@ mod tests {
         let anvil = Anvil::new().try_spawn().unwrap();
         let key_path = "/tmp/priv_key_test";
         let network = "ETH137";
-
-        let cfg =
-            get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
 
         let app_state =
             create_app_state_from_sequencer_config(network, key_path, anvil.endpoint().as_str())

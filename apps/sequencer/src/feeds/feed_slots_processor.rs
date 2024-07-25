@@ -253,7 +253,7 @@ mod tests {
         // voting will be 3 seconds long
         let voting_wait_duration_ms = 3000;
 
-        let feed =
+        let _feed =
             FeedMetaData::new_oneshot("TestFeed", voting_wait_duration_ms, voting_start_time);
 
         let name = "test_feed";
@@ -348,7 +348,7 @@ mod tests {
             Ok(None) => {
                 println!("Channel closed as expected");
             }
-            Err(e) => {
+            Err(_) => {
                 println!("Timeout as expected");
             }
         }

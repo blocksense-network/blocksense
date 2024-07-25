@@ -1,12 +1,11 @@
-use alloy::primitives::Address;
 use chrono::{DateTime, Utc};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
 /// An Allocation is a representation of an allocated storage slot in a Solidity smart contract.
+#[allow(dead_code)]
 pub struct Allocation {
-    contract_address: Address,
     storage_index: u32,
     number_of_slots: u8,
     schema_id: Uuid,
@@ -17,7 +16,6 @@ pub struct Allocation {
 
 impl Allocation {
     pub fn new(
-        contract_address: Address,
         storage_index: u32,
         number_of_slots: u8,
         schema_id: Uuid,
@@ -26,7 +24,6 @@ impl Allocation {
         voting_end_timestamp: DateTime<Utc>,
     ) -> Result<Self, String> {
         let allocation = Self {
-            contract_address,
             storage_index,
             number_of_slots,
             schema_id,
@@ -90,7 +87,6 @@ impl Allocator {
     /// Returns an error if no available index was found
     pub fn allocate(
         &mut self,
-        contract_address: Address,
         number_of_slots: u8,
         schema_id: Uuid,
         voting_start_timestamp: DateTime<Utc>,
@@ -108,7 +104,6 @@ impl Allocator {
 
         // generate Allocation
         let allocation = Allocation::new(
-            contract_address,
             free_index,
             number_of_slots,
             schema_id,
@@ -148,6 +143,12 @@ impl Allocator {
     }
 }
 
+pub fn init_concurrent_allocator() -> ConcurrentAllocator {
+    // read from persistent storage if available
+    // read range bounds from config file
+    ConcurrentAllocator::new(1000..=2000)
+}
+
 pub struct ConcurrentAllocator {
     allocator: Arc<RwLock<Allocator>>,
 }
@@ -162,7 +163,6 @@ impl ConcurrentAllocator {
 
     pub fn allocate(
         &self,
-        contract_address: Address,
         number_of_slots: u8,
         schema_id: Uuid,
         voting_start_timestamp: DateTime<Utc>,
@@ -170,7 +170,6 @@ impl ConcurrentAllocator {
     ) -> Result<u32, String> {
         let mut allocator = self.allocator.write().unwrap();
         allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -198,7 +197,6 @@ impl ConcurrentAllocator {
 mod tests {
     use super::*;
     use crate::feeds::feed_allocator::Allocator;
-    use alloy::primitives::{address, Address};
     use chrono::{DateTime, TimeDelta, Utc};
     use std::ops::Add;
     use std::sync::Arc;
@@ -221,15 +219,13 @@ mod tests {
     #[test]
     fn test_allocation_get_expired_index() {
         // setup
-        let contract_address: Address = address!("66f9664f97F2b50F62D13eA064982f936dE76657");
         let number_of_slots: u8 = 1;
         let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
         let mut allocator: Allocator = Allocator::new(1..=5);
-        let allocation1 = allocator.allocate(
-            contract_address,
+        let _allocation1 = allocator.allocate(
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -262,14 +258,12 @@ mod tests {
         assert_eq!(allocator.num_allocated_indexes(), 0);
 
         // allocate 1 slot
-        let contract_address: Address = address!("66f9664f97F2b50F62D13eA064982f936dE76657");
         let number_of_slots: u8 = 1;
         let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
         let allocate_request_1 = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -284,28 +278,24 @@ mod tests {
 
         // fill space
         let _ = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
             voting_end_timestamp,
         );
         let _ = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
             voting_end_timestamp,
         );
         let _ = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
             voting_end_timestamp,
         );
         let _ = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -321,7 +311,6 @@ mod tests {
     #[test]
     fn test_allocation_free_space() {
         // setup
-        let contract_address: Address = address!("66f9664f97F2b50F62D13eA064982f936dE76657");
         let number_of_slots: u8 = 1;
         let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
@@ -331,7 +320,6 @@ mod tests {
 
         // run
         let result = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -359,14 +347,12 @@ mod tests {
         assert_eq!(allocator.num_allocated_indexes(), 0);
 
         // allocate 1 slot
-        let contract_address: Address = address!("66f9664f97F2b50F62D13eA064982f936dE76657");
         let number_of_slots: u8 = 1;
         let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
         let allocate_request_1 = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -375,11 +361,10 @@ mod tests {
         assert!(allocate_request_1.is_ok_and(|index| index == 1));
 
         // run
-        let num_free_indexes = allocator.num_free_indexes();
+        let _num_free_indexes = allocator.num_free_indexes();
 
         // fill space
         let allocate_request_2 = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -388,7 +373,6 @@ mod tests {
         assert!(allocate_request_2.is_ok_and(|index| index == 2));
 
         let allocate_request_3 = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -397,7 +381,6 @@ mod tests {
         assert!(allocate_request_3.is_ok_and(|index| index == 3));
 
         let allocate_request_4 = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -406,7 +389,6 @@ mod tests {
         assert!(allocate_request_4.is_ok_and(|index| index == 4));
 
         let allocate_request_5 = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -416,7 +398,6 @@ mod tests {
 
         // space is full and no expired allocates
         let allocate_request_6 = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -431,7 +412,6 @@ mod tests {
 
         // allocate
         let allocate_request_7 = allocator.allocate(
-            contract_address,
             number_of_slots,
             schema_id,
             voting_start_timestamp,
@@ -446,7 +426,6 @@ mod tests {
     fn test_concurrent_allocator_allocation() {
         let allocator = Arc::new(ConcurrentAllocator::new(1..=5));
 
-        let contract_address: Address = address!("66f9664f97F2b50F62D13eA064982f936dE76657");
         let number_of_slots: u8 = 1;
         let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
@@ -456,11 +435,9 @@ mod tests {
         let handles: Vec<_> = (0..5)
             .map(|_| {
                 let allocator = Arc::clone(&allocator);
-                let contract_address = contract_address.clone();
                 let schema_id = schema_id.clone();
                 thread::spawn(move || {
                     allocator.allocate(
-                        contract_address,
                         number_of_slots,
                         schema_id,
                         voting_start_timestamp,
