@@ -108,7 +108,7 @@ mod tests {
     use crate::reporters::reporter::init_shared_reporters;
     use crate::utils::logging::init_shared_logging_handle;
     use data_feeds::feeds_processing::naive_packing;
-    use data_feeds::types::FeedType;
+    use feed_registry::types::FeedType;
     use std::env;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};

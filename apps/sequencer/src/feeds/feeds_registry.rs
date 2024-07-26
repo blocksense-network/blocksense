@@ -268,7 +268,7 @@ pub fn get_feed_id(name: &str) -> Option<u32> {
 
 #[cfg(test)]
 mod tests {
-    use data_feeds::types::FeedType;
+    use feed_registry::types::FeedType;
 
     use crate::feeds::feeds_registry::{
         new_feeds_meta_data_reg_with_test_data, AllFeedsReports, FeedMetaData, ReportRelevance,
