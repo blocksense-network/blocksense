@@ -36,6 +36,9 @@ impl FeedType {
     pub fn from_bytes(bytes: Vec<u8>, variant: FeedType) -> Result<FeedType, String> {
         match variant {
             FeedType::Numerical(_) => {
+                if bytes.len() < 8 {
+                    return Err("Bytes len less than required!".to_string());
+                }
                 let arr: [u8; 8] = bytes[..8]
                     .try_into()
                     .map_err(|_| "Failed to convert to array".to_string())?;

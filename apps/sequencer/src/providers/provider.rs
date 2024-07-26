@@ -49,20 +49,26 @@ pub struct RpcProvider {
 pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
 pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
-    let latest_block = provider
-        .lock()
-        .await
-        .provider
-        .get_block_number()
-        .await
-        .expect("Could not lock provider mutex!");
-    let bytecode = provider
+    let latest_block = match provider.lock().await.provider.get_block_number().await {
+        Ok(result) => result,
+        Err(e) => {
+            error!("Could not get block number: {}", e);
+            return false;
+        }
+    };
+    let bytecode = match provider
         .lock()
         .await
         .provider
         .get_code_at(*addr, latest_block.into())
         .await
-        .expect("Could not get bytecode of contract from provider!");
+    {
+        Ok(result) => result,
+        Err(e) => {
+            error!("Could not get bytecode of contract: {}", e);
+            return false;
+        }
+    };
     bytecode.to_string() != "0x"
 }
 
