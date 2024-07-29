@@ -3553,6 +3553,7 @@ dependencies = [
  "lazy_static 1.4.0",
  "serde 1.0.203",
  "thiserror",
+ "tracing",
 ]
 
 [[package]]

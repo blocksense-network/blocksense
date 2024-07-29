@@ -1,8 +1,126 @@
 use serde::{Deserialize, Serialize};
-use std::fmt::{self, Display};
+use std::{
+    fmt::{self, Display},
+    time::{SystemTime, UNIX_EPOCH},
+};
 use thiserror::Error;
+use tracing::debug;
 
 use crypto::JsonSerializableSignature;
+
+use crate::traits::FeedAggregate;
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum Repeatability {
+    Periodic, // Has infinite number of voting slots
+    Oneshot,  // Has only one voting slot
+}
+
+#[derive(Debug, PartialEq)]
+pub enum ReportRelevance {
+    Relevant,
+    NonRelevantOld,
+    NonRelevantInFuture,
+}
+
+#[derive(Debug)]
+pub struct FeedMetaData {
+    name: String,
+    voting_repeatability: Repeatability,
+    report_interval_ms: u64, // Consider oneshot feeds.
+    first_report_start_time: SystemTime,
+    feed_type: Box<dyn FeedAggregate>,
+}
+
+impl FeedMetaData {
+    pub fn new_oneshot(
+        n: &str,
+        r: u64, // Consider oneshot feeds.
+        f: SystemTime,
+    ) -> FeedMetaData {
+        FeedMetaData {
+            name: n.to_string(),
+            voting_repeatability: Repeatability::Oneshot,
+            report_interval_ms: r,
+            first_report_start_time: f,
+            feed_type: Box::new(AverageAggregator {}),
+        }
+    }
+
+    pub fn new(
+        n: &str,
+        r: u64, // Consider oneshot feeds.
+        f: SystemTime,
+    ) -> FeedMetaData {
+        FeedMetaData {
+            name: n.to_string(),
+            voting_repeatability: Repeatability::Periodic,
+            report_interval_ms: r,
+            first_report_start_time: f,
+            feed_type: Box::new(AverageAggregator {}), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
+        }
+    }
+
+    pub fn get_name(&self) -> &String {
+        &self.name
+    }
+    pub fn get_report_interval_ms(&self) -> u64 {
+        self.report_interval_ms
+    }
+    pub fn get_first_report_start_time_ms(&self) -> u128 {
+        let since_the_epoch = self
+            .first_report_start_time
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards");
+        since_the_epoch.as_millis()
+    }
+    pub fn get_slot(&self, current_time_as_ms: u128) -> u64 {
+        if self.voting_repeatability == Repeatability::Oneshot {
+            // Oneshots only have the zero slot
+            return 0;
+        }
+        ((current_time_as_ms - self.get_first_report_start_time_ms())
+            / self.report_interval_ms as u128) as u64
+    }
+    pub fn get_feed_type(&self) -> &dyn FeedAggregate {
+        self.feed_type.as_ref()
+    }
+    pub fn check_report_relevance(
+        &self,
+        current_time_as_ms: u128,
+        msg_timestamp: u128,
+    ) -> ReportRelevance {
+        let start_of_voting_round = self.get_first_report_start_time_ms()
+            + (self.get_slot(current_time_as_ms) as u128 * self.get_report_interval_ms() as u128);
+        let end_of_voting_round = start_of_voting_round + self.get_report_interval_ms() as u128;
+
+        if msg_timestamp < start_of_voting_round {
+            debug!("Rejected report, time stamp is in a past slot.");
+            return ReportRelevance::NonRelevantOld;
+        }
+        if msg_timestamp > end_of_voting_round {
+            debug!("Rejected report, time stamp is in a future slot.");
+            return ReportRelevance::NonRelevantInFuture;
+        }
+        debug!("Accepted report!");
+        ReportRelevance::Relevant
+    }
+
+    // Return time to slot end. Can be negative for Oneshot feeds in the past.
+    pub fn time_to_slot_end_ms(feed_meta_data: &FeedMetaData, timestamp_as_ms: u128) -> i128 {
+        let start_of_voting_round = feed_meta_data.get_first_report_start_time_ms()
+            + (feed_meta_data.get_slot(timestamp_as_ms) as u128
+                * feed_meta_data.get_report_interval_ms() as u128);
+        let end_of_voting_round =
+            start_of_voting_round + feed_meta_data.get_report_interval_ms() as u128;
+        end_of_voting_round as i128 - timestamp_as_ms as i128
+    }
+
+    // Return if this Feed is Oneshot.
+    pub fn is_oneshot(&self) -> bool {
+        self.voting_repeatability == Repeatability::Oneshot
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub enum FeedType {
@@ -51,14 +169,6 @@ impl FeedType {
             }
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DataFeedAPI {
-    EmptyAPI,
-    YahooFinanceDataFeed,
-    CoinMarketCapDataFeed,
-    // OpenWeather,
 }
 
 pub type Timestamp = u128;

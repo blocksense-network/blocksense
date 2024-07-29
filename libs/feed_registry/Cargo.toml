@@ -11,3 +11,4 @@ crypto = { path = "../crypto" }
 lazy_static = "1.4.0"
 serde = { version = "1.0.197", features = ["derive"] }
 thiserror = "1.0.61"
+tracing = { version = "0.1.40", features = ["async-await", "log"] }

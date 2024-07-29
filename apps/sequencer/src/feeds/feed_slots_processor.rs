@@ -15,7 +15,7 @@ use tracing::warn;
 use tracing::{debug, info};
 use utils::to_hex_string;
 
-use super::feeds_registry::FeedAggregateHistory;
+use feed_registry::feeds_registry::FeedAggregateHistory;
 
 const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
