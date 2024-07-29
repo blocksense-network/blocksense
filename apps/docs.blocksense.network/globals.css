@@ -357,3 +357,30 @@ main {
   font-weight: normal;
   font-style: italic;
 }
+
+/* Space Mono Nerd */
+@font-face {
+  font-family: 'SpaceMono Nerd';
+  font-weight: 400;
+  src: url('/fonts/nerd/SpaceMonoNerdFont-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'SpaceMono Nerd Bold';
+  font-weight: 700;
+  src: url('/fonts/nerd/SpaceMonoNerdFont-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'SpaceMono Nerd Italic';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/nerd/SpaceMonoNerdFont-Italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'SpaceMono Nerd BoldItalic';
+  font-style: italic;
+  font-weight: 700;
+  src: url('/fonts/nerd/SpaceMonoNerdFont-BoldItalic.ttf') format('truetype');
+}
