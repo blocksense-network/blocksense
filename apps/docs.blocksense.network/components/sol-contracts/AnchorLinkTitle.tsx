@@ -12,7 +12,7 @@ const titleStyles = {
   3: 'text-2xl',
   4: 'text-xl',
   5: 'text-lg',
-  6: 'text-base',
+  6: 'text-xxs sm:text-xs lg:text-base',
 };
 
 const accordionStyles = 'text-gray-900';

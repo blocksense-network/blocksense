@@ -295,6 +295,14 @@ main {
   .token.punctuation {
     color: var(--shiki-token-punctuation);
   }
+
+  .text-xxs {
+    font-size: 0.5rem;
+  }
+
+  .text-xs {
+    font-size: 0.7rem;
+  }
 }
 
 /* This is how we can adjust the Shiki Theme built in Nextra */
