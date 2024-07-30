@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs::File;
+use std::hash::Hash;
 use std::io::Write;
 use std::time::SystemTime;
 use std::{collections::HashMap, env, fmt::Debug};
@@ -18,6 +19,7 @@ pub struct ReporterConfig {
     pub sequencer_url: String,
     pub prometheus_url: String,
     pub poll_period_ms: u64, // TODO(snikolov): Move inside `Reporter` different poll periods are handled in reporter
+    pub secret_key_path: String,
 
     pub resources: HashMap<String, String>, // <`API`,`API_resource_dir`>
     pub reporter: Reporter,
