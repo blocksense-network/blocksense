@@ -31,17 +31,19 @@ fn feed_selector(feeds: &[(DataFeedAPI, String)], batch_size: usize) -> Vec<(Dat
 
 fn resolve_feed(
     feed_api: &DataFeedAPI,
+    resources: &HashMap<String, String>,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
 ) -> Rc<RefCell<dyn DataFeed>> {
-    handle_connection_cache(feed_api, connection_cache)
+    handle_connection_cache(feed_api, resources, connection_cache)
 }
 
 fn handle_connection_cache(
     api: &DataFeedAPI,
+    resources: &HashMap<String, String>,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
 ) -> Rc<RefCell<dyn DataFeed>> {
     if !connection_cache.contains_key(api) {
-        let feed: Rc<RefCell<dyn DataFeed>> = feed_builder(api);
+        let feed: Rc<RefCell<dyn DataFeed>> = feed_builder(api, resources);
         connection_cache.insert(api.to_owned(), feed);
     }
 
@@ -51,11 +53,21 @@ fn handle_connection_cache(
         .clone()
 }
 
-fn feed_builder(api: &DataFeedAPI) -> Rc<RefCell<dyn DataFeed>> {
+fn feed_builder(
+    api: &DataFeedAPI,
+    resources: &HashMap<String, String>,
+) -> Rc<RefCell<dyn DataFeed>> {
     match api {
         DataFeedAPI::EmptyAPI => todo!(),
         DataFeedAPI::YahooFinanceDataFeed => Rc::new(RefCell::new(YahooFinanceDataFeed::new())),
-        DataFeedAPI::CoinMarketCapDataFeed => Rc::new(RefCell::new(CoinMarketCapDataFeed::new())),
+        DataFeedAPI::CoinMarketCapDataFeed => {
+            let cmc_api_key_path = resources
+                .get("CMC_API_KEY_PATH")
+                .expect("CMC_API_KEY_PATH not provided in config!");
+            Rc::new(RefCell::new(CoinMarketCapDataFeed::new(
+                cmc_api_key_path.to_string(),
+            )))
+        }
     }
 }
 
@@ -74,7 +86,7 @@ pub async fn dispatch(
     for (api, asset) in feed_subset {
         let start_time = Instant::now();
 
-        let data_feed = resolve_feed(&api, connection_cache);
+        let data_feed = resolve_feed(&api, &reporter_config.resources, connection_cache);
         let feed_asset_name = DataFeedAPI::feed_asset_str(&api, &asset);
         let feed_id = feed_id_map
             .get(&feed_asset_name)

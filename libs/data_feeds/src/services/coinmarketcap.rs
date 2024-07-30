@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use cmc::Cmc;
 use ringbuf::{self, storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use tracing::{trace, warn};
-use utils::{current_unix_time, get_env_var};
+use utils::{current_unix_time, get_env_var, read_file};
 
 use crate::{
     interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical},
@@ -20,8 +20,8 @@ pub struct CoinMarketCapDataFeed {
 }
 
 impl CoinMarketCapDataFeed {
-    pub fn new() -> Self {
-        let cmc_api_key: String = get_env_var("CMC_API_KEY").unwrap();
+    pub fn new(resource_path: String) -> Self {
+        let cmc_api_key: String = read_file(resource_path.as_str());
 
         Self {
             api_connector: Cmc::new(cmc_api_key),

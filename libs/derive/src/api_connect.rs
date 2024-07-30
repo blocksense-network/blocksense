@@ -14,10 +14,6 @@ pub fn api_connect_impl(input: TokenStream) -> TokenStream {
                 &DataFeedAPI::#name
             }
 
-            fn api_connect(&self) -> Box<dyn DataFeed> {
-                Box::new(#name::new())
-            }
-
             fn is_connected(&self) -> bool {
                 self.is_connected
             }
