@@ -359,7 +359,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blocksense/base-utils@workspace:libs/base-utils":
+"@blocksense/base-utils@workspace:*, @blocksense/base-utils@workspace:libs/base-utils":
   version: 0.0.0-use.local
   resolution: "@blocksense/base-utils@workspace:libs/base-utils"
   dependencies:
@@ -447,6 +447,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network"
   dependencies:
+    "@blocksense/base-utils": "workspace:*"
     "@blocksense/contracts": "workspace:*"
     "@blocksense/docs-theme": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"

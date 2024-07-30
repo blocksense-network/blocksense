@@ -26,6 +26,7 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
+    "@blocksense/base-utils": "workspace:*",
     "@blocksense/contracts": "workspace:*",
     "@blocksense/docs-theme": "workspace:*",
     "@blocksense/sol-reflector": "workspace:*",
