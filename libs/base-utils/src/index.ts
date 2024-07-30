@@ -1,1 +1,3 @@
-console.log('Hello, @blocksense/base-utils!');
+import { createFsIOForDir } from './fs-IO-for-dir';
+
+export { createFsIOForDir };
