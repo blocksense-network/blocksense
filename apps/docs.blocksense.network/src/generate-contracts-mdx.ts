@@ -4,9 +4,10 @@ import { pagesContractRefDocFolder } from './constants';
 
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 
-import { createFsIOForDir } from './fs-IO-for-dir';
+import { createFsIOForDir } from '@blocksense/base-utils';
 
 import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
+
 const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
 
 function stringifyObject(obj: any): string {
