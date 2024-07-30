@@ -31,3 +31,11 @@
    ```
 
 [blocksnse-logo]: ./docs/assets/img/blocksense-logo.jpg
+
+---
+
+## Running the system
+
+### Supported deployment options:
+
+See [Blocksense Network Documentation Site](/apps/docs.blocksense.network/README.md)
