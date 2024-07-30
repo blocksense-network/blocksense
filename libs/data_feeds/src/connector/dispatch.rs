@@ -82,10 +82,14 @@ pub async fn dispatch(
 ) {
     let feed_subset = feed_selector(feeds, reporter_config.batch_size);
 
+    let secret_key_path = reporter_config
+        .resources
+        .get("SECRET_KEY_PATH")
+        .expect("SECRET_KEY_PATH not set in config!");
     let secret_key_path = std::env::var("BLOCKSENSE_ROOT")
         .expect("BLOCKSENSE_ROOT env not set")
         .to_string()
-        + reporter_config.secret_key_path.as_str();
+        + secret_key_path;
     println!("{}", secret_key_path);
     let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
 
