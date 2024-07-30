@@ -1,6 +1,7 @@
 use alloy::providers::Provider;
 use alloy::transports::http::Http;
 use alloy::{
+    hex,
     network::{Ethereum, EthereumSigner},
     primitives::Address,
     providers::{
@@ -44,6 +45,8 @@ pub struct RpcProvider {
     pub event_contract_address: Option<Address>,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
     pub transcation_timeout_secs: u32,
+    pub data_feed_store_byte_code: Vec<u8>,
+    pub data_feed_sports_byte_code: Vec<u8>,
 }
 
 pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
@@ -176,6 +179,20 @@ async fn get_rpc_providers(
             wallet,
             provider_metrics: provider_metrics.clone(),
             transcation_timeout_secs: p.transcation_timeout_secs,
+            data_feed_store_byte_code: hex::decode(p.data_feed_store_byte_code.clone()).expect(
+                format!(
+                    "data_feed_store_byte_code for provider {} is not valid hex string!",
+                    key
+                )
+                .as_str(),
+            ),
+            data_feed_sports_byte_code: hex::decode(p.data_feed_sports_byte_code.clone()).expect(
+                format!(
+                    "data_feed_sports_byte_code for provider {} is not valid hex string!",
+                    key
+                )
+                .as_str(),
+            ),
         }));
 
         providers.insert(key.clone(), rpc_provider.clone());

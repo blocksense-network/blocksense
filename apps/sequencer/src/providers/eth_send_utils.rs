@@ -1,6 +1,6 @@
 use alloy::{
-    hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
-    rpc::types::eth::TransactionRequest, sol,
+    hex::FromHex, network::TransactionBuilder, primitives::hex, primitives::Bytes,
+    providers::Provider, rpc::types::eth::TransactionRequest,
 };
 use eyre::Result;
 // use reqwest::Client;
@@ -24,28 +24,6 @@ use std::time::Instant;
 use tracing::info_span;
 use tracing::{debug, error, info};
 
-// Codegen from embedded Solidity code and precompiled bytecode.
-// Price Feed Solidity Contract
-sol! {
-    #[allow(missing_docs)]
-    // solc v0.8.24; solc a.sol --via-ir --optimize --bin
-    #[sol(rpc, bytecode="0x60a060405234801561001057600080fd5b503360805260805160e761002d60003960006045015260e76000f3fe6080604052348015600f57600080fd5b506000366060600060046000601c37506000516201ffff811015604357600f60fc1b6020526005601c205460005260206000f35b7f0000000000000000000000000000000000000000000000000000000000000000338114606f57600080fd5b631a2d80ac8281109083101760ac57600f60fc1b6004523660045b8181101560aa57600481600037600560002060048201359055602401608a565b005b600080fdfea264697066735822122015800ed562cf954d8d71346ded5d44d9d6c459e49b37d67049ba43a5524b430764736f6c63430008180033")]
-    contract DataFeedStoreV1 {
-        function setFeeds(bytes calldata) external;
-    }
-}
-
-// Sport Events Solidity Contract used for Oneshot metadata feeds
-sol! {
-    #[allow(missing_docs)]
-    // solc v0.8.24; solc a.sol --via-ir --optimize --bin
-    #[sol(rpc, bytecode="60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033")]
-    contract SportsDataFeedStoreV2 {
-        function setFeeds(bytes calldata) external;
-        function getFeedById(uint32 key, uint256 len) external view returns (bytes32);
-    }
-}
-
 pub async fn deploy_contract(
     network: &String,
     providers: &SharedRpcProviders,
@@ -59,24 +37,50 @@ pub async fn deploy_contract(
     };
     drop(providers);
     let mut p = p.lock().await;
+    let wallet = &p.wallet;
     let provider = &p.provider;
+    let provider_metrics = &p.provider_metrics;
 
     // Get the base fee for the block.
     let base_fee = provider.get_gas_price().await?;
 
     // Deploy the contract.
-    let contract_builder = if feed_type == Periodic {
-        DataFeedStoreV1::deploy_builder(provider)
+    let bytecode = if feed_type == Periodic {
+        p.data_feed_store_byte_code.clone()
     } else {
-        SportsDataFeedStoreV2::deploy_builder(provider)
+        p.data_feed_sports_byte_code.clone()
     };
-    let estimate = contract_builder.estimate_gas().await?;
+
+    let max_priority_fee_per_gas = process_provider_getter!(
+        provider.get_max_priority_fee_per_gas().await,
+        network,
+        provider_metrics,
+        get_max_priority_fee_per_gas
+    );
+
+    let chain_id = process_provider_getter!(
+        provider.get_chain_id().await,
+        network,
+        provider_metrics,
+        get_chain_id
+    );
+
+    let tx = TransactionRequest::default()
+        .from(wallet.address())
+        .with_gas_limit(2e5 as u128)
+        .with_max_fee_per_gas(base_fee + base_fee)
+        .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
+        .with_chain_id(chain_id)
+        .with_deploy_code(bytecode);
+
     let deploy_time = Instant::now();
-    let contract_address = contract_builder
-        .gas(estimate)
-        .gas_price(base_fee)
-        .deploy()
-        .await?;
+    let contract_address = provider
+        .send_transaction(tx)
+        .await?
+        .get_receipt()
+        .await?
+        .contract_address
+        .expect("Failed to get contract address");
 
     info!(
         "Deployed {:?} contract at address: {:?} took {}ms\n",
