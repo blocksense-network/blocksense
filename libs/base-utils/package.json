@@ -15,7 +15,8 @@
   },
   "scripts": {
     "build": "rollup --silent --config ./rollup.config.mjs",
-    "ts": "yarn node --import tsx"
+    "ts": "yarn node --import tsx",
+    "test": "yarn vitest -w false"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^26.0.1",
@@ -29,6 +30,7 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-typescript2": "^0.36.0",
     "tsx": "^4.7.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^2.0.4"
   }
 }
