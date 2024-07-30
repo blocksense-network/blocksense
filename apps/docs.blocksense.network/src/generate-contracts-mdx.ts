@@ -4,7 +4,7 @@ import { pagesContractRefDocFolder } from './constants';
 
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 
-import { createFsIOForDir } from '@blocksense/base-utils';
+import { selectDirectory } from '@blocksense/base-utils';
 
 import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
 
@@ -43,7 +43,7 @@ function generateSolRefDocFiles(): Promise<void[]> {
     {},
   );
 
-  const { write, writeJSON } = createFsIOForDir(pagesContractRefDocFolder);
+  const { write, writeJSON } = selectDirectory(pagesContractRefDocFolder);
 
   return Promise.all([
     ...mdxFiles.map(args => write({ ext: '.mdx', ...args })),
