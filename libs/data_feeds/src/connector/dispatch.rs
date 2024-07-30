@@ -64,9 +64,12 @@ fn feed_builder(
             let cmc_api_key_path = resources
                 .get("CMC_API_KEY_PATH")
                 .expect("CMC_API_KEY_PATH not provided in config!");
-            Rc::new(RefCell::new(CoinMarketCapDataFeed::new(
-                cmc_api_key_path.to_string(),
-            )))
+            let cmc_api_key_path = std::env::var("BLOCKSENSE_ROOT")
+                .expect("BLOCKSENSE_ROOT env not set")
+                .to_string()
+                + cmc_api_key_path;
+
+            Rc::new(RefCell::new(CoinMarketCapDataFeed::new(cmc_api_key_path)))
         }
     }
 }
@@ -79,9 +82,12 @@ pub async fn dispatch(
 ) {
     let feed_subset = feed_selector(feeds, reporter_config.batch_size);
 
-    let secret_key = read_file(reporter_config.secret_key_path.as_str())
-        .trim()
-        .to_string();
+    let secret_key_path = std::env::var("BLOCKSENSE_ROOT")
+        .expect("BLOCKSENSE_ROOT env not set")
+        .to_string()
+        + reporter_config.secret_key_path.as_str();
+    println!("{}", secret_key_path);
+    let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
 
     for (api, asset) in feed_subset {
         let start_time = Instant::now();
