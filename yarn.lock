@@ -359,6 +359,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blocksense/base-utils@workspace:libs/base-utils":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/base-utils@workspace:libs/base-utils"
+  dependencies:
+    "@types/node": "npm:^20.12.13"
+    tsx: "npm:^4.7.1"
+    typescript: "npm:^5.4.5"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/contracts@workspace:*, @blocksense/contracts@workspace:libs/contracts":
   version: 0.0.0-use.local
   resolution: "@blocksense/contracts@workspace:libs/contracts"

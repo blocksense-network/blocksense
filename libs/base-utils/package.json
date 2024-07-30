@@ -1,0 +1,24 @@
+{
+  "name": "@blocksense/base-utils",
+  "version": "0.0.0",
+  "keywords": [
+    "utils",
+    "helpers"
+  ],
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.ts",
+      "import": "./dist/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "ts": "yarn node --import tsx"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.13",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.5"
+  }
+}
