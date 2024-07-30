@@ -67,11 +67,11 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                   title={_function.name || _function.kind}
                   titleLevel={isFromSourceUnit ? 5 : 6}
                 />
+                <Selector selector={_function.functionSelector} />
               </AccordionTrigger>
               <AccordionContent
                 className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
               >
-                <Selector selector={_function.functionSelector} />
                 <Badge className="contract-item-wrapper__function-kind mb-4">
                   <span>Kind: {_function.kind}</span>
                 </Badge>

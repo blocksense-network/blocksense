@@ -65,11 +65,11 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
                   title={error.name || `Error ${index + 1}`}
                   titleLevel={isFromSourceUnit ? 5 : 6}
                 />
+                <Selector selector={error.errorSelector} />
               </AccordionTrigger>
               <AccordionContent
                 className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
               >
-                <Selector selector={error.errorSelector} />
                 <Signature signature={error.signature} />
                 <NatSpec natspec={error.natspec} />
                 <Parameters

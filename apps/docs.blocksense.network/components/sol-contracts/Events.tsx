@@ -64,11 +64,11 @@ export const Events = ({ events }: EventsProps) => {
                   title={event.name || `Event ${index + 1}`}
                   titleLevel={6}
                 />
+                <Selector selector={event.eventSelector} />
               </AccordionTrigger>
               <AccordionContent
                 className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
               >
-                <Selector selector={event.eventSelector} />
                 <Signature signature={event.signature} />
                 <span className="contract-item-wrapper__event-anonymous">
                   Anonymous: {event.anonymous.toString()}
