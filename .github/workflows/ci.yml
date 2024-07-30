@@ -107,6 +107,9 @@ jobs:
       - name: Build
         run: yarn workspace @blocksense/docs.blocksense.network build
 
+      - name: Test `@blocksense/base-utils`
+        run: yarn workspace @blocksense/base-utils test
+
       - name: Test
         run: yarn workspace @blocksense/docs.blocksense.network test
 
