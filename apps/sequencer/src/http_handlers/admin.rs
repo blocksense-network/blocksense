@@ -12,8 +12,8 @@ use alloy::{
 use eyre::eyre;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
-use crate::feeds::feeds_registry::Repeatability;
 use feed_registry::types::FeedType;
+use feed_registry::types::Repeatability;
 use prometheus::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
 use tracing::info_span;
@@ -212,12 +212,11 @@ async fn metrics() -> Result<HttpResponse, Error> {
 mod tests {
     use super::*;
     use crate::config::config::init_sequencer_config;
-    use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
-    use crate::utils::logging::init_shared_logging_handle;
     use actix_web::{http::header::ContentType, test, App};
     use alloy::node_bindings::Anvil;
+    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use regex::Regex;
     use sequencer_config::get_test_config_with_single_provider;
     use std::env;
@@ -225,6 +224,7 @@ mod tests {
     use std::io::Write;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};
+    use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
     async fn test_get_feed_report_interval() {

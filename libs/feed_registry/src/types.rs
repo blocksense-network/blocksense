@@ -8,7 +8,7 @@ use tracing::debug;
 
 use crypto::JsonSerializableSignature;
 
-use crate::traits::FeedAggregate;
+use crate::aggregate::{AverageAggregator, FeedAggregate};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Repeatability {
@@ -27,7 +27,7 @@ pub enum ReportRelevance {
 pub struct FeedMetaData {
     name: String,
     voting_repeatability: Repeatability,
-    report_interval_ms: u64, // Consider oneshot feeds.
+    pub report_interval_ms: u64, // Consider oneshot feeds.
     first_report_start_time: SystemTime,
     feed_type: Box<dyn FeedAggregate>,
 }

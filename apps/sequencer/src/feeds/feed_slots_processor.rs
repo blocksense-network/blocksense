@@ -1,10 +1,9 @@
-use crate::feeds::feeds_registry::FeedMetaData;
-use crate::feeds::feeds_registry::{AllFeedsReports, Repeatability};
-use crate::utils::time_utils::{get_ms_since_epoch, SlotTimeTracker};
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
 use eyre::Report;
+use feed_registry::registry::{AllFeedsReports, SlotTimeTracker};
 use feed_registry::types::FeedType;
+use feed_registry::types::{FeedMetaData, Repeatability};
 use ringbuf::traits::Consumer;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
@@ -13,9 +12,10 @@ use tokio::sync::mpsc::UnboundedSender;
 use tracing::error;
 use tracing::warn;
 use tracing::{debug, info};
+use utils::time::current_unix_time;
 use utils::to_hex_string;
 
-use feed_registry::feeds_registry::FeedAggregateHistory;
+use feed_registry::registry::FeedAggregateHistory;
 
 const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
@@ -57,7 +57,7 @@ pub async fn feed_slots_processor_loop<
         let result_post_to_contract: FeedType; //TODO(snikolov): This needs to be enforced as Bytes32
         let key_post: u32;
         {
-            let current_time_as_ms = get_ms_since_epoch();
+            let current_time_as_ms = current_unix_time();
 
             let slot = feed.read().unwrap().get_slot(current_time_as_ms);
 
@@ -66,7 +66,7 @@ pub async fn feed_slots_processor_loop<
                 name, key, slot, report_interval_ms
             );
 
-            let reports: Arc<RwLock<crate::feeds::feeds_registry::FeedReports>> =
+            let reports: Arc<RwLock<feed_registry::registry::FeedReports>> =
                 match reports.read().unwrap().get(key) {
                     Some(x) => x,
                     None => {
@@ -154,8 +154,9 @@ pub async fn feed_slots_processor_loop<
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::feeds::feeds_registry::{AllFeedsReports, FeedMetaData};
     use data_feeds::feeds_processing::naive_packing;
+    use feed_registry::registry::AllFeedsReports;
+    use feed_registry::types::FeedMetaData;
     use std::sync::{Arc, RwLock};
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::mpsc::unbounded_channel;

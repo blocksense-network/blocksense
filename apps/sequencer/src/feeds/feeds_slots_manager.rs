@@ -1,8 +1,8 @@
 use crate::feeds::feed_slots_processor::feed_slots_processor_loop;
-use crate::feeds::feeds_registry::FeedAggregateHistory;
 use crate::feeds::feeds_state::FeedsState;
 use actix_web::rt::spawn;
 use actix_web::web;
+use feed_registry::registry::FeedAggregateHistory;
 use futures::stream::FuturesUnordered;
 use std::fmt::Debug;
 use std::io::Error;
@@ -103,17 +103,17 @@ pub async fn feeds_slots_manager_loop<
 mod tests {
     use super::*;
     use crate::config::config::init_sequencer_config;
-    use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
-    use crate::utils::logging::init_shared_logging_handle;
     use data_feeds::feeds_processing::naive_packing;
+    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::FeedType;
     use std::env;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};
     use std::time::Duration;
     use tokio::sync::mpsc::unbounded_channel;
+    use utils::logging::init_shared_logging_handle;
     use utils::to_hex_string;
 
     #[actix_web::test]

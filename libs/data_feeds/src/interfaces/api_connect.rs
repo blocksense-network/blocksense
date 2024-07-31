@@ -1,4 +1,4 @@
-use feed_registry::types::DataFeedAPI;
+use feed_registry::api::DataFeedAPI;
 
 use super::data_feed::DataFeed;
 

@@ -14,8 +14,8 @@ use actix_web::rt::spawn;
 use eyre::eyre;
 use prometheus::process_provider_getter;
 
-use crate::feeds::feeds_registry::Repeatability;
-use crate::feeds::feeds_registry::Repeatability::Periodic;
+use feed_registry::types::Repeatability;
+use feed_registry::types::Repeatability::Periodic;
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_metric_by};
@@ -296,10 +296,10 @@ pub async fn eth_batch_send_to_all_contracts<
 mod tests {
     use super::*;
     use crate::feeds::feed_slots_processor::feed_slots_processor_loop;
-    use crate::feeds::feeds_registry::Repeatability::Oneshot;
     use crate::providers::provider::{can_read_contract_bytecode, init_shared_rpc_providers};
     use alloy::primitives::{address, Address};
     use alloy::{node_bindings::Anvil, providers::Provider};
+    use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
     use sequencer_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,

@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display};
 
-use feed_registry::types::FeedType;
+use super::types::FeedType;
 
 pub enum ConsensusMetric {
     Median,

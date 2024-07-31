@@ -1,12 +1,13 @@
-use crate::feeds::feeds_registry::Repeatability;
-use crate::utils::time_utils::{get_ms_since_epoch, SlotTimeTracker};
 use actix_web::rt::spawn;
+use feed_registry::registry::SlotTimeTracker;
+use feed_registry::types::Repeatability;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::io::Error;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
 use tracing::{debug, error, info, info_span};
+use utils::time::current_unix_time;
 
 pub async fn votes_result_batcher_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
@@ -23,10 +24,8 @@ pub async fn votes_result_batcher_loop<
         info!("max_keys_to_batch set to {}", max_keys_to_batch);
         info!("timeout_duration set to {}", timeout_duration);
 
-        let mut stt = SlotTimeTracker::new(
-            Duration::from_millis(timeout_duration),
-            get_ms_since_epoch(),
-        );
+        let mut stt =
+            SlotTimeTracker::new(Duration::from_millis(timeout_duration), current_unix_time());
 
         loop {
             let mut updates: HashMap<K, V> = Default::default();

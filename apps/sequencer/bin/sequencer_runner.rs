@@ -1,7 +1,7 @@
 use std::sync::{Arc, RwLock};
 
 use actix_web::{web, App, HttpServer};
-use sequencer::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
+use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
 use sequencer::feeds::feeds_slots_manager;
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::feeds::{
@@ -16,7 +16,7 @@ use sequencer::reporters::reporter::init_shared_reporters;
 use sequencer::http_handlers::admin::{deploy, get_feed_report_interval, get_key, set_log_level};
 use sequencer::http_handlers::data_feeds::post_report;
 use sequencer::metrics_collector::metrics_collector::metrics_collector_loop;
-use sequencer::utils::logging::init_shared_logging_handle;
+use utils::logging::init_shared_logging_handle;
 
 use actix_web::rt::spawn;
 use futures::stream::FuturesUnordered;

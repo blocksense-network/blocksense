@@ -1,12 +1,12 @@
-use super::super::utils::time_utils::get_ms_since_epoch;
 use crypto::PublicKey;
 use eyre::Result;
+use utils::time::current_unix_time;
 
-use super::super::feeds::feeds_registry::ReportRelevance;
 use super::super::feeds::feeds_state::FeedsState;
 use actix_web::web;
 use actix_web::{error, Error};
 use actix_web::{post, HttpResponse};
+use feed_registry::types::ReportRelevance;
 use futures::StreamExt;
 
 use tracing::{debug, info, trace, warn};
@@ -151,7 +151,7 @@ pub async fn post_report(
         }
     };
 
-    let current_time_as_ms = get_ms_since_epoch();
+    let current_time_as_ms = current_unix_time();
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
@@ -223,18 +223,18 @@ pub async fn post_report(
 mod tests {
     use super::*;
     use crate::config::config::init_sequencer_config;
-    use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
-    use crate::utils::logging::init_shared_logging_handle;
     use actix_web::{test, App};
     use crypto::JsonSerializableSignature;
     use data_feeds::connector::post::generate_signature;
+    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
     use std::env;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};
     use std::time::{SystemTime, UNIX_EPOCH};
+    use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
     async fn post_report_from_unknown_reporter_fails_with_401() {

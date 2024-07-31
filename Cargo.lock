@@ -3551,9 +3551,13 @@ version = "0.0.1"
 dependencies = [
  "crypto",
  "lazy_static 1.4.0",
+ "ringbuf",
+ "sequencer_config",
  "serde 1.0.203",
  "thiserror",
+ "tokio 1.37.0",
  "tracing",
+ "utils",
 ]
 
 [[package]]
@@ -10077,6 +10081,10 @@ name = "utils"
 version = "0.0.1"
 dependencies = [
  "hex",
+ "once_cell",
+ "tokio 1.37.0",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

@@ -1,7 +1,7 @@
-use crate::feeds::feeds_registry::Repeatability::Periodic;
 use crate::providers::eth_send_utils::eth_batch_send_to_all_contracts;
 use crate::providers::provider::SharedRpcProviders;
 use actix_web::rt::spawn;
+use feed_registry::types::Repeatability::Periodic;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::io::Error;
