@@ -25,6 +25,7 @@
     {
       apps = {
         sequencer = mkApp blocksense-rs "sequencer";
+        reporter = mkApp blocksense-rs "launch_reporter";
       };
       packages = {
         inherit blocksense-rs;
