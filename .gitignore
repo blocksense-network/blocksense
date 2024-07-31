@@ -155,3 +155,5 @@ _vercel-deployment-url
 apps/docs.blocksense.network/pages/docs/contracts/reference-documentation/*.mdx
 apps/docs.blocksense.network/pages/docs/contracts/reference-documentation/_meta.json
 
+# Process Compose
+process-compose.yml
