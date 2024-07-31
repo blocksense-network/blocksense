@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rollup --silent --config ./rollup.config.mjs",
     "ts": "yarn node --import tsx"
   },
   "devDependencies": {
