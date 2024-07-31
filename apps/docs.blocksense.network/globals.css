@@ -9,6 +9,63 @@
   border: none;
 }
 
+/* Space Mono */
+
+@font-face {
+  font-family: 'Space Mono';
+  src: url('/fonts/SpaceMono-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Mono Bold';
+  src: url('/fonts/SpaceMono-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Space Mono BoldItalic';
+  src: url('/fonts/SpaceMono-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Space Mono Italic';
+  src: url('/fonts/SpaceMono-Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* Space Mono Nerd */
+@font-face {
+  font-family: 'SpaceMono Nerd';
+  font-weight: 400;
+  src: url('/fonts/nerd/SpaceMonoNerdFont-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'SpaceMono Nerd Bold';
+  font-weight: 700;
+  src: url('/fonts/nerd/SpaceMonoNerdFont-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'SpaceMono Nerd Italic';
+  font-style: italic;
+  font-weight: 400;
+  src: url('/fonts/nerd/SpaceMonoNerdFont-Italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'SpaceMono Nerd BoldItalic';
+  font-style: italic;
+  font-weight: 700;
+  src: url('/fonts/nerd/SpaceMonoNerdFont-BoldItalic.ttf') format('truetype');
+}
+
 main {
   margin-top: 20px;
 }
@@ -332,63 +389,4 @@ main {
   --shiki-token-string-expression: #4bb74a;
   --shiki-token-punctuation: #bbb;
   --shiki-token-link: #ffab70;
-}
-
-/* Add custom Fonts */
-
-/* Space Mono */
-
-@font-face {
-  font-family: 'Space Mono ';
-  src: url('/fonts/SpaceMono-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Space Mono Bold';
-  src: url('/fonts/SpaceMono-Bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Space Mono BoldItalic';
-  src: url('/fonts/SpaceMono-BoldItalic.ttf') format('truetype');
-  font-weight: bold;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: 'Space Mono Italic';
-  src: url('/fonts/SpaceMono-Italic.ttf') format('truetype');
-  font-weight: normal;
-  font-style: italic;
-}
-
-/* Space Mono Nerd */
-@font-face {
-  font-family: 'SpaceMono Nerd';
-  font-weight: 400;
-  src: url('/fonts/nerd/SpaceMonoNerdFont-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'SpaceMono Nerd Bold';
-  font-weight: 700;
-  src: url('/fonts/nerd/SpaceMonoNerdFont-Bold.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'SpaceMono Nerd Italic';
-  font-style: italic;
-  font-weight: 400;
-  src: url('/fonts/nerd/SpaceMonoNerdFont-Italic.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'SpaceMono Nerd BoldItalic';
-  font-style: italic;
-  font-weight: 700;
-  src: url('/fonts/nerd/SpaceMonoNerdFont-BoldItalic.ttf') format('truetype');
 }
