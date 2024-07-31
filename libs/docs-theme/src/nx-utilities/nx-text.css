@@ -128,8 +128,9 @@
 }
 .nx-text-primary-600 {
   --tw-text-opacity: 1;
+  font-weight: 700;
   color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 45% /
+    var(--nextra-primary-hue) var(--nextra-primary-saturation) 0.05% /
       var(--tw-text-opacity)
   );
 }

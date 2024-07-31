@@ -53,7 +53,8 @@
 }
 .nx-bg-primary-700\/5 {
   background-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 39%/0.05
+    var(--nextra-primary-hue) var(--nextra-primary-saturation)
+      var(--nextra-primary-lightness) / 0.55
   );
 }
 .nx-bg-red-100 {
