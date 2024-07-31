@@ -5,10 +5,12 @@
   libusb,
   git,
   openssl,
+  libgcc,
   zstd,
   stdenv,
   darwin,
   filesets,
+  autoPatchelfHook,
 }:
 let
   sharedAttrs = {
@@ -19,6 +21,7 @@ let
     nativeBuildInputs = [
       pkg-config
       git
+      autoPatchelfHook
     ];
 
     buildInputs = [
@@ -33,9 +36,12 @@ let
 
     doCheck = false;
     strictDeps = true;
+
+    preBuild = ''
+      addAutoPatchelfSearchPath ${libgcc.lib}/lib/
+    '';
   };
 
   cargoArtifacts = craneLib.buildDepsOnly sharedAttrs;
 in
 craneLib.buildPackage (sharedAttrs // { inherit cargoArtifacts; })
-# craneLib.buildPackage sharedAttrs
