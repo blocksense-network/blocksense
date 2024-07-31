@@ -3,11 +3,12 @@
   imports = [
     ./shells
     ./pkgs
+    ./modules
   ];
 
   flake.lib = {
     filesets = import ./filesets.nix { inherit lib; };
-  };
+  } // (import ./lib lib);
 
   perSystem =
     { inputs', ... }:
