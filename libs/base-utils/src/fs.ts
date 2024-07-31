@@ -1,5 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import { existsSync } from 'fs';
 
 /**  An object whose properties represent significant elements of the path. */
 // ┌─────────────────────┬────────────┐
@@ -55,6 +56,11 @@ interface PathObject {
  */
 export function selectDirectory(baseDir: string) {
   type FileArgs = Omit<PathObject, 'dir' | `root`>;
+
+  // Check if the base directory exists
+  if (!existsSync(baseDir)) {
+    throw new Error(`The directory ${baseDir} does not exist.`);
+  }
 
   return {
     /**
