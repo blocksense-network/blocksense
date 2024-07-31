@@ -77,14 +77,14 @@ export function selectDirectory(baseDir: string) {
      * Params:
      * - **args** - The arguments for specifying the file and content.
      * - **args.base** - The file name including extension (if any) such as 'data.json'
-     * - **args.ext** - The file extension (if any) such as '.json'
+     * - **args.ext** - The file extension (if any) such as '.json'.  Defaults to '.json'.
      * - **args.name** - The file name without extension (if any) such as 'data'
      * - **args.content** - The JSON content to be written to the file.
      * @returns A promise that resolves when the file is written.
      */
     writeJSON: (args: FileArgs & { content: Record<string, unknown> }) =>
       fs.writeFile(
-        path.format({ dir: baseDir, ...args }),
+        path.format({ dir: baseDir, ext: '.json', ...args }),
         JSON.stringify(args.content, null, 2),
       ),
 
@@ -107,13 +107,13 @@ export function selectDirectory(baseDir: string) {
      * Params:
      * - **args** - The arguments for specifying the file.
      * - **args.base** - The file name including extension (if any) such as 'data.json'
-     * - **args.ext** - The file extension (if any) such as '.json'
+     * - **args.ext** - The file extension (if any) such as '.json'. Defaults to '.json'.
      * - **args.name** - The file name without extension (if any) such as 'data'
      * @returns A promise that resolves with the parsed JSON object.
      */
     readJSON: (args: FileArgs) =>
       fs
-        .readFile(path.format({ dir: baseDir, ...args }), 'utf8')
+        .readFile(path.format({ dir: baseDir, ext: '.json', ...args }), 'utf8')
         .then(JSON.parse),
   };
 }
