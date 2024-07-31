@@ -1,0 +1,115 @@
+import { Callout } from 'nextra/components'
+
+# Feed Registry
+
+The Feed Registry serves as a blockchain-based directory that links assets to their corresponding data feeds. This system allows for direct querying of Blockense data feeds using asset addresses, eliminating the need to know specific feed contract addresses. As a result, smart contracts can efficiently retrieve up-to-date asset prices through a single function call to a unified contract interface.
+
+```mermaid
+---
+config:
+    rightAngles: true
+    theme: neutral
+    primaryColor: "#d0d0d0"
+    signalColor: "FF0000"
+    signalTextColor: "#808080"
+---
+flowchart TD
+  classDef node fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem;
+
+  linkStyle default fill:none,stroke-width:1px,stroke:#1c1917
+
+  A[Client] -->|get latest round data| FR[FeedRegistry]
+  FR -->|reads from| DFS[HistoricDataFeedStore]
+
+  class A,FR,DFS node
+```
+
+<Callout type="info" title="Note">
+  The Feed Registry exclusively includes feeds associated with canonical token addresses on a given network. Feeds without a corresponding token address, such as those for stock indices, are not included in the registry due to the lack of a canonical token representation.
+</Callout>
+
+For a complete list of functions and parameters for the FeedRegistry contract, see the [Feed Registry Reference Documentation](../reference-documentation/FeedRegistry.mdx).
+
+## Base and Quote
+
+The FeedRegistry maps feeds from `base` and `quote` address pairs. To get the latest WETH / USDC round data from the registry, call:
+
+```solidity copy
+latestRoundData(address base, address quote)
+```
+
+For example, to get the latest WETH / USDC price:
+
+- `base`: The WETH token address on that network e.g. `0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2` for WETH on Ethereum mainnet
+- `quote`: The USDC token address on Ethereum mainnet `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48`
+
+```solidity copy
+latestRoundData(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48)
+```
+
+## Code Examples
+
+### Solidity
+
+To consume price data from the Feed Registry, your smart contract should reference [`IFeedRegistry`](https://github.com/blocksense-network/blocksense/blob/main/libs/contracts/contracts/interfaces/IFeedRegistry.sol), which defines the external functions implemented by the Feed Registry.
+
+```solidity showLineNumbers copy
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+/**
+ * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
+ * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
+ * DO NOT USE THIS CODE IN PRODUCTION.
+ */
+contract RegistryConsumer {
+  IFeedRegistry public immutable registry;
+
+  constructor(address _registry) {
+    registry = IFeedRegistry(_registry);
+  }
+
+  function getLatestPrice(
+    address base,
+    address quote
+  ) external view returns (uint256) {
+    return uint256(registry.latestAnswer(base, quote));
+  }
+
+  function getRoundData(
+    address base,
+    address quote,
+    uint80 roundId
+  ) external view returns (int256 _price, uint256 _lastUpdate) {
+    (/*uint80 _roundId*/, _price, /*uint startedAt*/, _lastUpdate, /*uint80 answeredInRound*/) = registry.getRoundData(base, quote, roundId);
+  }
+}
+```
+
+### Solidity Hardhat Example
+
+<Callout type="info" title="Note">
+  You can find a working Hardhat project [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts). Clone the repo and follow the setup instructions to run the example locally.
+</Callout>
+
+### JavaScript
+
+To get latest price:
+
+```js copy
+const registry = new ethers.Contract(contractAddress, abiJson, provider);
+const price = await registry.latestAnswer(base, quote);
+```
+
+To get round data:
+
+```js copy
+const registry = new ethers.Contract(contractAddress, abiJson, provider);
+const [roundID, answer, startedAt, updatedAt, answeredInRound] = await registry.getRoundData(base, quote, roundId);
+```
+
+To get the ChainlinkProxy address responsible for a given feed:
+
+```js copy
+const registry = new ethers.Contract(contractAddress, abiJson, provider);
+const chainlinkProxyAddress = await registry.getFeed(base, quote);
+```
