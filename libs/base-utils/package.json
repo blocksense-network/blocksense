@@ -8,8 +8,9 @@
   "types": "src/index.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.js"
+      "require": "./dist/cjs/index.cjs",
+      "import": "./dist/esm/index.mjs",
+      "types": "./dist/types/index.d.ts"
     }
   },
   "scripts": {
