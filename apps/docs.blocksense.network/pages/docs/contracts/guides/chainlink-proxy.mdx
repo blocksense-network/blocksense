@@ -1,0 +1,101 @@
+import { Callout } from 'nextra/components'
+
+# Chainlink Proxy
+
+The Chainlink Proxy is a smart contract that acts as a proxy for a Blocksense feed. It provides easy access to the latest round data and historical round data for a given feed. The Chainlink Proxy is responsible for a single feed associated with a specific token pair on a given network.
+
+```mermaid
+---
+config:
+    rightAngles: true
+    theme: neutral
+    primaryColor: "#d0d0d0"
+    signalColor: "FF0000"
+    signalTextColor: "#808080"
+---
+flowchart TD
+  classDef node fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem;
+
+  linkStyle default fill:none,stroke-width:1px,stroke:#1c1917
+
+  A[Client] -->|get feed's data| CP[ChainlinkProxy]
+  CP -->|reads from| DFS[HistoricDataFeedStore]
+
+  class A,CP,DFS node
+```
+
+<Callout type="info" title="Note">
+  Feeds without a corresponding token address, such as those for stock indices, do not have a dedicated Chainlink Proxy due to the lack of a canonical token representation.
+</Callout>
+
+For a complete list of functions and parameters for the ChainlinkProxy contract, see the [Chainlink Proxy Reference Documentation](../reference-documentation/ChainlinkProxy.mdx).
+
+## Code Examples
+
+### Solidity
+
+To consume price data from the Chainlink Proxy, your smart contract should reference [`IAggregator`](https://github.com/blocksense-network/blocksense/blob/main/libs/contracts/contracts/interfaces/IAggregator.sol), which defines the external functions implemented by the Chainlink Proxy.
+
+```solidity showLineNumbers copy
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+/**
+ * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
+ * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
+ * DO NOT USE THIS CODE IN PRODUCTION.
+ */
+contract ChainlinkProxyConsumer {
+  IChainlinkAggregator public immutable feed;
+
+  constructor(address feedAddress) {
+    dataFeedStore = IChainlinkAggregator(feedAddress);
+  }
+
+  function getLatestAnswer() external view returns (uint256) {
+    return uint256(dataFeedStore.latestAnswer());
+  }
+
+  function getLatestRoundData()
+    external
+    view
+    returns (
+      uint80 roundId,
+      int256 answer,
+      uint256 startedAt,
+      uint256 updatedAt,
+      uint80 answeredInRound
+    )
+  {
+    return feed.latestRoundData();
+  }
+}
+```
+
+### Solidity Hardhat Example
+
+<Callout type="info" title="Note">
+  You can find a working Hardhat project [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts). Clone the repo and follow the setup instructions to run the example locally.
+</Callout>
+
+### JavaScript
+
+To get latest price:
+
+```js copy
+const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
+const price = await aggregator.latestAnswer();
+```
+
+To get round data:
+
+```js copy
+const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
+const [roundID, answer, startedAt, updatedAt, answeredInRound] = await aggregator.getRoundData(roundId);
+```
+
+To get the feed key the Chainlink Proxy is responsible for:
+
+```js copy
+const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
+const key = await aggregator.key();
+```
