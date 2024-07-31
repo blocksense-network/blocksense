@@ -1,66 +1,68 @@
+Can you format it as mdx file?
+
 # Development Setup and Commands
 
 ### Display Available Commands
 
 See a list of all available Hardhat commands and their descriptions.
 
-```code
-  yarn hardhat help
+```bash copy
+yarn hardhat help
 ```
 
 ### Clean All Untracked Files
 
 This command removes all untracked files and directories. It's useful for cleaning up your workspace.
 
-```code
+```bash copy
 yarn clean
 ```
 
 ### Compile Contracts
 
-Compile smart contracts to ensure they are up-to-date and ready for deployment or testing.
+[Compile](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L12) smart contracts to ensure they are up-to-date and ready for deployment or testing.
 
-```code
+```bash copy filename="package.json"
 yarn build
 ```
 
 ### Run Tests
 
-Execute the test suite to verify that the contracts behave as expected.
+[Execute](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L14) the test suite to verify that the contracts behave as expected.
 
-```code
+```bash copy filename="package.json"
 yarn test
 ```
 
 ### Run Tests with Forking Enabled Only for Tests Marked with @fork in the Description
 
-Run tests with forking enabled for specific tests marked with @fork.
+[Run](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L15) tests with forking enabled for specific tests marked with @fork.
 
-```code
+```bash copy filename="package.json"
 yarn test:fork
 ```
 
 ### Run Tests and Generate Coverage Report
 
-Generate a coverage report.
+[Generate](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L16) a coverage report.
 
-```code
+```bash copy filename="package.json"
 yarn coverage
 ```
 
 ### Display Size of Contracts
 
-Display the size of the compiled contracts to monitor their deployment costs.
+Display the [size](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L18) of the compiled contracts to monitor their deployment costs.
 
-```code
+```bash copy filename="package.json"
 yarn size
 ```
 
 ### Run Local Nodes in Separate Shells
 
-Start a local node and deploy contracts to it. This is useful for local testing and development.
+Start a local node and [deploy](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L17) contracts to it. This is useful for local testing and development.
 
-```code
+```bash copy filename="package.json"
 yarn hardhat node
 yarn deploy:local ./scripts/<script_name>.ts
 ```
@@ -69,7 +71,7 @@ yarn deploy:local ./scripts/<script_name>.ts
 
 Fork the mainnet to test scripts or contracts in a controlled local environment.
 
-```code
+```bash copy
 FORKING=true yarn hardhat run ./scripts/{script-name}.ts
 ```
 
@@ -77,6 +79,6 @@ FORKING=true yarn hardhat run ./scripts/{script-name}.ts
 
 Run tests with opcode and gas usage tracing enabled to analyze the performance and efficiency of your contracts.
 
-```code
+```bash copy
 TRACE_TX=true yarn test
 ```
