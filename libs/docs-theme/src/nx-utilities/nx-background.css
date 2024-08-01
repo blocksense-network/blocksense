@@ -72,3 +72,7 @@
   --tw-bg-opacity: 1;
   background-color: rgba(254, 252, 232, var(--tw-bg-opacity));
 }
+.nx-bg-slate-200 {
+  --tw-bg-opacity: 0.4;
+  background-color: rgba(226, 232, 240, var(--tw-bg-opacity));
+}

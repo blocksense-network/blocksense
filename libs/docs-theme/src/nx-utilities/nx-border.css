@@ -76,3 +76,7 @@
 .nx-border-opacity-\[0\.04\] {
   --tw-border-opacity: 0.004;
 }
+.nx-border-slate-200 {
+  --tw-bg-opacity: 0.4;
+  background-color: rgba(226, 232, 240, var(--tw-bg-opacity));
+}
