@@ -518,6 +518,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/sol-reflector@workspace:libs/sol-reflector"
   dependencies:
+    "@blocksense/base-utils": "workspace:*"
     "@types/mocha": "npm:^7.0.2"
     "@types/node": "npm:^22.1.0"
     hardhat: "npm:^2.22.7"
