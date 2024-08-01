@@ -14,7 +14,7 @@ Historic Data Feed Store contract is where all data is stored. It is written in 
 
 In order to read data from the contract, the client must call the `fallback` function as follows:
 
-- To read the latest round data:
+- To read the latest price and timestamp:
   - ProxyCall:
   ```solidity copy
   function getDataById(
@@ -94,7 +94,7 @@ In order to read data from the contract, the client must call the `fallback` fun
   ```
 
 - To get the latest round data:
-- ProxyCall:
+  - ProxyCall:
   ```solidity copy
   function getDataById(
     uint32 key
@@ -127,3 +127,83 @@ In order to read data from the contract, the client must call the `fallback` fun
 <Callout type="info" title="Note">
   You can find a working Hardhat project [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts). Clone the repo and follow the setup instructions to run the example locally.
 </Callout>
+
+### Ethers.js v6.x
+
+To read the latest value and timestamp:
+
+```js copy
+const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
+const data = '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
+
+const res = await network.provider.send('eth_call', [
+  {
+    to: historicDataFeedStore.target,
+    data,
+  },
+  'latest',
+]);
+
+const value = Number(res.slice(0, 50));
+const timestamp = Number('0x' + res.slice(50, 66));
+```
+
+To read historical data for a specific round:
+
+```js copy
+const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
+const round = 1;
+const data = '0x' + ((key | 0x20000000) >>> 0).toString(16).padStart(8, '0');
+
+const res = await network.provider.send('eth_call', [
+  {
+    to: historicDataFeedStore.target,
+    data: ethers.solidityPacked(
+      ['bytes4', 'uint256'],
+      [
+        data,
+        round,
+      ],
+    ),
+  },
+  'latest',
+]);
+
+const value = Number(res.slice(0, 50));
+const timestamp = Number('0x' + res.slice(50, 66));
+```
+
+To get the latest round:
+
+```js copy
+const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
+const data = '0x' + ((key | 0x40000000) >>> 0).toString(16).padStart(8, '0');
+
+const res = await network.provider.send('eth_call', [
+  {
+    to: historicDataFeedStore.target,
+    data,
+  },
+  'latest',
+]);
+const round = Number('0x' + res.slice(66));
+```
+
+To get the latest round data:
+
+```js copy
+const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
+const data = '0x' + ((key | 0xc0000000) >>> 0).toString(16).padStart(8, '0');
+
+const res = await network.provider.send('eth_call', [
+  {
+    to: historicDataFeedStore.target,
+    data,
+  },
+  'latest',
+]);
+
+const value = Number(res.slice(0, 50));
+const timestamp = Number('0x' + res.slice(50, 66));
+const round = Number('0x' + res.slice(66));
+```
