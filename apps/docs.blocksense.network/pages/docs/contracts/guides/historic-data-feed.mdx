@@ -2,17 +2,17 @@ import { Callout } from 'nextra/components'
 
 # Historic Data Feed Store
 
-Historic Data Feed Store contract is where all data is stored. It is written in Solidity assembly and contains only one function: `fallback`.
+Historic Data Feed Store contract is where all data is stored and where all contract read from. It is written in Solidity assembly and contains only one function: `fallback`.
 
 ## Code Examples
 
 ### Solidity
 
 <Callout type="info">
-  Use [ProxyCall library](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts/contracts/libraries/ProxyCall.sol) for easier interaction with the contract.
+  Use [ProxyCall library](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts/contracts/libraries/ProxyCall.sol) for easy and gas optimised interaction with the contract.
 </Callout>
 
-In order to read data from the contract, the client must call the `fallback` function as follows:
+In order to retrieve data from the contract, the client must call the `fallback` function as follows:
 
 - To read the latest price and timestamp:
   - ProxyCall:

@@ -32,7 +32,7 @@ For a complete list of functions and parameters for the FeedRegistry contract, s
 
 ## Base and Quote
 
-The FeedRegistry maps feeds from `base` and `quote` address pairs. To get the latest WETH / USDC round data from the registry, call:
+The Feed Registry maps feeds from `base` and `quote` address pairs. To get the latest WETH / USDC round data from the registry, call:
 
 ```solidity copy
 latestRoundData(address base, address quote)
@@ -91,7 +91,7 @@ contract RegistryConsumer {
   You can find a working Hardhat project [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts). Clone the repo and follow the setup instructions to run the example locally.
 </Callout>
 
-### JavaScript
+### Ethers.js v6.x
 
 To get latest price:
 

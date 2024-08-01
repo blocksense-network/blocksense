@@ -2,7 +2,7 @@ import { Callout } from 'nextra/components'
 
 # Chainlink Proxy
 
-The Chainlink Proxy is a smart contract that acts as a proxy for a Blocksense feed. It provides easy access to the latest round data and historical round data for a given feed. The Chainlink Proxy is responsible for a single feed associated with a specific token pair on a given network.
+The Chainlink Proxy is a smart contract that acts as a proxy for a Blocksense feed. It provides easy access to the latest round data and historical round data for a given feed. The Chainlink Proxy is responsible for a single feed associated with a specific token pair on a given network. It exposes a part of Chainlink's aggregator interface, hence the name.
 
 ```mermaid
 ---
@@ -77,7 +77,7 @@ contract ChainlinkProxyConsumer {
   You can find a working Hardhat project [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts). Clone the repo and follow the setup instructions to run the example locally.
 </Callout>
 
-### JavaScript
+### Ethers.js v6.x
 
 To get latest price:
 
