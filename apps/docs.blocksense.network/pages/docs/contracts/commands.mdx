@@ -1,10 +1,8 @@
-Can you format it as mdx file?
-
 # Development Setup and Commands
 
 ### Display Available Commands
 
-See a list of all available Hardhat commands and their descriptions.
+See a complete list of available Hardhat commands and their descriptions in [package.json](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json).
 
 ```bash copy
 yarn hardhat help
@@ -20,49 +18,49 @@ yarn clean
 
 ### Compile Contracts
 
-[Compile](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L12) smart contracts to ensure they are up-to-date and ready for deployment or testing.
+Compile smart contracts to ensure they are up-to-date and ready for deployment or testing.
 
-```bash copy filename="package.json"
+```bash copy
 yarn build
 ```
 
 ### Run Tests
 
-[Execute](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L14) the test suite to verify that the contracts behave as expected.
+Execute the test suite to verify that the contracts behave as expected.
 
-```bash copy filename="package.json"
+```bash copy
 yarn test
 ```
 
 ### Run Tests with Forking Enabled Only for Tests Marked with @fork in the Description
 
-[Run](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L15) tests with forking enabled for specific tests marked with @fork.
+Run tests with forking enabled for specific tests marked with @fork.
 
-```bash copy filename="package.json"
+```bash copy
 yarn test:fork
 ```
 
 ### Run Tests and Generate Coverage Report
 
-[Generate](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L16) a coverage report.
+Generate a coverage report.
 
-```bash copy filename="package.json"
+```bash copy
 yarn coverage
 ```
 
 ### Display Size of Contracts
 
-Display the [size](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L18) of the compiled contracts to monitor their deployment costs.
+Display the size of the compiled contracts to monitor their deployment costs.
 
-```bash copy filename="package.json"
+```bash copy
 yarn size
 ```
 
 ### Run Local Nodes in Separate Shells
 
-Start a local node and [deploy](https://github.com/blocksense-network/blocksense/blob/a7dc2c4976f6c8fee6a913616c29bf948d489bbc/libs/contracts/package.json#L17) contracts to it. This is useful for local testing and development.
+Start a local node and deploy contracts to it. This is useful for local testing and development.
 
-```bash copy filename="package.json"
+```bash copy
 yarn hardhat node
 yarn deploy:local ./scripts/<script_name>.ts
 ```
