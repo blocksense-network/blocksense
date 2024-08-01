@@ -32,7 +32,7 @@ import { SourceUnit } from '@/sol-contracts-components/SourceUnit';
   return content;
 }
 
-function generateSolRefDocFiles(): Promise<void[]> {
+function generateSolRefDocFiles(): Promise<string[]> {
   const mdxFiles = solReflection.map(sourceUnit => ({
     name: path.parse(sourceUnit.absolutePath).name,
     content: generateMarkdownContent(sourceUnit),
