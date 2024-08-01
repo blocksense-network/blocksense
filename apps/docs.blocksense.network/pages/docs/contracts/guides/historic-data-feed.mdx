@@ -1,0 +1,129 @@
+import { Callout } from 'nextra/components'
+
+# Historic Data Feed Store
+
+Historic Data Feed Store contract is where all data is stored. It is written in Solidity assembly and contains only one function: `fallback`.
+
+## Code Examples
+
+### Solidity
+
+<Callout type="info">
+  Use [ProxyCall library](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts/contracts/libraries/ProxyCall.sol) for easier interaction with the contract.
+</Callout>
+
+In order to read data from the contract, the client must call the `fallback` function as follows:
+
+- To read the latest round data:
+  - ProxyCall:
+  ```solidity copy
+  function getDataById(
+    uint32 key
+  ) external view returns (uint256 value, uint64 timestamp) {
+    bytes32 data = ProxyCall._callDataFeed(
+      dataFeedStore,
+      abi.encodePacked(0x80000000 | key)
+    );
+
+    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+  }
+  ```
+  - Raw call:
+  ```solidity copy
+  function getDataById(
+    uint32 key
+  ) external view returns (uint256 value, uint64 timestamp) {
+    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
+      abi.encodePacked(0x80000000 | key)
+    );
+    require(success, "DataFeedStore: call failed");
+
+    bytes32 data = bytes32(returnData);
+    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+  }
+  ```
+
+- To read historical data for a specific round:
+  - ProxyCall:
+  ```solidity copy
+  function getFeedAtCounter(
+    uint32 key,
+    uint32 counter
+  ) external view returns (uint256 value, uint64 timestamp) {
+    bytes32 data = ProxyCall._callDataFeed(
+      dataFeedStore,
+      abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
+    );
+
+    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+  }
+  ```
+  - Raw call:
+  ```solidity copy
+  function getFeedAtCounter(
+    uint32 key,
+    uint32 counter
+  ) external view returns (uint256 value, uint64 timestamp) {
+    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
+      abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
+    );
+    require(success, "DataFeedStore: call failed");
+
+    bytes32 data = bytes32(returnData);
+    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+  }
+  ```
+
+- To get the latest round:
+  - ProxyCall:
+  ```solidity copy
+  function getLatestCounter(uint32 key) external view returns (uint32 counter) {
+    return uint32(ProxyCall._latestRound(key, dataFeedStore));
+  }
+  ```
+  - Raw call:
+  ```solidity copy
+  function getLatestCounter(uint32 key) external view returns (uint32 counter) {
+    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
+      abi.encodePacked(0x40000000 | key)
+    );
+    require(success, "DataFeedStore: call failed");
+
+    return uint32(uint256(bytes32(returnData)));
+  }
+  ```
+
+- To get the latest round data:
+- ProxyCall:
+  ```solidity copy
+  function getDataById(
+    uint32 key
+  ) external view returns (int256 value, uint256 timestamp, uint80 counter) {
+    (counter, value, timestamp, , ) = ProxyCall
+      ._latestRoundData(key, dataFeedStore);
+  }
+  ```
+  - Raw call:
+  ```solidity copy
+  function getDataById(
+    uint32 key
+  ) external view returns (uint256 value, uint64 timestamp, uint256 counter) {
+    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
+      abi.encodePacked(0xc0000000 | key)
+    );
+    require(success, "DataFeedStore: call failed");
+
+    value = uint256(uint192(bytes24(returnData)));
+    timestamp = uint64(uint256(bytes32(returnData)));
+    assembly {
+      returnData := add(returnData, 0x20)
+    }
+    counter = uint256(bytes32(returnData));
+  }
+  ```
+
+### Solidity Hardhat Example
+
+<Callout type="info" title="Note">
+  You can find a working Hardhat project [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts). Clone the repo and follow the setup instructions to run the example locally.
+</Callout>
