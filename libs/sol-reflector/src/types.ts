@@ -27,9 +27,10 @@ export enum OutputFormat {
   Both = 'both',
 }
 
-export interface Build {
+export interface BuildArtifacts {
   input: SolcInput;
   output: SolcOutput;
+  artifactsPaths: string[];
 }
 
 export type NodeType =
