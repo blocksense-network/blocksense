@@ -3,6 +3,7 @@ import { extendConfig, task } from 'hardhat/config';
 import './type-extensions';
 import { Build } from '../types';
 import { relative } from 'path';
+import { collectAbi } from '../abiCollector';
 
 extendConfig(config => {
   config.reflect ??= {};
@@ -28,4 +29,13 @@ task('reflect', async (_, hre) => {
   );
 
   await main(latestBuild, hre.config.reflect);
+});
+
+// Task to walk all abi files and combine them into a single JSON file
+task('collectABIs', async (_, hre) => {
+  await hre.run('clean');
+  await hre.run('compile');
+
+  const artifactsPaths = await hre.artifacts.getArtifactPaths();
+  await collectAbi(artifactsPaths, hre.config.collectABIs);
 });
