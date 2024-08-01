@@ -1,5 +1,7 @@
 import cn from 'clsx';
-import { Code, Pre, Table, Td, Th, Tr } from 'nextra/components';
+import { Table, Td, Th, Tr } from 'nextra/components';
+import { Code } from './components/code';
+import { Pre } from './components/pre';
 import type { Components } from 'nextra/mdx';
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
 import { Children, cloneElement, useEffect, useRef, useState } from 'react';
