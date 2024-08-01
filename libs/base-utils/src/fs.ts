@@ -72,10 +72,14 @@ export function selectDirectory(baseDir: string) {
      * - **args.ext** - The file extension (if any) such as '.html'
      * - **args.name** - The file name without extension (if any) such as 'index'
      * - **args.content** - The content to be written to the file.
-     * @returns A promise that resolves when the file is written.
+     * @returns A promise that resolves with the file path of the written file.
      */
-    write: (args: FileArgs & { content: string }) =>
-      fs.writeFile(path.format({ dir: baseDir, ...args }), args.content),
+    write: (args: FileArgs & { content: string }) => {
+      const filePath = path.format({ dir: baseDir, ...args });
+      return fs.writeFile(filePath, args.content).then(() => {
+        return filePath;
+      });
+    },
 
     /**
      * Writes a JSON object to a file at the specified directory.
@@ -86,13 +90,16 @@ export function selectDirectory(baseDir: string) {
      * - **args.ext** - The file extension (if any) such as '.json'.  Defaults to '.json'.
      * - **args.name** - The file name without extension (if any) such as 'data'
      * - **args.content** - The JSON content to be written to the file.
-     * @returns A promise that resolves when the file is written.
+     * @returns A promise that resolves with the file path of the written file.
      */
-    writeJSON: (args: FileArgs & { content: Record<string, unknown> }) =>
-      fs.writeFile(
-        path.format({ dir: baseDir, ext: '.json', ...args }),
-        JSON.stringify(args.content, null, 2),
-      ),
+    writeJSON: (args: FileArgs & { content: Record<string, unknown> }) => {
+      const filePath = path.format({ dir: baseDir, ext: '.json', ...args });
+      return fs
+        .writeFile(filePath, JSON.stringify(args.content, null, 2))
+        .then(() => {
+          return filePath;
+        });
+    },
 
     /**
      * Reads content from a file at the specified directory.
