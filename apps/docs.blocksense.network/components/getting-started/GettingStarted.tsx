@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { gettingStartedConfig } from '@/config';
-import { LinkButton } from '@/components/common/LinkButton';
 import { FigureBackdrop } from '@/components/common/FigureBackdrop';
+import { LinkButton } from '@/components/common/LinkButton';
 
 export const GettingStarted = () => {
   return (
@@ -17,10 +17,13 @@ export const GettingStarted = () => {
           </p>
           <span className="lg:ml-auto">
             <LinkButton
+              href="/docs/overview/getting-started"
               label="Get Started"
-              link="/docs/overview/getting-started"
-            />
-            <LinkButton label="Roadmap" link="/docs/overview/roadmap" />
+            ></LinkButton>
+            <LinkButton
+              href="/docs/overview/roadmap"
+              label="Roadmap"
+            ></LinkButton>
           </span>
         </article>
         <aside className="getting-started__image hidden lg:mt-0 lg:col-span-3 lg:flex">

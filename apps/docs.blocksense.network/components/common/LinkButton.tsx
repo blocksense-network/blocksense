@@ -6,7 +6,7 @@ interface ButtonProps {
   href?: string;
   external?: boolean;
   className?: string;
-  children?: React.ReactNode;
+  label?: string;
   asChild?: true;
 }
 
@@ -14,7 +14,7 @@ export const LinkButton = ({
   href,
   external = false,
   className,
-  children,
+  label,
 }: ButtonProps) => {
   const classes = `link_button me-2 mb-2 font-bold ${className} `;
 
@@ -22,10 +22,10 @@ export const LinkButton = ({
     <Button className={classes} asChild>
       {external ? (
         <a href={href} target="_blank" rel="noopener noreferrer">
-          {children}
+          {label}
         </a>
       ) : (
-        href && <Link href={href}>{children}</Link>
+        href && <Link href={href}>{label}</Link>
       )}
     </Button>
   );

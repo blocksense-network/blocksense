@@ -12,10 +12,10 @@ export const Footer = () => {
     >
       <section className="footer__link-button nx-flex nx-items-center hover:nx-opacity-75 ltr:nx-mr-auto rtl:nx-ml-auto">
         <LinkButton
+          href={config.adoptersTextLink}
+          external
           label="Early Adopters"
-          link={config.adoptersTextLink}
-          target="_blank"
-        />
+        ></LinkButton>
       </section>
       <nav className="footer__social-nav flex items-center nx-justify-end">
         <ul className="footer__social-list flex gap-2 mr-6">
