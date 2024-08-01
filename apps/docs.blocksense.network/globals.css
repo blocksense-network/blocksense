@@ -66,6 +66,42 @@
   src: url('/fonts/nerd/SpaceMonoNerdFont-BoldItalic.ttf') format('truetype');
 }
 
+/* Fira Code */
+@font-face {
+  font-family: 'Fira Code';
+  src: url('/fonts/fira/FiraCode-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fira Code Bold';
+  src: url('/fonts/fira/FiraCode-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fira Code Light';
+  src: url('/fonts/fira/FiraCode-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fira Code Medium';
+  src: url('/fonts/fira/FiraCode-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fira Code SemiBold';
+  src: url('/fonts/fira/FiraCode-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
 main {
   margin-top: 20px;
 }
