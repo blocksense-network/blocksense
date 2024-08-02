@@ -36,7 +36,7 @@ For a complete list of functions and parameters for the ChainlinkProxy contract,
 
 To consume price data from the Chainlink Proxy, your smart contract should reference [`IAggregator`](https://github.com/blocksense-network/blocksense/blob/main/libs/contracts/contracts/interfaces/IAggregator.sol), which defines the external functions implemented by the Chainlink Proxy.
 
-```solidity showLineNumbers copy
+```solidity showLineNumbers copy filename="ChainlinkProxyConsumer.sol"
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 /**
@@ -48,11 +48,11 @@ contract ChainlinkProxyConsumer {
   IChainlinkAggregator public immutable feed;
 
   constructor(address feedAddress) {
-    dataFeedStore = IChainlinkAggregator(feedAddress);
+    feed = IChainlinkAggregator(feedAddress);
   }
 
   function getLatestAnswer() external view returns (uint256) {
-    return uint256(dataFeedStore.latestAnswer());
+    return uint256(feed.latestAnswer());
   }
 
   function getLatestRoundData()
@@ -81,21 +81,21 @@ contract ChainlinkProxyConsumer {
 
 To get latest price:
 
-```js copy
+```js copy filename="javascript"
 const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
 const price = await aggregator.latestAnswer();
 ```
 
 To get round data:
 
-```js copy
+```js copy filename="javascript"
 const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
 const [roundID, answer, startedAt, updatedAt, answeredInRound] = await aggregator.getRoundData(roundId);
 ```
 
 To get the feed key the Chainlink Proxy is responsible for:
 
-```js copy
+```js copy filename="javascript"
 const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
 const key = await aggregator.key();
 ```

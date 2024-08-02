@@ -16,7 +16,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 - To read the latest price and timestamp:
   - ProxyCall:
-  ```solidity copy
+  ```solidity copy filename="solidity"
   function getDataById(
     uint32 key
   ) external view returns (uint256 value, uint64 timestamp) {
@@ -29,7 +29,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
   }
   ```
   - Raw call:
-  ```solidity copy
+  ```solidity copy filename="solidity"
   function getDataById(
     uint32 key
   ) external view returns (uint256 value, uint64 timestamp) {
@@ -45,7 +45,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 - To read historical data for a specific round:
   - ProxyCall:
-  ```solidity copy
+  ```solidity copy filename="solidity"
   function getFeedAtCounter(
     uint32 key,
     uint32 counter
@@ -59,7 +59,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
   }
   ```
   - Raw call:
-  ```solidity copy
+  ```solidity copy filename="solidity"
   function getFeedAtCounter(
     uint32 key,
     uint32 counter
@@ -76,13 +76,13 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 - To get the latest round:
   - ProxyCall:
-  ```solidity copy
+  ```solidity copy filename="solidity"
   function getLatestCounter(uint32 key) external view returns (uint32 counter) {
     return uint32(ProxyCall._latestRound(key, dataFeedStore));
   }
   ```
   - Raw call:
-  ```solidity copy
+  ```solidity copy filename="solidity"
   function getLatestCounter(uint32 key) external view returns (uint32 counter) {
     (bool success, bytes memory returnData) = dataFeedStore.staticcall(
       abi.encodePacked(0x40000000 | key)
@@ -95,7 +95,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 - To get the latest round data:
   - ProxyCall:
-  ```solidity copy
+  ```solidity copy filename="solidity"
   function getDataById(
     uint32 key
   ) external view returns (int256 value, uint256 timestamp, uint80 counter) {
@@ -104,7 +104,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
   }
   ```
   - Raw call:
-  ```solidity copy
+  ```solidity copy filename="solidity"
   function getDataById(
     uint32 key
   ) external view returns (uint256 value, uint64 timestamp, uint256 counter) {
@@ -132,7 +132,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 To read the latest value and timestamp:
 
-```js copy
+```js copy filename="javascript"
 const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
 const data = '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
 
@@ -150,7 +150,7 @@ const timestamp = Number('0x' + res.slice(50, 66));
 
 To read historical data for a specific round:
 
-```js copy
+```js copy filename="javascript"
 const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
 const round = 1;
 const data = '0x' + ((key | 0x20000000) >>> 0).toString(16).padStart(8, '0');
@@ -175,7 +175,7 @@ const timestamp = Number('0x' + res.slice(50, 66));
 
 To get the latest round:
 
-```js copy
+```js copy filename="javascript"
 const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
 const data = '0x' + ((key | 0x40000000) >>> 0).toString(16).padStart(8, '0');
 
@@ -191,7 +191,7 @@ const round = Number('0x' + res.slice(66));
 
 To get the latest round data:
 
-```js copy
+```js copy filename="javascript"
 const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
 const data = '0x' + ((key | 0xc0000000) >>> 0).toString(16).padStart(8, '0');
 
