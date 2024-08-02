@@ -10,11 +10,9 @@ use tokio::sync::mpsc;
 use sequencer::reporters::reporter::init_shared_reporters;
 
 use sequencer::http_handlers::admin::{deploy, get_feed_report_interval, get_key, set_log_level};
-use sequencer::http_handlers::data_feeds::post_report;
-use sequencer::metrics_collector::metrics_collector::metrics_collector_loop;
-use utils::logging::init_shared_logging_handle;
 use sequencer::http_handlers::data_feeds::{post_report, register_feed};
-use sequencer::utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
+use sequencer::metrics_collector::metrics_collector::metrics_collector_loop;
+use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 
 use actix_web::rt::spawn;
 use actix_web::web::Data;
@@ -159,9 +157,6 @@ OPTIONS
 
     collected_futures.push(main_http_server_fut);
     collected_futures.push(admin_http_server_fut);
-    collected_futures.push(votes_batcher);
-    collected_futures.push(votes_sender);
-    collected_futures.push(metrics_collector);
 
     if start_metrics_server {
         let prometheus_http_server_fut = spawn(async move {

@@ -1,9 +1,8 @@
-use crypto::PublicKey;
-use super::super::utils::time_utils::get_ms_since_epoch;
 use chrono::{TimeZone, Utc};
+use crypto::PublicKey;
 use eyre::Result;
-use utils::time::current_unix_time;
 use std::sync::{Arc, RwLock};
+use utils::time::current_unix_time;
 
 use super::super::feeds::feeds_state::FeedsState;
 use actix_web::web;
@@ -17,10 +16,11 @@ use tracing::{debug, info, trace, warn};
 use uuid::Uuid;
 
 use crate::feeds::feed_slots_processor::feed_slots_processor_loop;
-use crate::feeds::feeds_registry::{FeedAggregateHistory, FeedMetaData};
 use crypto::verify_signature;
 use crypto::Signature;
+use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::{DataFeedPayload, FeedResult, Timestamp};
+use feed_registry::types::{FeedMetaData, Repeatability};
 use prometheus::{inc_metric, inc_vec_metric};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time::Duration;
@@ -160,7 +160,7 @@ pub async fn post_report(
         }
     };
 
-    let current_time_as_ms = get_ms_since_epoch();
+    let current_time_as_ms = current_unix_time();
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
@@ -354,7 +354,6 @@ mod tests {
     use crate::config::config::init_sequencer_config;
     use crate::feeds::feed_allocator::init_concurrent_allocator;
     use crate::feeds::feed_workers::prepare_app_workers;
-    use crate::feeds::feeds_registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use crate::http_handlers::admin::deploy;
     use crate::providers::provider::can_read_contract_bytecode;
     use crate::providers::provider::init_shared_rpc_providers;
@@ -366,7 +365,6 @@ mod tests {
     use data_feeds::connector::post::generate_signature;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
-    use data_feeds::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
     use regex::Regex;
     use sequencer_config::get_test_config_with_single_provider;
     use std::collections::HashMap;
@@ -374,11 +372,10 @@ mod tests {
     use std::path::PathBuf;
     use std::str::FromStr;
     use std::sync::{Arc, RwLock};
-    use std::time::{SystemTime, UNIX_EPOCH};
-    use utils::logging::init_shared_logging_handle;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::mpsc;
     use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+    use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
     async fn post_report_from_unknown_reporter_fails_with_401() {
@@ -454,5 +451,223 @@ mod tests {
         // Execute the request and read the response
         let resp = test::call_service(&app, req).await;
         assert_eq!(resp.status(), 401);
+    }
+
+    async fn create_app_state_from_sequencer_config(
+        network: &str,
+        key_path: &str,
+        anvil_endpoint: &str,
+    ) -> (UnboundedReceiver<(String, String)>, web::Data<FeedsState>) {
+        let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
+
+        let providers =
+            init_shared_rpc_providers(&cfg, Some("create_app_state_from_sequencer_config")).await;
+
+        let log_handle = init_shared_logging_handle();
+
+        let (vote_send, vote_recv): (
+            UnboundedSender<(String, String)>,
+            UnboundedReceiver<(String, String)>,
+        ) = mpsc::unbounded_channel();
+        let send_channel: UnboundedSender<(String, String)> = vote_send.clone();
+
+        (
+            vote_recv,
+            web::Data::new(FeedsState {
+                registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(&cfg))),
+                reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+                providers: providers.clone(),
+                log_handle,
+                reporters: init_shared_reporters(
+                    &cfg,
+                    Some("create_app_state_from_sequencer_config"),
+                ),
+                feed_id_allocator: Arc::new(RwLock::new(Some(init_concurrent_allocator()))),
+                voting_send_channel: send_channel,
+            }),
+        )
+    }
+
+    #[actix_web::test]
+    async fn test_register_feed_success() {
+        // Test that registering a oneshot feed and reporting a vote will lead
+        // to a transaction write in the smart contract
+        const HTTP_STATUS_SUCCESS: u16 = 200;
+
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = "/tmp/priv_key_test";
+        let network = "ETH140";
+
+        // Read app config
+        let cfg =
+            get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
+
+        // Create app state
+        let (voting_receive_channel, app_state) =
+            create_app_state_from_sequencer_config(network, key_path, anvil.endpoint().as_str())
+                .await;
+
+        // Prepare the workers outside of the spawned task
+        let collected_futures =
+            prepare_app_workers(app_state.clone(), &cfg, voting_receive_channel).await;
+
+        // Start the async block in a separate task
+        let _handle = tokio::spawn(async move {
+            let result = futures::future::join_all(collected_futures).await;
+            for v in result {
+                match v {
+                    Ok(res) => match res {
+                        Ok(x) => x,
+                        Err(e) => {
+                            panic!("TaskError: {}", e.to_string());
+                        }
+                    },
+                    Err(e) => {
+                        panic!("JoinError: {} ", e.to_string());
+                    }
+                }
+            }
+        });
+
+        // Initialize the service
+        let app = test::init_service(
+            App::new()
+                .app_data(app_state.clone())
+                .service(register_feed)
+                .service(deploy)
+                .service(post_report),
+        )
+        .await;
+
+        // Deploy event_feed contract
+        let req = test::TestRequest::get()
+            .uri(&format!("/deploy/{}/event_feed", network))
+            .to_request();
+
+        let resp = test::call_service(&app, req).await;
+        {
+            // Assert contract is deployed
+
+            fn extract_eth_address(message: &str) -> Option<String> {
+                let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
+                if let Some(mat) = re.find(message) {
+                    return Some(mat.as_str().to_string());
+                }
+                None
+            }
+
+            assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+            let body = test::read_body(resp).await;
+            let body_str = std::str::from_utf8(&body).expect("Failed to read body");
+            let contract_address = extract_eth_address(body_str).unwrap();
+            assert_eq!(body_str.len(), 66);
+
+            // Assert we can read bytecode from that address
+            let extracted_address = Address::from_str(&contract_address).ok().unwrap();
+            let provider = app_state
+                .providers
+                .read()
+                .unwrap()
+                .get(network)
+                .unwrap()
+                .clone();
+            let can_get_bytecode = can_read_contract_bytecode(provider, &extracted_address).await;
+            assert!(can_get_bytecode);
+        }
+
+        // Construct the request payload
+        let register_request = RegisterFeedRequest {
+            name: "TestFeed".to_string(),
+            schema_id: "de82dccb-953f-4e48-b830-71b820347b12".to_string(),
+            num_slots: 2 as u8,
+            repeatability: "event_feed".to_string(),
+            voting_start_time: SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_millis()
+                + 60000, // 1 minute in the future
+            voting_end_time: SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_millis()
+                + 120000, // 2 minutes in the future
+        };
+
+        // Send the request
+        let req = test::TestRequest::post()
+            .uri("/feed/register")
+            .set_json(&register_request)
+            .to_request();
+
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+
+        // Implement and endpoint that gets the data feeds after some timestamp
+        // Call it and check feed has been added
+
+        // Post a report for the datafeed
+
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP TWO - Prepare sample report and send it to /post_report
+        /////////////////////////////////////////////////////////////////////
+
+        // Updates for Oneshot
+        let slot1 =
+            String::from("0404040404040404040404040404040404040404040404040404040404040404");
+        let slot2 =
+            String::from("0505050505050505050505050505050505050505050505050505050505050505");
+        let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
+        let mut updates_oneshot: HashMap<String, String> = HashMap::new();
+        updates_oneshot.insert(String::from("00000003"), value1);
+
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("System clock set before EPOCH")
+            .as_millis();
+
+        const FEED_ID: &str = "1";
+        const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
+        const REPORT_VAL: f64 = 80000.8;
+        let result = FeedResult::Result {
+            result: FeedType::Numerical(REPORT_VAL),
+        };
+        let signature = generate_signature(&SECRET_KEY.to_string(), FEED_ID, timestamp, &result);
+
+        let payload = DataFeedPayload {
+            payload_metadata: PayloadMetaData {
+                reporter_id: 0,
+                feed_id: FEED_ID.to_string(),
+                timestamp,
+                signature: JsonSerializableSignature { sig: signature },
+            },
+            result,
+        };
+
+        let serialized_payload = match serde_json::to_value(&payload) {
+            Ok(payload) => payload,
+            Err(_) => panic!("Failed serialization of payload!"),
+        };
+
+        let payload_as_string = serialized_payload.to_string();
+
+        let req = test::TestRequest::post()
+            .uri("/post_report")
+            .set_payload(payload_as_string)
+            .to_request();
+
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), 401);
+
+        /////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////
+
+        // sleep a little bit
+        tokio::time::sleep(Duration::from_millis(2000)).await;
+        // Use contract_address and assert a transaction was written there
+        // sleep a little bit
+        tokio::time::sleep(Duration::from_millis(2000)).await;
+        // Assert feed is no longer in registry (was removed after vote)
     }
 }

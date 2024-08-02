@@ -214,7 +214,6 @@ mod tests {
     use crate::config::config::init_sequencer_config;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
-    use crate::utils::logging::init_shared_logging_handle;
     use actix_web::{http::header::ContentType, test, App};
     use alloy::node_bindings::Anvil;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};

@@ -298,13 +298,11 @@ mod tests {
     use super::*;
     use crate::feeds::feed_slots_processor::feed_slots_processor_loop;
     use crate::providers::provider::{can_read_contract_bytecode, init_shared_rpc_providers};
-    use alloy::primitives::{address, Address};
+    use actix_web::Handler;
+    use alloy::primitives::{address, Address, TxKind};
+    use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
     use feed_registry::types::Repeatability::Oneshot;
-    use actix_web::Handler;
-    use alloy::node_bindings::Anvil;
-    use alloy::primitives::{Address, TxKind};
-    use alloy::rpc::types::eth::TransactionInput;
     use regex::Regex;
     use sequencer_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,
