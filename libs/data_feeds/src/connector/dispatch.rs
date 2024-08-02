@@ -76,7 +76,7 @@ fn feed_builder(
 
 pub async fn dispatch(
     reporter_config: &ReporterConfig,
-    feed_registry: &AllFeedsConfig,
+    _feed_registry: &AllFeedsConfig,
     feeds: &Vec<(DataFeedAPI, String)>,
     feed_id_map: &HashMap<String, &FeedConfig>,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,

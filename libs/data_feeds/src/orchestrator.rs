@@ -73,7 +73,7 @@ pub async fn orchestrator() {
     FEED_COUNTER.inc_by(all_feeds.len() as u64);
     info!("Available feed count: {}\n", FEED_COUNTER.get());
 
-    let prometheus_server = reqwest::Client::new();
+    let request_client = reqwest::Client::new();
 
     loop {
         BATCH_COUNTER.inc();
@@ -103,7 +103,7 @@ pub async fn orchestrator() {
         BATCH_PARSE_TIME_GAUGE.set(elapsed_time as i64);
 
         let metrics_result = handle_prometheus_metrics(
-            &prometheus_server,
+            &request_client,
             reporter_config.prometheus_url.as_str(),
             &encoder,
         )

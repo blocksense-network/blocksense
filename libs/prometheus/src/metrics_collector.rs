@@ -3,10 +3,13 @@ use prometheus_framework::TextEncoder;
 
 use anyhow::Result;
 
+use crate::metrics::BUILD_INFO;
+
 pub fn gather_and_dump_metrics() -> Result<String> {
     let mut buffer = Vec::new();
     let encoder = TextEncoder::new();
 
+    BUILD_INFO.set(1);
     // Gather the metrics.
     let metric_families = prometheus_framework::gather();
     // Encode them to send.
