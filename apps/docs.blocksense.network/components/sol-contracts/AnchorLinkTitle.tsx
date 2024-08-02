@@ -2,6 +2,7 @@ import React, { createElement } from 'react';
 
 type AnchorLinkTitleProps = {
   title?: string;
+  parentTitle?: string;
   titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   accordion?: boolean;
 };
@@ -22,6 +23,7 @@ const borderStyles =
 
 export const AnchorLinkTitle = ({
   title,
+  parentTitle,
   titleLevel,
   accordion,
 }: AnchorLinkTitleProps) => {
@@ -35,8 +37,8 @@ export const AnchorLinkTitle = ({
       <>
         {title}
         <a
-          href={`#${title}`}
-          id={title}
+          href={`#${parentTitle ? `${parentTitle}-` : ''}${title}`}
+          id={`${parentTitle ? `${parentTitle}-` : ''}${title}`}
           className="subheading-anchor"
           aria-label="Permalink for this section"
         ></a>
