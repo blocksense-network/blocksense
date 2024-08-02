@@ -34,11 +34,13 @@ export const SourceUnit = ({
         variables={filterConstants(sourceUnit.variables)}
         title="Constants"
         titleLevel={2}
+        columns={['type', 'name', 'mutability', 'description']}
       />
       <Variables
         variables={filterVariables(sourceUnit.variables)}
         title="Variables"
         titleLevel={2}
+        columns={['type', 'name', 'mutability', 'description']}
       />
       <Errors errors={sourceUnit.errors} isFromSourceUnit />
       <Functions functions={sourceUnit.functions} isFromSourceUnit />

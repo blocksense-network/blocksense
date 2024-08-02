@@ -29,11 +29,13 @@ export const Contracts = ({ contracts }: ContractsProps) => {
               variables={filterConstants(contract.variables)}
               title="Constants"
               titleLevel={3}
+              columns={['type', 'name', 'mutability', 'description']}
             />
             <Variables
               variables={filterVariables(contract.variables)}
               title="Variables"
               titleLevel={3}
+              columns={['type', 'name', 'mutability', 'description']}
             />
             <Errors errors={contract.errors} />
             <Events events={contract.events} />
