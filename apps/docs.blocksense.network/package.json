@@ -22,7 +22,7 @@
     "prettier": "^3.3.1",
     "shiki": "^1.10.1",
     "tslib": "^2.6.3",
-    "typescript": "^5.4.5",
+    "typescript": "^5.5.4",
     "vitest": "^1.6.0"
   },
   "dependencies": {
