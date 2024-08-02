@@ -1,0 +1,20 @@
+import { assertNotNull } from './asserts';
+
+/**
+ * The root directory of the Git repository.
+ */
+export const rootDir = getEnvString('GIT_ROOT');
+
+/**
+ * Retrieves the value of an environment variable.
+ *
+ * @param {string} varName - The name of the environment variable.
+ * @returns {string} - The value of the environment variable.
+ * @throws {Error} - Throws an error if the environment variable is not set.
+ */
+export function getEnvString(varName: string): string {
+  return assertNotNull(
+    process.env[varName],
+    `Env variable '${varName}' is missing.`,
+  );
+}
