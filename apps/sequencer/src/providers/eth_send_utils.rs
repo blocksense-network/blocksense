@@ -51,6 +51,10 @@ pub async fn deploy_contract(
         p.data_feed_sports_byte_code.clone()
     };
 
+    let Some(bytecode) = bytecode else {
+        return Err(eyre!("Byte code unavailable"));
+    };
+
     let max_priority_fee_per_gas = process_provider_getter!(
         provider.get_max_priority_fee_per_gas().await,
         network,
