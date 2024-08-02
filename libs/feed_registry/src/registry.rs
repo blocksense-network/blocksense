@@ -5,7 +5,7 @@ use std::{
 };
 
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
-use sequencer_config::{get_config_file_path, FeedConfig, SequencerConfig};
+use sequencer_config::{get_config_file_path, FeedConfig};
 use serde::Deserialize;
 use tokio::time;
 use tracing::{info, trace};
@@ -402,8 +402,8 @@ mod tests {
 
         assert_eq!(feed.get_name(), "TestFeed");
 
-        let mut current_time_as_ms = current_unix_time();
-        let mut msg_timestamp_as_ms = current_time_as_ms;
+        let current_time_as_ms = current_unix_time();
+        let msg_timestamp_as_ms = current_time_as_ms;
 
         // test
         // Note: current_time passed is irrelevant for Oneshot feeds because in those feeds there is only one slot.
@@ -602,7 +602,7 @@ mod tests {
         // setup
         const SLOT_INTERVAL: Duration = Duration::from_secs(1);
         const START_TIME_MS: u128 = 0;
-        let mut time_tracker = SlotTimeTracker::new(SLOT_INTERVAL, START_TIME_MS);
+        let time_tracker = SlotTimeTracker::new(SLOT_INTERVAL, START_TIME_MS);
 
         // run
         let start_time = Instant::now();
@@ -648,7 +648,7 @@ mod tests {
         // setup
         let slot_interval: Duration = Duration::from_secs(3);
         let start_time_ms: u128 = current_unix_time() + 6000;
-        let mut time_tracker = SlotTimeTracker::new(slot_interval, start_time_ms);
+        let time_tracker = SlotTimeTracker::new(slot_interval, start_time_ms);
 
         // run
         let duration_ms =

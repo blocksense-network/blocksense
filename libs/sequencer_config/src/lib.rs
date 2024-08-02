@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use std::fs::File;
-use std::hash::Hash;
 use std::io::Write;
 use std::time::SystemTime;
 use std::{collections::HashMap, env, fmt::Debug};

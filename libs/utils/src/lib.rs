@@ -1,3 +1,4 @@
+pub mod build_info;
 pub mod logging;
 pub mod time;
 

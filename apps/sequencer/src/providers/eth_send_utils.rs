@@ -296,10 +296,9 @@ pub async fn eth_batch_send_to_all_contracts<
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::feeds::feed_slots_processor::feed_slots_processor_loop;
+
     use crate::providers::provider::{can_read_contract_bytecode, init_shared_rpc_providers};
-    use actix_web::Handler;
-    use alloy::primitives::{address, Address, TxKind};
+    use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
     use feed_registry::types::Repeatability::Oneshot;
@@ -375,8 +374,6 @@ mod tests {
         let cfg =
             get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
 
-        let first_secret_key = anvil.keys().first().unwrap();
-        let secret_key_bytes = first_secret_key.to_bytes();
         let providers =
             init_shared_rpc_providers(&cfg, Some("test_eth_batch_send_to_oneshot_contract_")).await;
 

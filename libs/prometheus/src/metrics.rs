@@ -1,7 +1,12 @@
 use prometheus_framework::{
-    register_counter, register_histogram_vec, register_int_counter, register_int_counter_vec,
-    register_int_gauge, register_int_gauge_vec, Counter, HistogramVec, IntCounter, IntCounterVec,
-    IntGauge, IntGaugeVec,
+    labels, opts, register_counter, register_histogram_vec, register_int_counter,
+    register_int_counter_vec, register_int_gauge, register_int_gauge_vec, Counter, HistogramVec,
+    IntCounter, IntCounterVec, IntGauge, IntGaugeVec,
+};
+
+use utils::build_info::{
+    BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
+    VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
 };
 
 use anyhow::Result;
@@ -15,7 +20,7 @@ lazy_static::lazy_static! {
         register_int_counter!("BATCH_COUNTER", "number of batches served").unwrap();
 
         pub static ref BATCH_SIZE: IntCounter =
-        register_int_counter!("FEED_COUNTER", "Available feed count").unwrap();
+        register_int_counter!("BATCH_SIZE", "batch size").unwrap();
 
         pub static ref FEED_COUNTER: IntCounter =
         register_int_counter!("FEED_COUNTER", "Available feed count").unwrap();
@@ -24,6 +29,23 @@ lazy_static::lazy_static! {
         register_counter!("UPTIME_COUNTER", "Runtime(sec) duration of reporter").unwrap();
 
         pub static ref BATCH_PARSE_TIME_GAUGE: IntGauge = register_int_gauge!("BATCH_PARSE_TIME_GAUGE", "Time(ms) to parse current batch").unwrap();
+
+        pub static ref BUILD_INFO: IntGauge = register_int_gauge!(opts!(
+            "BUILD_INFO",
+            "BUILD info to identify version of this software product",
+            labels! {
+                "version" => BLOCKSENSE_VERSION,
+                "git_hash" => GIT_HASH,
+                "git_hash_short" => GIT_HASH_SHORT,
+                "git_dirty" => GIT_DIRTY,
+                "git_branch" => GIT_BRANCH,
+                "git_tag" => GIT_TAG,
+                "debug" => VERGEN_CARGO_DEBUG,
+                "features" => VERGEN_CARGO_FEATURES,
+                "optimizations" => VERGEN_CARGO_OPT_LEVEL,
+                "compiler" => VERGEN_RUSTC_SEMVER,
+            }
+        )).unwrap();
 }
 
 #[macro_export]
