@@ -19,10 +19,10 @@
   "devDependencies": {
     "@types/mocha": "^7.0.2",
     "@types/node": "^20.12.13",
-    "hardhat": "^2.22.4",
+    "hardhat": "^2.22.7",
     "solidity-ast": "^0.4.56",
     "ts-node": "^10.9.2",
-    "tsx": "^4.7.1",
+    "tsx": "^4.16.5",
     "typescript": "^5.5.4"
   }
 }

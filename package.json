@@ -19,10 +19,10 @@
     }
   },
   "devDependencies": {
-    "@vercel/build-utils": "^8.2.2",
-    "@vercel/next": "^4.2.16",
-    "@vercel/nft": "^0.27.2",
-    "prettier": "^3.3.1",
+    "@vercel/build-utils": "^8.3.5",
+    "@vercel/next": "^4.3.6",
+    "@vercel/nft": "^0.27.3",
+    "prettier": "^3.3.3",
     "react": "^18.3.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
