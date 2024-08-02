@@ -1,4 +1,4 @@
-import { Callout } from 'nextra/components'
+import { Callout, Tabs } from 'nextra/components'
 
 # Historic Data Feed Store
 
@@ -15,112 +15,128 @@ Historic Data Feed Store contract is where all data is stored and where all cont
 In order to retrieve data from the contract, the client must call the `fallback` function as follows:
 
 - To read the latest price and timestamp:
-  - ProxyCall:
-  ```solidity copy filename="solidity"
-  function getDataById(
-    uint32 key
-  ) external view returns (uint256 value, uint64 timestamp) {
-    bytes32 data = ProxyCall._callDataFeed(
-      dataFeedStore,
-      abi.encodePacked(0x80000000 | key)
-    );
+  <Tabs items={['ProxyCall', 'Raw call']}>
+    <Tabs.Tab>
+      ```solidity copy filename="solidity"
+      function getDataById(
+        uint32 key
+      ) external view returns (uint256 value, uint64 timestamp) {
+        bytes32 data = ProxyCall._callDataFeed(
+          dataFeedStore,
+          abi.encodePacked(0x80000000 | key)
+        );
 
-    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
-  }
-  ```
-  - Raw call:
-  ```solidity copy filename="solidity"
-  function getDataById(
-    uint32 key
-  ) external view returns (uint256 value, uint64 timestamp) {
-    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
-      abi.encodePacked(0x80000000 | key)
-    );
-    require(success, "DataFeedStore: call failed");
+        return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+      }
+      ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+      ```solidity copy filename="solidity"
+      function getDataById(
+        uint32 key
+      ) external view returns (uint256 value, uint64 timestamp) {
+        (bool success, bytes memory returnData) = dataFeedStore.staticcall(
+          abi.encodePacked(0x80000000 | key)
+        );
+        require(success, "DataFeedStore: call failed");
 
-    bytes32 data = bytes32(returnData);
-    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
-  }
-  ```
+        bytes32 data = bytes32(returnData);
+        return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+      }
+      ```
+    </Tabs.Tab>
+  </Tabs>
 
 - To read historical data for a specific round:
-  - ProxyCall:
-  ```solidity copy filename="solidity"
-  function getFeedAtCounter(
-    uint32 key,
-    uint32 counter
-  ) external view returns (uint256 value, uint64 timestamp) {
-    bytes32 data = ProxyCall._callDataFeed(
-      dataFeedStore,
-      abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
-    );
+  <Tabs items={['ProxyCall', 'Raw call']}>
+    <Tabs.Tab>
+      ```solidity copy filename="solidity"
+      function getFeedAtCounter(
+        uint32 key,
+        uint32 counter
+      ) external view returns (uint256 value, uint64 timestamp) {
+        bytes32 data = ProxyCall._callDataFeed(
+          dataFeedStore,
+          abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
+        );
 
-    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
-  }
-  ```
-  - Raw call:
-  ```solidity copy filename="solidity"
-  function getFeedAtCounter(
-    uint32 key,
-    uint32 counter
-  ) external view returns (uint256 value, uint64 timestamp) {
-    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
-      abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
-    );
-    require(success, "DataFeedStore: call failed");
+        return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+      }
+      ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+      ```solidity copy filename="solidity"
+      function getFeedAtCounter(
+        uint32 key,
+        uint32 counter
+      ) external view returns (uint256 value, uint64 timestamp) {
+        (bool success, bytes memory returnData) = dataFeedStore.staticcall(
+          abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
+        );
+        require(success, "DataFeedStore: call failed");
 
-    bytes32 data = bytes32(returnData);
-    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
-  }
-  ```
+        bytes32 data = bytes32(returnData);
+        return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+      }
+      ```
+    </Tabs.Tab>
+  </Tabs>
 
 - To get the latest round:
-  - ProxyCall:
-  ```solidity copy filename="solidity"
-  function getLatestCounter(uint32 key) external view returns (uint32 counter) {
-    return uint32(ProxyCall._latestRound(key, dataFeedStore));
-  }
-  ```
-  - Raw call:
-  ```solidity copy filename="solidity"
-  function getLatestCounter(uint32 key) external view returns (uint32 counter) {
-    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
-      abi.encodePacked(0x40000000 | key)
-    );
-    require(success, "DataFeedStore: call failed");
+  <Tabs items={['ProxyCall', 'Raw call']}>
+    <Tabs.Tab>
+      ```solidity copy filename="solidity"
+      function getLatestCounter(uint32 key) external view returns (uint32 counter) {
+        return uint32(ProxyCall._latestRound(key, dataFeedStore));
+      }
+      ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+      ```solidity copy filename="solidity"
+      function getLatestCounter(uint32 key) external view returns (uint32 counter) {
+        (bool success, bytes memory returnData) = dataFeedStore.staticcall(
+          abi.encodePacked(0x40000000 | key)
+        );
+        require(success, "DataFeedStore: call failed");
 
-    return uint32(uint256(bytes32(returnData)));
-  }
-  ```
+        return uint32(uint256(bytes32(returnData)));
+      }
+      ```
+    </Tabs.Tab>
+  </Tabs>
 
 - To get the latest round data:
-  - ProxyCall:
-  ```solidity copy filename="solidity"
-  function getDataById(
-    uint32 key
-  ) external view returns (int256 value, uint256 timestamp, uint80 counter) {
-    (counter, value, timestamp, , ) = ProxyCall
-      ._latestRoundData(key, dataFeedStore);
-  }
-  ```
-  - Raw call:
-  ```solidity copy filename="solidity"
-  function getDataById(
-    uint32 key
-  ) external view returns (uint256 value, uint64 timestamp, uint256 counter) {
-    (bool success, bytes memory returnData) = dataFeedStore.staticcall(
-      abi.encodePacked(0xc0000000 | key)
-    );
-    require(success, "DataFeedStore: call failed");
+  <Tabs items={['ProxyCall', 'Raw call']}>
+    <Tabs.Tab>
+      ```solidity copy filename="solidity"
+      function getDataById(
+        uint32 key
+      ) external view returns (int256 value, uint256 timestamp, uint80 counter) {
+        (counter, value, timestamp, , ) = ProxyCall
+          ._latestRoundData(key, dataFeedStore);
+      }
+      ```
+    </Tabs.Tab>
+    <Tabs.Tab>
+      ```solidity copy filename="solidity"
+      function getDataById(
+        uint32 key
+      ) external view returns (uint256 value, uint64 timestamp, uint256 counter) {
+        (bool success, bytes memory returnData) = dataFeedStore.staticcall(
+          abi.encodePacked(0xc0000000 | key)
+        );
+        require(success, "DataFeedStore: call failed");
 
-    value = uint256(uint192(bytes24(returnData)));
-    timestamp = uint64(uint256(bytes32(returnData)));
-    assembly {
-      returnData := add(returnData, 0x20)
-    }
-    counter = uint256(bytes32(returnData));
-  }
-  ```
+        value = uint256(uint192(bytes24(returnData)));
+        timestamp = uint64(uint256(bytes32(returnData)));
+        assembly {
+          returnData := add(returnData, 0x20)
+        }
+        counter = uint256(bytes32(returnData));
+      }
+      ```
+    </Tabs.Tab>
+  </Tabs>
 
 ### Solidity Hardhat Example
 
