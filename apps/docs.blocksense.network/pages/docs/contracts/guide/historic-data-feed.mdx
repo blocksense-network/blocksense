@@ -1,4 +1,4 @@
-import { Callout, Tabs } from 'nextra/components'
+import { Callout, Tabs } from 'nextra/components';
 
 # Historic Data Feed Store
 
@@ -9,13 +9,16 @@ Historic Data Feed Store contract is where all data is stored and where all cont
 ### Solidity
 
 <Callout type="info">
-  Use [ProxyCall library](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts/contracts/libraries/ProxyCall.sol) for easy and gas optimised interaction with the contract.
+  Use [ProxyCall
+  library](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts/contracts/libraries/ProxyCall.sol)
+  for easy and gas optimised interaction with the contract.
 </Callout>
 
 In order to retrieve data from the contract, the client must call the `fallback` function as follows:
 
 - To read the latest price and timestamp:
-  <Tabs items={['ProxyCall', 'Raw call']}>
+
+<Tabs items={['ProxyCall', 'Raw call']}>
     <Tabs.Tab>
       ```solidity copy filename="solidity"
       function getDataById(
@@ -30,6 +33,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
       }
       ```
     </Tabs.Tab>
+
     <Tabs.Tab>
       ```solidity copy filename="solidity"
       function getDataById(
@@ -45,10 +49,12 @@ In order to retrieve data from the contract, the client must call the `fallback`
       }
       ```
     </Tabs.Tab>
-  </Tabs>
+
+</Tabs>
 
 - To read historical data for a specific round:
-  <Tabs items={['ProxyCall', 'Raw call']}>
+
+<Tabs items={['ProxyCall', 'Raw call']}>
     <Tabs.Tab>
       ```solidity copy filename="solidity"
       function getFeedAtCounter(
@@ -64,6 +70,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
       }
       ```
     </Tabs.Tab>
+
     <Tabs.Tab>
       ```solidity copy filename="solidity"
       function getFeedAtCounter(
@@ -80,10 +87,12 @@ In order to retrieve data from the contract, the client must call the `fallback`
       }
       ```
     </Tabs.Tab>
-  </Tabs>
+
+</Tabs>
 
 - To get the latest round:
-  <Tabs items={['ProxyCall', 'Raw call']}>
+
+<Tabs items={['ProxyCall', 'Raw call']}>
     <Tabs.Tab>
       ```solidity copy filename="solidity"
       function getLatestCounter(uint32 key) external view returns (uint32 counter) {
@@ -91,6 +100,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
       }
       ```
     </Tabs.Tab>
+
     <Tabs.Tab>
       ```solidity copy filename="solidity"
       function getLatestCounter(uint32 key) external view returns (uint32 counter) {
@@ -103,10 +113,12 @@ In order to retrieve data from the contract, the client must call the `fallback`
       }
       ```
     </Tabs.Tab>
-  </Tabs>
+
+</Tabs>
 
 - To get the latest round data:
-  <Tabs items={['ProxyCall', 'Raw call']}>
+
+<Tabs items={['ProxyCall', 'Raw call']}>
     <Tabs.Tab>
       ```solidity copy filename="solidity"
       function getDataById(
@@ -117,6 +129,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
       }
       ```
     </Tabs.Tab>
+
     <Tabs.Tab>
       ```solidity copy filename="solidity"
       function getDataById(
@@ -136,12 +149,15 @@ In order to retrieve data from the contract, the client must call the `fallback`
       }
       ```
     </Tabs.Tab>
-  </Tabs>
+
+</Tabs>
 
 ### Solidity Hardhat Example
 
 <Callout type="info" title="Note">
-  You can find a working Hardhat project [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts). Clone the repo and follow the setup instructions to run the example locally.
+  You can find a working Hardhat project
+  [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts).
+  Clone the repo and follow the setup instructions to run the example locally.
 </Callout>
 
 ### Ethers.js v6.x
@@ -149,7 +165,11 @@ In order to retrieve data from the contract, the client must call the `fallback`
 To read the latest value and timestamp:
 
 ```js copy filename="javascript"
-const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
+const historicDataFeedStore = new ethers.Contract(
+  contractAddress,
+  abiJson,
+  provider,
+);
 const data = '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
 
 const res = await network.provider.send('eth_call', [
@@ -167,20 +187,18 @@ const timestamp = Number('0x' + res.slice(50, 66));
 To read historical data for a specific round:
 
 ```js copy filename="javascript"
-const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
+const historicDataFeedStore = new ethers.Contract(
+  contractAddress,
+  abiJson,
+  provider,
+);
 const round = 1;
 const data = '0x' + ((key | 0x20000000) >>> 0).toString(16).padStart(8, '0');
 
 const res = await network.provider.send('eth_call', [
   {
     to: historicDataFeedStore.target,
-    data: ethers.solidityPacked(
-      ['bytes4', 'uint256'],
-      [
-        data,
-        round,
-      ],
-    ),
+    data: ethers.solidityPacked(['bytes4', 'uint256'], [data, round]),
   },
   'latest',
 ]);
@@ -192,7 +210,11 @@ const timestamp = Number('0x' + res.slice(50, 66));
 To get the latest round:
 
 ```js copy filename="javascript"
-const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
+const historicDataFeedStore = new ethers.Contract(
+  contractAddress,
+  abiJson,
+  provider,
+);
 const data = '0x' + ((key | 0x40000000) >>> 0).toString(16).padStart(8, '0');
 
 const res = await network.provider.send('eth_call', [
@@ -208,7 +230,11 @@ const round = Number('0x' + res.slice(66));
 To get the latest round data:
 
 ```js copy filename="javascript"
-const historicDataFeedStore = new ethers.Contract(contractAddress, abiJson, provider);
+const historicDataFeedStore = new ethers.Contract(
+  contractAddress,
+  abiJson,
+  provider,
+);
 const data = '0x' + ((key | 0xc0000000) >>> 0).toString(16).padStart(8, '0');
 
 const res = await network.provider.send('eth_call', [

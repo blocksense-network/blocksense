@@ -1,4 +1,4 @@
-import { Callout } from 'nextra/components'
+import { Callout } from 'nextra/components';
 
 # Feed Registry
 
@@ -25,7 +25,10 @@ flowchart TD
 ```
 
 <Callout type="info" title="Note">
-  The Feed Registry exclusively includes feeds associated with canonical token addresses on a given network. Feeds without a corresponding token address, such as those for stock indices, are not included in the registry due to the lack of a canonical token representation.
+  The Feed Registry exclusively includes feeds associated with canonical token
+  addresses on a given network. Feeds without a corresponding token address,
+  such as those for stock indices, are not included in the registry due to the
+  lack of a canonical token representation.
 </Callout>
 
 For a complete list of functions and parameters for the FeedRegistry contract, see the [Feed Registry Reference Documentation](../reference-documentation/FeedRegistry.mdx).
@@ -88,7 +91,9 @@ contract RegistryConsumer {
 ### Solidity Hardhat Example
 
 <Callout type="info" title="Note">
-  You can find a working Hardhat project [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts). Clone the repo and follow the setup instructions to run the example locally.
+  You can find a working Hardhat project
+  [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts).
+  Clone the repo and follow the setup instructions to run the example locally.
 </Callout>
 
 ### Ethers.js v6.x
@@ -104,7 +109,8 @@ To get round data:
 
 ```js copy filename="javascript"
 const registry = new ethers.Contract(contractAddress, abiJson, provider);
-const [roundID, answer, startedAt, updatedAt, answeredInRound] = await registry.getRoundData(base, quote, roundId);
+const [roundID, answer, startedAt, updatedAt, answeredInRound] =
+  await registry.getRoundData(base, quote, roundId);
 ```
 
 To get the ChainlinkProxy address responsible for a given feed:
