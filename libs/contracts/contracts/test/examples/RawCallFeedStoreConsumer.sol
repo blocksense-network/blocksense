@@ -20,8 +20,10 @@ contract RawCallFeedStoreConsumer {
     );
     require(success, 'DataFeedStore: call failed');
 
-    bytes32 data = bytes32(returnData);
-    return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+    return (
+      uint256(uint192(bytes24(returnData))),
+      uint64(uint256(bytes32(returnData)))
+    );
   }
 
   function getRoundData(
@@ -43,7 +45,7 @@ contract RawCallFeedStoreConsumer {
     );
     require(success, 'DataFeedStore: call failed');
 
-    return uint32(uint256(bytes32(returnData)));
+    (, roundId) = abi.decode(returnData, (bytes32, uint32));
   }
 
   function getLatestRoundData(
@@ -54,11 +56,10 @@ contract RawCallFeedStoreConsumer {
     );
     require(success, 'DataFeedStore: call failed');
 
-    value = uint256(uint192(bytes24(returnData)));
-    timestamp = uint64(uint256(bytes32(returnData)));
-    assembly {
-      returnData := add(returnData, 0x20)
-    }
-    roundId = uint256(bytes32(returnData));
+    (bytes32 data1, bytes32 data2) = abi.decode(returnData, (bytes32, bytes32));
+
+    value = uint256(uint192(bytes24(data1)));
+    timestamp = uint64(uint256(data1));
+    roundId = uint256(data2);
   }
 }
