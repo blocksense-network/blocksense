@@ -12,7 +12,7 @@ utils = { path = "../utils" }
 # Note(stanm): Stefan really wanted to keep the library called the same, so we
 # alias the framework.
 prometheus_framework = { package = "prometheus", version = "0.13.4" }
-actix-web = "4.5.1"
-reqwest = "0.12.4"
+actix-web = "4.8.0"
+reqwest = "0.12.5"
 anyhow = "1.0.81"
-lazy_static = "1.4.0"
+lazy_static = "1.5.0"
