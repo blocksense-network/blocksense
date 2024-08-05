@@ -111,6 +111,7 @@ export function filterRelevantFiles(output: SolcOutput, config: FullConfig) {
  */
 export function formatVariable(v: VariableDeclaration): string {
   return [v.typeName?.typeDescriptions.typeString!]
+    .concat(v.constant || v.mutability == 'immutable' ? v.mutability : [])
     .concat(v.name || [])
     .join(' ');
 }
