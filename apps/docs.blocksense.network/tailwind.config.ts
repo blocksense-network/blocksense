@@ -93,14 +93,11 @@ const config = {
     fontFamily: {
       body: ['Inter', ...fallbackFonts],
       sans: ['Inter', ...fallbackFonts],
-      mono: ['Fira Code', 'Space Mono', ...fallbackFonts],
-      'mono-bold': ['Fira Code Bold', 'Space Mono Bold', ...fallbackFonts],
-      'mono-light': ['Fira Code Light', 'Space Mono Italic', ...fallbackFonts],
-      'mono-semibold': [
-        'Fira Code SemiBold',
-        'Space Mono BoldItalic',
-        ...fallbackFonts,
-      ],
+      mono: ['Fira Code', ...fallbackFonts],
+      'mono-space': ['Space Mono', ...fallbackFonts],
+      'mono-space-bold': ['Space Mono Bold', ...fallbackFonts],
+      'mono-space-italic': ['Space Mono Italic', ...fallbackFonts],
+      'mono-space-bold-italic': ['Space Mono BoldItalic', ...fallbackFonts],
       nerd: ['SpaceMono Nerd', 'Space Mono', ...fallbackFonts],
       'nerd-bold': ['SpaceMono Nerd Bold', 'Space Mono Bold', ...fallbackFonts],
       'nerd-italic': [
