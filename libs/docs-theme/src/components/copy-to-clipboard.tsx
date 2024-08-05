@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { CheckIcon } from '../icons/check';
 import { CopyIcon } from '../icons/copy';
 import { Button } from './button';
+import { Tooltip } from './tooltip';
 
 export const CopyToClipboard = ({
   getValue,
@@ -40,8 +41,13 @@ export const CopyToClipboard = ({
   const IconToUse = isCopied ? CheckIcon : CopyIcon;
 
   return (
-    <Button onClick={handleClick} title="Copy code" tabIndex={0} {...props}>
-      <IconToUse className="nextra-copy-icon nx-pointer-events-none nx-h-4 nx-w-4" />
-    </Button>
+    <Tooltip>
+      <Tooltip.Content>
+        <span>Copy code</span>
+      </Tooltip.Content>
+      <Button onClick={handleClick} tabIndex={0} {...props}>
+        <IconToUse className="nextra-copy-icon nx-pointer-events-none nx-h-4 nx-w-4" />
+      </Button>
+    </Tooltip>
   );
 };
