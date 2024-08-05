@@ -366,7 +366,7 @@ __metadata:
     "@rollup/plugin-commonjs": "npm:^26.0.1"
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/plugin-node-resolve": "npm:^15.2.1"
-    "@types/node": "npm:^22.0.0"
+    "@types/node": "npm:^22.1.0"
     "@types/rollup-plugin-peer-deps-external": "npm:^2"
     glob: "npm:^11.0.0"
     rollup: "npm:^3.29.4"
@@ -394,7 +394,7 @@ __metadata:
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4"
     "@types/mocha": "npm:^10.0.6"
-    "@types/node": "npm:^20.14.2"
+    "@types/node": "npm:^22.1.0"
     chai: "npm:4"
     dotenv: "npm:^16.4.5"
     ethers: "npm:^6.13.2"
@@ -468,7 +468,7 @@ __metadata:
     "@radix-ui/react-label": "npm:^2.1.0"
     "@radix-ui/react-slot": "npm:^1.1.0"
     "@radix-ui/react-switch": "npm:^1.1.0"
-    "@types/node": "npm:^20.14.2"
+    "@types/node": "npm:^22.1.0"
     "@types/react": "npm:^18.3.3"
     autoprefixer: "npm:^10.4.19"
     class-variance-authority: "npm:^0.7.0"
@@ -519,7 +519,7 @@ __metadata:
   resolution: "@blocksense/sol-reflector@workspace:libs/sol-reflector"
   dependencies:
     "@types/mocha": "npm:^7.0.2"
-    "@types/node": "npm:^20.12.13"
+    "@types/node": "npm:^22.1.0"
     hardhat: "npm:^2.22.7"
     solidity-ast: "npm:^0.4.56"
     ts-node: "npm:^10.9.2"
@@ -3878,30 +3878,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.12.13":
-  version: 20.14.8
-  resolution: "@types/node@npm:20.14.8"
+"@types/node@npm:^22.1.0":
+  version: 22.1.0
+  resolution: "@types/node@npm:22.1.0"
   dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/06d4643fa3b179b41fe19f9c75c240278ca1f7a313b3b837bc36ea119499c7ad77f06bbe72694ac04aa91ec77fe747baa09b889f4c435450c1724a26bd55f160
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^20.14.2":
-  version: 20.14.2
-  resolution: "@types/node@npm:20.14.2"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/2d86e5f2227aaa42212e82ea0affe72799111b888ff900916376450b02b09b963ca888b20d9c332d8d2b833ed4781987867a38eaa2e4863fa8439071468b0a6f
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^22.0.0":
-  version: 22.0.0
-  resolution: "@types/node@npm:22.0.0"
-  dependencies:
-    undici-types: "npm:~6.11.1"
-  checksum: 10c0/af26a8ec7266c857b0ced75dc3a93c6b65280d1fa40d1b4488c814d30831c5c752489c99ecb5698daec1376145b1a9ddd08350882dc2e07769917a5f22a460bc
+    undici-types: "npm:~6.13.0"
+  checksum: 10c0/553dafcb842b889c036d43b390d464e8ffcf3ca455ddd5b1a1ef98396381eafbeb0c112a15cc6bf9662b72bc25fc45efc4b6f604760e1e84c410f1b7936c488b
   languageName: node
   linkType: hard
 
@@ -15237,10 +15219,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~6.11.1":
-  version: 6.11.1
-  resolution: "undici-types@npm:6.11.1"
-  checksum: 10c0/d8f5739a8e6c779d72336c82deb49c56d5ac9f9f6e0eb2e8dd4d3f6929ae9db7cde370d2e46516fe6cad04ea53e790c5e16c4c75eed7cd0f9bd31b0763bb2fa3
+"undici-types@npm:~6.13.0":
+  version: 6.13.0
+  resolution: "undici-types@npm:6.13.0"
+  checksum: 10c0/2de55181f569c77a4f08063f8bf2722fcbb6ea312a26a9e927bd1f5ea5cf3a281c5ddf23155061db083e0a25838f54813543ff13b0ac34d230d5c1205ead66c1
   languageName: node
   linkType: hard
 
