@@ -14,11 +14,11 @@ contract ChainlinkProxyConsumer {
     feed = IChainlinkAggregator(feedAddress);
   }
 
-  function decimals() external view returns (uint8 decimals_) {
+  function getDecimals() external view returns (uint8 decimals_) {
     return feed.decimals();
   }
 
-  function description() external view returns (string memory description_) {
+  function getDescription() external view returns (string memory description_) {
     return feed.description();
   }
 
