@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, RefObject } from 'react';
 
 type AccordionStates = {
   [key: string]: boolean;
 };
 
-export const useExpandCollapse = (names: string[]) => {
+export const useExpandCollapse = (
+  names: string[],
+  ref: RefObject<HTMLDivElement>,
+) => {
   const [accordionStates, setAccordionStates] = useState<AccordionStates>(
     getInitialAccordionStates(),
   );
@@ -13,24 +16,28 @@ export const useExpandCollapse = (names: string[]) => {
     return Object.fromEntries(names.map(name => [name, false]));
   }
 
+  function scrollToAnchorLink(anchorLinkId: string) {
+    const anchorListNode = ref?.current;
+    const anchorLink = anchorListNode?.querySelector(
+      `#${anchorLinkId.replace(' ', '\\ ')}`,
+    );
+    anchorLink?.scrollIntoView({ behavior: 'smooth' });
+  }
+
   useEffect(() => {
     const handleHashChange = () => {
       const hash = decodeURIComponent(window.location.hash.slice(1).trim());
 
       if (hash) {
+        let resultHash = hash.includes('-') ? hash.split('-')[0] : hash;
         setAccordionStates({
           ...accordionStates,
-          [hash]: true,
+          [resultHash]: true,
         });
-
-        const element = document.getElementById(hash);
-        if (element) {
-          setTimeout(() => {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        }
+        scrollToAnchorLink(hash);
       }
     };
+
     handleHashChange();
 
     window.addEventListener('hashchange', handleHashChange);
@@ -38,7 +45,7 @@ export const useExpandCollapse = (names: string[]) => {
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
-  }, []);
+  }, [ref?.current]);
 
   function expandAll() {
     setAccordionStates(
