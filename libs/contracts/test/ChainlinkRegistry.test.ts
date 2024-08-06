@@ -74,27 +74,15 @@ describe('Chainlink registry interface', async () => {
     );
     await contractWrapperV2.init(owner);
 
-    await contractWrapperV1.setFeed(
-      TOKENS.ETH,
-      TOKENS.USD,
-      contractWrappersV1[0],
-    );
-    await contractWrapperV1.setFeed(
-      TOKENS.BTC,
-      TOKENS.USD,
-      contractWrappersV1[1],
-    );
+    await contractWrapperV1.setFeeds([
+      { base: TOKENS.ETH, quote: TOKENS.USD, feed: contractWrappersV1[0] },
+      { base: TOKENS.BTC, quote: TOKENS.USD, feed: contractWrappersV1[1] },
+    ]);
 
-    await contractWrapperV2.setFeed(
-      TOKENS.ETH,
-      TOKENS.USD,
-      contractWrappersV2[0],
-    );
-    await contractWrapperV2.setFeed(
-      TOKENS.BTC,
-      TOKENS.USD,
-      contractWrappersV2[1],
-    );
+    await contractWrapperV2.setFeeds([
+      { base: TOKENS.ETH, quote: TOKENS.USD, feed: contractWrappersV2[0] },
+      { base: TOKENS.BTC, quote: TOKENS.USD, feed: contractWrappersV2[1] },
+    ]);
   });
 
   it('Should return the correct feed', async () => {

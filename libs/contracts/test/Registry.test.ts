@@ -107,27 +107,31 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       registryWrapperV2.contract.target as string,
     );
 
-    await registryWrapperV1.setFeed(
-      TOKENS.ETH,
-      TOKENS.USD,
-      chainlinkProxyWrappersV1[0],
-    );
-    await registryWrapperV1.setFeed(
-      TOKENS.BTC,
-      TOKENS.USD,
-      chainlinkProxyWrappersV1[1],
-    );
+    await registryWrapperV1.setFeeds([
+      {
+        base: TOKENS.ETH,
+        quote: TOKENS.USD,
+        feed: chainlinkProxyWrappersV1[0],
+      },
+      {
+        base: TOKENS.BTC,
+        quote: TOKENS.USD,
+        feed: chainlinkProxyWrappersV1[1],
+      },
+    ]);
 
-    await registryWrapperV2.setFeed(
-      TOKENS.ETH,
-      TOKENS.USD,
-      chainlinkProxyWrappersV2[0],
-    );
-    await registryWrapperV2.setFeed(
-      TOKENS.BTC,
-      TOKENS.USD,
-      chainlinkProxyWrappersV2[1],
-    );
+    await registryWrapperV2.setFeeds([
+      {
+        base: TOKENS.ETH,
+        quote: TOKENS.USD,
+        feed: chainlinkProxyWrappersV2[0],
+      },
+      {
+        base: TOKENS.BTC,
+        quote: TOKENS.USD,
+        feed: chainlinkProxyWrappersV2[1],
+      },
+    ]);
 
     registryV1.underliers = chainlinkProxyWrappersV1.map(
       wrapper => wrapper.contract,
