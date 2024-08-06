@@ -109,7 +109,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
         );
         require(success, "DataFeedStore: call failed");
 
-        return uint32(uint256(bytes32(returnData)));
+        (, counter) = abi.decode(returnData, (bytes32, uint32));
       }
       ```
     </Tabs.Tab>
@@ -140,12 +140,11 @@ In order to retrieve data from the contract, the client must call the `fallback`
         );
         require(success, "DataFeedStore: call failed");
 
-        value = uint256(uint192(bytes24(returnData)));
-        timestamp = uint64(uint256(bytes32(returnData)));
-        assembly {
-          returnData := add(returnData, 0x20)
-        }
-        counter = uint256(bytes32(returnData));
+        (bytes32 data1, bytes32 data2) = abi.decode(returnData, (bytes32, bytes32));
+
+        value = uint256(uint192(bytes24(data1)));
+        timestamp = uint64(uint256(data1));
+        counter = uint256(data2);
       }
       ```
     </Tabs.Tab>
