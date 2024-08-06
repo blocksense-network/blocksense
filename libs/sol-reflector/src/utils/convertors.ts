@@ -190,6 +190,7 @@ function deriveEnums(node: ASTNode): EnumDocItem[] | undefined {
     (n, parsed) => {
       return {
         ...parsed,
+        signature: getSignature(n),
         _members: n.members.map((m: EnumDefinition) => m.name),
       };
     },
@@ -204,6 +205,7 @@ function deriveStructs(node: ASTNode): StructDocItem[] | undefined {
     (n, parsed) => {
       return {
         ...parsed,
+        signature: getSignature(n),
         _members: (
           n.members.filter(isVariableDeclaration) as VariableDeclaration[]
         ).map(e => {
@@ -293,6 +295,12 @@ function getSignature(node: ASTNode): string | undefined {
 
     case 'VariableDeclaration':
       return `${formatVariable(node)};`;
+
+    case 'EnumDefinition':
+      return `enum ${node.name} { ... };`;
+
+    case 'StructDefinition':
+      return `struct ${node.name} { ... };`;
 
     default:
       return undefined;

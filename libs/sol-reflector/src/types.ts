@@ -187,12 +187,14 @@ export class VariableDocItem {
 
 export class EnumDocItem {
   name: string = '';
+  signature?: string;
   _members: string[] = [];
   natspec: NatSpec = {};
 }
 
 export class StructDocItem {
   name: string = '';
+  signature?: string;
   visibility: Visibility = 'external';
   _members?: VariableDocItem[];
   natspec: NatSpec = {};
