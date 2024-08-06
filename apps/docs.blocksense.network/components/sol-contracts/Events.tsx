@@ -26,8 +26,9 @@ const getEventNames = (events: EventDocItem[] = []) => {
 };
 
 export const Events = ({ events }: EventsProps) => {
+  const elementsRef = React.useRef<HTMLDivElement>(null);
   const { accordionStates, expandAll, collapseAll, toggleAccordion } =
-    useExpandCollapse(getEventNames(events));
+    useExpandCollapse(getEventNames(events), elementsRef);
 
   const allExpanded = Object.values(accordionStates).every(
     accordion => accordion === true,
@@ -53,6 +54,7 @@ export const Events = ({ events }: EventsProps) => {
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
         className="contract-item-wrapper__event w-full space-y-4"
+        ref={elementsRef}
       >
         {events?.map((event, index) => {
           const id = event.name || `event-${index}`;
@@ -75,6 +77,7 @@ export const Events = ({ events }: EventsProps) => {
                 </span>
                 <NatSpec natspec={event.natspec} />
                 <Parameters
+                  parentTitle={event.name}
                   parameters={event._parameters}
                   columns={['type', 'name', 'indexed', 'description']}
                 />

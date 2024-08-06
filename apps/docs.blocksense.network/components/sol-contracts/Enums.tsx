@@ -24,8 +24,9 @@ const getEnumNames = (enums: EnumDocItem[] = []) => {
 };
 
 export const Enums = ({ enums, isFromSourceUnit }: EnumsProps) => {
+  const elementsRef = React.useRef<HTMLDivElement>(null);
   const { accordionStates, expandAll, collapseAll, toggleAccordion } =
-    useExpandCollapse(getEnumNames(enums));
+    useExpandCollapse(getEnumNames(enums), elementsRef);
 
   const allExpanded = Object.values(accordionStates).every(
     accordion => accordion === true,
@@ -51,6 +52,7 @@ export const Enums = ({ enums, isFromSourceUnit }: EnumsProps) => {
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
         className="contract-item-wrapper__enum w-full space-y-4"
+        ref={elementsRef}
       >
         {enums?.map((_enum, index) => {
           const id = _enum.name;
