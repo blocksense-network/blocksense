@@ -4,7 +4,7 @@ import { pagesContractRefDocFolder } from './constants';
 
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 
-import { selectDirectory } from '@blocksense/base-utils';
+import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
 
