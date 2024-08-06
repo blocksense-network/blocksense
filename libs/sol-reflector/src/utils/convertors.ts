@@ -273,26 +273,26 @@ function getSignature(node: ASTNode): string | undefined {
       if (returns.length > 0) {
         res.push(`returns (${returns.map(formatVariable).join(', ')})`);
       }
-      return res.join(' ');
+      return res.join(' ').concat(';');
     }
 
     case 'EventDefinition': {
       const params = node.parameters.parameters;
-      return `event ${node.name}(${params.map(formatVariable).join(', ')})`;
+      return `event ${node.name}(${params.map(formatVariable).join(', ')});`;
     }
 
     case 'ErrorDefinition': {
       const params = node.parameters.parameters;
-      return `error ${node.name}(${params.map(formatVariable).join(', ')})`;
+      return `error ${node.name}(${params.map(formatVariable).join(', ')});`;
     }
 
     case 'ModifierDefinition': {
       const params = node.parameters.parameters;
-      return `modifier ${node.name}(${params.map(formatVariable).join(', ')})`;
+      return `modifier ${node.name}(${params.map(formatVariable).join(', ')});`;
     }
 
     case 'VariableDeclaration':
-      return formatVariable(node);
+      return `${formatVariable(node)};`;
 
     default:
       return undefined;
