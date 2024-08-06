@@ -141,6 +141,11 @@ You can also run the tests and generate a coverage report by running:
 yarn coverage
 ```
 
+## Examples
+
+Example contracts on how to consume data from Blocksense contracts can be found in `contracts/test/examples`.
+Ethers examples on how to read data from Blocksense contracts can be found in `test/examples/utils`.
+
 ## Documentation generation
 
 We use [@blocksense/sol-reflector](../../libs/sol-reflector/README.md) - a tool designed to enhance the documentation extraction process for Solidity smart contracts.
