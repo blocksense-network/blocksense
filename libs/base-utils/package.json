@@ -11,6 +11,18 @@
       "require": "./dist/cjs/index.cjs",
       "import": "./dist/esm/index.mjs",
       "types": "./dist/types/index.d.ts"
+    },"./assert": {
+      "require": "./dist/cjs/asserts.cjs",
+      "import": "./dist/esm/asserts.mjs",
+      "types": "./dist/types/asserts.d.ts"
+    },"./fs": {
+      "require": "./dist/cjs/fs.cjs",
+      "import": "./dist/esm/fs.mjs",
+      "types": "./dist/types/fs.d.ts"
+    },"./env": {
+      "require": "./dist/cjs/env.cjs",
+      "import": "./dist/esm/env.mjs",
+      "types": "./dist/types/env.d.ts"
     }
   },
   "scripts": {
