@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { CopyButton } from '@/components/common/CopyButton';
-import { Tooltip } from '@/components/common/Tooltip';
 
 type SelectorProps = {
   selector?: string;
@@ -16,12 +15,7 @@ export const Selector = ({ selector = '' }: SelectorProps) => {
         <p className="selector-container__text hidden 2xl:block bg-slate-100 px-2">
           {resultSelector}
         </p>
-        <Tooltip position="top">
-          <Tooltip.Content>
-            <span>Copy</span>
-          </Tooltip.Content>
-          <CopyButton textToCopy={resultSelector} />
-        </Tooltip>
+        <CopyButton textToCopy={resultSelector} tooltipPosition="top" />
       </aside>
     )
   );

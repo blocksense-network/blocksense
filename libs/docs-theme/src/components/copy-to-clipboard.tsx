@@ -43,7 +43,7 @@ export const CopyToClipboard = ({
   return (
     <Tooltip>
       <Tooltip.Content>
-        <span>Copy code</span>
+        <span>{isCopied ? 'Copied' : 'Copy'}</span>
       </Tooltip.Content>
       <Button onClick={handleClick} tabIndex={0} {...props}>
         <IconToUse className="nextra-copy-icon nx-pointer-events-none nx-h-4 nx-w-4" />
