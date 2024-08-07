@@ -35,13 +35,15 @@ interface NetworkConfig {
 
 interface ContractConfig {
   [chainId: string]: {
-    [contractName in ContractNames]:
-      | string
-      | Array<{
-          description: string;
-          address: string;
-        }>;
+    [contractName in ContractNames]: string | Array<ChainlinkProxyData>;
   };
+}
+
+interface ChainlinkProxyData {
+  description: string;
+  base: string;
+  quote: string;
+  address: string;
 }
 
 enum ContractNames {
@@ -95,7 +97,9 @@ task('deploy', 'Deploy contracts')
       const multisig = await deployMultisig(config);
 
       const abiCoder = ethers.AbiCoder.defaultAbiCoder();
-      const artifact = artifacts.readArtifactSync('HistoricDataFeedStoreV2');
+      const artifact = artifacts.readArtifactSync(
+        ContractNames.HistoricDataFeedStoreV2,
+      );
       const bytecode = ethers.solidityPacked(
         ['bytes', 'bytes'],
         [
@@ -113,21 +117,21 @@ task('deploy', 'Deploy contracts')
       const multisigAddress = await multisig.getAddress();
       const addresses = await deployContracts(config, multisig, artifacts, [
         {
-          name: 'HistoricDataFeedStoreV2',
+          name: ContractNames.HistoricDataFeedStoreV2,
           argsTypes: ['address'],
           argsValues: [config.signer.address],
           salt: ethers.id('dataFeedStore'),
           value: 0n,
         },
         {
-          name: 'UpgradeableProxy',
+          name: ContractNames.UpgradeableProxy,
           argsTypes: ['address', 'address'],
           argsValues: [dataFeedStoreAddress, multisigAddress],
           salt: ethers.id('proxy'),
           value: 0n,
         },
         {
-          name: 'FeedRegistry',
+          name: ContractNames.FeedRegistry,
           argsTypes: ['address', 'address'],
           argsValues: [config.signer.address, dataFeedStoreAddress],
           salt: ethers.id('registry'),
@@ -135,7 +139,7 @@ task('deploy', 'Deploy contracts')
         },
         ...dataFeedConfig.map((data: any) => {
           return {
-            name: 'ChainlinkProxy',
+            name: ContractNames.ChainlinkProxy,
             argsTypes: ['string', 'uint8', 'uint32', 'address'],
             argsValues: [
               data.description,
@@ -145,6 +149,7 @@ task('deploy', 'Deploy contracts')
             ],
             salt: ethers.id('aggregator'),
             value: 0n,
+            data: data,
           };
         }),
       ]);
@@ -153,6 +158,8 @@ task('deploy', 'Deploy contracts')
         ...addresses,
         SafeMultisig: multisigAddress,
       };
+
+      await registerChainlinkProxies(config, addresses, artifacts);
     }
 
     const file = process.cwd() + '/deployments/deploymentV1.json';
@@ -271,6 +278,7 @@ const deployContracts = async (
     argsValues: any[];
     salt: string;
     value: bigint;
+    data: any;
   }[],
 ) => {
   const createCallAddress = config.safeAddresses.createCallAddress;
@@ -282,9 +290,7 @@ const deployContracts = async (
   );
 
   let contractAddresses = {} as {
-    [contractName in ContractNames]:
-      | string
-      | Array<{ description: any; address: string }>;
+    [contractName in ContractNames]: string | Array<ChainlinkProxyData>;
   };
 
   const abiCoder = ethers.AbiCoder.defaultAbiCoder();
@@ -326,13 +332,10 @@ const deployContracts = async (
       if (!contractAddresses[contract.name]) {
         contractAddresses[contract.name] = [];
       }
-      (
-        contractAddresses[contract.name] as Array<{
-          description: any;
-          address: string;
-        }>
-      ).push({
-        description: contract.argsValues[0],
+      (contractAddresses[contract.name] as Array<ChainlinkProxyData>).push({
+        description: contract.data.description,
+        base: contract.data.base,
+        quote: contract.data.quote,
         address: contractAddress,
       });
     } else {
@@ -343,4 +346,41 @@ const deployContracts = async (
   await multisigTxExec(transactions, multisig);
 
   return contractAddresses;
+};
+
+const registerChainlinkProxies = async (
+  config: NetworkConfig,
+  contracts: {
+    [contractName in ContractNames]: string | Array<ChainlinkProxyData>;
+  },
+  artifacts: Artifacts,
+) => {
+  console.log('\nRegistering ChainlinkProxies in FeedRegistry...');
+  // The difference between setting n and n+1 feeds via FeedRegistry::setFeeds is approximately 55k gas.
+
+  // Split into batches of 100
+  const batches: Array<Array<ChainlinkProxyData>> = [];
+  if (Array.isArray(contracts.ChainlinkProxy)) {
+    for (let i = 0; i < contracts.ChainlinkProxy.length; i += 100) {
+      batches.push(contracts.ChainlinkProxy.slice(i, i + 100));
+    }
+  }
+
+  const registry = new ethers.Contract(
+    contracts.FeedRegistry as string,
+    (await artifacts.readArtifact(ContractNames.FeedRegistry)).abi,
+    config.signer,
+  );
+
+  // Set feeds in batches
+  for (const batch of batches) {
+    const tx = await registry.connect(config.signer).getFunction('setFeeds')(
+      batch.map(data => {
+        return { base: data.base, quote: data.quote, feed: data.address };
+      }),
+      { gasLimit: 20000 + 60 * 1000 * batch.length },
+    );
+    console.log('-> tx hash', tx.hash);
+    await tx.wait();
+  }
 };
