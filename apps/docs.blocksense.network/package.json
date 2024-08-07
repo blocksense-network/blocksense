@@ -21,6 +21,7 @@
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
     "shiki": "^1.12.1",
+    "shiki-magic-move": "^0.4.3",
     "tslib": "^2.6.3",
     "typescript": "^5.5.4",
     "vitest": "^1.6.0"

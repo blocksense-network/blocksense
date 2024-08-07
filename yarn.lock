@@ -483,6 +483,7 @@ __metadata:
     react-dom: "npm:^18.3.1"
     react-vertical-timeline-component: "npm:^3.6.0"
     shiki: "npm:^1.12.1"
+    shiki-magic-move: "npm:^0.4.3"
     tailwind-merge: "npm:^2.4.0"
     tailwindcss: "npm:^3.4.7"
     tailwindcss-animate: "npm:^1.0.7"
@@ -6663,6 +6664,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"diff-match-patch-es@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "diff-match-patch-es@npm:0.1.0"
+  checksum: 10c0/c456d10662506f676489c1572af2a48ad52d015a856b74bf16594d39f11c9a352cd763fd66b5a5952c86a18818f4b7de28d55876e7ffd47f5d71282e3a5056a2
+  languageName: node
+  linkType: hard
+
 "diff-sequences@npm:^29.4.3, diff-sequences@npm:^29.6.3":
   version: 29.6.3
   resolution: "diff-sequences@npm:29.6.3"
@@ -12039,6 +12047,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ohash@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "ohash@npm:1.1.3"
+  checksum: 10c0/928f5bdbd8cd73f90cf544c0533dbda8e0a42d9b8c7454ab89e64e4d11bc85f85242830b4e107426ce13dc4dd3013286f8f5e0c84abd8942a014b907d9692540
+  languageName: node
+  linkType: hard
+
 "once@npm:1.x, once@npm:^1.3.0, once@npm:^1.3.1, once@npm:^1.4.0":
   version: 1.4.0
   resolution: "once@npm:1.4.0"
@@ -14012,6 +14027,30 @@ __metadata:
   bin:
     shjs: bin/shjs
   checksum: 10c0/feb25289a12e4bcd04c40ddfab51aff98a3729f5c2602d5b1a1b95f6819ec7804ac8147ebd8d9a85dfab69d501bcf92d7acef03247320f51c1552cec8d8e2382
+  languageName: node
+  linkType: hard
+
+"shiki-magic-move@npm:^0.4.3":
+  version: 0.4.3
+  resolution: "shiki-magic-move@npm:0.4.3"
+  dependencies:
+    diff-match-patch-es: "npm:^0.1.0"
+    ohash: "npm:^1.1.3"
+  peerDependencies:
+    react: ^18.2.0
+    shiki: ^1.1.6
+    svelte: 5.0.0-next.107
+    vue: ^3.4.0
+  peerDependenciesMeta:
+    react:
+      optional: true
+    shiki:
+      optional: true
+    svelte:
+      optional: true
+    vue:
+      optional: true
+  checksum: 10c0/e9c3bf851ee99877cafabf98dd3ece830c9459f79a338963dd04e70b5b36434658b2ca5f0873adcd501e19a2dfe098d105a9b7b4f8c6a48a7775c60b79ab31bf
   languageName: node
   linkType: hard
 
