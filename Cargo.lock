@@ -8113,6 +8113,7 @@ dependencies = [
 name = "sequencer_config"
 version = "0.1.1"
 dependencies = [
+ "anyhow",
  "dirs 5.0.1",
  "serde 1.0.203",
 ]

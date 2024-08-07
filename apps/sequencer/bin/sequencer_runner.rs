@@ -21,7 +21,7 @@ use sequencer::config::init_sequencer_config;
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
-use sequencer_config::SequencerConfig;
+use sequencer_config::{SequencerConfig, Validated};
 use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
@@ -152,6 +152,9 @@ OPTIONS
         init_sequencer_config().expect("Failed to get config: ");
     let feeds_config = init_feeds_config();
 
+    sequencer_config
+        .validate("SequencerConfig")
+        .expect("validation error");
     let (voting_receive_channel, app_state): (
         UnboundedReceiver<(String, String)>,
         Data<FeedsState>,

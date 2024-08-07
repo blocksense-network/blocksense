@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::Write;
 use std::time::SystemTime;
@@ -14,6 +15,10 @@ pub struct AssetPair {
 pub struct ChainlinkCompatibility {
     pub base: String,
     pub quote: String,
+}
+
+pub trait Validated {
+    fn validate(&self, context: &str) -> anyhow::Result<()>;
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -41,6 +46,12 @@ pub struct ReporterConfig {
     pub reporter: Reporter,
 }
 
+impl Validated for ReporterConfig {
+    fn validate(&self, _context: &str) -> anyhow::Result<()> {
+        Ok(())
+    }
+}
+
 #[derive(Debug, Deserialize)]
 // #[serde(rename_all = "PascalCase")]
 pub struct Provider {
@@ -51,12 +62,26 @@ pub struct Provider {
     pub transcation_timeout_secs: u32,
 }
 
+impl Validated for Provider {
+    fn validate(&self, context: &str) -> anyhow::Result<()> {
+        if self.transcation_timeout_secs == 0 {
+            anyhow::bail!("{}: transcation_timeout_secs cannot be set to 0", context);
+        }
+        Ok(())
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Reporter {
     pub id: u32,
     pub pub_key: String,
 }
 
+impl Validated for Reporter {
+    fn validate(&self, _context: &str) -> anyhow::Result<()> {
+        todo!("Implement validate for reporter")
+    }
+}
 #[derive(Debug, Deserialize)]
 pub struct SequencerConfig {
     pub main_port: u16,
@@ -66,6 +91,29 @@ pub struct SequencerConfig {
     pub keys_batch_duration: u64,
     pub providers: HashMap<String, Provider>,
     pub reporters: Vec<Reporter>,
+}
+
+impl Validated for SequencerConfig {
+    fn validate(&self, context: &str) -> anyhow::Result<()> {
+        let ports = [self.main_port, self.admin_port, self.prometheus_port];
+        let filtered_same_ports = HashSet::from(ports);
+        if filtered_same_ports.len() != ports.len() {
+            anyhow::bail!(
+                "{}: main_port, admin_port or prometheus_port cannot be equal",
+                context
+            );
+        }
+
+        for (key, provider) in &self.providers {
+            provider.validate(key.as_str())?
+        }
+
+        for reporter in &self.reporters {
+            reporter.validate(format!("{}: Reporter id: {}", context, reporter.id).as_str())?
+        }
+
+        Ok(())
+    }
 }
 
 pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) -> String {

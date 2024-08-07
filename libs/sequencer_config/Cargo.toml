@@ -10,3 +10,4 @@ edition.workspace = true
 [dependencies]
 dirs = "5.0.1"
 serde = { version = "1.0.203", features = ["derive"]}
+anyhow = "1.0.82"
