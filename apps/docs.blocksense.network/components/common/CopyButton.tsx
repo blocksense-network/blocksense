@@ -4,11 +4,13 @@ import { Tooltip } from '@/components/common/Tooltip';
 type CopyButtonProps = {
   textToCopy: string;
   tooltipPosition?: 'top' | 'right' | 'bottom' | 'left';
+  isCodeSnippet?: boolean;
 };
 
 export const CopyButton = ({
   textToCopy,
   tooltipPosition = 'bottom',
+  isCodeSnippet = false,
 }: CopyButtonProps) => {
   const [isCopied, setIsCopied] = React.useState(false);
 
@@ -20,8 +22,12 @@ export const CopyButton = ({
     }, 2000);
   };
 
+  const classNames = 'signature__copy-button'.concat(
+    isCodeSnippet ? ' absolute top-0 right-0 m-2 nx-z-10' : '',
+  );
+
   return (
-    <aside className="signature__copy-button">
+    <aside className={classNames}>
       <Tooltip position={tooltipPosition}>
         <Tooltip.Content>
           <span>{isCopied ? 'Copied' : 'Copy'}</span>

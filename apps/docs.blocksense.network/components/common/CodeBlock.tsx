@@ -4,6 +4,7 @@ import { ShikiMagicMove } from 'shiki-magic-move/react';
 import { type HighlighterCore, createHighlighter } from 'shiki';
 
 import 'shiki-magic-move/dist/style.css';
+import { CopyButton } from './CopyButton';
 
 type CodeBlockProps = {
   code: string;
@@ -53,6 +54,11 @@ export const CodeBlock = ({
     <div>
       {highlighter && (
         <div style={{ whiteSpace: 'pre', position: 'relative' }}>
+          <CopyButton
+            textToCopy={code}
+            isCodeSnippet={true}
+            tooltipPosition="left"
+          />
           {/* Use the ShikiMagicMove component to render the highlighted code */}
           <ShikiMagicMove
             lang={lang}
