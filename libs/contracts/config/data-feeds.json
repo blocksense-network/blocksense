@@ -1,0 +1,22 @@
+[
+  {
+    "key": 0,
+    "description": "ETH/USD",
+    "decimals": 18
+  },
+  {
+    "key": 1,
+    "description": "BTC/USD",
+    "decimals": 8
+  },
+  {
+    "key": 2,
+    "description": "LINK/USD",
+    "decimals": 18
+  },
+  {
+    "key": 3,
+    "description": "DOT/USD",
+    "decimals": 18
+  }
+]

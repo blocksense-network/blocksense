@@ -33,6 +33,25 @@ interface NetworkConfig {
   threshold: number;
 }
 
+interface ContractConfig {
+  [chainId: string]: {
+    [contractName in ContractNames]:
+      | string
+      | Array<{
+          description: string;
+          address: string;
+        }>;
+  };
+}
+
+enum ContractNames {
+  SafeMultisig = 'SafeMultisig',
+  FeedRegistry = 'FeedRegistry',
+  ChainlinkProxy = 'ChainlinkProxy',
+  HistoricDataFeedStoreV2 = 'HistoricDataFeedStoreV2',
+  UpgradeableProxy = 'UpgradeableProxy',
+}
+
 enum NetworkNames {
   sepolia = 'ETH_SEPOLIA',
   holesky = 'ETH_HOLESKY',
@@ -60,15 +79,20 @@ task('deploy', 'Deploy contracts')
       if (!testNetworks.includes(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await initChain(network));
+      configs.push(await initChain(network as keyof typeof NetworkNames));
     }
 
-    const multisigs: Safe[] = [];
-    let contractAddresses: string[][] = [];
+    const dataFeedConfig = JSON.parse(
+      await fs.readFile('./config/data-feeds.json', 'utf8'),
+    );
+
+    let contractAddresses: ContractConfig = {};
+
     for (const config of configs) {
+      const chainId = config.network.chainId.toString();
+
       console.log(`\n\n// ChainId: ${config.network.chainId} //`);
       const multisig = await deployMultisig(config);
-      multisigs.push(multisig);
 
       const abiCoder = ethers.AbiCoder.defaultAbiCoder();
       const artifact = artifacts.readArtifactSync('HistoricDataFeedStoreV2');
@@ -86,42 +110,49 @@ task('deploy', 'Deploy contracts')
         ethers.keccak256(bytecode),
       );
 
+      const multisigAddress = await multisig.getAddress();
       const addresses = await deployContracts(config, multisig, artifacts, [
         {
           name: 'HistoricDataFeedStoreV2',
-          encodedArgs: abiCoder.encode(['address'], [config.signer.address]),
+          argsTypes: ['address'],
+          argsValues: [config.signer.address],
           salt: ethers.id('dataFeedStore'),
           value: 0n,
         },
         {
           name: 'UpgradeableProxy',
-          encodedArgs: abiCoder.encode(
-            ['address', 'address'],
-            [dataFeedStoreAddress, config.signer.address],
-          ),
+          argsTypes: ['address', 'address'],
+          argsValues: [dataFeedStoreAddress, multisigAddress],
           salt: ethers.id('proxy'),
           value: 0n,
         },
         {
-          name: 'ChainlinkProxy',
-          encodedArgs: abiCoder.encode(
-            ['string', 'uint8', 'uint32', 'address'],
-            ['ETH/USD', 18, 1, dataFeedStoreAddress],
-          ),
-          salt: ethers.id('aggregator'),
-          value: 0n,
-        },
-        {
           name: 'FeedRegistry',
-          encodedArgs: abiCoder.encode(
-            ['address', 'address'],
-            [config.signer.address, dataFeedStoreAddress],
-          ),
+          argsTypes: ['address', 'address'],
+          argsValues: [config.signer.address, dataFeedStoreAddress],
           salt: ethers.id('registry'),
           value: 0n,
         },
+        ...dataFeedConfig.map((data: any) => {
+          return {
+            name: 'ChainlinkProxy',
+            argsTypes: ['string', 'uint8', 'uint32', 'address'],
+            argsValues: [
+              data.description,
+              data.decimals,
+              data.key,
+              dataFeedStoreAddress,
+            ],
+            salt: ethers.id('aggregator'),
+            value: 0n,
+          };
+        }),
       ]);
-      contractAddresses.push(addresses);
+
+      contractAddresses[chainId] = {
+        ...addresses,
+        SafeMultisig: multisigAddress,
+      };
     }
 
     const file = process.cwd() + '/deployments/deploymentV1.json';
@@ -134,14 +165,9 @@ task('deploy', 'Deploy contracts')
     const jsonData = await fs.readFile(file, 'utf8');
     const parsedData = JSON.parse(jsonData);
 
-    for (const [index, config] of configs.entries()) {
-      parsedData[config.network.chainId.toString()] = {
-        SafeMultisig: await multisigs[index].getAddress(),
-        HistoricDataFeedStoreV2: contractAddresses[index][0],
-        UpgradeableProxy: contractAddresses[index][1],
-        ChainlinkProxy: contractAddresses[index][2],
-        FeedRegistry: contractAddresses[index][3],
-      };
+    for (const config of configs) {
+      const chainId = config.network.chainId.toString();
+      parsedData[chainId] = contractAddresses[chainId];
     }
 
     await fs.writeFile(file, JSON.stringify(parsedData, null, 2), 'utf8');
@@ -240,8 +266,9 @@ const deployContracts = async (
   multisig: Safe,
   artifacts: Artifacts,
   contracts: {
-    name: string;
-    encodedArgs: string;
+    name: keyof typeof ContractNames;
+    argsTypes: string[];
+    argsValues: any[];
     salt: string;
     value: bigint;
   }[],
@@ -254,14 +281,25 @@ const deployContracts = async (
     config.signer,
   );
 
-  const contractAddresses: string[] = [];
+  let contractAddresses = {} as {
+    [contractName in ContractNames]:
+      | string
+      | Array<{ description: any; address: string }>;
+  };
+
+  const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
   const transactions: SafeTransactionDataPartial[] = [];
   for (const contract of contracts) {
+    const encodedArgs = abiCoder.encode(
+      contract.argsTypes,
+      contract.argsValues,
+    );
+
     const artifact = artifacts.readArtifactSync(contract.name);
     const bytecode = ethers.solidityPacked(
       ['bytes', 'bytes'],
-      [artifact.bytecode, contract.encodedArgs],
+      [artifact.bytecode, encodedArgs],
     );
 
     const contractAddress = ethers.getCreate2Address(
@@ -284,7 +322,22 @@ const deployContracts = async (
     };
     transactions.push(safeTransactionData);
 
-    contractAddresses.push(contractAddress);
+    if (contract.name === ContractNames.ChainlinkProxy) {
+      if (!contractAddresses[contract.name]) {
+        contractAddresses[contract.name] = [];
+      }
+      (
+        contractAddresses[contract.name] as Array<{
+          description: any;
+          address: string;
+        }>
+      ).push({
+        description: contract.argsValues[0],
+        address: contractAddress,
+      });
+    } else {
+      contractAddresses[contract.name] = contractAddress;
+    }
   }
 
   await multisigTxExec(transactions, multisig);
