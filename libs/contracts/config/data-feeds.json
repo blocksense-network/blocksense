@@ -1,22 +1,30 @@
 [
   {
     "key": 0,
-    "description": "ETH/USD",
-    "decimals": 18
+    "description": "WETH/USD",
+    "decimals": 18,
+    "base": "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+    "quote": "0x0000000000000000000000000000000000000348"
   },
   {
     "key": 1,
-    "description": "BTC/USD",
-    "decimals": 8
+    "description": "WBTC/USD",
+    "decimals": 8,
+    "base": "0x92f3B59a79bFf5dc60c0d59eA13a44D082B2bdFC",
+    "quote": "0x0000000000000000000000000000000000000348"
   },
   {
     "key": 2,
     "description": "LINK/USD",
-    "decimals": 18
+    "decimals": 18,
+    "base": "0x779877A7B0D9E8603169DdbD7836e478b4624789",
+    "quote": "0x0000000000000000000000000000000000000348"
   },
   {
     "key": 3,
     "description": "DOT/USD",
-    "decimals": 18
+    "decimals": 18,
+    "base": "0xd7974De8DFce428A13fc393d6CE08Dd6B8c1BC45",
+    "quote": "0x0000000000000000000000000000000000000348"
   }
 ]
