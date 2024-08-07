@@ -100,7 +100,7 @@ pub async fn post_feed_response(
 
     info!("\nPayload: {:?}", payload_json);
 
-    let feed_url = sequencer_url.to_string() + "/feed/" + &feed_id.to_string();
+    let feed_url = sequencer_url.to_string() + "/post_report";
 
     // Comment out if you want to test API availability & aggregation
     post_request(&feed_url, payload_json);
