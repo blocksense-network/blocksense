@@ -9,6 +9,7 @@ import {
   appendNatspecDetailsToParams,
 } from './utils/natspec';
 import { collectAbi } from './abiCollector';
+import { contractsFileStructureAsJSON } from './constractsFileStructure';
 
 if ('extendConfig' in global && 'task' in global) {
   // Assume Hardhat.
@@ -36,6 +37,8 @@ export async function main(
   await writeDocFiles(solReflection, userConfig);
 
   await collectAbi(build.artifactsPaths, userConfig);
+
+  await contractsFileStructureAsJSON(build.artifactPath, userConfig);
 }
 
 // We ask Node.js not to cache this file.
