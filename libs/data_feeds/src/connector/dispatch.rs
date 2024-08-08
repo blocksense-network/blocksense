@@ -90,7 +90,7 @@ pub async fn dispatch(
         .expect("BLOCKSENSE_ROOT env not set")
         .to_string()
         + secret_key_path;
-    println!("{}", secret_key_path);
+
     let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
 
     for (api, asset) in feed_subset {
