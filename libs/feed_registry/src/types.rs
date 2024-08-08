@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{self, Display},
+    hash::{Hash, Hasher},
     time::{SystemTime, UNIX_EPOCH},
 };
 use thiserror::Error;
@@ -166,6 +167,20 @@ impl FeedType {
                 let s =
                     String::from_utf8(bytes).map_err(|_| "Invalid UTF-8 sequence".to_string())?;
                 Ok(FeedType::Text(s))
+            }
+        }
+    }
+}
+
+impl Eq for FeedType {}
+
+impl Hash for FeedType {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match self {
+            FeedType::Text(value) => value.hash(state),
+            FeedType::Numerical(value) => {
+                let bits: u64 = value.to_bits();
+                bits.hash(state);
             }
         }
     }
