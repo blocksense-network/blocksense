@@ -39,7 +39,8 @@ pub fn parse_contract_address(addr: &str) -> Option<Address> {
 
 #[derive(Debug)]
 pub struct RpcProvider {
-    pub provider: ProviderType,
+    pub name: String,
+    pub providers: Vec<ProviderType>,
     pub wallet: LocalWallet,
     pub contract_address: Option<Address>,
     pub event_contract_address: Option<Address>,
@@ -47,12 +48,34 @@ pub struct RpcProvider {
     pub transcation_timeout_secs: u32,
     pub data_feed_store_byte_code: Option<Vec<u8>>,
     pub data_feed_sports_byte_code: Option<Vec<u8>>,
+    pub active_provider_index: u32,
+}
+
+impl RpcProvider {
+    pub fn get_current_provider(&self) -> &ProviderType {
+        self.providers
+            .get(self.active_provider_index as usize)
+            .expect("active_provider index out of bounds!")
+    }
+    pub fn switch_provider(&mut self) {
+        if self.providers.len() == 0 {
+            error!("No providers set for network: {}", self.name);
+            return;
+        }
+        self.active_provider_index = (self.active_provider_index + 1) % self.providers.len() as u32;
+    }
 }
 
 pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
 pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
-    let latest_block = match provider.lock().await.provider.get_block_number().await {
+    let latest_block = match provider
+        .lock()
+        .await
+        .get_current_provider()
+        .get_block_number()
+        .await
+    {
         Ok(result) => result,
         Err(e) => {
             error!("Could not get block number: {}", e);
@@ -62,7 +85,7 @@ pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr:
     let bytecode = match provider
         .lock()
         .await
-        .provider
+        .get_current_provider()
         .get_code_at(*addr, latest_block.into())
         .await
     {
@@ -137,17 +160,23 @@ async fn get_rpc_providers(
     conf: &SequencerConfig,
     prefix: &str,
 ) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
-    let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
+    let mut rpc_providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
 
     let provider_metrics = Arc::new(RwLock::new(
         ProviderMetrics::new(prefix).expect("Failed to allocate ProviderMetrics"),
     ));
 
     for (key, p) in &conf.providers {
-        let rpc_url: Url = p
-            .url
-            .parse()
-            .unwrap_or_else(|_| panic!("Not a valid url provided for {key}!"));
+        let rpc_urls: Vec<Url> = p
+            .urls
+            .clone()
+            .into_iter()
+            .map(|url| {
+                url.parse()
+                    .unwrap_or_else(|_| panic!("Not a valid url provided for {key}!"))
+            })
+            .collect();
+
         let priv_key_path = &p.private_key_path;
         let priv_key = fs::read_to_string(priv_key_path.clone()).unwrap_or_else(|_| {
             panic!(
@@ -159,10 +188,16 @@ async fn get_rpc_providers(
             .trim()
             .parse()
             .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .signer(EthereumSigner::from(wallet.clone()))
-            .on_http(rpc_url);
+        let providers: Vec<ProviderType> = rpc_urls
+            .into_iter()
+            .map(|url| {
+                ProviderBuilder::new()
+                    .with_recommended_fillers()
+                    .signer(EthereumSigner::from(wallet.clone()))
+                    .on_http(url)
+            })
+            .collect();
+
         let address = match &p.contract_address {
             Some(x) => parse_contract_address(x.as_str()),
             None => None,
@@ -173,9 +208,10 @@ async fn get_rpc_providers(
         };
 
         let rpc_provider = Arc::new(Mutex::new(RpcProvider {
+            name: key.clone(),
             contract_address: address,
             event_contract_address: event_address,
-            provider,
+            providers,
             wallet,
             provider_metrics: provider_metrics.clone(),
             transcation_timeout_secs: p.transcation_timeout_secs,
@@ -187,9 +223,10 @@ async fn get_rpc_providers(
                 hex::decode(byte_code.clone())
                     .expect("data_feed_sports_byte_code for provider is not valid hex string!")
             }),
+            active_provider_index: 0,
         }));
 
-        providers.insert(key.clone(), rpc_provider.clone());
+        rpc_providers.insert(key.clone(), rpc_provider.clone());
 
         // Verify contract_address
         // If contract does not exist statements are logged and the process continues
@@ -201,11 +238,11 @@ async fn get_rpc_providers(
     }
 
     debug!("List of providers:");
-    for (key, value) in &providers {
+    for (key, value) in &rpc_providers {
         debug!("{}: {:?}", key, value);
     }
 
-    providers
+    rpc_providers
 }
 
 // pub fn print_type<T>(_: &T) {
@@ -247,7 +284,8 @@ mod tests {
         let cfg = get_test_config_with_single_provider(network, "/tmp/key", &anvil.endpoint());
 
         let providers = get_rpc_providers(&cfg, "basic_test_provider_").await;
-        let provider = &providers.get(network).unwrap().lock().await.provider;
+        let provider = &providers.get(network).unwrap().lock().await;
+        let provider = provider.get_current_provider();
 
         let alice = anvil.addresses()[7];
         let bob = anvil.addresses()[0];

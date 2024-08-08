@@ -53,8 +53,8 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
         "main_port": SEQUENCER_MAIN_PORT,
         "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
-            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0])},
-            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1])}
+            "ETH1": {"urls": vec!(format!("http://127.0.0.1:{}", eth_networks_ports[0])), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0])},
+            "ETH2": {"urls": vec!(format!("http://127.0.0.1:{}", eth_networks_ports[1])), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1])}
         },
     });
 
