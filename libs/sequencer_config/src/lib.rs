@@ -22,7 +22,6 @@ pub struct ReporterConfig {
 
     pub resources: HashMap<String, String>, // <`API`,`API_resource_dir`>
     pub reporter: Reporter,
-    pub feeds: Vec<FeedMetaData>,
 }
 
 #[derive(Debug, Deserialize)]

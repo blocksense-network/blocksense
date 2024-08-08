@@ -28,7 +28,7 @@ pub fn init_feeds_config() -> FeedsConfig {
 
 #[derive(Debug, Deserialize)]
 pub struct FeedsConfig {
-    feeds: Vec<sequencer_config::FeedMetaData>,
+    pub feeds: Vec<sequencer_config::FeedMetaData>,
 }
 
 /// Map representing feed_id -> FeedMetaData

@@ -17,7 +17,10 @@ use utils::read_file;
 use tracing::{debug, info};
 
 use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed};
-use feed_registry::api::DataFeedAPI;
+use feed_registry::{
+    api::DataFeedAPI,
+    registry::{init_feeds_config, FeedsConfig},
+};
 
 pub fn init_reporter_config() -> ReporterConfig {
     let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "/reporter_config.json");
@@ -33,10 +36,10 @@ pub fn init_reporter_config() -> ReporterConfig {
 }
 
 fn find_feed_meta_data_by_name<'a>(
-    feeds: &'a Vec<FeedMetaData>,
+    feeds: &'a FeedsConfig,
     feed_name: &String,
 ) -> Option<&'a FeedMetaData> {
-    feeds.iter().find(|&feed| feed.name == *feed_name)
+    feeds.feeds.iter().find(|&feed| feed.name == *feed_name)
 }
 
 pub async fn orchestrator() {
@@ -44,6 +47,8 @@ pub async fn orchestrator() {
     tracing_subscriber::fmt::init();
 
     let reporter_config = init_reporter_config();
+
+    let feeds_registry = init_feeds_config();
 
     let mut connection_cache = HashMap::<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>::new();
 
@@ -57,7 +62,7 @@ pub async fn orchestrator() {
     for (api, asset) in &all_feeds {
         let feed_name = DataFeedAPI::feed_asset_str(&api, &asset);
 
-        match find_feed_meta_data_by_name(&reporter_config.feeds, &feed_name) {
+        match find_feed_meta_data_by_name(&feeds_registry, &feed_name) {
             Some(feed_meta_data) => {
                 feed_id_map.insert(feed_name, feed_meta_data);
             }
@@ -77,6 +82,7 @@ pub async fn orchestrator() {
 
         dispatch(
             &reporter_config,
+            &feeds_registry,
             &all_feeds,
             &feed_id_map,
             &mut connection_cache,
