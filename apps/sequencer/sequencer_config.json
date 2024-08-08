@@ -8,22 +8,6 @@
       "ETH1": {"private_key_path": "/tmp/priv_key_test", "url": "http://127.0.0.1:8545", "transcation_timeout_secs": 50, "contract_address": "0x663F3ad617193148711d28f5334eE4Ed07016602"},
       "ETH2": {"private_key_path": "/tmp/priv_key_test", "url": "http://127.0.0.1:8546", "transcation_timeout_secs": 50, "contract_address": "0x663F3ad617193148711d28f5334eE4Ed07016602"}
   },
-  "feeds" : [
-    {"id": 0, "name": "DOGE", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 1, "name": "BTC", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 2, "name": "ETH", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 3, "name": "SHIB", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 4, "name": "SOL", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 5, "name": "DOT", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 6, "name": "XRP", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 7, "name": "AAPL", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 8, "name": "GOOGL", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 9, "name": "TSLA", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 10, "name": "IBKR", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 11, "name": "NVDA", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 12, "name": "TLRY", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 13, "name": "AMD", "report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
-  ],
   "reporters" : [
     {"id": 0, "pub_key": "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e" },
     {"id": 1, "pub_key": "ea30a8bd97d4f78213320c38215e95b239f8889df885552d85a50665b8b802de85fb40ae9b72d3f67628fa301e81252cd87e" },
