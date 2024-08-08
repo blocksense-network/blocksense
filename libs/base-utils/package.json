@@ -11,18 +11,26 @@
       "require": "./dist/cjs/index.cjs",
       "import": "./dist/esm/index.mjs",
       "types": "./dist/types/index.d.ts"
-    },"./assert": {
+    },
+    "./assert": {
       "require": "./dist/cjs/asserts.cjs",
       "import": "./dist/esm/asserts.mjs",
       "types": "./dist/types/asserts.d.ts"
-    },"./fs": {
+    },
+    "./fs": {
       "require": "./dist/cjs/fs.cjs",
       "import": "./dist/esm/fs.mjs",
       "types": "./dist/types/fs.d.ts"
-    },"./env": {
+    },
+    "./env": {
       "require": "./dist/cjs/env.cjs",
       "import": "./dist/esm/env.mjs",
       "types": "./dist/types/env.d.ts"
+    },
+    "./syntax-highlighting": {
+      "require": "./dist/cjs/syntax-highlighting.cjs",
+      "import": "./dist/esm/syntax-highlighting.mjs",
+      "types": "./dist/types/syntax-highlighting.d.ts"
     }
   },
   "scripts": {
