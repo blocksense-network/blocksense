@@ -188,3 +188,48 @@ export function extractFields<T extends {}, U extends Partial<T>>(
   }
   return result;
 }
+
+/**
+ * Iterates over all elements of each contract in a SolReflection object and applies a callback function to each element.
+ *
+ * @param {SolReflection} solReflection - The SolReflection object to iterate over.
+ * @param {Function} callback - The callback function to apply to each contract element. The function should return a Promise.
+ *
+ * @returns {Promise<void>} - The function returns a Promise that resolves when all callbacks have been applied.
+ *
+ * @example
+ * ```typescript
+ * const solReflection = getSolReflection();
+ * await iterateContractElements(solReflection, async (element) => {
+ *   console.log(element);
+ * });
+ * ```
+ */
+export async function iterateContractElements(
+  solReflection: SolReflection,
+  callback: (element: any) => Promise<unknown>,
+) {
+  for (const { fineData } of solReflection) {
+    if (fineData.contracts) {
+      for (const contract of fineData.contracts) {
+        const contractElements = [
+          contract.functions,
+          contract.errors,
+          contract.events,
+          contract.modifiers,
+          contract.variables,
+          contract.enums,
+          contract.structs,
+        ];
+
+        for (const elements of contractElements) {
+          if (elements) {
+            for (const element of elements) {
+              await callback(element);
+            }
+          }
+        }
+      }
+    }
+  }
+}
