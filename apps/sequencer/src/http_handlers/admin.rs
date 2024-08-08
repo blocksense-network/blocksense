@@ -14,6 +14,7 @@ use eyre::eyre;
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
 use feed_registry::types::FeedType;
 use feed_registry::types::Repeatability;
+use prometheus::metrics::FeedsMetrics;
 use prometheus::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
 use tracing::info_span;
@@ -234,12 +235,11 @@ mod tests {
         let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
         let log_handle = init_shared_logging_handle();
-        let sequencer_config = init_sequencer_config();
+        let sequencer_config = init_sequencer_config().expect("Failed to load config:");
         let feeds_config = init_feeds_config();
+        let metrics_prefix = Some("test_get_feed_report_interval_");
 
-        let providers =
-            init_shared_rpc_providers(&sequencer_config, Some("test_get_feed_report_interval_"))
-                .await;
+        let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
 
         let (vote_send, _vote_recv): (
             UnboundedSender<(String, String)>,
@@ -252,12 +252,13 @@ mod tests {
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(
-                &sequencer_config,
-                Some("test_get_feed_report_interval_"),
-            ),
+            reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
             feed_id_allocator: Arc::new(RwLock::new(None)),
             voting_send_channel: vote_send,
+            feeds_metrics: Arc::new(RwLock::new(
+                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
+                    .expect("Failed to allocate feed_metrics"),
+            )),
         });
 
         let app = test::init_service(
@@ -287,9 +288,9 @@ mod tests {
     ) -> web::Data<FeedsState> {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
         let feeds_config = init_feeds_config();
+        let metrics_prefix = Some("create_app_state_from_sequencer_config_");
 
-        let providers =
-            init_shared_rpc_providers(&cfg, Some("create_app_state_from_sequencer_config_")).await;
+        let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
 
         let log_handle = init_shared_logging_handle();
 
@@ -306,9 +307,13 @@ mod tests {
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(&cfg, Some("create_app_state_from_sequencer_config_")),
+            reporters: init_shared_reporters(&cfg, metrics_prefix),
             feed_id_allocator: Arc::new(RwLock::new(None)),
             voting_send_channel: send_channel,
+            feeds_metrics: Arc::new(RwLock::new(
+                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
+                    .expect("Failed to allocate feed_metrics"),
+            )),
         })
     }
 

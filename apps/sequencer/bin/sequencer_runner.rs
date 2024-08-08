@@ -16,6 +16,7 @@ use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 
 use actix_web::rt::spawn;
 use actix_web::web::Data;
+use prometheus::metrics::FeedsMetrics;
 use sequencer::config::config::init_sequencer_config;
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
@@ -29,6 +30,7 @@ use tokio::task::JoinHandle;
 pub async fn prepare_app_state(
     sequencer_config: &SequencerConfig,
     feeds_config: AllFeedsConfig,
+    metrics_prefix: Option<&str>,
 ) -> (UnboundedReceiver<(String, String)>, Data<FeedsState>) {
     let log_handle: SharedLoggingHandle = init_shared_logging_handle();
 
@@ -37,7 +39,7 @@ pub async fn prepare_app_state(
         std::process::exit(0);
     });
 
-    let providers = init_shared_rpc_providers(&sequencer_config, None).await;
+    let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (vote_send, vote_recv): (
         UnboundedSender<(String, String)>,
@@ -51,9 +53,13 @@ pub async fn prepare_app_state(
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
         providers: providers.clone(),
         log_handle,
-        reporters: init_shared_reporters(&sequencer_config, None),
+        reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
         feed_id_allocator: Arc::new(RwLock::new(Some(feed_id_allocator))),
         voting_send_channel: vote_send,
+        feeds_metrics: Arc::new(RwLock::new(
+            FeedsMetrics::new(metrics_prefix.unwrap_or(""))
+                .expect("Failed to allocate feed_metrics"),
+        )),
     });
 
     (vote_recv, app_state)
@@ -140,13 +146,14 @@ OPTIONS
         }
     }
 
-    let sequencer_config: SequencerConfig = init_sequencer_config();
+    let sequencer_config: SequencerConfig =
+        init_sequencer_config().expect("Failed to get config: ");
     let feeds_config = init_feeds_config();
 
     let (voting_receive_channel, app_state): (
         UnboundedReceiver<(String, String)>,
         Data<FeedsState>,
-    ) = prepare_app_state(&sequencer_config, feeds_config).await;
+    ) = prepare_app_state(&sequencer_config, feeds_config, None).await;
 
     let collected_futures =
         prepare_app_workers(app_state.clone(), &sequencer_config, voting_receive_channel).await;

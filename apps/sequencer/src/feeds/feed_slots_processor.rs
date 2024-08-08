@@ -6,6 +6,7 @@ use feed_registry::registry::{AllFeedsReports, SlotTimeTracker};
 use feed_registry::types::FeedResult;
 use feed_registry::types::FeedType;
 use feed_registry::types::{FeedMetaData, Repeatability};
+use prometheus::{inc_metric, metrics::FeedsMetrics};
 use ringbuf::traits::Consumer;
 use std::fmt::Debug;
 use std::sync::{Arc, RwLock};
@@ -32,6 +33,7 @@ pub async fn feed_slots_processor_loop<
     history: Arc<RwLock<FeedAggregateHistory>>,
     key: u32,
     reporters: SharedReporters,
+    feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
 ) -> Result<String, Report> {
     let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
         let datafeed = feed.read().unwrap();
@@ -66,6 +68,8 @@ pub async fn feed_slots_processor_loop<
 
         let result_post_to_contract: FeedType; //TODO(snikolov): This needs to be enforced as Bytes32
         let key_post: u32;
+        let mut is_quorum_reached = true;
+
         {
             let current_time_as_ms = current_unix_time();
 
@@ -102,17 +106,23 @@ pub async fn feed_slots_processor_loop<
                 continue;
             }
 
-            let total_votes_count = values.len();
+            let total_votes_count = values.len() as f32;
+            let required_votes_count = quorum_percentage * reporters.read().unwrap().len() as f32;
 
-            if (total_votes_count as f32)
-                < (quorum_percentage * reporters.read().unwrap().len() as f32)
-            {
-                info!(
-                    "Insufficient quorum of reports to post to contract for feed: {} slot: {}!",
-                    name, &slot
+            if total_votes_count < required_votes_count {
+                warn!(
+                    "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
+                    name, &slot, quorum_percentage, total_votes_count, reporters.read().unwrap().len()
                 );
-                reports.clear();
-                continue;
+                is_quorum_reached = false;
+            }
+
+            if let Some(feed_metrics) = &feed_metrics {
+                if is_quorum_reached {
+                    inc_metric!(feed_metrics, key, quorums_reached);
+                } else {
+                    inc_metric!(feed_metrics, key, failures_to_reach_quorum);
+                }
             }
 
             key_post = key;
@@ -128,7 +138,7 @@ pub async fn feed_slots_processor_loop<
                 let history_lock = history.read().unwrap();
 
                 // The first slice is from the current read position to the end of the array
-                // // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
+                // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
                 let (first, last) = history_lock
                     .collect(key)
                     .expect("Missing key from History!")
@@ -168,12 +178,14 @@ pub async fn feed_slots_processor_loop<
             info!("result_post_to_contract = {:?}", result_post_to_contract);
             reports.clear();
         }
-        result_send
-            .send((
-                to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
-                naive_packing(result_post_to_contract).into(),
-            ))
-            .unwrap();
+        if is_quorum_reached {
+            result_send
+                .send((
+                    to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
+                    naive_packing(result_post_to_contract).into(),
+                ))
+                .unwrap();
+        }
     }
 }
 
@@ -187,13 +199,14 @@ mod tests {
     use std::sync::{Arc, RwLock};
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::mpsc::unbounded_channel;
+    const QUORUM_PERCENTAGE: f32 = 0.001;
 
     #[tokio::test]
     async fn test_feed_slots_processor_loop() {
         // setup
         let name = "test_feed";
         let report_interval_ms = 1000; // 1 second interval
-        let quorum_percentage = 0.001;
+        let quorum_percentage = QUORUM_PERCENTAGE;
         let first_report_start_time = SystemTime::now();
         let feed_metadata = FeedMetaData::new(
             name,
@@ -244,6 +257,7 @@ mod tests {
                 history_cp,
                 feed_id,
                 Arc::new(RwLock::new(HashMap::new())),
+                None,
             )
             .await
             .unwrap();
@@ -285,15 +299,19 @@ mod tests {
         let voting_wait_duration_ms = 3000;
 
         let _feed = FeedMetaData::new_oneshot(
-            "TestFeed",
+            "TestFeed".to_string(),
             voting_wait_duration_ms,
-            0.001,
+            QUORUM_PERCENTAGE,
             voting_start_time,
         );
 
         let name = "test_feed";
-        let feed_metadata =
-            FeedMetaData::new_oneshot(name, voting_wait_duration_ms, 0.001, voting_start_time);
+        let feed_metadata = FeedMetaData::new_oneshot(
+            name.to_string(),
+            voting_wait_duration_ms,
+            QUORUM_PERCENTAGE,
+            voting_start_time,
+        );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
@@ -332,6 +350,7 @@ mod tests {
                 feed_aggregate_history_clone,
                 feed_id,
                 Arc::new(RwLock::new(HashMap::new())),
+                None,
             )
             .await
             .unwrap();

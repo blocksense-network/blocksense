@@ -36,17 +36,17 @@ pub struct FeedMetaData {
 
 impl FeedMetaData {
     pub fn new_oneshot(
-        n: &str,
-        r: u64, // Consider oneshot feeds.
-        q: f32,
-        f: SystemTime,
+        name: String,
+        report_interval_ms: u64, // Consider oneshot feeds.
+        quorum_percentage: f32,
+        first_report_start_time: SystemTime,
     ) -> FeedMetaData {
         FeedMetaData {
-            name: n.to_string(),
+            name,
             voting_repeatability: Repeatability::Oneshot,
-            report_interval_ms: r,
-            quorum_percentage: q,
-            first_report_start_time: f,
+            report_interval_ms,
+            quorum_percentage,
+            first_report_start_time,
             feed_type: Box::new(AverageAggregator {}),
         }
     }

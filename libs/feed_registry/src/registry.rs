@@ -258,6 +258,7 @@ mod tests {
     use std::thread;
     use std::time::Instant;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
+    const QUORUM_PERCENTAGE: f32 = 0.001;
 
     #[test]
     fn basic_test() {
@@ -398,9 +399,9 @@ mod tests {
         let voting_wait_duration_ms = 30000;
 
         let feed = FeedMetaData::new_oneshot(
-            "TestFeed",
+            "TestFeed".to_string(),
             voting_wait_duration_ms,
-            0.001,
+            QUORUM_PERCENTAGE,
             voting_start_time,
         );
 
@@ -488,15 +489,15 @@ mod tests {
         let voting_wait_duration_ms = 30000;
 
         let oneshot_feed = FeedMetaData::new_oneshot(
-            "TestFeed",
+            "TestFeed".to_string(),
             voting_wait_duration_ms,
-            0.001,
+            QUORUM_PERCENTAGE,
             voting_start_time,
         );
         let regular_feed = FeedMetaData::new(
             "TestFeed",
             voting_wait_duration_ms,
-            0.001,
+            QUORUM_PERCENTAGE,
             current_system_time,
         );
 

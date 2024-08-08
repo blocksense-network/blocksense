@@ -127,17 +127,16 @@ pub async fn post_report(
     };
     let reporter_metrics = reporter.read().unwrap().reporter_metrics.clone();
 
-    let result = match &data_feed.result {
+    match &data_feed.result {
         FeedResult::Result { result } => {
             debug!("Recvd result from reporter[{}]: {:?}", reporter_id, result);
-            data_feed.result
         }
         FeedResult::Error { error } => {
             info!("Reported error from reporter[{}]: {}", reporter_id, error);
             inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
-            data_feed.result
         }
     };
+    let result = data_feed.result;
 
     trace!(
         "result = {:?}; feed_id = {:?}; reporter_id = {:?}",
@@ -178,7 +177,7 @@ pub async fn post_report(
                 .expect("Error trying to lock Reports for read!");
             if reports.push(feed_id, reporter_id, result) {
                 debug!(
-                    "Recvd timely vote from reporter_id = {} for feed_id = {}",
+                    "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
                     reporter_id, feed_id
                 );
                 inc_vec_metric!(
@@ -296,7 +295,7 @@ pub async fn register_feed(
     let voting_start_system_time = UNIX_EPOCH + Duration::from_millis(voting_start_time_ms as u64);
     let report_interval_ms = voting_end_time_ms - voting_start_time_ms;
     let new_feed_metadata = FeedMetaData::new_oneshot(
-        &name,
+        name.clone(),
         report_interval_ms as u64,
         quorum_percentage,
         voting_start_system_time,
@@ -342,6 +341,7 @@ pub async fn register_feed(
             feed_aggregate_history,
             feed_id,
             reporters,
+            None,
         )
         .await
     });
@@ -371,6 +371,7 @@ mod tests {
     use feed_registry::registry::init_feeds_config;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
+    use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use sequencer_config::get_test_config_with_single_provider;
     use std::collections::HashMap;
@@ -389,14 +390,11 @@ mod tests {
         let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
         let log_handle = init_shared_logging_handle();
-        let sequencer_config = init_sequencer_config();
+        let sequencer_config = init_sequencer_config().expect("Failed to load config:");
         let feeds_config = init_feeds_config();
+        let metrics_prefix = Some("post_report_from_unknown_reporter_fails_with_401_");
 
-        let providers = init_shared_rpc_providers(
-            &sequencer_config,
-            Some("post_report_from_unknown_reporter_fails_with_401_"),
-        )
-        .await;
+        let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
 
         let (vote_send, _vote_recv): (
             UnboundedSender<(String, String)>,
@@ -409,12 +407,13 @@ mod tests {
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(
-                &sequencer_config,
-                Some("post_report_from_unknown_reporter_fails_with_401_"),
-            ),
+            reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
             feed_id_allocator: Arc::new(RwLock::new(None)),
             voting_send_channel: vote_send,
+            feeds_metrics: Arc::new(RwLock::new(
+                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
+                    .expect("Failed to allocate feed_metrics"),
+            )),
         });
 
         let app =
@@ -467,9 +466,9 @@ mod tests {
     ) -> (UnboundedReceiver<(String, String)>, web::Data<FeedsState>) {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
         let feeds_config = init_feeds_config();
+        let metrics_prefix = Some("create_app_state_from_sequencer_config");
 
-        let providers =
-            init_shared_rpc_providers(&cfg, Some("create_app_state_from_sequencer_config")).await;
+        let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
 
         let log_handle = init_shared_logging_handle();
 
@@ -488,12 +487,15 @@ mod tests {
                 reports: Arc::new(RwLock::new(AllFeedsReports::new())),
                 providers: providers.clone(),
                 log_handle,
-                reporters: init_shared_reporters(
-                    &cfg,
-                    Some("create_app_state_from_sequencer_config"),
-                ),
+                reporters: init_shared_reporters(&cfg, metrics_prefix),
                 feed_id_allocator: Arc::new(RwLock::new(Some(init_concurrent_allocator()))),
                 voting_send_channel: send_channel,
+                feeds_metrics: Arc::new(RwLock::new(
+                    FeedsMetrics::new(
+                        metrics_prefix.expect("Need to set metrics prefix in tests!"),
+                    )
+                    .expect("Failed to allocate feed_metrics"),
+                )),
             }),
         )
     }

@@ -53,6 +53,7 @@ pub async fn feeds_slots_manager_loop<
             let name = feed.read().expect(lock_err_msg).get_name().clone();
             let feed_aggregate_history_cp = feed_aggregate_history.clone();
             let reporters_cp = app_state.reporters.clone();
+            let feed_metrics_cp = app_state.feeds_metrics.clone();
 
             collected_futures.push(spawn(async move {
                 feed_slots_processor_loop(
@@ -63,6 +64,7 @@ pub async fn feeds_slots_manager_loop<
                     feed_aggregate_history_cp,
                     key,
                     reporters_cp,
+                    Some(feed_metrics_cp),
                 )
                 .await
             }));
@@ -103,7 +105,8 @@ mod tests {
     use feed_registry::registry::{
         init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsReports,
     };
-    use feed_registry::types::FeedType;
+    use feed_registry::types::{FeedResult, FeedType};
+    use prometheus::metrics::FeedsMetrics;
     use std::env;
     use std::path::PathBuf;
     use std::sync::{Arc, RwLock};
@@ -119,13 +122,13 @@ mod tests {
         let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
         let log_handle = init_shared_logging_handle();
-        let sequencer_config = init_sequencer_config();
+        let sequencer_config = init_sequencer_config().expect("Failed to load config:");
         let feeds_config = init_feeds_config();
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
-        let providers =
-            init_shared_rpc_providers(&sequencer_config, Some("test_feed_slots_manager_loop_"))
-                .await;
+        let metrics_prefix = Some("test_feed_slots_manager_loop_");
+
+        let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
 
         let original_report_data = FeedType::Numerical(13.0);
 
@@ -150,12 +153,13 @@ mod tests {
             reports: all_feeds_reports_arc,
             providers: providers.clone(),
             log_handle,
-            reporters: init_shared_reporters(
-                &sequencer_config,
-                Some("test_feed_slots_manager_loop_"),
-            ),
+            reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
             feed_id_allocator: Arc::new(RwLock::new(None)),
             voting_send_channel: vote_send.clone(),
+            feeds_metrics: Arc::new(RwLock::new(
+                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
+                    .expect("Failed to allocate feed_metrics"),
+            )),
         });
 
         let _future = feeds_slots_manager_loop(app_state, vote_send.clone()).await;

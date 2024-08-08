@@ -68,8 +68,27 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
 
     let feeds = json!({
         "feeds": [
-            {"id": 0, "name": "DOGE", "report_interval_ms": 7000,  "quorum_percentage": 0.006,"first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-            {"id": 1, "name": "BTC", "report_interval_ms": 7000,  "quorum_percentage": 0.006,"first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
+            {
+                "id": 1,
+                "name": "BTC",
+                "description": "BTC / USD",
+                "decimals": 18,
+                "script": "CoinMarketCap",
+                "pair": {
+                  "base": "BTC",
+                  "quote": "USD"
+                },
+                "report_interval_ms": 7000,
+                "first_report_start_time": {
+                  "secs_since_epoch": 0,
+                  "nanos_since_epoch": 0
+                },
+                "quorum_percentage": 0.006,
+                "chainlink_compatiblity": {
+                  "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+                  "quote": "0x0000000000000000000000000000000000000348"
+                }
+              },
         ]
     });
 

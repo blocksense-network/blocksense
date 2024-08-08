@@ -277,3 +277,26 @@ impl ReporterMetrics {
         })
     }
 }
+
+#[derive(Debug)]
+pub struct FeedsMetrics {
+    pub quorums_reached: IntCounterVec,
+    pub failures_to_reach_quorum: IntCounterVec,
+}
+
+impl FeedsMetrics {
+    pub fn new(prefix: &str) -> Result<FeedsMetrics> {
+        Ok(FeedsMetrics {
+            quorums_reached: register_int_counter_vec!(
+                format!("{}quorums_reached", prefix),
+                "Number of slots for which quorum was reached for a given feed id",
+                &["FeedId"]
+            )?,
+            failures_to_reach_quorum: register_int_counter_vec!(
+                format!("{}failures_to_reach_quorum", prefix),
+                "Number of slots for whcih quorum was not reached for a given feed id",
+                &["FeedId"]
+            )?,
+        })
+    }
+}
