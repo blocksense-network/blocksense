@@ -9,6 +9,7 @@ import {
   appendNatspecDetailsToParams,
 } from './utils/natspec';
 import { collectAbi } from './abiCollector';
+import { formatAndHighlightSignatures } from './utils/signature';
 
 if ('extendConfig' in global && 'task' in global) {
   // Assume Hardhat.
@@ -32,6 +33,7 @@ export async function main(
 
   appendInheritedNatspec(solReflection);
   appendNatspecDetailsToParams(solReflection);
+  await formatAndHighlightSignatures(solReflection);
 
   await writeDocFiles(solReflection, userConfig);
 
