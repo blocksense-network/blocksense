@@ -1,9 +1,11 @@
 import { extendConfig, task } from 'hardhat/config';
+import path from 'path';
 
 import './type-extensions';
 import { BuildArtifacts } from '../types';
 import { relative } from 'path';
 import { collectAbi } from '../abiCollector';
+import { contractsFileStructureAsJSON } from '../constractsFileStructure';
 
 extendConfig(config => {
   config.reflect ??= {};
@@ -40,4 +42,16 @@ task('collectABIs', async (_, hre) => {
 
   const artifactsPaths = await hre.artifacts.getArtifactPaths();
   await collectAbi(artifactsPaths, hre.config.collectABIs);
+});
+
+// Task to process the file structure of the Contracts as JSON file
+task('contractsFileStructureAsJSON', async (_, hre) => {
+  await hre.run('clean');
+  await hre.run('compile');
+
+  const contractsPath = path.resolve(__dirname, '../../../contracts/contracts');
+  await contractsFileStructureAsJSON(
+    contractsPath,
+    hre.config.contractsFileStructureAsJSON,
+  );
 });
