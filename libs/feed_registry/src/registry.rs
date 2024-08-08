@@ -5,13 +5,26 @@ use std::{
 };
 
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
-use sequencer_config::SequencerConfig;
+use sequencer_config::{get_config_file_path, SequencerConfig};
 use serde::Deserialize;
 use tokio::time;
 use tracing::{info, trace};
-use utils::time::current_unix_time;
+use utils::{read_file, time::current_unix_time};
 
 use crate::types::{FeedMetaData, FeedType, Repeatability};
+
+pub fn init_feeds_config() -> FeedsConfig {
+    let config_file_path = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
+
+    let data = read_file(config_file_path.as_str());
+
+    info!("Using config file: {}", config_file_path.as_str());
+
+    let feeds_config: FeedsConfig =
+        serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
+
+    feeds_config
+}
 
 #[derive(Debug, Deserialize)]
 pub struct FeedsConfig {
