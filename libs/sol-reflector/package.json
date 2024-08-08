@@ -20,6 +20,7 @@
     "@blocksense/base-utils": "workspace:*",
     "@types/mocha": "^7.0.2",
     "@types/node": "^22.1.0",
+    "directory-tree": "^3.5.2",
     "hardhat": "^2.22.7",
     "solidity-ast": "^0.4.56",
     "ts-node": "^10.9.2",
