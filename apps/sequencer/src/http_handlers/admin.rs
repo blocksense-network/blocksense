@@ -37,7 +37,7 @@ async fn get_key_from_contract(
     let p = p.lock().await;
 
     let wallet = &p.wallet;
-    let provider = &p.provider;
+    let provider = p.get_current_provider();
     let contract_address = &p.contract_address;
     let Some(addr) = contract_address else {
         return Err(eyre!("No contract found for network {}", network));
