@@ -31,6 +31,7 @@ export interface BuildArtifacts {
   input: SolcInput;
   output: SolcOutput;
   artifactsPaths: string[];
+  artifactPath: string;
 }
 
 export type NodeType =
