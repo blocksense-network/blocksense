@@ -6,11 +6,17 @@ use std::{
 
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use sequencer_config::SequencerConfig;
+use serde::Deserialize;
 use tokio::time;
 use tracing::{info, trace};
 use utils::time::current_unix_time;
 
 use crate::types::{FeedMetaData, FeedType, Repeatability};
+
+#[derive(Debug, Deserialize)]
+pub struct FeedsConfig {
+    feeds: Vec<sequencer_config::FeedMetaData>,
+}
 
 /// Map representing feed_id -> FeedMetaData
 #[derive(Debug)]
