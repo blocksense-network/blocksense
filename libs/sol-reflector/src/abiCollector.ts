@@ -3,7 +3,7 @@ import * as path from 'path';
 import { selectDirectory } from '@blocksense/base-utils';
 
 import { Config, defaults } from './config';
-import { isFileIncluded, writeABIFile } from './utils/common';
+import { isFileIncluded, writeArtifactFile } from './utils/common';
 
 export type ArtifactsRecord = Record<string, Record<string, string>>;
 
@@ -71,5 +71,5 @@ export async function collectAbi(
     });
 
   await replaceFilePathsWithContent(artifactsRecord);
-  await writeABIFile(artifactsRecord, config);
+  await writeArtifactFile(artifactsRecord, config, 'abi');
 }
