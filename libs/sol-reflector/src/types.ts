@@ -58,6 +58,11 @@ export type FunctionModifierKind =
   | 'modifierInvocation'
   | 'baseConstructorSpecifier';
 
+export type Signature = {
+  codeSnippet: string;
+  signatureCodeSnippetHTML: string;
+};
+
 export type NatSpecParam = {
   name?: string;
   description: string;
@@ -132,7 +137,7 @@ export class ContractDocItem {
 export class ErrorDocItem {
   name: string = '';
   errorSelector: string = '';
-  signature?: string;
+  signature?: Signature;
   _parameters?: VariableDocItem[];
   natspec: NatSpec = {};
 }
@@ -140,7 +145,7 @@ export class ErrorDocItem {
 export class EventDocItem {
   name: string = '';
   eventSelector: string = '';
-  signature?: string;
+  signature?: Signature;
   anonymous: boolean = false;
   _parameters?: VariableDocItem[];
   natspec: NatSpec = {};
@@ -150,7 +155,7 @@ export class FunctionDocItem {
   name: string = '';
   kind: FunctionType = 'function';
   functionSelector: string = '';
-  signature?: string;
+  signature?: Signature;
   visibility: Visibility = 'external';
   stateMutability: StateMutability = 'payable';
   virtual: boolean = true;
@@ -168,7 +173,7 @@ export class FunctionModifierDocItem {
 export class ModifierDocItem {
   name: string = '';
   visibility: Visibility = 'external';
-  signature?: string;
+  signature?: Signature;
   _parameters?: VariableDocItem[];
   natspec: NatSpec = {};
 }
@@ -176,7 +181,7 @@ export class ModifierDocItem {
 export class VariableDocItem {
   name: string = '';
   typeDescriptions: TypeDescriptions = {};
-  signature?: string;
+  signature?: Signature;
   mutability: Mutability = 'mutable';
   _value?: string;
   indexed: boolean = false;
@@ -188,14 +193,14 @@ export class VariableDocItem {
 
 export class EnumDocItem {
   name: string = '';
-  signature?: string;
+  signature?: Signature;
   _members: string[] = [];
   natspec: NatSpec = {};
 }
 
 export class StructDocItem {
   name: string = '';
-  signature?: string;
+  signature?: Signature;
   visibility: Visibility = 'external';
   _members?: VariableDocItem[];
   natspec: NatSpec = {};
