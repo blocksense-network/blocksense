@@ -48,7 +48,6 @@ pub struct SequencerConfig {
     pub max_keys_to_batch: usize,
     pub keys_batch_duration: u64,
     pub providers: HashMap<String, Provider>,
-    pub feeds: Vec<FeedMetaData>,
     pub reporters: Vec<Reporter>,
 }
 
@@ -89,7 +88,6 @@ pub fn get_test_config_with_single_provider(
                 transcation_timeout_secs: 50,
             },
         )]),
-        feeds: Vec::new(),
         reporters: Vec::new(),
     }
 }
@@ -124,7 +122,6 @@ pub fn get_test_config_with_multiple_providers(
         max_keys_to_batch: 1,
         keys_batch_duration: 500,
         providers,
-        feeds: Vec::new(),
         reporters: Vec::new(),
     }
 }

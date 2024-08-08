@@ -216,7 +216,9 @@ mod tests {
     use crate::reporters::reporter::init_shared_reporters;
     use actix_web::{http::header::ContentType, test, App};
     use alloy::node_bindings::Anvil;
-    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
+    use feed_registry::registry::{
+        init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsReports,
+    };
     use regex::Regex;
     use sequencer_config::get_test_config_with_single_provider;
     use std::env;
@@ -233,6 +235,7 @@ mod tests {
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config();
+        let feeds_config = init_feeds_config();
 
         let providers =
             init_shared_rpc_providers(&sequencer_config, Some("test_get_feed_report_interval_"))
@@ -244,7 +247,7 @@ mod tests {
         ) = mpsc::unbounded_channel();
         let app_state = web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &sequencer_config,
+                &feeds_config,
             ))),
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
@@ -283,6 +286,7 @@ mod tests {
         anvil_endpoint: &str,
     ) -> web::Data<FeedsState> {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
+        let feeds_config = init_feeds_config();
 
         let providers =
             init_shared_rpc_providers(&cfg, Some("create_app_state_from_sequencer_config_")).await;
@@ -296,7 +300,9 @@ mod tests {
         let send_channel: UnboundedSender<(String, String)> = vote_send.clone();
 
         web::Data::new(FeedsState {
-            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(&cfg))),
+            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
+                &feeds_config,
+            ))),
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
             log_handle,

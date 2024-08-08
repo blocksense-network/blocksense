@@ -70,7 +70,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     fmdr
 }
 
-pub fn new_feeds_meta_data_reg_from_config(conf: &SequencerConfig) -> FeedMetaDataRegistry {
+pub fn new_feeds_meta_data_reg_from_config(conf: &FeedsConfig) -> FeedMetaDataRegistry {
     let mut fmdr = FeedMetaDataRegistry::new();
 
     for feed in &conf.feeds {

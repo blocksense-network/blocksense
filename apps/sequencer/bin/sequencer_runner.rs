@@ -1,7 +1,9 @@
 use std::sync::{Arc, RwLock};
 
 use actix_web::{web, App, HttpServer};
-use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
+use feed_registry::registry::{
+    init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedsConfig,
+};
 use sequencer::feeds::feeds_slots_manager;
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::providers::provider::{init_shared_rpc_providers, SharedRpcProviders};
@@ -28,6 +30,7 @@ use tokio::task::JoinHandle;
 /// Given a Sequencer config is returns the app state need to start the Actix Sequencer server.
 pub async fn prepare_app_state(
     sequencer_config: &SequencerConfig,
+    feeds_config: FeedsConfig,
 ) -> (UnboundedReceiver<(String, String)>, Data<FeedsState>) {
     let log_handle: SharedLoggingHandle = init_shared_logging_handle();
 
@@ -45,7 +48,7 @@ pub async fn prepare_app_state(
 
     let app_state: Data<FeedsState> = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-            sequencer_config,
+            &feeds_config,
         ))),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
         providers: providers.clone(),
@@ -140,10 +143,12 @@ OPTIONS
     }
 
     let sequencer_config: SequencerConfig = init_sequencer_config();
+    let feeds_config = init_feeds_config();
+
     let (voting_receive_channel, app_state): (
         UnboundedReceiver<(String, String)>,
         Data<FeedsState>,
-    ) = prepare_app_state(&sequencer_config).await;
+    ) = prepare_app_state(&sequencer_config, feeds_config).await;
 
     let collected_futures =
         prepare_app_workers(app_state.clone(), &sequencer_config, voting_receive_channel).await;

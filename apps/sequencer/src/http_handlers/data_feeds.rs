@@ -363,6 +363,7 @@ mod tests {
     use alloy::primitives::Address;
     use crypto::JsonSerializableSignature;
     use data_feeds::connector::post::generate_signature;
+    use feed_registry::registry::init_feeds_config;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
     use regex::Regex;
@@ -384,6 +385,7 @@ mod tests {
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config();
+        let feeds_config = init_feeds_config();
 
         let providers = init_shared_rpc_providers(
             &sequencer_config,
@@ -397,7 +399,7 @@ mod tests {
         ) = mpsc::unbounded_channel();
         let app_state = web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &sequencer_config,
+                &feeds_config,
             ))),
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
             providers: providers.clone(),
@@ -459,6 +461,7 @@ mod tests {
         anvil_endpoint: &str,
     ) -> (UnboundedReceiver<(String, String)>, web::Data<FeedsState>) {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
+        let feeds_config = init_feeds_config();
 
         let providers =
             init_shared_rpc_providers(&cfg, Some("create_app_state_from_sequencer_config")).await;
@@ -474,7 +477,9 @@ mod tests {
         (
             vote_recv,
             web::Data::new(FeedsState {
-                registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(&cfg))),
+                registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
+                    &feeds_config,
+                ))),
                 reports: Arc::new(RwLock::new(AllFeedsReports::new())),
                 providers: providers.clone(),
                 log_handle,

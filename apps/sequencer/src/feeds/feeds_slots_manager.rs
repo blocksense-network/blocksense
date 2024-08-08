@@ -106,7 +106,9 @@ mod tests {
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
     use data_feeds::feeds_processing::naive_packing;
-    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
+    use feed_registry::registry::{
+        init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsReports,
+    };
     use feed_registry::types::FeedType;
     use std::env;
     use std::path::PathBuf;
@@ -124,6 +126,7 @@ mod tests {
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config();
+        let feeds_config = init_feeds_config();
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
         let providers =
@@ -146,7 +149,7 @@ mod tests {
         ) = mpsc::unbounded_channel();
         let app_state = web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &sequencer_config,
+                &feeds_config,
             ))),
             reports: all_feeds_reports_arc,
             providers: providers.clone(),
