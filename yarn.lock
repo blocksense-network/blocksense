@@ -373,6 +373,7 @@ __metadata:
     rollup-plugin-delete: "npm:^2.0.0"
     rollup-plugin-peer-deps-external: "npm:^2.2.4"
     rollup-plugin-typescript2: "npm:^0.36.0"
+    shiki: "npm:^1.12.1"
     tsx: "npm:^4.16.5"
     typescript: "npm:^5.5.4"
     vitest: "npm:^2.0.4"
