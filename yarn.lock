@@ -527,6 +527,7 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@types/mocha": "npm:^7.0.2"
     "@types/node": "npm:^22.3.0"
+    directory-tree: "npm:^3.5.2"
     hardhat: "npm:^2.22.8"
     prettier: "npm:^3.3.3"
     prettier-plugin-solidity: "npm:^1.3.1"
@@ -5700,7 +5701,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"command-line-args@npm:^5.1.1":
+"command-line-args@npm:^5.1.1, command-line-args@npm:^5.2.0":
   version: 5.2.1
   resolution: "command-line-args@npm:5.2.1"
   dependencies:
@@ -5712,7 +5713,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"command-line-usage@npm:^6.1.0":
+"command-line-usage@npm:^6.1.0, command-line-usage@npm:^6.1.1":
   version: 6.1.3
   resolution: "command-line-usage@npm:6.1.3"
   dependencies:
@@ -6675,6 +6676,18 @@ __metadata:
   dependencies:
     path-type: "npm:^4.0.0"
   checksum: 10c0/dcac00920a4d503e38bb64001acb19df4efc14536ada475725e12f52c16777afdee4db827f55f13a908ee7efc0cb282e2e3dbaeeb98c0993dd93d1802d3bf00c
+  languageName: node
+  linkType: hard
+
+"directory-tree@npm:^3.5.2":
+  version: 3.5.2
+  resolution: "directory-tree@npm:3.5.2"
+  dependencies:
+    command-line-args: "npm:^5.2.0"
+    command-line-usage: "npm:^6.1.1"
+  bin:
+    directory-tree: bin/index.js
+  checksum: 10c0/0ddc90224f6b9a1342130d7f97cedf9302e82114df9b53131e4e1264563c95d0e73a295a98ad5939ae0a1fcde35d74c28dfefebe58219d471126f9ae423a5436
   languageName: node
   linkType: hard
 
