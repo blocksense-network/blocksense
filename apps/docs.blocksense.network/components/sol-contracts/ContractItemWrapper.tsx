@@ -5,6 +5,7 @@ import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 type ContractItemWrapperProps = {
   itemsLength: number | undefined;
   title?: string;
+  parentTitle?: string;
   titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   children: ReactNode;
 };
@@ -12,13 +13,18 @@ type ContractItemWrapperProps = {
 export const ContractItemWrapper = ({
   itemsLength,
   title,
+  parentTitle,
   titleLevel,
   children,
 }: ContractItemWrapperProps) => {
   return (
     Boolean(itemsLength) && (
       <div className="contract-item-wrapper mt-6">
-        <AnchorLinkTitle title={title} titleLevel={titleLevel} />
+        <AnchorLinkTitle
+          title={title}
+          parentTitle={parentTitle}
+          titleLevel={titleLevel}
+        />
         <div className="contract-item-wrapper__content">{children}</div>
       </div>
     )

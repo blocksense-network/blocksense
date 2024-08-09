@@ -25,8 +25,9 @@ const getModifierNames = (modifiers: ModifierDocItem[] = []) => {
 };
 
 export const Modifiers = ({ modifiers }: ModifiersProps) => {
+  const elementsRef = React.useRef<HTMLDivElement>(null);
   const { accordionStates, expandAll, collapseAll, toggleAccordion } =
-    useExpandCollapse(getModifierNames(modifiers));
+    useExpandCollapse(getModifierNames(modifiers), elementsRef);
 
   const allExpanded = Object.values(accordionStates).every(
     accordion => accordion === true,
@@ -52,6 +53,7 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
         className="contract-item-wrapper__modifier w-full space-y-4"
+        ref={elementsRef}
       >
         {modifiers?.map((modifier, index) => {
           const id = modifier.name;
@@ -72,7 +74,10 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
                 </span>
                 <Signature signature={modifier.signature} />
                 <NatSpec natspec={modifier.natspec} />
-                <Parameters parameters={modifier?._parameters} />
+                <Parameters
+                  parentTitle={modifier.name}
+                  parameters={modifier?._parameters}
+                />
               </AccordionContent>
             </AccordionItem>
           );

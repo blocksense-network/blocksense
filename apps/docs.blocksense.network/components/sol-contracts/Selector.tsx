@@ -15,7 +15,7 @@ export const Selector = ({ selector = '' }: SelectorProps) => {
         <p className="selector-container__text hidden 2xl:block bg-slate-100 px-2">
           {resultSelector}
         </p>
-        <CopyButton textToCopy={resultSelector} />
+        <CopyButton textToCopy={resultSelector} tooltipPosition="top" />
       </aside>
     )
   );

@@ -4,9 +4,11 @@ import { Config, ReflectConfig } from '../config';
 declare module 'hardhat/types/config' {
   export interface HardhatUserConfig {
     reflect?: ReflectConfig;
+    collectABIs?: ReflectConfig;
   }
 
   export interface HardhatConfig {
     reflect: Config;
+    collectABIs: Config;
   }
 }

@@ -17,6 +17,7 @@
     "ts": "yarn node --import tsx"
   },
   "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
     "@types/mocha": "^7.0.2",
     "@types/node": "^22.1.0",
     "hardhat": "^2.22.7",

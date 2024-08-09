@@ -25,8 +25,9 @@ const getStructNames = (structs: StructDocItem[] = []) => {
 };
 
 export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
+  const elementsRef = React.useRef<HTMLDivElement>(null);
   const { accordionStates, expandAll, collapseAll, toggleAccordion } =
-    useExpandCollapse(getStructNames(structs));
+    useExpandCollapse(getStructNames(structs), elementsRef);
 
   const allExpanded = Object.values(accordionStates).every(
     accordion => accordion === true,
@@ -52,6 +53,7 @@ export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
         className="contract-item-wrapper__struct w-full space-y-4"
+        ref={elementsRef}
       >
         {structs?.map((struct, index) => {
           const id = struct.name || `struct-${index}`;
@@ -72,6 +74,7 @@ export const Structs = ({ structs, isFromSourceUnit }: StructsProps) => {
                 </span>
                 <NatSpec natspec={struct.natspec} />
                 <Parameters
+                  parentTitle={struct.name}
                   parameters={struct._members}
                   title="Members"
                   titleLevel={isFromSourceUnit ? 4 : 5}

@@ -16,6 +16,7 @@ const config: HardhatUserConfig = {
     outputDir: 'artifacts/docs',
     exclude: ['test'],
   },
+  collectABIs: { outputDir: 'artifacts/docs', exclude: ['test'] },
   solidity: {
     version: '0.8.24',
     settings: {

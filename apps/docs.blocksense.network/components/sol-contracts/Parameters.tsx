@@ -23,6 +23,7 @@ type Column =
 type ParametersProps = {
   parameters?: VariableDocItem[];
   title?: string;
+  parentTitle?: string;
   titleLevel?: 4 | 5;
   columns?: Column[];
 };
@@ -61,6 +62,7 @@ const getParameterValueByColumn = (
 export const Parameters = ({
   parameters,
   title = 'Parameters',
+  parentTitle,
   titleLevel = 4,
   columns = ['type', 'name', 'description'],
 }: ParametersProps) => {
@@ -68,6 +70,7 @@ export const Parameters = ({
     <ContractItemWrapper
       itemsLength={parameters?.length}
       title={title}
+      parentTitle={parentTitle}
       titleLevel={titleLevel}
     >
       <Table className="variables__table mt-6 mb-4">

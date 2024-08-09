@@ -25,7 +25,7 @@ impl CoinMarketCapDataFeed {
         let cmc_api_key: String = read_file(resource_path.as_str());
 
         Self {
-            api_connector: Cmc::new(cmc_api_key),
+            api_connector: Cmc::new(cmc_api_key.trim()),
             is_connected: true,
             history_buffer: HeapRb::<(FeedType, Timestamp)>::new(
                 get_env_var("HISTORY_BUFFER_SIZE").unwrap_or(10_000),

@@ -34,8 +34,9 @@ export const Variables = ({
   title,
   titleLevel,
 }: VariablesProps) => {
+  const elementsRef = React.useRef<HTMLDivElement>(null);
   const { accordionStates, expandAll, collapseAll, toggleAccordion } =
-    useExpandCollapse(getVariableNames(variables));
+    useExpandCollapse(getVariableNames(variables), elementsRef);
 
   const allExpanded = Object.values(accordionStates).every(
     accordion => accordion === true,
@@ -61,6 +62,7 @@ export const Variables = ({
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
         className="contract-item-wrapper__variable w-full space-y-4"
+        ref={elementsRef}
       >
         {variables?.map((variable, index) => {
           const id = variable.name || `variable-${index}`;

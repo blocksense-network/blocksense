@@ -29,8 +29,9 @@ const getNames = (functions: FunctionDocItem[] = []) => {
 };
 
 export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
+  const elementsRef = React.useRef<HTMLDivElement>(null);
   const { accordionStates, expandAll, collapseAll, toggleAccordion } =
-    useExpandCollapse(getNames(functions));
+    useExpandCollapse(getNames(functions), elementsRef);
 
   const allExpanded = Object.values(accordionStates).every(
     accordion => accordion === true,
@@ -56,6 +57,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
         className="contract-item-wrapper__function w-full space-y-4"
+        ref={elementsRef}
       >
         {functions?.map(_function => {
           const id = _function.name || _function.kind;
@@ -88,12 +90,14 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                 <NatSpec natspec={_function.natspec} />
                 <Parameters
                   parameters={_function._parameters}
+                  parentTitle={_function.name || _function.kind}
                   titleLevel={isFromSourceUnit ? 4 : 5}
                   columns={['type', 'name', 'dataLocation', 'description']}
                 />
                 <Parameters
                   parameters={_function._returnParameters}
                   title="Return Parameters"
+                  parentTitle={_function.name || _function.kind}
                   titleLevel={isFromSourceUnit ? 4 : 5}
                   columns={['type', 'name', 'dataLocation', 'description']}
                 />

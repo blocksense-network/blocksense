@@ -1,11 +1,15 @@
 import path from 'path';
 import { promises as fs } from 'fs';
+import { mkdir } from 'fs/promises';
 
 import { VariableDeclaration } from 'solidity-ast';
 import { SolcOutput } from 'solidity-ast/solc';
 
+import { selectDirectory } from '@blocksense/base-utils';
+
 import { Config, FullConfig, defaults } from '../config';
 import { OutputFormat, SolReflection } from '../types';
+import { ArtifactsRecord } from '../abiCollector';
 
 /**
  * Writes documentation files based on the provided content and configuration.
@@ -67,6 +71,37 @@ async function writeDocFile(
   console.log(`Wrote documentation to ${filePath}`);
 }
 
+export async function writeABIFile(
+  artifactsRecord: ArtifactsRecord,
+  userConfig?: Config,
+) {
+  const config = { ...defaults, ...userConfig };
+
+  let writeJSON;
+  const baseDir = path.resolve(config.root, config.outputDir);
+  try {
+    ({ writeJSON } = selectDirectory(baseDir));
+  } catch (error: unknown) {
+    if (
+      (error as Error).message == `The directory ${baseDir} does not exist.`
+    ) {
+      await fs.mkdir(baseDir, {
+        recursive: true,
+      });
+      ({ writeJSON } = selectDirectory(
+        path.resolve(config.root, config.outputDir),
+      ));
+    } else {
+      throw error;
+    }
+  }
+
+  const abiArtifactsPath = await writeJSON({
+    name: 'abi',
+    content: artifactsRecord,
+  });
+  console.info(`Abi artifacts collected in ${abiArtifactsPath}`);
+}
 /**
  * Checks if a given file path is a child (or a subdirectory) of a specified parent directory.
  *

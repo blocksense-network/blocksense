@@ -27,8 +27,9 @@ const getErrorNames = (errors: ErrorDocItem[] = []) => {
 };
 
 export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
+  const elementsRef = React.useRef<HTMLDivElement>(null);
   const { accordionStates, expandAll, collapseAll, toggleAccordion } =
-    useExpandCollapse(getErrorNames(errors));
+    useExpandCollapse(getErrorNames(errors), elementsRef);
 
   const allExpanded = Object.values(accordionStates).every(
     accordion => accordion === true,
@@ -54,6 +55,7 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
         className="contract-item-wrapper__error w-full space-y-4"
+        ref={elementsRef}
       >
         {errors?.map((error, index) => {
           const id = error.name || `error-${index}`;
@@ -73,6 +75,7 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
                 <Signature signature={error.signature} />
                 <NatSpec natspec={error.natspec} />
                 <Parameters
+                  parentTitle={error.name}
                   parameters={error._parameters}
                   titleLevel={isFromSourceUnit ? 4 : 5}
                 />
