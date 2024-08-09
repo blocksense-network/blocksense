@@ -48,7 +48,11 @@ interface ContractsConfig {
   [ContractNames.SafeMultisig]: string;
 }
 
-type CoreContract = { [contractName in ContractNames]: string };
+type CoreContract = {
+  [ContractNames.HistoricDataFeedStoreV2]: string;
+  [ContractNames.UpgradeableProxy]: string;
+  [ContractNames.FeedRegistry]: string;
+};
 
 interface ChainlinkProxyData {
   description: string;
@@ -269,6 +273,8 @@ const multisigTxExec = async (
 
   const txResponse = await safe.executeTransaction(safeTransaction);
 
+  // transactionResponse is of unknown type and there is no type def in the specs
+  await (txResponse.transactionResponse as any).wait();
   console.log('-> tx hash', txResponse.hash);
 };
 
@@ -277,7 +283,7 @@ const deployContracts = async (
   multisig: Safe,
   artifacts: Artifacts,
   contracts: {
-    name: keyof typeof ContractNames;
+    name: Exclude<ContractNames, ContractNames.SafeMultisig>;
     argsTypes: string[];
     argsValues: any[];
     salt: string;
@@ -346,7 +352,13 @@ const deployContracts = async (
     }
   }
 
-  await multisigTxExec(transactions, multisig);
+  // deploying 30 contracts in a single transaction costs about 12.6m gas
+  const BATCH_LENGTH = 30;
+  const batches = Math.ceil(transactions.length / BATCH_LENGTH);
+  for (let i = 0; i < batches; i++) {
+    const batch = transactions.slice(i * BATCH_LENGTH, (i + 1) * BATCH_LENGTH);
+    await multisigTxExec(batch, multisig);
+  }
 
   return contractAddresses;
 };
@@ -357,12 +369,13 @@ const registerChainlinkProxies = async (
   artifacts: Artifacts,
 ) => {
   console.log('\nRegistering ChainlinkProxies in FeedRegistry...');
-  // The difference between setting n and n+1 feeds via FeedRegistry::setFeeds is approximately 55k gas.
+  // The difference between setting n and n+1 feeds via FeedRegistry::setFeeds is slightly above 55k gas.
 
   // Split into batches of 100
+  const BATCH_LENGTH = 100;
   const batches: Array<Array<ChainlinkProxyData>> = [];
-  for (let i = 0; i < deployData.ChainlinkProxy.length; i += 100) {
-    batches.push(deployData.ChainlinkProxy.slice(i, i + 100));
+  for (let i = 0; i < deployData.ChainlinkProxy.length; i += BATCH_LENGTH) {
+    batches.push(deployData.ChainlinkProxy.slice(i, i + BATCH_LENGTH));
   }
 
   const registry = new ethers.Contract(
@@ -377,7 +390,8 @@ const registerChainlinkProxies = async (
       batch.map(data => {
         return { base: data.base, quote: data.quote, feed: data.address };
       }),
-      { gasLimit: 20000 + 60 * 1000 * batch.length },
+      // 21k for tx execution and 60k * batch.length for each feed in batch
+      { gasLimit: 21000 + 60000 * batch.length },
     );
     console.log('-> tx hash', tx.hash);
     await tx.wait();
