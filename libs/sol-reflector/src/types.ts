@@ -33,6 +33,7 @@ export interface BuildArtifacts {
   input: SolcInput;
   output: SolcOutput;
   artifactsPaths: string[];
+  artifactPath: string;
 }
 
 export type NodeType =
@@ -230,6 +231,14 @@ export class StructDocItem {
 export class PragmaDocItem {
   literals: string[] = [];
 }
+
+export type TreeNode = {
+  name: string;
+  path?: string;
+  children?: TreeNode[];
+  icon?: 'folder' | 'solidity';
+  id?: number;
+};
 
 export function isLiteral(value: ASTNode): value is Literal {
   return value ? value.nodeType === 'Literal' : false;

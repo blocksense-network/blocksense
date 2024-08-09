@@ -1,6 +1,9 @@
+import path from 'path';
+
+import { rootDir } from '@blocksense/base-utils';
+
 import { Config, defaults } from './config';
 import { BuildArtifacts, SolReflection } from './types';
-
 import './hardhat/type-extensions';
 import { filterRelevantFiles, writeDocFiles } from './utils/common';
 import { addNatspec, convertSourceUnit } from './utils/convertors';
@@ -10,6 +13,7 @@ import {
 } from './utils/natspec';
 import { appendAbiToSolReflection, collectAbi } from './abiCollector';
 import { formatAndHighlightSignatures } from './utils/signature';
+import { contractsFileStructureAsJSON } from './contractsFileStructure';
 
 if ('extendConfig' in global && 'task' in global) {
   // Assume Hardhat.
@@ -40,6 +44,10 @@ export async function main(
   await formatAndHighlightSignatures(solReflection);
 
   await writeDocFiles(solReflection, userConfig);
+
+  await collectAbi(build.artifactsPaths, userConfig);
+
+  await contractsFileStructureAsJSON(userConfig);
 }
 
 // We ask Node.js not to cache this file.
