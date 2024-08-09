@@ -46,10 +46,6 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
             "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0])},
             "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1])}
         },
-        "feeds": [
-            {"id": 0, "name": "DOGE", "report_interval_ms": 7000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-            {"id": 1, "name": "BTC", "report_interval_ms": 7000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
-        ]
     });
 
     let config_file_path = get_config_file_path("SEQUENCER_CONFIG_DIR", "/sequencer_config.json");
@@ -62,14 +58,25 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
     merge(&mut sequencer_config, &config_patch);
 
     fs::write("/tmp/sequencer_config.json", sequencer_config.to_string())
-        .expect("Unable to write config file");
+        .expect("Unable to write sequencer config file");
+
+    let feeds = json!({
+        "feeds": [
+            {"id": 0, "name": "DOGE", "report_interval_ms": 7000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
+            {"id": 1, "name": "BTC", "report_interval_ms": 7000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
+        ]
+    });
+
+    fs::write("/tmp/feeds_config.json", feeds.to_string())
+        .expect("Unable to write feeds config file");
 
     thread::spawn(move || {
         let mut command = Command::new("cargo");
         let command = command.args(["run", "--bin", "sequencer"]);
         let sequencer = command
             .env("SEQUENCER_LOGGING_LEVEL", "INFO")
-            .env("SEQUENCER_CONFIG_DIR", "/tmp");
+            .env("SEQUENCER_CONFIG_DIR", "/tmp")
+            .env("FEEDS_CONFIG_DIR", "/tmp");
 
         sequencer.status().expect("process failed to execute");
     })
