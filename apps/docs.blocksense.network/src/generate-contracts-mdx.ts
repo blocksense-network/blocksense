@@ -11,7 +11,7 @@ import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
 const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
 
 function stringifyObject(obj: any): string {
-  return JSON.stringify(obj)
+  return `'${JSON.stringify(obj)
     .replace(/\\n/g, '\\\\n')
     .replace(/\\'/g, "\\\\'")
     .replace(/\\"/g, '\\\\"')
@@ -19,14 +19,16 @@ function stringifyObject(obj: any): string {
     .replace(/\\r/g, '\\\\r')
     .replace(/\\t/g, '\\\\t')
     .replace(/\\b/g, '\\\\b')
-    .replace(/\\f/g, '\\\\f');
+    .replace(/\\f/g, '\\\\f')}'`;
 }
 
 function generateMarkdownContent(sourceUnit: SourceUnitDocItem): string {
+  const sourceUnitJsonString = stringifyObject(sourceUnit);
+
   const content = `
 import { SourceUnit } from '@/sol-contracts-components/SourceUnit';
 
-<SourceUnit sourceUnitJsonString={'${stringifyObject(sourceUnit)}'} />
+<SourceUnit sourceUnitJsonString={${sourceUnitJsonString}} />
 `;
 
   return content;
