@@ -216,7 +216,7 @@ export const DEFAULT_THEME: DocsThemeConfig = {
     text: 'Edit this page',
   },
   feedback: {
-    content: 'Question? Give us feedback →',
+    content: 'Share your feedback',
     labels: 'feedback',
     useLink() {
       const config = useConfig();

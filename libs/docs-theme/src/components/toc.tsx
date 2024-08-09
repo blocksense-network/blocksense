@@ -2,6 +2,8 @@ import cn from 'clsx';
 import type { Heading } from 'nextra';
 import type { ReactElement } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
+import { EditIcon } from '../icons/edit';
+import { FeedbackIcon } from '../icons/feedback';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { useActiveAnchor, useConfig } from '../contexts';
 import { renderComponent } from '../utils';
@@ -14,8 +16,8 @@ export type TOCProps = {
 };
 
 const linkClassName = cn(
-  'nx-text-s nx-font-semibold nx-text-gray-600 hover:nx-text-gray-900',
-  'contrast-more:nx-text-gray-800 contrast-more:dark:nx-text-gray-50',
+  'nx-text-s nx-font-semibold nx-text-gray-900 hover:nx-opacity-75',
+  'contrast-more:nx-text-gray-900 contrast-more:dark:nx-text-gray-50',
 );
 
 export function TOC({ headings, filePath }: TOCProps): ReactElement {
@@ -107,26 +109,32 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
         <div
           className={cn(
             hasHeadings && 'nextra-toc__info-section',
-            'nx-mt-10 nx-bg-gray-50 nx-rounded-lg nx-border nx-px-4 nx-py-0 nx-border-gray-200 nx-pt-4',
-            'nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 nx-pb-4 dark:nx-border-neutral-800',
+            'nx-mt-8 nx-bg-neutral-900 nx-bg-opacity-[0.02] nx-rounded-md nx-border nx-px-6 nx-py-4 nx-border-neutral-200/70 nx-pt-4',
+            'nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 nx-pb-2 dark:nx-border-neutral-800',
             'contrast-more:nx-border-t contrast-more:nx-border-neutral-400 contrast-more:nx-shadow-none contrast-more:dark:nx-border-neutral-400',
           )}
         >
-          {config.feedback.content ? (
-            <Anchor
-              className={linkClassName}
-              href={config.feedback.useLink()}
-              newWindow
-            >
-              {renderComponent(config.feedback.content)}
-            </Anchor>
-          ) : null}
+          <div className="nx-flex nx-items-center nx-gap-2 dark:nx-border-neutral-600">
+            <FeedbackIcon />
+            {config.feedback.content ? (
+              <Anchor
+                className={linkClassName}
+                href={config.feedback.useLink()}
+                newWindow
+              >
+                {renderComponent(config.feedback.content)}
+              </Anchor>
+            ) : null}
+          </div>
 
-          {renderComponent(config.editLink.component, {
-            filePath,
-            className: linkClassName,
-            children: renderComponent(config.editLink.text),
-          })}
+          <div className="nx-flex nx-items-center nx-gap-2 dark:nx-border-neutral-600">
+            <EditIcon />
+            {renderComponent(config.editLink.component, {
+              filePath,
+              className: linkClassName,
+              children: renderComponent(config.editLink.text),
+            })}
+          </div>
 
           {renderComponent(config.toc.extraContent)}
 
