@@ -3,6 +3,7 @@
   craneLib,
   pkg-config,
   libusb,
+  git,
   openssl,
   zstd,
   stdenv,
@@ -15,7 +16,10 @@ let
     version = "alpha";
     inherit (filesets.rustSrc) src;
 
-    nativeBuildInputs = [ pkg-config ];
+    nativeBuildInputs = [
+      pkg-config
+      git
+    ];
 
     buildInputs = [
       libusb
