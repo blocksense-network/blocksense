@@ -17,6 +17,10 @@ const config: HardhatUserConfig = {
     exclude: ['test'],
   },
   collectABIs: { outputDir: 'artifacts/docs', exclude: ['test'] },
+  contractsFileStructureAsJSON: {
+    outputDir: 'artifacts/docs',
+    exclude: ['test'],
+  },
   solidity: {
     version: '0.8.24',
     settings: {
