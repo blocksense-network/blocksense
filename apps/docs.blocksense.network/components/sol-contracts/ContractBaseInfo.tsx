@@ -11,6 +11,7 @@ import {
 
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
+import { ContractOverview } from './ContractOverview';
 
 export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
   return (
@@ -47,6 +48,10 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
               </div>
             </CardContent>
           )}
+          <span className="contract-base-info__base-contracts-title text-xl font-semibold text-gray-800 ml-4">
+            Overview
+          </span>
+          <ContractOverview contract={contract} />
           <CardFooter>
             <NatSpec natspec={contract.natspec} />
           </CardFooter>
