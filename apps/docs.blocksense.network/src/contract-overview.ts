@@ -54,3 +54,93 @@ export function getOverviewCodeContent(contract: ContractDocItem): string {
 
   return contractData;
 }
+
+/**
+ * Options for the `transformerOverviewLineLink` function.
+ *
+ * @property {string} routeLink - The base URL to which the target keyword will be appended as a URL fragment.
+ * @property {string[]} [classes] - Optional. Additional CSS classes to apply to the line of code.
+ */
+export interface TransformerLineLinkOption {
+  routeLink: string;
+  classes?: string[];
+}
+
+/**
+ * Creates a Shiki transformer that adds an `onclick` event to a line of code,
+ *  redirecting to a specific URL when clicked.
+ *
+ * @param {TransformerLineLinkOption} params - The options for the transformer.
+ *  Should include `routeLink` and optionally `classes`.
+ * @returns {ShikiTransformer} - The created Shiki transformer.
+ *
+ * @note The `routeLink` option is used as the base URL, and the target keyword
+ *  extracted from the code line is appended as a URL fragment.
+ */
+export function transformerOverviewLineLink(
+  params: TransformerLineLinkOption,
+): ShikiTransformer {
+  return {
+    name: 'transformer-line-link',
+    line(node) {
+      const target = getUrlTarget(node);
+      if (!target) return;
+      node.properties = {
+        ...node.properties,
+        onclick: `window.location.href='${params.routeLink}#${target}'`,
+      };
+
+      if (params.classes) this.addClassToHast(node, params.classes);
+    },
+  };
+}
+
+/**
+ * Extracts the target keyword from a code snippet to be used as a URL fragment.
+ * @note The result of this function is used to be added to a URL that navigates
+ * to a specific part of a page in the documentation website.
+ */
+function getUrlTarget(node: any): string {
+  const codeSnippetTokens = getCodeSnippetTokens(node);
+  const index = codeSnippetTokens.findIndex((token: string) =>
+    smartContractOverviewKeyWords.includes(token),
+  );
+  const target =
+    index !== -1
+      ? codeSnippetTokens[index + 1]
+      : codeSnippetTokens.includes('constructor')
+        ? 'constructor'
+        : codeSnippetTokens.includes('fallback')
+          ? 'fallback'
+          : codeSnippetTokens[1];
+  return target;
+}
+
+/**
+ * Extracts the tokens from a shiki code snippet represented as a nested structure of nodes.
+ */
+function getCodeSnippetTokens(node: any): string[] {
+  return node.children
+    .flat()
+    .map((child: any) => {
+      if ('children' in child)
+        return child.children.flat().map((c: any) => {
+          if ('value' in c) return c.value.trim();
+        });
+    })
+    .flat();
+}
+/**
+ * Keywords that are used to identify the type of a smart contract element.
+ */
+const smartContractOverviewKeyWords: string[] = [
+  'enum',
+  'struct',
+  'error',
+  'event',
+  'modifier',
+  'function',
+  'constant',
+  'immutable',
+  'contract',
+];
