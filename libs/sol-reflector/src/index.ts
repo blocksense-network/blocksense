@@ -10,6 +10,9 @@ import {
 } from './utils/natspec';
 import { appendAbiToSolReflection, collectAbi } from './abiCollector';
 import { formatAndHighlightSignatures } from './utils/signature';
+import { contractsFileStructureAsJSON } from './constractsFileStructure';
+import path from 'path';
+
 
 if ('extendConfig' in global && 'task' in global) {
   // Assume Hardhat.
@@ -40,6 +43,14 @@ export async function main(
   await formatAndHighlightSignatures(solReflection);
 
   await writeDocFiles(solReflection, userConfig);
+
+  await collectAbi(build.artifactsPaths, userConfig);
+
+  const contractsPath = path.resolve(
+    __dirname,
+    '../../../libs/contracts/contracts',
+  );
+  await contractsFileStructureAsJSON(contractsPath, userConfig);
 }
 
 // We ask Node.js not to cache this file.

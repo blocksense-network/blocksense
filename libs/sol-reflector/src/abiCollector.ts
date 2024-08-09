@@ -7,7 +7,7 @@ import {
   isFileIncluded,
   iterateContractElements,
   iterateContracts,
-  writeABIFile,
+  writeArtifactFile,
 } from './utils/common';
 import { SolReflection } from './types';
 import { AbiStruct } from 'web3-types';
@@ -78,7 +78,7 @@ export async function collectAbi(
     });
 
   await replaceFilePathsWithContent(artifactsRecord);
-  await writeABIFile(artifactsRecord, config);
+  await writeArtifactFile(artifactsRecord, config, 'abi');
 
   return artifactsRecord;
 }

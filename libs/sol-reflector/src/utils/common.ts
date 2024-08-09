@@ -77,9 +77,17 @@ async function writeDocFile(
   console.log(`Wrote documentation to ${filePath}`);
 }
 
-export async function writeABIFile(
-  artifactsRecord: ArtifactsRecord,
+export type TreeNode = {
+  name: string;
+  path?: string;
+  children?: TreeNode[];
+  icon?: 'folder' | 'solidity';
+};
+
+export async function writeArtifactFile(
+  artifactsRecord: ArtifactsRecord | TreeNode,
   userConfig?: Config,
+  name?: string,
 ) {
   const config = { ...defaults, ...userConfig };
 
@@ -102,11 +110,11 @@ export async function writeABIFile(
     }
   }
 
-  const abiArtifactsPath = await writeJSON({
-    name: 'abi',
+  const artifactsPath = await writeJSON({
+    name: name,
     content: artifactsRecord,
   });
-  console.info(`Abi artifacts collected in ${abiArtifactsPath}`);
+  console.info(`${name} artifacts collected in ${artifactsPath}`);
 }
 /**
  * Checks if a given file path is a child (or a subdirectory) of a specified parent directory.
