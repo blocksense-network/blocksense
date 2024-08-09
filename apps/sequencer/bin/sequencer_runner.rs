@@ -2,7 +2,7 @@ use std::sync::{Arc, RwLock};
 
 use actix_web::{web, App, HttpServer};
 use feed_registry::registry::{
-    init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedsConfig,
+    init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
 };
 use sequencer::feeds::feeds_slots_manager;
 use sequencer::feeds::feeds_state::FeedsState;
@@ -30,7 +30,7 @@ use tokio::task::JoinHandle;
 /// Given a Sequencer config is returns the app state need to start the Actix Sequencer server.
 pub async fn prepare_app_state(
     sequencer_config: &SequencerConfig,
-    feeds_config: FeedsConfig,
+    feeds_config: AllFeedsConfig,
 ) -> (UnboundedReceiver<(String, String)>, Data<FeedsState>) {
     let log_handle: SharedLoggingHandle = init_shared_logging_handle();
 

@@ -6,7 +6,7 @@ use std::time::SystemTime;
 use std::{collections::HashMap, env, fmt::Debug};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct FeedMetaData {
+pub struct FeedConfig {
     pub id: u32,
     pub name: String,
     pub report_interval_ms: u64,

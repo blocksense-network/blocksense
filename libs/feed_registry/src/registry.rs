@@ -5,7 +5,7 @@ use std::{
 };
 
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
-use sequencer_config::{get_config_file_path, SequencerConfig};
+use sequencer_config::{get_config_file_path, FeedConfig, SequencerConfig};
 use serde::Deserialize;
 use tokio::time;
 use tracing::{info, trace};
@@ -13,22 +13,22 @@ use utils::{read_file, time::current_unix_time};
 
 use crate::types::{FeedMetaData, FeedType, Repeatability};
 
-pub fn init_feeds_config() -> FeedsConfig {
+pub fn init_feeds_config() -> AllFeedsConfig {
     let config_file_path = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
 
     let data = read_file(config_file_path.as_str());
 
     info!("Using config file: {}", config_file_path.as_str());
 
-    let feeds_config: FeedsConfig =
+    let feeds_config: AllFeedsConfig =
         serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
 
     feeds_config
 }
 
 #[derive(Debug, Deserialize)]
-pub struct FeedsConfig {
-    pub feeds: Vec<sequencer_config::FeedMetaData>,
+pub struct AllFeedsConfig {
+    pub feeds: Vec<FeedConfig>,
 }
 
 /// Map representing feed_id -> FeedMetaData
@@ -70,7 +70,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     fmdr
 }
 
-pub fn new_feeds_meta_data_reg_from_config(conf: &FeedsConfig) -> FeedMetaDataRegistry {
+pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDataRegistry {
     let mut fmdr = FeedMetaDataRegistry::new();
 
     for feed in &conf.feeds {

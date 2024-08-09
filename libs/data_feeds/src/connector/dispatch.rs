@@ -1,9 +1,9 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
-use feed_registry::{api::DataFeedAPI, registry::FeedsConfig};
+use feed_registry::{api::DataFeedAPI, registry::AllFeedsConfig};
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
-use sequencer_config::{FeedMetaData, ReporterConfig};
+use sequencer_config::{FeedConfig, ReporterConfig};
 use tracing::debug;
 use utils::read_file;
 
@@ -76,9 +76,9 @@ fn feed_builder(
 
 pub async fn dispatch(
     reporter_config: &ReporterConfig,
-    feed_registry: &FeedsConfig,
+    feed_registry: &AllFeedsConfig,
     feeds: &Vec<(DataFeedAPI, String)>,
-    feed_id_map: &HashMap<String, &FeedMetaData>,
+    feed_id_map: &HashMap<String, &FeedConfig>,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
 ) {
     let feed_subset = feed_selector(feeds, reporter_config.batch_size);
