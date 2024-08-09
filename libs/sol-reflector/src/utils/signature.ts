@@ -7,6 +7,7 @@ import { ASTNode, Signature, SolReflection, SourceUnitDocItem } from '../types';
 import { formatVariable, iterateContractElements } from './common';
 
 export function getSignature(node: ASTNode): Signature | undefined {
+  let codeSnippet = '';
   switch (node.nodeType) {
     case 'ContractDefinition':
       return {
@@ -26,6 +27,8 @@ export function getSignature(node: ASTNode): Signature | undefined {
         `${head}(${params.map(formatVariable).join(', ')})`,
         node.visibility,
       ];
+      let overviewCodeSnippet = '';
+
       if (node.stateMutability !== 'nonpayable') {
         res.push(node.stateMutability);
       }
@@ -38,54 +41,71 @@ export function getSignature(node: ASTNode): Signature | undefined {
         );
       }
 
-      const codeSnippet = res.join(' ').concat(';');
+      overviewCodeSnippet = res
+        .filter(el => !el.includes('returns'))
+        .join(' ')
+        .concat(';');
+      codeSnippet = res.join(' ').concat(';');
 
       return {
         codeSnippet,
         signatureCodeSnippetHTML: '',
+        overviewCodeSnippet,
       };
     }
 
     case 'EventDefinition': {
       const params = node.parameters.parameters;
+      codeSnippet = `event ${node.name}(${params.map(formatVariable).join(', ')});`;
       return {
-        codeSnippet: `event ${node.name}(${params.map(formatVariable).join(', ')});`,
+        codeSnippet,
         signatureCodeSnippetHTML: '',
+        overviewCodeSnippet: codeSnippet,
       };
     }
 
     case 'ErrorDefinition': {
       const params = node.parameters.parameters;
+      codeSnippet = `error ${node.name}(${params.map(formatVariable).join(', ')});`;
       return {
-        codeSnippet: `error ${node.name}(${params.map(formatVariable).join(', ')});`,
+        codeSnippet,
         signatureCodeSnippetHTML: '',
+        overviewCodeSnippet: codeSnippet,
       };
     }
 
     case 'ModifierDefinition': {
       const params = node.parameters.parameters;
+      codeSnippet = `modifier ${node.name}(${params.map(formatVariable).join(', ')});`;
       return {
-        codeSnippet: `modifier ${node.name}(${params.map(formatVariable).join(', ')});`,
+        codeSnippet,
         signatureCodeSnippetHTML: '',
+        overviewCodeSnippet: codeSnippet,
       };
     }
 
     case 'VariableDeclaration':
+      codeSnippet = `${formatVariable(node)};`;
       return {
-        codeSnippet: `${formatVariable(node)};`,
+        codeSnippet,
         signatureCodeSnippetHTML: '',
+        overviewCodeSnippet: codeSnippet,
       };
 
     case 'EnumDefinition':
+      codeSnippet = `enum ${node.name} { ... };`;
       return {
-        codeSnippet: `enum ${node.name} { ... };`,
+        codeSnippet,
         signatureCodeSnippetHTML: '',
+        overviewCodeSnippet: codeSnippet,
       };
 
     case 'StructDefinition':
+      codeSnippet = `struct ${node.name} { ... };`;
       return {
-        codeSnippet: `struct ${node.name} { ... };`,
+        codeSnippet,
         signatureCodeSnippetHTML: '',
+        overviewCodeSnippet: codeSnippet,
       };
 
     default:
