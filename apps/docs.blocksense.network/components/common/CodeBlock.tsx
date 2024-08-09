@@ -1,6 +1,8 @@
 import React from 'react';
 import { codeToHtml } from 'shiki';
 import { CopyButton } from './CopyButton';
+import { useRouter } from 'next/router';
+import { transformerOverviewLineLink } from '@/src/contract-overview';
 
 type CodeBlockProps = {
   code: string;
@@ -26,6 +28,45 @@ export const CodeBlock = ({
           lang,
           theme,
         }).then((htmlString: any) => setHtml(htmlString));
+  }, [code]);
+
+  return (
+    <div style={{ position: 'relative' }}>
+      {copy && (
+        <CopyButton
+          textToCopy={code}
+          tooltipPosition="left"
+          copyButtonClasses="absolute top-0 right-0 m-2 nx-z-10"
+        />
+      )}
+      <div
+        className="signature__code flex-grow"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
+  );
+};
+
+export const OverviewCodeBlock = ({
+  code,
+  lang = 'solidity',
+  theme = 'material-theme-lighter',
+  copy = true,
+}: CodeBlockProps) => {
+  const router = useRouter();
+  const [html, setHtml] = React.useState('');
+
+  React.useEffect(() => {
+    codeToHtml(code, {
+      lang,
+      theme,
+      transformers: [
+        transformerOverviewLineLink({
+          routeLink: router.route,
+          classes: ['hover:bg-gray-200', 'cursor-pointer'],
+        }),
+      ],
+    }).then((htmlString: any) => setHtml(htmlString));
   }, [code]);
 
   return (
