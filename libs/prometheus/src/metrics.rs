@@ -20,7 +20,7 @@ lazy_static::lazy_static! {
         register_int_counter!("BATCH_COUNTER", "number of batches served").unwrap();
 
         pub static ref BATCH_SIZE: IntCounter =
-        register_int_counter!("BATCH_SIZE", "bacth size").unwrap();
+        register_int_counter!("BATCH_SIZE", "batch size").unwrap();
 
         pub static ref FEED_COUNTER: IntCounter =
         register_int_counter!("FEED_COUNTER", "Available feed count").unwrap();
@@ -229,7 +229,6 @@ pub struct ReporterMetrics {
     pub late_reports_per_feed: IntCounterVec,
     pub in_future_reports_per_feed: IntCounterVec,
     pub total_revotes_for_same_slot_per_feed: IntCounterVec,
-    //pub build_info: IntCounterVec,
 }
 
 impl ReporterMetrics {

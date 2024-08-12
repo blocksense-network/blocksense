@@ -3,8 +3,6 @@
 /// The version of the Blocksense CLI.
 pub const BLOCKSENSE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-//pub const VERGEN_BUILD_DATE: &str = env!("VERGEN_BUILD_DATE");
-//pub const VERGEN_BUILD_TIMESTAMP: &str = env!("VERGEN_BUILD_TIMESTAMP");
 pub const GIT_HASH: &str = env!("GIT_HASH");
 pub const GIT_TAG: &str = env!("GIT_TAG");
 pub const GIT_HASH_SHORT: &str = env!("GIT_HASH_SHORT");
@@ -44,15 +42,12 @@ pub struct BuildInfo {
     pub git_dirty: String,
     pub git_branch: String,
 
-    //build_date: String,
-    //build_timestamp: String,
     pub cargo_debug: String,
     pub cargo_features: String,
     pub cargo_opt_level: String,
     #[allow(dead_code)]
     pub cargo_target_triple: String,
 
-    //cargo_dependencies: String,
     pub rustc_channel: String,
     pub rustc_commit_date: String,
     pub rustc_host_triple: String,
@@ -80,8 +75,6 @@ impl Default for BuildInfo {
     fn default() -> Self {
         BuildInfo {
             version: BLOCKSENSE_VERSION.to_string(),
-            //build_date: VERGEN_BUILD_DATE.to_string(),
-            //build_timestamp: VERGEN_BUILD_TIMESTAMP.to_string(),
             git_hash: GIT_HASH.to_string(),
             git_tag: GIT_TAG.to_string(),
             git_hash_short: GIT_HASH_SHORT.to_string(),
@@ -93,7 +86,6 @@ impl Default for BuildInfo {
             cargo_features: VERGEN_CARGO_FEATURES.to_string(),
             cargo_opt_level: VERGEN_CARGO_OPT_LEVEL.to_string(),
             cargo_target_triple: VERGEN_CARGO_TARGET_TRIPLE.to_string(),
-            //cargo_dependencies: VERGEN_CARGO_DEPENDENCIES.to_string(),
             rustc_channel: VERGEN_RUSTC_CHANNEL.to_string(),
             rustc_commit_date: VERGEN_RUSTC_COMMIT_DATE.to_string(),
             rustc_host_triple: VERGEN_RUSTC_HOST_TRIPLE.to_string(),

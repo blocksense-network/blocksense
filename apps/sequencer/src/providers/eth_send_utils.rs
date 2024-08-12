@@ -374,8 +374,6 @@ mod tests {
         let cfg =
             get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
 
-        let first_secret_key = anvil.keys().first().unwrap();
-        let _secret_key_bytes = first_secret_key.to_bytes();
         let providers =
             init_shared_rpc_providers(&cfg, Some("test_eth_batch_send_to_oneshot_contract_")).await;
 

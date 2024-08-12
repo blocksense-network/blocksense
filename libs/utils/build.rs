@@ -1,6 +1,6 @@
 use vergen::{CargoBuilder, Emitter, RustcBuilder, SysinfoBuilder};
 
-fn get_git_branch() -> Option<String> {
+fn get_git_branch() -> String {
     use std::process::Command;
 
     let branch = Command::new("git")
@@ -10,7 +10,7 @@ fn get_git_branch() -> Option<String> {
         .output();
     if let Ok(branch_output) = branch {
         let branch_string = String::from_utf8_lossy(&branch_output.stdout);
-        Some(branch_string.to_string())
+        branch_string.to_string()
     } else {
         panic!("Can not get git branch: {}", branch.unwrap_err());
     }
@@ -135,7 +135,9 @@ fn main() {
         println!("cargo:rustc-env=GIT_HASH={}", git_hash);
     }
     if let Some(top_level) = git_top_level() {
-        if let Some(git_branch) = get_git_branch() {
+        let git_branch = get_git_branch();
+        // in deattached git state, git branch should be empty
+        if git_branch.len() > 0 {
             println!("cargo:rustc-env=GIT_BRANCH={}", git_branch);
             println!("cargo:rerun-if-changed={top_level}/.git/refs/heads/{git_branch}");
         }
