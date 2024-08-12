@@ -48,6 +48,10 @@
   --tw-border-opacity: 1;
   border-color: rgba(209, 213, 219, var(--tw-border-opacity));
 }
+.nx-border-neutral-300 {
+  --tw-border-opacity: 1;
+  border-color: rgba(203, 213, 225, var(--tw-border-opacity));
+}
 .nx-border-neutral-200\/70 {
   border-color: rgba(229, 229, 229, 0.7);
 }

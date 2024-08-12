@@ -87,6 +87,10 @@
 .nx-tracking-tight {
   letter-spacing: -0.015em;
 }
+.nx-text-black {
+  --tw-text-opacity: 1;
+  color: rgba(0, 0, 0, var(--tw-text-opacity));
+}
 .nx-text-blue-900 {
   --tw-text-opacity: 1;
   color: rgba(30, 58, 138, var(--tw-text-opacity));

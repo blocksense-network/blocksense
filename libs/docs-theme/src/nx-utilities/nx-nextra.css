@@ -552,6 +552,11 @@
     right: auto;
   }
 }
+@media (min-width: 768px) {
+  .md\:nx-block {
+    display: block;
+  }
+}
 @media (min-width: 1280px) {
   .xl\:nx-block {
     display: block;

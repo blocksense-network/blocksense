@@ -393,3 +393,12 @@ video {
   --tw-backdrop-saturate: ;
   --tw-backdrop-sepia: ;
 }
+
+.tooltip {
+  display: none;
+}
+
+.tooltip-visible:hover .tooltip,
+.tooltip-visible:focus .tooltip {
+  display: none;
+}

@@ -33,7 +33,7 @@ export const Tooltip = ({ children }: TooltipProps) => {
     <div className="relative inline-flex items-center group">
       {trigger}
       <div
-        className={`absolute ${positionClass} hidden group-hover:block group-focus:block px-4 py-1.5 text-sm font-semibold text-gray-800 bg-white border border-neutral-300 rounded-md shadow-md z-50 whitespace-nowrap`}
+        className={`absolute ${positionClass} hidden group-hover:block group-focus:block px-4 py-1.5 text-sm font-semibold text-gray-800 nx-bg-white nx-border-b nx-border-neutral-300 rounded-md shadow-md z-50 whitespace-nowrap`}
       >
         {content?.props.children}
         <div className={`absolute ${arrowClass} border-solid`} />
