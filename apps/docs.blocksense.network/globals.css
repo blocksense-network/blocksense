@@ -9,14 +9,111 @@
   border: none;
 }
 
-/* Space Mono */
-
+/* Noto Sans Regular */
 @font-face {
-  font-family: 'Space Mono';
-  src: url('/fonts/SpaceMono-Regular.ttf') format('truetype');
-  font-weight: normal;
+  font-family: 'Noto Sans Regular';
+  src: url('/fonts/noto-sans/NotoSans-Regular.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
 }
+
+/* Noto Sans Italic */
+@font-face {
+  font-family: 'Noto Sans Italic';
+  src: url('/fonts/NotoSans-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Noto Sans Light */
+@font-face {
+  font-family: 'Noto Sans Light';
+  src: url('/fonts/NotoSans-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Noto Sans Light Italic */
+@font-face {
+  font-family: 'Noto Sans Light Italic';
+  src: url('/fonts/noto-sans/NotoSans-LightItalic.ttf') format('truetype');
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* Noto Sans Medium */
+@font-face {
+  font-family: 'Noto Sans Medium';
+  src: url('/fonts/noto-sans/NotoSans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Noto Sans SemiBold */
+@font-face {
+  font-family: 'Noto Sans SemiBold';
+  src: url('/fonts/noto-sans/NotoSans-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Noto Sans SemiBold Italic */
+@font-face {
+  font-family: 'Noto Sans SemiBold Italic';
+  src: url('/fonts/noto-sans/NotoSans-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+}
+
+/* Noto Sans Thin */
+@font-face {
+  font-family: 'Noto Sans Thin';
+  src: url('/fonts/noto-sans/NotoSans-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+/* Noto Sans Thin Italic */
+@font-face {
+  font-family: 'Noto Sans Thin Italic';
+  src: url('/fonts/noto-sans/NotoSans-ThinItalic.ttf') format('truetype');
+  font-weight: 100;
+  font-style: italic;
+}
+
+/* Noto Sans Bold */
+@font-face {
+  font-family: 'Noto Sans Bold';
+  src: url('/fonts/noto-sans/NotoSans-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Noto Sans Bold Italic */
+@font-face {
+  font-family: 'Noto Sans Bold Italic';
+  src: url('/fonts/noto-sans/NotoSans-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* Noto Sans Extra Bold */
+@font-face {
+  font-family: 'Noto Sans Extra Bold';
+  src: url('/fonts/noto-sans/NotoSans-ExtraBold.ttf') format('truetype');
+  font-weight: bolder;
+  font-style: normal;
+}
+
+/* Noto Sans Black */
+@font-face {
+  font-family: 'Noto Sans Black';
+  src: url('/fonts/noto-sans/NotoSans-Black.ttf') format('truetype');
+  font-weight: bolder;
+  font-style: normal;
+}
+
+/* Space Mono */
 
 @font-face {
   font-family: 'Space Mono Bold';
@@ -25,80 +122,11 @@
   font-style: normal;
 }
 
-@font-face {
-  font-family: 'Space Mono BoldItalic';
-  src: url('/fonts/SpaceMono-BoldItalic.ttf') format('truetype');
-  font-weight: bold;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: 'Space Mono Italic';
-  src: url('/fonts/SpaceMono-Italic.ttf') format('truetype');
-  font-weight: normal;
-  font-style: italic;
-}
-
-/* Space Mono Nerd */
-@font-face {
-  font-family: 'SpaceMono Nerd';
-  font-weight: 400;
-  src: url('/fonts/nerd/SpaceMonoNerdFont-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'SpaceMono Nerd Bold';
-  font-weight: 700;
-  src: url('/fonts/nerd/SpaceMonoNerdFont-Bold.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'SpaceMono Nerd Italic';
-  font-style: italic;
-  font-weight: 400;
-  src: url('/fonts/nerd/SpaceMonoNerdFont-Italic.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'SpaceMono Nerd BoldItalic';
-  font-style: italic;
-  font-weight: 700;
-  src: url('/fonts/nerd/SpaceMonoNerdFont-BoldItalic.ttf') format('truetype');
-}
-
 /* Fira Code */
 @font-face {
   font-family: 'Fira Code';
   src: url('/fonts/fira/FiraCode-Regular.ttf') format('truetype');
   font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Fira Code Bold';
-  src: url('/fonts/fira/FiraCode-Bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Fira Code Light';
-  src: url('/fonts/fira/FiraCode-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Fira Code Medium';
-  src: url('/fonts/fira/FiraCode-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Fira Code SemiBold';
-  src: url('/fonts/fira/FiraCode-SemiBold.ttf') format('truetype');
-  font-weight: 600;
   font-style: normal;
 }
 
