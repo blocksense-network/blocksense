@@ -6,6 +6,8 @@ use lazy_static::lazy_static;
 use utils::build_info::BuildInfo;
 lazy_static! {
     pub static ref BUILD_INFO: BuildInfo = BuildInfo::default();
+    pub static ref BUILD_INFO_STR: String =
+        format!("{}\n{}", &BUILD_INFO.version, show_build_info());
 }
 
 /// Helper for passing VERSION to structopt.
@@ -15,6 +17,9 @@ fn version() -> &'static str {
 
 fn about() -> &'static str {
     "Blocksense network main tool"
+}
+fn version_long() -> &'static str {
+    &BUILD_INFO_STR
 }
 
 fn show_build_info() -> String {
@@ -45,7 +50,7 @@ fn show_build_info() -> String {
 
 /// Blocksense cli
 #[derive(Debug, Parser)]
-#[command(name = "blocksense", version = version(), about = about(), after_long_help = show_build_info())]
+#[command(name = "blocksense", version = version(), about = about(), long_version = version_long())]
 enum BlocksenseApp {
     /// Interface for developing Blocksense applications.
     #[command(subcommand)]
