@@ -3,7 +3,6 @@ import React from 'react';
 import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 
 import { AbsolutePath } from '@/sol-contracts-components/AbsolutePath';
-import { Pragmas } from '@/sol-contracts-components/Pragmas';
 import { License } from '@/sol-contracts-components/License';
 import { Contracts } from '@/sol-contracts-components/Contracts';
 import { Enums } from '@/sol-contracts-components/Enums';
@@ -26,7 +25,6 @@ export const SourceUnit = ({
       <section className="source-unit__header flex space-x-4">
         <AbsolutePath absolutePath={sourceUnit.absolutePath} />
         <License license={sourceUnit.license} />
-        <Pragmas pragmas={sourceUnit.pragmas} />
       </section>
       <Enums enums={sourceUnit.enums} isFromSourceUnit />
       <Structs structs={sourceUnit.structs} isFromSourceUnit />

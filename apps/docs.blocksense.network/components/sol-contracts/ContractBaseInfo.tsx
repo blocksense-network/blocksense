@@ -25,7 +25,8 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
                 Kind: {contract.contractKind}
               </span>
               <span className="contract-base-info__abstract__abstract ml-4 text-base text-black">
-                Abstract: {contract.abstract.toString()}
+                {contract.contractKind == 'contract' &&
+                  `Abstract: ${contract.abstract.toString()}`}
               </span>
             </CardDescription>
           </CardHeader>

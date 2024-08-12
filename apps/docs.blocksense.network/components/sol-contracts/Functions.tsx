@@ -9,7 +9,6 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 import { Selector } from '@/sol-contracts-components/Selector';
-import { Badge } from '@/components/ui/badge';
 import { FunctionDocItem } from '@blocksense/sol-reflector';
 import { Signature } from '@/sol-contracts-components/Signature';
 import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers';
@@ -75,18 +74,6 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
               <AccordionContent
                 className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
               >
-                <Badge className="contract-item-wrapper__function-kind mb-4">
-                  <span>Kind: {_function.kind}</span>
-                </Badge>
-                <Badge className="contract-item-wrapper__function-visibility">
-                  <span>Visibility: {_function.visibility}</span>
-                </Badge>
-                <Badge className="contract-item-wrapper__function-state-mutability">
-                  <span>State Mutability: {_function.stateMutability}</span>
-                </Badge>
-                <Badge className="contract-item-wrapper__function-virtual">
-                  <span>Virtual: {_function.virtual.toString()}</span>
-                </Badge>
                 <Signature signature={_function.signature} />
                 <ABIModal abi={_function.abi} name={_function.name} />
                 <NatSpec natspec={_function.natspec} />
