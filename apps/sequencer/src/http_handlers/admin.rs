@@ -277,7 +277,7 @@ mod tests {
 
         let body = test::read_body(resp).await;
         let body_str = std::str::from_utf8(&body).expect("Failed to read body");
-        assert_eq!(body_str, "30000");
+        assert_eq!(body_str, "60000");
     }
 
     async fn create_app_state_from_sequencer_config(
