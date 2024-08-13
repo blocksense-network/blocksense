@@ -271,6 +271,7 @@ export { Pre } from './components/pre';
 export { Banner } from './components/banner';
 export { Bleed } from './components/bleed';
 export { Breadcrumb } from './components/breadcrumb';
+export { Callout } from './components/callout';
 export { Collapse } from './components/collapse';
 export { Code } from './components/code';
 export { CopyToClipboard } from './components/copy-to-clipboard';
