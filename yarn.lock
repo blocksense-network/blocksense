@@ -529,6 +529,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     tsx: "npm:^4.16.5"
     typescript: "npm:^5.5.4"
+    web3-types: "npm:^1.7.0"
   languageName: unknown
   linkType: soft
 
@@ -16243,6 +16244,13 @@ __metadata:
   version: 1.3.0
   resolution: "web-worker@npm:1.3.0"
   checksum: 10c0/bca341b421f07c2d33aa205d463e6a2d3d376fb0628a01052dc343fd88a1d688df58d1c7fe36f631d0d860bbd3060f5014cca67d6f8781634b6c2fae25d1fc70
+  languageName: node
+  linkType: hard
+
+"web3-types@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "web3-types@npm:1.7.0"
+  checksum: 10c0/0da724b67911d76139b704406107bde624c524a04bfe749808a3e137e06078ac1c52c305eedb521b84d67363932d214ba54d7851394a8e7b425e17de5ef813e4
   languageName: node
   linkType: hard
 
