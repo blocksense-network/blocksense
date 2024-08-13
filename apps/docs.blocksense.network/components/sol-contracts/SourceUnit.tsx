@@ -11,7 +11,7 @@ import { Errors } from '@/sol-contracts-components/Errors';
 import { Functions } from '@/sol-contracts-components/Functions';
 import { Structs } from '@/sol-contracts-components/Structs';
 import { Variables } from '@/sol-contracts-components/Variables';
-import { filterConstants, filterVariables } from '@/utils';
+import { filterConstants, filterVariables } from '@/src/utils';
 
 type SourceUnitProps = {
   sourceUnitJsonString: string;
