@@ -10,7 +10,7 @@ import { Structs } from '@/sol-contracts-components/Structs';
 import { Variables } from '@/sol-contracts-components/Variables';
 import { ContractBaseInfo } from '@/sol-contracts-components/ContractBaseInfo';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { filterConstants, filterVariables } from '@/utils';
+import { filterConstants, filterVariables } from '@/src/utils';
 
 type ContractsProps = {
   contracts?: ContractDocItem[];
