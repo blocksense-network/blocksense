@@ -8,7 +8,7 @@ import {
   appendInheritedNatspec,
   appendNatspecDetailsToParams,
 } from './utils/natspec';
-import { collectAbi } from './abiCollector';
+import { appendAbiToSolReflection, collectAbi } from './abiCollector';
 import { formatAndHighlightSignatures } from './utils/signature';
 
 if ('extendConfig' in global && 'task' in global) {
@@ -31,13 +31,15 @@ export async function main(
     solReflection.push({ rawData, fineData });
   });
 
+  const abiArtifacts = await collectAbi(build.artifactsPaths, userConfig);
+
   appendInheritedNatspec(solReflection);
   appendNatspecDetailsToParams(solReflection);
+  appendAbiToSolReflection(solReflection, abiArtifacts);
+
   await formatAndHighlightSignatures(solReflection);
 
   await writeDocFiles(solReflection, userConfig);
-
-  await collectAbi(build.artifactsPaths, userConfig);
 }
 
 // We ask Node.js not to cache this file.

@@ -3,9 +3,16 @@ import * as path from 'path';
 import { selectDirectory } from '@blocksense/base-utils';
 
 import { Config, defaults } from './config';
-import { isFileIncluded, writeABIFile } from './utils/common';
+import {
+  isFileIncluded,
+  iterateContractElements,
+  iterateContracts,
+  writeABIFile,
+} from './utils/common';
+import { SolReflection } from './types';
+import { AbiStruct } from 'web3-types';
 
-export type ArtifactsRecord = Record<string, Record<string, string>>;
+export type ArtifactsRecord = Record<string, Record<string, any>>;
 
 export async function replaceFilePathsWithContent(
   artifactsRecord: Record<string, any>,
@@ -51,7 +58,7 @@ export async function replaceFilePathsWithContent(
 export async function collectAbi(
   artifactsPaths: string[],
   userConfig?: Config,
-): Promise<void> {
+): Promise<ArtifactsRecord> {
   const artifactsRecord: ArtifactsRecord = {};
   const config = { ...defaults, ...userConfig };
 
@@ -72,4 +79,49 @@ export async function collectAbi(
 
   await replaceFilePathsWithContent(artifactsRecord);
   await writeABIFile(artifactsRecord, config);
+
+  return artifactsRecord;
+}
+
+export function appendAbiToSolReflection(
+  solReflection: SolReflection,
+  abiArtifacts: ArtifactsRecord,
+) {
+  for (const { sourceUnit, contract } of iterateContracts(solReflection)) {
+    const sourceUnitName = path.parse(sourceUnit.absolutePath).name;
+    const contractAbi = abiArtifacts[sourceUnitName]![contract.name]
+      .abi as AbiStruct[];
+
+    contract.abi = contractAbi;
+  }
+
+  for (const { sourceUnit, contract, element } of iterateContractElements(
+    solReflection,
+  )) {
+    const sourceUnitName = path.parse(sourceUnit.absolutePath).name;
+
+    const contractAbi = abiArtifacts[sourceUnitName]![contract.name]
+      .abi as AbiStruct[];
+
+    if ('abi' in element) {
+      const relevantAbi = contractAbi.find(
+        abi =>
+          abi.name === element.name ||
+          ('kind' in element &&
+            abi.type === element.kind &&
+            (abi.type === 'constructor' || abi.type === 'fallback')),
+      );
+      if (relevantAbi) {
+        element.abi = relevantAbi;
+      }
+
+      // Remove the ABI if the element is internal or private.
+      if (
+        'visibility' in element &&
+        (element.visibility === 'internal' || element.visibility === 'private')
+      ) {
+        element.abi = undefined;
+      }
+    }
+  }
 }

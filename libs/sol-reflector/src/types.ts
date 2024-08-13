@@ -21,6 +21,8 @@ import {
 } from 'solidity-ast';
 import { SolcInput, SolcOutput } from 'solidity-ast/solc';
 
+import { AbiStruct } from 'web3-types';
+
 export enum OutputFormat {
   Raw = 'raw',
   Fine = 'fine',
@@ -133,6 +135,7 @@ export class ContractDocItem {
   name: string = '';
   contractKind: ContractKind = 'contract';
   abstract: boolean = false;
+  abi: AbiStruct[] = [{ name: '', type: '', inputs: [] }];
   natspec: NatSpec = {};
   _baseContracts: string[] = [];
   functions?: FunctionDocItem[];
@@ -148,6 +151,7 @@ export class ErrorDocItem {
   name: string = '';
   errorSelector: string = '';
   signature?: Signature;
+  abi: AbiStruct = { name: '', type: '', inputs: [] };
   _parameters?: VariableDocItem[];
   natspec: NatSpec = {};
 }
@@ -156,6 +160,7 @@ export class EventDocItem {
   name: string = '';
   eventSelector: string = '';
   signature?: Signature;
+  abi: AbiStruct = { name: '', type: '', inputs: [] };
   anonymous: boolean = false;
   _parameters?: VariableDocItem[];
   natspec: NatSpec = {};
@@ -166,6 +171,7 @@ export class FunctionDocItem {
   kind: FunctionType = 'function';
   functionSelector: string = '';
   signature?: Signature;
+  abi: AbiStruct = { name: '', type: '', inputs: [] };
   visibility: Visibility = 'external';
   stateMutability: StateMutability = 'payable';
   virtual: boolean = true;
@@ -192,6 +198,7 @@ export class VariableDocItem {
   name: string = '';
   typeDescriptions: TypeDescriptions = {};
   signature?: Signature;
+  abi?: AbiStruct = { name: '', type: '', inputs: [] };
   mutability: Mutability = 'mutable';
   visibility: Visibility = 'external';
   _value?: string;
