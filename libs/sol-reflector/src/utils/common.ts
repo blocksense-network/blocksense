@@ -8,7 +8,13 @@ import { SolcOutput } from 'solidity-ast/solc';
 import { selectDirectory } from '@blocksense/base-utils';
 
 import { Config, FullConfig, defaults } from '../config';
-import { OutputFormat, SolReflection } from '../types';
+import {
+  ContractDocItem,
+  ContractElement,
+  OutputFormat,
+  SolReflection,
+  SourceUnitDocItem,
+} from '../types';
 import { ArtifactsRecord } from '../abiCollector';
 
 /**
@@ -189,45 +195,69 @@ export function extractFields<T extends {}, U extends Partial<T>>(
   return result;
 }
 
+type SourceUnitContractPair = {
+  sourceUnit: SourceUnitDocItem;
+  contract: ContractDocItem;
+};
+
 /**
- * Iterates over all elements of each contract in a SolReflection object and applies a callback function to each element.
+ * Iterates over the contracts in the provided Solidity reflection object and
+ *   yields them paired with the source unit that contains them.
  *
- * @param {SolReflection} solReflection - The SolReflection object to iterate over.
- * @param {(element: any) => Promise<unknown>} callback - The callback function to apply to each contract element.
+ * @param {SolReflection} solReflection - The Solidity reflection object to
+ *   iterate over.
  *
- * @returns {Promise<void>} - The returned promise resolves when all callbacks have been applied.
- *
- * @example
- * ```typescript
- * const solReflection = getSolReflection();
- * await iterateContractElements(solReflection, async (element) => {
- *   console.log(element);
- * });
- * ```
+ * @yields {SourceUnitContractPair} An object containing a source unit from the
+ *   `solReflection` object, paired with a contract in that source unit.
  */
-export async function iterateContractElements(
+export function* iterateContracts(
   solReflection: SolReflection,
-  callback: (element: any) => Promise<unknown>,
-) {
+): Generator<SourceUnitContractPair> {
   for (const { fineData } of solReflection) {
     if (fineData.contracts) {
       for (const contract of fineData.contracts) {
-        const contractElements = [
-          contract.functions,
-          contract.errors,
-          contract.events,
-          contract.modifiers,
-          contract.variables,
-          contract.enums,
-          contract.structs,
-        ];
+        yield { sourceUnit: fineData, contract };
+      }
+    }
+  }
+}
 
-        for (const elements of contractElements) {
-          if (elements) {
-            for (const element of elements) {
-              await callback(element);
-            }
-          }
+type SourceUnitContractElementTuple = {
+  sourceUnit: SourceUnitDocItem;
+  contract: ContractDocItem;
+  element: ContractElement;
+};
+
+/**
+ * Iterates over the elements of the contracts in the provided Solidity
+ *   reflection object. Yields the elements in a tuple, together with their
+ *   contract, and the source unit that contains the contract.
+ *
+ * @param {SolReflection} solReflection - The Solidity reflection object to
+ *   iterate over.
+ *
+ * @yields {SourceUnitContractElementTuple} An object containing a source unit
+ *   from the `solReflection` object, a contract from that source unit, and an
+ *   element from that contract.
+ */
+export function* iterateContractElements(
+  solReflection: SolReflection,
+): Generator<SourceUnitContractElementTuple> {
+  for (const { sourceUnit, contract } of iterateContracts(solReflection)) {
+    const contractElements = [
+      contract.functions,
+      contract.errors,
+      contract.events,
+      contract.modifiers,
+      contract.variables,
+      contract.enums,
+      contract.structs,
+    ];
+
+    for (const elements of contractElements) {
+      if (elements) {
+        for (const element of elements) {
+          yield { sourceUnit, contract, element };
         }
       }
     }

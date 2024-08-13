@@ -103,9 +103,12 @@ export function getSignature(node: ASTNode): Signature | undefined {
  *   when all signatures have been formatted and highlighted.
  */
 export async function formatAndHighlightSignatures(docItem: SolReflection) {
-  await iterateContractElements(docItem, async (element: any) => {
+  for (const { element } of iterateContractElements(docItem)) {
+    if (!element.signature) {
+      continue;
+    }
     await formatAndHighlightSignature(element.signature);
-  });
+  }
 }
 
 /**

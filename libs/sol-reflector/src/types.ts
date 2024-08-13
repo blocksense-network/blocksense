@@ -105,6 +105,15 @@ export type ASTNode =
 
 export type SolReflection = { rawData: ASTNode; fineData: SourceUnitDocItem }[];
 
+export type ContractElement =
+  | FunctionDocItem
+  | ErrorDocItem
+  | EventDocItem
+  | ModifierDocItem
+  | VariableDocItem
+  | EnumDocItem
+  | StructDocItem;
+
 export type DocItemConstructor<T> = new (...args: any[]) => T;
 
 export class SourceUnitDocItem {
