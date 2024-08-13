@@ -59,6 +59,7 @@ interface ChainlinkProxyData {
   base: string;
   quote: string;
   address: string;
+  chainlink_proxy: string;
 }
 
 enum ContractNames {
@@ -100,8 +101,8 @@ task('deploy', 'Deploy contracts')
     }
 
     const dataFeedConfig = JSON.parse(
-      await fs.readFile('./config/data-feeds.json', 'utf8'),
-    );
+      await fs.readFile('./scripts/feeds_config2.json', 'utf8'),
+    ).feeds;
 
     const chainsDeployment: ChainConfig = {};
 
@@ -135,7 +136,7 @@ task('deploy', 'Deploy contracts')
         {
           name: ContractNames.FeedRegistry,
           argsTypes: ['address', 'address'],
-          argsValues: [config.signer.address, dataFeedStoreAddress],
+          argsValues: [multisigAddress, dataFeedStoreAddress],
           salt: ethers.id('registry'),
           value: 0n,
         },
@@ -146,7 +147,7 @@ task('deploy', 'Deploy contracts')
             argsValues: [
               data.description,
               data.decimals,
-              data.key,
+              data.id,
               dataFeedStoreAddress,
             ],
             salt: ethers.id('aggregator'),
@@ -164,7 +165,7 @@ task('deploy', 'Deploy contracts')
         },
       };
 
-      await registerChainlinkProxies(config, deployData, artifacts);
+      await registerChainlinkProxies(config, multisig, deployData, artifacts);
     }
 
     await saveDeployment(configs, chainsDeployment);
@@ -341,11 +342,48 @@ const deployContracts = async (
       if (!contractAddresses[contract.name]) {
         contractAddresses[contract.name] = [];
       }
+
+      let base = undefined;
+      let quote = undefined;
+      let chainlinkProxyAddress = undefined;
+
+      if (contract.data.chainlink_compatibility) {
+        if (typeof contract.data.chainlink_compatibility.base === 'string') {
+          base = contract.data.chainlink_compatibility.base;
+        } else if (
+          typeof contract.data.chainlink_compatibility.base === 'object'
+        ) {
+          base =
+            contract.data.chainlink_compatibility.base[
+              config.network.chainId.toString()
+            ];
+        }
+
+        if (typeof contract.data.chainlink_compatibility.quote === 'string') {
+          quote = contract.data.chainlink_compatibility.quote;
+        } else if (
+          typeof contract.data.chainlink_compatibility.quote === 'object'
+        ) {
+          quote =
+            contract.data.chainlink_compatibility.quote[
+              config.network.chainId.toString()
+            ];
+        }
+
+        if (contract.data.chainlink_compatibility.chainlink_proxy) {
+          chainlinkProxyAddress =
+            contract.data.chainlink_compatibility.chainlink_proxy[
+              config.network.chainId.toString()
+            ];
+        }
+      }
+
       contractAddresses[contract.name].push({
         description: contract.data.description,
-        base: contract.data.base,
-        quote: contract.data.quote,
+        base: base && quote ? base : undefined,
+        quote: base && quote ? quote : undefined,
         address: contractAddress,
+        chainlink_proxy: chainlinkProxyAddress,
       });
     } else {
       contractAddresses.coreContracts[contract.name] = contractAddress;
@@ -365,6 +403,7 @@ const deployContracts = async (
 
 const registerChainlinkProxies = async (
   config: NetworkConfig,
+  multisig: Safe,
   deployData: ContractsConfig,
   artifacts: Artifacts,
 ) => {
@@ -374,8 +413,9 @@ const registerChainlinkProxies = async (
   // Split into batches of 100
   const BATCH_LENGTH = 100;
   const batches: Array<Array<ChainlinkProxyData>> = [];
-  for (let i = 0; i < deployData.ChainlinkProxy.length; i += BATCH_LENGTH) {
-    batches.push(deployData.ChainlinkProxy.slice(i, i + BATCH_LENGTH));
+  const filteredData = deployData.ChainlinkProxy.filter(d => d.base);
+  for (let i = 0; i < filteredData.length; i += BATCH_LENGTH) {
+    batches.push(filteredData.slice(i, i + BATCH_LENGTH));
   }
 
   const registry = new ethers.Contract(
@@ -386,15 +426,18 @@ const registerChainlinkProxies = async (
 
   // Set feeds in batches
   for (const batch of batches) {
-    const tx = await registry.connect(config.signer).getFunction('setFeeds')(
-      batch.map(data => {
-        return { base: data.base, quote: data.quote, feed: data.address };
-      }),
-      // 21k for tx execution and 60k * batch.length for each feed in batch
-      { gasLimit: 21000 + 60000 * batch.length },
-    );
-    console.log('-> tx hash', tx.hash);
-    await tx.wait();
+    const safeTransactionData: SafeTransactionDataPartial = {
+      to: registry.target.toString(),
+      value: '0',
+      data: registry.interface.encodeFunctionData('setFeeds', [
+        batch.map(data => {
+          return { base: data.base, quote: data.quote, feed: data.address };
+        }),
+      ]),
+      operation: OperationType.Call,
+    };
+
+    await multisigTxExec([safeTransactionData], multisig);
   }
 };
 
