@@ -8,6 +8,10 @@
     "./abi.json": {
       "require": "./artifacts/docs/abi.json",
       "import": "./artifacts/docs/abi.json"
+    },
+    "./contractsFileStructure.json": {
+      "require": "./artifacts/docs/contractsFileStructure.json",
+      "import": "./artifacts/docs/contractsFileStructure.json"
     }
   },
   "scripts": {

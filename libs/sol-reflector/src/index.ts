@@ -13,7 +13,6 @@ import { formatAndHighlightSignatures } from './utils/signature';
 import { contractsFileStructureAsJSON } from './constractsFileStructure';
 import path from 'path';
 
-
 if ('extendConfig' in global && 'task' in global) {
   // Assume Hardhat.
   require('./hardhat');
