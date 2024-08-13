@@ -4,6 +4,7 @@ export { Pre } from './pre';
 export { Banner } from './banner';
 export { Bleed } from './bleed';
 export { Breadcrumb } from './breadcrumb';
+export { Callout } from './callout';
 export { Collapse } from './collapse';
 export { Code } from './code';
 export { CopyToClipboard } from './copy-to-clipboard';

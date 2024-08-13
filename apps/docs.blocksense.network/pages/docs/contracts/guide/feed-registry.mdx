@@ -1,4 +1,5 @@
-import { Callout } from 'nextra/components';
+import { Callout } from '@blocksense/docs-theme';
+import { Tabs } from 'nextra/components';
 
 # Feed Registry
 
@@ -24,7 +25,7 @@ flowchart TD
   class A,FR,DFS node
 ```
 
-<Callout type="info" title="Note">
+<Callout type="info" title="Note" emoji="💡">
   The Feed Registry exclusively includes feeds associated with canonical token
   addresses on a given network. Feeds without a corresponding token address,
   such as those for stock indices, are not included in the registry due to the
@@ -90,7 +91,7 @@ contract RegistryConsumer {
 
 ### Solidity Hardhat Example
 
-<Callout type="info" title="Note">
+<Callout type="info" title="Note" emoji="💡">
   You can find a working Hardhat project
   [here](https://github.com/blocksense-network/blocksense/tree/main/libs/contracts).
   Clone the repo and follow the setup instructions to run the example locally.
