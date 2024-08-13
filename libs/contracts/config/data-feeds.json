@@ -1,30 +1,115 @@
 [
   {
-    "key": 0,
-    "description": "WETH/USD",
+    "id": 0,
+    "name": "DOGE",
     "decimals": 18,
-    "base": "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
-    "quote": "0x0000000000000000000000000000000000000348"
+    "script": "CoinMarketCap",
+    "pair": {
+      "base": "DOGE",
+      "quote": "USD"
+    },
+    "report_interval_ms": 60000,
+    "first_report_start_time": {
+      "secs_since_epoch": 0,
+      "nanos_since_epoch": 0
+    }
   },
   {
-    "key": 1,
-    "description": "WBTC/USD",
-    "decimals": 8,
-    "base": "0x92f3B59a79bFf5dc60c0d59eA13a44D082B2bdFC",
-    "quote": "0x0000000000000000000000000000000000000348"
+    "id": 1,
+    "name": "BTC",
+    "decimals": 18,
+    "script": "CoinMarketCap",
+    "pair": {
+      "base": "BTC",
+      "quote": "USD"
+    },
+    "report_interval_ms": 60000,
+    "first_report_start_time": {
+      "secs_since_epoch": 0,
+      "nanos_since_epoch": 0
+    },
+    "chainLinkCompatibility": {
+      "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+      "quote": "0x0000000000000000000000000000000000000348"
+    }
   },
   {
-    "key": 2,
-    "description": "LINK/USD",
+    "id": 2,
+    "name": "ETH",
     "decimals": 18,
-    "base": "0x779877A7B0D9E8603169DdbD7836e478b4624789",
-    "quote": "0x0000000000000000000000000000000000000348"
+    "script": "CoinMarketCap",
+    "pair": {
+      "base": "ETH",
+      "quote": "USD"
+    },
+    "report_interval_ms": 60000,
+    "first_report_start_time": {
+      "secs_since_epoch": 0,
+      "nanos_since_epoch": 0
+    },
+    "chainLinkCompatibility": {
+      "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "quote": "0x0000000000000000000000000000000000000348"
+    }
   },
   {
-    "key": 3,
-    "description": "DOT/USD",
+    "id": 3,
+    "name": "SHIB",
     "decimals": 18,
-    "base": "0xd7974De8DFce428A13fc393d6CE08Dd6B8c1BC45",
-    "quote": "0x0000000000000000000000000000000000000348"
+    "script": "CoinMarketCap",
+    "pair": {
+      "base": "SHIB",
+      "quote": "USD"
+    },
+    "report_interval_ms": 60000,
+    "first_report_start_time": {
+      "secs_since_epoch": 0,
+      "nanos_since_epoch": 0
+    }
+  },
+  {
+    "id": 4,
+    "name": "SOL",
+    "decimals": 18,
+    "script": "CoinMarketCap",
+    "pair": {
+      "base": "SOL",
+      "quote": "USD"
+    },
+    "report_interval_ms": 60000,
+    "first_report_start_time": {
+      "secs_since_epoch": 0,
+      "nanos_since_epoch": 0
+    }
+  },
+  {
+    "id": 5,
+    "name": "DOT",
+    "decimals": 18,
+    "script": "CoinMarketCap",
+    "pair": {
+      "base": "DOT",
+      "quote": "USD"
+    },
+    "report_interval_ms": 60000,
+    "first_report_start_time": {
+      "secs_since_epoch": 0,
+      "nanos_since_epoch": 0
+    }
+  },
+  {
+    "id": 6,
+    "name": "XRP",
+    "decimals": 18,
+    "script": "CoinMarketCap",
+    "pair": {
+      "base": "XRP",
+      "quote": "USD"
+    },
+    "report_interval_ms": 60000,
+    "first_report_start_time": {
+      "secs_since_epoch": 0,
+      "nanos_since_epoch": 0
+    }
   }
 ]
