@@ -260,25 +260,33 @@ export default function Layout({
 
 export { useConfig, PartialDocsThemeConfig as DocsThemeConfig };
 export { useMDXComponents } from 'nextra/mdx';
-export {
-  Callout,
-  Steps,
-  Tabs,
-  Tab,
-  Cards,
-  Card,
-  FileTree,
-} from 'nextra/components';
+export { Steps, Tabs, Tab, Cards, Card, FileTree } from 'nextra/components';
 export { useTheme } from 'next-themes';
 export { Link } from './mdx-components';
-export {
-  Bleed,
-  Collapse,
-  NotFoundPage,
-  ServerSideErrorPage,
-  Navbar,
-  SkipNavContent,
-  SkipNavLink,
-  ThemeSwitch,
-  LocaleSwitch,
-} from './components';
+
+// Exporting out version of the components
+export { Anchor } from './components/anchor';
+export { Button } from './components/button';
+export { Pre } from './components/pre';
+export { Banner } from './components/banner';
+export { Bleed } from './components/bleed';
+export { Breadcrumb } from './components/breadcrumb';
+export { Collapse } from './components/collapse';
+export { Code } from './components/code';
+export { CopyToClipboard } from './components/copy-to-clipboard';
+export { Flexsearch } from './components/flexsearch';
+export { Footer } from './components/footer';
+export { Head } from './components/head';
+export { Input } from './components/input';
+export { LocaleSwitch } from './components/locale-switch';
+export { NavLinks } from './components/nav-links';
+export { Navbar } from './components/navbar';
+export { NotFoundPage } from './components/404';
+export { Search } from './components/search';
+export { Select } from './components/select';
+export { ServerSideErrorPage } from './components/500';
+export { Sidebar } from './components/sidebar';
+export { SkipNavContent, SkipNavLink } from './components/skip-nav';
+export { ThemeSwitch } from './components/theme-switch';
+export { TOC } from './components/toc';
+export { Tooltip } from './components/tooltip';
