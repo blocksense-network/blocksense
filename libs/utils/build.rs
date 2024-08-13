@@ -140,6 +140,8 @@ fn main() {
         if git_branch.len() > 0 {
             println!("cargo:rustc-env=GIT_BRANCH={}", git_branch);
             println!("cargo:rerun-if-changed={top_level}/.git/refs/heads/{git_branch}");
+        } else {
+            println!("cargo:rustc-env=GIT_BRANCH={}", "DETACHED HEAD");
         }
         println!("cargo:rerun-if-changed={top_level}/.git/HEAD");
     }
