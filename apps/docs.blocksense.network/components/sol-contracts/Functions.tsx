@@ -18,6 +18,7 @@ import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrap
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { Parameters } from '@/sol-contracts-components/Parameters';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
+import { ABIModal } from './ABIModal/ABIModal';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];
@@ -87,6 +88,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                   <span>Virtual: {_function.virtual.toString()}</span>
                 </Badge>
                 <Signature signature={_function.signature} />
+                <ABIModal abi={_function.abi} name={_function.name} />
                 <NatSpec natspec={_function.natspec} />
                 <Parameters
                   parameters={_function._parameters}

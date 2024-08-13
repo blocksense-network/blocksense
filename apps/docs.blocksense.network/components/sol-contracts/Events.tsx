@@ -16,6 +16,7 @@ import { Parameters } from '@/sol-contracts-components/Parameters';
 import { Selector } from '@/sol-contracts-components/Selector';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
+import { ABIModal } from './ABIModal/ABIModal';
 
 type EventsProps = {
   events?: EventDocItem[];
@@ -72,6 +73,7 @@ export const Events = ({ events }: EventsProps) => {
                 className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
               >
                 <Signature signature={event.signature} />
+                <ABIModal abi={event.abi} name={event.name} />
                 <span className="contract-item-wrapper__event-anonymous">
                   Anonymous: {event.anonymous.toString()}
                 </span>

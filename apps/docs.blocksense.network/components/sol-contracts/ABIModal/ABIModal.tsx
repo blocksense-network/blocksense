@@ -27,8 +27,14 @@ import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton
 import { CloseButton } from '@/components/sol-contracts/ABIModal/CloseButton';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
 
+export interface AbiStruct {
+  [key: string]: unknown;
+  name?: string;
+  type: string;
+}
+
 type ABIModalProps = {
-  abi: unknown;
+  abi: AbiStruct | AbiStruct[];
   name?: string;
 };
 

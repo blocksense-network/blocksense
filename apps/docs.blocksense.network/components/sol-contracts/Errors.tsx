@@ -16,6 +16,7 @@ import { Parameters } from '@/sol-contracts-components/Parameters';
 import { Selector } from '@/sol-contracts-components/Selector';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
+import { ABIModal } from './ABIModal/ABIModal';
 
 type ErrorsProps = {
   errors?: ErrorDocItem[];
@@ -73,6 +74,7 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
                 className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
               >
                 <Signature signature={error.signature} />
+                <ABIModal abi={error.abi} name={error.name} />
                 <NatSpec natspec={error.natspec} />
                 <Parameters
                   parentTitle={error.name}

@@ -15,6 +15,7 @@ import { Signature } from '@/sol-contracts-components/Signature';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
+import { ABIModal } from './ABIModal/ABIModal';
 
 type VariablesProps = {
   variables?: VariableDocItem[];
@@ -79,6 +80,7 @@ export const Variables = ({
                 className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
               >
                 <Signature signature={variable.signature} />
+                <ABIModal abi={variable.abi!} name={variable.name} />
                 <NatSpec natspec={variable.natspec} />
               </AccordionContent>
             </AccordionItem>
