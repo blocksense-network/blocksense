@@ -193,6 +193,7 @@ export class VariableDocItem {
   typeDescriptions: TypeDescriptions = {};
   signature?: Signature;
   mutability: Mutability = 'mutable';
+  visibility: Visibility = 'external';
   _value?: string;
   indexed: boolean = false;
   constant: boolean = false;
