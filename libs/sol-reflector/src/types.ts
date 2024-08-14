@@ -61,6 +61,7 @@ export type FunctionModifierKind =
 export type Signature = {
   codeSnippet: string;
   signatureCodeSnippetHTML: string;
+  type?: NodeType;
 };
 
 export type NatSpecParam = {

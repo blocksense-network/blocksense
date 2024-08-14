@@ -51,6 +51,7 @@ export function getSignature(node: ASTNode): Signature | undefined {
       return {
         codeSnippet: `event ${node.name}(${params.map(formatVariable).join(', ')});`,
         signatureCodeSnippetHTML: '',
+        type: node.nodeType,
       };
     }
 
@@ -59,6 +60,7 @@ export function getSignature(node: ASTNode): Signature | undefined {
       return {
         codeSnippet: `error ${node.name}(${params.map(formatVariable).join(', ')});`,
         signatureCodeSnippetHTML: '',
+        type: node.nodeType,
       };
     }
 
@@ -67,25 +69,39 @@ export function getSignature(node: ASTNode): Signature | undefined {
       return {
         codeSnippet: `modifier ${node.name}(${params.map(formatVariable).join(', ')});`,
         signatureCodeSnippetHTML: '',
+        type: node.nodeType,
       };
     }
 
     case 'VariableDeclaration':
+      const variableSignature = [node.typeName?.typeDescriptions.typeString!]
+        .concat(node.visibility)
+        .concat(
+          node.constant || node.mutability == 'immutable'
+            ? node.mutability
+            : [],
+        )
+        .concat(node.name || [])
+        .join(' ');
+
       return {
-        codeSnippet: `${formatVariable(node)};`,
+        codeSnippet: `${variableSignature};`,
         signatureCodeSnippetHTML: '',
+        type: node.nodeType,
       };
 
     case 'EnumDefinition':
       return {
         codeSnippet: `enum ${node.name} { ... };`,
         signatureCodeSnippetHTML: '',
+        type: node.nodeType,
       };
 
     case 'StructDefinition':
       return {
         codeSnippet: `struct ${node.name} { ... };`,
         signatureCodeSnippetHTML: '',
+        type: node.nodeType,
       };
 
     default:
@@ -121,7 +137,10 @@ export async function formatAndHighlightSignatures(docItem: SolReflection) {
  */
 async function formatAndHighlightSignature(signature: Signature) {
   if (signature?.codeSnippet) {
-    const formattedCodeSnippet = await formatCodeSnippet(signature.codeSnippet);
+    const formattedCodeSnippet =
+      signature.type != 'VariableDeclaration'
+        ? await formatCodeSnippet(signature.codeSnippet)
+        : signature.codeSnippet;
     const highlightedSignatureHTML = await generateCodeSnippetHTML(
       formattedCodeSnippet,
       'solidity',
