@@ -4,10 +4,18 @@ use std::io::Write;
 use std::time::SystemTime;
 use std::{collections::HashMap, env, fmt::Debug};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct AssetPair {
+    pub base: String,
+    pub quote: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FeedConfig {
     pub id: u32,
     pub name: String,
+    pub script: String,
+    pub pair: AssetPair,
     pub report_interval_ms: u64,
     pub first_report_start_time: SystemTime,
 }

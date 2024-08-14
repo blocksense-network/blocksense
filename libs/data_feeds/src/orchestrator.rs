@@ -54,24 +54,8 @@ pub async fn orchestrator() {
 
     let encoder = TextEncoder::new();
 
-    let all_feeds = DataFeedAPI::get_all_feeds();
-    debug!("All feeds dump - {:?}", all_feeds);
-
-    // Initialize feed_id_map so we can resolve the id of each feed during dispatch
-    let mut feed_id_map = HashMap::<String, &FeedConfig>::new();
-    for (api, asset) in &all_feeds {
-        let feed_name = DataFeedAPI::feed_asset_str(&api, &asset);
-
-        match find_feed_meta_data_by_name(&feeds_registry, &feed_name) {
-            Some(feed_meta_data) => {
-                feed_id_map.insert(feed_name, feed_meta_data);
-            }
-            None => panic!("Feed with name {} not found!", feed_name),
-        }
-    }
-
-    FEED_COUNTER.inc_by(all_feeds.len() as u64);
-    info!("Available feed count: {}\n", FEED_COUNTER.get());
+    // FEED_COUNTER.inc_by(all_feeds.len() as u64);
+    // info!("Available feed count: {}\n", FEED_COUNTER.get());
 
     let request_client = reqwest::Client::new();
 
@@ -80,14 +64,7 @@ pub async fn orchestrator() {
 
         let start_time = Instant::now();
 
-        dispatch(
-            &reporter_config,
-            &feeds_registry,
-            &all_feeds,
-            &feed_id_map,
-            &mut connection_cache,
-        )
-        .await;
+        dispatch(&reporter_config, &feeds_registry, &mut connection_cache).await;
 
         info!("Finished with {}-th batch..\n", BATCH_COUNTER.get());
 

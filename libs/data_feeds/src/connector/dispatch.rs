@@ -14,7 +14,7 @@ use crate::{
 
 use super::post::post_feed_response;
 
-fn feed_selector(feeds: &[(DataFeedAPI, String)], batch_size: usize) -> Vec<(DataFeedAPI, String)> {
+fn feed_selector(feeds: &Vec<FeedConfig>, batch_size: usize) -> Vec<FeedConfig> {
     let mut rng = thread_rng();
 
     let selected_feeds_idx = (0..feeds.len()).choose_multiple(&mut rng, batch_size);
@@ -76,12 +76,10 @@ fn feed_builder(
 
 pub async fn dispatch(
     reporter_config: &ReporterConfig,
-    _feed_registry: &AllFeedsConfig,
-    feeds: &Vec<(DataFeedAPI, String)>,
-    feed_id_map: &HashMap<String, &FeedConfig>,
+    feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
 ) {
-    let feed_subset = feed_selector(feeds, reporter_config.batch_size);
+    let feeds_subset = feed_selector(&feed_registry.feeds, reporter_config.batch_size);
 
     let secret_key_path = reporter_config
         .resources
@@ -94,29 +92,28 @@ pub async fn dispatch(
 
     let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
 
-    for (api, asset) in feed_subset {
+    for feed in feeds_subset {
         let start_time = Instant::now();
 
-        let data_feed = resolve_feed(&api, &reporter_config.resources, connection_cache);
-        let feed_asset_name = DataFeedAPI::feed_asset_str(&api, &asset);
-        let feed_id = feed_id_map
-            .get(&feed_asset_name)
-            .expect("`feed_id_map` encountered unknown key!")
-            .id;
+        let data_feed = resolve_feed(
+            &DataFeedAPI::from_str(feed.script.as_str()),
+            &reporter_config.resources,
+            connection_cache,
+        );
 
         post_feed_response(
             &reporter_config.reporter,
             &secret_key,
             data_feed,
-            feed_id,
-            &asset,
+            feed.id,
+            &feed.name,
             &reporter_config.sequencer_url,
         )
         .await;
 
         let elapsed_time = start_time.elapsed().as_millis();
         DATA_FEED_PARSE_TIME_GAUGE
-            .with_label_values(&[feed_asset_name.as_str()])
+            .with_label_values(&[&feed.id.to_string()])
             .set(elapsed_time as i64);
     }
 }
