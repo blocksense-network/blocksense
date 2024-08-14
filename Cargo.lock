@@ -3608,7 +3608,6 @@ name = "feed_registry"
 version = "0.1.1"
 dependencies = [
  "crypto",
- "lazy_static 1.4.0",
  "num",
  "ringbuf",
  "sequencer_config",

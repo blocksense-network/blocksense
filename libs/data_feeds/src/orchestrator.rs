@@ -54,8 +54,8 @@ pub async fn orchestrator() {
 
     let encoder = TextEncoder::new();
 
-    // FEED_COUNTER.inc_by(all_feeds.len() as u64);
-    // info!("Available feed count: {}\n", FEED_COUNTER.get());
+    FEED_COUNTER.inc_by(feeds_registry.feeds.len() as u64);
+    info!("Available feed count: {}\n", FEED_COUNTER.get());
 
     let request_client = reqwest::Client::new();
 
