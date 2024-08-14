@@ -10,6 +10,7 @@ import type { AnchorProps } from './components/anchor';
 import type { DocsThemeConfig } from './constants';
 import { DetailsProvider, useDetails, useSetActiveAnchor } from './contexts';
 import { useIntersectionObserver, useSlugs } from './contexts/active-anchor';
+import { ListIcon } from './icons/list';
 
 // Anchor links
 function HeadingLink({
@@ -206,17 +207,24 @@ export const getComponents = ({
     h6: props => <HeadingLink tag="h6" context={context} {...props} />,
     ul: props => (
       <ul
-        className="nx-mt-6 nx-list-disc first:nx-mt-0 ltr:nx-ml-6 rtl:nx-mr-6"
+        className="nx-mt-6 nx-list-none first:nx-mt-0 ltr:nx-ml-0 rtl:nx-mr-6"
         {...props}
       />
     ),
     ol: props => (
       <ol
-        className="nx-mt-6 nx-list-decimal first:nx-mt-0 ltr:nx-ml-6 rtl:nx-mr-6"
+        className="nx-mt-6 nx-list-decimal first:nx-mt-0 rtl:nx-mr-6"
         {...props}
       />
     ),
-    li: props => <li className="nx-my-2" {...props} />,
+    li: props => (
+      <li className="flex items-start nx-gap-4 nx-my-2" {...props}>
+        <aside className="w-4 h-4 nx-flex-shrink-0" aria-hidden="true">
+          <ListIcon />
+        </aside>
+        <span className="flex-grow">{props.children}</span>
+      </li>
+    ),
     blockquote: props => (
       <blockquote
         className={cn(
