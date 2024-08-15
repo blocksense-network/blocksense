@@ -155,7 +155,7 @@ fn send_report(payload_json: serde_json::Value) {
         .unwrap();
     easy.post(true).unwrap();
 
-    easy.post_fields_copy(&payload_json.to_string().as_bytes())
+    easy.post_fields_copy(payload_json.to_string().as_bytes())
         .unwrap();
 
     // Set a closure to handle the response
@@ -167,7 +167,8 @@ fn send_report(payload_json: serde_json::Value) {
 
 fn cleanup_spawned_processes() {
     let mut children = vec![];
-    for process in vec!["sequencer"] {
+    {
+        let process = "sequencer";
         println!("Killing process: {}", process);
         children.push(thread::spawn(move || {
             let mut command = Command::new("pkill");

@@ -55,7 +55,7 @@ macro_rules! process_provider_getter {
             match $_get {
                 Ok(res) => {
                     $_provider_metrics.read() // Holding a read lock here suffice, since the counters are atomic.
-                    .unwrap()
+                    .await
                     .[<success_ $_metric>]
                     .with_label_values(&[&$_net.to_string()])
                     .inc();
@@ -63,7 +63,7 @@ macro_rules! process_provider_getter {
                 },
                 Err(e) => {
                     $_provider_metrics.read() // Holding a read lock here suffice, since the counters are atomic.
-                    .unwrap()
+                    .await
                     .[<failed_ $_metric>]
                     .with_label_values(&[&$_net.to_string()])
                     .inc();
@@ -79,7 +79,7 @@ macro_rules! inc_metric (
     ($_component: ident, $_comp_index: ident, $_metric: ident) => (
         $_component
         .read() // Holding a read lock here suffice, since the counters are atomic.
-        .unwrap()
+        .await
         .$_metric
         .with_label_values(&[&$_comp_index.to_string()])
         .inc();
@@ -91,7 +91,7 @@ macro_rules! inc_metric_by (
     ($_component: ident, $_comp_index: ident, $_metric: ident, $_inc_val: ident) => (
         $_component
         .read() // Holding a read lock here suffice, since the counters are atomic.
-        .unwrap()
+        .await
         .$_metric
         .with_label_values(&[&$_comp_index.to_string()])
         .inc_by($_inc_val as u64);
@@ -103,7 +103,7 @@ macro_rules! inc_vec_metric (
     ($_component: ident, $_comp_index: ident, $_metric: ident, $_index: ident) => (
         $_component
         .read() // Holding a read lock here suffice, since the counters are atomic.
-        .unwrap()
+        .await
         .$_metric
         .with_label_values(&[&$_comp_index.to_string(), &$_index.to_string()])
         .inc();

@@ -48,18 +48,18 @@ pub fn get_reporter_secret_config_file_path(secret_key_file_path: String) -> Str
 }
 
 pub fn generate_signature(
-    priv_key_hex: &String,
+    priv_key_hex: &str,
     feed_id: &str,
     timestamp: Timestamp,
     feed_result: &FeedResult,
 ) -> Signature {
-    let priv_key = deserialize_priv_key(&priv_key_hex).expect("Wrong key format! ");
+    let priv_key = deserialize_priv_key(priv_key_hex).expect("Wrong key format! ");
 
     let mut byte_buffer: Vec<u8> = feed_id
         .as_bytes()
-        .to_vec()
-        .into_iter()
-        .chain((timestamp as u128).to_be_bytes().to_vec())
+        .iter()
+        .copied()
+        .chain(timestamp.to_be_bytes().to_vec())
         .collect();
 
     match feed_result {
@@ -73,18 +73,18 @@ pub fn generate_signature(
     sign_message(&priv_key, &byte_buffer)
 }
 
-pub async fn post_feed_response(
+pub fn post_feed_response(
     reporter: &Reporter,
-    secret_key: &String,
+    secret_key: &str,
     data_feed: Rc<RefCell<dyn DataFeed>>,
     feed_id: u32,
     asset: &str,
     sequencer_url: &str,
 ) {
-    let (result, timestamp) = data_feed.borrow_mut().poll(asset).await;
+    let (result, timestamp) = data_feed.borrow_mut().poll(asset);
 
     let signature = generate_signature(
-        &secret_key,
+        secret_key,
         format!("{}", feed_id).as_str(),
         timestamp,
         &result,

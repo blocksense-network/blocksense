@@ -1,4 +1,4 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 
 use actix_web::{web, App, HttpServer};
 use feed_registry::registry::{
@@ -6,7 +6,7 @@ use feed_registry::registry::{
 };
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::providers::provider::init_shared_rpc_providers;
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, RwLock};
 
 use sequencer::reporters::reporter::init_shared_reporters;
 
@@ -17,7 +17,7 @@ use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 use actix_web::rt::spawn;
 use actix_web::web::Data;
 use prometheus::metrics::FeedsMetrics;
-use sequencer::config::config::init_sequencer_config;
+use sequencer::config::init_sequencer_config;
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
@@ -25,6 +25,11 @@ use sequencer_config::SequencerConfig;
 use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
+
+type VoteChannel = (
+    UnboundedSender<(String, String)>,
+    UnboundedReceiver<(String, String)>,
+);
 
 /// Given a Sequencer config is returns the app state need to start the Actix Sequencer server.
 pub async fn prepare_app_state(
@@ -39,12 +44,9 @@ pub async fn prepare_app_state(
         std::process::exit(0);
     });
 
-    let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
+    let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
-    let (vote_send, vote_recv): (
-        UnboundedSender<(String, String)>,
-        UnboundedReceiver<(String, String)>,
-    ) = mpsc::unbounded_channel();
+    let (vote_send, vote_recv): VoteChannel = mpsc::unbounded_channel();
 
     let app_state: Data<FeedsState> = web::Data::new(FeedsState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -53,7 +55,7 @@ pub async fn prepare_app_state(
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
         providers: providers.clone(),
         log_handle,
-        reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
+        reporters: init_shared_reporters(sequencer_config, metrics_prefix),
         feed_id_allocator: Arc::new(RwLock::new(Some(feed_id_allocator))),
         voting_send_channel: vote_send,
         feeds_metrics: Arc::new(RwLock::new(
@@ -134,7 +136,7 @@ OPTIONS
   -c, --config-file-path     specify sequencer's config file path
   --no-metrics-server        do not start prometheus metric server"
                 );
-                return Ok({});
+                return Ok(());
             }
             _ => {
                 if arg.starts_with('-') {
@@ -186,11 +188,11 @@ OPTIONS
             Ok(res) => match res {
                 Ok(x) => x,
                 Err(e) => {
-                    panic!("TaskError: {}", e.to_string());
+                    panic!("TaskError: {}", e);
                 }
             },
             Err(e) => {
-                panic!("JoinError: {} ", e.to_string());
+                panic!("JoinError: {} ", e);
             }
         }
     }

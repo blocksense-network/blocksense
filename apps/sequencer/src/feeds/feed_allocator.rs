@@ -61,25 +61,24 @@ pub struct Allocator {
 impl Allocator {
     pub fn new(space: std::ops::RangeInclusive<u32>) -> Allocator {
         Allocator {
-            space_lower_bound: space.start().clone(),
-            space_upper_bound: space.end().clone(),
+            space_lower_bound: *space.start(),
+            space_upper_bound: *space.end(),
             allocations: HashMap::new(),
         }
     }
 
     pub fn space_size(&self) -> u32 {
         let space_size: u32 = self.space_upper_bound - self.space_lower_bound + 1;
-        return space_size;
+        space_size
     }
 
     pub fn num_allocated_indexes(&self) -> u32 {
         let num_allocated_indexes = self.allocations.len();
-        return num_allocated_indexes as u32;
+        num_allocated_indexes as u32
     }
 
     pub fn num_free_indexes(&self) -> u32 {
-        let num_free_indexes = self.space_size() - self.num_allocated_indexes();
-        return num_free_indexes;
+        self.space_size() - self.num_allocated_indexes()
     }
 
     /// Creates an Allocation object with the provided parameters, finds an availiable index
@@ -114,14 +113,13 @@ impl Allocator {
         self.allocations.insert(free_index, allocation);
         // put allocation into hashmap
         // return index
-        return Ok(free_index);
+        Ok(free_index)
     }
 
     fn get_free_index(&self) -> Result<u32, &str> {
-        let result = (self.space_lower_bound..=self.space_upper_bound)
+        (self.space_lower_bound..=self.space_upper_bound)
             .find(|index| !self.allocations.contains_key(index))
-            .ok_or("no free space");
-        return result;
+            .ok_or("no free space")
     }
 
     fn get_expired_index(&self) -> Result<u32, &str> {
@@ -139,7 +137,7 @@ impl Allocator {
                         < current_time_ms)
             })
             .ok_or("it hit the fan");
-        return result;
+        result
     }
 }
 
@@ -435,7 +433,7 @@ mod tests {
         let handles: Vec<_> = (0..5)
             .map(|_| {
                 let allocator = Arc::clone(&allocator);
-                let schema_id = schema_id.clone();
+                let schema_id = schema_id;
                 thread::spawn(move || {
                     allocator.allocate(
                         number_of_slots,

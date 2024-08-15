@@ -5,8 +5,6 @@ use extended_isolation_forest::{Forest, ForestOptions};
 Reference implementation - https://github.com/sahandha/eif
 */
 pub fn make_f64_forest<const N: usize>(values: Vec<[f64; N]>) -> Forest<f64, N> {
-    let values_array: Vec<[f64; N]> = values.iter().map(|&x| x.try_into().unwrap()).collect();
-
     let options = ForestOptions {
         n_trees: 150,
         sample_size: 200,
@@ -14,7 +12,7 @@ pub fn make_f64_forest<const N: usize>(values: Vec<[f64; N]>) -> Forest<f64, N> 
         extension_level: 0, //TODO(snikolov): Figure out why it's required `extension_level` < `Dimensions`
     };
 
-    Forest::from_slice(values_array.as_slice(), &options).unwrap()
+    Forest::from_slice(values.as_slice(), &options).unwrap()
 }
 
 pub fn is_anomaly<const N: usize>(forest: &Forest<f64, N>, data_point: &[f64; N]) -> f64 {

@@ -64,7 +64,7 @@ pub async fn orchestrator() {
 
         let start_time = Instant::now();
 
-        dispatch(&reporter_config, &feeds_registry, &mut connection_cache).await;
+        dispatch(&reporter_config, &feeds_registry, &mut connection_cache);
 
         info!("Finished with {}-th batch..\n", BATCH_COUNTER.get());
 

@@ -158,7 +158,7 @@ interval_secs = 15
 [component.revolut-example]
 source = "revolut-example.wasm"
 "#;
-        let config: BlocksenseConfig = serde_json::from_str(&json).expect("Failed to parse json.");
+        let config: BlocksenseConfig = serde_json::from_str(json).expect("Failed to parse json.");
         let spin_config = AppManifest::from(config);
         let toml_to_compare =
             toml::to_string_pretty(&spin_config).expect("Failed to serialize to toml.");

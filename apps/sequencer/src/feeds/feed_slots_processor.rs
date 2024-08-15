@@ -9,9 +9,9 @@ use feed_registry::types::{FeedMetaData, Repeatability};
 use prometheus::{inc_metric, metrics::FeedsMetrics};
 use ringbuf::traits::Consumer;
 use std::fmt::Debug;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::{mpsc::UnboundedSender, RwLock};
 use tracing::error;
 use tracing::warn;
 use tracing::{debug, info};
@@ -22,169 +22,192 @@ use feed_registry::registry::FeedAggregateHistory;
 
 const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
-pub async fn feed_slots_processor_loop<
-    K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
-    V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
->(
-    result_send: UnboundedSender<(K, V)>,
-    feed: Arc<RwLock<FeedMetaData>>,
+pub struct FeedSlotsProcessor {
     name: String,
-    reports: Arc<RwLock<AllFeedsReports>>,
-    history: Arc<RwLock<FeedAggregateHistory>>,
+    report_interval_ms: u64,
+    first_report_start_time: u128,
     key: u32,
-    reporters: SharedReporters,
-    feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
-) -> Result<String, Report> {
-    let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
-        let datafeed = feed.read().unwrap();
-        (
-            datafeed.is_oneshot(),
-            datafeed.get_report_interval_ms(),
-            datafeed.get_first_report_start_time_ms(),
-            datafeed.get_quorum_percentage(),
-        )
-    };
+}
 
-    let feed_slots_time_tracker = SlotTimeTracker::new(
-        Duration::from_millis(report_interval_ms),
-        first_report_start_time,
-    );
-
-    let mut is_processed = false;
-    let repeatability = if is_oneshot {
-        Repeatability::Oneshot
-    } else {
-        Repeatability::Periodic
-    };
-
-    loop {
-        if is_oneshot && is_processed {
-            return Ok(String::from("Oneshot feed processed"));
+impl FeedSlotsProcessor {
+    pub fn new(
+        name: String,
+        report_interval_ms: u64,
+        first_report_start_time: u128,
+        key: u32,
+    ) -> FeedSlotsProcessor {
+        FeedSlotsProcessor {
+            name,
+            report_interval_ms,
+            first_report_start_time,
+            key,
         }
-        feed_slots_time_tracker
-            .await_end_of_current_slot(&repeatability)
-            .await;
-        is_processed = true;
+    }
 
-        let result_post_to_contract: FeedType; //TODO(snikolov): This needs to be enforced as Bytes32
-        let key_post: u32;
-        let mut is_quorum_reached = true;
+    pub async fn start_loop<
+        K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
+        V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
+    >(
+        &self,
+        result_send: UnboundedSender<(K, V)>,
+        feed: Arc<RwLock<FeedMetaData>>,
+        reports: Arc<RwLock<AllFeedsReports>>,
+        history: Arc<RwLock<FeedAggregateHistory>>,
+        reporters: SharedReporters,
+        feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    ) -> Result<String, Report> {
+        let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
+            let datafeed = feed.read().unwrap();
+            (
+                datafeed.is_oneshot(),
+                datafeed.get_report_interval_ms(),
+                datafeed.get_first_report_start_time_ms(),
+                datafeed.get_quorum_percentage(),
+            )
+        };
 
-        {
-            let current_time_as_ms = current_unix_time();
+        let feed_slots_time_tracker = SlotTimeTracker::new(
+            Duration::from_millis(report_interval_ms),
+            first_report_start_time,
+        );
 
-            let slot = feed.read().unwrap().get_slot(current_time_as_ms);
+        let mut is_processed = false;
+        let repeatability = if is_oneshot {
+            Repeatability::Oneshot
+        } else {
+            Repeatability::Periodic
+        };
 
-            info!(
-                "Processing votes for {} with id {} for slot {} rep_interval {}.",
-                name, key, slot, report_interval_ms
-            );
+        loop {
+            if is_oneshot && is_processed {
+                return Ok(String::from("Oneshot feed processed"));
+            }
+            feed_slots_time_tracker
+                .await_end_of_current_slot(&repeatability)
+                .await;
+            is_processed = true;
 
-            let reports: Arc<RwLock<feed_registry::registry::FeedReports>> =
-                match reports.read().unwrap().get(key) {
-                    Some(x) => x,
-                    None => {
-                        info!("No reports found!");
-                        continue;
+            let result_post_to_contract: FeedType; //TODO(snikolov): This needs to be enforced as Bytes32
+            let key_post: u32;
+            let mut is_quorum_reached = true;
+
+            {
+                let current_time_as_ms = current_unix_time();
+
+                let slot = feed.read().unwrap().get_slot(current_time_as_ms);
+
+                info!(
+                    "Processing votes for {} with id {} for slot {} rep_interval {}.",
+                    name, key, slot, report_interval_ms
+                );
+
+                let reports: Arc<RwLock<feed_registry::registry::FeedReports>> =
+                    match reports.read().unwrap().get(key) {
+                        Some(x) => x,
+                        None => {
+                            info!("No reports found!");
+                            continue;
+                        }
+                    };
+                debug!("found the following reports:");
+                debug!("reports = {:?}", reports);
+
+                let mut reports = reports.write().unwrap();
+                // Process the reports:
+                let mut values: Vec<&FeedType> = vec![];
+                for kv in &reports.report {
+                    match kv.1 {
+                        FeedResult::Result { result } => values.push(result),
+                        FeedResult::Error { .. } => todo!(),
                     }
-                };
-            debug!("found the following reports:");
-            debug!("reports = {:?}", reports);
-
-            let mut reports = reports.write().unwrap();
-            // Process the reports:
-            let mut values: Vec<&FeedType> = vec![];
-            for kv in &reports.report {
-                match kv.1 {
-                    FeedResult::Result { result } => values.push(result),
-                    FeedResult::Error { .. } => todo!(),
                 }
-            }
 
-            if values.is_empty() {
-                info!("No reports found for feed: {} slot: {}!", name, &slot);
-                continue;
-            }
+                if values.is_empty() {
+                    info!("No reports found for feed: {} slot: {}!", name, &slot);
+                    continue;
+                }
 
-            let total_votes_count = values.len() as f32;
-            let required_votes_count = quorum_percentage * reporters.read().unwrap().len() as f32;
+                let total_votes_count = values.len() as f32;
+                let required_votes_count =
+                    quorum_percentage * reporters.read().unwrap().len() as f32;
 
-            if total_votes_count < required_votes_count {
-                warn!(
+                if total_votes_count < required_votes_count {
+                    warn!(
                     "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
                     name, &slot, quorum_percentage, total_votes_count, reporters.read().unwrap().len()
                 );
-                is_quorum_reached = false;
-            }
-
-            if let Some(feed_metrics) = &feed_metrics {
-                if is_quorum_reached {
-                    inc_metric!(feed_metrics, key, quorums_reached);
-                } else {
-                    inc_metric!(feed_metrics, key, failures_to_reach_quorum);
-                }
-            }
-
-            key_post = key;
-            result_post_to_contract = feed.read().unwrap().get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
-
-            // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
-            if !is_oneshot {
-                {
-                    let mut history_guard = history.write().unwrap();
-                    history_guard.push(key, result_post_to_contract.clone())
+                    is_quorum_reached = false;
                 }
 
-                let history_lock = history.read().unwrap();
+                if let Some(feed_metrics) = &feed_metrics {
+                    if is_quorum_reached {
+                        inc_metric!(feed_metrics, key, quorums_reached);
+                    } else {
+                        inc_metric!(feed_metrics, key, failures_to_reach_quorum);
+                    }
+                }
 
-                // The first slice is from the current read position to the end of the array
-                // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
-                let (first, last) = history_lock
-                    .collect(key)
-                    .expect("Missing key from History!")
-                    .as_slices();
+                key_post = key;
+                result_post_to_contract = feed.read().unwrap().get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
 
-                let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
-                let numerical_vec: Vec<f64> = history_vec
-                    .iter()
-                    .filter_map(|feed| {
-                        if let FeedType::Numerical(value) = feed {
-                            Some(*value)
-                        } else if let FeedType::Text(_) = feed {
-                            warn!(
+                // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
+                if !is_oneshot {
+                    {
+                        let mut history_guard = history.write().unwrap();
+                        history_guard.push(key, result_post_to_contract.clone())
+                    }
+
+                    let history_lock = history.read().unwrap();
+
+                    // The first slice is from the current read position to the end of the array
+                    // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
+                    let (first, last) = history_lock
+                        .collect(key)
+                        .expect("Missing key from History!")
+                        .as_slices();
+
+                    let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
+                    let numerical_vec: Vec<f64> = history_vec
+                        .iter()
+                        .filter_map(|feed| {
+                            if let FeedType::Numerical(value) = feed {
+                                Some(*value)
+                            } else if let FeedType::Text(_) = feed {
+                                warn!(
                                 "Anomaly Detection not implemented for FeedType::Text, skipping..."
                             );
-                            None
-                        } else {
-                            warn!("Anomaly Detection does not recognize FeedType, skipping...");
-                            None
-                        }
-                    })
-                    .collect();
+                                None
+                            } else {
+                                warn!("Anomaly Detection does not recognize FeedType, skipping...");
+                                None
+                            }
+                        })
+                        .collect();
 
-                // Get AD prediction only if enough data is present
-                if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
-                    match anomaly_detector_aggregate(numerical_vec) {
-                        Ok(ad_score) => {
-                            info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
-                        }
-                        Err(e) => {
-                            error!("Anomaly Detection failed with error - {}", e);
+                    // Get AD prediction only if enough data is present
+                    if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
+                        match anomaly_detector_aggregate(numerical_vec) {
+                            Ok(ad_score) => {
+                                info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
+                            }
+                            Err(e) => {
+                                error!("Anomaly Detection failed with error - {}", e);
+                            }
                         }
                     }
                 }
-            }
 
-            info!("result_post_to_contract = {:?}", result_post_to_contract);
-            reports.clear();
-        }
-        if is_quorum_reached {
-            result_send
-                .send((
-                    to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
-                    naive_packing(result_post_to_contract).into(),
-                ))
-                .unwrap();
+                info!("result_post_to_contract = {:?}", result_post_to_contract);
+                reports.clear();
+            }
+            if is_quorum_reached {
+                result_send
+                    .send((
+                        to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
+                        naive_packing(result_post_to_contract).into(),
+                    ))
+                    .unwrap();
+            }
         }
     }
 }

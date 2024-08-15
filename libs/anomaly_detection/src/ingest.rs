@@ -31,7 +31,7 @@ pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error
     const DIM: usize = 1; // Dimensionality of data
 
     let values_array: Vec<[f64; DIM]> = values.iter().map(|&x| [x]).collect();
-    let last_value = values_array.last().unwrap().clone();
+    let last_value = *values_array.last().unwrap();
 
     let forest = make_f64_forest::<DIM>(values_array);
 
@@ -41,7 +41,7 @@ pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error
 
     let detector_result = make_f64_hdbscan(values_array).unwrap();
 
-    let hdbscan_result = f64::from(*detector_result.last().unwrap() == (-1 as i32));
+    let hdbscan_result = f64::from(*detector_result.last().unwrap() == -1_i32);
 
     let aggregate_result = (isolation_forest_result + hdbscan_result) / 2.;
 

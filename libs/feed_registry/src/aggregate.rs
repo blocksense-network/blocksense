@@ -36,8 +36,8 @@ impl FeedAggregate for AverageAggregator {
 
         let values: Vec<&f64> = values
             .into_iter()
-            .filter_map(|value| match value {
-                FeedType::Numerical(x) => Some(x),
+            .map(|value| match value {
+                FeedType::Numerical(x) => x,
                 _ => panic!("Attempting to perform arithmetic on non-numerical type!"), //TODO(snikolov): What level of error?
             })
             .collect();

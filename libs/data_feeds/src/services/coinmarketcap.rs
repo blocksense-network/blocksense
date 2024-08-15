@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use cmc::Cmc;
 use feed_registry::{
     aggregate::{AverageAggregator, ConsensusMetric},
@@ -34,13 +33,12 @@ impl CoinMarketCapDataFeed {
     }
 }
 
-#[async_trait(?Send)]
 impl DataFeed for CoinMarketCapDataFeed {
     fn score_by(&self) -> ConsensusMetric {
         ConsensusMetric::Mean(AverageAggregator {})
     }
 
-    async fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
+    fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
         let response = self.api_connector.price(asset);
 
         trace!("response = {:?}", response);

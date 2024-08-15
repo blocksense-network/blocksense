@@ -69,7 +69,9 @@ assert_cmd = "2.0.14"
 dirs = "5.0.1"
 
 # Service APIs
-yahoo_finance_api = "2.1.0"
+yahoo_finance_api = {"version" = "2.1.0", features = ["blocking"]}
 cmc = "0.4.4"
 fred-rs = "0.1.1"
 weer_api = "0.1.1"
+tokio = "1.39.2"
+tokio-test = "0.4.4"

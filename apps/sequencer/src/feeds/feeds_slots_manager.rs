@@ -1,4 +1,4 @@
-use crate::feeds::feed_slots_processor::feed_slots_processor_loop;
+use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::feeds::feeds_state::FeedsState;
 use actix_web::rt::spawn;
 use actix_web::web;
@@ -7,8 +7,7 @@ use futures::stream::FuturesUnordered;
 use std::fmt::Debug;
 use std::io::Error;
 use std::sync::Arc;
-use std::sync::RwLock;
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, RwLock};
 use tracing::debug;
 use tracing::error;
 
@@ -23,10 +22,7 @@ pub async fn feeds_slots_manager_loop<
     spawn(async move {
         let collected_futures = FuturesUnordered::new();
 
-        let reg = app_state
-            .registry
-            .write()
-            .expect("Could not lock all feeds meta data registry.");
+        let reg = app_state.registry.write().await;
 
         let keys = reg.get_keys();
 
@@ -41,32 +37,33 @@ pub async fn feeds_slots_manager_loop<
 
             feed_aggregate_history
                 .write()
-                .unwrap()
-                .register_feed(key.clone(), 10_000); //TODO(snikolov): How to avoid borrow?
+                .await
+                .register_feed(key, 10_000); //TODO(snikolov): How to avoid borrow?
 
             let feed = match reg.get(key) {
                 Some(x) => x,
                 None => panic!("Error timer for feed that was not registered."),
             };
 
-            let lock_err_msg = "Could not lock feed meta data registry for read";
             let name = feed.read().expect(lock_err_msg).get_name().clone();
             let feed_aggregate_history_cp = feed_aggregate_history.clone();
             let reporters_cp = app_state.reporters.clone();
             let feed_metrics_cp = app_state.feeds_metrics.clone();
 
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, report_interval_ms, first_report_start_time, key);
+
             collected_futures.push(spawn(async move {
-                feed_slots_processor_loop(
-                    send_channel,
-                    feed,
-                    name,
-                    rc,
-                    feed_aggregate_history_cp,
-                    key,
-                    reporters_cp,
-                    Some(feed_metrics_cp),
-                )
-                .await
+                feed_slots_processor
+                    .start_loop(
+                        send_channel,
+                        feed,
+                        rc,
+                        feed_aggregate_history_cp,
+                        reporters_cp,
+                        Some(feed_metrics_cp),
+                    )
+                    .await
             }));
         }
         drop(reg);
@@ -91,14 +88,14 @@ pub async fn feeds_slots_manager_loop<
             }
             all_results += " "
         }
-        Ok({})
+        Ok(())
     })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::config::init_sequencer_config;
+    use crate::config::init_sequencer_config;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
     use data_feeds::feeds_processing::naive_packing;
@@ -109,10 +106,13 @@ mod tests {
     use prometheus::metrics::FeedsMetrics;
     use std::env;
     use std::path::PathBuf;
-    use std::sync::{Arc, RwLock};
+    use std::sync::Arc;
     use std::time::Duration;
 
-    use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+    use tokio::sync::{
+        mpsc::{UnboundedReceiver, UnboundedSender},
+        RwLock,
+    };
     use utils::logging::init_shared_logging_handle;
     use utils::to_hex_string;
 
@@ -135,13 +135,18 @@ mod tests {
         // we are specifically sending only one report message as we don't want to test the average processor
         let feed_id = 1;
         let reporter_id = 42;
-        all_feeds_reports_arc.write().unwrap().push(
-            feed_id,
-            reporter_id,
-            FeedResult::Result {
-                result: original_report_data.clone(),
-            },
-        );
+        all_feeds_reports_arc
+            .write()
+            .await
+            .push(
+                feed_id,
+                reporter_id,
+                FeedResult::Result {
+                    result: original_report_data.clone(),
+                },
+            )
+            .await;
+
         let (vote_send, mut vote_recv): (
             UnboundedSender<(String, String)>,
             UnboundedReceiver<(String, String)>,

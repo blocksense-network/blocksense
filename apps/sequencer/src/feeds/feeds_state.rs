@@ -4,8 +4,8 @@ use crate::reporters::reporter::SharedReporters;
 use feed_registry::registry::AllFeedsReports;
 use feed_registry::registry::FeedMetaDataRegistry;
 use prometheus::metrics::FeedsMetrics;
-use std::sync::{Arc, RwLock};
-use tokio::sync::mpsc;
+use std::sync::Arc;
+use tokio::sync::{mpsc, RwLock};
 use utils::logging::SharedLoggingHandle;
 
 pub struct FeedsState {

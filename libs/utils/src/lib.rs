@@ -51,9 +51,9 @@ pub fn to_hex_string(mut bytes: Vec<u8>, padding_to: Option<usize>) -> String {
 }
 
 pub fn read_file(path: &str) -> String {
-    let mut file = File::open(path).expect(format!("File not found in {}", path).as_str());
+    let mut file = File::open(path).unwrap_or_else(|_| panic!("File not found in {}", path));
     let mut data = String::new();
     file.read_to_string(&mut data)
-        .expect(format!("File {} read failure! ", path).as_str());
+        .unwrap_or_else(|_| panic!("File {} read failure! ", path));
     data
 }

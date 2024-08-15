@@ -25,7 +25,7 @@ fn get_git_hash() -> Option<String> {
         .output();
     if let Ok(commit_output) = commit {
         let commit_string = String::from_utf8_lossy(&commit_output.stdout);
-        Some(format!("{}", commit_string.lines().next().unwrap_or("")))
+        Some(commit_string.lines().next().unwrap_or("").to_string())
     } else {
         panic!("Can not get git commit: {:?}", commit);
     }
@@ -39,7 +39,7 @@ fn git_top_level() -> Option<String> {
         .output();
     if let Ok(commit_output) = commit {
         let commit_string = String::from_utf8_lossy(&commit_output.stdout);
-        Some(format!("{}", commit_string.lines().next().unwrap_or("")))
+        Some(commit_string.lines().next().unwrap_or("").to_string())
     } else {
         panic!("Can not get git top level: {:?}", commit);
     }
@@ -137,11 +137,11 @@ fn main() {
     if let Some(top_level) = git_top_level() {
         let git_branch = get_git_branch();
         // in deattached git state, git branch should be empty
-        if git_branch.len() > 0 {
+        if !git_branch.is_empty() {
             println!("cargo:rustc-env=GIT_BRANCH={}", git_branch);
             println!("cargo:rerun-if-changed={top_level}/.git/refs/heads/{git_branch}");
         } else {
-            println!("cargo:rustc-env=GIT_BRANCH={}", "DETACHED HEAD");
+            println!("cargo:rustc-env=GIT_BRANCH=DETACHED HEAD");
         }
         println!("cargo:rerun-if-changed={top_level}/.git/HEAD");
     }

@@ -1,6 +1,6 @@
 use std::{
     collections::HashMap,
-    sync::{Arc, RwLock},
+    sync::Arc,
     time::{Duration, SystemTime},
 };
 
@@ -8,7 +8,7 @@ use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use sequencer_config::{get_config_file_path, FeedConfig};
 use serde::Deserialize;
-use tokio::time;
+use tokio::{sync::RwLock, time};
 use tracing::{info, trace};
 use utils::{read_file, time::current_unix_time};
 
@@ -34,6 +34,12 @@ pub struct AllFeedsConfig {
 #[derive(Debug)]
 pub struct FeedMetaDataRegistry {
     registered_feeds: HashMap<u32, Arc<RwLock<FeedMetaData>>>,
+}
+
+impl Default for FeedMetaDataRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl FeedMetaDataRegistry {
@@ -103,6 +109,12 @@ pub struct FeedAggregateHistory {
     aggregate_history: HashMap<u32, HeapRb<FeedType>>,
 }
 
+impl Default for FeedAggregateHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FeedAggregateHistory {
     pub fn new() -> Self {
         Self {
@@ -139,22 +151,28 @@ pub struct AllFeedsReports {
     reports: HashMap<u32, Arc<RwLock<FeedReports>>>,
 }
 
+impl Default for AllFeedsReports {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AllFeedsReports {
     pub fn new() -> AllFeedsReports {
         AllFeedsReports {
             reports: HashMap::new(),
         }
     }
-    pub fn push(&mut self, feed_id: u32, reporter_id: u64, data: FeedResult) -> bool {
+    pub async fn push(&mut self, feed_id: u32, reporter_id: u64, data: FeedResult) -> bool {
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
             }))
         }); //TODO: Reject votes for unregistered feed ID-s
-        let mut res = res.write().unwrap();
-        if !res.report.contains_key(&reporter_id) {
+        let mut res = res.write().await;
+        if let std::collections::hash_map::Entry::Vacant(e) = res.report.entry(reporter_id) {
             // Stick to first vote from a reporter.
-            res.report.insert(reporter_id, data);
+            e.insert(data);
             return true;
         }
         false
@@ -254,14 +272,14 @@ mod tests {
     use crate::types::Repeatability;
     use crate::types::ReportRelevance;
     use std::sync::Arc;
-    use std::sync::RwLock;
-    use std::thread;
     use std::time::Instant;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
+    use tokio::sync::RwLock;
+
     const QUORUM_PERCENTAGE: f32 = 0.001;
 
-    #[test]
-    fn basic_test() {
+    #[tokio::test]
+    async fn basic_test() {
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
         let mut expected_keys_vec = vec![0, 1, 2];
@@ -278,7 +296,7 @@ mod tests {
             fmdr.get(0)
                 .expect("ID not present in registry")
                 .read()
-                .unwrap()
+                .await
                 .get_slot(current_time_as_ms)
                 == 0
         );
@@ -286,14 +304,14 @@ mod tests {
             fmdr.get(1)
                 .expect("ID not present in registry")
                 .read()
-                .unwrap()
+                .await
                 .get_slot(current_time_as_ms)
                 == 0
         );
 
         assert!(
-            fmdr.get(0).expect("ID not present in registry").read().unwrap().get_report_interval_ms() as u128 ==
-            fmdr.get(1).expect("ID not present in registry").read().unwrap().get_report_interval_ms() as u128 * 2,
+            fmdr.get(0).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 ==
+            fmdr.get(1).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 * 2,
             "The test expects that Feed ID 0 has twice longer report interval compared to Feed ID 1"
         );
 
@@ -301,14 +319,14 @@ mod tests {
             .get(1)
             .expect("ID not present in registry")
             .read()
-            .unwrap()
+            .await
             .get_report_interval_ms() as u128
             + 1u128;
         assert!(
             fmdr.get(0)
                 .expect("ID not present in registry")
                 .read()
-                .unwrap()
+                .await
                 .get_slot(current_time_as_ms)
                 == 0
         );
@@ -316,7 +334,7 @@ mod tests {
             fmdr.get(1)
                 .expect("ID not present in registry")
                 .read()
-                .unwrap()
+                .await
                 .get_slot(current_time_as_ms)
                 == 1
         );
@@ -324,7 +342,7 @@ mod tests {
             .get(1)
             .expect("ID not present in registry")
             .read()
-            .unwrap()
+            .await
             .get_report_interval_ms() as u128
             + 1u128;
 
@@ -332,7 +350,7 @@ mod tests {
             fmdr.get(0)
                 .expect("ID not present in registry")
                 .read()
-                .unwrap()
+                .await
                 .get_slot(current_time_as_ms)
                 == 1
         );
@@ -340,14 +358,14 @@ mod tests {
             fmdr.get(1)
                 .expect("ID not present in registry")
                 .read()
-                .unwrap()
+                .await
                 .get_slot(current_time_as_ms)
                 == 2
         );
     }
 
-    #[test]
-    fn relevant_feed_check() {
+    #[tokio::test]
+    async fn relevant_feed_check() {
         const DATA_FEED_ID: u32 = 1;
 
         let fmdr = new_feeds_meta_data_reg_with_test_data();
@@ -361,25 +379,25 @@ mod tests {
         println!("fmdr.get_keys()={:?}", fmdr);
         assert!(
             feed.read()
-                .unwrap()
+                .await
                 .check_report_relevance(current_time_as_ms, msg_timestamp)
                 == ReportRelevance::Relevant
         );
 
-        current_time_as_ms += feed.read().unwrap().report_interval_ms as u128 + 1; // Advance time, the report will become obsolete
+        current_time_as_ms += feed.read().await.report_interval_ms as u128 + 1; // Advance time, the report will become obsolete
 
         assert!(
             feed.read()
-                .unwrap()
+                .await
                 .check_report_relevance(current_time_as_ms, msg_timestamp)
                 == ReportRelevance::NonRelevantOld
         );
 
-        msg_timestamp += feed.read().unwrap().report_interval_ms as u128 + 1; // Advance report time to make it relevant
+        msg_timestamp += feed.read().await.report_interval_ms as u128 + 1; // Advance report time to make it relevant
 
         assert!(
             feed.read()
-                .unwrap()
+                .await
                 .check_report_relevance(current_time_as_ms, msg_timestamp)
                 == ReportRelevance::Relevant
         );
@@ -551,8 +569,8 @@ mod tests {
         assert_eq!(super::get_feed_id("NonExistentName"), None);
     }
 
-    #[test]
-    fn chech_relevant_and_insert_mt() {
+    #[tokio::test]
+    async fn check_relevant_and_insert_mt() {
         const NTHREADS: u32 = 10;
         const DATA_FEED_ID: u32 = 1;
 
@@ -567,10 +585,10 @@ mod tests {
 
             let msg_timestamp = current_unix_time();
 
-            children.push(thread::spawn(move || {
+            children.push(tokio::spawn(async move {
                 let feed = fmdr
                     .read()
-                    .unwrap()
+                    .await
                     .get(0)
                     .expect("ID not present in registry");
 
@@ -578,33 +596,34 @@ mod tests {
 
                 assert!(
                     feed.read()
-                        .unwrap()
+                        .await
                         .check_report_relevance(current_time_as_ms, msg_timestamp)
                         == ReportRelevance::Relevant
                 );
 
-                reports.write().unwrap().push(
-                    DATA_FEED_ID,
-                    i.into(),
-                    FeedResult::Result {
-                        result: FeedType::Numerical(0.1),
-                    },
-                );
+                reports
+                    .write()
+                    .await
+                    .push(
+                        DATA_FEED_ID,
+                        i.into(),
+                        FeedResult::Result {
+                            result: FeedType::Numerical(0.1),
+                        },
+                    )
+                    .await;
 
                 println!("this is thread number {}", i);
             }));
         }
 
-        for child in children {
-            // Wait for the thread to finish. Returns a result.
-            let _ = child.join();
-        }
+        let _ = futures::future::join_all(children).await;
 
-        let reports = reports.write().unwrap();
+        let reports = reports.write().await;
         let reports = reports
             .get(DATA_FEED_ID)
             .expect("ID not present in registry");
-        let reports = reports.read().unwrap();
+        let reports = reports.read().await;
         // Process the reports:
         let mut values: Vec<&FeedResult> = vec![];
         for kv in &reports.report {
@@ -670,7 +689,7 @@ mod tests {
         let duration_ms =
             time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Oneshot);
         // assert
-        assert!(duration_ms >= 8000 && duration_ms <= 10000);
+        assert!((8000..=10000).contains(&duration_ms));
 
         tokio::time::sleep(Duration::from_millis(7000)).await;
 
@@ -678,7 +697,7 @@ mod tests {
         let duration_ms =
             time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Oneshot);
         // assert
-        assert!(duration_ms >= 1000 && duration_ms <= 3000);
+        assert!((1000..=3000).contains(&duration_ms));
 
         tokio::time::sleep(Duration::from_millis(3000)).await;
 

@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
 use ringbuf::{HeapRb, SharedRb};
@@ -16,14 +15,13 @@ use feed_registry::{
     types::{FeedError, FeedResult, FeedType, Timestamp},
 };
 
-#[async_trait(?Send)]
 impl DataFeed for YahooFinanceDataFeed {
     fn score_by(&self) -> ConsensusMetric {
         ConsensusMetric::Mean(AverageAggregator {})
     }
 
-    async fn poll(&mut self, ticker: &str) -> (FeedResult, Timestamp) {
-        let response = self.api_connector.get_latest_quotes(ticker, "1d").await;
+    fn poll(&mut self, ticker: &str) -> (FeedResult, Timestamp) {
+        let response = self.api_connector.get_latest_quotes(ticker, "1d");
 
         trace!("response = {:?}", response);
 
@@ -41,9 +39,9 @@ impl DataFeed for YahooFinanceDataFeed {
                         warn!("YahooFinance API failed: {}", e);
                         (
                             FeedResult::Error {
-                                error: FeedError::from(FeedError::APIError(
+                                error: FeedError::APIError(
                                     "CoinMarketCap poll failed!".to_string(),
-                                )),
+                                ),
                             },
                             current_unix_time(),
                         )
@@ -75,6 +73,12 @@ pub struct YahooFinanceDataFeed {
     api_connector: YahooConnector,
     is_connected: bool,
     history_buffer: HeapRb<(FeedType, Timestamp)>,
+}
+
+impl Default for YahooFinanceDataFeed {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl YahooFinanceDataFeed {

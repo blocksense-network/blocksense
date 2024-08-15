@@ -2,7 +2,7 @@ use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
 use crate::feeds::feeds_state::FeedsState;
 use crate::feeds::votes_result_batcher::votes_result_batcher_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
-use crate::metrics_collector::metrics_collector::metrics_collector_loop;
+use crate::metrics_collector::metrics_collector_loop;
 use actix_web::web::Data;
 use futures_util::stream::FuturesUnordered;
 use sequencer_config::SequencerConfig;
@@ -12,6 +12,10 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
 
+type BatchedVotesChannel = (
+    UnboundedSender<HashMap<String, String>>,
+    UnboundedReceiver<HashMap<String, String>>,
+);
 /// Given an app state and a sequencer configuration in launches the following app workers:
 /// - Feeds slots manager loop
 /// - Votes result batcher loop
@@ -22,10 +26,7 @@ pub async fn prepare_app_workers(
     sequencer_config: &SequencerConfig,
     voting_receive_channel: UnboundedReceiver<(String, String)>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
-    let (batched_votes_send, batched_votes_recv): (
-        UnboundedSender<HashMap<String, String>>,
-        UnboundedReceiver<HashMap<String, String>>,
-    ) = mpsc::unbounded_channel();
+    let (batched_votes_send, batched_votes_recv): BatchedVotesChannel = mpsc::unbounded_channel();
 
     let feeds_slots_manager_loop_fut =
         feeds_slots_manager_loop(app_state.clone(), app_state.voting_send_channel.clone()).await;

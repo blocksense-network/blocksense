@@ -25,9 +25,7 @@ async fn get_key_from_contract(
     network: &String,
     key: &String,
 ) -> Result<String> {
-    let providers = providers
-        .read()
-        .expect("Could not lock all providers' lock");
+    let providers = providers.read().await;
 
     let provider = providers.get(network);
 
@@ -73,7 +71,7 @@ async fn get_key_from_contract(
         }
     };
     info!("Call result: {:?}", return_val);
-    Ok(return_val.to_string())
+    Ok(return_val.parse_to_string())
 }
 
 #[get("/deploy/{network}/{feed_type}")]
@@ -171,10 +169,8 @@ pub async fn get_feed_report_interval(
     };
 
     let feed = {
-        let reg = app_state
-            .registry
-            .read()
-            .expect("Error trying to lock Registry for read!");
+        let reg = app_state.registry.read().await;
+
         debug!("getting feed_id = {}", &feed_id);
         match reg.get(feed_id) {
             Some(x) => x,
@@ -187,12 +183,7 @@ pub async fn get_feed_report_interval(
 
     return Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
-        .body(format!(
-            "{}",
-            feed.read()
-                .expect("Error trying to lock Feed for read!")
-                .get_report_interval_ms()
-        )));
+        .body(format!("{}", feed.read().await.get_report_interval_ms())));
 }
 
 #[get("/metrics")]
@@ -212,7 +203,7 @@ async fn metrics() -> Result<HttpResponse, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::config::init_sequencer_config;
+    use crate::config::init_sequencer_config;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
     use actix_web::{test, App};
@@ -224,9 +215,9 @@ mod tests {
     use sequencer_config::get_test_config_with_single_provider;
     use std::env;
     use std::path::PathBuf;
-    use std::sync::{Arc, RwLock};
-    use tokio::sync::mpsc;
+    use std::sync::Arc;
     use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+    use tokio::sync::{mpsc, RwLock};
     use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]

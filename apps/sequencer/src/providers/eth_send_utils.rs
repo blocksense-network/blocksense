@@ -51,9 +51,7 @@ pub async fn deploy_contract(
     providers: &SharedRpcProviders,
     feed_type: Repeatability,
 ) -> Result<String> {
-    let providers = providers
-        .read()
-        .expect("Could not lock all providers' lock");
+    let providers = providers.read().await;
 
     let provider = providers.get(network);
     let Some(p) = provider.cloned() else {
@@ -93,10 +91,7 @@ pub async fn deploy_contract(
         p.event_contract_address = Some(contract_address);
     }
 
-    return Ok(format!(
-        "CONTRACT_ADDRESS set to {}",
-        contract_address.to_string()
-    ));
+    Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
 }
 
 pub async fn eth_batch_send_to_contract<
@@ -113,11 +108,11 @@ pub async fn eth_batch_send_to_contract<
     let contract_address = if feed_type == Periodic {
         provider
             .contract_address
-            .expect(format!("Contract address not set for network {}.", net).as_str())
+            .unwrap_or_else(|| panic!("Contract address not set for network {}.", net))
     } else {
         provider
             .event_contract_address
-            .expect(format!("Event contract address not set for network {}.", net).as_str())
+            .unwrap_or_else(|| panic!("Event contract address not set for network {}.", net))
     };
 
     info!(
@@ -154,7 +149,7 @@ pub async fn eth_batch_send_to_contract<
     debug!("Observed gas price (base_fee) = {}", base_fee);
     provider_metrics
         .read()
-        .unwrap()
+        .await
         .gas_price
         .with_label_values(&[net.as_str()])
         .observe((base_fee as f64) / 1000000000.0);
@@ -216,7 +211,7 @@ pub async fn eth_batch_send_to_contract<
 
     provider_metrics
         .read()
-        .unwrap()
+        .await
         .transaction_confirmation_times
         .with_label_values(&[net.as_str()])
         .observe(transaction_time as f64);
@@ -235,9 +230,7 @@ pub async fn eth_batch_send_to_all_contracts<
     let _guard = span.enter();
     debug!("updates: {:?}", updates);
 
-    let providers = providers
-        .read()
-        .expect("Error locking all providers mutex.");
+    let providers = providers.read().await;
 
     let collected_futures = FuturesUnordered::new();
 
@@ -270,11 +263,7 @@ pub async fn eth_batch_send_to_all_contracts<
                     all_results += &format!("success from {} -> {:?}", net, x);
                 }
                 (Err(e), net, provider) => {
-                    let err = format!(
-                        "Timed out transaction for network {} -> {}",
-                        net,
-                        e.to_string()
-                    );
+                    let err = format!("Timed out transaction for network {} -> {}", net, e);
                     error!(err);
                     all_results += &err;
                     let provider = provider.lock().await;
@@ -349,7 +338,7 @@ mod tests {
             );
             // Assert we can read bytecode from that address
             let extracted_address = Address::from_str(&extracted_address.unwrap()).ok().unwrap();
-            let provider = providers.read().unwrap().get(network).unwrap().clone();
+            let provider = providers.read().await.get(network).unwrap().clone();
             let can_get_bytecode = can_read_contract_bytecode(provider, &extracted_address).await;
             assert!(can_get_bytecode);
         } else {
@@ -397,9 +386,7 @@ mod tests {
 
         let net = "ETH333".to_string();
 
-        let providers = providers
-            .read()
-            .expect("Could not lock all providers' lock");
+        let providers = providers.read().await;
 
         let provider = providers.get("ETH333").unwrap();
 

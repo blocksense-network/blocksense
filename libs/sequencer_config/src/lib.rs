@@ -85,9 +85,9 @@ pub fn get_test_config_with_single_provider(
     url: &str,
 ) -> SequencerConfig {
     let mut file = File::create(private_key_path)
-        .expect(format!("Could not create file {}", private_key_path).as_str());
+        .unwrap_or_else(|_| panic!("Could not create file {}", private_key_path));
     file.write_all(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-        .expect(format!("Could not write to file {}", private_key_path).as_str());
+        .unwrap_or_else(|_| panic!("Could not write to file {}", private_key_path));
 
     SequencerConfig {
         main_port: 8877,
@@ -116,9 +116,9 @@ pub fn get_test_config_with_multiple_providers(
 
     for (network, private_key_path, url) in provider_details {
         let mut file = File::create(private_key_path)
-            .expect(format!("Could not create file {}", private_key_path).as_str());
+            .unwrap_or_else(|_| panic!("Could not create file {}", private_key_path));
         file.write_all(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-            .expect(format!("Could not write to file {}", private_key_path).as_str());
+            .unwrap_or_else(|_| panic!("Could not write to file {}", private_key_path));
 
         providers.insert(
             network.to_string(),

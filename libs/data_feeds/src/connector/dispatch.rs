@@ -1,6 +1,6 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
-use feed_registry::{api::DataFeedAPI, registry::AllFeedsConfig};
+use feed_registry::api::DataFeedAPI;
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
 use sequencer_config::{FeedConfig, ReporterConfig};
@@ -74,7 +74,7 @@ fn feed_builder(
     }
 }
 
-pub async fn dispatch(
+pub fn dispatch(
     reporter_config: &ReporterConfig,
     feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>,
@@ -108,8 +108,7 @@ pub async fn dispatch(
             feed.id,
             &feed.name,
             &reporter_config.sequencer_url,
-        )
-        .await;
+        );
 
         let elapsed_time = start_time.elapsed().as_millis();
         DATA_FEED_PARSE_TIME_GAUGE

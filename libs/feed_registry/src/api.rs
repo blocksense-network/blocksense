@@ -7,7 +7,7 @@ pub enum DataFeedAPI {
 }
 
 impl DataFeedAPI {
-    pub fn as_str(&self) -> &'static str {
+    pub fn get_as_str(&self) -> &'static str {
         match *self {
             DataFeedAPI::EmptyAPI => "None",
             DataFeedAPI::YahooFinanceDataFeed => "YahooFinance",
@@ -15,7 +15,7 @@ impl DataFeedAPI {
         }
     }
 
-    pub fn from_str(string: &str) -> Self {
+    pub fn get_from_str(string: &str) -> Self {
         match string {
             "YahooFinance" => DataFeedAPI::YahooFinanceDataFeed,
             "CoinMarketCap" => DataFeedAPI::CoinMarketCapDataFeed,

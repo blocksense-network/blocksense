@@ -192,7 +192,7 @@ impl FeedType {
         }
     }
 
-    pub fn to_string(&self) -> String {
+    pub fn parse_to_string(&self) -> String {
         match self {
             FeedType::Numerical(val) => format!("{}", val),
             FeedType::Text(s) => s.clone(),

@@ -17,7 +17,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::sync::Arc;
 use tokio::spawn;
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 use tokio::time::Duration;
 use tracing::{debug, error, info, warn};
 
@@ -42,11 +42,11 @@ pub struct RpcProvider {
     pub wallet: LocalWallet,
     pub contract_address: Option<Address>,
     pub event_contract_address: Option<Address>,
-    pub provider_metrics: Arc<std::sync::RwLock<ProviderMetrics>>,
+    pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
     pub transcation_timeout_secs: u32,
 }
 
-pub type SharedRpcProviders = Arc<std::sync::RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
+pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
 pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
     let latest_block = match provider.lock().await.provider.get_block_number().await {
@@ -77,9 +77,7 @@ pub async fn init_shared_rpc_providers(
     prefix: Option<&str>,
 ) -> SharedRpcProviders {
     let prefix = prefix.unwrap_or("");
-    Arc::new(std::sync::RwLock::new(
-        get_rpc_providers(conf, prefix).await,
-    ))
+    Arc::new(RwLock::new(get_rpc_providers(conf, prefix).await))
 }
 
 async fn verify_contract_exists(
@@ -94,12 +92,11 @@ async fn verify_contract_exists(
                 key, addr
             );
             match spawn(async move {
-                let result = actix_web::rt::time::timeout(
+                actix_web::rt::time::timeout(
                     Duration::from_secs(5),
                     can_read_contract_bytecode(rpc_provider, &addr),
                 )
-                .await;
-                result
+                .await
             })
             .await
             {
@@ -139,7 +136,7 @@ async fn get_rpc_providers(
 ) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
 
-    let provider_metrics = Arc::new(std::sync::RwLock::new(
+    let provider_metrics = Arc::new(RwLock::new(
         ProviderMetrics::new(prefix).expect("Failed to allocate ProviderMetrics"),
     ));
 
@@ -147,19 +144,18 @@ async fn get_rpc_providers(
         let rpc_url: Url = p
             .url
             .parse()
-            .expect(format!("Not a valid url provided for {key}!").as_str());
+            .unwrap_or_else(|_| panic!("Not a valid url provided for {key}!"));
         let priv_key_path = &p.private_key_path;
-        let priv_key = fs::read_to_string(priv_key_path.clone()).expect(
-            format!(
+        let priv_key = fs::read_to_string(priv_key_path.clone()).unwrap_or_else(|_| {
+            panic!(
                 "Failed to read private key for {} from {}",
                 key, priv_key_path
             )
-            .as_str(),
-        );
+        });
         let wallet: LocalWallet = priv_key
             .trim()
             .parse()
-            .expect(format!("Incorrect private key specified {}.", priv_key).as_str());
+            .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()
             .signer(EthereumSigner::from(wallet.clone()))
@@ -236,10 +232,10 @@ mod tests {
 
         let tx = TransactionRequest::default()
             .with_from(alice)
-            .with_to(bob.into())
+            .with_to(bob)
             .with_value(U256::from(100))
             // Notice that without the `GasEstimatorLayer`, you need to set the gas related fields.
-            .with_gas_limit(21000 as u128)
+            .with_gas_limit(21000_u128)
             .with_max_fee_per_gas(20e9 as u128)
             .with_max_priority_fee_per_gas(1e9 as u128)
             // It is required to set the chain_id for EIP-1559 transactions.
@@ -297,7 +293,7 @@ mod tests {
             Some("test_get_rpc_providers_returns_single_provider_"),
         )
         .await;
-        let result = binding.read().unwrap();
+        let result = binding.read().await;
 
         // assert
         assert_eq!(result.len(), 1);
