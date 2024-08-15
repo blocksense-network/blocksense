@@ -100,7 +100,7 @@ describe('Data feed store contract', () => {
     ).rejects.toThrow('You are not the owner!');
   }, 300_000);
 
-  it.only('Should get and set 1 feeds in a single transaction', async () => {
+  it.only('Should get and set 10 feeds in a single transaction', async () => {
     const data = Array.from(
       { length: 32 },
       () => new Fr(Math.floor(Math.random() * 256)),
@@ -110,7 +110,7 @@ describe('Data feed store contract', () => {
       .send()
       .deployed();
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 10; i++) {
       const index_i = new Fr(i);
       await contract.methods.setFeed(data, index_i).send().wait();
       const get_feed_tx = await contract.methods.getFeed(index_i).simulate();
