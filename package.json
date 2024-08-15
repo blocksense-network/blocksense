@@ -3,7 +3,8 @@
   "packageManager": "yarn@4.3.1",
   "workspaces": [
     "apps/*",
-    "libs/ts/*"
+    "libs/ts/*",
+    "libs/aztec_contracts/"
   ],
   "scripts": {
     "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -e .pre-commit-config.yaml -- $(git rev-parse --show-toplevel)",
