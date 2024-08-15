@@ -256,6 +256,11 @@ main {
     @apply border-slate-200 max-w-96 mt-10;
   }
 
+  .tabs {
+    border: 1px solid;
+    @apply border-slate-200 shadow-md;
+  }
+
   .cn-table {
     @apply bg-white;
     border: 1px solid;
