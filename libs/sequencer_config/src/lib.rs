@@ -14,6 +14,8 @@ pub struct AssetPair {
 pub struct FeedConfig {
     pub id: u32,
     pub name: String,
+    pub description: String,
+    pub decimals: u8,
     pub script: String,
     pub pair: AssetPair,
     pub report_interval_ms: u64,
