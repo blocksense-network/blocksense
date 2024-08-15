@@ -11,6 +11,12 @@ pub struct AssetPair {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ChainlinkCompatibility {
+    pub base: String,
+    pub quote: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FeedConfig {
     pub id: u32,
     pub name: String,
@@ -20,6 +26,7 @@ pub struct FeedConfig {
     pub pair: AssetPair,
     pub report_interval_ms: u64,
     pub first_report_start_time: SystemTime,
+    pub chainlink_compatiblity: Option<ChainlinkCompatibility>,
 }
 
 #[derive(Debug, Deserialize)]
