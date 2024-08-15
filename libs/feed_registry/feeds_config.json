@@ -1,16 +1,3756 @@
-{"feeds": [
-    {"id": 0, "name": "DOGE", "description": "DOGE / USD", "decimals": 18, "script": "CoinMarketCap", "pair": {"base":"DOGE", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 1, "name": "BTC", "description": "BTC / USD", "decimals": 18, "script": "CoinMarketCap", "pair": {"base":"BTC", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}, "chainlink_compatiblity": {"base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB", "quote": "0x0000000000000000000000000000000000000348"}},
-    {"id": 2, "name": "ETH", "description": "ETH / USD", "decimals": 18, "script": "CoinMarketCap", "pair": {"base":"ETH", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}, "chainlink_compatiblity": {"base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", "quote": "0x0000000000000000000000000000000000000348"}},
-    {"id": 3, "name": "SHIB", "description": "SHIB / USD", "decimals": 18, "script": "CoinMarketCap", "pair": {"base":"SHIB", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 4, "name": "SOL", "description": "SOL / USD", "decimals": 18, "script": "CoinMarketCap", "pair": {"base":"SOL", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 5, "name": "DOT", "description": "DOT / USD", "decimals": 18, "script": "CoinMarketCap", "pair": {"base":"DOT", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 6, "name": "XRP", "description": "XRP / USD", "decimals": 18, "script": "CoinMarketCap", "pair": {"base":"XRP", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 7, "name": "AAPL", "description": "AAPL / USD", "decimals": 18, "script": "YahooFinance", "pair": {"base":"AAPL", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 8, "name": "GOOGL", "description": "GOOGL / USD", "decimals": 18, "script": "YahooFinance", "pair": {"base":"GOOGL", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 9, "name": "TSLA", "description": "TSLA / USD", "decimals": 18, "script": "YahooFinance", "pair": {"base":"TSLA", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 10, "name": "IBKR", "description": "IBKR / USD", "decimals": 18, "script": "YahooFinance", "pair": {"base":"IBKR", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 11, "name": "NVDA", "description": "NVDA / USD", "decimals": 18, "script": "YahooFinance", "pair": {"base":"NVDA", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 12, "name": "TLRY", "description": "TLRY / USD", "decimals": 18, "script": "YahooFinance", "pair": {"base":"TLRY", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 13, "name": "AMD", "description": "AMD / USD", "decimals": 18, "script": "YahooFinance", "pair": {"base":"AMD", "quote": "USD"},"report_interval_ms": 60000, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
-  ]}
+{
+  "feeds": [
+    {
+      "id": 0,
+      "name": "DOGE",
+      "description": "DOGE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DOGE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 1,
+      "name": "BTC",
+      "description": "BTC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BTC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 2,
+      "name": "ETH",
+      "description": "ETH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ETH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 3,
+      "name": "SHIB",
+      "description": "SHIB / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SHIB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 4,
+      "name": "SOL",
+      "description": "SOL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SOL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 5,
+      "name": "DOT",
+      "description": "DOT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DOT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 6,
+      "name": "XRP",
+      "description": "XRP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "XRP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 7,
+      "name": "AAPL",
+      "description": "AAPL / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "AAPL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 8,
+      "name": "GOOGL",
+      "description": "GOOGL / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "GOOGL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 9,
+      "name": "TSLA",
+      "description": "TSLA / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "TSLA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 10,
+      "name": "IBKR",
+      "description": "IBKR / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "IBKR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 11,
+      "name": "NVDA",
+      "description": "NVDA / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "NVDA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 12,
+      "name": "TLRY",
+      "description": "TLRY / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "TLRY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 13,
+      "name": "AMD",
+      "description": "AMD / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "AMD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 14,
+      "name": "BAT",
+      "description": "BAT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BAT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 15,
+      "name": "MANA",
+      "description": "MANA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MANA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 16,
+      "name": "USDC",
+      "description": "USDC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "USDC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 17,
+      "name": "APE",
+      "description": "APE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "APE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 18,
+      "name": "AXS",
+      "description": "AXS / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "AXS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 19,
+      "name": "MKR",
+      "description": "MKR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MKR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 20,
+      "name": "MATIC",
+      "description": "MATIC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MATIC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 21,
+      "name": "SNX",
+      "description": "SNX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SNX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 22,
+      "name": "USDT",
+      "description": "USDT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "USDT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 23,
+      "name": "NEAR",
+      "description": "NEAR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "NEAR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 24,
+      "name": "COMP",
+      "description": "COMP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "COMP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 25,
+      "name": "ZRX",
+      "description": "ZRX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ZRX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 26,
+      "name": "CHZ",
+      "description": "CHZ / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CHZ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 27,
+      "name": "BEAM",
+      "description": "BEAM / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BEAM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 28,
+      "name": "SGD",
+      "description": "SGD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SGD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 29,
+      "name": "SPELL",
+      "description": "SPELL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SPELL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 30,
+      "name": "CAKE",
+      "description": "CAKE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CAKE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 31,
+      "name": "JOE",
+      "description": "JOE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "JOE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 32,
+      "name": "XAVA",
+      "description": "XAVA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "XAVA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 33,
+      "name": "YFI",
+      "description": "YFI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "YFI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 34,
+      "name": "LINK",
+      "description": "LINK / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "LINK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 35,
+      "name": "TUSD",
+      "description": "TUSD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "TUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 36,
+      "name": "ARKB",
+      "description": "ARKB / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "ARKB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 37,
+      "name": "CHFUSD=X",
+      "description": "CHF / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "CHF",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x00000000000000000000000000000000000002F4",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 38,
+      "name": "GMX",
+      "description": "GMX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "GMX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 39,
+      "name": "CVX",
+      "description": "CVX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CVX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 40,
+      "name": "QI",
+      "description": "QI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "QI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 41,
+      "name": "KNC",
+      "description": "KNC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "KNC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 42,
+      "name": "MIMATIC",
+      "description": "MIMATIC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MIMATIC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 43,
+      "name": "FRAX",
+      "description": "FRAX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FRAX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 44,
+      "name": "COQ",
+      "description": "COQ / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "COQ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 45,
+      "name": "XAG",
+      "description": "XAG / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "XAG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 46,
+      "name": "XAU",
+      "description": "XAU / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "XAU",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 47,
+      "name": "JPY",
+      "description": "JPY / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "JPY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x0000000000000000000000000000000000000188",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 48,
+      "name": "FIL",
+      "description": "FIL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FIL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 49,
+      "name": "AVAX",
+      "description": "AVAX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "AVAX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 50,
+      "name": "EUR",
+      "description": "EUR / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "EUR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x00000000000000000000000000000000000003d2",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 51,
+      "name": "ALPHA",
+      "description": "ALPHA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ALPHA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 52,
+      "name": "MIM",
+      "description": "MIM / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MIM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 53,
+      "name": "UNI",
+      "description": "UNI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "UNI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 54,
+      "name": "FTM",
+      "description": "FTM / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FTM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 55,
+      "name": "DAI",
+      "description": "DAI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DAI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 56,
+      "name": "TRY",
+      "description": "TRY / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "TRY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 57,
+      "name": "CRV",
+      "description": "CRV / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CRV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 58,
+      "name": "SAND",
+      "description": "SAND / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SAND",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 59,
+      "name": "WBTC",
+      "description": "WBTC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "WBTC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 60,
+      "name": "SUSHI",
+      "description": "SUSHI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SUSHI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 61,
+      "name": "CUSD",
+      "description": "CUSD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 62,
+      "name": "CELO",
+      "description": "CELO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CELO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 63,
+      "name": "COP",
+      "description": "COP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "COP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 64,
+      "name": "INR",
+      "description": "INR / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "INR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x0000000000000000000000000000000000000164",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 65,
+      "name": "PHP",
+      "description": "PHP / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "PHP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x0000000000000000000000000000000000000260",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 66,
+      "name": "METIS",
+      "description": "METIS / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "METIS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 67,
+      "name": "SPY",
+      "description": "SPY / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "SPY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 68,
+      "name": "OP",
+      "description": "OP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "OP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 69,
+      "name": "CNY",
+      "description": "CNY / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "CNY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x000000000000000000000000000000000000009c",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 70,
+      "name": "LUSD",
+      "description": "LUSD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "LUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 71,
+      "name": "KRW",
+      "description": "KRW / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "KRW",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x000000000000000000000000000000000000019a",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 72,
+      "name": "DPX",
+      "description": "DPX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DPX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 73,
+      "name": "EURC",
+      "description": "EURC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "EURC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 74,
+      "name": "PAXG",
+      "description": "PAXG / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "PAXG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 75,
+      "name": "LTC",
+      "description": "LTC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "LTC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 76,
+      "name": "USD+",
+      "description": "USD+ / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "USD+",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 77,
+      "name": "sUSDe",
+      "description": "sUSDe / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "sUSDe",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 78,
+      "name": "ARB",
+      "description": "ARB / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ARB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 79,
+      "name": "BNB",
+      "description": "BNB / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BNB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 80,
+      "name": "BONK",
+      "description": "BONK / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BONK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 81,
+      "name": "ATOM",
+      "description": "ATOM / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ATOM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 82,
+      "name": "ADA",
+      "description": "ADA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ADA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 83,
+      "name": "GALA",
+      "description": "GALA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "GALA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 84,
+      "name": "BCH",
+      "description": "BCH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BCH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 85,
+      "name": "FLOW",
+      "description": "FLOW / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FLOW",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 86,
+      "name": "ILV",
+      "description": "ILV / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ILV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 87,
+      "name": "KAVA",
+      "description": "KAVA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "KAVA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 88,
+      "name": "ICP",
+      "description": "ICP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ICP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 89,
+      "name": "ALGO",
+      "description": "ALGO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ALGO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 90,
+      "name": "MAGIC",
+      "description": "MAGIC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MAGIC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 91,
+      "name": "ZK",
+      "description": "ZK / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ZK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 92,
+      "name": "JTO",
+      "description": "JTO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "JTO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 93,
+      "name": "GRT",
+      "description": "GRT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "GRT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 94,
+      "name": "DASH",
+      "description": "DASH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DASH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 95,
+      "name": "EOS",
+      "description": "EOS / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "EOS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 96,
+      "name": "LDO",
+      "description": "LDO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "LDO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 97,
+      "name": "EGLD",
+      "description": "EGLD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "EGLD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 98,
+      "name": "ZRO",
+      "description": "ZRO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ZRO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 99,
+      "name": "FLOKI",
+      "description": "FLOKI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FLOKI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 100,
+      "name": "GHO",
+      "description": "GHO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "GHO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 101,
+      "name": "AUD",
+      "description": "AUD / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "AUD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x0000000000000000000000000000000000000024",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 102,
+      "name": "RPL",
+      "description": "RPL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "RPL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 103,
+      "name": "WTI",
+      "description": "WTI / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "WTI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 104,
+      "name": "STG",
+      "description": "STG / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "STG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 105,
+      "name": "PENDLE",
+      "description": "PENDLE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "PENDLE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 106,
+      "name": "GNS",
+      "description": "GNS / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "GNS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 107,
+      "name": "CAD",
+      "description": "CAD / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "CAD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x000000000000000000000000000000000000007c",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 108,
+      "name": "BAL",
+      "description": "BAL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BAL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 109,
+      "name": "PEPE",
+      "description": "PEPE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "PEPE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 110,
+      "name": "WIF",
+      "description": "WIF / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "WIF",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 111,
+      "name": "ORDI",
+      "description": "ORDI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ORDI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 112,
+      "name": "MEME",
+      "description": "MEME / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MEME",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 113,
+      "name": "ZRO",
+      "description": "ZRO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ZRO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 114,
+      "name": "AMZN",
+      "description": "AMZN / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "AMZN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 115,
+      "name": "RSR",
+      "description": "RSR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "RSR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 116,
+      "name": "MSFT",
+      "description": "MSFT / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "MSFT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 117,
+      "name": "BRL",
+      "description": "BRL / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "BRL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x00000000000000000000000000000000000003Da",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 118,
+      "name": "COIN",
+      "description": "COIN / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "COIN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 119,
+      "name": "AXL",
+      "description": "AXL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "AXL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 120,
+      "name": "IOTX",
+      "description": "IOTX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "IOTX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 121,
+      "name": "MVI",
+      "description": "MVI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MVI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 122,
+      "name": "GBP",
+      "description": "GBP / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "GBP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x000000000000000000000000000000000000033a",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 123,
+      "name": "TIA",
+      "description": "TIA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "TIA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 124,
+      "name": "XVS",
+      "description": "XVS / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "XVS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 125,
+      "name": "RDNT",
+      "description": "RDNT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "RDNT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 126,
+      "name": "ZAR",
+      "description": "ZAR / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "ZAR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "chainlink_compatiblity": {
+        "base": "0x00000000000000000000000000000000000002c6",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    },
+    {
+      "id": 127,
+      "name": "TAO",
+      "description": "TAO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "TAO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 128,
+      "name": "META",
+      "description": "META / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "META",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 129,
+      "name": "MNT",
+      "description": "MNT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MNT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 130,
+      "name": "STETH",
+      "description": "STETH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "STETH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 131,
+      "name": "LDO",
+      "description": "LDO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "LDO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 132,
+      "name": "TBTC",
+      "description": "TBTC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "TBTC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 133,
+      "name": "XAI",
+      "description": "XAI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "XAI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 134,
+      "name": "1INCH",
+      "description": "1INCH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "1INCH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 135,
+      "name": "CBETH",
+      "description": "CBETH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CBETH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 136,
+      "name": "DODO",
+      "description": "DODO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DODO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 137,
+      "name": "SEK",
+      "description": "SEK / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "SEK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 138,
+      "name": "USDD",
+      "description": "USDD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "USDD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 139,
+      "name": "DPI",
+      "description": "DPI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DPI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 140,
+      "name": "RSETH",
+      "description": "RSETH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "RSETH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 141,
+      "name": "WEMIX",
+      "description": "WEMIX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "WEMIX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 142,
+      "name": "FXS",
+      "description": "FXS / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FXS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 143,
+      "name": "USDV",
+      "description": "USDV / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "USDV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 144,
+      "name": "ezETH",
+      "description": "ezETH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ezETH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 145,
+      "name": "OGN",
+      "description": "OGN / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "OGN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 146,
+      "name": "MEW",
+      "description": "MEW / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MEW",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 147,
+      "name": "MAVIA",
+      "description": "MAVIA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MAVIA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 148,
+      "name": "APT",
+      "description": "APT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "APT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 149,
+      "name": "AERO",
+      "description": "AERO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "AERO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 150,
+      "name": "DEGEN",
+      "description": "DEGEN / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DEGEN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 151,
+      "name": "MOG",
+      "description": "MOG / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MOG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 152,
+      "name": "UMA",
+      "description": "UMA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "UMA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 153,
+      "name": "SUSD",
+      "description": "SUSD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 154,
+      "name": "DYDX",
+      "description": "DYDX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DYDX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 155,
+      "name": "RUNE",
+      "description": "RUNE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "RUNE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 156,
+      "name": "TRX",
+      "description": "TRX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "TRX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 157,
+      "name": "VELO",
+      "description": "VELO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "VELO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 158,
+      "name": "ZIL",
+      "description": "ZIL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ZIL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 159,
+      "name": "ANKR",
+      "description": "ANKR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ANKR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 160,
+      "name": "XLM",
+      "description": "XLM / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "XLM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 161,
+      "name": "ETC",
+      "description": "ETC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ETC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 162,
+      "name": "JUP",
+      "description": "JUP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "JUP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 163,
+      "name": "IMX",
+      "description": "IMX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "IMX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 164,
+      "name": "ONE",
+      "description": "ONE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ONE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 165,
+      "name": "ENJ",
+      "description": "ENJ / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ENJ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 166,
+      "name": "XTZ",
+      "description": "XTZ / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "XTZ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 167,
+      "name": "INJ",
+      "description": "INJ / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "INJ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 168,
+      "name": "FET",
+      "description": "FET / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FET",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 169,
+      "name": "WLD",
+      "description": "WLD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "WLD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 170,
+      "name": "PERP",
+      "description": "PERP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "PERP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 171,
+      "name": "PYTH",
+      "description": "PYTH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "PYTH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 172,
+      "name": "MAV",
+      "description": "MAV / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MAV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 173,
+      "name": "SEI",
+      "description": "SEI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SEI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 174,
+      "name": "ZEC",
+      "description": "ZEC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ZEC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 175,
+      "name": "BLUR",
+      "description": "BLUR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BLUR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 176,
+      "name": "STRK",
+      "description": "STRK / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "STRK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 177,
+      "name": "TRB",
+      "description": "TRB / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "TRB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 178,
+      "name": "TON",
+      "description": "TON / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "TON",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 179,
+      "name": "ASTR",
+      "description": "ASTR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ASTR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 180,
+      "name": "THETA",
+      "description": "THETA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "THETA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 181,
+      "name": "QNT",
+      "description": "QNT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "QNT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 182,
+      "name": "OMG",
+      "description": "OMG / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "OMG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 183,
+      "name": "ONDO",
+      "description": "ONDO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ONDO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 184,
+      "name": "VET",
+      "description": "VET / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "VET",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 185,
+      "name": "ENA",
+      "description": "ENA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ENA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 186,
+      "name": "IB01",
+      "description": "IB01 / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "IB01",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 187,
+      "name": "CZK",
+      "description": "CZK / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CZK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 188,
+      "name": "SUSDE",
+      "description": "SUSDE / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SUSDE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 189,
+      "name": "CSPX",
+      "description": "CSPX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CSPX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 190,
+      "name": "IBTA",
+      "description": "IBTA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "IBTA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 191,
+      "name": "FORTH",
+      "description": "FORTH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FORTH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 192,
+      "name": "BOO",
+      "description": "BOO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BOO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 193,
+      "name": "ALPACA",
+      "description": "ALPACA / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ALPACA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 194,
+      "name": "MOVR",
+      "description": "MOVR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MOVR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 195,
+      "name": "RAI",
+      "description": "RAI / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "RAI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 196,
+      "name": "FDUSD",
+      "description": "FDUSD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FDUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 197,
+      "name": "PYUSD",
+      "description": "PYUSD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "PYUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 198,
+      "name": "XCN",
+      "description": "XCN / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "XCN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 199,
+      "name": "ALCX",
+      "description": "ALCX / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "ALCX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 200,
+      "name": "LRC",
+      "description": "LRC / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "LRC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 201,
+      "name": "AGEUR",
+      "description": "AGEUR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "AGEUR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 202,
+      "name": "HIGH",
+      "description": "HIGH / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "HIGH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 203,
+      "name": "UST",
+      "description": "UST / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "UST",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 204,
+      "name": "MLN",
+      "description": "MLN / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MLN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 205,
+      "name": "SHV",
+      "description": "SHV / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SHV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 206,
+      "name": "BADGER",
+      "description": "BADGER / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "BADGER",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 207,
+      "name": "OHMv2",
+      "description": "OHMv2 / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "OHMv2",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 208,
+      "name": "REN",
+      "description": "REN / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "REN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 209,
+      "name": "USDP",
+      "description": "USDP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "USDP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 210,
+      "name": "NZD",
+      "description": "NZD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "NZD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 211,
+      "name": "SXP",
+      "description": "SXP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SXP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 212,
+      "name": "AMPL",
+      "description": "AMPL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "AMPL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 213,
+      "name": "CRVUSD",
+      "description": "CRVUSD / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "CRVUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 214,
+      "name": "QUICK",
+      "description": "QUICK / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "QUICK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 215,
+      "name": "GHST",
+      "description": "GHST / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "GHST",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 216,
+      "name": "MXN",
+      "description": "MXN / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "MXN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 217,
+      "name": "ILS",
+      "description": "ILS / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "ILS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 218,
+      "name": "KLAY",
+      "description": "KLAY / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "KLAY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 219,
+      "name": "PLN",
+      "description": "PLN / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "PLN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 220,
+      "name": "THB",
+      "description": "THB / USD",
+      "decimals": 18,
+      "script": "YahooFinance",
+      "pair": {
+        "base": "THB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 221,
+      "name": "XPT",
+      "description": "XPT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "XPT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 222,
+      "name": "FTT",
+      "description": "FTT / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "FTT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 223,
+      "name": "SLP",
+      "description": "SLP / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SLP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 224,
+      "name": "STORJ",
+      "description": "STORJ / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "STORJ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 225,
+      "name": "HBAR",
+      "description": "HBAR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "HBAR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 226,
+      "name": "DGB",
+      "description": "DGB / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "DGB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 227,
+      "name": "GLMR",
+      "description": "GLMR / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "GLMR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 228,
+      "name": "SRM",
+      "description": "SRM / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "SRM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 229,
+      "name": "mSOL",
+      "description": "mSOL / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "mSOL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 230,
+      "name": "GNO",
+      "description": "GNO / USD",
+      "decimals": 18,
+      "script": "CoinMarketCap",
+      "pair": {
+        "base": "GNO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    }
+  ]
+}
