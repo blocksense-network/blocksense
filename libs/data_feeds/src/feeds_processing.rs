@@ -27,7 +27,7 @@ mod tests {
         let bytes = hex::decode(hex_string).unwrap();
         let reversed = FeedType::from_bytes(bytes, FeedType::Numerical(0.0)).unwrap();
 
-        assert_eq!(value.to_string(), reversed.to_string());
+        assert_eq!(value.to_string(), reversed.parse_to_string());
     }
 
     #[test]

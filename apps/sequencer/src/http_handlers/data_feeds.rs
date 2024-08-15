@@ -326,8 +326,7 @@ pub async fn register_feed(
 
     let reporters = app_state.reporters.clone();
 
-    let feed_slots_processor =
-        FeedSlotsProcessor::new(name, report_interval_ms as u64, voting_end_time_ms, feed_id);
+    let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
 
     actix_web::rt::spawn(async move {
         feed_slots_processor

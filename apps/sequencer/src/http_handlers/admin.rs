@@ -14,7 +14,6 @@ use eyre::eyre;
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
 use feed_registry::types::FeedType;
 use feed_registry::types::Repeatability;
-use prometheus::metrics::FeedsMetrics;
 use prometheus::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
 use tracing::info_span;
@@ -170,7 +169,6 @@ pub async fn get_feed_report_interval(
 
     let feed = {
         let reg = app_state.registry.read().await;
-
         debug!("getting feed_id = {}", &feed_id);
         match reg.get(feed_id) {
             Some(x) => x,
@@ -211,6 +209,7 @@ mod tests {
     use feed_registry::registry::{
         init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsReports,
     };
+    use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use sequencer_config::get_test_config_with_single_provider;
     use std::env;

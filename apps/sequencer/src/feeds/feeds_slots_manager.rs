@@ -45,13 +45,12 @@ pub async fn feeds_slots_manager_loop<
                 None => panic!("Error timer for feed that was not registered."),
             };
 
-            let name = feed.read().expect(lock_err_msg).get_name().clone();
+            let name = feed.read().await.get_name().clone();
             let feed_aggregate_history_cp = feed_aggregate_history.clone();
             let reporters_cp = app_state.reporters.clone();
             let feed_metrics_cp = app_state.feeds_metrics.clone();
 
-            let feed_slots_processor =
-                FeedSlotsProcessor::new(name, report_interval_ms, first_report_start_time, key);
+            let feed_slots_processor = FeedSlotsProcessor::new(name, key);
 
             collected_futures.push(spawn(async move {
                 feed_slots_processor

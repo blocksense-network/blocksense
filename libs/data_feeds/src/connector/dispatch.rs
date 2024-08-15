@@ -1,6 +1,6 @@
 use std::{cell::RefCell, collections::HashMap, rc::Rc, time::Instant};
 
-use feed_registry::api::DataFeedAPI;
+use feed_registry::{api::DataFeedAPI, registry::AllFeedsConfig};
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
 use sequencer_config::{FeedConfig, ReporterConfig};
@@ -14,7 +14,7 @@ use crate::{
 
 use super::post::post_feed_response;
 
-fn feed_selector(feeds: &Vec<FeedConfig>, batch_size: usize) -> Vec<FeedConfig> {
+fn feed_selector(feeds: &[FeedConfig], batch_size: usize) -> Vec<FeedConfig> {
     let mut rng = thread_rng();
 
     let selected_feeds_idx = (0..feeds.len()).choose_multiple(&mut rng, batch_size);
@@ -96,7 +96,7 @@ pub fn dispatch(
         let start_time = Instant::now();
 
         let data_feed = resolve_feed(
-            &DataFeedAPI::from_str(feed.script.as_str()),
+            &DataFeedAPI::get_from_str(feed.script.as_str()),
             &reporter_config.resources,
             connection_cache,
         );

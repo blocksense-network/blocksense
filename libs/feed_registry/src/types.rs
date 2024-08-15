@@ -209,7 +209,7 @@ impl FeedType {
                 let mut bytes_mut = bytes;
                 bytes_mut.truncate(24);
 
-                let mut result = vec![0 as u8; 8];
+                let mut result = vec![0_u8; 8];
                 result.append(&mut bytes_mut);
 
                 let combined = BigUint::from_bytes_be(&result);

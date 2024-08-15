@@ -11,16 +11,13 @@ use prometheus::{
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-use sequencer_config::{get_config_file_path, FeedConfig, ReporterConfig};
+use sequencer_config::{get_config_file_path, ReporterConfig};
 use utils::read_file;
 
 use tracing::{debug, info};
 
 use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed};
-use feed_registry::{
-    api::DataFeedAPI,
-    registry::{init_feeds_config, AllFeedsConfig},
-};
+use feed_registry::{api::DataFeedAPI, registry::init_feeds_config};
 
 pub fn init_reporter_config() -> ReporterConfig {
     let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "/reporter_config.json");
@@ -33,13 +30,6 @@ pub fn init_reporter_config() -> ReporterConfig {
         serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
 
     reporter_config
-}
-
-fn find_feed_meta_data_by_name<'a>(
-    feeds: &'a AllFeedsConfig,
-    feed_name: &String,
-) -> Option<&'a FeedConfig> {
-    feeds.feeds.iter().find(|&feed| feed.name == *feed_name)
 }
 
 pub async fn orchestrator() {

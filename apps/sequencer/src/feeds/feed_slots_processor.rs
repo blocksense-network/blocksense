@@ -7,7 +7,7 @@ use feed_registry::types::FeedResult;
 use feed_registry::types::FeedType;
 use feed_registry::types::{FeedMetaData, Repeatability};
 use prometheus::{inc_metric, metrics::FeedsMetrics};
-use ringbuf::traits::Consumer;
+use ringbuf::traits::consumer::Consumer;
 use std::fmt::Debug;
 use std::sync::Arc;
 use std::time::Duration;
@@ -24,24 +24,12 @@ const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
 pub struct FeedSlotsProcessor {
     name: String,
-    report_interval_ms: u64,
-    first_report_start_time: u128,
     key: u32,
 }
 
 impl FeedSlotsProcessor {
-    pub fn new(
-        name: String,
-        report_interval_ms: u64,
-        first_report_start_time: u128,
-        key: u32,
-    ) -> FeedSlotsProcessor {
-        FeedSlotsProcessor {
-            name,
-            report_interval_ms,
-            first_report_start_time,
-            key,
-        }
+    pub fn new(name: String, key: u32) -> FeedSlotsProcessor {
+        FeedSlotsProcessor { name, key }
     }
 
     pub async fn start_loop<
@@ -57,7 +45,7 @@ impl FeedSlotsProcessor {
         feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     ) -> Result<String, Report> {
         let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
-            let datafeed = feed.read().unwrap();
+            let datafeed = feed.read().await;
             (
                 datafeed.is_oneshot(),
                 datafeed.get_report_interval_ms(),
@@ -94,15 +82,15 @@ impl FeedSlotsProcessor {
             {
                 let current_time_as_ms = current_unix_time();
 
-                let slot = feed.read().unwrap().get_slot(current_time_as_ms);
+                let slot = feed.read().await.get_slot(current_time_as_ms);
 
                 info!(
                     "Processing votes for {} with id {} for slot {} rep_interval {}.",
-                    name, key, slot, report_interval_ms
+                    self.name, self.key, slot, report_interval_ms
                 );
 
                 let reports: Arc<RwLock<feed_registry::registry::FeedReports>> =
-                    match reports.read().unwrap().get(key) {
+                    match reports.read().await.get(self.key) {
                         Some(x) => x,
                         None => {
                             info!("No reports found!");
@@ -112,7 +100,7 @@ impl FeedSlotsProcessor {
                 debug!("found the following reports:");
                 debug!("reports = {:?}", reports);
 
-                let mut reports = reports.write().unwrap();
+                let mut reports = reports.write().await;
                 // Process the reports:
                 let mut values: Vec<&FeedType> = vec![];
                 for kv in &reports.report {
@@ -123,46 +111,45 @@ impl FeedSlotsProcessor {
                 }
 
                 if values.is_empty() {
-                    info!("No reports found for feed: {} slot: {}!", name, &slot);
+                    info!("No reports found for feed: {} slot: {}!", self.name, &slot);
                     continue;
                 }
 
                 let total_votes_count = values.len() as f32;
-                let required_votes_count =
-                    quorum_percentage * reporters.read().unwrap().len() as f32;
+                let required_votes_count = quorum_percentage * reporters.read().await.len() as f32;
 
                 if total_votes_count < required_votes_count {
                     warn!(
                     "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
-                    name, &slot, quorum_percentage, total_votes_count, reporters.read().unwrap().len()
+                    self.name, &slot, quorum_percentage, total_votes_count, reporters.read().await.len()
                 );
                     is_quorum_reached = false;
                 }
 
+                key_post = self.key;
                 if let Some(feed_metrics) = &feed_metrics {
                     if is_quorum_reached {
-                        inc_metric!(feed_metrics, key, quorums_reached);
+                        inc_metric!(feed_metrics, key_post, quorums_reached);
                     } else {
-                        inc_metric!(feed_metrics, key, failures_to_reach_quorum);
+                        inc_metric!(feed_metrics, key_post, failures_to_reach_quorum);
                     }
                 }
 
-                key_post = key;
-                result_post_to_contract = feed.read().unwrap().get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
+                result_post_to_contract = feed.read().await.get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
 
                 // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
                 if !is_oneshot {
                     {
-                        let mut history_guard = history.write().unwrap();
-                        history_guard.push(key, result_post_to_contract.clone())
+                        let mut history_guard = history.write().await;
+                        history_guard.push(self.key, result_post_to_contract.clone())
                     }
 
-                    let history_lock = history.read().unwrap();
+                    let history_lock = history.read().await;
 
                     // The first slice is from the current read position to the end of the array
                     // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
                     let (first, last) = history_lock
-                        .collect(key)
+                        .collect(self.key)
                         .expect("Missing key from History!")
                         .as_slices();
 
@@ -219,9 +206,9 @@ mod tests {
     use feed_registry::registry::AllFeedsReports;
     use feed_registry::types::FeedMetaData;
     use std::collections::HashMap;
-    use std::sync::{Arc, RwLock};
-    use std::time::{Duration, SystemTime, UNIX_EPOCH};
-    use tokio::sync::mpsc::unbounded_channel;
+    use std::sync::Arc;
+    use std::time::{Duration, SystemTime};
+    use tokio::sync::{mpsc::unbounded_channel, RwLock};
     const QUORUM_PERCENTAGE: f32 = 0.001;
 
     #[tokio::test]
@@ -250,13 +237,17 @@ mod tests {
         {
             let feed_id = 1;
             let reporter_id = 42;
-            all_feeds_reports_arc.write().unwrap().push(
-                feed_id,
-                reporter_id,
-                FeedResult::Result {
-                    result: original_report_data.clone(),
-                },
-            );
+            all_feeds_reports_arc
+                .write()
+                .await
+                .push(
+                    feed_id,
+                    reporter_id,
+                    FeedResult::Result {
+                        result: original_report_data.clone(),
+                    },
+                )
+                .await;
         }
 
         // run
@@ -265,25 +256,25 @@ mod tests {
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
         let all_feeds_reports_arc_clone = Arc::clone(&all_feeds_reports_arc);
         {
-            let mut history_guard = history.write().unwrap();
+            let mut history_guard = history.write().await;
             history_guard.register_feed(feed_id, 10_000);
         }
 
         let history_cp = history.clone();
 
         tokio::spawn(async move {
-            feed_slots_processor_loop(
-                tx,
-                feed_metadata_arc_clone,
-                name,
-                all_feeds_reports_arc_clone,
-                history_cp,
-                feed_id,
-                Arc::new(RwLock::new(HashMap::new())),
-                None,
-            )
-            .await
-            .unwrap();
+            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            feed_slots_processor
+                .start_loop(
+                    tx,
+                    feed_metadata_arc_clone,
+                    all_feeds_reports_arc_clone,
+                    history_cp,
+                    Arc::new(RwLock::new(HashMap::new())),
+                    None,
+                )
+                .await
+                .unwrap();
         });
 
         // Attempt to receive with a timeout of 2 seconds
@@ -347,13 +338,17 @@ mod tests {
         {
             let feed_id = 1;
             let reporter_id = 42;
-            all_feeds_reports_arc.write().unwrap().push(
-                feed_id,
-                reporter_id,
-                FeedResult::Result {
-                    result: original_report_data.clone(),
-                },
-            );
+            all_feeds_reports_arc
+                .write()
+                .await
+                .push(
+                    feed_id,
+                    reporter_id,
+                    FeedResult::Result {
+                        result: original_report_data.clone(),
+                    },
+                )
+                .await;
         }
 
         // run
@@ -365,18 +360,18 @@ mod tests {
             Arc::new(RwLock::new(FeedAggregateHistory::new()));
         let feed_aggregate_history_clone = Arc::clone(&feed_aggregate_history);
         tokio::spawn(async move {
-            feed_slots_processor_loop(
-                tx,
-                feed_metadata_arc_clone,
-                name,
-                all_feeds_reports_arc_clone,
-                feed_aggregate_history_clone,
-                feed_id,
-                Arc::new(RwLock::new(HashMap::new())),
-                None,
-            )
-            .await
-            .unwrap();
+            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            feed_slots_processor
+                .start_loop(
+                    tx,
+                    feed_metadata_arc_clone,
+                    all_feeds_reports_arc_clone,
+                    feed_aggregate_history_clone,
+                    Arc::new(RwLock::new(HashMap::new())),
+                    None,
+                )
+                .await
+                .unwrap();
         });
 
         // Attempt to receive with a timeout of 2 seconds
@@ -405,13 +400,17 @@ mod tests {
         {
             let feed_id = 1;
             let reporter_id = 42;
-            all_feeds_reports_arc.write().unwrap().push(
-                feed_id,
-                reporter_id,
-                FeedResult::Result {
-                    result: original_report_data.clone(),
-                },
-            );
+            all_feeds_reports_arc
+                .write()
+                .await
+                .push(
+                    feed_id,
+                    reporter_id,
+                    FeedResult::Result {
+                        result: original_report_data.clone(),
+                    },
+                )
+                .await;
         }
 
         // Attempt to receive with a timeout of 2 seconds
