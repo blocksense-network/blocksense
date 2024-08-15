@@ -7,6 +7,7 @@ use thiserror::Error;
 use tracing::debug;
 
 use crypto::JsonSerializableSignature;
+use num::BigUint;
 
 use crate::aggregate::{AverageAggregator, FeedAggregate};
 
@@ -128,6 +129,9 @@ pub enum FeedType {
     Text(String),
 }
 
+//TODO: In the future, consider support for variable precision
+const MAX_DIGITS_IN_FRACTION: usize = 18;
+
 impl FeedType {
     pub fn sizeof(&self) -> usize {
         match self {
@@ -138,7 +142,44 @@ impl FeedType {
 
     pub fn as_bytes(&self) -> Vec<u8> {
         match self {
-            FeedType::Numerical(val) => val.to_be_bytes().to_vec(),
+            FeedType::Numerical(val) => {
+                let truncate =
+                    |s: String, max_width: usize| -> String { s.chars().take(max_width).collect() };
+
+                let str_val = val.to_string();
+                let val_split: Vec<&str> = str_val.split('.').collect();
+
+                let integer = val_split[0].parse::<BigUint>().unwrap();
+
+                let actual_digits_in_fraction: usize;
+                let fraction: BigUint;
+
+                if val_split.len() > 1 {
+                    actual_digits_in_fraction =
+                        truncate(val_split[1].to_string(), MAX_DIGITS_IN_FRACTION).len();
+
+                    fraction = truncate(val_split[1].to_string(), MAX_DIGITS_IN_FRACTION)
+                        .parse::<BigUint>()
+                        .unwrap();
+                } else {
+                    actual_digits_in_fraction = 0;
+                    fraction = BigUint::from(0u32);
+                }
+
+                let result = (integer * BigUint::from(10u32).pow(MAX_DIGITS_IN_FRACTION as u32))
+                    + (fraction
+                        * BigUint::from(10u32)
+                            .pow(MAX_DIGITS_IN_FRACTION as u32 - actual_digits_in_fraction as u32));
+
+                let mut value_bytes = result.to_bytes_be();
+                let mut bytes_vec = vec![0; 32 - value_bytes.len()];
+                bytes_vec.append(&mut value_bytes);
+
+                bytes_vec.drain(..8);
+                bytes_vec.extend(vec![0; 8]);
+
+                bytes_vec
+            }
             FeedType::Text(s) => s.as_bytes().to_vec(),
         }
     }
@@ -153,13 +194,28 @@ impl FeedType {
     pub fn from_bytes(bytes: Vec<u8>, variant: FeedType) -> Result<FeedType, String> {
         match variant {
             FeedType::Numerical(_) => {
-                if bytes.len() < 8 {
+                if bytes.len() < 32 {
                     return Err("Bytes len less than required!".to_string());
                 }
-                let arr: [u8; 8] = bytes[..8]
-                    .try_into()
-                    .map_err(|_| "Failed to convert to array".to_string())?;
-                let val = f64::from_be_bytes(arr);
+
+                let mut bytes_mut = bytes;
+                bytes_mut.truncate(24);
+
+                let mut result = vec![0 as u8; 8];
+                result.append(&mut bytes_mut);
+
+                let combined = BigUint::from_bytes_be(&result);
+
+                let fraction = &combined % BigUint::from(10u32).pow(MAX_DIGITS_IN_FRACTION as u32);
+                let integer = &combined / BigUint::from(10u32).pow(MAX_DIGITS_IN_FRACTION as u32);
+
+                let str_val = format!("{}.{:0>18}", integer, fraction.to_string());
+
+                let val = match str_val.parse::<f64>() {
+                    Ok(v) => v,
+                    Err(e) => return Err(format!("Bytes cannot be parsed as f64: {}", e)),
+                };
+
                 Ok(FeedType::Numerical(val))
             }
             FeedType::Text(_) => {

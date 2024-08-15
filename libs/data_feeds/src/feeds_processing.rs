@@ -25,11 +25,9 @@ mod tests {
         let hex_string = naive_packing(FeedType::Numerical(value));
 
         let bytes = hex::decode(hex_string).unwrap();
-        let mut buf = [0; 8];
-        buf.copy_from_slice(&bytes[..8]);
-        let reversed = f64::from_be_bytes(buf);
+        let reversed = FeedType::from_bytes(bytes, FeedType::Numerical(0.0)).unwrap();
 
-        assert_eq!(value, reversed);
+        assert_eq!(value.to_string(), reversed.to_string());
     }
 
     #[test]

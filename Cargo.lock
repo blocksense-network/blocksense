@@ -3609,6 +3609,7 @@ version = "0.1.1"
 dependencies = [
  "crypto",
  "lazy_static 1.4.0",
+ "num",
  "ringbuf",
  "sequencer_config",
  "serde 1.0.203",
@@ -5804,6 +5805,7 @@ checksum = "c165a9ab64cf766f73521c0dd2cfdff64f488b8f0b3e621face3462d3db536d7"
 dependencies = [
  "num-integer",
  "num-traits 0.2.19",
+ "serde 1.0.203",
 ]
 
 [[package]]
@@ -5813,6 +5815,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73f88a1307638156682bada9d7604135552957b7818057dcef22705b4d509495"
 dependencies = [
  "num-traits 0.2.19",
+ "serde 1.0.203",
 ]
 
 [[package]]
@@ -5850,6 +5853,7 @@ dependencies = [
  "num-bigint",
  "num-integer",
  "num-traits 0.2.19",
+ "serde 1.0.203",
 ]
 
 [[package]]
