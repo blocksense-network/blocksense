@@ -149,7 +149,7 @@ jobs:
         run: cargo test
 
       - name: Run Cargo Clippy
-        run: cargo clippy
+        run: cargo clippy -- --deny warnings
 
       # - name: Build and install oracle trigger plugin
       #   run: ./libs/sdk/build-and-install-plugin.sh
