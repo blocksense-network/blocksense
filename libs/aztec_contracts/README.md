@@ -35,3 +35,32 @@ It has three tests respectively:
 - Checks that the caller isn't the owner
 - Checks setting and getting of 10 feeds in a single transaction
 - Checks the deployment of the contract
+
+## Testing
+
+To execute the tests you must have the following prerequisites:
+
+1.  Node.js >= v18 (recommend installing with nvm)
+2.  Docker (visit this page of the Docker docs on how to install it)
+3.  To install aztec's tooling, including aztec's sandbox, aztec-cli, aztec-nargo and aztec-up, run:
+
+        bash -i <(curl -s install.aztec.network)
+
+4.  Once these have been installed, to start the sandbox, run:
+
+        aztec start --sandbox
+
+5.  Go to the `data_feed_store` directory and execute:
+
+        aztec-nargo compile --silence-warnings
+
+    This will generate contracts ABI artifacts in the `target` folder.
+
+6.  Next, generate the typescript bindings for the ABI artifacts using:
+
+        aztec codegen target -o src/artifacts
+
+7.  When you complete these steps, you can run the tests when you go to the root directory `aztec_contracts`:
+
+        yarn install
+        yarn test
