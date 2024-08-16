@@ -1,6 +1,6 @@
 
 import { Callout } from '@blocksense/docs-theme';
-import { Tabs } from 'nextra/components';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 # Historic Data Feed Store
 
@@ -20,8 +20,12 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 - To read the latest price and timestamp:
 
-<Tabs items={['ProxyCall', 'Raw call']}>
-    <Tabs.Tab>
+<Tabs defaultValue="proxy-call" className="mt-4">
+  <TabsList>
+    <TabsTrigger value="proxy-call">Proxy Call</TabsTrigger>
+    <TabsTrigger value="raw-call">Raw Call</TabsTrigger>
+  </TabsList>
+    <TabsContent value="proxy-call">
       ```solidity copy filename="solidity"
       function getDataById(
         uint32 key
@@ -34,9 +38,9 @@ In order to retrieve data from the contract, the client must call the `fallback`
         return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
       }
       ```
-    </Tabs.Tab>
+    </TabsContent>
 
-    <Tabs.Tab>
+      <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
       function getDataById(
         uint32 key
@@ -50,14 +54,18 @@ In order to retrieve data from the contract, the client must call the `fallback`
         return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
       }
       ```
-    </Tabs.Tab>
+    </TabsContent>
 
 </Tabs>
 
 - To read historical data for a specific round:
 
-<Tabs items={['ProxyCall', 'Raw call']}>
-    <Tabs.Tab>
+<Tabs defaultValue="proxy-call" className="mt-4">
+  <TabsList>
+    <TabsTrigger value="proxy-call">Proxy Call</TabsTrigger>
+    <TabsTrigger value="raw-call">Raw Call</TabsTrigger>
+  </TabsList>
+    <TabsContent value="proxy-call">
       ```solidity copy filename="solidity"
       function getFeedAtCounter(
         uint32 key,
@@ -71,9 +79,9 @@ In order to retrieve data from the contract, the client must call the `fallback`
         return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
       }
       ```
-    </Tabs.Tab>
+    </TabsContent>
 
-    <Tabs.Tab>
+    <TabsContent value="raw-call" className="mt-4">
       ```solidity copy filename="solidity"
       function getFeedAtCounter(
         uint32 key,
@@ -88,22 +96,26 @@ In order to retrieve data from the contract, the client must call the `fallback`
         return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
       }
       ```
-    </Tabs.Tab>
+    </TabsContent>
 
 </Tabs>
 
 - To get the latest round:
 
-<Tabs items={['ProxyCall', 'Raw call']}>
-    <Tabs.Tab>
+<Tabs defaultValue="proxy-call" className="mt-4">
+  <TabsList>
+    <TabsTrigger value="proxy-call">Proxy Call</TabsTrigger>
+    <TabsTrigger value="raw-call">Raw Call</TabsTrigger>
+  </TabsList>
+    <TabsContent value="proxy-call">
       ```solidity copy filename="solidity"
       function getLatestCounter(uint32 key) external view returns (uint32 counter) {
         return uint32(ProxyCall._latestRound(key, dataFeedStore));
       }
       ```
-    </Tabs.Tab>
+    </TabsContent>
 
-    <Tabs.Tab>
+    <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
       function getLatestCounter(uint32 key) external view returns (uint32 counter) {
         (bool success, bytes memory returnData) = dataFeedStore.staticcall(
@@ -114,14 +126,18 @@ In order to retrieve data from the contract, the client must call the `fallback`
         (, counter) = abi.decode(returnData, (bytes32, uint32));
       }
       ```
-    </Tabs.Tab>
+    </TabsContent>
 
 </Tabs>
 
 - To get the latest round data:
 
-<Tabs items={['ProxyCall', 'Raw call']}>
-    <Tabs.Tab>
+<Tabs defaultValue="proxy-call" className="mt-4">
+  <TabsList>
+    <TabsTrigger value="proxy-call">Proxy Call</TabsTrigger>
+    <TabsTrigger value="raw-call">Raw Call</TabsTrigger>
+  </TabsList>
+    <TabsContent value="proxy-call">
       ```solidity copy filename="solidity"
       function getDataById(
         uint32 key
@@ -130,9 +146,9 @@ In order to retrieve data from the contract, the client must call the `fallback`
           ._latestRoundData(key, dataFeedStore);
       }
       ```
-    </Tabs.Tab>
+    </TabsContent>
 
-    <Tabs.Tab>
+    <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
       function getDataById(
         uint32 key
@@ -149,7 +165,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
         counter = uint256(data2);
       }
       ```
-    </Tabs.Tab>
+    </TabsContent>
 
 </Tabs>
 
