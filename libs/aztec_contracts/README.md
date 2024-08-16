@@ -60,7 +60,7 @@ To execute the tests you must have the following prerequisites:
 
         aztec codegen target -o src/artifacts
 
-7.  When you complete these steps, you can run the tests by going returning to the root directory `aztec_contracts` and executing:
+7.  When you complete these steps, you can run the tests by returning to the root directory `aztec_contracts` and executing:
 
         yarn install
         yarn test
