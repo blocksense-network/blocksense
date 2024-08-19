@@ -60,16 +60,6 @@ impl DataFeed for YahooFinanceDataFeed {
     }
 }
 
-// impl From<YahooError> for FeedError {
-//     fn from(error: YahooError) -> Self {
-//         match error {
-//             // YahooError::ConnectionFailed(err) => FeedError::RequestError(err),
-//             YahooError::FetchFailed(message) => FeedError::APIError(message),
-//             _ => FeedError::UndefinedError,
-//         }
-//     }
-// }
-
 #[derive(ApiConnect, Historical)]
 pub struct YahooFinanceDataFeed {
     api_connector: YahooConnector,
