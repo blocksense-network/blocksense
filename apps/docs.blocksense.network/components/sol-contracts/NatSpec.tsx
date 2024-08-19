@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { NatSpec as NatSpecType } from '@blocksense/sol-reflector';
 
 type NatSpecProps = {
@@ -10,33 +9,51 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
   return (
     <>
       {Object.keys(natspec).length > 0 && (
-        <div className="natspec px-4 py-4 border-solid border border-slate-200 bg-slate-50 rounded-lg text-black">
-          <p className="natspec__title text-lg font-semibold text-slate-600">
-            Description
-          </p>
-          <br />
+        <ol className="relative border-l-2 border-gray-200 dark:border-gray-700">
           {natspec.author && (
-            <h3 className="natspec__author text-xl mb-1  text-slate-600">
-              {natspec.author}
-            </h3>
+            <li className="mb-4">
+              <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
+                Author
+              </h3>
+              <p className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+                {natspec.author}
+              </p>
+            </li>
           )}
           {natspec.notice && (
-            <p className="natspec__notice mb-4 text-slate-600">
-              {natspec.notice}
-            </p>
+            <li className="mb-4">
+              <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
+                Notice
+              </h3>
+              <p className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 italic">
+                {natspec.notice}
+              </p>
+            </li>
           )}
           {natspec.dev && (
-            <div className="natspec__dev  text-slate-600">{natspec.dev}</div>
+            <li className="mb-4">
+              <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
+                Developer notes
+              </h3>
+              <p className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 italic">
+                {natspec.dev}
+              </p>
+            </li>
           )}
           {Object.entries(natspec.custom || {}).map(([key, value], index) => (
-            <div className="natspec__custom mb-5" key={index}>
-              <span className="natspec__custom-key text-base font-semibold">
-                {key}:
-              </span>{' '}
-              <span className="natspec__custom-value">{value}</span>
-            </div>
+            <li
+              className={`ml-4 ${index < Object.keys(natspec.custom || {}).length - 1 ? 'mb-4' : ''}`}
+              key={index}
+            >
+              <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
+                {key}
+              </h3>
+              <p className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 italic">
+                {value}
+              </p>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
     </>
   );
