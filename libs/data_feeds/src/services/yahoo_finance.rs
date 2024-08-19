@@ -42,7 +42,7 @@ impl DataFeed for YahooFinanceDataFeed {
                         (
                             FeedResult::Error {
                                 error: FeedError::from(FeedError::APIError(
-                                    "CoinMarketCap poll failed!".to_string(),
+                                    "YahooFinance API failed!".to_string(),
                                 )),
                             },
                             current_unix_time(),
@@ -52,7 +52,7 @@ impl DataFeed for YahooFinanceDataFeed {
             }
             Err(_) => (
                 FeedResult::Error {
-                    error: FeedError::APIError("CoinMarketCap poll failed!".to_string()),
+                    error: FeedError::APIError("YahooFinance API failed!".to_string()),
                 },
                 current_unix_time(),
             ),
