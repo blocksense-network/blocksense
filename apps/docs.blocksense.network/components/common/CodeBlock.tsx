@@ -34,7 +34,7 @@ const JitCodeBlock = ({
         <CopyButton
           textToCopy={code}
           tooltipPosition="left"
-          copyButtonClasses="absolute top-0 right-0 m-2 nx-z-10"
+          copyButtonClasses="absolute top-2 right-2 m-2 nx-z-10"
         />
       )}
       <div
@@ -101,7 +101,9 @@ export const OverviewCodeBlock = ({
       transformers: [
         transformerOverviewLineLink({
           routeLink: router.route,
-          classes: ['hover:bg-gray-200', 'cursor-pointer'],
+          classes: [
+            'border border-natural-200 rounded-md p-1 hover:bg-stone-100 cursor-pointer',
+          ],
         }),
       ],
     }).then((htmlString: any) => setHtml(htmlString));
@@ -113,7 +115,7 @@ export const OverviewCodeBlock = ({
         <CopyButton
           textToCopy={code}
           tooltipPosition="left"
-          copyButtonClasses="absolute top-0 right-0 m-2 nx-z-10"
+          copyButtonClasses="bg-zinc-50 absolute top-4 right-2 m-2 nx-z-10"
         />
       )}
       <div
