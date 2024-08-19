@@ -34,7 +34,7 @@ const JitCodeBlock = ({
         <CopyButton
           textToCopy={code}
           tooltipPosition="left"
-          copyButtonClasses="absolute top-2 right-2 m-2 nx-z-10"
+          copyButtonClasses="absolute top-2 right-2 nx-z-10"
         />
       )}
       <div

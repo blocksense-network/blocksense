@@ -12,8 +12,19 @@ export const FormatButton = ({
   isFormatted,
 }: FormatButtonProps) => {
   return (
-    <Button variant="outline" onClick={formatHandler} className={'w-full'}>
-      {isFormatted ? 'Compact' : 'Format'}
+    <Button
+      className="format__button w-[100px] flex-shrink-0 flex items-center justify-center"
+      variant="link"
+      onClick={formatHandler}
+    >
+      <img
+        src={isFormatted ? '/icons/format-compact.svg' : '/icons/format.svg'}
+        alt={isFormatted ? 'Compact' : 'Format'}
+        className="w-6 h-6 mr-2"
+      />
+      <span className="whitespace-nowrap">
+        {isFormatted ? 'Compact' : 'Format'}
+      </span>
     </Button>
   );
 };

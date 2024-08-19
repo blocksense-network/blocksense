@@ -11,7 +11,10 @@ export const TriggerButton = ({ tooltipContent }: TriggerButtonProps) => {
   return (
     <Tooltip position="right">
       <Tooltip.Content>{tooltipContent}</Tooltip.Content>
-      <Button variant="outline" className="my-2">
+      <Button
+        variant="secondary"
+        className="mt-2 mb-2 font-bold w-full min-w-16 border-solid border border-slate-200 bg-slate-50 rounded-m"
+      >
         ABI
       </Button>
     </Tooltip>

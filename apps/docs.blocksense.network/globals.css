@@ -246,9 +246,17 @@ main {
 @layer base {
   * {
     @apply border-border border-2;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(229, 231, 235, 0.6) transparent;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  @supports (color: lab(0% 0 0)) {
+    * {
+      scrollbar-color: lab(91.37% -0.01 -0.54 / 0.6) transparent;
+    }
   }
 
   .bg-card {
@@ -275,6 +283,10 @@ main {
   .cn-table th {
     font-weight: bold;
     @apply text-slate-700;
+  }
+
+  [role='dialog'] pre {
+    border: none;
   }
 
   code {

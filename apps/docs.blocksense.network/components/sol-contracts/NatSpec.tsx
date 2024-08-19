@@ -15,7 +15,7 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
               <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                 Author
               </h3>
-              <p className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+              <p className="block mb-2 text-sm font-normal text-gray-500 dark:text-gray-500">
                 {natspec.author}
               </p>
             </li>
@@ -25,7 +25,7 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
               <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                 Notice
               </h3>
-              <p className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 italic">
+              <p className="block mb-2 text-sm font-normal text-gray-500 dark:text-gray-500 italic">
                 {natspec.notice}
               </p>
             </li>
@@ -35,7 +35,7 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
               <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                 Developer notes
               </h3>
-              <p className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 italic">
+              <p className="block mb-2 text-sm font-normal text-gray-500 dark:text-gray-500 italic">
                 {natspec.dev}
               </p>
             </li>
@@ -48,7 +48,7 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
               <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                 {key}
               </h3>
-              <p className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500 italic">
+              <p className="block mb-2 text-sm font-normal text-gray-500 dark:text-gray-500 italic">
                 {value}
               </p>
             </li>

@@ -24,7 +24,6 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
-import { CloseButton } from '@/components/sol-contracts/ABIModal/CloseButton';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
 
 export interface AbiStruct {
@@ -43,7 +42,7 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
   const [isFormatted, setIsFormatted] = React.useState(true);
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
-  const title = `${name} ABI`.trimStart();
+  const title = `${name}`.trimStart();
 
   const getABI = () => {
     return isFormatted ? JSON.stringify(abi, null, 2) : JSON.stringify(abi);
@@ -65,27 +64,18 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
         </DialogTrigger>
         <DialogContent className="h-4/6 max-w-screen-md">
           <DialogHeader>
-            <section className="flex gap-2 items-center">
+            <section className="flex items-center justify-between px-2 pt-2 pb-0">
               <DialogTitle>{title}</DialogTitle>
+              <FormatButton
+                isFormatted={isFormatted}
+                formatHandler={formatHandler}
+              />
             </section>
             <DialogDescription />
           </DialogHeader>
           <ScrollArea>
             <CodeBlock code={getABI()} lang="json" theme="github-light" />
           </ScrollArea>
-          <DialogFooter className="items-end">
-            <section>
-              <FormatButton
-                isFormatted={isFormatted}
-                formatHandler={formatHandler}
-              />
-            </section>
-            <DialogClose asChild>
-              <section>
-                <CloseButton />
-              </section>
-            </DialogClose>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     );
@@ -99,30 +89,19 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
         </section>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader className="text-left">
-          <section className="flex gap-2 items-center">
-            <DrawerTitle>{title}</DrawerTitle>
+        <DialogHeader>
+          <section className="flex items-center justify-between px-4 py-2">
+            <DialogTitle>{title}</DialogTitle>
+            <FormatButton
+              isFormatted={isFormatted}
+              formatHandler={formatHandler}
+            />
           </section>
-          <DrawerDescription />
-        </DrawerHeader>
-        <div className="max-h-96 overflow-y-scroll">
+          <DialogDescription />
+        </DialogHeader>
+        <div className="max-h-96 overflow-y-scroll pb-6">
           <CodeBlock code={getABI()} lang="json" theme="github-light" />
         </div>
-        <DrawerFooter>
-          <section className="flex gap-2">
-            <section className="flex-1">
-              <FormatButton
-                isFormatted={isFormatted}
-                formatHandler={formatHandler}
-              />
-            </section>
-            <DrawerClose asChild className="flex-1">
-              <section>
-                <CloseButton />
-              </section>
-            </DrawerClose>
-          </section>
-        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );

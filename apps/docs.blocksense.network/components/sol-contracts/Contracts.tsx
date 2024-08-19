@@ -11,7 +11,6 @@ import { Variables } from '@/sol-contracts-components/Variables';
 import { ContractBaseInfo } from '@/sol-contracts-components/ContractBaseInfo';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { filterConstants, filterVariables } from '@/src/utils';
-import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 
 type ContractsProps = {
   contracts?: ContractDocItem[];
@@ -24,12 +23,6 @@ export const Contracts = ({ contracts }: ContractsProps) => {
         return (
           <div className="contract-item-wrapper__item" key={index}>
             <ContractBaseInfo {...contract} />
-            {contract.contractKind !== 'library' && (
-              <ABIModal
-                abi={contract.abi}
-                name={`${contract.contractKind} ${contract.name}`}
-              />
-            )}
             <Enums enums={contract.enums} />
             <Structs structs={contract.structs} />
             <Variables
