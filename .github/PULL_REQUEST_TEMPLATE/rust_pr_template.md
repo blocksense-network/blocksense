@@ -14,7 +14,8 @@ List the changes you have made.
 
 ## How to test
 
-Please describe the tests that you ran to verify your changes.
+Please describe the tests that you ran to verify your changes,
+or at least the manual procedure to exercise the new code.
 
 - [ ] cargo test [test name]
 
