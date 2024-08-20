@@ -97,6 +97,7 @@ All calls are handled by a fallback function based on the selector:
 Available scripts:
 
 ```sh
+yarn setup # Builds dependencies if not built
 yarn hardhat help # Display Hardhat commands
 yarn clean # Clean all untracked files
 yarn build:deps # Build workspace dependencies
@@ -118,6 +119,9 @@ FORKING=true yarn hardhat run ./scripts/chainlink-event-fetcher.ts
 # To run tests with opcodes & gas tracing:
 TRACE_TX=true yarn test
 ```
+
+> [!NOTE]
+> When calling raw hardhat commands, make sure that the `setup` command is called to initialize dependencies if necessary.
 
 ## Testing
 
