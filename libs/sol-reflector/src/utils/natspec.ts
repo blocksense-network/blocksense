@@ -79,26 +79,19 @@ export function parseNatspec(node: ASTNode): NatSpec {
         if (p === undefined) {
           throw new ItemError('Got more @return tags than expected', node);
         }
-        if (!p.name) {
-          natSpec.returns.push({ description: content.trim() });
-        } else {
-          const paramMatches = content.match(/(\w+)( ([^]*))?/);
-          if (!paramMatches || paramMatches[1] !== p.name) {
-            throw new ItemError(
-              `Expected @return tag to start with name '${p.name}'`,
-              node,
-            );
-          }
-          const [, name, description] = paramMatches as [
-            string,
-            string,
-            string?,
-          ];
-          natSpec.returns.push({
-            name,
-            description: description?.trim() ?? '',
-          });
+        const returnParamMatches = content.match(/(\w+)( ([^]*))?/);
+        if (!returnParamMatches) {
+          throw new ItemError(
+            `Expected @return tag to start with name '${p.name}'`,
+            node,
+          );
         }
+        const [, returnParamName, returnParamDescription] =
+          returnParamMatches as [string, string, string?];
+        natSpec.returns.push({
+          name: returnParamName,
+          description: returnParamDescription?.trim() ?? '',
+        });
         break;
       case '@custom':
         const [customTag, ...customDesc] = content.replace(':', '').split(' ');
