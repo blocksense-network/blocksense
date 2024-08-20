@@ -2,7 +2,7 @@ use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
 use ringbuf::{HeapRb, SharedRb};
 use tracing::{trace, warn};
-use utils::{current_unix_time, get_env_var};
+use utils::{get_env_var, time::current_unix_time};
 use yahoo_finance_api::YahooConnector;
 
 extern crate derive;

@@ -81,19 +81,19 @@ pub fn post_feed_response(
     asset: &str,
     sequencer_url: &str,
 ) {
-    let (result, timestamp) = data_feed.borrow_mut().poll(asset);
+    let (result, timestamp_ms) = data_feed.borrow_mut().poll(asset);
 
     let signature = generate_signature(
         secret_key,
         format!("{}", feed_id).as_str(),
-        timestamp,
+        timestamp_ms,
         &result,
     );
 
     let payload_json = handle_feed_response(
         reporter.id,
         feed_id.to_string(),
-        timestamp,
+        timestamp_ms,
         result,
         signature,
     );

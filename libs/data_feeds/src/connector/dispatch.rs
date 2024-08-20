@@ -110,9 +110,9 @@ pub fn dispatch(
             &reporter_config.sequencer_url,
         );
 
-        let elapsed_time = start_time.elapsed().as_millis();
+        let elapsed_time_ms = start_time.elapsed().as_millis();
         DATA_FEED_PARSE_TIME_GAUGE
             .with_label_values(&[&feed.id.to_string()])
-            .set(elapsed_time as i64);
+            .set(elapsed_time_ms as i64);
     }
 }

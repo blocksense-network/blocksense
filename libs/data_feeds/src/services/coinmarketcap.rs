@@ -6,7 +6,7 @@ use feed_registry::{
 };
 use ringbuf::{self, storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use tracing::{trace, warn};
-use utils::{current_unix_time, get_env_var, read_file};
+use utils::{get_env_var, read_file, time::current_unix_time};
 
 use derive::{ApiConnect, Historical};
 

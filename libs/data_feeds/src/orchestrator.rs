@@ -58,16 +58,16 @@ pub async fn orchestrator() {
 
         info!("Finished with {}-th batch..\n", BATCH_COUNTER.get());
 
-        let elapsed_time = start_time.elapsed().as_millis();
+        let elapsed_time_ms = start_time.elapsed().as_millis();
 
         //TODO(snikolov): `poll_period_ms` is dependent on the feed, we should ship payload ASAP and sleep this feed only.
-        if elapsed_time < reporter_config.poll_period_ms.into() {
-            let remaining_time_ms = reporter_config.poll_period_ms - (elapsed_time as u64);
+        if elapsed_time_ms < reporter_config.poll_period_ms.into() {
+            let remaining_time_ms = reporter_config.poll_period_ms - (elapsed_time_ms as u64);
             sleep(Duration::from_millis(remaining_time_ms));
         }
 
         UPTIME_COUNTER.inc_by((reporter_config.poll_period_ms as f64) / 1000.0);
-        BATCH_PARSE_TIME_GAUGE.set(elapsed_time as i64);
+        BATCH_PARSE_TIME_GAUGE.set(elapsed_time_ms as i64);
 
         let metrics_result = handle_prometheus_metrics(
             &request_client,
