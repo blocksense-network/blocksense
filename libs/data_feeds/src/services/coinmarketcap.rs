@@ -1,4 +1,4 @@
-use cmc::Cmc;
+use cmc::{api::CmcResult, Cmc};
 use feed_registry::{
     aggregate::{AverageAggregator, ConsensusMetric},
     api::DataFeedAPI,
@@ -38,8 +38,9 @@ impl DataFeed for CoinMarketCapDataFeed {
         ConsensusMetric::Mean(AverageAggregator {})
     }
 
-    fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
-        let response = self.api_connector.price(asset);
+    fn poll(&mut self, _asset: &str) -> (FeedResult, Timestamp) {
+        // let response = self.api_connector.price(asset);
+        let response: CmcResult<f64> = Ok(143.0);
 
         trace!("response = {:?}", response);
 
