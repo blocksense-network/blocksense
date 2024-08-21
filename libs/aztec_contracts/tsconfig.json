@@ -19,8 +19,11 @@
         "resolveJsonModule": true,
         "composite": true,
         "skipLibCheck": true,
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        "paths": {
+          "tslib": ["../../.yarn/unplugged/tslib-npm-2.6.3-0fd136b3be/node_modules/tslib"]
+        }
     },
-    "include": ["tests", "src", "src/**/*.json", "src/artifacts/*"]
-  }
+    "include": ["tests", "src", "src/**/*.json", "src/artifacts/*"],
+}
   
