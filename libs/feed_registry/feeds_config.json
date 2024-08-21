@@ -630,7 +630,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 28,
+      "id": 29,
       "name": "SPELL",
       "description": "SPELL / USD",
       "decimals": 18,
@@ -1582,7 +1582,7 @@
       }
     },
     {
-      "id": 75,
+      "id": 78,
       "name": "ARB",
       "description": "ARB / USD",
       "decimals": 18,
@@ -2880,7 +2880,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 141,
+      "id": 145,
       "name": "OGN",
       "description": "OGN / USD",
       "decimals": 18,
@@ -3690,7 +3690,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 181,
+      "id": 188,
       "name": "SUSDE",
       "description": "SUSDE / USD",
       "decimals": 18,
@@ -3712,7 +3712,7 @@
       }
     },
     {
-      "id": 182,
+      "id": 191,
       "name": "FORTH",
       "description": "FORTH / USD",
       "decimals": 18,
@@ -3887,7 +3887,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 192,
+      "id": 202,
       "name": "HIGH",
       "description": "HIGH / USD",
       "decimals": 18,
@@ -3904,7 +3904,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 193,
+      "id": 204,
       "name": "MLN",
       "description": "MLN / USD",
       "decimals": 18,
@@ -3921,7 +3921,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 194,
+      "id": 206,
       "name": "BADGER",
       "description": "BADGER / USD",
       "decimals": 18,
@@ -3938,7 +3938,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 195,
+      "id": 208,
       "name": "REN",
       "description": "REN / USD",
       "decimals": 18,
@@ -3972,7 +3972,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 197,
+      "id": 211,
       "name": "SXP",
       "description": "SXP / USD",
       "decimals": 18,
@@ -4057,7 +4057,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 202,
+      "id": 217,
       "name": "ILS",
       "description": "ILS / USD",
       "decimals": 18,
@@ -4125,7 +4125,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 206,
+      "id": 222,
       "name": "FTT",
       "description": "FTT / USD",
       "decimals": 18,
@@ -4244,7 +4244,7 @@
       "quorum_percentage": 0.6
     },
     {
-      "id": 213,
+      "id": 230,
       "name": "GNO",
       "description": "GNO / USD",
       "decimals": 18,
