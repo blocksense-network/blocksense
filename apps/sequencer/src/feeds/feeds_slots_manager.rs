@@ -18,6 +18,11 @@ pub async fn feeds_slots_manager_loop<
     app_state: web::Data<FeedsState>,
     vote_send: mpsc::UnboundedSender<(K, V)>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
+    let reporters_cp = app_state.reporters.clone();
+    debug!(
+        "stanm: 1 reporters_cp.len={}",
+        reporters_cp.read().await.len()
+    );
     let reports_clone = app_state.reports.clone();
     spawn(async move {
         let collected_futures = FuturesUnordered::new();
@@ -48,6 +53,10 @@ pub async fn feeds_slots_manager_loop<
             let name = feed.read().await.get_name().clone();
             let feed_aggregate_history_cp = feed_aggregate_history.clone();
             let reporters_cp = app_state.reporters.clone();
+            debug!(
+                "stanm: reporters_cp.len={}",
+                reporters_cp.read().await.len()
+            );
             let feed_metrics_cp = app_state.feeds_metrics.clone();
 
             let feed_slots_processor = FeedSlotsProcessor::new(name, key);

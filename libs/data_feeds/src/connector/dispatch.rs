@@ -65,6 +65,8 @@ fn feed_builder(
                 .get("CMC_API_KEY_PATH")
                 .expect("CMC_API_KEY_PATH not provided in config!");
 
+            let cmc_api_key_path = "nix/test-environments/test-keys/CMC_API_KEY".to_string();
+
             Rc::new(RefCell::new(CoinMarketCapDataFeed::new(
                 cmc_api_key_path.clone(),
             )))
@@ -83,6 +85,8 @@ pub fn dispatch(
         .resources
         .get("SECRET_KEY_PATH")
         .expect("SECRET_KEY_PATH not set in config!");
+
+    let secret_key_path = "nix/test-environments/test-keys/reporter_secret_key".to_string();
 
     let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
 

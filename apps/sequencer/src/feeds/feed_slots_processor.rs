@@ -44,6 +44,7 @@ impl FeedSlotsProcessor {
         reporters: SharedReporters,
         feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     ) -> Result<String, Report> {
+        debug!("stanm: reporters.len={}", reporters.read().await.len());
         let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
             let datafeed = feed.read().await;
             (
@@ -98,7 +99,9 @@ impl FeedSlotsProcessor {
                         }
                     };
                 debug!("found the following reports:");
+                let len = reports.read().await.report.len();
                 debug!("reports = {:?}", reports);
+                debug!("reports.len = {len}");
 
                 let mut reports = reports.write().await;
                 // Process the reports:
@@ -115,8 +118,18 @@ impl FeedSlotsProcessor {
                     continue;
                 }
 
+                // TODO(stanm): learn Nix, so I can figure out where the configs come from; also,
+                // delete this hardcoded line.
+                let quorum_percentage = 0.01;
+
                 let total_votes_count = values.len() as f32;
-                let required_votes_count = quorum_percentage * reporters.read().await.len() as f32;
+                let reporters_len = reporters.read().await.len();
+                let required_votes_count = quorum_percentage * reporters_len as f32;
+
+                debug!("stanm total_votes_count={total_votes_count}");
+                debug!("stanm required_votes_count={required_votes_count}");
+                debug!("stanm quorum_percentage={quorum_percentage}");
+                debug!("stanm reporters_len={reporters_len}");
 
                 if total_votes_count < required_votes_count {
                     warn!(

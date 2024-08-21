@@ -4,6 +4,7 @@ use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use tracing::debug;
 
 #[derive(Debug)]
 pub struct Reporter {
@@ -27,6 +28,7 @@ fn init_reporters(conf: &SequencerConfig, prefix: &str) -> HashMap<u64, Arc<RwLo
     let reporter_metrics = Arc::new(RwLock::new(
         ReporterMetrics::new(prefix).expect("Failed to allocate ReporterMetrics."),
     ));
+    debug!("stanm: conf.reporters={:?}", &conf.reporters);
     for r in &conf.reporters {
         reporters.insert(
             r.id.into(),
