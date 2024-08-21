@@ -31,6 +31,11 @@
       "require": "./dist/cjs/syntax-highlighting.cjs",
       "import": "./dist/esm/syntax-highlighting.mjs",
       "types": "./dist/types/syntax-highlighting.d.ts"
+    },
+    "./buffer-and-hex-utils": {
+      "require": "./dist/cjs/buffer-and-hex-utils/index.cjs",
+      "import": "./dist/esm/buffer-and-hex-utils/index.mjs",
+      "types": "./dist/types/buffer-and-hex-utils/index.d.ts"
     }
   },
   "scripts": {
