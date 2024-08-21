@@ -363,11 +363,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/base-utils@workspace:libs/base-utils"
   dependencies:
+    "@effect/schema": "npm:^0.71.1"
     "@rollup/plugin-commonjs": "npm:^26.0.1"
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/plugin-node-resolve": "npm:^15.2.1"
     "@types/node": "npm:^22.3.0"
     "@types/rollup-plugin-peer-deps-external": "npm:^2"
+    effect: "npm:^3.6.5"
     glob: "npm:^11.0.0"
     rollup: "npm:^4.20.0"
     rollup-plugin-delete: "npm:^2.0.0"
@@ -593,6 +595,17 @@ __metadata:
   dependencies:
     "@edge-runtime/primitives": "npm:4.1.0"
   checksum: 10c0/ee9f23abfe3f661f9bf5bcc3b1b779157d8e2c42ff160827ca345ec5b4043e98939cec5a917a3c3a3169908bc095d1d180d9261353886d83a4a083aa6e9feae0
+  languageName: node
+  linkType: hard
+
+"@effect/schema@npm:^0.71.1":
+  version: 0.71.1
+  resolution: "@effect/schema@npm:0.71.1"
+  dependencies:
+    fast-check: "npm:^3.21.0"
+  peerDependencies:
+    effect: ^3.6.5
+  checksum: 10c0/5b9197c222cb2ea03cbffdcd541363811285af26fbd57ce1f8050294a47f784f3eb1d72775bd5b5531b8dfb18fcc16b1ea62099100a39f9049baa48b5342e590
   languageName: node
   linkType: hard
 
@@ -6703,6 +6716,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"effect@npm:^3.6.5":
+  version: 3.6.5
+  resolution: "effect@npm:3.6.5"
+  checksum: 10c0/e5ee1055300a95dd2de65158cc26613738864db0d43421ff52f30e29a09104a714888b4ed0884b2cad03e7d9b04c6497d92cfaec0a158edb059c54481bcac91b
+  languageName: node
+  linkType: hard
+
 "electron-to-chromium@npm:^1.4.668":
   version: 1.4.789
   resolution: "electron-to-chromium@npm:1.4.789"
@@ -7721,6 +7741,15 @@ __metadata:
   version: 3.0.2
   resolution: "extend@npm:3.0.2"
   checksum: 10c0/73bf6e27406e80aa3e85b0d1c4fd987261e628064e170ca781125c0b635a3dabad5e05adbf07595ea0cf1e6c5396cacb214af933da7cbaf24fe75ff14818e8f9
+  languageName: node
+  linkType: hard
+
+"fast-check@npm:^3.21.0":
+  version: 3.21.0
+  resolution: "fast-check@npm:3.21.0"
+  dependencies:
+    pure-rand: "npm:^6.1.0"
+  checksum: 10c0/69c31cf27503f19e383fb72e03bdc22c9bc669b55e8e243b3f7ec328ff956787ee49d06239b7ba75250c964c815ff33ff03dfe441bbbf67d97e0f65761efb046
   languageName: node
   linkType: hard
 
@@ -12769,6 +12798,13 @@ __metadata:
   version: 2.3.1
   resolution: "punycode@npm:2.3.1"
   checksum: 10c0/14f76a8206bc3464f794fb2e3d3cc665ae416c01893ad7a02b23766eb07159144ee612ad67af5e84fa4479ccfe67678c4feb126b0485651b302babf66f04f9e9
+  languageName: node
+  linkType: hard
+
+"pure-rand@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "pure-rand@npm:6.1.0"
+  checksum: 10c0/1abe217897bf74dcb3a0c9aba3555fe975023147b48db540aa2faf507aee91c03bf54f6aef0eb2bf59cc259a16d06b28eca37f0dc426d94f4692aeff02fb0e65
   languageName: node
   linkType: hard
 
