@@ -12,8 +12,9 @@ pub struct AssetPair {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ChainlinkCompatibility {
-    pub base: String,
-    pub quote: String,
+    pub base: Option<String>,
+    pub quote: Option<String>,
+    pub chainlink_proxy: Option<HashMap<String, String>>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -27,7 +28,7 @@ pub struct FeedConfig {
     pub report_interval_ms: u64,
     pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
     pub first_report_start_time: SystemTime,
-    pub chainlink_compatiblity: Option<ChainlinkCompatibility>,
+    pub chainlink_compatibility: Option<ChainlinkCompatibility>,
 }
 
 #[derive(Debug, Deserialize)]
