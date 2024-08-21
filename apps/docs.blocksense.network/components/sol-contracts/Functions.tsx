@@ -56,7 +56,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
       <Accordion
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
-        className="contract-item-wrapper__function w-full space-y-4"
+        className="contract-item-wrapper__function w-full"
         ref={elementsRef}
       >
         {functions?.map(_function => {
@@ -67,30 +67,59 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                 <AnchorLinkTitle
                   accordion
                   title={_function.name || _function.kind}
-                  titleLevel={isFromSourceUnit ? 5 : 6}
+                  titleLevel={isFromSourceUnit ? 4 : 5}
                 />
-                <Selector selector={_function.functionSelector} />
               </AccordionTrigger>
               <AccordionContent
-                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
+                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''} p-2 sm:p-4 border-b border-gray-200`}
               >
-                <Signature signature={_function.signature} />
-                <ABIModal abi={_function.abi} name={_function.name} />
-                <NatSpec natspec={_function.natspec} />
-                <Parameters
-                  parameters={_function._parameters}
-                  parentTitle={_function.name || _function.kind}
-                  titleLevel={isFromSourceUnit ? 4 : 5}
-                  columns={['type', 'name', 'dataLocation', 'description']}
-                />
-                <Parameters
-                  parameters={_function._returnParameters}
-                  title="Return Parameters"
-                  parentTitle={_function.name || _function.kind}
-                  titleLevel={isFromSourceUnit ? 4 : 5}
-                  columns={['type', 'name', 'dataLocation', 'description']}
-                />
-                <FunctionModifiers functionModifiers={_function._modifiers} />
+                <section className="function-details__signature">
+                  <Signature signature={_function.signature} />
+                </section>
+                <section className="function-details__natspec mt-6 mb-4">
+                  <NatSpec natspec={_function.natspec} />
+                </section>
+
+                {_function._parameters && _function._parameters.length > 0 && (
+                  <section className="function-details__parameters mb-4">
+                    <Parameters
+                      parameters={_function._parameters}
+                      parentTitle={_function.name || _function.kind}
+                      titleLevel={isFromSourceUnit ? 5 : 6}
+                      columns={['type', 'name', 'dataLocation', 'description']}
+                    />
+                  </section>
+                )}
+
+                {_function._returnParameters &&
+                  _function._returnParameters.length > 0 && (
+                    <section className="function-details__return-parameters">
+                      <Parameters
+                        parameters={_function._returnParameters}
+                        title="Return Parameters"
+                        parentTitle={_function.name || _function.kind}
+                        titleLevel={isFromSourceUnit ? 5 : 6}
+                        columns={[
+                          'type',
+                          'name',
+                          'dataLocation',
+                          'description',
+                        ]}
+                      />
+                    </section>
+                  )}
+
+                <section className="function-details__modifiers">
+                  <FunctionModifiers functionModifiers={_function._modifiers} />
+                </section>
+                <footer className="function-details__footer flex justify-between items-center mt-2">
+                  <aside className="function-details__abi-modal flex-shrink-0">
+                    <ABIModal abi={_function.abi} name={_function.name} />
+                  </aside>
+                  <aside className="function-details__selector flex-shrink-0">
+                    <Selector selector={_function.functionSelector} />
+                  </aside>
+                </footer>
               </AccordionContent>
             </AccordionItem>
           );

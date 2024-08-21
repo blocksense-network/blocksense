@@ -12,8 +12,8 @@ const titleStyles = {
   2: 'text-3xl',
   3: 'text-2xl',
   4: 'text-xl',
-  5: 'text-lg',
-  6: 'text-xxs sm:text-xs lg:text-base',
+  5: 'text-md max-w-[280px] px-4 sm:max-w-none sm:whitespace-normal sm:overflow-visible truncate sm:truncate-none',
+  6: 'text-sm px-4',
 };
 
 const accordionStyles = 'text-gray-900';
@@ -32,7 +32,7 @@ export const AnchorLinkTitle = ({
     createElement(
       `h${titleLevel}`,
       {
-        className: `${titleStyles[titleLevel]} ${accordion ? accordionStyles : ''} nx-font-semibold nx-tracking-tight nx-text-slate-900 dark:nx-text-slate-100 nx-mt-4 nx-pb-4 ${accordion ? '' : borderStyles}`,
+        className: `${titleStyles[titleLevel]} ${accordion ? accordionStyles : ''} nx-font-semibold nx-text-slate-900 dark:nx-text-slate-100 py-4 ${accordion ? '' : borderStyles}`,
       },
       <>
         {title}

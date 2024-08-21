@@ -12,7 +12,7 @@ export const NatSpec = ({ natspec }: NatSpecProps) => {
   return (
     <>
       {Object.keys(natspec).length > 0 && (
-        <ol className="relative border-l-2 border-gray-200 dark:border-gray-700">
+        <ol className="relative">
           <NatSpecItem title="Author" content={natspec.author} />
           <NatSpecItem title="Notice" content={natspec.notice} />
           <NatSpecItem title="Developer notes" content={natspec.dev} />

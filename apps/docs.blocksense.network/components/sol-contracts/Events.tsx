@@ -54,7 +54,7 @@ export const Events = ({ events }: EventsProps) => {
       <Accordion
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
-        className="contract-item-wrapper__event w-full space-y-4"
+        className="contract-item-wrapper__event w-full"
         ref={elementsRef}
       >
         {events?.map((event, index) => {
@@ -65,24 +65,41 @@ export const Events = ({ events }: EventsProps) => {
                 <AnchorLinkTitle
                   accordion
                   title={event.name || `Event ${index + 1}`}
-                  titleLevel={6}
+                  titleLevel={5}
                 />
-                <Selector selector={event.eventSelector} />
               </AccordionTrigger>
               <AccordionContent
-                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
+                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''} p-2 sm:p-4 border-b border-gray-200`}
               >
-                <Signature signature={event.signature} />
-                <ABIModal abi={event.abi} name={event.name} />
-                <span className="contract-item-wrapper__event-anonymous">
-                  Anonymous: {event.anonymous.toString()}
-                </span>
-                <NatSpec natspec={event.natspec} />
-                <Parameters
-                  parentTitle={event.name}
-                  parameters={event._parameters}
-                  columns={['type', 'name', 'indexed', 'description']}
-                />
+                <section className="event-details__signature">
+                  <Signature signature={event.signature} />
+                </section>
+
+                <section className="event-details__natspec mb-4">
+                  <NatSpec natspec={event.natspec} />
+                </section>
+
+                {event._parameters && event._parameters.length > 0 && (
+                  <section className="event-details__parameters mb-4">
+                    <Parameters
+                      parentTitle={event.name}
+                      parameters={event._parameters}
+                      columns={['type', 'name', 'indexed', 'description']}
+                      titleLevel={6}
+                    />
+                  </section>
+                )}
+
+                <section className="event-details__anonymous">
+                  <span className="font-semibold">Anonymous:</span>{' '}
+                  {event.anonymous.toString()}
+                </section>
+
+                <footer className="event-details__footer flex justify-between items-center mt-2">
+                  <aside className="event-details__abi-modal flex-shrink-0">
+                    <ABIModal abi={event.abi} name={event.name} />
+                  </aside>
+                </footer>
               </AccordionContent>
             </AccordionItem>
           );

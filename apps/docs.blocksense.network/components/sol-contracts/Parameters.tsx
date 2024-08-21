@@ -24,7 +24,7 @@ type ParametersProps = {
   parameters?: VariableDocItem[];
   title?: string;
   parentTitle?: string;
-  titleLevel?: 4 | 5;
+  titleLevel?: 5 | 6;
   columns?: Column[];
 };
 
@@ -63,7 +63,7 @@ export const Parameters = ({
   parameters,
   title = 'Parameters',
   parentTitle,
-  titleLevel = 4,
+  titleLevel = 5,
   columns = ['type', 'name', 'description'],
 }: ParametersProps) => {
   return (

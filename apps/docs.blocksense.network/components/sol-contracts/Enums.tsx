@@ -51,7 +51,7 @@ export const Enums = ({ enums, isFromSourceUnit }: EnumsProps) => {
       <Accordion
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
-        className="contract-item-wrapper__enum w-full space-y-4"
+        className="contract-item-wrapper__enum w-full"
         ref={elementsRef}
       >
         {enums?.map((_enum, index) => {

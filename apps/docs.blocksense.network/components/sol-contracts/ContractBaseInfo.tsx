@@ -11,7 +11,7 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
   return (
     <>
       <AnchorLinkTitle title={contract.name} titleLevel={2} />
-      <div className="contract-base-info border-solid border border-slate-200 bg-white shadow-md px-2 py-2 md:px-4 md:pt-4 pb-0 rounded-md mt-6 flex flex-col lg:flex-row items-start">
+      <div className="contract-base-info border-solid border border-slate-200 bg-white shadow-md px-2 py-2 md:px-4 md:pt-4 pb-0 rounded-md mt-6 mb-6 flex flex-col lg:flex-row items-start">
         <section className="contract-base-info__content w-full">
           <header className="contract-base-info__header px-2 py-2 flex flex-col items-start mb-3 lg:flex-row lg:justify-between lg:items-center">
             <h2 className="contract-base-info__base-contracts-title text-2xl mr-2 font-semibold text-gray-800">
@@ -19,7 +19,7 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
             </h2>
 
             <div className="flex flex-col w-full justify-end lg:flex-row lg:items-center lg:space-x-2">
-              <aside className="contract-base-info__description border-solid border border-slate-200 bg-slate-50 rounded-md font-bold px-4 py-1.5 mt-4 lg:mt-0">
+              <aside className="contract-base-info__description border-solid border border-slate-200 bg-slate-50 rounded-md font-bold px-4 py-1.5 mt-4 mb-2 md:mb-0 lg:my-0">
                 <dl className="contract-base-info__list flex flex-col lg:flex-row lg:items-center lg:space-x-2">
                   <div
                     className={`contract-base-info__item flex items-center ${contract.contractKind === 'contract' ? 'mb-2 lg:mb-0' : 'mb-0'}`}

@@ -55,7 +55,7 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
       <Accordion
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
-        className="contract-item-wrapper__error w-full space-y-4"
+        className="contract-item-wrapper__error w-full"
         ref={elementsRef}
       >
         {errors?.map((error, index) => {
@@ -66,21 +66,40 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
                 <AnchorLinkTitle
                   accordion
                   title={error.name || `Error ${index + 1}`}
-                  titleLevel={isFromSourceUnit ? 5 : 6}
-                />
-                <Selector selector={error.errorSelector} />
-              </AccordionTrigger>
-              <AccordionContent
-                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
-              >
-                <Signature signature={error.signature} />
-                <ABIModal abi={error.abi} name={error.name} />
-                <NatSpec natspec={error.natspec} />
-                <Parameters
-                  parentTitle={error.name}
-                  parameters={error._parameters}
                   titleLevel={isFromSourceUnit ? 4 : 5}
                 />
+              </AccordionTrigger>
+              <AccordionContent
+                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''} p-2 sm:p-4 border-b border-gray-200`}
+              >
+                <section className="error-details__signature mb-4">
+                  <Signature signature={error.signature} />
+                </section>
+
+                <section className="error-details__natspec mb-4">
+                  <NatSpec natspec={error.natspec} />
+                </section>
+
+                {error._parameters && error._parameters.length > 0 && (
+                  <section className="error-details__parameters mb-4">
+                    <Parameters
+                      parameters={error._parameters}
+                      parentTitle={error.name || `Error ${index + 1}`}
+                      title="Parameters"
+                      titleLevel={isFromSourceUnit ? 5 : 6}
+                      columns={['type', 'name', 'dataLocation', 'description']}
+                    />
+                  </section>
+                )}
+
+                <footer className="error-details__footer flex justify-between items-center mt-2">
+                  <aside className="error-details__abi-modal flex-shrink-0">
+                    <ABIModal abi={error.abi} name={error.name} />
+                  </aside>
+                  <aside className="error-details__selector flex-shrink-0">
+                    <Selector selector={error.errorSelector} />
+                  </aside>
+                </footer>
               </AccordionContent>
             </AccordionItem>
           );

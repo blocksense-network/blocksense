@@ -52,7 +52,7 @@ export const Modifiers = ({ modifiers }: ModifiersProps) => {
       <Accordion
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
-        className="contract-item-wrapper__modifier w-full space-y-4"
+        className="contract-item-wrapper__modifier w-full"
         ref={elementsRef}
       >
         {modifiers?.map((modifier, index) => {

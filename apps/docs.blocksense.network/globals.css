@@ -258,7 +258,9 @@ main {
       scrollbar-color: lab(91.37% -0.01 -0.54 / 0.6) transparent;
     }
   }
-
+  .border-l-s {
+    border-left-style: solid;
+  }
   .bg-card {
     border: 1px solid;
     @apply border-slate-200 max-w-96 mt-10;
@@ -363,10 +365,27 @@ main {
     padding: 0 !important;
   }
 
-  .contract-base-info__base-contracts-description pre code {
+  .contract-base-info__base-contracts-description pre code,
+  .signature__content pre code {
     white-space: pre;
     overflow-y: scroll;
     scrollbar-width: none;
+    padding: 0px;
+  }
+
+  .contract-item-wrapper__content table {
+    margin-bottom: 0;
+    margin-top: 4;
+  }
+
+  .contract-item-wrapper h6 {
+    padding: 4px 0;
+  }
+  .function-details__natspec li {
+    margin-bottom: 2px;
+  }
+  .variable-details__natspec li {
+    margin-bottom: 2px;
   }
 
   html[data-word-wrap] pre .line {
@@ -439,7 +458,7 @@ main {
   }
 
   .text-xxs {
-    font-size: 0.5rem;
+    font-size: 0.75rem;
   }
 
   .text-xs {

@@ -61,7 +61,7 @@ export const Variables = ({
       <Accordion
         type="multiple"
         value={Object.keys(accordionStates).filter(k => accordionStates[k])}
-        className="contract-item-wrapper__variable w-full space-y-4"
+        className="contract-item-wrapper__variable w-full"
         ref={elementsRef}
       >
         {variables?.map((variable, index) => {
@@ -72,15 +72,25 @@ export const Variables = ({
                 <AnchorLinkTitle
                   accordion
                   title={variable.name ? variable.name : 'unnamed'}
-                  titleLevel={6}
+                  titleLevel={5}
                 />
               </AccordionTrigger>
               <AccordionContent
-                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''}`}
+                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''} p-2 sm:p-4 border-b border-gray-200`}
               >
-                <Signature signature={variable.signature} />
-                <ABIModal abi={variable.abi!} name={variable.name} />
-                <NatSpec natspec={variable.natspec} />
+                <section className="variable-details__signature mb-4">
+                  <Signature signature={variable.signature} />
+                </section>
+
+                <section className="variable-details__natspec">
+                  <NatSpec natspec={variable.natspec} />
+                </section>
+
+                <footer className="variable-details__footer flex justify-between items-center mt-2">
+                  <aside className="variable-details__abi-modal flex-shrink-0">
+                    <ABIModal abi={variable.abi!} name={variable.name} />
+                  </aside>
+                </footer>
               </AccordionContent>
             </AccordionItem>
           );

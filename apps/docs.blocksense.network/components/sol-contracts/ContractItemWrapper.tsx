@@ -19,7 +19,7 @@ export const ContractItemWrapper = ({
 }: ContractItemWrapperProps) => {
   return (
     Boolean(itemsLength) && (
-      <div className="contract-item-wrapper mt-6">
+      <div className="contract-item-wrapper">
         <AnchorLinkTitle
           title={title}
           parentTitle={parentTitle}

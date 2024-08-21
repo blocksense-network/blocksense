@@ -28,7 +28,7 @@ export const Footer = () => {
         </a>
       </aside>
       <nav className="footer__social-nav flex items-center nx-justify-end">
-        <ul className="footer__social-list flex gap-2 mr-6">
+        <ul className="footer__social-list flex gap-2">
           <li className="footer__social-item flex items-center space-x-4 p-2">
             <a
               className="footer__social-icon footer__social-icon--telegram flex items-center space-x-2"
