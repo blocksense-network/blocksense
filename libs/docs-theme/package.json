@@ -37,6 +37,7 @@
     "react-dom": ">=16.13.1"
   },
   "dependencies": {
+    "@blocksense/contracts": "workspace:*",
     "@headlessui/react": "^2.1.2",
     "@popperjs/core": "^2.11.8",
     "clsx": "^2.0.0",
