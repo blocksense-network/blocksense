@@ -1,7 +1,6 @@
 use std::{
-    cell::RefCell,
     collections::HashMap,
-    rc::Rc,
+    sync::Arc,
     thread::sleep,
     time::{Duration, Instant},
 };
@@ -12,6 +11,7 @@ use prometheus::{
     TextEncoder,
 };
 use sequencer_config::{get_config_file_path, ReporterConfig, Validated};
+use tokio::sync::Mutex;
 use utils::read_file;
 
 use tracing::{debug, info};
@@ -54,7 +54,7 @@ pub async fn orchestrator() {
 
     let feeds_registry = init_feeds_config().expect("Failed to get config: ");
 
-    let mut connection_cache = HashMap::<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>::new();
+    let mut connection_cache = HashMap::<DataFeedAPI, Arc<Mutex<dyn DataFeed>>>::new();
 
     let encoder = TextEncoder::new();
 
@@ -68,7 +68,7 @@ pub async fn orchestrator() {
 
         let start_time = Instant::now();
 
-        dispatch(&reporter_config, &feeds_registry, &mut connection_cache);
+        dispatch(&reporter_config, &feeds_registry, &mut connection_cache).await;
 
         info!("Finished with {}-th batch..\n", BATCH_COUNTER.get());
 
