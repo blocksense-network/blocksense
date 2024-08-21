@@ -45,6 +45,7 @@ pub fn check_signature(
     match feed_result {
         FeedResult::Result { result } => {
             byte_buffer.extend(result.as_bytes());
+            info!("Reported result for feed_id {} : {:?}", feed_id, result);
         }
         FeedResult::Error { error } => {
             warn!("Reported error for feed_id {} : {}", feed_id, error);
@@ -111,6 +112,11 @@ pub async fn post_report(
                         );
                         inc_metric!(reporter_metrics, reporter_id, non_valid_signature);
                         return Ok(HttpResponse::Unauthorized().into());
+                    } else {
+                        info!(
+                            "Signature check passed for feed_id: {} from reporter_id: {}",
+                            feed_id, reporter_id
+                        );
                     }
                 }
                 reporter.clone()
