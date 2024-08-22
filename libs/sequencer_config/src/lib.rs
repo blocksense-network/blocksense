@@ -51,7 +51,7 @@ pub struct Provider {
     pub transcation_timeout_secs: u32,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Reporter {
     pub id: u32,
     pub pub_key: String,

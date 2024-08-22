@@ -431,7 +431,9 @@ mod tests {
                 reporter_id: 0,
                 feed_id: FEED_ID.to_string(),
                 timestamp,
-                signature: JsonSerializableSignature { sig: signature },
+                signature: JsonSerializableSignature {
+                    sig: signature.unwrap(),
+                },
             },
             result,
         };
@@ -646,7 +648,9 @@ mod tests {
                 reporter_id: 0,
                 feed_id: FEED_ID.to_string(),
                 timestamp,
-                signature: JsonSerializableSignature { sig: signature },
+                signature: JsonSerializableSignature {
+                    sig: signature.unwrap(),
+                },
             },
             result,
         };
