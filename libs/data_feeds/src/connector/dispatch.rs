@@ -1,19 +1,21 @@
-use feed_registry::{api::DataFeedAPI, registry::AllFeedsConfig};
+use feed_registry::{
+    api::DataFeedAPI,
+    registry::AllFeedsConfig,
+    types::{FeedResult, Timestamp},
+};
+
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
 use sequencer_config::{FeedConfig, ReporterConfig};
 use std::sync::Arc;
 use std::{collections::HashMap, time::Instant};
-use tokio::sync::Mutex;
+use tokio::sync::{mpsc::UnboundedSender, Mutex};
 use tracing::debug;
-use utils::read_file;
 
 use crate::{
     interfaces::data_feed::DataFeed,
     services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooFinanceDataFeed},
 };
-
-use super::post::post_feed_response;
 
 fn feed_selector(feeds: &[FeedConfig], batch_size: usize) -> Vec<FeedConfig> {
     let mut rng = thread_rng();
@@ -33,18 +35,18 @@ fn feed_selector(feeds: &[FeedConfig], batch_size: usize) -> Vec<FeedConfig> {
 fn resolve_feed(
     feed_api: &DataFeedAPI,
     resources: &HashMap<String, String>,
-    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed>>>,
-) -> Arc<Mutex<dyn DataFeed>> {
+    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
+) -> Arc<Mutex<dyn DataFeed + Send>> {
     handle_connection_cache(feed_api, resources, connection_cache)
 }
 
 fn handle_connection_cache(
     api: &DataFeedAPI,
     resources: &HashMap<String, String>,
-    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed>>>,
-) -> Arc<Mutex<dyn DataFeed>> {
+    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
+) -> Arc<Mutex<dyn DataFeed + Send>> {
     if !connection_cache.contains_key(api) {
-        let feed: Arc<Mutex<dyn DataFeed>> = feed_builder(api, resources);
+        let feed: Arc<Mutex<dyn DataFeed + Send>> = feed_builder(api, resources);
         connection_cache.insert(api.to_owned(), feed);
     }
 
@@ -57,7 +59,7 @@ fn handle_connection_cache(
 fn feed_builder(
     api: &DataFeedAPI,
     resources: &HashMap<String, String>,
-) -> Arc<Mutex<dyn DataFeed>> {
+) -> Arc<Mutex<dyn DataFeed + Send>> {
     match api {
         DataFeedAPI::EmptyAPI => todo!(),
         DataFeedAPI::YahooFinanceDataFeed => Arc::new(Mutex::new(YahooFinanceDataFeed::new())),
@@ -66,7 +68,9 @@ fn feed_builder(
                 .get("CMC_API_KEY_PATH")
                 .expect("CMC_API_KEY_PATH not provided in config!");
 
-            Arc::new(Mutex::new(CoinMarketCapDataFeed::new(cmc_api_key_path.clone())))
+            Arc::new(Mutex::new(CoinMarketCapDataFeed::new(
+                cmc_api_key_path.clone(),
+            )))
         }
     }
 }
@@ -74,16 +78,10 @@ fn feed_builder(
 pub async fn dispatch(
     reporter_config: &ReporterConfig,
     feed_registry: &AllFeedsConfig,
-    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed>>>,
+    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
+    data_feed_sender: UnboundedSender<(FeedResult, Timestamp, u32)>,
 ) {
     let feeds_subset = feed_selector(&feed_registry.feeds, reporter_config.batch_size);
-
-    let secret_key_path = reporter_config
-        .resources
-        .get("SECRET_KEY_PATH")
-        .expect("SECRET_KEY_PATH not set in config!");
-
-    let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
 
     for feed in feeds_subset {
         let start_time = Instant::now();
@@ -94,20 +92,14 @@ pub async fn dispatch(
             connection_cache,
         );
 
-        // TODO(adikov):
-        // * Parallelize data_feed.poll and post_feed_resopnse to be in different
-        // threads and communicate via a channel.
-        // * Handle post_feed_response Result propertly.
-        let (result, timestamp_ms) = data_feed.lock().await.poll(&feed.name);
-        let _ = post_feed_response(
-            &reporter_config.reporter,
-            &secret_key,
-            feed.id,
-            timestamp_ms,
-            result,
-            &reporter_config.sequencer_url,
-        )
-        .await;
+        let feed_name = feed.name.clone();
+        let feed_id = feed.id;
+        let tx = data_feed_sender.clone();
+        tokio::task::spawn(async move {
+            let (result, timestamp_ms) = data_feed.lock().await.poll(&feed_name);
+            tx.send((result, timestamp_ms, feed_id)).unwrap();
+            debug!("DataFeed {:?} polled", feed_name);
+        });
 
         let elapsed_time_ms = start_time.elapsed().as_millis();
         DATA_FEED_PARSE_TIME_GAUGE

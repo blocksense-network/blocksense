@@ -94,7 +94,7 @@ impl Validated for Provider {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Reporter {
     pub id: u32,
     pub pub_key: String,
