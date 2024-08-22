@@ -60,6 +60,7 @@ impl Validated for FeedConfig {
 
 #[derive(Debug, Deserialize)]
 pub struct ReporterConfig {
+    pub full_batch: bool,
     pub batch_size: usize,
     pub sequencer_url: String,
     pub prometheus_url: String,
