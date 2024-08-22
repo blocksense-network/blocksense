@@ -38,7 +38,7 @@ function formatComponentData(
 export function getOverviewCodeContent(contract: ContractDocItem): string {
   let content = ''
     .concat(formatComponentData('Enums', contract.enums))
-    .concat(formatComponentData('Structures', contract.structs))
+    .concat(formatComponentData('Structs', contract.structs))
     .concat(
       formatComponentData('Constants', filterConstants(contract.variables)),
     )
@@ -108,11 +108,13 @@ function getUrlTarget(node: any): string {
   const target =
     index !== -1
       ? codeSnippetTokens[index + 1]
-      : codeSnippetTokens.includes('constructor')
-        ? 'constructor'
-        : codeSnippetTokens.includes('fallback')
-          ? 'fallback'
-          : codeSnippetTokens[1];
+      : codeSnippetTokens[0].includes('// ')
+        ? codeSnippetTokens[0].substring(3)
+        : codeSnippetTokens.includes('constructor')
+          ? 'constructor'
+          : codeSnippetTokens.includes('fallback')
+            ? 'fallback'
+            : codeSnippetTokens[1];
   return target;
 }
 
