@@ -146,6 +146,7 @@ export class ContractDocItem {
   variables?: VariableDocItem[];
   enums?: EnumDocItem[];
   structs?: StructDocItem[];
+  signature?: Signature;
 }
 
 export class ErrorDocItem {

@@ -97,6 +97,7 @@ export function convertContract(
   const extracted = extractFields(node, ContractDocItem);
   return {
     ...extracted,
+    signature: getSignature(node),
     _baseContracts: node.baseContracts.map(c => c.baseName.name!),
     functions: deriveFunctions(node),
     errors: deriveErrors(node),
