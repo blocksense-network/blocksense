@@ -7404,6 +7404,7 @@ name = "reporter"
 version = "0.1.1"
 dependencies = [
  "data_feeds",
+ "feed_registry",
  "prometheus 0.1.1",
  "tokio 1.39.3",
 ]
