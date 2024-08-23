@@ -12,3 +12,15 @@ export const filterVariables = (
 ): VariableDocItem[] => {
   return variables.filter(v => v.constant === false);
 };
+
+export function stringifyObject(obj: any): string {
+  return `'${JSON.stringify(obj)
+    .replace(/\\n/g, '\\\\n')
+    .replace(/\\'/g, "\\\\'")
+    .replace(/\\"/g, '\\\\"')
+    .replace(/\\&/g, '\\\\&')
+    .replace(/\\r/g, '\\\\r')
+    .replace(/\\t/g, '\\\\t')
+    .replace(/\\b/g, '\\\\b')
+    .replace(/\\f/g, '\\\\f')}'`;
+}
