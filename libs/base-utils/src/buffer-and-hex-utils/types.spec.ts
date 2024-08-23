@@ -14,8 +14,6 @@ import {
   parseHexDataString,
   parseHexQuantityString,
   parseHexString,
-  isEthereumAddress,
-  parseEthereumAddress,
 } from './types';
 
 describe('`hex-types` tests', () => {
@@ -139,25 +137,5 @@ describe('`hex-types` tests', () => {
     expect(parseHexDataString('0x00420000')).toBe('0x00420000');
     expect(parseHexDataString('0x41')).toBe('0x41');
     expect(parseHexDataString('0x000000000000')).toBe('0x000000000000');
-  });
-
-  test(`'Ethereum address encoding`, () => {
-    expect(isEthereumAddress('0xabc')).toBe(false);
-    expect(
-      isEthereumAddress('0xabcdef0123456789abcdef0123456789abcdef01'),
-    ).toBe(true);
-    expect(
-      isEthereumAddress('0xabcdef0123456789abcdef0123456789abcdef012'),
-    ).toBe(false);
-
-    expect(
-      parseEthereumAddress('0xabcdef0123456789abcdef0123456789abcdef01'),
-    ).toBe('0xabcdef0123456789abcdef0123456789abcdef01');
-
-    expect(() => {
-      parseEthereumAddress('0xabc');
-    }).toThrowError(
-      `Expected argument in hex string format (0xab12...) with byte length >= 40. Got: '0xabc'`,
-    );
   });
 });

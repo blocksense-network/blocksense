@@ -7,6 +7,24 @@
 
 export type PrimitiveType = boolean | number | string | symbol | bigint;
 
+export type KeysOf<T> = Extract<keyof T, string>;
+export type ValuesOf<T> = T[KeysOf<T>];
+export type Entries<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
+export type KeyFromValue<V, T extends Record<PropertyKey, PropertyKey>> = {
+  [K in KeysOf<T>]: V extends T[K] ? K : never;
+}[KeysOf<T>];
+
+/**
+ *  Computes the inverse map of an object.
+ *  Example: { a: 1, b: 2} => { 1: a, 2: b}
+ */
+export type InverseOf<T extends Record<PropertyKey, PropertyKey>> = {
+  [V in ValuesOf<T>]: KeyFromValue<V, T>;
+};
+
 /**
  * Recursively replaces instances of the type `Replace` with `WithThat` in the
  * given type `Where`.
