@@ -60,18 +60,18 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
         ref={elementsRef}
       >
         {functions?.map(_function => {
-          const id = _function.name || _function.kind;
+          const functionId = _function.name || _function.kind;
           return (
-            <AccordionItem key={id} value={id}>
-              <AccordionTrigger onClick={() => toggleAccordion(id)}>
+            <AccordionItem key={functionId} value={functionId}>
+              <AccordionTrigger onClick={() => toggleAccordion(functionId)}>
                 <AnchorLinkTitle
                   accordion
-                  title={_function.name || _function.kind}
+                  title={functionId}
                   titleLevel={isFromSourceUnit ? 4 : 5}
                 />
               </AccordionTrigger>
               <AccordionContent
-                className={`accordion-content ${accordionStates[id] ? 'expanded' : ''} p-2 sm:p-4 border-b border-gray-200`}
+                className={`accordion-content ${accordionStates[functionId] ? 'expanded' : ''} p-2 sm:p-4 border-b border-gray-200`}
               >
                 <section className="function-details__signature">
                   <Signature signature={_function.signature} />
@@ -84,7 +84,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                   <section className="function-details__parameters mb-4">
                     <Parameters
                       parameters={_function._parameters}
-                      parentTitle={_function.name || _function.kind}
+                      parentTitle={functionId}
                       titleLevel={isFromSourceUnit ? 5 : 6}
                       columns={['type', 'name', 'dataLocation', 'description']}
                     />
@@ -97,7 +97,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                       <Parameters
                         parameters={_function._returnParameters}
                         title="Return Parameters"
-                        parentTitle={_function.name || _function.kind}
+                        parentTitle={functionId}
                         titleLevel={isFromSourceUnit ? 5 : 6}
                         columns={[
                           'type',
@@ -114,7 +114,7 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                 </section>
                 <footer className="function-details__footer flex justify-between items-center mt-2">
                   <aside className="function-details__abi-modal flex-shrink-0">
-                    <ABIModal abi={_function.abi} name={_function.name} />
+                    <ABIModal abi={_function.abi} name={functionId} />
                   </aside>
                   <aside className="function-details__selector flex-shrink-0">
                     <Selector selector={_function.functionSelector} />
