@@ -6,20 +6,20 @@ export const ListIcon = (props: ComponentProps<'svg'>): ReactElement => {
       <path
         d="M20 7L4 7"
         stroke="#1C274C"
-        stroke-width="1.5"
-        stroke-linecap="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
       <path
         d="M15 12L4 12"
         stroke="#1C274C"
-        stroke-width="1.5"
-        stroke-linecap="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
       <path
         d="M9 17H4"
         stroke="#1C274C"
-        stroke-width="1.5"
-        stroke-linecap="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
     </svg>
   );
