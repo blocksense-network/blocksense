@@ -77,3 +77,14 @@ pub async fn post_feed_response(
 
     Ok(res.text().await?)
 }
+
+pub async fn post_feed_response_batch(
+    reporter: &Reporter,
+    secret_key: &str,
+    feed_api_name: &str,
+    timestamp_ms: Timestamp,
+    feed_result: Vec<FeedResult>,
+    sequencer_url: &str,
+) -> anyhow::Result<String> {
+    todo!()
+}

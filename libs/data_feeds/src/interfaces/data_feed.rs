@@ -10,6 +10,8 @@ pub trait DataFeed: ApiConnect + Historical {
 
     fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp);
 
+    fn poll_batch(&mut self, assets: &Vec<String>) -> (Vec<FeedResult>, Timestamp);
+
     //TODO: Implement abstraction for publishing
 
     // async fn publish(destination: String, payload: Box<dyn Payload>) -> Result<(),anyhow::Error>;

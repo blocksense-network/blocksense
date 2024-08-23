@@ -61,4 +61,8 @@ impl DataFeed for CoinMarketCapDataFeed {
             }
         }
     }
+
+    fn poll_batch(&mut self, assets: &Vec<String>) -> (Vec<FeedResult>, Timestamp) {
+        todo!()
+    }
 }

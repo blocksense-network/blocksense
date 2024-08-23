@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+use strum_macros::EnumIter;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, EnumIter)]
 pub enum DataFeedAPI {
     EmptyAPI,
     YahooFinanceDataFeed,

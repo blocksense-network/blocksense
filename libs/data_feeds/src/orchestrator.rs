@@ -17,7 +17,10 @@ use utils::read_file;
 use tracing::{debug, info};
 
 use crate::{
-    connector::{dispatch::dispatch, post::post_feed_response},
+    connector::{
+        dispatch::dispatch_subset,
+        post::{post_feed_response, post_feed_response_batch},
+    },
     interfaces::data_feed::DataFeed,
 };
 use feed_registry::{
@@ -51,6 +54,35 @@ pub fn get_validated_reporter_config() -> ReporterConfig {
         .expect("validation error");
 
     reporter_config
+}
+
+fn start_reporter_batch(
+    reporter_config: &ReporterConfig,
+    mut receiver: mpsc::UnboundedReceiver<(Vec<FeedResult>, Timestamp, String)>,
+) {
+    let secret_key_path = reporter_config
+        .resources
+        .get("SECRET_KEY_PATH")
+        .expect("SECRET_KEY_PATH not set in config!");
+
+    let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
+    let sequencer_url = reporter_config.sequencer_url.clone();
+    let reporter = reporter_config.reporter.clone();
+
+    tokio::task::spawn(async move {
+        while let Some((results, timestamp_ms, feed_api_name)) = receiver.recv().await {
+            let res = post_feed_response_batch(
+                &reporter,
+                &secret_key,
+                feed_api_name.as_str(),
+                timestamp_ms,
+                results,
+                &sequencer_url,
+            )
+            .await;
+            debug!("Data feed response sent {:?}", res);
+        }
+    });
 }
 
 fn start_reporter(
@@ -106,7 +138,7 @@ pub async fn orchestrator() {
 
         let start_time = Instant::now();
 
-        dispatch(
+        dispatch_subset(
             &reporter_config,
             &feeds_registry,
             &mut connection_cache,

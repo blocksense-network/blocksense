@@ -67,6 +67,7 @@ curl = "0.4.46"
 async-trait = "0.1.74"
 assert_cmd = "2.0.14"
 dirs = "5.0.1"
+strum = { version = "0.26.3", features = ["derive"] }
 
 # Service APIs
 yahoo_finance_api = {"version" = "2.1.0", features = ["blocking"]}

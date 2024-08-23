@@ -9,6 +9,7 @@ use rand::{seq::IteratorRandom, thread_rng};
 use sequencer_config::{FeedConfig, ReporterConfig};
 use std::sync::Arc;
 use std::{collections::HashMap, time::Instant};
+use strum::IntoEnumIterator;
 use tokio::sync::{mpsc::UnboundedSender, Mutex};
 use tracing::debug;
 
@@ -74,8 +75,10 @@ fn feed_builder(
         }
     }
 }
-
-pub async fn dispatch(
+/// Compute a subset of `FeedConfig`
+/// Initialize/Get API instances from connection_cache
+/// Poll the given API with a various
+pub async fn dispatch_subset(
     reporter_config: &ReporterConfig,
     feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
@@ -106,4 +109,44 @@ pub async fn dispatch(
             .with_label_values(&[&feed.id.to_string()])
             .set(elapsed_time_ms as i64);
     }
+}
+
+/// Take all API interfaces
+/// Poll all available feeds per API interface
+/// Collect Results and batch post all results.
+pub async fn dispatch_full_batch(
+    reporter_config: &ReporterConfig,
+    feed_registry: &AllFeedsConfig,
+    connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
+    data_feed_sender: UnboundedSender<(Vec<FeedResult>, Timestamp, String)>,
+) {
+    let mut script_to_assets: HashMap<String, Vec<String>> = HashMap::new();
+
+    for feed in &feed_registry.feeds {
+        script_to_assets
+            .entry(feed.script.clone())
+            .or_insert_with(Vec::new)
+            .push(feed.name.clone());
+    }
+
+    for feed_api_enum in DataFeedAPI::iter() {
+        let tx = data_feed_sender.clone();
+
+        let feed_api = resolve_feed(&feed_api_enum, &reporter_config.resources, connection_cache);
+        let feed_api_name = feed_api_enum.get_as_str();
+
+        let assets = script_to_assets
+            .get(feed_api_name)
+            .expect("Unrecognized DataFeed Script!")
+            .clone();
+
+        tokio::task::spawn(async move {
+            let (results, timestamp_ms) = feed_api.lock().await.poll_batch(&assets);
+            tx.send((results, timestamp_ms, feed_api_name.to_string()))
+                .unwrap();
+            debug!("DataFeed {} polled", feed_api_enum.get_as_str());
+        });
+    }
+
+    todo!()
 }
