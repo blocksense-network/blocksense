@@ -39,7 +39,7 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function (
     <div
       ref={forwardedRef}
       className={cn(
-        'nextra-callout nx-overflow-x-auto nx-mt-6 nx-py-4 nx-pl-2 nx-pr-4 nx-flex nx-bg-neutral-900 nx-bg-opacity-[0.02] nx-rounded-md nx-border nx-border-neutral-200/70 ltr:nx-pr-4 rtl:nx-pl-4 nx-pointer-events-none',
+        'nextra-callout nx-overflow-x-auto nx-mt-6 nx-py-4 nx-pl-2 nx-pr-4 nx-flex nx-bg-neutral-900 nx-bg-opacity-[0.02] nx-rounded-md nx-border nx-border-neutral-200/70 ltr:nx-pr-4 rtl:nx-pl-4',
         'contrast-more:nx-border-current contrast-more:dark:nx-border-current',
         classes[type],
       )}
@@ -54,7 +54,9 @@ export const Callout = forwardRef<HTMLDivElement, CalloutProps>(function (
       >
         {emoji}
       </div>
-      <div className="nx-w-full nx-min-w-0 nx-leading-6">{children}</div>
+      <div className="nx-w-full nx-min-w-0 nx-leading-6 nx-pointer-events-none">
+        {children}
+      </div>
     </div>
   );
 });

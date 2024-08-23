@@ -593,3 +593,24 @@ body.nextra-banner-hidden .\[body\.nextra-banner-hidden_\&\]\:nx-hidden {
 div:hover > .\[div\:hover\>\&\]\:nx-opacity-100 {
   opacity: 1;
 }
+.nextra-callout {
+  position: relative;
+}
+
+.nextra-callout,
+.nextra-callout a {
+  position: relative;
+}
+
+.nextra-callout::before,
+.nextra-callout::after,
+.nextra-callout a::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.nextra-callout a {
+  pointer-events: auto;
+}
