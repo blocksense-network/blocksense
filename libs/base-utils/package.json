@@ -36,6 +36,11 @@
       "require": "./dist/cjs/buffer-and-hex-utils/index.cjs",
       "import": "./dist/esm/buffer-and-hex-utils/index.mjs",
       "types": "./dist/types/buffer-and-hex-utils/index.d.ts"
+    },
+    "./evm-utils": {
+      "require": "./dist/cjs/evm-utils/index.cjs",
+      "import": "./dist/esm/evm-utils/index.mjs",
+      "types": "./dist/types/evm-utils/index.d.ts"
     }
   },
   "scripts": {

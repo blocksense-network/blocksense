@@ -80,19 +80,4 @@ export function parseHexQuantityString(input: unknown): HexQuantityString {
   else throw new ExpectedHexStringError(String(input), 'quantity');
 }
 
-// Ethereum address
-
-export const ethereumAddress = hexDataString.pipe(
-  S.pattern(/^0x([0-9a-fA-F]{40})$/),
-  S.brand('EthereumAddress'),
-);
-export type EthereumAddress = S.Schema.Type<typeof ethereumAddress>;
-
-export const isEthereumAddress = S.is(ethereumAddress);
-
-export function parseEthereumAddress(input: unknown): EthereumAddress {
-  if (isEthereumAddress(input)) return input;
-  else throw new ExpectedHexStringError(String(input), 40);
-}
-
 export type Without0x<S extends string> = S extends `0x${infer R}` ? R : S;
