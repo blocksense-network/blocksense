@@ -7,20 +7,9 @@ import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
+import { stringifyObject } from './utils';
 
 const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
-
-function stringifyObject(obj: any): string {
-  return `'${JSON.stringify(obj)
-    .replace(/\\n/g, '\\\\n')
-    .replace(/\\'/g, "\\\\'")
-    .replace(/\\"/g, '\\\\"')
-    .replace(/\\&/g, '\\\\&')
-    .replace(/\\r/g, '\\\\r')
-    .replace(/\\t/g, '\\\\t')
-    .replace(/\\b/g, '\\\\b')
-    .replace(/\\f/g, '\\\\f')}'`;
-}
 
 function generateMarkdownContent(sourceUnit: SourceUnitDocItem): string {
   const sourceUnitJsonString = stringifyObject(sourceUnit);
