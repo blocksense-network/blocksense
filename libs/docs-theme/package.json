@@ -61,7 +61,7 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.3.1",
     "concurrently": "^8.0.0",
-    "jsdom": "^24.1.1",
+    "jsdom": "^25.0.0",
     "next": "^14.2.5",
     "nextra": "^2.13.4",
     "postcss": "^8.4.41",
