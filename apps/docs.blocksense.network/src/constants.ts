@@ -14,7 +14,7 @@ export const pagesContractRefDocFolder = path.join(
 
 export const pagesDataFeedsFolder = path.join(
   docsBlocksenseNetworkRoot,
-  'pages/docs/data-feeds/',
+  'pages/docs/DataFeeds/',
 );
 
 export const ghContractFolder =

@@ -33,7 +33,7 @@ function generateMarkdownContent(networks: any, dataFeeds: any): string {
   const dataFeedsOverviewString = stringifyObject(dataFeedsOverview);
 
   const content = `
-import { DataFeeds } from '@/components/data-feeds/DataFeeds';
+import { DataFeeds } from '@/components/DataFeeds/DataFeeds';
 
 <DataFeeds dataFeedsOverviewString={${dataFeedsOverviewString}}/>
 `;
