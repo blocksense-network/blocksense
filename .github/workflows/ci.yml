@@ -34,7 +34,7 @@ jobs:
 
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Check formatting
@@ -63,7 +63,7 @@ jobs:
 
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Install JS deps
@@ -104,7 +104,7 @@ jobs:
 
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Install JS deps
@@ -139,7 +139,7 @@ jobs:
 
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Build Rust workspace
@@ -198,7 +198,7 @@ jobs:
 
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --impure .#devShells.x86_64-linux.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Set node linker
