@@ -429,7 +429,7 @@ __metadata:
     escape-string-regexp: "npm:^5.0.0"
     flexsearch: "npm:^0.7.31"
     focus-visible: "npm:^5.2.1"
-    git-url-parse: "npm:^14.1.0"
+    git-url-parse: "npm:^15.0.0"
     intersection-observer: "npm:^0.12.2"
     jsdom: "npm:^24.1.1"
     match-sorter: "npm:^6.3.1"
@@ -8270,12 +8270,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"git-url-parse@npm:^14.1.0":
-  version: 14.1.0
-  resolution: "git-url-parse@npm:14.1.0"
+"git-url-parse@npm:^15.0.0":
+  version: 15.0.0
+  resolution: "git-url-parse@npm:15.0.0"
   dependencies:
     git-up: "npm:^7.0.0"
-  checksum: 10c0/cd91547210eccdfaca92c41c5ab018c23a75e881f36aa8d7c46cef8e10dea790a455aeb4ca91426109fd5f645c6e874c0cf80a38be6a8675ed91abb08ed904d4
+  checksum: 10c0/1813a3ac8e97d348e46471db4710d776cc7b24a56a432339ab0c0f4f2323525a8627a1891aa80a53fd9be973191fe2902c0af8e17fb9b04f29445a83fbef3a4e
   languageName: node
   linkType: hard
 
