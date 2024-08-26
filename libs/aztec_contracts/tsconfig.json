@@ -26,4 +26,3 @@
     },
     "include": ["tests", "src", "src/**/*.json", "src/artifacts/*"],
 }
-  
