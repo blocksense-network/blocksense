@@ -1,3 +1,4 @@
+use hex::decode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::fs::File;
@@ -33,6 +34,28 @@ pub struct FeedConfig {
     pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
     pub first_report_start_time: SystemTime,
     pub chainlink_compatiblity: Option<ChainlinkCompatibility>,
+}
+
+impl Validated for FeedConfig {
+    fn validate(&self, context: &str) -> anyhow::Result<()> {
+        if self.report_interval_ms == 0 {
+            anyhow::bail!(
+                "{}: report_interval_ms for feed {} with id {} cannot be set to 0",
+                context,
+                self.name,
+                self.id
+            );
+        }
+        if self.quorum_percentage < 0.0 || self.quorum_percentage > 1.0 {
+            anyhow::bail!(
+                "{}: quorum_percentage for feed {} with id {} must be between 0.0 and 1.0",
+                context,
+                self.name,
+                self.id
+            );
+        }
+        Ok(())
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -79,7 +102,14 @@ pub struct Reporter {
 
 impl Validated for Reporter {
     fn validate(&self, _context: &str) -> anyhow::Result<()> {
-        todo!("Implement validate for reporter")
+        if let Err(e) = decode(&self.pub_key) {
+            anyhow::bail!(
+                "Pub key of reporter id {} is not a valid hex string: {}",
+                self.id,
+                e
+            );
+        }
+        Ok(())
     }
 }
 #[derive(Debug, Deserialize)]

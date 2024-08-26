@@ -226,7 +226,7 @@ mod tests {
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config().expect("Failed to load config:");
-        let feeds_config = init_feeds_config();
+        let feeds_config = init_feeds_config().expect("Failed to get config: ");
         let metrics_prefix = Some("test_get_feed_report_interval_");
 
         let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
@@ -277,7 +277,7 @@ mod tests {
         anvil_endpoint: &str,
     ) -> web::Data<FeedsState> {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
-        let feeds_config = init_feeds_config();
+        let feeds_config = init_feeds_config().expect("Failed to get config: ");
         let metrics_prefix = Some("create_app_state_from_sequencer_config_");
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;

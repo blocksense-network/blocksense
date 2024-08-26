@@ -26,6 +26,11 @@ use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
 
+use utils::build_info::{
+    BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
+    VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
+};
+
 type VoteChannel = (
     UnboundedSender<(String, String)>,
     UnboundedReceiver<(String, String)>,
@@ -109,8 +114,29 @@ pub async fn prepare_http_servers(
     (main_http_server_fut, admin_http_server_fut)
 }
 
+pub fn get_validated_sequencer_config() -> SequencerConfig {
+    let sequencer_config = init_sequencer_config().expect("Failed to get config: ");
+
+    sequencer_config
+        .validate("SequencerConfig")
+        .expect("validation error");
+
+    sequencer_config
+}
+
+pub fn get_validated_feeds_config() -> AllFeedsConfig {
+    let feeds_config = init_feeds_config().expect("Failed to get config: ");
+
+    feeds_config
+        .validate("FeedsConfig")
+        .expect("validation error");
+
+    feeds_config
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    init_shared_logging_handle();
     let mut start_metrics_server = true;
 
     let mut args = env::args().skip(1);
@@ -125,6 +151,23 @@ async fn main() -> std::io::Result<()> {
             }
             "--no-metrics-server" => {
                 start_metrics_server = false;
+            }
+            "--validate-config" => {
+                println!("Validating configuration for version:");
+                println!("version => {BLOCKSENSE_VERSION}");
+                println!("git_hash => {GIT_HASH}");
+                println!("git_hash_short => {GIT_HASH_SHORT}");
+                println!("git_dirty => {GIT_DIRTY}");
+                println!("git_branch => {GIT_BRANCH}");
+                println!("git_tag => {GIT_TAG}");
+                println!("debug => {VERGEN_CARGO_DEBUG}");
+                println!("features => {VERGEN_CARGO_FEATURES}");
+                println!("optimizations => {VERGEN_CARGO_OPT_LEVEL}");
+                println!("compiler => {VERGEN_RUSTC_SEMVER}");
+
+                let _sequencer_config = get_validated_sequencer_config();
+                let _feeds_config = get_validated_feeds_config();
+                return std::io::Result::Ok(());
             }
             "--help" => {
                 println!(
@@ -148,13 +191,9 @@ OPTIONS
         }
     }
 
-    let sequencer_config: SequencerConfig =
-        init_sequencer_config().expect("Failed to get config: ");
-    let feeds_config = init_feeds_config();
+    let sequencer_config = get_validated_sequencer_config();
+    let feeds_config = get_validated_feeds_config();
 
-    sequencer_config
-        .validate("SequencerConfig")
-        .expect("validation error");
     let (voting_receive_channel, app_state): (
         UnboundedReceiver<(String, String)>,
         Data<FeedsState>,

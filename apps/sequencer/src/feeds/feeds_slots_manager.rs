@@ -122,7 +122,7 @@ mod tests {
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config().expect("Failed to load config:");
-        let feeds_config = init_feeds_config();
+        let feeds_config = init_feeds_config().expect("Failed to get config: ");
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
         let metrics_prefix = Some("test_feed_slots_manager_loop_");

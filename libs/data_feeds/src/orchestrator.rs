@@ -38,7 +38,7 @@ pub async fn orchestrator() {
 
     let reporter_config = init_reporter_config();
 
-    let feeds_registry = init_feeds_config();
+    let feeds_registry = init_feeds_config().expect("Failed to get config: ");
 
     let mut connection_cache = HashMap::<DataFeedAPI, Rc<RefCell<dyn DataFeed>>>::new();
 

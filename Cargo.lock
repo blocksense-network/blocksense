@@ -3609,6 +3609,7 @@ dependencies = [
 name = "feed_registry"
 version = "0.1.1"
 dependencies = [
+ "anyhow",
  "crypto",
  "futures",
  "num",
@@ -8115,6 +8116,7 @@ version = "0.1.1"
 dependencies = [
  "anyhow",
  "dirs 5.0.1",
+ "hex",
  "serde 1.0.203",
 ]
 
