@@ -209,6 +209,7 @@ export class VariableDocItem {
   natspec: NatSpec = {};
   _natspecDescription?: string;
   _natspecName?: string;
+  storageLocation?: 'calldata' | 'default' | 'memory' | 'storage' = 'default';
 }
 
 export class EnumDocItem {
