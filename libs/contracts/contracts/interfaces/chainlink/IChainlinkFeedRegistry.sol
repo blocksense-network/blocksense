@@ -1,4 +1,8 @@
-// SPDX-License-Identifier: MIT
+/**
+ * SPDX-FileCopyrightText: Copyright (c) 2021 SmartContract ChainLink Limited SEZC
+ *
+ * SPDX-License-Identifier: MIT
+ */
 pragma solidity ^0.8.24;
 
 import {IChainlinkAggregator} from './IChainlinkAggregator.sol';
