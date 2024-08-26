@@ -52,8 +52,12 @@ const getParameterValueByColumn = (
       return parameter._natspecDescription || '-';
     case 'mutability':
       return parameter.mutability || '-';
-    // case 'dataLocation':
-    //   return parameter.dataLocation || '-';
+    case 'dataLocation':
+      return parameter.storageLocation
+        ? parameter.storageLocation === 'default'
+          ? 'memory'
+          : parameter.storageLocation
+        : '-';
     default:
       return '-';
   }
