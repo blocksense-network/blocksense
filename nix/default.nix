@@ -27,6 +27,8 @@
             rustfmt
             targets.wasm32-wasi.latest.rust-std
           ];
+
+        inherit (inputs'.mcl-nixos-modules.checks) foundry;
       };
     };
 }

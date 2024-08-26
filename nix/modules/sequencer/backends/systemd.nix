@@ -7,9 +7,9 @@
 }:
 let
   cfg = config.services.blocksense;
-
-  inherit (self.apps.${pkgs.system}) sequencer reporter;
-  inherit (inputs.ethereum-nix.packages.${pkgs.system}) foundry;
+  inherit (pkgs) system;
+  inherit (self.apps.${system}) sequencer reporter;
+  inherit (self.legacyPackages.${system}) foundry;
 
   anvilInstances = lib.mapAttrs' (
     name:
