@@ -56,8 +56,18 @@ describe('Example: RegistryConsumer', function () {
     );
     await feedRegistry.init(owner);
 
-    await feedRegistry.setFeed(TOKENS.ETH, TOKENS.USD, chainlinkProxies[0]);
-    await feedRegistry.setFeed(TOKENS.BTC, TOKENS.USD, chainlinkProxies[1]);
+    await feedRegistry.setFeeds([
+      {
+        base: TOKENS.ETH,
+        quote: TOKENS.USD,
+        feed: chainlinkProxies[0],
+      },
+      {
+        base: TOKENS.BTC,
+        quote: TOKENS.USD,
+        feed: chainlinkProxies[1],
+      },
+    ]);
 
     registryConsumer = await deployContract<RegistryConsumer>(
       'RegistryConsumer',

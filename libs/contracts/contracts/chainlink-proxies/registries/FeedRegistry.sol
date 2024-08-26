@@ -2,7 +2,6 @@
 pragma solidity ^0.8.24;
 
 import '../../interfaces/IFeedRegistry.sol';
-import {IChainlinkAggregator} from '../../interfaces/chainlink/IChainlinkAggregator.sol';
 import {IAggregator} from '../../interfaces/IAggregator.sol';
 import {ProxyCall} from '../../libraries/ProxyCall.sol';
 
@@ -16,7 +15,7 @@ contract FeedRegistry is IFeedRegistry {
   address public immutable override OWNER;
 
   /// @notice Feed data for a given pair
-  mapping(address => mapping(address => Feed)) internal feedData;
+  mapping(address => mapping(address => FeedData)) internal feedData;
 
   /// @notice Constructor
   /// @param _owner The owner of the contract
@@ -73,17 +72,19 @@ contract FeedRegistry is IFeedRegistry {
   }
 
   /// @inheritdoc IFeedRegistry
-  function setFeed(address base, address quote, address feed) external {
+  function setFeeds(Feed[] calldata feeds) external override {
     if (msg.sender != OWNER) {
       revert OnlyOwner();
     }
 
-    feedData[base][quote] = Feed(
-      IChainlinkAggregator(feed),
-      IAggregator(feed).key(),
-      IAggregator(feed).decimals(),
-      IAggregator(feed).description()
-    );
+    for (uint256 i = 0; i < feeds.length; i++) {
+      feedData[feeds[i].base][feeds[i].quote] = FeedData(
+        IChainlinkAggregator(feeds[i].feed),
+        IAggregator(feeds[i].feed).key(),
+        IAggregator(feeds[i].feed).decimals(),
+        IAggregator(feeds[i].feed).description()
+      );
+    }
   }
 
   /// @inheritdoc IChainlinkFeedRegistry

@@ -19,16 +19,27 @@ export class ChainlinkRegistryBaseWrapper {
     this.dataFeedStore = _dataFeedStore;
   }
 
-  public async setFeed(
-    base: string,
-    quote: string,
-    feed: ChainlinkBaseWrapper<HistoricDataFeedStore>,
+  public async setFeeds(
+    feeds: {
+      base: string;
+      quote: string;
+      feed: ChainlinkBaseWrapper<HistoricDataFeedStore>;
+    }[],
   ) {
-    this.map[base] = {};
-    this.map[base][quote] = feed;
-    return this.contract
-      .connect(this.owner)
-      .setFeed(base, quote, feed.contract.target);
+    for (const feedData of feeds) {
+      const { base, quote, feed } = feedData;
+      this.map[base] = {};
+      this.map[base][quote] = feed;
+    }
+    return this.contract.connect(this.owner).setFeeds(
+      feeds.map(data => {
+        return {
+          base: data.base,
+          quote: data.quote,
+          feed: data.feed.contract.target,
+        };
+      }),
+    );
   }
 
   public async checkFeed(base: string, quote: string, feed: string) {
