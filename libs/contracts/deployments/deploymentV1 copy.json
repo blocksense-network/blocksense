@@ -1,0 +1,86 @@
+{
+  "1": {
+    "name": "mainnet",
+    "contracts": {
+      "coreContracts": {
+        "HistoricDataFeedStoreV2": "0xfe2a4bd13f7929d0C43b41fBe74d55395a3Be9Bf",
+        "UpgradeableProxy": "0x44Da91D89ca26Ac8f8657CdB75D901D270cfA9F4",
+        "FeedRegistry": "0x626f512459F4dEe3b4CE5Ba801307f56D3b4682C"
+      },
+      "ChainlinkProxy": [
+        {
+          "description": "DOGE / USD",
+          "address": "0xd907cdd036F32ec33A65860fFaF315871bc8242C"
+        },
+        {
+          "description": "BTC / USD",
+          "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3454C392AD99182a8b124E28f22C4eBBfFD4981B"
+        },
+        {
+          "description": "ETH / USD",
+          "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9181E7e0945023a831C95ca0D671b4F9da847AEd"
+        },
+        {
+          "description": "SHIB / USD",
+          "address": "0x22E3AD79bCfE41773f4Bf8DA08f42b8defe8fbCa"
+        },
+        {
+          "description": "SOL / USD",
+          "address": "0x1335a395dD147D72517d8A59f5C1eEb8C5d0dFd2"
+        },
+        {
+          "description": "DOT / USD",
+          "address": "0x24f9e8438Fed4d0ffc7445AF3aA7748A0bF4405c"
+        },
+        {
+          "description": "XRP / USD",
+          "address": "0x45A917FdD073beC478B7ca1D6426Ff79fC486f24"
+        }
+      ],
+      "SafeMultisig": "0xed8De9e7A46FEfDC530Bd60c9E06CfFbB19FD6EE"
+    }
+  },
+  "11155111": {
+    "name": "sepolia",
+    "contracts": {
+      "coreContracts": {
+        "HistoricDataFeedStoreV2": "0xa03e9aab0c2933D1e7a14d6EFF9B1e746Ab5b1f1",
+        "UpgradeableProxy": "0x5c317CD1afF09b266e798dbDC5D3422De2C21F37",
+        "FeedRegistry": "0x22c49116C986c1Fb1EC2BBF1995396Ea63E359B6"
+      },
+      "ChainlinkProxy": [
+        {
+          "description": "DOGE / USD",
+          "address": "0xc3671b97E210F3FA336aef48509F1F2f03dDdF5f"
+        },
+        {
+          "description": "BTC / USD",
+          "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x082e8756c724Fcd9104ad15569C598a7165C4edF",
+          "chainlink_proxy": "0x0814104fC775A6DA92E2703ad6e3D5CCe3c178aB"
+        },
+        {
+          "description": "ETH / USD",
+          "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x522E269164EC11FA5654c659ea70de1f8C019159",
+          "chainlink_proxy": "0x694AA1769357215DE4FAC081bf1f309aDC325306"
+        },
+        {
+          "description": "SHIB / USD",
+          "address": "0xB5e2b3FEFCda71b55294B3293A9Db4E92f14a6aC"
+        },
+        {
+          "description": "SOL / USD",
+          "address": "0x903DA09eB43576DA1c5DAc9DF3D38c1Cd2740a75"
+        }
+      ],
+      "SafeMultisig": "0x30d645f9D54836e1122feda8c53CB7E95BdD3376"
+    }
+  }
+}

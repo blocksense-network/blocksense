@@ -62,7 +62,7 @@ interface ChainlinkProxyData {
   chainlink_proxy: string;
 }
 
-enum ContractNames {
+export enum ContractNames {
   SafeMultisig = 'SafeMultisig',
   FeedRegistry = 'FeedRegistry',
   ChainlinkProxy = 'ChainlinkProxy',
@@ -89,7 +89,7 @@ enum NetworkNames {
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
-  .setAction(async (args, { ethers, artifacts }) => {
+  .setAction(async (args, { ethers, artifacts, run }) => {
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
     const testNetworks = Object.keys(NetworkNames);
@@ -106,23 +106,38 @@ task('deploy', 'Deploy contracts')
 
     const chainsDeployment: ChainConfig = {};
 
+    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+
     for (const config of configs) {
       const chainId = config.network.chainId.toString();
 
       console.log(`\n\n// ChainId: ${config.network.chainId} //`);
-      const multisig = await deployMultisig(config);
+      // const multisig = await deployMultisig(config);
+      const multisigAddress = '0x30d645f9D54836e1122feda8c53CB7E95BdD3376';
 
-      const dataFeedStoreAddress = await predictDataFeedStoreAddress(
+      const dataFeedStoreAddress = await predictAddress(
         artifacts,
         config,
+        ContractNames.HistoricDataFeedStoreV2,
+        ethers.id('dataFeedStore'),
+        abiCoder.encode(['address'], [process.env.SEQUENCER_ADDRESS]),
+      );
+      const upgradeableProxyAddress = await predictAddress(
+        artifacts,
+        config,
+        ContractNames.UpgradeableProxy,
+        ethers.id('proxy'),
+        abiCoder.encode(
+          ['address', 'address'],
+          [dataFeedStoreAddress, multisigAddress],
+        ),
       );
 
-      const multisigAddress = await multisig.getAddress();
-      const deployData = await deployContracts(config, multisig, artifacts, [
+      const deployDataArgs = [
         {
           name: ContractNames.HistoricDataFeedStoreV2,
           argsTypes: ['address'],
-          argsValues: [config.signer.address],
+          argsValues: [process.env.SEQUENCER_ADDRESS],
           salt: ethers.id('dataFeedStore'),
           value: 0n,
         },
@@ -136,7 +151,7 @@ task('deploy', 'Deploy contracts')
         {
           name: ContractNames.FeedRegistry,
           argsTypes: ['address', 'address'],
-          argsValues: [multisigAddress, dataFeedStoreAddress],
+          argsValues: [multisigAddress, upgradeableProxyAddress],
           salt: ethers.id('registry'),
           value: 0n,
         },
@@ -148,27 +163,49 @@ task('deploy', 'Deploy contracts')
               data.description,
               data.decimals,
               data.id,
-              dataFeedStoreAddress,
+              upgradeableProxyAddress,
             ],
             salt: ethers.id('aggregator'),
             value: 0n,
             data: data,
           };
         }),
-      ]);
+      ];
 
-      chainsDeployment[chainId] = {
-        name: configs[0].network.name,
-        contracts: {
-          ...deployData,
-          SafeMultisig: multisigAddress,
-        },
-      };
+      const parsedData = await saveDeployment(configs, {});
 
-      await registerChainlinkProxies(config, multisig, deployData, artifacts);
+      for (const [i, data] of deployDataArgs.slice(3).entries()) {
+        const address = parsedData.ChainlinkProxy[i].address;
+        console.log(
+          '\n\ndescription',
+          parsedData.ChainlinkProxy[i].description,
+        );
+        console.log('address', address);
+        await run('verify:verify', {
+          address: address,
+          constructorArguments: data.argsValues,
+        });
+      }
+
+      // const deployData = await deployContracts(
+      //   config,
+      //   multisig,
+      //   artifacts,
+      //   deployDataArgs,
+      // );
+
+      // chainsDeployment[chainId] = {
+      //   name: configs[0].network.name,
+      //   contracts: {
+      //     ...deployData,
+      //     SafeMultisig: multisigAddress,
+      //   },
+      // };
+
+      // await registerChainlinkProxies(config, multisig, deployData, artifacts);
     }
 
-    await saveDeployment(configs, chainsDeployment);
+    // await saveDeployment(configs, chainsDeployment);
   });
 
 const deployMultisig = async (config: NetworkConfig) => {
@@ -217,8 +254,8 @@ const initChain = async (
   const rpc = process.env['RPC_URL_' + envName]!;
   const provider = new ethers.JsonRpcProvider(rpc);
   const wallet = new Wallet(process.env['PRIV_KEY_' + envName]!, provider);
-  const owners: string[] =
-    process.env['OWNER_ADDRESSES_' + envName]?.split(',') || [];
+  const envOwners = process.env['OWNER_ADDRESSES_' + envName];
+  const owners: string[] = envOwners ? envOwners.split(',') : [];
 
   return {
     rpc,
@@ -240,22 +277,22 @@ const initChain = async (
   };
 };
 
-const predictDataFeedStoreAddress = async (
+const predictAddress = async (
   artifacts: Artifacts,
   config: NetworkConfig,
+  contractName: ContractNames,
+  salt: string,
+  args: string,
 ) => {
-  const abiCoder = ethers.AbiCoder.defaultAbiCoder();
-  const artifact = artifacts.readArtifactSync(
-    ContractNames.HistoricDataFeedStoreV2,
-  );
+  const artifact = artifacts.readArtifactSync(contractName);
   const bytecode = ethers.solidityPacked(
     ['bytes', 'bytes'],
-    [artifact.bytecode, abiCoder.encode(['address'], [config.signer.address])],
+    [artifact.bytecode, args],
   );
 
   return ethers.getCreate2Address(
     config.safeAddresses.createCallAddress,
-    ethers.id('dataFeedStore'),
+    salt,
     ethers.keccak256(bytecode),
   );
 };
@@ -455,10 +492,12 @@ const saveDeployment = async (
   const jsonData = await fs.readFile(file, 'utf8');
   const parsedData = JSON.parse(jsonData);
 
-  for (const config of configs) {
-    const chainId = config.network.chainId.toString();
-    parsedData[chainId] = chainsDeployment[chainId];
-  }
+  // for (const config of configs) {
+  //   const chainId = config.network.chainId.toString();
+  //   parsedData[chainId] = chainsDeployment[chainId];
+  // }
 
-  await fs.writeFile(file, JSON.stringify(parsedData, null, 2), 'utf8');
+  return parsedData[configs[0].network.chainId.toString()].contracts;
+
+  // await fs.writeFile(file, JSON.stringify(parsedData, null, 2), 'utf8');
 };

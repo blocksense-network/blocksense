@@ -2,7 +2,6 @@
 pragma solidity ^0.8.24;
 
 import '../../interfaces/IFeedRegistry.sol';
-import {IChainlinkAggregator} from '../../interfaces/chainlink/IChainlinkAggregator.sol';
 import {IAggregator} from '../../interfaces/IAggregator.sol';
 import {ProxyCall} from '../../libraries/ProxyCall.sol';
 
