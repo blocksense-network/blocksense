@@ -180,22 +180,12 @@ async fn get_rpc_providers(
             provider_metrics: provider_metrics.clone(),
             transcation_timeout_secs: p.transcation_timeout_secs,
             data_feed_store_byte_code: p.data_feed_store_byte_code.clone().map(|byte_code| {
-                hex::decode(byte_code.clone()).expect(
-                    format!(
-                        "data_feed_store_byte_code for provider {} is not valid hex string!",
-                        key
-                    )
-                    .as_str(),
-                )
+                hex::decode(byte_code.clone())
+                    .expect("data_feed_store_byte_code for provider is not valid hex string!")
             }),
             data_feed_sports_byte_code: p.data_feed_sports_byte_code.clone().map(|byte_code| {
-                hex::decode(byte_code.clone()).expect(
-                    format!(
-                        "data_feed_sports_byte_code for provider {} is not valid hex string!",
-                        key
-                    )
-                    .as_str(),
-                )
+                hex::decode(byte_code.clone())
+                    .expect("data_feed_sports_byte_code for provider is not valid hex string!")
             }),
         }));
 

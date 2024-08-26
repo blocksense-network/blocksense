@@ -1,6 +1,6 @@
 use alloy::{
-    hex::FromHex, network::TransactionBuilder, primitives::hex, primitives::Bytes,
-    providers::Provider, rpc::types::eth::TransactionRequest,
+    hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
+    rpc::types::eth::TransactionRequest,
 };
 use eyre::Result;
 // use reqwest::Client;
@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::Duration;
+
+use alloy::{dyn_abi::DynSolValue, primitives::Address};
 
 use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::spawn;
@@ -51,7 +53,7 @@ pub async fn deploy_contract(
         p.data_feed_sports_byte_code.clone()
     };
 
-    let Some(bytecode) = bytecode else {
+    let Some(mut bytecode) = bytecode else {
         return Err(eyre!("Byte code unavailable"));
     };
 
@@ -68,6 +70,13 @@ pub async fn deploy_contract(
         provider_metrics,
         get_chain_id
     );
+
+    let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(Address::from_private_key(
+        wallet.signer(),
+    ))]);
+
+    let mut encoded_arg = message_value.abi_encode();
+    bytecode.append(&mut encoded_arg);
 
     let tx = TransactionRequest::default()
         .from(wallet.address())

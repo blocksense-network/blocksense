@@ -22,7 +22,7 @@ use tracing::{debug, error, info};
 async fn get_key_from_contract(
     providers: &SharedRpcProviders,
     network: &String,
-    key: &String,
+    key: String,
 ) -> Result<String> {
     let providers = providers.read().await;
 
@@ -48,8 +48,11 @@ async fn get_key_from_contract(
 
     let base_fee = provider.get_gas_price().await?;
 
-    // key: 0x00000000
-    let input = Bytes::from_hex(key).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
+    let mut selector = key;
+    selector.replace_range(0..1, "8"); // 8 indicates we want to take the latest value.
+                                       // key: 0x00000000
+    let input =
+        Bytes::from_hex(selector).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
     let tx = TransactionRequest::default()
         .to(*addr)
         .from(wallet.address())
@@ -116,7 +119,7 @@ pub async fn get_key(req: HttpRequest, app_state: web::Data<FeedsState>) -> impl
     info!("getting key {} for network {} ...", key, network);
     let result = actix_web::rt::time::timeout(
         Duration::from_secs(7),
-        get_key_from_contract(&app_state.providers, &network, &key),
+        get_key_from_contract(&app_state.providers, &network, key),
     )
     .await;
     match result {
