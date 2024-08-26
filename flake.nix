@@ -5,10 +5,12 @@
     extra-substituters = [
       "https://blocksense.cachix.org"
       "https://mcl-blockchain-packages.cachix.org"
+      "https://mcl-public-cache.cachix.org"
     ];
     extra-trusted-public-keys = [
       "blocksense.cachix.org-1:BGg+LtKwTRIBw3BxCWEV//IO7v6+5CiJVSGzBOQUY/4="
       "mcl-blockchain-packages.cachix.org-1:qoEiUyBgNXmgJTThjbjO//XA9/6tCmx/OohHHt9hWVY="
+      "mcl-public-cache.cachix.org-1:OcUzMeoSAwNEd3YCaEbNjLV5/Gd+U5VFxdN2WGHfpCI="
     ];
   };
 
@@ -16,6 +18,7 @@
     mcl-blockchain.url = "github:metacraft-labs/nix-blockchain-development";
     nixpkgs.follows = "mcl-blockchain/nixpkgs";
     nixpkgs-unstable.follows = "mcl-blockchain/nixpkgs-unstable";
+    mcl-nixos-modules.follows = "mcl-blockchain/nixos-modules";
     ethereum-nix.follows = "mcl-blockchain/nixos-modules/ethereum-nix";
     flake-parts.follows = "mcl-blockchain/flake-parts";
     fenix.follows = "mcl-blockchain/fenix";

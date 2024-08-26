@@ -1155,6 +1155,10 @@
           "flake-parts"
         ],
         "mcl-blockchain": "mcl-blockchain",
+        "mcl-nixos-modules": [
+          "mcl-blockchain",
+          "nixos-modules"
+        ],
         "mk-shell-bin": "mk-shell-bin",
         "nix2container": [
           "mcl-blockchain",
