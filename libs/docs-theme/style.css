@@ -5,7 +5,7 @@
 /* Layout and Positioning */
 @import './src/nx-utilities/nx-layout-and-positioning.css';
 @import './src/nx-utilities/nx-layout-and-gaps.css';
-@import './src/nx-utilities/breadcrumb.css';
+@import './src/nx-utilities/nx-breadcrumb.css';
 /* Dimensions and Spacing */
 @import './src/nx-utilities/nx-dimensions.css';
 @import './src/nx-utilities/nx-padding.css';

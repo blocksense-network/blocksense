@@ -1,4 +1,4 @@
-import { useState, ReactNode, useEffect } from 'react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 import cn from 'clsx';
 
 type DropdownProps = {
@@ -9,41 +9,33 @@ type DropdownProps = {
 
 export function Dropdown({ trigger, children, className }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (!(event.target as HTMLElement).closest('.nx-dropdown-container')) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
 
     document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const handleToggle = (event: React.MouseEvent) => {
+  const toggleDropdown = (event: React.MouseEvent) => {
     event.stopPropagation();
-    setIsOpen(prev => !prev);
+    setIsOpen(prevIsOpen => !prevIsOpen);
   };
 
   return (
-    <div className={cn('nx-dropdown-container', className)}>
-      {trigger && (
-        <div className="nx-dropdown-trigger" onClick={handleToggle}>
-          {trigger}
-        </div>
-      )}
-      {isOpen && (
-        <div
-          className={cn('nx-dropdown-menu', {
-            'nx-dropdown-menu-open': isOpen,
-          })}
-        >
-          {children}
-        </div>
-      )}
+    <div ref={dropdownRef} className={cn('nx-dropdown-container', className)}>
+      <div className="nx-dropdown-trigger" onClick={toggleDropdown}>
+        {trigger}
+      </div>
+      {isOpen && <div className="nx-dropdown-menu">{children}</div>}
     </div>
   );
 }
