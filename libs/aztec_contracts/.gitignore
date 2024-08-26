@@ -1,4 +1,4 @@
 contracts/data_feed_store/target/
 contracts/data_feed_store/src/artifacts/
 node_modules/
-codegenCache.json
+contracts/data_feed_store/codegenCache.json
