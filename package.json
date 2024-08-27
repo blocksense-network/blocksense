@@ -8,7 +8,8 @@
   "scripts": {
     "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -e .pre-commit-config.yaml -- $(git rev-parse --show-toplevel)",
     "format:check": "pre-commit run --all",
-    "format:write": "pre-commit run --all || pre-commit run --all"
+    "format:write": "pre-commit run --all || pre-commit run --all",
+    "generate-data-feeds-config": "yarn workspace '@blocksense/data-feeds-config-generator' generate"
   },
   "dependenciesMeta": {
     "@openzeppelin/contracts@5.0.2": {
@@ -16,6 +17,12 @@
     },
     "next@14.2.5": {
       "unplugged": true
+    }
+  },
+  "exports": {
+    "./feeds_config": {
+      "require": "./config/feeds_config.json",
+      "import": "./config/feeds_config.json"
     }
   },
   "devDependencies": {
