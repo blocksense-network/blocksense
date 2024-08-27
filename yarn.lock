@@ -922,20 +922,10 @@ __metadata:
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.5.4"
     vercel: "npm:^35.2.4"
-  peerDependencies:
-    tslib: ^2.6.3
   dependenciesMeta:
-    "@aztec/foundation@0.49.2":
-      unplugged: true
     "@openzeppelin/contracts@5.0.2":
       unplugged: true
-    jest@29.7.0:
-      unplugged: true
     next@14.2.5:
-      unplugged: true
-    ts-jest@29.2.4:
-      unplugged: true
-    tslib@2.6.3:
       unplugged: true
   languageName: unknown
   linkType: soft
