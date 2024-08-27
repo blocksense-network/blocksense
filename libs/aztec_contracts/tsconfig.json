@@ -1,28 +1,13 @@
 {
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "dest",
-    "tsBuildInfoFile": ".tsbuildinfo",
     "target": "es2020",
     "lib": ["esnext", "dom", "es2017.object"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "strict": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": true,
     "esModuleInterop": true,
-    "downlevelIteration": true,
-    "inlineSourceMap": true,
-    "declarationMap": true,
-    "importHelpers": true,
     "resolveJsonModule": true,
-    "composite": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "tslib": ["../../.yarn/unplugged/tslib-npm-2.6.3-0fd136b3be/node_modules/tslib"]
-    }
   },
   "include": ["tests", "src", "src/**/*.json", "src/artifacts/*"],
 }
