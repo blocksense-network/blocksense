@@ -5,7 +5,6 @@ import type { ReactElement } from 'react';
 import { useConfig } from '../contexts';
 import type { DocsThemeConfig } from '../index';
 import { Anchor } from './anchor';
-import { Tooltip } from './tooltip';
 
 interface NavLinkProps {
   currentIndex: number;
@@ -55,14 +54,6 @@ export const NavLinks = ({
           <span className="nx-block nx-text-sm nx-font-semibold nx-text-black hover:nx-text-blue-900">
             {prev.title}
           </span>
-          <Tooltip>
-            <Tooltip.Content>
-              <span>Back to Previous</span>
-            </Tooltip.Content>
-            <span className="nx-hidden md:nx-block nx-text-xs nx-font-semibold nx-text-gray-600">
-              Previous
-            </span>
-          </Tooltip>
         </Anchor>
       )}
       {next && (
@@ -73,14 +64,6 @@ export const NavLinks = ({
             'ltr:nx-ml-auto ltr:nx-pl-4 ltr:nx-text-right rtl:nx-mr-auto rtl:nx-pr-4 rtl:nx-text-left nx-text-blue-900 hover:nx-text-black',
           )}
         >
-          <Tooltip>
-            <Tooltip.Content>
-              <span>Move Forward</span>
-            </Tooltip.Content>
-            <span className="nx-hidden md:nx-block nx-text-xs nx-font-semibold">
-              Next
-            </span>
-          </Tooltip>
           <span className="nx-block nx-text-sm nx-font-semibold nx-text-black hover:nx-text-blue-900">
             {next.title}
           </span>
