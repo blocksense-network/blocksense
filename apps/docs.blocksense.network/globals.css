@@ -146,9 +146,8 @@ main {
   .vertical-timeline-element {
     @apply p-8;
   }
-
   .vertical-timeline-element-date {
-    @apply text-slate-800;
+    @apply text-slate-600;
   }
 }
 
@@ -265,7 +264,10 @@ main {
     border: 1px solid;
     @apply border-slate-200 max-w-96 mt-10;
   }
-
+  .roadmap {
+    border: 1px solid;
+    @apply bg-zinc-50 border-slate-200 max-w-96;
+  }
   .tabs {
     border: 1px solid;
     @apply border-slate-200 shadow-md;
@@ -463,6 +465,9 @@ main {
 
   .text-xs {
     font-size: 0.7rem;
+  }
+  .vertical-timeline-element-title {
+    margin-bottom: 6px !important;
   }
 }
 
