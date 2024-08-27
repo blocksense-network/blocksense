@@ -41,6 +41,7 @@ let
     value.process-compose = {
       command = "${reporter.program}";
       environment = [
+        "FEEDS_CONFIG_DIR=${../../../../libs/feed_registry}"
         "REPORTER_CONFIG_DIR=${reportersConfigJSON.${name}}/reporter-${name}"
         "RUST_LOG=${conf.log-level}"
       ];
@@ -54,6 +55,7 @@ in
       blocksense-sequencer.process-compose = {
         command = "${sequencer.program}";
         environment = [
+          "FEEDS_CONFIG_DIR=${../../../../libs/feed_registry}"
           "SEQUENCER_CONFIG_DIR=${sequencerConfigJSON}"
           "SEQUENCER_LOGGING_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
         ];
