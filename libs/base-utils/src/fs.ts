@@ -95,7 +95,7 @@ export function selectDirectory(baseDir: string) {
     writeJSON: (args: FileArgs & { content: Record<string, unknown> }) => {
       const filePath = path.format({ dir: baseDir, ext: '.json', ...args });
       return fs
-        .writeFile(filePath, JSON.stringify(args.content, null, 2))
+        .writeFile(filePath, JSON.stringify(args.content, null, 2) + '\n')
         .then(() => {
           return filePath;
         });
@@ -128,5 +128,24 @@ export function selectDirectory(baseDir: string) {
       fs
         .readFile(path.format({ dir: baseDir, ext: '.json', ...args }), 'utf8')
         .then(JSON.parse),
+
+    /**
+     * Reads all JSON files in a directory and returns their data.
+     *
+     * @returns A promise that resolves to an array of objects, each containing the base name of a JSON file and its data.
+     */
+    readAllJSONFiles: async () => {
+      const files = await fs.readdir(baseDir);
+      const jsonFiles = files.filter(file => file.endsWith('.json'));
+      const jsonFilesData = await Promise.all(
+        jsonFiles.map(async file => {
+          const filePath = path.join(baseDir, file);
+          const { base } = path.parse(filePath);
+          const fileData = await fs.readFile(filePath, 'utf8');
+          return { base, data: JSON.parse(fileData) };
+        }),
+      );
+      return jsonFilesData;
+    },
   };
 }
