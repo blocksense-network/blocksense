@@ -410,6 +410,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/data-feeds-config-generator@workspace:apps/data-feeds-config-generator":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/data-feeds-config-generator@workspace:apps/data-feeds-config-generator"
+  dependencies:
+    "@blocksense/base-utils": "workspace:*"
+    "@effect/data": "npm:^0.18.7"
+    "@effect/schema": "npm:^0.71.1"
+    "@types/node": "npm:^22.3.0"
+    effect: "npm:^3.7.0"
+    tsx: "npm:^4.17.0"
+    typescript: "npm:^5.5.4"
+    yahoo-finance2: "npm:^2.11.3"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/docs-theme@workspace:*, @blocksense/docs-theme@workspace:libs/docs-theme":
   version: 0.0.0-use.local
   resolution: "@blocksense/docs-theme@workspace:libs/docs-theme"
@@ -596,6 +611,13 @@ __metadata:
   dependencies:
     "@edge-runtime/primitives": "npm:4.1.0"
   checksum: 10c0/ee9f23abfe3f661f9bf5bcc3b1b779157d8e2c42ff160827ca345ec5b4043e98939cec5a917a3c3a3169908bc095d1d180d9261353886d83a4a083aa6e9feae0
+  languageName: node
+  linkType: hard
+
+"@effect/data@npm:^0.18.7":
+  version: 0.18.7
+  resolution: "@effect/data@npm:0.18.7"
+  checksum: 10c0/5c6f26fab197df3fb669839a242c3caeacac2b01ceb7b7873ccf10473d95674981bd2495176e59217172604157dda8a18651dacaa4e949b4027de0eb0106dc71
   languageName: node
   linkType: hard
 
@@ -4028,6 +4050,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/tough-cookie@npm:^4.0.2":
+  version: 4.0.5
+  resolution: "@types/tough-cookie@npm:4.0.5"
+  checksum: 10c0/68c6921721a3dcb40451543db2174a145ef915bc8bcbe7ad4e59194a0238e776e782b896c7a59f4b93ac6acefca9161fccb31d1ce3b3445cb6faa467297fb473
+  languageName: node
+  linkType: hard
+
 "@types/unist@npm:*, @types/unist@npm:^3.0.0":
   version: 3.0.2
   resolution: "@types/unist@npm:3.0.2"
@@ -4578,6 +4607,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ajv-formats@npm:2.1.1":
+  version: 2.1.1
+  resolution: "ajv-formats@npm:2.1.1"
+  dependencies:
+    ajv: "npm:^8.0.0"
+  peerDependencies:
+    ajv: ^8.0.0
+  peerDependenciesMeta:
+    ajv:
+      optional: true
+  checksum: 10c0/e43ba22e91b6a48d96224b83d260d3a3a561b42d391f8d3c6d2c1559f9aa5b253bfb306bc94bbeca1d967c014e15a6efe9a207309e95b3eaae07fcbcdc2af662
+  languageName: node
+  linkType: hard
+
+"ajv@npm:8.10.0":
+  version: 8.10.0
+  resolution: "ajv@npm:8.10.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+    uri-js: "npm:^4.2.2"
+  checksum: 10c0/cc2c02a89289420ea96720f728d39d4d19dbcb2c1d0363481d0a9973282b69d94c8c1a02f4c424a89a1bd888e6049f87d0f82d21b5d056546cdbb364dd043f23
+  languageName: node
+  linkType: hard
+
 "ajv@npm:8.6.3":
   version: 8.6.3
   resolution: "ajv@npm:8.6.3"
@@ -4599,6 +4654,18 @@ __metadata:
     json-schema-traverse: "npm:^0.4.1"
     uri-js: "npm:^4.2.2"
   checksum: 10c0/41e23642cbe545889245b9d2a45854ebba51cda6c778ebced9649420d9205f2efb39cb43dbc41e358409223b1ea43303ae4839db682c848b891e4811da1a5a71
+  languageName: node
+  linkType: hard
+
+"ajv@npm:^8.0.0":
+  version: 8.17.1
+  resolution: "ajv@npm:8.17.1"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    fast-uri: "npm:^3.0.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+  checksum: 10c0/ec3ba10a573c6b60f94639ffc53526275917a2df6810e4ab5a6b959d87459f9ef3f00d5e7865b82677cb7d21590355b34da14d1d0b9c32d75f95a187e76fff35
   languageName: node
   linkType: hard
 
@@ -6752,6 +6819,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"effect@npm:^3.7.0":
+  version: 3.7.0
+  resolution: "effect@npm:3.7.0"
+  checksum: 10c0/707061cdd543e7d82192cea99444869dd8a7ee5897b9589c00d213a64f0c7d6e8abe419a1db644f669bfdab227c71c6a69c7fb9651db3bc19cf7e98f9413fc6f
+  languageName: node
+  linkType: hard
+
 "electron-to-chromium@npm:^1.4.668":
   version: 1.4.789
   resolution: "electron-to-chromium@npm:1.4.789"
@@ -7782,7 +7856,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-deep-equal@npm:^3.1.1":
+"fast-deep-equal@npm:^3.1.1, fast-deep-equal@npm:^3.1.3":
   version: 3.1.3
   resolution: "fast-deep-equal@npm:3.1.3"
   checksum: 10c0/40dedc862eb8992c54579c66d914635afbec43350afbbe991235fdcb4e3a8d5af1b23ae7e79bef7d4882d0ecee06c3197488026998fb19f72dc95acff1d1b1d0
@@ -7813,6 +7887,13 @@ __metadata:
   version: 2.0.6
   resolution: "fast-levenshtein@npm:2.0.6"
   checksum: 10c0/111972b37338bcb88f7d9e2c5907862c280ebf4234433b95bc611e518d192ccb2d38119c4ac86e26b668d75f7f3894f4ff5c4982899afced7ca78633b08287c4
+  languageName: node
+  linkType: hard
+
+"fast-uri@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "fast-uri@npm:3.0.1"
+  checksum: 10c0/3cd46d6006083b14ca61ffe9a05b8eef75ef87e9574b6f68f2e17ecf4daa7aaadeff44e3f0f7a0ef4e0f7e7c20fc07beec49ff14dc72d0b500f00386592f2d10
   languageName: node
   linkType: hard
 
@@ -11714,7 +11795,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.7":
+"node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:
@@ -14837,7 +14918,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tough-cookie@npm:^4.1.4":
+"tough-cookie-file-store@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "tough-cookie-file-store@npm:2.0.3"
+  dependencies:
+    tough-cookie: "npm:^4.0.0"
+  checksum: 10c0/50dc929d235d5b2cbba0d33f642715a2191c641867f5d242dba3b4bec6f44dbc69005cb3d1581b0e0b85861cd15ec547a6cda41592c8da2bea64b42f4231f07f
+  languageName: node
+  linkType: hard
+
+"tough-cookie@npm:^4.0.0, tough-cookie@npm:^4.1.2, tough-cookie@npm:^4.1.4":
   version: 4.1.4
   resolution: "tough-cookie@npm:4.1.4"
   dependencies:
@@ -16509,6 +16599,22 @@ __metadata:
   version: 5.0.8
   resolution: "y18n@npm:5.0.8"
   checksum: 10c0/4df2842c36e468590c3691c894bc9cdbac41f520566e76e24f59401ba7d8b4811eb1e34524d57e54bc6d864bcb66baab7ffd9ca42bf1eda596618f9162b91249
+  languageName: node
+  linkType: hard
+
+"yahoo-finance2@npm:^2.11.3":
+  version: 2.11.3
+  resolution: "yahoo-finance2@npm:2.11.3"
+  dependencies:
+    "@types/tough-cookie": "npm:^4.0.2"
+    ajv: "npm:8.10.0"
+    ajv-formats: "npm:2.1.1"
+    node-fetch: "npm:^2.6.1"
+    tough-cookie: "npm:^4.1.2"
+    tough-cookie-file-store: "npm:^2.0.3"
+  bin:
+    yahoo-finance: bin/yahoo-finance.js
+  checksum: 10c0/1d066d4d459e0f8f2df0df89287ea45a7353c2013a034b5557987a3ce5272966e8866c6e40c5973138a3479eb12ee18af13d7a6e90cbd7ec64e05a6c050dfe82
   languageName: node
   linkType: hard
 

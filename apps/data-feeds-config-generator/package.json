@@ -1,0 +1,29 @@
+{
+  "name": "@blocksense/data-feeds-config-generator",
+  "type": "module",
+  "version": "0.0.0",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "ts": "yarn node --import tsx",
+    "get-chainlink-feeds": "yarn ts src/get_chainlink_feeds.ts",
+    "generate-data-feeds-config": "yarn ts src/index.ts > artifacts/data-feeds-config-generation-output.json",
+    "generate": "yarn get-chainlink-feeds && yarn generate-data-feeds-config"
+  },
+  "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@effect/data": "^0.18.7",
+    "@effect/schema": "^0.71.1",
+    "@types/node": "^22.3.0",
+    "effect": "^3.7.0",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "yahoo-finance2": "^2.11.3"
+  }
+}
