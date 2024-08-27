@@ -157,3 +157,6 @@ apps/docs.blocksense.network/pages/docs/contracts/reference-documentation/_meta.
 
 # Process Compose
 process-compose.yml
+
+# Data files like chainlink feeds, cmc assets, etc.
+apps/data-feeds-config-generator/artifacts
