@@ -33,7 +33,7 @@ let
       wantedBy = [ "multi-user.target" ];
       requires = [ "blocksense-sequencer.service" ];
       environment = {
-        FEEDS_CONFIG_DIR = "${../../../../libs/feed_registry}";
+        FEEDS_CONFIG_DIR = "${../../../../config}";
         REPORTER_CONFIG_DIR = "/etc/blocksense/reporter-${name}";
         RUST_LOG = "${conf.log-level}";
       };
@@ -65,7 +65,7 @@ in
           (map (x: "blocksense-anvil-${x}.service"))
         ];
         environment = {
-          FEEDS_CONFIG_DIR = "${../../../../libs/feed_registry}";
+          FEEDS_CONFIG_DIR = "${../../../../config}";
           SEQUENCER_CONFIG_DIR = "/etc/blocksense";
           SEQUENCER_LOGGING_LEVEL = "${lib.toUpper cfg.sequencer.log-level}";
         };

@@ -1,0 +1,4941 @@
+{
+  "feeds": [
+    {
+      "id": 0,
+      "name": "SAND",
+      "fullName": "",
+      "description": "SAND / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SAND",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6210,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 1,
+      "name": "AVAX",
+      "fullName": "",
+      "description": "AVAX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "AVAX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5805,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 2,
+      "name": "UNI",
+      "fullName": "",
+      "description": "UNI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "UNI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4307,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 3,
+      "name": "DOT",
+      "fullName": "",
+      "description": "DOT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DOT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6636,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 4,
+      "name": "BAT",
+      "fullName": "",
+      "description": "BAT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BAT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1697,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 5,
+      "name": "LINK",
+      "fullName": "",
+      "description": "LINK / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "LINK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1975,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 6,
+      "name": "MANA",
+      "fullName": "",
+      "description": "MANA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MANA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1966,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 7,
+      "name": "USDC",
+      "fullName": "",
+      "description": "USDC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USDC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3408,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 8,
+      "name": "APE",
+      "fullName": "",
+      "description": "APE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "APE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7257,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 9,
+      "name": "AXS",
+      "fullName": "",
+      "description": "AXS / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "AXS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6783,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 10,
+      "name": "MKR",
+      "fullName": "",
+      "description": "MKR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MKR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1518,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 11,
+      "name": "BTC",
+      "fullName": "",
+      "description": "BTC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BTC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 12,
+      "name": "MATIC",
+      "fullName": "",
+      "description": "MATIC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MATIC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3890,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 13,
+      "name": "SNX",
+      "fullName": "",
+      "description": "SNX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SNX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2586,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 14,
+      "name": "USDT",
+      "fullName": "",
+      "description": "USDT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USDT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 825,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 15,
+      "name": "NEAR",
+      "fullName": "",
+      "description": "NEAR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "NEAR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6535,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 16,
+      "name": "COMP",
+      "fullName": "",
+      "description": "COMP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "COMP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5692,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 17,
+      "name": "ZRX",
+      "fullName": "",
+      "description": "ZRX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ZRX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1896,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 18,
+      "name": "ETH",
+      "fullName": "",
+      "description": "ETH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ETH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1027,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 19,
+      "name": "CHZ",
+      "fullName": "",
+      "description": "CHZ / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CHZ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4066,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 20,
+      "name": "BEAM",
+      "fullName": "Beam",
+      "description": "BEAM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BEAM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3702,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 21,
+      "name": "SGD",
+      "fullName": "Singapore Dollar",
+      "description": "SGD / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "SGD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "SGDUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 22,
+      "name": "SPELL",
+      "fullName": "Spell Token",
+      "description": "SPELL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SPELL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 11289,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 23,
+      "name": "CAKE",
+      "fullName": "PancakeSwap",
+      "description": "CAKE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CAKE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7186,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 24,
+      "name": "XAU",
+      "fullName": "Gold",
+      "description": "XAU / USD",
+      "type": "Commodities",
+      "decimals": 8,
+      "pair": {
+        "base": "XAU",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 25,
+      "name": "ALPHA",
+      "fullName": "Alpha Finance",
+      "description": "ALPHA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ALPHA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7232,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 26,
+      "name": "JOE",
+      "fullName": "Trader Joe",
+      "description": "JOE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "JOE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 11396,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 27,
+      "name": "XAVA",
+      "fullName": "Avalaunch",
+      "description": "XAVA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XAVA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9797,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 28,
+      "name": "CVX",
+      "fullName": "Convex Finance",
+      "description": "CVX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CVX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9903,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 29,
+      "name": "QI",
+      "fullName": "Benqi",
+      "description": "QI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "QI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8510,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 30,
+      "name": "YFI",
+      "fullName": "Yearn Finance",
+      "description": "YFI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "YFI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5864,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 31,
+      "name": "MIM",
+      "fullName": "Magic Internet Money",
+      "description": "MIM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MIM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 162,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 32,
+      "name": "EUR",
+      "fullName": "Euro",
+      "description": "EUR / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "EUR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "EURUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 33,
+      "name": "TUSD",
+      "fullName": "True USD",
+      "description": "TUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "TUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2563,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 34,
+      "name": "CHF",
+      "fullName": "Swiss Franc",
+      "description": "CHF / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "CHF",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "CHFUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 35,
+      "name": "KNC",
+      "fullName": "Kyber Network Crystal v2",
+      "description": "KNC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "KNC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9444,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 36,
+      "name": "GMX",
+      "fullName": "GMX",
+      "description": "GMX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "GMX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 11857,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 37,
+      "name": "WBTC",
+      "fullName": "Wrapped Bitcoin",
+      "description": "WBTC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "WBTC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3717,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 38,
+      "name": "ADA",
+      "fullName": "Cardano",
+      "description": "ADA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ADA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2010,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 39,
+      "name": "FRAX",
+      "fullName": "FRAX",
+      "description": "FRAX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FRAX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6952,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 40,
+      "name": "FXS",
+      "fullName": "Frax Share",
+      "description": "FXS / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FXS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6953,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 41,
+      "name": "MIMATIC",
+      "fullName": "MAI",
+      "description": "MIMATIC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MIMATIC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 10238,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 42,
+      "name": "COQ",
+      "fullName": "Coq Inu",
+      "description": "COQ / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "COQ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 28675,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 43,
+      "name": "FTM",
+      "fullName": "Fantom",
+      "description": "FTM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FTM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3513,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 44,
+      "name": "SUSHI",
+      "fullName": "Sushi",
+      "description": "SUSHI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SUSHI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6758,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 45,
+      "name": "TRY",
+      "fullName": "Turkish Lira",
+      "description": "TRY / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "TRY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "TRYUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 46,
+      "name": "FIL",
+      "fullName": "Filecoin",
+      "description": "FIL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FIL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2280,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 47,
+      "name": "XAG",
+      "fullName": "Silver",
+      "description": "XAG / USD",
+      "type": "Commodities",
+      "decimals": 8,
+      "pair": {
+        "base": "XAG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 48,
+      "name": "JPY",
+      "fullName": "Japanese Yen",
+      "description": "JPY / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "JPY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "JPYUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 49,
+      "name": "DAI",
+      "fullName": "DAI",
+      "description": "DAI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DAI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4943,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 50,
+      "name": "CRV",
+      "fullName": "Curve DAO",
+      "description": "CRV / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CRV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6538,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 51,
+      "name": "UST",
+      "fullName": "Terra USD",
+      "description": "UST / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "UST",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 52,
+      "name": "AAVE",
+      "fullName": "Aave",
+      "description": "AAVE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "AAVE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7278,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 53,
+      "name": "EURC",
+      "fullName": "Circle EUR",
+      "description": "EURC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "EURC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 20641,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 54,
+      "name": "TRX",
+      "fullName": "Tron",
+      "description": "TRX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "TRX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1958,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 55,
+      "name": "INR",
+      "fullName": "Indian Rupee",
+      "description": "INR / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "INR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "INRUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 56,
+      "name": "LIT",
+      "fullName": "Litentry",
+      "description": "LIT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "LIT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3870,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 57,
+      "name": "WING",
+      "fullName": "Wing Finance",
+      "description": "WING / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "WING",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7048,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 58,
+      "name": "COIN",
+      "fullName": "Coinbase",
+      "description": "COIN / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "COIN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 59,
+      "name": "DOGE",
+      "fullName": "Dogecoin",
+      "description": "DOGE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DOGE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 74,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 60,
+      "name": "1INCH",
+      "fullName": "1inch",
+      "description": "1INCH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "1INCH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8104,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 61,
+      "name": "CHR",
+      "fullName": "Chromaway",
+      "description": "CHR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CHR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3978,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 62,
+      "name": "NVDA",
+      "fullName": "Nvidia",
+      "description": "NVDA / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "NVDA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 63,
+      "name": "TSLA",
+      "fullName": "Tesla",
+      "description": "TSLA / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "TSLA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 64,
+      "name": "WIN",
+      "fullName": "WINkLink",
+      "description": "WIN / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "WIN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4206,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 65,
+      "name": "EOS",
+      "fullName": "EOS",
+      "description": "EOS / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "EOS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1765,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 66,
+      "name": "PFE",
+      "fullName": "Pfizer",
+      "description": "PFE / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "PFE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 67,
+      "name": "KAVA",
+      "fullName": "Kava",
+      "description": "KAVA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "KAVA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4846,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 68,
+      "name": "ONT",
+      "fullName": "Ontology",
+      "description": "ONT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ONT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2566,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 69,
+      "name": "PAXG",
+      "fullName": "Pax Gold",
+      "description": "PAXG / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "PAXG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4705,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 70,
+      "name": "MXN",
+      "fullName": "Mexican Peso",
+      "description": "MXN / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "MXN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "MXNUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 71,
+      "name": "BETH",
+      "fullName": "Binance ETH",
+      "description": "BETH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BETH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8353,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 72,
+      "name": "SPY",
+      "fullName": "SPY S&P 500 ETF",
+      "description": "SPY / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "SPY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 73,
+      "name": "ATOM",
+      "fullName": "Cosmos",
+      "description": "ATOM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ATOM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3794,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 74,
+      "name": "C98",
+      "fullName": "C98",
+      "description": "C98 / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "C98",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 10903,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 75,
+      "name": "SHIB",
+      "fullName": "Shiba Inu",
+      "description": "SHIB / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SHIB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5994,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 76,
+      "name": "PHP",
+      "fullName": "Philippine Peso",
+      "description": "PHP / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "PHP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "PHPUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 77,
+      "name": "SOL",
+      "fullName": "Solana",
+      "description": "SOL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SOL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5426,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 78,
+      "name": "CFX",
+      "fullName": "Conflux",
+      "description": "CFX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CFX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7334,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 79,
+      "name": "INJ",
+      "fullName": "Injective Protocol",
+      "description": "INJ / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "INJ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7226,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 80,
+      "name": "GBP",
+      "fullName": "Pound Sterling",
+      "description": "GBP / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "GBP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "GBPUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 81,
+      "name": "BAND",
+      "fullName": "Band Protocol",
+      "description": "BAND / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BAND",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4679,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 82,
+      "name": "DODO",
+      "fullName": "Dodo",
+      "description": "DODO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DODO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7224,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 83,
+      "name": "BUSD",
+      "fullName": "Binance USD",
+      "description": "BUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4687,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 84,
+      "name": "THB",
+      "fullName": "Thai Baht",
+      "description": "THB / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "THB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "THBUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 85,
+      "name": "NULS",
+      "fullName": "Nuls",
+      "description": "NULS / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "NULS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2092,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 86,
+      "name": "SXP",
+      "fullName": "Swipe",
+      "description": "SXP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SXP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4279,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 87,
+      "name": "USDV",
+      "fullName": "Verified USD",
+      "description": "USDV / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USDV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 28443,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 88,
+      "name": "WOO",
+      "fullName": "Woo Network",
+      "description": "WOO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "WOO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7501,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 89,
+      "name": "REEF",
+      "fullName": "Reef Finance",
+      "description": "REEF / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "REEF",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6951,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 90,
+      "name": "MS",
+      "fullName": "Morgan Stanley",
+      "description": "MS / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "MS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 91,
+      "name": "XRP",
+      "fullName": "Ripple",
+      "description": "XRP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XRP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 52,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 92,
+      "name": "VAI",
+      "fullName": "Vai",
+      "description": "VAI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "VAI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7824,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 93,
+      "name": "FET",
+      "fullName": "Fetch.ai",
+      "description": "FET / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FET",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3773,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 94,
+      "name": "VET",
+      "fullName": "VeChain",
+      "description": "VET / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "VET",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3077,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 95,
+      "name": "ZAR",
+      "fullName": "South African Rand",
+      "description": "ZAR / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "ZAR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "ZARUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 96,
+      "name": "GME",
+      "fullName": "Gamestop",
+      "description": "GME / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "GME",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 97,
+      "name": "FDUSD",
+      "fullName": "First Digital USD",
+      "description": "FDUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FDUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 26081,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 98,
+      "name": "MASK",
+      "fullName": "Mask Network",
+      "description": "MASK / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MASK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8536,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 99,
+      "name": "XVS",
+      "fullName": "Venus",
+      "description": "XVS / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XVS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7288,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 100,
+      "name": "ONG",
+      "fullName": "Ontology Gas",
+      "description": "ONG / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ONG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3217,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 101,
+      "name": "ICP",
+      "fullName": "Internet Computer Protocol",
+      "description": "ICP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ICP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8916,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 102,
+      "name": "JPM",
+      "fullName": "JP Morgan",
+      "description": "JPM / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "JPM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 103,
+      "name": "RDNT",
+      "fullName": "Radiant Capital",
+      "description": "RDNT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "RDNT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 21106,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 104,
+      "name": "GOOGL",
+      "fullName": "Alphabet",
+      "description": "GOOGL / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "GOOGL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 105,
+      "name": "WTI",
+      "fullName": "WTI Crude",
+      "description": "WTI / USD",
+      "type": "Commodities",
+      "decimals": 8,
+      "pair": {
+        "base": "WTI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 106,
+      "name": "HIGH",
+      "fullName": "Highstreet",
+      "description": "HIGH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "HIGH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 11232,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 107,
+      "name": "BSW",
+      "fullName": "Biswap",
+      "description": "BSW / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BSW",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 10746,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 108,
+      "name": "BNB",
+      "fullName": "BNB",
+      "description": "BNB / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BNB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1839,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 109,
+      "name": "AMZN",
+      "fullName": "Amazon",
+      "description": "AMZN / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "AMZN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 110,
+      "name": "LINA",
+      "fullName": "Linear",
+      "description": "LINA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "LINA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7102,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 111,
+      "name": "AAPL",
+      "fullName": "Apple",
+      "description": "AAPL / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "AAPL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 112,
+      "name": "XTZ",
+      "fullName": "Tezos",
+      "description": "XTZ / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XTZ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2011,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 113,
+      "name": "GMT",
+      "fullName": "STEPN",
+      "description": "GMT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "GMT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 18069,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 114,
+      "name": "MSFT",
+      "fullName": "Microsoft",
+      "description": "MSFT / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "MSFT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 115,
+      "name": "META",
+      "fullName": "Meta",
+      "description": "META / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "META",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 116,
+      "name": "NFLX",
+      "fullName": "Netflix",
+      "description": "NFLX / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "NFLX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 117,
+      "name": "ALPACA",
+      "fullName": "Alpaca Finance",
+      "description": "ALPACA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ALPACA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8707,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 118,
+      "name": "BCH",
+      "fullName": "Bitcoin Cash",
+      "description": "BCH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BCH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1831,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 119,
+      "name": "MRNA",
+      "fullName": "Moderna",
+      "description": "MRNA / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "MRNA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 120,
+      "name": "XLM",
+      "fullName": "Stellar",
+      "description": "XLM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XLM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 512,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 121,
+      "name": "QQQ",
+      "fullName": "QQQ Nasdaq 100 ETF",
+      "description": "QQQ / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "QQQ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 122,
+      "name": "KLAY",
+      "fullName": "Klaytn",
+      "description": "KLAY / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "KLAY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4256,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 123,
+      "name": "BRL",
+      "fullName": "Brazilian Real",
+      "description": "BRL / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "BRL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "BRLUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 124,
+      "name": "LTC",
+      "fullName": "Litecoin",
+      "description": "LTC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "LTC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 125,
+      "name": "MBOX",
+      "fullName": "",
+      "description": "MBOX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MBOX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9175,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 126,
+      "name": "CUSD",
+      "fullName": "Celo Dollar",
+      "description": "CUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7236,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 127,
+      "name": "CELO",
+      "fullName": "Celo",
+      "description": "CELO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CELO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5567,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 128,
+      "name": "COP",
+      "fullName": "Colombian Peso",
+      "description": "COP / USD",
+      "type": "Fiat",
+      "decimals": 8,
+      "pair": {
+        "base": "COP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "COPUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 129,
+      "name": "METIS",
+      "fullName": "Metis",
+      "description": "METIS / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "METIS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9640,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 130,
+      "name": "OP",
+      "fullName": "Optimism",
+      "description": "OP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "OP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 11840,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 131,
+      "name": "CNY",
+      "fullName": "Chinese Yuan",
+      "description": "CNY / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "CNY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "CNYUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 132,
+      "name": "LUSD",
+      "fullName": "Liquity USD",
+      "description": "LUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "LUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9566,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 133,
+      "name": "KRW",
+      "fullName": "Korean Won",
+      "description": "KRW / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "KRW",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "KRWUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 134,
+      "name": "DPX",
+      "fullName": "Dopex",
+      "description": "DPX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DPX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 11188,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 135,
+      "name": "USD+",
+      "fullName": "USD+",
+      "description": "USD+ / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USD+",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 20317,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 136,
+      "name": "sUSDe",
+      "fullName": "Ethena Staked USDe",
+      "description": "sUSDe / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "sUSDe",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 29471,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 137,
+      "name": "GHO",
+      "fullName": "GHO",
+      "description": "GHO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "GHO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 23508,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 138,
+      "name": "RPL",
+      "fullName": "Rocket Pool",
+      "description": "RPL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "RPL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2943,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 139,
+      "name": "ARB",
+      "fullName": "Arbitrum",
+      "description": "ARB / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ARB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 938,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 140,
+      "name": "ULTI",
+      "fullName": "",
+      "description": "ULTI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ULTI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 31504,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 141,
+      "name": "STG",
+      "fullName": "Stargate Finance",
+      "description": "STG / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "STG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 18934,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 142,
+      "name": "PENDLE",
+      "fullName": "Pendle",
+      "description": "PENDLE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "PENDLE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9481,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 143,
+      "name": "GNS",
+      "fullName": "Gains Network",
+      "description": "GNS / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "GNS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 13663,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 144,
+      "name": "CAD",
+      "fullName": "Canadian Dollar",
+      "description": "CAD / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "CAD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "CADUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 145,
+      "name": "BAL",
+      "fullName": "Balancer",
+      "description": "BAL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BAL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5728,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 146,
+      "name": "RSR",
+      "fullName": "Reserve Rights",
+      "description": "RSR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "RSR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3964,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 147,
+      "name": "MAGIC",
+      "fullName": "Magic",
+      "description": "MAGIC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MAGIC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 14783,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 148,
+      "name": "PEPE",
+      "fullName": "PEPE",
+      "description": "PEPE / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "PEPE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 22454,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 149,
+      "name": "AXL",
+      "fullName": "Axelar",
+      "description": "AXL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "AXL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 15853,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 150,
+      "name": "IOTX",
+      "fullName": "IoTeX",
+      "description": "IOTX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "IOTX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2777,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 151,
+      "name": "WIF",
+      "fullName": "dogwifhat",
+      "description": "WIF / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "WIF",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 28752,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 152,
+      "name": "GRT",
+      "fullName": "The Graph",
+      "description": "GRT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "GRT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6719,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 153,
+      "name": "TIA",
+      "fullName": "Celestia",
+      "description": "TIA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "TIA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 18411,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 154,
+      "name": "MLN",
+      "fullName": "",
+      "description": "MLN / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MLN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1552,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 155,
+      "name": "TAO",
+      "fullName": "Bittensor",
+      "description": "TAO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "TAO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 22974,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 156,
+      "name": "MNT",
+      "fullName": "Mantle",
+      "description": "MNT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MNT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 27075,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 157,
+      "name": "USDe",
+      "fullName": "Ethena USDe",
+      "description": "USDe / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USDe",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 29470,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 158,
+      "name": "LDO",
+      "fullName": "Lido DAO",
+      "description": "LDO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "LDO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8000,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 159,
+      "name": "ZRO",
+      "fullName": "LayerZero",
+      "description": "ZRO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ZRO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 26997,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 160,
+      "name": "TBTC",
+      "fullName": "tBTC",
+      "description": "TBTC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "TBTC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5776,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 161,
+      "name": "XAI",
+      "fullName": "Xai",
+      "description": "XAI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XAI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 11726,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 162,
+      "name": "CRVUSD",
+      "fullName": "crvUSD",
+      "description": "CRVUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CRVUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 24927,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 163,
+      "name": "SEK",
+      "fullName": "Swedish Krona",
+      "description": "SEK / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "SEK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "SEKUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 164,
+      "name": "ASTR",
+      "fullName": "",
+      "description": "ASTR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ASTR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 12885,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 165,
+      "name": "USDD",
+      "fullName": "USDD",
+      "description": "USDD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USDD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 19891,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 166,
+      "name": "DPI",
+      "fullName": "DefiPulse Index",
+      "description": "DPI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DPI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7055,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 167,
+      "name": "WEMIX",
+      "fullName": "WEMIX",
+      "description": "WEMIX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "WEMIX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7548,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 168,
+      "name": "OGN",
+      "fullName": "",
+      "description": "OGN / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "OGN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5117,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 169,
+      "name": "MEW",
+      "fullName": "",
+      "description": "MEW / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "MEW",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 30126,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 170,
+      "name": "MAVIA",
+      "fullName": "Heroes of Mavia",
+      "description": "MAVIA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MAVIA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 28829,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 171,
+      "name": "APT",
+      "fullName": "Aptos",
+      "description": "APT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "APT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 13473,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 172,
+      "name": "AERO",
+      "fullName": "Aerodrome Finance",
+      "description": "AERO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "AERO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 17706,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 173,
+      "name": "DEGEN",
+      "fullName": "Degen (Base)",
+      "description": "DEGEN / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DEGEN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 24276,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 174,
+      "name": "MOG",
+      "fullName": "",
+      "description": "MOG / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "MOG",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 27659,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 175,
+      "name": "WSTETH",
+      "fullName": "Lido wstETH",
+      "description": "WSTETH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "WSTETH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 12409,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 176,
+      "name": "FOXY",
+      "fullName": "",
+      "description": "FOXY / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "FOXY",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 20801,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 177,
+      "name": "FLOW",
+      "fullName": "Flow",
+      "description": "FLOW / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FLOW",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4558,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 178,
+      "name": "UMA",
+      "fullName": "UMA",
+      "description": "UMA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "UMA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5617,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 179,
+      "name": "SUSD",
+      "fullName": "SUSD",
+      "description": "SUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2927,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 180,
+      "name": "DYDX",
+      "fullName": "dYdX",
+      "description": "DYDX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DYDX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 28324,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 181,
+      "name": "STX",
+      "fullName": "Stacks",
+      "description": "STX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "STX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1861,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 182,
+      "name": "RUNE",
+      "fullName": "THORChain",
+      "description": "RUNE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "RUNE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4157,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 183,
+      "name": "ORDI",
+      "fullName": "ORDI",
+      "description": "ORDI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ORDI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 25028,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 184,
+      "name": "ALGO",
+      "fullName": "Algorand",
+      "description": "ALGO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ALGO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4030,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 185,
+      "name": "VELO",
+      "fullName": "Velo",
+      "description": "VELO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "VELO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7127,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 186,
+      "name": "ZIL",
+      "fullName": "Zilliqa",
+      "description": "ZIL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ZIL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2469,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 187,
+      "name": "FLOKI",
+      "fullName": "Floki Inu",
+      "description": "FLOKI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FLOKI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 10804,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 188,
+      "name": "ANKR",
+      "fullName": "Ankr",
+      "description": "ANKR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ANKR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3783,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 189,
+      "name": "ETC",
+      "fullName": "Ethereum",
+      "description": "ETC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ETC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1321,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 190,
+      "name": "JUP",
+      "fullName": "Jupiter",
+      "description": "JUP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "JUP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1503,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 191,
+      "name": "IMX",
+      "fullName": "Immutable X",
+      "description": "IMX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "IMX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 10603,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 192,
+      "name": "ONE",
+      "fullName": "Harmony",
+      "description": "ONE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ONE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2324,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 193,
+      "name": "ENJ",
+      "fullName": "Enjin Coin",
+      "description": "ENJ / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ENJ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2130,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 194,
+      "name": "WLD",
+      "fullName": "Worldcoin",
+      "description": "WLD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "WLD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 13502,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 195,
+      "name": "SATS",
+      "fullName": "",
+      "description": "SATS / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "SATS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 23839,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 196,
+      "name": "XMR",
+      "fullName": "Monero",
+      "description": "XMR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XMR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 328,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 197,
+      "name": "BONK",
+      "fullName": "Bonk",
+      "description": "BONK / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "BONK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 23095,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 198,
+      "name": "PERP",
+      "fullName": "Perpetual Protocol",
+      "description": "PERP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "PERP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6950,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 199,
+      "name": "PYTH",
+      "fullName": "Pyth Network",
+      "description": "PYTH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "PYTH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 28177,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 200,
+      "name": "MAV",
+      "fullName": "Maverick Protocol",
+      "description": "MAV / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MAV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 18037,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 201,
+      "name": "SEI",
+      "fullName": "Sei",
+      "description": "SEI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SEI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 23149,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 202,
+      "name": "JTO",
+      "fullName": "Jito",
+      "description": "JTO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "JTO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 28541,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 203,
+      "name": "ZEC",
+      "fullName": "ZCash",
+      "description": "ZEC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ZEC",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1437,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 204,
+      "name": "BLUR",
+      "fullName": "Blur",
+      "description": "BLUR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BLUR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 23121,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 205,
+      "name": "STRK",
+      "fullName": "Starknet",
+      "description": "STRK / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "STRK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8911,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 206,
+      "name": "SUI",
+      "fullName": "Sui",
+      "description": "SUI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SUI",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 20947,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 207,
+      "name": "MEME",
+      "fullName": "Memecoin",
+      "description": "MEME / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MEME",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1191,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 208,
+      "name": "TRB",
+      "fullName": "Tellor Tributes",
+      "description": "TRB / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "TRB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4944,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 209,
+      "name": "ZK",
+      "fullName": "ZKsync",
+      "description": "ZK / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ZK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 24091,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 210,
+      "name": "CSPX",
+      "fullName": "",
+      "description": "CSPX / USD",
+      "type": "",
+      "decimals": 8,
+      "pair": {
+        "base": "CSPX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "CSPXUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 211,
+      "name": "CZK",
+      "fullName": "",
+      "description": "CZK / USD",
+      "type": "",
+      "decimals": 8,
+      "pair": {
+        "base": "CZK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "CZKUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 212,
+      "name": "USDE",
+      "fullName": "",
+      "description": "USDE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USDE",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3792,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 213,
+      "name": "IBTA",
+      "fullName": "",
+      "description": "IBTA / USD",
+      "type": "",
+      "decimals": 8,
+      "pair": {
+        "base": "IBTA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "IBTAUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 214,
+      "name": "FORTH",
+      "fullName": "",
+      "description": "FORTH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FORTH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9421,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 215,
+      "name": "BOO",
+      "fullName": "Spookyswap",
+      "description": "BOO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BOO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9608,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 216,
+      "name": "MOVR",
+      "fullName": "Moonriver",
+      "description": "MOVR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MOVR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 9285,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 217,
+      "name": "KSM",
+      "fullName": "Kusama",
+      "description": "KSM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "KSM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5034,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 218,
+      "name": "PYUSD",
+      "fullName": "PayPal USD",
+      "description": "PYUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "PYUSD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 27772,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 219,
+      "name": "XCN",
+      "fullName": "Chain",
+      "description": "XCN / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XCN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 501,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 220,
+      "name": "ENS",
+      "fullName": "Ethereum Name Service",
+      "description": "ENS / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ENS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 13855,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 221,
+      "name": "SHV",
+      "fullName": "iShares Short Treasury Bond ETF",
+      "description": "SHV / USD",
+      "type": "Equities",
+      "decimals": 8,
+      "pair": {
+        "base": "SHV",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 222,
+      "name": "IDR",
+      "fullName": "Indonesian Rupiah",
+      "description": "IDR / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "IDR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "IDRUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 223,
+      "name": "USDP",
+      "fullName": "Pax Dollar",
+      "description": "USDP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USDP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3330,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 224,
+      "name": "NZD",
+      "fullName": "New Zealand Dollar",
+      "description": "NZD / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "NZD",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "NZDUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 225,
+      "name": "AMPL",
+      "fullName": "Ampleforth",
+      "description": "AMPL / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "AMPL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4056,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 226,
+      "name": "QUICK",
+      "fullName": "Quickswap",
+      "description": "QUICK / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "QUICK",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8206,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 227,
+      "name": "OM",
+      "fullName": "Mantra DAO",
+      "description": "OM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "OM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6536,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 228,
+      "name": "QNT",
+      "fullName": "Quant",
+      "description": "QNT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "QNT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 3155,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 229,
+      "name": "ILS",
+      "fullName": "Israeli Shekel",
+      "description": "ILS / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "ILS",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "ILSUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 230,
+      "name": "GHST",
+      "fullName": "Aavegotchi",
+      "description": "GHST / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "GHST",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7046,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 231,
+      "name": "PLN",
+      "fullName": "Polish Zloty",
+      "description": "PLN / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "PLN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "yf_symbol": "PLNUSD=X",
+      "script": "YahooFinance"
+    },
+    {
+      "id": 232,
+      "name": "XPT",
+      "fullName": "Platinum",
+      "description": "XPT / USD",
+      "type": "Commodities",
+      "decimals": 8,
+      "pair": {
+        "base": "XPT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 233,
+      "name": "THETA",
+      "fullName": "Theta Token",
+      "description": "THETA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "THETA",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2416,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 234,
+      "name": "FTT",
+      "fullName": "FTX Token",
+      "description": "FTT / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "FTT",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4195,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 235,
+      "name": "DASH",
+      "fullName": "Dash",
+      "description": "DASH / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DASH",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 131,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 236,
+      "name": "SLP",
+      "fullName": "Smooth Love Potion",
+      "description": "SLP / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SLP",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 5824,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 237,
+      "name": "BADGER",
+      "fullName": "Badger DAO",
+      "description": "BADGER / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BADGER",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 7859,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 238,
+      "name": "STORJ",
+      "fullName": "Storj",
+      "description": "STORJ / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "STORJ",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1772,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 239,
+      "name": "HBAR",
+      "fullName": "Hedera Hashgraph",
+      "description": "HBAR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "HBAR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 4642,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 240,
+      "name": "ALCX",
+      "fullName": "Alchemix",
+      "description": "ALCX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ALCX",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 8613,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 241,
+      "name": "DGB",
+      "fullName": "Digibyte",
+      "description": "DGB / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "DGB",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 109,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 242,
+      "name": "GLMR",
+      "fullName": "Moonbeam",
+      "description": "GLMR / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "GLMR",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6836,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 243,
+      "name": "ZERO",
+      "fullName": "",
+      "description": "ZERO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "ZERO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 28803,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 244,
+      "name": "SRM",
+      "fullName": "Serum",
+      "description": "SRM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SRM",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 6187,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 245,
+      "name": "mSOL",
+      "fullName": "Marinade Staked SOL",
+      "description": "mSOL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "mSOL",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 246,
+      "name": "REN",
+      "fullName": "Ren",
+      "description": "REN / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "REN",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 2539,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 247,
+      "name": "GNO",
+      "fullName": "Gnosis",
+      "description": "GNO / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "GNO",
+        "quote": "USD"
+      },
+      "report_interval_ms": 60000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 0.6,
+      "cmc_id": 1659,
+      "script": "CoinMarketCap"
+    }
+  ]
+}

@@ -117,9 +117,12 @@ mod tests {
 
     #[actix_web::test]
     async fn test_feed_slots_manager_loop() {
+        let repo_root_dir = env::var("GIT_ROOT").unwrap();
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let config_dir_path = PathBuf::new().join(repo_root_dir).join("config");
         let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
         env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
+        env::set_var("FEEDS_CONFIG_DIR", config_dir_path);
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config().expect("Failed to load config:");
         let feeds_config = init_feeds_config().expect("Failed to get config: ");
