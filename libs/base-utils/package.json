@@ -17,6 +17,11 @@
       "import": "./dist/esm/asserts.mjs",
       "types": "./dist/types/asserts.d.ts"
     },
+    "./async": {
+      "require": "./dist/cjs/async.cjs",
+      "import": "./dist/esm/async.mjs",
+      "types": "./dist/types/async.d.ts"
+    },
     "./fs": {
       "require": "./dist/cjs/fs.cjs",
       "import": "./dist/esm/fs.mjs",
