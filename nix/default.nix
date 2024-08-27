@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, inputs, ... }:
 {
   imports = [
     ./shells
@@ -12,7 +12,7 @@
   } // (import ./lib lib);
 
   perSystem =
-    { inputs', ... }:
+    { inputs', system, ... }:
     {
       legacyPackages = {
         rustToolchain =
@@ -28,7 +28,12 @@
             targets.wasm32-wasi.latest.rust-std
           ];
 
-        inherit (inputs'.mcl-nixos-modules.checks) foundry;
+        foundry =
+          let
+            # https://github.com/ethereum/solidity/issues/12291
+            foundrySystem = if system == "aarch64-darwin" then "x86_64-darwin" else system;
+          in
+          inputs.mcl-nixos-modules.checks.${foundrySystem}.foundry;
       };
     };
 }
