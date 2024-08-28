@@ -11,7 +11,7 @@ use prometheus::{
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-use sequencer_config::{get_config_file_path, ReporterConfig};
+use sequencer_config::{get_config_file_path, ReporterConfig, Validated};
 use utils::read_file;
 
 use tracing::{debug, info};
@@ -19,15 +19,29 @@ use tracing::{debug, info};
 use crate::{connector::dispatch::dispatch, interfaces::data_feed::DataFeed};
 use feed_registry::{api::DataFeedAPI, registry::init_feeds_config};
 
-pub fn init_reporter_config() -> ReporterConfig {
+pub fn init_reporter_config() -> anyhow::Result<ReporterConfig> {
     let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "/reporter_config.json");
 
     let data = read_file(config_file_path.as_str());
 
     info!("Using config file: {}", config_file_path.as_str());
 
-    let reporter_config: ReporterConfig =
-        serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
+    match serde_json::from_str::<ReporterConfig>(data.as_str()) {
+        Ok(c) => Ok(c),
+        Err(e) => anyhow::bail!(
+            "Config file ({}) is not valid JSON! {}",
+            config_file_path.as_str(),
+            e
+        ),
+    }
+}
+
+pub fn get_validated_reporter_config() -> ReporterConfig {
+    let reporter_config = init_reporter_config().expect("Failed to get config: ");
+
+    reporter_config
+        .validate("ReporterConfig")
+        .expect("validation error");
 
     reporter_config
 }
@@ -36,7 +50,7 @@ pub async fn orchestrator() {
     // Initializes a tracing subscriber that displays runtime information based on the RUST_LOG env variable
     tracing_subscriber::fmt::init();
 
-    let reporter_config = init_reporter_config();
+    let reporter_config = init_reporter_config().expect("Config file is not valid JSON!");
 
     let feeds_registry = init_feeds_config().expect("Failed to get config: ");
 

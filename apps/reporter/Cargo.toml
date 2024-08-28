@@ -10,8 +10,12 @@ edition.workspace = true
 [dependencies]
 data_feeds = { path = "../../libs/data_feeds"}
 prometheus = { path = "../../libs/prometheus" }
+utils = { path = "../../libs/utils" }
+feed_registry = { path = "../../libs/feed_registry"}
 
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tracing-subscriber = { version = "0.3.18", features = ["json"] }
+serde_json = "1.0.117"
 
 [[bin]]
 name = "launch_reporter"

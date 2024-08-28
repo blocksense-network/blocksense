@@ -149,6 +149,7 @@ impl Validated for SequencerConfig {
 pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) -> String {
     let config_file_path = env::var(base_path_from_env).unwrap_or_else(|_| {
         let conf_dir = dirs::config_dir().expect("Configuration file path not specified.");
+        let conf_dir = conf_dir.join("blocksense");
         conf_dir
             .to_str()
             .expect("Configuration file path not valid.")

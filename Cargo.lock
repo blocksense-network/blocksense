@@ -7405,8 +7405,12 @@ name = "reporter"
 version = "0.1.1"
 dependencies = [
  "data_feeds",
+ "feed_registry",
  "prometheus 0.1.1",
+ "serde_json",
  "tokio 1.39.3",
+ "tracing-subscriber",
+ "utils",
 ]
 
 [[package]]
