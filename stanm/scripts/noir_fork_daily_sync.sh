@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This script should be called when the current directory is the root of the
-# Noir repo and the selected branch is plonky2. This is because direnv will then
+# Noir repo and the selected branch is blocksense. This is because direnv will then
 # select the correct Rust version that is necessary for the builds to pass.
 #
 # Please, don't try to automate this behavior, just allow it.
@@ -9,7 +9,7 @@
 #
 # ```
 # cd ~/code/repos/noir
-# git checkout plonky2 # if necessary
+# git checkout blocksense # if necessary
 # ~/code/repos/blocksense/stanm/scripts/noir_fork_daily_sync.sh ~/code/repos/noir
 # ```
 
@@ -32,15 +32,15 @@ if ! git checkout master; then
 fi
 git pull upstream master
 git push origin master
-git checkout plonky2
-git pull origin plonky2
+git checkout blocksense
+git pull origin blocksense
 echo "Try to merge now with git merge master ..."
 date=$(date +"%d %b %Y")
 if git merge master --no-ff -m "chore: Daily merge of \`master\`, $date"; then
     echo -e "\e[32mMerge succeeded! Testing...\e[0m"
     if cargo test -q; then
         echo -e "\e[32mTesting succeeded! Pushing...\e[0m"
-        git push origin plonky2
+        git push origin blocksense
         echo -e "\e[32mSync succeeded.\e[0m"
     else
         echo -e "\e[31mTesting failed. Resolve and push manually.\e[0m"
