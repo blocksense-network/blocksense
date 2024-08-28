@@ -179,7 +179,7 @@ const initChain = async (
   const envName = NetworkNames[chianName];
   const rpc = process.env['RPC_URL_' + envName]!;
   const provider = new ethers.JsonRpcProvider(rpc);
-  const wallet = new Wallet(process.env['PRIV_KEY_' + envName]!, provider);
+  const wallet = new Wallet(process.env.SIGNER_PRIVATE_KEY!, provider);
   const envOwners = process.env['OWNER_ADDRESSES_' + envName];
   const owners: string[] = envOwners ? envOwners.split(',') : [];
 
