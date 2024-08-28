@@ -61,7 +61,7 @@ serde_json = "1.0.115"
 serde = { version = "1.0.197", features = ["derive"] }
 erased-serde = "0.4.4"
 ringbuf = "0.4.0"
-reqwest = "0.12.4"
+reqwest = { version = "0.12.4", features = ["blocking", "json"] }
 rand = "0.8.5"
 curl = "0.4.46"
 async-trait = "0.1.74"

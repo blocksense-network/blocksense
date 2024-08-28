@@ -57,7 +57,7 @@ impl DataFeed for YahooFinanceDataFeed {
         }
     }
 
-    fn poll_batch(&mut self, assets: &Vec<String>) -> (Vec<FeedResult>, Timestamp) {
+    fn poll_batch(&mut self, assets: &Vec<String>) -> Vec<(FeedResult, Timestamp)> {
         todo!()
     }
 }

@@ -118,7 +118,7 @@ pub async fn dispatch_full_batch(
     reporter_config: &ReporterConfig,
     feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
-    data_feed_sender: UnboundedSender<(Vec<FeedResult>, Timestamp, String)>,
+    data_feed_sender: UnboundedSender<(Vec<(FeedResult, Timestamp)>, String)>,
 ) {
     let mut script_to_assets: HashMap<String, Vec<String>> = HashMap::new();
 
@@ -141,9 +141,8 @@ pub async fn dispatch_full_batch(
             .clone();
 
         tokio::task::spawn(async move {
-            let (results, timestamp_ms) = feed_api.lock().await.poll_batch(&assets);
-            tx.send((results, timestamp_ms, feed_api_name.to_string()))
-                .unwrap();
+            let results = feed_api.lock().await.poll_batch(&assets);
+            tx.send((results, feed_api_name.to_string())).unwrap();
             debug!("DataFeed {} polled", feed_api_enum.get_as_str());
         });
     }
