@@ -54,13 +54,12 @@ function HeadingLink({
         className === 'sr-only'
           ? 'nx-sr-only'
           : cn(
-              'nx-font-semibold nx-tracking-tight nx-text-slate-900 dark:nx-text-slate-100',
               {
-                h2: 'nx-mt-10 nx-border-b nx-pb-1 nx-text-3xl nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400',
-                h3: 'nx-mt-8 nx-text-2xl',
-                h4: 'nx-mt-8 nx-text-xl',
-                h5: 'nx-mt-8 nx-text-lg',
-                h6: 'nx-mt-8 nx-text-base',
+                h2: 'nx-mt-8 nx-border-b nx-pb-2 nx-text-3xl nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400',
+                h3: 'nx-mt-6 nx-text-2xl',
+                h4: 'nx-mt-6 nx-text-xl',
+                h5: 'nx-mt-6 nx-text-lg',
+                h6: 'nx-mt-6 nx-text-base',
               }[Tag],
             )
       }
@@ -170,7 +169,7 @@ export const Link = ({ href = '', className, ...props }: AnchorProps) => (
     href={href}
     newWindow={EXTERNAL_HREF_REGEX.test(href)}
     className={cn(
-      'nx-text-primary-600 nx-underline nx-decoration-from-font [text-underline-position:from-font]',
+      'nx-underline nx-font-bold nx-decoration-from-font [text-underline-position:from-font]',
       className,
     )}
     {...props}
@@ -194,12 +193,7 @@ export const getComponents = ({
 
   const context = { index: 0 };
   return {
-    h1: props => (
-      <h1
-        className="nx-mt-2 nx-text-4xl nx-font-bold nx-tracking-tight nx-text-slate-900 dark:nx-text-slate-100"
-        {...props}
-      />
-    ),
+    h1: props => <h1 className="nx-mt-6 nx-text-4xl nx-pb-4" {...props} />,
     h2: props => <HeadingLink tag="h2" context={context} {...props} />,
     h3: props => <HeadingLink tag="h3" context={context} {...props} />,
     h4: props => <HeadingLink tag="h4" context={context} {...props} />,
@@ -213,12 +207,12 @@ export const getComponents = ({
     ),
     ol: props => (
       <ol
-        className="nx-mt-6 nx-list-decimal first:nx-mt-0 rtl:nx-mr-6"
+        className="nx-mt-4 nx-list-decimal first:nx-mt-0 rtl:nx-mr-6"
         {...props}
       />
     ),
     li: props => (
-      <li className="flex items-start nx-gap-4 nx-my-2" {...props}>
+      <li className="flex items-start nx-gap-4 nx-my-4" {...props}>
         <aside className="w-4 h-4 nx-flex-shrink-0" aria-hidden="true">
           <ListIcon />
         </aside>
@@ -228,7 +222,7 @@ export const getComponents = ({
     blockquote: props => (
       <blockquote
         className={cn(
-          'nx-mt-6 nx-border-gray-300 nx-italic nx-text-gray-700 dark:nx-border-gray-700 dark:nx-text-gray-400',
+          'nx-mt-4 nx-border-gray-300',
           'first:nx-mt-0 ltr:nx-border-l-2 ltr:nx-pl-6 rtl:nx-border-r-2 rtl:nx-pr-6',
         )}
         {...props}
@@ -243,11 +237,11 @@ export const getComponents = ({
     a: Link,
     table: props => (
       <Table
-        className="nextra-scrollbar nx-mt-6 nx-p-0 first:nx-mt-0"
+        className="nextra-scrollbar nx-mt-4 nx-p-0 first:nx-mt-0"
         {...props}
       />
     ),
-    p: props => <p className="nx-mt-6 nx-leading-7 first:nx-mt-0" {...props} />,
+    p: props => <p className="nx-mt-4 nx-leading-7 first:nx-mt-0" {...props} />,
     tr: Tr,
     th: Th,
     td: Td,

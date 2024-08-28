@@ -63,6 +63,7 @@
 }
 :is([dir='ltr'] .ltr\:nx-pr-2) {
   padding-right: 0.5rem;
+  padding-top: 0.5rem;
 }
 :is([dir='ltr'] .ltr\:nx-pr-4) {
   padding-right: 1rem;

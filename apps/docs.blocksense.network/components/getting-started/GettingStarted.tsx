@@ -9,10 +9,10 @@ export const GettingStarted = () => {
     <section className="getting-started relative isolate px-6 pt-14 lg:px-8">
       <section className="getting-started__content-holder mx-auto max-w-2xl py-32 sm:py-48 lg:py-56 flex items-center px-4 lg:gap-8 xl:gap-0">
         <article className="getting-started__content mr-auto place-self-center lg:col-span-7">
-          <h1 className="getting-started__title max-w-2xl mb-4 text-4xl font-noto-sans-extra-bold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
+          <h1 className="getting-started__title max-w-2xl mb-4 font-noto-sans-extra-bold text-4xl tracking-tight md:text-5xl xl:text-6xl dark:text-white">
             {gettingStartedConfig.title}
           </h1>
-          <p className="getting-started__description max-w-2xl mb-6 font-noto-sans-thin text-gray-900 lg:mb-8 md:text-lg lg:text-xl">
+          <p className="getting-started__description max-w-2xl mb-6 font-noto-sans-thin text-gray-700 lg:mb-8 md:text-lg lg:text-xl">
             {gettingStartedConfig.description}
           </p>
           <span className="lg:ml-auto">

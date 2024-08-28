@@ -4,7 +4,7 @@ article.nextra-body-typesetting-article {
     'rlig' 1,
     'calt' 1;
   h1 {
-    @apply nx-mt-6 nx-mb-4 nx-text-center;
+    @apply nx-mt-8 nx-mb-4 nx-text-center;
     font-size: 2.5rem;
   }
   h2 {

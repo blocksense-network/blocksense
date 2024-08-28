@@ -207,7 +207,7 @@ export function Flexsearch({
           ),
           children: (
             <>
-              <div className="nx-text-base nx-font-semibold nx-leading-5">
+              <div className="nx-text-base nx-font-bold nx-leading-5">
                 <HighlightMatches match={search} value={title} />
               </div>
               {content && (

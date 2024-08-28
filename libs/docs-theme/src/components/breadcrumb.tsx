@@ -23,7 +23,7 @@ export function Breadcrumb({
               className={cn(
                 'nx-whitespace-nowrap nx-transition-colors',
                 isActive
-                  ? 'nx-font-bold nx-text-black contrast-more:nx-font-bold contrast-more:nx-text-current'
+                  ? 'nx-font-bold contrast-more:nx-font-bold contrast-more:nx-text-current'
                   : [
                       'nx-min-w-[24px] nx-overflow-hidden nx-text-ellipsis',
                       isLink &&

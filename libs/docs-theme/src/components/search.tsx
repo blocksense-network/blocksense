@@ -237,7 +237,7 @@ export function Search({
             'nextra-scrollbar',
             // Using bg-white as background-color when the browser didn't support backdrop-filter
             'nx-border nx-border-gray-200 nx-bg-white nx-text-gray-100 dark:nx-border-neutral-800 dark:nx-bg-neutral-900',
-            'nx-absolute nx-top-full nx-z-20 nx-mt-2 nx-overflow-auto nx-overscroll-contain nx-rounded-xl nx-py-2.5 nx-shadow-xl',
+            'nx-absolute nx-top-full nx-z-20 nx-mt-2 nx-overflow-auto nx-overscroll-contain nx-rounded-md nx-py-2.5',
             'nx-max-h-[min(calc(50vh-11rem-env(safe-area-inset-bottom)),400px)]',
             'md:nx-max-h-[min(calc(100vh-5rem-env(safe-area-inset-bottom)),400px)]',
             'nx-inset-x-0 ltr:md:nx-left-auto rtl:md:nx-right-auto',
@@ -268,7 +268,7 @@ export function Search({
                     'nx-mx-2.5 nx-break-words nx-rounded-md',
                     'contrast-more:nx-border',
                     i === active
-                      ? 'nx-bg-primary-500/10 nx-text-primary-600 contrast-more:nx-border-primary-500'
+                      ? 'nx-bg-primary-500/10 nx-text-primary-500 contrast-more:nx-border-primary-500'
                       : 'nx-text-gray-800 contrast-more:nx-border-transparent dark:nx-text-gray-300',
                   )}
                 >

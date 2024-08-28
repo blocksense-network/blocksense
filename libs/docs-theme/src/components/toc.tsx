@@ -68,9 +68,7 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
     >
       {hasHeadings && (
         <>
-          <p className="nx-mb-4 nx-font-semibold nx-tracking-tight">
-            {renderComponent(config.toc.title)}
-          </p>
+          <p className="nx-mb-4">{renderComponent(config.toc.title)}</p>
           <ul>
             {items.map(({ id, value, depth }) => (
               <li
@@ -89,7 +87,7 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
                     }[depth as Exclude<typeof depth, 1> as number],
                     'nx-inline-block',
                     activeAnchor[id]?.isActive
-                      ? 'nx-text-primary-600 nx-subpixel-antialiased contrast-more:!nx-text-primary-600'
+                      ? 'nx-subpixel-antialiased contrast-more:!nx-text-primary-600'
                       : 'nx-text-gray-700 hover:nx-text-gray-900 dark:nx-text-gray-400 dark:hover:nx-text-gray-300',
                     'contrast-more:nx-text-gray-900 contrast-more:nx-underline',
                   )}
@@ -106,7 +104,7 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
       )}
 
       {hasMetaInfo && (
-        <div className="nextra-toc__info-container nx-bg-white nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 nx-pb-2 dark:nx-border-neutral-800">
+        <div className="nextra-toc__info-container nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 dark:nx-border-neutral-800">
           <div
             className={cn(
               hasHeadings && 'nextra-toc__info-section',

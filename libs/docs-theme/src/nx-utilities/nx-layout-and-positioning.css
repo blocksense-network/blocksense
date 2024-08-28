@@ -85,6 +85,14 @@
   margin-left: -1.5rem;
   margin-right: -1.5rem;
 }
+.nx-mx-0 {
+  margin-left: 0rem;
+  margin-right: 0rem;
+}
+.nx-mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
 .nx-mx-2 {
   margin-left: 0.5rem;
   margin-right: 0.5rem;

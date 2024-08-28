@@ -37,7 +37,7 @@ export const NavLinks = ({
   return (
     <div
       className={cn(
-        'nx-mb-8 nx-flex nx-items-center nx-border-n nx-pt-8 dark:nx-border-neutral-800',
+        'bottom-nav nx-mx-0 sm:nx-mx-1 nx-flex nx-items-center nx-border-n nx-pt-8 dark:nx-border-neutral-800',
         'contrast-more:nx-border-neutral-400 dark:contrast-more:nx-border-neutral-400',
         'print:nx-hidden',
       )}
@@ -47,11 +47,11 @@ export const NavLinks = ({
           href={prev.route}
           className={cn(
             classes.link,
-            'ltr:nx-mr-auto ltr:nx-pr-4 rtl:nx-pl-4 rtl:nx-mr-auto nx-text-black hover:nx-text-blue-900',
+            'ltr:nx-mr-auto ltr:nx-pr-4 rtl:nx-pl-4 rtl:nx-mr-auto nx-whitespace-nowrap hover:nx-text-blue-900',
           )}
         >
           <ArrowRightIcon className={cn(classes.icon, 'ltr:nx-rotate-180')} />
-          <span className="nx-block nx-text-sm nx-font-semibold nx-text-black hover:nx-text-blue-900">
+          <span className="nx-block nx-text-sm nx-font-semibold hover:nx-text-blue-900">
             {prev.title}
           </span>
         </Anchor>
@@ -61,7 +61,7 @@ export const NavLinks = ({
           href={next.route}
           className={cn(
             classes.link,
-            'ltr:nx-ml-auto ltr:nx-pl-4 ltr:nx-text-right rtl:nx-mr-auto rtl:nx-pr-4 rtl:nx-text-left nx-text-blue-900 hover:nx-text-black',
+            'ltr:nx-ml-auto ltr:nx-pl-4 ltr:nx-text-right rtl:nx-mr-auto nx-whitespace-nowrap rtl:nx-pr-4 rtl:nx-text-left nx-text-blue-900 hover:nx-text-black',
           )}
         >
           <span className="nx-block nx-text-sm nx-font-semibold nx-text-black hover:nx-text-blue-900">

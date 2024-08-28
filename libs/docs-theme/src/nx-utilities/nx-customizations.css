@@ -9,6 +9,7 @@ html {
   -webkit-tap-highlight-color: transparent;
   font-size: 1rem;
 }
+
 body {
   --tw-bg-opacity: 1;
   background-color: rgba(255, 255, 255, var(--tw-bg-opacity));
@@ -199,10 +200,10 @@ summary {
     transition: transform 0.8s cubic-bezier(0.52, 0.16, 0.04, 1);
   }
   .nextra-sidebar-container > .nextra-scrollbar {
-    -webkit-mask-image: linear-gradient(transparent, #000 20px),
-      linear-gradient(270deg, #000 10px, transparent 10px);
+    -webkit-mask-image: linear-gradient(transparent, #fff 20px),
+      linear-gradient(270deg, #fff 10px, transparent 10px);
     mask-image: linear-gradient(transparent, #000 20px),
-      linear-gradient(270deg, #000 10px, transparent 10px);
+      linear-gradient(270deg, #fff 10px, transparent 10px);
   }
   .nextra-banner-container ~ div .nextra-sidebar-container {
     padding-top: 6.5rem;

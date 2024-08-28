@@ -46,7 +46,7 @@
   font-size: 0.8rem;
 }
 .nx-text-xs {
-  font-size: 0.55rem;
+  font-size: 0.75rem;
 }
 .nx-font-bold {
   font-weight: 700;
@@ -86,9 +86,6 @@
 }
 .nx-leading-tight {
   line-height: 1.25;
-}
-.nx-tracking-tight {
-  letter-spacing: -0.015em;
 }
 .nx-text-black {
   --tw-text-opacity: 1;
@@ -132,6 +129,10 @@
 .nx-text-orange-800 {
   --tw-text-opacity: 1;
   color: rgba(154, 52, 18, var(--tw-text-opacity));
+}
+.nx-text-neutral-500 {
+  --tw-text-opacity: 1;
+  color: rgb(115 115 115, var(--tw-text-opacity));
 }
 .nx-text-primary-600 {
   --tw-text-opacity: 1;

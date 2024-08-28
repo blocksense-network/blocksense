@@ -19,7 +19,7 @@ const titleStyles = {
 const accordionStyles = 'text-gray-900';
 
 const borderStyles =
-  'nx-border-b nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400';
+  'nx-border-b nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400  py-4';
 
 export const AnchorLinkTitle = ({
   title,
@@ -32,7 +32,7 @@ export const AnchorLinkTitle = ({
     createElement(
       `h${titleLevel}`,
       {
-        className: `${titleStyles[titleLevel]} ${accordion ? accordionStyles : ''} nx-font-semibold nx-text-slate-900 dark:nx-text-slate-100 py-4 ${accordion ? '' : borderStyles}`,
+        className: `${titleStyles[titleLevel]} ${accordion ? accordionStyles : ''} nx-font-semibold nx-text-slate-900 dark:nx-text-slate-100 ${accordion ? '' : borderStyles}`,
       },
       <>
         {title}

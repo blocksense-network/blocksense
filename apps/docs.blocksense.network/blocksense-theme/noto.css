@@ -1,0 +1,101 @@
+p {
+  @apply text-gray-600 font-noto-sans-regular;
+}
+
+button {
+  @apply mt-2;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-noto-sans-bold;
+}
+
+header span,
+footer span {
+  @apply font-noto-sans-bold;
+}
+
+span {
+  @apply font-noto-sans-light;
+}
+
+span strong {
+  @apply text-slate-900;
+}
+
+a {
+  @apply text-slate-800;
+}
+
+a > span {
+  @apply not-italic text-slate-950;
+}
+
+ul > li {
+  @apply text-neutral-600 mb-3 font-noto-sans-bold;
+}
+
+input {
+  @apply font-noto-sans-regular text-gray-500;
+}
+
+blockquote {
+  @apply text-gray-700 font-noto-sans-bold;
+}
+
+.nextra-scrollbar p:first-of-type {
+  @apply font-noto-sans-bold text-gray-900;
+}
+.nextra-scrollbar ul > li a {
+  @apply font-noto-sans-regular;
+}
+
+.nextra-sidebar-container ul > li a {
+  @apply font-noto-sans-regular;
+}
+
+.nextra-sidebar-container {
+  @apply font-noto-sans-regular;
+}
+
+.nextra-breadcrumb {
+  @apply font-noto-sans-regular;
+  flex-direction: row;
+  flex-wrap: wrap;
+  line-height: 1.75rem;
+}
+
+.nextra-callout {
+  @apply font-noto-sans-light text-slate-800 text-sm;
+}
+
+.nextra-callout a {
+  @apply font-noto-sans-bold text-gray-900;
+}
+
+.nextra-sidebar-container ul > li {
+  @apply mb-0 mt-0.5;
+}
+
+.nextra-toc ul > li {
+  @apply mb-0;
+}
+
+.signature-code pre {
+  padding: 0;
+}
+
+.contract-item-wrapper table code {
+  @apply text-sm;
+}
+@media (max-width: 600px) {
+  pre code .line,
+  pre:not([data-theme]) {
+    padding-left: 0.65rem;
+  }
+}

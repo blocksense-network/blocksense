@@ -19,7 +19,7 @@ const classes: Record<CalloutType, string> = {
   error: cn(
     'nx-border-red-200 nx-bg-red-100 nx-text-red-900 dark:nx-border-red-200/30 dark:nx-bg-red-900/30 dark:nx-text-red-200',
   ),
-  info: cn('nx-text-gray-500 nx-tracking-tight nx-leading-6'),
+  info: cn('nx-text-gray-500 nx-leading-6'),
   warning: cn(
     'nx-border-yellow-100 nx-bg-yellow-50 nx-text-yellow-900 dark:nx-border-yellow-200/30 dark:nx-bg-yellow-700/30 dark:nx-text-yellow-200',
   ),

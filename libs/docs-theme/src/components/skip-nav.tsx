@@ -59,7 +59,6 @@ export const SkipNavLink = forwardRef<HTMLAnchorElement, SkipNavLinkProps>(
               'nx-sr-only',
               'focus:nx-not-sr-only focus:nx-fixed focus:nx-z-50 focus:nx-m-3 focus:nx-ml-4 focus:nx-h-[calc(var(--nextra-navbar-height)-1.5rem)] focus:nx-rounded-lg focus:nx-border focus:nx-px-3 focus:nx-py-2 focus:nx-align-middle focus:nx-text-sm focus:nx-font-bold',
               'focus:nx-text-gray-900 focus:dark:nx-text-gray-100',
-              'focus:nx-bg-white focus:dark:nx-bg-neutral-900',
               'focus:nx-border-neutral-400 focus:dark:nx-border-neutral-800',
             )
           : ''

@@ -44,16 +44,16 @@ const classes = {
     'nx-cursor-pointer [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] contrast-more:nx-border',
   ),
   inactive: cn(
-    'nx-text-black hover:nx-bg-gray-100 hover:nx-text-gray-900',
+    'hover:nx-bg-gray-100 hover:nx-text-gray-900',
     'dark:nx-text-neutral-400 dark:hover:nx-bg-primary-100/5 dark:hover:nx-text-gray-50',
     'contrast-more:nx-text-gray-900 contrast-more:dark:nx-text-gray-50',
     'contrast-more:nx-border-transparent contrast-more:hover:nx-border-gray-900 contrast-more:dark:hover:nx-border-gray-50',
   ),
   active: cn(
-    'nx-bg-black nx-font-semibold text-white dark:nx-bg-primary-400/10 dark:nx-text-primary-600',
+    'nx-bg-black nx-font-semibold text-white dark:nx-bg-primary-400/10',
     'contrast-more:nx-border-primary-500 contrast-more:dark:nx-border-primary-500',
   ),
-  list: cn('nx-flex nx-flex-col nx-gap-1'),
+  list: cn('nx-flex nx-flex-col'),
   border: cn(
     'nx-relative before:nx-absolute before:nx-inset-y-1',
     'ltr:nx-pl-3 ltr:before:nx-left-0 rtl:nx-pr-3 rtl:before:nx-right-0',
@@ -138,7 +138,7 @@ function FolderImpl({ item, anchors }: FolderProps): ReactElement {
       <ComponentToUse
         href={isLink ? item.route : undefined}
         className={cn(
-          'nx-items-center nx-justify-between nx-gap-2',
+          'nx-items-center nx-justify-between nx-gap-1.5',
           !isLink && 'nx-text-left nx-w-full nx-font-bold',
           classes.link,
           active ? classes.active : classes.inactive,
@@ -273,7 +273,7 @@ function File({
                 href={`#${id}`}
                 className={cn(
                   classes.link,
-                  'nx-flex nx-gap-2 before:nx-opacity-25 before:nx-content-["#"]',
+                  'nx-flex nx-gap-1.5 before:nx-opacity-25 before:nx-content-["#"]',
                   activeAnchor[id]?.isActive
                     ? classes.active
                     : classes.inactive,
@@ -473,7 +473,7 @@ export function Sidebar({
               'nx-sticky nx-bottom-0',
               'nx-bg-transparent dark:nx-bg-transparent', // when banner is showed, sidebar links can be behind menu, set bg color as body bg color
               'nx-mx-4 nx-py-4',
-              'nx-flex nx-items-center nx-gap-2',
+              'nx-flex nx-items-center nx-gap-1.5',
               'dark:nx-border-neutral-800 dark:nx-shadow-[0_-12px_16px_#111]',
               'contrast-more:nx-border-neutral-400 contrast-more:nx-shadow-none contrast-more:dark:nx-shadow-none',
               showSidebar

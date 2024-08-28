@@ -95,7 +95,11 @@ export const Parameters = ({
                   className={`variables__table-cell variables__table-cell--${column}`}
                   key={column}
                 >
-                  {getParameterValueByColumn(parameter, column)}
+                  {column === 'description' ? (
+                    getParameterValueByColumn(parameter, column)
+                  ) : (
+                    <code>{getParameterValueByColumn(parameter, column)}</code>
+                  )}
                 </TableCell>
               ))}
             </TableRow>

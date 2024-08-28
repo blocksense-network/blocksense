@@ -49,6 +49,10 @@
   padding-left: 1rem;
   padding-right: 1rem;
 }
+.nx-px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
 .nx-px-6 {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -94,6 +98,9 @@
 }
 .nx-pb-1\.5 {
   padding-bottom: 0.375rem;
+}
+.nx-pb-2 {
+  padding-bottom: 0.5rem;
 }
 .nx-pb-4 {
   padding-bottom: 1rem;

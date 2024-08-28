@@ -74,9 +74,10 @@ pre code {
 }
 pre code .line,
 pre:not([data-theme]) {
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
 }
+
 html[data-nextra-word-wrap] pre {
   word-break: break-word;
   white-space: pre-wrap;

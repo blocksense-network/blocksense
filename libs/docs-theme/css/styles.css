@@ -52,8 +52,8 @@ summary {
     backface-visibility: hidden;
 
     & > .nextra-scrollbar {
-      mask-image: linear-gradient(to bottom, transparent, #000 20px),
-        linear-gradient(to left, #000 10px, transparent 10px);
+      mask-image: linear-gradient(to bottom, transparent, #fff 20px),
+        linear-gradient(to left, #fff 10px, transparent 10px);
     }
   }
 
@@ -116,10 +116,10 @@ article details > summary {
   (-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))
 ) {
   .nextra-search ul {
-    @apply nx-backdrop-blur-lg nx-bg-white/70 dark:nx-bg-dark/80;
+    @apply nx-bg-white/70 dark:nx-bg-dark/80;
   }
   .nextra-nav-container-blur {
-    @apply nx-backdrop-blur-md nx-bg-white/[.85] dark:!nx-bg-dark/80;
+    @apply nx-bg-white/[.85] dark:!nx-bg-dark/80;
   }
 }
 

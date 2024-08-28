@@ -54,7 +54,7 @@ function NavbarMenu({
           leaveFrom="nx-opacity-100"
           leaveTo="nx-opacity-0"
         >
-          <Menu.Items className="nx-absolute nx-right-0 nx-z-20 nx-mt-1 nx-max-h-64 nx-min-w-full nx-overflow-auto nx-rounded-md nx-ring-1 nx-ring-black/5 nx-bg-white nx-py-1 nx-text-sm nx-shadow-lg dark:nx-ring-white/20 dark:nx-bg-neutral-800">
+          <Menu.Items className="nx-absolute nx-right-0 nx-z-20 nx-mt-1 nx-max-h-64 nx-min-w-full nx-overflow-auto nx-rounded-md nx-ring-1 nx-ring-black/5 nx-py-1 nx-text-sm nx-shadow-lg dark:nx-ring-white/20 dark:nx-bg-neutral-800">
             {Object.entries(items || {}).map(([key, item]) => (
               <Menu.Item key={key}>
                 <Anchor
@@ -87,11 +87,11 @@ export function Navbar({ flatDirectories, items }: NavBarProps): ReactElement {
     <div className="nextra-nav-container nx-sticky nx-top-0 nx-z-20 nx-w-full nx-bg-transparent print:nx-hidden">
       <div
         className={cn(
-          'nextra-nav-container-blur',
-          'nx-pointer-events-none nx-absolute nx-z-[-1] nx-h-full nx-w-full nx-bg-white dark:nx-bg-dark',
+          'nextra-nav-container-b',
+          'nx-pointer-events-none nx-absolute nx-z-[-1] nx-h-full nx-w-full',
         )}
       />
-      <nav className="nx-mx-auto nx-flex nx-h-[var(--nextra-navbar-height)] nx-max-w-[90rem] nx-items-center nx-justify-end nx-gap-2 nx-pl-[max(env(safe-area-inset-left),1.5rem)] nx-pr-[max(env(safe-area-inset-right),1.5rem)]">
+      <nav className="nx-bg-white nx-mx-auto nx-flex nx-h-[var(--nextra-navbar-height)] nx-max-w-[90rem] nx-items-center nx-justify-end nx-gap-2 nx-pl-[max(env(safe-area-inset-left),1.5rem)] nx-pr-[max(env(safe-area-inset-right),1.5rem)] dark:nx-bg-black">
         {config.logoLink ? (
           <Anchor
             href={typeof config.logoLink === 'string' ? config.logoLink : '/'}

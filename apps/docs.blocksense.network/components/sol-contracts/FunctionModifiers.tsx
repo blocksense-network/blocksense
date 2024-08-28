@@ -44,10 +44,10 @@ export const FunctionModifiers = ({
           {functionModifiers?.map((functionModifier, index) => (
             <TableRow className="contract-item-wrapper__table-row" key={index}>
               <TableCell className="contract-item-wrapper__table-cell">
-                {functionModifier._modifierName}
+                <code>{functionModifier._modifierName}</code>
               </TableCell>
               <TableCell className="contract-item-wrapper__table-cell">
-                {functionModifier.kind}
+                <code>{functionModifier.kind}</code>
               </TableCell>
             </TableRow>
           ))}
