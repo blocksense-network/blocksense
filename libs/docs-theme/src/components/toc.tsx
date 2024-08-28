@@ -106,39 +106,40 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
       )}
 
       {hasMetaInfo && (
-        <div
-          className={cn(
-            hasHeadings && 'nextra-toc__info-section',
-            'nx-mt-8 nx-bg-neutral-900 nx-bg-opacity-[0.02] nx-rounded-md nx-border nx-px-6 nx-py-4 nx-border-neutral-200/70 nx-pt-4',
-            'nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 nx-pb-2 dark:nx-border-neutral-800',
-            'contrast-more:nx-border-t contrast-more:nx-border-neutral-400 contrast-more:nx-shadow-none contrast-more:dark:nx-border-neutral-400',
-          )}
-        >
-          <div className="nx-flex nx-items-center nx-gap-2 dark:nx-border-neutral-600">
-            <FeedbackIcon />
-            {config.feedback.content ? (
-              <Anchor
-                className={linkClassName}
-                href={config.feedback.useLink()}
-                newWindow
-              >
-                {renderComponent(config.feedback.content)}
-              </Anchor>
-            ) : null}
+        <div className="nextra-toc__info-container nx-bg-white nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 nx-pb-2 dark:nx-border-neutral-800">
+          <div
+            className={cn(
+              hasHeadings && 'nextra-toc__info-section',
+              'nx-mt-4 nx-bg-neutral-900 nx-bg-opacity-[0.02] nx-rounded-md nx-border nx-px-6 nx-py-4 nx-border-neutral-200/70 nx-pt-4',
+              'contrast-more:nx-border-t contrast-more:nx-border-neutral-400 contrast-more:nx-shadow-none contrast-more:dark:nx-border-neutral-400',
+            )}
+          >
+            <div className="nx-flex nx-items-center nx-gap-2 dark:nx-border-neutral-600">
+              <FeedbackIcon />
+              {config.feedback.content ? (
+                <Anchor
+                  className={linkClassName}
+                  href={config.feedback.useLink()}
+                  newWindow
+                >
+                  {renderComponent(config.feedback.content)}
+                </Anchor>
+              ) : null}
+            </div>
+
+            <div className="nx-flex nx-items-center nx-gap-2 dark:nx-border-neutral-600">
+              <EditIcon />
+              {renderComponent(config.editLink.component, {
+                filePath,
+                className: linkClassName,
+                children: renderComponent(config.editLink.text),
+              })}
+            </div>
+
+            {renderComponent(config.toc.extraContent)}
+
+            {config.toc.backToTop && <BackToTop className={linkClassName} />}
           </div>
-
-          <div className="nx-flex nx-items-center nx-gap-2 dark:nx-border-neutral-600">
-            <EditIcon />
-            {renderComponent(config.editLink.component, {
-              filePath,
-              className: linkClassName,
-              children: renderComponent(config.editLink.text),
-            })}
-          </div>
-
-          {renderComponent(config.toc.extraContent)}
-
-          {config.toc.backToTop && <BackToTop className={linkClassName} />}
         </div>
       )}
     </div>
