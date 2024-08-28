@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { task } from 'hardhat/config';
 import { Artifacts } from 'hardhat/types';
-import { JsonRpcProvider, Network, Wallet, ethers } from 'ethers';
+import { Wallet, ethers } from 'ethers';
 import Safe, {
   SafeAccountConfig,
   SafeFactory,
@@ -13,82 +13,21 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 import { getCreateCallDeployment } from '@safe-global/safe-deployments';
+import {
+  NetworkConfig,
+  NetworkNames,
+  ChainConfig,
+  ContractNames,
+  ContractsConfig,
+  CoreContract,
+  ChainlinkProxyData,
+} from './types';
 
 const fileName = '/deployments/deploymentV1.json';
 
-interface NetworkConfig {
-  rpc: string;
-  provider: JsonRpcProvider;
-  network: Network;
-  signer: Wallet;
-  owners: string[];
-  safeAddresses: {
-    multiSendAddress: string;
-    multiSendCallOnlyAddress: string;
-    createCallAddress: string;
-    safeSingletonAddress: string;
-    safeProxyFactoryAddress: string;
-    fallbackHandlerAddress: string;
-    signMessageLibAddress: string;
-    simulateTxAccessorAddress: string;
-  };
-  threshold: number;
-}
-
-interface ChainConfig {
-  [chainId: string]: {
-    name: string;
-    contracts: ContractsConfig;
-  };
-}
-
-interface ContractsConfig {
-  coreContracts: CoreContract;
-  [ContractNames.ChainlinkProxy]: Array<ChainlinkProxyData>;
-  [ContractNames.SafeMultisig]: string;
-}
-
-type CoreContract = {
-  [ContractNames.HistoricDataFeedStoreV2]: string;
-  [ContractNames.UpgradeableProxy]: string;
-  [ContractNames.FeedRegistry]: string;
-};
-
-interface ChainlinkProxyData {
-  description: string;
-  base: string;
-  quote: string;
-  address: string;
-  chainlink_proxy: string;
-}
-
-enum ContractNames {
-  SafeMultisig = 'SafeMultisig',
-  FeedRegistry = 'FeedRegistry',
-  ChainlinkProxy = 'ChainlinkProxy',
-  HistoricDataFeedStoreV2 = 'HistoricDataFeedStoreV2',
-  UpgradeableProxy = 'UpgradeableProxy',
-}
-
-enum NetworkNames {
-  sepolia = 'ETH_SEPOLIA',
-  holesky = 'ETH_HOLESKY',
-  amoy = 'POLYGON_AMOY',
-  manta = 'MANTA_SEPOLIA',
-  fuji = 'AVAX_FUJI',
-  chiado = 'GNOSIS_CHIADO',
-  opSepolia = 'OPTIMISM_SEPOLIA',
-  zkSyncSepolia = 'ZKSYNC_SEPOLIA',
-  baseSepolia = 'BASE_SEPOLIA',
-  specular = 'SPECULAR',
-  scrollSepolia = 'SCROLL_SEPOLIA',
-  arbSepolia = 'ARBITRUM_SEPOLIA',
-  artio = 'BERA_ARTIO',
-  hekla = 'TAIKO_HEKLA',
-}
-
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
+  .addParam('configFile', 'Path to config file')
   .setAction(async (args, { ethers, artifacts }) => {
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
@@ -101,28 +40,43 @@ task('deploy', 'Deploy contracts')
     }
 
     const dataFeedConfig = JSON.parse(
-      await fs.readFile('./scripts/feeds_config2.json', 'utf8'),
+      await fs.readFile(args.configFile, 'utf8'),
     ).feeds;
 
     const chainsDeployment: ChainConfig = {};
+
+    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
     for (const config of configs) {
       const chainId = config.network.chainId.toString();
 
       console.log(`\n\n// ChainId: ${config.network.chainId} //`);
       const multisig = await deployMultisig(config);
+      const multisigAddress = await multisig.getAddress();
 
-      const dataFeedStoreAddress = await predictDataFeedStoreAddress(
+      const dataFeedStoreAddress = await predictAddress(
         artifacts,
         config,
+        ContractNames.HistoricDataFeedStoreV2,
+        ethers.id('dataFeedStore'),
+        abiCoder.encode(['address'], [process.env.SEQUENCER_ADDRESS]),
+      );
+      const upgradeableProxyAddress = await predictAddress(
+        artifacts,
+        config,
+        ContractNames.UpgradeableProxy,
+        ethers.id('proxy'),
+        abiCoder.encode(
+          ['address', 'address'],
+          [dataFeedStoreAddress, multisigAddress],
+        ),
       );
 
-      const multisigAddress = await multisig.getAddress();
       const deployData = await deployContracts(config, multisig, artifacts, [
         {
           name: ContractNames.HistoricDataFeedStoreV2,
           argsTypes: ['address'],
-          argsValues: [config.signer.address],
+          argsValues: [process.env.SEQUENCER_ADDRESS],
           salt: ethers.id('dataFeedStore'),
           value: 0n,
         },
@@ -136,7 +90,7 @@ task('deploy', 'Deploy contracts')
         {
           name: ContractNames.FeedRegistry,
           argsTypes: ['address', 'address'],
-          argsValues: [multisigAddress, dataFeedStoreAddress],
+          argsValues: [multisigAddress, upgradeableProxyAddress],
           salt: ethers.id('registry'),
           value: 0n,
         },
@@ -148,7 +102,7 @@ task('deploy', 'Deploy contracts')
               data.description,
               data.decimals,
               data.id,
-              dataFeedStoreAddress,
+              upgradeableProxyAddress,
             ],
             salt: ethers.id('aggregator'),
             value: 0n,
@@ -200,6 +154,15 @@ const deployMultisig = async (config: NetworkConfig) => {
 
   console.log('Predicted deployed Safe address:', predictedDeploySafeAddress);
 
+  if (await checkAddressExists(config, predictedDeploySafeAddress)) {
+    console.log(' -> Safe already deployed!');
+    return Safe.init({
+      provider: config.rpc,
+      safeAddress: predictedDeploySafeAddress,
+      signer: config.signer.privateKey,
+    });
+  }
+
   // Deploy Safe
   return safeFactory.deploySafe({
     safeAccountConfig,
@@ -217,8 +180,8 @@ const initChain = async (
   const rpc = process.env['RPC_URL_' + envName]!;
   const provider = new ethers.JsonRpcProvider(rpc);
   const wallet = new Wallet(process.env['PRIV_KEY_' + envName]!, provider);
-  const owners: string[] =
-    process.env['OWNER_ADDRESSES_' + envName]?.split(',') || [];
+  const envOwners = process.env['OWNER_ADDRESSES_' + envName];
+  const owners: string[] = envOwners ? envOwners.split(',') : [];
 
   return {
     rpc,
@@ -240,30 +203,43 @@ const initChain = async (
   };
 };
 
-const predictDataFeedStoreAddress = async (
+const predictAddress = async (
   artifacts: Artifacts,
   config: NetworkConfig,
+  contractName: ContractNames,
+  salt: string,
+  args: string,
 ) => {
-  const abiCoder = ethers.AbiCoder.defaultAbiCoder();
-  const artifact = artifacts.readArtifactSync(
-    ContractNames.HistoricDataFeedStoreV2,
-  );
+  const artifact = artifacts.readArtifactSync(contractName);
   const bytecode = ethers.solidityPacked(
     ['bytes', 'bytes'],
-    [artifact.bytecode, abiCoder.encode(['address'], [config.signer.address])],
+    [artifact.bytecode, args],
   );
 
   return ethers.getCreate2Address(
     config.safeAddresses.createCallAddress,
-    ethers.id('dataFeedStore'),
+    salt,
     ethers.keccak256(bytecode),
   );
 };
+
+async function checkAddressExists(
+  config: NetworkConfig,
+  address: string,
+): Promise<boolean> {
+  const result = await config.provider.getCode(address);
+  return result !== '0x';
+}
 
 const multisigTxExec = async (
   transactions: SafeTransactionDataPartial[],
   safe: Safe,
 ) => {
+  if (transactions.length === 0) {
+    console.log('No transactions to execute');
+    return;
+  }
+
   const tx: SafeTransaction = await safe.createTransaction({
     transactions,
   });
@@ -318,25 +294,32 @@ const deployContracts = async (
       [artifact.bytecode, encodedArgs],
     );
 
-    const contractAddress = ethers.getCreate2Address(
-      createCallAddress,
+    const contractAddress = await predictAddress(
+      artifacts,
+      config,
+      contract.name,
       contract.salt,
-      ethers.keccak256(bytecode),
+      encodedArgs,
     );
+
     console.log(`\nPredicted ${contract.name} address`, contractAddress);
 
-    const encodedData = createCall.interface.encodeFunctionData(
-      'performCreate2',
-      [0n, bytecode, contract.salt],
-    );
+    if (!(await checkAddressExists(config, contractAddress))) {
+      const encodedData = createCall.interface.encodeFunctionData(
+        'performCreate2',
+        [0n, bytecode, contract.salt],
+      );
 
-    const safeTransactionData: SafeTransactionDataPartial = {
-      to: createCallAddress,
-      value: '0',
-      data: encodedData,
-      operation: OperationType.Call,
-    };
-    transactions.push(safeTransactionData);
+      const safeTransactionData: SafeTransactionDataPartial = {
+        to: createCallAddress,
+        value: '0',
+        data: encodedData,
+        operation: OperationType.Call,
+      };
+      transactions.push(safeTransactionData);
+    } else {
+      console.log(' -> Contract already deployed!');
+    }
 
     if (contract.name === ContractNames.ChainlinkProxy) {
       if (!contractAddresses[contract.name]) {
@@ -383,10 +366,14 @@ const deployContracts = async (
         base: base && quote ? base : undefined,
         quote: base && quote ? quote : undefined,
         address: contractAddress,
-        chainlink_proxy: chainlinkProxyAddress,
+        constructorArgs: contract.argsValues,
+        chainlink_aggregator: chainlinkProxyAddress,
       });
     } else {
-      contractAddresses.coreContracts[contract.name] = contractAddress;
+      contractAddresses.coreContracts[contract.name] = {
+        address: contractAddress,
+        constructorArgs: contract.argsValues,
+      };
     }
   }
 
@@ -407,22 +394,39 @@ const registerChainlinkProxies = async (
   deployData: ContractsConfig,
   artifacts: Artifacts,
 ) => {
-  console.log('\nRegistering ChainlinkProxies in FeedRegistry...');
   // The difference between setting n and n+1 feeds via FeedRegistry::setFeeds is slightly above 55k gas.
+  console.log('\nRegistering ChainlinkProxies in FeedRegistry...');
+
+  const registry = new ethers.Contract(
+    deployData.coreContracts.FeedRegistry.address,
+    artifacts.readArtifactSync(ContractNames.FeedRegistry).abi,
+    config.signer,
+  );
 
   // Split into batches of 100
   const BATCH_LENGTH = 100;
   const batches: Array<Array<ChainlinkProxyData>> = [];
-  const filteredData = deployData.ChainlinkProxy.filter(d => d.base);
+  const proxyData = deployData.ChainlinkProxy.filter(d => d.base);
+  const filteredData = [];
+  for (const data of proxyData) {
+    const feed = await registry.connect(config.signer).getFunction('getFeed')(
+      data.base,
+      data.quote,
+    );
+
+    if (feed === ethers.ZeroAddress) {
+      filteredData.push(data);
+    } else {
+      console.log(' -> Feed already registered', {
+        base: data.base,
+        quote: data.quote,
+        feed,
+      });
+    }
+  }
   for (let i = 0; i < filteredData.length; i += BATCH_LENGTH) {
     batches.push(filteredData.slice(i, i + BATCH_LENGTH));
   }
-
-  const registry = new ethers.Contract(
-    deployData.coreContracts.FeedRegistry,
-    (await artifacts.readArtifact(ContractNames.FeedRegistry)).abi,
-    config.signer,
-  );
 
   // Set feeds in batches
   for (const batch of batches) {
