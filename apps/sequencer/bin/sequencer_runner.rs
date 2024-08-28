@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use actix_web::{web, App, HttpServer};
 use feed_registry::registry::{
-    init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
+    get_validated_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsConfig,
+    AllFeedsReports,
 };
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::providers::provider::init_shared_rpc_providers;
@@ -17,11 +18,11 @@ use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 use actix_web::rt::spawn;
 use actix_web::web::Data;
 use prometheus::metrics::FeedsMetrics;
-use sequencer::config::init_sequencer_config;
+use sequencer::config::get_validated_sequencer_config;
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
-use sequencer_config::{SequencerConfig, Validated};
+use sequencer_config::SequencerConfig;
 use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
@@ -114,26 +115,6 @@ pub async fn prepare_http_servers(
     (main_http_server_fut, admin_http_server_fut)
 }
 
-pub fn get_validated_sequencer_config() -> SequencerConfig {
-    let sequencer_config = init_sequencer_config().expect("Failed to get config: ");
-
-    sequencer_config
-        .validate("SequencerConfig")
-        .expect("validation error");
-
-    sequencer_config
-}
-
-pub fn get_validated_feeds_config() -> AllFeedsConfig {
-    let feeds_config = init_feeds_config().expect("Failed to get config: ");
-
-    feeds_config
-        .validate("FeedsConfig")
-        .expect("validation error");
-
-    feeds_config
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     init_shared_logging_handle();
@@ -170,15 +151,15 @@ async fn main() -> std::io::Result<()> {
                 return std::io::Result::Ok(());
             }
             "--help" => {
-                println!(
-                    "Usage:
-sequencer [options] [args]
+                println!("Usage:");
+                println!("sequencer [options] [args]");
+                println!(" ");
+                println!("OPTIONS");
+                println!("--help                     show list of command-line options");
+                println!("-c, --config-file-path     specify sequencer's config file path");
+                println!("--no-metrics-server        do not start prometheus metric server");
+                println!("--validate-config          validate configuration, print used config files paths and terminate");
 
-OPTIONS
-  --help                     show list of command-line options
-  -c, --config-file-path     specify sequencer's config file path
-  --no-metrics-server        do not start prometheus metric server"
-                );
                 return Ok(());
             }
             _ => {

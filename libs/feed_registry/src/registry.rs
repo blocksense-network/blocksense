@@ -29,6 +29,16 @@ pub fn init_feeds_config() -> anyhow::Result<AllFeedsConfig> {
     }
 }
 
+pub fn get_validated_feeds_config() -> AllFeedsConfig {
+    let feeds_config = init_feeds_config().expect("Failed to get config: ");
+
+    feeds_config
+        .validate("FeedsConfig")
+        .expect("validation error");
+
+    feeds_config
+}
+
 #[derive(Debug, Deserialize)]
 pub struct AllFeedsConfig {
     pub feeds: Vec<FeedConfig>,
