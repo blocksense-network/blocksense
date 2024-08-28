@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
+import '@nomicfoundation/hardhat-verify';
 import 'solidity-coverage';
 import '@typechain/hardhat';
 import 'hardhat-contract-sizer';
@@ -49,7 +50,7 @@ const config: HardhatUserConfig = {
     },
     hardhat: {
       forking: {
-        blockNumber: 19860864,
+        blockNumber: 20576488,
         enabled: process.env.FORKING === 'true',
         url: '' + process.env.RPC_URL_ETH_MAINNET,
       },
@@ -157,6 +158,15 @@ const config: HardhatUserConfig = {
   gasReporter: {
     enabled: process.env.REPORT_GAS === 'true',
     currency: 'USD',
+  },
+  paths: {
+    sources: './contracts',
+    cache: './cache',
+    artifacts: './artifacts',
+  },
+  etherscan: {
+    enabled: true,
+    apiKey: process.env.ETHERSCAN_API_KEY || '',
   },
 };
 
