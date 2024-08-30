@@ -137,7 +137,7 @@ impl DataFeed for YahooFinanceDataFeed {
             let mut headers = reqwest::header::HeaderMap::new();
             headers.insert(
                 "X-CMC_PRO_API_KEY",
-                reqwest::header::HeaderValue::from_str(self.api_key.as_str()).unwrap(),
+                reqwest::header::HeaderValue::from_str(self.api_key.as_str().trim()).unwrap(),
             );
             headers.insert(
                 "Accept",
