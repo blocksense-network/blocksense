@@ -18,7 +18,7 @@ use tracing::{debug, info};
 
 use crate::{
     connector::{
-        dispatch::dispatch_subset,
+        dispatch::{dispatch_full_batch, dispatch_subset},
         post::{post_feed_response, post_feed_response_batch},
     },
     interfaces::data_feed::DataFeed,
@@ -58,7 +58,7 @@ pub fn get_validated_reporter_config() -> ReporterConfig {
 
 fn start_reporter_batch(
     reporter_config: &ReporterConfig,
-    mut receiver: mpsc::UnboundedReceiver<(Vec<FeedResult>, Timestamp, String)>,
+    mut receiver: mpsc::UnboundedReceiver<(Vec<(FeedResult, u32, Timestamp)>, String)>,
 ) {
     let secret_key_path = reporter_config
         .resources
@@ -70,16 +70,9 @@ fn start_reporter_batch(
     let reporter = reporter_config.reporter.clone();
 
     tokio::task::spawn(async move {
-        while let Some((results, timestamp_ms, feed_api_name)) = receiver.recv().await {
-            let res = post_feed_response_batch(
-                &reporter,
-                &secret_key,
-                feed_api_name.as_str(),
-                timestamp_ms,
-                results,
-                &sequencer_url,
-            )
-            .await;
+        while let Some((results, _)) = receiver.recv().await {
+            let res =
+                post_feed_response_batch(&reporter, &secret_key, results, &sequencer_url).await;
             debug!("Data feed response sent {:?}", res);
         }
     });
@@ -131,14 +124,19 @@ pub async fn orchestrator() {
 
     let request_client = reqwest::Client::new();
     let (tx, rx) = mpsc::unbounded_channel();
-    start_reporter(&reporter_config, rx);
+    if reporter_config.full_batch {
+        start_reporter_batch(&reporter_config, rx)
+    } else {
+        todo!()
+        // start_reporter(&reporter_config, rx);
+    }
 
     loop {
         BATCH_COUNTER.inc();
 
         let start_time = Instant::now();
 
-        dispatch_subset(
+        dispatch_full_batch(
             &reporter_config,
             &feeds_registry,
             &mut connection_cache,

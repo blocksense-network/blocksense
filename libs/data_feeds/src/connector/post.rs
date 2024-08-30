@@ -78,13 +78,22 @@ pub async fn post_feed_response(
     Ok(res.text().await?)
 }
 
+//TODO(snikolov): Refactor to use a separate endpoint once it's implemented within sequencer
 pub async fn post_feed_response_batch(
     reporter: &Reporter,
     secret_key: &str,
-    feed_api_name: &str,
-    timestamp_ms: Timestamp,
-    feed_result: Vec<FeedResult>,
+    feed_result: Vec<(FeedResult, u32, Timestamp)>,
     sequencer_url: &str,
-) -> anyhow::Result<String> {
-    todo!()
+) {
+    for (feed_result, feed_id, timestamp_ms) in feed_result {
+        let _ = post_feed_response(
+            reporter,
+            secret_key,
+            feed_id,
+            timestamp_ms,
+            feed_result,
+            sequencer_url,
+        )
+        .await;
+    }
 }

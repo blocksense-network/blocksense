@@ -69,23 +69,20 @@ fn get_yf_json_price(yf_response: &Value, idx: usize, asset: &str) -> Result<f64
     }
 }
 
-fn get_feed_result(response_json: &Value, asset: &str) -> (FeedResult, Timestamp) {
+fn get_feed_result(response_json: &Value, asset: &str) -> FeedResult {
     let price = get_yf_json_price(&response_json.clone(), 0, asset);
 
     match price {
-        Ok(price) => (
-            FeedResult::Result {
-                result: FeedType::Numerical(price),
-            },
-            current_unix_time(),
-        ),
+        Ok(price) => FeedResult::Result {
+            result: FeedType::Numerical(price),
+        },
         Err(e) => {
             error!(
                 "{}",
                 format!("Error occured while getting {} price! - {}", asset, e)
             );
 
-            get_generic_feed_error("CoinMarketCap")
+            get_generic_feed_error("YahooFinance")
         }
     }
 }
@@ -113,27 +110,26 @@ impl DataFeed for YahooFinanceDataFeed {
             headers
         };
 
-        let response = self
-            .client
-            .get(url)
-            .headers(headers)
-            // .query(&params)
-            .send()
-            .unwrap();
+        let response = self.client.get(url).headers(headers).send().unwrap();
 
         if response.status().is_success() {
             let resp_json: Value = response.json().unwrap();
 
-            get_feed_result(&resp_json, asset)
+            (get_feed_result(&resp_json, asset), current_unix_time())
         } else {
             warn!("Request failed with status: {}", response.status());
 
-            get_generic_feed_error("YahooFinance")
+            (get_generic_feed_error("YahooFinance"), current_unix_time())
         }
     }
 
-    fn poll_batch(&mut self, assets: &Vec<String>) -> Vec<(FeedResult, Timestamp)> {
+    fn poll_batch(
+        &mut self,
+        asset_id_vec: &Vec<(String, u32)>,
+    ) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
+
+        let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
 
         let params = [("symbol", assets.join(","))];
 
@@ -158,20 +154,35 @@ impl DataFeed for YahooFinanceDataFeed {
             .send()
             .unwrap();
 
-        let mut results_vec: Vec<(FeedResult, Timestamp)> = Vec::new();
+        let mut results_vec: Vec<(FeedResult, u32, Timestamp)> = Vec::new();
 
         if response.status().is_success() {
             let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-            for asset in assets {
-                results_vec.push(get_feed_result(&resp_json, asset));
+            for (asset, feed_id) in asset_id_vec {
+                results_vec.push((
+                    get_feed_result(&resp_json, asset),
+                    *feed_id,
+                    current_unix_time(),
+                ));
             }
 
             results_vec
         } else {
             warn!("Request failed with status: {}", response.status());
 
-            fill_generic_feed_error_vec("CoinMarketCap", assets.len())
+            let err_vec = asset_id_vec
+                .into_iter()
+                .map(|(_, id)| {
+                    ((
+                        get_generic_feed_error("YahooFinance"),
+                        *id,
+                        current_unix_time(),
+                    ))
+                })
+                .collect();
+
+            err_vec
         }
     }
 }

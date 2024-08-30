@@ -126,34 +126,37 @@ pub async fn dispatch_full_batch(
     reporter_config: &ReporterConfig,
     feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
-    data_feed_sender: UnboundedSender<(Vec<(FeedResult, Timestamp)>, String)>,
+    data_feed_sender: UnboundedSender<(Vec<(FeedResult, u32, Timestamp)>, String)>,
 ) {
-    let mut script_to_assets: HashMap<String, Vec<String>> = HashMap::new();
+    let mut script_to_assets: HashMap<String, Vec<(String, u32)>> = HashMap::new();
 
     for feed in &feed_registry.feeds {
         script_to_assets
             .entry(feed.script.clone())
             .or_insert_with(Vec::new)
-            .push(feed.name.clone());
+            .push((feed.name.clone(), feed.id));
     }
 
     for feed_api_enum in DataFeedAPI::iter() {
+        if let DataFeedAPI::EmptyAPI = feed_api_enum {
+            // Skip this iteration if it's an EmptyAPI
+            continue;
+        }
+
         let tx = data_feed_sender.clone();
 
         let feed_api = resolve_feed(&feed_api_enum, &reporter_config.resources, connection_cache);
         let feed_api_name = feed_api_enum.get_as_str();
 
-        let assets = script_to_assets
+        let asset_id_vec = script_to_assets
             .get(feed_api_name)
             .expect("Unrecognized DataFeed Script!")
             .clone();
 
         tokio::task::spawn(async move {
-            let results = feed_api.lock().await.poll_batch(&assets);
+            let results = feed_api.lock().await.poll_batch(&asset_id_vec);
             tx.send((results, feed_api_name.to_string())).unwrap();
             debug!("DataFeed {} polled", feed_api_enum.get_as_str());
         });
     }
-
-    todo!()
 }

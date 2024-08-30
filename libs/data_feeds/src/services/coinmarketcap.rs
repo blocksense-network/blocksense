@@ -53,16 +53,13 @@ fn get_cmc_json_price(cmc_response: Value, asset: &str) -> Option<f64> {
     price
 }
 
-fn get_feed_result(response_json: &Value, asset: &str) -> (FeedResult, Timestamp) {
+fn get_feed_result(response_json: &Value, asset: &str) -> FeedResult {
     let price = get_cmc_json_price(response_json.clone(), asset);
 
     match price {
-        Some(price) => (
-            FeedResult::Result {
-                result: FeedType::Numerical(price),
-            },
-            current_unix_time(),
-        ),
+        Some(price) => FeedResult::Result {
+            result: FeedType::Numerical(price),
+        },
         None => {
             error!("Could not parse CMC Response Json!");
 
@@ -105,16 +102,21 @@ impl DataFeed for CoinMarketCapDataFeed {
         if response.status().is_success() {
             let resp_json: Value = response.json().unwrap();
 
-            get_feed_result(&resp_json, asset)
+            (get_feed_result(&resp_json, asset), current_unix_time())
         } else {
             warn!("Request failed with status: {}", response.status());
 
-            get_generic_feed_error("CoinMarketCap")
+            (get_generic_feed_error("CoinMarketCap"), current_unix_time())
         }
     }
 
-    fn poll_batch(&mut self, assets: &Vec<String>) -> Vec<(FeedResult, Timestamp)> {
+    fn poll_batch(
+        &mut self,
+        asset_id_vec: &Vec<(String, u32)>,
+    ) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
+
+        let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
 
         let params = [("symbol", assets.join(","))];
 
@@ -139,20 +141,35 @@ impl DataFeed for CoinMarketCapDataFeed {
             .send()
             .unwrap();
 
-        let mut results_vec: Vec<(FeedResult, Timestamp)> = Vec::new();
+        let mut results_vec: Vec<(FeedResult, u32, Timestamp)> = Vec::new();
 
         if response.status().is_success() {
             let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-            for asset in assets {
-                results_vec.push(get_feed_result(&resp_json, asset));
+            for (asset, feed_id) in asset_id_vec {
+                results_vec.push((
+                    get_feed_result(&resp_json, asset),
+                    *feed_id,
+                    current_unix_time(),
+                ));
             }
 
             results_vec
         } else {
             warn!("Request failed with status: {}", response.status());
 
-            fill_generic_feed_error_vec("CoinMarketCap", assets.len())
+            let err_vec = asset_id_vec
+                .into_iter()
+                .map(|(_, id)| {
+                    ((
+                        get_generic_feed_error("CoinMarketCap"),
+                        *id,
+                        current_unix_time(),
+                    ))
+                })
+                .collect();
+
+            err_vec
         }
     }
 }
