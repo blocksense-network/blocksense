@@ -240,6 +240,12 @@ export type TreeNode = {
   id?: number;
 };
 
+export type TreeStructure = {
+  path: string;
+  name: string;
+  children?: TreeStructure[];
+};
+
 export function isLiteral(value: ASTNode): value is Literal {
   return value ? value.nodeType === 'Literal' : false;
 }

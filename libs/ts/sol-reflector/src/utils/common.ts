@@ -1,6 +1,5 @@
 import path from 'path';
 import { promises as fs } from 'fs';
-import { mkdir } from 'fs/promises';
 
 import { VariableDeclaration } from 'solidity-ast';
 import { SolcOutput } from 'solidity-ast/solc';
@@ -15,6 +14,7 @@ import {
   SolReflection,
   SourceUnitDocItem,
   TreeNode,
+  TreeStructure,
 } from '../types';
 import { ArtifactsRecord } from '../abiCollector';
 
@@ -263,4 +263,36 @@ export function* iterateContractElements(
       }
     }
   }
+}
+
+// This function recursively generates a file tree structure for the specified path.
+
+export async function generateFileTree(dir: string): Promise<TreeStructure> {
+  const tree: TreeStructure = {
+    path: dir,
+    name: path.basename(dir),
+  };
+
+  const files = await fs.readdir(dir);
+
+  if (files.length > 0) {
+    tree['children'] = [];
+
+    for (const file of files) {
+      const filePath = path.join(dir, file);
+      const stat = await fs.stat(filePath);
+
+      if (stat.isDirectory()) {
+        tree['children'].push(await generateFileTree(filePath));
+      } else {
+        const currentTree: TreeStructure = {
+          path: filePath,
+          name: path.basename(filePath),
+        };
+        tree['children'].push(currentTree);
+      }
+    }
+  }
+
+  return tree;
 }
