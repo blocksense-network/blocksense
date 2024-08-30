@@ -6,7 +6,8 @@
   "poll_period_ms": 5000,
   "resources": {
     "SECRET_KEY_PATH": "./apps/reporter/reporter_secret_key",
-    "CMC_API_KEY_PATH": "./apps/reporter/CMC_API_KEY"
+    "CMC_API_KEY_PATH": "./apps/reporter/CMC_API_KEY",
+    "YH_FINANCE_API_KEY_PATH": "./apps/reporter/YH_FINANCE_API_KEY"
   },
   "reporter": {
     "id": 0,

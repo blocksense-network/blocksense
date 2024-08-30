@@ -1,13 +1,13 @@
 use feed_registry::{
     aggregate::{AverageAggregator, ConsensusMetric},
     api::DataFeedAPI,
-    types::{FeedError, FeedResult, FeedType, Timestamp},
+    types::{FeedResult, FeedType, Timestamp},
 };
 use log::error;
-use reqwest::blocking::{Client, Response};
+use reqwest::blocking::Client;
 use ringbuf::{self, storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use serde_json::Value;
-use tracing::{debug, trace, warn};
+use tracing::{debug, warn};
 use utils::{get_env_var, read_file, time::current_unix_time};
 
 use derive::{ApiConnect, Historical};

@@ -63,7 +63,15 @@ fn feed_builder(
 ) -> Arc<Mutex<dyn DataFeed + Send>> {
     match api {
         DataFeedAPI::EmptyAPI => todo!(),
-        DataFeedAPI::YahooFinanceDataFeed => Arc::new(Mutex::new(YahooFinanceDataFeed::new())),
+        DataFeedAPI::YahooFinanceDataFeed => {
+            let yh_finance_api_key_path = resources
+                .get("YH_FINANCE_API_KEY_PATH")
+                .expect("YH_FINANCE_API_KEY_PATH not provided in config!");
+
+            Arc::new(Mutex::new(YahooFinanceDataFeed::new(
+                yh_finance_api_key_path.clone(),
+            )))
+        }
         DataFeedAPI::CoinMarketCapDataFeed => {
             let cmc_api_key_path = resources
                 .get("CMC_API_KEY_PATH")
