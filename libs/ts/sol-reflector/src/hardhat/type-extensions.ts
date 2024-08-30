@@ -5,12 +5,12 @@ declare module 'hardhat/types/config' {
   export interface HardhatUserConfig {
     reflect?: ReflectConfig;
     collectABIs?: ReflectConfig;
-    contractsFileStructureAsJSON?: ReflectConfig;
+    enableFileTree: ReflectConfig;
   }
 
   export interface HardhatConfig {
     reflect: Config;
     collectABIs: Config;
-    contractsFileStructureAsJSON: Config;
+    enableFileTree: Config;
   }
 }

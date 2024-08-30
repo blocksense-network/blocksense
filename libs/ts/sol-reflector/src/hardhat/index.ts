@@ -6,7 +6,7 @@ import './type-extensions';
 import { BuildArtifacts } from '../types';
 import { relative } from 'path';
 import { collectAbi } from '../abiCollector';
-import { contractsFileStructureAsJSON } from '../contractsFileStructure';
+import { enableFileTree } from '../contractsFileStructure';
 import { main } from '..';
 
 extendConfig(config => {
@@ -44,9 +44,6 @@ task('collectABIs', async (_, hre) => {
 });
 
 // Task to process the file structure of the Contracts as JSON file
-task('contractsFileStructureAsJSON', async (_, hre) => {
-  await hre.run('clean');
-  await hre.run('compile');
-
-  await contractsFileStructureAsJSON(hre.config.contractsFileStructureAsJSON);
+task('enableFileTree', async (_, hre) => {
+  await enableFileTree(hre.config.enableFileTree);
 });

@@ -28,7 +28,7 @@ const config: HardhatUserConfig = {
     exclude: ['test'],
   },
   collectABIs: { outputDir: 'artifacts/docs', exclude: ['test'] },
-  contractsFileStructureAsJSON: {
+  enableFileTree: {
     outputDir: 'artifacts/docs',
     exclude: ['test'],
   },

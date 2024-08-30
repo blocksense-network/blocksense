@@ -1,16 +1,14 @@
-import dirTree from 'directory-tree';
+import path from 'path';
 
 import { Config, defaults } from './config';
-import { writeArtifactFile } from './utils/common';
+import { writeArtifactFile, generateFileTree } from './utils/common';
 import { TreeNode } from './types';
-import path from 'path';
 import { rootDir } from '@blocksense/base-utils';
 
-export function constructFileTreeStructure(
-  { name, children, icon, id, path }: TreeNode,
+function constructFileTreeStructure(
+  { name, children, icon, id }: TreeNode,
   idCounter: number = 0,
 ) {
-  path = path!.replace(/.*contracts\/contracts/, '');
   id = idCounter;
   if (children) {
     icon = 'folder';
@@ -35,21 +33,21 @@ export function constructFileTreeStructure(
   return { name, children, icon, id, path };
 }
 
-export async function contractsFileStructureAsJSON(userConfig?: Config) {
+export async function enableFileTree(userConfig?: Config) {
   const contractsPath = path.resolve(
     __dirname,
     `${rootDir}/libs/ts/contracts/contracts`,
   );
-  const tree = dirTree(contractsPath);
+  const tree = await generateFileTree(contractsPath);
   // Filter out test and experiments folders. Leave only production contracts.
   tree.children = tree.children!.filter(
-    el => el.name !== 'test' && el.name !== 'experiments',
+    (el: any) => el.name !== 'test' && el.name !== 'experiments',
   );
+
   const contractsFileStructure = constructFileTreeStructure(tree);
-  const config = { ...defaults, ...userConfig };
   await writeArtifactFile(
     contractsFileStructure,
-    config,
+    { ...defaults, ...userConfig },
     'contractsFileStructure',
   );
 }
