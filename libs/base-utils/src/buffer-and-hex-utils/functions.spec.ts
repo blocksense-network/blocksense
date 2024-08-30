@@ -8,12 +8,16 @@
 import { describe, expect, test } from 'vitest';
 import { Buffer } from 'buffer';
 
-import { HexDataString, parseHexDataString, parseHexString } from './types';
+import {
+  HexDataString,
+  parseHexDataString,
+  parseHexString,
+  byteLength,
+} from './types';
 
 import {
   addHexPrefix,
   arrayToHex,
-  byteLength,
   checkedHexToArray,
   hexToArray,
   hexToBuffer,

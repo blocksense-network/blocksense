@@ -9,6 +9,7 @@ import { Buffer } from 'buffer';
 
 import { ReplaceType } from '../type-level';
 import {
+  byteLength,
   HexDataString,
   HexQuantityString,
   HexString,
@@ -131,27 +132,6 @@ export function checkedHexToArray(
     );
   }
   return hexToArray(hex);
-}
-
-/**
- * Returns the byte length of a hexadecimal data string.
- *
- * This function calculates the byte length of the input hex string. If the hex string starts with '0x',
- * these two characters are not counted in the byte length. If the length of the hex string is not a multiple of 2,
- * an error is thrown.
- *
- * @param {HexDataString} hex - The hexadecimal data string to calculate the byte length of.
- * @returns {number} The byte length of the hex string.
- * @throws {Error} If the length of the hex string is not a multiple of 2.
- */
-export function byteLength(hex: HexDataString): number {
-  if (hex.length % 2 !== 0) {
-    throw new Error(
-      `Invalid length. Received: string '${hex}' with length ${hex.length}. Expected length to be a multiple of 2`,
-    );
-  }
-  const stringLength = hex.length - (hex.startsWith('0x') ? 2 : 0);
-  return stringLength / 2;
 }
 
 /**
