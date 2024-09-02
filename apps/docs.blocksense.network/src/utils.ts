@@ -1,3 +1,4 @@
+import { FilterType, OptionType } from '@/components/ui/DataTable/DataTable';
 import { VariableDocItem } from '@blocksense/sol-reflector';
 
 export const filterConstants = (
