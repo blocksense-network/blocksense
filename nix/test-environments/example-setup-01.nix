@@ -86,7 +86,7 @@
         batch-size = 5;
         resources = {
           SECRET_KEY_PATH = ./test-keys/reporter_secret_key;
-          CMC_API_KEY_PATH = config.devenv.root + "/apps/reporter/CMC_API_KEY";
+          CMC_API_KEY_PATH = config.devenv.root + "/nix/test-environments/test-keys/CMC_API_KEY";
         };
         reporter = {
           pub_key = "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e";

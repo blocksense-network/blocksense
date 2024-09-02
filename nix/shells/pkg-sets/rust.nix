@@ -5,9 +5,18 @@
   ...
 }:
 {
-  env.SEQUENCER_CONFIG_DIR = config.devenv.root + "/apps/sequencer/";
-  env.REPORTER_SECRET_KEY_FILE_PATH = config.devenv.root + "/apps/reporter";
-  env.FEEDS_CONFIG_DIR = config.devenv.root + "/libs/feed_registry";
+  env = {
+    SEQUENCER_CONFIG_DIR = config.devenv.root + "/apps/sequencer";
+    REPORTER_CONFIG_DIR = config.devenv.root + "/apps/reporter";
+    FEEDS_CONFIG_DIR = config.devenv.root + "/libs/feed_registry";
+    REPORTER_SECRET_KEY_FILE_PATH = config.devenv.root + "/nix/test-environments/test-keys";
+  };
+
+  enterShell = ''
+    if [ "''${CMC_API_KEY:-}" != "" ]; then
+      echo "$CMC_API_KEY" > nix/test-environments/test-keys/CMC_API_KEY
+    fi
+  '';
 
   packages =
     [ self'.legacyPackages.rustToolchain ]
