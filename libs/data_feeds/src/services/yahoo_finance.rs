@@ -7,17 +7,16 @@ use serde_json::Value;
 use tracing::{debug, error, trace, warn};
 use utils::read_file;
 use utils::{get_env_var, time::current_unix_time};
-use yahoo_finance_api::YahooConnector;
 
 extern crate derive;
 use derive::{ApiConnect, Historical};
 
 use crate::interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical};
-use crate::services::common::{fill_generic_feed_error_vec, get_generic_feed_error};
+use crate::services::common::get_generic_feed_error;
 use feed_registry::{
     aggregate::{AverageAggregator, ConsensusMetric},
     api::DataFeedAPI,
-    types::{FeedError, FeedResult, FeedType, Timestamp},
+    types::{FeedResult, FeedType, Timestamp},
 };
 
 #[derive(ApiConnect, Historical)]
@@ -50,9 +49,7 @@ fn get_yf_json_price(yf_response: &Value, idx: usize, asset: &str) -> Result<f64
         .and_then(|symbol| symbol.as_str())
         .ok_or_else(|| anyhow!("Ticker not found or is not a valid string!"))?;
 
-    debug!("yf_symbol: {:?}", symbol);
-
-    if symbol == asset {
+    if symbol.to_string() == asset {
         let price = yf_response
             .get("quoteResponse")
             .and_then(|quote_response| quote_response.get("result"))
@@ -61,7 +58,7 @@ fn get_yf_json_price(yf_response: &Value, idx: usize, asset: &str) -> Result<f64
             .and_then(|price| price.as_f64())
             .ok_or_else(|| anyhow!("Price not found or is not a valid f64!"))?;
 
-        debug!("yf_price = {:?}", price);
+        debug!("yf_symbol: {:?} yf_price = {:?}", symbol, price);
 
         Ok(price)
     } else {
@@ -69,8 +66,8 @@ fn get_yf_json_price(yf_response: &Value, idx: usize, asset: &str) -> Result<f64
     }
 }
 
-fn get_feed_result(response_json: &Value, asset: &str) -> FeedResult {
-    let price = get_yf_json_price(&response_json.clone(), 0, asset);
+fn get_feed_result(response_json: &Value, idx: usize, asset: &str) -> FeedResult {
+    let price = get_yf_json_price(&response_json.clone(), idx, asset);
 
     match price {
         Ok(price) => FeedResult::Result {
@@ -95,7 +92,9 @@ impl DataFeed for YahooFinanceDataFeed {
     fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
         let url = "https://yfapi.net/v6/finance/quote";
 
-        // let params = [("symbol", asset)];
+        let full_url = format!("{}?symbols={}", url, asset);
+
+        debug!("Request url - {}", full_url);
 
         let headers = {
             let mut headers = reqwest::header::HeaderMap::new();
@@ -110,12 +109,12 @@ impl DataFeed for YahooFinanceDataFeed {
             headers
         };
 
-        let response = self.client.get(url).headers(headers).send().unwrap();
+        let response = self.client.get(full_url).headers(headers).send().unwrap();
 
         if response.status().is_success() {
             let resp_json: Value = response.json().unwrap();
 
-            (get_feed_result(&resp_json, asset), current_unix_time())
+            (get_feed_result(&resp_json, 0, asset), current_unix_time())
         } else {
             warn!("Request failed with status: {}", response.status());
 
@@ -127,16 +126,20 @@ impl DataFeed for YahooFinanceDataFeed {
         &mut self,
         asset_id_vec: &Vec<(String, u32)>,
     ) -> Vec<(FeedResult, u32, Timestamp)> {
-        let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
+        let url = "https://yfapi.net/v6/finance/quote";
 
         let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
 
-        let params = [("symbol", assets.join(","))];
+        let joined_symbols = assets.join(",");
+        let full_url = format!("{}?symbols={}", url, joined_symbols);
+
+        debug!("Request url - {}", full_url);
+        debug!("All YahooFinance symbols - {}", joined_symbols);
 
         let headers = {
             let mut headers = reqwest::header::HeaderMap::new();
             headers.insert(
-                "X-CMC_PRO_API_KEY",
+                "x-api-key",
                 reqwest::header::HeaderValue::from_str(self.api_key.as_str().trim()).unwrap(),
             );
             headers.insert(
@@ -146,25 +149,23 @@ impl DataFeed for YahooFinanceDataFeed {
             headers
         };
 
-        let response = self
-            .client
-            .get(url)
-            .headers(headers)
-            .query(&params)
-            .send()
-            .unwrap();
+        let response = self.client.get(full_url).headers(headers).send().unwrap();
 
         let mut results_vec: Vec<(FeedResult, u32, Timestamp)> = Vec::new();
 
         if response.status().is_success() {
             let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
+            let mut idx = 0;
             for (asset, feed_id) in asset_id_vec {
+                trace!("Feed Asset pair - {}.{}", asset, feed_id);
                 results_vec.push((
-                    get_feed_result(&resp_json, asset),
+                    get_feed_result(&resp_json, idx, asset),
                     *feed_id,
                     current_unix_time(),
                 ));
+
+                idx += 1;
             }
 
             results_vec
