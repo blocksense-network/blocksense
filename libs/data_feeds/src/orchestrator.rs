@@ -18,7 +18,7 @@ use tracing::{debug, info};
 
 use crate::{
     connector::{
-        dispatch::{dispatch_full_batch, dispatch_subset},
+        dispatch::{self, dispatch_full_batch, dispatch_subset},
         post::{post_feed_response, post_feed_response_batch},
     },
     interfaces::data_feed::DataFeed,
@@ -29,8 +29,8 @@ use feed_registry::{
     types::{FeedResult, Timestamp},
 };
 
-pub fn init_reporter_config() -> anyhow::Result<ReporterConfig> {
-    let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "/reporter_config.json");
+pub fn init_reporter_config() -> Result<ReporterConfig, anyhow::Error> {
+    let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "reporter_config.json");
 
     let data = read_file(config_file_path.as_str());
 
@@ -56,7 +56,7 @@ pub fn get_validated_reporter_config() -> ReporterConfig {
     reporter_config
 }
 
-fn start_reporter_batch(
+fn start_reporter_full(
     reporter_config: &ReporterConfig,
     mut receiver: mpsc::UnboundedReceiver<(Vec<(FeedResult, u32, Timestamp)>, String)>,
 ) {
@@ -78,7 +78,7 @@ fn start_reporter_batch(
     });
 }
 
-fn start_reporter(
+fn start_reporter_subset(
     reporter_config: &ReporterConfig,
     mut receiver: mpsc::UnboundedReceiver<(FeedResult, Timestamp, u32)>,
 ) {
@@ -123,12 +123,12 @@ pub async fn orchestrator() {
     info!("Available feed count: {}\n", FEED_COUNTER.get());
 
     let request_client = reqwest::Client::new();
-    let (tx, rx) = mpsc::unbounded_channel();
+    let (tx_batch, rx_batch) = mpsc::unbounded_channel();
+    let (tx_full, rx_full) = mpsc::unbounded_channel();
     if reporter_config.full_batch {
-        start_reporter_batch(&reporter_config, rx)
+        start_reporter_full(&reporter_config, rx_full);
     } else {
-        todo!()
-        // start_reporter(&reporter_config, rx);
+        start_reporter_subset(&reporter_config, rx_batch)
     }
 
     loop {
@@ -136,13 +136,23 @@ pub async fn orchestrator() {
 
         let start_time = Instant::now();
 
-        dispatch_full_batch(
-            &reporter_config,
-            &feeds_registry,
-            &mut connection_cache,
-            tx.clone(),
-        )
-        .await;
+        if reporter_config.full_batch {
+            dispatch_full_batch(
+                &reporter_config,
+                &feeds_registry,
+                &mut connection_cache,
+                tx_full.clone(),
+            )
+            .await;
+        } else {
+            dispatch_subset(
+                &reporter_config,
+                &feeds_registry,
+                &mut connection_cache,
+                tx_batch.clone(),
+            )
+            .await;
+        }
 
         info!("Finished with {}-th batch..\n", BATCH_COUNTER.get());
 
@@ -151,6 +161,7 @@ pub async fn orchestrator() {
         //TODO(snikolov): `poll_period_ms` is dependent on the feed, we should ship payload ASAP and sleep this feed only.
         if elapsed_time_ms < reporter_config.poll_period_ms.into() {
             let remaining_time_ms = reporter_config.poll_period_ms - (elapsed_time_ms as u64);
+            info!("Remaining milliseconds in slot - {}", remaining_time_ms);
             sleep(Duration::from_millis(remaining_time_ms));
         }
 
