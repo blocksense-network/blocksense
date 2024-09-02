@@ -104,7 +104,7 @@ export function TOC({ headings, filePath }: TOCProps): ReactElement {
       )}
 
       {hasMetaInfo && (
-        <div className="nextra-toc__info-container nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 dark:nx-border-neutral-800">
+        <div className="nextra-toc__info-container nx-bg-white nx-sticky nx-bottom-0 nx-flex nx-flex-col nx-items-start nx-gap-1 nx-pb-2 dark:nx-border-neutral-800">
           <div
             className={cn(
               hasHeadings && 'nextra-toc__info-section',

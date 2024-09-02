@@ -32,10 +32,6 @@ a {
   @apply text-slate-800;
 }
 
-a > span {
-  @apply not-italic text-slate-950;
-}
-
 ul > li {
   @apply text-neutral-600 mb-3 font-noto-sans-bold;
 }
