@@ -44,12 +44,12 @@ export abstract class SportsDataFeedStoreConsumerBaseWrapper<
       const dataTypes = Object.keys(data).map(() => 'uint32');
       const dataValues = Object.values(data);
 
-      for (const [i, parsedValue] of parsedValues.entries()) {
+      for (const parsedValue of parsedValues) {
         let packedValue = ethers.solidityPacked(
           dataTypes.splice(0, 8),
           dataValues.splice(0, 8),
         );
-        packedValue = '0x' + packedValue.slice(2).padStart(64, '0');
+        packedValue = '0x' + packedValue.slice(2).padEnd(64, '0');
         expect(packedValue).to.equal(parsedValue);
       }
     }

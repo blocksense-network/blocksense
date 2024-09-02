@@ -55,7 +55,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        blockNumber: 20576488,
+        blockNumber: 20663021,
         enabled: process.env.FORKING === 'true',
         url: getOptionalRpcUrl('ethereum-mainnet'),
       },

@@ -18,7 +18,7 @@ abstract contract SportsGenericConsumer {
     emit DataDecoded();
 
     uint256 decoded1 = uint256(data[0]);
-    uint64 decoded2 = uint64(uint256(data[1]));
+    uint256 decoded2 = uint256(data[1]);
 
     return
       SportsDecoder.FootballData(
@@ -30,8 +30,8 @@ abstract contract SportsGenericConsumer {
         uint32(decoded1 >> 64),
         uint32(decoded1 >> 32),
         uint32(decoded1),
-        uint32(decoded2 >> 32),
-        uint32(decoded2)
+        uint32(decoded2 >> 224),
+        uint32(decoded2 >> 192)
       );
   }
 
@@ -42,7 +42,7 @@ abstract contract SportsGenericConsumer {
 
     uint256 decoded1 = uint256(data[0]);
     uint256 decoded2 = uint256(data[1]);
-    uint256 decoded3 = uint64(uint256(data[2]));
+    uint256 decoded3 = uint256(data[2]);
     return
       SportsDecoder.BasketballData(
         uint32(decoded1 >> 224),
@@ -61,8 +61,8 @@ abstract contract SportsGenericConsumer {
         uint32(decoded2 >> 64),
         uint32(decoded2 >> 32),
         uint32(decoded2),
-        uint32(decoded3 >> 32),
-        uint32(decoded3)
+        uint32(decoded3 >> 224),
+        uint32(decoded3 >> 192)
       );
   }
 }

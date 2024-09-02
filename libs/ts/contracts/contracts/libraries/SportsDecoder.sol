@@ -67,8 +67,8 @@ library SportsDecoder {
         uint32(decoded1 >> 64),
         uint32(decoded1 >> 32),
         uint32(decoded1),
-        uint32(decoded2 >> 32),
-        uint32(decoded2)
+        uint32(decoded2 >> 224),
+        uint32(decoded2 >> 192)
       );
   }
 
@@ -103,8 +103,8 @@ library SportsDecoder {
         uint32(decoded2 >> 64),
         uint32(decoded2 >> 32),
         uint32(decoded2),
-        uint32(decoded3 >> 32),
-        uint32(decoded3)
+        uint32(decoded3 >> 224),
+        uint32(decoded3 >> 192)
       );
   }
 

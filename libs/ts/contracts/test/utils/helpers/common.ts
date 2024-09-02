@@ -47,7 +47,7 @@ export const encodeData = (data: number[]) => {
         data,
       )
       .slice(2)
-      .padStart(64, '0')
+      .padEnd(64, '0')
   );
 };
 
