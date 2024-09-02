@@ -14,7 +14,6 @@ import {
   SolReflection,
   SourceUnitDocItem,
   TreeNode,
-  TreeStructure,
 } from '../types';
 import { ArtifactsRecord } from '../abiCollector';
 
@@ -78,8 +77,17 @@ async function writeDocFile(
   console.log(`Wrote documentation to ${filePath}`);
 }
 
+// export type TreeNode = {
+//   name: string;
+//   path?: string;
+//   children?: TreeNode[];
+//   icon?: 'folder' | 'solidity';
+//   id?: number;
+// };
 export async function writeArtifactFile(
-  artifactsRecord: ArtifactsRecord | TreeNode,
+  artifactsRecord:
+    | ArtifactsRecord
+    | TreeNode<{ path?: string; icon?: 'folder' | 'solidity'; id?: number }>,
   userConfig?: Config,
   name?: string,
 ) {
@@ -267,8 +275,10 @@ export function* iterateContractElements(
 
 // This function recursively generates a file tree structure for the specified path.
 
-export async function generateFileTree(dir: string): Promise<TreeStructure> {
-  const tree: TreeStructure = {
+export async function generateFileTree(
+  dir: string,
+): Promise<TreeNode<{ path: string }>> {
+  const tree: TreeNode<{ path: string }> = {
     path: dir,
     name: path.basename(dir),
   };
@@ -285,7 +295,7 @@ export async function generateFileTree(dir: string): Promise<TreeStructure> {
       if (stat.isDirectory()) {
         tree['children'].push(await generateFileTree(filePath));
       } else {
-        const currentTree: TreeStructure = {
+        const currentTree: TreeNode<{ path: string }> = {
           path: filePath,
           name: path.basename(filePath),
         };

@@ -6,7 +6,12 @@ import { TreeNode } from './types';
 import { rootDir } from '@blocksense/base-utils';
 
 function constructFileTreeStructure(
-  { name, children, icon, id }: TreeNode,
+  {
+    name,
+    children,
+    icon,
+    id,
+  }: TreeNode<{ path?: string; icon?: 'folder' | 'solidity'; id?: number }>,
   idCounter: number = 0,
 ) {
   id = idCounter;
@@ -27,10 +32,9 @@ function constructFileTreeStructure(
   } else {
     children = [];
     icon = 'folder';
-    path;
     id = 0;
   }
-  return { name, children, icon, id, path };
+  return { name, children, icon, id };
 }
 
 export async function enableFileTree(userConfig?: Config) {

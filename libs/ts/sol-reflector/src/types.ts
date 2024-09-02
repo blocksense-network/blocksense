@@ -232,19 +232,10 @@ export class PragmaDocItem {
   literals: string[] = [];
 }
 
-export type TreeNode = {
+export type TreeNode<ExtraData> = {
   name: string;
-  path?: string;
-  children?: TreeNode[];
-  icon?: 'folder' | 'solidity';
-  id?: number;
-};
-
-export type TreeStructure = {
-  path: string;
-  name: string;
-  children?: TreeStructure[];
-};
+  children?: TreeNode<ExtraData>[];
+} & ExtraData;
 
 export function isLiteral(value: ASTNode): value is Literal {
   return value ? value.nodeType === 'Literal' : false;
