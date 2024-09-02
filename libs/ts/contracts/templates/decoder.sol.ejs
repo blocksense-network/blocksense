@@ -1,0 +1,86 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+<%_
+let prevSizeSum = 0
+fields.forEach((field, index) => {
+  field.shift = 0;
+  const isArray = field.type.endsWith('[]');
+  const isBytes = field.type.startsWith('bytes');
+  const isBytesMemory = field.type === 'bytes';
+
+  // if field is bytes
+  if (isBytes) {
+    if(prevSizeSum + field.size < 256) {
+      // if field is bytesNum
+      if (!isArray && !isBytesMemory) {
+        if (index !== 0) {
+          field.shift = -prevSizeSum; // if negative - shift left, if positive - shift right
+        }
+      }
+      prevSizeSum += field.size
+    } else {
+      prevSizeSum = 0;
+    }
+  } else {
+    if (prevSizeSum + field.size >= 256) {
+      prevSizeSum = 0;
+    }
+
+    if (!isArray) {
+      field.shift = 256 - prevSizeSum - field.size;
+    }
+    prevSizeSum += field.size
+  }
+})-%>
+
+/// @title Decoder
+/// @notice Decoder for stored packed sports data
+library Decoder {
+  /// @notice User defined struct
+  /// @dev Using structs avoids hitting the EVM stack limit
+  struct SportsData {
+    <%_ fields.forEach(field => { -%>
+    <%= field.type %> <%= field.name -%>;
+    <%_ }); -%>
+  }
+
+  function decode(
+    bytes memory data
+  ) external pure returns (SportsData memory sportsData) {
+    assembly {
+      let memData := mload(add(data, 32))
+      <%_
+      let wordOffset = 32
+      let bitOffset = 0
+      let prevSize = 0
+      -%>
+
+      <%_ fields.forEach((field, index) => { -%>
+      <%_
+      let shouldUpdate = false;
+      if(index > 0) {
+        prevSize += fields[index - 1].size;
+      }
+      bitOffset += field.size
+
+      if (prevSize + field.size >= 256) {
+        // should be based on bitOffset or some other tracker for fields size
+        wordOffset += prevSize / 8;
+        bitOffset = field.size;
+        shouldUpdate = true;
+        prevSize = 0;
+      }
+      -%>
+      <%_ if (shouldUpdate) { -%>
+      memData := mload(add(data, <%= wordOffset %>))
+      <%_ } -%>
+      <%_ if (field.size <= 256) { -%>
+      mstore(<%= index * 0x20 ? `add(sportsData, ${index * 0x20})` : 'sportsData' %>, <%= field.shift == 0 ? 'memData' : field.shift < 0 ? `shl(${Math.abs(field.shift)}, memData)` : `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` %>)
+      <%_ } else { -%>
+        // Handle larger types (array, bytes) here
+      <%_ } -%>
+      <%_ }); _%>
+    }
+  }
+}
