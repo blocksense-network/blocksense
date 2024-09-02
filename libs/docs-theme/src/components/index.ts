@@ -8,6 +8,7 @@ export { Callout } from './callout';
 export { Collapse } from './collapse';
 export { Code } from './code';
 export { CopyToClipboard } from './copy-to-clipboard';
+export { FileTree } from './file-tree';
 export { Flexsearch } from './flexsearch';
 export { Footer } from './footer';
 export { Head } from './head';

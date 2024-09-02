@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileTree } from 'nextra/components';
+import { FileTree } from '@blocksense/docs-theme';
 
 type TreeNode = {
   name: string;

@@ -48,6 +48,9 @@
 .nx-min-h-\[calc\(100vh-var\(--nextra-navbar-height\)\)\] {
   min-height: calc(100vh - var(--nextra-navbar-height));
 }
+.nx-w-2 {
+  width: 0.5rem;
+}
 .nx-w-3 {
   width: 0.75rem;
 }

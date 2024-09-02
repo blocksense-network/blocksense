@@ -59,6 +59,10 @@ blockquote {
   @apply font-noto-sans-regular;
 }
 
+.nextra-sidebar-container ul > li span {
+  @apply font-noto-sans-regular text-gray-900 dark:text-gray-300;
+}
+
 .nextra-breadcrumb {
   @apply font-noto-sans-regular;
   flex-direction: row;

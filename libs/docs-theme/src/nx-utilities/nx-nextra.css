@@ -614,3 +614,11 @@ div:hover > .\[div\:hover\>\&\]\:nx-opacity-100 {
 .nextra-callout a {
   pointer-events: auto;
 }
+
+.nextra-filetree ul > li {
+  margin-bottom: 0.5rem;
+}
+
+.nextra-filetree button {
+  margin-bottom: 0.25rem;
+}

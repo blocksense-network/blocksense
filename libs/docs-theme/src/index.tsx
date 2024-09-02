@@ -260,7 +260,7 @@ export default function Layout({
 
 export { useConfig, PartialDocsThemeConfig as DocsThemeConfig };
 export { useMDXComponents } from 'nextra/mdx';
-export { Steps, Tabs, Tab, Cards, Card, FileTree } from 'nextra/components';
+export { Steps, Tabs, Tab, Cards, Card } from 'nextra/components';
 export { useTheme } from 'next-themes';
 export { Link } from './mdx-components';
 
@@ -275,6 +275,7 @@ export { Callout } from './components/callout';
 export { Collapse } from './components/collapse';
 export { Code } from './components/code';
 export { CopyToClipboard } from './components/copy-to-clipboard';
+export { FileTree } from './components/file-tree';
 export { Flexsearch } from './components/flexsearch';
 export { Footer } from './components/footer';
 export { Head } from './components/head';
