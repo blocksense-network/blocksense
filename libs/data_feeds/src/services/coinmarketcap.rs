@@ -14,7 +14,7 @@ use derive::{ApiConnect, Historical};
 
 use crate::{
     interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical},
-    services::common::{fill_generic_feed_error_vec, get_generic_feed_error},
+    services::common::get_generic_feed_error,
 };
 
 #[derive(ApiConnect, Historical)]
@@ -162,18 +162,16 @@ impl DataFeed for CoinMarketCapDataFeed {
         } else {
             warn!("Request failed with status: {}", response.status());
 
-            let err_vec = asset_id_vec
-                .into_iter()
+            asset_id_vec
+                .iter()
                 .map(|(_, id)| {
-                    ((
+                    (
                         get_generic_feed_error("CoinMarketCap"),
                         *id,
                         current_unix_time(),
-                    ))
+                    )
                 })
-                .collect();
-
-            err_vec
+                .collect()
         }
     }
 }

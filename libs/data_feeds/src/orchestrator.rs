@@ -18,7 +18,7 @@ use tracing::{debug, info};
 
 use crate::{
     connector::{
-        dispatch::{self, dispatch_full_batch, dispatch_subset},
+        dispatch::{dispatch_full_batch, dispatch_subset},
         post::{post_feed_response, post_feed_response_batch},
     },
     interfaces::data_feed::DataFeed,
@@ -30,7 +30,7 @@ use feed_registry::{
 };
 
 pub fn init_reporter_config() -> Result<ReporterConfig, anyhow::Error> {
-    let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "reporter_config.json");
+    let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "/reporter_config.json");
 
     let data = read_file(config_file_path.as_str());
 

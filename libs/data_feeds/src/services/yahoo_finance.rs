@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Error, Result};
+use anyhow::{anyhow, Result};
 use reqwest::blocking::Client;
 use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
@@ -49,7 +49,7 @@ fn get_yf_json_price(yf_response: &Value, idx: usize, asset: &str) -> Result<f64
         .and_then(|symbol| symbol.as_str())
         .ok_or_else(|| anyhow!("Ticker not found or is not a valid string!"))?;
 
-    if symbol.to_string() == asset {
+    if symbol == asset {
         let price = yf_response
             .get("quoteResponse")
             .and_then(|quote_response| quote_response.get("result"))
@@ -172,18 +172,16 @@ impl DataFeed for YahooFinanceDataFeed {
         } else {
             warn!("Request failed with status: {}", response.status());
 
-            let err_vec = asset_id_vec
-                .into_iter()
+            asset_id_vec
+                .iter()
                 .map(|(_, id)| {
-                    ((
+                    (
                         get_generic_feed_error("YahooFinance"),
                         *id,
                         current_unix_time(),
-                    ))
+                    )
                 })
-                .collect();
-
-            err_vec
+                .collect()
         }
     }
 }

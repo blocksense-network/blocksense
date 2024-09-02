@@ -133,7 +133,7 @@ pub async fn dispatch_full_batch(
     for feed in &feed_registry.feeds {
         script_to_assets
             .entry(feed.script.clone())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push((feed.name.clone(), feed.id));
     }
 
