@@ -49,6 +49,7 @@ impl Allocation {
 }
 
 /// A single-threaded version of an Allocator for indexes in the range [lower_bound; upper_bound].
+///
 /// When allocation is needed it starts from lower to upper bound until a free index is found.
 /// If no free index has been found, it iterates from lower to upper bound
 /// until an expired index is found and returns is.

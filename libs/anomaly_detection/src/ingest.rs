@@ -25,6 +25,7 @@ pub fn read_csv_to_vec(file_path: &str, column: &str) -> Result<Vec<f64>, Box<dy
 }
 
 /// Takes in Vec<f64> passes it through several Anomaly Detection algos and returns a score
+///
 /// The last value of `values` will be checked for anomalies
 /// Sending an empty `values` vector will result in a panic!
 pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error> {
