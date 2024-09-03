@@ -5,7 +5,10 @@ use crypto::sign_message;
 use crypto::{JsonSerializableSignature, Signature};
 use log::warn;
 use sequencer_config::Reporter;
+use sequencer_config::ReporterConfig;
+use tracing::debug;
 use tracing::info;
+use utils::read_file;
 
 pub fn get_reporter_secret_config_file_path(secret_key_file_path: String) -> String {
     let config_file_name = "/reporter_secret_key";
@@ -78,22 +81,34 @@ pub async fn post_feed_response(
     Ok(res.text().await?)
 }
 
-//TODO(snikolov): Refactor to use a separate endpoint once it's implemented within sequencer
-pub async fn post_feed_response_batch(
-    reporter: &Reporter,
-    secret_key: &str,
-    feed_result: Vec<(FeedResult, u32, Timestamp)>,
-    sequencer_url: &str,
+//TODO(snikolov): Refactor function to use a separate endpoint for full-batch
+pub async fn post_feed_response_full(
+    reporter_config: &ReporterConfig,
+    feed_api_name: String,
+    api_result: Vec<(FeedResult, u32, Timestamp)>,
 ) {
-    for (feed_result, feed_id, timestamp_ms) in feed_result {
-        let _ = post_feed_response(
-            reporter,
-            secret_key,
+    let secret_key_path = reporter_config
+        .resources
+        .get("SECRET_KEY_PATH")
+        .expect("SECRET_KEY_PATH not set in config!");
+
+    let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
+    let sequencer_url = reporter_config.sequencer_url.clone();
+    let reporter = reporter_config.reporter.clone();
+
+    for (feed_result, feed_id, timestamp_ms) in api_result {
+        let resp = post_feed_response(
+            &reporter_config.reporter,
+            secret_key.as_str(),
             feed_id,
             timestamp_ms,
             feed_result,
-            sequencer_url,
+            sequencer_url.as_str(),
         )
         .await;
+
+        debug!("Sequencer response for feed_id: {} - {:?}", feed_id, resp);
     }
+
+    debug!("Data feed response sent {:?}", feed_api_name);
 }

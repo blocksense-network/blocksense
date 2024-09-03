@@ -19,7 +19,7 @@ use tracing::{debug, info};
 use crate::{
     connector::{
         dispatch::{dispatch_full_batch, dispatch_subset},
-        post::{post_feed_response, post_feed_response_batch},
+        post::post_feed_response,
     },
     interfaces::data_feed::DataFeed,
 };
@@ -54,28 +54,6 @@ pub fn get_validated_reporter_config() -> ReporterConfig {
         .expect("validation error");
 
     reporter_config
-}
-
-fn start_reporter_full(
-    reporter_config: &ReporterConfig,
-    mut receiver: mpsc::UnboundedReceiver<(Vec<(FeedResult, u32, Timestamp)>, String)>,
-) {
-    let secret_key_path = reporter_config
-        .resources
-        .get("SECRET_KEY_PATH")
-        .expect("SECRET_KEY_PATH not set in config!");
-
-    let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
-    let sequencer_url = reporter_config.sequencer_url.clone();
-    let reporter = reporter_config.reporter.clone();
-
-    tokio::task::spawn(async move {
-        while let Some((results, _)) = receiver.recv().await {
-            let res =
-                post_feed_response_batch(&reporter, &secret_key, results, &sequencer_url).await;
-            debug!("Data feed response sent {:?}", res);
-        }
-    });
 }
 
 fn start_reporter_subset(
@@ -123,11 +101,10 @@ pub async fn orchestrator() {
     info!("Available feed count: {}\n", FEED_COUNTER.get());
 
     let request_client = reqwest::Client::new();
+
     let (tx_batch, rx_batch) = mpsc::unbounded_channel();
-    let (tx_full, rx_full) = mpsc::unbounded_channel();
-    if reporter_config.full_batch {
-        start_reporter_full(&reporter_config, rx_full);
-    } else {
+
+    if !reporter_config.full_batch {
         start_reporter_subset(&reporter_config, rx_batch)
     }
 
@@ -137,13 +114,7 @@ pub async fn orchestrator() {
         let start_time = Instant::now();
 
         if reporter_config.full_batch {
-            dispatch_full_batch(
-                &reporter_config,
-                &feeds_registry,
-                &mut connection_cache,
-                tx_full.clone(),
-            )
-            .await;
+            dispatch_full_batch(&reporter_config, &feeds_registry, &mut connection_cache).await;
         } else {
             dispatch_subset(
                 &reporter_config,

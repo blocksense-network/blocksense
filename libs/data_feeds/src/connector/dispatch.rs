@@ -14,6 +14,7 @@ use tokio::sync::{mpsc::UnboundedSender, Mutex};
 use tracing::debug;
 
 use crate::{
+    connector::post::post_feed_response_full,
     interfaces::data_feed::DataFeed,
     services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooFinanceDataFeed},
 };
@@ -126,7 +127,6 @@ pub async fn dispatch_full_batch(
     reporter_config: &ReporterConfig,
     feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
-    data_feed_sender: UnboundedSender<(Vec<(FeedResult, u32, Timestamp)>, String)>,
 ) {
     let mut script_to_assets: HashMap<String, Vec<(String, u32)>> = HashMap::new();
 
@@ -143,8 +143,6 @@ pub async fn dispatch_full_batch(
             continue;
         }
 
-        let tx = data_feed_sender.clone();
-
         let feed_api = resolve_feed(&feed_api_enum, &reporter_config.resources, connection_cache);
         let feed_api_name = feed_api_enum.get_as_str();
 
@@ -153,10 +151,10 @@ pub async fn dispatch_full_batch(
             .expect("Unrecognized DataFeed Script!")
             .clone();
 
-        tokio::task::spawn(async move {
-            let results = feed_api.lock().await.poll_batch(&asset_id_vec);
-            tx.send((results, feed_api_name.to_string())).unwrap();
-            debug!("DataFeed {} polled", feed_api_enum.get_as_str());
-        });
+        let results = feed_api.lock().await.poll_batch(&asset_id_vec).await;
+
+        debug!("DataFeed {} polled", feed_api_enum.get_as_str());
+
+        post_feed_response_full(reporter_config, feed_api_name.to_string(), results).await;
     }
 }

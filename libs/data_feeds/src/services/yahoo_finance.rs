@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Result};
+use async_trait::async_trait;
 use reqwest::blocking::Client;
 use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
@@ -84,6 +85,7 @@ fn get_feed_result(response_json: &Value, idx: usize, asset: &str) -> FeedResult
     }
 }
 
+#[async_trait]
 impl DataFeed for YahooFinanceDataFeed {
     fn score_by(&self) -> ConsensusMetric {
         ConsensusMetric::Mean(AverageAggregator {})
@@ -122,7 +124,7 @@ impl DataFeed for YahooFinanceDataFeed {
         }
     }
 
-    fn poll_batch(
+    async fn poll_batch(
         &mut self,
         asset_id_vec: &Vec<(String, u32)>,
     ) -> Vec<(FeedResult, u32, Timestamp)> {

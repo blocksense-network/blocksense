@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use feed_registry::{
     aggregate::{AverageAggregator, ConsensusMetric},
     api::DataFeedAPI,
@@ -68,6 +69,7 @@ fn get_feed_result(response_json: &Value, asset: &str) -> FeedResult {
     }
 }
 
+#[async_trait]
 impl DataFeed for CoinMarketCapDataFeed {
     fn score_by(&self) -> ConsensusMetric {
         ConsensusMetric::Mean(AverageAggregator {})
@@ -110,7 +112,7 @@ impl DataFeed for CoinMarketCapDataFeed {
         }
     }
 
-    fn poll_batch(
+    async fn poll_batch(
         &mut self,
         asset_id_vec: &Vec<(String, u32)>,
     ) -> Vec<(FeedResult, u32, Timestamp)> {
