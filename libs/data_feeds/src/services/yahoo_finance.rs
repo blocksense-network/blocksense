@@ -126,7 +126,7 @@ impl DataFeed for YahooFinanceDataFeed {
 
     async fn poll_batch(
         &mut self,
-        asset_id_vec: &Vec<(String, u32)>,
+        asset_id_vec: &[(String, u32)],
     ) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://yfapi.net/v6/finance/quote";
 
@@ -158,16 +158,13 @@ impl DataFeed for YahooFinanceDataFeed {
         if response.status().is_success() {
             let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-            let mut idx = 0;
-            for (asset, feed_id) in asset_id_vec {
+            for (idx, (asset, feed_id)) in asset_id_vec.iter().enumerate() {
                 trace!("Feed Asset pair - {}.{}", asset, feed_id);
                 results_vec.push((
                     get_feed_result(&resp_json, idx, asset),
                     *feed_id,
                     current_unix_time(),
                 ));
-
-                idx += 1;
             }
 
             results_vec

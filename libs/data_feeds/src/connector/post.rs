@@ -94,7 +94,6 @@ pub async fn post_feed_response_full(
 
     let secret_key = read_file(secret_key_path.as_str()).trim().to_string();
     let sequencer_url = reporter_config.sequencer_url.clone();
-    let reporter = reporter_config.reporter.clone();
 
     for (feed_result, feed_id, timestamp_ms) in api_result {
         let resp = post_feed_response(

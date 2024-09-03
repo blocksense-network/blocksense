@@ -114,7 +114,7 @@ impl DataFeed for CoinMarketCapDataFeed {
 
     async fn poll_batch(
         &mut self,
-        asset_id_vec: &Vec<(String, u32)>,
+        asset_id_vec: &[(String, u32)],
     ) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
 

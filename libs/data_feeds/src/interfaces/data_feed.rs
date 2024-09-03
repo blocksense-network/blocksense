@@ -12,8 +12,5 @@ pub trait DataFeed: ApiConnect + Historical {
 
     fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp);
 
-    async fn poll_batch(
-        &mut self,
-        assets: &Vec<(String, u32)>,
-    ) -> Vec<(FeedResult, u32, Timestamp)>;
+    async fn poll_batch(&mut self, assets: &[(String, u32)]) -> Vec<(FeedResult, u32, Timestamp)>;
 }
