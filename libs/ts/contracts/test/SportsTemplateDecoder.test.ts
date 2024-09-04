@@ -7,18 +7,14 @@ import { run } from 'hardhat';
 
 interface Field {
   name: string;
-  type: string;
-  size: number;
-  length?: number;
+  values: { name: string; type: string; size: number; length?: number }[];
 }
 
 describe('Decoder', () => {
   const templatePath = path.join(__dirname, '../templates/decoder.sol.ejs');
-  const tempFilePath = path.join(__dirname, '../contracts/UserDecoder.sol');
+  const tempFilePath = path.join(__dirname, '../contracts/Decoder.sol');
 
-  async function generateAndDeployDecoder(
-    fields: { name: string; type: string; size: number }[],
-  ) {
+  async function generateAndDeployDecoder(fields: Field) {
     const template = fs.readFileSync(templatePath, 'utf-8');
     const generatedCode = ejs.render(template, { fields });
     fs.writeFileSync(tempFilePath, generatedCode, 'utf-8');
@@ -29,11 +25,11 @@ describe('Decoder', () => {
     return await DecoderFactory.deploy();
   }
 
-  async function testDecoder(fields: Field[], values: any[]) {
+  async function testDecoder(fields: Field, values: any[]) {
     const decoder = await generateAndDeployDecoder(fields);
     const compareValues = [...values];
 
-    fields.forEach((field, i) => {
+    fields.values.forEach((field, i) => {
       if (field.type.includes('[')) {
         values[i] = ethers.concat(
           values[i].map((value: any) => {
@@ -44,73 +40,99 @@ describe('Decoder', () => {
       }
     });
     const packedData = ethers.solidityPacked(
-      fields.map(field => field.type),
+      fields.values.map(field => field.type),
       values,
     );
     const result: any = await decoder.decode(packedData);
     expect(result).to.deep.equal(compareValues);
   }
 
+  afterEach(async () => {
+    if (fs.existsSync(tempFilePath)) {
+      fs.rm(tempFilePath, { force: true }, err => {
+        if (err) throw err;
+      });
+    }
+  });
+
   it('should correctly decode packed sports data with boolean fields', async () => {
-    const fields = [
-      { name: 'isHomeTeam', type: 'bool', size: 8 },
-      { name: 'isOvertime', type: 'bool', size: 8 },
-      { name: 'score', type: 'uint16', size: 16 },
-    ];
+    const fields = {
+      name: 'GameData',
+      values: [
+        { name: 'isHomeTeam', type: 'bool', size: 8 },
+        { name: 'isOvertime', type: 'bool', size: 8 },
+        { name: 'score', type: 'uint16', size: 16 },
+      ],
+    };
     const values = [true, false, 100];
     await testDecoder(fields, values);
   });
 
   it('should correctly decode packed sports data with mixed field types and sizes', async () => {
-    const fields = [
-      { name: 'gameId', type: 'uint32', size: 32 },
-      { name: 'teamName', type: 'bytes32', size: 256 },
-      { name: 'playerCount', type: 'uint8', size: 8 },
-    ];
+    const fields = {
+      name: 'GameData',
+      values: [
+        { name: 'gameId', type: 'uint32', size: 32 },
+        { name: 'teamName', type: 'bytes32', size: 256 },
+        { name: 'playerCount', type: 'uint8', size: 8 },
+      ],
+    };
     const values = [12345, ethers.encodeBytes32String('TeamA'), 11];
     await testDecoder(fields, values);
   });
 
   it('should handle maximum values for each field type', async () => {
-    const fields = [
-      { name: 'maxUint8', type: 'uint8', size: 8 },
-      { name: 'maxUint16', type: 'uint16', size: 16 },
-      { name: 'maxUint32', type: 'uint32', size: 32 },
-      { name: 'maxUint64', type: 'uint64', size: 64 },
-    ];
+    const fields = {
+      name: 'MaxValues',
+      values: [
+        { name: 'maxUint8', type: 'uint8', size: 8 },
+        { name: 'maxUint16', type: 'uint16', size: 16 },
+        { name: 'maxUint32', type: 'uint32', size: 32 },
+        { name: 'maxUint64', type: 'uint64', size: 64 },
+      ],
+    };
     const values = [255, 65535, 4294967295, BigInt('18446744073709551615')];
     await testDecoder(fields, values);
   });
 
   it('should handle mixed field types and sizes', async () => {
-    const fields = [
-      { name: 'isOvertime', type: 'bool', size: 8 },
-      { name: 'isFinal', type: 'bool', size: 8 },
-      { name: 'homeScore', type: 'uint16', size: 16 },
-      { name: 'awayScore', type: 'uint16', size: 16 },
-    ];
+    const fields = {
+      name: 'MixedFields',
+      values: [
+        { name: 'isOvertime', type: 'bool', size: 8 },
+        { name: 'isFinal', type: 'bool', size: 8 },
+        { name: 'homeScore', type: 'uint16', size: 16 },
+        { name: 'awayScore', type: 'uint16', size: 16 },
+      ],
+    };
     const values = [true, false, 110, 108];
     await testDecoder(fields, values);
   });
 
   it('should correctly decode packed sports data with maximum values', async () => {
-    const fields = [
-      { name: 'maxUint8', type: 'uint8', size: 8 },
-      { name: 'maxUint16', type: 'uint16', size: 16 },
-      { name: 'maxUint32', type: 'uint32', size: 32 },
-    ];
+    const fields = {
+      name: 'MaxSportsData',
+      values: [
+        { name: 'maxUint8', type: 'uint8', size: 8 },
+        { name: 'maxUint16', type: 'uint16', size: 16 },
+        { name: 'maxUint32', type: 'uint32', size: 32 },
+      ],
+    };
     const values = [255, 65535, 4294967295];
     await testDecoder(fields, values);
   });
 
   it('should handle different int sizes and address', async () => {
-    const fields = [
-      { name: 'int8Value', type: 'int8', size: 8 },
-      { name: 'int16Value', type: 'int16', size: 16 },
-      { name: 'int32Value', type: 'int32', size: 32 },
-      { name: 'int64Value', type: 'int64', size: 64 },
-      { name: 'addressValue', type: 'address', size: 160 },
-    ];
+    const fields = {
+      name: 'IntAndAddress',
+      values: [
+        { name: 'int8Value', type: 'int8', size: 8 },
+        { name: 'int16Value', type: 'int16', size: 16 },
+        { name: 'int32Value', type: 'int32', size: 32 },
+        { name: 'int64Value', type: 'int64', size: 64 },
+        { name: 'addressValue', type: 'address', size: 160 },
+      ],
+    };
     const values = [
       -128,
       -32768,
@@ -122,11 +144,14 @@ describe('Decoder', () => {
   });
 
   it('should handle different bytes sizes', async () => {
-    const fields = [
-      { name: 'bytes1Value', type: 'bytes1', size: 8 },
-      { name: 'bytes16Value', type: 'bytes16', size: 128 },
-      { name: 'bytes32Value', type: 'bytes32', size: 256 },
-    ];
+    const fields = {
+      name: 'BytesSizes',
+      values: [
+        { name: 'bytes1Value', type: 'bytes1', size: 8 },
+        { name: 'bytes16Value', type: 'bytes16', size: 128 },
+        { name: 'bytes32Value', type: 'bytes32', size: 256 },
+      ],
+    };
     const values = [
       '0xff',
       '0x1234567890abcdef1234567890abcdef',
@@ -136,13 +161,16 @@ describe('Decoder', () => {
   });
 
   it('should handle complex struct with mixed types', async () => {
-    const fields = [
-      { name: 'boolValue', type: 'bool', size: 8 },
-      { name: 'uint24Value', type: 'uint24', size: 24 },
-      { name: 'int48Value', type: 'int48', size: 48 },
-      { name: 'bytes8Value', type: 'bytes8', size: 64 },
-      { name: 'addressValue', type: 'address', size: 160 },
-    ];
+    const fields = {
+      name: 'ComplexStruct',
+      values: [
+        { name: 'boolValue', type: 'bool', size: 8 },
+        { name: 'uint24Value', type: 'uint24', size: 24 },
+        { name: 'int48Value', type: 'int48', size: 48 },
+        { name: 'bytes8Value', type: 'bytes8', size: 64 },
+        { name: 'addressValue', type: 'address', size: 160 },
+      ],
+    };
     const values = [
       true,
       16777215,
@@ -154,13 +182,16 @@ describe('Decoder', () => {
   });
 
   it('should handle mixed types including negative integers', async () => {
-    const fields = [
-      { name: 'int16Value', type: 'int16', size: 16 },
-      { name: 'uint32Value', type: 'uint32', size: 32 },
-      { name: 'boolValue', type: 'bool', size: 8 },
-      { name: 'bytes4Value', type: 'bytes4', size: 32 },
-      { name: 'addressValue', type: 'address', size: 160 },
-    ];
+    const fields = {
+      name: 'MixedWithNegatives',
+      values: [
+        { name: 'int16Value', type: 'int16', size: 16 },
+        { name: 'uint32Value', type: 'uint32', size: 32 },
+        { name: 'boolValue', type: 'bool', size: 8 },
+        { name: 'bytes4Value', type: 'bytes4', size: 32 },
+        { name: 'addressValue', type: 'address', size: 160 },
+      ],
+    };
     const values = [
       -1234,
       4294967295,
@@ -172,12 +203,15 @@ describe('Decoder', () => {
   });
 
   it('should handle large unsigned integers and small bytes', async () => {
-    const fields = [
-      { name: 'uint128Value', type: 'uint128', size: 128 },
-      { name: 'bytes2Value', type: 'bytes2', size: 16 },
-      { name: 'uint8Value', type: 'uint8', size: 8 },
-      { name: 'boolValue', type: 'bool', size: 8 },
-    ];
+    const fields = {
+      name: 'LargeUintSmallBytes',
+      values: [
+        { name: 'uint128Value', type: 'uint128', size: 128 },
+        { name: 'bytes2Value', type: 'bytes2', size: 16 },
+        { name: 'uint8Value', type: 'uint8', size: 8 },
+        { name: 'boolValue', type: 'bool', size: 8 },
+      ],
+    };
     const values = [
       BigInt('340282366920938463463374607431768211455'),
       '0xabcd',
@@ -188,13 +222,16 @@ describe('Decoder', () => {
   });
 
   it('should handle multiple addresses and mixed integer sizes', async () => {
-    const fields = [
-      { name: 'address1', type: 'address', size: 160 },
-      { name: 'uint40Value', type: 'uint40', size: 40 },
-      { name: 'address2', type: 'address', size: 160 },
-      { name: 'int24Value', type: 'int24', size: 24 },
-      { name: 'bytes3Value', type: 'bytes3', size: 24 },
-    ];
+    const fields = {
+      name: 'MultiAddressMixedInts',
+      values: [
+        { name: 'address1', type: 'address', size: 160 },
+        { name: 'uint40Value', type: 'uint40', size: 40 },
+        { name: 'address2', type: 'address', size: 160 },
+        { name: 'int24Value', type: 'int24', size: 24 },
+        { name: 'bytes3Value', type: 'bytes3', size: 24 },
+      ],
+    };
     const values = [
       '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       BigInt('1099511627775'),
@@ -206,14 +243,17 @@ describe('Decoder', () => {
   });
 
   it('should handle uint32, bytes4, bytes16, int128, bytes32, and address', async () => {
-    const fields = [
-      { name: 'uint32Value', type: 'uint32', size: 32 },
-      { name: 'bytes4Value', type: 'bytes4', size: 32 },
-      { name: 'bytes16Value', type: 'bytes16', size: 128 },
-      { name: 'int128Value', type: 'int128', size: 128 },
-      { name: 'bytes32Value', type: 'bytes32', size: 256 },
-      { name: 'addressValue', type: 'address', size: 160 },
-    ];
+    const fields = {
+      name: 'MixedTypes',
+      values: [
+        { name: 'uint32Value', type: 'uint32', size: 32 },
+        { name: 'bytes4Value', type: 'bytes4', size: 32 },
+        { name: 'bytes16Value', type: 'bytes16', size: 128 },
+        { name: 'int128Value', type: 'int128', size: 128 },
+        { name: 'bytes32Value', type: 'bytes32', size: 256 },
+        { name: 'addressValue', type: 'address', size: 160 },
+      ],
+    };
     const values = [
       4294967295,
       '0x12345678',
@@ -226,14 +266,17 @@ describe('Decoder', () => {
   });
 
   it('should handle fixed size array, uint256, bytes, and bool', async () => {
-    const fields = [
-      { name: 'uint8Array1', type: 'uint8[4]', size: 8, length: 4 },
-      { name: 'uint256Value1', type: 'uint256', size: 256 },
-      { name: 'uint8Array2', type: 'uint8[4]', size: 8, length: 4 },
-      { name: 'uint256Value2', type: 'uint256', size: 256 },
-      { name: 'bytes16Value', type: 'bytes16', size: 128 },
-      { name: 'boolValue', type: 'bool', size: 8 },
-    ];
+    const fields = {
+      name: 'FixedArraysAndLargeInts',
+      values: [
+        { name: 'uint8Array1', type: 'uint8[4]', size: 8, length: 4 },
+        { name: 'uint256Value1', type: 'uint256', size: 256 },
+        { name: 'uint8Array2', type: 'uint8[4]', size: 8, length: 4 },
+        { name: 'uint256Value2', type: 'uint256', size: 256 },
+        { name: 'bytes16Value', type: 'bytes16', size: 128 },
+        { name: 'boolValue', type: 'bool', size: 8 },
+      ],
+    };
 
     const values = [
       [10, 20, 30, 40],
@@ -251,13 +294,16 @@ describe('Decoder', () => {
   });
 
   it('should handle fixed size arrays of different types and sizes', async () => {
-    const fields = [
-      { name: 'uint32Array', type: 'uint32[9]', size: 32, length: 9 },
-      { name: 'bytes4Array', type: 'bytes4[2]', size: 32, length: 2 },
-      { name: 'addressArray', type: 'address[2]', size: 160, length: 2 },
-      { name: 'int128Array', type: 'int128[2]', size: 128, length: 2 },
-      { name: 'boolArray', type: 'bool[4]', size: 8, length: 4 },
-    ];
+    const fields = {
+      name: 'MixedFixedArrays',
+      values: [
+        { name: 'uint32Array', type: 'uint32[9]', size: 32, length: 9 },
+        { name: 'bytes4Array', type: 'bytes4[2]', size: 32, length: 2 },
+        { name: 'addressArray', type: 'address[2]', size: 160, length: 2 },
+        { name: 'int128Array', type: 'int128[2]', size: 128, length: 2 },
+        { name: 'boolArray', type: 'bool[4]', size: 8, length: 4 },
+      ],
+    };
     const values = [
       [
         1234567890, 2345678901, 3456789012, 456789012, 567890124, 678901345,
@@ -278,14 +324,17 @@ describe('Decoder', () => {
   });
 
   it('should handle mixed types including fixed size arrays and single values', async () => {
-    const fields = [
-      { name: 'uint8Array', type: 'uint8[3]', size: 8, length: 3 },
-      { name: 'bytes32Value', type: 'bytes32', size: 256 },
-      { name: 'int256Array', type: 'int256[2]', size: 256, length: 2 },
-      { name: 'addressValue', type: 'address', size: 160 },
-      { name: 'boolArray', type: 'bool[3]', size: 8, length: 3 },
-      { name: 'uint256Value', type: 'uint256', size: 256 },
-    ];
+    const fields = {
+      name: 'MixedTypesWithArrays',
+      values: [
+        { name: 'uint8Array', type: 'uint8[3]', size: 8, length: 3 },
+        { name: 'bytes32Value', type: 'bytes32', size: 256 },
+        { name: 'int256Array', type: 'int256[2]', size: 256, length: 2 },
+        { name: 'addressValue', type: 'address', size: 160 },
+        { name: 'boolArray', type: 'bool[3]', size: 8, length: 3 },
+        { name: 'uint256Value', type: 'uint256', size: 256 },
+      ],
+    };
     const values = [
       [255, 128, 0],
       '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
@@ -307,13 +356,16 @@ describe('Decoder', () => {
   });
 
   it('should handle uint256 and bytes32 fixed arrays among other values', async () => {
-    const fields = [
-      { name: 'uint256Array', type: 'uint256[3]', size: 256, length: 3 },
-      { name: 'bytes32Array', type: 'bytes32[2]', size: 256, length: 2 },
-      { name: 'addressValue', type: 'address', size: 160 },
-      { name: 'boolValue', type: 'bool', size: 8 },
-      { name: 'int128Value', type: 'int128', size: 128 },
-    ];
+    const fields = {
+      name: 'LargeArraysWithMixedTypes',
+      values: [
+        { name: 'uint256Array', type: 'uint256[3]', size: 256, length: 3 },
+        { name: 'bytes32Array', type: 'bytes32[2]', size: 256, length: 2 },
+        { name: 'addressValue', type: 'address', size: 160 },
+        { name: 'boolValue', type: 'bool', size: 8 },
+        { name: 'int128Value', type: 'int128', size: 128 },
+      ],
+    };
     const values = [
       [
         BigInt(

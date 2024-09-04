@@ -2,11 +2,13 @@
 pragma solidity ^0.8.24;
 
 <%_
+let name = fields.name.charAt(0).toLowerCase() + fields.name.slice(1)
+
 let prevSizeSum = 0
 
 let expandedFields = [];
 let arraysCount = 0;
-fields.forEach((field) => {
+fields.values.forEach((field) => {
   if (field.type.endsWith(']')) {
     // This is an array field
     expandedFields.push({
@@ -69,15 +71,15 @@ expandedFields.forEach((field, index) => {
 library Decoder {
   /// @notice User defined struct
   /// @dev Using structs avoids hitting the EVM stack limit
-  struct SportsData {
-    <%_ fields.forEach(field => { -%>
+  struct <%= fields.name %> {
+    <%_ fields.values.forEach(field => { -%>
     <%= field.type %> <%= field.name -%>;
     <%_ }); -%>
   }
 
   function decode(
     bytes memory data
-  ) external pure returns (SportsData memory sportsData) {
+  ) external pure returns (<%= fields.name %> memory <%= name %>) {
     assembly {
       let memData := mload(add(data, 32))
       <%_
@@ -85,7 +87,7 @@ library Decoder {
       let bitOffset = 0
       let prevSize = 0
       let index = 0
-      let location = 'sportsData'
+      let location = name
       -%>
 
       <%_ for (const [i, field] of expandedFields.entries()) { -%>
@@ -110,11 +112,11 @@ library Decoder {
         <%_ if (field.size <= 256) { -%>
           <%_ if (field.isArray) { -%>
             <%_ if (field.type === 'end') { -%>
-              <%_ location = 'sportsData' -%>
+              <%_ location = name -%>
             <%_ } else { -%>
               <%_ location = 'arrayAddress' + field.arrayIndex -%>
 
-      let arrayAddress<%= field.arrayIndex %> := mload(<%= index ? `add(sportsData, ${index * 0x20})` : 'sportsData' %>)
+      let arrayAddress<%= field.arrayIndex %> := mload(<%= index ? `add(${name}, ${index * 0x20})` : name %>)
               <%_ index++ -%>
               <%_ continue -%>
             <%_ } -%>
