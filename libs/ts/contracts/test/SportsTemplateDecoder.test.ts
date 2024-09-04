@@ -9,6 +9,7 @@ interface Field {
   name: string;
   type: string;
   size: number;
+  length?: number;
 }
 
 describe('Decoder', () => {
@@ -30,12 +31,24 @@ describe('Decoder', () => {
 
   async function testDecoder(fields: Field[], values: any[]) {
     const decoder = await generateAndDeployDecoder(fields);
+    const compareValues = [...values];
+
+    fields.forEach((field, i) => {
+      if (field.type.includes('[')) {
+        values[i] = ethers.concat(
+          values[i].map((value: any) => {
+            return ethers.solidityPacked([field.type.split('[')[0]], [value]);
+          }),
+        );
+        field.type = 'bytes';
+      }
+    });
     const packedData = ethers.solidityPacked(
       fields.map(field => field.type),
       values,
     );
     const result: any = await decoder.decode(packedData);
-    expect(result).to.deep.equal(values);
+    expect(result).to.deep.equal(compareValues);
   }
 
   it('should correctly decode packed sports data with boolean fields', async () => {
@@ -208,6 +221,116 @@ describe('Decoder', () => {
       BigInt('-170141183460469231731687303715884105728'),
       '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
       '0xcccccccccccccccccccccccccccccccccccccccc',
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle fixed size array, uint256, bytes, and bool', async () => {
+    const fields = [
+      { name: 'uint8Array1', type: 'uint8[4]', size: 8, length: 4 },
+      { name: 'uint256Value1', type: 'uint256', size: 256 },
+      { name: 'uint8Array2', type: 'uint8[4]', size: 8, length: 4 },
+      { name: 'uint256Value2', type: 'uint256', size: 256 },
+      { name: 'bytes16Value', type: 'bytes16', size: 128 },
+      { name: 'boolValue', type: 'bool', size: 8 },
+    ];
+
+    const values = [
+      [10, 20, 30, 40],
+      BigInt(
+        '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+      ),
+      [50, 60, 70, 80],
+      BigInt(
+        '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+      ),
+      '0x1234567890abcdef1234567890abcdef',
+      true,
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle fixed size arrays of different types and sizes', async () => {
+    const fields = [
+      { name: 'uint32Array', type: 'uint32[9]', size: 32, length: 9 },
+      { name: 'bytes4Array', type: 'bytes4[2]', size: 32, length: 2 },
+      { name: 'addressArray', type: 'address[2]', size: 160, length: 2 },
+      { name: 'int128Array', type: 'int128[2]', size: 128, length: 2 },
+      { name: 'boolArray', type: 'bool[4]', size: 8, length: 4 },
+    ];
+    const values = [
+      [
+        1234567890, 2345678901, 3456789012, 456789012, 567890124, 678901345,
+        780123456, 890123456, 912345678,
+      ],
+      ['0x12345678', '0x90abcdef'],
+      [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ],
+      [
+        BigInt('-170141183460469231731687303715884105728'),
+        BigInt('170141183460469231731687303715884105727'),
+      ],
+      [true, false, true, false],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle mixed types including fixed size arrays and single values', async () => {
+    const fields = [
+      { name: 'uint8Array', type: 'uint8[3]', size: 8, length: 3 },
+      { name: 'bytes32Value', type: 'bytes32', size: 256 },
+      { name: 'int256Array', type: 'int256[2]', size: 256, length: 2 },
+      { name: 'addressValue', type: 'address', size: 160 },
+      { name: 'boolArray', type: 'bool[3]', size: 8, length: 3 },
+      { name: 'uint256Value', type: 'uint256', size: 256 },
+    ];
+    const values = [
+      [255, 128, 0],
+      '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      [
+        BigInt(
+          '-57896044618658097711785492504343953926634992332820282019728792003956564819968',
+        ),
+        BigInt(
+          '57896044618658097711785492504343953926634992332820282019728792003956564819967',
+        ),
+      ],
+      '0xdddddddddddddddddddddddddddddddddddddddd',
+      [true, false, true],
+      BigInt(
+        '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+      ),
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle uint256 and bytes32 fixed arrays among other values', async () => {
+    const fields = [
+      { name: 'uint256Array', type: 'uint256[3]', size: 256, length: 3 },
+      { name: 'bytes32Array', type: 'bytes32[2]', size: 256, length: 2 },
+      { name: 'addressValue', type: 'address', size: 160 },
+      { name: 'boolValue', type: 'bool', size: 8 },
+      { name: 'int128Value', type: 'int128', size: 128 },
+    ];
+    const values = [
+      [
+        BigInt(
+          '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+        ),
+        BigInt(
+          '57896044618658097711785492504343953926634992332820282019728792003956564819967',
+        ),
+        BigInt('1234567890123456789012345678901234567890'),
+      ],
+      [
+        '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+        '0xfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210',
+      ],
+      '0x1234567890123456789012345678901234567890',
+      true,
+      BigInt('-170141183460469231731687303715884105728'),
     ];
     await testDecoder(fields, values);
   });
