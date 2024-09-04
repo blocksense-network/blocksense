@@ -419,7 +419,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/data-feeds-config-generator@workspace:apps/data-feeds-config-generator":
+"@blocksense/data-feeds-config-generator@workspace:*, @blocksense/data-feeds-config-generator@workspace:apps/data-feeds-config-generator":
   version: 0.0.0-use.local
   resolution: "@blocksense/data-feeds-config-generator@workspace:apps/data-feeds-config-generator"
   dependencies:
@@ -496,7 +496,9 @@ __metadata:
   dependencies:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/contracts": "workspace:*"
+    "@blocksense/data-feeds-config-generator": "workspace:*"
     "@blocksense/docs-theme": "workspace:*"
+    "@blocksense/monorepo": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"
     "@emotion/react": "npm:^11.13.0"
     "@emotion/styled": "npm:^11.13.0"
@@ -539,7 +541,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/monorepo@workspace:.":
+"@blocksense/monorepo@workspace:*, @blocksense/monorepo@workspace:.":
   version: 0.0.0-use.local
   resolution: "@blocksense/monorepo@workspace:."
   dependencies:

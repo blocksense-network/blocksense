@@ -28,7 +28,9 @@
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
     "@blocksense/contracts": "workspace:*",
+    "@blocksense/data-feeds-config-generator": "workspace:*",
     "@blocksense/docs-theme": "workspace:*",
+    "@blocksense/monorepo": "workspace:*",
     "@blocksense/sol-reflector": "workspace:*",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
