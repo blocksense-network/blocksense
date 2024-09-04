@@ -26,14 +26,18 @@ pub trait Validated {
 pub struct FeedConfig {
     pub id: u32,
     pub name: String,
+    #[serde(rename = "fullName")] // rename for naming convention
+    pub full_name: String,
     pub description: String,
+    #[serde(rename = "type")] // rename because of reserved keyword
+    pub type_: String,
     pub decimals: u8,
-    pub script: String,
     pub pair: AssetPair,
     pub report_interval_ms: u64,
-    pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
     pub first_report_start_time: SystemTime,
-    pub chainlink_compatiblity: Option<ChainlinkCompatibility>,
+    pub resources: HashMap<String, String>,
+    pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
+    pub script: String,
 }
 
 impl Validated for FeedConfig {
