@@ -12,5 +12,10 @@ export const pagesContractRefDocFolder = path.join(
   'pages/docs/contracts/reference-documentation/',
 );
 
+export const pagesDataFeedsFolder = path.join(
+  docsBlocksenseNetworkRoot,
+  'pages/docs/data-feeds/',
+);
+
 export const ghContractFolder =
   'https://github.com/blocksense-network/blocksense/blob/main/libs/contracts/';
