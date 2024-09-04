@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build:deps": "yarn workspace @blocksense/docs-theme build && yarn workspace @blocksense/contracts sol-reflect && yarn workspace @blocksense/base-utils build && yarn workspace @blocksense/data-feeds-config-generator build",
-    "build": "yarn build:deps && yarn build:tsc && yarn generate-contracts-mdx && next build",
+    "build": "yarn build:deps && yarn build:tsc && yarn generate-contracts-mdx && yarn generate-data-feed-mdx && next build",
     "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
     "dev": "next",
     "dev-watch": "yarn watch:docs-theme & next",
@@ -12,6 +12,7 @@
     "test": "yarn vitest -w false",
     "ts": "yarn node --import tsx",
     "generate-contracts-mdx": "yarn ts ./src/generate-contracts-mdx.ts && yarn prettier --write ./pages/docs/contracts --log-level silent",
+    "generate-data-feed-mdx": "yarn ts ./src/data-feeds/generate-data-feed-mdx.ts && yarn prettier --write ./pages/docs/data-feeds --log-level silent",
     "watch:docs-theme": "nodemon -w ../../libs/docs-theme -e js,jsx,ts,tsx,css --exec 'yarn workspace @blocksense/docs-theme build'"
   },
   "types": "./src/index.ts",
