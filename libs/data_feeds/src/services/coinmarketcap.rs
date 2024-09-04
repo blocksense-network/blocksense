@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use async_trait::async_trait;
 use feed_registry::{
     aggregate::{AverageAggregator, ConsensusMetric},
@@ -96,6 +98,7 @@ impl DataFeed for CoinMarketCapDataFeed {
         let response = self
             .client
             .get(url)
+            .timeout(Duration::from_secs(60))
             .headers(headers)
             .query(&params)
             .send()
@@ -124,8 +127,6 @@ impl DataFeed for CoinMarketCapDataFeed {
 
         debug!("{:?}", params);
 
-        debug!("{}", self.api_key);
-
         let headers = {
             let mut headers = reqwest::header::HeaderMap::new();
             headers.insert(
@@ -142,6 +143,7 @@ impl DataFeed for CoinMarketCapDataFeed {
         let response = self
             .client
             .get(url)
+            .timeout(Duration::from_secs(60))
             .headers(headers)
             .query(&params)
             .send()

@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use reqwest::blocking::Client;
@@ -111,7 +113,13 @@ impl DataFeed for YahooFinanceDataFeed {
             headers
         };
 
-        let response = self.client.get(full_url).headers(headers).send().unwrap();
+        let response = self
+            .client
+            .get(full_url)
+            .timeout(Duration::from_secs(60))
+            .headers(headers)
+            .send()
+            .unwrap();
 
         if response.status().is_success() {
             let resp_json: Value = response.json().unwrap();
@@ -151,7 +159,13 @@ impl DataFeed for YahooFinanceDataFeed {
             headers
         };
 
-        let response = self.client.get(full_url).headers(headers).send().unwrap();
+        let response = self
+            .client
+            .get(full_url)
+            .timeout(Duration::from_secs(60))
+            .headers(headers)
+            .send()
+            .unwrap();
 
         let mut results_vec: Vec<(FeedResult, u32, Timestamp)> = Vec::new();
 
