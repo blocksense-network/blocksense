@@ -11,13 +11,16 @@
         "base": "SAND",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6210,
+        "cmc_quote": "SAND"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6210,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -31,13 +34,16 @@
         "base": "AVAX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5805,
+        "cmc_quote": "AVAX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5805,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -51,13 +57,16 @@
         "base": "UNI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4307,
+        "cmc_quote": "UNI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4307,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -71,13 +80,16 @@
         "base": "DOT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6636,
+        "cmc_quote": "DOT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6636,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -91,13 +103,16 @@
         "base": "BAT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1697,
+        "cmc_quote": "BAT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1697,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -111,13 +126,16 @@
         "base": "LINK",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1975,
+        "cmc_quote": "LINK"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1975,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -131,13 +149,16 @@
         "base": "MANA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1966,
+        "cmc_quote": "MANA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1966,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -151,13 +172,16 @@
         "base": "USDC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3408,
+        "cmc_quote": "USDC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3408,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -171,13 +195,16 @@
         "base": "APE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7257,
+        "cmc_quote": "APE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7257,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -191,13 +218,16 @@
         "base": "AXS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6783,
+        "cmc_quote": "AXS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6783,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -211,13 +241,16 @@
         "base": "MKR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1518,
+        "cmc_quote": "MKR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1518,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -231,13 +264,16 @@
         "base": "BTC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1,
+        "cmc_quote": "BTC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -251,13 +287,16 @@
         "base": "MATIC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3890,
+        "cmc_quote": "MATIC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3890,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -271,13 +310,16 @@
         "base": "SNX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2586,
+        "cmc_quote": "SNX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2586,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -291,13 +333,16 @@
         "base": "USDT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 825,
+        "cmc_quote": "USDT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 825,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -311,13 +356,16 @@
         "base": "NEAR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6535,
+        "cmc_quote": "NEAR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6535,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -331,13 +379,16 @@
         "base": "COMP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5692,
+        "cmc_quote": "COMP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5692,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -351,13 +402,16 @@
         "base": "ZRX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1896,
+        "cmc_quote": "ZRX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1896,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -371,13 +425,16 @@
         "base": "ETH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1027,
+        "cmc_quote": "ETH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1027,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -391,97 +448,20 @@
         "base": "CHZ",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4066,
+        "cmc_quote": "CHZ"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4066,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
       "id": 20,
-      "name": "BEAM",
-      "fullName": "Beam",
-      "description": "BEAM / USD",
-      "type": "Crypto",
-      "decimals": 8,
-      "pair": {
-        "base": "BEAM",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3702,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 21,
-      "name": "SGD",
-      "fullName": "Singapore Dollar",
-      "description": "SGD / USD",
-      "type": "Forex",
-      "decimals": 8,
-      "pair": {
-        "base": "SGD",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "SGDUSD=X",
-      "script": "YahooFinance"
-    },
-    {
-      "id": 22,
-      "name": "SPELL",
-      "fullName": "Spell Token",
-      "description": "SPELL / USD",
-      "type": "Crypto",
-      "decimals": 8,
-      "pair": {
-        "base": "SPELL",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "cmc_id": 11289,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 23,
-      "name": "CAKE",
-      "fullName": "PancakeSwap",
-      "description": "CAKE / USD",
-      "type": "Crypto",
-      "decimals": 8,
-      "pair": {
-        "base": "CAKE",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7186,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 24,
       "name": "XAU",
       "fullName": "Gold",
       "description": "XAU / USD",
@@ -491,16 +471,19 @@
         "base": "XAU",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "XAU"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 25,
+      "id": 21,
       "name": "ALPHA",
       "fullName": "Alpha Finance",
       "description": "ALPHA / USD",
@@ -510,57 +493,20 @@
         "base": "ALPHA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7232,
+        "cmc_quote": "ALPHA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7232,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 26,
-      "name": "JOE",
-      "fullName": "Trader Joe",
-      "description": "JOE / USD",
-      "type": "Crypto",
-      "decimals": 8,
-      "pair": {
-        "base": "JOE",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "cmc_id": 11396,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 27,
-      "name": "XAVA",
-      "fullName": "Avalaunch",
-      "description": "XAVA / USD",
-      "type": "Crypto",
-      "decimals": 8,
-      "pair": {
-        "base": "XAVA",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9797,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 28,
+      "id": 22,
       "name": "CVX",
       "fullName": "Convex Finance",
       "description": "CVX / USD",
@@ -570,17 +516,20 @@
         "base": "CVX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9903,
+        "cmc_quote": "CVX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9903,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 29,
+      "id": 23,
       "name": "QI",
       "fullName": "Benqi",
       "description": "QI / USD",
@@ -590,37 +539,20 @@
         "base": "QI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8510,
+        "cmc_quote": "QI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8510,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 30,
-      "name": "YFI",
-      "fullName": "Yearn Finance",
-      "description": "YFI / USD",
-      "type": "Crypto",
-      "decimals": 8,
-      "pair": {
-        "base": "YFI",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5864,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 31,
+      "id": 24,
       "name": "MIM",
       "fullName": "Magic Internet Money",
       "description": "MIM / USD",
@@ -630,17 +562,20 @@
         "base": "MIM",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 162,
+        "cmc_quote": "MIM"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 162,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 32,
+      "id": 25,
       "name": "EUR",
       "fullName": "Euro",
       "description": "EUR / USD",
@@ -650,37 +585,19 @@
         "base": "EUR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "EURUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "EURUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 33,
-      "name": "TUSD",
-      "fullName": "True USD",
-      "description": "TUSD / USD",
-      "type": "Crypto",
-      "decimals": 8,
-      "pair": {
-        "base": "TUSD",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2563,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 34,
+      "id": 26,
       "name": "CHF",
       "fullName": "Swiss Franc",
       "description": "CHF / USD",
@@ -690,17 +607,19 @@
         "base": "CHF",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "CHFUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "CHFUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 35,
+      "id": 27,
       "name": "KNC",
       "fullName": "Kyber Network Crystal v2",
       "description": "KNC / USD",
@@ -710,37 +629,42 @@
         "base": "KNC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9444,
+        "cmc_quote": "KNC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9444,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 36,
-      "name": "GMX",
-      "fullName": "GMX",
-      "description": "GMX / USD",
-      "type": "Crypto",
+      "id": 28,
+      "name": "SGD",
+      "fullName": "Singapore Dollar",
+      "description": "SGD / USD",
+      "type": "Forex",
       "decimals": 8,
       "pair": {
-        "base": "GMX",
+        "base": "SGD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "SGDUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 11857,
-      "script": "CoinMarketCap"
+      "quorum_percentage": 1,
+      "script": "YahooFinance"
     },
     {
-      "id": 37,
+      "id": 29,
       "name": "WBTC",
       "fullName": "Wrapped Bitcoin",
       "description": "WBTC / USD",
@@ -750,17 +674,20 @@
         "base": "WBTC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3717,
+        "cmc_quote": "WBTC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3717,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 38,
+      "id": 30,
       "name": "ADA",
       "fullName": "Cardano",
       "description": "ADA / USD",
@@ -770,17 +697,43 @@
         "base": "ADA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2010,
+        "cmc_quote": "ADA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2010,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 39,
+      "id": 31,
+      "name": "XAVA",
+      "fullName": "Avalaunch",
+      "description": "XAVA / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "XAVA",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 9797,
+        "cmc_quote": "XAVA"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 32,
       "name": "FRAX",
       "fullName": "FRAX",
       "description": "FRAX / USD",
@@ -790,17 +743,20 @@
         "base": "FRAX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6952,
+        "cmc_quote": "FRAX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6952,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 40,
+      "id": 33,
       "name": "FXS",
       "fullName": "Frax Share",
       "description": "FXS / USD",
@@ -810,57 +766,43 @@
         "base": "FXS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6953,
+        "cmc_quote": "FXS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6953,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 41,
-      "name": "MIMATIC",
-      "fullName": "MAI",
-      "description": "MIMATIC / USD",
+      "id": 34,
+      "name": "JOE",
+      "fullName": "Trader Joe",
+      "description": "JOE / USD",
       "type": "Crypto",
       "decimals": 8,
       "pair": {
-        "base": "MIMATIC",
+        "base": "JOE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 11396,
+        "cmc_quote": "JOE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 10238,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 42,
-      "name": "COQ",
-      "fullName": "Coq Inu",
-      "description": "COQ / USD",
-      "type": "Crypto",
-      "decimals": 18,
-      "pair": {
-        "base": "COQ",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "cmc_id": 28675,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 43,
+      "id": 35,
       "name": "FTM",
       "fullName": "Fantom",
       "description": "FTM / USD",
@@ -870,17 +812,20 @@
         "base": "FTM",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3513,
+        "cmc_quote": "FTM"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3513,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 44,
+      "id": 36,
       "name": "SUSHI",
       "fullName": "Sushi",
       "description": "SUSHI / USD",
@@ -890,17 +835,66 @@
         "base": "SUSHI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6758,
+        "cmc_quote": "SUSHI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6758,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 45,
+      "id": 37,
+      "name": "BEAM",
+      "fullName": "Beam",
+      "description": "BEAM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "BEAM",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 3702,
+        "cmc_quote": "BEAM"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 38,
+      "name": "SPELL",
+      "fullName": "Spell Token",
+      "description": "SPELL / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SPELL",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 11289,
+        "cmc_quote": "SPELL"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 39,
       "name": "TRY",
       "fullName": "Turkish Lira",
       "description": "TRY / USD",
@@ -910,17 +904,19 @@
         "base": "TRY",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "TRYUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "TRYUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 46,
+      "id": 40,
       "name": "FIL",
       "fullName": "Filecoin",
       "description": "FIL / USD",
@@ -930,56 +926,43 @@
         "base": "FIL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2280,
+        "cmc_quote": "FIL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2280,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 47,
-      "name": "XAG",
-      "fullName": "Silver",
-      "description": "XAG / USD",
-      "type": "Commodities",
+      "id": 41,
+      "name": "GMX",
+      "fullName": "GMX",
+      "description": "GMX / USD",
+      "type": "Crypto",
       "decimals": 8,
       "pair": {
-        "base": "XAG",
+        "base": "GMX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 11857,
+        "cmc_quote": "GMX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "script": "YahooFinance"
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
     },
     {
-      "id": 48,
-      "name": "JPY",
-      "fullName": "Japanese Yen",
-      "description": "JPY / USD",
-      "type": "Forex",
-      "decimals": 8,
-      "pair": {
-        "base": "JPY",
-        "quote": "USD"
-      },
-      "report_interval_ms": 60000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "JPYUSD=X",
-      "script": "YahooFinance"
-    },
-    {
-      "id": 49,
+      "id": 42,
       "name": "DAI",
       "fullName": "DAI",
       "description": "DAI / USD",
@@ -989,37 +972,156 @@
         "base": "DAI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4943,
+        "cmc_quote": "DAI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4943,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 50,
-      "name": "CRV",
-      "fullName": "Curve DAO",
-      "description": "CRV / USD",
+      "id": 43,
+      "name": "POL",
+      "fullName": "",
+      "description": "POL / USD",
       "type": "Crypto",
       "decimals": 8,
       "pair": {
-        "base": "CRV",
+        "base": "POL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 28321,
+        "cmc_quote": "POL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6538,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 51,
+      "id": 44,
+      "name": "CAKE",
+      "fullName": "PancakeSwap",
+      "description": "CAKE / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CAKE",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 7186,
+        "cmc_quote": "CAKE"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 45,
+      "name": "MIMATIC",
+      "fullName": "MAI",
+      "description": "MIMATIC / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "MIMATIC",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 10238,
+        "cmc_quote": "MIMATIC"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 46,
+      "name": "XAG",
+      "fullName": "Silver",
+      "description": "XAG / USD",
+      "type": "Commodities",
+      "decimals": 8,
+      "pair": {
+        "base": "XAG",
+        "quote": "USD"
+      },
+      "resources": {
+        "yf_symbol": "XAG"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 47,
+      "name": "JPY",
+      "fullName": "Japanese Yen",
+      "description": "JPY / USD",
+      "type": "Forex",
+      "decimals": 8,
+      "pair": {
+        "base": "JPY",
+        "quote": "USD"
+      },
+      "resources": {
+        "yf_symbol": "JPYUSD=X"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "YahooFinance"
+    },
+    {
+      "id": 48,
+      "name": "TUSD",
+      "fullName": "True USD",
+      "description": "TUSD / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "TUSD",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 2563,
+        "cmc_quote": "TUSD"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 49,
       "name": "UST",
       "fullName": "Terra USD",
       "description": "UST / USD",
@@ -1029,16 +1131,42 @@
         "base": "UST",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "UST"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 52,
+      "id": 50,
+      "name": "COQ",
+      "fullName": "Coq Inu",
+      "description": "COQ / USD",
+      "type": "Crypto",
+      "decimals": 18,
+      "pair": {
+        "base": "COQ",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 28675,
+        "cmc_quote": "COQ"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 51,
       "name": "AAVE",
       "fullName": "Aave",
       "description": "AAVE / USD",
@@ -1048,13 +1176,39 @@
         "base": "AAVE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7278,
+        "cmc_quote": "AAVE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7278,
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 52,
+      "name": "YFI",
+      "fullName": "Yearn Finance",
+      "description": "YFI / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "YFI",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 5864,
+        "cmc_quote": "YFI"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
@@ -1068,17 +1222,43 @@
         "base": "EURC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 20641,
+        "cmc_quote": "EURC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 20641,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
       "id": 54,
+      "name": "CRV",
+      "fullName": "Curve DAO",
+      "description": "CRV / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "CRV",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 6538,
+        "cmc_quote": "CRV"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 55,
       "name": "TRX",
       "fullName": "Tron",
       "description": "TRX / USD",
@@ -1088,17 +1268,20 @@
         "base": "TRX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1958,
+        "cmc_quote": "TRX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1958,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 55,
+      "id": 56,
       "name": "INR",
       "fullName": "Indian Rupee",
       "description": "INR / USD",
@@ -1108,17 +1291,19 @@
         "base": "INR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "INRUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "INRUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 56,
+      "id": 57,
       "name": "LIT",
       "fullName": "Litentry",
       "description": "LIT / USD",
@@ -1128,17 +1313,20 @@
         "base": "LIT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3870,
+        "cmc_quote": "LIT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3870,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 57,
+      "id": 58,
       "name": "WING",
       "fullName": "Wing Finance",
       "description": "WING / USD",
@@ -1148,17 +1336,20 @@
         "base": "WING",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7048,
+        "cmc_quote": "WING"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7048,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 58,
+      "id": 59,
       "name": "COIN",
       "fullName": "Coinbase",
       "description": "COIN / USD",
@@ -1168,16 +1359,19 @@
         "base": "COIN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "COIN"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 59,
+      "id": 60,
       "name": "DOGE",
       "fullName": "Dogecoin",
       "description": "DOGE / USD",
@@ -1187,17 +1381,20 @@
         "base": "DOGE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 74,
+        "cmc_quote": "DOGE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 74,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 60,
+      "id": 61,
       "name": "1INCH",
       "fullName": "1inch",
       "description": "1INCH / USD",
@@ -1207,17 +1404,20 @@
         "base": "1INCH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8104,
+        "cmc_quote": "1INCH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8104,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 61,
+      "id": 62,
       "name": "CHR",
       "fullName": "Chromaway",
       "description": "CHR / USD",
@@ -1227,17 +1427,20 @@
         "base": "CHR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3978,
+        "cmc_quote": "CHR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3978,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 62,
+      "id": 63,
       "name": "NVDA",
       "fullName": "Nvidia",
       "description": "NVDA / USD",
@@ -1247,16 +1450,19 @@
         "base": "NVDA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "NVDA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 63,
+      "id": 64,
       "name": "TSLA",
       "fullName": "Tesla",
       "description": "TSLA / USD",
@@ -1266,16 +1472,19 @@
         "base": "TSLA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "TSLA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 64,
+      "id": 65,
       "name": "WIN",
       "fullName": "WINkLink",
       "description": "WIN / USD",
@@ -1285,17 +1494,20 @@
         "base": "WIN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4206,
+        "cmc_quote": "WIN"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4206,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 65,
+      "id": 66,
       "name": "EOS",
       "fullName": "EOS",
       "description": "EOS / USD",
@@ -1305,17 +1517,20 @@
         "base": "EOS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1765,
+        "cmc_quote": "EOS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1765,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 66,
+      "id": 67,
       "name": "PFE",
       "fullName": "Pfizer",
       "description": "PFE / USD",
@@ -1325,16 +1540,19 @@
         "base": "PFE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "PFE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 67,
+      "id": 68,
       "name": "KAVA",
       "fullName": "Kava",
       "description": "KAVA / USD",
@@ -1344,17 +1562,20 @@
         "base": "KAVA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4846,
+        "cmc_quote": "KAVA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4846,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 68,
+      "id": 69,
       "name": "ONT",
       "fullName": "Ontology",
       "description": "ONT / USD",
@@ -1364,17 +1585,20 @@
         "base": "ONT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2566,
+        "cmc_quote": "ONT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2566,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 69,
+      "id": 70,
       "name": "PAXG",
       "fullName": "Pax Gold",
       "description": "PAXG / USD",
@@ -1384,17 +1608,20 @@
         "base": "PAXG",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4705,
+        "cmc_quote": "PAXG"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4705,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 70,
+      "id": 71,
       "name": "MXN",
       "fullName": "Mexican Peso",
       "description": "MXN / USD",
@@ -1404,17 +1631,19 @@
         "base": "MXN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "MXNUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "MXNUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 71,
+      "id": 72,
       "name": "BETH",
       "fullName": "Binance ETH",
       "description": "BETH / USD",
@@ -1424,17 +1653,20 @@
         "base": "BETH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8353,
+        "cmc_quote": "BETH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8353,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 72,
+      "id": 73,
       "name": "SPY",
       "fullName": "SPY S&P 500 ETF",
       "description": "SPY / USD",
@@ -1444,16 +1676,19 @@
         "base": "SPY",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "SPY"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 73,
+      "id": 74,
       "name": "ATOM",
       "fullName": "Cosmos",
       "description": "ATOM / USD",
@@ -1463,17 +1698,20 @@
         "base": "ATOM",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3794,
+        "cmc_quote": "ATOM"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3794,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 74,
+      "id": 75,
       "name": "C98",
       "fullName": "C98",
       "description": "C98 / USD",
@@ -1483,17 +1721,20 @@
         "base": "C98",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 10903,
+        "cmc_quote": "C98"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 10903,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 75,
+      "id": 76,
       "name": "SHIB",
       "fullName": "Shiba Inu",
       "description": "SHIB / USD",
@@ -1503,17 +1744,20 @@
         "base": "SHIB",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5994,
+        "cmc_quote": "SHIB"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5994,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 76,
+      "id": 77,
       "name": "PHP",
       "fullName": "Philippine Peso",
       "description": "PHP / USD",
@@ -1523,17 +1767,19 @@
         "base": "PHP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "PHPUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "PHPUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 77,
+      "id": 78,
       "name": "SOL",
       "fullName": "Solana",
       "description": "SOL / USD",
@@ -1543,17 +1789,20 @@
         "base": "SOL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5426,
+        "cmc_quote": "SOL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5426,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 78,
+      "id": 79,
       "name": "CFX",
       "fullName": "Conflux",
       "description": "CFX / USD",
@@ -1563,17 +1812,20 @@
         "base": "CFX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7334,
+        "cmc_quote": "CFX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7334,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 79,
+      "id": 80,
       "name": "INJ",
       "fullName": "Injective Protocol",
       "description": "INJ / USD",
@@ -1583,17 +1835,20 @@
         "base": "INJ",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7226,
+        "cmc_quote": "INJ"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7226,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 80,
+      "id": 81,
       "name": "GBP",
       "fullName": "Pound Sterling",
       "description": "GBP / USD",
@@ -1603,17 +1858,19 @@
         "base": "GBP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "GBPUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "GBPUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 81,
+      "id": 82,
       "name": "BAND",
       "fullName": "Band Protocol",
       "description": "BAND / USD",
@@ -1623,17 +1880,20 @@
         "base": "BAND",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4679,
+        "cmc_quote": "BAND"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4679,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 82,
+      "id": 83,
       "name": "DODO",
       "fullName": "Dodo",
       "description": "DODO / USD",
@@ -1643,17 +1903,20 @@
         "base": "DODO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7224,
+        "cmc_quote": "DODO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7224,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 83,
+      "id": 84,
       "name": "BUSD",
       "fullName": "Binance USD",
       "description": "BUSD / USD",
@@ -1663,17 +1926,20 @@
         "base": "BUSD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4687,
+        "cmc_quote": "BUSD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4687,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 84,
+      "id": 85,
       "name": "THB",
       "fullName": "Thai Baht",
       "description": "THB / USD",
@@ -1683,17 +1949,19 @@
         "base": "THB",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "THBUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "THBUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 85,
+      "id": 86,
       "name": "NULS",
       "fullName": "Nuls",
       "description": "NULS / USD",
@@ -1703,17 +1971,20 @@
         "base": "NULS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2092,
+        "cmc_quote": "NULS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2092,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 86,
+      "id": 87,
       "name": "SXP",
       "fullName": "Swipe",
       "description": "SXP / USD",
@@ -1723,17 +1994,20 @@
         "base": "SXP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4279,
+        "cmc_quote": "SXP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4279,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 87,
+      "id": 88,
       "name": "USDV",
       "fullName": "Verified USD",
       "description": "USDV / USD",
@@ -1743,17 +2017,20 @@
         "base": "USDV",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 28443,
+        "cmc_quote": "USDV"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 28443,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 88,
+      "id": 89,
       "name": "WOO",
       "fullName": "Woo Network",
       "description": "WOO / USD",
@@ -1763,17 +2040,20 @@
         "base": "WOO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7501,
+        "cmc_quote": "WOO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7501,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 89,
+      "id": 90,
       "name": "REEF",
       "fullName": "Reef Finance",
       "description": "REEF / USD",
@@ -1783,17 +2063,20 @@
         "base": "REEF",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6951,
+        "cmc_quote": "REEF"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6951,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 90,
+      "id": 91,
       "name": "MS",
       "fullName": "Morgan Stanley",
       "description": "MS / USD",
@@ -1803,16 +2086,19 @@
         "base": "MS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "MS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 91,
+      "id": 92,
       "name": "XRP",
       "fullName": "Ripple",
       "description": "XRP / USD",
@@ -1822,17 +2108,20 @@
         "base": "XRP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 52,
+        "cmc_quote": "XRP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 52,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 92,
+      "id": 93,
       "name": "VAI",
       "fullName": "Vai",
       "description": "VAI / USD",
@@ -1842,17 +2131,20 @@
         "base": "VAI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7824,
+        "cmc_quote": "VAI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7824,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 93,
+      "id": 94,
       "name": "FET",
       "fullName": "Fetch.ai",
       "description": "FET / USD",
@@ -1862,17 +2154,20 @@
         "base": "FET",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3773,
+        "cmc_quote": "FET"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3773,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 94,
+      "id": 95,
       "name": "VET",
       "fullName": "VeChain",
       "description": "VET / USD",
@@ -1882,17 +2177,20 @@
         "base": "VET",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3077,
+        "cmc_quote": "VET"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3077,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 95,
+      "id": 96,
       "name": "ZAR",
       "fullName": "South African Rand",
       "description": "ZAR / USD",
@@ -1902,17 +2200,19 @@
         "base": "ZAR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "ZARUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "ZARUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 96,
+      "id": 97,
       "name": "GME",
       "fullName": "Gamestop",
       "description": "GME / USD",
@@ -1922,16 +2222,19 @@
         "base": "GME",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "GME"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 97,
+      "id": 98,
       "name": "FDUSD",
       "fullName": "First Digital USD",
       "description": "FDUSD / USD",
@@ -1941,17 +2244,20 @@
         "base": "FDUSD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 26081,
+        "cmc_quote": "FDUSD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 26081,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 98,
+      "id": 99,
       "name": "MASK",
       "fullName": "Mask Network",
       "description": "MASK / USD",
@@ -1961,17 +2267,20 @@
         "base": "MASK",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8536,
+        "cmc_quote": "MASK"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8536,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 99,
+      "id": 100,
       "name": "XVS",
       "fullName": "Venus",
       "description": "XVS / USD",
@@ -1981,17 +2290,20 @@
         "base": "XVS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7288,
+        "cmc_quote": "XVS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7288,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 100,
+      "id": 101,
       "name": "ONG",
       "fullName": "Ontology Gas",
       "description": "ONG / USD",
@@ -2001,17 +2313,20 @@
         "base": "ONG",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3217,
+        "cmc_quote": "ONG"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3217,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 101,
+      "id": 102,
       "name": "ICP",
       "fullName": "Internet Computer Protocol",
       "description": "ICP / USD",
@@ -2021,17 +2336,20 @@
         "base": "ICP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8916,
+        "cmc_quote": "ICP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8916,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 102,
+      "id": 103,
       "name": "JPM",
       "fullName": "JP Morgan",
       "description": "JPM / USD",
@@ -2041,16 +2359,19 @@
         "base": "JPM",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "JPM"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 103,
+      "id": 104,
       "name": "RDNT",
       "fullName": "Radiant Capital",
       "description": "RDNT / USD",
@@ -2060,17 +2381,20 @@
         "base": "RDNT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 21106,
+        "cmc_quote": "RDNT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 21106,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 104,
+      "id": 105,
       "name": "GOOGL",
       "fullName": "Alphabet",
       "description": "GOOGL / USD",
@@ -2080,16 +2404,19 @@
         "base": "GOOGL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "GOOGL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 105,
+      "id": 106,
       "name": "WTI",
       "fullName": "WTI Crude",
       "description": "WTI / USD",
@@ -2099,16 +2426,19 @@
         "base": "WTI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "WTI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 106,
+      "id": 107,
       "name": "HIGH",
       "fullName": "Highstreet",
       "description": "HIGH / USD",
@@ -2118,17 +2448,20 @@
         "base": "HIGH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 11232,
+        "cmc_quote": "HIGH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 11232,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 107,
+      "id": 108,
       "name": "BSW",
       "fullName": "Biswap",
       "description": "BSW / USD",
@@ -2138,17 +2471,20 @@
         "base": "BSW",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 10746,
+        "cmc_quote": "BSW"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 10746,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 108,
+      "id": 109,
       "name": "BNB",
       "fullName": "BNB",
       "description": "BNB / USD",
@@ -2158,17 +2494,20 @@
         "base": "BNB",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1839,
+        "cmc_quote": "BNB"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1839,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 109,
+      "id": 110,
       "name": "AMZN",
       "fullName": "Amazon",
       "description": "AMZN / USD",
@@ -2178,16 +2517,19 @@
         "base": "AMZN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "AMZN"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 110,
+      "id": 111,
       "name": "LINA",
       "fullName": "Linear",
       "description": "LINA / USD",
@@ -2197,17 +2539,20 @@
         "base": "LINA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7102,
+        "cmc_quote": "LINA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7102,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 111,
+      "id": 112,
       "name": "AAPL",
       "fullName": "Apple",
       "description": "AAPL / USD",
@@ -2217,16 +2562,19 @@
         "base": "AAPL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "AAPL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 112,
+      "id": 113,
       "name": "XTZ",
       "fullName": "Tezos",
       "description": "XTZ / USD",
@@ -2236,17 +2584,20 @@
         "base": "XTZ",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2011,
+        "cmc_quote": "XTZ"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2011,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 113,
+      "id": 114,
       "name": "GMT",
       "fullName": "STEPN",
       "description": "GMT / USD",
@@ -2256,17 +2607,20 @@
         "base": "GMT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 18069,
+        "cmc_quote": "GMT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 18069,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 114,
+      "id": 115,
       "name": "MSFT",
       "fullName": "Microsoft",
       "description": "MSFT / USD",
@@ -2276,16 +2630,19 @@
         "base": "MSFT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "MSFT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 115,
+      "id": 116,
       "name": "META",
       "fullName": "Meta",
       "description": "META / USD",
@@ -2295,16 +2652,19 @@
         "base": "META",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "META"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 116,
+      "id": 117,
       "name": "NFLX",
       "fullName": "Netflix",
       "description": "NFLX / USD",
@@ -2314,16 +2674,19 @@
         "base": "NFLX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "NFLX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 117,
+      "id": 118,
       "name": "ALPACA",
       "fullName": "Alpaca Finance",
       "description": "ALPACA / USD",
@@ -2333,17 +2696,20 @@
         "base": "ALPACA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8707,
+        "cmc_quote": "ALPACA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8707,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 118,
+      "id": 119,
       "name": "BCH",
       "fullName": "Bitcoin Cash",
       "description": "BCH / USD",
@@ -2353,17 +2719,20 @@
         "base": "BCH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1831,
+        "cmc_quote": "BCH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1831,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 119,
+      "id": 120,
       "name": "MRNA",
       "fullName": "Moderna",
       "description": "MRNA / USD",
@@ -2373,16 +2742,19 @@
         "base": "MRNA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "MRNA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 120,
+      "id": 121,
       "name": "XLM",
       "fullName": "Stellar",
       "description": "XLM / USD",
@@ -2392,17 +2764,20 @@
         "base": "XLM",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 512,
+        "cmc_quote": "XLM"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 512,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 121,
+      "id": 122,
       "name": "QQQ",
       "fullName": "QQQ Nasdaq 100 ETF",
       "description": "QQQ / USD",
@@ -2412,16 +2787,19 @@
         "base": "QQQ",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "QQQ"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 122,
+      "id": 123,
       "name": "KLAY",
       "fullName": "Klaytn",
       "description": "KLAY / USD",
@@ -2431,17 +2809,20 @@
         "base": "KLAY",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4256,
+        "cmc_quote": "KLAY"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4256,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 123,
+      "id": 124,
       "name": "BRL",
       "fullName": "Brazilian Real",
       "description": "BRL / USD",
@@ -2451,17 +2832,19 @@
         "base": "BRL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "BRLUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "BRLUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 124,
+      "id": 125,
       "name": "LTC",
       "fullName": "Litecoin",
       "description": "LTC / USD",
@@ -2471,17 +2854,20 @@
         "base": "LTC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2,
+        "cmc_quote": "LTC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 125,
+      "id": 126,
       "name": "MBOX",
       "fullName": "",
       "description": "MBOX / USD",
@@ -2491,17 +2877,20 @@
         "base": "MBOX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9175,
+        "cmc_quote": "MBOX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9175,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 126,
+      "id": 127,
       "name": "CUSD",
       "fullName": "Celo Dollar",
       "description": "CUSD / USD",
@@ -2511,17 +2900,20 @@
         "base": "CUSD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7236,
+        "cmc_quote": "CUSD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7236,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 127,
+      "id": 128,
       "name": "CELO",
       "fullName": "Celo",
       "description": "CELO / USD",
@@ -2531,17 +2923,20 @@
         "base": "CELO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5567,
+        "cmc_quote": "CELO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5567,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 128,
+      "id": 129,
       "name": "COP",
       "fullName": "Colombian Peso",
       "description": "COP / USD",
@@ -2551,17 +2946,19 @@
         "base": "COP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "COPUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "COPUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 129,
+      "id": 130,
       "name": "METIS",
       "fullName": "Metis",
       "description": "METIS / USD",
@@ -2571,17 +2968,20 @@
         "base": "METIS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9640,
+        "cmc_quote": "METIS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9640,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 130,
+      "id": 131,
       "name": "OP",
       "fullName": "Optimism",
       "description": "OP / USD",
@@ -2591,17 +2991,20 @@
         "base": "OP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 11840,
+        "cmc_quote": "OP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 11840,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 131,
+      "id": 132,
       "name": "CNY",
       "fullName": "Chinese Yuan",
       "description": "CNY / USD",
@@ -2611,17 +3014,19 @@
         "base": "CNY",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "CNYUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "CNYUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 132,
+      "id": 133,
       "name": "LUSD",
       "fullName": "Liquity USD",
       "description": "LUSD / USD",
@@ -2631,17 +3036,20 @@
         "base": "LUSD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9566,
+        "cmc_quote": "LUSD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9566,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 133,
+      "id": 134,
       "name": "KRW",
       "fullName": "Korean Won",
       "description": "KRW / USD",
@@ -2651,17 +3059,19 @@
         "base": "KRW",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "KRWUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "KRWUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 134,
+      "id": 135,
       "name": "DPX",
       "fullName": "Dopex",
       "description": "DPX / USD",
@@ -2671,17 +3081,20 @@
         "base": "DPX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 11188,
+        "cmc_quote": "DPX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 11188,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 135,
+      "id": 136,
       "name": "USD+",
       "fullName": "USD+",
       "description": "USD+ / USD",
@@ -2691,17 +3104,20 @@
         "base": "USD+",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 20317,
+        "cmc_quote": "USD+"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 20317,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 136,
+      "id": 137,
       "name": "sUSDe",
       "fullName": "Ethena Staked USDe",
       "description": "sUSDe / USD",
@@ -2711,17 +3127,20 @@
         "base": "sUSDe",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 29471,
+        "cmc_quote": "sUSDe"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 29471,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 137,
+      "id": 138,
       "name": "GHO",
       "fullName": "GHO",
       "description": "GHO / USD",
@@ -2731,17 +3150,20 @@
         "base": "GHO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 23508,
+        "cmc_quote": "GHO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 23508,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 138,
+      "id": 139,
       "name": "RPL",
       "fullName": "Rocket Pool",
       "description": "RPL / USD",
@@ -2751,17 +3173,20 @@
         "base": "RPL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2943,
+        "cmc_quote": "RPL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2943,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 139,
+      "id": 140,
       "name": "ARB",
       "fullName": "Arbitrum",
       "description": "ARB / USD",
@@ -2771,19 +3196,22 @@
         "base": "ARB",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 938,
+        "cmc_quote": "ARB"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 938,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 140,
+      "id": 141,
       "name": "ULTI",
-      "fullName": "",
+      "fullName": "Ultiverse",
       "description": "ULTI / USD",
       "type": "Crypto",
       "decimals": 8,
@@ -2791,17 +3219,20 @@
         "base": "ULTI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 31504,
+        "cmc_quote": "ULTI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 31504,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 141,
+      "id": 142,
       "name": "STG",
       "fullName": "Stargate Finance",
       "description": "STG / USD",
@@ -2811,17 +3242,20 @@
         "base": "STG",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 18934,
+        "cmc_quote": "STG"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 18934,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 142,
+      "id": 143,
       "name": "PENDLE",
       "fullName": "Pendle",
       "description": "PENDLE / USD",
@@ -2831,17 +3265,20 @@
         "base": "PENDLE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9481,
+        "cmc_quote": "PENDLE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9481,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 143,
+      "id": 144,
       "name": "GNS",
       "fullName": "Gains Network",
       "description": "GNS / USD",
@@ -2851,17 +3288,20 @@
         "base": "GNS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 13663,
+        "cmc_quote": "GNS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 13663,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 144,
+      "id": 145,
       "name": "CAD",
       "fullName": "Canadian Dollar",
       "description": "CAD / USD",
@@ -2871,17 +3311,19 @@
         "base": "CAD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "CADUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "CADUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 145,
+      "id": 146,
       "name": "BAL",
       "fullName": "Balancer",
       "description": "BAL / USD",
@@ -2891,17 +3333,20 @@
         "base": "BAL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5728,
+        "cmc_quote": "BAL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5728,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 146,
+      "id": 147,
       "name": "RSR",
       "fullName": "Reserve Rights",
       "description": "RSR / USD",
@@ -2911,17 +3356,20 @@
         "base": "RSR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3964,
+        "cmc_quote": "RSR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3964,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 147,
+      "id": 148,
       "name": "MAGIC",
       "fullName": "Magic",
       "description": "MAGIC / USD",
@@ -2931,17 +3379,20 @@
         "base": "MAGIC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 14783,
+        "cmc_quote": "MAGIC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 14783,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 148,
+      "id": 149,
       "name": "PEPE",
       "fullName": "PEPE",
       "description": "PEPE / USD",
@@ -2951,17 +3402,20 @@
         "base": "PEPE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 22454,
+        "cmc_quote": "PEPE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 22454,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 149,
+      "id": 150,
       "name": "AXL",
       "fullName": "Axelar",
       "description": "AXL / USD",
@@ -2971,17 +3425,20 @@
         "base": "AXL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 15853,
+        "cmc_quote": "AXL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 15853,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 150,
+      "id": 151,
       "name": "IOTX",
       "fullName": "IoTeX",
       "description": "IOTX / USD",
@@ -2991,17 +3448,20 @@
         "base": "IOTX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2777,
+        "cmc_quote": "IOTX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2777,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 151,
+      "id": 152,
       "name": "WIF",
       "fullName": "dogwifhat",
       "description": "WIF / USD",
@@ -3011,17 +3471,20 @@
         "base": "WIF",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 28752,
+        "cmc_quote": "WIF"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 28752,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 152,
+      "id": 153,
       "name": "GRT",
       "fullName": "The Graph",
       "description": "GRT / USD",
@@ -3031,17 +3494,20 @@
         "base": "GRT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6719,
+        "cmc_quote": "GRT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6719,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 153,
+      "id": 154,
       "name": "TIA",
       "fullName": "Celestia",
       "description": "TIA / USD",
@@ -3051,19 +3517,22 @@
         "base": "TIA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 18411,
+        "cmc_quote": "TIA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 18411,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 154,
+      "id": 155,
       "name": "MLN",
-      "fullName": "",
+      "fullName": "Enzyme",
       "description": "MLN / USD",
       "type": "Crypto",
       "decimals": 8,
@@ -3071,17 +3540,20 @@
         "base": "MLN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1552,
+        "cmc_quote": "MLN"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1552,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 155,
+      "id": 156,
       "name": "TAO",
       "fullName": "Bittensor",
       "description": "TAO / USD",
@@ -3091,17 +3563,20 @@
         "base": "TAO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 22974,
+        "cmc_quote": "TAO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 22974,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 156,
+      "id": 157,
       "name": "MNT",
       "fullName": "Mantle",
       "description": "MNT / USD",
@@ -3111,17 +3586,20 @@
         "base": "MNT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 27075,
+        "cmc_quote": "MNT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 27075,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 157,
+      "id": 158,
       "name": "USDe",
       "fullName": "Ethena USDe",
       "description": "USDe / USD",
@@ -3131,17 +3609,20 @@
         "base": "USDe",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 29470,
+        "cmc_quote": "USDe"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 29470,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 158,
+      "id": 159,
       "name": "LDO",
       "fullName": "Lido DAO",
       "description": "LDO / USD",
@@ -3151,17 +3632,20 @@
         "base": "LDO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8000,
+        "cmc_quote": "LDO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8000,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 159,
+      "id": 160,
       "name": "ZRO",
       "fullName": "LayerZero",
       "description": "ZRO / USD",
@@ -3171,17 +3655,20 @@
         "base": "ZRO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 26997,
+        "cmc_quote": "ZRO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 26997,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 160,
+      "id": 161,
       "name": "TBTC",
       "fullName": "tBTC",
       "description": "TBTC / USD",
@@ -3191,17 +3678,20 @@
         "base": "TBTC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5776,
+        "cmc_quote": "TBTC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5776,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 161,
+      "id": 162,
       "name": "XAI",
       "fullName": "Xai",
       "description": "XAI / USD",
@@ -3211,17 +3701,20 @@
         "base": "XAI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 11726,
+        "cmc_quote": "XAI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 11726,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 162,
+      "id": 163,
       "name": "CRVUSD",
       "fullName": "crvUSD",
       "description": "CRVUSD / USD",
@@ -3231,17 +3724,20 @@
         "base": "CRVUSD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 24927,
+        "cmc_quote": "CRVUSD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 24927,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 163,
+      "id": 164,
       "name": "SEK",
       "fullName": "Swedish Krona",
       "description": "SEK / USD",
@@ -3251,19 +3747,21 @@
         "base": "SEK",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "SEKUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "SEKUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 164,
+      "id": 165,
       "name": "ASTR",
-      "fullName": "",
+      "fullName": "Astar",
       "description": "ASTR / USD",
       "type": "Crypto",
       "decimals": 8,
@@ -3271,17 +3769,20 @@
         "base": "ASTR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 12885,
+        "cmc_quote": "ASTR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 12885,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 165,
+      "id": 166,
       "name": "USDD",
       "fullName": "USDD",
       "description": "USDD / USD",
@@ -3291,17 +3792,20 @@
         "base": "USDD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 19891,
+        "cmc_quote": "USDD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 19891,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 166,
+      "id": 167,
       "name": "DPI",
       "fullName": "DefiPulse Index",
       "description": "DPI / USD",
@@ -3311,17 +3815,20 @@
         "base": "DPI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7055,
+        "cmc_quote": "DPI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7055,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 167,
+      "id": 168,
       "name": "WEMIX",
       "fullName": "WEMIX",
       "description": "WEMIX / USD",
@@ -3331,19 +3838,22 @@
         "base": "WEMIX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7548,
+        "cmc_quote": "WEMIX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7548,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 168,
+      "id": 169,
       "name": "OGN",
-      "fullName": "",
+      "fullName": "Origin Protocol",
       "description": "OGN / USD",
       "type": "Crypto",
       "decimals": 8,
@@ -3351,19 +3861,22 @@
         "base": "OGN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5117,
+        "cmc_quote": "OGN"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5117,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 169,
+      "id": 170,
       "name": "MEW",
-      "fullName": "",
+      "fullName": "cat in a dogs world",
       "description": "MEW / USD",
       "type": "Crypto",
       "decimals": 18,
@@ -3371,17 +3884,20 @@
         "base": "MEW",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 30126,
+        "cmc_quote": "MEW"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 30126,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 170,
+      "id": 171,
       "name": "MAVIA",
       "fullName": "Heroes of Mavia",
       "description": "MAVIA / USD",
@@ -3391,17 +3907,20 @@
         "base": "MAVIA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 28829,
+        "cmc_quote": "MAVIA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 28829,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 171,
+      "id": 172,
       "name": "APT",
       "fullName": "Aptos",
       "description": "APT / USD",
@@ -3411,17 +3930,20 @@
         "base": "APT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 13473,
+        "cmc_quote": "APT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 13473,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 172,
+      "id": 173,
       "name": "AERO",
       "fullName": "Aerodrome Finance",
       "description": "AERO / USD",
@@ -3431,17 +3953,20 @@
         "base": "AERO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 17706,
+        "cmc_quote": "AERO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 17706,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 173,
+      "id": 174,
       "name": "DEGEN",
       "fullName": "Degen (Base)",
       "description": "DEGEN / USD",
@@ -3451,19 +3976,22 @@
         "base": "DEGEN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 24276,
+        "cmc_quote": "DEGEN"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 24276,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 174,
+      "id": 175,
       "name": "MOG",
-      "fullName": "",
+      "fullName": "Mog Coin",
       "description": "MOG / USD",
       "type": "Crypto",
       "decimals": 18,
@@ -3471,17 +3999,20 @@
         "base": "MOG",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 27659,
+        "cmc_quote": "MOG"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 27659,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 175,
+      "id": 176,
       "name": "WSTETH",
       "fullName": "Lido wstETH",
       "description": "WSTETH / USD",
@@ -3491,19 +4022,22 @@
         "base": "WSTETH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 12409,
+        "cmc_quote": "WSTETH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 12409,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 176,
+      "id": 177,
       "name": "FOXY",
-      "fullName": "",
+      "fullName": "Foxy",
       "description": "FOXY / USD",
       "type": "Crypto",
       "decimals": 18,
@@ -3511,17 +4045,20 @@
         "base": "FOXY",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 20801,
+        "cmc_quote": "FOXY"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 20801,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 177,
+      "id": 178,
       "name": "FLOW",
       "fullName": "Flow",
       "description": "FLOW / USD",
@@ -3531,17 +4068,20 @@
         "base": "FLOW",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4558,
+        "cmc_quote": "FLOW"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4558,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 178,
+      "id": 179,
       "name": "UMA",
       "fullName": "UMA",
       "description": "UMA / USD",
@@ -3551,17 +4091,20 @@
         "base": "UMA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5617,
+        "cmc_quote": "UMA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5617,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 179,
+      "id": 180,
       "name": "SUSD",
       "fullName": "SUSD",
       "description": "SUSD / USD",
@@ -3571,17 +4114,20 @@
         "base": "SUSD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2927,
+        "cmc_quote": "SUSD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2927,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 180,
+      "id": 181,
       "name": "DYDX",
       "fullName": "dYdX",
       "description": "DYDX / USD",
@@ -3591,17 +4137,20 @@
         "base": "DYDX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 28324,
+        "cmc_quote": "DYDX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 28324,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 181,
+      "id": 182,
       "name": "STX",
       "fullName": "Stacks",
       "description": "STX / USD",
@@ -3611,17 +4160,20 @@
         "base": "STX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1861,
+        "cmc_quote": "STX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1861,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 182,
+      "id": 183,
       "name": "RUNE",
       "fullName": "THORChain",
       "description": "RUNE / USD",
@@ -3631,17 +4183,20 @@
         "base": "RUNE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4157,
+        "cmc_quote": "RUNE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4157,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 183,
+      "id": 184,
       "name": "ORDI",
       "fullName": "ORDI",
       "description": "ORDI / USD",
@@ -3651,17 +4206,20 @@
         "base": "ORDI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 25028,
+        "cmc_quote": "ORDI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 25028,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 184,
+      "id": 185,
       "name": "ALGO",
       "fullName": "Algorand",
       "description": "ALGO / USD",
@@ -3671,17 +4229,20 @@
         "base": "ALGO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4030,
+        "cmc_quote": "ALGO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4030,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 185,
+      "id": 186,
       "name": "VELO",
       "fullName": "Velo",
       "description": "VELO / USD",
@@ -3691,17 +4252,20 @@
         "base": "VELO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7127,
+        "cmc_quote": "VELO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7127,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 186,
+      "id": 187,
       "name": "ZIL",
       "fullName": "Zilliqa",
       "description": "ZIL / USD",
@@ -3711,17 +4275,20 @@
         "base": "ZIL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2469,
+        "cmc_quote": "ZIL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2469,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 187,
+      "id": 188,
       "name": "FLOKI",
       "fullName": "Floki Inu",
       "description": "FLOKI / USD",
@@ -3731,17 +4298,20 @@
         "base": "FLOKI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 10804,
+        "cmc_quote": "FLOKI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 10804,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 188,
+      "id": 189,
       "name": "ANKR",
       "fullName": "Ankr",
       "description": "ANKR / USD",
@@ -3751,17 +4321,20 @@
         "base": "ANKR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3783,
+        "cmc_quote": "ANKR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3783,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 189,
+      "id": 190,
       "name": "ETC",
       "fullName": "Ethereum",
       "description": "ETC / USD",
@@ -3771,17 +4344,20 @@
         "base": "ETC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1321,
+        "cmc_quote": "ETC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1321,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 190,
+      "id": 191,
       "name": "JUP",
       "fullName": "Jupiter",
       "description": "JUP / USD",
@@ -3791,17 +4367,20 @@
         "base": "JUP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1503,
+        "cmc_quote": "JUP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1503,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 191,
+      "id": 192,
       "name": "IMX",
       "fullName": "Immutable X",
       "description": "IMX / USD",
@@ -3811,17 +4390,20 @@
         "base": "IMX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 10603,
+        "cmc_quote": "IMX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 10603,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 192,
+      "id": 193,
       "name": "ONE",
       "fullName": "Harmony",
       "description": "ONE / USD",
@@ -3831,17 +4413,20 @@
         "base": "ONE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2324,
+        "cmc_quote": "ONE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2324,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 193,
+      "id": 194,
       "name": "ENJ",
       "fullName": "Enjin Coin",
       "description": "ENJ / USD",
@@ -3851,17 +4436,20 @@
         "base": "ENJ",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2130,
+        "cmc_quote": "ENJ"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2130,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 194,
+      "id": 195,
       "name": "WLD",
       "fullName": "Worldcoin",
       "description": "WLD / USD",
@@ -3871,19 +4459,22 @@
         "base": "WLD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 13502,
+        "cmc_quote": "WLD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 13502,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 195,
+      "id": 196,
       "name": "SATS",
-      "fullName": "",
+      "fullName": "SATS (Ordinals)",
       "description": "SATS / USD",
       "type": "Crypto",
       "decimals": 18,
@@ -3891,17 +4482,20 @@
         "base": "SATS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 23839,
+        "cmc_quote": "SATS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 23839,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 196,
+      "id": 197,
       "name": "XMR",
       "fullName": "Monero",
       "description": "XMR / USD",
@@ -3911,17 +4505,20 @@
         "base": "XMR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 328,
+        "cmc_quote": "XMR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 328,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 197,
+      "id": 198,
       "name": "BONK",
       "fullName": "Bonk",
       "description": "BONK / USD",
@@ -3931,17 +4528,20 @@
         "base": "BONK",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 23095,
+        "cmc_quote": "BONK"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 23095,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 198,
+      "id": 199,
       "name": "PERP",
       "fullName": "Perpetual Protocol",
       "description": "PERP / USD",
@@ -3951,17 +4551,20 @@
         "base": "PERP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6950,
+        "cmc_quote": "PERP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6950,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 199,
+      "id": 200,
       "name": "PYTH",
       "fullName": "Pyth Network",
       "description": "PYTH / USD",
@@ -3971,17 +4574,20 @@
         "base": "PYTH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 28177,
+        "cmc_quote": "PYTH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 28177,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 200,
+      "id": 201,
       "name": "MAV",
       "fullName": "Maverick Protocol",
       "description": "MAV / USD",
@@ -3991,17 +4597,20 @@
         "base": "MAV",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 18037,
+        "cmc_quote": "MAV"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 18037,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 201,
+      "id": 202,
       "name": "SEI",
       "fullName": "Sei",
       "description": "SEI / USD",
@@ -4011,17 +4620,20 @@
         "base": "SEI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 23149,
+        "cmc_quote": "SEI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 23149,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 202,
+      "id": 203,
       "name": "JTO",
       "fullName": "Jito",
       "description": "JTO / USD",
@@ -4031,17 +4643,20 @@
         "base": "JTO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 28541,
+        "cmc_quote": "JTO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 28541,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 203,
+      "id": 204,
       "name": "ZEC",
       "fullName": "ZCash",
       "description": "ZEC / USD",
@@ -4051,17 +4666,20 @@
         "base": "ZEC",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1437,
+        "cmc_quote": "ZEC"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1437,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 204,
+      "id": 205,
       "name": "BLUR",
       "fullName": "Blur",
       "description": "BLUR / USD",
@@ -4071,17 +4689,20 @@
         "base": "BLUR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 23121,
+        "cmc_quote": "BLUR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 23121,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 205,
+      "id": 206,
       "name": "STRK",
       "fullName": "Starknet",
       "description": "STRK / USD",
@@ -4091,17 +4712,20 @@
         "base": "STRK",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8911,
+        "cmc_quote": "STRK"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8911,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 206,
+      "id": 207,
       "name": "SUI",
       "fullName": "Sui",
       "description": "SUI / USD",
@@ -4111,17 +4735,20 @@
         "base": "SUI",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 20947,
+        "cmc_quote": "SUI"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 20947,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 207,
+      "id": 208,
       "name": "MEME",
       "fullName": "Memecoin",
       "description": "MEME / USD",
@@ -4131,17 +4758,20 @@
         "base": "MEME",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1191,
+        "cmc_quote": "MEME"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1191,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 208,
+      "id": 209,
       "name": "TRB",
       "fullName": "Tellor Tributes",
       "description": "TRB / USD",
@@ -4151,17 +4781,20 @@
         "base": "TRB",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4944,
+        "cmc_quote": "TRB"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4944,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 209,
+      "id": 210,
       "name": "ZK",
       "fullName": "ZKsync",
       "description": "ZK / USD",
@@ -4171,17 +4804,20 @@
         "base": "ZK",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 24091,
+        "cmc_quote": "ZK"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 24091,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 210,
+      "id": 211,
       "name": "CSPX",
       "fullName": "",
       "description": "CSPX / USD",
@@ -4191,17 +4827,19 @@
         "base": "CSPX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "CSPXUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "CSPXUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 211,
+      "id": 212,
       "name": "CZK",
       "fullName": "",
       "description": "CZK / USD",
@@ -4211,17 +4849,19 @@
         "base": "CZK",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "CZKUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "CZKUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 212,
+      "id": 213,
       "name": "USDE",
       "fullName": "",
       "description": "USDE / USD",
@@ -4231,17 +4871,20 @@
         "base": "USDE",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3792,
+        "cmc_quote": "USDE"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3792,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 213,
+      "id": 214,
       "name": "IBTA",
       "fullName": "",
       "description": "IBTA / USD",
@@ -4251,17 +4894,19 @@
         "base": "IBTA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "IBTAUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "IBTAUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 214,
+      "id": 215,
       "name": "FORTH",
       "fullName": "",
       "description": "FORTH / USD",
@@ -4271,17 +4916,20 @@
         "base": "FORTH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9421,
+        "cmc_quote": "FORTH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9421,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 215,
+      "id": 216,
       "name": "BOO",
       "fullName": "Spookyswap",
       "description": "BOO / USD",
@@ -4291,17 +4939,20 @@
         "base": "BOO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9608,
+        "cmc_quote": "BOO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9608,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 216,
+      "id": 217,
       "name": "MOVR",
       "fullName": "Moonriver",
       "description": "MOVR / USD",
@@ -4311,17 +4962,20 @@
         "base": "MOVR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 9285,
+        "cmc_quote": "MOVR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 9285,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 217,
+      "id": 218,
       "name": "KSM",
       "fullName": "Kusama",
       "description": "KSM / USD",
@@ -4331,17 +4985,20 @@
         "base": "KSM",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5034,
+        "cmc_quote": "KSM"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5034,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 218,
+      "id": 219,
       "name": "PYUSD",
       "fullName": "PayPal USD",
       "description": "PYUSD / USD",
@@ -4351,17 +5008,20 @@
         "base": "PYUSD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 27772,
+        "cmc_quote": "PYUSD"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 27772,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 219,
+      "id": 220,
       "name": "XCN",
       "fullName": "Chain",
       "description": "XCN / USD",
@@ -4371,17 +5031,20 @@
         "base": "XCN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 501,
+        "cmc_quote": "XCN"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 501,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 220,
+      "id": 221,
       "name": "ENS",
       "fullName": "Ethereum Name Service",
       "description": "ENS / USD",
@@ -4391,17 +5054,20 @@
         "base": "ENS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 13855,
+        "cmc_quote": "ENS"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 13855,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 221,
+      "id": 222,
       "name": "SHV",
       "fullName": "iShares Short Treasury Bond ETF",
       "description": "SHV / USD",
@@ -4411,16 +5077,19 @@
         "base": "SHV",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "SHV"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 222,
+      "id": 223,
       "name": "IDR",
       "fullName": "Indonesian Rupiah",
       "description": "IDR / USD",
@@ -4430,17 +5099,19 @@
         "base": "IDR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "IDRUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "IDRUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 223,
+      "id": 224,
       "name": "USDP",
       "fullName": "Pax Dollar",
       "description": "USDP / USD",
@@ -4450,17 +5121,20 @@
         "base": "USDP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3330,
+        "cmc_quote": "USDP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3330,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 224,
+      "id": 225,
       "name": "NZD",
       "fullName": "New Zealand Dollar",
       "description": "NZD / USD",
@@ -4470,17 +5144,19 @@
         "base": "NZD",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "NZDUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "NZDUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 225,
+      "id": 226,
       "name": "AMPL",
       "fullName": "Ampleforth",
       "description": "AMPL / USD",
@@ -4490,17 +5166,20 @@
         "base": "AMPL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4056,
+        "cmc_quote": "AMPL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4056,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 226,
+      "id": 227,
       "name": "QUICK",
       "fullName": "Quickswap",
       "description": "QUICK / USD",
@@ -4510,17 +5189,20 @@
         "base": "QUICK",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8206,
+        "cmc_quote": "QUICK"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8206,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 227,
+      "id": 228,
       "name": "OM",
       "fullName": "Mantra DAO",
       "description": "OM / USD",
@@ -4530,17 +5212,20 @@
         "base": "OM",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6536,
+        "cmc_quote": "OM"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6536,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 228,
+      "id": 229,
       "name": "QNT",
       "fullName": "Quant",
       "description": "QNT / USD",
@@ -4550,17 +5235,20 @@
         "base": "QNT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 3155,
+        "cmc_quote": "QNT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 3155,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 229,
+      "id": 230,
       "name": "ILS",
       "fullName": "Israeli Shekel",
       "description": "ILS / USD",
@@ -4570,17 +5258,19 @@
         "base": "ILS",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "ILSUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "ILSUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 230,
+      "id": 231,
       "name": "GHST",
       "fullName": "Aavegotchi",
       "description": "GHST / USD",
@@ -4590,17 +5280,20 @@
         "base": "GHST",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7046,
+        "cmc_quote": "GHST"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7046,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 231,
+      "id": 232,
       "name": "PLN",
       "fullName": "Polish Zloty",
       "description": "PLN / USD",
@@ -4610,17 +5303,19 @@
         "base": "PLN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "PLNUSD=X"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "yf_symbol": "PLNUSD=X",
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 232,
+      "id": 233,
       "name": "XPT",
       "fullName": "Platinum",
       "description": "XPT / USD",
@@ -4630,16 +5325,19 @@
         "base": "XPT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "XPT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 233,
+      "id": 234,
       "name": "THETA",
       "fullName": "Theta Token",
       "description": "THETA / USD",
@@ -4649,17 +5347,20 @@
         "base": "THETA",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2416,
+        "cmc_quote": "THETA"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2416,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 234,
+      "id": 235,
       "name": "FTT",
       "fullName": "FTX Token",
       "description": "FTT / USD",
@@ -4669,17 +5370,20 @@
         "base": "FTT",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4195,
+        "cmc_quote": "FTT"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4195,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 235,
+      "id": 236,
       "name": "DASH",
       "fullName": "Dash",
       "description": "DASH / USD",
@@ -4689,17 +5393,20 @@
         "base": "DASH",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 131,
+        "cmc_quote": "DASH"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 131,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 236,
+      "id": 237,
       "name": "SLP",
       "fullName": "Smooth Love Potion",
       "description": "SLP / USD",
@@ -4709,17 +5416,20 @@
         "base": "SLP",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 5824,
+        "cmc_quote": "SLP"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 5824,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 237,
+      "id": 238,
       "name": "BADGER",
       "fullName": "Badger DAO",
       "description": "BADGER / USD",
@@ -4729,17 +5439,20 @@
         "base": "BADGER",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 7859,
+        "cmc_quote": "BADGER"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 7859,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 238,
+      "id": 239,
       "name": "STORJ",
       "fullName": "Storj",
       "description": "STORJ / USD",
@@ -4749,17 +5462,20 @@
         "base": "STORJ",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1772,
+        "cmc_quote": "STORJ"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1772,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 239,
+      "id": 240,
       "name": "HBAR",
       "fullName": "Hedera Hashgraph",
       "description": "HBAR / USD",
@@ -4769,17 +5485,20 @@
         "base": "HBAR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 4642,
+        "cmc_quote": "HBAR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 4642,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 240,
+      "id": 241,
       "name": "ALCX",
       "fullName": "Alchemix",
       "description": "ALCX / USD",
@@ -4789,17 +5508,20 @@
         "base": "ALCX",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 8613,
+        "cmc_quote": "ALCX"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 8613,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 241,
+      "id": 242,
       "name": "DGB",
       "fullName": "Digibyte",
       "description": "DGB / USD",
@@ -4809,17 +5531,20 @@
         "base": "DGB",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 109,
+        "cmc_quote": "DGB"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 109,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 242,
+      "id": 243,
       "name": "GLMR",
       "fullName": "Moonbeam",
       "description": "GLMR / USD",
@@ -4829,17 +5554,20 @@
         "base": "GLMR",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6836,
+        "cmc_quote": "GLMR"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6836,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 243,
+      "id": 244,
       "name": "ZERO",
       "fullName": "",
       "description": "ZERO / USD",
@@ -4849,17 +5577,20 @@
         "base": "ZERO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 28803,
+        "cmc_quote": "ZERO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 28803,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 244,
+      "id": 245,
       "name": "SRM",
       "fullName": "Serum",
       "description": "SRM / USD",
@@ -4869,17 +5600,20 @@
         "base": "SRM",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 6187,
+        "cmc_quote": "SRM"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 6187,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 245,
+      "id": 246,
       "name": "mSOL",
       "fullName": "Marinade Staked SOL",
       "description": "mSOL / USD",
@@ -4889,16 +5623,19 @@
         "base": "mSOL",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "yf_symbol": "mSOL"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
+      "quorum_percentage": 1,
       "script": "YahooFinance"
     },
     {
-      "id": 246,
+      "id": 247,
       "name": "REN",
       "fullName": "Ren",
       "description": "REN / USD",
@@ -4908,17 +5645,20 @@
         "base": "REN",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 2539,
+        "cmc_quote": "REN"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 2539,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     },
     {
-      "id": 247,
+      "id": 248,
       "name": "GNO",
       "fullName": "Gnosis",
       "description": "GNO / USD",
@@ -4928,13 +5668,16 @@
         "base": "GNO",
         "quote": "USD"
       },
-      "report_interval_ms": 60000,
+      "resources": {
+        "cmc_id": 1659,
+        "cmc_quote": "GNO"
+      },
+      "report_interval_ms": 300000,
       "first_report_start_time": {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 0.6,
-      "cmc_id": 1659,
+      "quorum_percentage": 1,
       "script": "CoinMarketCap"
     }
   ]

@@ -115,6 +115,15 @@ const FirstReportStartTimeSchema = S.Struct({
 });
 
 /**
+ * Schema for the additional resources. This includes the CoinMarketCap ID and quote, and the Yahoo Finance symbol.
+ */
+const AdditionalResourcesSchema = S.Struct({
+  cmc_id: S.optional(S.Number),
+  cmc_quote: S.optional(S.String),
+  yf_symbol: S.optional(S.String),
+});
+
+/**
  * Schema for the Data Feed type.
  */
 const FeedSchema = S.Struct({
@@ -129,8 +138,7 @@ const FeedSchema = S.Struct({
   report_interval_ms: S.Number,
   first_report_start_time: FirstReportStartTimeSchema,
   quorum_percentage: S.Number,
-  cmc_id: S.optional(S.Number),
-  yf_symbol: S.optional(S.String),
+  resources: AdditionalResourcesSchema,
 });
 
 /**

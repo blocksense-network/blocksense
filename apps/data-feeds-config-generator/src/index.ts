@@ -20,12 +20,12 @@ import {
 import { artifactsDir, chainlinkFeedsDir } from './paths';
 
 const defaultFeedInfo = {
-  report_interval_ms: 60_000,
+  report_interval_ms: 300_000,
   first_report_start_time: {
     secs_since_epoch: 0,
     nanos_since_epoch: 0,
   },
-  quorum_percentage: 0.6,
+  quorum_percentage: 1,
 } satisfies Partial<Feed>;
 
 function feedFromChainLinkFeedInfo(
@@ -39,6 +39,7 @@ function feedFromChainLinkFeedInfo(
     type: data.feedType,
     decimals: data.decimals,
     pair: { base, quote },
+    resources: {},
     ...defaultFeedInfo,
   };
 }
@@ -106,8 +107,7 @@ async function isFeedSupported(
     pair: Pair;
     description: string;
     fullName: string;
-    cmc_id?: number;
-    yf_symbol?: string;
+    resources: any;
   },
   supportedCMCCurrencies: readonly CMCInfo[],
 ): Promise<boolean> {
@@ -117,20 +117,22 @@ async function isFeedSupported(
       (feed.type === 'Crypto' || feed.type === ''),
   );
   if (cmcSupported != null) {
-    feed.cmc_id = cmcSupported.id;
+    feed.resources.cmc_id = cmcSupported.id;
+    feed.resources.cmc_quote = feed.pair.base;
     feed.type = 'Crypto';
     return true;
   }
 
   const yfSupported = await isFeedSupportedByYF(feed.pair.base);
   if (yfSupported) {
+    feed.resources.yf_symbol = feed.pair.base;
     if (
       feed.type === 'Currency' ||
       feed.type === 'Forex' ||
       feed.type === 'Fiat' ||
       feed.type === ''
     ) {
-      feed.yf_symbol = `${feed.pair.base}${feed.pair.quote}=X`;
+      feed.resources.yf_symbol = `${feed.pair.base}${feed.pair.quote}=X`;
     }
     return true;
   }
@@ -192,7 +194,9 @@ async function generateFeedConfig(
   const feedsWithIdAndScript = feeds.map((feed, id) => ({
     id,
     ...feed,
-    script: decodeScript('cmc_id' in feed ? 'CoinMarketCap' : 'YahooFinance'),
+    script: decodeScript(
+      'cmc_id' in feed.resources ? 'CoinMarketCap' : 'YahooFinance',
+    ),
   }));
 
   return { feeds: feedsWithIdAndScript };
