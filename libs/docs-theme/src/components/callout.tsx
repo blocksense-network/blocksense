@@ -6,7 +6,7 @@ import { InformationCircleIcon } from '../icons/information-circle';
 const TypeToEmoji = {
   default: '💡',
   error: '🚫',
-  info: <InformationCircleIcon className="nx-mt-1" />,
+  info: <InformationCircleIcon />,
   warning: '⚠️',
 };
 
