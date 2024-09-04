@@ -135,17 +135,16 @@ mod tests {
         let original_report_data = FeedType::Numerical(13.0);
 
         // we are specifically sending only one report message as we don't want to test the average processor
-        let feed_id: u32 = 1;
         const TIME_INTERVAL: u64 = 2000;
 
-        feeds_config.feeds[feed_id as usize].report_interval_ms = TIME_INTERVAL; // lower the report time interval.
+        feeds_config.feeds[1].report_interval_ms = TIME_INTERVAL; // lower the report time interval.
 
         let reporter_id = 42;
         all_feeds_reports_arc
             .write()
             .await
             .push(
-                feed_id,
+                1,
                 reporter_id,
                 FeedResult::Result {
                     result: original_report_data.clone(),
@@ -187,7 +186,7 @@ mod tests {
                 // assert the received data
                 assert_eq!(
                     key,
-                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
+                    to_hex_string((1 as u32).to_be_bytes().to_vec(), None),
                     "The key does not match the expected value"
                 );
                 assert_eq!(result, naive_packing(original_report_data));
