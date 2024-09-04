@@ -117,7 +117,6 @@ pub async fn prepare_http_servers(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    init_shared_logging_handle();
     let mut start_metrics_server = true;
 
     let mut args = env::args().skip(1);
@@ -133,7 +132,11 @@ async fn main() -> std::io::Result<()> {
             "--no-metrics-server" => {
                 start_metrics_server = false;
             }
+            "--no-tokio-console" => {
+                env::set_var("SEQUENCER_TOKIO_CONSOLE", "false");
+            }
             "--validate-config" => {
+                init_shared_logging_handle();
                 println!("Validating configuration for version:");
                 println!("version => {BLOCKSENSE_VERSION}");
                 println!("git_hash => {GIT_HASH}");
@@ -171,6 +174,7 @@ async fn main() -> std::io::Result<()> {
             }
         }
     }
+    init_shared_logging_handle();
 
     let sequencer_config = get_validated_sequencer_config();
     let feeds_config = get_validated_feeds_config();

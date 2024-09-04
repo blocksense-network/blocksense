@@ -1,4 +1,5 @@
 use eyre::Result;
+use utils::logging::tokio_console_active;
 
 use super::super::feeds::feeds_state::FeedsState;
 use actix_web::http::header::ContentType;
@@ -136,22 +137,26 @@ pub async fn set_log_level(
     req: HttpRequest,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
-    let bad_input = error::ErrorBadRequest("Incorrect input.");
-    let log_level: String = req
-        .match_info()
-        .get("log_level")
-        .ok_or(bad_input)?
-        .parse()?;
-    info!("set_log_level called with {}", log_level);
-    if let Some(val) = req.connection_info().realip_remote_addr() {
-        if val == "127.0.0.1"
-            && app_state
-                .log_handle
-                .lock()
-                .expect("Could not acquire GLOBAL_LOG_HANDLE's mutex")
-                .set_logging_level(log_level.as_str())
-        {
-            return Ok(HttpResponse::Ok().into());
+    if tokio_console_active() {
+        return Ok(HttpResponse::NotAcceptable().into());
+    } else {
+        let bad_input = error::ErrorBadRequest("Incorrect input.");
+        let log_level: String = req
+            .match_info()
+            .get("log_level")
+            .ok_or(bad_input)?
+            .parse()?;
+        info!("set_log_level called with {}", log_level);
+        if let Some(val) = req.connection_info().realip_remote_addr() {
+            if val == "127.0.0.1"
+                && app_state
+                    .log_handle
+                    .lock()
+                    .expect("Could not acquire GLOBAL_LOG_HANDLE's mutex")
+                    .set_logging_level(log_level.as_str())
+            {
+                return Ok(HttpResponse::Ok().into());
+            }
         }
     }
     Ok(HttpResponse::BadRequest().into())

@@ -3,7 +3,8 @@ use std::env;
 use std::sync::Arc;
 use std::sync::Mutex;
 use tracing_subscriber::filter::LevelFilter;
-use tracing_subscriber::{filter, fmt, prelude::*, reload, Registry};
+use tracing_subscriber::prelude::*;
+use tracing_subscriber::{filter, fmt, reload, Registry};
 
 type Handle = tracing_subscriber::reload::Handle<LevelFilter, Registry>;
 pub type SharedLoggingHandle = Arc<Mutex<LoggingHandle>>;
@@ -41,6 +42,13 @@ pub fn init_shared_logging_handle() -> SharedLoggingHandle {
     SHARED_LOGGING_HANDLE.clone()
 }
 
+pub fn tokio_console_active() -> bool {
+    match env::var("SEQUENCER_TOKIO_CONSOLE") {
+        Ok(val) => val == "true",
+        Err(_) => true,
+    }
+}
+
 pub fn init_logging_handle() -> LoggingHandle {
     let filter = match env::var("SEQUENCER_LOGGING_LEVEL") {
         Ok(logging_level) => match str_to_filter_level(logging_level.as_str()) {
@@ -50,11 +58,29 @@ pub fn init_logging_handle() -> LoggingHandle {
         Err(_) => filter::LevelFilter::INFO,
     };
 
-    let (filter, reload_handle) = reload::Layer::new(filter);
-    tracing_subscriber::registry()
-        .with(filter)
-        .with(fmt::Layer::default())
-        .init();
+    let tokio_console = tokio_console_active();
+
+    let (layer_filter, reload_handle) = reload::Layer::new(filter);
+
+    if tokio_console {
+        // spawn the console server in the background,
+        // returning a `Layer`:
+        let console_layer = console_subscriber::spawn();
+
+        // build a `Subscriber` by combining layers with a
+        // `tracing_subscriber::Registry`:
+        tracing_subscriber::registry()
+            // add the console layer to the subscriber
+            .with(console_layer)
+            // add the logs layer
+            .with(tracing_subscriber::fmt::layer().with_filter(filter))
+            .init();
+    } else {
+        tracing_subscriber::registry()
+            .with(layer_filter)
+            .with(fmt::Layer::default())
+            .init();
+    }
     LoggingHandle {
         handle: reload_handle,
     }
@@ -69,6 +95,7 @@ mod tests {
     fn test_set_logging_levels() {
         // Test env variable sets up the logging level
         env::set_var("SEQUENCER_LOGGING_LEVEL", "TRACE");
+        env::set_var("SEQUENCER_TOKIO_CONSOLE", "false");
         let shared_logging_handle = init_shared_logging_handle();
         let logging_handle = shared_logging_handle.lock().unwrap();
 
