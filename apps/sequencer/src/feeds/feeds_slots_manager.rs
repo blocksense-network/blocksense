@@ -116,7 +116,6 @@ mod tests {
     use utils::to_hex_string;
 
     #[actix_web::test]
-    #[ignore] //TODO(snikolov): Fix this test
     async fn test_feed_slots_manager_loop() {
         let repo_root_dir = env::var("GIT_ROOT").unwrap();
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
@@ -126,7 +125,7 @@ mod tests {
         env::set_var("FEEDS_CONFIG_DIR", config_dir_path);
         let log_handle = init_shared_logging_handle();
         let sequencer_config = init_sequencer_config().expect("Failed to load config:");
-        let feeds_config = init_feeds_config().expect("Failed to get config: ");
+        let mut feeds_config = init_feeds_config().expect("Failed to get config: ");
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
         let metrics_prefix = Some("test_feed_slots_manager_loop_");
@@ -136,7 +135,11 @@ mod tests {
         let original_report_data = FeedType::Numerical(13.0);
 
         // we are specifically sending only one report message as we don't want to test the average processor
-        let feed_id = 1;
+        let feed_id: u32 = 1;
+        const TIME_INTERVAL: u64 = 2000;
+
+        feeds_config.feeds[feed_id as usize].report_interval_ms = TIME_INTERVAL; // lower the report time interval.
+
         let reporter_id = 42;
         all_feeds_reports_arc
             .write()
@@ -173,7 +176,11 @@ mod tests {
         let _future = feeds_slots_manager_loop(app_state, vote_send.clone()).await;
 
         // Attempt to receive with a timeout of 2 seconds
-        let received = tokio::time::timeout(Duration::from_secs(60), vote_recv.recv()).await;
+        let received = tokio::time::timeout(
+            Duration::from_millis(TIME_INTERVAL + 1000),
+            vote_recv.recv(),
+        )
+        .await;
 
         match received {
             Ok(Some((key, result))) => {
