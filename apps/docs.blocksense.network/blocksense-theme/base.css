@@ -17,6 +17,10 @@ main {
   margin-top: calc(-1 * var(--nextra-navbar-height));
 }
 
+.max-bs-2xl {
+  max-width: 40rem;
+}
+
 @layer base {
   * {
     @apply border-border border-2;

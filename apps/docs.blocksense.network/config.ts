@@ -21,7 +21,7 @@ export const config = {
 };
 
 export const gettingStartedConfig = {
-  title: 'Blocksense Documentation',
+  title: 'The ZK rollup for verifiable data and compute services',
   description:
-    ' Blocksense is a blockchain platform for easy creation and consumption of oracle data feeds. It delivers fast and cost-effective transactions with top-tier security and privacy.',
+    'A fully decentralized protocol with ground-breaking cost efficiency. Everyone will be able to create secure oracles in minutes.',
 };
