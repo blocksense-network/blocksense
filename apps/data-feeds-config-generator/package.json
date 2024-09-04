@@ -5,12 +5,13 @@
   "types": "src/index.ts",
   "exports": {
     ".": {
-      "require": "./src/index.ts",
-      "import": "./src/index.ts"
+      "require": "./dist/cjs/index.cjs",
+      "import": "./dist/esm/index.mjs",
+      "types": "./dist/types/src/index.d.ts"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "rollup --silent --config ./rollup.config.mjs",
     "ts": "yarn node --import tsx",
     "get-chainlink-feeds": "yarn ts src/scripts/get_chainlink_feeds.ts",
     "generate-data-feeds-config": "yarn ts src/scripts/generate-feeds-config.ts > artifacts/data-feeds-config-generation-output.json",
@@ -20,8 +21,17 @@
     "@blocksense/base-utils": "workspace:*",
     "@effect/data": "^0.18.7",
     "@effect/schema": "^0.71.1",
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.1",
     "@types/node": "^22.3.0",
+    "@types/rollup-plugin-peer-deps-external": "^2",
     "effect": "^3.7.0",
+    "glob": "^11.0.0",
+    "rollup": "^4.20.0",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-typescript2": "^0.36.0",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
     "yahoo-finance2": "^2.11.3"
