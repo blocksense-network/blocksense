@@ -3,7 +3,7 @@ import { parse as parsePath } from 'path';
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import { chainlinkFeedsDir } from './paths';
+import { chainlinkFeedsDir } from '../paths';
 
 const commitHash = '05da0466ce4ff5e2ea9c73147bf0b9aafa3af834';
 const feedsJsonRegistryUrl = `https://raw.githubusercontent.com/smartcontractkit/documentation/${commitHash}/src/features/data/chains.ts`;

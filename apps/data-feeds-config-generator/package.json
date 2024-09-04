@@ -12,8 +12,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "ts": "yarn node --import tsx",
-    "get-chainlink-feeds": "yarn ts src/get_chainlink_feeds.ts",
-    "generate-data-feeds-config": "yarn ts src/index.ts > artifacts/data-feeds-config-generation-output.json",
+    "get-chainlink-feeds": "yarn ts src/scripts/get_chainlink_feeds.ts",
+    "generate-data-feeds-config": "yarn ts src/scripts/generate-feeds-config.ts > artifacts/data-feeds-config-generation-output.json",
     "generate": "yarn get-chainlink-feeds && yarn generate-data-feeds-config"
   },
   "devDependencies": {
