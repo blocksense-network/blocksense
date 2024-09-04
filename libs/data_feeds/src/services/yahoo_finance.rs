@@ -7,7 +7,7 @@ use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
 use ringbuf::{HeapRb, SharedRb};
 use serde_json::Value;
-use tracing::{debug, error, trace, warn};
+use tracing::{debug, error, trace};
 use utils::read_file;
 use utils::{get_env_var, time::current_unix_time};
 
@@ -118,15 +118,21 @@ impl DataFeed for YahooFinanceDataFeed {
             .get(full_url)
             .timeout(Duration::from_secs(60))
             .headers(headers)
-            .send()
-            .unwrap();
+            .send();
 
-        if response.status().is_success() {
-            let resp_json: Value = response.json().unwrap();
+        if let Ok(response) = response {
+            if response.status().is_success() {
+                let resp_json: Value = response.json().unwrap();
 
-            (get_feed_result(&resp_json, 0, asset), current_unix_time())
+                (get_feed_result(&resp_json, 0, asset), current_unix_time())
+            } else {
+                error!("Request failed with status: {}", response.status());
+
+                (get_generic_feed_error("YahooFinance"), current_unix_time())
+            }
         } else {
-            warn!("Request failed with status: {}", response.status());
+            //TODO(snikolov): Figure out how to handle the Error if it occurs
+            error!("Request failed with error");
 
             (get_generic_feed_error("YahooFinance"), current_unix_time())
         }
@@ -164,26 +170,41 @@ impl DataFeed for YahooFinanceDataFeed {
             .get(full_url)
             .timeout(Duration::from_secs(60))
             .headers(headers)
-            .send()
-            .unwrap();
+            .send();
 
         let mut results_vec: Vec<(FeedResult, u32, Timestamp)> = Vec::new();
 
-        if response.status().is_success() {
-            let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
+        if let Ok(response) = response {
+            if response.status().is_success() {
+                let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-            for (idx, (asset, feed_id)) in asset_id_vec.iter().enumerate() {
-                trace!("Feed Asset pair - {}.{}", asset, feed_id);
-                results_vec.push((
-                    get_feed_result(&resp_json, idx, asset),
-                    *feed_id,
-                    current_unix_time(),
-                ));
+                for (idx, (asset, feed_id)) in asset_id_vec.iter().enumerate() {
+                    trace!("Feed Asset pair - {}.{}", asset, feed_id);
+                    results_vec.push((
+                        get_feed_result(&resp_json, idx, asset),
+                        *feed_id,
+                        current_unix_time(),
+                    ));
+                }
+
+                results_vec
+            } else {
+                error!("Request failed with status: {}", response.status());
+
+                asset_id_vec
+                    .iter()
+                    .map(|(_, id)| {
+                        (
+                            get_generic_feed_error("YahooFinance"),
+                            *id,
+                            current_unix_time(),
+                        )
+                    })
+                    .collect()
             }
-
-            results_vec
         } else {
-            warn!("Request failed with status: {}", response.status());
+            //TODO(snikolov): Figure out how to handle the Error if it occurs
+            error!("Request failed with error!");
 
             asset_id_vec
                 .iter()
