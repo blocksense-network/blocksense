@@ -47,7 +47,7 @@ function generateOverviewContent(contractsMetaJSON: {
   # Introduction\n
   Explore the range of smart contracts available within the Blocksense protocol. This overview covers contracts for interacting with data feeds, historical data feed storage, proxy contracts, and interfaces for integrating with data aggregation services.\n
   <br/>`;
-  overviewContent += `<ul className="nx-mt-6 nx-list-none first:nx-mt-0 ltr:nx-ml-0 rtl:nx-mr-6">`;
+  overviewContent += `<ul className="overview__list nx-mt-6 nx-list-none first:nx-mt-0 ltr:nx-ml-0 rtl:nx-mr-6">`;
   Object.keys(contractsMetaJSON).map(name => {
     overviewContent += generateLinkContent(name);
   });

@@ -99,3 +99,7 @@ blockquote {
     padding-left: 0.65rem;
   }
 }
+
+.overview__list a {
+  @apply underline;
+}
