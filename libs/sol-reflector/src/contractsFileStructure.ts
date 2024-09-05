@@ -7,15 +7,16 @@ import path from 'path';
 import { rootDir } from '@blocksense/base-utils';
 
 export function constructFileTreeStructure(
-  { name, children, icon, id }: TreeNode,
+  { name, children, icon, id, path }: TreeNode,
   idCounter: number = 0,
 ) {
+  path = path!.replace(/.*contracts\/contracts/, '');
   id = idCounter;
   if (children) {
     icon = 'folder';
     children.map(child => {
       idCounter++;
-      delete child.path;
+      child.path = child.path!.replace(/.*contracts\/contracts\//, '');
       child['icon'] = 'solidity';
       child['id'] = idCounter;
       if (child.children) {
@@ -28,9 +29,10 @@ export function constructFileTreeStructure(
   } else {
     children = [];
     icon = 'folder';
+    path;
     id = 0;
   }
-  return { name, children, icon, id };
+  return { name, children, icon, id, path };
 }
 
 export async function contractsFileStructureAsJSON(userConfig?: Config) {
