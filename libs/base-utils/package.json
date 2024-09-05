@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@effect/schema": "^0.71.1",
-    "effect": "^3.6.5",
+    "effect": "^3.7.0",
     "shiki": "^1.12.1"
   }
 }

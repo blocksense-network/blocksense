@@ -378,7 +378,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^15.2.1"
     "@types/node": "npm:^22.3.0"
     "@types/rollup-plugin-peer-deps-external": "npm:^2"
-    effect: "npm:^3.6.5"
+    effect: "npm:^3.7.0"
     glob: "npm:^11.0.0"
     rollup: "npm:^4.20.0"
     rollup-plugin-delete: "npm:^2.0.0"
@@ -7395,13 +7395,6 @@ __metadata:
   bin:
     edge-runtime: dist/cli/index.js
   checksum: 10c0/1bc80ef2c89e05a332b21c6a14ed079893dcc7a09701b276d1250f7094cbc489cc64991d36035f27b9fb9e78aea071fbe9487d3d38cb02a7e1fc6a8c17b36b05
-  languageName: node
-  linkType: hard
-
-"effect@npm:^3.6.5":
-  version: 3.6.5
-  resolution: "effect@npm:3.6.5"
-  checksum: 10c0/e5ee1055300a95dd2de65158cc26613738864db0d43421ff52f30e29a09104a714888b4ed0884b2cad03e7d9b04c6497d92cfaec0a158edb059c54481bcac91b
   languageName: node
   linkType: hard
 
