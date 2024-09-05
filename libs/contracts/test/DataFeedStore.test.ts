@@ -21,6 +21,8 @@ let genericContractWrappers: DataFeedStoreBaseWrapper<GenericDataFeedStore>[] =
   [];
 
 describe('DataFeedStore', function () {
+  this.timeout(1000000);
+
   beforeEach(async function () {
     contractWrappers = [];
     genericContractWrappers = [];

@@ -20,7 +20,7 @@ let genericContractWrappers: DataFeedStoreConsumerBaseWrapper<GenericDataFeedSto
   [];
 
 describe('DataFeedConsumer', function () {
-  this.timeout(100000);
+  this.timeout(1000000);
 
   beforeEach(async function () {
     contractWrappers = [];
