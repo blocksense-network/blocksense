@@ -4,132 +4,168 @@ pragma solidity ^0.8.24;
 <%_
 let name = fields.name.charAt(0).toLowerCase() + fields.name.slice(1)
 
-let prevSizeSum = 0
-
-let expandedFields = [];
-let arraysCount = 0;
-fields.values.forEach((field) => {
-  if (field.type.endsWith(']')) {
-    // This is an array field
-    expandedFields.push({
-      type: 'gap',
-      isArray: true,
-      arrayIndex: ++arraysCount,
-      size: 0,
-      length: field.length
-    })
-    for (let i = 0; i < field.length; i++) {
-      expandedFields.push({
-        type: field.type.split('[')[0], // Remove the '[]' from the type
-        size: field.size,
-        index: i,
-      });
-    }
-
-    expandedFields.push({
-      type: 'end',
-      isArray: true,
-      size: 0,
-    })
-  } else {
-    // This is not an array field, add it as is
-    expandedFields.push(field);
-  }
-});
-
-expandedFields.forEach((field, index) => {
-  field.shift = 0;
-  const isBytes = field.type.startsWith('bytes');
-  const isBytesMemory = field.type === 'bytes';
-
-  let fieldSize = field.size;
-  // Handle bytes fields
-  if (isBytes) {
-    if (prevSizeSum + fieldSize < 256) {
-      // Handle bytesNum (not array or bytes memory)
-      if (!isBytesMemory) {
-        field.shift = index !== 0 ? -prevSizeSum : 0;
+const expandFields = (values) => {
+  const expandedFields = values.map((field) => {
+    let data;
+    if (field.type.endsWith(']') && field.type !== 'tuple') {
+      // This is an array field
+      data = []
+      for (let i = 0; i < field.length; i++) {
+        data.push({
+          type: field.type.split('[')[0], // Remove the '[]' from the type
+          size: field.size,
+        });
       }
-      prevSizeSum += fieldSize;
+    } else if (field.type === 'tuple') {
+      // This is a tuple field
+      data = []
+      data.push(...expandFields(field.components));
     } else {
-      prevSizeSum = 0;
+      // This is not an array field, add it as is
+      data = field
     }
-  } else {
-    // Handle non-bytes fields
-    if (prevSizeSum + fieldSize >= 256) {
-      prevSizeSum = 0;
-    }
+    return data
+  });
 
-    if(field.type !== 'end') {
-      field.shift = 256 - prevSizeSum - fieldSize;
-      prevSizeSum += fieldSize;
+  return expandedFields;
+}
+
+function organizeFieldsIntoStructs(values) {
+  let structs = [];
+  let mainStruct = { name: fields.name, fields: [] };
+
+  function processField(field, parentStruct) {
+    if (field.type === 'tuple') {
+      let newStruct = {
+        name: field.name.charAt(0).toUpperCase() + field.name.slice(1),
+        fields: []
+      };
+      field.components.forEach(component => processField(component, newStruct));
+      structs.push(newStruct);
+      parentStruct.fields.push({ name: field.name, type: newStruct.name });
+    } else if (field.type.endsWith('[]')) {
+      let arrayType = field.type.split('[')[0];
+      parentStruct.fields.push({ name: field.name, type: `${arrayType}[]` });
+    } else {
+      parentStruct.fields.push({ name: field.name, type: field.type });
     }
   }
-})-%>
-/// @title Decoder
+
+  values.forEach(field => processField(field, mainStruct));
+  structs.unshift(mainStruct);
+
+  return structs;
+}
+
+const organizedStructs = organizeFieldsIntoStructs(fields.values);
+
+let prevSizeSum = 0;
+function processFields(fields) {
+  fields.forEach((field, index) => {
+    if (Array.isArray(field)) {
+      // If the field is an array, recursively process its elements
+      field = processFields(field);
+    } else {
+      field.shift = 0;
+      const isBytes = field.type.startsWith('bytes');
+      const isBytesMemory = field.type === 'bytes';
+      let fieldSize = field.size;
+      // Handle bytes fields
+      if (isBytes) {
+        if (prevSizeSum + fieldSize < 256) {
+          // Handle bytesNum (not array or bytes memory)
+          if (!isBytesMemory) {
+            field.shift = -prevSizeSum;
+          }
+          prevSizeSum += fieldSize;
+        } else {
+          prevSizeSum = 0;
+        }
+      } else {
+        // Handle non-bytes fields
+        if (prevSizeSum + fieldSize >= 256) {
+          prevSizeSum = 0;
+        }
+
+        field.shift = 256 - prevSizeSum - fieldSize;
+        prevSizeSum += fieldSize;
+      }
+    }
+  });
+
+  return fields;
+}
+
+
+const expandedFields = processFields(expandFields(fields.values));
+
+let wordOffset = 32;
+let bitOffset = 0;
+let prevSize = 0;
+let shouldUpdate = false;
+function generateDecoderLines(expandedFields, name, startIndex = 0) {
+  const lines = [];
+  let index = startIndex;
+  let location = name;
+
+  for (let i = 0; i < expandedFields.length; i++) {
+    const field = expandedFields[i];
+
+    bitOffset += Array.isArray(field) ? 0 : field.size;
+
+    if (!Array.isArray(field) && prevSize + field.size >= 256) {
+      wordOffset += prevSize / 8;
+      bitOffset = field.size;
+      shouldUpdate = true;
+      prevSize = 0;
+    }
+
+    if (shouldUpdate && wordOffset > 32) {
+      lines.push('');
+      lines.push(`// Offset data with ${wordOffset} bytes`);
+      lines.push(`memData := mload(add(data, ${wordOffset}))`);
+      lines.push('');
+      shouldUpdate = false;
+    }
+
+    if (Array.isArray(field)) {
+      const innerName = name + '_' + index;
+      lines.push('');
+      lines.push(`// Get address of field at slot ${index + 1} of ${name}`);
+      lines.push(`let ${innerName} := mload(${index ? `add(${name}, ${index * 0x20})` : name})`);
+      const innerLines = generateDecoderLines(field, innerName, 0);
+      lines.push(...innerLines);
+    } else if (field.size <= 256) {
+      prevSize += field.size;
+      lines.push(`// Store the next ${field.size} bytes of memData at slot ${index + 1} of ${location}`);
+      lines.push(`mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.shift == 0 ? 'memData' : field.shift < 0 ? `shl(${Math.abs(field.shift)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)`})`);
+    } else {
+      lines.push('// Handle larger types (bytes) here');
+    }
+    index++;
+  }
+
+  return lines;
+}-%>
+
 /// @notice Decoder for stored packed sports data
 library Decoder {
   /// @notice User defined struct
   /// @dev Using structs avoids hitting the EVM stack limit
-  struct <%= fields.name %> {
-    <%_ fields.values.forEach(field => { -%>
-    <%= field.type %> <%= field.name -%>;
-    <%_ }); -%>
-  }
+<%= organizedStructs.map((struct) => {
+  return `  struct ${struct.name} {
+  ${struct.fields.map((fields) => `  ${fields.type} ${fields.name};`).join('\n  ')}
+  }`
+}).join('\n\n') %>
 
   function decode(
     bytes memory data
   ) external pure returns (<%= fields.name %> memory <%= name %>) {
     assembly {
+      // First 32 bytes are the length of the data
       let memData := mload(add(data, 32))
-      <%_
-      let wordOffset = 32
-      let bitOffset = 0
-      let prevSize = 0
-      let index = 0
-      let location = name
-      -%>
 
-      <%_ for (const [i, field] of expandedFields.entries()) { -%>
-        <%_
-        let shouldUpdate = false;
-        if(i > 0) {
-          prevSize += expandedFields[i - 1].size;
-        }
-        bitOffset += field.size
-
-        if (prevSize + field.size >= 256) {
-          // should be based on bitOffset or some other tracker for fields size
-          wordOffset += prevSize / 8;
-          bitOffset = field.size;
-          shouldUpdate = true;
-          prevSize = 0;
-        }
-        -%>
-        <%_ if (shouldUpdate) { -%>
-      memData := mload(add(data, <%= wordOffset %>))
-        <%_ } -%>
-        <%_ if (field.size <= 256) { -%>
-          <%_ if (field.isArray) { -%>
-            <%_ if (field.type === 'end') { -%>
-              <%_ location = name -%>
-            <%_ } else { -%>
-              <%_ location = 'arrayAddress' + field.arrayIndex -%>
-
-      let arrayAddress<%= field.arrayIndex %> := mload(<%= index ? `add(${name}, ${index * 0x20})` : name %>)
-              <%_ index++ -%>
-              <%_ continue -%>
-            <%_ } -%>
-          <%_ } else if (!isNaN(field.index)) { -%>
-      mstore(<%= field.index ? `add(${location}, ${field.index * 0x20})` : location %>, <%= field.shift == 0 ? 'memData' : field.shift < 0 ? `shl(${Math.abs(field.shift)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)` %>)
-          <%_ } else { -%>
-      mstore(<%= index ? `add(${location}, ${index * 0x20})` : location %>, <%= field.shift == 0 ? 'memData' : field.shift < 0 ? `shl(${Math.abs(field.shift)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)` %>)
-            <%_ index ++ -%>
-          <%_ } -%>
-        <%_ } else { -%>
-          // Handle larger types (bytes) here
-        <%_ } -%>
-        <%_ } _%>
+      <%= generateDecoderLines(expandedFields, name).join('\n      ') %>
     }
   }
 }

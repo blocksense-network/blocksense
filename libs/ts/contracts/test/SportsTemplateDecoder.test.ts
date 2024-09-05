@@ -5,14 +5,57 @@ import path from 'path';
 import ejs from 'ejs';
 import { run } from 'hardhat';
 
+type SimpleField = {
+  name: string;
+  type: string;
+  size: number;
+  length?: number;
+};
+
+type TupleField = {
+  name: string;
+  type: string;
+  components: (SimpleField | TupleField)[];
+};
+
 interface Field {
   name: string;
-  values: { name: string; type: string; size: number; length?: number }[];
+  values: (SimpleField | TupleField)[];
+}
+
+function processFields(
+  fields: Field['values'],
+  values: any[],
+): [Field['values'], any[]] {
+  const processedFields = fields.map((field, i) => {
+    if (field.type.includes('[')) {
+      values[i] = ethers.concat(
+        values[i].map((value: any) => {
+          return ethers.solidityPacked([field.type.split('[')[0]], [value]);
+        }),
+      );
+      return { ...field, type: 'bytes' };
+    } else if ('components' in field) {
+      const [processedComponents, processedValues] = processFields(
+        field.components,
+        values[i],
+      );
+      values[i] = ethers.solidityPacked(
+        processedComponents.map(component => component.type),
+        processedValues,
+      );
+      return { ...field, type: 'bytes', components: processedComponents };
+    }
+    return field;
+  });
+
+  return [processedFields, values];
 }
 
 describe('Decoder', () => {
+  const contractName = 'Decoder';
   const templatePath = path.join(__dirname, '../templates/decoder.sol.ejs');
-  const tempFilePath = path.join(__dirname, '../contracts/Decoder.sol');
+  const tempFilePath = path.join(__dirname, `../contracts/${contractName}.sol`);
 
   async function generateAndDeployDecoder(fields: Field) {
     const template = fs.readFileSync(templatePath, 'utf-8');
@@ -21,24 +64,22 @@ describe('Decoder', () => {
 
     await run('compile');
 
-    const DecoderFactory = await ethers.getContractFactory('Decoder');
+    const DecoderFactory = await ethers.getContractFactory(contractName);
     return await DecoderFactory.deploy();
   }
 
   async function testDecoder(fields: Field, values: any[]) {
     const decoder = await generateAndDeployDecoder(fields);
-    const compareValues = [...values];
+    const clone = (items: any) =>
+      items.map((item: any) => (Array.isArray(item) ? clone(item) : item));
+    const compareValues = clone(values);
 
-    fields.values.forEach((field, i) => {
-      if (field.type.includes('[')) {
-        values[i] = ethers.concat(
-          values[i].map((value: any) => {
-            return ethers.solidityPacked([field.type.split('[')[0]], [value]);
-          }),
-        );
-        field.type = 'bytes';
-      }
-    });
+    const [processedFields, processedValues] = processFields(
+      fields.values,
+      values,
+    );
+    fields.values = processedFields;
+    values = processedValues;
     const packedData = ethers.solidityPacked(
       fields.values.map(field => field.type),
       values,
@@ -383,6 +424,92 @@ describe('Decoder', () => {
       '0x1234567890123456789012345678901234567890',
       true,
       BigInt('-170141183460469231731687303715884105728'),
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle nested structs', async () => {
+    const fields: Field = {
+      name: 'NestedStructs',
+      values: [
+        { name: 'outerUint', type: 'uint256', size: 256 },
+        {
+          name: 'innerStruct',
+          type: 'tuple',
+          components: [
+            { name: 'innerBool', type: 'bool', size: 8 },
+            {
+              name: 'deeperStruct',
+              type: 'tuple',
+              components: [
+                { name: 'deeperAddress', type: 'address', size: 160 },
+                { name: 'deeperInt', type: 'int64', size: 64 },
+              ],
+            },
+          ],
+        },
+        { name: 'outerBytes', type: 'bytes32', size: 256 },
+      ],
+    };
+    const values = [
+      BigInt('123456789012345678901234567890'),
+      [
+        true,
+        [
+          '0x1234567890123456789012345678901234567890',
+          BigInt('-9223372036854775808'),
+        ],
+      ],
+      '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle nested structs with arrays', async () => {
+    const fields: Field = {
+      name: 'NestedStructsWithArrays',
+      values: [
+        { name: 'outerUint', type: 'uint256', size: 256 },
+        {
+          name: 'innerStructArray',
+          type: 'tuple',
+          components: [
+            { name: 'innerBool', type: 'bool', size: 8 },
+            {
+              name: 'deeperIntArray',
+              type: 'int64[2]',
+              size: 64,
+              length: 2,
+            },
+            {
+              name: 'deeperStruct',
+              type: 'tuple',
+              components: [
+                { name: 'deeperAddress', type: 'address', size: 160 },
+                {
+                  name: 'deeperIntArray',
+                  type: 'int64[3]',
+                  size: 64,
+                  length: 3,
+                },
+              ],
+            },
+          ],
+        },
+        { name: 'outerBytes', type: 'bytes32', size: 256 },
+      ],
+    };
+    const values = [
+      BigInt('987654321098765432109876543210'),
+      [
+        false,
+        [BigInt('-1234567890'), BigInt('1234567890')],
+        [
+          '0x1234567890abcdef1234567890abcdef12345678',
+          [BigInt('-987654321'), BigInt('123456789'), BigInt('555555555')],
+        ],
+      ],
+      '0xfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210',
     ];
     await testDecoder(fields, values);
   });
