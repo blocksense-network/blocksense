@@ -9,6 +9,8 @@ import {
 } from '../data-services/types';
 import { getCMCCryptoList } from '../data-services/cmc';
 import { isFeedSupportedByYF } from '../data-services/yf';
+import { selectDirectory } from '@blocksense/base-utils/fs';
+import { artifactsDir } from '../paths';
 
 const defaultFeedInfo = {
   report_interval_ms: 300_000,
@@ -101,6 +103,14 @@ export async function generateFeedConfig(
       'cmc_id' in feed.resources ? 'CoinMarketCap' : 'YahooFinance',
     ),
   }));
+
+  {
+    const { writeJSON } = selectDirectory(artifactsDir);
+    await writeJSON({
+      content: { feeds: feedsWithIdAndScript },
+      name: 'feeds_config',
+    });
+  }
 
   return { feeds: feedsWithIdAndScript };
 }

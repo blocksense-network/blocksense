@@ -3,6 +3,7 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 import { chainlinkFeedsDir, artifactsDir, configDir } from '../paths';
 import { collectRawDataFeeds } from '../data-services/chainlink_feeds';
 import { generateFeedConfig } from '../feeds-config/index';
+import { generateChainlinkCompatibilityConfig } from '../chainlink-compatibility/index';
 
 async function saveConfigsToDir(
   outputDir: string,
@@ -22,7 +23,18 @@ async function main(chainlinkFeedsDir: string) {
 
   const feedConfig = await generateFeedConfig(rawDataFeeds);
 
-  saveConfigs({ name: 'feeds_config', content: feedConfig });
+  const chainlinkCompatibilityData = await generateChainlinkCompatibilityConfig(
+    rawDataFeeds,
+    feedConfig,
+  );
+
+  saveConfigs(
+    { name: 'feeds_config', content: feedConfig },
+    {
+      name: 'chainlink_compatibility',
+      content: chainlinkCompatibilityData,
+    },
+  );
 }
 
 await main(chainlinkFeedsDir);
