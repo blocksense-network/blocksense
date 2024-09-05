@@ -193,7 +193,7 @@ export const getComponents = ({
 
   const context = { index: 0 };
   return {
-    h1: props => <h1 className="nx-mt-6 nx-text-4xl nx-pb-4" {...props} />,
+    h1: props => <h1 className="nx-mt-6 nx-text-4xl" {...props} />,
     h2: props => <HeadingLink tag="h2" context={context} {...props} />,
     h3: props => <HeadingLink tag="h3" context={context} {...props} />,
     h4: props => <HeadingLink tag="h4" context={context} {...props} />,
