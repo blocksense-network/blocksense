@@ -43,7 +43,7 @@ jobs:
       - name: nix flake check
         run: nix flake check --impure
 
-  hardhat:
+  smart-contracts-tests:
     timeout-minutes: 360
     runs-on: self-hosted
 
