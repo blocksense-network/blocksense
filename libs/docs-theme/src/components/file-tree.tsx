@@ -24,6 +24,7 @@ interface FileProps {
   name: string;
   label?: ReactElement;
   active?: boolean;
+  href?: string;
 }
 
 function Tree({ children }: { children: ReactNode }): ReactElement {
@@ -88,13 +89,18 @@ const Folder = memo<FolderProps>(
 );
 Folder.displayName = 'Folder';
 
-const File = memo<FileProps>(({ label, name, active }) => (
+const File = memo<FileProps>(({ label, name, active, href }) => (
   <li className={cn('nx-list-none', active && 'contrast-more:nx-underline')}>
-    <span className="nx-inline-flex text-sm nx-cursor-default nx-items-center nx-text-gray-900 dark:nx-text-gray-300">
+    <a
+      href={href}
+      className="nx-inline-flex text-sm nx-cursor-default nx-items-center nx-text-gray-900 dark:nx-text-gray-300"
+    >
       <Indent />
       <EthereumIcon />
-      <span className="nx-m-0 nx-my-0 nx-mx-1">{label ?? name}</span>
-    </span>
+      <span className="nx-m-0 nx-my-0 nx-mx-1 hover:underline cursor-pointer">
+        {label ?? name}
+      </span>
+    </a>
   </li>
 ));
 File.displayName = 'File';
