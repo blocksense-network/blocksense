@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{collections::HashMap, time::Duration};
 
 use async_trait::async_trait;
 use feed_registry::{
@@ -123,9 +123,22 @@ impl DataFeed for CoinMarketCapDataFeed {
 
     async fn poll_batch(
         &mut self,
-        asset_id_vec: &[(String, u32)],
+        asset_id_vec: &[(HashMap<String, String>, u32)],
     ) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
+
+        let asset_id_vec: Vec<(String, u32)> = asset_id_vec
+            .iter()
+            .filter_map(|(resources, feed_id)| {
+                Some((
+                    resources
+                        .get("cmc_quote")
+                        .expect("[CMC] Missing Resource!")
+                        .clone(),
+                    *feed_id,
+                ))
+            })
+            .collect();
 
         let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
 
@@ -163,8 +176,8 @@ impl DataFeed for CoinMarketCapDataFeed {
                 for (asset, feed_id) in asset_id_vec {
                     trace!("Feed Asset pair - {}.{}", asset, feed_id);
                     results_vec.push((
-                        get_feed_result(&resp_json, asset),
-                        *feed_id,
+                        get_feed_result(&resp_json, asset.as_str()),
+                        feed_id,
                         current_unix_time(),
                     ));
                 }

@@ -1,5 +1,6 @@
 use hex::decode;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
+use serde_json::Value;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::Write;
@@ -22,6 +23,28 @@ pub trait Validated {
     fn validate(&self, context: &str) -> anyhow::Result<()>;
 }
 
+/// Custom deserializator for the `resources` object in the FeedsConfig. Skips all non-string items for now
+/// such as `cmc_id`, which are currently not used
+fn deserialize_resources<'de, D>(deserializer: D) -> Result<HashMap<String, String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = Value::deserialize(deserializer)?;
+    let mut map = HashMap::new();
+
+    if let Value::Object(obj) = value {
+        for (key, val) in obj {
+            let val_str = match val {
+                Value::String(s) => s,
+                _ => continue, // Skip other types
+            };
+            map.insert(key, val_str);
+        }
+    }
+
+    Ok(map)
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FeedConfig {
     pub id: u32,
@@ -30,12 +53,13 @@ pub struct FeedConfig {
     pub full_name: String,
     pub description: String,
     #[serde(rename = "type")] // rename because of reserved keyword
-    pub type_: String,
+    pub _type: String,
     pub decimals: u8,
     pub pair: AssetPair,
     pub report_interval_ms: u64,
     pub first_report_start_time: SystemTime,
-    pub resources: HashMap<String, String>,
+    #[serde(deserialize_with = "deserialize_resources")]
+    pub resources: HashMap<String, String>, // TODO(snikolov): Find best way to handle various types of resource data
     pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
     pub script: String,
 }

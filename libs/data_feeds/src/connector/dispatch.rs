@@ -128,15 +128,15 @@ pub async fn dispatch_full_batch(
     feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
 ) {
-    let mut script_to_assets: HashMap<String, Vec<(String, u32)>> = HashMap::new();
+    let mut script_to_assets: HashMap<String, Vec<(HashMap<String, String>, u32)>> = HashMap::new();
 
     // Example result in `scripts_to_assets` -
-    // {"CoinMarketCap: [("BTC",1), "("ETH",2)",...], "YahooFinance": [...]}
+    // {"CoinMarketCap: [("{cmc_id: 1234, cmc_quote="BTC"}",1), "{cmc_id: 1235, cmc_quote="ETH"}",2)",...], "YahooFinance": [...]}
     for feed in &feed_registry.feeds {
         script_to_assets
             .entry(feed.script.clone())
             .or_default()
-            .push((feed.name.clone(), feed.id));
+            .push((feed.resources.clone(), feed.id));
     }
 
     for feed_api_enum in DataFeedAPI::iter() {

@@ -8417,6 +8417,7 @@ dependencies = [
  "dirs 5.0.1",
  "hex",
  "serde 1.0.210",
+ "serde_json",
 ]
 
 [[package]]

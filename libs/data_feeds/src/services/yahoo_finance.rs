@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::time::Duration;
 
 use anyhow::{anyhow, Result};
@@ -52,7 +53,20 @@ fn get_yf_json_price(yf_response: &Value, idx: usize, asset: &str) -> Result<f64
         .and_then(|symbol| symbol.as_str())
         .ok_or_else(|| anyhow!("Ticker not found or is not a valid string!"))?;
 
-    if symbol == asset {
+    let type_displayed = yf_response
+        .get("quoteResponse")
+        .and_then(|quote_response| quote_response.get("result"))
+        .and_then(|response| response.get(idx))
+        .and_then(|idx| idx.get("typeDisp"))
+        .and_then(|result_type| result_type.as_str())
+        .ok_or_else(|| anyhow!("Quote displayed type not found or is not a valid string!"))?;
+
+    trace!("yf_symbol: {}, asset: {}", symbol, asset);
+
+    if (symbol == asset) ||  // Check if symbol matches asset name
+    (format!("{}USD=X", asset) == asset && (type_displayed == "Currency" || type_displayed == "Fiat" || type_displayed == ""))
+    // Different syntax for Currency/Fiat pairs
+    {
         let price = yf_response
             .get("quoteResponse")
             .and_then(|quote_response| quote_response.get("result"))
@@ -140,9 +154,22 @@ impl DataFeed for YahooFinanceDataFeed {
 
     async fn poll_batch(
         &mut self,
-        asset_id_vec: &[(String, u32)],
+        asset_id_vec: &[(HashMap<String, String>, u32)],
     ) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://yfapi.net/v6/finance/quote";
+
+        let asset_id_vec: Vec<(String, u32)> = asset_id_vec
+            .iter()
+            .filter_map(|(resources, feed_id)| {
+                Some((
+                    resources
+                        .get("yf_symbol")
+                        .expect("[YahooFinance] Missing Resource")
+                        .clone(),
+                    *feed_id,
+                ))
+            })
+            .collect();
 
         let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
 
@@ -179,7 +206,7 @@ impl DataFeed for YahooFinanceDataFeed {
                 let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
                 for (idx, (asset, feed_id)) in asset_id_vec.iter().enumerate() {
-                    trace!("Feed Asset pair - {}.{}", asset, feed_id);
+                    trace!("Feed Asset pair: {} ... Feed Id: {}", asset, feed_id);
                     results_vec.push((
                         get_feed_result(&resp_json, idx, asset),
                         *feed_id,
