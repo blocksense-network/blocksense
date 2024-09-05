@@ -23,6 +23,10 @@
     "./feeds_config": {
       "require": "./config/feeds_config.json",
       "import": "./config/feeds_config.json"
+    },
+    "./chainlink_compatibility": {
+      "require": "./config/chainlink_compatibility.json",
+      "import": "./config/chainlink_compatibility.json"
     }
   },
   "devDependencies": {
