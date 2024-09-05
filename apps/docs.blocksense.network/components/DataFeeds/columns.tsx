@@ -1,9 +1,10 @@
 import * as React from 'react';
 
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, Row } from '@tanstack/react-table';
 
 import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
+import Link from 'next/link';
 
 export type DataFeed = {
   id: string;
@@ -31,6 +32,11 @@ export const columns: ColumnDef<DataFeed>[] = [
         type={'number'}
       />
     ),
+    cell: ({ row }) => (
+      <strong>
+        <DataFeedLink row={row} placeholderId="id" />
+      </strong>
+    ),
   },
   {
     accessorKey: 'description',
@@ -40,6 +46,14 @@ export const columns: ColumnDef<DataFeed>[] = [
         title={dataFeedsColumnsTitles['description']}
         type={'string'}
       />
+    ),
+    cell: ({ row }) => (
+      <Badge
+        variant="outline"
+        className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium"
+      >
+        <DataFeedLink row={row} placeholderId="description" />
+      </Badge>
     ),
   },
   {
@@ -81,3 +95,16 @@ export const columns: ColumnDef<DataFeed>[] = [
     ),
   },
 ];
+
+type DataFeedLinkProps = {
+  row: Row<DataFeed>;
+  placeholderId: string;
+};
+
+const DataFeedLink = ({ row, placeholderId }: DataFeedLinkProps) => {
+  return (
+    <Link href={`feed/0x${row.getValue('id')}`}>
+      {row.getValue(placeholderId)}
+    </Link>
+  );
+};

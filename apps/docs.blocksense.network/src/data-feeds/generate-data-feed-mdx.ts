@@ -1,6 +1,7 @@
 import {
   decodeFeedsConfig,
   Feed,
+  FeedsConfig,
 } from '@blocksense/data-feeds-config-generator';
 import { selectDirectory } from '@blocksense/base-utils';
 
@@ -18,10 +19,8 @@ type DataFeedOverview = {
   script: string;
 };
 
-function generateMarkdownContent(): string {
-  const dataFeeds = decodeFeedsConfig(DATA_FEEDS);
-
-  const dataFeedsOverview: DataFeedOverview[] = dataFeeds.feeds.map(
+function generateOverviewMarkdownContent(feedsConfig: FeedsConfig): string {
+  const dataFeedsOverview: DataFeedOverview[] = feedsConfig.feeds.map(
     (feed: Feed) => ({
       id: feed.id,
       name: feed.name,
@@ -43,10 +42,12 @@ import { DataFeeds } from '@/components/DataFeeds/DataFeeds';
   return content;
 }
 
-function generateDataFeedsFile(): Promise<string[]> {
+async function generateDataFeedsOverviewFile(
+  feedsConfig: FeedsConfig,
+): Promise<string[]> {
   const mdxFile = {
     name: 'overview',
-    content: generateMarkdownContent(),
+    content: generateOverviewMarkdownContent(feedsConfig),
   };
 
   const { write, writeJSON } = selectDirectory(pagesDataFeedsFolder);
@@ -60,8 +61,77 @@ function generateDataFeedsFile(): Promise<string[]> {
   ]);
 }
 
-generateDataFeedsFile()
-  .then(() => console.log('Data Feed Overview Page generated!'))
+function generateIndividualDataFeedPageContent(feed: Feed): string {
+  const content = `
+  # Data Feed: '${feed.description}' with ID: ${feed.id}
+  ### Decimals
+  ${feed.decimals}
+  ### Report Interval
+  ${feed.report_interval_ms}
+  ### Script
+  ${feed.script}
+  `;
+  return content;
+}
+
+async function generateIndividualDataFeedPages(
+  feedsConfig: FeedsConfig,
+): Promise<any> {
+  const feedsFolder = `${pagesDataFeedsFolder}/feed`;
+  const { write, writeJSON } = selectDirectory(feedsFolder);
+
+  const dataFeedPages = feedsConfig.feeds.map((feed: Feed) => {
+    return {
+      description: feed.description,
+      name: `0x${feed.id}`,
+      content: generateIndividualDataFeedPageContent(feed),
+    };
+  });
+
+  const metaJSON = dataFeedPages.reduce(
+    (obj, { name, description }) => ({
+      ...obj,
+      [name]: {
+        title: description,
+        display: 'hidden',
+      },
+    }),
+    {},
+  );
+
+  const { writeJSON: writeRootMetaFile, readJSON } =
+    selectDirectory(pagesDataFeedsFolder);
+
+  let rootMetaFileContent = await readJSON({ name: '_meta' });
+  rootMetaFileContent = {
+    ...rootMetaFileContent,
+    feed: {
+      display: 'hidden',
+    },
+  };
+
+  return Promise.all([
+    ...dataFeedPages.map(args => write({ ext: '.mdx', ...args })),
+    writeJSON({
+      base: '_meta.json',
+      content: metaJSON,
+    }),
+    writeRootMetaFile({
+      base: '_meta.json',
+      content: rootMetaFileContent,
+    }),
+  ]);
+}
+
+async function generateDataFeedsPages() {
+  const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
+
+  await generateDataFeedsOverviewFile(feedsConfig);
+  await generateIndividualDataFeedPages(feedsConfig);
+}
+
+generateDataFeedsPages()
+  .then(() => console.log('Data Feeds Pages generated!'))
   .catch(err => {
-    console.log(err);
+    console.log(`DFP generation error: ${err}`);
   });
