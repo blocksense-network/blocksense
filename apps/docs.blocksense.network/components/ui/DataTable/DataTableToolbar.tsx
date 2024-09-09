@@ -28,21 +28,26 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
-    <div className="flex items-center justify-between overflow-x-auto gap-2 p-1">
-      <div className="flex flex-1 space-x-2 items-end">
-        {filterCell && (
-          <Input
-            placeholder="Filter descriptions..."
-            value={
-              (table.getColumn(filterCell)?.getFilterValue() as string) ?? ''
-            }
-            onChange={event =>
-              table.getColumn(filterCell)?.setFilterValue(event.target.value)
-            }
-            className="h-8 w-[150px] lg:w-[250px] border-solid border-slate-200"
-            type="search"
-          />
-        )}
+    <div className="flex flex-col md:flex-row items-center justify-between overflow-x-auto gap-2 px-1 py-2 lg:py-1">
+      <div className="flex flex-1 space-x-2 items-start w-full">
+        <div className="flex items-center space-x-2 w-full">
+          {filterCell && (
+            <Input
+              placeholder="Filter descriptions..."
+              value={
+                (table.getColumn(filterCell)?.getFilterValue() as string) ?? ''
+              }
+              onChange={event =>
+                table.getColumn(filterCell)?.setFilterValue(event.target.value)
+              }
+              className={`h-8 w-full lg:w-[250px] mr-1 lg:mr-2 border-solid border-slate-200 transition-all duration-200`}
+              type="search"
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-end w-full gap-1 lg:gap-2 mb-2">
         {filters?.map(
           filter =>
             table.getColumn(filter.name) && (
@@ -56,16 +61,15 @@ export function DataTableToolbar<TData>({
         )}
         {isFiltered && (
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3 border-solid border-slate-200"
+            className="h-8 p-1"
           >
-            Reset
-            <X className="ml-2 h-4 w-4" />
+            <X className="h-4 w-4" />
           </Button>
         )}
+        <DataTableViewOptions table={table} columnsTitles={columnsTitles} />
       </div>
-      <DataTableViewOptions table={table} columnsTitles={columnsTitles} />
     </div>
   );
 }
