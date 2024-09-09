@@ -45,7 +45,7 @@ import { DataFeeds } from '@/components/DataFeeds/DataFeeds';
 
 function generateDataFeedsFile(): Promise<string[]> {
   const mdxFile = {
-    name: 'data-feeds-overview',
+    name: 'overview',
     content: generateMarkdownContent(),
   };
 
@@ -55,7 +55,7 @@ function generateDataFeedsFile(): Promise<string[]> {
     write({ ext: '.mdx', ...mdxFile }),
     writeJSON({
       base: '_meta.json',
-      content: { 'data-feeds-overview': 'Data Feeds Overview' },
+      content: { overview: 'Overview' },
     }),
   ]);
 }
