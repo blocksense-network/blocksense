@@ -6,6 +6,6 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
-serde = { version = "1.0.203", features = ["derive"]}
+serde = { version = "1.0.210", features = ["derive"]}
 blst = { version = "0.3.12", features = ["serde"] }
 hex = "0.4.3"
