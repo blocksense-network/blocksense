@@ -106,7 +106,12 @@ impl FeedSlotsProcessor {
                 for kv in &reports.report {
                     match kv.1 {
                         FeedResult::Result { result } => values.push(result),
-                        FeedResult::Error { .. } => todo!(),
+                        FeedResult::Error { .. } => {
+                            warn!(
+                                "Got error from reporter {} for feed id {} slot {}",
+                                kv.0, self.key, slot
+                            );
+                        }
                     }
                 }
 
