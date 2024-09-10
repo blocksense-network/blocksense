@@ -74,6 +74,10 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
       columnVisibility,
+      pagination: {
+        pageIndex: 0,
+        pageSize: 30,
+      },
     },
   });
 
@@ -135,7 +139,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} dataLength={data.length} />
+      <DataTablePagination table={table} />
     </div>
   );
 }
