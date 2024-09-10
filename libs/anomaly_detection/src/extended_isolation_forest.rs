@@ -1,10 +1,11 @@
+use anyhow::Result;
 use extended_isolation_forest::{Forest, ForestOptions};
 
 /*
 "Extended Isolation Forest" paper - https://ieeexplore.ieee.org/document/8888179
 Reference implementation - https://github.com/sahandha/eif
 */
-pub fn make_f64_forest<const N: usize>(values: Vec<[f64; N]>) -> Forest<f64, N> {
+pub fn make_f64_forest<const N: usize>(values: Vec<[f64; N]>) -> Result<Forest<f64, N>> {
     let options = ForestOptions {
         n_trees: 150,
         sample_size: 200,
@@ -12,7 +13,10 @@ pub fn make_f64_forest<const N: usize>(values: Vec<[f64; N]>) -> Forest<f64, N> 
         extension_level: 0, //TODO(snikolov): Figure out why it's required `extension_level` < `Dimensions`
     };
 
-    Forest::from_slice(values.as_slice(), &options).unwrap()
+    match Forest::from_slice(values.as_slice(), &options) {
+        Ok(res) => Ok(res),
+        Err(e) => anyhow::bail!("Error building forest from trainig data: {}", e.to_string()),
+    }
 }
 
 pub fn is_anomaly<const N: usize>(forest: &Forest<f64, N>, data_point: &[f64; N]) -> f64 {
@@ -41,7 +45,7 @@ mod tests {
             })
             .collect();
 
-        let forest = make_f64_forest::<3>(values.to_vec());
+        let forest = make_f64_forest::<3>(values.to_vec()).expect("Error building forest");
 
         // no anomaly
         assert!(is_anomaly::<3>(&forest, &[0.0, 0.0, 35.0]) < 0.5);

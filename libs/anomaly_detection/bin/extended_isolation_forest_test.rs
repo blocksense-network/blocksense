@@ -7,7 +7,7 @@ fn main() {
 
     let values_array = values.iter().map(|&x| [x]).collect();
 
-    let forest = make_f64_forest::<DIM>(values_array);
+    let forest = make_f64_forest::<DIM>(values_array).expect("Error building forest");
 
     let result = forest.score(&[0.]);
 

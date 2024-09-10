@@ -34,7 +34,7 @@ pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error
     let values_array: Vec<[f64; DIM]> = values.iter().map(|&x| [x]).collect();
     let last_value = *values_array.last().unwrap();
 
-    let forest = make_f64_forest::<DIM>(values_array);
+    let forest = make_f64_forest::<DIM>(values_array)?;
 
     let isolation_forest_result = forest.score(&last_value);
 
