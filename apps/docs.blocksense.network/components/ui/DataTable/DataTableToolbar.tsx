@@ -33,7 +33,7 @@ export function DataTableToolbar<TData>({
         <div className="flex items-center space-x-2 w-full">
           {filterCell && (
             <Input
-              placeholder="Filter descriptions..."
+              placeholder={`Filter ${filterCell}...`}
               value={
                 (table.getColumn(filterCell)?.getFilterValue() as string) ?? ''
               }
