@@ -1,0 +1,1030 @@
+{
+  "1": {
+    "name": "mainnet",
+    "contracts": {
+      "coreContracts": {
+        "HistoricDataFeedStoreV2": "0xfe2a4bd13f7929d0C43b41fBe74d55395a3Be9Bf",
+        "UpgradeableProxy": "0x44Da91D89ca26Ac8f8657CdB75D901D270cfA9F4",
+        "FeedRegistry": "0x626f512459F4dEe3b4CE5Ba801307f56D3b4682C"
+      },
+      "ChainlinkProxy": [
+        {
+          "description": "DOGE / USD",
+          "address": "0xd907cdd036F32ec33A65860fFaF315871bc8242C"
+        },
+        {
+          "description": "BTC / USD",
+          "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3454C392AD99182a8b124E28f22C4eBBfFD4981B"
+        },
+        {
+          "description": "ETH / USD",
+          "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9181E7e0945023a831C95ca0D671b4F9da847AEd"
+        },
+        {
+          "description": "SHIB / USD",
+          "address": "0x22E3AD79bCfE41773f4Bf8DA08f42b8defe8fbCa"
+        },
+        {
+          "description": "SOL / USD",
+          "address": "0x1335a395dD147D72517d8A59f5C1eEb8C5d0dFd2"
+        },
+        {
+          "description": "DOT / USD",
+          "address": "0x24f9e8438Fed4d0ffc7445AF3aA7748A0bF4405c"
+        },
+        {
+          "description": "XRP / USD",
+          "address": "0x45A917FdD073beC478B7ca1D6426Ff79fC486f24"
+        }
+      ],
+      "SafeMultisig": "0xed8De9e7A46FEfDC530Bd60c9E06CfFbB19FD6EE"
+    }
+  },
+  "11155111": {
+    "name": "sepolia",
+    "contracts": {
+      "coreContracts": {
+        "HistoricDataFeedStoreV2": "0xfe2a4bd13f7929d0C43b41fBe74d55395a3Be9Bf",
+        "UpgradeableProxy": "0x44Da91D89ca26Ac8f8657CdB75D901D270cfA9F4",
+        "FeedRegistry": "0x626f512459F4dEe3b4CE5Ba801307f56D3b4682C"
+      },
+      "ChainlinkProxy": [
+        {
+          "description": "DOGE / USD",
+          "address": "0xd907cdd036F32ec33A65860fFaF315871bc8242C"
+        },
+        {
+          "description": "BTC / USD",
+          "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3454C392AD99182a8b124E28f22C4eBBfFD4981B",
+          "chainlink_proxy": "0x0814104fC775A6DA92E2703ad6e3D5CCe3c178aB"
+        },
+        {
+          "description": "ETH / USD",
+          "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9181E7e0945023a831C95ca0D671b4F9da847AEd",
+          "chainlink_proxy": "0x694AA1769357215DE4FAC081bf1f309aDC325306"
+        },
+        {
+          "description": "SHIB / USD",
+          "address": "0x22E3AD79bCfE41773f4Bf8DA08f42b8defe8fbCa"
+        },
+        {
+          "description": "SOL / USD",
+          "address": "0x1335a395dD147D72517d8A59f5C1eEb8C5d0dFd2"
+        },
+        {
+          "description": "DOT / USD",
+          "address": "0x24f9e8438Fed4d0ffc7445AF3aA7748A0bF4405c"
+        },
+        {
+          "description": "XRP / USD",
+          "address": "0x45A917FdD073beC478B7ca1D6426Ff79fC486f24"
+        },
+        {
+          "description": "AAPL / USD",
+          "address": "0xa8C6737A84F8De1377f8A39b2D80fa97bC215340"
+        },
+        {
+          "description": "GOOGL / USD",
+          "address": "0xdaF20020a4A5D7E04c97b1311cCC835c90687bD3"
+        },
+        {
+          "description": "TSLA / USD",
+          "address": "0x36B28FFB4f25B4e8F1019CaB35D36A097cB0F497"
+        },
+        {
+          "description": "IBKR / USD",
+          "address": "0xB100520DaDcD3d254FB9de32548D85fE46c0Af5f"
+        },
+        {
+          "description": "NVDA / USD",
+          "address": "0xFBeBbB2aD07D722c4015F723499CCE0e2cBC729D"
+        },
+        {
+          "description": "TLRY / USD",
+          "address": "0x3173D6fcb2C4A08e68f4F19129F62Ec3759abDdD"
+        },
+        {
+          "description": "AMD / USD",
+          "address": "0x542722063DAc7842CC0aAb200348CB764e0F02e8"
+        },
+        {
+          "description": "BAT / USD",
+          "address": "0x3205714Df06450a0b2b915c72603018F7F6d6653"
+        },
+        {
+          "description": "MANA / USD",
+          "address": "0xf49d07A71Cf1865155777d49a7c1E221a9e78F49"
+        },
+        {
+          "description": "USDC / USD",
+          "address": "0x95beC02A2cA1916758A9CE8Bf7857f9Ff40F2378",
+          "chainlink_proxy": "0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E"
+        },
+        {
+          "description": "APE / USD",
+          "address": "0x12440774aF90d95A39D818D3d02Bd72f120e0b9f"
+        },
+        {
+          "description": "AXS / USD",
+          "address": "0x1E7d3B2C08f3002808889f9AcB18e6Bdf2E1BdBE"
+        },
+        {
+          "description": "MKR / USD",
+          "address": "0x98A00416227f6f9141cf96Bd7280B12B9b2112F9"
+        },
+        {
+          "description": "MATIC / USD",
+          "address": "0xbA368261871C2656484a917139d1B18436f5CF20"
+        },
+        {
+          "description": "SNX / USD",
+          "address": "0x4ad976a226596274F6763F982A6D68A323Aa4824",
+          "chainlink_proxy": "0xc0F82A46033b8BdBA4Bb0B0e28Bc2006F64355bC"
+        },
+        {
+          "description": "USDT / USD",
+          "address": "0x075F65ac65cd400D6C985755Fa5a1BdA1102F437"
+        },
+        {
+          "description": "NEAR / USD",
+          "address": "0x73C21b90f9d5165a5A564385d59f06cf3ED8F601"
+        },
+        {
+          "description": "COMP / USD",
+          "address": "0x6e3e277454001049895Cb539A341AbE0f333F4c5"
+        },
+        {
+          "description": "ZRX / USD",
+          "address": "0x91Edfcd66FcC7e368c318DEdF46d47C13548BB3a"
+        },
+        {
+          "description": "CHZ / USD",
+          "address": "0x9f7F55073583C6B898E10BaF69AFFAb701ec3eEe"
+        },
+        {
+          "description": "BEAM / USD",
+          "address": "0x90e53005019c66d980d7bC385aEA114091039088"
+        },
+        {
+          "description": "SGD / USD",
+          "address": "0x0c47CE8b10e8F336381Bc14e3CeD7C1b7016009F"
+        },
+        {
+          "description": "SPELL / USD",
+          "address": "0xcBEb0b5152F68c514bAE11fC4071c17a04EDa506"
+        },
+        {
+          "description": "CAKE / USD",
+          "address": "0xFf3fB99636628B5A8E0Aa0CCd765a120c6070fF3"
+        },
+        {
+          "description": "JOE / USD",
+          "address": "0x85199a7007B978B221c78AD53d56acDC0AC315fd"
+        },
+        {
+          "description": "XAVA / USD",
+          "address": "0x01B0e1de63eC6a11213dEd913E9C6E0294A483f7"
+        },
+        {
+          "description": "YFI / USD",
+          "address": "0x6Fc51A90F4Caab8470D80160658D23B17B7e36C9"
+        },
+        {
+          "description": "LINK / USD",
+          "address": "0xdb0eB9dCbc7bF655579494A822096B98c9dd3CA9",
+          "chainlink_proxy": "0x0d72F186C3C7c466cF3dB553Fd359849f9795186"
+        },
+        {
+          "description": "TUSD / USD",
+          "address": "0xd64014be42c9fCA71268CB2D61ef76e1111C99fB"
+        },
+        {
+          "description": "ARKB / USD",
+          "address": "0xFf07b1cCCe29c88Fc95302BBD05697d3Ad5142B8"
+        },
+        {
+          "description": "CHF / USD",
+          "base": "0x00000000000000000000000000000000000002F4",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x4d07D26aadf1DA7Cb01B1cC58FE91121c08CDb33"
+        },
+        {
+          "description": "GMX / USD",
+          "address": "0x6bAD40C918D0Fc632B5590d9297a6BbAfE7C502c"
+        },
+        {
+          "description": "CVX / USD",
+          "address": "0x5449664AC545681552b58e600A21a93d92BDEB3E"
+        },
+        {
+          "description": "QI / USD",
+          "address": "0xFf86725B8D050d353745f760546068071cb61Da3"
+        },
+        {
+          "description": "KNC / USD",
+          "address": "0x514094A24772a80112B72aD56DE1d6DD68D38119"
+        },
+        {
+          "description": "MIMATIC / USD",
+          "address": "0x29B32976B3e787f62b94514307bBa2d6Ad3fbf86"
+        },
+        {
+          "description": "FRAX / USD",
+          "address": "0x5b1082cf9Be21c939441eAD7425f7A9e4067B80b"
+        },
+        {
+          "description": "COQ / USD",
+          "address": "0xf03B579f5dfa1741D1C92a61895f322a95959E90"
+        },
+        {
+          "description": "XAG / USD",
+          "address": "0x80Dc6Ea851036666280e510fF74904c0Bc3811BD"
+        },
+        {
+          "description": "XAU / USD",
+          "address": "0x768cB9CF7FB082B2cC381dFc64EFe27831fE2224",
+          "chainlink_proxy": "0xC5981F461d74c46eB4b0CF3f4Ec79f025573B0Ea"
+        },
+        {
+          "description": "JPY / USD",
+          "base": "0x0000000000000000000000000000000000000188",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1190B83a004823F405b59eB89d74842Fb5F945bc",
+          "chainlink_proxy": "0x8A6af2B75F23831ADc973ce6288e5329F63D86c6"
+        },
+        {
+          "description": "FIL / USD",
+          "address": "0x99cF08D2FD9c0103B3cD51E0590e3c628307E174"
+        },
+        {
+          "description": "AVAX / USD",
+          "address": "0x04000C83441733123F387a50e7E13C8411175186"
+        },
+        {
+          "description": "EUR / USD",
+          "base": "0x00000000000000000000000000000000000003d2",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2441f3600Ca490DfD8BaA4EEE99Aed8d3A47568C",
+          "chainlink_proxy": "0x1a81afB8146aeFfCFc5E50e8479e826E7D55b910"
+        },
+        {
+          "description": "ALPHA / USD",
+          "address": "0xa03d3E38BabC6f668EcB6F6d307a83E22A31142C"
+        },
+        {
+          "description": "MIM / USD",
+          "address": "0xA5A65C56Ec1f48e9175783AbFcCA834478dAdF2f"
+        },
+        {
+          "description": "UNI / USD",
+          "address": "0xcf9eFD13DfC4C7998EA094cFEf4B827c92DEc485"
+        },
+        {
+          "description": "FTM / USD",
+          "address": "0x548958fACe750B39319be8Ec9583C1FcCFD08661"
+        },
+        {
+          "description": "DAI / USD",
+          "address": "0x1E9738dd27d377ea6D291aaa82274D1d6032670b",
+          "chainlink_proxy": "0x14866185B1962B63C3Ea9E03Bc1da838bab34C19"
+        },
+        {
+          "description": "TRY / USD",
+          "address": "0xe09a53E62EA1e84c666e3Ac0829e9b9f9121e592"
+        },
+        {
+          "description": "CRV / USD",
+          "address": "0x0e5B6f5da9b475Ab57d1108F459020d054da00fc"
+        },
+        {
+          "description": "SAND / USD",
+          "address": "0x52018e6A64f3458a33bB4f1fADbfa29Be593a164"
+        },
+        {
+          "description": "WBTC / USD",
+          "address": "0x69D90096FAc228A0E59335d931028be4A956aB92"
+        },
+        {
+          "description": "SUSHI / USD",
+          "address": "0x9D312BE3cF59729DafbE333858360856F6cD628c"
+        },
+        {
+          "description": "CUSD / USD",
+          "address": "0x8A0FB0745008DaF7008957AAE7424755A4aE31e0"
+        },
+        {
+          "description": "CELO / USD",
+          "address": "0x0E9Afea839212d90d222F2c9a2b5C19a51F6F954"
+        },
+        {
+          "description": "COP / USD",
+          "address": "0xffe76311faBE7075135ECdf964fa01C184Eed1b3"
+        },
+        {
+          "description": "INR / USD",
+          "base": "0x0000000000000000000000000000000000000164",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xB9B9f2ae3ed71Cf6349Bb21b99165d87d37c846d"
+        },
+        {
+          "description": "PHP / USD",
+          "base": "0x0000000000000000000000000000000000000260",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1Df2cCBF6cf0c604BcC1dBa6101D49eD12FACd26"
+        },
+        {
+          "description": "METIS / USD",
+          "address": "0x9b9191356a173Ee8D16F3B12Ede24195b3EB4AcA"
+        },
+        {
+          "description": "SPY / USD",
+          "address": "0x51e542061b362E7632D4136CFB7faD3453b310F3"
+        },
+        {
+          "description": "OP / USD",
+          "address": "0x376862b8a34eB432BB7e683579E8CEf1f1ca5EfB"
+        },
+        {
+          "description": "CNY / USD",
+          "base": "0x000000000000000000000000000000000000009c",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x85F0431e1F51D9c77b42B8F0D0604Df4e1813330"
+        },
+        {
+          "description": "LUSD / USD",
+          "address": "0x3B3cC575059c42f12873BA9f8f6Eb8Bf5178A64D"
+        },
+        {
+          "description": "KRW / USD",
+          "base": "0x000000000000000000000000000000000000019a",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x00f1e44FA189DFB9C70719E120AE66C7e25de6Cf"
+        },
+        {
+          "description": "DPX / USD",
+          "address": "0x29eDB87c613d28F8Ea98D50A7BAbb4dA29e5a156"
+        },
+        {
+          "description": "EURC / USD",
+          "address": "0x89D76409E773b6015eed34563d6dDcF05b63A2B1"
+        },
+        {
+          "description": "PAXG / USD",
+          "address": "0x34B83bbF26ad0A7fbB1322d40DA4261330Ed15bF"
+        },
+        {
+          "description": "LTC / USD",
+          "address": "0x2894ed2b1df0596044C21C71d6d95E076AB882Bf"
+        },
+        {
+          "description": "USD+ / USD",
+          "address": "0xEBAA2155b34bDCF9389793D5ae428A58aeAEC3CB"
+        },
+        {
+          "description": "sUSDe / USD",
+          "address": "0x4A97c2F049f9cB5Df00aEF2C681760CD25f0874a"
+        },
+        {
+          "description": "ARB / USD",
+          "address": "0xe7215dF46aBD8aD213A646Bdb03a8711Ba58263F"
+        },
+        {
+          "description": "BNB / USD",
+          "address": "0x95E75ee079e47f8C5C5EB823E37d2931cAA0758e"
+        },
+        {
+          "description": "BONK / USD",
+          "address": "0x82946dc948426B3F88470049400554F25A4E96bA"
+        },
+        {
+          "description": "ATOM / USD",
+          "address": "0x7ad38CC7fe0A35c81D197Df0B2c87410f1532E31"
+        },
+        {
+          "description": "ADA / USD",
+          "address": "0x3a3C7079e499907784392f6013ba8aE6bb11567f"
+        },
+        {
+          "description": "GALA / USD",
+          "address": "0x747548ec86d96C25693F9F97fcFEdEAFc7Aa3F43"
+        },
+        {
+          "description": "BCH / USD",
+          "address": "0x911DfDC2459cF8A91471522492Aca070593a9e39"
+        },
+        {
+          "description": "FLOW / USD",
+          "address": "0x2efca3cDb027cDA77eCE2FaAdB5473671781d69f"
+        },
+        {
+          "description": "ILV / USD",
+          "address": "0x0c2627BE3B740d8c82bd1F1607d3EF894344eFCf"
+        },
+        {
+          "description": "KAVA / USD",
+          "address": "0x1b5340838520D6d5AC9C8DA74a6DD18B3e52e826"
+        },
+        {
+          "description": "ICP / USD",
+          "address": "0x658E02Ed7574165d611cF4C6C9DE51E24CD7e3D0"
+        },
+        {
+          "description": "ALGO / USD",
+          "address": "0x73aB5386c011dAc4DC801069EE3D771e2D74E3E7"
+        },
+        {
+          "description": "MAGIC / USD",
+          "address": "0x102746f02b631677c1e5B98D059A9277aaE4356f"
+        },
+        {
+          "description": "ZK / USD",
+          "address": "0x5A60DfAE8DbD420023B4060e3B174cf751e22066"
+        },
+        {
+          "description": "JTO / USD",
+          "address": "0x80D9EC8A17AF2674B651C68614ba16D341C258F6"
+        },
+        {
+          "description": "GRT / USD",
+          "address": "0x684F16e3fa5285c064683dfc6BB30Ed9CB623350"
+        },
+        {
+          "description": "DASH / USD",
+          "address": "0xF6F27bdD03534DA2349bADffCfC92fcB4D6eEE5A"
+        },
+        {
+          "description": "EOS / USD",
+          "address": "0x376c9feeC9B00259A107CD067538992Ed7B6E856"
+        },
+        {
+          "description": "LDO / USD",
+          "address": "0xf2D9038388aBe25691de69CD914F45209FF3D43f"
+        },
+        {
+          "description": "EGLD / USD",
+          "address": "0x857ba73bfB99A2aFFb7f0b2Ea2bdF801F55c7605"
+        },
+        {
+          "description": "ZRO / USD",
+          "address": "0xeC7F0Ec1dB1b7206Bb18fEcEaB03f06C0aa87aAC"
+        },
+        {
+          "description": "FLOKI / USD",
+          "address": "0xdB2651713D05A5734FB4a2af42F5b8994e573820"
+        },
+        {
+          "description": "GHO / USD",
+          "address": "0x440DE1AFB7BacCEe8B1586B730410bdbfA05aD6B",
+          "chainlink_proxy": "0x635A86F9fdD16Ff09A0701C305D3a845F1758b8E"
+        },
+        {
+          "description": "AUD / USD",
+          "base": "0x0000000000000000000000000000000000000024",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1F22eA80456a1367B098e7765F08A77d0E463352",
+          "chainlink_proxy": "0xB0C712f98daE15264c8E26132BCC91C40aD4d5F9"
+        },
+        {
+          "description": "RPL / USD",
+          "address": "0x0F769c2BE776901967629591cDf578c6553481a8"
+        },
+        {
+          "description": "WTI / USD",
+          "address": "0x21D22b9CD352Ee4DD8f3009A7D29EF947f625F9c"
+        },
+        {
+          "description": "STG / USD",
+          "address": "0x4abf9E9b0c8A218bF7bd5AbE6eAF59BE1abC8c34"
+        },
+        {
+          "description": "PENDLE / USD",
+          "address": "0xF61339b92286aDe2C359C79A15c85E08d8c28E79"
+        },
+        {
+          "description": "GNS / USD",
+          "address": "0x6F6e03F0cDbb7DB86F4a8B5653f8d47Be6041926"
+        },
+        {
+          "description": "CAD / USD",
+          "base": "0x000000000000000000000000000000000000007c",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x82256a6bC5f608E9bb4690F868CDba949b5f4E25"
+        },
+        {
+          "description": "BAL / USD",
+          "address": "0xa2065944C482154dA3bd3851C2cc0021B50A5D3d"
+        },
+        {
+          "description": "PEPE / USD",
+          "address": "0x49B05e36AeC9F357D486272A1aD25d52D145A018"
+        },
+        {
+          "description": "WIF / USD",
+          "address": "0x6a08634B534d7C3f3Db7ba892875B77e0d2a2592"
+        },
+        {
+          "description": "ORDI / USD",
+          "address": "0x07dFa67d590c20585A1cC2d73f803CA6e6e32c62"
+        },
+        {
+          "description": "MEME / USD",
+          "address": "0x01295C403D4dD214cB781235A72F50f68981E2Cd"
+        },
+        {
+          "description": "ZRO / USD",
+          "address": "0x81e3c4eE9B6A96318d1BB14A75bD3242A075B8e7"
+        },
+        {
+          "description": "AMZN / USD",
+          "address": "0x5df23732689db55D8812a2A6C954946EBd77a92f"
+        },
+        {
+          "description": "RSR / USD",
+          "address": "0x0e0A184Dbd6A03f6f8220A80D4aFD126661619Ad"
+        },
+        {
+          "description": "MSFT / USD",
+          "address": "0x43DB33728903C195041983EbAbAAb1E424e21D23"
+        },
+        {
+          "description": "BRL / USD",
+          "base": "0x00000000000000000000000000000000000003Da",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3bc2C5065Ea120C97F72772771f0c4D9a8eb896a"
+        },
+        {
+          "description": "COIN / USD",
+          "address": "0x00A968543Eeb571114aD168277F4a623753fBcd6"
+        },
+        {
+          "description": "AXL / USD",
+          "address": "0xd8D65d28b8b99181957914b7110C305aF0DC0B15"
+        },
+        {
+          "description": "IOTX / USD",
+          "address": "0x4e6DEf14343dAf8F2cB43C5b9c916521264BecF9"
+        },
+        {
+          "description": "MVI / USD",
+          "address": "0xE5d024b3dDb1cAf8284c827a9859002c0dAb83e6"
+        },
+        {
+          "description": "GBP / USD",
+          "base": "0x000000000000000000000000000000000000033a",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xa583a4d32c786ad410ad5778d9Ac5A7d2290461B",
+          "chainlink_proxy": "0x91FAB41F5f3bE955963a986366edAcff1aaeaa83"
+        },
+        {
+          "description": "TIA / USD",
+          "address": "0x8259577e455c63eeb9dFd0F805BE0083b496de49"
+        },
+        {
+          "description": "XVS / USD",
+          "address": "0x221035d20DC5A21A00530bC55bE6f4d18793F667"
+        },
+        {
+          "description": "RDNT / USD",
+          "address": "0xbBbB71eD54d3d438c3b31CA49ff930bA41e90Cfa"
+        },
+        {
+          "description": "ZAR / USD",
+          "base": "0x00000000000000000000000000000000000002c6",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1A7aac38336Ec6eB992Ea49910c82e4860109fF1"
+        },
+        {
+          "description": "TAO / USD",
+          "address": "0x8748Be965dBf94cBA042910E50fd11955Fae555a"
+        },
+        {
+          "description": "META / USD",
+          "address": "0x2d5234860c55650928806F49dc9dF849EE12AF6E"
+        },
+        {
+          "description": "MNT / USD",
+          "address": "0x2afe6769dB674f55732E964CA5b0ab41Bc6327b8"
+        },
+        {
+          "description": "STETH / USD",
+          "address": "0xE04B775F8da64Dc14Bf435835C178F89E86e9DB8"
+        },
+        {
+          "description": "LDO / USD",
+          "address": "0x252A67789A1f6fc4D948578446b656e198d1e054"
+        },
+        {
+          "description": "TBTC / USD",
+          "address": "0x17C8B01f316f399adED9226b95432Df92F8194b8"
+        },
+        {
+          "description": "XAI / USD",
+          "address": "0x9eA9d2c02542BCcE58D7e1298D5732C279814946"
+        },
+        {
+          "description": "1INCH / USD",
+          "address": "0x5338cdAfD0b50C86c26A4cd3f58A3717C7880528"
+        },
+        {
+          "description": "CBETH / USD",
+          "address": "0x5D1258Bd489A5D188d70B479302EC9fb8211Ea03"
+        },
+        {
+          "description": "DODO / USD",
+          "address": "0x99dD7477F2870d8b7C76Ffd5e9291d2Eed70e7f0"
+        },
+        {
+          "description": "SEK / USD",
+          "address": "0x7A10f288439Fc188F4581496396c95098eaDc09e"
+        },
+        {
+          "description": "USDD / USD",
+          "address": "0x9F0fFc41C1bcc5b772f4749605Da50a5c047EFD8"
+        },
+        {
+          "description": "DPI / USD",
+          "address": "0x390843dad1BC659F87526CAB4B1385Fb036C4ddF"
+        },
+        {
+          "description": "RSETH / USD",
+          "address": "0x082f1f0C951aad385323979101EB76fD3c942121"
+        },
+        {
+          "description": "WEMIX / USD",
+          "address": "0xf0C140feadbB8C7303857F478409CE1FdaBbbBbf"
+        },
+        {
+          "description": "FXS / USD",
+          "address": "0x034eBe92d816D0723e39dE5cbf9191Ce165746e4"
+        },
+        {
+          "description": "USDV / USD",
+          "address": "0x5e22C9876F4FDf27510945Df96e0a922be0d1448"
+        },
+        {
+          "description": "ezETH / USD",
+          "address": "0x3e90B9384d603F037e7a6BD2Bb4F3c4b58361141"
+        },
+        {
+          "description": "OGN / USD",
+          "address": "0xeb30E666581Cd63A3379CD132281d783aD5c6dBD"
+        },
+        {
+          "description": "MEW / USD",
+          "address": "0x6F293179244bAfB866bE6be1A2659b3de094C407"
+        },
+        {
+          "description": "MAVIA / USD",
+          "address": "0xdb65ef519a148176079F1ACc887280B74d06063B"
+        },
+        {
+          "description": "APT / USD",
+          "address": "0x3661bDB2cf6fBA4418eeEcE50F5B76918CD75Dd6"
+        },
+        {
+          "description": "AERO / USD",
+          "address": "0x21dc807FDdCA0c14A02685ca1A7Cc0592c829123"
+        },
+        {
+          "description": "DEGEN / USD",
+          "address": "0x45Fd6a6f0E01a68d944e0A124303eb0334f6CC29"
+        },
+        {
+          "description": "MOG / USD",
+          "address": "0xeC964E38BB86841eC2B29Cdd14e93A1795c5263B"
+        },
+        {
+          "description": "UMA / USD",
+          "address": "0xb67Bf856fAaDa88a01205976B41CF196F7E607C9"
+        },
+        {
+          "description": "SUSD / USD",
+          "address": "0xBEF4EA7dDcEB56bD14097002Af6dc5b47Bf36D8B"
+        },
+        {
+          "description": "DYDX / USD",
+          "address": "0xB7608bD10bA6e85aE9B05Ab6CcB3747B15E737fe"
+        },
+        {
+          "description": "RUNE / USD",
+          "address": "0x6A1D3907ae3Aa59D759F4679E9C83610f25f3E4B"
+        },
+        {
+          "description": "TRX / USD",
+          "address": "0xdc9851310009B3E1b27ad8E1a5bD165796567127"
+        },
+        {
+          "description": "VELO / USD",
+          "address": "0x369eD58297C99b46Ab9eD81298ca01AA467Fb993"
+        },
+        {
+          "description": "ZIL / USD",
+          "address": "0x4C310225Bc68004aF9772e5c16e5d29E335DC1C7"
+        },
+        {
+          "description": "ANKR / USD",
+          "address": "0x4eea90b3D622f165F59a63c9fe29141E2F76C9da"
+        },
+        {
+          "description": "XLM / USD",
+          "address": "0xCE49589CAb69b0a8F464FC2E1AdC2c77175e7Dd9"
+        },
+        {
+          "description": "ETC / USD",
+          "address": "0x9F837F375Bc5e503592603E5C7b20F0f1493A96b"
+        },
+        {
+          "description": "JUP / USD",
+          "address": "0xd37DFda50c9a869E75E50aC05cb5D63d3Db46132"
+        },
+        {
+          "description": "IMX / USD",
+          "address": "0x2900F77A78df413cEAb93AC95457D7Bb78fFfFAF"
+        },
+        {
+          "description": "ONE / USD",
+          "address": "0xa507CAEdE7F9959168E86E9BAaE25cF60AAA4ead"
+        },
+        {
+          "description": "ENJ / USD",
+          "address": "0xC6C5102FD011299392E08A661c31d0b19B9e4536"
+        },
+        {
+          "description": "XTZ / USD",
+          "address": "0x8BE09c23992f8cb9DD617FDbA249d7EfaC8E70Ce"
+        },
+        {
+          "description": "INJ / USD",
+          "address": "0x9adFaF95Bd77d61FCEbb45C8F47BaCeeE8bE3Ba3"
+        },
+        {
+          "description": "FET / USD",
+          "address": "0xf3E78c1375e613AB0f4CCE2901924b615be417a8"
+        },
+        {
+          "description": "WLD / USD",
+          "address": "0x14099E7acF937DfDF8b7A7b6dBf192aC50373f20"
+        },
+        {
+          "description": "PERP / USD",
+          "address": "0xd49e42d2Ed4fe0Bfac0c207355Fd0fBa1261B5E7"
+        },
+        {
+          "description": "PYTH / USD",
+          "address": "0xF6d0e3725e7381FE53e83EC6eB21a0E7086C7e1A"
+        },
+        {
+          "description": "MAV / USD",
+          "address": "0xED7be7cD4dFc2e187E7aCdC15d7C45585b7CF9A4"
+        },
+        {
+          "description": "SEI / USD",
+          "address": "0x36E7C9313FaF992Cb573e938Fc7297580a631389"
+        },
+        {
+          "description": "ZEC / USD",
+          "address": "0x3460BB184e666220E8BDc4b48dF0b3aE28A61693"
+        },
+        {
+          "description": "BLUR / USD",
+          "address": "0x75488373f963a60F117652F76AD5542829AD3151"
+        },
+        {
+          "description": "STRK / USD",
+          "address": "0xD29B831bC626eb80bA74DAf72d8293324BeB1238"
+        },
+        {
+          "description": "TRB / USD",
+          "address": "0xCcF745d02249308D703182A70Fdff188631Fa3C8"
+        },
+        {
+          "description": "TON / USD",
+          "address": "0x8F0105e9Ae7144Fb78FA95c5a1a6dCc8F89C4aeA"
+        },
+        {
+          "description": "ASTR / USD",
+          "address": "0x2a0fdeEd0C0440e2E98BB049a898689016779060"
+        },
+        {
+          "description": "THETA / USD",
+          "address": "0x0ECC2dd8a68438a53Cf2bae175EbB5c9dC4673f1"
+        },
+        {
+          "description": "QNT / USD",
+          "address": "0x133a991fD8e86543561697175A6e1A71959752ce"
+        },
+        {
+          "description": "OMG / USD",
+          "address": "0xA15BdEc7dD6ea1d6C33971aF219BBA489A92f640"
+        },
+        {
+          "description": "ONDO / USD",
+          "address": "0xa07Ee21b49B8051BaBBdAe7271253C86a7c99834"
+        },
+        {
+          "description": "VET / USD",
+          "address": "0xc5363C9760D9A378F90E0151B33a475dC328D9A3"
+        },
+        {
+          "description": "ENA / USD",
+          "address": "0x1261e3c71b794eFA9797cf1d1A5Ba04Df116bdA5"
+        },
+        {
+          "description": "IB01 / USD",
+          "address": "0xfEC38828ccBc29dA85701e3F7A5bAecc00D57aFE",
+          "chainlink_proxy": "0xB677bfBc9B09a3469695f40477d05bc9BcB15F50"
+        },
+        {
+          "description": "CZK / USD",
+          "address": "0x22D3058E9E9a5894AE858F9aCED3776e91C7b31b",
+          "chainlink_proxy": "0xC32f0A9D70A34B9E7377C10FDAd88512596f61EA"
+        },
+        {
+          "description": "SUSDE / USD",
+          "address": "0x177e9575481b78Fa70bc61DB2810DB9eE3527Ac8",
+          "chainlink_proxy": "0x6f7be09227d98Ce1Df812d5Bc745c0c775507E92"
+        },
+        {
+          "description": "CSPX / USD",
+          "address": "0x0dbe27074DaCd34d51f6C0357B02A3c3450E91c8",
+          "chainlink_proxy": "0x4b531A318B0e44B549F3b2f824721b3D0d51930A"
+        },
+        {
+          "description": "IBTA / USD",
+          "address": "0x797e2Db330b9094894Ecb24F6bcab3010f0F34aC",
+          "chainlink_proxy": "0x5c13b249846540F81c093Bc342b5d963a7518145"
+        },
+        {
+          "description": "FORTH / USD",
+          "address": "0xBaF93e982F619b33372052cBc56Ca180bb858145",
+          "chainlink_proxy": "0x070bF128E88A4520b3EfA65AB1e4Eb6F0F9E6632"
+        },
+        {
+          "description": "BOO / USD",
+          "address": "0xd501a00112B5bF84aB6EEC49b47b403f77C62582"
+        },
+        {
+          "description": "ALPACA / USD",
+          "address": "0xBf829a4E220f4852cB59EBC9739c8Eee6704B1f5"
+        },
+        {
+          "description": "MOVR / USD",
+          "address": "0xc9D04ce4c9f4aA1C7262F4985fE77dFe2f123377"
+        },
+        {
+          "description": "RAI / USD",
+          "address": "0xAD879E2Fe2dAC3671DEBA07ce4Ec499d677842e3"
+        },
+        {
+          "description": "FDUSD / USD",
+          "address": "0xdd1149902a3Ff2E094ed5779DaBd87f5fe94b12D"
+        },
+        {
+          "description": "PYUSD / USD",
+          "address": "0xAD084705643dFdEd5F44e8Bf1Bb1cbC1269423DF"
+        },
+        {
+          "description": "XCN / USD",
+          "address": "0xBa5f4f409ac397201c0147004277b1f679b02c6C"
+        },
+        {
+          "description": "ALCX / USD",
+          "address": "0x8730d472B4036F4CFdFF4253FDa3608A36b1F2FD"
+        },
+        {
+          "description": "LRC / USD",
+          "address": "0x89eA7cb47C7417AeA80e08AB637Aa6592B0c3007"
+        },
+        {
+          "description": "AGEUR / USD",
+          "address": "0x2FEB40026734B82F8A5D16a8829A3C8B134273dA"
+        },
+        {
+          "description": "HIGH / USD",
+          "address": "0xE846bE5Ca7126d94d6Ce37AEe12dab39c5F5615D"
+        },
+        {
+          "description": "UST / USD",
+          "address": "0x82780Ca92a9Fd244e947b79F2f425a501e60Cb62"
+        },
+        {
+          "description": "MLN / USD",
+          "address": "0xC13A12Fd9e64b1953B4856A30BEf3C198577b0e8"
+        },
+        {
+          "description": "SHV / USD",
+          "address": "0x6d503544c338CFAf5f4bb5de7643d7f862336508"
+        },
+        {
+          "description": "BADGER / USD",
+          "address": "0xa229CB6ED8b355B9ff7E14C51B5488C55f169815"
+        },
+        {
+          "description": "OHMv2 / USD",
+          "address": "0x0Afd29790038a1e71b1c289c879669Ec86860FD2"
+        },
+        {
+          "description": "REN / USD",
+          "address": "0x2F8CF407d8e12e58b2107C60fAFC70E1DC344A96"
+        },
+        {
+          "description": "USDP / USD",
+          "address": "0xB16465803B0A96f9091a67653902C3834e4BF73b"
+        },
+        {
+          "description": "NZD / USD",
+          "address": "0xf0deF70209BbFDe2b326956FAdE7865477CcaE77"
+        },
+        {
+          "description": "SXP / USD",
+          "address": "0x673208EeCe17b20831a11d3D7F6776593A861DA5"
+        },
+        {
+          "description": "AMPL / USD",
+          "address": "0x9eFaEcb8DD4157Aa87e70cd1968DA08096126EC8"
+        },
+        {
+          "description": "CRVUSD / USD",
+          "address": "0x9D311AE1C1D3dbb0dE1fcD9BD89e227CD2EA2A80"
+        },
+        {
+          "description": "QUICK / USD",
+          "address": "0x1605c1406388AFfff3Cb66471D2353A6E386d717"
+        },
+        {
+          "description": "GHST / USD",
+          "address": "0x870e1e37e65Eb35032b53D728a1f7015788a885f"
+        },
+        {
+          "description": "MXN / USD",
+          "address": "0xCD0bD56d2ec6e8F7ca0173CdEf6778387Eb085bA"
+        },
+        {
+          "description": "ILS / USD",
+          "address": "0x29883FD7AC4f5b67C547E546e204AC3a83A6443e"
+        },
+        {
+          "description": "KLAY / USD",
+          "address": "0xAAa4973Ed19eD53fD3B8d5ed9bb9012a2Ce51E58"
+        },
+        {
+          "description": "PLN / USD",
+          "address": "0x54CfDdE0e9C3a71329dd9757cA7bA7103E401538"
+        },
+        {
+          "description": "THB / USD",
+          "address": "0xf3b2Bc527C11FBc957D15b0087542ea65a29163b"
+        },
+        {
+          "description": "XPT / USD",
+          "address": "0x2ECB754abAef44301Fef869f74715eB05B6d870e"
+        },
+        {
+          "description": "FTT / USD",
+          "address": "0xac23FD718EAb8254d08ceDCd3DCD1297Cc9FE553"
+        },
+        {
+          "description": "SLP / USD",
+          "address": "0xcB992CbFcdc2D1f4851779A6C8785A1F770059Fa"
+        },
+        {
+          "description": "STORJ / USD",
+          "address": "0xBB446742Df057538c445D183C66029b932F2A144"
+        },
+        {
+          "description": "HBAR / USD",
+          "address": "0x974F97444A36Db064324eFa4f685181551C414bB"
+        },
+        {
+          "description": "DGB / USD",
+          "address": "0xcF9B59290E2138F22D9507287580892c29C74360"
+        },
+        {
+          "description": "GLMR / USD",
+          "address": "0x813951fc0115bA862a2Fc83cBD1611C385a37833"
+        },
+        {
+          "description": "SRM / USD",
+          "address": "0x4C87C1DBB578828F6A92C531BD51714200d6B815"
+        },
+        {
+          "description": "mSOL / USD",
+          "address": "0xF02FB66C782DF2132c02D32cdBaf163EAa6cD007"
+        },
+        {
+          "description": "GNO / USD",
+          "address": "0xFd004840cF98227d7b377931E2949f3Fc5B30FB7"
+        }
+      ],
+      "SafeMultisig": "0xed8De9e7A46FEfDC530Bd60c9E06CfFbB19FD6EE"
+    }
+  }
+}
