@@ -26,31 +26,31 @@ summary,
 button,
 input,
 [tabindex]:not([tabindex='-1']) {
-  outline-offset: 2px;
-  outline: 2px solid transparent;
+  outline-offset: 1px;
+  outline: 1px solid transparent;
 }
 a:focus-visible {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 transparent);
+  --tw-ring-offset-width: 0px;
+  --tw-ring-color: #d1d5db;
+  --tw-ring-offset-color: transparent;
   --tw-ring-opacity: 1;
-  --tw-ring-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 86% /
-      var(--tw-ring-opacity)
-  );
-  --tw-ring-offset-width: 1px;
-  --tw-ring-offset-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 77%
-  );
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 1px var(--tw-ring-color);
+  --tw-ring-offset-shadow: none;
+
+  box-shadow:
+    var(--tw-ring-shadow),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  border-radius: 0.375rem;
+  border-width: 1px;
+  border-color: #e5e5e5;
 }
 summary:focus-visible {
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
     var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
     var(--tw-shadow, 0 0 transparent);
   --tw-ring-opacity: 1;
@@ -58,61 +58,61 @@ summary:focus-visible {
     var(--nextra-primary-hue) var(--nextra-primary-saturation) 86% /
       var(--tw-ring-opacity)
   );
-  --tw-ring-offset-width: 1px;
+  --tw-ring-offset-width: 0px;
   --tw-ring-offset-color: hsl(
     var(--nextra-primary-hue) var(--nextra-primary-saturation) 77%
   );
 }
 button:focus-visible {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 transparent);
+  --tw-ring-offset-width: 0px;
+  --tw-ring-color: #d1d5db;
+  --tw-ring-offset-color: transparent;
   --tw-ring-opacity: 1;
-  --tw-ring-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 86% /
-      var(--tw-ring-opacity)
-  );
-  --tw-ring-offset-width: 1px;
-  --tw-ring-offset-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 77%
-  );
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 1px var(--tw-ring-color);
+  --tw-ring-offset-shadow: none;
+
+  box-shadow:
+    var(--tw-ring-shadow),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  border-radius: 0.375rem;
+  border-width: 1px;
+  border-color: #e5e5e5;
 }
 input:focus-visible {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 transparent);
+  --tw-ring-offset-width: 0px;
+  --tw-ring-color: #d1d5db;
+  --tw-ring-offset-color: transparent;
   --tw-ring-opacity: 1;
-  --tw-ring-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 86% /
-      var(--tw-ring-opacity)
-  );
-  --tw-ring-offset-width: 1px;
-  --tw-ring-offset-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 77%
-  );
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 1px var(--tw-ring-color);
+  --tw-ring-offset-shadow: none;
+
+  box-shadow:
+    var(--tw-ring-shadow),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  border-radius: 0.375rem;
+  border-width: 1px;
+  border-color: #e5e5e5;
 }
 [tabindex]:not([tabindex='-1']):focus-visible {
-  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-    var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-    calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-    var(--tw-shadow, 0 0 transparent);
+  --tw-ring-offset-width: 0px;
+  --tw-ring-color: #d1d5db;
+  --tw-ring-offset-color: transparent;
   --tw-ring-opacity: 1;
-  --tw-ring-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 86% /
-      var(--tw-ring-opacity)
-  );
-  --tw-ring-offset-width: 1px;
-  --tw-ring-offset-color: hsl(
-    var(--nextra-primary-hue) var(--nextra-primary-saturation) 77%
-  );
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 1px var(--tw-ring-color);
+  --tw-ring-offset-shadow: none;
+
+  box-shadow:
+    var(--tw-ring-shadow),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  border-radius: 0.375rem;
+  border-width: 1px;
+  border-color: #e5e5e5;
 }
 :is(html[class~='dark'] a:focus-visible) {
   --tw-ring-opacity: 1;
