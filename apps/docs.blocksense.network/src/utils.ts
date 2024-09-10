@@ -1,3 +1,4 @@
+import { previewHexString } from '@blocksense/base-utils/buffer-and-hex-utils';
 import { VariableDocItem } from '@blocksense/sol-reflector';
 
 export const filterConstants = (
@@ -22,4 +23,12 @@ export function stringifyObject(obj: any): string {
     .replace(/\\t/g, '\\\\t')
     .replace(/\\b/g, '\\\\b')
     .replace(/\\f/g, '\\\\f')}'`;
+}
+
+export function previewHexStringOrDefault(
+  value: string | undefined,
+  defaultValue: string = '-',
+  bytesToShow?: number,
+): string {
+  return value ? previewHexString(value, bytesToShow) : defaultValue;
 }

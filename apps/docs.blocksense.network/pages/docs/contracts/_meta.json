@@ -2,5 +2,7 @@
   "index": "Overview",
   "guide": "Guide",
   "reference-documentation": "Reference documentation",
-  "commands": "Dev Setup and Commands"
+  "commands": "Dev Setup and Commands",
+  "supported-networks": "Supported Networks",
+  "supported-contracts": "Supported Contracts"
 }
