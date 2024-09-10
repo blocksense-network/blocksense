@@ -46,6 +46,25 @@ interface DataTableProps<TData, TValue> {
   columnsTitles: ColumnsTitlesType;
 }
 
+function getUniqueValuesFromColumns(column: string, data: any): OptionType[] {
+  return Array.from(new Set(data.map((d: any) => d[column]))).map(data => ({
+    label: data as string,
+    value: data as string,
+  }));
+}
+
+export function getFacetedFilters(
+  columns: string[],
+  data: any,
+  columnTitles: { [key: string]: string },
+): FilterType[] {
+  return columns.map(column => ({
+    name: column,
+    title: columnTitles[column as keyof typeof columnTitles],
+    options: getUniqueValuesFromColumns(column, data),
+  }));
+}
+
 export function DataTable<TData, TValue>({
   columns,
   data,

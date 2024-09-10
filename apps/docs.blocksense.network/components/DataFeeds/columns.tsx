@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import Link from 'next/link';
 
-export type DataFeed = {
+type DataFeed = {
   id: string;
   description: string;
   decimals: number;
