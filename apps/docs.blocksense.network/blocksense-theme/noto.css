@@ -79,7 +79,13 @@ blockquote {
 }
 
 .nextra-sidebar-container ul > li {
-  @apply mb-0 mt-0.5;
+  @apply mb-[2px] mx-[2px];
+}
+
+@media (max-width: 640px) {
+  .nextra-sidebar-container ul > li a {
+    @apply mt-1;
+  }
 }
 
 .nextra-toc ul > li {
