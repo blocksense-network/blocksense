@@ -83,7 +83,7 @@ async function generateIndividualDataFeedPages(
   const dataFeedPages = feedsConfig.feeds.map((feed: Feed) => {
     return {
       description: feed.description,
-      name: `0x${feed.id}`,
+      name: `${feed.id}`,
       content: generateIndividualDataFeedPageContent(feed),
     };
   });
@@ -106,7 +106,8 @@ async function generateIndividualDataFeedPages(
   rootMetaFileContent = {
     ...rootMetaFileContent,
     feed: {
-      display: 'hidden',
+      title: 'Supported Data Feeds',
+      display: 'children',
     },
   };
 
