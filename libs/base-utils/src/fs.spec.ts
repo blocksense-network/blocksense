@@ -83,10 +83,15 @@ describe('selectDirectory', async () => {
     expect(await readJSON(args)).toEqual(args.content);
   });
 
-  test('should throw an error when `baseDir` does not exists', async () => {
-    expect(() => selectDirectory('non-existent-directory')).toThrowError(
-      `The directory non-existent-directory does not exist.`,
-    );
+  test('write should create all parent dirs of the file', async () => {
+    const { write } = selectDirectory(`${fsTestFolder}/non-existent-directory`);
+    await write({ base: 'subdir/test.txt', content: "It's alive!" });
+    expect(
+      await fs.readFile(
+        `${fsTestFolder}/non-existent-directory/subdir/test.txt`,
+        'utf8',
+      ),
+    ).toEqual("It's alive!");
   });
 
   test('readAllJSONFiles should return an empty array when no files are present', async () => {

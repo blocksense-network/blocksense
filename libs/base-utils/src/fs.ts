@@ -1,6 +1,5 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { existsSync } from 'fs';
 
 /**  An object whose properties represent significant elements of the path. */
 // ┌─────────────────────┬────────────┐
@@ -57,11 +56,6 @@ type FileArgs = Omit<PathObject, 'dir' | `root`>;
  * Each `args` object should omit the 'dir' property from the `PathObject` type, as the directory is already specified by `baseDir`.
  */
 export function selectDirectory(dir: string) {
-  // Check if the base directory exists
-  if (!existsSync(dir)) {
-    throw new Error(`The directory ${dir} does not exist.`);
-  }
-
   return new SelectedDirectory(dir);
 }
 
@@ -81,9 +75,17 @@ class SelectedDirectory {
    */
   write = (args: FileArgs & { content: string }) => {
     const filePath = path.format({ dir: this.dir, ...args });
-    return fs.writeFile(filePath, args.content).then(() => {
-      return filePath;
-    });
+
+    // Get the actual base dir in case the file is nested, e.g.
+    // selectDirectory('a/b/c').write({ base: 'd/e/f.txt', content: 'Hello' })
+    const { dir: baseDir } = path.parse(filePath);
+
+    return fs
+      .mkdir(baseDir, { recursive: true }) // ...and create parent dirs as needed.
+      .then(() => fs.writeFile(filePath, args.content))
+      .then(() => {
+        return filePath;
+      });
   };
 
   /**
