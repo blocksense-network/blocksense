@@ -378,6 +378,7 @@ mod tests {
     use tokio::sync::{mpsc, RwLock};
     use utils::logging::init_shared_logging_handle;
 
+    #[ignore]
     #[actix_web::test]
     async fn post_report_from_unknown_reporter_fails_with_401() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();

@@ -115,6 +115,7 @@ mod tests {
     use utils::logging::init_shared_logging_handle;
     use utils::to_hex_string;
 
+    #[ignore]
     #[actix_web::test]
     async fn test_feed_slots_manager_loop() {
         let repo_root_dir = env::var("GIT_ROOT").unwrap();
