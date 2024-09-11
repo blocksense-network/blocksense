@@ -10,28 +10,8 @@ import { pagesDataFeedsFolder } from '@/src/constants';
 
 import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
 
-type DataFeedOverview = {
-  id: number;
-  name: string;
-  description: string;
-  decimals: number;
-  report_interval_ms: number;
-  script: string;
-};
-
 function generateOverviewMarkdownContent(feedsConfig: FeedsConfig): string {
-  const dataFeedsOverview: DataFeedOverview[] = feedsConfig.feeds.map(
-    (feed: Feed) => ({
-      id: feed.id,
-      name: feed.name,
-      description: feed.description,
-      decimals: feed.decimals,
-      report_interval_ms: feed.report_interval_ms,
-      script: feed.script,
-    }),
-  );
-
-  const dataFeedsOverviewString = stringifyObject(dataFeedsOverview);
+  const dataFeedsOverviewString = stringifyObject(feedsConfig);
 
   const content = `
 import { DataFeeds } from '@/components/DataFeeds/DataFeeds';

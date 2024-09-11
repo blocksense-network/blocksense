@@ -12,7 +12,7 @@
     "test": "yarn vitest -w false",
     "ts": "yarn node --import tsx",
     "generate-contracts-mdx": "yarn ts ./src/generate-contracts-mdx.ts && yarn prettier --write ./pages/docs/contracts --log-level silent",
-    "generate-data-feed-mdx": "yarn ts ./src/data-feeds/generate-data-feed-mdx.ts && yarn prettier --write ./pages/docs/data-feeds --log-level silent",
+    "generate-data-feed-mdx": "yarn ts ./src/generate-data-feed-mdx.ts && yarn prettier --write ./pages/docs/data-feeds --log-level silent",
     "watch:docs-theme": "nodemon -w ../../libs/docs-theme -e js,jsx,ts,tsx,css --exec 'yarn workspace @blocksense/docs-theme build'"
   },
   "types": "./src/index.ts",

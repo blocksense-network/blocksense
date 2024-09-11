@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { decodeFeedsConfig } from '@blocksense/data-feeds-config-generator';
+
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import {
   DataTable,
@@ -15,7 +17,7 @@ type ParametersProps = {
 };
 
 export const DataFeeds = ({ dataFeedsOverviewString }: ParametersProps) => {
-  const feeds = JSON.parse(dataFeedsOverviewString);
+  const { feeds } = decodeFeedsConfig(JSON.parse(dataFeedsOverviewString));
 
   const filters = React.useMemo(
     () => getFacetedFilters(['id', 'script'], feeds, dataFeedsColumnsTitles),

@@ -1,13 +1,13 @@
 import * as React from 'react';
+import Link from 'next/link';
 
 import { ColumnDef, Row } from '@tanstack/react-table';
 
 import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
-import Link from 'next/link';
 
 type DataFeed = {
-  id: string;
+  id: number;
   description: string;
   decimals: number;
   report_interval_ms: number;
