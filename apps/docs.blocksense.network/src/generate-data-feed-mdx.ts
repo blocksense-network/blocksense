@@ -44,15 +44,16 @@ async function generateDataFeedsOverviewFile(
 }
 
 function generateIndividualDataFeedPageContent(feed: Feed): string {
+  const dataFeedString = stringifyObject(feed);
+
   const content = `
-  # Data Feed: '${feed.description}' with ID: ${feed.id}
-  ### Decimals
-  ${feed.decimals}
-  ### Report Interval
-  ${feed.report_interval_ms}
-  ### Script
-  ${feed.script}
-  `;
+import { DataFeedDetails } from '@/components/DataFeeds/DataFeedDetails';
+
+<DataFeedDetails
+  feedJsonString={${dataFeedString}}
+/>
+`;
+
   return content;
 }
 
