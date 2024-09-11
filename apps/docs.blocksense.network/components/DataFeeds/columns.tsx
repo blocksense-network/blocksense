@@ -103,7 +103,7 @@ type DataFeedLinkProps = {
 
 const DataFeedLink = ({ row, placeholderId }: DataFeedLinkProps) => {
   return (
-    <Link href={`feed/0x${row.getValue('id')}`}>
+    <Link href={`feed/${row.getValue('id')}`}>
       {row.getValue(placeholderId)}
     </Link>
   );
