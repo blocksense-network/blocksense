@@ -38,7 +38,7 @@ type FileArgs = Omit<PathObject, 'dir' | `root`>;
  * `selectDirectory` is a function that creates a set of file system operations for a specific directory.
  * These operations include writing and reading both plain text and JSON files.
  *
- * @param {string} baseDir - The base directory for the file operations.
+ * @param {string} dir - The base directory for the file operations.
  *
  * @returns {Object} An object containing the following methods:
  *
@@ -56,17 +56,17 @@ type FileArgs = Omit<PathObject, 'dir' | `root`>;
  *
  * Each `args` object should omit the 'dir' property from the `PathObject` type, as the directory is already specified by `baseDir`.
  */
-export function selectDirectory(baseDir: string) {
+export function selectDirectory(dir: string) {
   // Check if the base directory exists
-  if (!existsSync(baseDir)) {
-    throw new Error(`The directory ${baseDir} does not exist.`);
+  if (!existsSync(dir)) {
+    throw new Error(`The directory ${dir} does not exist.`);
   }
 
-  return new SelectedDirectory(baseDir);
+  return new SelectedDirectory(dir);
 }
 
 class SelectedDirectory {
-  constructor(public readonly baseDir: string) {}
+  constructor(public readonly dir: string) {}
 
   /**
    * Writes content to a file at the specified directory.
@@ -80,7 +80,7 @@ class SelectedDirectory {
    * @returns A promise that resolves with the file path of the written file.
    */
   write = (args: FileArgs & { content: string }) => {
-    const filePath = path.format({ dir: this.baseDir, ...args });
+    const filePath = path.format({ dir: this.dir, ...args });
     return fs.writeFile(filePath, args.content).then(() => {
       return filePath;
     });
@@ -115,7 +115,7 @@ class SelectedDirectory {
    * @returns A promise that resolves with the file content as a string.
    */
   read = (args: FileArgs) =>
-    fs.readFile(path.format({ dir: this.baseDir, ...args }), 'utf8');
+    fs.readFile(path.format({ dir: this.dir, ...args }), 'utf8');
 
   /**
    * Reads a JSON object from a file at the specified directory.
@@ -136,7 +136,7 @@ class SelectedDirectory {
    * @returns A promise that resolves to an array of objects, each containing the base name of a JSON file and its data.
    */
   readAllJSONFiles = async () => {
-    const files = await fs.readdir(this.baseDir);
+    const files = await fs.readdir(this.dir);
     const jsonFiles = files.filter(file => file.endsWith('.json'));
     return Promise.all(
       jsonFiles.map(base =>
