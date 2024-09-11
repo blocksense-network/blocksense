@@ -88,4 +88,29 @@ describe('selectDirectory', async () => {
       `The directory non-existent-directory does not exist.`,
     );
   });
+
+  test('readAllJSONFiles should return an empty array when no files are present', async () => {
+    const { readAllJSONFiles } = selectDirectory(fsTestFolder);
+    expect(await readAllJSONFiles()).toEqual([]);
+  });
+
+  test('readAllJSONFiles should return an array of objects with file names and content', async () => {
+    const { writeJSON, readAllJSONFiles } = selectDirectory(fsTestFolder);
+    const files = [
+      { base: 'file1.json', content: { message: 'Hello, fs utils!' } },
+      { base: 'file2.json', content: { message: 'Goodbye, fs utils!' } },
+    ];
+
+    await Promise.all(files.map(file => writeJSON(file)));
+
+    const result = await readAllJSONFiles();
+    expect(result).toEqual(files);
+
+    expect(
+      JSON.parse(await fs.readFile(`${fsTestFolder}/file1.json`, 'utf8')),
+    ).toEqual(files[0].content);
+    expect(
+      JSON.parse(await fs.readFile(`${fsTestFolder}/file2.json`, 'utf8')),
+    ).toEqual(files[1].content);
+  });
 });

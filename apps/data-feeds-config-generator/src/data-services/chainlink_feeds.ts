@@ -8,8 +8,8 @@ export async function collectRawDataFeeds(directoryPath: string) {
 
   const rawDataFeeds: RawDataFeeds = {};
 
-  for (const { base, data } of await readAllJSONFiles()) {
-    const info = decodeChainLinkFeedsInfo(data);
+  for (const { base, content } of await readAllJSONFiles()) {
+    const info = decodeChainLinkFeedsInfo(content);
 
     for (const feed of info) {
       const feedName = feed.name;
