@@ -32,6 +32,8 @@ interface PathObject {
   name?: string | undefined;
 }
 
+type FileArgs = Omit<PathObject, 'dir' | `root`>;
+
 /**
  * `selectDirectory` is a function that creates a set of file system operations for a specific directory.
  * These operations include writing and reading both plain text and JSON files.
@@ -55,97 +57,102 @@ interface PathObject {
  * Each `args` object should omit the 'dir' property from the `PathObject` type, as the directory is already specified by `baseDir`.
  */
 export function selectDirectory(baseDir: string) {
-  type FileArgs = Omit<PathObject, 'dir' | `root`>;
-
   // Check if the base directory exists
   if (!existsSync(baseDir)) {
     throw new Error(`The directory ${baseDir} does not exist.`);
   }
 
-  return {
-    /**
-     * Writes content to a file at the specified directory.
-     *
-     * Params:
-     * - **args** - The arguments for specifying the file and content.
-     * - **args.base** -The file name including extension (if any) such as 'index.html'
-     * - **args.ext** - The file extension (if any) such as '.html'
-     * - **args.name** - The file name without extension (if any) such as 'index'
-     * - **args.content** - The content to be written to the file.
-     * @returns A promise that resolves with the file path of the written file.
-     */
-    write: (args: FileArgs & { content: string }) => {
-      const filePath = path.format({ dir: baseDir, ...args });
-      return fs.writeFile(filePath, args.content).then(() => {
+  return new SelectedDirectory(baseDir);
+}
+
+class SelectedDirectory {
+  constructor(public readonly baseDir: string) {}
+
+  /**
+   * Writes content to a file at the specified directory.
+   *
+   * Params:
+   * - **args** - The arguments for specifying the file and content.
+   * - **args.base** -The file name including extension (if any) such as 'index.html'
+   * - **args.ext** - The file extension (if any) such as '.html'
+   * - **args.name** - The file name without extension (if any) such as 'index'
+   * - **args.content** - The content to be written to the file.
+   * @returns A promise that resolves with the file path of the written file.
+   */
+  write = (args: FileArgs & { content: string }) => {
+    const filePath = path.format({ dir: this.baseDir, ...args });
+    return fs.writeFile(filePath, args.content).then(() => {
+      return filePath;
+    });
+  };
+
+  /**
+   * Writes a JSON object to a file at the specified directory.
+   *
+   * Params:
+   * - **args** - The arguments for specifying the file and content.
+   * - **args.base** - The file name including extension (if any) such as 'data.json'
+   * - **args.ext** - The file extension (if any) such as '.json'.  Defaults to '.json'.
+   * - **args.name** - The file name without extension (if any) such as 'data'
+   * - **args.content** - The JSON content to be written to the file.
+   * @returns A promise that resolves with the file path of the written file.
+   */
+  writeJSON = (args: FileArgs & { content: Record<string, unknown> }) => {
+    const filePath = path.format({ dir: this.baseDir, ext: '.json', ...args });
+    return fs
+      .writeFile(filePath, JSON.stringify(args.content, null, 2) + '\n')
+      .then(() => {
         return filePath;
       });
-    },
+  };
 
-    /**
-     * Writes a JSON object to a file at the specified directory.
-     *
-     * Params:
-     * - **args** - The arguments for specifying the file and content.
-     * - **args.base** - The file name including extension (if any) such as 'data.json'
-     * - **args.ext** - The file extension (if any) such as '.json'.  Defaults to '.json'.
-     * - **args.name** - The file name without extension (if any) such as 'data'
-     * - **args.content** - The JSON content to be written to the file.
-     * @returns A promise that resolves with the file path of the written file.
-     */
-    writeJSON: (args: FileArgs & { content: Record<string, unknown> }) => {
-      const filePath = path.format({ dir: baseDir, ext: '.json', ...args });
-      return fs
-        .writeFile(filePath, JSON.stringify(args.content, null, 2) + '\n')
-        .then(() => {
-          return filePath;
-        });
-    },
+  /**
+   * Reads content from a file at the specified directory.
+   *
+   * Params:
+   * - **args** - The arguments for specifying the file.
+   * - **args.base** - The file name including extension (if any) such as 'index.html'
+   * - **args.ext** - The file extension (if any) such as '.html'
+   * - **args.name** - The file name without extension (if any) such as 'index'
+   * @returns A promise that resolves with the file content as a string.
+   */
+  read = (args: FileArgs) =>
+    fs.readFile(path.format({ dir: this.baseDir, ...args }), 'utf8');
 
-    /**
-     * Reads content from a file at the specified directory.
-     *
-     * Params:
-     * - **args** - The arguments for specifying the file.
-     * - **args.base** - The file name including extension (if any) such as 'index.html'
-     * - **args.ext** - The file extension (if any) such as '.html'
-     * - **args.name** - The file name without extension (if any) such as 'index'
-     * @returns A promise that resolves with the file content as a string.
-     */
-    read: (args: FileArgs) =>
-      fs.readFile(path.format({ dir: baseDir, ...args }), 'utf8'),
+  /**
+   * Reads a JSON object from a file at the specified directory.
+   *
+   * Params:
+   * - **args** - The arguments for specifying the file.
+   * - **args.base** - The file name including extension (if any) such as 'data.json'
+   * - **args.ext** - The file extension (if any) such as '.json'. Defaults to '.json'.
+   * - **args.name** - The file name without extension (if any) such as 'data'
+   * @returns A promise that resolves with the parsed JSON object.
+   */
+  readJSON = (args: FileArgs) =>
+    fs
+      .readFile(
+        path.format({ dir: this.baseDir, ext: '.json', ...args }),
+        'utf8',
+      )
+      .then(JSON.parse);
 
-    /**
-     * Reads a JSON object from a file at the specified directory.
-     *
-     * Params:
-     * - **args** - The arguments for specifying the file.
-     * - **args.base** - The file name including extension (if any) such as 'data.json'
-     * - **args.ext** - The file extension (if any) such as '.json'. Defaults to '.json'.
-     * - **args.name** - The file name without extension (if any) such as 'data'
-     * @returns A promise that resolves with the parsed JSON object.
-     */
-    readJSON: (args: FileArgs) =>
-      fs
-        .readFile(path.format({ dir: baseDir, ext: '.json', ...args }), 'utf8')
-        .then(JSON.parse),
-
-    /**
-     * Reads all JSON files in a directory and returns their data.
-     *
-     * @returns A promise that resolves to an array of objects, each containing the base name of a JSON file and its data.
-     */
-    readAllJSONFiles: async () => {
-      const files = await fs.readdir(baseDir);
-      const jsonFiles = files.filter(file => file.endsWith('.json'));
-      const jsonFilesData = await Promise.all(
-        jsonFiles.map(async file => {
-          const filePath = path.join(baseDir, file);
-          const { base } = path.parse(filePath);
-          const fileData = await fs.readFile(filePath, 'utf8');
-          return { base, data: JSON.parse(fileData) };
-        }),
-      );
-      return jsonFilesData;
-    },
+  /**
+   * Reads all JSON files in a directory and returns their data.
+   *
+   * @returns A promise that resolves to an array of objects, each containing the base name of a JSON file and its data.
+   */
+  readAllJSONFiles = async () => {
+    const files = await fs.readdir(this.baseDir);
+    const jsonFiles = files.filter(file => file.endsWith('.json'));
+    const jsonFilesData = await Promise.all(
+      jsonFiles.map(async file => {
+        const filePath = path.join(this.baseDir, file);
+        const { base } = path.parse(filePath);
+        const fileData = await fs.readFile(filePath, 'utf8');
+        return { base, data: JSON.parse(fileData) };
+      }),
+    );
+    return jsonFilesData;
   };
 }
