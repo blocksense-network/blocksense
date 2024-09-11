@@ -97,14 +97,12 @@ class SelectedDirectory {
    * - **args.content** - The JSON content to be written to the file.
    * @returns A promise that resolves with the file path of the written file.
    */
-  writeJSON = (args: FileArgs & { content: Record<string, unknown> }) => {
-    const filePath = path.format({ dir: this.baseDir, ext: '.json', ...args });
-    return fs
-      .writeFile(filePath, JSON.stringify(args.content, null, 2) + '\n')
-      .then(() => {
-        return filePath;
-      });
-  };
+  writeJSON = (args: FileArgs & { content: Record<string, unknown> }) =>
+    this.write({
+      ext: '.json',
+      ...args,
+      content: JSON.stringify(args.content, null, 2) + '\n',
+    });
 
   /**
    * Reads content from a file at the specified directory.
@@ -130,12 +128,7 @@ class SelectedDirectory {
    * @returns A promise that resolves with the parsed JSON object.
    */
   readJSON = (args: FileArgs) =>
-    fs
-      .readFile(
-        path.format({ dir: this.baseDir, ext: '.json', ...args }),
-        'utf8',
-      )
-      .then(JSON.parse);
+    this.read({ ext: '.json', ...args }).then(JSON.parse);
 
   /**
    * Reads all JSON files in a directory and returns their data.
@@ -145,14 +138,10 @@ class SelectedDirectory {
   readAllJSONFiles = async () => {
     const files = await fs.readdir(this.baseDir);
     const jsonFiles = files.filter(file => file.endsWith('.json'));
-    const jsonFilesData = await Promise.all(
-      jsonFiles.map(async file => {
-        const filePath = path.join(this.baseDir, file);
-        const { base } = path.parse(filePath);
-        const fileData = await fs.readFile(filePath, 'utf8');
-        return { base, data: JSON.parse(fileData) };
-      }),
+    return Promise.all(
+      jsonFiles.map(base =>
+        this.readJSON({ base }).then(content => ({ base, content })),
+      ),
     );
-    return jsonFilesData;
   };
 }
