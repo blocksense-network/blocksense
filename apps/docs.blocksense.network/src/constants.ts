@@ -7,9 +7,14 @@ export const docsBlocksenseNetworkRoot = path.join(
   '/apps/docs.blocksense.network/',
 );
 
-export const pagesContractRefDocFolder = path.join(
+export const pagesContractsFolder = path.join(
   docsBlocksenseNetworkRoot,
-  'pages/docs/contracts/reference-documentation/',
+  'pages/docs/contracts/',
+);
+
+export const pagesContractRefDocFolder = path.join(
+  pagesContractsFolder,
+  'reference-documentation/',
 );
 
 export const pagesDataFeedsFolder = path.join(

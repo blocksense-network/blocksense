@@ -4,5 +4,5 @@
   "reference-documentation": "Reference documentation",
   "commands": "Dev Setup and Commands",
   "supported-networks": "Supported Networks",
-  "supported-contracts": "Supported Contracts"
+  "deployed-contracts": "Deployed Contracts"
 }
