@@ -4,11 +4,6 @@ contract HistoricDataFeedStore {
 
     // Transmission's value which is 24 bytes.
     global TRANSMISSION_VALUE_BYTES_LEN = 24;
-    /**
-     * Timestamp is 8 bytes but its value is
-     * serialized as one field element, thus
-     * Transmission's value + timestamp value.
-     */
     global MAX_FEEDS_NUMBER: u16 = 2;
     global MAX_FEEDS_BYTES_LEN = MAX_FEEDS_NUMBER * TRANSMISSION_VALUE_BYTES_LEN;
 
@@ -19,9 +14,9 @@ contract HistoricDataFeedStore {
         timestamp: Field
     }
 
-    impl Serialize<2> for Transmission {
-        fn serialize(self) -> [Field; 2] {
-            let mut output = [0 as Field; 2];
+    impl Serialize<MAX_FEEDS_NUMBER> for Transmission {
+        fn serialize(self) -> [Field; MAX_FEEDS_NUMBER] {
+            let mut output = [0 as Field; MAX_FEEDS_NUMBER];
             let mut bytes_value: Field = 0;
             let mut mul: Field = 1;
 
@@ -38,8 +33,8 @@ contract HistoricDataFeedStore {
         }
     }
 
-    impl Deserialize<2> for Transmission {
-        fn deserialize(input: [Field; 2]) -> Self {
+    impl Deserialize<MAX_FEEDS_NUMBER> for Transmission {
+        fn deserialize(input: [Field; MAX_FEEDS_NUMBER]) -> Self {
             let mut value: [u8; 24] = [0; 24];
 
             let part_value = input[0].to_be_bytes(24);
@@ -75,12 +70,12 @@ contract HistoricDataFeedStore {
      * @note Using `current_transmission_value` as a portion
      * of the whole `input_values` array.
      *
-     * @param keys The keys of each data feed, capped at 7
-     * @param input_values The values of the data feed, 32 bytes each, thus 32 * 7 bytes
+     * @param keys The keys of each data feed, capped at MAX_FEEDS_NUMBER
+     * @param input_values The values of the data feed, 24 bytes each, thus 24 * MAX_FEEDS_NUMBER bytes
      */
     #[aztec(public)]
     fn set_feeds(keys: [Field; MAX_FEEDS_NUMBER], input_values: [u8; MAX_FEEDS_BYTES_LEN], length: u64) {
-        // assert(storage.owner.read().eq(context.msg_sender()), "You are not the owner!");
+        assert(storage.owner.read().eq(context.msg_sender()), "You are not the owner!");
 
         for i in 0..length {
             let mut counter = storage.counters.at(keys[i]).read() as u16;
