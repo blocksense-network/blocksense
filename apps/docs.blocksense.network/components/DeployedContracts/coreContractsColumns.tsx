@@ -3,15 +3,15 @@ import Link from 'next/link';
 
 import { ColumnDef, Row } from '@tanstack/react-table';
 
-import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
-import { CoreContract } from '@/src/deployed-contracts/types';
-
-import { Badge } from '../ui/badge';
 import {
   EthereumAddress,
   explorerAddressUrls,
   NetworkName,
 } from '@blocksense/base-utils/evm-utils';
+
+import { CoreContract } from '@/src/deployed-contracts/types';
+import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
+import { Badge } from '@/components/ui/badge';
 
 export const contractsColumnsTitles = {
   network: 'Network',
@@ -39,6 +39,7 @@ export const columns: ColumnDef<CoreContract>[] = [
         type={'string'}
       />
     ),
+    cell: ({ row }) => <code>{row.original.address}</code>,
   },
   {
     accessorKey: 'network',
@@ -49,7 +50,7 @@ export const columns: ColumnDef<CoreContract>[] = [
         type={'string'}
       />
     ),
-    cell: ({ row }) => <NetworksWithLinks row={row} />,
+    cell: ({ row }) => <NetworkAddressExplorerLink row={row} />,
   },
 ];
 
@@ -57,7 +58,7 @@ type RowWrapper = {
   row: Row<CoreContract>;
 };
 
-const NetworksWithLinks = ({ row }: RowWrapper) => {
+const NetworkAddressExplorerLink = ({ row }: RowWrapper) => {
   const address = row.original.address;
   return (
     <div>
@@ -65,7 +66,7 @@ const NetworksWithLinks = ({ row }: RowWrapper) => {
         <Badge
           key={network}
           variant="outline"
-          className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium m-1"
+          className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium"
         >
           <Link href={explorerAddressUrls[network](address as EthereumAddress)}>
             {network}

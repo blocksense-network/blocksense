@@ -1,15 +1,16 @@
 import { selectDirectory } from '@blocksense/base-utils';
 
+import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
+import { decodeFeedsConfig } from '@blocksense/config-types';
+
 import { pagesContractsFolder } from '@/src/constants';
 import { stringifyObject } from '@/src/utils';
 import { updateMetaJsonFile } from '@/src/utils-fs';
-import SUPPORTED_NETWORKS from '@/src/_mock/supported-networks-mock.json';
 import { decodeSupportedNetworks, SupportedNetworks } from '@/src/_mock/types';
-import { CoreContract } from './types';
+import SUPPORTED_NETWORKS from '@/src/_mock/supported-networks-mock.json';
+import { CoreContract, ProxyContractData } from './types';
 
-function generateDeployedContractsContent(
-  networksData: SupportedNetworks,
-): string {
+function getCoreContractsData(networksData: SupportedNetworks) {
   const parsedCoreContracts: CoreContract[] = [];
 
   Object.entries(networksData).forEach(([_, networkData]) => {
@@ -32,13 +33,45 @@ function generateDeployedContractsContent(
       }
     });
   });
+  return parsedCoreContracts;
+}
+
+function getProxyContractsContent(networksData: SupportedNetworks) {
+  const { feeds: dataFeeds } = decodeFeedsConfig(DATA_FEEDS);
+
+  const supportedNetworks: ProxyContractData[] = Object.entries(networksData)
+    .map(([_, network]) => {
+      const { name, contracts } = network;
+      const { ChainlinkProxy } = contracts;
+
+      return ChainlinkProxy.map(proxy => {
+        return {
+          ...proxy,
+          id: dataFeeds.find(feed => feed.description === proxy.description)
+            ?.id,
+          network: name,
+        };
+      });
+    })
+    .flat();
+  return supportedNetworks;
+}
+
+function generateDeployedContractsContent(
+  networksData: SupportedNetworks,
+): string {
+  const parsedCoreContracts = getCoreContractsData(networksData);
+  const parsedProxyContracts = getProxyContractsContent(networksData);
 
   const deployedCoreContractsString = stringifyObject(parsedCoreContracts);
+  const deployedProxyContractsString = stringifyObject(parsedProxyContracts);
 
   const content = `
 import { DeployedContracts } from '@/components/DeployedContracts/DeployedContracts';
 
-<DeployedContracts deployedCoreContractsString={${deployedCoreContractsString}}/>
+<DeployedContracts
+  deployedCoreContractsString={${deployedCoreContractsString}}
+  deployedProxyContractsString={${deployedProxyContractsString}}/>
 `;
   return content;
 }
