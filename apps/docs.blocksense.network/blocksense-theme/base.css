@@ -9,6 +9,10 @@
   border: none;
 }
 
+*:focus {
+  outline: none;
+}
+
 main {
   margin-top: 20px;
 }
@@ -273,5 +277,13 @@ main {
     .next-error-h1 {
       border-right: 1px solid #71717a !important;
     }
+  }
+  .overview__list a {
+    color: initial;
+    text-decoration: none;
+  }
+
+  .scroll-area .signature__code {
+    @apply p-1;
   }
 }

@@ -74,7 +74,9 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
             <DialogDescription />
           </DialogHeader>
           <ScrollArea>
-            <CodeBlock code={getABI()} lang="json" theme="github-light" />
+            <aside className="scroll-area">
+              <CodeBlock code={getABI()} lang="json" theme="github-light" />
+            </aside>
           </ScrollArea>
         </DialogContent>
       </Dialog>

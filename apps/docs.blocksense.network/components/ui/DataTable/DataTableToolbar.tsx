@@ -40,7 +40,7 @@ export function DataTableToolbar<TData>({
               onChange={event =>
                 table.getColumn(filterCell)?.setFilterValue(event.target.value)
               }
-              className={`h-8 w-full lg:w-[250px] mr-1 lg:mr-2 border-solid border-slate-200 transition-all duration-200`}
+              className={`h-8 w-full min-w-[250px] lg:w-[250px] mr-1 lg:mr-2 border-solid border-slate-200 transition-all duration-200`}
               type="search"
             />
           )}
