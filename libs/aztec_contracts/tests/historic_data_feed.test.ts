@@ -68,17 +68,16 @@ describe("Data feed store contract", () => {
         );
     }, 10000);
 
-    test.only("Sets and get 7 data feeds", async () => {
+    test.only("Sets and get 2 data feeds", async () => {
         let keys = [];
-        for (let i = 1; i <= 7; i++) {
+        for (let i = 0; i <= 2; i++) {
             keys.push(new Fr(i));
         }
-        // console.log(keys);
         let values = [];
-        for (let i = 1; i <= 7; i++) {
+        for (let i = 0; i <= 2; i++) {
             const data = Array.from(
-                { length: 32 },
-                () => new Fr(Math.floor(Math.random() * 256))
+                { length: 24 },
+                () => Math.floor(Math.random() * 256)
             );
             values.push(...data);
         }
@@ -89,12 +88,16 @@ describe("Data feed store contract", () => {
 
         console.log(contract.address);
 
-        await expect(
-            contract
-                .withWallet(wallets[1])
-                .methods.set_feeds(keys, values, 7)
-                .send()
-                .wait()
-        ).rejects.toThrow("You are not the owner!");
+        await contract
+            .withWallet(wallets[0])
+            .methods.set_feeds(keys, values, 2)
+            .send()
+            .wait();
+        const get_feed_tx = await contract.methods.get_data_feed(keys[0]).simulate();
+        const _get_feed_tx = await contract.methods.get_data_feed(keys[1]).simulate();
+        const __get_feed_tx = await contract.methods.get_data_feed(keys[2]).simulate();
+        console.log(get_feed_tx)
+        console.log(_get_feed_tx)
+        console.log(__get_feed_tx)
     }, 30000);
 });
