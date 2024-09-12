@@ -3,7 +3,7 @@
   "batch_size": 5,
   "sequencer_url": "https://postman-echo.com",
   "prometheus_url": "127.0.0.1:8080",
-  "poll_period_ms": 5000,
+  "poll_period_ms": 300000,
   "resources": {
     "SECRET_KEY_PATH": "./apps/reporter/reporter_secret_key",
     "CMC_API_KEY_PATH": "./apps/reporter/CMC_API_KEY",

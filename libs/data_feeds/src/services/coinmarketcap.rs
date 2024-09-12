@@ -45,7 +45,6 @@ fn get_cmc_json_price(cmc_response: Value, asset: &str) -> Option<f64> {
     let price = cmc_response
         .get("data")
         .and_then(|data| data.get(asset))
-        .and_then(|asset_arr| asset_arr.get(0))
         .and_then(|first_asset| first_asset.get("quote"))
         .and_then(|quote| quote.get("USD"))
         .and_then(|usd| usd.get("price"))
@@ -80,7 +79,7 @@ impl DataFeed for CoinMarketCapDataFeed {
     fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
 
-        let params = [("symbol", asset)];
+        let params = [("id", asset)];
 
         let headers = {
             let mut headers = reqwest::header::HeaderMap::new();
@@ -132,7 +131,7 @@ impl DataFeed for CoinMarketCapDataFeed {
             .filter_map(|(resources, feed_id)| {
                 Some((
                     resources
-                        .get("cmc_quote")
+                        .get("cmc_id")
                         .expect("[CMC] Missing Resource!")
                         .clone(),
                     *feed_id,
@@ -142,7 +141,7 @@ impl DataFeed for CoinMarketCapDataFeed {
 
         let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
 
-        let params = [("symbol", assets.join(","))];
+        let params = [("id", assets.join(","))];
 
         debug!("{:?}", params);
 

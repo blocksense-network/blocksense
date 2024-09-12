@@ -1,11 +1,11 @@
 use hex::decode;
-use serde::{Deserialize, Deserializer, Serialize};
-use serde_json::Value;
+use serde::{de, Deserialize, Deserializer, Serialize};
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::Write;
 use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
+use tracing::trace;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AssetPair {
@@ -23,26 +23,36 @@ pub trait Validated {
     fn validate(&self, context: &str) -> anyhow::Result<()>;
 }
 
-/// Custom deserializator for the `resources` object in the FeedsConfig. Skips all non-string items for now
-/// such as `cmc_id`, which are currently not used
-fn deserialize_resources<'de, D>(deserializer: D) -> Result<HashMap<String, String>, D::Error>
+/// Custom deserializator for the `resources` object in the FeedsConfig. Skips all non-string parsable items
+fn deserialize_resources_as_string<'de, D>(
+    deserializer: D,
+) -> Result<HashMap<String, String>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let value = Value::deserialize(deserializer)?;
-    let mut map = HashMap::new();
+    let raw_map: HashMap<String, serde_json::Value> = HashMap::deserialize(deserializer)?;
 
-    if let Value::Object(obj) = value {
-        for (key, val) in obj {
-            let val_str = match val {
-                Value::String(s) => s,
-                _ => continue, // Skip other types
-            };
-            map.insert(key, val_str);
-        }
+    let mut string_map: HashMap<String, String> = HashMap::new();
+
+    for (key, value) in raw_map {
+        // Convert each value to a String, regardless of its original type
+        let value_as_string = match value {
+            serde_json::Value::String(s) => s,
+            serde_json::Value::Number(n) => n.to_string(),
+            serde_json::Value::Bool(b) => b.to_string(),
+            _ => {
+                return Err(de::Error::custom(
+                    "Expected string, number, or boolean for value",
+                ))
+            }
+        };
+
+        string_map.insert(key, value_as_string);
     }
 
-    Ok(map)
+    trace!("[FeedConfig] Resources: \n{:?}", string_map);
+
+    Ok(string_map)
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -58,7 +68,7 @@ pub struct FeedConfig {
     pub pair: AssetPair,
     pub report_interval_ms: u64,
     pub first_report_start_time: SystemTime,
-    #[serde(deserialize_with = "deserialize_resources")]
+    #[serde(deserialize_with = "deserialize_resources_as_string")]
     pub resources: HashMap<String, String>, // TODO(snikolov): Find best way to handle various types of resource data
     pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
     pub script: String,
