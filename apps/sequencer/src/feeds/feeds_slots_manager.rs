@@ -113,20 +113,24 @@ mod tests {
         RwLock,
     };
     use utils::logging::init_shared_logging_handle;
-    use utils::to_hex_string;
+    use utils::{get_config_file_path, to_hex_string};
 
-    #[ignore]
     #[actix_web::test]
     async fn test_feed_slots_manager_loop() {
-        let repo_root_dir = env::var("GIT_ROOT").unwrap();
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let config_dir_path = PathBuf::new().join(repo_root_dir).join("config");
         let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
-        env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
-        env::set_var("FEEDS_CONFIG_DIR", config_dir_path);
+        let sequencer_config_file = tests_dir_path
+            .to_str()
+            .expect("sequencer test dir path error!")
+            .to_string()
+            + "/sequencer_config.json";
+
         let log_handle = init_shared_logging_handle();
-        let sequencer_config = init_sequencer_config().expect("Failed to load config:");
-        let mut feeds_config = init_feeds_config().expect("Failed to get config: ");
+        let sequencer_config =
+            init_sequencer_config(sequencer_config_file.as_str()).expect("Failed to load config:");
+        let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
+        let mut feeds_config =
+            init_feeds_config(feeds_config_file.as_str()).expect("Failed to get config: ");
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
         let metrics_prefix = Some("test_feed_slots_manager_loop_");

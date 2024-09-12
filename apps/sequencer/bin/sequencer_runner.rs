@@ -26,6 +26,7 @@ use sequencer_config::SequencerConfig;
 use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
+use utils::get_config_file_path;
 
 use utils::build_info::{
     BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
@@ -115,6 +116,15 @@ pub async fn prepare_http_servers(
     (main_http_server_fut, admin_http_server_fut)
 }
 
+fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
+    let sequencer_config_file =
+        get_config_file_path("SEQUENCER_CONFIG_DIR", "/sequencer_config.json");
+    let sequencer_config = get_validated_sequencer_config(sequencer_config_file.as_str());
+    let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
+    let feeds_config = get_validated_feeds_config(feeds_config_file.as_str());
+    (sequencer_config, feeds_config)
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let mut start_metrics_server = true;
@@ -149,8 +159,8 @@ async fn main() -> std::io::Result<()> {
                 println!("optimizations => {VERGEN_CARGO_OPT_LEVEL}");
                 println!("compiler => {VERGEN_RUSTC_SEMVER}");
 
-                let _sequencer_config = get_validated_sequencer_config();
-                let _feeds_config = get_validated_feeds_config();
+                get_sequencer_and_feed_configs();
+
                 return std::io::Result::Ok(());
             }
             "--help" => {
@@ -176,8 +186,7 @@ async fn main() -> std::io::Result<()> {
     }
     init_shared_logging_handle();
 
-    let sequencer_config = get_validated_sequencer_config();
-    let feeds_config = get_validated_feeds_config();
+    let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
     let (voting_receive_channel, app_state): (
         UnboundedReceiver<(String, String)>,

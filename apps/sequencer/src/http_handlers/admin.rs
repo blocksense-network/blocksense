@@ -225,16 +225,25 @@ mod tests {
     use std::sync::Arc;
     use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
     use tokio::sync::{mpsc, RwLock};
+    use utils::get_config_file_path;
     use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
     async fn test_get_feed_report_interval() {
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
-        env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
+        let sequencer_config_file = tests_dir_path
+            .to_str()
+            .expect("test dir path error!")
+            .to_string()
+            + "/sequencer_config.json";
+
         let log_handle = init_shared_logging_handle();
-        let sequencer_config = init_sequencer_config().expect("Failed to load config:");
-        let feeds_config = init_feeds_config().expect("Failed to get config: ");
+        let sequencer_config =
+            init_sequencer_config(sequencer_config_file.as_str()).expect("Failed to load config:");
+        let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
+        let feeds_config =
+            init_feeds_config(feeds_config_file.as_str()).expect("Failed to get config: ");
         let metrics_prefix = Some("test_get_feed_report_interval_");
 
         let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
@@ -285,7 +294,8 @@ mod tests {
         anvil_endpoint: &str,
     ) -> web::Data<FeedsState> {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
-        let feeds_config = init_feeds_config().expect("Failed to get config: ");
+        let config_file = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
+        let feeds_config = init_feeds_config(config_file.as_str()).expect("Failed to get config: ");
         let metrics_prefix = Some("create_app_state_from_sequencer_config_");
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;

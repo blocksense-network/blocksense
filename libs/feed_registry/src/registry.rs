@@ -6,31 +6,25 @@ use std::{
 
 use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
-use sequencer_config::{get_config_file_path, FeedConfig, Validated};
+use sequencer_config::{FeedConfig, Validated};
 use serde::Deserialize;
 use tokio::{sync::RwLock, time};
 use tracing::{info, trace};
 use utils::{read_file, time::current_unix_time};
 
-pub fn init_feeds_config() -> anyhow::Result<AllFeedsConfig> {
-    let config_file_path = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
+pub fn init_feeds_config(config_file: &str) -> anyhow::Result<AllFeedsConfig> {
+    let data = read_file(config_file);
 
-    let data = read_file(config_file_path.as_str());
-
-    info!("Using config file: {}", config_file_path.as_str());
+    info!("Using config file: {}", config_file);
 
     match serde_json::from_str::<AllFeedsConfig>(data.as_str()) {
         Ok(c) => Ok(c),
-        Err(e) => anyhow::bail!(
-            "Config file ({}) is not valid JSON! {}",
-            config_file_path.as_str(),
-            e
-        ),
+        Err(e) => anyhow::bail!("Config file ({}) is not valid JSON! {}", config_file, e),
     }
 }
 
-pub fn get_validated_feeds_config() -> AllFeedsConfig {
-    let feeds_config = init_feeds_config().expect("Failed to get config: ");
+pub fn get_validated_feeds_config(config_file: &str) -> AllFeedsConfig {
+    let feeds_config = init_feeds_config(config_file).expect("Failed to get config: ");
 
     feeds_config
         .validate("FeedsConfig")

@@ -10603,6 +10603,7 @@ name = "utils"
 version = "0.1.1"
 dependencies = [
  "console-subscriber",
+ "dirs 5.0.1",
  "hex",
  "once_cell",
  "tokio 1.40.0",

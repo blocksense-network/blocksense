@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use std::fs::File;
 use std::io::Write;
 use std::time::SystemTime;
-use std::{collections::HashMap, env, fmt::Debug};
+use std::{collections::HashMap, fmt::Debug};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AssetPair {
@@ -147,18 +147,6 @@ impl Validated for SequencerConfig {
 
         Ok(())
     }
-}
-
-pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) -> String {
-    let config_file_path = env::var(base_path_from_env).unwrap_or_else(|_| {
-        let conf_dir = dirs::config_dir().expect("Configuration file path not specified.");
-        let conf_dir = conf_dir.join("blocksense");
-        conf_dir
-            .to_str()
-            .expect("Configuration file path not valid.")
-            .to_string()
-    });
-    config_file_path + config_file_name
 }
 
 pub fn get_test_config_with_single_provider(

@@ -7,6 +7,7 @@ use utils::build_info::{
 };
 
 use feed_registry::registry::get_validated_feeds_config;
+use utils::get_config_file_path;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -28,8 +29,10 @@ async fn main() -> std::io::Result<()> {
                 println!("optimizations => {VERGEN_CARGO_OPT_LEVEL}");
                 println!("compiler => {VERGEN_RUSTC_SEMVER}");
 
+                let feeds_config_file =
+                    get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
                 let _reporter_config = get_validated_reporter_config();
-                let _feeds_config = get_validated_feeds_config();
+                let _feeds_config = get_validated_feeds_config(feeds_config_file.as_str());
 
                 return std::io::Result::Ok(());
             }

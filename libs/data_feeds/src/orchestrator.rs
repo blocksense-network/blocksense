@@ -10,8 +10,9 @@ use prometheus::{
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-use sequencer_config::{get_config_file_path, ReporterConfig, Validated};
+use sequencer_config::{ReporterConfig, Validated};
 use tokio::sync::{mpsc, Mutex};
+use utils::get_config_file_path;
 use utils::read_file;
 
 use tracing::{debug, info};
@@ -91,7 +92,9 @@ pub async fn orchestrator() {
 
     let reporter_config = init_reporter_config().expect("Config file is not valid JSON!");
 
-    let feeds_registry = init_feeds_config().expect("Failed to get config: ");
+    let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
+    let feeds_registry =
+        init_feeds_config(feeds_config_file.as_str()).expect("Failed to get config: ");
 
     let mut connection_cache = HashMap::<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>::new();
 

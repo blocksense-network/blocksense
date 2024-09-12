@@ -1,27 +1,21 @@
 use eyre::Result;
-use sequencer_config::{get_config_file_path, SequencerConfig, Validated};
+use sequencer_config::{SequencerConfig, Validated};
 use tracing::info;
 use utils::read_file;
 
-pub fn init_sequencer_config() -> Result<SequencerConfig> {
-    let config_file_path = get_config_file_path("SEQUENCER_CONFIG_DIR", "/sequencer_config.json");
+pub fn init_sequencer_config(config_file: &str) -> Result<SequencerConfig> {
+    let data = read_file(config_file);
 
-    let data = read_file(config_file_path.as_str());
-
-    info!("Using config file: {}", config_file_path.as_str());
+    info!("Using config file: {}", config_file);
 
     match serde_json::from_str::<SequencerConfig>(data.as_str()) {
         Ok(c) => Ok(c),
-        Err(e) => eyre::bail!(
-            "Config file ({}) is not valid JSON! {}",
-            config_file_path.as_str(),
-            e
-        ),
+        Err(e) => eyre::bail!("Config file ({}) is not valid JSON! {}", config_file, e),
     }
 }
 
-pub fn get_validated_sequencer_config() -> SequencerConfig {
-    let sequencer_config = init_sequencer_config().expect("Failed to get config: ");
+pub fn get_validated_sequencer_config(config_file: &str) -> SequencerConfig {
+    let sequencer_config = init_sequencer_config(config_file).expect("Failed to get config: ");
 
     sequencer_config
         .validate("SequencerConfig")
@@ -32,6 +26,8 @@ pub fn get_validated_sequencer_config() -> SequencerConfig {
 
 #[cfg(test)]
 mod tests {
+    use utils::get_config_file_path;
+
     use super::*;
     use std::env;
     use std::fs;
@@ -56,7 +52,6 @@ mod tests {
         )
         .expect("Unable to write sequencer config file");
 
-        env::set_var("SEQUENCER_CONFIG_DIR", "/tmp");
-        let _ = std::panic::catch_unwind(|| get_validated_sequencer_config());
+        let _ = std::panic::catch_unwind(|| get_validated_sequencer_config("/tmp"));
     }
 }

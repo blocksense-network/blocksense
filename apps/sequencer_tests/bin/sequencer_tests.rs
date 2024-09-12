@@ -9,7 +9,7 @@ use eyre::Result;
 use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use json_patch::merge;
 use port_scanner::scan_port;
-use sequencer_config::{get_config_file_path, SequencerConfig};
+use sequencer_config::SequencerConfig;
 use serde_json::json;
 use std::fs;
 use std::io::stdout;
@@ -19,6 +19,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs::File, io::Write};
 use tokio::time;
 use tokio::time::Duration;
+use utils::get_config_file_path;
 use utils::read_file;
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
