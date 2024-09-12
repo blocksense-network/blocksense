@@ -16,8 +16,9 @@ import {
   chainIdToNetworkName,
   explorerUrls,
   networkNameToChainId,
+  explorerAddressUrls,
 } from './networks';
-import { parseTxHash } from './hex-types';
+import { parseEthereumAddress, parseTxHash } from './hex-types';
 
 describe('Network constants tests', () => {
   test(`'isNetworkName' should return true for valid network names`, () => {
@@ -152,6 +153,57 @@ describe('Network constants tests', () => {
     );
     expect(explorerUrls.hekla(txHash)).toBe(
       `https://hekla.taikoscan.io/tx/${txHash}`,
+    );
+  });
+
+  test(`'explorerAddressUrls' should return the correct explorer URL for supported network`, () => {
+    const address = parseEthereumAddress(
+      '0x74c1e4b8cae59269ec1d85d3d4f324396048f4ac',
+    );
+    expect(explorerAddressUrls.mainnet(address)).toBe(
+      `https://etherscan.io/address/${address}`,
+    );
+    expect(explorerAddressUrls.sepolia(address)).toBe(
+      `https://sepolia.etherscan.io/address/${address}`,
+    );
+    expect(explorerAddressUrls.holesky(address)).toBe(
+      `https://holesky.etherscan.io/address/${address}`,
+    );
+    expect(explorerAddressUrls.amoy(address)).toBe(
+      `https://amoy.polygonscan.com/address/${address}`,
+    );
+    expect(explorerAddressUrls.manta(address)).toBe(
+      `https://pacific-explorer.sepolia-testnet.manta.network/address/${address}`,
+    );
+    expect(explorerAddressUrls.fuji(address)).toBe(
+      `https://testnet.snowtrace.io/address/${address}`,
+    );
+    expect(explorerAddressUrls.chiado(address)).toBe(
+      `https://gnosis-chiado.blockscout.com/address/${address}`,
+    );
+    expect(explorerAddressUrls.opSepolia(address)).toBe(
+      `https://sepolia-optimism.etherscan.io/address/${address}`,
+    );
+    expect(explorerAddressUrls.zkSyncSepolia(address)).toBe(
+      `https://sepolia.explorer.zksync.io/address/${address}`,
+    );
+    expect(explorerAddressUrls.baseSepolia(address)).toBe(
+      `https://sepolia.basescan.org/address/${address}`,
+    );
+    expect(explorerAddressUrls.specular(address)).toBe(
+      `https://explorer.specular.network/address/${address}`,
+    );
+    expect(explorerAddressUrls.scrollSepolia(address)).toBe(
+      `https://sepolia.scrollscan.com/address/${address}`,
+    );
+    expect(explorerAddressUrls.arbSepolia(address)).toBe(
+      `https://sepolia.arbiscan.io/address/${address}`,
+    );
+    expect(explorerAddressUrls.artio(address)).toBe(
+      `https://artio.beratrail.io/address/${address}`,
+    );
+    expect(explorerAddressUrls.hekla(address)).toBe(
+      `https://hekla.taikoscan.io/address/${address}`,
     );
   });
 });

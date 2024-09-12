@@ -7,7 +7,7 @@
 
 import * as S from '@effect/schema/Schema';
 import { InverseOf } from '../type-level';
-import { TxHash } from './hex-types';
+import { EthereumAddress, TxHash } from './hex-types';
 
 const networks = [
   'mainnet',
@@ -113,7 +113,7 @@ export const chainIdToNetworkName = {
 } satisfies InverseOf<typeof networkNameToChainId>;
 
 /**
- * Mapping of network names to explorer URL.
+ * Mapping of network names to explorer URL for transactions.
  * The URL generator function takes a transaction hash as input and returns the corresponding explorer URL.
  */
 export const explorerUrls = {
@@ -135,4 +135,31 @@ export const explorerUrls = {
   hekla: txHash => `https://hekla.taikoscan.io/tx/${txHash}`,
 } satisfies {
   [network in NetworkName]: (tx: TxHash) => string;
+};
+
+/**
+ * Mapping of network names to explorer URL for smart contracts.
+ * The URL generator function takes a smart contact address as input and returns the corresponding explorer URL.
+ */
+export const explorerAddressUrls = {
+  mainnet: address => `https://etherscan.io/address/${address}`,
+  sepolia: address => `https://sepolia.etherscan.io/address/${address}`,
+  holesky: address => `https://holesky.etherscan.io/address/${address}`,
+  amoy: address => `https://amoy.polygonscan.com/address/${address}`,
+  manta: address =>
+    `https://pacific-explorer.sepolia-testnet.manta.network/address/${address}`,
+  fuji: address => `https://testnet.snowtrace.io/address/${address}`,
+  chiado: address => `https://gnosis-chiado.blockscout.com/address/${address}`,
+  opSepolia: address =>
+    `https://sepolia-optimism.etherscan.io/address/${address}`,
+  zkSyncSepolia: address =>
+    `https://sepolia.explorer.zksync.io/address/${address}`,
+  baseSepolia: address => `https://sepolia.basescan.org/address/${address}`,
+  specular: address => `https://explorer.specular.network/address/${address}`,
+  scrollSepolia: address => `https://sepolia.scrollscan.com/address/${address}`,
+  arbSepolia: address => `https://sepolia.arbiscan.io/address/${address}`,
+  artio: address => `https://artio.beratrail.io/address/${address}`,
+  hekla: address => `https://hekla.taikoscan.io/address/${address}`,
+} satisfies {
+  [network in NetworkName]: (address: EthereumAddress) => string;
 };
