@@ -100,8 +100,8 @@
 .nx-max-w-\[50\%\] {
   max-width: 50%;
 }
-.nx-max-w-\[90rem\] {
-  max-width: 90rem;
+.nx-max-w-\[100rem\] {
+  max-width: 100rem;
 }
 .nx-max-w-\[min\(calc\(100vw-2rem\)\,calc\(100\%\+20rem\)\)\] {
   max-width: min(100vw - 2rem, 100% + 20rem);

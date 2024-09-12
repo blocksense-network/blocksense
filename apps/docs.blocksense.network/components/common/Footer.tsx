@@ -5,7 +5,7 @@ import { config } from '@/config';
 export const Footer = () => {
   return (
     <footer
-      className="footer nx-mx-auto nx-flex nx-h-[var(--nextra-navbar-height)] nx-max-w-[90rem]
+      className="footer nx-mx-auto nx-flex nx-h-[var(--nextra-navbar-height)] nx-max-w-[100rem]
   nx-items-center nx-justify-end nx-gap-2 nx-pl-[max(env(safe-area-inset-left),1.5rem)]
   nx-pr-[max(env(safe-area-inset-right),1.5rem)] h-20"
     >
