@@ -286,4 +286,8 @@ main {
   .scroll-area .signature__code {
     @apply p-1;
   }
+
+  .overview__list li a:focus-visible {
+    @apply text-blue-700;
+  }
 }
