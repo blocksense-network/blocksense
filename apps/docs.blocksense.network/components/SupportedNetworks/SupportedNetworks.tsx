@@ -9,7 +9,7 @@ import {
   networksColumnsTitles,
 } from '@/components/SupportedNetworks/columns';
 import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
-import networksData from '../../supported-networks-mock.json';
+import networksData from '../../src/_mock/supported-networks-mock.json';
 
 export const SupportedNetworks = () => {
   const structureSupportedNetworks = React.useCallback(() => {
