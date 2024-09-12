@@ -6,6 +6,8 @@ import {
 import { selectDirectory } from '@blocksense/base-utils';
 
 import { stringifyObject } from '@/src/utils';
+import { updateMetaJsonFile } from '@/src/utils-fs';
+
 import { pagesDataFeedsFolder } from '@/src/constants';
 
 import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
@@ -97,9 +99,11 @@ async function generateIndividualDataFeedPages(
       base: '_meta.json',
       content: metaJSON,
     }),
-    writeRootMetaFile({
-      base: '_meta.json',
-      content: rootMetaFileContent,
+    updateMetaJsonFile(pagesDataFeedsFolder, {
+      feed: {
+        title: 'Supported Data Feeds',
+        display: 'children',
+      },
     }),
   ]);
 }

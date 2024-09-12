@@ -2,6 +2,7 @@ import { selectDirectory } from '@blocksense/base-utils';
 
 import { pagesContractsFolder } from '@/src/constants';
 import { stringifyObject } from '@/src/utils';
+import { updateMetaJsonFile } from '@/src/utils-fs';
 import SUPPORTED_NETWORKS from '@/src/_mock/supported-networks-mock.json';
 import { decodeSupportedNetworks, SupportedNetworks } from '@/src/_mock/types';
 import { CoreContract } from './types';
@@ -50,17 +51,12 @@ async function generateDeployedContractsFile() {
     content: generateDeployedContractsContent(networksData),
   };
 
-  const { write, writeJSON, readJSON } = selectDirectory(pagesContractsFolder);
-  let metaFileContent = await readJSON({ name: '_meta' });
-  metaFileContent = {
-    ...metaFileContent,
-    'deployed-contracts': 'Deployed Contracts',
-  };
+  const { write } = selectDirectory(pagesContractsFolder);
+
   return Promise.all([
     write({ ext: '.mdx', ...mdxFile }),
-    writeJSON({
-      base: '_meta.json',
-      content: metaFileContent,
+    updateMetaJsonFile(pagesContractsFolder, {
+      'deployed-contracts': 'Deployed Contracts',
     }),
   ]);
 }
