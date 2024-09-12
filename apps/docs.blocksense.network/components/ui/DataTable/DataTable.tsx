@@ -44,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   filterCell?: string;
   filters?: FilterType[];
   columnsTitles: ColumnsTitlesType;
+  hasToolbar?: boolean;
 }
 
 function getUniqueValuesFromColumns(column: string, data: any): OptionType[] {
@@ -71,6 +72,7 @@ export function DataTable<TData, TValue>({
   filterCell,
   filters,
   columnsTitles,
+  hasToolbar = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -104,12 +106,14 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4 mt-2">
-      <DataTableToolbar
-        table={table}
-        filterCell={filterCell}
-        filters={filters}
-        columnsTitles={columnsTitles}
-      />
+      {hasToolbar && (
+        <DataTableToolbar
+          table={table}
+          filterCell={filterCell}
+          filters={filters}
+          columnsTitles={columnsTitles}
+        />
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
