@@ -16,11 +16,13 @@ use std::io::stdout;
 use std::process::Command;
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
-use std::{fs::File, io::Write};
 use tokio::time;
 use tokio::time::Duration;
 use utils::get_config_file_path;
 use utils::read_file;
+
+use tokio::fs::File;
+use tokio::io::AsyncWriteExt;
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 const PROVIDERS_KEY_PREFIX: &str = "/tmp/key_";
@@ -40,7 +42,13 @@ impl Handler for Collector {
     }
 }
 
-fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
+async fn write_file(key_path: &str, content: &[u8]) {
+    let mut f = File::create(key_path).await.expect("Could not create file");
+    f.write(content).await.expect("Failed to write to file");
+    f.flush().await.expect("Could not flush file");
+}
+
+async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
     let config_patch = json!(
     {
         "main_port": SEQUENCER_MAIN_PORT,
@@ -64,8 +72,11 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
     let _: SequencerConfig = serde_json::from_str(sequencer_config.to_string().as_str())
         .expect("Error after patching the config file!");
 
-    fs::write("/tmp/sequencer_config.json", sequencer_config.to_string())
-        .expect("Unable to write sequencer config file");
+    write_file(
+        "/tmp/sequencer_config.json",
+        sequencer_config.to_string().as_bytes(),
+    )
+    .await;
 
     let feeds = json!({
         "feeds": [
@@ -93,8 +104,7 @@ fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
         ]
     });
 
-    fs::write("/tmp/feeds_config.json", feeds.to_string())
-        .expect("Unable to write feeds config file");
+    write_file("/tmp/feeds_config.json", feeds.to_string().as_bytes()).await;
 
     thread::spawn(move || {
         let mut command = Command::new("cargo");
@@ -160,7 +170,7 @@ fn send_report(payload_json: serde_json::Value) {
         .unwrap();
 
     // Set a closure to handle the response
-    easy.write_function(|data| Ok(stdout().write(data).unwrap()))
+    easy.write_function(|data| Ok(std::io::Write::write(&mut stdout(), data).unwrap()))
         .unwrap();
 
     easy.perform().unwrap();
@@ -196,11 +206,14 @@ async fn main() -> Result<()> {
         let signer = provider.keys()[0].clone();
         let signer = signer.to_bytes().encode_hex();
 
-        let mut file = File::create(format!("/tmp/key_{}", provider.port()))?;
-        file.write_all(signer.as_bytes())?;
+        write_file(
+            format!("/tmp/key_{}", provider.port()).as_str(),
+            signer.as_bytes(),
+        )
+        .await;
     }
 
-    let seq = spawn_sequencer(PROVIDERS_PORTS);
+    let seq = spawn_sequencer(PROVIDERS_PORTS).await;
 
     wait_for_sequencer_to_accept_votes(5 * 60).await;
 

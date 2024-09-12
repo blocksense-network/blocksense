@@ -29,8 +29,8 @@ mod tests {
     use utils::get_config_file_path;
 
     use super::*;
-    use std::env;
-    use std::fs;
+    use std::fs::File;
+    use std::io::prelude::*;
 
     #[test]
     fn test_get_validated_sequencer_config_with_error_in_set_endpoint_ports() {
@@ -46,11 +46,12 @@ mod tests {
             ),
         };
         config_json.main_port = config_json.admin_port; // Set an error in the config - endpoints cannot have same ports.
-        fs::write(
-            "/tmp/sequencer_config.json",
-            serde_json::to_string(&config_json).unwrap(),
-        )
-        .expect("Unable to write sequencer config file");
+
+        let mut file = File::create("/tmp/sequencer_config.json")
+            .expect("Could not create sequencer config file!");
+        file.write(serde_json::to_string(&config_json).unwrap().as_bytes())
+            .expect("Could not write to sequencer config file");
+        file.flush().expect("Could flush sequencer config file");
 
         let _ = std::panic::catch_unwind(|| get_validated_sequencer_config("/tmp"));
     }

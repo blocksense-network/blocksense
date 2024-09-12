@@ -314,7 +314,8 @@ mod tests {
     };
     use std::collections::HashMap;
     use std::str::FromStr;
-    use std::{fs::File, io::Write};
+    use tokio::fs::File;
+    use tokio::io::AsyncWriteExt;
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -324,15 +325,24 @@ mod tests {
         None
     }
 
+    async fn create_priv_key(key_path: &str, private_key: &[u8]) {
+        let mut f = File::create(key_path)
+            .await
+            .expect("Could not create key file");
+        f.write(private_key)
+            .await
+            .expect("Failed to write to temp file");
+        f.flush().await.expect("Could not flush temp file");
+    }
+
     #[tokio::test]
     async fn test_deploy_contract_returns_valid_address() {
         // setup
         let anvil = Anvil::new().try_spawn().unwrap();
         let key_path = "/tmp/priv_key_test";
+        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
         let network = "ETH131";
-        let mut file = File::create(key_path).unwrap();
-        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-            .unwrap();
+        create_priv_key(key_path, private_key).await;
 
         let cfg =
             get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
@@ -372,10 +382,9 @@ mod tests {
         // setup
         let anvil = Anvil::new().try_spawn().unwrap();
         let key_path = "/tmp/priv_key_test";
+        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
         let network = "ETH333";
-        let mut file = File::create(key_path).unwrap();
-        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-            .unwrap();
+        create_priv_key(key_path, private_key).await;
 
         let cfg =
             get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
@@ -472,9 +481,9 @@ mod tests {
 
         // setup
         let key_path = "/tmp/priv_key_test";
-        let mut file = File::create(key_path).unwrap();
-        file.write(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-            .unwrap();
+        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
+        create_priv_key(key_path, private_key).await;
+
         let anvil_network1 = Anvil::new().try_spawn().unwrap();
         let network1 = "ETH374";
         let anvil_network2 = Anvil::new().try_spawn().unwrap();
