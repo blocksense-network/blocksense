@@ -21,13 +21,5 @@ export async function collectRawDataFeeds(directoryPath: string) {
     }
   }
 
-  {
-    const { writeJSON } = selectDirectory(artifactsDir);
-    await writeJSON({
-      content: rawDataFeeds,
-      name: 'raw_chainlink_feeds',
-    });
-  }
-
   return rawDataFeeds;
 }
