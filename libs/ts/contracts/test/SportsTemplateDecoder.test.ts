@@ -8,7 +8,7 @@ import { run } from 'hardhat';
 type SimpleField = {
   name: string;
   type: string;
-  size: number;
+  size?: number;
   length?: number;
 };
 
@@ -29,11 +29,56 @@ function processFields(
 ): [Field['values'], any[]] {
   const processedFields = fields.map((field, i) => {
     if (field.type.includes('[')) {
-      values[i] = ethers.concat(
-        values[i].map((value: any) => {
-          return ethers.solidityPacked([field.type.split('[')[0]], [value]);
-        }),
+      if (field.type.includes('[]')) {
+        // Encode the length of the dynamic array as uint32
+        const arrayLength = ethers.solidityPacked(
+          ['uint32'],
+          [values[i].length],
+        );
+        values[i] = ethers.concat([
+          arrayLength,
+          ...values[i].map((value: any) => {
+            if ('components' in field) {
+              const [processedComponents, processedValues] = processFields(
+                field.components,
+                value,
+              );
+              return ethers.solidityPacked(
+                processedComponents.map(component => component.type),
+                processedValues,
+              );
+            } else {
+              return ethers.solidityPacked([field.type.split('[')[0]], [value]);
+            }
+          }),
+        ]);
+      } else {
+        values[i] = ethers.concat(
+          values[i].map((value: any) => {
+            if ('components' in field) {
+              const [processedComponents, processedValues] = processFields(
+                field.components,
+                value,
+              );
+              return ethers.solidityPacked(
+                processedComponents.map(component => component.type),
+                processedValues,
+              );
+            } else {
+              return ethers.solidityPacked([field.type.split('[')[0]], [value]);
+            }
+          }),
+        );
+      }
+      return { ...field, type: 'bytes' };
+    } else if (field.type === 'string') {
+      // Encode the length of the string in bytes as uint32
+      const stringBytes = ethers.toUtf8Bytes(values[i]);
+      const stringLength = ethers.solidityPacked(
+        ['uint32'],
+        [stringBytes.length],
       );
+      values[i] = ethers.concat([stringLength, stringBytes]);
       return { ...field, type: 'bytes' };
     } else if ('components' in field) {
       const [processedComponents, processedValues] = processFields(
@@ -510,6 +555,97 @@ describe('Decoder', () => {
         ],
       ],
       '0xfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210',
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle struct fixed array', async () => {
+    const fields: Field = {
+      name: 'StructFixedArray',
+      values: [
+        {
+          name: 'structArray',
+          type: 'tuple[3]',
+          length: 3,
+          components: [
+            { name: 'id', type: 'uint256', size: 256 },
+            { name: 'active', type: 'bool', size: 8 },
+            { name: 'balance', type: 'int64', size: 64 },
+          ],
+        },
+      ],
+    };
+    const values = [
+      [
+        [BigInt('1'), true, BigInt('1000000')],
+        [BigInt('2'), false, BigInt('-500000')],
+        [BigInt('3'), true, BigInt('750000')],
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle structs with arrays of nested structs', async () => {
+    const fields: Field = {
+      name: 'StructWithArraysOfNestedStructs',
+      values: [
+        {
+          name: 'mainStruct',
+          type: 'tuple',
+          components: [
+            { name: 'id', type: 'uint256', size: 256 },
+            {
+              name: 'nestedStructs',
+              type: 'tuple[3]',
+              length: 3,
+              components: [
+                { name: 'subId', type: 'uint32', size: 32 },
+                { name: 'name', type: 'bytes32', size: 256 },
+                {
+                  name: 'details',
+                  type: 'tuple[2]',
+                  length: 2,
+                  components: [
+                    { name: 'value', type: 'int64', size: 64 },
+                    { name: 'active', type: 'bool', size: 8 },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const values = [
+      [
+        BigInt('1000'),
+        [
+          [
+            42,
+            ethers.encodeBytes32String('First'),
+            [
+              [BigInt('1000000'), true],
+              [BigInt('-500000'), false],
+            ],
+          ],
+          [
+            43,
+            ethers.encodeBytes32String('Second'),
+            [
+              [BigInt('-500000'), true],
+              [BigInt('750000'), true],
+            ],
+          ],
+          [
+            44,
+            ethers.encodeBytes32String('Third'),
+            [
+              [BigInt('750000'), false],
+              [BigInt('142537'), true],
+            ],
+          ],
+        ],
+      ],
     ];
     await testDecoder(fields, values);
   });

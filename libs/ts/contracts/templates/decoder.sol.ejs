@@ -7,24 +7,30 @@ let name = fields.name.charAt(0).toLowerCase() + fields.name.slice(1)
 const expandFields = (values) => {
   const expandedFields = values.map((field) => {
     let data;
-    if (field.type.endsWith(']') && field.type !== 'tuple') {
+    if (field.type.endsWith(']')) {
       // This is an array field
-      data = []
-      for (let i = 0; i < field.length; i++) {
-        data.push({
-          type: field.type.split('[')[0], // Remove the '[]' from the type
-          size: field.size,
-        });
+      const baseType = field.type.split('[')[0];
+      const arraySize = field.type.match(/\[(\d*)\]/)[1] || field.length;
+      data = [];
+      for (let i = 0; i < parseInt(arraySize); i++) {
+        if (baseType === 'tuple') {
+          // Handle tuple array
+          data.push(expandFields(field.components));
+        } else {
+          data.push({
+            type: baseType,
+            size: field.size,
+          });
+        }
       }
     } else if (field.type === 'tuple') {
       // This is a tuple field
-      data = []
-      data.push(...expandFields(field.components));
+      data = expandFields(field.components);
     } else {
       // This is not an array field, add it as is
-      data = field
+      data = field;
     }
-    return data
+    return JSON.parse(JSON.stringify(data));
   });
 
   return expandedFields;
@@ -35,14 +41,20 @@ function organizeFieldsIntoStructs(values) {
   let mainStruct = { name: fields.name, fields: [] };
 
   function processField(field, parentStruct) {
-    if (field.type === 'tuple') {
+    if (field.type === 'tuple' || (field.type.endsWith(']') && field.components)) {
       let newStruct = {
         name: field.name.charAt(0).toUpperCase() + field.name.slice(1),
         fields: []
       };
-      field.components.forEach(component => processField(component, newStruct));
+      if (field.components) {
+        field.components.forEach(component => processField(component, newStruct));
+      }
       structs.push(newStruct);
-      parentStruct.fields.push({ name: field.name, type: newStruct.name });
+      if (field.type.endsWith(']')) {
+        parentStruct.fields.push({ name: field.name, type: `${newStruct.name}[${field.type.split('[')[1]}` });
+      } else {
+        parentStruct.fields.push({ name: field.name, type: newStruct.name });
+      }
     } else if (field.type.endsWith('[]')) {
       let arrayType = field.type.split('[')[0];
       parentStruct.fields.push({ name: field.name, type: `${arrayType}[]` });
@@ -56,7 +68,6 @@ function organizeFieldsIntoStructs(values) {
 
   return structs;
 }
-
 const organizedStructs = organizeFieldsIntoStructs(fields.values);
 
 let prevSizeSum = 0;
@@ -95,7 +106,6 @@ function processFields(fields) {
 
   return fields;
 }
-
 
 const expandedFields = processFields(expandFields(fields.values));
 
