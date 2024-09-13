@@ -391,6 +391,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/config-types@workspace:libs/config-types":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/config-types@workspace:libs/config-types"
+  dependencies:
+    "@effect/schema": "npm:^0.71.1"
+    "@rollup/plugin-commonjs": "npm:^26.0.1"
+    "@rollup/plugin-json": "npm:^6.1.0"
+    "@rollup/plugin-node-resolve": "npm:^15.2.1"
+    "@types/node": "npm:^22.3.0"
+    "@types/rollup-plugin-peer-deps-external": "npm:^2"
+    effect: "npm:^3.7.0"
+    glob: "npm:^11.0.0"
+    rollup: "npm:^4.20.0"
+    rollup-plugin-delete: "npm:^2.0.0"
+    rollup-plugin-peer-deps-external: "npm:^2.2.4"
+    rollup-plugin-typescript2: "npm:^0.36.0"
+    tsx: "npm:^4.17.0"
+    typescript: "npm:^5.5.4"
+    vitest: "npm:^2.0.4"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/contracts@workspace:*, @blocksense/contracts@workspace:libs/contracts":
   version: 0.0.0-use.local
   resolution: "@blocksense/contracts@workspace:libs/contracts"

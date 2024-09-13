@@ -1,0 +1,36 @@
+{
+  "name": "@blocksense/config-types",
+  "version": "0.0.0",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.cjs",
+      "import": "./dist/esm/index.mjs",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "rollup --silent --config ./rollup.config.mjs",
+    "ts": "yarn node --import tsx",
+    "test": "yarn vitest -w false"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.1",
+    "@types/node": "^22.3.0",
+    "@types/rollup-plugin-peer-deps-external": "^2",
+    "glob": "^11.0.0",
+    "rollup": "^4.20.0",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.4"
+  },
+  "dependencies": {
+    "@effect/schema": "^0.71.1",
+    "effect": "^3.7.0"
+  }
+}
