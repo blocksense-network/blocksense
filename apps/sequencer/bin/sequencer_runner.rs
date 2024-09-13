@@ -13,7 +13,10 @@ use sequencer::reporters::reporter::init_shared_reporters;
 
 use sequencer::http_handlers::admin::{deploy, get_feed_report_interval, get_key, set_log_level};
 use sequencer::http_handlers::data_feeds::{post_report, register_feed};
-use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
+use utils::logging::{
+    get_log_level, get_shared_logging_handle, init_shared_logging_handle, tokio_console_active,
+    SharedLoggingHandle,
+};
 
 use actix_web::rt::spawn;
 use actix_web::web::Data;
@@ -44,7 +47,7 @@ pub async fn prepare_app_state(
     feeds_config: AllFeedsConfig,
     metrics_prefix: Option<&str>,
 ) -> (UnboundedReceiver<(String, String)>, Data<FeedsState>) {
-    let log_handle: SharedLoggingHandle = init_shared_logging_handle();
+    let log_handle: SharedLoggingHandle = get_shared_logging_handle();
 
     tokio::spawn(async move {
         tokio::signal::ctrl_c().await.unwrap();
@@ -146,7 +149,7 @@ async fn main() -> std::io::Result<()> {
                 env::set_var("SEQUENCER_TOKIO_CONSOLE", "false");
             }
             "--validate-config" => {
-                init_shared_logging_handle();
+                init_shared_logging_handle("INFO", false);
                 println!("Validating configuration for version:");
                 println!("version => {BLOCKSENSE_VERSION}");
                 println!("git_hash => {GIT_HASH}");
@@ -184,7 +187,10 @@ async fn main() -> std::io::Result<()> {
             }
         }
     }
-    init_shared_logging_handle();
+    init_shared_logging_handle(
+        get_log_level("SEQUENCER").as_str(),
+        tokio_console_active("SEQUENCER"),
+    );
 
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 

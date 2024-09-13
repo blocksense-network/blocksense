@@ -11,7 +11,6 @@ use json_patch::merge;
 use port_scanner::scan_port;
 use sequencer_config::SequencerConfig;
 use serde_json::json;
-use std::fs;
 use std::io::stdout;
 use std::process::Command;
 use std::thread;

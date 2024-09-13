@@ -1,4 +1,3 @@
-use once_cell::sync::Lazy;
 use std::env;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -35,30 +34,44 @@ fn str_to_filter_level(log_level: &str) -> Option<LevelFilter> {
     }
 }
 
-static SHARED_LOGGING_HANDLE: Lazy<SharedLoggingHandle> =
-    Lazy::new(|| Arc::new(Mutex::new(init_logging_handle())));
+use std::sync::OnceLock;
 
-pub fn init_shared_logging_handle() -> SharedLoggingHandle {
-    SHARED_LOGGING_HANDLE.clone()
+fn shared_logging_handle_get_or_init(
+    level: &str,
+    tokio_console: bool,
+) -> &'static SharedLoggingHandle {
+    static SHARED_LOGGING_HANDLE: OnceLock<SharedLoggingHandle> = OnceLock::new();
+    SHARED_LOGGING_HANDLE
+        .get_or_init(move || Arc::new(Mutex::new(init_logging_handle(level, tokio_console))))
 }
 
-pub fn tokio_console_active() -> bool {
-    match env::var("SEQUENCER_TOKIO_CONSOLE") {
+pub fn init_shared_logging_handle(level: &str, tokio_console: bool) -> SharedLoggingHandle {
+    shared_logging_handle_get_or_init(level, tokio_console).clone()
+}
+
+pub fn get_shared_logging_handle() -> SharedLoggingHandle {
+    shared_logging_handle_get_or_init("INFO", true).clone() // The parameters won't matter if init was previously called.
+}
+
+pub fn tokio_console_active(app_name: &str) -> bool {
+    match env::var(app_name.to_string() + "_TOKIO_CONSOLE") {
         Ok(val) => val == "true",
         Err(_) => true,
     }
 }
 
-pub fn init_logging_handle() -> LoggingHandle {
-    let filter = match env::var("SEQUENCER_LOGGING_LEVEL") {
-        Ok(logging_level) => match str_to_filter_level(logging_level.as_str()) {
-            Some(f) => f,
-            None => filter::LevelFilter::INFO,
-        },
-        Err(_) => filter::LevelFilter::INFO,
-    };
+pub fn get_log_level(app_name: &str) -> String {
+    match env::var(app_name.to_string() + "_LOG_LEVEL") {
+        Ok(logging_level) => logging_level,
+        Err(_) => "INFO".to_string(),
+    }
+}
 
-    let tokio_console = tokio_console_active();
+pub fn init_logging_handle(logging_level: &str, tokio_console: bool) -> LoggingHandle {
+    let filter = match str_to_filter_level(logging_level) {
+        Some(f) => f,
+        None => filter::LevelFilter::INFO,
+    };
 
     let (layer_filter, reload_handle) = reload::Layer::new(filter);
 
@@ -94,9 +107,7 @@ mod tests {
     #[test]
     fn test_set_logging_levels() {
         // Test env variable sets up the logging level
-        env::set_var("SEQUENCER_LOGGING_LEVEL", "TRACE");
-        env::set_var("SEQUENCER_TOKIO_CONSOLE", "false");
-        let shared_logging_handle = init_shared_logging_handle();
+        let shared_logging_handle = init_shared_logging_handle("TRACE", false);
         let logging_handle = shared_logging_handle.lock().unwrap();
 
         // Test all logging levels are set up correctly

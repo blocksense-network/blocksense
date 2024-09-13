@@ -137,7 +137,7 @@ pub async fn set_log_level(
     req: HttpRequest,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
-    if tokio_console_active() {
+    if tokio_console_active("SEQUENCER") {
         return Ok(HttpResponse::NotAcceptable().into());
     } else {
         let bad_input = error::ErrorBadRequest("Incorrect input.");
@@ -238,7 +238,7 @@ mod tests {
             .to_string()
             + "/sequencer_config.json";
 
-        let log_handle = init_shared_logging_handle();
+        let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config =
             init_sequencer_config(sequencer_config_file.as_str()).expect("Failed to load config:");
         let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
@@ -300,7 +300,7 @@ mod tests {
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
 
-        let log_handle = init_shared_logging_handle();
+        let log_handle = init_shared_logging_handle("INFO", false);
 
         let (vote_send, _vote_recv): (
             UnboundedSender<(String, String)>,
