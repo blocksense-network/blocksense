@@ -35,5 +35,8 @@
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
     "yahoo-finance2": "^2.11.3"
+  },
+  "dependencies": {
+    "@blocksense/config-types": "workspace:*"
   }
 }

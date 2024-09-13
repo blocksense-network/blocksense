@@ -1,6 +1,6 @@
 import * as S from '@effect/schema/Schema';
 
-import { FeedTypeSchema } from '../feeds-config/types';
+import { FeedTypeSchema } from '@blocksense/config-types/data-feeds-config';
 
 /**
  * Schema for the ChainLink feed information.

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { decodeFeedsConfig } from '@blocksense/data-feeds-config-generator';
+import { decodeFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import {

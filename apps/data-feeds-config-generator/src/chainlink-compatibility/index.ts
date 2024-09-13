@@ -17,7 +17,7 @@ import {
 } from './types';
 import { artifactsDir } from '../paths';
 import { RawDataFeeds } from '../data-services/types';
-import { FeedsConfig } from '../feeds-config/types';
+import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
 async function getBlocksenseFeedsCompatibility(
   rawDataFeeds: RawDataFeeds,

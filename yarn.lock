@@ -391,7 +391,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/config-types@workspace:libs/config-types":
+"@blocksense/config-types@workspace:*, @blocksense/config-types@workspace:libs/config-types":
   version: 0.0.0-use.local
   resolution: "@blocksense/config-types@workspace:libs/config-types"
   dependencies:
@@ -441,11 +441,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/data-feeds-config-generator@workspace:*, @blocksense/data-feeds-config-generator@workspace:apps/data-feeds-config-generator":
+"@blocksense/data-feeds-config-generator@workspace:apps/data-feeds-config-generator":
   version: 0.0.0-use.local
   resolution: "@blocksense/data-feeds-config-generator@workspace:apps/data-feeds-config-generator"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
+    "@blocksense/config-types": "workspace:*"
     "@effect/data": "npm:^0.18.7"
     "@effect/schema": "npm:^0.71.1"
     "@rollup/plugin-commonjs": "npm:^26.0.1"
@@ -517,8 +518,8 @@ __metadata:
   resolution: "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
+    "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
-    "@blocksense/data-feeds-config-generator": "workspace:*"
     "@blocksense/docs-theme": "workspace:*"
     "@blocksense/monorepo": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"

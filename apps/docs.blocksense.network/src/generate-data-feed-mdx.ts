@@ -2,7 +2,7 @@ import {
   decodeFeedsConfig,
   Feed,
   FeedsConfig,
-} from '@blocksense/data-feeds-config-generator';
+} from '@blocksense/config-types/data-feeds-config';
 import { selectDirectory } from '@blocksense/base-utils';
 
 import { stringifyObject } from '@/src/utils';

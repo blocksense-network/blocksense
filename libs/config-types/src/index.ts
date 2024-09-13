@@ -1,3 +1,1 @@
-export function hello() {
-  return 'Hello';
-}
+export * from './data-feeds-config';

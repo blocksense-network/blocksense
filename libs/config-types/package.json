@@ -7,6 +7,11 @@
       "require": "./dist/cjs/index.cjs",
       "import": "./dist/esm/index.mjs",
       "types": "./dist/types/index.d.ts"
+    },
+    "./data-feeds-config": {
+      "require": "./dist/cjs/data-feeds-config/index.cjs",
+      "import": "./dist/esm/data-feeds-config/index.mjs",
+      "types": "./dist/types/data-feeds-config/index.d.ts"
     }
   },
   "scripts": {

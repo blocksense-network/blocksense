@@ -1,6 +1,12 @@
 import { filterAsync } from '@blocksense/base-utils/async';
 
-import { Feed, FeedsConfig, FeedType, Pair, decodeScript } from './types';
+import {
+  Feed,
+  FeedsConfig,
+  FeedType,
+  Pair,
+  decodeScript,
+} from '@blocksense/config-types/data-feeds-config';
 
 import {
   ChainLinkFeedInfo,
