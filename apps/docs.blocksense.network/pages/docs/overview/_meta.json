@@ -1,4 +1,4 @@
 {
   "getting-started": "Getting Started",
-  "roadmap": "Roadmap"
+  "roadmap": {"title":"Roadmap","display":"hidden"}
 }

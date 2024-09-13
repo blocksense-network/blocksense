@@ -20,7 +20,11 @@ export const GettingStarted = () => {
               href="/docs/overview/getting-started"
               label="Get Started"
             />
-            <LinkButton href="/docs/overview/roadmap" label="Roadmap" />
+            <LinkButton
+              href="/docs/overview/roadmap"
+              label="Roadmap"
+              className="hidden"
+            />
           </div>
         </article>
         <aside className="getting-started__image flex-row-reverse hidden md:flex md:mt-0 lg:mt-0 lg:flex">
