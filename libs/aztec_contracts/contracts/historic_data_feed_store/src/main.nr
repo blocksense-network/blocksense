@@ -62,8 +62,7 @@ contract HistoricDataFeedStore {
     /**
      * Sets a historical data feed
      * 
-     * Represent all values as one monolith array since
-     * nested arrays are not supported in Noir.
+     * Represent all values as one monolith array.
      * Using sentinel value like 0 for indexing the end
      * of the bytes in the input values.
      *
