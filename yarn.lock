@@ -402,6 +402,9 @@ __metadata:
     "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
     "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.0.2"
+    "@safe-global/protocol-kit": "npm:^4.0.2"
+    "@safe-global/safe-core-sdk-types": "npm:^5.0.3"
+    "@safe-global/safe-deployments": "npm:^1.37.2"
     "@typechain/ethers-v6": "npm:^0.5.1"
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4"
@@ -2025,6 +2028,13 @@ __metadata:
   version: 1.3.3
   resolution: "@noble/hashes@npm:1.3.3"
   checksum: 10c0/23c020b33da4172c988e44100e33cd9f8f6250b68b43c467d3551f82070ebd9716e0d9d2347427aa3774c85934a35fa9ee6f026fca2117e3fa12db7bedae7668
+  languageName: node
+  linkType: hard
+
+"@noble/hashes@npm:^1.3.3":
+  version: 1.5.0
+  resolution: "@noble/hashes@npm:1.5.0"
+  checksum: 10c0/1b46539695fbfe4477c0822d90c881a04d4fa2921c08c552375b444a48cac9930cb1ee68de0a3c7859e676554d0f3771999716606dc4d8f826e414c11692cdd9
   languageName: node
   linkType: hard
 
@@ -4024,6 +4034,47 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@safe-global/protocol-kit@npm:^4.0.2":
+  version: 4.1.0
+  resolution: "@safe-global/protocol-kit@npm:4.1.0"
+  dependencies:
+    "@noble/hashes": "npm:^1.3.3"
+    "@safe-global/safe-core-sdk-types": "npm:^5.1.0"
+    "@safe-global/safe-deployments": "npm:^1.37.3"
+    "@safe-global/safe-modules-deployments": "npm:^2.2.1"
+    abitype: "npm:^1.0.2"
+    ethereumjs-util: "npm:^7.1.5"
+    ethers: "npm:^6.13.1"
+    semver: "npm:^7.6.2"
+  checksum: 10c0/a112ababfa43cd9b6ed753913857d530e2805f39e1ead1f70c1e5770719f466c312c81a932f6f5348aa514c064aec74fd05f98a8a3fd07fc614dae7494e110d0
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-core-sdk-types@npm:^5.0.3, @safe-global/safe-core-sdk-types@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "@safe-global/safe-core-sdk-types@npm:5.1.0"
+  dependencies:
+    abitype: "npm:^1.0.2"
+  checksum: 10c0/f8572603f5980f2653be51cb148e4a014c06fd063e5bac1e318f1bed7f3485f6380e6ee0e4a2d4998dd5707ae537aaf781e7a1d25839c1ec3173676626fdf6ff
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-deployments@npm:^1.37.2, @safe-global/safe-deployments@npm:^1.37.3":
+  version: 1.37.5
+  resolution: "@safe-global/safe-deployments@npm:1.37.5"
+  dependencies:
+    semver: "npm:^7.6.2"
+  checksum: 10c0/dcec4f8a19a37b3d9bcc0a4d7a97d4799d53d02d1e9d58e29f4f662351ce4a73ce76d5e7f5771a9b2e24589571fbdfb80fdad2457a65d551cdcb74a9b0e22410
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-modules-deployments@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "@safe-global/safe-modules-deployments@npm:2.2.1"
+  checksum: 10c0/72f4d44342264e0f945f27207c814fbd5e1ce3671cc808c92f7e798869d138a8d930acf3b1d1846019003d3c29894827e18955e7f0824b700f1e506a205ba9a6
+  languageName: node
+  linkType: hard
+
 "@scure/base@npm:~1.1.0, @scure/base@npm:~1.1.2, @scure/base@npm:~1.1.4":
   version: 1.1.6
   resolution: "@scure/base@npm:1.1.6"
@@ -5430,6 +5481,21 @@ __metadata:
     zod:
       optional: true
   checksum: 10c0/d685351a725c49f81bdc588e2f3825c28ad96c59048d4f36bf5e4ef30935c31f7e60b5553c70177b77a9e4d8b04290eea43d3d9c1c2562cb130381c88b15d39f
+  languageName: node
+  linkType: hard
+
+"abitype@npm:^1.0.2":
+  version: 1.0.6
+  resolution: "abitype@npm:1.0.6"
+  peerDependencies:
+    typescript: ">=5.0.4"
+    zod: ^3 >=3.22.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+    zod:
+      optional: true
+  checksum: 10c0/30ca97010bbf34b9aaed401858eeb6bc30419f7ff11eb34adcb243522dd56c9d8a9d3d406aa5d4f60a7c263902f5136043005698e3f073ea882a4922d43a2929
   languageName: node
   linkType: hard
 
@@ -9069,7 +9135,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethereumjs-util@npm:^7.1.4":
+"ethereumjs-util@npm:^7.1.4, ethereumjs-util@npm:^7.1.5":
   version: 7.1.5
   resolution: "ethereumjs-util@npm:7.1.5"
   dependencies:
@@ -9082,7 +9148,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^6.13.2":
+"ethers@npm:^6.13.1, ethers@npm:^6.13.2":
   version: 6.13.2
   resolution: "ethers@npm:6.13.2"
   dependencies:
@@ -15808,7 +15874,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.6.0, semver@npm:^7.6.3":
+"semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.6.0, semver@npm:^7.6.2, semver@npm:^7.6.3":
   version: 7.6.3
   resolution: "semver@npm:7.6.3"
   bin:
