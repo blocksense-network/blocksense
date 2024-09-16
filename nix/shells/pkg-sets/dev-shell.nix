@@ -29,6 +29,7 @@
       lib.makeLibraryPath [
         pkgs.openssl
         pkgs.curl
+        pkgs.zlib
       ]
     }:$LD_LIBRARY_PATH"
     export GIT_ROOT="$(git rev-parse --show-toplevel)"
