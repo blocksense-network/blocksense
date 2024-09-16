@@ -66,7 +66,7 @@ const NetworkAddressExplorerLink = ({ row }: RowWrapper) => {
         <Badge
           key={network}
           variant="outline"
-          className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium"
+          className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium whitespace-nowrap"
         >
           <Link href={explorerAddressUrls[network](address as EthereumAddress)}>
             {network}

@@ -50,7 +50,7 @@ export const columns: ColumnDef<DataFeed>[] = [
     cell: ({ row }) => (
       <Badge
         variant="outline"
-        className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium"
+        className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium whitespace-nowrap"
       >
         <DataFeedLink row={row} placeholderId="description" />
       </Badge>
