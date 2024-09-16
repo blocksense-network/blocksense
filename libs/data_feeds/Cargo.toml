@@ -53,7 +53,7 @@ alloy = { git = "https://github.com/alloy-rs/alloy", rev = "6f4e397f7cf71812160a
 ] }
 
 log = "0.4.21"
-anyhow = "1.0.87"
+anyhow = "1.0.89"
 thiserror = "1.0.61"
 tracing = { version = "0.1.40", features = ["async-await", "log"] }
 tracing-subscriber = { version = "0.3.18", features = ["json"] }

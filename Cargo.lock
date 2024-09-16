@@ -1016,9 +1016,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.87"
+version = "1.0.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10f00e1f6e58a40e807377c75c6a7f97bf9044fab57816f2414e6f5f4499d7b8"
+checksum = "86fdf8605db99b54d3cd748a44c6d04df638eb5dafb219b135d0149bd0db01f6"
 
 [[package]]
 name = "arbitrary"
@@ -4138,9 +4138,9 @@ dependencies = [
 
 [[package]]
 name = "hdbscan"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "047e959c9ecd8c55c94d653953db0a95f42e5e2024f6db40ce3c3531dd011654"
+checksum = "fd577167ca045c21ae55f7891741e91e7e829c5fc4dc9f1da08528215b9d94b8"
 dependencies = [
  "kdtree",
  "num-traits 0.2.19",
@@ -6022,9 +6022,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.19.0"
+version = "1.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
+checksum = "33ea5043e58958ee56f3e15a90aee535795cd7dfd319846288d93c5b57d85cbe"
 
 [[package]]
 name = "onig"

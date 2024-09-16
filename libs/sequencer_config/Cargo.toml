@@ -10,5 +10,5 @@ edition.workspace = true
 [dependencies]
 dirs = "5.0.1"
 serde = { version = "1.0.210", features = ["derive"]}
-anyhow = "1.0.87"
+anyhow = "1.0.89"
 hex = "0.4.3"

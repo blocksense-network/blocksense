@@ -10,7 +10,7 @@ data_feeds = { path = "../../data_feeds"}
 feed_registry = { path = "../../feed_registry"}
 crypto = { path = "../../crypto"}
 
-anyhow = "1.0.87"
+anyhow = "1.0.89"
 clap = { version = "3.1.15", features = ["derive", "env"] }
 futures = "0.3"
 is-terminal = "0.4.12"
