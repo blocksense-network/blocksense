@@ -24,5 +24,6 @@
       openssl
       pkg-config
       cargo-tarpaulin
+      libz
     ]);
 }

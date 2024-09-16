@@ -1,0 +1,9 @@
+[package]
+name = "demo"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+[dependencies]
+mysql = "25.0"
