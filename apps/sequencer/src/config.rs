@@ -5,28 +5,29 @@ use tracing::info;
 use utils::read_file;
 
 pub fn init_sequencer_config(config_file: &PathBuf) -> Result<SequencerConfig> {
-    let config_file = config_file
-        .to_str()
-        .expect("Environment variable does not hold a dir path");
+    let config_file = match config_file.to_str() {
+        Some(v) => v,
+        None => eyre::bail!("Error converting path to str, needed to read file."),
+    };
 
     let data = read_file(config_file);
 
     info!("Using config file: {}", config_file);
 
-    match serde_json::from_str::<SequencerConfig>(data.as_str()) {
-        Ok(c) => Ok(c),
-        Err(e) => eyre::bail!("Config file ({}) is not valid JSON! {}", config_file, e),
-    }
+    serde_json::from_str::<SequencerConfig>(data.as_str())
+        .map_err(|e| eyre::eyre!("Config file ({}) is not valid JSON! {}", config_file, e))
 }
 
-pub fn get_validated_sequencer_config(config_file: &PathBuf) -> SequencerConfig {
-    let sequencer_config = init_sequencer_config(config_file).expect("Failed to get config: ");
+pub fn get_validated_sequencer_config(config_file: &PathBuf) -> Result<SequencerConfig> {
+    let sequencer_config = match init_sequencer_config(config_file) {
+        Ok(v) => v,
+        Err(e) => eyre::bail!("Failed to get config {} ", e),
+    };
 
-    sequencer_config
-        .validate("SequencerConfig")
-        .expect("validation error");
-
-    sequencer_config
+    match sequencer_config.validate("SequencerConfig") {
+        Ok(_) => Ok(sequencer_config),
+        Err(e) => eyre::bail!("Validation error {} ", e),
+    }
 }
 
 #[cfg(test)]
@@ -59,7 +60,10 @@ mod tests {
             .expect("Could not write to sequencer config file");
         file.flush().expect("Could flush sequencer config file");
 
-        let path = PathBuf::new().join("/tmp");
-        let _ = std::panic::catch_unwind(|| get_validated_sequencer_config(&path));
+        let path = PathBuf::new().join("/tmp").join("sequencer_config.json");
+        match get_validated_sequencer_config(&path) {
+            Ok(_) => panic!("Did not detect error in config file!"),
+            Err(_) => {}
+        }
     }
 }
