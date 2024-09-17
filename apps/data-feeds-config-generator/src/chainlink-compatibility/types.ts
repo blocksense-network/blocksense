@@ -3,11 +3,11 @@ import * as S from '@effect/schema/Schema';
 import {
   chainId,
   ChainId,
-  denominationAddress,
   ethereumAddress,
   networkNameToChainId,
 } from '@blocksense/base-utils/evm-utils';
-import { never } from 'effect/Fiber';
+
+import { denominationAddress } from '@blocksense/config-types/chainlink-compatibility';
 
 export const chainlinkSupportedNetworkFileNames = [
   'feeds-avalanche-fuji-testnet.json',

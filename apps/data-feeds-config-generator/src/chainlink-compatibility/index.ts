@@ -1,10 +1,12 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
+import { parseEthereumAddress } from '@blocksense/base-utils/evm-utils';
+
+import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import {
   denominationTokenToAddress,
   isDenominationToken,
   parseDenominationToken,
-  parseEthereumAddress,
-} from '@blocksense/base-utils/evm-utils';
+} from '@blocksense/config-types/chainlink-compatibility';
 
 import {
   BlocksenseFeedsCompatibility,
@@ -17,7 +19,6 @@ import {
 } from './types';
 import { artifactsDir } from '../paths';
 import { RawDataFeeds } from '../data-services/types';
-import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
 async function getBlocksenseFeedsCompatibility(
   rawDataFeeds: RawDataFeeds,
