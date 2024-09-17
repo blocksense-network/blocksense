@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import React, {
   ReactNode,
   ReactElement,
@@ -8,6 +9,7 @@ import React, {
 type TooltipProps = {
   position?: 'top' | 'right' | 'bottom' | 'left';
   children: ReactNode;
+  contentClassName?: string;
 };
 
 const TooltipContent = ({ children }: TooltipProps) => children;
@@ -28,7 +30,11 @@ const arrowClasses = {
   left: 'absolute top-1/2 right-[-10px] transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-transparent border-l-4 border-l-black',
 };
 
-export const Tooltip = ({ position = 'top', children }: TooltipProps) => {
+export const Tooltip = ({
+  position = 'top',
+  children,
+  contentClassName = '',
+}: TooltipProps) => {
   const childrenArray = Children.toArray(children);
 
   const content = childrenArray.find(
@@ -44,12 +50,16 @@ export const Tooltip = ({ position = 'top', children }: TooltipProps) => {
   return (
     <div className="relative inline-flex items-center group">
       {trigger}
-      <div
-        className={`absolute ${positionClasses[position]} hidden group-hover:block group-focus:block px-4 py-1.5 text-sm font-semibold text-gray-800 bg-white border border-neutral-300 rounded-md shadow-md z-50 whitespace-nowrap`}
-      >
-        {content?.props.children}
-        <div className={`absolute ${arrowClasses[position]} border-solid`} />
-      </div>
+      {content && (
+        <div
+          className={cn(
+            `absolute ${positionClasses[position]} hidden group-hover:block group-focus:block px-4 py-1.5 text-sm font-semibold border border-neutral-300 rounded-md shadow-md z-50 whitespace-nowrap text-gray-800 bg-white ${contentClassName}`,
+          )}
+        >
+          {content?.props.children}
+          <div className={`absolute ${arrowClasses[position]} border-solid`} />
+        </div>
+      )}
     </div>
   );
 };
