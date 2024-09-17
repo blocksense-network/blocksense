@@ -46,7 +46,7 @@ export const DeployedContracts = ({
   );
 
   return (
-    <div>
+    <div className="mt-4">
       <ContractItemWrapper
         title="Core Contracts"
         titleLevel={2}

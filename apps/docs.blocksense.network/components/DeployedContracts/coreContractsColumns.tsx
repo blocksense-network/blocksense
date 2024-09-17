@@ -8,7 +8,7 @@ import {
   explorerAddressUrls,
   NetworkName,
 } from '@blocksense/base-utils/evm-utils';
-
+import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { CoreContract } from '@/src/deployed-contracts/types';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +39,9 @@ export const columns: ColumnDef<CoreContract>[] = [
         type={'string'}
       />
     ),
-    cell: ({ row }) => <code>{row.original.address}</code>,
+    cell: ({ row }) => (
+      <ContractAddress address={row.getValue('address')} enableCopy />
+    ),
   },
   {
     accessorKey: 'network',

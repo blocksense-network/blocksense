@@ -4,24 +4,19 @@ import { useRouter } from 'next/router';
 
 import { ColumnDef, Row } from '@tanstack/react-table';
 
-import { previewHexStringOrDefault } from '@/src/utils';
 import { ProxyContractData } from '@/src/deployed-contracts/types';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import { Badge } from '@/components/ui/badge';
-import {
-  EthereumAddress,
-  explorerAddressUrls,
-  isEthereumAddress,
-} from '@blocksense/base-utils/evm-utils';
+import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 
 export const proxyColumnsTitles = {
   network: 'Network',
   id: 'ID',
   description: 'Data Feed Name',
-  address: 'Blocksense Proxy address',
+  address: 'Blocksense Proxy Address',
   base: 'Base Address',
   quote: 'Quote Address',
-  chainlink_proxy: 'CL Aggregator Proxy address',
+  chainlink_proxy: 'CL Aggregator Proxy Address',
 };
 
 export const columns: ColumnDef<ProxyContractData>[] = [
@@ -32,6 +27,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         column={column}
         title={proxyColumnsTitles['description']}
         type={'string'}
+        hasSort={false}
       />
     ),
     cell: ({ row }) => <DataFeedLink row={row} placeholderId="description" />,
@@ -43,6 +39,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         column={column}
         title={proxyColumnsTitles['id']}
         type={'number'}
+        hasSort={false}
       />
     ),
     cell: ({ row }) => <DataFeedLink row={row} placeholderId="id" />,
@@ -54,10 +51,16 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         column={column}
         title={proxyColumnsTitles['address']}
         type={'string'}
+        hasSort={false}
       />
     ),
     cell: ({ row }) => (
-      <AddressExplorerLink row={row} placeholderId="address" />
+      <ContractAddress
+        network={row.original.network}
+        address={row.getValue('address')}
+        enableCopy
+        hasAbbreviation
+      />
     ),
   },
   {
@@ -67,9 +70,17 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         column={column}
         title={proxyColumnsTitles['base']}
         type={'string'}
+        hasSort={false}
       />
     ),
-    cell: ({ row }) => <AddressExplorerLink row={row} placeholderId="base" />,
+    cell: ({ row }) => (
+      <ContractAddress
+        network={row.original.network}
+        address={row.getValue('base')}
+        enableCopy
+        hasAbbreviation
+      />
+    ),
   },
   {
     accessorKey: 'quote',
@@ -78,9 +89,17 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         column={column}
         title={proxyColumnsTitles['quote']}
         type={'string'}
+        hasSort={false}
       />
     ),
-    cell: ({ row }) => <AddressExplorerLink row={row} placeholderId="quote" />,
+    cell: ({ row }) => (
+      <ContractAddress
+        network={row.original.network}
+        address={row.getValue('quote')}
+        enableCopy
+        hasAbbreviation
+      />
+    ),
   },
   {
     accessorKey: 'chainlink_proxy',
@@ -89,10 +108,16 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         column={column}
         title={proxyColumnsTitles['chainlink_proxy']}
         type={'string'}
+        hasSort={false}
       />
     ),
     cell: ({ row }) => (
-      <AddressExplorerLink row={row} placeholderId="chainlink_proxy" />
+      <ContractAddress
+        network={row.original.network}
+        address={row.getValue('chainlink_proxy')}
+        enableCopy
+        hasAbbreviation
+      />
     ),
   },
   {
@@ -116,7 +141,7 @@ const DataFeedLink = ({ row, placeholderId }: RowWrapper) => {
   return (
     <Badge
       variant="outline"
-      className={`border-solid border-slate-200 ${placeholderValue && 'cursor-pointer'} m-0 text-primary-600 bold font-medium whitespace-nowrap`}
+      className={`justify-center border-solid border-slate-200 ${placeholderValue && 'cursor-pointer'} m-0 text-primary-600 bold font-medium whitespace-nowrap`}
     >
       {placeholderValue ? (
         <Link href={feedPageUrl}>{row.getValue(placeholderId!)}</Link>
@@ -124,23 +149,5 @@ const DataFeedLink = ({ row, placeholderId }: RowWrapper) => {
         '-'
       )}
     </Badge>
-  );
-};
-
-const AddressExplorerLink = ({ row, placeholderId }: RowWrapper) => {
-  const address = row.getValue(placeholderId!);
-  if (!address) {
-    return '-';
-  }
-  if (!isEthereumAddress(address)) {
-    throw new Error(`Invalid Ethereum address: ${address}`);
-  }
-  const network = row.original.network;
-  return (
-    <code>
-      <Link href={explorerAddressUrls[network](address as EthereumAddress)}>
-        {previewHexStringOrDefault(address)}
-      </Link>
-    </code>
   );
 };
