@@ -373,6 +373,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/config-types@workspace:libs/config-types"
   dependencies:
+    "@blocksense/base-utils": "workspace:*"
     "@effect/schema": "npm:^0.71.1"
     "@rollup/plugin-commonjs": "npm:^26.0.1"
     "@rollup/plugin-json": "npm:^6.1.0"

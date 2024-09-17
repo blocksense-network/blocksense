@@ -12,6 +12,11 @@
       "require": "./dist/cjs/data-feeds-config/index.cjs",
       "import": "./dist/esm/data-feeds-config/index.mjs",
       "types": "./dist/types/data-feeds-config/index.d.ts"
+    },
+    "./chainlink-compatibility": {
+      "require": "./dist/cjs/chainlink-compatibility/index.cjs",
+      "import": "./dist/esm/chainlink-compatibility/index.mjs",
+      "types": "./dist/types/chainlink-compatibility/index.d.ts"
     }
   },
   "scripts": {
@@ -35,6 +40,7 @@
     "vitest": "^2.0.4"
   },
   "dependencies": {
+    "@blocksense/base-utils": "workspace:*",
     "@effect/schema": "^0.71.1",
     "effect": "^3.7.0"
   }
