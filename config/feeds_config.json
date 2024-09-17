@@ -472,7 +472,7 @@
         "quote": "USD"
       },
       "resources": {
-        "yf_symbol": "XAU"
+        "yf_symbol": "SI-F"
       },
       "report_interval_ms": 300000,
       "first_report_start_time": {
@@ -1065,7 +1065,7 @@
         "quote": "USD"
       },
       "resources": {
-        "yf_symbol": "XAG"
+        "yf_symbol": "GC=F"
       },
       "report_interval_ms": 300000,
       "first_report_start_time": {
@@ -3806,6 +3806,29 @@
     },
     {
       "id": 167,
+      "name": "USDM",
+      "fullName": "",
+      "description": "USDM / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USDM",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 29569,
+        "cmc_quote": "USDM"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 168,
       "name": "DPI",
       "fullName": "DefiPulse Index",
       "description": "DPI / USD",
@@ -3828,7 +3851,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 168,
+      "id": 169,
       "name": "WEMIX",
       "fullName": "WEMIX",
       "description": "WEMIX / USD",
@@ -3841,29 +3864,6 @@
       "resources": {
         "cmc_id": 7548,
         "cmc_quote": "WEMIX"
-      },
-      "report_interval_ms": 300000,
-      "first_report_start_time": {
-        "secs_since_epoch": 0,
-        "nanos_since_epoch": 0
-      },
-      "quorum_percentage": 1,
-      "script": "CoinMarketCap"
-    },
-    {
-      "id": 169,
-      "name": "USDM",
-      "fullName": "",
-      "description": "USDM / USD",
-      "type": "Crypto",
-      "decimals": 8,
-      "pair": {
-        "base": "USDM",
-        "quote": "USD"
-      },
-      "resources": {
-        "cmc_id": 29569,
-        "cmc_quote": "USDM"
       },
       "report_interval_ms": 300000,
       "first_report_start_time": {
@@ -5091,6 +5091,29 @@
     },
     {
       "id": 223,
+      "name": "USD0",
+      "fullName": "",
+      "description": "USD0 / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "USD0",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 32307,
+        "cmc_quote": "USD0"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "CoinMarketCap"
+    },
+    {
+      "id": 224,
       "name": "SHV",
       "fullName": "iShares Short Treasury Bond ETF",
       "description": "SHV / USD",
@@ -5112,7 +5135,7 @@
       "script": "YahooFinance"
     },
     {
-      "id": 224,
+      "id": 225,
       "name": "IDR",
       "fullName": "Indonesian Rupiah",
       "description": "IDR / USD",
@@ -5134,7 +5157,7 @@
       "script": "YahooFinance"
     },
     {
-      "id": 225,
+      "id": 226,
       "name": "USDP",
       "fullName": "Pax Dollar",
       "description": "USDP / USD",
@@ -5157,7 +5180,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 226,
+      "id": 227,
       "name": "NZD",
       "fullName": "New Zealand Dollar",
       "description": "NZD / USD",
@@ -5179,7 +5202,7 @@
       "script": "YahooFinance"
     },
     {
-      "id": 227,
+      "id": 228,
       "name": "AMPL",
       "fullName": "Ampleforth",
       "description": "AMPL / USD",
@@ -5202,7 +5225,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 228,
+      "id": 229,
       "name": "QUICK",
       "fullName": "Quickswap",
       "description": "QUICK / USD",
@@ -5225,7 +5248,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 229,
+      "id": 230,
       "name": "OM",
       "fullName": "Mantra DAO",
       "description": "OM / USD",
@@ -5248,7 +5271,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 230,
+      "id": 231,
       "name": "QNT",
       "fullName": "Quant",
       "description": "QNT / USD",
@@ -5271,7 +5294,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 231,
+      "id": 232,
       "name": "ILS",
       "fullName": "Israeli Shekel",
       "description": "ILS / USD",
@@ -5293,7 +5316,7 @@
       "script": "YahooFinance"
     },
     {
-      "id": 232,
+      "id": 233,
       "name": "GHST",
       "fullName": "Aavegotchi",
       "description": "GHST / USD",
@@ -5316,7 +5339,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 233,
+      "id": 234,
       "name": "PLN",
       "fullName": "Polish Zloty",
       "description": "PLN / USD",
@@ -5338,7 +5361,7 @@
       "script": "YahooFinance"
     },
     {
-      "id": 234,
+      "id": 235,
       "name": "XPT",
       "fullName": "Platinum",
       "description": "XPT / USD",
@@ -5360,7 +5383,7 @@
       "script": "YahooFinance"
     },
     {
-      "id": 235,
+      "id": 236,
       "name": "THETA",
       "fullName": "Theta Token",
       "description": "THETA / USD",
@@ -5383,7 +5406,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 236,
+      "id": 237,
       "name": "FTT",
       "fullName": "FTX Token",
       "description": "FTT / USD",
@@ -5406,7 +5429,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 237,
+      "id": 238,
       "name": "DASH",
       "fullName": "Dash",
       "description": "DASH / USD",
@@ -5429,7 +5452,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 238,
+      "id": 239,
       "name": "SLP",
       "fullName": "Smooth Love Potion",
       "description": "SLP / USD",
@@ -5452,7 +5475,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 239,
+      "id": 240,
       "name": "BADGER",
       "fullName": "Badger DAO",
       "description": "BADGER / USD",
@@ -5475,7 +5498,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 240,
+      "id": 241,
       "name": "STORJ",
       "fullName": "Storj",
       "description": "STORJ / USD",
@@ -5498,7 +5521,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 241,
+      "id": 242,
       "name": "HBAR",
       "fullName": "Hedera Hashgraph",
       "description": "HBAR / USD",
@@ -5521,7 +5544,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 242,
+      "id": 243,
       "name": "ALCX",
       "fullName": "Alchemix",
       "description": "ALCX / USD",
@@ -5544,7 +5567,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 243,
+      "id": 244,
       "name": "DGB",
       "fullName": "Digibyte",
       "description": "DGB / USD",
@@ -5567,7 +5590,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 244,
+      "id": 245,
       "name": "GLMR",
       "fullName": "Moonbeam",
       "description": "GLMR / USD",
@@ -5590,7 +5613,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 245,
+      "id": 246,
       "name": "ZERO",
       "fullName": "",
       "description": "ZERO / USD",
@@ -5613,7 +5636,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 246,
+      "id": 247,
       "name": "SRM",
       "fullName": "Serum",
       "description": "SRM / USD",
@@ -5636,7 +5659,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 247,
+      "id": 248,
       "name": "mSOL",
       "fullName": "Marinade Staked SOL",
       "description": "mSOL / USD",
@@ -5658,7 +5681,7 @@
       "script": "YahooFinance"
     },
     {
-      "id": 248,
+      "id": 249,
       "name": "REN",
       "fullName": "Ren",
       "description": "REN / USD",
@@ -5681,7 +5704,7 @@
       "script": "CoinMarketCap"
     },
     {
-      "id": 249,
+      "id": 250,
       "name": "GNO",
       "fullName": "Gnosis",
       "description": "GNO / USD",

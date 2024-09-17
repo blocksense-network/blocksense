@@ -75,6 +75,18 @@ async function isFeedSupported(
     ) {
       feed.resources.yf_symbol = `${feed.pair.base}${feed.pair.quote}=X`;
     }
+
+    const specialCases: Record<string, any> = {
+      XAG: {
+        yf_symbol: 'GC=F',
+      },
+      XAU: {
+        yf_symbol: 'SI-F',
+      },
+    };
+
+    const special = specialCases[feed.pair.base];
+    if (special) feed.resources = { ...special };
     return true;
   }
 
