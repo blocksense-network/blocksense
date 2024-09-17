@@ -8,11 +8,16 @@ use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use sequencer_config::{FeedConfig, Validated};
 use serde::Deserialize;
+use std::path::PathBuf;
 use tokio::{sync::RwLock, time};
 use tracing::{info, trace};
 use utils::{read_file, time::current_unix_time};
 
-pub fn init_feeds_config(config_file: &str) -> anyhow::Result<AllFeedsConfig> {
+pub fn init_feeds_config(config_file: &PathBuf) -> anyhow::Result<AllFeedsConfig> {
+    let config_file = config_file
+        .to_str()
+        .expect("Environment variable does not hold a dir path");
+
     let data = read_file(config_file);
 
     info!("Using config file: {}", config_file);
@@ -23,7 +28,7 @@ pub fn init_feeds_config(config_file: &str) -> anyhow::Result<AllFeedsConfig> {
     }
 }
 
-pub fn get_validated_feeds_config(config_file: &str) -> AllFeedsConfig {
+pub fn get_validated_feeds_config(config_file: &PathBuf) -> AllFeedsConfig {
     let feeds_config = init_feeds_config(config_file).expect("Failed to get config: ");
 
     feeds_config

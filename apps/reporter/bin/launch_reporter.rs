@@ -30,9 +30,9 @@ async fn main() -> std::io::Result<()> {
                 println!("compiler => {VERGEN_RUSTC_SEMVER}");
 
                 let feeds_config_file =
-                    get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
+                    get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
                 let _reporter_config = get_validated_reporter_config();
-                let _feeds_config = get_validated_feeds_config(feeds_config_file.as_str());
+                let _feeds_config = get_validated_feeds_config(&feeds_config_file);
 
                 return std::io::Result::Ok(());
             }

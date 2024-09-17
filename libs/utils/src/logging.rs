@@ -102,7 +102,6 @@ pub fn init_logging_handle(logging_level: &str, tokio_console: bool) -> LoggingH
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::env;
 
     #[test]
     fn test_set_logging_levels() {

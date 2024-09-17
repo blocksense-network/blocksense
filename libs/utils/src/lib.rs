@@ -8,6 +8,7 @@ use std::{
     fs::File,
     hash::{DefaultHasher, Hash, Hasher},
     io::Read,
+    path::PathBuf,
     str::FromStr,
 };
 
@@ -50,7 +51,7 @@ pub fn read_file(path: &str) -> String {
     data
 }
 
-pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) -> String {
+pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) -> PathBuf {
     let config_file_path = env::var(base_path_from_env).unwrap_or_else(|_| {
         let conf_dir = dirs::config_dir().expect("Configuration file path not specified.");
         let conf_dir = conf_dir.join("blocksense");
@@ -59,5 +60,6 @@ pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) ->
             .expect("Configuration file path not valid.")
             .to_string()
     });
-    config_file_path + config_file_name
+    let config_file_path: PathBuf = config_file_path.as_str().into();
+    config_file_path.join(config_file_name)
 }

@@ -121,10 +121,10 @@ pub async fn prepare_http_servers(
 
 fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
     let sequencer_config_file =
-        get_config_file_path("SEQUENCER_CONFIG_DIR", "/sequencer_config.json");
-    let sequencer_config = get_validated_sequencer_config(sequencer_config_file.as_str());
-    let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
-    let feeds_config = get_validated_feeds_config(feeds_config_file.as_str());
+        get_config_file_path("SEQUENCER_CONFIG_DIR", "sequencer_config.json");
+    let sequencer_config = get_validated_sequencer_config(&sequencer_config_file);
+    let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
+    let feeds_config = get_validated_feeds_config(&feeds_config_file);
     (sequencer_config, feeds_config)
 }
 

@@ -58,9 +58,12 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
         },
     });
 
-    let config_file_path = get_config_file_path("SEQUENCER_CONFIG_DIR", "/sequencer_config.json");
+    let config_file_path = get_config_file_path("SEQUENCER_CONFIG_DIR", "sequencer_config.json");
+    let config_file_path = config_file_path
+        .to_str()
+        .expect("Environment variable does not hold a dir path");
 
-    let data = read_file(config_file_path.as_str());
+    let data = read_file(config_file_path);
 
     let mut sequencer_config =
         serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");

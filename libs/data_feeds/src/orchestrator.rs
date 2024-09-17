@@ -31,17 +31,20 @@ use feed_registry::{
 };
 
 pub fn init_reporter_config() -> Result<ReporterConfig, anyhow::Error> {
-    let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "/reporter_config.json");
+    let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "reporter_config.json");
+    let config_file_path = config_file_path
+        .to_str()
+        .expect("Environment variable does not hold a dir path");
 
-    let data = read_file(config_file_path.as_str());
+    let data = read_file(config_file_path);
 
-    info!("Using config file: {}", config_file_path.as_str());
+    info!("Using config file: {}", config_file_path);
 
     match serde_json::from_str::<ReporterConfig>(data.as_str()) {
         Ok(c) => Ok(c),
         Err(e) => anyhow::bail!(
             "Config file ({}) is not valid JSON! {}",
-            config_file_path.as_str(),
+            config_file_path,
             e
         ),
     }
@@ -92,9 +95,8 @@ pub async fn orchestrator() {
 
     let reporter_config = init_reporter_config().expect("Config file is not valid JSON!");
 
-    let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "/feeds_config.json");
-    let feeds_registry =
-        init_feeds_config(feeds_config_file.as_str()).expect("Failed to get config: ");
+    let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
+    let feeds_registry = init_feeds_config(&feeds_config_file).expect("Failed to get config: ");
 
     let mut connection_cache = HashMap::<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>::new();
 
