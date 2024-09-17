@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::time::Duration;
 
 use anyhow::{anyhow, Result};
@@ -94,6 +95,22 @@ fn get_feed_result(response_json: &Value, idx: usize, asset: &str) -> FeedResult
             error!(
                 "{}",
                 format!("Error occured while getting {} price! - {}", asset, e)
+            );
+
+            get_generic_feed_error("YahooFinance")
+        }
+    }
+}
+
+fn get_feed_result_from_hashmap(asset: &str, map: &HashMap<String, f64>) -> FeedResult {
+    match map.get(asset) {
+        Some(&price) => FeedResult::Result {
+            result: FeedType::Numerical(price),
+        },
+        None => {
+            error!(
+                "{}",
+                format!("Error occured while getting {} price!", asset)
             );
 
             get_generic_feed_error("YahooFinance")
@@ -205,10 +222,24 @@ impl DataFeed for YahooFinanceDataFeed {
             if response.status().is_success() {
                 let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-                for (idx, (asset, feed_id)) in asset_id_vec.iter().enumerate() {
+                let symbol_price_map: HashMap<String, f64> = resp_json["quoteResponse"]["result"]
+                    .as_array()
+                    .unwrap_or(&vec![]) // Provide an empty vec if result is not an array
+                    .iter()
+                    .filter_map(|result| {
+                        let symbol = result["symbol"].as_str();
+                        let price = result["regularMarketPrice"].as_f64();
+                        match (symbol, price) {
+                            (Some(symbol), Some(price)) => Some((symbol.to_string(), price)),
+                            _ => None, // TODO(snikolov): How to react to invalid entries?
+                        }
+                    })
+                    .collect();
+
+                for (asset, feed_id) in asset_id_vec.iter() {
                     trace!("Feed Asset pair: {} ... Feed Id: {}", asset, feed_id);
                     results_vec.push((
-                        get_feed_result(&resp_json, idx, asset),
+                        get_feed_result_from_hashmap(asset, &symbol_price_map),
                         *feed_id,
                         current_unix_time(),
                     ));
