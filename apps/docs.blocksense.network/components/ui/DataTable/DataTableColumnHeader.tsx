@@ -13,15 +13,17 @@ interface DataTableColumnHeaderProps<TData, TValue>
   column: Column<TData, TValue>;
   title: string;
   type: 'string' | 'number';
+  hasSort?: boolean;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
   column,
   title,
   type,
+  hasSort = true,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-  if (!column.getCanSort()) {
-    return <div>{title}</div>;
+  if (!column.getCanSort() || hasSort === false) {
+    return <span className="capitalize text-sm">{title}</span>;
   }
 
   return (
@@ -29,18 +31,20 @@ export function DataTableColumnHeader<TData, TValue>({
       onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       className="cursor-pointer flex items-center"
     >
-      <span className="capitalize text-sm font-medium">{title}</span>
-      {type === 'number' ? (
-        column.getIsSorted() === 'desc' ? (
-          <ArrowDown10 className="ml-2 h-4 w-4" />
+      <span className="capitalize text-sm">{title}</span>
+      <div className="h-4 w-4">
+        {type === 'number' ? (
+          column.getIsSorted() === 'desc' ? (
+            <ArrowDown10 className="ml-2 h-4 w-4" />
+          ) : (
+            <ArrowDown01 className="ml-2 h-4 w-4" />
+          )
+        ) : column.getIsSorted() === 'desc' ? (
+          <ArrowDownZA className="ml-2 h-4 w-4" />
         ) : (
-          <ArrowDown01 className="ml-2 h-4 w-4" />
-        )
-      ) : column.getIsSorted() === 'desc' ? (
-        <ArrowDownZA className="ml-2 h-4 w-4" />
-      ) : (
-        <ArrowDownAZ className="ml-2 h-4 w-4" />
-      )}
+          <ArrowDownAZ className="ml-2 h-4 w-4" />
+        )}
+      </div>
     </div>
   );
 }
