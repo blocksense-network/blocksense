@@ -43,7 +43,7 @@ impl Handler for Collector {
 
 async fn write_file(key_path: &str, content: &[u8]) {
     let mut f = File::create(key_path).await.expect("Could not create file");
-    f.write(content).await.expect("Failed to write to file");
+    f.write_all(content).await.expect("Failed to write to file");
     f.flush().await.expect("Could not flush file");
 }
 

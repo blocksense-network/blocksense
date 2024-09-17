@@ -1,10 +1,10 @@
 use eyre::Result;
 use sequencer_config::{SequencerConfig, Validated};
-use std::path::PathBuf;
+use std::path::Path;
 use tracing::info;
 use utils::read_file;
 
-pub fn init_sequencer_config(config_file: &PathBuf) -> Result<SequencerConfig> {
+pub fn init_sequencer_config(config_file: &Path) -> Result<SequencerConfig> {
     let config_file = match config_file.to_str() {
         Some(v) => v,
         None => eyre::bail!("Error converting path to str, needed to read file."),
@@ -18,7 +18,7 @@ pub fn init_sequencer_config(config_file: &PathBuf) -> Result<SequencerConfig> {
         .map_err(|e| eyre::eyre!("Config file ({}) is not valid JSON! {}", config_file, e))
 }
 
-pub fn get_validated_sequencer_config(config_file: &PathBuf) -> Result<SequencerConfig> {
+pub fn get_validated_sequencer_config(config_file: &Path) -> Result<SequencerConfig> {
     let sequencer_config = match init_sequencer_config(config_file) {
         Ok(v) => v,
         Err(e) => eyre::bail!("Failed to get config {} ", e),
@@ -37,12 +37,15 @@ mod tests {
     use super::*;
     use std::fs::File;
     use std::io::prelude::*;
+    use std::path::PathBuf;
 
     #[test]
     fn test_get_validated_sequencer_config_with_error_in_set_endpoint_ports() {
         let config_file_path =
             get_config_file_path("SEQUENCER_CONFIG_DIR", "sequencer_config.json");
-        let config_file_path = config_file_path.to_str().expect("");
+        let config_file_path = config_file_path
+            .to_str()
+            .expect("Error converting path to str, needed to read file.");
 
         let data = read_file(config_file_path);
         let mut config_json = match serde_json::from_str::<SequencerConfig>(data.as_str()) {
