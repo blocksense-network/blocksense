@@ -211,7 +211,7 @@ export function Flexsearch({
                 <HighlightMatches match={search} value={title} />
               </div>
               {content && (
-                <div className="excerpt nx-mt-1 nx-text-sm nx-leading-[1.35rem] nx-text-gray-600 dark:nx-text-gray-400 contrast-more:dark:nx-text-gray-50">
+                <div className="excerpt nx-mt-1 nx-text-sm nx-leading-[1.35rem] nx-text-gray-500 dark:nx-text-gray-400 contrast-more:dark:nx-text-gray-50">
                   <HighlightMatches match={search} value={content} />
                 </div>
               )}

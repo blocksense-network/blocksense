@@ -51,6 +51,14 @@ blockquote {
   @apply font-noto-sans-regular;
 }
 
+.nextra-search ul > li a {
+  @apply font-noto-sans-light;
+}
+
+.nextra-search ul > li a:hover {
+  @apply bg-zinc-100/10;
+}
+
 .nextra-sidebar-container ul > li a {
   @apply font-noto-sans-regular;
 }
