@@ -48,7 +48,7 @@ export const Pre = ({
       </pre>
       <div
         className={cn(
-          'nx-opacity-0 nx-transition [div:hover>&]:nx-opacity-100 focus-within:nx-opacity-100',
+          'nx-opacity-0 nx-transition nx-mt-0 [div:hover>&]:nx-opacity-100 focus-within:nx-opacity-100',
           'nx-flex nx-gap-1 nx-absolute nx-m-[11px] nx-right-0',
           filename ? 'nx-top-8' : 'nx-top-0',
         )}
