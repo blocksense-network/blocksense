@@ -1,10 +1,11 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
+import { parseEthereumAddress } from '@blocksense/base-utils/evm-utils';
+
 import {
   denominationTokenToAddress,
   isDenominationToken,
   parseDenominationToken,
-  parseEthereumAddress,
-} from '@blocksense/base-utils/evm-utils';
+} from '@blocksense/config-types/chainlink-compatibility';
 
 import {
   BlocksenseFeedsCompatibility,
