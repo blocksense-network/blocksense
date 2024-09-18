@@ -7,7 +7,7 @@ import { CopyButton } from '@/components/common/CopyButton';
 import { previewHexStringOrDefault } from '@/src/utils';
 import {
   EthereumAddress,
-  explorerAddressUrls,
+  explorerUrls,
   isEthereumAddress,
 } from '@blocksense/base-utils/evm-utils';
 import { cn } from '@/lib/utils';
@@ -44,9 +44,7 @@ export const ContractAddress = ({
         {network ? (
           <code className="hover:underline">
             <Link
-              href={explorerAddressUrls[
-                network as keyof typeof explorerAddressUrls
-              ](address as EthereumAddress)}
+              href={explorerUrls[network].address(address as EthereumAddress)}
             >
               {addressToDisplay}
             </Link>
