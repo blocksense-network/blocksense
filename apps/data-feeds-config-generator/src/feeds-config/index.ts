@@ -1,4 +1,5 @@
 import { filterAsync } from '@blocksense/base-utils/async';
+import keccak256 from 'keccak256';
 
 import {
   Feed,
@@ -114,7 +115,13 @@ export async function generateFeedConfig(
   const feeds = await filterAsync(usdPairFeeds, feed =>
     isFeedSupported(feed, supportedCMCCurrencies),
   );
-  const feedsWithIdAndScript = feeds.map((feed, id) => ({
+  const feedsSortedByDescription = feeds.sort((a, b) => {
+    // We hash the descriptions here, to avoid an obvious ordering.
+    const a_ = keccak256(a.description).toString();
+    const b_ = keccak256(b.description).toString();
+    return a_.localeCompare(b_);
+  });
+  const feedsWithIdAndScript = feedsSortedByDescription.map((feed, id) => ({
     id,
     ...feed,
     script: decodeScript(
