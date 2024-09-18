@@ -1,10 +1,10 @@
-use std::{collections::HashMap, time::Duration};
+use std::time::Duration;
 
 use async_trait::async_trait;
 use feed_registry::{
     aggregate::{AverageAggregator, ConsensusMetric},
     api::DataFeedAPI,
-    types::{FeedResult, FeedType, Timestamp},
+    types::{Asset, FeedResult, FeedType, Timestamp},
 };
 use log::error;
 use reqwest::blocking::Client;
@@ -120,25 +120,22 @@ impl DataFeed for CoinMarketCapDataFeed {
         }
     }
 
-    async fn poll_batch(
-        &mut self,
-        asset_id_vec: &[(HashMap<String, String>, u32)],
-    ) -> Vec<(FeedResult, u32, Timestamp)> {
+    async fn poll_batch(&mut self, asset_id_vec: &[Asset]) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
 
         let asset_id_vec: Vec<(String, u32)> = asset_id_vec
             .iter()
-            .filter_map(|(resources, feed_id)| {
-                Some((
-                    resources
+            .map(|asset| {
+                (
+                    asset
+                        .resources
                         .get("cmc_id")
-                        .expect(
-                            format!("[CMC] Missing resource `cmc_id` for feed - {feed_id}!")
-                                .as_str(),
-                        )
+                        .unwrap_or_else(|| {
+                            panic!("[CMC] Missing resource `cmc_id` for feed - {:?}!", asset)
+                        })
                         .clone(),
-                    *feed_id,
-                ))
+                    asset.feed_id,
+                )
             })
             .collect();
 

@@ -1,7 +1,7 @@
 use feed_registry::{
     api::DataFeedAPI,
     registry::AllFeedsConfig,
-    types::{FeedResult, Timestamp},
+    types::{Asset, FeedResult, Timestamp},
 };
 
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
@@ -128,7 +128,7 @@ pub async fn dispatch_full_batch(
     feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
 ) {
-    let mut script_to_assets: HashMap<String, Vec<(HashMap<String, String>, u32)>> = HashMap::new();
+    let mut script_to_assets: HashMap<String, Vec<Asset>> = HashMap::new();
 
     // Example result in `scripts_to_assets` -
     // {"CoinMarketCap": [("{cmc_id: 1234, cmc_quote="BTC"}",1), "{cmc_id: 1235, cmc_quote="ETH"}",2)",...], "YahooFinance": [...]}
@@ -136,7 +136,10 @@ pub async fn dispatch_full_batch(
         script_to_assets
             .entry(feed.script.clone())
             .or_default()
-            .push((feed.resources.clone(), feed.id));
+            .push(Asset {
+                resources: feed.resources.clone(),
+                feed_id: feed.id,
+            });
     }
 
     for feed_api_enum in DataFeedAPI::iter() {
@@ -150,10 +153,9 @@ pub async fn dispatch_full_batch(
 
         let asset_id_vec = script_to_assets
             .get(feed_api_name)
-            .expect("Unrecognized DataFeed Script!")
-            .clone();
+            .expect("Unrecognized DataFeed Script!");
 
-        let results = feed_api.lock().await.poll_batch(&asset_id_vec).await;
+        let results = feed_api.lock().await.poll_batch(asset_id_vec).await;
 
         debug!("DataFeed {} polled", feed_api_enum.get_as_str());
 

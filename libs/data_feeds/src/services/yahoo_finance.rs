@@ -1,9 +1,9 @@
 use std::collections::HashMap;
-use std::hash::Hash;
 use std::time::Duration;
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
+use feed_registry::types::Asset;
 use reqwest::blocking::Client;
 use ringbuf::storage::Heap;
 use ringbuf::traits::RingBuffer;
@@ -65,7 +65,7 @@ fn get_yf_json_price(yf_response: &Value, idx: usize, asset: &str) -> Result<f64
     trace!("yf_symbol: {}, asset: {}", symbol, asset);
 
     if (symbol == asset) ||  // Check if symbol matches asset name
-    (format!("{}USD=X", asset) == asset && (type_displayed == "Currency" || type_displayed == "Fiat" || type_displayed == ""))
+    (format!("{}USD=X", asset) == symbol && (type_displayed == "Currency" || type_displayed == "Fiat" || type_displayed.is_empty()))
     // Different syntax for Currency/Fiat pairs
     {
         let price = yf_response
@@ -169,27 +169,25 @@ impl DataFeed for YahooFinanceDataFeed {
         }
     }
 
-    async fn poll_batch(
-        &mut self,
-        asset_id_vec: &[(HashMap<String, String>, u32)],
-    ) -> Vec<(FeedResult, u32, Timestamp)> {
+    async fn poll_batch(&mut self, asset_id_vec: &[Asset]) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://yfapi.net/v6/finance/quote";
 
         let asset_id_vec: Vec<(String, u32)> = asset_id_vec
             .iter()
-            .filter_map(|(resources, feed_id)| {
-                Some((
-                    resources
+            .map(|asset| {
+                (
+                    asset
+                        .resources
                         .get("yf_symbol")
-                        .expect(
-                            format!(
-                                "[YahooFinance] Missing resource `yf_symbol` in feed - {feed_id}"
+                        .unwrap_or_else(|| {
+                            panic!(
+                                "[YahooFinance] Missing resource `yf_symbol` in feed - {:?}",
+                                asset.feed_id
                             )
-                            .as_str(),
-                        )
+                        })
                         .clone(),
-                    *feed_id,
-                ))
+                    asset.feed_id,
+                )
             })
             .collect();
 

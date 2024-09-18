@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::{
+    collections::HashMap,
     fmt::{self, Display},
     time::{SystemTime, UNIX_EPOCH},
 };
@@ -236,6 +237,12 @@ impl FeedType {
 }
 
 pub type Timestamp = u128;
+
+#[derive(Debug)]
+pub struct Asset {
+    pub resources: HashMap<String, String>,
+    pub feed_id: u32,
+}
 
 #[derive(Debug, Serialize)]
 pub struct Bytes32(pub [u8; 32]);
