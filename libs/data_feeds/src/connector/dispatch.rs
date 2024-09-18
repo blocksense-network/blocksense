@@ -131,7 +131,7 @@ pub async fn dispatch_full_batch(
     let mut script_to_assets: HashMap<String, Vec<(HashMap<String, String>, u32)>> = HashMap::new();
 
     // Example result in `scripts_to_assets` -
-    // {"CoinMarketCap: [("{cmc_id: 1234, cmc_quote="BTC"}",1), "{cmc_id: 1235, cmc_quote="ETH"}",2)",...], "YahooFinance": [...]}
+    // {"CoinMarketCap": [("{cmc_id: 1234, cmc_quote="BTC"}",1), "{cmc_id: 1235, cmc_quote="ETH"}",2)",...], "YahooFinance": [...]}
     for feed in &feed_registry.feeds {
         script_to_assets
             .entry(feed.script.clone())
