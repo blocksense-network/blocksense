@@ -221,10 +221,11 @@ mod tests {
     use regex::Regex;
     use sequencer_config::get_test_config_with_single_provider;
     use std::env;
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
     use std::sync::Arc;
     use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
     use tokio::sync::{mpsc, RwLock};
+    use utils::constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE};
     use utils::get_config_file_path;
     use utils::logging::init_shared_logging_handle;
 
@@ -239,7 +240,7 @@ mod tests {
         let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config =
             init_sequencer_config(&sequencer_config_file).expect("Failed to load config:");
-        let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
+        let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
         let feeds_config = init_feeds_config(&feeds_config_file).expect("Failed to get config: ");
         let metrics_prefix = Some("test_get_feed_report_interval_");
 
@@ -287,11 +288,11 @@ mod tests {
 
     async fn create_app_state_from_sequencer_config(
         network: &str,
-        key_path: &str,
+        key_path: &Path,
         anvil_endpoint: &str,
     ) -> web::Data<FeedsState> {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
-        let config_file = get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
+        let config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
         let feeds_config = init_feeds_config(&config_file).expect("Failed to get config: ");
         let metrics_prefix = Some("create_app_state_from_sequencer_config_");
 
@@ -327,12 +328,15 @@ mod tests {
         const HTTP_STATUS_SUCCESS: u16 = 200;
 
         let anvil = Anvil::new().try_spawn().unwrap();
-        let key_path = "/tmp/priv_key_test";
+        let key_path = PathBuf::new().join("/tmp").join("priv_key_test");
         let network = "ETH137";
 
-        let app_state =
-            create_app_state_from_sequencer_config(network, key_path, anvil.endpoint().as_str())
-                .await;
+        let app_state = create_app_state_from_sequencer_config(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+        )
+        .await;
 
         // Initialize the service
         let app = test::init_service(App::new().app_data(app_state.clone()).service(deploy)).await;

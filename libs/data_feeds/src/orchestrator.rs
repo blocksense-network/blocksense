@@ -12,8 +12,11 @@ use prometheus::{
 };
 use sequencer_config::{ReporterConfig, Validated};
 use tokio::sync::{mpsc, Mutex};
-use utils::get_config_file_path;
 use utils::read_file;
+use utils::{
+    constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE},
+    get_config_file_path,
+};
 
 use tracing::{debug, info};
 
@@ -31,7 +34,7 @@ use feed_registry::{
 };
 
 pub fn init_reporter_config() -> Result<ReporterConfig, anyhow::Error> {
-    let config_file_path = get_config_file_path("REPORTER_CONFIG_DIR", "reporter_config.json");
+    let config_file_path = get_config_file_path(REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE);
     let config_file_path = config_file_path
         .to_str()
         .expect("Environment variable does not hold a dir path");
@@ -95,7 +98,7 @@ pub async fn orchestrator() {
 
     let reporter_config = init_reporter_config().expect("Config file is not valid JSON!");
 
-    let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
+    let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
     let feeds_registry = init_feeds_config(&feeds_config_file).expect("Failed to get config: ");
 
     let mut connection_cache = HashMap::<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>::new();

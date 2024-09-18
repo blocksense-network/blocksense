@@ -1,8 +1,7 @@
 use hex::decode;
 use serde::{de, Deserialize, Deserializer, Serialize};
 use std::collections::HashSet;
-use std::fs::File;
-use std::io::Write;
+use std::path::Path;
 use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
 use tracing::trace;
@@ -189,14 +188,9 @@ impl Validated for SequencerConfig {
 
 pub fn get_test_config_with_single_provider(
     network: &str,
-    private_key_path: &str,
+    private_key_path: &Path,
     url: &str,
 ) -> SequencerConfig {
-    let mut file = File::create(private_key_path)
-        .unwrap_or_else(|_| panic!("Could not create file {}", private_key_path));
-    file.write_all(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-        .unwrap_or_else(|_| panic!("Could not write to file {}", private_key_path));
-
     SequencerConfig {
         main_port: 8877,
         admin_port: 5556,
@@ -206,7 +200,7 @@ pub fn get_test_config_with_single_provider(
         providers: HashMap::from([(
             network.to_string(),
             Provider {
-                private_key_path: private_key_path.to_string(),
+                private_key_path: private_key_path.to_str().expect("Error in private key path").to_string(),
                 url: url.to_string(),
                 contract_address: None,
                 event_contract_address: None,
@@ -220,20 +214,18 @@ pub fn get_test_config_with_single_provider(
 }
 
 pub fn get_test_config_with_multiple_providers(
-    provider_details: Vec<(&str, &str, &str)>,
+    provider_details: Vec<(&str, &Path, &str)>,
 ) -> SequencerConfig {
     let mut providers = HashMap::new();
 
     for (network, private_key_path, url) in provider_details {
-        let mut file = File::create(private_key_path)
-            .unwrap_or_else(|_| panic!("Could not create file {}", private_key_path));
-        file.write_all(b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356")
-            .unwrap_or_else(|_| panic!("Could not write to file {}", private_key_path));
-
         providers.insert(
             network.to_string(),
             Provider {
-                private_key_path: private_key_path.to_string(),
+                private_key_path: private_key_path
+                    .to_str()
+                    .expect("Error in private_key_path: ")
+                    .to_string(),
                 url: url.to_string(),
                 contract_address: None,
                 event_contract_address: None,

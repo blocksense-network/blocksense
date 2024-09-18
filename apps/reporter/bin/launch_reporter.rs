@@ -1,9 +1,12 @@
 use data_feeds::orchestrator::{get_validated_reporter_config, orchestrator};
 use std::env;
 
-use utils::build_info::{
-    BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
-    VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
+use utils::{
+    build_info::{
+        BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
+        VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
+    },
+    constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE},
 };
 
 use feed_registry::registry::get_validated_feeds_config;
@@ -29,8 +32,7 @@ async fn main() -> std::io::Result<()> {
                 println!("optimizations => {VERGEN_CARGO_OPT_LEVEL}");
                 println!("compiler => {VERGEN_RUSTC_SEMVER}");
 
-                let feeds_config_file =
-                    get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
+                let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
                 let _reporter_config = get_validated_reporter_config();
                 let _feeds_config = get_validated_feeds_config(&feeds_config_file);
 

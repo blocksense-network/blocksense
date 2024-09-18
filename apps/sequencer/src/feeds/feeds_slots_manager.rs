@@ -107,6 +107,7 @@ mod tests {
     use std::path::PathBuf;
     use std::sync::Arc;
     use std::time::Duration;
+    use utils::constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE};
 
     use tokio::sync::{
         mpsc::{UnboundedReceiver, UnboundedSender},
@@ -126,7 +127,7 @@ mod tests {
         let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config =
             init_sequencer_config(&sequencer_config_file).expect("Failed to load config:");
-        let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
+        let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
         let mut feeds_config =
             init_feeds_config(&feeds_config_file).expect("Failed to get config: ");
         let all_feeds_reports = AllFeedsReports::new();

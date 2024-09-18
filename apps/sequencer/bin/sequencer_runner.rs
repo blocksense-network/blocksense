@@ -13,6 +13,9 @@ use sequencer::reporters::reporter::init_shared_reporters;
 
 use sequencer::http_handlers::admin::{deploy, get_feed_report_interval, get_key, set_log_level};
 use sequencer::http_handlers::data_feeds::{post_report, register_feed};
+use utils::constants::{
+    FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
+};
 use utils::logging::{
     get_log_level, get_shared_logging_handle, init_shared_logging_handle, tokio_console_active,
     SharedLoggingHandle,
@@ -120,11 +123,10 @@ pub async fn prepare_http_servers(
 }
 
 fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
-    let sequencer_config_file =
-        get_config_file_path("SEQUENCER_CONFIG_DIR", "sequencer_config.json");
+    let sequencer_config_file = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
     let sequencer_config = get_validated_sequencer_config(&sequencer_config_file)
         .expect("Could not get validated sequencer config");
-    let feeds_config_file = get_config_file_path("FEEDS_CONFIG_DIR", "feeds_config.json");
+    let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
     let feeds_config = get_validated_feeds_config(&feeds_config_file);
     (sequencer_config, feeds_config)
 }

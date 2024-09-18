@@ -17,6 +17,7 @@ use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time;
 use tokio::time::Duration;
+use utils::constants::{SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE};
 use utils::get_config_file_path;
 use utils::read_file;
 
@@ -58,7 +59,7 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
         },
     });
 
-    let config_file_path = get_config_file_path("SEQUENCER_CONFIG_DIR", "sequencer_config.json");
+    let config_file_path = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
     let config_file_path = config_file_path
         .to_str()
         .expect("Environment variable does not hold a dir path");

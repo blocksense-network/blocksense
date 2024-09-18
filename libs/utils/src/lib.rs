@@ -1,5 +1,7 @@
 pub mod build_info;
+pub mod constants;
 pub mod logging;
+pub mod test_env;
 pub mod time;
 
 use std::{
@@ -7,20 +9,22 @@ use std::{
     fmt::{Debug, Display},
     fs::File,
     hash::{DefaultHasher, Hash, Hasher},
-    io::Read,
-    path::PathBuf,
+    io::{Read, Write},
+    path::{Path, PathBuf},
     str::FromStr,
 };
 
-pub fn get_env_var<T>(key: &str) -> Result<T, String>
+use anyhow::{anyhow, Result};
+
+pub fn get_env_var<T>(key: &str) -> Result<T>
 where
     T: FromStr,
     T::Err: Debug + Display,
 {
-    let value_str = env::var(key).map_err(|_| format!("Environment variable '{}' not set", key))?;
+    let value_str = env::var(key).map_err(|_| anyhow!("Environment variable '{key}' not set"))?;
     value_str
         .parse()
-        .map_err(|err| format!("Failed to parse environment variable '{}': {}", key, err))
+        .map_err(|err| anyhow!("Failed to parse environment variable '{key}': {err}"))
 }
 
 pub fn generate_string_hash(string: &str) -> u64 {
@@ -44,11 +48,18 @@ pub fn to_hex_string(mut bytes: Vec<u8>, padding_to: Option<usize>) -> String {
 }
 
 pub fn read_file(path: &str) -> String {
-    let mut file = File::open(path).unwrap_or_else(|_| panic!("File not found in {}", path));
+    let mut file = File::open(path).unwrap_or_else(|_| panic!("File not found in {path}"));
     let mut data = String::new();
     file.read_to_string(&mut data)
-        .unwrap_or_else(|_| panic!("File {} read failure! ", path));
+        .unwrap_or_else(|_| panic!("File {path} read failure! "));
     data
+}
+
+pub fn write_flush_file(filename: &Path, content: &String) -> Result<()> {
+    let mut file = File::create(filename)?;
+    file.write_all(content.as_bytes())?;
+    file.flush()?;
+    Ok(())
 }
 
 pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) -> PathBuf {

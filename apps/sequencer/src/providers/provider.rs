@@ -214,37 +214,29 @@ async fn get_rpc_providers(
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::*;
     use alloy::{
         network::TransactionBuilder, node_bindings::Anvil, primitives::U256,
         rpc::types::eth::request::TransactionRequest,
     };
     use eyre::Result;
+    use utils::test_env::get_test_private_key_path;
 
     use crate::providers::provider::get_rpc_providers;
     use alloy::providers::Provider as AlloyProvider;
     use sequencer_config::get_test_config_with_single_provider;
-
-    use tokio::fs::File;
-    use tokio::io::AsyncWriteExt;
-
-    async fn create_priv_key(key_path: &str, private_key: &[u8]) {
-        let mut f = File::create(key_path)
-            .await
-            .expect("Could not create key file");
-        f.write(private_key)
-            .await
-            .expect("Failed to write to temp file");
-        f.flush().await.expect("Could not flush temp file");
-    }
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
         let network = "ETH";
 
         let anvil = Anvil::new().try_spawn()?;
+        let key_path = PathBuf::new().join("/tmp").join("key");
 
-        let cfg = get_test_config_with_single_provider(network, "/tmp/key", &anvil.endpoint());
+        let cfg =
+            get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
 
         let providers = get_rpc_providers(&cfg, "basic_test_provider_").await;
         let provider = &providers.get(network).unwrap().lock().await.provider;
@@ -279,14 +271,14 @@ mod tests {
     #[tokio::test]
     async fn test_get_wallet_success() {
         let network = "ETH1";
-        // Create a temporary file with a valid private key
-        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
         let expected_wallet_address = "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955"; // generated as hash of private_key
-        let key_path = "/tmp/key";
+        let key_path = get_test_private_key_path();
 
-        create_priv_key(key_path, private_key).await;
-
-        let cfg = get_test_config_with_single_provider(network, key_path, "http://localhost:8545");
+        let cfg = get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            "http://localhost:8545",
+        );
         let providers = get_rpc_providers(&cfg, "test_get_wallet_success_").await;
 
         // Call the function
@@ -300,13 +292,13 @@ mod tests {
     async fn test_get_rpc_providers_returns_single_provider() {
         // setup
         let network = "ETH2";
-        // Create a temporary file with a valid private key
-        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
-        let key_path = "/tmp/key";
+        let key_path = get_test_private_key_path();
 
-        create_priv_key(key_path, private_key).await;
-
-        let cfg = get_test_config_with_single_provider(network, key_path, "http://localhost:8545");
+        let cfg = get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            "http://localhost:8545",
+        );
 
         // test
         let binding = init_shared_rpc_providers(

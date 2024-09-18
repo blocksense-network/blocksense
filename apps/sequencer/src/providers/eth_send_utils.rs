@@ -314,8 +314,7 @@ mod tests {
     };
     use std::collections::HashMap;
     use std::str::FromStr;
-    use tokio::fs::File;
-    use tokio::io::AsyncWriteExt;
+    use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -325,27 +324,18 @@ mod tests {
         None
     }
 
-    async fn create_priv_key(key_path: &str, private_key: &[u8]) {
-        let mut f = File::create(key_path)
-            .await
-            .expect("Could not create key file");
-        f.write(private_key)
-            .await
-            .expect("Failed to write to temp file");
-        f.flush().await.expect("Could not flush temp file");
-    }
-
     #[tokio::test]
     async fn test_deploy_contract_returns_valid_address() {
         // setup
         let anvil = Anvil::new().try_spawn().unwrap();
-        let key_path = "/tmp/priv_key_test";
-        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
         let network = "ETH131";
-        create_priv_key(key_path, private_key).await;
+        let key_path = get_test_private_key_path();
 
-        let cfg =
-            get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
+        let cfg = get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+        );
 
         // give some time for cleanup env variables
         let providers =
@@ -381,13 +371,14 @@ mod tests {
 
         // setup
         let anvil = Anvil::new().try_spawn().unwrap();
-        let key_path = "/tmp/priv_key_test";
-        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
+        let key_path = get_test_private_key_path();
         let network = "ETH333";
-        create_priv_key(key_path, private_key).await;
 
-        let cfg =
-            get_test_config_with_single_provider(network, key_path, anvil.endpoint().as_str());
+        let cfg = get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+        );
 
         let providers =
             init_shared_rpc_providers(&cfg, Some("test_eth_batch_send_to_oneshot_contract_")).await;
@@ -480,9 +471,7 @@ mod tests {
         /////////////////////////////////////////////////////////////////////
 
         // setup
-        let key_path = "/tmp/priv_key_test";
-        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
-        create_priv_key(key_path, private_key).await;
+        let key_path = get_test_private_key_path();
 
         let anvil_network1 = Anvil::new().try_spawn().unwrap();
         let network1 = "ETH374";
@@ -490,8 +479,16 @@ mod tests {
         let network2 = "ETH375";
 
         let cfg = get_test_config_with_multiple_providers(vec![
-            (network1, key_path, anvil_network1.endpoint().as_str()),
-            (network2, key_path, anvil_network2.endpoint().as_str()),
+            (
+                network1,
+                key_path.as_path(),
+                anvil_network1.endpoint().as_str(),
+            ),
+            (
+                network2,
+                key_path.as_path(),
+                anvil_network2.endpoint().as_str(),
+            ),
         ]);
 
         let providers =
