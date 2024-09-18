@@ -7,7 +7,10 @@ import { artifactsDir } from '../paths';
 export async function getCMCCryptoList(): Promise<readonly CMCInfo[]> {
   const url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map';
   const headers = {
-    'X-CMC_PRO_API_KEY': assertNotNull(process.env['CMC_API_KEY']),
+    'X-CMC_PRO_API_KEY': assertNotNull(
+      process.env['CMC_API_KEY'],
+      'CMC_API_KEY env variable not set',
+    ),
     Accept: 'application/json',
   };
 
@@ -15,7 +18,13 @@ export async function getCMCCryptoList(): Promise<readonly CMCInfo[]> {
 
   const response = await fetch(fullUrl, { headers });
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(
+      `Failed to fetch CoinMarketCap crypto list;
+response:
+  status=${response.status};
+  text=
+${await response.text()}`,
+    );
   }
   const typedData = (await response.json()) as { data: unknown[] };
 
