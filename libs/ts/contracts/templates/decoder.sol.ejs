@@ -6,11 +6,14 @@ let name = fields.name.charAt(0).toLowerCase() + fields.name.slice(1)
 
 const expandFields = (values) => {
   const expandedFields = values.map((field) => {
+    const isDynamic = field.type === 'bytes' || field.type === 'string' || field.type.endsWith('[]');
     let data;
-    if (field.type.endsWith(']')) {
+    if (isDynamic) {
+      data = field
+    } else if (field.type.endsWith(']')) {
       // This is an array field
       const baseType = field.type.split('[')[0];
-      const arraySize = field.type.match(/\[(\d*)\]/)[1] || field.length;
+      const arraySize = field.type.match(/\[(\d*)\]/)[1];
       data = [];
       for (let i = 0; i < parseInt(arraySize); i++) {
         if (baseType === 'tuple') {
@@ -41,7 +44,7 @@ function organizeFieldsIntoStructs(values) {
   let mainStruct = { name: fields.name, fields: [] };
 
   function processField(field, parentStruct) {
-    if (field.type === 'tuple' || (field.type.endsWith(']') && field.components)) {
+    if (field.type.includes('tuple')) {
       let newStruct = {
         name: field.name.charAt(0).toUpperCase() + field.name.slice(1),
         fields: []
@@ -55,9 +58,9 @@ function organizeFieldsIntoStructs(values) {
       } else {
         parentStruct.fields.push({ name: field.name, type: newStruct.name });
       }
-    } else if (field.type.endsWith('[]')) {
-      let arrayType = field.type.split('[')[0];
-      parentStruct.fields.push({ name: field.name, type: `${arrayType}[]` });
+    // } else if (field.type.endsWith('[]') || field.type === 'bytes' || field.type === 'string') { // Handle dynamic data
+    //   let arrayType = field.type.split('[')[0];
+    //   parentStruct.fields.push({ name: field.name, type: field.type });
     } else {
       parentStruct.fields.push({ name: field.name, type: field.type });
     }
@@ -78,21 +81,19 @@ function processFields(fields) {
       field = processFields(field);
     } else {
       field.shift = 0;
-      const isBytes = field.type.startsWith('bytes');
-      const isBytesMemory = field.type === 'bytes';
+      const isBytes = field.type.startsWith('bytes') && field.type !== 'bytes' && !field.type.endsWith('[]');
+      const isDynamic = field.type === 'bytes' || field.type === 'string' || field.type.endsWith('[]');
       let fieldSize = field.size;
       // Handle bytes fields
       if (isBytes) {
+        // Handle bytesNum
         if (prevSizeSum + fieldSize < 256) {
-          // Handle bytesNum (not array or bytes memory)
-          if (!isBytesMemory) {
-            field.shift = -prevSizeSum;
-          }
+          field.shift = -prevSizeSum;
           prevSizeSum += fieldSize;
         } else {
           prevSizeSum = 0;
         }
-      } else {
+      } else if (!isDynamic) {
         // Handle non-bytes fields
         if (prevSizeSum + fieldSize >= 256) {
           prevSizeSum = 0;
@@ -100,6 +101,10 @@ function processFields(fields) {
 
         field.shift = 256 - prevSizeSum - fieldSize;
         prevSizeSum += fieldSize;
+      } else {
+        // Handle dynamic data
+        field.isDynamic = true;
+        prevSizeSum = 0;
       }
     }
   });
@@ -113,7 +118,8 @@ let wordOffset = 32;
 let bitOffset = 0;
 let prevSize = 0;
 let shouldUpdate = false;
-function generateDecoderLines(expandedFields, name, startIndex = 0) {
+let shift = false;
+function generateDecoderLines(expandedFields, name, startIndex = 0, indentation = '') {
   const lines = [];
   let index = startIndex;
   let location = name;
@@ -121,19 +127,19 @@ function generateDecoderLines(expandedFields, name, startIndex = 0) {
   for (let i = 0; i < expandedFields.length; i++) {
     const field = expandedFields[i];
 
-    bitOffset += Array.isArray(field) ? 0 : field.size;
+    bitOffset += Array.isArray(field) || field.isDynamic ? 0 : field.size;
 
     if (!Array.isArray(field) && prevSize + field.size >= 256) {
       wordOffset += prevSize / 8;
-      bitOffset = field.size;
+      bitOffset = field.isDynamic ? 0 : field.size;
       shouldUpdate = true;
       prevSize = 0;
     }
 
-    if (shouldUpdate && wordOffset > 32) {
+    if (shouldUpdate && (wordOffset > 32 || shift)) {
       lines.push('');
       lines.push(`// Offset data with ${wordOffset} bytes`);
-      lines.push(`memData := mload(add(data, ${wordOffset}))`);
+      lines.push(`memData := mload(add(data, ${shift ? `add(shift, ${wordOffset})` : wordOffset}))`);
       lines.push('');
       shouldUpdate = false;
     }
@@ -141,21 +147,89 @@ function generateDecoderLines(expandedFields, name, startIndex = 0) {
     if (Array.isArray(field)) {
       const innerName = name + '_' + index;
       lines.push('');
-      lines.push(`// Get address of field at slot ${index + 1} of ${name}`);
-      lines.push(`let ${innerName} := mload(${index ? `add(${name}, ${index * 0x20})` : name})`);
-      const innerLines = generateDecoderLines(field, innerName, 0);
+      lines.push('{');
+      lines.push(`  // Get address of field at slot ${index + 1} of ${name}`);
+      lines.push(`  let ${innerName} := mload(${index ? `add(${name}, ${index * 0x20})` : name})`);
+      const innerLines = generateDecoderLines(field, innerName, 0, '  ');
       lines.push(...innerLines);
-    } else if (field.size <= 256) {
+      lines.push('}');
+    } else if (!field.isDynamic) {
       prevSize += field.size;
       lines.push(`// Store the next ${field.size} bytes of memData at slot ${index + 1} of ${location}`);
       lines.push(`mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.shift == 0 ? 'memData' : field.shift < 0 ? `shl(${Math.abs(field.shift)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)`})`);
     } else {
-      lines.push('// Handle larger types (bytes) here');
+      lines.push('');
+      if (!shift) {
+        lines.push(`let shift := ${wordOffset + 4}`);
+      } else {
+        lines.push(`shift := add(shift, ${wordOffset + 4})`);
+      }
+      shift = true;
+
+      const isBytes = field.type.startsWith('bytes') && field.type !== 'bytes';
+
+      lines.push(`{`);
+      lines.push(`  let ${field.name} := mload(0x40)`);
+      lines.push(`  let size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+      lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.name})`);
+      lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`);
+      lines.push(`  let prevSizeSum := 0`);
+      if (isBytes) {
+        lines.push(`  let offset := 32`);
+      } else {
+        lines.push(`  let offset := ${field.size + 32}`);
+      }
+      lines.push(`  mstore(${field.name}, size)`);
+      lines.push(`  for {`);
+      lines.push(`    let i := 0`);
+      lines.push(`  } lt(i, size) {`);
+      lines.push(`    i := add(i, 1)`);
+      lines.push(`    offset := add(offset, ${field.size})`);
+      lines.push(`    prevSizeSum := add(prevSizeSum, ${field.size})`);
+      lines.push(`  } {`);
+      if (isBytes) {
+        lines.push(`    if gt(add(offset, ${field.size}), 256) {`);
+      } else {
+        lines.push(`    if gt(offset, 256) {`);
+      }
+      lines.push(`      shift := add(shift, div(prevSizeSum, 8))`);
+      lines.push(`      memData := mload(add(data, shift))`);
+      if (isBytes) {
+        lines.push(`      offset := 0`);
+      } else {
+        lines.push(`      offset := ${field.size}`);
+      }
+      lines.push(`      prevSizeSum := 0`);
+      lines.push(`    }`);
+      lines.push(`    mstore(`);
+      lines.push(`      add(${field.name}, mul(0x20, add(i, 1))),`);
+      if (isBytes) {
+        lines.push(`      shl(offset, memData)`);
+      } else {
+        lines.push(`      and(shr(sub(256, offset), memData), ${'0x' + 'F'.repeat(field.size / 4)})`);
+      }
+      lines.push(`    )`);
+      lines.push(`  }`);
+      if (isBytes) {
+        lines.push(`    switch gt(add(offset, ${field.size}), 256)`);
+      } else {
+        lines.push(`    switch gt(offset, 256)`);
+      }
+      lines.push(`  case 1 {`);
+      lines.push(`    shift := add(shift, div(prevSizeSum, 8))`);
+      lines.push(`  }`);
+      lines.push(`  default {`);
+      lines.push(`    shift := add(shift, div(sub(offset, ${field.size + 32}), 8))`);
+      lines.push(`  }`);
+      lines.push(`  memData := mload(add(data, shift))`);
+      lines.push(`}`);
+
+      wordOffset = 0;
     }
     index++;
   }
 
-  return lines;
+  return lines.map(line => line !== '' ? indentation + line : line);
 }-%>
 
 /// @notice Decoder for stored packed sports data

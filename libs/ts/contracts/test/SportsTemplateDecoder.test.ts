@@ -9,7 +9,6 @@ type SimpleField = {
   name: string;
   type: string;
   size?: number;
-  length?: number;
 };
 
 type TupleField = {
@@ -29,57 +28,55 @@ function processFields(
 ): [Field['values'], any[]] {
   const processedFields = fields.map((field, i) => {
     if (field.type.includes('[')) {
-      if (field.type.includes('[]')) {
-        // Encode the length of the dynamic array as uint32
-        const arrayLength = ethers.solidityPacked(
-          ['uint32'],
-          [values[i].length],
-        );
-        values[i] = ethers.concat([
-          arrayLength,
-          ...values[i].map((value: any) => {
-            if ('components' in field) {
-              const [processedComponents, processedValues] = processFields(
-                field.components,
-                value,
-              );
-              return ethers.solidityPacked(
-                processedComponents.map(component => component.type),
-                processedValues,
-              );
-            } else {
-              return ethers.solidityPacked([field.type.split('[')[0]], [value]);
-            }
-          }),
-        ]);
-      } else {
-        values[i] = ethers.concat(
-          values[i].map((value: any) => {
-            if ('components' in field) {
-              const [processedComponents, processedValues] = processFields(
-                field.components,
-                value,
-              );
-              return ethers.solidityPacked(
-                processedComponents.map(component => component.type),
-                processedValues,
-              );
-            } else {
-              return ethers.solidityPacked([field.type.split('[')[0]], [value]);
-            }
-          }),
-        );
-      }
+      const dimensions = field.type
+        .split('[')
+        .slice(1)
+        .map(dim => dim.replace(']', ''));
+      const baseType = field.type.split('[')[0];
+
+      const processArray = (arr: any[], dims: string[]): any => {
+        if (dims.length === 0) {
+          if ('components' in field) {
+            const [processedComponents, processedValues] = processFields(
+              field.components,
+              arr,
+            );
+            return ethers.solidityPacked(
+              processedComponents.map(component => component.type),
+              processedValues,
+            );
+          } else {
+            return ethers.solidityPacked([baseType], [arr]);
+          }
+        }
+
+        const currentDim = dims[0];
+        const remainingDims = dims.slice(1);
+        const isCurrentDimDynamic = currentDim === '';
+
+        if (isCurrentDimDynamic) {
+          const arrayLength = ethers.solidityPacked(['uint32'], [arr.length]);
+          const processedSubArrays = arr.map(subArr =>
+            processArray(subArr, remainingDims),
+          );
+          return ethers.concat([arrayLength, ...processedSubArrays]);
+        } else {
+          return ethers.concat(
+            arr.map(subArr => processArray(subArr, remainingDims)),
+          );
+        }
+      };
+
+      values[i] = processArray(values[i], dimensions);
       return { ...field, type: 'bytes' };
-    } else if (field.type === 'string') {
-      // Encode the length of the string in bytes as uint32
+    } else if (field.type === 'string' || field.type === 'bytes') {
       const stringBytes = ethers.toUtf8Bytes(values[i]);
       const stringLength = ethers.solidityPacked(
         ['uint32'],
         [stringBytes.length],
       );
       values[i] = ethers.concat([stringLength, stringBytes]);
-      return { ...field, type: 'bytes' };
+      return { ...field, type: field.type };
     } else if ('components' in field) {
       const [processedComponents, processedValues] = processFields(
         field.components,
@@ -355,9 +352,9 @@ describe('Decoder', () => {
     const fields = {
       name: 'FixedArraysAndLargeInts',
       values: [
-        { name: 'uint8Array1', type: 'uint8[4]', size: 8, length: 4 },
+        { name: 'uint8Array1', type: 'uint8[4]', size: 8 },
         { name: 'uint256Value1', type: 'uint256', size: 256 },
-        { name: 'uint8Array2', type: 'uint8[4]', size: 8, length: 4 },
+        { name: 'uint8Array2', type: 'uint8[4]', size: 8 },
         { name: 'uint256Value2', type: 'uint256', size: 256 },
         { name: 'bytes16Value', type: 'bytes16', size: 128 },
         { name: 'boolValue', type: 'bool', size: 8 },
@@ -383,11 +380,11 @@ describe('Decoder', () => {
     const fields = {
       name: 'MixedFixedArrays',
       values: [
-        { name: 'uint32Array', type: 'uint32[9]', size: 32, length: 9 },
-        { name: 'bytes4Array', type: 'bytes4[2]', size: 32, length: 2 },
-        { name: 'addressArray', type: 'address[2]', size: 160, length: 2 },
-        { name: 'int128Array', type: 'int128[2]', size: 128, length: 2 },
-        { name: 'boolArray', type: 'bool[4]', size: 8, length: 4 },
+        { name: 'uint32Array', type: 'uint32[9]', size: 32 },
+        { name: 'bytes4Array', type: 'bytes4[2]', size: 32 },
+        { name: 'addressArray', type: 'address[2]', size: 160 },
+        { name: 'int128Array', type: 'int128[2]', size: 128 },
+        { name: 'boolArray', type: 'bool[4]', size: 8 },
       ],
     };
     const values = [
@@ -413,11 +410,11 @@ describe('Decoder', () => {
     const fields = {
       name: 'MixedTypesWithArrays',
       values: [
-        { name: 'uint8Array', type: 'uint8[3]', size: 8, length: 3 },
+        { name: 'uint8Array', type: 'uint8[3]', size: 8 },
         { name: 'bytes32Value', type: 'bytes32', size: 256 },
-        { name: 'int256Array', type: 'int256[2]', size: 256, length: 2 },
+        { name: 'int256Array', type: 'int256[2]', size: 256 },
         { name: 'addressValue', type: 'address', size: 160 },
-        { name: 'boolArray', type: 'bool[3]', size: 8, length: 3 },
+        { name: 'boolArray', type: 'bool[3]', size: 8 },
         { name: 'uint256Value', type: 'uint256', size: 256 },
       ],
     };
@@ -445,8 +442,8 @@ describe('Decoder', () => {
     const fields = {
       name: 'LargeArraysWithMixedTypes',
       values: [
-        { name: 'uint256Array', type: 'uint256[3]', size: 256, length: 3 },
-        { name: 'bytes32Array', type: 'bytes32[2]', size: 256, length: 2 },
+        { name: 'uint256Array', type: 'uint256[3]', size: 256 },
+        { name: 'bytes32Array', type: 'bytes32[2]', size: 256 },
         { name: 'addressValue', type: 'address', size: 160 },
         { name: 'boolValue', type: 'bool', size: 8 },
         { name: 'int128Value', type: 'int128', size: 128 },
@@ -524,7 +521,6 @@ describe('Decoder', () => {
               name: 'deeperIntArray',
               type: 'int64[2]',
               size: 64,
-              length: 2,
             },
             {
               name: 'deeperStruct',
@@ -535,7 +531,6 @@ describe('Decoder', () => {
                   name: 'deeperIntArray',
                   type: 'int64[3]',
                   size: 64,
-                  length: 3,
                 },
               ],
             },
@@ -566,7 +561,7 @@ describe('Decoder', () => {
         {
           name: 'structArray',
           type: 'tuple[3]',
-          length: 3,
+
           components: [
             { name: 'id', type: 'uint256', size: 256 },
             { name: 'active', type: 'bool', size: 8 },
@@ -597,14 +592,14 @@ describe('Decoder', () => {
             {
               name: 'nestedStructs',
               type: 'tuple[3]',
-              length: 3,
+
               components: [
                 { name: 'subId', type: 'uint32', size: 32 },
                 { name: 'name', type: 'bytes32', size: 256 },
                 {
                   name: 'details',
                   type: 'tuple[2]',
-                  length: 2,
+
                   components: [
                     { name: 'value', type: 'int64', size: 64 },
                     { name: 'active', type: 'bool', size: 8 },
@@ -646,6 +641,87 @@ describe('Decoder', () => {
           ],
         ],
       ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle dynamic array with uint8[2]', async () => {
+    const fields: Field = {
+      name: 'DynamicArrayWithUint8Array',
+      values: [
+        { name: 'dynamicArray', type: 'bytes16[]', size: 128 },
+        { name: 'uint8Array', type: 'uint8[2]', size: 8 },
+        { name: 'uint256Value', type: 'uint256', size: 256 },
+        { name: 'uint8Array2', type: 'uint8[]', size: 8 },
+        { name: 'uint256Array', type: 'uint256[2]', size: 256 },
+        { name: 'uint96Array', type: 'uint96[]', size: 96 },
+        { name: 'uint256Value2', type: 'uint256', size: 256 },
+        { name: 'uint8Array3', type: 'uint8[6]', size: 8 },
+      ],
+    };
+    const values = [
+      [
+        '0x1234567890abcdef1234567890abcdef',
+        '0xabcdef1234567890abcdef1234567812',
+        '0x1234567890abcdef1234567890abcdea',
+      ],
+      [1, 2],
+      23456678,
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      [BigInt('123456789012345678901234567890'), BigInt('45678901234567890')],
+      [1, 2, 3, 4],
+      23456,
+      [1, 2, 3, 4, 5, 6],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle dynamic array of addresses', async () => {
+    const fields: Field = {
+      name: 'DynamicArrayOfAddresses',
+      values: [
+        { name: 'addressArray', type: 'address[]', size: 160 },
+        { name: 'uint256Value', type: 'uint256', size: 256 },
+      ],
+    };
+    const values = [
+      [
+        '0x1234567890123456789012345678901234567890',
+        '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+        '0xfedcbafedcbafedcbafedcbafedcbafedcbafeda',
+      ],
+      BigInt('123456789012345678901234567890'),
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle dynamic array of booleans', async () => {
+    const fields: Field = {
+      name: 'DynamicArrayOfBooleans',
+      values: [
+        { name: 'boolArray', type: 'bool[]', size: 8 },
+        { name: 'uint64Value', type: 'uint64', size: 64 },
+      ],
+    };
+    const values = [[true, false, true, true, false], BigInt('12345678901234')];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle dynamic array of bytes', async () => {
+    const fields: Field = {
+      name: 'DynamicArrayOfBytes',
+      values: [
+        { name: 'bytesArray', type: 'bytes32[]', size: 256 },
+        { name: 'int128Value', type: 'int128', size: 128 },
+      ],
+    };
+    const values = [
+      [
+        ethers.encodeBytes32String('Hello, World!'),
+        ethers.encodeBytes32String('Why so serious'),
+        ethers.encodeBytes32String('The weather is good'),
+      ],
+      BigInt('-170141183460469231731687303715884105728'), // Min value for int128
     ];
     await testDecoder(fields, values);
   });
