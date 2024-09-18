@@ -181,7 +181,12 @@ impl DataFeed for YahooFinanceDataFeed {
                 Some((
                     resources
                         .get("yf_symbol")
-                        .expect("[YahooFinance] Missing Resource")
+                        .expect(
+                            format!(
+                                "[YahooFinance] Missing resource `yf_symbol` in feed - {feed_id}"
+                            )
+                            .as_str(),
+                        )
                         .clone(),
                     *feed_id,
                 ))

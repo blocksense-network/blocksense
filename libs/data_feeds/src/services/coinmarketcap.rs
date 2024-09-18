@@ -132,7 +132,10 @@ impl DataFeed for CoinMarketCapDataFeed {
                 Some((
                     resources
                         .get("cmc_id")
-                        .expect("[CMC] Missing Resource!")
+                        .expect(
+                            format!("[CMC] Missing resource `cmc_id` for feed - {feed_id}!")
+                                .as_str(),
+                        )
                         .clone(),
                     *feed_id,
                 ))
