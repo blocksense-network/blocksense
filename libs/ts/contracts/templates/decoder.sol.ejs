@@ -9,34 +9,46 @@ const expandFields = (values) => {
     const isDynamic = field.type === 'bytes' || field.type === 'string' || field.type.endsWith('[]');
     let data;
     if (isDynamic) {
-      data = field
-    } else if (field.type.endsWith(']')) {
-      // This is an array field
+      data = field;
+    } else if (field.type.includes('[')) {
+      // This is an array field (potentially multi-dimensional)
       const baseType = field.type.split('[')[0];
-      const arraySize = field.type.match(/\[(\d*)\]/)[1];
-      data = [];
-      for (let i = 0; i < parseInt(arraySize); i++) {
-        if (baseType === 'tuple') {
-          // Handle tuple array
-          data.push(expandFields(field.components));
-        } else {
-          data.push({
-            type: baseType,
-            size: field.size,
-          });
-        }
-      }
+      const dimensions = field.type.match(/\[(\d*)\]/g);
+      data = expandArray(baseType, dimensions, field);
     } else if (field.type === 'tuple') {
       // This is a tuple field
       data = expandFields(field.components);
     } else {
       // This is not an array field, add it as is
       data = field;
-    }
-    return JSON.parse(JSON.stringify(data));
+    }    return JSON.parse(JSON.stringify(data));
   });
 
   return expandedFields;
+}
+
+const expandArray = (baseType, dimensions, field) => {
+  if (dimensions.length === 0) {
+    if (baseType === 'tuple') {
+      return expandFields(field.components);
+    } else {
+      return {
+        type: baseType,
+        size: field.size,
+      };
+    }
+  }
+
+  const currentDimension = dimensions[dimensions.length-1];
+  const size = currentDimension.match(/\[(\d*)\]/)[1];
+  const arraySize = size ? parseInt(size) : 0;
+
+  const result = [];
+  for (let i = 0; i < arraySize || arraySize === 0; i++) {
+    result.push(expandArray(baseType, dimensions.slice(0, dimensions.length-1), field));
+  }
+
+  return result;
 }
 
 function organizeFieldsIntoStructs(values) {
@@ -53,14 +65,15 @@ function organizeFieldsIntoStructs(values) {
         field.components.forEach(component => processField(component, newStruct));
       }
       structs.push(newStruct);
-      if (field.type.endsWith(']')) {
-        parentStruct.fields.push({ name: field.name, type: `${newStruct.name}[${field.type.split('[')[1]}` });
+
+      let arrayDimensions = field.type.match(/(\[\d*\])+$/);
+      if (arrayDimensions) {
+        parentStruct.fields.push({ name: field.name, type: `${newStruct.name}${arrayDimensions[0]}` });
       } else {
         parentStruct.fields.push({ name: field.name, type: newStruct.name });
       }
-    // } else if (field.type.endsWith('[]') || field.type === 'bytes' || field.type === 'string') { // Handle dynamic data
-    //   let arrayType = field.type.split('[')[0];
-    //   parentStruct.fields.push({ name: field.name, type: field.type });
+    } else if (field.type.endsWith('[]') || field.type === 'bytes' || field.type === 'string') {
+      parentStruct.fields.push({ name: field.name, type: field.type });
     } else {
       parentStruct.fields.push({ name: field.name, type: field.type });
     }
@@ -113,7 +126,6 @@ function processFields(fields) {
 }
 
 const expandedFields = processFields(expandFields(fields.values));
-
 let wordOffset = 32;
 let bitOffset = 0;
 let prevSize = 0;

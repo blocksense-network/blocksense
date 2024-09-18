@@ -725,4 +725,144 @@ describe('Decoder', () => {
     ];
     await testDecoder(fields, values);
   });
+
+  it('should handle nested fixed arrays', async () => {
+    const fields: Field = {
+      name: 'NestedDynamicArrays',
+      values: [
+        { name: 'nestedArray', type: 'uint32[3][3]', size: 32 },
+        { name: 'bytes32Value', type: 'bytes32', size: 256 },
+      ],
+    };
+    const values = [
+      [
+        [1, 2, 3],
+        [4, 5, 5],
+        [6, 7, 8],
+      ],
+      ethers.encodeBytes32String('NestedArrayTest'),
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle 2D fixed array', async () => {
+    const fields: Field = {
+      name: 'TwoDimensionalFixedArray',
+      values: [
+        { name: 'array2D', type: 'uint16[2][3]', size: 16 },
+        { name: 'int64Value', type: 'int64', size: 64 },
+      ],
+    };
+    const values = [
+      [
+        [1, 2],
+        [3, 4],
+        [5, 6],
+      ],
+      BigInt('-9223372036854775808'), // Min value for int64
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle 3D fixed array', async () => {
+    const fields: Field = {
+      name: 'ThreeDimensionalFixedArray',
+      values: [
+        { name: 'array3D', type: 'int8[4][3][2]', size: 8 },
+        { name: 'uint128Value', type: 'uint128', size: 128 },
+      ],
+    };
+    const values = [
+      [
+        [
+          [-128, 127, 2, -1],
+          [0, 1, 2, 3],
+          [4, 5, 6, 7],
+        ],
+        [
+          [10, -10, 0, -12],
+          [-50, 50, 0, 12],
+          [-25, 25, 0, -32],
+        ],
+      ],
+      BigInt('340282366920938463463374607431768211455'), // Max value for uint128
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle 4D fixed array', async () => {
+    const fields: Field = {
+      name: 'FourDimensionalFixedArray',
+      values: [
+        { name: 'array4D', type: 'bool[3][2][3][2]', size: 8 },
+        { name: 'bytes16Value', type: 'bytes16', size: 128 },
+      ],
+    };
+    const values = [
+      [
+        [
+          [
+            [true, false, true],
+            [false, true, true],
+          ],
+          [
+            [true, true, false],
+            [false, false, true],
+          ],
+          [
+            [false, true, true],
+            [true, false, false],
+          ],
+        ],
+        [
+          [
+            [false, true, false],
+            [true, false, true],
+          ],
+          [
+            [false, false, true],
+            [true, true, false],
+          ],
+          [
+            [true, false, true],
+            [false, true, false],
+          ],
+        ],
+      ],
+      ethers.hexlify(ethers.randomBytes(16)), // Random 16 bytes
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle 2x3 array of struct type', async () => {
+    const fields: Field = {
+      name: 'TwoDimensionalStructArray',
+      values: [
+        {
+          name: 'structArray',
+          type: 'tuple[3][2]',
+          components: [
+            { name: 'intValue', type: 'int32', size: 32 },
+            { name: 'boolValue', type: 'bool', size: 8 },
+            { name: 'addressValue', type: 'address', size: 160 },
+          ],
+        },
+      ],
+    };
+    const values = [
+      [
+        [
+          [123, true, '0x1234567890123456789012345678901234567890'],
+          [-456, false, '0x2345678901234567890123456789012345678901'],
+          [789, true, '0x3456789012345678901234567890123456789012'],
+        ],
+        [
+          [-987, false, '0x4567890123456789012345678901234567890123'],
+          [654, true, '0x5678901234567890123456789012345678901234'],
+          [-321, false, '0x6789012345678901234567890123456789012345'],
+        ],
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
 });
