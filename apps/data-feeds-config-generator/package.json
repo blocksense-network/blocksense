@@ -40,6 +40,7 @@
     "yahoo-finance2": "^2.11.3"
   },
   "dependencies": {
-    "@blocksense/config-types": "workspace:*"
+    "@blocksense/config-types": "workspace:*",
+    "web3": "^4.12.1"
   }
 }
