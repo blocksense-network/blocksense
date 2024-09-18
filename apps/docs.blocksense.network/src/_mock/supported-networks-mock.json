@@ -1,6 +1,6 @@
 {
   "1": {
-    "name": "mainnet",
+    "name": "ethereum-mainnet",
     "contracts": {
       "coreContracts": {
         "HistoricDataFeedStoreV2": "0xfe2a4bd13f7929d0C43b41fBe74d55395a3Be9Bf",
@@ -45,7 +45,7 @@
     }
   },
   "11155111": {
-    "name": "sepolia",
+    "name": "ethereum-sepolia",
     "contracts": {
       "coreContracts": {
         "HistoricDataFeedStoreV2": "0xfe2a4bd13f7929d0C43b41fBe74d55395a3Be9Bf",
