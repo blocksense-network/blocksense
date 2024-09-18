@@ -6,17 +6,15 @@ import {
   denominationTokenToAddress,
   isDenominationToken,
   parseDenominationToken,
-} from '@blocksense/config-types/chainlink-compatibility';
-
-import {
   BlocksenseFeedsCompatibility,
   ChainlinkAggregatorProxy,
   ChainlinkCompatibilityData,
-  chainlinkNetworkNameToChainId,
-  parseNetworkName,
   ChainlinkAddressToBlocksenseId,
   ChainlinkCompatibilityConfig,
-} from './types';
+} from '@blocksense/config-types/chainlink-compatibility';
+
+import { parseNetworkName, chainlinkNetworkNameToChainId } from './types';
+
 import { artifactsDir } from '../paths';
 import { RawDataFeeds } from '../data-services/types';
 
