@@ -63,7 +63,7 @@ type RowWrapper = {
 const NetworkAddressExplorerLink = ({ row }: RowWrapper) => {
   const address = row.original.address;
   return (
-    <div>
+    <aside className="space-x-2 space-y-1">
       {row.original.networks.map((network: NetworkName) => (
         <Badge
           key={network}
@@ -75,6 +75,6 @@ const NetworkAddressExplorerLink = ({ row }: RowWrapper) => {
           </Link>
         </Badge>
       ))}
-    </div>
+    </aside>
   );
 };

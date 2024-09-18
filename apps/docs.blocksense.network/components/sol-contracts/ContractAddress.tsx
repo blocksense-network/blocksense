@@ -42,7 +42,7 @@ export const ContractAddress = ({
       <Tooltip contentClassName="bg-gray-900 text-white">
         {hasAbbreviation && <Tooltip.Content>{address}</Tooltip.Content>}
         {network ? (
-          <code>
+          <code className="hover:underline">
             <Link
               href={explorerAddressUrls[
                 network as keyof typeof explorerAddressUrls

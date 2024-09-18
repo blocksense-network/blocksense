@@ -25,26 +25,29 @@ export const DataFeeds = ({ dataFeedsOverviewString }: ParametersProps) => {
   );
 
   return (
-    <ContractItemWrapper
-      title="Data Feeds"
-      titleLevel={2}
-      itemsLength={feeds.length}
-    >
-      <p className="mt-2">
-        Blocksense provides a platform for securely and efficiently collecting
-        various data feeds and integrating them into the blockchain ecosystem.
-        Our protocol supports a wide range of data types, from financial market
-        data and decentralized finance (DeFi) metrics to weather data, sports
-        scores, and more. Explore the range of data feeds provided by the
-        Blocksense Network.
-      </p>
-      <DataTable
-        columns={columns}
-        data={feeds}
-        filterCell={'description'}
-        filters={filters}
-        columnsTitles={dataFeedsColumnsTitles}
-      />
-    </ContractItemWrapper>
+    <section className="mt-4">
+      <ContractItemWrapper
+        title="Data Feeds"
+        titleLevel={2}
+        itemsLength={feeds.length}
+      >
+        <article className="mt-4 mb-6">
+          <span className="text-gray-500 text-md">
+            Blocksense offers a platform to securely collect and integrate
+            diverse data feeds into the blockchain. Our protocol supports many
+            data types, including financial markets, DeFi metrics, weather,
+            sports scores, and more. Discover the data feeds available through
+            the Blocksense Network.
+          </span>
+        </article>
+        <DataTable
+          columns={columns}
+          data={feeds}
+          filterCell={'description'}
+          filters={filters}
+          columnsTitles={dataFeedsColumnsTitles}
+        />
+      </ContractItemWrapper>
+    </section>
   );
 };
