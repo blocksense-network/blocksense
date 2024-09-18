@@ -5,3 +5,4 @@
  */
 
 export * from './denominations';
+export * from './types';
