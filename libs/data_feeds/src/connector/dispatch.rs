@@ -15,7 +15,7 @@ use tracing::debug;
 
 use crate::{
     connector::post::post_feed_response_full,
-    interfaces::data_feed::DataFeed,
+    interfaces::data_feed::{Asset, DataFeed},
     services::{coinmarketcap::CoinMarketCapDataFeed, yahoo_finance::YahooFinanceDataFeed},
 };
 
@@ -128,7 +128,7 @@ pub async fn dispatch_full_batch(
     feed_registry: &AllFeedsConfig,
     connection_cache: &mut HashMap<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>,
 ) {
-    let mut script_to_assets: HashMap<String, Vec<(String, u32)>> = HashMap::new();
+    let mut script_to_assets: HashMap<String, Vec<Asset>> = HashMap::new();
 
     // Example result in `scripts_to_assets` -
     // {"CoinMarketCap: [("BTC",1), "("ETH",2)",...], "YahooFinance": [...]}
@@ -136,7 +136,10 @@ pub async fn dispatch_full_batch(
         script_to_assets
             .entry(feed.script.clone())
             .or_default()
-            .push((feed.name.clone(), feed.id));
+            .push(Asset {
+                name: feed.name.clone(),
+                id: feed.id,
+            });
     }
 
     for feed_api_enum in DataFeedAPI::iter() {
@@ -148,12 +151,11 @@ pub async fn dispatch_full_batch(
         let feed_api = resolve_feed(&feed_api_enum, &reporter_config.resources, connection_cache);
         let feed_api_name = feed_api_enum.get_as_str();
 
-        let asset_id_vec = script_to_assets
+        let assets: &[Asset] = script_to_assets
             .get(feed_api_name)
-            .expect("Unrecognized DataFeed Script!")
-            .clone();
+            .expect("Unrecognized DataFeed Script!");
 
-        let results = feed_api.lock().await.poll_batch(&asset_id_vec).await;
+        let results = feed_api.lock().await.poll_batch(assets).await;
 
         debug!("DataFeed {} polled", feed_api_enum.get_as_str());
 

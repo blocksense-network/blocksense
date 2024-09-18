@@ -16,7 +16,11 @@ use utils::{get_env_var, read_file, time::current_unix_time};
 use derive::{ApiConnect, Historical};
 
 use crate::{
-    interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical},
+    interfaces::{
+        api_connect::ApiConnect,
+        data_feed::{Asset, DataFeed},
+        historical::Historical,
+    },
     services::common::get_generic_feed_error,
 };
 
@@ -121,15 +125,12 @@ impl DataFeed for CoinMarketCapDataFeed {
         }
     }
 
-    async fn poll_batch(
-        &mut self,
-        asset_id_vec: &[(String, u32)],
-    ) -> Vec<(FeedResult, u32, Timestamp)> {
+    async fn poll_batch(&mut self, assets: &[Asset]) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
 
-        let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
+        let asset_names: Vec<&str> = assets.iter().map(|a| a.name.as_str()).collect();
 
-        let params = [("symbol", assets.join(","))];
+        let params = [("symbol", asset_names.join(","))];
 
         debug!("{:?}", params);
 
@@ -160,11 +161,11 @@ impl DataFeed for CoinMarketCapDataFeed {
             if response.status().is_success() {
                 let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-                for (asset, feed_id) in asset_id_vec {
-                    trace!("Feed Asset pair - {}.{}", asset, feed_id);
+                for asset in assets {
+                    trace!("Feed Asset pair - {}.{}", asset.name, asset.id);
                     results_vec.push((
-                        get_feed_result(&resp_json, asset),
-                        *feed_id,
+                        get_feed_result(&resp_json, &asset.name),
+                        asset.id,
                         current_unix_time(),
                     ));
                 }
@@ -173,12 +174,12 @@ impl DataFeed for CoinMarketCapDataFeed {
             } else {
                 error!("Request failed with status: {}", response.status());
 
-                asset_id_vec
-                    .iter()
-                    .map(|(_, id)| {
+                assets
+                    .into_iter()
+                    .map(|asset| {
                         (
                             get_generic_feed_error("CoinMarketCap"),
-                            *id,
+                            asset.id,
                             current_unix_time(),
                         )
                     })
@@ -188,12 +189,12 @@ impl DataFeed for CoinMarketCapDataFeed {
             //TODO(snikolov): Figure out how to handle the Error if it occurs
             error!("Request failed with error!");
 
-            asset_id_vec
-                .iter()
-                .map(|(_, id)| {
+            assets
+                .into_iter()
+                .map(|asset| {
                     (
                         get_generic_feed_error("CoinMarketCap"),
-                        *id,
+                        asset.id,
                         current_unix_time(),
                     )
                 })

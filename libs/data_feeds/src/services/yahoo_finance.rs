@@ -14,7 +14,11 @@ use utils::{get_env_var, time::current_unix_time};
 extern crate derive;
 use derive::{ApiConnect, Historical};
 
-use crate::interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical};
+use crate::interfaces::{
+    api_connect::ApiConnect,
+    data_feed::{Asset, DataFeed},
+    historical::Historical,
+};
 use crate::services::common::get_generic_feed_error;
 use feed_registry::{
     aggregate::{AverageAggregator, ConsensusMetric},
@@ -138,15 +142,12 @@ impl DataFeed for YahooFinanceDataFeed {
         }
     }
 
-    async fn poll_batch(
-        &mut self,
-        asset_id_vec: &[(String, u32)],
-    ) -> Vec<(FeedResult, u32, Timestamp)> {
+    async fn poll_batch(&mut self, assets: &[Asset]) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://yfapi.net/v6/finance/quote";
 
-        let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
+        let asset_names: Vec<&str> = assets.iter().map(|asset| asset.name.as_str()).collect();
 
-        let joined_symbols = assets.join(",");
+        let joined_symbols = asset_names.join(",");
         let full_url = format!("{}?symbols={}", url, joined_symbols);
 
         debug!("Request url - {}", full_url);
@@ -178,11 +179,11 @@ impl DataFeed for YahooFinanceDataFeed {
             if response.status().is_success() {
                 let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-                for (idx, (asset, feed_id)) in asset_id_vec.iter().enumerate() {
-                    trace!("Feed Asset pair - {}.{}", asset, feed_id);
+                for (idx, asset) in assets.into_iter().enumerate() {
+                    trace!("Feed Asset pair - {}.{}", asset.name, asset.id);
                     results_vec.push((
-                        get_feed_result(&resp_json, idx, asset),
-                        *feed_id,
+                        get_feed_result(&resp_json, idx, asset.name.as_str()),
+                        asset.id,
                         current_unix_time(),
                     ));
                 }
@@ -191,12 +192,12 @@ impl DataFeed for YahooFinanceDataFeed {
             } else {
                 error!("Request failed with status: {}", response.status());
 
-                asset_id_vec
-                    .iter()
-                    .map(|(_, id)| {
+                assets
+                    .into_iter()
+                    .map(|asset| {
                         (
                             get_generic_feed_error("YahooFinance"),
-                            *id,
+                            asset.id,
                             current_unix_time(),
                         )
                     })
@@ -206,12 +207,12 @@ impl DataFeed for YahooFinanceDataFeed {
             //TODO(snikolov): Figure out how to handle the Error if it occurs
             error!("Request failed with error!");
 
-            asset_id_vec
-                .iter()
-                .map(|(_, id)| {
+            assets
+                .into_iter()
+                .map(|asset| {
                     (
                         get_generic_feed_error("YahooFinance"),
-                        *id,
+                        asset.id,
                         current_unix_time(),
                     )
                 })
