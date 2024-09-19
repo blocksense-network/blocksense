@@ -199,7 +199,7 @@ const InnerLayout = ({
       <div
         className={cn(
           'nx-mx-auto nx-flex',
-          themeContext.layout !== 'raw' && 'nx-max-w-[100rem]',
+          themeContext.layout !== 'raw' && 'nx-max-w-[90rem]',
         )}
       >
         <ActiveAnchorProvider>
