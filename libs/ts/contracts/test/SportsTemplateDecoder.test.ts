@@ -36,7 +36,9 @@ function processFields(
 
       const processArray = (arr: any[], dims: string[]): any => {
         if (dims.length === 0) {
-          if ('components' in field) {
+          if (['string', 'bytes'].includes(baseType)) {
+            return processStringOrBytes(arr);
+          } else if ('components' in field) {
             const [processedComponents, processedValues] = processFields(
               field.components,
               arr,
@@ -69,15 +71,8 @@ function processFields(
 
       values[i] = processArray(values[i], dimensions);
       return { ...field, type: 'bytes' };
-    } else if (field.type === 'string' || field.type === 'bytes') {
-      const data = ethers.isBytesLike(values[i])
-        ? values[i]
-        : ethers.hexlify(ethers.toUtf8Bytes(values[i]));
-      const dataLength = ethers.solidityPacked(
-        ['uint32'],
-        [(data.length - 2) / 2],
-      );
-      values[i] = ethers.concat([dataLength, data]);
+    } else if (['string', 'bytes'].includes(field.type)) {
+      values[i] = processStringOrBytes(values[i]);
       return { ...field, type: 'bytes' };
     } else if ('components' in field) {
       const [processedComponents, processedValues] = processFields(
@@ -94,6 +89,14 @@ function processFields(
   });
 
   return [processedFields, values];
+}
+
+function processStringOrBytes(value: any): string {
+  const data = ethers.isBytesLike(value)
+    ? value
+    : ethers.hexlify(ethers.toUtf8Bytes(value));
+  const dataLength = ethers.solidityPacked(['uint32'], [(data.length - 2) / 2]);
+  return ethers.concat([dataLength, data]);
 }
 
 describe('Decoder', () => {
@@ -350,7 +353,7 @@ describe('Decoder', () => {
     await testDecoder(fields, values);
   });
 
-  it('should handle fixed size array, uint256, bytes, and bool', async () => {
+  it('should handle fixed size array, uint256, bytes16, and bool', async () => {
     const fields = {
       name: 'FixedArraysAndLargeInts',
       values: [
@@ -647,7 +650,7 @@ describe('Decoder', () => {
     await testDecoder(fields, values);
   });
 
-  it('should handle dynamic array with uint8[2]', async () => {
+  it('should handle dynamic array with different data types', async () => {
     const fields: Field = {
       name: 'DynamicArrayWithUint8Array',
       values: [
@@ -907,6 +910,42 @@ describe('Decoder', () => {
       BigInt(
         '115792089237316195423570985008687907853269984665640564039457584007913129639935',
       ),
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle fixed array of bytes and string', async () => {
+    const fields: Field = {
+      name: 'FixedArrayField',
+      values: [
+        {
+          name: 'fixedStringArray',
+          type: 'string[2]',
+        },
+        {
+          name: 'uint16Value',
+          type: 'uint16',
+          size: 16,
+        },
+        {
+          name: 'fixedBytesArray',
+          type: 'bytes[3]',
+        },
+        {
+          name: 'stringValue',
+          type: 'string',
+        },
+      ],
+    };
+    const values = [
+      ['String 1 with some data', 'String 2 with even more data'],
+      42,
+      [
+        ethers.hexlify(ethers.randomBytes(104)),
+        ethers.hexlify(ethers.randomBytes(15)),
+        ethers.hexlify(ethers.randomBytes(73)),
+      ],
+      'Hello, World!',
     ];
     await testDecoder(fields, values);
   });

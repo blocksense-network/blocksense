@@ -2,11 +2,12 @@
 pragma solidity ^0.8.24;
 
 <%_
-let name = fields.name.charAt(0).toLowerCase() + fields.name.slice(1)
+let name = fields.name.charAt(0).toLowerCase() + fields.name.slice(1);
+let containsDynamicData = false;
 
 const expandFields = (values) => {
   const expandedFields = values.map((field) => {
-    const isDynamic = field.type === 'bytes' || field.type === 'string' || field.type.endsWith('[]');
+    const isDynamic = field.type === 'bytes' || field.type === 'string' || field.type.includes('[]');
     let data;
     if (isDynamic) {
       data = field;
@@ -33,6 +34,7 @@ const expandArray = (baseType, dimensions, field) => {
       return expandFields(field.components);
     } else {
       return {
+        name: field.name,
         type: baseType,
         size: field.size,
       };
@@ -115,6 +117,7 @@ function processFields(fields) {
       } else {
         // Handle dynamic data
         field.isDynamic = true;
+        containsDynamicData = true;
         prevSizeSum = 0;
       }
 
@@ -172,11 +175,7 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
       lines.push(`mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.shift == 0 ? 'memData' : field.shift < 0 ? `shl(${Math.abs(field.shift)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)`})`);
     } else {
       lines.push('');
-      if (!shift) {
-        lines.push(`let shift := ${wordOffset + prevSize / 8 + 4}`);
-      } else {
-        lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
-      }
+      lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
       shift = true;
 
       const isBytes = field.type.startsWith('bytes') && field.type !== 'bytes';
@@ -188,19 +187,19 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
       lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`);
       lines.push(`  mstore(${field.name}, size)`);
       if (field.type === 'bytes' || field.type === 'string') {
-        lines.push(`let i := 32`);
-        lines.push(`for {`);
-        lines.push(`} lt(i, size) {`);
-        lines.push(`  i := add(i, 32)`);
-        lines.push(`  shift := add(shift, 32)`);
-        lines.push(`} {`);
+        lines.push(`  let i := 32`);
+        lines.push(`  for {`);
+        lines.push(`  } lt(i, size) {`);
+        lines.push(`    i := add(i, 32)`);
+        lines.push(`    shift := add(shift, 32)`);
+        lines.push(`  } {`);
+        lines.push(`    memData := mload(add(data, shift))`);
+        lines.push(`    mstore(add(${field.name}, i), memData)`);
+        lines.push(`  }`);
         lines.push(`  memData := mload(add(data, shift))`);
         lines.push(`  mstore(add(${field.name}, i), memData)`);
-        lines.push(`}`);
-        lines.push(`memData := mload(add(data, shift))`);
-        lines.push(`mstore(add(${field.name}, i), memData)`);
-        lines.push(`shift := add(shift, mod(size, 32))`)
-        lines.push(`memData := mload(add(data, shift))`)
+        lines.push(`  shift := add(shift, mod(size, 32))`)
+        lines.push(`  memData := mload(add(data, shift))`)
       } else {
         lines.push(`  let prevSizeSum := 0`);
         if (isBytes) {
@@ -254,6 +253,7 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
       lines.push(`}`);
       wordOffset = 0;
       prevSize = 0;
+      bitOffset = 0;
     }
     index++;
   }
@@ -277,7 +277,7 @@ library Decoder {
     assembly {
       // First 32 bytes are the length of the data
       let memData := mload(add(data, 32))
-
+      <%= containsDynamicData ? 'let shift := 0' : '' %>
       <%= generateDecoderLines(expandedFields, name).join('\n      ') %>
     }
   }
