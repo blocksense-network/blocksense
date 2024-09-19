@@ -45,6 +45,7 @@ interface DataTableProps<TData, TValue> {
   filters?: FilterType[];
   columnsTitles: ColumnsTitlesType;
   hasToolbar?: boolean;
+  invisibleColumns?: string[];
 }
 
 function getUniqueValuesFromColumns(column: string, data: any): OptionType[] {
@@ -73,13 +74,16 @@ export function DataTable<TData, TValue>({
   filters,
   columnsTitles,
   hasToolbar = true,
+  invisibleColumns = [],
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<VisibilityState>(
+      Object.fromEntries(invisibleColumns.map(column => [column, false])),
+    );
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 30,
@@ -112,6 +116,7 @@ export function DataTable<TData, TValue>({
           filterCell={filterCell}
           filters={filters}
           columnsTitles={columnsTitles}
+          invisibleColumns={invisibleColumns}
         />
       )}
       <div className="rounded-md border">
@@ -137,10 +142,7 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id} className="px-3 py-2.5">
                       {flexRender(

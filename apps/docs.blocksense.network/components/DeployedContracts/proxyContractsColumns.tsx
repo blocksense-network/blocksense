@@ -122,8 +122,6 @@ export const columns: ColumnDef<ProxyContractData>[] = [
   },
   {
     accessorKey: 'network',
-    header: ({ column }) => null,
-    cell: ({ row }) => null,
   },
 ];
 

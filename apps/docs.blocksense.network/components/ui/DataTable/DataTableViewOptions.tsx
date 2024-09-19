@@ -17,11 +17,13 @@ import { ColumnsTitlesType } from '@/components/ui/DataTable/DataTable';
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
   columnsTitles: ColumnsTitlesType;
+  invisibleColumns?: string[];
 }
 
 export function DataTableViewOptions<TData>({
   table,
   columnsTitles,
+  invisibleColumns,
 }: DataTableViewOptionsProps<TData>) {
   return (
     <DropdownMenu>
@@ -45,6 +47,13 @@ export function DataTableViewOptions<TData>({
               typeof column.accessorFn !== 'undefined' && column.getCanHide(),
           )
           .map(column => {
+            if (
+              invisibleColumns?.includes(column.id) ||
+              !columnsTitles[column.id]
+            ) {
+              return null;
+            }
+
             return (
               <DropdownMenuCheckboxItem
                 key={column.id}
