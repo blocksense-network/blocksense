@@ -1,10 +1,9 @@
 import * as React from 'react';
 
-import { Check } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { Column } from '@tanstack/react-table';
 
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -20,7 +19,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
 import { OptionType } from '@/components/ui/DataTable/DataTable';
 
 interface DataTableFacetedFilterProps<TData, TValue> {
@@ -41,8 +39,13 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 border-solid border-slate-200"
+        >
           {title}
+          <ChevronDown className="ml-1 h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
@@ -58,9 +61,8 @@ export function DataTableFacetedFilter<TData, TValue>({
                   <CommandItem
                     key={option.value + index.toString()}
                     onSelect={() => {
-                      if (isSelected) {
-                        selectedValues.delete(option.value);
-                      } else {
+                      selectedValues.clear();
+                      if (!isSelected) {
                         selectedValues.add(option.value);
                       }
                       const filterValues = Array.from(selectedValues);
