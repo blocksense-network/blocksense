@@ -171,7 +171,7 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
       lines.push('}');
     } else if (!field.isDynamic) {
       prevSize += field.size;
-      lines.push(`// Store the next ${field.size} bytes of memData at slot ${index + 1} of ${location}`);
+      lines.push(`// Store the next ${field.size} bits of memData at slot ${index + 1} of ${location}`);
       lines.push(`mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.shift == 0 ? 'memData' : field.shift < 0 ? `shl(${Math.abs(field.shift)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)`})`);
     } else {
       lines.push('');
@@ -198,8 +198,15 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
         lines.push(`  }`);
         lines.push(`  memData := mload(add(data, shift))`);
         lines.push(`  mstore(add(${field.name}, i), memData)`);
-        lines.push(`  shift := add(shift, mod(size, 32))`)
-        lines.push(`  memData := mload(add(data, shift))`)
+        lines.push(`  let shiftSize := mod(size, 32)`);
+        lines.push(`  switch shiftSize`);
+        lines.push(`  case 0 {`);
+        lines.push(`    shift := add(shift, 32)`);
+        lines.push(`  }`);
+        lines.push(`  default {`);
+        lines.push(`    shift := add(shift, shiftSize)`);
+        lines.push(`  }`);
+        lines.push(`  memData := mload(add(data, shift))`);
       } else {
         lines.push(`  let prevSizeSum := 0`);
         if (isBytes) {

@@ -949,4 +949,39 @@ describe('Decoder', () => {
     ];
     await testDecoder(fields, values);
   });
+
+  it('should handle struct with bytes and string fields', async () => {
+    const fields: Field = {
+      name: 'StructField',
+      values: [
+        {
+          name: 'structValue',
+          type: 'tuple',
+          components: [
+            {
+              name: 'bytesField',
+              type: 'bytes',
+            },
+            {
+              name: 'stringField',
+              type: 'string',
+            },
+            {
+              name: 'uint16Field',
+              type: 'uint16',
+              size: 16,
+            },
+          ],
+        },
+      ],
+    };
+    const values = [
+      [
+        ethers.hexlify(ethers.randomBytes(50)),
+        'This is a string inside a struct',
+        42,
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
 });
