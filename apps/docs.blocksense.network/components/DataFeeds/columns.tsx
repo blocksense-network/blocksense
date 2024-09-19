@@ -16,7 +16,7 @@ type DataFeed = {
 
 export const dataFeedsColumnsTitles = {
   id: 'Id',
-  description: 'Description',
+  description: 'Data Feed Name',
   decimals: 'Decimals',
   report_interval_ms: 'Refresh Interval (ms)',
   script: 'Data Sources',

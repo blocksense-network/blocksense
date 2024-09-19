@@ -38,7 +38,7 @@ export const DeployedContracts = ({
   const filters = React.useMemo(
     () =>
       getFacetedFilters(
-        ['network', 'description'],
+        ['network'],
         deployedProxyContracts,
         proxyColumnsTitles,
       ),
@@ -99,6 +99,7 @@ export const DeployedContracts = ({
             columnsTitles={proxyColumnsTitles}
             filters={filters}
             invisibleColumns={['network']}
+            filterCell="description"
           />
         </ContractItemWrapper>
       </div>
