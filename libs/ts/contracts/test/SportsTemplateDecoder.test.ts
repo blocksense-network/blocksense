@@ -70,13 +70,15 @@ function processFields(
       values[i] = processArray(values[i], dimensions);
       return { ...field, type: 'bytes' };
     } else if (field.type === 'string' || field.type === 'bytes') {
-      const stringBytes = ethers.toUtf8Bytes(values[i]);
-      const stringLength = ethers.solidityPacked(
+      const data = ethers.isBytesLike(values[i])
+        ? values[i]
+        : ethers.hexlify(ethers.toUtf8Bytes(values[i]));
+      const dataLength = ethers.solidityPacked(
         ['uint32'],
-        [stringBytes.length],
+        [(data.length - 2) / 2],
       );
-      values[i] = ethers.concat([stringLength, stringBytes]);
-      return { ...field, type: field.type };
+      values[i] = ethers.concat([dataLength, data]);
+      return { ...field, type: 'bytes' };
     } else if ('components' in field) {
       const [processedComponents, processedValues] = processFields(
         field.components,
@@ -713,6 +715,7 @@ describe('Decoder', () => {
       values: [
         { name: 'bytesArray', type: 'bytes32[]', size: 256 },
         { name: 'int128Value', type: 'int128', size: 128 },
+        { name: 'bytesArray2', type: 'bytes32[]', size: 256 },
       ],
     };
     const values = [
@@ -722,6 +725,11 @@ describe('Decoder', () => {
         ethers.encodeBytes32String('The weather is good'),
       ],
       BigInt('-170141183460469231731687303715884105728'), // Min value for int128
+      [
+        ethers.encodeBytes32String('Why so serious'),
+        ethers.encodeBytes32String('The weather is good'),
+        ethers.encodeBytes32String('Hello, World!'),
+      ],
     ];
     await testDecoder(fields, values);
   });
@@ -862,6 +870,43 @@ describe('Decoder', () => {
           [-321, false, '0x6789012345678901234567890123456789012345'],
         ],
       ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle string', async () => {
+    const fields: Field = {
+      name: 'StringField',
+      values: [
+        { name: 'stringValue', type: 'string' },
+        {
+          name: 'stringValue2',
+          type: 'string',
+        },
+        {
+          name: 'uint32Value',
+          type: 'uint32',
+          size: 32,
+        },
+        {
+          name: 'bytesValue',
+          type: 'bytes',
+        },
+        {
+          name: 'uint256Value',
+          type: 'uint256',
+          size: 256,
+        },
+      ],
+    };
+    const values = [
+      'Hello, World! And hello my fellow sunshine and rain!',
+      'Hello, World!',
+      42,
+      ethers.hexlify(ethers.randomBytes(106)),
+      BigInt(
+        '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+      ),
     ];
     await testDecoder(fields, values);
   });
