@@ -10,7 +10,7 @@ use super::{api_connect::ApiConnect, historical::Historical};
 pub trait DataFeed: ApiConnect + Historical {
     fn score_by(&self) -> ConsensusMetric;
 
-    fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp);
+    fn poll(&mut self, asset: &Asset) -> (FeedResult, Timestamp);
 
     async fn poll_batch(&mut self, assets: &[Asset]) -> Vec<(FeedResult, u32, Timestamp)>;
 }

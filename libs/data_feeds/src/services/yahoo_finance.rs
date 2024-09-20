@@ -124,10 +124,14 @@ impl DataFeed for YahooFinanceDataFeed {
         ConsensusMetric::Mean(AverageAggregator {})
     }
 
-    fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
+    fn poll(&mut self, asset: &Asset) -> (FeedResult, Timestamp) {
         let url = "https://yfapi.net/v6/finance/quote";
 
-        let full_url = format!("{}?symbols={}", url, asset);
+        let full_url = format!(
+            "{}?symbols={}",
+            url,
+            asset.resources.get("yf_symbol").unwrap()
+        );
 
         debug!("Request url - {}", full_url);
 
@@ -155,7 +159,10 @@ impl DataFeed for YahooFinanceDataFeed {
             if response.status().is_success() {
                 let resp_json: Value = response.json().unwrap();
 
-                (get_feed_result(&resp_json, 0, asset), current_unix_time())
+                (
+                    get_feed_result(&resp_json, 0, asset.resources.get("yf_symbol").unwrap()),
+                    current_unix_time(),
+                )
             } else {
                 error!("Request failed with status: {}", response.status());
 

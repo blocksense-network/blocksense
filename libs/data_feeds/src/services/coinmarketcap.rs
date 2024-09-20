@@ -41,12 +41,12 @@ impl CoinMarketCapDataFeed {
     }
 }
 
-fn get_cmc_json_price(cmc_response: Value, asset: &str) -> Option<f64> {
+fn get_cmc_json_price(cmc_response: Value, asset: &Asset) -> Option<f64> {
     let price = cmc_response
         .get("data")
-        .and_then(|data| data.get(asset))
+        .and_then(|data| data.get(asset.resources.get("cmc_id").unwrap()))
         .and_then(|first_asset| first_asset.get("quote"))
-        .and_then(|quote| quote.get("USD"))
+        .and_then(|quote| quote.get("USD")) //TODO(snikolov): Change to `asset.resources.get("quote").unwrap()` when feed_config.json is updated
         .and_then(|usd| usd.get("price"))
         .and_then(|price| price.as_f64());
 
@@ -55,7 +55,7 @@ fn get_cmc_json_price(cmc_response: Value, asset: &str) -> Option<f64> {
     price
 }
 
-fn get_feed_result(response_json: &Value, asset: &str) -> FeedResult {
+fn get_feed_result(response_json: &Value, asset: &Asset) -> FeedResult {
     let price = get_cmc_json_price(response_json.clone(), asset);
 
     match price {
@@ -70,16 +70,46 @@ fn get_feed_result(response_json: &Value, asset: &str) -> FeedResult {
     }
 }
 
+fn set_query_params_usd(asset_id_vec: &[Asset]) -> [(&str, String); 1] {
+    let asset_id_vec: Vec<(String, u32)> = asset_id_vec
+        .iter()
+        .map(|asset| {
+            (
+                asset
+                    .resources
+                    .get("cmc_id")
+                    .unwrap_or_else(|| {
+                        panic!("[CMC] Missing resource `cmc_id` for feed - {:?}!", asset)
+                    })
+                    .clone(),
+                asset.feed_id,
+            )
+        })
+        .collect();
+
+    let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
+
+    let params: [(&str, String); 1] = [("id", assets.join(","))];
+
+    debug!("{:?}", params);
+
+    params
+}
+
+fn set_query_params_quote(quote: &str) -> [(String, String); 1] {
+    todo!()
+}
+
 #[async_trait]
 impl DataFeed for CoinMarketCapDataFeed {
     fn score_by(&self) -> ConsensusMetric {
         ConsensusMetric::Mean(AverageAggregator {})
     }
 
-    fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
+    fn poll(&mut self, asset: &Asset) -> (FeedResult, Timestamp) {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
 
-        let params = [("id", asset)];
+        let params = [("id", asset.resources.get("cmc_id").unwrap())];
 
         let headers = {
             let mut headers = reqwest::header::HeaderMap::new();
@@ -120,30 +150,8 @@ impl DataFeed for CoinMarketCapDataFeed {
         }
     }
 
-    async fn poll_batch(&mut self, asset_id_vec: &[Asset]) -> Vec<(FeedResult, u32, Timestamp)> {
+    async fn poll_batch(&mut self, assets: &[Asset]) -> Vec<(FeedResult, u32, Timestamp)> {
         let url = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest";
-
-        let asset_id_vec: Vec<(String, u32)> = asset_id_vec
-            .iter()
-            .map(|asset| {
-                (
-                    asset
-                        .resources
-                        .get("cmc_id")
-                        .unwrap_or_else(|| {
-                            panic!("[CMC] Missing resource `cmc_id` for feed - {:?}!", asset)
-                        })
-                        .clone(),
-                    asset.feed_id,
-                )
-            })
-            .collect();
-
-        let assets: Vec<String> = asset_id_vec.iter().map(|(s, _)| s.clone()).collect();
-
-        let params = [("id", assets.join(","))];
-
-        debug!("{:?}", params);
 
         let headers = {
             let mut headers = reqwest::header::HeaderMap::new();
@@ -157,6 +165,8 @@ impl DataFeed for CoinMarketCapDataFeed {
             );
             headers
         };
+
+        let params = set_query_params_usd(&assets);
 
         let response = self
             .client
@@ -172,11 +182,11 @@ impl DataFeed for CoinMarketCapDataFeed {
             if response.status().is_success() {
                 let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-                for (asset, feed_id) in asset_id_vec {
-                    trace!("Feed Asset pair - {}.{}", asset, feed_id);
+                for asset in assets {
+                    trace!("Parsing response for feed_id: {}", asset.feed_id);
                     results_vec.push((
-                        get_feed_result(&resp_json, asset.as_str()),
-                        feed_id,
+                        get_feed_result(&resp_json, asset),
+                        asset.feed_id,
                         current_unix_time(),
                     ));
                 }
@@ -185,12 +195,12 @@ impl DataFeed for CoinMarketCapDataFeed {
             } else {
                 error!("Request failed with status: {}", response.status());
 
-                asset_id_vec
+                assets
                     .iter()
-                    .map(|(_, id)| {
+                    .map(|asset| {
                         (
                             get_generic_feed_error("CoinMarketCap"),
-                            *id,
+                            asset.feed_id,
                             current_unix_time(),
                         )
                     })
@@ -200,12 +210,12 @@ impl DataFeed for CoinMarketCapDataFeed {
             //TODO(snikolov): Figure out how to handle the Error if it occurs
             error!("Request failed with error!");
 
-            asset_id_vec
+            assets
                 .iter()
-                .map(|(_, id)| {
+                .map(|asset| {
                     (
                         get_generic_feed_error("CoinMarketCap"),
-                        *id,
+                        asset.feed_id,
                         current_unix_time(),
                     )
                 })

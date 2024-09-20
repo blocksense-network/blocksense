@@ -106,9 +106,15 @@ pub async fn dispatch_subset(
 
         let feed_name = feed.name.clone();
         let feed_id = feed.id;
+
+        let asset = Asset {
+            resources: feed.resources.clone(),
+            feed_id: feed.id,
+        };
+
         let tx = data_feed_sender.clone();
         tokio::task::spawn(async move {
-            let (result, timestamp_ms) = data_feed.lock().await.poll(&feed_name);
+            let (result, timestamp_ms) = data_feed.lock().await.poll(&asset);
             tx.send((result, timestamp_ms, feed_id)).unwrap();
             debug!("DataFeed {:?} polled", feed_name);
         });
