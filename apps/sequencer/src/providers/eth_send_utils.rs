@@ -40,7 +40,7 @@ pub async fn deploy_contract(
     drop(providers);
     let mut p = p.lock().await;
     let wallet = &p.wallet;
-    let provider = &p.provider;
+    let provider = p.get_current_provider();
     let provider_metrics = &p.provider_metrics;
 
     // Get the base fee for the block.
@@ -138,7 +138,7 @@ pub async fn eth_batch_send_to_contract<
     );
 
     let provider_metrics = &provider.provider_metrics;
-    let provider = &provider.provider;
+    let provider = provider.get_current_provider();
 
     let selector = "0x1a2d80ac";
 
@@ -283,9 +283,11 @@ pub async fn eth_batch_send_to_all_contracts<
                     let err = format!("Timed out transaction for network {} -> {}", net, e);
                     error!(err);
                     all_results += &err;
-                    let provider = provider.lock().await;
+                    let mut provider = provider.lock().await;
+                    provider.switch_provider();
                     let provider_metrics = provider.provider_metrics.clone();
                     inc_metric!(provider_metrics, net, total_timed_out_tx);
+                    inc_metric!(provider_metrics, net, total_times_provider_switched);
                 }
             },
             Err(e) => {
@@ -457,7 +459,7 @@ mod tests {
         let result = provider
             .lock()
             .await
-            .provider
+            .get_current_provider()
             .call(&TransactionRequest {
                 to: Some(TxKind::Call(address_to_send)),
                 input: TransactionInput {

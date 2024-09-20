@@ -118,7 +118,7 @@ impl Validated for ReporterConfig {
 // #[serde(rename_all = "PascalCase")]
 pub struct Provider {
     pub private_key_path: String,
-    pub url: String,
+    pub urls: Vec<String>,
     pub contract_address: Option<String>,
     pub event_contract_address: Option<String>,
     pub transcation_timeout_secs: u32,
@@ -207,7 +207,7 @@ pub fn get_test_config_with_single_provider(
             network.to_string(),
             Provider {
                 private_key_path: private_key_path.to_string(),
-                url: url.to_string(),
+                urls: vec![url.to_string()],
                 contract_address: None,
                 event_contract_address: None,
                 transcation_timeout_secs: 50,
@@ -234,7 +234,7 @@ pub fn get_test_config_with_multiple_providers(
             network.to_string(),
             Provider {
                 private_key_path: private_key_path.to_string(),
-                url: url.to_string(),
+                urls: vec![url.to_string()],
                 contract_address: None,
                 event_contract_address: None,
                 transcation_timeout_secs: 50,
