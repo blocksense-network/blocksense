@@ -2,6 +2,7 @@ import * as S from '@effect/schema/Schema';
 
 import {
   ChainId,
+  ethereumAddress,
   networkNameToChainId,
 } from '@blocksense/base-utils/evm-utils';
 
@@ -126,3 +127,18 @@ export const chainlinkNetworkNameToChainId = {
 } satisfies {
   [Net in NetworkName]: ChainId | null;
 };
+
+export const confirmedFeedEvent = S.Struct({
+  returnValues: S.Struct({
+    asset: ethereumAddress,
+    denomination: ethereumAddress,
+    latestAggregator: ethereumAddress,
+    previousAggregator: ethereumAddress,
+    nextPhaseId: S.NumberFromString, // uint16 in Solidity
+    sender: ethereumAddress,
+  }),
+});
+
+export type ConfirmedFeedEvent = S.Schema.Type<typeof confirmedFeedEvent>;
+
+export const decodeConfirmedFeedEvent = S.decodeUnknownSync(confirmedFeedEvent);
