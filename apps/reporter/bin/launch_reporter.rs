@@ -1,4 +1,6 @@
-use data_feeds::orchestrator::{get_validated_reporter_config, orchestrator};
+use data_feeds::orchestrator::orchestrator;
+use feed_registry::registry::AllFeedsConfig;
+use sequencer_config::{get_validated_config, ReporterConfig};
 use std::env;
 
 use utils::{
@@ -6,10 +8,9 @@ use utils::{
         BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
         VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
     },
-    constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE},
+    constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE},
 };
 
-use feed_registry::registry::get_validated_feeds_config;
 use utils::get_config_file_path;
 
 #[tokio::main]
@@ -32,9 +33,12 @@ async fn main() -> std::io::Result<()> {
                 println!("optimizations => {VERGEN_CARGO_OPT_LEVEL}");
                 println!("compiler => {VERGEN_RUSTC_SEMVER}");
 
+                let reporter_config_file =
+                    get_config_file_path(REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE);
                 let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-                let _reporter_config = get_validated_reporter_config();
-                let _feeds_config = get_validated_feeds_config(&feeds_config_file);
+                let _reporter_config =
+                    get_validated_config::<ReporterConfig>(&reporter_config_file);
+                let _feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file);
 
                 return std::io::Result::Ok(());
             }

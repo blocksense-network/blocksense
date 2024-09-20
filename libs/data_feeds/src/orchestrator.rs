@@ -10,7 +10,7 @@ use prometheus::{
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-use sequencer_config::{ReporterConfig, Validated};
+use sequencer_config::{get_validated_config, init_config, ReporterConfig};
 use tokio::sync::{mpsc, Mutex};
 use utils::read_file;
 use utils::{
@@ -29,39 +29,9 @@ use crate::{
 };
 use feed_registry::{
     api::DataFeedAPI,
-    registry::init_feeds_config,
+    registry::AllFeedsConfig,
     types::{FeedResult, Timestamp},
 };
-
-pub fn init_reporter_config() -> Result<ReporterConfig, anyhow::Error> {
-    let config_file_path = get_config_file_path(REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE);
-    let config_file_path = config_file_path
-        .to_str()
-        .expect("Environment variable does not hold a dir path");
-
-    let data = read_file(config_file_path);
-
-    info!("Using config file: {}", config_file_path);
-
-    match serde_json::from_str::<ReporterConfig>(data.as_str()) {
-        Ok(c) => Ok(c),
-        Err(e) => anyhow::bail!(
-            "Config file ({}) is not valid JSON! {}",
-            config_file_path,
-            e
-        ),
-    }
-}
-
-pub fn get_validated_reporter_config() -> ReporterConfig {
-    let reporter_config = init_reporter_config().expect("Failed to get config: ");
-
-    reporter_config
-        .validate("ReporterConfig")
-        .expect("validation error");
-
-    reporter_config
-}
 
 fn start_reporter_subset(
     reporter_config: &ReporterConfig,
@@ -96,10 +66,14 @@ pub async fn orchestrator() {
     // Initializes a tracing subscriber that displays runtime information based on the RUST_LOG env variable
     tracing_subscriber::fmt::init();
 
-    let reporter_config = init_reporter_config().expect("Config file is not valid JSON!");
+    let config_file_path: std::path::PathBuf =
+        get_config_file_path(REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE);
+    let reporter_config = get_validated_config::<ReporterConfig>(&config_file_path)
+        .expect("Config file is not valid JSON!");
 
     let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-    let feeds_registry = init_feeds_config(&feeds_config_file).expect("Failed to get config: ");
+    let feeds_registry =
+        init_config::<AllFeedsConfig>(&feeds_config_file).expect("Failed to get config: ");
 
     let mut connection_cache = HashMap::<DataFeedAPI, Arc<Mutex<dyn DataFeed + Send>>>::new();
 

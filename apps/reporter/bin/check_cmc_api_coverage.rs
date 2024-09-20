@@ -2,15 +2,18 @@ use std::thread;
 use std::time::Duration;
 
 use data_feeds::interfaces::data_feed::DataFeed;
-use data_feeds::orchestrator::init_reporter_config;
 use data_feeds::services::coinmarketcap::CoinMarketCapDataFeed;
-use feed_registry::registry::init_feeds_config;
+use feed_registry::registry::AllFeedsConfig;
 use feed_registry::types::FeedResult;
+use config::get_validated_config;
+use utils::constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE};
+use utils::get_config_file_path;
 
 /// Checks if all assets are available from CMC API and prints non-available pairs
 /// takes 5m+ to run
 fn main() {
-    let reporter_config = init_reporter_config();
+    let config_file_path: std::path::PathBuf = get_config_file_path(REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE);
+    let reporter_config = get_validated_config::<config::ReporterConfig>(&config_file_path).expect("Failed to get config: ");
 
     let cmc_api_key_path = reporter_config
         .resources
@@ -21,7 +24,8 @@ fn main() {
         .to_string()
         + cmc_api_key_path;
 
-    let all_feeds_config = init_feeds_config();
+    let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
+    let all_feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file).expect("Failed to get config: ");
 
     let mut cmc_feed = CoinMarketCapDataFeed::new(cmc_api_key_path);
 

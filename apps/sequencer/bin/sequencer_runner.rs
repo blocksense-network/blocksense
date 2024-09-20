@@ -2,8 +2,7 @@ use std::sync::Arc;
 
 use actix_web::{web, App, HttpServer};
 use feed_registry::registry::{
-    get_validated_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsConfig,
-    AllFeedsReports,
+    new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
 };
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::providers::provider::init_shared_rpc_providers;
@@ -24,11 +23,10 @@ use utils::logging::{
 use actix_web::rt::spawn;
 use actix_web::web::Data;
 use prometheus::metrics::FeedsMetrics;
-use sequencer::config::get_validated_sequencer_config;
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
-use sequencer_config::SequencerConfig;
+use sequencer_config::{get_validated_config, SequencerConfig};
 use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
@@ -124,10 +122,11 @@ pub async fn prepare_http_servers(
 
 fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
     let sequencer_config_file = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
-    let sequencer_config = get_validated_sequencer_config(&sequencer_config_file)
+    let sequencer_config = get_validated_config::<SequencerConfig>(&sequencer_config_file)
         .expect("Could not get validated sequencer config");
     let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-    let feeds_config = get_validated_feeds_config(&feeds_config_file);
+    let feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file)
+        .expect("Could not get validated feeds config");
     (sequencer_config, feeds_config)
 }
 

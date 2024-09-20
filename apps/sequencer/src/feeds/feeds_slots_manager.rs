@@ -94,15 +94,16 @@ pub async fn feeds_slots_manager_loop<
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::init_sequencer_config;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
     use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::{
-        init_feeds_config, new_feeds_meta_data_reg_from_config, AllFeedsReports,
+        new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
     };
     use feed_registry::types::{FeedResult, FeedType};
     use prometheus::metrics::FeedsMetrics;
+    use sequencer_config::init_config;
+    use sequencer_config::SequencerConfig;
     use std::env;
     use std::path::PathBuf;
     use std::sync::Arc;
@@ -126,10 +127,10 @@ mod tests {
 
         let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config =
-            init_sequencer_config(&sequencer_config_file).expect("Failed to load config:");
+            init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
         let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
         let mut feeds_config =
-            init_feeds_config(&feeds_config_file).expect("Failed to get config: ");
+            init_config::<AllFeedsConfig>(&feeds_config_file).expect("Failed to get config: ");
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
         let metrics_prefix = Some("test_feed_slots_manager_loop_");

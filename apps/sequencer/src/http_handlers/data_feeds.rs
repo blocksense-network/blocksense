@@ -351,7 +351,6 @@ pub async fn register_feed(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::config::init_sequencer_config;
     use crate::feeds::feed_allocator::init_concurrent_allocator;
     use crate::feeds::feed_workers::prepare_app_workers;
     use crate::http_handlers::admin::deploy;
@@ -363,12 +362,14 @@ mod tests {
     use alloy::primitives::Address;
     use crypto::JsonSerializableSignature;
     use data_feeds::connector::post::generate_signature;
-    use feed_registry::registry::init_feeds_config;
+    use feed_registry::registry::AllFeedsConfig;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
     use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use sequencer_config::get_test_config_with_single_provider;
+    use sequencer_config::init_config;
+    use sequencer_config::SequencerConfig;
     use std::collections::HashMap;
     use std::env;
     use std::path::Path;
@@ -391,9 +392,10 @@ mod tests {
 
         let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config =
-            init_sequencer_config(&sequencer_config_file).expect("Failed to load config:");
+            init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
         let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-        let feeds_config = init_feeds_config(&feeds_config_file).expect("Failed to get config: ");
+        let feeds_config =
+            init_config::<AllFeedsConfig>(&feeds_config_file).expect("Failed to get config: ");
         let metrics_prefix = Some("post_report_from_unknown_reporter_fails_with_401_");
 
         let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
@@ -471,7 +473,8 @@ mod tests {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
 
         let config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-        let feeds_config = init_feeds_config(&config_file).expect("Failed to get config: ");
+        let feeds_config =
+            init_config::<AllFeedsConfig>(&config_file).expect("Failed to get config: ");
         let metrics_prefix = Some("create_app_state_from_sequencer_config");
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;

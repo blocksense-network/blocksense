@@ -8,35 +8,9 @@ use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use sequencer_config::{FeedConfig, Validated};
 use serde::Deserialize;
-use std::path::Path;
 use tokio::{sync::RwLock, time};
 use tracing::{info, trace};
-use utils::{read_file, time::current_unix_time};
-
-pub fn init_feeds_config(config_file: &Path) -> anyhow::Result<AllFeedsConfig> {
-    let config_file = config_file
-        .to_str()
-        .expect("Environment variable does not hold a dir path");
-
-    let data = read_file(config_file);
-
-    info!("Using config file: {}", config_file);
-
-    match serde_json::from_str::<AllFeedsConfig>(data.as_str()) {
-        Ok(c) => Ok(c),
-        Err(e) => anyhow::bail!("Config file ({config_file}) is not valid JSON! {e}"),
-    }
-}
-
-pub fn get_validated_feeds_config(config_file: &Path) -> AllFeedsConfig {
-    let feeds_config = init_feeds_config(config_file).expect("Failed to get config: ");
-
-    feeds_config
-        .validate("FeedsConfig")
-        .expect("validation error");
-
-    feeds_config
-}
+use utils::time::current_unix_time;
 
 #[derive(Debug, Deserialize)]
 pub struct AllFeedsConfig {

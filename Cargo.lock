@@ -7660,6 +7660,7 @@ dependencies = [
  "data_feeds",
  "feed_registry",
  "prometheus 0.1.1",
+ "sequencer_config",
  "serde_json",
  "tokio 1.40.0",
  "tracing-subscriber",

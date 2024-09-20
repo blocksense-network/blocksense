@@ -11,6 +11,7 @@ edition.workspace = true
 data_feeds = { path = "../../libs/data_feeds"}
 prometheus = { path = "../../libs/prometheus" }
 utils = { path = "../../libs/utils" }
+sequencer_config = { path = "../../libs/sequencer_config" }
 feed_registry = { path = "../../libs/feed_registry"}
 
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
