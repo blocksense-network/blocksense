@@ -11,7 +11,11 @@ async function saveConfigsToDir(
 ) {
   const { writeJSON } = selectDirectory(outputDir);
 
-  return Promise.all(configs.map(cfg => writeJSON(cfg)));
+  return Promise.all(
+    configs.map(cfg =>
+      writeJSON(cfg).then(path => console.log(`Saved artifact to: '${path}'`)),
+    ),
+  );
 }
 
 const saveArtifacts = saveConfigsToDir.bind(null, artifactsDir);
