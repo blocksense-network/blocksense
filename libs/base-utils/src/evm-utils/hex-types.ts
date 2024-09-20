@@ -37,3 +37,9 @@ export type TxHash = S.Schema.Type<typeof txHash>;
 
 export const isTxHash = S.is(txHash);
 export const parseTxHash = S.decodeUnknownSync(txHash);
+
+export const zeroAddress = parseEthereumAddress(
+  '0x0000000000000000000000000000000000000000',
+);
+export const isZeroAddress = (address: unknown): address is EthereumAddress =>
+  address === zeroAddress;
