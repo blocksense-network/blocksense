@@ -61,6 +61,7 @@ export enum ContractNames {
 }
 
 export enum NetworkNames {
+  local = 'LOCAL',
   sepolia = 'ETH_SEPOLIA',
   holesky = 'ETH_HOLESKY',
   amoy = 'POLYGON_AMOY',

@@ -52,15 +52,26 @@ task('deploy', 'Deploy contracts')
 
       console.log(`\n\n// ChainId: ${config.network.chainId} //`);
       const multisig = await deployMultisig(config);
+      console.log(`hi stan: ${JSON.stringify(multisig)}`);
       const multisigAddress = await multisig.getAddress();
+      console.log(`hi emo 1: ${multisigAddress}`);
+
+      console.log(`hi emo 5: ${JSON.stringify(process.env)}`);
+
+      const bar = abiCoder.encode(['address'], [process.env.SEQUENCER_ADDRESS]);
+
+      console.log(`hi emo 4: ${bar}`);
 
       const dataFeedStoreAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.HistoricDataFeedStoreV2,
         ethers.id('dataFeedStore'),
-        abiCoder.encode(['address'], [process.env.SEQUENCER_ADDRESS]),
+        bar,
       );
+
+      console.log(`hi emo 2: ${JSON.stringify(dataFeedStoreAddress)}`);
+
       const upgradeableProxyAddress = await predictAddress(
         artifacts,
         config,
@@ -71,6 +82,8 @@ task('deploy', 'Deploy contracts')
           [dataFeedStoreAddress, multisigAddress],
         ),
       );
+
+      console.log(`hi emo 3: ${JSON.stringify(upgradeableProxyAddress)}`);
 
       const deployData = await deployContracts(config, multisig, artifacts, [
         {
@@ -210,17 +223,23 @@ const predictAddress = async (
   salt: string,
   args: string,
 ) => {
+  console.log(`hi emo 11: ${JSON.stringify(artifacts)}`);
+
   const artifact = artifacts.readArtifactSync(contractName);
   const bytecode = ethers.solidityPacked(
     ['bytes', 'bytes'],
     [artifact.bytecode, args],
   );
 
-  return ethers.getCreate2Address(
+  console.log(`hi emo 12: ${JSON.stringify(bytecode)}`);
+
+  const foo = ethers.getCreate2Address(
     config.safeAddresses.createCallAddress,
     salt,
     ethers.keccak256(bytecode),
   );
+  console.log(`hi emo 13: ${JSON.stringify(foo)}`);
+  return foo;
 };
 
 async function checkAddressExists(
