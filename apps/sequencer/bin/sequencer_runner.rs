@@ -22,11 +22,11 @@ use utils::logging::{
 
 use actix_web::rt::spawn;
 use actix_web::web::Data;
+use config::{get_validated_config, SequencerConfig};
 use prometheus::metrics::FeedsMetrics;
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
-use sequencer_config::{get_validated_config, SequencerConfig};
 use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;

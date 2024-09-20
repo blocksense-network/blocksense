@@ -12,8 +12,8 @@ use alloy::{
 };
 use reqwest::{Client, Url};
 
+use config::SequencerConfig;
 use prometheus::metrics::ProviderMetrics;
-use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
 use std::fs;
 use std::sync::Arc;
@@ -226,7 +226,7 @@ mod tests {
 
     use crate::providers::provider::get_rpc_providers;
     use alloy::providers::Provider as AlloyProvider;
-    use sequencer_config::get_test_config_with_single_provider;
+    use config::get_test_config_with_single_provider;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {

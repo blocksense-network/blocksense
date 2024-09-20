@@ -7,7 +7,7 @@ edition.workspace = true
 
 [dependencies]
 crypto = { path = "../crypto" }
-sequencer_config = { path = "../sequencer_config" }
+config = { path = "../config" }
 utils = { path = "../utils" }
 
 serde = { version = "1.0.210", features = ["derive"] }

@@ -5,12 +5,12 @@ use std::{
     time::{Duration, Instant},
 };
 
+use config::{get_validated_config, init_config, ReporterConfig};
 use prometheus::{
     actix_server::handle_prometheus_metrics,
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
     TextEncoder,
 };
-use sequencer_config::{get_validated_config, init_config, ReporterConfig};
 use tokio::sync::{mpsc, Mutex};
 use utils::read_file;
 use utils::{

@@ -1,5 +1,6 @@
 use alloy::hex::ToHexExt;
 use alloy::node_bindings::Anvil;
+use config::SequencerConfig;
 use crypto::JsonSerializableSignature;
 use curl::easy::Handler;
 use curl::easy::WriteError;
@@ -9,7 +10,6 @@ use eyre::Result;
 use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
 use json_patch::merge;
 use port_scanner::scan_port;
-use sequencer_config::SequencerConfig;
 use serde_json::json;
 use std::io::stdout;
 use std::process::Command;
@@ -115,7 +115,7 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
         let mut command = Command::new("cargo");
         let command = command.args(["run", "--bin", "sequencer"]);
         let sequencer = command
-            .env("SEQUENCER_LOGGING_LEVEL", "INFO")
+            .env("SEQUENCER_LOG_LEVEL", "INFO")
             .env("SEQUENCER_CONFIG_DIR", "/tmp")
             .env("FEEDS_CONFIG_DIR", "/tmp");
 

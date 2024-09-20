@@ -63,7 +63,7 @@ to the sequencer and waits fot the sequencer to posts data to the contracts. It 
 To set the logging level, you can provide an environment variable before running the sequencer as follows:
 
 ```
-export SEQUENCER_LOGGING_LEVEL=DEBUG
+export SEQUENCER_LOG_LEVEL=DEBUG
 ```
 
 This environment variable is not mandatory, and the default value is `INFO`. All supported logging levels are in apps/sequencer/src/utils/logging.rs

@@ -8,7 +8,7 @@ edition.workspace = true
 [dependencies]
 data_feeds = { path = "../../libs/data_feeds" }
 anomaly_detection = { path = "../../libs/anomaly_detection" }
-sequencer_config = { path = "../../libs/sequencer_config" }
+config = { path = "../../libs/config" }
 crypto = { path = "../../libs/crypto" }
 utils = { path = "../../libs/utils" }
 feed_registry = { path = "../../libs/feed_registry"}

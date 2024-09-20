@@ -307,11 +307,9 @@ mod tests {
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
+    use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
     use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
-    use sequencer_config::{
-        get_test_config_with_multiple_providers, get_test_config_with_single_provider,
-    };
     use std::collections::HashMap;
     use std::str::FromStr;
     use utils::test_env::get_test_private_key_path;

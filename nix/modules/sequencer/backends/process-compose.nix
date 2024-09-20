@@ -57,7 +57,7 @@ in
         environment = [
           "FEEDS_CONFIG_DIR=${../../../../config}"
           "SEQUENCER_CONFIG_DIR=${sequencerConfigJSON}"
-          "SEQUENCER_LOGGING_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
+          "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
         ];
         shutdown.signal = 9;
       };

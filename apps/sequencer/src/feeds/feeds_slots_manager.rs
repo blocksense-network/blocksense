@@ -96,14 +96,14 @@ mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
+    use config::init_config;
+    use config::SequencerConfig;
     use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::{
         new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
     };
     use feed_registry::types::{FeedResult, FeedType};
     use prometheus::metrics::FeedsMetrics;
-    use sequencer_config::init_config;
-    use sequencer_config::SequencerConfig;
     use std::env;
     use std::path::PathBuf;
     use std::sync::Arc;

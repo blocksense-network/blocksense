@@ -5,8 +5,8 @@ use std::{
 };
 
 use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
+use config::{FeedConfig, Validated};
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
-use sequencer_config::{FeedConfig, Validated};
 use serde::Deserialize;
 use tokio::{sync::RwLock, time};
 use tracing::{info, trace};

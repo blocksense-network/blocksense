@@ -290,7 +290,7 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn test_get_validated_sequencer_config_with_error_in_set_endpoint_ports() {
+    fn sequencer_config_with_conflicting_ports_fails_validation() {
         let config_file_path = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
         let config_file_path = config_file_path
             .to_str()

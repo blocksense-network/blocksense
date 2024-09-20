@@ -13,7 +13,7 @@ derive = { path = "../derive"}
 utils = { path = "../utils" }
 crypto = { path = "../crypto" }
 feed_registry = { path = "../feed_registry"}
-sequencer_config = { path = "../sequencer_config"}
+config = { path = "../config"}
 
 alloy = { git = "https://github.com/alloy-rs/alloy", rev = "6f4e397f7cf71812160a165bdcebf40cac814fef", features = [
     # "dyn-abi",

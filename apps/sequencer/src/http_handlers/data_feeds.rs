@@ -360,6 +360,7 @@ mod tests {
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
     use alloy::primitives::Address;
+    use config::{get_test_config_with_single_provider, init_config, SequencerConfig};
     use crypto::JsonSerializableSignature;
     use data_feeds::connector::post::generate_signature;
     use feed_registry::registry::AllFeedsConfig;
@@ -367,9 +368,6 @@ mod tests {
     use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
     use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
-    use sequencer_config::get_test_config_with_single_provider;
-    use sequencer_config::init_config;
-    use sequencer_config::SequencerConfig;
     use std::collections::HashMap;
     use std::env;
     use std::path::Path;

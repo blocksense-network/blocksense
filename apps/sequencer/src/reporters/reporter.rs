@@ -1,6 +1,6 @@
+use config::SequencerConfig;
 use crypto::{deserialize_public_key, PublicKey, MULTIFORMATS_BLS_PUBKYE_PREFIX};
 use prometheus::metrics::ReporterMetrics;
-use sequencer_config::SequencerConfig;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;

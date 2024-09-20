@@ -2497,6 +2497,19 @@ dependencies = [
 
 [[package]]
 name = "config"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "dirs 5.0.1",
+ "hex",
+ "serde 1.0.210",
+ "serde_json",
+ "tracing",
+ "utils",
+]
+
+[[package]]
+name = "config"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b1b9d958c2b1368a663f05538fc1b5975adce1e19f435acceae987aceeeb369"
@@ -3047,6 +3060,7 @@ dependencies = [
  "assert_cmd",
  "async-trait",
  "cmc",
+ "config 0.1.1",
  "crypto",
  "curl",
  "derive",
@@ -3059,7 +3073,6 @@ dependencies = [
  "rand 0.8.5",
  "reqwest 0.12.7",
  "ringbuf",
- "sequencer_config",
  "serde 1.0.210",
  "serde_json",
  "strum",
@@ -3696,11 +3709,11 @@ name = "feed_registry"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "config 0.1.1",
  "crypto",
  "futures",
  "num",
  "ringbuf",
- "sequencer_config",
  "serde 1.0.210",
  "serde_json",
  "strum",
@@ -7329,7 +7342,7 @@ checksum = "a0de80796b316aec75344095a6d2ef68ec9b8f573b9e7adc821149ba3598e270"
 dependencies = [
  "ansi_term",
  "atty",
- "config",
+ "config 0.11.0",
  "directories",
  "petgraph",
  "serde 1.0.210",
@@ -7657,10 +7670,10 @@ checksum = "7a66a03ae7c801facd77a29370b4faec201768915ac14a721ba36f20bc9c209b"
 name = "reporter"
 version = "0.1.1"
 dependencies = [
+ "config 0.1.1",
  "data_feeds",
  "feed_registry",
  "prometheus 0.1.1",
- "sequencer_config",
  "serde_json",
  "tokio 1.40.0",
  "tracing-subscriber",
@@ -8381,6 +8394,7 @@ dependencies = [
  "async-channel 2.3.1",
  "bytes 1.7.1",
  "chrono",
+ "config 0.1.1",
  "console-subscriber",
  "conv",
  "crypto",
@@ -8398,7 +8412,6 @@ dependencies = [
  "regex",
  "reqwest 0.12.7",
  "ringbuf",
- "sequencer_config",
  "serde 1.0.210",
  "serde_json",
  "tempfile",
@@ -8411,23 +8424,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "sequencer_config"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "dirs 5.0.1",
- "hex",
- "serde 1.0.210",
- "serde_json",
- "tracing",
- "utils",
-]
-
-[[package]]
 name = "sequencer_tests"
 version = "0.1.1"
 dependencies = [
  "alloy",
+ "config 0.1.1",
  "crypto",
  "curl",
  "data_feeds",
@@ -8437,7 +8438,6 @@ dependencies = [
  "json-patch",
  "port_scanner",
  "reqwest 0.12.7",
- "sequencer_config",
  "serde 1.0.210",
  "serde_json",
  "tokio 1.40.0",

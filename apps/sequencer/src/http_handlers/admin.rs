@@ -213,13 +213,13 @@ mod tests {
     use crate::reporters::reporter::init_shared_reporters;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
+    use config::init_config;
+    use config::{get_test_config_with_single_provider, SequencerConfig};
     use feed_registry::registry::{
         new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
     };
     use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
-    use sequencer_config::init_config;
-    use sequencer_config::{get_test_config_with_single_provider, SequencerConfig};
     use std::env;
     use std::path::{Path, PathBuf};
     use std::sync::Arc;

@@ -1,5 +1,5 @@
 [package]
-name = "sequencer_config"
+name = "config"
 version.workspace = true
 authors.workspace = true
 license.workspace = true

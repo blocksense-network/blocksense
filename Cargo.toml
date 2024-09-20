@@ -12,7 +12,7 @@ members = [
   "libs/sdk",
   "libs/sdk/trigger-oracle",
   "libs/utils",
-  "libs/sequencer_config"
+  "libs/config"
 , "libs/crypto", "libs/feed_registry"]
 resolver = "2"
 

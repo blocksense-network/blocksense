@@ -4,9 +4,9 @@ use feed_registry::{
     types::{Asset, FeedResult, Timestamp},
 };
 
+use config::{FeedConfig, ReporterConfig};
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
-use sequencer_config::{FeedConfig, ReporterConfig};
 use std::sync::Arc;
 use std::{collections::HashMap, time::Instant};
 use strum::IntoEnumIterator;

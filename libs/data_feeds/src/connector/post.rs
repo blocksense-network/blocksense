@@ -1,11 +1,10 @@
 use feed_registry::types::{DataFeedPayload, FeedResult, PayloadMetaData, Timestamp};
 
+use config::{Reporter, ReporterConfig};
 use crypto::deserialize_priv_key;
 use crypto::sign_message;
 use crypto::{JsonSerializableSignature, Signature};
 use log::warn;
-use sequencer_config::Reporter;
-use sequencer_config::ReporterConfig;
 use tracing::debug;
 use tracing::info;
 use utils::read_file;
