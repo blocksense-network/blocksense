@@ -13,6 +13,7 @@ h4,
 h5,
 h6 {
   @apply font-noto-sans-bold;
+  line-height: normal;
 }
 
 header span,
