@@ -9,14 +9,14 @@ import 'react-vertical-timeline-component/style.min.css';
 import ArrowRoundedIcon from '@/components/IconComponents/ArrowRoundedIcon';
 import ArrowPathIcon from '@/components/IconComponents/ArrowPathIcon';
 
-export type Stage = {
+type Stage = {
   date: string;
   title: string;
   subTitle: string;
   description: string;
 };
 
-export type RoadMapConfig = Record<string, Stage>;
+type RoadMapConfig = Record<string, Stage>;
 
 export const RoadMap = ({ roadMapConfig }: RoadMapConfig) => {
   return (

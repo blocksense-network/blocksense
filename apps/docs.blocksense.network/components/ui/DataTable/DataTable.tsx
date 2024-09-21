@@ -48,8 +48,13 @@ interface DataTableProps<TData, TValue> {
   invisibleColumns?: string[];
 }
 
-function getUniqueValuesFromColumns(column: string, data: any): OptionType[] {
-  return Array.from(new Set(data.map((d: any) => d[column]))).map(data => ({
+function getUniqueValuesFromColumns(
+  column: string,
+  data: Object[],
+): OptionType[] {
+  return Array.from(
+    new Set(data.map((d: Object) => (d as { [key: string]: unknown })[column])),
+  ).map(data => ({
     label: data as string,
     value: data as string,
   }));
@@ -57,7 +62,7 @@ function getUniqueValuesFromColumns(column: string, data: any): OptionType[] {
 
 export function getFacetedFilters(
   columns: string[],
-  data: any,
+  data: Object[],
   columnTitles: { [key: string]: string },
 ): FilterType[] {
   return columns.map(column => ({
