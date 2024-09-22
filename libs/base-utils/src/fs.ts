@@ -99,11 +99,17 @@ class SelectedDirectory {
    * - **args.content** - The JSON content to be written to the file.
    * @returns A promise that resolves with the file path of the written file.
    */
-  writeJSON = (args: FileArgs & { content: Record<string, unknown> }) =>
+  writeJSON = (args: FileArgs & { content: unknown }) =>
     this.write({
       ext: '.json',
       ...args,
-      content: JSON.stringify(args.content, null, 2) + '\n',
+      content:
+        JSON.stringify(
+          args.content,
+          (_key, value) =>
+            typeof value === 'bigint' ? value.toString() : value,
+          2,
+        ) + '\n',
     });
 
   /**

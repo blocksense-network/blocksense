@@ -156,7 +156,7 @@ export async function getAllProposedFeedsRegistryEvents(
         toBlock: 'latest',
       },
       {
-        number: FMT_NUMBER.BIGINT,
+        number: FMT_NUMBER.STR,
         bytes: FMT_BYTES.HEX,
       },
     )
