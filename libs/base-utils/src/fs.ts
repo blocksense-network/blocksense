@@ -103,7 +103,13 @@ class SelectedDirectory {
     this.write({
       ext: '.json',
       ...args,
-      content: JSON.stringify(args.content, null, 2) + '\n',
+      content:
+        JSON.stringify(
+          args.content,
+          (_key, value) =>
+            typeof value === 'bigint' ? value.toString() : value,
+          2,
+        ) + '\n',
     });
 
   /**
