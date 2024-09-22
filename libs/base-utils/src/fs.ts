@@ -45,7 +45,7 @@ type FileArgs = Omit<PathObject, 'dir' | `root`>;
  *   @param {FileArgs & { content: string }} args - An object containing file path details and the content to write.
  *
  * - `writeJSON`: Writes a JSON object to a file in the base directory.
- *   @param {FileArgs & { content: Record<string, unknown> }} args - An object containing file path details and the JSON content to write.
+ *   @param {FileArgs & { content: unknown }} args - An object containing file path details and the JSON content to write.
  *
  * - `read`: Reads a file as a string from the base directory.
  *   @param {FileArgs} args - An object containing file path details.
@@ -99,7 +99,7 @@ class SelectedDirectory {
    * - **args.content** - The JSON content to be written to the file.
    * @returns A promise that resolves with the file path of the written file.
    */
-  writeJSON = (args: FileArgs & { content: Record<string, unknown> }) =>
+  writeJSON = (args: FileArgs & { content: unknown }) =>
     this.write({
       ext: '.json',
       ...args,
