@@ -14,7 +14,7 @@
     "build": "rollup --silent --config ./rollup.config.mjs",
     "ts": "yarn node --import tsx",
     "get-chainlink-feeds": "yarn ts src/scripts/get_chainlink_feeds.ts",
-    "generate-data-feeds-config": "yarn ts src/scripts/generate-feeds-config.ts > artifacts/data-feeds-config-generation-output.json",
+    "generate-data-feeds-config": "yarn ts src/scripts/generate-feeds-config.ts",
     "generate": "yarn get-chainlink-feeds && yarn generate-data-feeds-config"
   },
   "devDependencies": {
