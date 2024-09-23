@@ -1,5 +1,14 @@
-import { filterAsync } from '@blocksense/base-utils/async';
 import keccak256 from 'keccak256';
+import Web3 from 'web3';
+
+import { assertNotNull } from '@blocksense/base-utils/assert';
+import { everyAsync, filterAsync } from '@blocksense/base-utils/async';
+import { selectDirectory } from '@blocksense/base-utils/fs';
+import {
+  getRpcUrl,
+  isTestnet,
+  NetworkName,
+} from '@blocksense/base-utils/evm-utils';
 
 import {
   Feed,
@@ -9,6 +18,8 @@ import {
   decodeScript,
 } from '@blocksense/config-types/data-feeds-config';
 
+import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
+
 import {
   ChainLinkFeedInfo,
   RawDataFeeds,
@@ -16,17 +27,11 @@ import {
 } from '../data-services/types';
 import { getCMCCryptoList } from '../data-services/cmc';
 import { isFeedSupportedByYF } from '../data-services/yf';
-import { selectDirectory } from '@blocksense/base-utils/fs';
 import { artifactsDir } from '../paths';
-
-const defaultFeedInfo = {
-  report_interval_ms: 300_000,
-  first_report_start_time: {
-    secs_since_epoch: 0,
-    nanos_since_epoch: 0,
-  },
-  quorum_percentage: 1,
-} satisfies Partial<Feed>;
+import {
+  chainlinkNetworkNameToChainId,
+  parseNetworkFilename,
+} from '../chainlink-compatibility/types';
 
 function feedFromChainLinkFeedInfo(
   data: ChainLinkFeedInfo,
@@ -40,7 +45,12 @@ function feedFromChainLinkFeedInfo(
     decimals: data.decimals,
     pair: { base, quote },
     resources: {},
-    ...defaultFeedInfo,
+    report_interval_ms: 300_000,
+    first_report_start_time: {
+      secs_since_epoch: 0,
+      nanos_since_epoch: 0,
+    },
+    quorum_percentage: 1,
   };
 }
 async function isFeedSupported(
@@ -93,28 +103,104 @@ async function isFeedSupported(
 
   return false;
 }
+
+function chainLinkFileNameIsNotTestnet(fileName: string) {
+  const chainlinkNetworkName = parseNetworkFilename(fileName);
+  const networkName = chainlinkNetworkNameToChainId[chainlinkNetworkName];
+  if (networkName == null) return false;
+  return !isTestnet(networkName);
+}
+
+async function isFeedDataSameOnChain(
+  networkName: NetworkName,
+  feedInfo: ChainLinkFeedInfo,
+  web3: Web3 = new Web3(getRpcUrl(networkName)),
+): Promise<boolean> {
+  const chainLinkContractAddress = feedInfo.contractAddress;
+
+  const chainLinkContract = new web3.eth.Contract(
+    ChainLinkAbi,
+    chainLinkContractAddress,
+  );
+
+  try {
+    const [decimals, description] = (await Promise.all([
+      chainLinkContract.methods['decimals']().call(),
+      chainLinkContract.methods['description']().call(),
+    ])) as unknown as [number, string];
+
+    return (
+      BigInt(decimals) === BigInt(feedInfo.decimals) &&
+      description === feedInfo.name
+    );
+  } catch (e) {
+    console.error(
+      `Failed to fetch data from ${networkName} for ${feedInfo.name} at ${chainLinkContractAddress}`,
+    );
+
+    // If we can't fetch the data, we assume it's correct.
+    return true;
+  }
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
 ): Promise<FeedsConfig> {
-  const allPossibleFeeds: Omit<Feed, 'id' | 'script'>[] = Object.entries(
-    rawDataFeeds,
-  ).map(([_feedName, feedData]) => {
-    // TODO: Check if the feed data for all networks is the same
-    const data = Object.entries(feedData.networks)[0][1];
+  let filteredFeeds = Object.entries(rawDataFeeds).filter(
+    ([_feedName, feedData]) =>
+      Object.entries(feedData.networks).some(([chainlinkFileName, _feedData]) =>
+        chainLinkFileNameIsNotTestnet(chainlinkFileName),
+      ),
+  );
 
-    return {
-      ...feedFromChainLinkFeedInfo(data),
-    };
-  });
+  const allPossibleFeeds: Omit<Feed, 'id' | 'script'>[] = filteredFeeds.map(
+    ([_feedName, feedData]) => {
+      const maxEntry = Object.entries(feedData.networks).reduce<
+        ChainLinkFeedInfo | undefined
+      >((max, [chainlinkFileName, data]) => {
+        if (!chainLinkFileNameIsNotTestnet(chainlinkFileName)) return max;
+        return !max || data.decimals > max.decimals ? data : max;
+      }, undefined);
+
+      return { ...feedFromChainLinkFeedInfo(maxEntry!) };
+    },
+  );
 
   const supportedCMCCurrencies = await getCMCCryptoList();
 
   const usdPairFeeds = allPossibleFeeds.filter(
     feed => feed.pair.quote === 'USD',
   );
+
   const feeds = await filterAsync(usdPairFeeds, feed =>
     isFeedSupported(feed, supportedCMCCurrencies),
   );
+
+  let flatedNonTestnetSupportedFeeds = filteredFeeds
+    .filter(([feedName, _feedData]) =>
+      feeds.some(feed => feed.description === feedName),
+    )
+    .flatMap(([_feedName, feedData]) => {
+      return Object.entries(feedData.networks).map(
+        ([chaninLinkFileName, feedData]) => ({
+          network:
+            chainlinkNetworkNameToChainId[
+              parseNetworkFilename(chaninLinkFileName)
+            ],
+          feed: feedData,
+        }),
+      );
+    })
+    .filter(x => x.network && !isTestnet(x.network));
+
+  if (
+    !(await everyAsync(flatedNonTestnetSupportedFeeds, x =>
+      isFeedDataSameOnChain(assertNotNull(x.network), x.feed),
+    ))
+  ) {
+    throw new Error("Feed data doesn't match on chain");
+  }
+
   const feedsSortedByDescription = feeds.sort((a, b) => {
     // We hash the descriptions here, to avoid an obvious ordering.
     const a_ = keccak256(a.description).toString();
