@@ -1,4 +1,4 @@
-import { filterAsync } from '@blocksense/base-utils/async';
+import { everyAsync, filterAsync } from '@blocksense/base-utils/async';
 import keccak256 from 'keccak256';
 
 import {
@@ -18,6 +18,19 @@ import { getCMCCryptoList } from '../data-services/cmc';
 import { isFeedSupportedByYF } from '../data-services/yf';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { artifactsDir } from '../paths';
+import {
+  chainIdToNetworkName,
+  isTestnetNetworkName,
+  NetworkName,
+  networkNameToRpcEnvVar,
+} from '@blocksense/base-utils/evm-utils';
+import {
+  chainlinkNetworkNameToChainId,
+  parseNetworkFilename,
+} from '../chainlink-compatibility/types';
+import Web3 from 'web3';
+import ChainLinkAbi from '../abis/chainlink_contract_abi.json';
+import { getEnvString } from '@blocksense/base-utils/env';
 
 const defaultFeedInfo = {
   report_interval_ms: 300_000,
@@ -93,28 +106,112 @@ async function isFeedSupported(
 
   return false;
 }
+
+function chainLinkFileNameIsNotTestnet(fileName: string) {
+  const chainlinkNetworkName = parseNetworkFilename(fileName);
+
+  const chainId = chainlinkNetworkNameToChainId[chainlinkNetworkName];
+  if (chainId === null) return false;
+
+  const networkName = chainIdToNetworkName[chainId];
+  return !isTestnetNetworkName(networkName);
+}
+
+async function isFeedDataSameOnChain(
+  networkName: NetworkName,
+  feedInfo: ChainLinkFeedInfo,
+): Promise<boolean> {
+  const rpcEndpoint = getEnvString(networkNameToRpcEnvVar(networkName));
+
+  const web3 = new Web3(rpcEndpoint);
+
+  const chainLinkContractAddress = feedInfo.contractAddress;
+
+  const chainLinkContract = new web3.eth.Contract(
+    ChainLinkAbi,
+    chainLinkContractAddress,
+  );
+
+  try {
+    const [decimals, description] = (await Promise.all([
+      chainLinkContract.methods['decimals']().call(),
+      chainLinkContract.methods['description']().call(),
+    ])) as unknown as [number, string];
+
+    return (
+      BigInt(decimals) === BigInt(feedInfo.decimals) &&
+      description === feedInfo.name
+    );
+  } catch (e) {
+    console.error(
+      `Failed to fetch data from ${networkName} for ${feedInfo.name} at ${chainLinkContractAddress}`,
+    );
+
+    // If we can't fetch the data, we assume it's correct.
+    return true;
+  }
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
 ): Promise<FeedsConfig> {
-  const allPossibleFeeds: Omit<Feed, 'id' | 'script'>[] = Object.entries(
-    rawDataFeeds,
-  ).map(([_feedName, feedData]) => {
-    // TODO: Check if the feed data for all networks is the same
-    const data = Object.entries(feedData.networks)[0][1];
+  let filteredFeeds = Object.entries(rawDataFeeds).filter(
+    ([_feedName, feedData]) =>
+      Object.entries(feedData.networks).some(([chainlinkFileName, _feedData]) =>
+        chainLinkFileNameIsNotTestnet(chainlinkFileName),
+      ),
+  );
 
-    return {
-      ...feedFromChainLinkFeedInfo(data),
-    };
-  });
+  const allPossibleFeeds: Omit<Feed, 'id' | 'script'>[] = filteredFeeds.map(
+    ([_feedName, feedData]) => {
+      const maxEntry = Object.entries(feedData.networks).reduce<
+        ChainLinkFeedInfo | undefined
+      >((max, [chainlinkFileName, data]) => {
+        if (!chainLinkFileNameIsNotTestnet(chainlinkFileName)) return max;
+        return !max || data.decimals > max.decimals ? data : max;
+      }, undefined);
+
+      return { ...feedFromChainLinkFeedInfo(maxEntry!) };
+    },
+  );
 
   const supportedCMCCurrencies = await getCMCCryptoList();
 
   const usdPairFeeds = allPossibleFeeds.filter(
     feed => feed.pair.quote === 'USD',
   );
+
   const feeds = await filterAsync(usdPairFeeds, feed =>
     isFeedSupported(feed, supportedCMCCurrencies),
   );
+
+  let flatedNonTestnetSupportedFeeds = filteredFeeds
+    .filter(([feedName, _feedData]) =>
+      feeds.some(feed => feed.description === feedName),
+    )
+    .flatMap(([_feedName, feedData]) => {
+      return Object.entries(feedData.networks).map(
+        ([chaninLinkFileName, feedData]) => ({
+          network:
+            chainIdToNetworkName[
+              chainlinkNetworkNameToChainId[
+                parseNetworkFilename(chaninLinkFileName)
+              ]!
+            ],
+          feed: feedData,
+        }),
+      );
+    })
+    .filter(x => x.network !== undefined && !isTestnetNetworkName(x.network));
+
+  if (
+    !(await everyAsync(flatedNonTestnetSupportedFeeds, x =>
+      isFeedDataSameOnChain(x.network, x.feed),
+    ))
+  ) {
+    throw new Error("Feed data doesn't match on chain");
+  }
+
   const feedsSortedByDescription = feeds.sort((a, b) => {
     // We hash the descriptions here, to avoid an obvious ordering.
     const a_ = keccak256(a.description).toString();

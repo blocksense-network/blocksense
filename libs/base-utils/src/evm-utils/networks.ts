@@ -35,6 +35,7 @@ const networks = [
   'linea-sepolia',
   'manta-mainnet',
   'manta-sepolia',
+  'kusama-moonriver',
   'optimism-mainnet',
   'optimism-sepolia',
   'polygon-mainnet',
@@ -52,13 +53,32 @@ const chainIds = [
   1, 11155111, 17000, 43114, 43113, 1088, 42161, 421614, 80085, 8453, 84532, 56,
   97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009, 59140, 59141, 169,
   3441006, 10, 11155420, 137, 80002, 1101, 1442, 534352, 534351, 13527, 324,
-  300,
+  300, 1285,
+] as const;
+
+const testnetNetworks: NetworkName[] = [
+  'avalanche-fuji',
+  'bsc-testnet',
+  'celo-alfajores',
+  'arbitrum-sepolia',
+  'base-sepolia',
+  'optimism-sepolia',
+  'polygon-zkevm-sepolia',
+  'scroll-sepolia',
+  'ethereum-sepolia',
+  'fantom-testnet',
+  'polygon-amoy',
 ] as const;
 
 export const networkName = S.Literal(...networks);
 export const isNetworkName = S.is(networkName);
 export const parseNetworkName = S.encodeSync(networkName);
 export type NetworkName = S.Schema.Type<typeof networkName>;
+
+export const testNetworkName = S.Literal(...testnetNetworks);
+export const isTestnetNetworkName = S.is(testNetworkName);
+export const parseTestnetNetworkName = S.encodeSync(testNetworkName);
+export type TestnetNetworkName = S.Schema.Type<typeof testNetworkName>;
 
 export const chainId = S.Literal(...chainIds);
 export const isChainId = S.is(chainId);
@@ -110,6 +130,7 @@ export const networkNameToChainId = {
   'linea-sepolia': 59141,
   'manta-mainnet': 169,
   'manta-sepolia': 3441006,
+  'kusama-moonriver': 1285,
   'optimism-mainnet': 10,
   'optimism-sepolia': 11155420,
   'polygon-mainnet': 137,
@@ -175,6 +196,7 @@ export const chainIdToNetworkName = {
   13527: 'specular-mainnet',
   324: 'zksync-mainnet',
   300: 'zksync-sepolia',
+  1285: 'kusama-moonriver',
 } satisfies InverseOf<typeof networkNameToChainId>;
 
 /**
@@ -285,6 +307,10 @@ export const explorerUrls: Record<string, any> = {
     address: address =>
       `https://pacific-explorer.sepolia-testnet.manta.network/address/${address}`,
   },
+  'kusama-moonriver': {
+    tx: txHash => `https://moonriver.moonscan.io/tx/${txHash}`,
+    address: address => `https://moonriver.moonscan.io/address/${address}`,
+  },
   'optimism-mainnet': {
     tx: txHash => `https://optimistic.etherscan.io/tx/${txHash}`,
     address: address => `https://optimistic.etherscan.io/address/${address}`,
@@ -329,3 +355,11 @@ export const explorerUrls: Record<string, any> = {
     address: (address: EthereumAddress) => string;
   };
 };
+
+function toScreamingCase(s: string) {
+  return s.toUpperCase().replaceAll(/-/g, '_');
+}
+
+export function networkNameToRpcEnvVar(network: NetworkName) {
+  return `RPC_URL_${toScreamingCase(network)}`;
+}

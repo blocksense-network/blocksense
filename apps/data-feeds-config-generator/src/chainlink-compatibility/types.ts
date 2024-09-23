@@ -95,7 +95,7 @@ export const chainlinkNetworkNameToChainId = {
   'celo-mainnet': networkNameToChainId['celo-mainnet'],
   'celo-testnet-alfajores': networkNameToChainId['celo-alfajores'],
   'ethereum-mainnet-andromeda-1': networkNameToChainId['andromeda-mainnet'],
-  'ethereum-mainnet-arbitrum-1': networkNameToChainId['arbitrum-sepolia'],
+  'ethereum-mainnet-arbitrum-1': networkNameToChainId['arbitrum-mainnet'],
   'ethereum-mainnet-base-1': networkNameToChainId['base-mainnet'],
   'ethereum-mainnet-linea-1': networkNameToChainId['linea-mainnet'],
   'ethereum-mainnet-optimism-1': networkNameToChainId['optimism-mainnet'],
@@ -104,7 +104,8 @@ export const chainlinkNetworkNameToChainId = {
   'ethereum-mainnet-scroll-1': networkNameToChainId['scroll-mainnet'],
   'ethereum-mainnet-starknet-1': null,
   'ethereum-mainnet-zksync-1': networkNameToChainId['zksync-mainnet'],
-  'ethereum-testnet-sepolia-arbitrum-1': null,
+  'ethereum-testnet-sepolia-arbitrum-1':
+    networkNameToChainId['arbitrum-sepolia'],
   'ethereum-testnet-sepolia-base-1': networkNameToChainId['base-sepolia'],
   'ethereum-testnet-sepolia-optimism-1':
     networkNameToChainId['optimism-sepolia'],
@@ -116,14 +117,14 @@ export const chainlinkNetworkNameToChainId = {
   'ethereum-testnet-sepolia': networkNameToChainId['ethereum-sepolia'],
   'fantom-mainnet': networkNameToChainId['fantom-mainnet'],
   'fantom-testnet': networkNameToChainId['fantom-testnet'],
-  'kusama-mainnet-moonriver': null,
+  'kusama-mainnet-moonriver': networkNameToChainId['kusama-moonriver'],
   mainnet: networkNameToChainId['ethereum-mainnet'],
   'matic-mainnet': networkNameToChainId['polygon-mainnet'],
   'polkadot-mainnet-moonbeam': null,
   'polygon-testnet-amoy': networkNameToChainId['polygon-amoy'],
   'solana-devnet': null,
   'solana-mainnet': null,
-  'xdai-mainnet': null,
+  'xdai-mainnet': networkNameToChainId['gnosis-mainnet'],
 } satisfies {
   [Net in NetworkName]: ChainId | null;
 };

@@ -58,12 +58,14 @@ async function main(chainlinkFeedsDir: string) {
     () => collectRawDataFeeds(chainlinkFeedsDir),
   );
 
+  console.log('Generating feed config');
+
   const feedConfig = await generateFeedConfig(rawDataFeeds);
 
-  console.log({ feedConfig });
+  console.log('Feed config successfully generated');
 
   const feedRegistryEvents = await getAllProposedFeedsInRegistry(
-    new Web3(getEnvString('RPC_URL_ETH_MAINNET')),
+    new Web3(getEnvString('RPC_URL_ETHEREUM_MAINNET')),
     'ethereum-mainnet',
   );
 

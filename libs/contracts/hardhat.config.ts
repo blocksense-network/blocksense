@@ -52,7 +52,7 @@ const config: HardhatUserConfig = {
       forking: {
         blockNumber: 20576488,
         enabled: process.env.FORKING === 'true',
-        url: '' + process.env.RPC_URL_ETH_MAINNET,
+        url: '' + process.env.RPC_URL_ETHEREUM_MAINNET,
       },
     },
     sepolia: {
@@ -84,7 +84,7 @@ const config: HardhatUserConfig = {
         : [],
     },
     fuji: {
-      url: process.env.RPC_URL_AVAX_FUJI || '',
+      url: process.env.RPC_URL_AVALANCHE_FUJI || '',
       gasPrice: 225000000000,
       chainId: 43113,
       accounts: process.env.SIGNER_PRIVATE_KEY
