@@ -9,14 +9,14 @@ import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumn
 import { Badge } from '@/components/ui/badge';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 
-export const proxyColumnsTitles = {
-  network: 'Network',
-  id: 'ID',
+export const proxyColumnsTitles: { [key: string]: string } = {
   description: 'Data Feed Name',
+  id: 'ID',
   address: 'Blocksense Proxy Address',
   base: 'Base Address',
   quote: 'Quote Address',
   chainlink_proxy: 'CL Aggregator Proxy Address',
+  network: 'Network',
 };
 
 export const columns: ColumnDef<ProxyContractData>[] = [
@@ -25,7 +25,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={proxyColumnsTitles['description']}
+        title={proxyColumnsTitles[column.id]}
         type={'string'}
         hasSort={false}
       />
@@ -37,7 +37,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={proxyColumnsTitles['id']}
+        title={proxyColumnsTitles[column.id]}
         type={'number'}
         hasSort={false}
       />
@@ -49,7 +49,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={proxyColumnsTitles['address']}
+        title={proxyColumnsTitles[column.id]}
         type={'string'}
         hasSort={false}
       />
@@ -68,7 +68,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={proxyColumnsTitles['base']}
+        title={proxyColumnsTitles[column.id]}
         type={'string'}
         hasSort={false}
       />
@@ -87,7 +87,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={proxyColumnsTitles['quote']}
+        title={proxyColumnsTitles[column.id]}
         type={'string'}
         hasSort={false}
       />
@@ -106,7 +106,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={proxyColumnsTitles['chainlink_proxy']}
+        title={proxyColumnsTitles[column.id]}
         type={'string'}
         hasSort={false}
       />

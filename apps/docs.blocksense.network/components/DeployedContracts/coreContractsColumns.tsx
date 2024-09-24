@@ -13,7 +13,7 @@ import { CoreContract } from '@/src/deployed-contracts/types';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import { Badge } from '@/components/ui/badge';
 
-export const contractsColumnsTitles = {
+export const contractsColumnsTitles: { [key: string]: string } = {
   network: 'Network',
   contract: 'Contract',
   address: 'Address',
@@ -25,7 +25,7 @@ export const columns: ColumnDef<CoreContract>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={contractsColumnsTitles['contract']}
+        title={contractsColumnsTitles[column.id]}
         type={'string'}
         hasSort={false}
       />
@@ -36,7 +36,7 @@ export const columns: ColumnDef<CoreContract>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={contractsColumnsTitles['address']}
+        title={contractsColumnsTitles[column.id]}
         type={'string'}
         hasSort={false}
       />
@@ -50,7 +50,7 @@ export const columns: ColumnDef<CoreContract>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={contractsColumnsTitles['network']}
+        title={contractsColumnsTitles[column.id]}
         type={'string'}
         hasSort={false}
       />

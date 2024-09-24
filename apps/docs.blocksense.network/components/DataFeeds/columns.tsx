@@ -14,7 +14,7 @@ type DataFeed = {
   script: string;
 };
 
-export const dataFeedsColumnsTitles = {
+export const dataFeedsColumnsTitles: { [key: string]: string } = {
   id: 'Id',
   description: 'Data Feed Name',
   decimals: 'Decimals',
@@ -28,7 +28,7 @@ export const columns: ColumnDef<DataFeed>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={dataFeedsColumnsTitles['id']}
+        title={dataFeedsColumnsTitles[column.id]}
         type={'number'}
       />
     ),
@@ -43,7 +43,7 @@ export const columns: ColumnDef<DataFeed>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={dataFeedsColumnsTitles['description']}
+        title={dataFeedsColumnsTitles[column.id]}
         type={'string'}
       />
     ),
@@ -61,7 +61,7 @@ export const columns: ColumnDef<DataFeed>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={dataFeedsColumnsTitles['decimals']}
+        title={dataFeedsColumnsTitles[column.id]}
         type={'number'}
       />
     ),
@@ -71,7 +71,7 @@ export const columns: ColumnDef<DataFeed>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={dataFeedsColumnsTitles['report_interval_ms']}
+        title={dataFeedsColumnsTitles[column.id]}
         type={'number'}
       />
     ),
@@ -81,7 +81,7 @@ export const columns: ColumnDef<DataFeed>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title={dataFeedsColumnsTitles['script']}
+        title={dataFeedsColumnsTitles[column.id]}
         type={'string'}
       />
     ),
