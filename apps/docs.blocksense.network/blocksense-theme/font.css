@@ -3,6 +3,7 @@
   src: url('/fonts/noto-sans/NotoSans-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -10,13 +11,7 @@
   src: url('/fonts/NotoSans-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
-}
-
-@font-face {
-  font-family: 'Noto Sans Light';
-  src: url('/fonts/NotoSans-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -24,6 +19,7 @@
   src: url('/fonts/noto-sans/NotoSans-LightItalic.ttf') format('truetype');
   font-weight: 300;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -31,6 +27,7 @@
   src: url('/fonts/noto-sans/NotoSans-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -38,6 +35,7 @@
   src: url('/fonts/noto-sans/NotoSans-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -45,6 +43,7 @@
   src: url('/fonts/noto-sans/NotoSans-SemiBoldItalic.ttf') format('truetype');
   font-weight: 600;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -52,6 +51,7 @@
   src: url('/fonts/noto-sans/NotoSans-Thin.ttf') format('truetype');
   font-weight: 100;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -59,6 +59,7 @@
   src: url('/fonts/noto-sans/NotoSans-ThinItalic.ttf') format('truetype');
   font-weight: 100;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -66,6 +67,7 @@
   src: url('/fonts/noto-sans/NotoSans-Bold.ttf') format('truetype');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -73,6 +75,7 @@
   src: url('/fonts/noto-sans/NotoSans-BoldItalic.ttf') format('truetype');
   font-weight: bold;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -80,6 +83,7 @@
   src: url('/fonts/noto-sans/NotoSans-ExtraBold.ttf') format('truetype');
   font-weight: bolder;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -87,6 +91,7 @@
   src: url('/fonts/noto-sans/NotoSans-Black.ttf') format('truetype');
   font-weight: bolder;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -94,6 +99,7 @@
   src: url('/fonts/SpaceMono-Bold.ttf') format('truetype');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -101,4 +107,5 @@
   src: url('/fonts/fira/FiraCode-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
