@@ -41,6 +41,7 @@ pub fn parse_contract_address(addr: &str) -> Option<Address> {
 pub struct RpcProvider {
     pub name: String,
     pub providers: Vec<ProviderType>,
+    pub chain_id: u64,
     pub wallet: LocalWallet,
     pub contract_address: Option<Address>,
     pub event_contract_address: Option<Address>,
@@ -215,6 +216,7 @@ async fn get_rpc_providers(
             contract_address: address,
             event_contract_address: event_address,
             providers,
+            chain_id: p.chain_id,
             wallet,
             provider_metrics: provider_metrics.clone(),
             transcation_timeout_secs: p.transcation_timeout_secs,

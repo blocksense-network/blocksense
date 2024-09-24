@@ -119,6 +119,7 @@ impl Validated for ReporterConfig {
 pub struct Provider {
     pub private_key_path: String,
     pub urls: Vec<String>,
+    pub chain_id: u64,
     pub contract_address: Option<String>,
     pub event_contract_address: Option<String>,
     pub transcation_timeout_secs: u32,
@@ -208,6 +209,7 @@ pub fn get_test_config_with_single_provider(
             Provider {
                 private_key_path: private_key_path.to_string(),
                 urls: vec![url.to_string()],
+                chain_id: 31337,
                 contract_address: None,
                 event_contract_address: None,
                 transcation_timeout_secs: 50,
@@ -240,6 +242,7 @@ pub fn get_test_config_with_single_provider_multiple_fallbacks(
             Provider {
                 private_key_path: private_key_path.to_string(),
                 urls,
+                chain_id: 31337,
                 contract_address: None,
                 event_contract_address: None,
                 transcation_timeout_secs: 50,
@@ -267,6 +270,7 @@ pub fn get_test_config_with_multiple_providers(
             Provider {
                 private_key_path: private_key_path.to_string(),
                 urls: vec![url.to_string()],
+                chain_id: 31337,
                 contract_address: None,
                 event_contract_address: None,
                 transcation_timeout_secs: 50,

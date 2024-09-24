@@ -28,16 +28,16 @@ use tracing::{debug, error, info};
 
 pub async fn deploy_contract(
     network: &String,
-    providers: &SharedRpcProviders,
+    rpc_providers: &SharedRpcProviders,
     feed_type: Repeatability,
 ) -> Result<String> {
-    let providers = providers.read().await;
+    let rpc_providers = rpc_providers.read().await;
 
-    let provider = providers.get(network);
-    let Some(p) = provider.cloned() else {
+    let rpc_provider = rpc_providers.get(network);
+    let Some(p) = rpc_provider.cloned() else {
         return Err(eyre!("No provider for network {}", network));
     };
-    drop(providers);
+    drop(rpc_providers);
     let mut p = p.lock().await;
     let wallet = &p.wallet;
     let provider = p.get_current_provider();
@@ -116,18 +116,18 @@ pub async fn eth_batch_send_to_contract<
     V: Debug + Clone + std::string::ToString + 'static,
 >(
     net: String,
-    provider: Arc<Mutex<RpcProvider>>,
+    rpc_provider: Arc<Mutex<RpcProvider>>,
     updates: HashMap<K, V>,
     feed_type: Repeatability,
 ) -> Result<String> {
-    let provider = provider.lock().await;
-    let wallet = &provider.wallet;
+    let rpc_provider = rpc_provider.lock().await;
+    let wallet = &rpc_provider.wallet;
     let contract_address = if feed_type == Periodic {
-        provider
+        rpc_provider
             .contract_address
             .unwrap_or_else(|| panic!("Contract address not set for network {}.", net))
     } else {
-        provider
+        rpc_provider
             .event_contract_address
             .unwrap_or_else(|| panic!("Event contract address not set for network {}.", net))
     };
@@ -137,8 +137,9 @@ pub async fn eth_batch_send_to_contract<
         contract_address, net
     );
 
-    let provider_metrics = &provider.provider_metrics;
-    let provider = provider.get_current_provider();
+    let provider_metrics = &rpc_provider.provider_metrics;
+    let configured_chain_id = rpc_provider.chain_id;
+    let provider = rpc_provider.get_current_provider();
 
     let selector = "0x1a2d80ac";
 
@@ -184,6 +185,13 @@ pub async fn eth_batch_send_to_contract<
         provider_metrics,
         get_chain_id
     );
+
+    if chain_id != configured_chain_id {
+        error!(
+            "Endpoint reported chain ID {chain_id} which does not equal the configured for the network {configured_chain_id}!"
+        );
+        eyre::bail!("Chain ID mismatch!");
+    }
 
     let tx = TransactionRequest::default()
         .to(contract_address)
@@ -276,8 +284,21 @@ pub async fn eth_batch_send_to_all_contracts<
     for v in result {
         match v {
             Ok(res) => match res {
-                (Ok(x), net, _provider) => {
-                    all_results += &format!("success from {} -> {:?}", net, x);
+                (Ok(report), net, provider) => {
+                    match report {
+                        Ok(result) => {
+                            all_results += &format!("success from {} -> {:?}", net, result)
+                        }
+                        Err(e) => {
+                            error!("{}", e.to_string());
+                            all_results += &e.to_string();
+                            let mut provider = provider.lock().await;
+                            provider.switch_provider();
+                            let provider_metrics = provider.provider_metrics.clone();
+                            inc_metric!(provider_metrics, net, failed_send_tx);
+                            inc_metric!(provider_metrics, net, total_times_provider_switched);
+                        }
+                    };
                 }
                 (Err(e), net, provider) => {
                     let err = format!("Timed out transaction for network {} -> {}", net, e);
