@@ -23,7 +23,7 @@ const setupSandbox = async () => {
   return pxe;
 };
 
-describe.skip("Data feed store contract", () => {
+describe("Data feed store contract", () => {
   let pxe: PXE;
   let wallets: AccountWallet[] = [];
   let accounts: CompleteAddress[] = [];

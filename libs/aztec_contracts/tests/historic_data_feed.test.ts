@@ -23,7 +23,7 @@ describe("Data feed store contract", () => {
         accounts = wallets.map((w) => w.getCompleteAddress());
     });
 
-    test.skip("If it deploys the contract", async () => {
+    test("If it deploys the contract", async () => {
         const salt = Fr.random();
         const dataFeedStoreContractArtifact = HistoricDataFeedStoreContractArtifact;
         const deployArgs = wallets[0].getCompleteAddress().address;
