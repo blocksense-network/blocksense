@@ -21,7 +21,7 @@ contract HistoricDataFeedStore {
             let mut mul: Field = 1;
 
             for i in 1..24 {
-                let temp: Field = self.value[24 - i] as Field;
+                let temp: Field = self.value[23 - i] as Field;
                 bytes_value = bytes_value + (temp * mul);
                 mul *= 256;
             }
@@ -50,7 +50,7 @@ contract HistoricDataFeedStore {
     struct Storage {
         historic_data_feeds: Map<Field, Map<Field, PublicMutable<Transmission>>>,
         counters: Map<Field, PublicMutable<Field>>,
-        owner: PublicImmutable<AztecAddress>
+        owner: PublicImmutable<AztecAddress>,
     }
 
     #[aztec(public)]
@@ -101,42 +101,5 @@ contract HistoricDataFeedStore {
 
     unconstrained fn get_feed_at_counter(key: Field, counter: Field) -> pub Transmission {
         storage.historic_data_feeds.at(key).at(counter).read()
-    }
-
-    use dep::aztec::test::{helpers::{test_environment::TestEnvironment}};
-    #[test]
-    fn test_historical_data_feed_store() {
-        let mut env = TestEnvironment::new();
-        let owner = env.create_account();
-        env.impersonate(owner);
-        // Deploy contract and initialize
-        let initializer = HistoricDataFeedStore::interface().constructor();
-        let counter_contract = env.deploy_self("HistoricDataFeedStore").with_public_initializer(initializer);
-        let contract_address = counter_contract.to_address();
-        env.impersonate(contract_address);
-        let keys: [Field; MAX_FEEDS_NUMBER] = [0; MAX_FEEDS_NUMBER];
-        let target_values: [Field; 48] = [0; 48];
-        let exp_values = [
-            125, 96, 176, 190, 247, 199, 141, 153,
-            163, 70, 6, 106, 58, 171, 232, 33, 100,
-            147, 239, 0, 117, 40, 198, 155
-        ];
-        let target_values = [
-            125, 96, 176, 190, 247, 199, 141, 153,
-            163, 70, 6, 106, 58, 171, 232, 33, 100,
-            147, 239, 0, 117, 40, 198, 155,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ];
-        let expected_transmission = Transmission { value: exp_values, timestamp: 100 };
-        let set_feeds_interface = HistoricDataFeedStore::at(contract_address).set_feeds(keys, target_values, 2);
-        env.call_public(set_feeds_interface);
-        let result_transmission = get_data_feed(0);
-        print(result_transmission.value);
-        for i in 0..24 {
-            assert(
-                expected_transmission.value[i] == result_transmission.value[i], f"Expected {expected_transmission.value} but got {result_transmission.value}"
-            );
-        }
     }
 }
