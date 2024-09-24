@@ -139,7 +139,7 @@ const DataFeedLink = ({ row, placeholderId }: RowWrapper) => {
   return (
     <Badge
       variant="outline"
-      className={`justify-center border-solid border-slate-200 ${placeholderValue && 'cursor-pointer'} m-0 text-primary-600 bold font-medium whitespace-nowrap hover:bg-neutral-50 hover:border-gray-600`}
+      className={`justify-center border-solid border-slate-200 ${placeholderValue && 'cursor-pointer'} px-2 m-0 text-primary-600 bold font-medium whitespace-nowrap hover:bg-neutral-50 hover:border-gray-600`}
     >
       {placeholderValue ? (
         <Link href={feedPageUrl}>{row.getValue(placeholderId!)}</Link>

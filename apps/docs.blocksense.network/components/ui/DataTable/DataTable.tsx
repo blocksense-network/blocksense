@@ -149,7 +149,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map(row => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id} className="px-3 py-2.5">
+                    <TableCell key={cell.id} className="px-2 py-2.5">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
