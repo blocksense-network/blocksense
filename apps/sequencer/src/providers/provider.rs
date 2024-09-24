@@ -58,8 +58,11 @@ impl RpcProvider {
             .expect("active_provider index out of bounds!")
     }
     pub fn switch_provider(&mut self) {
-        if self.providers.len() == 0 {
+        if self.providers.is_empty() {
             error!("No providers set for network: {}", self.name);
+            return;
+        } else if self.providers.len() == 1 {
+            warn!("No fallback providers set for network: {}", self.name);
             return;
         }
         self.active_provider_index = (self.active_provider_index + 1) % self.providers.len() as u32;
@@ -260,7 +263,10 @@ mod tests {
 
     use crate::providers::provider::get_rpc_providers;
     use alloy::providers::Provider as AlloyProvider;
-    use sequencer_config::get_test_config_with_single_provider;
+    use sequencer_config::{
+        get_test_config_with_single_provider,
+        get_test_config_with_single_provider_multiple_fallbacks,
+    };
 
     use tokio::fs::File;
     use tokio::io::AsyncWriteExt;
@@ -356,5 +362,45 @@ mod tests {
 
         // assert
         assert_eq!(result.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn test_iterate_over_fallback_urls() {
+        // setup
+        let network = "ETH1";
+        let urls = vec![
+            "http://localhost:8545".to_string(),
+            "http://localhost:8546".to_string(),
+            "http://localhost:8547".to_string(),
+        ];
+        // Create a temporary file with a valid private key
+        let private_key = b"0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356";
+        let key_path = "/tmp/key";
+
+        create_priv_key(key_path, private_key).await;
+
+        let cfg = get_test_config_with_single_provider_multiple_fallbacks(
+            network,
+            key_path,
+            urls.clone(),
+        );
+
+        // test
+        let binding: Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>> =
+            init_shared_rpc_providers(&cfg, Some("test_iterate_over_fallback_urls")).await;
+        {
+            let result = binding.read().await;
+            assert_eq!(result.len(), 1);
+        }
+
+        let provider = binding.write().await;
+        let provider = provider.get(network).unwrap();
+        let mut provider = provider.lock().await;
+        assert_eq!(provider.providers.len(), urls.len());
+
+        for i in 0..urls.len() * 2 {
+            assert_eq!(provider.active_provider_index as usize, i % urls.len());
+            provider.switch_provider();
+        }
     }
 }
