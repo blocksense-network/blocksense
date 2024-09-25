@@ -26,5 +26,6 @@ tracing = { version = "0.1.40" , features=["log"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 url = "2.5.0"
 blocksense-registry = { path = "../registry" }
+feed_registry = { path = "../feed_registry" }
 utils = { path = "../utils"}
 

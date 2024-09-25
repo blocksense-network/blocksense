@@ -90,6 +90,7 @@ version = "0.1.1"
 dependencies = [
  "blocksense-macro",
  "reqwest",
+ "serde",
  "spin-sdk",
  "wit-bindgen",
 ]
@@ -608,18 +609,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "oracle-app-example"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "blocksense-sdk",
- "serde",
- "serde_json",
- "url",
- "wit-bindgen",
-]
-
-[[package]]
 name = "percent-encoding"
 version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -721,6 +710,18 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
+]
+
+[[package]]
+name = "revolut-oracle"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-sdk",
+ "serde",
+ "serde_json",
+ "url",
+ "wit-bindgen",
 ]
 
 [[package]]

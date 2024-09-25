@@ -10,3 +10,4 @@ blocksense-macro = { path = "macro" }
 wit-bindgen = "0.16.0"
 spin-sdk = "3.0.1"
 reqwest = "0.12"
+serde = "1.0"

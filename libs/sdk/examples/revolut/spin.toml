@@ -6,20 +6,24 @@ name = "Blocksense Oracle Example"
 version = "0.1.0"
 
 [application.trigger.settings]
+interval_time_in_seconds = 10
 sequencer = "http://gpu-server-001:8877/1"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
 
 [[trigger.oracle]]
-interval_secs = 10
 component = "revolut-api-fetcher"
-data_feed = "USD/BTC"
+  [[trigger.oracle.data_feeds]]
+  id = "3"
+  data = "USD/ETH"
 
 [[trigger.oracle]]
-interval_secs = 15
 component = "revolut-api-fetcher"
-data_feed = "USD/ETH"
+  [[trigger.oracle.data_feeds]]
+  id = "4"
+  data = "USD/BTC"
 
 [component.revolut-api-fetcher]
-source = "target/wasm32-wasi/release/oracle_app_example.wasm"
+source = "target/wasm32-wasi/release/revolut_oracle.wasm"
 allowed_outbound_hosts = [
   "https://www.revolut.com",
 ]

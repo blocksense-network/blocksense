@@ -1,10 +1,14 @@
 use std::convert::From;
 
 use serde::{Deserialize, Serialize};
+
 pub(crate) type Map<K, V> = indexmap::IndexMap<K, V>;
 
-use crate::opts::{APP_NAME, AUTHOR, SEQUENCER_URL, SPIN_MANIFEST_VERSION, VERSION};
-use blocksense_registry::config::{BlocksenseConfig, DataFeed, OracleScript};
+use crate::opts::{
+    APP_NAME, AUTHOR, SECRET_KEY, SEQUENCER_URL, SPIN_MANIFEST_VERSION, TIME_INTERVAL, VERSION,
+};
+use blocksense_registry::config::{BlocksenseConfig, OracleScript};
+use feed_registry::registry::AllFeedsConfig;
 
 //TODO(adikov): Transition to using - https://github.com/fermyon/spin/blob/main/crates/manifest/src/schema/v2.rs when
 // we implement Serialize in our spin fork for the manifest crate.
@@ -42,6 +46,7 @@ pub struct Trigger {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Component {
     source: ComponentSource,
+    allowed_outbound_hosts: Vec<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -58,41 +63,48 @@ impl From<BlocksenseConfig> for AppManifest {
         let mut trigger_global_configs = Map::new();
         trigger_global_configs.insert(
             "settings".to_string(),
-            toml::toml!(sequencer = SEQUENCER_URL),
+            toml::toml!(
+                interval_time_in_seconds = TIME_INTERVAL
+                sequencer = SEQUENCER_URL
+                secret_key = SECRET_KEY
+            ),
         );
 
-        let oracles = config
-            .oracles
-            .into_iter()
-            .map(|oracle: OracleScript| {
-                components.insert(
-                    oracle.id.clone(),
-                    Component {
-                        source: ComponentSource::Local(oracle.oracle_script_wasm.clone()),
-                    },
-                );
+        let mut oracles: Vec<Trigger> = vec![];
+        for oracle in config.oracles.iter() {
+            let mut feeds: Vec<toml::Value> = vec![];
+            for data_feed in config.data_feeds.iter() {
+                if data_feed.script != oracle.id {
+                    continue;
+                }
 
-                oracle
-                    .data_feeds
-                    .into_iter()
-                    .map(|data_feed: DataFeed| -> Trigger {
-                        let mut table = toml::Table::new();
-                        table.insert("data_feed".to_string(), toml::Value::String(data_feed.id));
-                        table.insert(
-                            "interval_secs".to_string(),
-                            toml::Value::Integer(data_feed.interval as i64),
-                        );
-                        Trigger {
-                            component: oracle.id.clone(),
-                            config: table,
-                        }
-                    })
-                    .collect()
-            })
-            .collect::<Vec<Vec<Trigger>>>()
-            .into_iter()
-            .flatten()
-            .collect();
+                let mut table = toml::Table::new();
+                table.insert(
+                    "id".to_string(),
+                    toml::Value::String(data_feed.id.to_string()),
+                );
+                table.insert(
+                    "data".to_string(),
+                    toml::Value::String(data_feed.resources.to_string()),
+                );
+                feeds.push(toml::Value::Table(table));
+            }
+            let mut table = toml::Table::new();
+            table.insert("data_feeds".to_string(), toml::Value::Array(feeds));
+
+            oracles.push(Trigger {
+                component: oracle.id.clone(),
+                config: table,
+            });
+
+            components.insert(
+                oracle.id.clone(),
+                Component {
+                    source: ComponentSource::Local(oracle.oracle_script_wasm.clone()),
+                    allowed_outbound_hosts: oracle.allowed_outbound_hosts.clone(),
+                },
+            );
+        }
 
         let mut triggers = Map::new();
         triggers.insert("oracle".to_string(), oracles);

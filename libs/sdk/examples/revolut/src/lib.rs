@@ -1,6 +1,6 @@
 use anyhow::Result;
 use blocksense_sdk::{
-    oracle::{Payload, Settings},
+    oracle::{DataFeedResult, Payload, Settings},
     oracle_component,
     spin::http::{send, Method, Request, Response},
 };
@@ -18,7 +18,8 @@ struct Rate {
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    let url = match settings.id.as_str() {
+    let data_feed = settings.data_feeds.first().unwrap();
+    let url = match data_feed.data.as_str() {
         "USD/BTC" => Url::parse("https://www.revolut.com/api/quote/public/BTCUSD")?,
         "USD/ETH" => Url::parse("https://www.revolut.com/api/quote/public/ETHUSD")?,
         &_ => todo!(),
@@ -38,8 +39,10 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let value: Rate = serde_json::from_str(&string).unwrap();
 
     println!("{:?}", value);
-
-    Ok(Payload {
-        body: Some(value.rate as u64),
-    })
+    let mut payload: Payload = Payload::new();
+    payload.values.push(DataFeedResult {
+        id: data_feed.id.clone(),
+        value: value.rate,
+    });
+    Ok(payload)
 }

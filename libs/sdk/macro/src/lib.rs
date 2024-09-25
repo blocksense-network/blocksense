@@ -30,16 +30,34 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     })
                 }
             }
-            impl From<self::preamble::blocksense::oracle::oracle_types::Settings> for ::blocksense_sdk::oracle::Settings {
-                fn from(settings: self::preamble::blocksense::oracle::oracle_types::Settings) -> Self {
-                    Self { id: settings.id }
+
+            impl From<self::preamble::blocksense::oracle::oracle_types::DataFeed> for ::blocksense_sdk::oracle::DataFeedSetting {
+                fn from(df: self::preamble::blocksense::oracle::oracle_types::DataFeed) -> Self {
+                    Self {
+                        id: df.id,
+                        data: df.data,
+                    }
                 }
             }
 
+            impl From<self::preamble::blocksense::oracle::oracle_types::Settings> for ::blocksense_sdk::oracle::Settings {
+                fn from(settings: self::preamble::blocksense::oracle::oracle_types::Settings) -> Self {
+                    Self { data_feeds: settings.data_feeds.into_iter().map(From::from).collect() }
+                }
+            }
+
+            impl From<::blocksense_sdk::oracle::DataFeedResult> for self::preamble::blocksense::oracle::oracle_types::DataFeedResult {
+                fn from(res: ::blocksense_sdk::oracle::DataFeedResult) -> Self {
+                    Self {
+                        id: res.id,
+                        value: res.value,
+                    }
+                }
+            }
 
             impl From<::blocksense_sdk::oracle::Payload> for self::preamble::blocksense::oracle::oracle_types::Payload {
                 fn from(payload: ::blocksense_sdk::oracle::Payload) -> Self {
-                    Self { body: payload.body }
+                    Self { values: payload.values.into_iter().map(From::from).collect() }
                 }
             }
         }

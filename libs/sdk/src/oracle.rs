@@ -1,19 +1,33 @@
-pub struct Settings {
+#[derive(Clone)]
+pub struct DataFeedSetting {
     pub id: String,
+    pub data: String,
+}
+
+pub struct Settings {
+    pub data_feeds: Vec<DataFeedSetting>,
 }
 
 impl Settings {
-    pub fn new(id: impl Into<String>) -> Self {
-        Self { id: id.into() }
+    pub fn new(data_feeds: Vec<DataFeedSetting>) -> Self {
+        Self { data_feeds }
     }
 }
 
+//TODO(adikov): Start using FeedType from feed_registry
+#[derive(Debug)]
+pub struct DataFeedResult {
+    pub id: String,
+    pub value: f64,
+}
+
+#[derive(Debug)]
 pub struct Payload {
-    pub body: Option<u64>,
+    pub values: Vec<DataFeedResult>,
 }
 
 impl Payload {
-    pub fn new(_body: u64) -> Self {
-        Self { body: None }
+    pub fn new() -> Self {
+        Self { values: vec![] }
     }
 }

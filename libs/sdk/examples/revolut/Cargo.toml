@@ -1,5 +1,5 @@
 [package]
-name = "oracle-app-example"
+name = "revolut-oracle"
 authors = ["Antoni Dikov"]
 description = ""
 version = "0.1.0"

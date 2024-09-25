@@ -1,12 +1,20 @@
 package blocksense:oracle@2.0.0;
 
 interface oracle-types {
-  record settings {
+  record data-feed {
     id: string,
+    data: string,
+  }
+  record settings {
+    data-feeds: list<data-feed>,
   }
 
+  record data-feed-result {
+    id: string,
+    value: f64,
+  }
   record payload {
-    body: option<u64>
+    values: list<data-feed-result>
   }
 
   variant error {

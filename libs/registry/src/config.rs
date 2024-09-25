@@ -1,7 +1,9 @@
+use sequencer_config::FeedConfig;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
+#[serde(rename_all = "camelCase")]
 pub struct BlocksenseConfig {
     /// List of all the oracle scripts
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -9,6 +11,9 @@ pub struct BlocksenseConfig {
     /// List of all the capabilities scripts
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub capabilities: Vec<Capability>,
+    /// List of all data feeds
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub data_feeds: Vec<FeedConfig>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -21,31 +26,11 @@ pub struct OracleScript {
     pub description: Option<String>,
     /// "local.wasm"
     pub oracle_script_wasm: String,
-    pub data_feeds: Vec<DataFeed>,
+    /// Allowed hosts
+    pub allowed_outbound_hosts: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Capability {
     pub id: String,
-}
-
-// Function for calculating the result from the oracle script
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-pub enum OracleFunction {
-    Median,
-    #[default]
-    Default,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct DataFeed {
-    pub id: String,
-    #[serde(default)]
-    pub name: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub namespace: Option<String>,
-    /// TODO(adikov): Initially data feeds would be executed in specified intervals
-    pub interval: u64,
-    #[serde(default)]
-    pub function: OracleFunction,
 }

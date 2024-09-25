@@ -2,14 +2,19 @@ use clap::Args;
 use serde::{Deserialize, Serialize};
 
 use std::{
-    collections::HashMap,
+    borrow::Borrow,
+    collections::{HashMap, HashSet},
+    hash::{Hash, Hasher},
     sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
 };
 
 use http::uri::Scheme;
 use hyper::Request;
-use tokio::sync::mpsc::{channel, Receiver, Sender};
+use tokio::sync::{
+    broadcast::{channel, Receiver as BroadcastReceiver, Sender as BroadcastSender},
+    mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
+};
 use tracing::Instrument;
 
 use outbound_http::OutboundHttpComponent;
@@ -35,9 +40,6 @@ wasmtime::component::bindgen!({
 
 use blocksense::oracle::oracle_types as oracle;
 
-//TODO(adikov): Remove
-const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
-
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
 
@@ -55,6 +57,8 @@ pub struct CliArgs {
 pub struct OracleTrigger {
     engine: TriggerAppEngine<Self>,
     sequencer: String,
+    secret_key: String,
+    interval_time_in_seconds: u64,
     queue_components: HashMap<String, Component>,
 }
 
@@ -68,7 +72,33 @@ struct TriggerMetadataParent {
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TriggerMetadata {
+    interval_time_in_seconds: Option<u64>,
     sequencer: Option<String>,
+    secret_key: Option<String>,
+}
+
+#[derive(Clone, Eq, Debug, Default, Deserialize, Serialize)]
+pub struct DataFeedSetting {
+    pub id: String,
+    pub data: String,
+}
+
+impl PartialEq for DataFeedSetting {
+    fn eq(&self, other: &DataFeedSetting) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Hash for DataFeedSetting {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+impl Borrow<String> for DataFeedSetting {
+    fn borrow(&self) -> &String {
+        &self.id
+    }
 }
 
 // Per-component settings (raw serialization format)
@@ -76,16 +106,13 @@ struct TriggerMetadata {
 #[serde(deny_unknown_fields)]
 pub struct OracleTriggerConfig {
     component: String,
-    interval_secs: u64,
-    data_feed: String,
+    data_feeds: Vec<DataFeedSetting>,
 }
 
 #[derive(Clone, Debug)]
 struct Component {
     pub id: String,
-    pub data_feed: String,
-    pub idle_wait: tokio::time::Duration,
-    pub oracle_settings: oracle::Settings,
+    pub oracle_settings: HashSet<DataFeedSetting>,
 }
 
 // This is a placeholder - we don't yet detect any situations that would require
@@ -116,14 +143,17 @@ impl TriggerExecutor for OracleTrigger {
     type InstancePre = InstancePre<RuntimeData>;
 
     async fn new(engine: spin_trigger::TriggerAppEngine<Self>) -> anyhow::Result<Self> {
-        let sequencer = engine
+        let metadata = engine
             .app()
             .require_metadata(TRIGGER_METADATA_KEY)?
             .settings
-            .unwrap_or_default()
-            .sequencer
-            .expect("Sequencer URL is not provided");
+            .unwrap_or_default();
 
+        let interval_time_in_seconds = metadata
+            .interval_time_in_seconds
+            .expect("Report time interval not provided");
+        let sequencer = metadata.sequencer.expect("Sequencer URL is not provided");
+        let secret_key = metadata.secret_key.expect("Secret key is not provided");
         // TODO(adikov) There is a specific case in which one reporter receives task to report multiple
         // data feeds which are gathered from one wasm component. For example -
         // USD/BTC and USD/ETH. In that case we need to optimize calling the component once and
@@ -132,14 +162,10 @@ impl TriggerExecutor for OracleTrigger {
             .trigger_configs()
             .map(|(_, config)| {
                 (
-                    config.data_feed.clone(),
+                    config.component.clone(),
                     Component {
                         id: config.component.clone(),
-                        data_feed: config.data_feed.clone(),
-                        idle_wait: tokio::time::Duration::from_secs(config.interval_secs),
-                        oracle_settings: oracle::Settings {
-                            id: config.data_feed.clone(),
-                        },
+                        oracle_settings: HashSet::from_iter(config.data_feeds.iter().cloned()),
                     },
                 )
             })
@@ -150,6 +176,8 @@ impl TriggerExecutor for OracleTrigger {
         Ok(Self {
             engine,
             sequencer,
+            secret_key,
+            interval_time_in_seconds,
             queue_components,
         })
     }
@@ -158,7 +186,7 @@ impl TriggerExecutor for OracleTrigger {
         let engine = Arc::new(self.engine);
         if config.test {
             for component in self.queue_components.values() {
-                Self::execute_wasm(engine.clone(), component).await?;
+                Self::execute_wasm(engine.clone(), component, vec![]).await?;
             }
             return Ok(());
         }
@@ -171,17 +199,35 @@ impl TriggerExecutor for OracleTrigger {
         });
 
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
-        let (tx, rx) = channel(32);
+        let (data_feed_sender, data_feed_receiver) = unbounded_channel();
+        let (signal_data_feed_sender, _) = channel(16);
         //TODO(adikov): Move all the logic to a different struct and handle
         //errors properly.
         // For each component, run its own timer loop
+
+        let components = self.queue_components.clone();
+        tracing::info!("Components: {:?}", &components);
         let mut loops: Vec<_> = self
             .queue_components
             .into_values()
-            .map(|component| Self::start_oracle_loop(engine.clone(), tx.clone(), &component))
+            .map(|component| {
+                Self::start_oracle_loop(
+                    engine.clone(),
+                    signal_data_feed_sender.subscribe(),
+                    data_feed_sender.clone(),
+                    &component,
+                )
+            })
             .collect();
 
-        let manager = Self::start_manager(rx, &self.sequencer);
+        let orchestrator = Self::start_orchestrator(
+            tokio::time::Duration::from_secs(self.interval_time_in_seconds),
+            components,
+            signal_data_feed_sender.clone(),
+        );
+        loops.push(orchestrator);
+
+        let manager = Self::start_manager(data_feed_receiver, &self.sequencer, &self.secret_key);
         loops.push(manager);
 
         let (tr, _, rest) = futures::future::select_all(loops).await;
@@ -203,29 +249,47 @@ impl TriggerExecutor for OracleTrigger {
 impl OracleTrigger {
     fn start_oracle_loop(
         engine: Arc<TriggerAppEngine<Self>>,
-        thread_tx: Sender<(String, Payload)>,
+        signal_receiver: BroadcastReceiver<HashSet<DataFeedSetting>>,
+        payload_sender: UnboundedSender<(String, Payload)>,
         component: &Component,
     ) -> tokio::task::JoinHandle<TerminationReason> {
-        let future = Self::execute(engine, thread_tx, component.clone());
+        let future = Self::execute(engine, signal_receiver, payload_sender, component.clone());
         tokio::task::spawn(future)
     }
 
     async fn execute(
         engine: Arc<TriggerAppEngine<Self>>,
-        thread_tx: Sender<(String, Payload)>,
+        mut signal_receiver: BroadcastReceiver<HashSet<DataFeedSetting>>,
+        payload_sender: UnboundedSender<(String, Payload)>,
         component: Component,
     ) -> TerminationReason {
-        loop {
-            tokio::time::sleep(component.idle_wait).await;
-            let payload = match Self::execute_wasm(engine.clone(), &component).await {
+        while let Ok(feeds) = signal_receiver.recv().await {
+            let intersection: Vec<_> = component
+                .oracle_settings
+                .intersection(&feeds)
+                .cloned()
+                .collect();
+
+            if intersection.is_empty() {
+                tracing::trace!("Empty intersection between component {}", &component.id);
+                continue;
+            }
+
+            //TODO(adikov): start using the intersection.
+            let payload = match Self::execute_wasm(engine.clone(), &component, intersection).await {
                 Ok(payload) => payload,
-                Err(_error) => {
+                Err(error) => {
+                    tracing::error!(
+                        "Component - ({}) execution ended with error {}",
+                        &component.id,
+                        error
+                    );
                     //TODO(adikov): We need to come up with proper way of handling errors in wasm
                     //components.
                     continue;
                 }
             };
-            match thread_tx.send((component.data_feed.clone(), payload)).await {
+            match payload_sender.send((component.id.clone(), payload)) {
                 Ok(_) => {
                     continue;
                 }
@@ -238,53 +302,88 @@ impl OracleTrigger {
         TerminationReason::Other("Oracle execution loop terminated".to_string())
     }
 
-    fn start_manager(
-        rx: Receiver<(String, Payload)>,
-        sequencer: &str,
+    fn start_orchestrator(
+        time_interval: tokio::time::Duration,
+        components: HashMap<String, Component>,
+        signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
     ) -> tokio::task::JoinHandle<TerminationReason> {
-        let future = Self::process_payload(rx, sequencer.to_owned());
+        let future = Self::signal_data_feeds(time_interval, components, signal_sender);
+
+        tokio::task::spawn(future)
+    }
+
+    async fn signal_data_feeds(
+        time_interval: tokio::time::Duration,
+        components: HashMap<String, Component>,
+        signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
+    ) -> TerminationReason {
+        //TODO(adikov): Implement proper logic and remove dummy values
+        loop {
+            let _ = tokio::time::sleep(time_interval).await;
+
+            let data_feed_signal = components
+                .iter()
+                .map(|(_, comp)| comp.oracle_settings.clone())
+                .flatten()
+                .collect();
+            tracing::info!("Signal data feeds: {:?}", &data_feed_signal);
+            let _ = signal_sender.send(data_feed_signal);
+        }
+
+        //TerminationReason::Other("Signal data feed loop terminated".to_string())
+    }
+
+    fn start_manager(
+        rx: UnboundedReceiver<(String, Payload)>,
+        sequencer: &str,
+        secret_key: &str,
+    ) -> tokio::task::JoinHandle<TerminationReason> {
+        let future = Self::process_payload(rx, sequencer.to_owned(), secret_key.to_owned());
 
         tokio::task::spawn(future)
     }
 
     async fn process_payload(
-        mut rx: Receiver<(String, Payload)>,
+        mut rx: UnboundedReceiver<(String, Payload)>,
         sequencer: String,
+        secret_key: String,
     ) -> TerminationReason {
-        while let Some((feed_id, payload)) = rx.recv().await {
+        while let Some((_component_id, payload)) = rx.recv().await {
             let timestamp = current_unix_time();
-            let result = FeedResult::Result {
-                result: FeedType::Numerical(payload.body.unwrap() as f64),
-            };
+            //TODO(adikov): Implement a way to send multiple results to the sequencer and properly
+            //handle this here.
+            for oracle::DataFeedResult { id, value } in payload.values {
+                let result = FeedResult::Result {
+                    result: FeedType::Numerical(value),
+                };
+                let signature =
+                    generate_signature(&secret_key, id.as_str(), timestamp, &result).unwrap();
 
-            let signature =
-                generate_signature(SECRET_KEY, feed_id.as_str(), timestamp, &result).unwrap();
-            let payload_json = DataFeedPayload {
-                payload_metadata: PayloadMetaData {
-                    reporter_id: 1,
-                    feed_id,
-                    timestamp,
-                    signature: JsonSerializableSignature { sig: signature },
-                },
-                result,
-            };
-
-            let client = reqwest::Client::new();
-            match client
-                .post(sequencer.clone())
-                .json(&payload_json)
-                .send()
-                .await
-            {
-                Ok(res) => {
-                    let contents = res.text().await.unwrap();
-                    tracing::trace!("Sequencer responded with: {}", &contents);
-                }
-                Err(e) => {
-                    tracing::error!("Sequencer failed to respond with: {}", &e);
-                    break;
-                }
-            };
+                let payload_json = DataFeedPayload {
+                    payload_metadata: PayloadMetaData {
+                        reporter_id: 1,
+                        feed_id: id,
+                        timestamp,
+                        signature: JsonSerializableSignature { sig: signature },
+                    },
+                    result,
+                };
+                let client = reqwest::Client::new();
+                match client
+                    .post(sequencer.clone())
+                    .json(&payload_json)
+                    .send()
+                    .await
+                {
+                    Ok(res) => {
+                        let contents = res.text().await.unwrap();
+                        tracing::trace!("Sequencer responded with: {}", &contents);
+                    }
+                    Err(e) => {
+                        tracing::error!("Sequencer failed to respond with: {}", &e);
+                    }
+                };
+            }
         }
 
         TerminationReason::SequencerExitRequested
@@ -293,6 +392,7 @@ impl OracleTrigger {
     async fn execute_wasm(
         engine: Arc<TriggerAppEngine<Self>>,
         component: &Component,
+        feeds: Vec<DataFeedSetting>,
     ) -> anyhow::Result<Payload> {
         // Load the guest...
         let component_id = component.id.clone();
@@ -317,10 +417,21 @@ impl OracleTrigger {
             "Triggering application: {}; component_id: {}; data_feed: {}",
             &engine.app_name,
             component_id,
-            &component.data_feed
+            &component.id
         );
+
+        let wit_settings = oracle::Settings {
+            data_feeds: feeds
+                .iter()
+                .cloned()
+                .map(|feed| oracle::DataFeed {
+                    id: feed.id,
+                    data: feed.data,
+                })
+                .collect(),
+        };
         match instance
-            .call_handle_oracle_request(&mut store, &component.oracle_settings)
+            .call_handle_oracle_request(&mut store, &wit_settings)
             .await
         {
             Ok(Ok(payload)) => {
