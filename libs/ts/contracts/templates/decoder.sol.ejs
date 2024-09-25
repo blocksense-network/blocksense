@@ -22,7 +22,8 @@ const expandFields = (values) => {
     } else {
       // This is not an array field, add it as is
       data = field;
-    }    return JSON.parse(JSON.stringify(data));
+    }
+    return JSON.parse(JSON.stringify(data));
   });
 
   return expandedFields;
@@ -136,6 +137,7 @@ let bitOffset = 0;
 let prevSize = 0;
 let shouldUpdate = false;
 let shift = false;
+
 function generateDecoderLines(expandedFields, name, startIndex = 0, indentation = '') {
   const lines = [];
   let index = startIndex;
@@ -153,9 +155,10 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
       prevSize = 0;
     }
 
-    if (shouldUpdate && (wordOffset > 32 || shift)) {      lines.push('');
+    if (shouldUpdate && (wordOffset > 32 || shift)) {
+      lines.push('');
       lines.push(`// Offset data with ${wordOffset} bytes`);
-      lines.push(`memData := mload(add(data, ${shift ? `add(shift, ${wordOffset})` : wordOffset}))`);
+      lines.push(`memData := mload(add(data, ${shift ? wordOffset > 0 ? `add(shift, ${wordOffset})` : 'shift' : wordOffset}))`);
       lines.push('');
       shouldUpdate = false;
     }
@@ -173,91 +176,75 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
       prevSize += field.size;
       lines.push(`// Store the next ${field.size} bits of memData at slot ${index + 1} of ${location}`);
       lines.push(`mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.shift == 0 ? 'memData' : field.shift < 0 ? `shl(${Math.abs(field.shift)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)`})`);
+    } else if (field.type === 'bytes' || field.type === 'string') {
+      shift = true
+      lines.push(...generateDecoderStringBytes(field, location, index, indentation));
+
+      wordOffset = 0;
+      prevSize = 0;
+      bitOffset = 0;
     } else {
-      lines.push('');
-      lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
       shift = true;
 
-      const isBytes = field.type.startsWith('bytes') && field.type !== 'bytes';
+      const isBytes = field.type.startsWith('bytes') && field.type !== 'bytes' && field.type !== 'bytes[]';
+      const isDynamic = !isBytes && (field.type.startsWith('bytes') || field.type.startsWith('string'));
 
-      lines.push(`{`);
-      lines.push(`  let ${field.name} := mload(0x40)`);
-      lines.push(`  let size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
-      lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.name})`);
-      lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`);
-      lines.push(`  mstore(${field.name}, size)`);
-      if (field.type === 'bytes' || field.type === 'string') {
-        lines.push(`  let i := 32`);
-        lines.push(`  for {`);
-        lines.push(`  } lt(i, size) {`);
-        lines.push(`    i := add(i, 32)`);
-        lines.push(`    shift := add(shift, 32)`);
-        lines.push(`  } {`);
-        lines.push(`    memData := mload(add(data, shift))`);
-        lines.push(`    mstore(add(${field.name}, i), memData)`);
-        lines.push(`  }`);
-        lines.push(`  memData := mload(add(data, shift))`);
-        lines.push(`  mstore(add(${field.name}, i), memData)`);
-        lines.push(`  let shiftSize := mod(size, 32)`);
-        lines.push(`  switch shiftSize`);
-        lines.push(`  case 0 {`);
-        lines.push(`    shift := add(shift, 32)`);
-        lines.push(`  }`);
-        lines.push(`  default {`);
-        lines.push(`    shift := add(shift, shiftSize)`);
-        lines.push(`  }`);
-        lines.push(`  memData := mload(add(data, shift))`);
-      } else {
-        lines.push(`  let prevSizeSum := 0`);
-        if (isBytes) {
-          lines.push(`  let offset := 32`);
+      function handleMultiDimensionalArray(dimensions, type, currentLocation, indentation, depth = 0) {
+        const innerType = type.slice(0, -2); // Remove last '[]'
+        const innerName = `${location}_${index}_${depth}`;
+        lines.push('');
+        lines.push(indentation + `shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
+        lines.push(indentation + '{');
+        lines.push(indentation + `  // Get address of array at depth ${depth}`);
+        lines.push(indentation + `  let ${innerName} := mload(0x40)`);
+        lines.push(indentation + `  let ${innerName}_length := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+        if (depth > 0) {
+          lines.push(indentation + `  mstore(add(${currentLocation}, mul(add(i_${depth - 1}, 1), 32)), ${innerName})`);
         } else {
-          lines.push(`  let offset := ${field.size + 32}`);
+          lines.push(indentation + `  mstore(${index ? `add(${currentLocation}, ${index * 0x20})` : currentLocation}, ${innerName})`);
         }
-        lines.push(`  for {`);
-        lines.push(`    let i := 0`);
-        lines.push(`  } lt(i, size) {`);
-        lines.push(`    i := add(i, 1)`);
-        lines.push(`    offset := add(offset, ${field.size})`);
-        lines.push(`    prevSizeSum := add(prevSizeSum, ${field.size})`);
-        lines.push(`  } {`);
-        if (isBytes) {
-          lines.push(`    if gt(add(offset, ${field.size}), 256) {`);
+        lines.push(indentation + `  mstore(0x40, add(${innerName}, mul(add(${innerName}_length, 1), 32)))`);
+        lines.push(indentation + `  mstore(${innerName}, ${innerName}_length)`);
+        lines.push(indentation + `  memData := mload(add(data, shift))`);
+        lines.push(indentation + '');
+        lines.push(indentation + `  for {let i_${depth} := 0} lt(i_${depth}, ${innerName}_length) {i_${depth} := add(i_${depth}, 1)} {`);
+
+        wordOffset = 0;
+
+        if (dimensions > 1) {
+          // If it's still a nested array, recurse
+          handleMultiDimensionalArray(dimensions - 1, innerType, innerName, indentation + '    ', depth + 1);
         } else {
-          lines.push(`    if gt(offset, 256) {`);
+          // Base case: handle the innermost type
+          if (isBytes) {
+            lines.push(...generateDecoderFixedBytesLines({...field, type: innerType}, innerName, index, indentation + '    ', `i_${depth}`));
+          } else if (isDynamic) {
+            lines.push(...generateDecoderDynamicDataLines({...field, type: innerType}, innerName, index, indentation + '    ', `i_${depth}`));
+          } else {
+            lines.push(...generateDecoderPrimitiveLines({...field, type: innerType}, innerName, index, indentation + '    ', `i_${depth}`));
+          }
         }
-        lines.push(`      shift := add(shift, div(prevSizeSum, 8))`);
-        lines.push(`      memData := mload(add(data, shift))`);
-        if (isBytes) {
-          lines.push(`      offset := 0`);
-        } else {
-          lines.push(`      offset := ${field.size}`);
-        }
-        lines.push(`      prevSizeSum := 0`);
-        lines.push(`    }`);
-        lines.push(`    mstore(`);
-        lines.push(`      add(${field.name}, mul(0x20, add(i, 1))),`);
-        if (isBytes) {
-          lines.push(`      shl(offset, memData)`);
-        } else {
-          lines.push(`      and(shr(sub(256, offset), memData), ${'0x' + 'F'.repeat(field.size / 4)})`);
-        }
-        lines.push(`    )`);
-        lines.push(`  }`);
-        if (isBytes) {
-          lines.push(`    switch gt(add(offset, ${field.size}), 256)`);
-        } else {
-          lines.push(`    switch gt(offset, 256)`);
-        }
-        lines.push(`  case 1 {`);
-        lines.push(`    shift := add(shift, div(prevSizeSum, 8))`);
-        lines.push(`  }`);
-        lines.push(`  default {`);
-        lines.push(`    shift := add(shift, div(sub(offset, ${field.size + 32}), 8))`);
-        lines.push(`  }`);
-        lines.push(`  memData := mload(add(data, shift))`);
+        lines.push(indentation + '  }');
+        lines.push(indentation + '}');
       }
-      lines.push(`}`);
+
+      const dimensions = (field.type.match(/\[/g)).length;
+      if (dimensions > 1) {
+        // current index should be inner for the recursion and yet use
+        handleMultiDimensionalArray(dimensions - 1, field.type, location, indentation);
+      } else {
+        if (isBytes) {
+          lines.push(...generateDecoderFixedBytesLines(field, location, index, indentation));
+        } else if (isDynamic) {
+          lines.push(...generateDecoderDynamicDataLines(field, location, index, indentation));
+        } else {
+          lines.push(...generateDecoderPrimitiveLines(field, location, index, indentation));
+        }
+      }
+
+      // FIXME
+      field.size = 0;
+
       wordOffset = 0;
       prevSize = 0;
       bitOffset = 0;
@@ -266,7 +253,230 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
   }
 
   return lines.map(line => line !== '' ? indentation + line : line);
-}-%>
+}
+
+function generateDecoderDynamicDataLines(field, location, index, indentation, parentIndex) {
+  const lines = [];
+
+  const dataName = field.name + '_' + index;
+
+  lines.push('');
+  lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
+  lines.push(`{`)
+  lines.push(`  let ${field.name} := mload(0x40)`)
+  lines.push(`  let size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+  if (parentIndex) {
+    lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${field.name})`);
+  } else {
+    lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.name})`);
+  }
+  lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`)
+  lines.push(`  mstore(${field.name}, size)`)
+  lines.push(`  memData := mload(add(data, shift))`)
+  lines.push(`  for {`)
+  lines.push(`    let ${dataName}_i := 0`)
+  lines.push(`  } lt(${dataName}_i, size) {`)
+  lines.push(`    ${dataName}_i := add(${dataName}_i, 1)`)
+  lines.push(`  } {`)
+  lines.push(`    shift := add(shift, 4)`)
+  lines.push(`    {`)
+  lines.push(`      let ${dataName} := mload(0x40)`)
+  lines.push(`      let dynamicSize := and(shr(224, memData), 0xFFFFFFFF)`)
+  lines.push(`      // test := dynamicSize`)
+  lines.push(`      mstore(`)
+  lines.push(`        add(${field.name}, mul(add(${dataName}_i, 1), 32)),`)
+  lines.push(`        ${dataName}`)
+  lines.push(`      )`)
+  lines.push(`      mstore(`)
+  lines.push(`        0x40,`)
+  lines.push(`        add(${dataName}, mul(add(dynamicSize, 1), 32))`)
+  lines.push(`      )`)
+  lines.push(`      mstore(${dataName}, dynamicSize)`)
+  lines.push(`      let ${dataName}_j := 32`)
+  lines.push(`      for {`)
+  lines.push(`      } lt(${dataName}_j, dynamicSize) {`)
+  lines.push(`        ${dataName}_j := add(${dataName}_j, 32)`)
+  lines.push(`        shift := add(shift, 32)`)
+  lines.push(`      } {`)
+  lines.push(`        memData := mload(add(data, shift))`)
+  lines.push(`        mstore(add(${dataName}, ${dataName}_j), memData)`)
+  lines.push(`      }`)
+  lines.push(`      memData := mload(add(data, shift))`)
+  lines.push(`      mstore(add(${dataName}, ${dataName}_j), memData)`)
+  lines.push(`      let shiftSize := mod(dynamicSize, 32)`)
+  lines.push(`      switch shiftSize`)
+  lines.push(`      case 0 {`)
+  lines.push(`        shift := add(shift, 32)`)
+  lines.push(`      }`)
+  lines.push(`      default {`)
+  lines.push(`        shift := add(shift, shiftSize)`)
+  lines.push(`      }`)
+  lines.push(`      memData := mload(add(data, shift))`)
+  lines.push(`    }`)
+  lines.push(`  }`)
+  lines.push(`}`)
+
+  return lines.map(line => line !== '' ? indentation + line : line);
+}
+
+function generateDecoderPrimitiveLines(field, location, index, indentation, parentIndex) {
+  const lines = [];
+
+  lines.push('');
+  lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
+  lines.push(`{`);
+  lines.push(`  let ${field.name} := mload(0x40)`);
+  lines.push(`  let size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+  if (parentIndex) {
+    lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${field.name})`);
+  } else {
+    lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.name})`);
+  }
+  lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`);
+  lines.push(`  mstore(${field.name}, size)`);
+  if (field.size < 256) {
+    lines.push(`  let prevSizeSum := 0`);
+    lines.push(`  let offset := ${field.size + 32}`);
+  }
+  lines.push(`  for {`);
+  lines.push(`    let ${field.name}_i := 0`);
+  if (field.size >= 256) {
+    lines.push(`    let shiftBytes := 0`);
+  }
+  lines.push(`  } lt(${field.name}_i, size) {`);
+  lines.push(`    ${field.name}_i := add(${field.name}_i, 1)`);
+  if (field.size < 256) {
+    lines.push(`    offset := add(offset, ${field.size})`);
+    lines.push(`    prevSizeSum := add(prevSizeSum, ${field.size})`);
+  } else {
+    lines.push(`    shiftBytes := 32`);
+  }
+  lines.push(`  } {`);
+  if (field.size < 256) {
+    lines.push(`    if gt(offset, 256) {`);
+    lines.push(`      shift := add(shift, div(prevSizeSum, 8))`);
+    lines.push(`      memData := mload(add(data, shift))`);
+    lines.push(`      offset := ${field.size}`);
+    lines.push(`      prevSizeSum := 0`);
+    lines.push(`    }`);
+  } else {
+    lines.push(`    shift := add(shift, shiftBytes)`);
+    lines.push(`    memData := mload(add(data, shift))`);
+  }
+  lines.push(`    mstore(`);
+  lines.push(`      add(${field.name}, mul(0x20, add(${field.name}_i, 1))),`);
+  lines.push(`      ${field.size < 256 ? `and(shr(sub(256, offset), memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `memData`}`);
+  lines.push(`    )`);
+  lines.push(`  }`);
+  if (field.size < 256) {
+    lines.push(`  switch gt(offset, 256)`);
+    lines.push(`  case 1 {`);
+    lines.push(`    shift := add(shift, div(prevSizeSum, 8))`);
+    lines.push(`  }`);
+    lines.push(`  default {`);
+    lines.push(`    shift := add(shift, div(sub(offset, ${field.size + 32}), 8))`);
+    lines.push(`  }`);
+  } else {
+    lines.push(`  shift := add(shift, 32)`);
+  }
+  lines.push(`  memData := mload(add(data, shift))`);
+  lines.push(`}`);
+
+  return lines.map(line => line !== '' ? indentation + line : line);
+}
+
+function generateDecoderFixedBytesLines(field, location, index, indentation, parentIndex) {
+  const lines = [];
+
+  lines.push('');
+  lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
+  lines.push(`{`);
+  lines.push(`  let ${field.name} := mload(0x40)`);
+  lines.push(`  let size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+  if (parentIndex) {
+    lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${field.name})`);
+  } else {
+    lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.name})`);
+  }
+  lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`);
+  lines.push(`  mstore(${field.name}, size)`);
+  lines.push(`  let prevSizeSum := 0`);
+  lines.push(`  let offset := 32`);
+  lines.push(`  for {`);
+  lines.push(`    let ${field.name}_i := 0`);
+  lines.push(`  } lt(${field.name}_i, size) {`);
+  lines.push(`    ${field.name}_i := add(${field.name}_i, 1)`);
+  lines.push(`    offset := add(offset, ${field.size})`);
+  lines.push(`    prevSizeSum := add(prevSizeSum, ${field.size})`);
+  lines.push(`  } {`);
+  lines.push(`    if gt(add(offset, ${field.size}), 256) {`);
+  lines.push(`      shift := add(shift, div(prevSizeSum, 8))`);
+  lines.push(`      memData := mload(add(data, shift))`);
+  lines.push(`      offset := 0`);
+  lines.push(`      prevSizeSum := 0`);
+  lines.push(`    }`);
+  lines.push(`    mstore(`);
+  lines.push(`      add(${field.name}, mul(0x20, add(${field.name}_i, 1))),`);
+  lines.push(`      shl(offset, memData)`);
+  lines.push(`    )`);
+  lines.push(`  }`);
+  lines.push(`  switch gt(add(offset, ${field.size}), 256)`);
+  lines.push(`  case 1 {`);
+  lines.push(`    shift := add(shift, div(prevSizeSum, 8))`);
+  lines.push(`  }`);
+  lines.push(`  default {`);
+  lines.push(`    shift := add(shift, div(sub(offset, ${field.size + 32}), 8))`);
+  lines.push(`  }`);
+  lines.push(`  memData := mload(add(data, shift))`);
+  lines.push(`}`);
+
+  return lines.map(line => line !== '' ? indentation + line : line);
+}
+
+function generateDecoderStringBytes(field, location, index, indentation, parentIndex) {
+  const lines = [];
+
+  lines.push('');
+  lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
+
+
+  const fieldName = field.name + '_' + index;
+
+  lines.push(`{`);
+  lines.push(`  let ${fieldName} := mload(0x40)`);
+  lines.push(`  let dynamicSize := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+  if (parentIndex) {
+    lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${fieldName})`);
+  } else {
+    lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${fieldName})`);
+  }
+  lines.push(`  mstore(0x40, add(${fieldName}, mul(add(dynamicSize, 1), 32)))`);
+  lines.push(`  mstore(${fieldName}, dynamicSize)`);
+  lines.push(`  let ${fieldName}_j := 32`);
+  lines.push(`  for {`);
+  lines.push(`  } lt(${fieldName}_j, dynamicSize) {`);
+  lines.push(`    ${fieldName}_j := add(${fieldName}_j, 32)`);
+  lines.push(`    shift := add(shift, 32)`);
+  lines.push(`  } {`);
+  lines.push(`    memData := mload(add(data, shift))`);
+  lines.push(`    mstore(add(${fieldName}, ${fieldName}_j), memData)`);
+  lines.push(`  }`);
+  lines.push(`  memData := mload(add(data, shift))`);
+  lines.push(`  mstore(add(${fieldName}, ${fieldName}_j), memData)`);
+  lines.push(`  let shiftSize := mod(dynamicSize, 32)`);
+  lines.push(`  switch shiftSize`);
+  lines.push(`  case 0 {`);
+  lines.push(`    shift := add(shift, 32)`);
+  lines.push(`  }`);
+  lines.push(`  default {`);
+  lines.push(`    shift := add(shift, shiftSize)`);
+  lines.push(`  }`);
+  lines.push(`  memData := mload(add(data, shift))`);
+  lines.push(`}`);
+
+  return lines.map(line => line !== '' ? indentation + line : line);
+}
+-%>
 
 /// @notice Decoder for stored packed sports data
 library Decoder {

@@ -737,6 +737,28 @@ describe('Decoder', () => {
     await testDecoder(fields, values);
   });
 
+  it('should handle dynamic uint256 array', async () => {
+    const fields: Field = {
+      name: 'DynamicUint256Array',
+      values: [
+        { name: 'uint256Array', type: 'uint256[]', size: 256 },
+        { name: 'int32Value', type: 'int32', size: 32 },
+      ],
+    };
+    const values = [
+      [
+        BigInt(
+          '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+        ), // Max value for uint256
+        BigInt('0'),
+        BigInt('1234567890123456789012345678901234567890'),
+        BigInt('340282366920938463463374607431768211455'), // 2^128 - 1
+      ],
+      -2147483648, // Min value for int32
+    ];
+    await testDecoder(fields, values);
+  });
+
   it('should handle nested fixed arrays', async () => {
     const fields: Field = {
       name: 'NestedDynamicArrays',
@@ -877,7 +899,7 @@ describe('Decoder', () => {
     await testDecoder(fields, values);
   });
 
-  it('should handle string', async () => {
+  it('should handle string and bytes', async () => {
     const fields: Field = {
       name: 'StringField',
       values: [
@@ -980,6 +1002,133 @@ describe('Decoder', () => {
         ethers.hexlify(ethers.randomBytes(50)),
         'This is a string inside a struct',
         42,
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle dynamic array of string and bytes', async () => {
+    const fields: Field = {
+      name: 'DynamicArrayField',
+      values: [
+        {
+          name: 'dynamicStringArray',
+          type: 'string[]',
+        },
+        {
+          name: 'dynamicBytesArray',
+          type: 'bytes[]',
+        },
+      ],
+    };
+    const values = [
+      ['String 1', 'String 2', 'String 3 with more data'],
+      [
+        ethers.hexlify(ethers.randomBytes(10)),
+        ethers.hexlify(ethers.randomBytes(20)),
+        ethers.hexlify(ethers.randomBytes(30)),
+        ethers.hexlify(ethers.randomBytes(40)),
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should handle struct with array of bytes and string', async () => {
+    const fields: Field = {
+      name: 'StructWithArrays',
+      values: [
+        {
+          name: 'structField',
+          type: 'tuple',
+          components: [
+            {
+              name: 'addressField',
+              type: 'address',
+              size: 160,
+            },
+            {
+              name: 'bytesArray',
+              type: 'bytes[]',
+            },
+            {
+              name: 'uintFixedArray',
+              type: 'uint256[5]',
+              size: 256,
+            },
+            {
+              name: 'stringArray',
+              type: 'string[3]',
+            },
+            {
+              name: 'uintDynamicArray',
+              type: 'uint128[]',
+              size: 128,
+            },
+            {
+              name: 'boolField',
+              type: 'bool',
+              size: 8,
+            },
+          ],
+        },
+      ],
+    };
+    const values = [
+      [
+        ethers.Wallet.createRandom().address,
+        [
+          ethers.hexlify(ethers.randomBytes(5)),
+          ethers.hexlify(ethers.randomBytes(10)),
+          ethers.hexlify(ethers.randomBytes(15)),
+        ],
+        [1, 2, 3, 4, 5],
+        ['First string', 'Second string', 'Third string with more data'],
+        [100, 200, 300],
+        true,
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should decode n-dimensional dynamic arrays', async () => {
+    const fields: Field = {
+      name: 'NDimensionalArrays',
+      values: [
+        {
+          name: 'oneDimensional',
+          type: 'uint256[]',
+          size: 256,
+        },
+        {
+          name: 'twoDimensional',
+          type: 'uint256[][]',
+          size: 256,
+        },
+        {
+          name: 'uint256Value',
+          type: 'uint256',
+          size: 256,
+        },
+        {
+          name: 'threeDimensional',
+          type: 'uint256[][][]',
+          size: 256,
+        },
+      ],
+    };
+    const values = [
+      [1, 2, 3],
+      [
+        [10, 20],
+        [30, 40, 50],
+      ],
+      1,
+      [
+        [[100, 200], [300]],
+        [
+          [400, 500],
+          [600, 700],
+        ],
       ],
     ];
     await testDecoder(fields, values);
