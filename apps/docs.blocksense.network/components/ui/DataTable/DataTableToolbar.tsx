@@ -30,7 +30,7 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between gap-2">
+    <div className="flex flex-col lg:flex-row items-center justify-between gap-2">
       {filterCell && (
         <div className="flex flex-1 space-x-2 items-start w-full">
           <div className="flex items-center space-x-2 w-full">
