@@ -2,21 +2,12 @@ import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
 
 const fonts = [
-  '/fonts/fira/FiraCode-Regular.ttf',
-  '/fonts/noto-sans/NotoSans-Black.ttf',
-  '/fonts/noto-sans/NotoSans-Bold.ttf',
-  '/fonts/noto-sans/NotoSans-BoldItalic.ttf',
-  '/fonts/noto-sans/NotoSans-ExtraBold.ttf',
-  '/fonts/noto-sans/NotoSans-Italic.ttf',
-  '/fonts/noto-sans/NotoSans-Light.ttf',
-  '/fonts/noto-sans/NotoSans-LightItalic.ttf',
-  '/fonts/noto-sans/NotoSans-Medium.ttf',
-  '/fonts/noto-sans/NotoSans-Regular.ttf',
-  '/fonts/noto-sans/NotoSans-SemiBold.ttf',
-  '/fonts/noto-sans/NotoSans-SemiBoldItalic.ttf',
-  '/fonts/noto-sans/NotoSans-Thin.ttf',
-  '/fonts/noto-sans/NotoSans-ThinItalic.ttf',
-  '/fonts/SpaceMono-Bold.ttf',
+  '/fonts/fira/FiraCode-Regular.woff2',
+  '/fonts/noto-sans/NotoSans-Light.woff2',
+  '/fonts/noto-sans/NotoSans-Regular.woff2',
+  '/fonts/noto-sans/NotoSans-Thin.woff2',
+  '/fonts/noto-sans/NotoSans-Bold.woff2',
+  '/fonts/SpaceMono-Bold.woff2',
 ];
 
 export default {
@@ -46,7 +37,7 @@ export default {
           rel="preload"
           href={font}
           as="font"
-          type="font/ttf"
+          type="font/woff2"
           crossOrigin="anonymous"
         />
       ))}
