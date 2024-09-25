@@ -204,13 +204,19 @@ jobs:
       - name: Nix build Rust workspace
         run: nix build --impure .#blocksense-rs
 
-  docs_website_deploy:
+  deploy_websites:
     timeout-minutes: 360
     runs-on: self-hosted
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
+    strategy:
+      matrix:
+        include:
+          - project: docs
+            vercel_project: docs.blocksense.network
+          - project: explorer
+            vercel_project: explorer.blocksense.network
+    outputs:
+      docsDeploymentMessage: ${{ steps.collect-docs.outputs.message }}
+      explorerDeploymentMessage: ${{ steps.collect-explorer.outputs.message }}
     steps:
       - uses: actions/checkout@v4
 
@@ -238,7 +244,7 @@ jobs:
         run: yarn install
 
       - name: Pull Vercel configuration
-        run: yarn vercel link --scope blocksense --project docs.blocksense.network --yes --token ${{ secrets.vercel_token }}
+        run: yarn vercel link --scope blocksense --project ${{ matrix.vercel_project }} --yes --token ${{ secrets.vercel_token }}
 
       - name: Vercel Build - Prod
         if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
@@ -256,15 +262,31 @@ jobs:
         if: github.ref != format('refs/heads/{0}', github.event.repository.default_branch)
         run: yarn vercel deploy --prebuilt --scope blocksense --token ${{ secrets.vercel_token }} > _vercel-deployment-url
 
-      - name: Read deployment URL
-        id: read-deployment-url
+      - name: Collect Docs Deployment URL
+        id: collect-docs
+        if: matrix.project == 'docs'
         run: |
-          deploymentUrl=$(cat _vercel-deployment-url)
-          echo "::set-output name=deploymentUrl::${deploymentUrl}"
+          DOCS_DEPLOY_URL=$(cat _vercel-deployment-url)
+          echo "::set-output name=message::$DOCS_DEPLOY_URL"
 
-      - name: Comment on the PR
+      - name: Collect Explorer Deployment URL
+        id: collect-explorer
+        if: matrix.project == 'explorer'
+        run: |
+          EXPLORER_DEPLOY_URL=$(cat _vercel-deployment-url)
+          echo "::set-output name=message::$EXPLORER_DEPLOY_URL"
+
+  comment_on_pr:
+    needs: [deploy_websites]
+    runs-on: self-hosted
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment Deployment Links on the PR
         uses: marocchino/sticky-pull-request-comment@v2.9.0
         with:
           recreate: true
           message: |
-            Deployed to ${{ steps.read-deployment-url.outputs.deploymentUrl }} 🌱
+            🚀 Deployment Links of Blocksense Network websites:
+             * 🌱 Documentation: ${{ needs.deploy_websites.outputs.docsDeploymentMessage }}
+             * 🧭 Explorer: ${{ needs.deploy_websites.outputs.explorerDeploymentMessage }}
