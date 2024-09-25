@@ -22,6 +22,11 @@ export const dataFeedsColumnsTitles: { [key: string]: string } = {
   script: 'Data Sources',
 };
 
+export const dataSourcesLinks: { [key: string]: string } = {
+  CoinMarketCap: 'https://coinmarketcap.com/',
+  YahooFinance: 'https://finance.yahoo.com/',
+};
+
 export const columns: ColumnDef<DataFeed>[] = [
   {
     accessorKey: 'id',
@@ -90,7 +95,9 @@ export const columns: ColumnDef<DataFeed>[] = [
         variant="outline"
         className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium"
       >
-        {row.getValue('script')}
+        <Link href={dataSourcesLinks[row.getValue('script') as string] || ''}>
+          {row.getValue('script')}
+        </Link>
       </Badge>
     ),
   },
