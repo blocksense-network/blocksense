@@ -35,6 +35,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
+  const [firstSelectedValue] = selectedValues;
 
   return (
     <Popover>
@@ -44,7 +45,7 @@ export function DataTableFacetedFilter<TData, TValue>({
           size="sm"
           className="h-8 border-solid border-slate-200"
         >
-          {title}
+          {firstSelectedValue || title}
           <ChevronDown className="ml-1 h-4 w-4" />
         </Button>
       </PopoverTrigger>
