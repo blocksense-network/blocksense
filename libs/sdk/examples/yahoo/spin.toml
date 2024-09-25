@@ -1,0 +1,209 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Antoni Dikov"]
+name = "Yahoo Oracle"
+version = "0.1.0"
+
+[application.trigger.settings]
+interval_time_in_seconds = 10
+sequencer = "http://gpu-server-001:8877/1"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+
+[[trigger.oracle]]
+component = "yahoo"
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"XAU"}'
+id = "20"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"EURUSD=X"}'
+id = "25"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"CHFUSD=X"}'
+id = "26"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"SGDUSD=X"}'
+id = "28"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"TRYUSD=X"}'
+id = "39"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"XAG"}'
+id = "46"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"JPYUSD=X"}'
+id = "47"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"UST"}'
+id = "49"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"INRUSD=X"}'
+id = "56"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"COIN"}'
+id = "59"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"NVDA"}'
+id = "63"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"TSLA"}'
+id = "64"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"PFE"}'
+id = "67"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"MXNUSD=X"}'
+id = "71"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"SPY"}'
+id = "73"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"PHPUSD=X"}'
+id = "77"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"GBPUSD=X"}'
+id = "81"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"THBUSD=X"}'
+id = "85"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"MS"}'
+id = "91"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"ZARUSD=X"}'
+id = "96"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"GME"}'
+id = "97"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"JPM"}'
+id = "103"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"GOOGL"}'
+id = "105"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"WTI"}'
+id = "106"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"AMZN"}'
+id = "110"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"AAPL"}'
+id = "112"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"MSFT"}'
+id = "115"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"META"}'
+id = "116"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"NFLX"}'
+id = "117"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"MRNA"}'
+id = "120"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"QQQ"}'
+id = "122"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"BRLUSD=X"}'
+id = "124"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"COPUSD=X"}'
+id = "129"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"CNYUSD=X"}'
+id = "132"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"KRWUSD=X"}'
+id = "134"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"CADUSD=X"}'
+id = "145"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"SEKUSD=X"}'
+id = "164"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"CSPXUSD=X"}'
+id = "211"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"CZKUSD=X"}'
+id = "212"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"IBTAUSD=X"}'
+id = "214"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"SHV"}'
+id = "222"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"IDRUSD=X"}'
+id = "223"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"NZDUSD=X"}'
+id = "225"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"ILSUSD=X"}'
+id = "230"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"PLNUSD=X"}'
+id = "232"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"XPT"}'
+id = "233"
+
+[[trigger.oracle.data_feeds]]
+data = '{"yf_symbol":"mSOL"}'
+id = "246"
+
+[component.yahoo]
+source = "target/wasm32-wasi/release/yahoo_oracle.wasm"
+allowed_outbound_hosts = [
+  "https://yfapi.net:443",
+]
+[component.yahoo.build]
+command = "cargo build --target wasm32-wasi --release"
