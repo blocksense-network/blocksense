@@ -34,7 +34,7 @@ export const columns: ColumnDef<DataFeed>[] = [
       <DataTableColumnHeader
         column={column}
         title={dataFeedsColumnsTitles[column.id]}
-        type={'number'}
+        sortingType={'number'}
       />
     ),
     cell: ({ row }) => (
@@ -49,7 +49,7 @@ export const columns: ColumnDef<DataFeed>[] = [
       <DataTableColumnHeader
         column={column}
         title={dataFeedsColumnsTitles[column.id]}
-        type={'string'}
+        sortingType={'string'}
       />
     ),
     cell: ({ row }) => (
@@ -67,7 +67,7 @@ export const columns: ColumnDef<DataFeed>[] = [
       <DataTableColumnHeader
         column={column}
         title={dataFeedsColumnsTitles[column.id]}
-        type={'number'}
+        sortingType={'number'}
       />
     ),
   },
@@ -77,7 +77,7 @@ export const columns: ColumnDef<DataFeed>[] = [
       <DataTableColumnHeader
         column={column}
         title={dataFeedsColumnsTitles[column.id]}
-        type={'number'}
+        sortingType={'number'}
       />
     ),
   },
@@ -87,7 +87,7 @@ export const columns: ColumnDef<DataFeed>[] = [
       <DataTableColumnHeader
         column={column}
         title={dataFeedsColumnsTitles[column.id]}
-        type={'string'}
+        sortingType={'string'}
       />
     ),
     cell: ({ row }) => (

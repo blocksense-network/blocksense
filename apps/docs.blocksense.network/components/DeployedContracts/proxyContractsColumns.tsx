@@ -26,8 +26,6 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <DataTableColumnHeader
         column={column}
         title={proxyColumnsTitles[column.id]}
-        type={'string'}
-        hasSort={false}
       />
     ),
     cell: ({ row }) => <DataFeedLink row={row} placeholderId="description" />,
@@ -38,8 +36,6 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <DataTableColumnHeader
         column={column}
         title={proxyColumnsTitles[column.id]}
-        type={'number'}
-        hasSort={false}
       />
     ),
     cell: ({ row }) => <DataFeedLink row={row} placeholderId="id" />,
@@ -50,8 +46,6 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <DataTableColumnHeader
         column={column}
         title={proxyColumnsTitles[column.id]}
-        type={'string'}
-        hasSort={false}
       />
     ),
     cell: ({ row }) => (
@@ -69,8 +63,6 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <DataTableColumnHeader
         column={column}
         title={proxyColumnsTitles[column.id]}
-        type={'string'}
-        hasSort={false}
       />
     ),
     cell: ({ row }) => (
@@ -88,8 +80,6 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <DataTableColumnHeader
         column={column}
         title={proxyColumnsTitles[column.id]}
-        type={'string'}
-        hasSort={false}
       />
     ),
     cell: ({ row }) => (
@@ -107,8 +97,6 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <DataTableColumnHeader
         column={column}
         title={proxyColumnsTitles[column.id]}
-        type={'string'}
-        hasSort={false}
       />
     ),
     cell: ({ row }) => (

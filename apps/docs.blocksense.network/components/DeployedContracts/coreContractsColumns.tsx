@@ -26,8 +26,6 @@ export const columns: ColumnDef<CoreContract>[] = [
       <DataTableColumnHeader
         column={column}
         title={contractsColumnsTitles[column.id]}
-        type={'string'}
-        hasSort={false}
       />
     ),
   },
@@ -37,8 +35,6 @@ export const columns: ColumnDef<CoreContract>[] = [
       <DataTableColumnHeader
         column={column}
         title={contractsColumnsTitles[column.id]}
-        type={'string'}
-        hasSort={false}
       />
     ),
     cell: ({ row }) => (
@@ -51,8 +47,6 @@ export const columns: ColumnDef<CoreContract>[] = [
       <DataTableColumnHeader
         column={column}
         title={contractsColumnsTitles[column.id]}
-        type={'string'}
-        hasSort={false}
       />
     ),
     cell: ({ row }) => <NetworkAddressExplorerLink row={row} />,

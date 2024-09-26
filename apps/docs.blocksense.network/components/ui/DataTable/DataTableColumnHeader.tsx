@@ -12,17 +12,15 @@ interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
   column: Column<TData, TValue>;
   title: string;
-  type: 'string' | 'number';
-  hasSort?: boolean;
+  sortingType?: 'string' | 'number';
 }
 
 export function DataTableColumnHeader<TData, TValue>({
   column,
   title,
-  type,
-  hasSort = true,
+  sortingType,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-  if (!column.getCanSort() || hasSort === false) {
+  if (!column.getCanSort() || !sortingType) {
     return <span className="capitalize text-sm">{title}</span>;
   }
 
@@ -33,7 +31,7 @@ export function DataTableColumnHeader<TData, TValue>({
     >
       <span className="capitalize text-sm">{title}</span>
       <div className="h-4 w-4">
-        {type === 'number' ? (
+        {sortingType === 'number' ? (
           column.getIsSorted() === 'desc' ? (
             <ArrowDown10 className="ml-2 h-4 w-4" />
           ) : (
