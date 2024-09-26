@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 import { gettingStartedConfig } from '@/config';
 import { FigureBackdrop } from '@/components/common/FigureBackdrop';
@@ -28,13 +29,13 @@ export const GettingStarted = () => {
           </div>
         </article>
         <aside className="getting-started__image flex-row-reverse hidden md:flex md:mt-0 lg:mt-0 lg:flex">
-          <img
+          <Image
             className="getting-started__image-content"
             src="/images/blocksense-fig.jpg"
             alt="Blocksense figurine"
             width={250}
             height={280}
-            loading="lazy"
+            quality={50}
           />
         </aside>
       </section>

@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Tooltip } from '@/components/common/Tooltip';
+import { ImageWrapper } from '@/components/common/ImageWrapper';
 
 type CopyButtonProps = {
   textToCopy: string;
@@ -29,13 +31,17 @@ export const CopyButton = ({
           <span>{isCopied ? 'Copied' : 'Copy'}</span>
         </Tooltip.Content>
         {isCopied ? (
-          <img src="/icons/check.svg" alt="Copied" className="w-5 h-5" />
+          <ImageWrapper
+            src="/icons/check.svg"
+            alt="Copied"
+            className="relative w-5 h-5"
+          />
         ) : (
-          <img
+          <ImageWrapper
             src="/icons/clipboard.svg"
             alt="Clipboard"
+            className="relative w-5 h-5 cursor-pointer"
             onClick={onCopy}
-            className="w-5 h-5 cursor-pointer"
           />
         )}
       </Tooltip>

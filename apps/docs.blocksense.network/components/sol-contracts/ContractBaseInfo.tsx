@@ -6,6 +6,7 @@ import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractOverview } from './ContractOverview';
+import { ImageWrapper } from '@/components/common/ImageWrapper';
 
 export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
   return (
@@ -24,11 +25,10 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
                   <div
                     className={`contract-base-info__item flex items-center ${contract.contractKind === 'contract' ? 'mb-2 lg:mb-0' : 'mb-0'}`}
                   >
-                    <img
-                      className="w-5 h-5 mr-2"
+                    <ImageWrapper
                       src="/icons/blocksense-kind.svg"
                       alt="Kind"
-                      loading="lazy"
+                      className="relative w-5 h-5 mr-2"
                     />
                     <dt className="contract-base-info__label text-gray-500 font-normal">
                       Kind:
@@ -45,11 +45,10 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
 
                       {/* Abstract section */}
                       <div className="contract-base-info__item flex items-center">
-                        <img
-                          className="w-5 h-5 mr-2"
+                        <ImageWrapper
                           src="/icons/blocksense-abstract.svg"
                           alt="Abstract"
-                          loading="lazy"
+                          className="relative w-5 h-5 mr-2"
                         />
                         <dt className="contract-base-info__label text-gray-500 font-normal">
                           Abstract:

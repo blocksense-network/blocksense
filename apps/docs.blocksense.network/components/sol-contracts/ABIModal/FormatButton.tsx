@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { ImageWrapper } from '@/components/common/ImageWrapper';
+
 import { Button } from '@/components/ui/button';
 
 type FormatButtonProps = {
@@ -17,10 +19,10 @@ export const FormatButton = ({
       variant="outline"
       onClick={formatHandler}
     >
-      <img
+      <ImageWrapper
         src={isFormatted ? '/icons/format-compact.svg' : '/icons/format.svg'}
         alt={isFormatted ? 'Compact' : 'Format'}
-        className="w-6 h-6 mr-2"
+        className="relative w-6 h-6 mr-2"
       />
       <span className="whitespace-nowrap">
         {isFormatted ? 'Compact' : 'Format'}

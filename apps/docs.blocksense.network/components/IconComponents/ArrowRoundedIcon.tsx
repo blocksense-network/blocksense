@@ -1,12 +1,13 @@
 import React from 'react';
 
+import { ImageWrapper } from '@/components/common/ImageWrapper';
+
 const ArrowRoundedIcon = () => {
   return (
-    <img
-      className="w-8 h-8"
+    <ImageWrapper
       src="/icons/blocksense-arrow-round.svg"
-      loading="lazy"
       alt="Blocksense roadmap arrow-round"
+      className="relative w-8 h-8"
     />
   );
 };

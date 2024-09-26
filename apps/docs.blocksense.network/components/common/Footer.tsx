@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { config } from '@/config';
+import { ImageWrapper } from '@/components/common/ImageWrapper';
 
 export const Footer = () => {
   return (
@@ -16,11 +17,10 @@ export const Footer = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <img
-            className="footer__social-icon-img w-6 h-6"
+          <ImageWrapper
             src="/icons/blocksense-rocket-icon.svg"
             alt={config.adoptersAltLink}
-            loading="lazy"
+            className="footer__social-icon-img relative w-6 h-6"
           />
           <label className="footer__social-label text-gray-900 hidden lg:block">
             <span className="font-semibold">Early Adopters</span>
@@ -36,11 +36,10 @@ export const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img
-                className="footer__social-icon-img w-6 h-6"
+              <ImageWrapper
                 src="/icons/blocksense-telegram.svg"
                 alt={config.social_media.telegram._alt}
-                loading="lazy"
+                className="footer__social-icon-img relative w-6 h-6"
               />
               <label className="footer__social-label text-gray-900 hidden lg:block">
                 <span className="font-semibold">Telegram</span>
@@ -54,11 +53,10 @@ export const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img
-                className="footer__social-icon-img w-6 h-6"
+              <ImageWrapper
                 src="/icons/blocksense-x.svg"
                 alt={config.social_media.x._alt}
-                loading="lazy"
+                className="footer__social-icon-img relative w-6 h-6"
               />
               <label className="footer__social-label text-gray-900 hidden lg:block">
                 <span className="font-semibold">Follow us</span>
@@ -72,11 +70,10 @@ export const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img
-                className="footer__social-icon-img w-6 h-6"
+              <ImageWrapper
                 src="/icons/blocksense-discord.svg"
                 alt={config.social_media.discord._alt}
-                loading="lazy"
+                className="footer__social-icon-img relative w-6 h-6"
               />
               <label className="footer__social-label text-gray-900 hidden lg:block">
                 <span className="font-semibold">Join our community</span>
