@@ -1,5 +1,6 @@
 use alloy::hex::ToHexExt;
 use alloy::node_bindings::Anvil;
+use config::get_sequencer_and_feed_configs;
 use config::SequencerConfig;
 use crypto::JsonSerializableSignature;
 use curl::easy::Handler;
@@ -17,9 +18,6 @@ use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::time;
 use tokio::time::Duration;
-use utils::constants::{SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE};
-use utils::get_config_file_path;
-use utils::read_file;
 
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
@@ -30,7 +28,7 @@ const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
 const REPORTER_SECRET_KEY: &str =
     "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
-const SEQUENCER_MAIN_PORT: u16 = 8777;
+const SEQUENCER_MAIN_PORT: u16 = 8787;
 const SEQUENCER_ADMIN_PORT: u16 = 5557;
 
 struct Collector(Vec<u8>);
@@ -59,15 +57,9 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
         },
     });
 
-    let config_file_path = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
-    let config_file_path = config_file_path
-        .to_str()
-        .expect("Environment variable does not hold a dir path");
-
-    let data = read_file(config_file_path);
-
-    let mut sequencer_config =
-        serde_json::from_str(data.as_str()).expect("Config file is not valid JSON!");
+    let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
+    let mut sequencer_config = serde_json::to_value(&sequencer_config)
+        .expect("Error serializing `sequencer_config` to JSON");
 
     merge(&mut sequencer_config, &config_patch);
 
@@ -81,33 +73,20 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
     )
     .await;
 
+    let mut feed = feeds_config
+        .feeds
+        .first()
+        .expect("Feeds array empty!")
+        .clone();
+    feed.id = 1;
+    feed.report_interval_ms = 7000;
+    feed.quorum_percentage = 0.001;
+
     let feeds = json!({
         "feeds": [
-            {
-                "id": 1,
-                "name": "BTC",
-                "fullName": "",
-                "description": "BTC / USD",
-                "type": "Crypto",
-                "decimals": 8,
-                "pair": {
-                  "base": "BTC",
-                  "quote": "USD"
-                },
-                "resources": {
-                  "cmc_id": 1,
-                  "cmc_quote": "BTC"
-                },
-                "report_interval_ms": 7000,
-                "first_report_start_time": {
-                  "secs_since_epoch": 0,
-                  "nanos_since_epoch": 0
-                },
-                "quorum_percentage": 0.001,
-                "script": "CoinMarketCap"
-              },
-        ]
-    });
+            feed
+        ]}
+    );
 
     write_file("/tmp/feeds_config.json", feeds.to_string().as_bytes()).await;
 
