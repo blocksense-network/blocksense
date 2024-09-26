@@ -175,6 +175,8 @@ mod tests {
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
             )),
+            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         });
 
         let _future = feeds_slots_manager_loop(app_state, vote_send.clone()).await;

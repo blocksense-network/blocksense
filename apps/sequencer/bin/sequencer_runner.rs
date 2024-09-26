@@ -10,7 +10,10 @@ use tokio::sync::{mpsc, RwLock};
 
 use sequencer::reporters::reporter::init_shared_reporters;
 
-use sequencer::http_handlers::admin::{deploy, get_feed_report_interval, get_key, set_log_level};
+use sequencer::http_handlers::admin::{
+    deploy, get_feed_config, get_feed_report_interval, get_feeds_config, get_key,
+    get_sequencer_config, set_log_level,
+};
 use sequencer::http_handlers::data_feeds::{post_report, register_feed};
 use utils::constants::{
     FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
@@ -73,6 +76,8 @@ pub async fn prepare_app_state(
             FeedsMetrics::new(metrics_prefix.unwrap_or(""))
                 .expect("Failed to allocate feed_metrics"),
         )),
+        feeds_config: Arc::new(RwLock::new(feeds_config)),
+        sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
     });
 
     (vote_recv, app_state)
@@ -109,6 +114,9 @@ pub async fn prepare_http_servers(
                 .service(set_log_level)
                 .service(get_feed_report_interval)
                 .service(register_feed)
+                .service(get_feeds_config)
+                .service(get_feed_config)
+                .service(get_sequencer_config)
         })
         .workers(1)
         .bind(("0.0.0.0", admin_port))

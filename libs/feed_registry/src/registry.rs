@@ -7,12 +7,12 @@ use std::{
 use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use config::{FeedConfig, Validated};
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tokio::{sync::RwLock, time};
 use tracing::{info, trace};
 use utils::time::current_unix_time;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct AllFeedsConfig {
     pub feeds: Vec<FeedConfig>,
 }

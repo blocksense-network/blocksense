@@ -416,6 +416,8 @@ mod tests {
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
             )),
+            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         });
 
         let app =
@@ -469,6 +471,15 @@ mod tests {
         anvil_endpoint: &str,
     ) -> (UnboundedReceiver<(String, String)>, web::Data<FeedsState>) {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
+        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let sequencer_config_file = PathBuf::new()
+            .join(manifest_dir)
+            .join("tests")
+            .join("sequencer_config.json");
+
+        let log_handle = init_shared_logging_handle("INFO", false);
+        let sequencer_config =
+            init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
 
         let config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
         let feeds_config =
@@ -476,8 +487,6 @@ mod tests {
         let metrics_prefix = Some("create_app_state_from_sequencer_config");
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
-
-        let log_handle = init_shared_logging_handle("INFO", false);
 
         let (vote_send, vote_recv): (
             UnboundedSender<(String, String)>,
@@ -503,6 +512,8 @@ mod tests {
                     )
                     .expect("Failed to allocate feed_metrics"),
                 )),
+                feeds_config: Arc::new(RwLock::new(feeds_config)),
+                sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             }),
         )
     }

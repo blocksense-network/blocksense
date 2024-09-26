@@ -1,6 +1,8 @@
 use crate::feeds::feed_allocator::ConcurrentAllocator;
 use crate::providers::provider::SharedRpcProviders;
 use crate::reporters::reporter::SharedReporters;
+use config::SequencerConfig;
+use feed_registry::registry::AllFeedsConfig;
 use feed_registry::registry::AllFeedsReports;
 use feed_registry::registry::FeedMetaDataRegistry;
 use prometheus::metrics::FeedsMetrics;
@@ -17,5 +19,7 @@ pub struct FeedsState {
     pub feed_id_allocator: Arc<RwLock<Option<ConcurrentAllocator>>>,
     pub voting_send_channel: mpsc::UnboundedSender<(String, String)>,
     pub feeds_metrics: Arc<RwLock<FeedsMetrics>>,
+    pub feeds_config: Arc<RwLock<AllFeedsConfig>>,
+    pub sequencer_config: Arc<RwLock<SequencerConfig>>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }

@@ -114,7 +114,7 @@ impl Validated for ReporterConfig {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 // #[serde(rename_all = "PascalCase")]
 pub struct Provider {
     pub private_key_path: String,
@@ -153,7 +153,7 @@ impl Validated for Reporter {
         Ok(())
     }
 }
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SequencerConfig {
     pub main_port: u16,
     pub admin_port: u16,

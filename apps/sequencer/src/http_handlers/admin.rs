@@ -1,4 +1,6 @@
+use config::{FeedConfig, SequencerConfig};
 use eyre::Result;
+use feed_registry::registry::AllFeedsConfig;
 use utils::logging::tokio_console_active;
 
 use super::super::feeds::feeds_state::FeedsState;
@@ -192,6 +194,52 @@ pub async fn get_feed_report_interval(
         .body(format!("{}", feed.read().await.get_report_interval_ms())));
 }
 
+#[get("/get_feeds_config")]
+pub async fn get_feeds_config(app_state: web::Data<FeedsState>) -> Result<HttpResponse, Error> {
+    let feeds_config = app_state.feeds_config.read().await;
+    let feeds_config_pretty = serde_json::to_string_pretty::<AllFeedsConfig>(&feeds_config)?;
+
+    return Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(feeds_config_pretty.to_string()));
+}
+
+#[get("/get_feed_config/{feed_id}")]
+pub async fn get_feed_config(
+    req: HttpRequest,
+    app_state: web::Data<FeedsState>,
+) -> Result<HttpResponse, Error> {
+    let bad_input = error::ErrorBadRequest("Incorrect input.");
+    let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
+
+    let feed_id: u32 = match feed_id.parse() {
+        Ok(r) => r,
+        Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
+    };
+
+    let feeds_config = app_state.feeds_config.read().await.feeds.clone();
+    let feed_config = feeds_config
+        .into_iter()
+        .find(|x| x.id == feed_id)
+        .ok_or(error::ErrorNotFound("Data feed with this ID not found"))?;
+    let feed_config_pretty = serde_json::to_string_pretty::<FeedConfig>(&feed_config)?;
+
+    return Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(feed_config_pretty.to_string()));
+}
+
+#[get("/get_sequencer_config")]
+pub async fn get_sequencer_config(app_state: web::Data<FeedsState>) -> Result<HttpResponse, Error> {
+    let sequencer_config = app_state.sequencer_config.read().await;
+    let sequencer_config_pretty =
+        serde_json::to_string_pretty::<SequencerConfig>(&sequencer_config)?;
+
+    return Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(sequencer_config_pretty.to_string()));
+}
+
 #[get("/metrics")]
 async fn metrics() -> Result<HttpResponse, Error> {
     let output = match gather_and_dump_metrics() {
@@ -265,6 +313,8 @@ mod tests {
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
             )),
+            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         });
 
         let app = test::init_service(
@@ -293,6 +343,13 @@ mod tests {
         anvil_endpoint: &str,
     ) -> web::Data<FeedsState> {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
+        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+        let sequencer_config_file = PathBuf::new()
+            .join(manifest_dir)
+            .join("tests")
+            .join("sequencer_config.json");
+        let sequencer_config =
+            init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
         let config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
         let feeds_config =
             init_config::<AllFeedsConfig>(&config_file).expect("Failed to get config: ");
@@ -322,6 +379,8 @@ mod tests {
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
             )),
+            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         })
     }
 
