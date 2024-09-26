@@ -20,7 +20,7 @@ contract HistoricDataFeedStore {
             let mut bytes_value: Field = 0;
             let mut mul: Field = 1;
 
-            for i in 1..24 {
+            for i in 0..24 {
                 let temp: Field = self.value[23 - i] as Field;
                 bytes_value = bytes_value + (temp * mul);
                 mul *= 256;
@@ -37,7 +37,7 @@ contract HistoricDataFeedStore {
         fn deserialize(input: [Field; MAX_FEEDS_NUMBER]) -> Self {
             let mut value: [u8; 24] = [0; 24];
 
-            let part_value = input[0].to_be_bytes(24);
+            let part_value: [u8; 24] = input[0].to_be_bytes();
             for i in 0..24 {
                 value[i] = part_value[i];
             }
@@ -73,7 +73,11 @@ contract HistoricDataFeedStore {
      * @param input_values The values of the data feed, 24 bytes each, thus 24 * MAX_FEEDS_NUMBER bytes
      */
     #[aztec(public)]
-    fn set_feeds(keys: [Field; MAX_FEEDS_NUMBER], input_values: [u8; MAX_FEEDS_BYTES_LEN], length: u64) {
+    fn set_feeds(
+        keys: [Field; MAX_FEEDS_NUMBER],
+        input_values: [u8; MAX_FEEDS_BYTES_LEN],
+        length: u64
+    ) {
         assert(storage.owner.read().eq(context.msg_sender()), "You are not the owner!");
 
         for i in 0..length {
@@ -82,11 +86,15 @@ contract HistoricDataFeedStore {
             if counter == 0 {
                 counter = 1;
             }
+            let mut helper_index = 0;
             let mut current_transmission_value = [0 as u8; TRANSMISSION_VALUE_BYTES_LEN];
             for j in i * TRANSMISSION_VALUE_BYTES_LEN as u64..(i + 1) * TRANSMISSION_VALUE_BYTES_LEN as u64 {
-                current_transmission_value[i] = input_values[j];
+                current_transmission_value[helper_index] = input_values[j];
+                helper_index += 1;
             }
-            storage.historic_data_feeds.at(keys[i]).at(counter as Field).write(Transmission { value: current_transmission_value, timestamp: 100 + i as Field });
+            storage.historic_data_feeds.at(keys[i]).at(counter as Field).write(
+                Transmission { value: current_transmission_value, timestamp: context.timestamp() as Field }
+            );
             storage.counters.at(keys[i]).write(counter as Field);
         }
     }
