@@ -1,9 +1,41 @@
+import { format } from 'node:path';
+
+import type { Schema } from '@effect/schema/Schema';
+import { decodeUnknownSync } from '@effect/schema/ParseResult';
+
 import { selectDirectory } from '@blocksense/base-utils/fs';
+
+import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
+import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 
 import { chainlinkFeedsDir, artifactsDir, configDir } from '../paths';
 import { collectRawDataFeeds } from '../data-services/chainlink_feeds';
+import { RawDataFeedsSchema } from '../data-services/types';
 import { generateFeedConfig } from '../feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../chainlink-compatibility/index';
+
+async function getOrCreateArtifact<A, I>(
+  name: string,
+  schema: Schema<A, I, never>,
+  create: () => Promise<A>,
+) {
+  const { readJSON, writeJSON } = selectDirectory(artifactsDir);
+  const path = format({ dir: artifactsDir, name, ext: '.json' });
+
+  let json: unknown;
+  try {
+    if (process.env['ENABLE_CACHE'] ?? false) {
+      json = await readJSON({ name });
+      console.log(`Loading existing artifact from: '${path}'`);
+    }
+    throw new Error('Skipping cache');
+  } catch {
+    console.log(`Creating new artifact: '${path}'`);
+    json = await create();
+    await writeJSON({ name, content: json });
+  }
+  return decodeUnknownSync(schema)(json);
+}
 
 async function saveConfigsToDir(
   outputDir: string,
@@ -22,14 +54,26 @@ const saveArtifacts = saveConfigsToDir.bind(null, artifactsDir);
 const saveConfigs = saveConfigsToDir.bind(null, configDir);
 
 async function main(chainlinkFeedsDir: string) {
-  const rawDataFeeds = await collectRawDataFeeds(chainlinkFeedsDir);
-  await saveArtifacts({ name: 'raw_chainlink_feeds', content: rawDataFeeds });
+  const rawDataFeeds = await getOrCreateArtifact(
+    'raw_chainlink_feeds',
+    RawDataFeedsSchema,
+    () => collectRawDataFeeds(chainlinkFeedsDir),
+  );
 
-  const feedConfig = await generateFeedConfig(rawDataFeeds);
+  const feedConfig = await getOrCreateArtifact(
+    'feeds_config',
+    FeedsConfigSchema,
+    () => generateFeedConfig(rawDataFeeds),
+  );
 
-  const chainlinkCompatConfig = await generateChainlinkCompatibilityConfig(
-    rawDataFeeds,
-    feedConfig,
+  const chainlinkCompatConfig = await getOrCreateArtifact(
+    'chainlink_compatibility',
+    ChainlinkCompatibilityConfigSchema,
+    () =>
+      generateChainlinkCompatibilityConfig(
+        rawDataFeeds,
+        feedConfig,
+      ),
   );
 
   await saveConfigs(
