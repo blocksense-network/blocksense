@@ -202,7 +202,7 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Nix build Rust workspace
-        run: nix build --impure .#blocksense-rs
+        run: nix build --impure --json -L --accept-flake-config .#blocksense-rs
 
   deploy_websites:
     timeout-minutes: 360
