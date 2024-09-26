@@ -1,10 +1,9 @@
 use feed_registry::{
     api::DataFeedAPI,
-    registry::AllFeedsConfig,
     types::{Asset, FeedResult, Timestamp},
 };
 
-use config::{FeedConfig, ReporterConfig};
+use config::{AllFeedsConfig, FeedConfig, ReporterConfig};
 use prometheus::metrics::DATA_FEED_PARSE_TIME_GAUGE;
 use rand::{seq::IteratorRandom, thread_rng};
 use std::sync::Arc;

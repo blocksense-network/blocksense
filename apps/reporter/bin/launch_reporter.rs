@@ -1,6 +1,5 @@
-use config::{get_validated_config, ReporterConfig};
+use config::{get_validated_config, AllFeedsConfig, ReporterConfig};
 use data_feeds::orchestrator::orchestrator;
-use feed_registry::registry::AllFeedsConfig;
 use std::env;
 
 use utils::{

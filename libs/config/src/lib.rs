@@ -5,7 +5,10 @@ use std::path::Path;
 use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
 use tracing::{info, trace};
-use utils::read_file;
+use utils::constants::{
+    FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
+};
+use utils::{get_config_file_path, read_file};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AssetPair {
@@ -92,6 +95,21 @@ impl Validated for FeedConfig {
                 self.id
             );
         }
+        Ok(())
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct AllFeedsConfig {
+    pub feeds: Vec<FeedConfig>,
+}
+
+impl Validated for AllFeedsConfig {
+    fn validate(&self, context: &str) -> anyhow::Result<()> {
+        for feed in &self.feeds {
+            feed.validate(context)?
+        }
+
         Ok(())
     }
 }
@@ -213,6 +231,16 @@ pub fn get_validated_config<T: for<'a> Deserialize<'a> + Validated>(
         Ok(_) => Ok(sequencer_config),
         Err(e) => anyhow::bail!("Validation error {e} "),
     }
+}
+
+pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
+    let sequencer_config_file = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
+    let sequencer_config = get_validated_config::<SequencerConfig>(&sequencer_config_file)
+        .expect("Could not get validated sequencer config");
+    let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
+    let feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file)
+        .expect("Could not get validated feeds config");
+    (sequencer_config, feeds_config)
 }
 
 // Utility functions for tests follow:

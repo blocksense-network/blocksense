@@ -5,7 +5,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use config::{get_validated_config, init_config, ReporterConfig};
+use config::{get_validated_config, init_config, AllFeedsConfig, ReporterConfig};
 use prometheus::{
     actix_server::handle_prometheus_metrics,
     metrics::{BATCH_COUNTER, BATCH_PARSE_TIME_GAUGE, FEED_COUNTER, UPTIME_COUNTER},
@@ -29,7 +29,6 @@ use crate::{
 };
 use feed_registry::{
     api::DataFeedAPI,
-    registry::AllFeedsConfig,
     types::{FeedResult, Timestamp},
 };
 

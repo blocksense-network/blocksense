@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
 use actix_web::{web, App, HttpServer};
-use feed_registry::registry::{
-    new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
-};
+use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use tokio::sync::{mpsc, RwLock};
@@ -15,9 +13,6 @@ use sequencer::http_handlers::admin::{
     get_sequencer_config, set_log_level,
 };
 use sequencer::http_handlers::data_feeds::{post_report, register_feed};
-use utils::constants::{
-    FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
-};
 use utils::logging::{
     get_log_level, get_shared_logging_handle, init_shared_logging_handle, tokio_console_active,
     SharedLoggingHandle,
@@ -25,7 +20,7 @@ use utils::logging::{
 
 use actix_web::rt::spawn;
 use actix_web::web::Data;
-use config::{get_validated_config, SequencerConfig};
+use config::{get_sequencer_and_feed_configs, AllFeedsConfig, SequencerConfig};
 use prometheus::metrics::FeedsMetrics;
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
@@ -33,7 +28,6 @@ use sequencer::http_handlers::admin::metrics;
 use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
-use utils::get_config_file_path;
 
 use utils::build_info::{
     BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
@@ -126,16 +120,6 @@ pub async fn prepare_http_servers(
     });
 
     (main_http_server_fut, admin_http_server_fut)
-}
-
-fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
-    let sequencer_config_file = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
-    let sequencer_config = get_validated_config::<SequencerConfig>(&sequencer_config_file)
-        .expect("Could not get validated sequencer config");
-    let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-    let feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file)
-        .expect("Could not get validated feeds config");
-    (sequencer_config, feeds_config)
 }
 
 #[actix_web::main]

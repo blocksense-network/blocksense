@@ -96,26 +96,24 @@ mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
+    use config::get_sequencer_and_feed_configs;
     use config::init_config;
     use config::SequencerConfig;
     use data_feeds::feeds_processing::naive_packing;
-    use feed_registry::registry::{
-        new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
-    };
+    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{FeedResult, FeedType};
     use prometheus::metrics::FeedsMetrics;
     use std::env;
     use std::path::PathBuf;
     use std::sync::Arc;
     use std::time::Duration;
-    use utils::constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE};
 
     use tokio::sync::{
         mpsc::{UnboundedReceiver, UnboundedSender},
         RwLock,
     };
     use utils::logging::init_shared_logging_handle;
-    use utils::{get_config_file_path, to_hex_string};
+    use utils::to_hex_string;
 
     #[actix_web::test]
     async fn test_feed_slots_manager_loop() {
@@ -128,9 +126,9 @@ mod tests {
         let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config =
             init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
-        let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-        let mut feeds_config =
-            init_config::<AllFeedsConfig>(&feeds_config_file).expect("Failed to get config: ");
+
+        let (_, mut feeds_config) = get_sequencer_and_feed_configs();
+
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
         let metrics_prefix = Some("test_feed_slots_manager_loop_");

@@ -1,8 +1,8 @@
 use crate::feeds::feed_allocator::ConcurrentAllocator;
 use crate::providers::provider::SharedRpcProviders;
 use crate::reporters::reporter::SharedReporters;
+use config::AllFeedsConfig;
 use config::SequencerConfig;
-use feed_registry::registry::AllFeedsConfig;
 use feed_registry::registry::AllFeedsReports;
 use feed_registry::registry::FeedMetaDataRegistry;
 use prometheus::metrics::FeedsMetrics;

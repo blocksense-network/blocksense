@@ -1,6 +1,5 @@
-use config::{FeedConfig, SequencerConfig};
+use config::{AllFeedsConfig, FeedConfig, SequencerConfig};
 use eyre::Result;
-use feed_registry::registry::AllFeedsConfig;
 use utils::logging::tokio_console_active;
 
 use super::super::feeds::feeds_state::FeedsState;
@@ -261,11 +260,9 @@ mod tests {
     use crate::reporters::reporter::init_shared_reporters;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
-    use config::init_config;
-    use config::{get_test_config_with_single_provider, SequencerConfig};
-    use feed_registry::registry::{
-        new_feeds_meta_data_reg_from_config, AllFeedsConfig, AllFeedsReports,
-    };
+    use config::{get_sequencer_and_feed_configs, init_config};
+    use config::{get_test_config_with_single_provider, AllFeedsConfig, SequencerConfig};
+    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use std::env;
@@ -350,9 +347,7 @@ mod tests {
             .join("sequencer_config.json");
         let sequencer_config =
             init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
-        let config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-        let feeds_config =
-            init_config::<AllFeedsConfig>(&config_file).expect("Failed to get config: ");
+
         let metrics_prefix = Some("create_app_state_from_sequencer_config_");
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
@@ -364,6 +359,8 @@ mod tests {
             UnboundedReceiver<(String, String)>,
         ) = mpsc::unbounded_channel();
         let send_channel: UnboundedSender<(String, String)> = vote_send.clone();
+
+        let (_, feeds_config) = get_sequencer_and_feed_configs();
 
         web::Data::new(FeedsState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
