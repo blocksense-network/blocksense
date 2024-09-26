@@ -23,7 +23,7 @@ const setupSandbox = async () => {
   return pxe;
 };
 
-describe.skip("Data feed store contract", () => {
+describe("Data feed store contract", () => {
   let pxe: PXE;
   let wallets: AccountWallet[] = [];
   let accounts: CompleteAddress[] = [];
@@ -35,7 +35,7 @@ describe.skip("Data feed store contract", () => {
     accounts = wallets.map((w) => w.getCompleteAddress());
   });
 
-  test.skip("If it deploys the contract", async () => {
+  test("If it deploys the contract", async () => {
     const salt = Fr.random();
     const dataFeedStoreContractArtifact = DataFeedStoreContractArtifact;
     const deployArgs = wallets[0].getCompleteAddress().address;
@@ -80,7 +80,7 @@ describe.skip("Data feed store contract", () => {
     );
   }, 30000);
 
-  test.skip("If the caller isn't the owner", async () => {
+  test("If the caller isn't the owner", async () => {
     const index_zero = new Fr(0);
     const data = Array.from(
       { length: 32 },
@@ -100,7 +100,7 @@ describe.skip("Data feed store contract", () => {
     ).rejects.toThrow("You are not the owner!");
   }, 30000);
 
-  test.skip("If gets and sets 10 feeds in a single transaction", async () => {
+  test("If gets and sets 10 feeds in a single transaction", async () => {
     const data = Array.from(
       { length: 32 },
       () => new Fr(Math.floor(Math.random() * 256))
@@ -120,5 +120,5 @@ describe.skip("Data feed store contract", () => {
         );
       }
     }
-  }, 30000);
+  }, 100000);
 });
