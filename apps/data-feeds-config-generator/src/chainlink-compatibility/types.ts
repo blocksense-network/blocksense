@@ -79,7 +79,7 @@ const transformedSchema = S.transform(
   },
 );
 
-export function parseNetworkName(filename: unknown): NetworkName {
+export function parseNetworkFilename(filename: unknown): NetworkName {
   if (!isChainlinkSupportedNetworkFileName(filename)) {
     throw new Error(`Invalid filename: ${filename}`);
   }
