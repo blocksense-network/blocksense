@@ -23,7 +23,7 @@ describe("Data feed store contract", () => {
         accounts = wallets.map((w) => w.getCompleteAddress());
     });
 
-    test.skip("If it deploys the contract", async () => {
+    test("If it deploys the contract", async () => {
         const salt = Fr.random();
         const dataFeedStoreContractArtifact = HistoricDataFeedStoreContractArtifact;
         const deployArgs = wallets[0].getCompleteAddress().address;
@@ -68,7 +68,7 @@ describe("Data feed store contract", () => {
         );
     }, 30000);
 
-    test.only("Sets and get 2 data feeds", async () => {
+    test("Sets and get 2 data feeds", async () => {
         let keys = [];
         for (let i = 0; i <= 2; i++) {
             keys.push(new Fr(i));
@@ -82,18 +82,14 @@ describe("Data feed store contract", () => {
             .send()
             .deployed();
 
-        console.log(contract.address);
-
         await contract
             .withWallet(wallets[0])
             .methods.set_feeds(keys, values, 2)
             .send()
             .wait();
-        const get_feed_tx = await contract.methods.get_data_feed(keys[0]).simulate();
-        const _get_feed_tx = await contract.methods.get_data_feed(keys[1]).simulate();
-        const __get_feed_tx = await contract.methods.get_data_feed(keys[2]).simulate();
-        console.log(get_feed_tx)
-        console.log(_get_feed_tx)
-        console.log(__get_feed_tx)
+        const get_first_feed_tx = await contract.methods.get_data_feed(keys[0]).simulate();
+        const get_second_feed_tx = await contract.methods.get_data_feed(keys[1]).simulate();
+        console.log(get_first_feed_tx);
+        console.log(get_second_feed_tx);
     }, 30000);
 });
