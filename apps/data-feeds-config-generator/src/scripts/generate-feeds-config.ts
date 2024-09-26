@@ -1,9 +1,34 @@
+import { format } from 'path';
+
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { chainlinkFeedsDir, artifactsDir, configDir } from '../paths';
 import { collectRawDataFeeds } from '../data-services/chainlink_feeds';
 import { generateFeedConfig } from '../feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../chainlink-compatibility/index';
+import { decodeUnknownSync } from '@effect/schema/ParseResult';
+import type { Schema } from '@effect/schema/Schema';
+import { RawDataFeedsSchema } from '../data-services/types';
+
+async function getOrCreateArtifact<A, I>(
+  name: string,
+  schema: Schema<A, I, never>,
+  create: () => Promise<A>,
+) {
+  const { readJSON, writeJSON } = selectDirectory(artifactsDir);
+  const path = format({ dir: artifactsDir, name, ext: '.json' });
+
+  let json: unknown;
+  try {
+    json = await readJSON({ name });
+    console.log(`Loading existing artifact from: '${path}.json'`);
+  } catch {
+    console.log(`Creating new artifact: '${path}.json'`);
+    json = await create();
+    await writeJSON({ name, content: json });
+  }
+  return decodeUnknownSync(schema)(json);
+}
 
 async function saveConfigsToDir(
   outputDir: string,
@@ -22,8 +47,11 @@ const saveArtifacts = saveConfigsToDir.bind(null, artifactsDir);
 const saveConfigs = saveConfigsToDir.bind(null, configDir);
 
 async function main(chainlinkFeedsDir: string) {
-  const rawDataFeeds = await collectRawDataFeeds(chainlinkFeedsDir);
-  await saveArtifacts({ name: 'raw_chainlink_feeds', content: rawDataFeeds });
+  const rawDataFeeds = await getOrCreateArtifact(
+    'raw_chainlink_feeds',
+    RawDataFeedsSchema,
+    () => collectRawDataFeeds(chainlinkFeedsDir),
+  );
 
   const feedConfig = await generateFeedConfig(rawDataFeeds);
 

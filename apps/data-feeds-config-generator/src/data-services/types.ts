@@ -73,12 +73,18 @@ export type CMCInfo = S.Schema.Type<typeof CMCInfoSchema>;
  */
 export const decodeCMCInfo = S.decodeUnknownSync(S.Array(CMCInfoSchema));
 
-export type RawDataFeeds = {
-  [feedName: string]: {
-    networks: NetworkMapping;
-  };
-};
+export const RawDataFeedsSchema = S.mutable(
+  S.Record({
+    key: S.String,
+    value: S.Struct({
+      networks: S.mutable(
+        S.Record({
+          key: S.String,
+          value: ChainLinkFeedInfoSchema,
+        }),
+      ),
+    }),
+  }),
+);
 
-export type NetworkMapping = {
-  [networkName: string]: ChainLinkFeedInfo;
-};
+export type RawDataFeeds = S.Schema.Type<typeof RawDataFeedsSchema>;
