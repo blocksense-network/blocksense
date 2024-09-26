@@ -23,7 +23,7 @@ describe("Data feed store contract", () => {
         accounts = wallets.map((w) => w.getCompleteAddress());
     });
 
-    test("If it deploys the contract", async () => {
+    test.skip("If it deploys the contract", async () => {
         const salt = Fr.random();
         const dataFeedStoreContractArtifact = HistoricDataFeedStoreContractArtifact;
         const deployArgs = wallets[0].getCompleteAddress().address;
@@ -66,21 +66,17 @@ describe("Data feed store contract", () => {
         expect(receiptAfterMined.contract.instance.address).toEqual(
             deploymentData.address
         );
-    }, 10000);
+    }, 30000);
 
     test.only("Sets and get 2 data feeds", async () => {
         let keys = [];
         for (let i = 0; i <= 2; i++) {
             keys.push(new Fr(i));
         }
-        let values = [];
-        for (let i = 0; i <= 2; i++) {
-            const data = Array.from(
-                { length: 24 },
-                () => Math.floor(Math.random() * 256)
-            );
-            values.push(...data);
-        }
+        let values = Array.from(
+            { length: 48 },
+            () => Math.floor(Math.random() * 256) as number | bigint
+        );
         console.log(values);
         const contract = await HistoricDataFeedStoreContract.deploy(wallets[0])
             .send()

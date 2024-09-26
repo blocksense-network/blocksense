@@ -6,14 +6,14 @@
     "type": "module",
     "module": "esnext",
     "dependencies": {
-        "@aztec/aztec.js": "0.52.0",
+        "@aztec/aztec.js": "0.55.1",
         "tslib": "^2.7.0",
         "vite": "^5.4.2"
     },
     "devDependencies": {
-        "@aztec/accounts": "0.52.0",
-        "@aztec/builder": "0.52.0",
-        "@aztec/noir-contracts.js": "0.52.0",
+        "@aztec/accounts": "0.55.1",
+        "@aztec/builder": "0.55.1",
+        "@aztec/noir-contracts.js": "0.55.1",
         "@babel/preset-typescript": "^7.24.7",
         "@types/node": "^22.3.0",
         "typescript": "^5.5.4",
