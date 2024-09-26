@@ -13,7 +13,7 @@ import {
   ChainlinkCompatibilityConfig,
 } from '@blocksense/config-types/chainlink-compatibility';
 
-import { parseNetworkName, chainlinkNetworkNameToChainId } from './types';
+import { parseNetworkFilename, chainlinkNetworkNameToChainId } from './types';
 
 import { artifactsDir } from '../paths';
 import { RawDataFeeds } from '../data-services/types';
@@ -28,7 +28,7 @@ async function getBlocksenseFeedsCompatibility(
       // Transform each feed data
       const chainlinkProxies = Object.entries(feedData.networks).reduce(
         (proxiesAcc, [networkFile, perNetworkFeedData]) => {
-          const networkName = parseNetworkName(networkFile);
+          const networkName = parseNetworkFilename(networkFile);
           const chainId = chainlinkNetworkNameToChainId[networkName];
           if (chainId != null) {
             const address = perNetworkFeedData.proxyAddress
@@ -108,7 +108,7 @@ async function getChainlinkAddressToBlocksenseId(
           result = {
             ...result,
             // Note: The address might not be an Ethereum address
-            [`${parseNetworkName(networkFile)}/${proxyAddress}`]:
+            [`${parseNetworkFilename(networkFile)}/${proxyAddress}`]:
               correspondingBlocksenseFeed
                 ? correspondingBlocksenseFeed.id
                 : null,
