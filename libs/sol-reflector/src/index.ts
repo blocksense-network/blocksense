@@ -27,7 +27,32 @@ export async function main(
   const config = { ...defaults, ...userConfig };
   const solReflection: SolReflection = [];
 
-  const solFiles = filterRelevantFiles(build.output, config);
+  // TODO(issue #476): Remove whitelist, once sol-reflector works with sports data smart contracts.
+  const whitelist = [
+    'contracts/DataFeedStoreV1.sol',
+    'contracts/DataFeedStoreV2.sol',
+    'contracts/DataFeedStoreV3.sol',
+    'contracts/HistoricDataFeedStoreV1.sol',
+    'contracts/HistoricDataFeedStoreV2.sol',
+    'contracts/UpgradeableProxy.sol',
+    'contracts/chainlink-proxies/ChainlinkProxy.sol',
+    'contracts/chainlink-proxies/registries/FeedRegistry.sol',
+    'contracts/interfaces/IAggregator.sol',
+    'contracts/interfaces/IFeedRegistry.sol',
+    'contracts/interfaces/chainlink/IChainlinkAggregator.sol',
+    'contracts/interfaces/chainlink/IChainlinkFeedRegistry.sol',
+    'contracts/libraries/ProxyCall.sol',
+  ];
+
+  const solFiles = filterRelevantFiles(build.output, config).filter(
+    s => whitelist.indexOf(s.ast.absolutePath) > -1,
+  );
+
+  const solPaths = solFiles.map(s => s.ast.absolutePath);
+
+  console.log(
+    `Generating docs for the following ${solPaths.length} smart contracts: [${solPaths}]`,
+  );
 
   solFiles.map(({ ast: rawData }) => {
     addNatspec(rawData);
