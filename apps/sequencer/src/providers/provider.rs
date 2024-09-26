@@ -233,7 +233,7 @@ mod tests {
         let network = "ETH";
 
         let anvil = Anvil::new().try_spawn()?;
-        let key_path = PathBuf::new().join("/tmp").join("key");
+        let key_path = get_test_private_key_path();
 
         let cfg =
             get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());

@@ -258,6 +258,7 @@ mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
+    use actix_test::to_bytes;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
     use config::{get_sequencer_and_feed_configs, init_config};
@@ -273,6 +274,7 @@ mod tests {
     use utils::constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE};
     use utils::get_config_file_path;
     use utils::logging::init_shared_logging_handle;
+    use utils::test_env::get_test_private_key_path;
 
     #[actix_web::test]
     async fn test_get_feed_report_interval() {
@@ -348,7 +350,8 @@ mod tests {
         let sequencer_config =
             init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
 
-        let metrics_prefix = Some("create_app_state_from_sequencer_config_");
+        let metrics_prefix = format!("create_app_state_from_sequencer_config_{network}");
+        let metrics_prefix = Some(metrics_prefix.as_str());
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
 
@@ -386,8 +389,8 @@ mod tests {
         const HTTP_STATUS_SUCCESS: u16 = 200;
 
         let anvil = Anvil::new().try_spawn().unwrap();
-        let key_path = PathBuf::new().join("/tmp").join("priv_key_test");
-        let network = "ETH137";
+        let key_path = get_test_private_key_path();
+        let network = "ETH_test_deploy_endpoint_success";
 
         let app_state = create_app_state_from_sequencer_config(
             network,
@@ -432,5 +435,124 @@ mod tests {
 
         let resp = test::call_service(&app, req).await;
         assert_eq!(resp.status(), 400);
+    }
+
+    #[actix_web::test]
+    async fn test_get_configs() {
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = get_test_private_key_path();
+        let network = "ETH_test_get_configs";
+
+        let app_state = create_app_state_from_sequencer_config(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+        )
+        .await;
+
+        let app = test::init_service(
+            App::new()
+                .app_data(app_state.clone())
+                .service(get_feeds_config)
+                .service(get_feed_config)
+                .service(get_sequencer_config),
+        )
+        .await;
+
+        let (_, feeds_config) = get_sequencer_and_feed_configs();
+
+        {
+            // test get_feeds_config
+            let req = test::TestRequest::get()
+                .uri("/get_feeds_config")
+                .to_request();
+
+            // Execute the request and read the response
+            let resp = test::call_service(&app, req).await;
+            assert_eq!(resp.status(), 200);
+
+            let body = test::read_body(resp).await;
+            let body_str = std::str::from_utf8(&body).expect("Failed to read body");
+
+            let recvd_data: AllFeedsConfig =
+                serde_json::from_str(body_str).expect("recvd_data is not valid JSON!");
+
+            assert_eq!(recvd_data, feeds_config);
+        }
+
+        {
+            // test get_feed_config
+            {
+                // positive test
+                let feed_id = 0;
+                let req = test::TestRequest::get()
+                    .uri(format!("/get_feed_config/{feed_id}").as_str())
+                    .to_request();
+
+                // Execute the request and read the response
+                let resp = test::call_service(&app, req).await;
+                assert_eq!(resp.status(), 200);
+
+                let body = test::read_body(resp).await;
+                let body_str = std::str::from_utf8(&body).expect("Failed to read body");
+
+                let recvd_data: FeedConfig =
+                    serde_json::from_str(body_str).expect("recvd_data is not valid JSON!");
+
+                assert_eq!(
+                    recvd_data,
+                    feeds_config
+                        .feeds
+                        .into_iter()
+                        .find(|x| x.id == feed_id)
+                        .ok_or(error::ErrorNotFound("Data feed with this ID not found"))
+                        .expect("")
+                );
+            }
+            {
+                //negative test
+                let feed_id = 1_000_000; // we consider this value is high enough for now
+                let req = test::TestRequest::get()
+                    .uri(format!("/get_feed_config/{feed_id}").as_str())
+                    .to_request();
+
+                // Execute the request and read the response
+                let resp = test::call_service(&app, req).await;
+                assert_eq!(resp.status(), 404);
+
+                let body = to_bytes(resp.into_body()).await.unwrap();
+                assert_eq!(
+                    body,
+                    actix_web::web::Bytes::from("Data feed with this ID not found")
+                );
+            }
+        }
+
+        {
+            // test get_sequencer_config
+            let req = test::TestRequest::get()
+                .uri("/get_sequencer_config")
+                .to_request();
+
+            let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+            let sequencer_config_file = PathBuf::new()
+                .join(manifest_dir)
+                .join("tests")
+                .join("sequencer_config.json");
+            let sequencer_config = init_config::<SequencerConfig>(&sequencer_config_file)
+                .expect("Failed to load config:");
+
+            // Execute the request and read the response
+            let resp = test::call_service(&app, req).await;
+            assert_eq!(resp.status(), 200);
+
+            let body = test::read_body(resp).await;
+            let body_str = std::str::from_utf8(&body).expect("Failed to read body");
+
+            let recvd_data: SequencerConfig =
+                serde_json::from_str(body_str).expect("recvd_data is not valid JSON!");
+
+            assert_eq!(recvd_data, sequencer_config);
+        }
     }
 }

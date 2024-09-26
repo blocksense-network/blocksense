@@ -10,13 +10,13 @@ use utils::constants::{
 };
 use utils::{get_config_file_path, read_file};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct AssetPair {
     pub base: String,
     pub quote: String,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct ChainlinkCompatibility {
     pub base: String,
     pub quote: String,
@@ -58,7 +58,7 @@ where
     Ok(string_map)
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct FeedConfig {
     pub id: u32,
     pub name: String,
@@ -99,7 +99,7 @@ impl Validated for FeedConfig {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct AllFeedsConfig {
     pub feeds: Vec<FeedConfig>,
 }
@@ -132,7 +132,7 @@ impl Validated for ReporterConfig {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 // #[serde(rename_all = "PascalCase")]
 pub struct Provider {
     pub private_key_path: String,
@@ -153,7 +153,7 @@ impl Validated for Provider {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Reporter {
     pub id: u32,
     pub pub_key: String,
@@ -171,7 +171,7 @@ impl Validated for Reporter {
         Ok(())
     }
 }
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct SequencerConfig {
     pub main_port: u16,
     pub admin_port: u16,
