@@ -2,20 +2,18 @@ import * as S from '@effect/schema/Schema';
 
 import { chainId, ethereumAddress } from '@blocksense/base-utils/evm-utils';
 
-import { denominationAddress } from './denominations';
-
-const ChainlinkAggregatorProxySchema = S.Record({
+export const ChainlinkAggregatorProxySchema = S.Record({
   key: chainId,
-  value: S.NullishOr(ethereumAddress),
+  value: S.NullOr(ethereumAddress),
 });
 
 export type ChainlinkAggregatorProxy = S.Schema.Type<
   typeof ChainlinkAggregatorProxySchema
 >;
 
-const ChainlinkCompatibilityDataSchema = S.Struct({
-  base: S.NullishOr(denominationAddress),
-  quote: S.NullishOr(denominationAddress),
+export const ChainlinkCompatibilityDataSchema = S.Struct({
+  base: S.NullOr(ethereumAddress),
+  quote: S.NullOr(ethereumAddress),
   chainlink_aggregator_proxies: ChainlinkAggregatorProxySchema,
 });
 

@@ -1,16 +1,17 @@
+import assert from 'node:assert';
+
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { parseEthereumAddress } from '@blocksense/base-utils/evm-utils';
 
 import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import {
-  denominationTokenToAddress,
-  isDenominationToken,
-  parseDenominationToken,
   BlocksenseFeedsCompatibility,
   ChainlinkAggregatorProxy,
   ChainlinkCompatibilityData,
   ChainlinkAddressToBlocksenseId,
   ChainlinkCompatibilityConfig,
+  isSupportedCurrencySymbol,
+  currencySymbolToDenominationAddress,
 } from '@blocksense/config-types/chainlink-compatibility';
 
 import { parseNetworkName, chainlinkNetworkNameToChainId } from './types';
@@ -53,18 +54,22 @@ async function getBlocksenseFeedsCompatibility(
       }
       const dataFeedId = dataFeed.id;
 
+      const [base, quote] = feedName.split(' / ');
+      assert(
+        isSupportedCurrencySymbol(quote),
+        `Unknown quote symbol: ${quote}`,
+      );
+
       let chainlink_compatibility: ChainlinkCompatibilityData = {
         base: null,
-        quote: denominationTokenToAddress.USD,
+        quote: currencySymbolToDenominationAddress.USD,
         chainlink_aggregator_proxies: chainlinkProxies,
       };
 
-      if (isDenominationToken(feedName.split(' / ')[0])) {
+      if (isSupportedCurrencySymbol(base)) {
         chainlink_compatibility = {
-          base: denominationTokenToAddress[
-            parseDenominationToken(feedName.split(' / ')[0])
-          ],
-          quote: denominationTokenToAddress.USD,
+          base: currencySymbolToDenominationAddress[base],
+          quote: currencySymbolToDenominationAddress.USD,
           chainlink_aggregator_proxies: chainlinkProxies,
         };
       }
