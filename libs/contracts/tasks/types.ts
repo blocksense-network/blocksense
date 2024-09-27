@@ -75,4 +75,5 @@ export enum NetworkNames {
   arbSepolia = 'ARBITRUM_SEPOLIA',
   artio = 'BERA_ARTIO',
   hekla = 'TAIKO_HEKLA',
+  local = 'LOCAL',
 }
