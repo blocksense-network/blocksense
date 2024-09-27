@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DataFeedSetting {
     pub id: String,
     pub data: String,

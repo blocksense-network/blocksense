@@ -66,9 +66,10 @@ impl BuildConfig {
         if self.up {
             // TODO(adikov): Change the way we depend on spin being installed.
             Command::new("spin")
+                .env("RUST_LOG", "trigger=trace")
                 .arg("up")
                 .arg("-f")
-                .arg(self.file_path)
+                .arg(PathBuf::from(std::env::current_dir()?).join(SPIN))
                 .stdout(Stdio::inherit())
                 .stderr(Stdio::inherit())
                 .spawn()?

@@ -275,7 +275,6 @@ impl OracleTrigger {
                 continue;
             }
 
-            //TODO(adikov): start using the intersection.
             let payload = match Self::execute_wasm(engine.clone(), &component, intersection).await {
                 Ok(payload) => payload,
                 Err(error) => {

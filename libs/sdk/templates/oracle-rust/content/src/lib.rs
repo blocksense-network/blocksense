@@ -1,18 +1,24 @@
 use blocksense_sdk::{
-    oracle::{DataStream, Settings},
+    oracle::{DataFeedResult, Payload, Settings},
     oracle_component,
     spin::{
-        http::{send, IntoResponse, Request, Response},
+        http::{send, Method, IntoResponse, Request, Response},
         variables,
     },
 };
 
 /// A simple Spin HTTP component.
 #[oracle_component]
-fn oracle_{{project-name | snake_case}}(settings: Settings) -> anyhow::Result<DataStream> {
-    println!("Handling oracle with id {:?}", settings.id);
+fn oracle_{{project-name | snake_case}}(settings: Settings) -> anyhow::Result<Payload> {
+    println!("Handling oracle with id {:?}", settings.data_feeds);
 
     // TODO: Implement the result of your oracle
-    let body = "body".to_string();
-    Ok(DataStream { body: Some(body) })
+    let id = "id".to_string();
+    let value = 0.0;
+    let mut payload: Payload = Payload::new();
+    payload.values.push(DataFeedResult {
+        id,
+        value
+    });
+    Ok(payload)
 }
