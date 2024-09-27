@@ -9,10 +9,14 @@ import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/cha
 import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 
 import { chainlinkFeedsDir, artifactsDir, configDir } from '../paths';
-import { collectRawDataFeeds } from '../data-services/chainlink_feeds';
+import {
+  collectRawDataFeeds,
+  getAllProposedFeedsInRegistry,
+} from '../data-services/chainlink_feeds';
 import { RawDataFeedsSchema } from '../data-services/types';
 import { generateFeedConfig } from '../feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../chainlink-compatibility/index';
+import { FeedRegistryEventsPerAggregatorSchema } from '../chainlink-compatibility/types';
 
 async function getOrCreateArtifact<A, I>(
   name: string,
@@ -66,6 +70,12 @@ async function main(chainlinkFeedsDir: string) {
     () => generateFeedConfig(rawDataFeeds),
   );
 
+  const feedRegistryEvents = await getOrCreateArtifact(
+    'feed_registry_events',
+    FeedRegistryEventsPerAggregatorSchema,
+    () => getAllProposedFeedsInRegistry('ethereum-mainnet'),
+  );
+
   const chainlinkCompatConfig = await getOrCreateArtifact(
     'chainlink_compatibility',
     ChainlinkCompatibilityConfigSchema,
@@ -73,6 +83,7 @@ async function main(chainlinkFeedsDir: string) {
       generateChainlinkCompatibilityConfig(
         rawDataFeeds,
         feedConfig,
+        feedRegistryEvents,
       ),
   );
 

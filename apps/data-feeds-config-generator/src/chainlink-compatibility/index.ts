@@ -1,7 +1,10 @@
 import assert from 'node:assert';
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import { parseEthereumAddress } from '@blocksense/base-utils/evm-utils';
+import {
+  parseEthereumAddress,
+  zeroAddress,
+} from '@blocksense/base-utils/evm-utils';
 
 import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import {
@@ -18,10 +21,12 @@ import { parseNetworkFilename, chainlinkNetworkNameToChainId } from './types';
 
 import { artifactsDir } from '../paths';
 import { RawDataFeeds } from '../data-services/types';
+import { FeedRegistryEventsPerAggregator } from '../chainlink-compatibility/types';
 
 async function getBlocksenseFeedsCompatibility(
   rawDataFeeds: RawDataFeeds,
   feedConfig: FeedsConfig,
+  feedRegistryEvents: FeedRegistryEventsPerAggregator,
 ): Promise<BlocksenseFeedsCompatibility> {
   const blocksenseFeedsCompatibility = Object.entries(rawDataFeeds)
     .filter(([feedName, _]) => feedName.split(' / ')[1] === 'USD')
@@ -31,16 +36,14 @@ async function getBlocksenseFeedsCompatibility(
         (proxiesAcc, [networkFile, perNetworkFeedData]) => {
           const networkName = parseNetworkFilename(networkFile);
           const chainId = chainlinkNetworkNameToChainId[networkName];
-          if (chainId != null) {
-            const address = parseEthereumAddress(
-              perNetworkFeedData.contractAddress,
-            );
-            return {
-              ...proxiesAcc,
-              [chainId]: address,
-            }; // Collect the proxy address for each network
-          }
-          return proxiesAcc;
+          if (chainId == null) return proxiesAcc; // Skip if the chainId is not found
+          const address = parseEthereumAddress(
+            perNetworkFeedData.contractAddress,
+          );
+          return {
+            ...proxiesAcc,
+            [chainId]: address,
+          }; // Collect the proxy address for each network
         },
         {} as ChainlinkAggregators,
       );
@@ -60,25 +63,21 @@ async function getBlocksenseFeedsCompatibility(
         `Unknown quote symbol: ${quote}`,
       );
 
-      let chainlink_compatibility: ChainlinkCompatibilityData = {
-        base: null,
-        quote: currencySymbolToDenominationAddress.USD,
-        chainlink_aggregators: chainlinkAggregators,
-      };
+      const baseAddress = isSupportedCurrencySymbol(base)
+        ? currencySymbolToDenominationAddress[base]
+        : feedRegistryEvents[chainlinkAggregators['1'] ?? zeroAddress]?.asset ??
+          null;
 
-      if (isSupportedCurrencySymbol(base)) {
-        chainlink_compatibility = {
-          base: currencySymbolToDenominationAddress[base],
-          quote: currencySymbolToDenominationAddress.USD,
-          chainlink_aggregators: chainlinkAggregators,
-        };
-      }
       acc = {
         ...acc,
         [dataFeedId]: {
           id: dataFeedId,
           description: feedName,
-          chainlink_compatibility,
+          chainlink_compatibility: {
+            base: baseAddress,
+            quote: currencySymbolToDenominationAddress[quote],
+            chainlink_aggregators: chainlinkAggregators,
+          },
         },
       };
 
@@ -138,10 +137,12 @@ async function getChainlinkAddressToBlocksenseId(
 export async function generateChainlinkCompatibilityConfig(
   rawDataFeeds: RawDataFeeds,
   feedConfig: FeedsConfig,
+  feedRegistryEvents: FeedRegistryEventsPerAggregator,
 ): Promise<ChainlinkCompatibilityConfig> {
   const blocksenseFeedsCompatibility = await getBlocksenseFeedsCompatibility(
     rawDataFeeds,
     feedConfig,
+    feedRegistryEvents,
   );
   const chainlinkAddressToBlocksenseId =
     await getChainlinkAddressToBlocksenseId(rawDataFeeds, feedConfig);
