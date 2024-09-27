@@ -6,7 +6,7 @@ import { parseEthereumAddress } from '@blocksense/base-utils/evm-utils';
 import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import {
   BlocksenseFeedsCompatibility,
-  ChainlinkAggregatorProxy,
+  ChainlinkAggregators,
   ChainlinkCompatibilityData,
   ChainlinkAddressToBlocksenseId,
   ChainlinkCompatibilityConfig,
@@ -27,22 +27,22 @@ async function getBlocksenseFeedsCompatibility(
     .filter(([feedName, _]) => feedName.split(' / ')[1] === 'USD')
     .reduce((acc, [feedName, feedData]) => {
       // Transform each feed data
-      const chainlinkProxies = Object.entries(feedData.networks).reduce(
+      const chainlinkAggregators = Object.entries(feedData.networks).reduce(
         (proxiesAcc, [networkFile, perNetworkFeedData]) => {
           const networkName = parseNetworkFilename(networkFile);
           const chainId = chainlinkNetworkNameToChainId[networkName];
           if (chainId != null) {
-            const address = perNetworkFeedData.proxyAddress
-              ? parseEthereumAddress(perNetworkFeedData.proxyAddress)
-              : null;
-            proxiesAcc = {
+            const address = parseEthereumAddress(
+              perNetworkFeedData.contractAddress,
+            );
+            return {
               ...proxiesAcc,
               [chainId]: address,
             }; // Collect the proxy address for each network
           }
           return proxiesAcc;
         },
-        {} as ChainlinkAggregatorProxy,
+        {} as ChainlinkAggregators,
       );
 
       const dataFeed = feedConfig.feeds.find(
@@ -63,14 +63,14 @@ async function getBlocksenseFeedsCompatibility(
       let chainlink_compatibility: ChainlinkCompatibilityData = {
         base: null,
         quote: currencySymbolToDenominationAddress.USD,
-        chainlink_aggregator_proxies: chainlinkProxies,
+        chainlink_aggregators: chainlinkAggregators,
       };
 
       if (isSupportedCurrencySymbol(base)) {
         chainlink_compatibility = {
           base: currencySymbolToDenominationAddress[base],
           quote: currencySymbolToDenominationAddress.USD,
-          chainlink_aggregator_proxies: chainlinkProxies,
+          chainlink_aggregators: chainlinkAggregators,
         };
       }
       acc = {
@@ -105,20 +105,16 @@ async function getChainlinkAddressToBlocksenseId(
       const { networks } = feedDetails;
 
       Object.entries(networks).forEach(([networkFile, networkDetails]) => {
-        const { proxyAddress } = networkDetails;
-        if (proxyAddress) {
-          const correspondingBlocksenseFeed = feedConfig.feeds.find(
-            feed => feed.description === feedName,
-          );
-          result = {
-            ...result,
-            // Note: The address might not be an Ethereum address
-            [`${parseNetworkFilename(networkFile)}/${proxyAddress}`]:
-              correspondingBlocksenseFeed
-                ? correspondingBlocksenseFeed.id
-                : null,
-          };
-        }
+        const { contractAddress } = networkDetails;
+        const correspondingBlocksenseFeed = feedConfig.feeds.find(
+          feed => feed.description === feedName,
+        );
+        result = {
+          ...result,
+          // Note: The address might not be an Ethereum address
+          [`${parseNetworkFilename(networkFile)}/${contractAddress}`]:
+            correspondingBlocksenseFeed ? correspondingBlocksenseFeed.id : null,
+        };
       });
 
       return result;
