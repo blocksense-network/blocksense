@@ -1,4 +1,6 @@
 import * as S from '@effect/schema/Schema';
+import * as ParseResult from '@effect/schema/ParseResult';
+import * as bigInt_ from 'effect/BigInt';
 
 import {
   ChainId,
@@ -128,17 +130,46 @@ export const chainlinkNetworkNameToChainId = {
   [Net in NetworkName]: ChainId | null;
 };
 
-export const confirmedFeedEvent = S.Struct({
-  returnValues: S.Struct({
-    asset: ethereumAddress,
-    denomination: ethereumAddress,
-    latestAggregator: ethereumAddress,
-    previousAggregator: ethereumAddress,
-    nextPhaseId: S.NumberFromString, // uint16 in Solidity
-    sender: ethereumAddress,
-  }),
+export class NumberFromBigInt extends S.transformOrFail(
+  S.BigIntFromSelf,
+  S.Number,
+  {
+    strict: true,
+    encode: (n, _, ast) =>
+      ParseResult.fromOption(
+        bigInt_.fromNumber(n),
+        () => new ParseResult.Type(ast, n),
+      ),
+    decode: (b, _, ast) =>
+      ParseResult.fromOption(
+        bigInt_.toNumber(b),
+        () => new ParseResult.Type(ast, b),
+      ),
+  },
+).annotations({ identifier: 'NumberFromBigInt' }) {}
+
+export const ConfirmedFeedEventValues = S.Struct({
+  asset: ethereumAddress,
+  denomination: ethereumAddress,
+  latestAggregator: ethereumAddress,
+  previousAggregator: ethereumAddress,
+  nextPhaseId: S.Union(NumberFromBigInt, S.Number), // uint16 in Solidity
+  sender: ethereumAddress,
 });
 
-export type ConfirmedFeedEvent = S.Schema.Type<typeof confirmedFeedEvent>;
+export const ConfirmedFeedEvent = S.Struct({
+  returnValues: ConfirmedFeedEventValues,
+});
 
-export const decodeConfirmedFeedEvent = S.decodeUnknownSync(confirmedFeedEvent);
+export type ConfirmedFeedEvent = S.Schema.Type<typeof ConfirmedFeedEvent>;
+
+export const decodeConfirmedFeedEvent = S.decodeUnknownSync(ConfirmedFeedEvent);
+
+export const FeedRegistryEventsPerAggregatorSchema = S.Record({
+  key: ethereumAddress,
+  value: ConfirmedFeedEventValues,
+});
+
+export type FeedRegistryEventsPerAggregator = S.Schema.Type<
+  typeof FeedRegistryEventsPerAggregatorSchema
+>;

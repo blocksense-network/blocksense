@@ -1,14 +1,24 @@
 import { format } from 'path';
+import Web3 from 'web3';
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
+import { getEnvString } from '@blocksense/base-utils/env';
+
+import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
+
+import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
 
 import { chainlinkFeedsDir, artifactsDir, configDir } from '../paths';
-import { collectRawDataFeeds } from '../data-services/chainlink_feeds';
+import {
+  collectRawDataFeeds,
+  getAllProposedFeedsInRegistry,
+} from '../data-services/chainlink_feeds';
 import { generateFeedConfig } from '../feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../chainlink-compatibility/index';
 import { decodeUnknownSync } from '@effect/schema/ParseResult';
-import type { Schema } from '@effect/schema/Schema';
+import { Schema } from '@effect/schema/Schema';
 import { RawDataFeedsSchema } from '../data-services/types';
+import { FeedRegistryEventsPerAggregatorSchema } from '../chainlink-compatibility/types';
 
 async function getOrCreateArtifact<A, I>(
   name: string,
@@ -21,9 +31,9 @@ async function getOrCreateArtifact<A, I>(
   let json: unknown;
   try {
     json = await readJSON({ name });
-    console.log(`Loading existing artifact from: '${path}.json'`);
+    console.log(`Loading existing artifact from: '${path}'`);
   } catch {
-    console.log(`Creating new artifact: '${path}.json'`);
+    console.log(`Creating new artifact: '${path}'`);
     json = await create();
     await writeJSON({ name, content: json });
   }
@@ -53,14 +63,34 @@ async function main(chainlinkFeedsDir: string) {
     () => collectRawDataFeeds(chainlinkFeedsDir),
   );
 
-  const feedConfig = await generateFeedConfig(rawDataFeeds);
-
-  const chainlinkCompatibilityData = await generateChainlinkCompatibilityConfig(
-    rawDataFeeds,
-    feedConfig,
+  const feedConfig = await getOrCreateArtifact(
+    'feeds_config',
+    FeedsConfigSchema,
+    () => generateFeedConfig(rawDataFeeds),
   );
 
-  saveConfigs(
+  const feedRegistryEvents = await getOrCreateArtifact(
+    'feed_registry_events',
+    FeedRegistryEventsPerAggregatorSchema,
+    () =>
+      getAllProposedFeedsInRegistry(
+        new Web3(getEnvString('RPC_URL_ETH_MAINNET')),
+        'ethereum-mainnet',
+      ),
+  );
+
+  const chainlinkCompatibilityData = await getOrCreateArtifact(
+    'chainlink_compatibility',
+    ChainlinkCompatibilityConfigSchema,
+    () =>
+      generateChainlinkCompatibilityConfig(
+        rawDataFeeds,
+        feedConfig,
+        feedRegistryEvents,
+      ),
+  );
+
+  await saveConfigs(
     { name: 'feeds_config', content: feedConfig },
     {
       name: 'chainlink_compatibility',

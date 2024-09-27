@@ -10,8 +10,8 @@ import {
 } from '@blocksense/base-utils/evm-utils';
 
 import {
-  ConfirmedFeedEvent,
   decodeConfirmedFeedEvent,
+  FeedRegistryEventsPerAggregator,
 } from '../chainlink-compatibility/types';
 import { RawDataFeeds, decodeChainLinkFeedsInfo } from './types';
 
@@ -42,10 +42,6 @@ export const feedRegistries: {
   'ethereum-mainnet': parseEthereumAddress(
     '0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf',
   ),
-};
-
-export type FeedRegistryEventsPerAggregator = {
-  [aggregator: EthereumAddress]: ConfirmedFeedEvent['returnValues'];
 };
 
 export async function getAllProposedFeedsInRegistry(
@@ -149,17 +145,10 @@ export async function getAllProposedFeedsRegistryEvents(
   const registryContract = new web3.eth.Contract(abi, feedRegistryAddress);
 
   const proposedFeeds = (
-    await registryContract.getPastEvents(
-      'FeedConfirmed',
-      {
-        fromBlock: 0,
-        toBlock: 'latest',
-      },
-      {
-        number: FMT_NUMBER.STR,
-        bytes: FMT_BYTES.HEX,
-      },
-    )
+    await registryContract.getPastEvents('FeedConfirmed', {
+      fromBlock: 0,
+      toBlock: 'latest',
+    })
   )
     .map(f => decodeConfirmedFeedEvent(f).returnValues)
     .filter(ev => !isZeroAddress(ev.latestAggregator))

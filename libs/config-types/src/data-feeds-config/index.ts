@@ -66,7 +66,7 @@ const AdditionalResourcesSchema = S.mutable(
 /**
  * Schema for the Data Feed type.
  */
-const FeedSchema = S.mutable(
+export const FeedSchema = S.mutable(
   S.Struct({
     id: S.Number,
     name: S.String,
@@ -96,7 +96,7 @@ export const decodeFeed = S.decodeUnknownSync(FeedSchema);
 /**
  * Schema for the Data Feeds configuration.
  */
-const FeedsConfigSchema = S.mutable(
+export const FeedsConfigSchema = S.mutable(
   S.Struct({
     feeds: S.mutable(S.Array(FeedSchema)),
   }),

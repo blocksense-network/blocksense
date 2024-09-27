@@ -43,7 +43,7 @@ export type ChainlinkAddressToBlocksenseId = S.Schema.Type<
   typeof ChainlinkAddressToBlocksenseIdSchema
 >;
 
-const ChainlinkCompatibilityConfigSchema = S.Struct({
+export const ChainlinkCompatibilityConfigSchema = S.Struct({
   blocksenseFeedsCompatibility: BlocksenseFeedsCompatibilitySchema,
   chainlinkAddressToBlocksenseId: ChainlinkAddressToBlocksenseIdSchema,
 });
