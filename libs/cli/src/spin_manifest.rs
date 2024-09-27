@@ -7,8 +7,7 @@ pub(crate) type Map<K, V> = indexmap::IndexMap<K, V>;
 use crate::opts::{
     APP_NAME, AUTHOR, SECRET_KEY, SEQUENCER_URL, SPIN_MANIFEST_VERSION, TIME_INTERVAL, VERSION,
 };
-use blocksense_registry::config::{BlocksenseConfig, OracleScript};
-use feed_registry::registry::AllFeedsConfig;
+use blocksense_registry::config::BlocksenseConfig;
 
 //TODO(adikov): Transition to using - https://github.com/fermyon/spin/blob/main/crates/manifest/src/schema/v2.rs when
 // we implement Serialize in our spin fork for the manifest crate.

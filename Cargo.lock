@@ -1860,6 +1860,7 @@ dependencies = [
  "blocksense-registry",
  "camino",
  "clap 4.5.16",
+ "feed_registry",
  "indexmap 2.5.0",
  "is-terminal",
  "lazy_static 1.5.0",
@@ -1902,6 +1903,7 @@ version = "0.1.1"
 dependencies = [
  "blocksense-macro",
  "reqwest 0.12.7",
+ "serde 1.0.210",
  "spin-sdk",
  "wit-bindgen",
 ]

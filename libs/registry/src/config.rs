@@ -1,5 +1,30 @@
-use sequencer_config::FeedConfig;
 use serde::{Deserialize, Serialize};
+use std::time::SystemTime;
+
+//TODO(melatron): This is duplicated from the config crate
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+pub struct AssetPair {
+    pub base: String,
+    pub quote: String,
+}
+//TODO(melatron): This is duplicated from the config crate
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+pub struct FeedConfig {
+    pub id: u32,
+    pub name: String,
+    #[serde(rename = "fullName")] // rename for naming convention
+    pub full_name: String,
+    pub description: String,
+    #[serde(rename = "type")] // rename because of reserved keyword
+    pub _type: String,
+    pub decimals: u8,
+    pub pair: AssetPair,
+    pub report_interval_ms: u64,
+    pub first_report_start_time: SystemTime,
+    pub resources: serde_json::Value,
+    pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
+    pub script: String,
+}
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
