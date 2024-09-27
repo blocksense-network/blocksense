@@ -23,17 +23,14 @@ async function main(chainlinkFeedsDir: string) {
 
   const feedConfig = await generateFeedConfig(rawDataFeeds);
 
-  const chainlinkCompatibilityData = await generateChainlinkCompatibilityConfig(
+  const chainlinkCompatConfig = await generateChainlinkCompatibilityConfig(
     rawDataFeeds,
     feedConfig,
   );
 
-  saveConfigs(
+  await saveConfigs(
     { name: 'feeds_config', content: feedConfig },
-    {
-      name: 'chainlink_compatibility',
-      content: chainlinkCompatibilityData,
-    },
+    { name: 'chainlink_compatibility', content: chainlinkCompatConfig },
   );
 }
 
