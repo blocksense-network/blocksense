@@ -1,7 +1,7 @@
 {
   "full_batch": true,
   "batch_size": 5,
-  "sequencer_url": "https://postman-echo.com",
+  "sequencer_url": "http://127.0.0.1:8877",
   "prometheus_url": "127.0.0.1:8080",
   "poll_period_ms": 300000,
   "resources": {
