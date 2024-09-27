@@ -14,7 +14,7 @@ export type ChainlinkAggregatorProxy = S.Schema.Type<
 const ChainlinkCompatibilityDataSchema = S.Struct({
   base: S.NullishOr(ethereumAddress),
   quote: S.NullishOr(ethereumAddress),
-  chainlink_aggregator_proxies: ChainlinkAggregatorProxySchema,
+  chainlink_aggregators: ChainlinkAggregatorProxySchema,
 });
 
 export type ChainlinkCompatibilityData = S.Schema.Type<
