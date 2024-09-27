@@ -37,7 +37,7 @@ export type Script = S.Schema.Type<typeof ScriptSchema>;
 
 export const decodeScript = S.decodeUnknownSync(ScriptSchema);
 
-const PairSchema = S.mutable(
+export const PairSchema = S.mutable(
   S.Struct({
     base: S.String,
     quote: S.String,
@@ -46,7 +46,7 @@ const PairSchema = S.mutable(
 
 export type Pair = S.Schema.Type<typeof PairSchema>;
 
-const FirstReportStartTimeSchema = S.mutable(
+export const FirstReportStartTimeSchema = S.mutable(
   S.Struct({
     secs_since_epoch: S.Number,
     nanos_since_epoch: S.Number,
@@ -56,7 +56,7 @@ const FirstReportStartTimeSchema = S.mutable(
 /**
  * Schema for the additional resources. This includes the CoinMarketCap ID and quote, and the Yahoo Finance symbol.
  */
-const AdditionalResourcesSchema = S.mutable(
+export const AdditionalResourcesSchema = S.mutable(
   S.Struct({
     cmc_id: S.optional(S.Number),
     cmc_quote: S.optional(S.String),
@@ -67,7 +67,7 @@ const AdditionalResourcesSchema = S.mutable(
 /**
  * Schema for the Data Feed type.
  */
-const FeedSchema = S.mutable(
+export const FeedSchema = S.mutable(
   S.Struct({
     id: S.Number,
     name: S.String,
@@ -97,7 +97,7 @@ export const decodeFeed = S.decodeUnknownSync(FeedSchema);
 /**
  * Schema for the Data Feeds configuration.
  */
-const FeedsConfigSchema = S.mutable(
+export const FeedsConfigSchema = S.mutable(
   S.Struct({
     feeds: S.mutable(S.Array(FeedSchema)),
   }),

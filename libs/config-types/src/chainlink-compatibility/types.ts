@@ -21,7 +21,7 @@ export type ChainlinkCompatibilityData = S.Schema.Type<
   typeof ChainlinkCompatibilityDataSchema
 >;
 
-const BlocksenseFeedsCompatibilitySchema = S.Record({
+export const BlocksenseFeedsCompatibilitySchema = S.Record({
   key: S.String,
   value: S.Struct({
     id: S.Number,
@@ -43,7 +43,7 @@ export type ChainlinkAddressToBlocksenseId = S.Schema.Type<
   typeof ChainlinkAddressToBlocksenseIdSchema
 >;
 
-const ChainlinkCompatibilityConfigSchema = S.Struct({
+export const ChainlinkCompatibilityConfigSchema = S.Struct({
   blocksenseFeedsCompatibility: BlocksenseFeedsCompatibilitySchema,
   chainlinkAddressToBlocksenseId: ChainlinkAddressToBlocksenseIdSchema,
 });
