@@ -22,7 +22,6 @@ ANVIL_RPC_URL="http://127.0.0.1:$ANVIL_PORT"
 
 REPORTED_RESULT=42000
 
-
 anvil --block-time 5 --balance 10000000000000000000 --port "$ANVIL_PORT" --fork-url https://sepolia.infura.io/v3/9ea3e88b90a043f488d03f539abc9545 >"$ANVIL_LOG_FILE" 2>&1 &
 
 # Function to display logs in a box
@@ -375,5 +374,8 @@ configure_sequencer
 build_sequencer
 run_sequencer_in_background
 post_report_to_sequencer
+sleep 10
+cat "$SEQENCER_LOG_FILE"
+
 read_latest_answer_from_anvil
 
