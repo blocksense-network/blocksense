@@ -21,9 +21,9 @@ const networks = [
   'andromeda-mainnet',
   'arbitrum-mainnet',
   'arbitrum-sepolia',
-  'artio-mainnet',
   'base-mainnet',
   'base-sepolia',
+  'berachain-bartio',
   'bsc-mainnet',
   'bsc-testnet',
   'celo-mainnet',
@@ -38,24 +38,23 @@ const networks = [
   'linea-sepolia',
   'manta-mainnet',
   'manta-sepolia',
+  'kusama-moonriver',
   'optimism-mainnet',
   'optimism-sepolia',
   'polygon-mainnet',
   'polygon-amoy',
   'polygon-zkevm-mainnet',
-  'polygon-zkevm-sepolia',
+  'polygon-zkevm-cardona',
   'scroll-mainnet',
   'scroll-sepolia',
-  'specular-mainnet',
   'zksync-mainnet',
   'zksync-sepolia',
 ] as const;
 
 const chainIds = [
-  1, 11155111, 17000, 43114, 43113, 1088, 42161, 421614, 80085, 8453, 84532, 56,
-  97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009, 59140, 59141, 169,
-  3441006, 10, 11155420, 137, 80002, 1101, 1442, 534352, 534351, 13527, 324,
-  300,
+  1, 11155111, 17000, 43114, 43113, 1088, 42161, 421614, 8453, 84532, 80084, 56,
+  97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009, 59144, 59141, 169,
+  3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442, 534352, 534351, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -96,9 +95,9 @@ export const networkNameToChainId = {
   'andromeda-mainnet': 1088,
   'arbitrum-mainnet': 42161,
   'arbitrum-sepolia': 421614,
-  'artio-mainnet': 80085,
   'base-mainnet': 8453,
   'base-sepolia': 84532,
+  'berachain-bartio': 80084,
   'bsc-mainnet': 56,
   'bsc-testnet': 97,
   'celo-mainnet': 42220,
@@ -109,19 +108,19 @@ export const networkNameToChainId = {
   'gnosis-chiado': 10200,
   'taiko-mainnet': 167000,
   'taiko-hekla': 167009,
-  'linea-mainnet': 59140,
+  'linea-mainnet': 59144,
   'linea-sepolia': 59141,
   'manta-mainnet': 169,
   'manta-sepolia': 3441006,
+  'kusama-moonriver': 1285,
   'optimism-mainnet': 10,
   'optimism-sepolia': 11155420,
   'polygon-mainnet': 137,
   'polygon-amoy': 80002,
   'polygon-zkevm-mainnet': 1101,
-  'polygon-zkevm-sepolia': 1442,
+  'polygon-zkevm-cardona': 2442,
   'scroll-mainnet': 534352,
   'scroll-sepolia': 534351,
-  'specular-mainnet': 13527,
   'zksync-mainnet': 324,
   'zksync-sepolia': 300,
 } satisfies {
@@ -150,9 +149,9 @@ export const chainIdToNetworkName = {
   1088: 'andromeda-mainnet',
   42161: 'arbitrum-mainnet',
   421614: 'arbitrum-sepolia',
-  80085: 'artio-mainnet',
   8453: 'base-mainnet',
   84532: 'base-sepolia',
+  80084: 'berachain-bartio',
   56: 'bsc-mainnet',
   97: 'bsc-testnet',
   42220: 'celo-mainnet',
@@ -163,19 +162,19 @@ export const chainIdToNetworkName = {
   10200: 'gnosis-chiado',
   167000: 'taiko-mainnet',
   167009: 'taiko-hekla',
-  59140: 'linea-mainnet',
+  59144: 'linea-mainnet',
   59141: 'linea-sepolia',
   169: 'manta-mainnet',
   3441006: 'manta-sepolia',
+  1285: 'kusama-moonriver',
   10: 'optimism-mainnet',
   11155420: 'optimism-sepolia',
   137: 'polygon-mainnet',
   80002: 'polygon-amoy',
   1101: 'polygon-zkevm-mainnet',
-  1442: 'polygon-zkevm-sepolia',
+  2442: 'polygon-zkevm-cardona',
   534352: 'scroll-mainnet',
   534351: 'scroll-sepolia',
-  13527: 'specular-mainnet',
   324: 'zksync-mainnet',
   300: 'zksync-sepolia',
 } satisfies InverseOf<typeof networkNameToChainId>;
@@ -217,10 +216,6 @@ export const explorerUrls: Record<string, any> = {
     tx: txHash => `https://sepolia.arbiscan.io/tx/${txHash}`,
     address: address => `https://sepolia.arbiscan.io/address/${address}`,
   },
-  'artio-mainnet': {
-    tx: txHash => `https://artio.beratrail.io/tx/${txHash}`,
-    address: address => `https://artio.beratrail.io/address/${address}`,
-  },
   'base-mainnet': {
     tx: txHash => `https://basescan.org/tx/${txHash}`,
     address: address => `https://basescan.org/address/${address}`,
@@ -228,6 +223,10 @@ export const explorerUrls: Record<string, any> = {
   'base-sepolia': {
     tx: txHash => `https://sepolia.basescan.org/tx/${txHash}`,
     address: address => `https://sepolia.basescan.org/address/${address}`,
+  },
+  'berachain-bartio': {
+    tx: txHash => `https://bartio.beratrail.io/tx/${txHash}`,
+    address: address => `https://bartio.beratrail.io/address/${address}`,
   },
   'bsc-mainnet': {
     tx: txHash => `https://bscscan.com/tx/${txHash}`,
@@ -284,9 +283,14 @@ export const explorerUrls: Record<string, any> = {
       `https://pacific-explorer.manta.network/address/${address}`,
   },
   'manta-sepolia': {
-    tx: txHash => `https://pacific-explorer.sepolia.manta.network/tx/${txHash}`,
+    tx: txHash =>
+      `https://pacific-explorer.sepolia-testnet.manta.network/tx/${txHash}`,
     address: address =>
       `https://pacific-explorer.sepolia-testnet.manta.network/address/${address}`,
+  },
+  'kusama-moonriver': {
+    tx: txHash => `https://moonriver.moonscan.io/tx/${txHash}`,
+    address: address => `https://moonriver.moonscan.io/address/${address}`,
   },
   'optimism-mainnet': {
     tx: txHash => `https://optimistic.etherscan.io/tx/${txHash}`,
@@ -309,6 +313,11 @@ export const explorerUrls: Record<string, any> = {
     tx: txHash => `https://zkevm.polygonscan.com/tx/${txHash}`,
     address: address => `https://zkevm.polygonscan.com/address/${address}`,
   },
+  'polygon-zkevm-cardona': {
+    tx: txHash => `https://cardona-zkevm.polygonscan.com/tx/${txHash}`,
+    address: address =>
+      `https://cardona-zkevm.polygonscan.com/address/${address}`,
+  },
   'scroll-mainnet': {
     tx: txHash => `https://scroll.io/tx/${txHash}`,
     address: address => `https://scroll.io/address/${address}`,
@@ -318,8 +327,8 @@ export const explorerUrls: Record<string, any> = {
     address: address => `https://sepolia.scrollscan.com/address/${address}`,
   },
   'zksync-mainnet': {
-    tx: txHash => `https://zksync.io/tx/${txHash}`,
-    address: address => `https://zksync.io/address/${address}`,
+    tx: txHash => `https://zksync.blockscout.com/tx/${txHash}`,
+    address: address => `https://zksync.blockscout.com/address/${address}`,
   },
   'zksync-sepolia': {
     tx: txHash => `https://zksync-sepolia.blockscout.com/tx/${txHash}`,

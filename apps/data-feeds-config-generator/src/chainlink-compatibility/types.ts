@@ -111,7 +111,7 @@ export const chainlinkNetworkNameToChainId = {
   'ethereum-testnet-sepolia-optimism-1':
     networkNameToChainId['optimism-sepolia'],
   'ethereum-testnet-sepolia-polygon-zkevm-1':
-    networkNameToChainId['polygon-zkevm-sepolia'],
+    networkNameToChainId['polygon-zkevm-cardona'],
   'ethereum-testnet-sepolia-scroll-1': networkNameToChainId['scroll-sepolia'],
   'ethereum-testnet-sepolia-starknet-1': null,
   'ethereum-testnet-sepolia-zksync-1': networkNameToChainId['zksync-sepolia'],
