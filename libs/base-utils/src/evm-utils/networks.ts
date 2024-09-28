@@ -185,158 +185,232 @@ export const chainIdToNetworkName = {
  */
 export const explorerUrls: Record<string, any> = {
   'ethereum-mainnet': {
+    chainId: 1,
+    isTestnet: false,
     tx: txHash => `https://etherscan.io/tx/${txHash}`,
     address: address => `https://etherscan.io/address/${address}`,
   },
   'ethereum-sepolia': {
+    chainId: 11155111,
+    isTestnet: true,
     tx: txHash => `https://sepolia.etherscan.io/tx/${txHash}`,
     address: address => `https://sepolia.etherscan.io/address/${address}`,
   },
   'ethereum-holesky': {
+    chainId: 17000,
+    isTestnet: true,
     tx: txHash => `https://holesky.etherscan.io/tx/${txHash}`,
     address: address => `https://holesky.etherscan.io/address/${address}`,
   },
   'avalanche-mainnet': {
+    chainId: 43114,
+    isTestnet: false,
     tx: txHash => `https://snowtrace.io/tx/${txHash}`,
     address: address => `https://snowtrace.io/address/${address}`,
   },
   'avalanche-fuji': {
+    chainId: 43113,
+    isTestnet: true,
     tx: txHash => `https://testnet.snowtrace.io/tx/${txHash}`,
     address: address => `https://testnet.snowtrace.io/address/${address}`,
   },
   'andromeda-mainnet': {
+    chainId: 1088,
+    isTestnet: false,
     tx: txHash => `https://andromeda.guru.com/tx/${txHash}`,
     address: address => `https://andromeda.guru.com/address/${address}`,
   },
   'arbitrum-mainnet': {
+    chainId: 42161,
+    isTestnet: false,
     tx: txHash => `https://arbiscan.io/tx/${txHash}`,
     address: address => `https://arbiscan.io/address/${address}`,
   },
   'arbitrum-sepolia': {
+    chainId: 421614,
+    isTestnet: true,
     tx: txHash => `https://sepolia.arbiscan.io/tx/${txHash}`,
     address: address => `https://sepolia.arbiscan.io/address/${address}`,
   },
   'base-mainnet': {
+    chainId: 8453,
+    isTestnet: false,
     tx: txHash => `https://basescan.org/tx/${txHash}`,
     address: address => `https://basescan.org/address/${address}`,
   },
   'base-sepolia': {
+    chainId: 84532,
+    isTestnet: true,
     tx: txHash => `https://sepolia.basescan.org/tx/${txHash}`,
     address: address => `https://sepolia.basescan.org/address/${address}`,
   },
   'berachain-bartio': {
+    chainId: 80084,
+    isTestnet: true,
     tx: txHash => `https://bartio.beratrail.io/tx/${txHash}`,
     address: address => `https://bartio.beratrail.io/address/${address}`,
   },
   'bsc-mainnet': {
+    chainId: 56,
+    isTestnet: false,
     tx: txHash => `https://bscscan.com/tx/${txHash}`,
     address: address => `https://bscscan.com/address/${address}`,
   },
   'bsc-testnet': {
+    chainId: 97,
+    isTestnet: true,
     tx: txHash => `https://testnet.bscscan.com/tx/${txHash}`,
     address: address => `https://testnet.bscscan.com/address/${address}`,
   },
   'celo-mainnet': {
+    chainId: 42220,
+    isTestnet: false,
     tx: txHash => `https://celoscan.com/tx/${txHash}`,
     address: address => `https://celoscan.com/address/${address}`,
   },
   'celo-alfajores': {
+    chainId: 44787,
+    isTestnet: true,
     tx: txHash => `https://alfajores.celoscan.com/tx/${txHash}`,
     address: address => `https://alfajores.celoscan.com/address/${address}`,
   },
   'fantom-mainnet': {
+    chainId: 250,
+    isTestnet: false,
     tx: txHash => `https://ftmscan.com/tx/${txHash}`,
     address: address => `https://ftmscan.com/address/${address}`,
   },
   'fantom-testnet': {
+    chainId: 4002,
+    isTestnet: true,
     tx: txHash => `https://testnet.ftmscan.com/tx/${txHash}`,
     address: address => `https://testnet.ftmscan.com/address/${address}`,
   },
   'gnosis-mainnet': {
+    chainId: 100,
+    isTestnet: false,
     tx: txHash => `https://gnosisscan.io/tx/${txHash}`,
     address: address => `https://gnosisscan.io/address/${address}`,
   },
   'gnosis-chiado': {
+    chainId: 10200,
+    isTestnet: true,
     tx: txHash => `https://gnosis-chiado.blockscout.com/tx/${txHash}`,
     address: address =>
       `https://gnosis-chiado.blockscout.com/address/${address}`,
   },
   'taiko-mainnet': {
+    chainId: 167000,
+    isTestnet: false,
     tx: txHash => `https://taikoscan.io/tx/${txHash}`,
     address: address => `https://taikoscan.io/address/${address}`,
   },
   'taiko-hekla': {
+    chainId: 167009,
+    isTestnet: true,
     tx: txHash => `https://hekla.taikoscan.io/tx/${txHash}`,
     address: address => `https://hekla.taikoscan.io/address/${address}`,
   },
   'linea-mainnet': {
+    chainId: 59144,
+    isTestnet: false,
     tx: txHash => `https://lineascan.build/tx/${txHash}`,
     address: address => `https://lineascan.build/address/${address}`,
   },
   'linea-sepolia': {
+    chainId: 59141,
+    isTestnet: true,
     tx: txHash => `https://sepolia.lineascan.build/tx/${txHash}`,
     address: address => `https://sepolia.lineascan.build/address/${address}`,
   },
   'manta-mainnet': {
+    chainId: 169,
+    isTestnet: false,
     tx: txHash => `https://pacific-explorer.manta.network/tx/${txHash}`,
     address: address =>
       `https://pacific-explorer.manta.network/address/${address}`,
   },
   'manta-sepolia': {
+    chainId: 3441006,
+    isTestnet: true,
     tx: txHash =>
       `https://pacific-explorer.sepolia-testnet.manta.network/tx/${txHash}`,
     address: address =>
       `https://pacific-explorer.sepolia-testnet.manta.network/address/${address}`,
   },
   'kusama-moonriver': {
+    chainId: 1285,
+    isTestnet: false,
     tx: txHash => `https://moonriver.moonscan.io/tx/${txHash}`,
     address: address => `https://moonriver.moonscan.io/address/${address}`,
   },
   'optimism-mainnet': {
+    chainId: 10,
+    isTestnet: false,
     tx: txHash => `https://optimistic.etherscan.io/tx/${txHash}`,
     address: address => `https://optimistic.etherscan.io/address/${address}`,
   },
   'optimism-sepolia': {
+    chainId: 11155420,
+    isTestnet: true,
     tx: txHash => `https://sepolia-optimism.etherscan.io/tx/${txHash}`,
     address: address =>
       `https://sepolia-optimism.etherscan.io/address/${address}`,
   },
   'polygon-mainnet': {
+    chainId: 137,
+    isTestnet: false,
     tx: txHash => `https://polygonscan.com/tx/${txHash}`,
     address: address => `https://polygonscan.com/address/${address}`,
   },
   'polygon-amoy': {
+    chainId: 80002,
+    isTestnet: true,
     tx: txHash => `https://amoy.polygonscan.com/tx/${txHash}`,
     address: address => `https://amoy.polygonscan.com/address/${address}`,
   },
   'polygon-zkevm-mainnet': {
+    chainId: 1101,
+    isTestnet: false,
     tx: txHash => `https://zkevm.polygonscan.com/tx/${txHash}`,
     address: address => `https://zkevm.polygonscan.com/address/${address}`,
   },
   'polygon-zkevm-cardona': {
+    chainId: 2442,
+    isTestnet: true,
     tx: txHash => `https://cardona-zkevm.polygonscan.com/tx/${txHash}`,
     address: address =>
       `https://cardona-zkevm.polygonscan.com/address/${address}`,
   },
   'scroll-mainnet': {
+    chainId: 534352,
+    isTestnet: false,
     tx: txHash => `https://scroll.io/tx/${txHash}`,
     address: address => `https://scroll.io/address/${address}`,
   },
   'scroll-sepolia': {
+    chainId: 534351,
+    isTestnet: true,
     tx: txHash => `https://sepolia.scrollscan.com/tx/${txHash}`,
     address: address => `https://sepolia.scrollscan.com/address/${address}`,
   },
   'zksync-mainnet': {
+    chainId: 324,
+    isTestnet: false,
     tx: txHash => `https://zksync.blockscout.com/tx/${txHash}`,
     address: address => `https://zksync.blockscout.com/address/${address}`,
   },
   'zksync-sepolia': {
+    chainId: 300,
+    isTestnet: true,
     tx: txHash => `https://zksync-sepolia.blockscout.com/tx/${txHash}`,
     address: address =>
       `https://zksync-sepolia.blockscout.com/address/${address}`,
   },
 } satisfies {
   [network in NetworkName]?: {
+    chainId: (typeof networkNameToChainId)[network];
+    isTestnet: boolean;
     tx: (tx: TxHash) => string;
     address: (address: EthereumAddress) => string;
   };
