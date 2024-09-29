@@ -1,11 +1,13 @@
+import fs from 'fs/promises';
+
 import { extendConfig, task } from 'hardhat/config';
 
-import { rootDir } from '@blocksense/base-utils';
 import './type-extensions';
 import { BuildArtifacts } from '../types';
 import { relative } from 'path';
 import { collectAbi } from '../abiCollector';
 import { contractsFileStructureAsJSON } from '../contractsFileStructure';
+import { main } from '..';
 
 extendConfig(config => {
   config.reflect ??= {};
@@ -16,9 +18,6 @@ extendConfig(config => {
 task('reflect', async (_, hre) => {
   await hre.run('clean');
   await hre.run('compile');
-
-  const { promises: fs } = await import('fs');
-  const { main } = await import('../index');
 
   const buildInfoPaths = await hre.artifacts.getBuildInfoPaths();
   const artifactsPaths = await hre.artifacts.getArtifactPaths();
