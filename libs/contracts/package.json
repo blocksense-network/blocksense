@@ -30,6 +30,8 @@
     "size": "hardhat size-contracts"
   },
   "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@blocksense/config-types": "workspace:*",
     "@blocksense/sol-reflector": "workspace:*",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
     "@nomicfoundation/hardhat-ethers": "^3.0.6",

@@ -403,6 +403,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/contracts@workspace:libs/contracts"
   dependencies:
+    "@blocksense/base-utils": "workspace:*"
+    "@blocksense/config-types": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"
     "@nomicfoundation/hardhat-chai-matchers": "npm:^2.0.6"
     "@nomicfoundation/hardhat-ethers": "npm:^3.0.6"
