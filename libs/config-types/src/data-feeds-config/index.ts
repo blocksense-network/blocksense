@@ -12,6 +12,7 @@ export const FeedTypeSchema = S.mutable(
     S.Literal('Fiat'),
     S.Literal('Fixed Income'),
     S.Literal('Fixed-Income'),
+    S.Literal('FX_Spot'),
     S.Literal('Commodities'),
     S.Literal('Forex'),
     S.Literal('Economic index'),
