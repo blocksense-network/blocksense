@@ -1,0 +1,25 @@
+{
+  "name": "@blocksense/e2e-tests",
+  "type": "module",
+  "version": "0.0.0",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.cjs",
+      "import": "./dist/esm/index.mjs",
+      "types": "./dist/types/src/index.d.ts"
+    }
+  },
+  "scripts": {
+    "ts": "yarn node --import tsx"
+  },
+  "dependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@effect/data": "^0.18.7",
+    "@effect/schema": "^0.71.1",
+    "@types/node": "^22.3.0",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "web3": "^4.12.1"
+  }
+}
