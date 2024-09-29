@@ -6,8 +6,11 @@
  */
 
 import * as S from '@effect/schema/Schema';
-import { InverseOf } from '../type-level';
+
+import { getEnvString, getOptionalEnvString } from '../env';
 import { EthereumAddress, TxHash } from './hex-types';
+import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
+import { InverseOf } from '../type-level';
 
 const networks = [
   'ethereum-mainnet',
@@ -329,3 +332,24 @@ export const explorerUrls: Record<string, any> = {
     address: (address: EthereumAddress) => string;
   };
 };
+
+export type NetworkNameToEnvVar<Net extends NetworkName> =
+  `RPC_URL_${KebabToSnakeCase<Net>}`;
+
+export type RpcUrlEnvVarNames = NetworkNameToEnvVar<NetworkName>;
+
+export function getRpcUrlEnvVar<Net extends NetworkName>(
+  network: Net,
+): NetworkNameToEnvVar<Net> {
+  return `RPC_URL_${kebabToSnakeCase(network)}`;
+}
+
+export function getRpcUrl(network: NetworkName): string {
+  const envVar = getRpcUrlEnvVar(network);
+  return getEnvString(envVar);
+}
+
+export function getOptionalRpcUrl(network: NetworkName): string {
+  const envVar = getRpcUrlEnvVar(network);
+  return getOptionalEnvString(envVar, '');
+}
