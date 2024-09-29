@@ -13,10 +13,10 @@ type AbsolutePathProps = {
 export const AbsolutePath = ({ absolutePath }: AbsolutePathProps) => {
   return (
     <Link
-      className="absolute-path__link font-semibold mx-2 my-3 text-sm flex items-center"
+      className="absolute-path__link font-semibold text-sm flex gap-2 items-center"
       href={`${ghContractFolder}${absolutePath}`}
     >
-      <GitHubIcon className="w-6 h-6 cursor-pointer ml-[-20px] mr-2" />
+      <GitHubIcon className="my-1" />
       {config.github}
     </Link>
   );

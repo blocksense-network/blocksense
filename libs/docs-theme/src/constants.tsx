@@ -291,7 +291,7 @@ export const DEFAULT_THEME: DocsThemeConfig = {
   project: {
     icon: (
       <>
-        <GitHubIcon />
+        <GitHubIcon className="nx-pointer-events-none" />
         <span className="nx-sr-only">GitHub</span>
       </>
     ),

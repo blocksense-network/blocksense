@@ -22,7 +22,7 @@ export const SourceUnit = ({
   const sourceUnit: SourceUnitDocItem = JSON.parse(sourceUnitJson);
   return (
     <section className="source-unit mt-6">
-      <section className="source-unit__header flex mx-2 my-2">
+      <section className="source-unit__header flex gap-2 py-2.5">
         <AbsolutePath absolutePath={sourceUnit.absolutePath} />
         <License license={sourceUnit.license} />
       </section>
