@@ -18,3 +18,10 @@ export function getEnvString(varName: string): string {
     `Env variable '${varName}' is missing.`,
   );
 }
+
+export function getOptionalEnvString(
+  varName: string,
+  defaultValue: string,
+): string {
+  return process.env[varName] ?? defaultValue;
+}
