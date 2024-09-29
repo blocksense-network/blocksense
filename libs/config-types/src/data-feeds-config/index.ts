@@ -3,22 +3,20 @@ import * as S from '@effect/schema/Schema';
 /**
  * Schema for the data feed types ( Chainlink compatible ).
  */
-export const FeedTypeSchema = S.mutable(
-  S.Union(
-    S.Literal(''),
-    S.Literal('Crypto'),
-    S.Literal('Currency'),
-    S.Literal('Equities'),
-    S.Literal('Fiat'),
-    S.Literal('Fixed Income'),
-    S.Literal('Fixed-Income'),
-    S.Literal('FX_Spot'),
-    S.Literal('Commodities'),
-    S.Literal('Forex'),
-    S.Literal('Economic index'),
-    S.Literal('US Treasuries'),
-  ),
-);
+export const FeedTypeSchema = S.Union(
+  S.Literal(''),
+  S.Literal('Crypto'),
+  S.Literal('Currency'),
+  S.Literal('Equities'),
+  S.Literal('Fiat'),
+  S.Literal('Fixed Income'),
+  S.Literal('Fixed-Income'),
+  S.Literal('FX_Spot'),
+  S.Literal('Commodities'),
+  S.Literal('Forex'),
+  S.Literal('Economic index'),
+  S.Literal('US Treasuries'),
+).annotations({ identifier: 'FeedType' });
 
 /**
  * Type for the data feed types.
@@ -31,7 +29,7 @@ export type FeedType = S.Schema.Type<typeof FeedTypeSchema>;
 export const ScriptSchema = S.Union(
   S.Literal('CoinMarketCap'),
   S.Literal('YahooFinance'),
-);
+).annotations({ identifier: 'ScriptName' });
 
 export type Script = S.Schema.Type<typeof ScriptSchema>;
 
@@ -42,7 +40,7 @@ export const PairSchema = S.mutable(
     base: S.String,
     quote: S.String,
   }),
-);
+).annotations({ identifier: 'Pair' });
 
 export type Pair = S.Schema.Type<typeof PairSchema>;
 
@@ -51,7 +49,7 @@ export const FirstReportStartTimeSchema = S.mutable(
     secs_since_epoch: S.Number,
     nanos_since_epoch: S.Number,
   }),
-);
+).annotations({ identifier: 'FirstReportStartTime' });
 
 /**
  * Schema for the additional resources. This includes the CoinMarketCap ID and quote, and the Yahoo Finance symbol.

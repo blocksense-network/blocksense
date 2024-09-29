@@ -26,7 +26,7 @@ const ChainLinkFeedInfoSchema = S.Struct({
   assetName: S.String,
   feedType: FeedTypeSchema,
   decimals: S.Number,
-});
+}).annotations({ identifier: 'ChainLinkFeedInfo' });
 
 /**
  * Type for the ChainLink feed information.
@@ -61,7 +61,7 @@ const CMCInfoSchema = S.Struct({
       token_address: S.String,
     }),
   ),
-});
+}).annotations({ identifier: 'CMCInfo' });
 
 /**
  * Type for the information about currencies received from CoinMarketCap.
@@ -85,6 +85,6 @@ export const RawDataFeedsSchema = S.mutable(
       ),
     }),
   }),
-);
+).annotations({ identifier: 'RawDataFeeds' });
 
 export type RawDataFeeds = S.Schema.Type<typeof RawDataFeedsSchema>;

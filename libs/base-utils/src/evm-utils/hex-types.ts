@@ -14,6 +14,7 @@ import { hexDataString } from '../buffer-and-hex-utils';
 export const ethereumAddress = hexDataString.pipe(
   S.pattern(/^0x([0-9a-fA-F]{40})$/),
   S.brand('EthereumAddress'),
+  S.annotations({ identifier: 'EthereumAddress' }),
 );
 export type EthereumAddress = S.Schema.Type<typeof ethereumAddress>;
 export const isEthereumAddress = S.is(ethereumAddress);
@@ -32,7 +33,10 @@ export const parseHash32byte = S.decodeUnknownSync(hash32byte);
 
 // EVM transaction hash
 
-export const txHash = hash32byte.pipe(S.brand('EVM transaction hash'));
+export const txHash = hash32byte.pipe(
+  S.brand('EVM TxHash'),
+  S.annotations({ identifier: 'EVM TxHash' }),
+);
 export type TxHash = S.Schema.Type<typeof txHash>;
 
 export const isTxHash = S.is(txHash);
