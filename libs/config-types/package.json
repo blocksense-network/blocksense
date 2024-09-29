@@ -22,7 +22,7 @@
   "scripts": {
     "build": "rollup --silent --config ./rollup.config.mjs",
     "ts": "yarn node --import tsx",
-    "test": "yarn vitest -w false"
+    "test": "yarn vitest -w false --passWithNoTests"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^26.0.1",
