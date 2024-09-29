@@ -11,15 +11,19 @@
     }
   },
   "scripts": {
-    "ts": "yarn node --import tsx"
+    "ts": "yarn node --import tsx",
+    "on-chain-data-test": "yarn vitest src/e2e-simulation.spec.ts -w false",
+    "run-simulation-script": "scripts/e2e-simulation.sh"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
     "@effect/data": "^0.18.7",
     "@effect/schema": "^0.71.1",
     "@types/node": "^22.3.0",
+    "effect": "^3.7.0",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
+    "vitest": "^2.0.4",
     "web3": "^4.12.1"
   }
 }
