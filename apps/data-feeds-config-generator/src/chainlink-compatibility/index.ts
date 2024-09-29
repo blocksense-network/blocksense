@@ -1,5 +1,5 @@
-import assert from 'node:assert';
-
+import { tuple, fromEntries } from '@blocksense/base-utils/array-iter';
+import { assert } from '@blocksense/base-utils/assert';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import {
   parseEthereumAddress,
@@ -9,8 +9,6 @@ import {
 import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import {
   BlocksenseFeedsCompatibility,
-  ChainlinkAggregators,
-  ChainlinkCompatibilityData,
   ChainlinkAddressToBlocksenseId,
   ChainlinkCompatibilityConfig,
   isSupportedCurrencySymbol,
@@ -31,21 +29,19 @@ async function getBlocksenseFeedsCompatibility(
   const blocksenseFeedsCompatibility = Object.entries(rawDataFeeds)
     .filter(([feedName, _]) => feedName.split(' / ')[1] === 'USD')
     .reduce((acc, [feedName, feedData]) => {
-      // Transform each feed data
-      const chainlinkAggregators = Object.entries(feedData.networks).reduce(
-        (proxiesAcc, [networkFile, perNetworkFeedData]) => {
-          const networkName = parseNetworkFilename(networkFile);
-          const chainId = chainlinkNetworkNameToChainId[networkName];
-          if (chainId == null) return proxiesAcc; // Skip if the chainId is not found
-          const address = parseEthereumAddress(
-            perNetworkFeedData.contractAddress,
-          );
-          return {
-            ...proxiesAcc,
-            [chainId]: address,
-          }; // Collect the proxy address for each network
-        },
-        {} as ChainlinkAggregators,
+      const chainlinkAggregators = fromEntries(
+        Object.entries(feedData.networks)
+          .map(([networkFile, perNetworkFeedData]) => {
+            const networkName =
+              chainlinkNetworkNameToChainId[parseNetworkFilename(networkFile)];
+            return networkName == null
+              ? null
+              : tuple(
+                  networkName,
+                  parseEthereumAddress(perNetworkFeedData.contractAddress),
+                );
+          })
+          .filter(pair => pair != null),
       );
 
       const dataFeed = feedConfig.feeds.find(
