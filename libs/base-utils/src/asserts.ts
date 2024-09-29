@@ -1,5 +1,25 @@
 import { throwError } from './errors';
 
+import { ok } from 'assert';
+
+let assert: (value: unknown, errorMessage?: string) => asserts value;
+
+if (
+  typeof process !== 'undefined' &&
+  process.env['NODE_ENV'] !== 'production'
+) {
+  assert = ok;
+} else {
+  assert = function assert(
+    value: unknown,
+    errorMessage?: string,
+  ): asserts value {
+    if (!value) throwError(errorMessage ?? 'Assertion failed');
+  };
+}
+
+export { assert };
+
 /**
  * Asserts that a value is not null or undefined.
  *
@@ -12,13 +32,10 @@ export function assertNotNull<T>(
   value: T | null | undefined,
   errorMessage?: string,
 ): T {
-  if (
-    value === null ||
-    value === undefined ||
-    (typeof value === 'string' && !value.length)
-  ) {
-    throwError(errorMessage ?? 'Assertion failed: value is null');
-  }
+  assert(
+    value != null && (typeof value !== 'string' || value.length),
+    errorMessage ?? 'Assertion failed: value is null',
+  );
   return value;
 }
 
@@ -31,10 +48,9 @@ export function assertNotNull<T>(
  * @throws Error if the value is null or not an object.
  */
 export function assertIsObject<T>(value: T, errorMessage?: string): T & object {
-  return typeof value === 'object' && value != null
-    ? value
-    : throwError(
-        errorMessage ??
-          `Assertion failed: value (=== '${value}') is not an object`,
-      );
+  assert(
+    typeof value === 'object' && value != null,
+    errorMessage ?? `Assertion failed: value (=== '${value}') is not an object`,
+  );
+  return value;
 }
