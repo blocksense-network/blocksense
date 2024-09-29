@@ -10,7 +10,6 @@ import * as S from '@effect/schema/Schema';
 import { getEnvString, getOptionalEnvString } from '../env';
 import { EthereumAddress, TxHash } from './hex-types';
 import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
-import { InverseOf } from '../type-level';
 
 const networks = [
   'ethereum-mainnet',
@@ -59,362 +58,231 @@ const chainIds = [
 
 export const networkName = S.Literal(...networks);
 export const isNetworkName = S.is(networkName);
-export const parseNetworkName = S.encodeSync(networkName);
+export const parseNetworkName = S.decodeUnknownSync(networkName);
 export type NetworkName = S.Schema.Type<typeof networkName>;
 
 export const chainId = S.Literal(...chainIds);
 export const isChainId = S.is(chainId);
-export const parseChainId = S.encodeSync(chainId);
+export const parseChainId = S.decodeUnknownSync(chainId);
 export type ChainId = S.Schema.Type<typeof chainId>;
 
 export const network = S.Union(networkName, chainId);
 export const isNetwork = S.is(network);
-export const parseNetwork = S.encodeSync(network);
+export const parseNetwork = S.decodeUnknownSync(network);
 export type Network = S.Schema.Type<typeof network>;
-
-/**
- * Maps network names to their corresponding chain IDs.
- *
- * @remarks
- * The `networkNameToChainId` constant is a mapping object that associates network names with their respective chain IDs.
- * The keys of the object are the network names, and the values are the corresponding chain IDs.
- *
- * Example:
- * ```typescript
- * networkNameToChainId.mainnet; // Returns 1
- * networkNameToChainId.sepolia; // Returns 11155111
- * networkNameToChainId.holesky; // Returns 17000
- * ```
- */
-export const networkNameToChainId = {
-  'ethereum-mainnet': 1,
-  'ethereum-sepolia': 11155111,
-  'ethereum-holesky': 17000,
-  'avalanche-mainnet': 43114,
-  'avalanche-fuji': 43113,
-  'andromeda-mainnet': 1088,
-  'arbitrum-mainnet': 42161,
-  'arbitrum-sepolia': 421614,
-  'base-mainnet': 8453,
-  'base-sepolia': 84532,
-  'berachain-bartio': 80084,
-  'bsc-mainnet': 56,
-  'bsc-testnet': 97,
-  'celo-mainnet': 42220,
-  'celo-alfajores': 44787,
-  'fantom-mainnet': 250,
-  'fantom-testnet': 4002,
-  'gnosis-mainnet': 100,
-  'gnosis-chiado': 10200,
-  'taiko-mainnet': 167000,
-  'taiko-hekla': 167009,
-  'linea-mainnet': 59144,
-  'linea-sepolia': 59141,
-  'manta-mainnet': 169,
-  'manta-sepolia': 3441006,
-  'kusama-moonriver': 1285,
-  'optimism-mainnet': 10,
-  'optimism-sepolia': 11155420,
-  'polygon-mainnet': 137,
-  'polygon-amoy': 80002,
-  'polygon-zkevm-mainnet': 1101,
-  'polygon-zkevm-cardona': 2442,
-  'scroll-mainnet': 534352,
-  'scroll-sepolia': 534351,
-  'zksync-mainnet': 324,
-  'zksync-sepolia': 300,
-} satisfies {
-  [Net in NetworkName]: ChainId;
-};
-
-/**
- * Converts a chain ID to its corresponding network name.
- *
- * @param chainId - The chain ID to convert.
- * @returns The network name associated with the given chain ID.
- *
- * Example:
- * ```typescript
- * chainIdToNetworkName[1]; // Returns 'mainnet'
- * chainIdToNetworkName[11155111]; // Returns 'sepolia'
- * chainIdToNetworkName[17000]; // Returns 'holesky'
- * ```
- */
-export const chainIdToNetworkName = {
-  1: 'ethereum-mainnet',
-  11155111: 'ethereum-sepolia',
-  17000: 'ethereum-holesky',
-  43114: 'avalanche-mainnet',
-  43113: 'avalanche-fuji',
-  1088: 'andromeda-mainnet',
-  42161: 'arbitrum-mainnet',
-  421614: 'arbitrum-sepolia',
-  8453: 'base-mainnet',
-  84532: 'base-sepolia',
-  80084: 'berachain-bartio',
-  56: 'bsc-mainnet',
-  97: 'bsc-testnet',
-  42220: 'celo-mainnet',
-  44787: 'celo-alfajores',
-  250: 'fantom-mainnet',
-  4002: 'fantom-testnet',
-  100: 'gnosis-mainnet',
-  10200: 'gnosis-chiado',
-  167000: 'taiko-mainnet',
-  167009: 'taiko-hekla',
-  59144: 'linea-mainnet',
-  59141: 'linea-sepolia',
-  169: 'manta-mainnet',
-  3441006: 'manta-sepolia',
-  1285: 'kusama-moonriver',
-  10: 'optimism-mainnet',
-  11155420: 'optimism-sepolia',
-  137: 'polygon-mainnet',
-  80002: 'polygon-amoy',
-  1101: 'polygon-zkevm-mainnet',
-  2442: 'polygon-zkevm-cardona',
-  534352: 'scroll-mainnet',
-  534351: 'scroll-sepolia',
-  324: 'zksync-mainnet',
-  300: 'zksync-sepolia',
-} satisfies InverseOf<typeof networkNameToChainId>;
 
 /**
  * Mapping of network names to explorer URLs
  * The URL generator functions take a transaction hash or an address as input and return the corresponding explorer URL.
  */
-export const explorerUrls: Record<string, any> = {
+export const networkMetadata = {
   'ethereum-mainnet': {
     chainId: 1,
     isTestnet: false,
-    tx: txHash => `https://etherscan.io/tx/${txHash}`,
-    address: address => `https://etherscan.io/address/${address}`,
+    explorerUrl: 'https://etherscan.io',
   },
   'ethereum-sepolia': {
     chainId: 11155111,
     isTestnet: true,
-    tx: txHash => `https://sepolia.etherscan.io/tx/${txHash}`,
-    address: address => `https://sepolia.etherscan.io/address/${address}`,
+    explorerUrl: 'https://sepolia.etherscan.io',
   },
   'ethereum-holesky': {
     chainId: 17000,
     isTestnet: true,
-    tx: txHash => `https://holesky.etherscan.io/tx/${txHash}`,
-    address: address => `https://holesky.etherscan.io/address/${address}`,
+    explorerUrl: 'https://holesky.etherscan.io',
   },
   'avalanche-mainnet': {
     chainId: 43114,
     isTestnet: false,
-    tx: txHash => `https://snowtrace.io/tx/${txHash}`,
-    address: address => `https://snowtrace.io/address/${address}`,
+    explorerUrl: 'https://snowtrace.io',
   },
   'avalanche-fuji': {
     chainId: 43113,
     isTestnet: true,
-    tx: txHash => `https://testnet.snowtrace.io/tx/${txHash}`,
-    address: address => `https://testnet.snowtrace.io/address/${address}`,
+    explorerUrl: 'https://testnet.snowtrace.io',
   },
   'andromeda-mainnet': {
     chainId: 1088,
     isTestnet: false,
-    tx: txHash => `https://andromeda.guru.com/tx/${txHash}`,
-    address: address => `https://andromeda.guru.com/address/${address}`,
+    explorerUrl: 'https://andromeda.guru.com',
   },
   'arbitrum-mainnet': {
     chainId: 42161,
     isTestnet: false,
-    tx: txHash => `https://arbiscan.io/tx/${txHash}`,
-    address: address => `https://arbiscan.io/address/${address}`,
+    explorerUrl: 'https://arbiscan.io',
   },
   'arbitrum-sepolia': {
     chainId: 421614,
     isTestnet: true,
-    tx: txHash => `https://sepolia.arbiscan.io/tx/${txHash}`,
-    address: address => `https://sepolia.arbiscan.io/address/${address}`,
+    explorerUrl: 'https://sepolia.arbiscan.io',
   },
   'base-mainnet': {
     chainId: 8453,
     isTestnet: false,
-    tx: txHash => `https://basescan.org/tx/${txHash}`,
-    address: address => `https://basescan.org/address/${address}`,
+    explorerUrl: 'https://basescan.org',
   },
   'base-sepolia': {
     chainId: 84532,
     isTestnet: true,
-    tx: txHash => `https://sepolia.basescan.org/tx/${txHash}`,
-    address: address => `https://sepolia.basescan.org/address/${address}`,
+    explorerUrl: 'https://sepolia.basescan.org',
   },
   'berachain-bartio': {
     chainId: 80084,
     isTestnet: true,
-    tx: txHash => `https://bartio.beratrail.io/tx/${txHash}`,
-    address: address => `https://bartio.beratrail.io/address/${address}`,
+    explorerUrl: 'https://bartio.beratrail.io',
   },
   'bsc-mainnet': {
     chainId: 56,
     isTestnet: false,
-    tx: txHash => `https://bscscan.com/tx/${txHash}`,
-    address: address => `https://bscscan.com/address/${address}`,
+    explorerUrl: 'https://bscscan.com',
   },
   'bsc-testnet': {
     chainId: 97,
     isTestnet: true,
-    tx: txHash => `https://testnet.bscscan.com/tx/${txHash}`,
-    address: address => `https://testnet.bscscan.com/address/${address}`,
+    explorerUrl: 'https://testnet.bscscan.com',
   },
   'celo-mainnet': {
     chainId: 42220,
     isTestnet: false,
-    tx: txHash => `https://celoscan.com/tx/${txHash}`,
-    address: address => `https://celoscan.com/address/${address}`,
+    explorerUrl: 'https://celoscan.com',
   },
   'celo-alfajores': {
     chainId: 44787,
     isTestnet: true,
-    tx: txHash => `https://alfajores.celoscan.com/tx/${txHash}`,
-    address: address => `https://alfajores.celoscan.com/address/${address}`,
+    explorerUrl: 'https://alfajores.celoscan.com',
   },
   'fantom-mainnet': {
     chainId: 250,
     isTestnet: false,
-    tx: txHash => `https://ftmscan.com/tx/${txHash}`,
-    address: address => `https://ftmscan.com/address/${address}`,
+    explorerUrl: 'https://ftmscan.com',
   },
   'fantom-testnet': {
     chainId: 4002,
     isTestnet: true,
-    tx: txHash => `https://testnet.ftmscan.com/tx/${txHash}`,
-    address: address => `https://testnet.ftmscan.com/address/${address}`,
+    explorerUrl: 'https://testnet.ftmscan.com',
   },
   'gnosis-mainnet': {
     chainId: 100,
     isTestnet: false,
-    tx: txHash => `https://gnosisscan.io/tx/${txHash}`,
-    address: address => `https://gnosisscan.io/address/${address}`,
+    explorerUrl: 'https://gnosisscan.io',
   },
   'gnosis-chiado': {
     chainId: 10200,
     isTestnet: true,
-    tx: txHash => `https://gnosis-chiado.blockscout.com/tx/${txHash}`,
-    address: address =>
-      `https://gnosis-chiado.blockscout.com/address/${address}`,
+    explorerUrl: 'https://gnosis-chiado.blockscout.com',
   },
   'taiko-mainnet': {
     chainId: 167000,
     isTestnet: false,
-    tx: txHash => `https://taikoscan.io/tx/${txHash}`,
-    address: address => `https://taikoscan.io/address/${address}`,
+    explorerUrl: 'https://taikoscan.io',
   },
   'taiko-hekla': {
     chainId: 167009,
     isTestnet: true,
-    tx: txHash => `https://hekla.taikoscan.io/tx/${txHash}`,
-    address: address => `https://hekla.taikoscan.io/address/${address}`,
+    explorerUrl: 'https://hekla.taikoscan.io',
   },
   'linea-mainnet': {
     chainId: 59144,
     isTestnet: false,
-    tx: txHash => `https://lineascan.build/tx/${txHash}`,
-    address: address => `https://lineascan.build/address/${address}`,
+    explorerUrl: 'https://lineascan.build',
   },
   'linea-sepolia': {
     chainId: 59141,
     isTestnet: true,
-    tx: txHash => `https://sepolia.lineascan.build/tx/${txHash}`,
-    address: address => `https://sepolia.lineascan.build/address/${address}`,
+    explorerUrl: 'https://sepolia.lineascan.build',
   },
   'manta-mainnet': {
     chainId: 169,
     isTestnet: false,
-    tx: txHash => `https://pacific-explorer.manta.network/tx/${txHash}`,
-    address: address =>
-      `https://pacific-explorer.manta.network/address/${address}`,
+    explorerUrl: 'https://pacific-explorer.manta.network',
   },
   'manta-sepolia': {
     chainId: 3441006,
     isTestnet: true,
-    tx: txHash =>
-      `https://pacific-explorer.sepolia-testnet.manta.network/tx/${txHash}`,
-    address: address =>
-      `https://pacific-explorer.sepolia-testnet.manta.network/address/${address}`,
+    explorerUrl: '    `https://pacific-explorer.sepolia-testnet.manta.network',
   },
   'kusama-moonriver': {
     chainId: 1285,
     isTestnet: false,
-    tx: txHash => `https://moonriver.moonscan.io/tx/${txHash}`,
-    address: address => `https://moonriver.moonscan.io/address/${address}`,
+    explorerUrl: 'https://moonriver.moonscan.io',
   },
   'optimism-mainnet': {
     chainId: 10,
     isTestnet: false,
-    tx: txHash => `https://optimistic.etherscan.io/tx/${txHash}`,
-    address: address => `https://optimistic.etherscan.io/address/${address}`,
+    explorerUrl: 'https://optimistic.etherscan.io',
   },
   'optimism-sepolia': {
     chainId: 11155420,
     isTestnet: true,
-    tx: txHash => `https://sepolia-optimism.etherscan.io/tx/${txHash}`,
-    address: address =>
-      `https://sepolia-optimism.etherscan.io/address/${address}`,
+    explorerUrl: 'https://sepolia-optimism.etherscan.io',
   },
   'polygon-mainnet': {
     chainId: 137,
     isTestnet: false,
-    tx: txHash => `https://polygonscan.com/tx/${txHash}`,
-    address: address => `https://polygonscan.com/address/${address}`,
+    explorerUrl: 'https://polygonscan.com',
   },
   'polygon-amoy': {
     chainId: 80002,
     isTestnet: true,
-    tx: txHash => `https://amoy.polygonscan.com/tx/${txHash}`,
-    address: address => `https://amoy.polygonscan.com/address/${address}`,
+    explorerUrl: 'https://amoy.polygonscan.com',
   },
   'polygon-zkevm-mainnet': {
     chainId: 1101,
     isTestnet: false,
-    tx: txHash => `https://zkevm.polygonscan.com/tx/${txHash}`,
-    address: address => `https://zkevm.polygonscan.com/address/${address}`,
+    explorerUrl: 'https://zkevm.polygonscan.com',
   },
   'polygon-zkevm-cardona': {
     chainId: 2442,
     isTestnet: true,
-    tx: txHash => `https://cardona-zkevm.polygonscan.com/tx/${txHash}`,
-    address: address =>
-      `https://cardona-zkevm.polygonscan.com/address/${address}`,
+    explorerUrl: 'https://cardona-zkevm.polygonscan.com',
   },
   'scroll-mainnet': {
     chainId: 534352,
     isTestnet: false,
-    tx: txHash => `https://scroll.io/tx/${txHash}`,
-    address: address => `https://scroll.io/address/${address}`,
+    explorerUrl: 'https://scroll.io',
   },
   'scroll-sepolia': {
     chainId: 534351,
     isTestnet: true,
-    tx: txHash => `https://sepolia.scrollscan.com/tx/${txHash}`,
-    address: address => `https://sepolia.scrollscan.com/address/${address}`,
+    explorerUrl: 'https://sepolia.scrollscan.com',
   },
   'zksync-mainnet': {
     chainId: 324,
     isTestnet: false,
-    tx: txHash => `https://zksync.blockscout.com/tx/${txHash}`,
-    address: address => `https://zksync.blockscout.com/address/${address}`,
+    explorerUrl: 'https://zksync.blockscout.com',
   },
   'zksync-sepolia': {
     chainId: 300,
     isTestnet: true,
-    tx: txHash => `https://zksync-sepolia.blockscout.com/tx/${txHash}`,
-    address: address =>
-      `https://zksync-sepolia.blockscout.com/address/${address}`,
+    explorerUrl: 'https://zksync-sepolia.blockscout.com',
   },
 } satisfies {
-  [network in NetworkName]?: {
-    chainId: (typeof networkNameToChainId)[network];
+  [Net in NetworkName]: {
+    chainId: ChainId;
     isTestnet: boolean;
-    tx: (tx: TxHash) => string;
-    address: (address: EthereumAddress) => string;
+    explorerUrl: string;
   };
 };
+
+export function isTestnet<Net extends NetworkName>(
+  network: Net,
+): (typeof networkMetadata)[Net]['isTestnet'] {
+  return networkMetadata[network].isTestnet;
+}
+
+export function getTxHashExplorerUrl(
+  network: NetworkName,
+  txhash: TxHash,
+): string {
+  return `${networkMetadata[network].explorerUrl}/tx/${txhash}`;
+}
+
+export function getAddressExplorerUrl(
+  network: NetworkName,
+  address: EthereumAddress,
+): string {
+  return `${networkMetadata[network].explorerUrl}/address/${address}`;
+}
 
 export type NetworkNameToEnvVar<Net extends NetworkName> =
   `RPC_URL_${KebabToSnakeCase<Net>}`;

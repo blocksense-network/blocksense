@@ -1,10 +1,12 @@
 import * as S from '@effect/schema/Schema';
 
-import { chainId, ethereumAddress } from '@blocksense/base-utils/evm-utils';
+import { networkName, ethereumAddress } from '@blocksense/base-utils/evm-utils';
+
+const [_local, ...networkNames] = networkName.literals;
 
 export const ChainlinkAggregatorsSchema = S.Record({
-  key: chainId,
-  value: S.NullOr(ethereumAddress),
+  key: S.Literal(...networkNames),
+  value: S.UndefinedOr(ethereumAddress),
 }).annotations({ identifier: 'ChainlinkAggregators' });
 
 export type ChainlinkAggregators = S.Schema.Type<
@@ -13,7 +15,7 @@ export type ChainlinkAggregators = S.Schema.Type<
 
 export const ChainlinkCompatibilityDataSchema = S.Struct({
   base: S.NullOr(ethereumAddress),
-  quote: S.NullOr(ethereumAddress),
+  quote: ethereumAddress,
   chainlink_aggregators: ChainlinkAggregatorsSchema,
 }).annotations({ identifier: 'ChainlinkCompatibilityData' });
 

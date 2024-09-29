@@ -5,7 +5,7 @@ import { ColumnDef, Row } from '@tanstack/react-table';
 
 import {
   EthereumAddress,
-  explorerUrls,
+  getAddressExplorerUrl,
   NetworkName,
 } from '@blocksense/base-utils/evm-utils';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
@@ -73,11 +73,7 @@ const NetworkAddressExplorerLink = ({ row }: RowWrapper) => {
           variant="outline"
           className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium whitespace-nowrap"
         >
-          <Link
-            href={explorerUrls[network].address(address as EthereumAddress)}
-          >
-            {network}
-          </Link>
+          <Link href={getAddressExplorerUrl(network, address)}>{network}</Link>
         </Badge>
       ))}
     </aside>

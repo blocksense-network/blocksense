@@ -7,7 +7,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "59140": "0x1E5777E847c6e1ed918590D1BDCdDCE3C795404B"
+          "linea-mainnet": "0x1E5777E847c6e1ed918590D1BDCdDCE3C795404B"
         }
       }
     },
@@ -18,8 +18,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xE18a4E99F019F92CD72E0C7C05599d76a89296Cd",
-          "11155420": "0x2EE894990A064f06F31Bf256660426a69e77F0FF"
+          "gnosis-mainnet": "0xafb768EF3aa6a5756f9F2d11CBE04C4EF90949bf",
+          "optimism-mainnet": "0xE18a4E99F019F92CD72E0C7C05599d76a89296Cd",
+          "optimism-sepolia": "0x2EE894990A064f06F31Bf256660426a69e77F0FF"
         }
       }
     },
@@ -30,8 +31,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xeBEE769fF6A85E3Ba27384C5BA0d1fcdf5f2176c",
-          "11155420": "0xC7d7610413C4373716bCA1e2E2d719A2F9C73cC4"
+          "optimism-mainnet": "0xeBEE769fF6A85E3Ba27384C5BA0d1fcdf5f2176c",
+          "optimism-sepolia": "0xC7d7610413C4373716bCA1e2E2d719A2F9C73cC4"
         }
       }
     },
@@ -42,16 +43,18 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xa88757c4D7f75C672a07Ae1Cf8011C4552a275f0",
-          "10": "0x92C9B9C512759f5D04563eFa3698FC4fbF735d59",
-          "56": "0x6C33E05482cA4F9374feaE55724DCF516028E685",
-          "137": "0x35B19A67A41282E39C32650b863F714EB95Dacf5",
-          "324": "0xcdDe7C0b98Af1e95f78c5fE9F2d9428BDBC58a03",
-          "8453": "0xEA990BCCb5b4dA5023B6dc88480297405Fd222c3",
-          "80002": "0x47d74B40f7C3F9cef2633963FF2A66ab86E8cbB3",
-          "421614": "0x8C4308F7cbD7fB829645853cD188500D7dA8610a",
-          "534352": "0x85DD2b093ea221B732752058AF61598d66362722",
-          "11155420": "0x40C4CE6a010405f95d399D17e86c6b879792952e"
+          "ethereum-mainnet": "0xa88757c4D7f75C672a07Ae1Cf8011C4552a275f0",
+          "arbitrum-mainnet": "0x8C4308F7cbD7fB829645853cD188500D7dA8610a",
+          "arbitrum-sepolia": "0xFee9CbFC21Bcc69fdB34E52Ce90Be1c0a3568F0c",
+          "base-mainnet": "0xEA990BCCb5b4dA5023B6dc88480297405Fd222c3",
+          "bsc-mainnet": "0x6C33E05482cA4F9374feaE55724DCF516028E685",
+          "gnosis-mainnet": "0x295442CF6Ba90E91b8a01A7C2dE9d7DB987439C8",
+          "optimism-mainnet": "0x92C9B9C512759f5D04563eFa3698FC4fbF735d59",
+          "optimism-sepolia": "0x40C4CE6a010405f95d399D17e86c6b879792952e",
+          "polygon-mainnet": "0x35B19A67A41282E39C32650b863F714EB95Dacf5",
+          "polygon-amoy": "0x47d74B40f7C3F9cef2633963FF2A66ab86E8cbB3",
+          "scroll-mainnet": "0x85DD2b093ea221B732752058AF61598d66362722",
+          "zksync-mainnet": "0xcdDe7C0b98Af1e95f78c5fE9F2d9428BDBC58a03"
         }
       }
     },
@@ -62,10 +65,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x0d110cC7876d73c3C4190324bCF4C59416bBD259",
-          "59140": "0x1Bd1d8F94111Ca0666fA58C9f3A271aD79512BA6",
-          "11155111": "0xaBc400913676a91A61B798Ed35962602de3544aF",
-          "11155420": "0x6555df705746fdC5531e2A3c2b333a85B588D2e1"
+          "ethereum-sepolia": "0xaBc400913676a91A61B798Ed35962602de3544aF",
+          "linea-mainnet": "0x1Bd1d8F94111Ca0666fA58C9f3A271aD79512BA6",
+          "optimism-mainnet": "0x0d110cC7876d73c3C4190324bCF4C59416bBD259",
+          "optimism-sepolia": "0x6555df705746fdC5531e2A3c2b333a85B588D2e1"
         }
       }
     },
@@ -76,8 +79,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x37DbB228A8BB97fC811913F305f2fAa01013b69C",
-          "421614": "0xAeB20e0A781A31F4cC497A898b17FB4f8137BC83"
+          "ethereum-mainnet": "0x37DbB228A8BB97fC811913F305f2fAa01013b69C",
+          "arbitrum-mainnet": "0xAeB20e0A781A31F4cC497A898b17FB4f8137BC83"
         }
       }
     },
@@ -85,15 +88,15 @@
       "id": 6,
       "description": "SAND / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x3845badAde8e6dFF049820680d1F14bD3903a5d0",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x6AeA2D551798f32c7cd39469211197b58f608a7C",
-          "10": "0x5d1345669278128B77AF9662C5D6B5e0b2FFD54A",
-          "137": "0xFc60685f01ec3E35bfcDB4A704f51513b3738e47",
-          "43113": "0x0dfe99599044B785658b4B58bdbAb092029cd98B",
-          "43114": "0x0B2bFcbE40213cF93CE2Be85156DD16E31483f70",
-          "80002": "0x8cbC4C620B28255ACB6e5cd0CcB878A77FB17E32"
+          "ethereum-mainnet": "0x6AeA2D551798f32c7cd39469211197b58f608a7C",
+          "avalanche-mainnet": "0x0B2bFcbE40213cF93CE2Be85156DD16E31483f70",
+          "avalanche-fuji": "0x0dfe99599044B785658b4B58bdbAb092029cd98B",
+          "optimism-mainnet": "0x5d1345669278128B77AF9662C5D6B5e0b2FFD54A",
+          "polygon-mainnet": "0xFc60685f01ec3E35bfcDB4A704f51513b3738e47",
+          "polygon-amoy": "0x8cbC4C620B28255ACB6e5cd0CcB878A77FB17E32"
         }
       }
     },
@@ -104,7 +107,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xE0e08C0C445AFDa9573Eb5383De4AF62Ee6A88E4"
+          "bsc-mainnet": "0xE0e08C0C445AFDa9573Eb5383De4AF62Ee6A88E4"
         }
       }
     },
@@ -115,11 +118,11 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x206A01D5b59B7D7315B6bC7B5866f62A6fdFF7bA",
-          "56": "0x084EECf8F633b294dd1dB3F28d52891e20a700A4",
-          "97": "0x99100e80B7240B9D8C8E796cA11e07698cF30e30",
-          "137": "0x4C0f82bE65Fa20A4Cc44A5Db503f24742fbF5112",
-          "11155420": "0x093d91DA6e495e412E498Cd3AbcE2D573D182ACE"
+          "bsc-mainnet": "0x084EECf8F633b294dd1dB3F28d52891e20a700A4",
+          "bsc-testnet": "0x99100e80B7240B9D8C8E796cA11e07698cF30e30",
+          "optimism-mainnet": "0x206A01D5b59B7D7315B6bC7B5866f62A6fdFF7bA",
+          "optimism-sepolia": "0x093d91DA6e495e412E498Cd3AbcE2D573D182ACE",
+          "polygon-mainnet": "0x4C0f82bE65Fa20A4Cc44A5Db503f24742fbF5112"
         }
       }
     },
@@ -130,7 +133,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x17D582034c038BaEb17A9E2A969d06f550d3586b"
+          "optimism-mainnet": "0x17D582034c038BaEb17A9E2A969d06f550d3586b"
         }
       }
     },
@@ -141,7 +144,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xDFe0A97F7dd20B551ea0647aA4f89Ae758D0d0EF"
+          "gnosis-mainnet": "0x7FeD35C1e4C303F272E4fcdF19865E85DfA44f72",
+          "polygon-mainnet": "0xDFe0A97F7dd20B551ea0647aA4f89Ae758D0d0EF"
         }
       }
     },
@@ -152,9 +156,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x3B269f943723543f51E5Bd3557E682C36BED5b87",
-          "43113": "0xfd9DA8A5dFaE73966f99F1cb488AcdD3A75BDb08",
-          "43114": "0xfb317b2a4404802dF62c87a5982EE383F2711ce6"
+          "avalanche-mainnet": "0xfb317b2a4404802dF62c87a5982EE383F2711ce6",
+          "avalanche-fuji": "0xfd9DA8A5dFaE73966f99F1cb488AcdD3A75BDb08",
+          "polygon-mainnet": "0x3B269f943723543f51E5Bd3557E682C36BED5b87"
         }
       }
     },
@@ -165,7 +169,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xaAE06edcF9c064f2F73cA264b6aB6a8d86F023C2"
+          "bsc-mainnet": "0xaAE06edcF9c064f2F73cA264b6aB6a8d86F023C2"
         }
       }
     },
@@ -173,12 +177,12 @@
       "id": 13,
       "description": "IMX / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xc240796f93C5659708C5d14D90563e297314C532",
-          "10": "0x5D860ee3A9F47dfd86d40aec1EF7DDD876356F71",
-          "11155420": "0x43DDA2Dd8F3417697058DC4928145E9EFBd468Ad"
+          "ethereum-mainnet": "0xc240796f93C5659708C5d14D90563e297314C532",
+          "optimism-mainnet": "0x5D860ee3A9F47dfd86d40aec1EF7DDD876356F71",
+          "optimism-sepolia": "0x43DDA2Dd8F3417697058DC4928145E9EFBd468Ad"
         }
       }
     },
@@ -189,8 +193,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x0542BbBfbc26A86EA92d2b7f6Da07DAf0CA091eD",
-          "11155420": "0xBd621e2059Dac971beeE35eD6002510537572c1C"
+          "optimism-mainnet": "0x0542BbBfbc26A86EA92d2b7f6Da07DAf0CA091eD",
+          "optimism-sepolia": "0xBd621e2059Dac971beeE35eD6002510537572c1C"
         }
       }
     },
@@ -201,9 +205,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x5d782463840e3a2Ed55e425916d498319f289DEd",
-          "421614": "0x7D5cA9120E0145193a999c1225aE2F32DA401DC3",
-          "11155420": "0x9A4A54D2793ffA9f88bc5D3FdeF1F175D3eE08fb"
+          "arbitrum-mainnet": "0x7D5cA9120E0145193a999c1225aE2F32DA401DC3",
+          "optimism-mainnet": "0x5d782463840e3a2Ed55e425916d498319f289DEd",
+          "optimism-sepolia": "0x9A4A54D2793ffA9f88bc5D3FdeF1F175D3eE08fb"
         }
       }
     },
@@ -214,7 +218,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x4BB4f12EF7af68E17ee552cCbE88790268AD2644"
+          "polygon-mainnet": "0x4BB4f12EF7af68E17ee552cCbE88790268AD2644"
         }
       }
     },
@@ -225,7 +229,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0x2489462e64Ea205386b7b8737609B3701047a77d"
+          "arbitrum-mainnet": "0x2489462e64Ea205386b7b8737609B3701047a77d"
         }
       }
     },
@@ -236,7 +240,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x1640C1a6984f744E069b65d5657c075935474d63"
+          "bsc-mainnet": "0x1640C1a6984f744E069b65d5657c075935474d63"
         }
       }
     },
@@ -247,7 +251,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xc76805E708d11180913265143dE3272B69AD0b80"
+          "polygon-mainnet": "0xc76805E708d11180913265143dE3272B69AD0b80"
         }
       }
     },
@@ -258,8 +262,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xe05a8c52B2e813c9605CFB8F073178ebe5A74705",
-          "11155420": "0x36BF47162A73576B33f25d046fc2b782D2768F18"
+          "optimism-mainnet": "0xe05a8c52B2e813c9605CFB8F073178ebe5A74705",
+          "optimism-sepolia": "0x36BF47162A73576B33f25d046fc2b782D2768F18"
         }
       }
     },
@@ -270,9 +274,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x51041231aB2526d3B4b19Db2bdE2aFE3B2B1D6d8",
-          "137": "0x67aEB9800259C40Cf1aDc087BDdDE3Fad9136E3B",
-          "421614": "0x2e4c363449E2EC7E93cd9ed4F3843c2CA4497108"
+          "arbitrum-mainnet": "0x2e4c363449E2EC7E93cd9ed4F3843c2CA4497108",
+          "bsc-mainnet": "0x51041231aB2526d3B4b19Db2bdE2aFE3B2B1D6d8",
+          "polygon-mainnet": "0x67aEB9800259C40Cf1aDc087BDdDE3Fad9136E3B"
         }
       }
     },
@@ -283,7 +287,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xA90204b8Cffa45EDbca42CB577CDF6fafAbF0d33"
+          "bsc-mainnet": "0xA90204b8Cffa45EDbca42CB577CDF6fafAbF0d33"
         }
       }
     },
@@ -291,10 +295,10 @@
       "id": 23,
       "description": "AVAIL / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xEeB4d8400AEefafC1B2953e0094134A887C76Bd8",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x48ac3CD812680C39879A1Fd1666639dBC9B978C0"
+          "ethereum-mainnet": "0x48ac3CD812680C39879A1Fd1666639dBC9B978C0"
         }
       }
     },
@@ -305,8 +309,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0x038fa58bd4DA1c938D2783941e657164D497C4B6",
-          "421614": "0x69C17BE52399EA82CC0d890EA712da8316C08535"
+          "arbitrum-mainnet": "0x69C17BE52399EA82CC0d890EA712da8316C08535",
+          "base-mainnet": "0x038fa58bd4DA1c938D2783941e657164D497C4B6"
         }
       }
     },
@@ -314,14 +318,15 @@
       "id": 25,
       "description": "BAL / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xba100000625a3754423978a60c9317c58a424e3D",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x2a29c3696dD424d3e703F5F3f2D6Af86598e9303",
-          "10": "0x44f690526B76D91072fb0427B0A24b882E612455",
-          "137": "0x837f41088D2c2AF372aEebC9Ec0A76460669397e",
-          "421614": "0x53368bC6a7eB4f4AF3d6974520FEba0295A5daAb",
-          "11155420": "0x0c04d67cC442F9c09637Cc4D56CA375B3297d833"
+          "ethereum-mainnet": "0x2a29c3696dD424d3e703F5F3f2D6Af86598e9303",
+          "arbitrum-mainnet": "0x53368bC6a7eB4f4AF3d6974520FEba0295A5daAb",
+          "gnosis-mainnet": "0x3F2BA1E94112120d11F1a525913134fBE510bF37",
+          "optimism-mainnet": "0x44f690526B76D91072fb0427B0A24b882E612455",
+          "optimism-sepolia": "0x0c04d67cC442F9c09637Cc4D56CA375B3297d833",
+          "polygon-mainnet": "0x837f41088D2c2AF372aEebC9Ec0A76460669397e"
         }
       }
     },
@@ -329,12 +334,12 @@
       "id": 26,
       "description": "DPI / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x1494CA1F11D487c2bBe4543E90080AeBa4BA3C2b",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x2878E76c12dAD8DFfDcCeb52588e091aa3858d26",
-          "137": "0x40698914C15b07C6daa5a76829Ee6639989b8Edf",
-          "421614": "0xe7F278c6cf5A9349f98F01A9c8ddD6Eaa2a1DD24"
+          "ethereum-mainnet": "0x2878E76c12dAD8DFfDcCeb52588e091aa3858d26",
+          "arbitrum-mainnet": "0xe7F278c6cf5A9349f98F01A9c8ddD6Eaa2a1DD24",
+          "polygon-mainnet": "0x40698914C15b07C6daa5a76829Ee6639989b8Edf"
         }
       }
     },
@@ -345,7 +350,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xcc66FdAAe873434259b0cEc8FA12fe03e937A64f"
+          "polygon-mainnet": "0xcc66FdAAe873434259b0cEc8FA12fe03e937A64f"
         }
       }
     },
@@ -356,11 +361,11 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xB6B77f1696bc4F95860228286d27f7f4df5D26e4",
-          "56": "0x63d009877EFBE61A74eBE40e682eF5593213B6C1",
-          "137": "0xF4427712809751316A429F6dd6479Eb954B81277",
-          "8453": "0x97100bac08Ef1532401041b5F864B4De999ab6D4",
-          "11155420": "0x8585a1718121c7Aff9804918e9477fB48a2c587B"
+          "base-mainnet": "0x97100bac08Ef1532401041b5F864B4De999ab6D4",
+          "bsc-mainnet": "0x63d009877EFBE61A74eBE40e682eF5593213B6C1",
+          "optimism-mainnet": "0xB6B77f1696bc4F95860228286d27f7f4df5D26e4",
+          "optimism-sepolia": "0x8585a1718121c7Aff9804918e9477fB48a2c587B",
+          "polygon-mainnet": "0xF4427712809751316A429F6dd6479Eb954B81277"
         }
       }
     },
@@ -371,8 +376,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xDaD904E1C8387E0626De1443F112C9d0123e5a03",
-          "11155420": "0x50c3468eBf3c3AAb3B56402c22BE576f108D53AD"
+          "optimism-mainnet": "0xDaD904E1C8387E0626De1443F112C9d0123e5a03",
+          "optimism-sepolia": "0x50c3468eBf3c3AAb3B56402c22BE576f108D53AD"
         }
       }
     },
@@ -383,8 +388,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x4420e05bA6826150fa8D325700be8A3B6B8E3d27",
-          "11155420": "0xd42D89a94bbfe9a6D218038A433e965651A46554"
+          "optimism-mainnet": "0x4420e05bA6826150fa8D325700be8A3B6B8E3d27",
+          "optimism-sepolia": "0xd42D89a94bbfe9a6D218038A433e965651A46554"
         }
       }
     },
@@ -395,31 +400,34 @@
         "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x4a3411ac2948B33c69666B35cc6d055B27Ea84f1",
-          "10": "0x0C1272d2aC652D10d03bb4dEB0D31F15ea3EAb2b",
-          "56": "0x5ecf6303BF228Ee55eF50CBA4F173B467d87C300",
-          "97": "0xAAf337687be186caE90Db1230d4C31567BeB32Ef",
-          "137": "0x014497a2AEF847C7021b17BFF70A68221D22AA63",
-          "250": "0x472105bB154bD92580a9669AB2483864c3dE9974",
-          "300": "0xBd80C05cD87e7517Fec70128b08A2f3E0a4Ec4ee",
-          "324": "0xE45a3ab1a1CEDC47f704f83Ef7e28B9BB6b0594a",
-          "1088": "0x0F13cfAE20B3df71EEEFd67a260ECf0CF15629fA",
-          "1101": "0x199F9e430C2970832f4483ED0013ABd8D247715d",
-          "1442": "0xD1092a65338d049DB68D7Be6bD89d17a0929945e",
-          "4002": "0xA827d4d54655b0Cd61249079fc3b70521aa3670e",
-          "8453": "0x852aE0B1Af1aAeDB0fC4428B4B24420780976ca8",
-          "42220": "0xA0154BC860af66d4dedF77d858292847B9292739",
-          "43113": "0xEC95B4b38245689EDcF3E2e48B098257D06eAbBc",
-          "43114": "0xa9Afa74dDAC812B86Eeaa60A035c6592470F4A48",
-          "44787": "0x0005793E925C2485A79Ff53663429496C3EafC78",
-          "59140": "0xD71cD2e38B7F65421bB59A872cca021e685647CC",
-          "80002": "0xd4cfC9C436c61bEF92E8002603c825401A2cCaa8",
-          "84532": "0x961AD289351459A45fC90884eF3AB0278ea95DDE",
-          "421614": "0x942d00008D658dbB40745BBEc89A93c253f9B882",
-          "534351": "0x6654b9c2B98d2bc001fe8937D6636b1398C61ccb",
-          "534352": "0xCbD4CB4116Dee5273Cbeb36F26Edb3640055cD34",
-          "11155111": "0x6B4181139e9500D0C21788e7c6B21c1d0d9b1112",
-          "11155420": "0x2E7B57987A1E2c7B028fD2183EB21634e260f9cc"
+          "ethereum-mainnet": "0x4a3411ac2948B33c69666B35cc6d055B27Ea84f1",
+          "ethereum-sepolia": "0x6B4181139e9500D0C21788e7c6B21c1d0d9b1112",
+          "avalanche-mainnet": "0xa9Afa74dDAC812B86Eeaa60A035c6592470F4A48",
+          "avalanche-fuji": "0xEC95B4b38245689EDcF3E2e48B098257D06eAbBc",
+          "andromeda-mainnet": "0x0F13cfAE20B3df71EEEFd67a260ECf0CF15629fA",
+          "arbitrum-mainnet": "0x942d00008D658dbB40745BBEc89A93c253f9B882",
+          "arbitrum-sepolia": "0xd94522a6feF7779f672f4C88eb672da9222f2eAc",
+          "base-mainnet": "0x852aE0B1Af1aAeDB0fC4428B4B24420780976ca8",
+          "base-sepolia": "0x961AD289351459A45fC90884eF3AB0278ea95DDE",
+          "bsc-mainnet": "0x5ecf6303BF228Ee55eF50CBA4F173B467d87C300",
+          "bsc-testnet": "0xAAf337687be186caE90Db1230d4C31567BeB32Ef",
+          "celo-mainnet": "0xA0154BC860af66d4dedF77d858292847B9292739",
+          "celo-alfajores": "0x0005793E925C2485A79Ff53663429496C3EafC78",
+          "fantom-mainnet": "0x472105bB154bD92580a9669AB2483864c3dE9974",
+          "fantom-testnet": "0xA827d4d54655b0Cd61249079fc3b70521aa3670e",
+          "gnosis-mainnet": "0xaD479D707a8f1fAA346Fe1380f76CF993ae54330",
+          "linea-mainnet": "0xD71cD2e38B7F65421bB59A872cca021e685647CC",
+          "kusama-moonriver": "0xff9E6849F257D8b62c733B4E8370613406d52f3c",
+          "optimism-mainnet": "0x0C1272d2aC652D10d03bb4dEB0D31F15ea3EAb2b",
+          "optimism-sepolia": "0x2E7B57987A1E2c7B028fD2183EB21634e260f9cc",
+          "polygon-mainnet": "0x014497a2AEF847C7021b17BFF70A68221D22AA63",
+          "polygon-amoy": "0xd4cfC9C436c61bEF92E8002603c825401A2cCaa8",
+          "polygon-zkevm-mainnet": "0x199F9e430C2970832f4483ED0013ABd8D247715d",
+          "polygon-zkevm-cardona": "0xD1092a65338d049DB68D7Be6bD89d17a0929945e",
+          "scroll-mainnet": "0xCbD4CB4116Dee5273Cbeb36F26Edb3640055cD34",
+          "scroll-sepolia": "0x6654b9c2B98d2bc001fe8937D6636b1398C61ccb",
+          "zksync-mainnet": "0xE45a3ab1a1CEDC47f704f83Ef7e28B9BB6b0594a",
+          "zksync-sepolia": "0xBd80C05cD87e7517Fec70128b08A2f3E0a4Ec4ee"
         }
       }
     },
@@ -430,8 +438,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xE5D13134e228d74eF8b3881618e04221D50543bA",
-          "11155420": "0x1e8e918D0301feFc73F491b9cF2acee25a8Ab2bd"
+          "optimism-mainnet": "0xE5D13134e228d74eF8b3881618e04221D50543bA",
+          "optimism-sepolia": "0x1e8e918D0301feFc73F491b9cF2acee25a8Ab2bd"
         }
       }
     },
@@ -439,29 +447,32 @@
       "id": 33,
       "description": "DAI / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x709783ab12b65fD6cd948214EEe6448f3BdD72A3",
-          "10": "0xbCe7579e241e5d676c2371Dc21891489dAcDA250",
-          "56": "0xd61f17d4E525ad1B2AAC5Cc2651851AD909d4431",
-          "97": "0x99c28445E2D64c9f187973459F90B8486dea2655",
-          "137": "0xd02B4faAd9f0b0EA05ADbF451499f373c548c141",
-          "250": "0x15e682Ba1F3e68D507Eb8D21F2D2a90bA82559Ae",
-          "300": "0xeA4956B1c05Fd6EFe38aCF7C77AE8F917A085C40",
-          "324": "0x963BD826c8827553130f2EFb957a9c3873f3165E",
-          "1088": "0x2d338D3b5AF189984A03c6785899Cc681aBe6C4B",
-          "1101": "0x89c06EDf70662a472353FA22c085B4bc7b9ACbe2",
-          "8453": "0x21b1E4eA0E9AE2e79932662300eB12A0f90AbE59",
-          "43114": "0x94BdDfA622FcEB1b44e50608cb02f1a583784224",
-          "59140": "0xE6EbCA31B844175bf4d8D19685982D1D5b535093",
-          "80002": "0x96Eed9a504dC55E9307f011EcE55b6D43024ccAc",
-          "84532": "0x6eaE3676F1124D7201c541950f633E3766D056dA",
-          "421614": "0xFc06bB03a9e1D8033f87eA6A682cbd65477A43b9",
-          "534351": "0x4a5E8cB6D3C6Bd26f9DFBD2b138F616fa2E68058",
-          "534352": "0x940b5c8d6f757Af7e8c5266215314819932C0cCd",
-          "11155111": "0xd558aA7DeCddeF5ce60A48B165b0Ed66660558bD",
-          "11155420": "0x96d0CbdA3A58c86f987ba50168802758D5617057"
+          "ethereum-mainnet": "0x709783ab12b65fD6cd948214EEe6448f3BdD72A3",
+          "ethereum-sepolia": "0xd558aA7DeCddeF5ce60A48B165b0Ed66660558bD",
+          "avalanche-mainnet": "0x94BdDfA622FcEB1b44e50608cb02f1a583784224",
+          "andromeda-mainnet": "0x2d338D3b5AF189984A03c6785899Cc681aBe6C4B",
+          "arbitrum-mainnet": "0xFc06bB03a9e1D8033f87eA6A682cbd65477A43b9",
+          "arbitrum-sepolia": "0xAc6DB6d5538Cd07f58afee9dA736ce192119017B",
+          "base-mainnet": "0x21b1E4eA0E9AE2e79932662300eB12A0f90AbE59",
+          "base-sepolia": "0x6eaE3676F1124D7201c541950f633E3766D056dA",
+          "bsc-mainnet": "0xd61f17d4E525ad1B2AAC5Cc2651851AD909d4431",
+          "bsc-testnet": "0x99c28445E2D64c9f187973459F90B8486dea2655",
+          "fantom-mainnet": "0x15e682Ba1F3e68D507Eb8D21F2D2a90bA82559Ae",
+          "gnosis-mainnet": "0xb65566283CAcE6b281308308da0f0783a613c416",
+          "linea-mainnet": "0xE6EbCA31B844175bf4d8D19685982D1D5b535093",
+          "kusama-moonriver": "0xeE6E82aD7cA1E83779b39ea34ECfc57b5d46C500",
+          "optimism-mainnet": "0xbCe7579e241e5d676c2371Dc21891489dAcDA250",
+          "optimism-sepolia": "0x96d0CbdA3A58c86f987ba50168802758D5617057",
+          "polygon-mainnet": "0xd02B4faAd9f0b0EA05ADbF451499f373c548c141",
+          "polygon-amoy": "0x96Eed9a504dC55E9307f011EcE55b6D43024ccAc",
+          "polygon-zkevm-mainnet": "0x89c06EDf70662a472353FA22c085B4bc7b9ACbe2",
+          "scroll-mainnet": "0x940b5c8d6f757Af7e8c5266215314819932C0cCd",
+          "scroll-sepolia": "0x4a5E8cB6D3C6Bd26f9DFBD2b138F616fa2E68058",
+          "zksync-mainnet": "0x963BD826c8827553130f2EFb957a9c3873f3165E",
+          "zksync-sepolia": "0xeA4956B1c05Fd6EFe38aCF7C77AE8F917A085C40"
         }
       }
     },
@@ -472,7 +483,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xFbBc7E59dd02ADa97FfB0f85C36cE14B1A3Fdfc2"
+          "bsc-mainnet": "0xFbBc7E59dd02ADa97FfB0f85C36cE14B1A3Fdfc2"
         }
       }
     },
@@ -483,7 +494,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x09871EF6eCf97667A11FF467A6DD4D5C5629F1bb"
+          "polygon-mainnet": "0x09871EF6eCf97667A11FF467A6DD4D5C5629F1bb"
         }
       }
     },
@@ -491,15 +502,16 @@
       "id": 36,
       "description": "1INCH / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x111111111117dC0aa78b770fA6A738034120C302",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x6AD3961c0348906504ff4125722e4Aa5146ff529",
-          "10": "0xbF620CB752ba2d16bAe2a3c5488cbf00b7D0Cc67",
-          "56": "0x27847d350F93B95744d6114e04F04cCb58d4bE9A",
-          "137": "0xaA931f96d9673e1688f6AB63eC3E83B22D9b1849",
-          "421614": "0xa64344ec6b4971d1FBDaf5550001ac5751EEd599",
-          "11155420": "0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1"
+          "ethereum-mainnet": "0x6AD3961c0348906504ff4125722e4Aa5146ff529",
+          "arbitrum-mainnet": "0xa64344ec6b4971d1FBDaf5550001ac5751EEd599",
+          "bsc-mainnet": "0x27847d350F93B95744d6114e04F04cCb58d4bE9A",
+          "gnosis-mainnet": "0xf50a71387D9D01ED3873E32f1044497327AF1044",
+          "optimism-mainnet": "0xbF620CB752ba2d16bAe2a3c5488cbf00b7D0Cc67",
+          "optimism-sepolia": "0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1",
+          "polygon-mainnet": "0xaA931f96d9673e1688f6AB63eC3E83B22D9b1849"
         }
       }
     },
@@ -510,7 +522,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0x9BDA3a26361b6021b5a4DF6E77e2cfb3A54A967b"
+          "arbitrum-mainnet": "0x9BDA3a26361b6021b5a4DF6E77e2cfb3A54A967b"
         }
       }
     },
@@ -521,7 +533,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "43114": "0xbAB7eC733E04E4Ca028A303003c215D93574Ca2F"
+          "avalanche-mainnet": "0xbAB7eC733E04E4Ca028A303003c215D93574Ca2F"
         }
       }
     },
@@ -529,14 +541,14 @@
       "id": 39,
       "description": "TUSD / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x0000000000085d4780B73119b644AE5ecd22b376",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xffB5820Df5F3366949754b31AB1E48331b943C1f",
-          "56": "0xB8a62D647b176B9AB10Fa0c2078b718f62aE2eBE",
-          "137": "0x24c1772f2725af97F0811Dc3Aee99B17dfd6115E",
-          "43114": "0xFE7019D5BCD395C56FB1cF43be548B1F056288FB",
-          "421614": "0xEC2E9000B487F28Fd03455f9277bE3c96a3180b2"
+          "ethereum-mainnet": "0xffB5820Df5F3366949754b31AB1E48331b943C1f",
+          "avalanche-mainnet": "0xFE7019D5BCD395C56FB1cF43be548B1F056288FB",
+          "arbitrum-mainnet": "0xEC2E9000B487F28Fd03455f9277bE3c96a3180b2",
+          "bsc-mainnet": "0xB8a62D647b176B9AB10Fa0c2078b718f62aE2eBE",
+          "polygon-mainnet": "0x24c1772f2725af97F0811Dc3Aee99B17dfd6115E"
         }
       }
     },
@@ -547,7 +559,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xe12A5bc8c0BEaB7B63bE47D4D4588E0195435415"
+          "bsc-mainnet": "0xe12A5bc8c0BEaB7B63bE47D4D4588E0195435415"
         }
       }
     },
@@ -558,7 +570,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "11155111": "0x82bCEd94ba4578CC8E4E7F1341f55f2cDBEbC7D1"
+          "ethereum-sepolia": "0x82bCEd94ba4578CC8E4E7F1341f55f2cDBEbC7D1"
         }
       }
     },
@@ -569,7 +581,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x6f58a80867489738f5155596488b0100531A0b6B"
+          "bsc-mainnet": "0x6f58a80867489738f5155596488b0100531A0b6B"
         }
       }
     },
@@ -580,13 +592,15 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x65F2c716937FB44b2C28417A7AfC2DACcF1C2D61",
-          "137": "0x039903dDc82D06ad885b7bc9d9D5A9e550b3416D",
-          "250": "0xe67D6eDDFF2d7A09c3070e5f564F35E559E32C17",
-          "8453": "0xE186722b9d5C063625C49a4BF6Bb3d669F66A8b5",
-          "43114": "0x3de683f981469069D0d5C30b0C7763ceC543221d",
-          "421614": "0xb20bd22d3D2E5a628523d37b3DED569598EB649b",
-          "534352": "0xAb6F72DA09A088a57A254FAbEe3d86d14d0dDc8D"
+          "avalanche-mainnet": "0x3de683f981469069D0d5C30b0C7763ceC543221d",
+          "arbitrum-mainnet": "0xb20bd22d3D2E5a628523d37b3DED569598EB649b",
+          "base-mainnet": "0xE186722b9d5C063625C49a4BF6Bb3d669F66A8b5",
+          "fantom-mainnet": "0xe67D6eDDFF2d7A09c3070e5f564F35E559E32C17",
+          "gnosis-mainnet": "0x5ED6A59735297Bc5D6CB4942913Ae7098E0cD703",
+          "kusama-moonriver": "0x2a7055C44094F7e1c14585DA4FA19b2A69ff64dC",
+          "optimism-mainnet": "0x65F2c716937FB44b2C28417A7AfC2DACcF1C2D61",
+          "polygon-mainnet": "0x039903dDc82D06ad885b7bc9d9D5A9e550b3416D",
+          "scroll-mainnet": "0xAb6F72DA09A088a57A254FAbEe3d86d14d0dDc8D"
         }
       }
     },
@@ -597,9 +611,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xD302285C018B46dEb7A0D6D170ee680553c049eB",
-          "97": "0xee3094085582e55767C5313ED144Fd28c1E26ADe",
-          "421614": "0x8f99f05E0a5Fa19579525A60801A0F473adB1CE1"
+          "arbitrum-mainnet": "0x8f99f05E0a5Fa19579525A60801A0F473adB1CE1",
+          "bsc-mainnet": "0xD302285C018B46dEb7A0D6D170ee680553c049eB",
+          "bsc-testnet": "0xee3094085582e55767C5313ED144Fd28c1E26ADe"
         }
       }
     },
@@ -610,7 +624,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x56a860c32ABb5C7bB770aAFAc68f32294dc88301"
+          "bsc-mainnet": "0x56a860c32ABb5C7bB770aAFAc68f32294dc88301"
         }
       }
     },
@@ -621,7 +635,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "43114": "0xa9f3A8f87CC2156049C38e1aA2134A9a1B5A2fae"
+          "avalanche-mainnet": "0xa9f3A8f87CC2156049C38e1aA2134A9a1B5A2fae"
         }
       }
     },
@@ -632,31 +646,34 @@
         "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x7d4E742018fb52E48b08BE73d041C18B21de6Fb5",
-          "10": "0x02f5E9e9dcc66ba6392f6904D5Fcf8625d9B19C9",
-          "56": "0x4b09a53349F9a59015521406CE580fD2E40d4E36",
-          "97": "0xa69753A65669116BCe927a5f0A3C4F1cb5C8F8b2",
-          "137": "0x63db7e86391F5d31BAB58808Bcf75eDB272F4F5C",
-          "250": "0x50f8339E5668F85Bcb4D8DF987C12b7Df4c99084",
-          "300": "0xcdd20Bb89e85c5bABd540874eF274277FE16B390",
-          "324": "0xB43Ea5b13F41aAC35703124f826ec0F3a3CABE0E",
-          "1088": "0x9656158b18Bc67ed62EcE17b385ac2A696513010",
-          "1101": "0xBc43dFDeC65cd7031Cd4835aD23EfA4b728c2E83",
-          "1442": "0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1",
-          "4002": "0x7C45463757a6C1551D8Fe7796d173012138984f7",
-          "8453": "0x57d2d46Fc7ff2A7142d479F2f59e1E3F95447077",
-          "42220": "0x4d96b289326603e18762A49E57A6B7073220312e",
-          "43113": "0xf829C9aa5569ae7FC047b2344631778069F3FE39",
-          "43114": "0x9ff520924dC295074F43a8a01Ee30a4D39a4223b",
-          "44787": "0xA7171399336ac52E756c2157f805741851F8c117",
-          "59140": "0x0635163285C6ef5692167F18b799FB339DF064f8",
-          "80002": "0xF1764080A314dc6AcB3cf84245721b08400Fdd1B",
-          "84532": "0xa24A68DD788e1D7eb4CA517765CFb2b7e217e7a3",
-          "421614": "0x3607e46698d218B3a5Cae44bF381475C0a5e2ca7",
-          "534351": "0x917f3E5946bF84E8CF54e4EFD00CF5748B342376",
-          "534352": "0x52d9a4FaC326934c593b451dDA6f53bBA053577F",
-          "11155111": "0xbc81e1F60e6F17cDF63C706c8e8A80E3073d52Db",
-          "11155420": "0x466A262E70d92eefd641ad508a6D7B3AC67D9949"
+          "ethereum-mainnet": "0x7d4E742018fb52E48b08BE73d041C18B21de6Fb5",
+          "ethereum-sepolia": "0xbc81e1F60e6F17cDF63C706c8e8A80E3073d52Db",
+          "avalanche-mainnet": "0x9ff520924dC295074F43a8a01Ee30a4D39a4223b",
+          "avalanche-fuji": "0xf829C9aa5569ae7FC047b2344631778069F3FE39",
+          "andromeda-mainnet": "0x9656158b18Bc67ed62EcE17b385ac2A696513010",
+          "arbitrum-mainnet": "0x3607e46698d218B3a5Cae44bF381475C0a5e2ca7",
+          "arbitrum-sepolia": "0xf3138B59cAcbA1a4d7d24fA7b184c20B3941433e",
+          "base-mainnet": "0x57d2d46Fc7ff2A7142d479F2f59e1E3F95447077",
+          "base-sepolia": "0xa24A68DD788e1D7eb4CA517765CFb2b7e217e7a3",
+          "bsc-mainnet": "0x4b09a53349F9a59015521406CE580fD2E40d4E36",
+          "bsc-testnet": "0xa69753A65669116BCe927a5f0A3C4F1cb5C8F8b2",
+          "celo-mainnet": "0x4d96b289326603e18762A49E57A6B7073220312e",
+          "celo-alfajores": "0xA7171399336ac52E756c2157f805741851F8c117",
+          "fantom-mainnet": "0x50f8339E5668F85Bcb4D8DF987C12b7Df4c99084",
+          "fantom-testnet": "0x7C45463757a6C1551D8Fe7796d173012138984f7",
+          "gnosis-mainnet": "0x059e7Bd8157e0d302dF3626E162B6C835340b311",
+          "linea-mainnet": "0x0635163285C6ef5692167F18b799FB339DF064f8",
+          "kusama-moonriver": "0x59B01FacB3C3A17c7a0b035297E00d0c46fBe007",
+          "optimism-mainnet": "0x02f5E9e9dcc66ba6392f6904D5Fcf8625d9B19C9",
+          "optimism-sepolia": "0x466A262E70d92eefd641ad508a6D7B3AC67D9949",
+          "polygon-mainnet": "0x63db7e86391F5d31BAB58808Bcf75eDB272F4F5C",
+          "polygon-amoy": "0xF1764080A314dc6AcB3cf84245721b08400Fdd1B",
+          "polygon-zkevm-mainnet": "0xBc43dFDeC65cd7031Cd4835aD23EfA4b728c2E83",
+          "polygon-zkevm-cardona": "0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1",
+          "scroll-mainnet": "0x52d9a4FaC326934c593b451dDA6f53bBA053577F",
+          "scroll-sepolia": "0x917f3E5946bF84E8CF54e4EFD00CF5748B342376",
+          "zksync-mainnet": "0xB43Ea5b13F41aAC35703124f826ec0F3a3CABE0E",
+          "zksync-sepolia": "0xcdd20Bb89e85c5bABd540874eF274277FE16B390"
         }
       }
     },
@@ -667,7 +684,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xEBc3F5B57Bd33F8D5b4EA62eDE9539865B47e2b9"
+          "polygon-mainnet": "0xEBc3F5B57Bd33F8D5b4EA62eDE9539865B47e2b9"
         }
       }
     },
@@ -678,8 +695,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x567BAD713b060320f3675081B930cf53b2a0Fe6D",
-          "137": "0x3D9b02dba75AfDa94F973F537A7f058f5788eDE6"
+          "bsc-mainnet": "0x567BAD713b060320f3675081B930cf53b2a0Fe6D",
+          "gnosis-mainnet": "0xD8aE5c2AEec843531Df1e523D775d870f877103C",
+          "polygon-mainnet": "0x3D9b02dba75AfDa94F973F537A7f058f5788eDE6"
         }
       }
     },
@@ -690,7 +708,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xB494AA7495Fbe1C55f4E039e7257810d0FD0DE98"
+          "bsc-mainnet": "0xB494AA7495Fbe1C55f4E039e7257810d0FD0DE98"
         }
       }
     },
@@ -701,7 +719,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "97": "0xB747B2FE964f83715Ee657d70238AB781ba40c39"
+          "bsc-testnet": "0xB747B2FE964f83715Ee657d70238AB781ba40c39"
         }
       }
     },
@@ -712,8 +730,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x86bC50dBf15Aa7342BA5B2EAa6247b4acb228a3D",
-          "97": "0xA4B281E6e3075603F1c1a724A9C65a70Aff23567"
+          "bsc-mainnet": "0x86bC50dBf15Aa7342BA5B2EAa6247b4acb228a3D",
+          "bsc-testnet": "0xA4B281E6e3075603F1c1a724A9C65a70Aff23567"
         }
       }
     },
@@ -724,9 +742,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xF36C5D4C31B7E0c4D82f1C35246Bc6982344d87E",
-          "421614": "0x4B552F6496a9E5E05B51BDdC372E623b76560155",
-          "11155420": "0x988A0F662d75C451ac49125c4F109e7B37C0d63E"
+          "arbitrum-mainnet": "0x4B552F6496a9E5E05B51BDdC372E623b76560155",
+          "bsc-mainnet": "0xF36C5D4C31B7E0c4D82f1C35246Bc6982344d87E",
+          "optimism-sepolia": "0x988A0F662d75C451ac49125c4F109e7B37C0d63E"
         }
       }
     },
@@ -737,8 +755,8 @@
         "base": "0x000000000000000000000000000000000000022A",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xbCD99Bc4C5Bee667939bf7E9B3367d0A0Fa096a0",
-          "137": "0x3978c2cA359925245C4ac2ECe7670920FD8E15ce"
+          "ethereum-mainnet": "0xbCD99Bc4C5Bee667939bf7E9B3367d0A0Fa096a0",
+          "polygon-mainnet": "0x3978c2cA359925245C4ac2ECe7670920FD8E15ce"
         }
       }
     },
@@ -749,9 +767,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x5e8A3e56e790C9DcAA1657aa9f399F2c954649De",
-          "8453": "0x6adE13EeacDd21e96FE2A6F4E2a5C6cf4FD30C00",
-          "421614": "0x6B37301D8723009dE204baf49e9AF6d4D37fe654"
+          "arbitrum-mainnet": "0x6B37301D8723009dE204baf49e9AF6d4D37fe654",
+          "base-mainnet": "0x6adE13EeacDd21e96FE2A6F4E2a5C6cf4FD30C00",
+          "optimism-mainnet": "0x5e8A3e56e790C9DcAA1657aa9f399F2c954649De"
         }
       }
     },
@@ -762,12 +780,13 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xb14cbe04a49bF352B939576f9f9665E1D8DC02d2",
-          "56": "0x923f7aE6BC5FA488D82cFD9130ECE95cF6c975f4",
-          "97": "0x9BC4465c511A45632B4aC129aE23fEfdf807448b",
-          "137": "0x8d5E29FF3B3f55D58AbB165EA9Ce3886C0A43Fc7",
-          "421614": "0x1Fe010E64b5Df97BCB034870334Ff8FbB02ad019",
-          "11155420": "0xD7B686779D854499CC034f066C73B2E09e288490"
+          "arbitrum-mainnet": "0x1Fe010E64b5Df97BCB034870334Ff8FbB02ad019",
+          "arbitrum-sepolia": "0xbB85E0166E229B70eEcfD87d72C606756317480A",
+          "bsc-mainnet": "0x923f7aE6BC5FA488D82cFD9130ECE95cF6c975f4",
+          "bsc-testnet": "0x9BC4465c511A45632B4aC129aE23fEfdf807448b",
+          "optimism-mainnet": "0xb14cbe04a49bF352B939576f9f9665E1D8DC02d2",
+          "optimism-sepolia": "0xD7B686779D854499CC034f066C73B2E09e288490",
+          "polygon-mainnet": "0x8d5E29FF3B3f55D58AbB165EA9Ce3886C0A43Fc7"
         }
       }
     },
@@ -778,10 +797,11 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x81d9a9056e9Af6585010B784Df5853a0fDEf8b11",
-          "56": "0x5988452C7b6890C27D6D3b04ee6cDbB57CB6EB26",
-          "421614": "0x77b911DBe147ED5b4554997860D6362A5652fC91",
-          "11155420": "0x0153002d20B96532C639313c2d54c3dA09109309"
+          "arbitrum-mainnet": "0x77b911DBe147ED5b4554997860D6362A5652fC91",
+          "arbitrum-sepolia": "0x924A5C0627D30A178cB481b8EdDC163D0Ee477b4",
+          "bsc-mainnet": "0x5988452C7b6890C27D6D3b04ee6cDbB57CB6EB26",
+          "optimism-mainnet": "0x81d9a9056e9Af6585010B784Df5853a0fDEf8b11",
+          "optimism-sepolia": "0x0153002d20B96532C639313c2d54c3dA09109309"
         }
       }
     },
@@ -789,10 +809,10 @@
       "id": 58,
       "description": "USDP / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x8E870D67F660D95d5be530380D0eC0bd388289E1",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xb611401574061947aBAc7d2406711F115BE22A6e"
+          "ethereum-mainnet": "0xb611401574061947aBAc7d2406711F115BE22A6e"
         }
       }
     },
@@ -803,7 +823,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xD2fC792221074d8c148B15e9121D0AFe9cd5Df48"
+          "bsc-mainnet": "0xD2fC792221074d8c148B15e9121D0AFe9cd5Df48"
         }
       }
     },
@@ -814,10 +834,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x50Ac053Def94ec35D87CA8234BCbB9a84e85ff3c",
-          "56": "0xe1F448180aEb3c47296C795262DCd8E2f8543683",
-          "137": "0xbc128024295Ed113926C4Dd49fb71964cfc9D516",
-          "11155420": "0xFB40555E80ab1b49644Feb1437Ef38A7c0711b11"
+          "bsc-mainnet": "0xe1F448180aEb3c47296C795262DCd8E2f8543683",
+          "optimism-mainnet": "0x50Ac053Def94ec35D87CA8234BCbB9a84e85ff3c",
+          "optimism-sepolia": "0xFB40555E80ab1b49644Feb1437Ef38A7c0711b11",
+          "polygon-mainnet": "0xbc128024295Ed113926C4Dd49fb71964cfc9D516"
         }
       }
     },
@@ -828,9 +848,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x6b247A09221E60ebafeE77d2869F41EBD70448cd",
-          "97": "0x509f0F2de9B5f10C464c43D64D6b211993f7E253",
-          "421614": "0x496000e12F6d5A2eC4512a6bE34Fe36ba84E6349"
+          "arbitrum-mainnet": "0x496000e12F6d5A2eC4512a6bE34Fe36ba84E6349",
+          "bsc-mainnet": "0x6b247A09221E60ebafeE77d2869F41EBD70448cd",
+          "bsc-testnet": "0x509f0F2de9B5f10C464c43D64D6b211993f7E253"
         }
       }
     },
@@ -841,12 +861,12 @@
         "base": "0x000000000000000000000000000000000000033a",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x563F9b302aF72aeeb8A411228CDc65b30cA1CB75",
-          "56": "0x7Bc0882B4F4246965c665ce0CB5AFFC5c101e6EE",
-          "137": "0xcDc3a8ba7aEEAc3a75082C148f34acae7C5B6338",
-          "421614": "0x78f28D363533695458696b42577D2e1728cEa3D1",
-          "11155111": "0x708330CB6361ea98995f6e0fE68CD217b75Ea009",
-          "11155420": "0x960861F7B8AF0CA7469852edB1d7EBF71526D46c"
+          "ethereum-mainnet": "0x563F9b302aF72aeeb8A411228CDc65b30cA1CB75",
+          "ethereum-sepolia": "0x708330CB6361ea98995f6e0fE68CD217b75Ea009",
+          "arbitrum-mainnet": "0x78f28D363533695458696b42577D2e1728cEa3D1",
+          "bsc-mainnet": "0x7Bc0882B4F4246965c665ce0CB5AFFC5c101e6EE",
+          "optimism-sepolia": "0x960861F7B8AF0CA7469852edB1d7EBF71526D46c",
+          "polygon-mainnet": "0xcDc3a8ba7aEEAc3a75082C148f34acae7C5B6338"
         }
       }
     },
@@ -857,8 +877,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x4CEFB2B0cf301402A30e1d1eB94cBA7d6250a32A",
-          "137": "0x22252D4293BB9D9eC3F47467d5B54EdFf31bD18C"
+          "bsc-mainnet": "0x4CEFB2B0cf301402A30e1d1eB94cBA7d6250a32A",
+          "polygon-mainnet": "0x22252D4293BB9D9eC3F47467d5B54EdFf31bD18C"
         }
       }
     },
@@ -869,9 +889,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xDa6fCf88c718eCEB18c2c08A543562b1146F4996",
-          "137": "0x744A2AA7ED8EBed138ac4A215135d2865F538979",
-          "11155420": "0xAf2eCDD9Eda79Ab26a234ce298BEE0761480f377"
+          "optimism-mainnet": "0xDa6fCf88c718eCEB18c2c08A543562b1146F4996",
+          "optimism-sepolia": "0xAf2eCDD9Eda79Ab26a234ce298BEE0761480f377",
+          "polygon-mainnet": "0x744A2AA7ED8EBed138ac4A215135d2865F538979"
         }
       }
     },
@@ -882,9 +902,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0xc95cd3490be4af06F0A25435e21C2c91B988C482",
-          "42220": "0xe0c266443401929B11A41156520b060E0bFec572",
-          "43114": "0xd2eB0f960e2Af673C4162c82ffBf7e967534C1D9"
+          "avalanche-mainnet": "0xd2eB0f960e2Af673C4162c82ffBf7e967534C1D9",
+          "base-mainnet": "0xc95cd3490be4af06F0A25435e21C2c91B988C482",
+          "celo-mainnet": "0xe0c266443401929B11A41156520b060E0bFec572"
         }
       }
     },
@@ -895,13 +915,13 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xB38d1D12Ba17aA62255e588a0bC845c1a589A50d",
-          "10": "0xcC341634464b6FD1221e4d517cD7801155ABaC55",
-          "56": "0x3D39027E638f331B6FC48A9582934A2f40eD106C",
-          "137": "0x0bd714b38F0f15746f682Ed76ac5e2faA85A0088",
-          "43114": "0xDEaC6b0CA04377F0051CB8C7A83c5e6F6525106d",
-          "421614": "0x0A4d55347817738166e2eF8302e12F99CfbDdEDD",
-          "11155420": "0xabAb916b28fA7DBEe3C10bA90b4202674F156a8a"
+          "ethereum-mainnet": "0xB38d1D12Ba17aA62255e588a0bC845c1a589A50d",
+          "avalanche-mainnet": "0xDEaC6b0CA04377F0051CB8C7A83c5e6F6525106d",
+          "arbitrum-mainnet": "0x0A4d55347817738166e2eF8302e12F99CfbDdEDD",
+          "bsc-mainnet": "0x3D39027E638f331B6FC48A9582934A2f40eD106C",
+          "optimism-mainnet": "0xcC341634464b6FD1221e4d517cD7801155ABaC55",
+          "optimism-sepolia": "0xabAb916b28fA7DBEe3C10bA90b4202674F156a8a",
+          "polygon-mainnet": "0x0bd714b38F0f15746f682Ed76ac5e2faA85A0088"
         }
       }
     },
@@ -912,9 +932,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xA2f199CDb286C716b4315Ee216192d8BDE617611",
-          "56": "0x9f1fD891E4D82F4b23420C769Bd96409C99806b2",
-          "11155420": "0x42d820B74E0Cd93118995eECdB3B7Ce6948786Ae"
+          "bsc-mainnet": "0x9f1fD891E4D82F4b23420C769Bd96409C99806b2",
+          "optimism-mainnet": "0xA2f199CDb286C716b4315Ee216192d8BDE617611",
+          "optimism-sepolia": "0x42d820B74E0Cd93118995eECdB3B7Ce6948786Ae"
         }
       }
     },
@@ -925,13 +945,13 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x7A18889f137B593f4E03C0A698A4360f43d1731c",
-          "56": "0x0B01DbBB5f306BeA950dc0EAAd55b48eAfaDcA23",
-          "137": "0xB12bCEAD553B559F68E4E1102c77f659D238734B",
-          "43113": "0x9DE4086641E636A76C279ce6357EfC2570665727",
-          "43114": "0x566FB95c9F636a0d27b5874d49C1dfffA2551014",
-          "421614": "0xA303a72d334e589122454e8e849E147BAd309E73",
-          "11155420": "0x3a7B80170761C8bbaa63e216a1D705D3125F5194"
+          "avalanche-mainnet": "0x566FB95c9F636a0d27b5874d49C1dfffA2551014",
+          "avalanche-fuji": "0x9DE4086641E636A76C279ce6357EfC2570665727",
+          "arbitrum-mainnet": "0xA303a72d334e589122454e8e849E147BAd309E73",
+          "bsc-mainnet": "0x0B01DbBB5f306BeA950dc0EAAd55b48eAfaDcA23",
+          "optimism-mainnet": "0x7A18889f137B593f4E03C0A698A4360f43d1731c",
+          "optimism-sepolia": "0x3a7B80170761C8bbaa63e216a1D705D3125F5194",
+          "polygon-mainnet": "0xB12bCEAD553B559F68E4E1102c77f659D238734B"
         }
       }
     },
@@ -942,14 +962,16 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xF030366b47eB1a9b14AD570381d29647E40955Af",
-          "56": "0x0765d9EF5E38A2E742d2c3A58C4944a3fb6D25C5",
-          "97": "0x57cfc3f40a97bF598334DCA27C7Ba43fdc85e933",
-          "137": "0x73B0F5b5E1E1Ead987a3f11D4674814b317567E2",
-          "43113": "0x4d63d59De67C0c1d53B42a9ffc1575B41F47e5f9",
-          "43114": "0xC3e5dDD4f98cDFfaF77685e340FF5c32d7282C5C",
-          "421614": "0x2F45a77c5024eB546E9E7F445f266c0D3e71e616",
-          "11155420": "0xDe498575B4E0b8Cd7AdC886430f455693fbc7765"
+          "avalanche-mainnet": "0xC3e5dDD4f98cDFfaF77685e340FF5c32d7282C5C",
+          "avalanche-fuji": "0x4d63d59De67C0c1d53B42a9ffc1575B41F47e5f9",
+          "arbitrum-mainnet": "0x2F45a77c5024eB546E9E7F445f266c0D3e71e616",
+          "bsc-mainnet": "0x0765d9EF5E38A2E742d2c3A58C4944a3fb6D25C5",
+          "bsc-testnet": "0x57cfc3f40a97bF598334DCA27C7Ba43fdc85e933",
+          "gnosis-mainnet": "0x5128beD0c719537b179aF0aF01386caf9B22Baf1",
+          "kusama-moonriver": "0x7859Ce93De269c8A6bE16Eb6f2Fa204553e46102",
+          "optimism-mainnet": "0xF030366b47eB1a9b14AD570381d29647E40955Af",
+          "optimism-sepolia": "0xDe498575B4E0b8Cd7AdC886430f455693fbc7765",
+          "polygon-mainnet": "0x73B0F5b5E1E1Ead987a3f11D4674814b317567E2"
         }
       }
     },
@@ -960,7 +982,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x3Fe9c5D69C4857a1b38A6e11C374BfEa2042C952"
+          "polygon-mainnet": "0x3Fe9c5D69C4857a1b38A6e11C374BfEa2042C952"
         }
       }
     },
@@ -971,8 +993,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x19BcA7C81f3ed561a49326b78468EaC64D0E8F2a",
-          "11155420": "0xF68fd425C4424247FF0EBed9a74f42164263E87b"
+          "optimism-mainnet": "0x19BcA7C81f3ed561a49326b78468EaC64D0E8F2a",
+          "optimism-sepolia": "0xF68fd425C4424247FF0EBed9a74f42164263E87b"
         }
       }
     },
@@ -983,7 +1005,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0xB4C75e52E2436aab6e6971BEF49ad17576C08882"
+          "arbitrum-mainnet": "0xB4C75e52E2436aab6e6971BEF49ad17576C08882",
+          "arbitrum-sepolia": "0x365bEB48fFD2976Ff789427ea6fD5FD3574c99A9"
         }
       }
     },
@@ -994,9 +1017,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x12151E9e21CaA9b2ca132c641A71bF390FF0bc81",
-          "137": "0xdCEbe924EB9D11ca72fAE06f70515fa99470a6b6",
-          "11155420": "0x04F829445fB4850121eacbDb1917460826868A6e"
+          "gnosis-mainnet": "0x3448BEB14411C2EcF5e86632dC9ad65849ae2a2E",
+          "optimism-mainnet": "0x12151E9e21CaA9b2ca132c641A71bF390FF0bc81",
+          "optimism-sepolia": "0x04F829445fB4850121eacbDb1917460826868A6e",
+          "polygon-mainnet": "0xdCEbe924EB9D11ca72fAE06f70515fa99470a6b6"
         }
       }
     },
@@ -1016,7 +1040,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0x49814574e634538985049db7e2ae60ffF3E19600"
+          "arbitrum-mainnet": "0x49814574e634538985049db7e2ae60ffF3E19600"
         }
       }
     },
@@ -1027,8 +1051,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x19e0f61d3e8C3501b665Eb4a88Ceac5CFCE38293",
-          "11155420": "0xce9BdD0DEd153E365e7Ae30Cc5e1C0082cb6Be93"
+          "optimism-mainnet": "0x19e0f61d3e8C3501b665Eb4a88Ceac5CFCE38293",
+          "optimism-sepolia": "0xce9BdD0DEd153E365e7Ae30Cc5e1C0082cb6Be93"
         }
       }
     },
@@ -1039,9 +1063,9 @@
         "base": "0x000000000000000000000000000000000000007c",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xD03f0FAeCB11cD49DE7A2397960E30F3BeA17E07",
-          "137": "0x957b2Db648fFf5851772A7d64eb65b9AAc45AedB",
-          "421614": "0x52716c109696C0229E18fDeadFf6f54B3b73784F"
+          "ethereum-mainnet": "0xD03f0FAeCB11cD49DE7A2397960E30F3BeA17E07",
+          "arbitrum-mainnet": "0x52716c109696C0229E18fDeadFf6f54B3b73784F",
+          "polygon-mainnet": "0x957b2Db648fFf5851772A7d64eb65b9AAc45AedB"
         }
       }
     },
@@ -1051,7 +1075,9 @@
       "chainlink_compatibility": {
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
-        "chainlink_aggregators": {}
+        "chainlink_aggregators": {
+          "kusama-moonriver": "0xbaA5A3379F28D3e63e623E5F96FafEE6A34d02fd"
+        }
       }
     },
     "79": {
@@ -1061,8 +1087,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xa44681BdaE78DB54cAc3d7f862d6A5BaE8c79CbC",
-          "11155420": "0x5F84e797bD9F25Ba07bD6888cD35Fc0f637Ab6d4"
+          "optimism-mainnet": "0xa44681BdaE78DB54cAc3d7f862d6A5BaE8c79CbC",
+          "optimism-sepolia": "0x5F84e797bD9F25Ba07bD6888cD35Fc0f637Ab6d4"
         }
       }
     },
@@ -1073,7 +1099,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0xD27766C20dF630a7D7e1e5885ae581FB0e61828A"
+          "base-mainnet": "0xD27766C20dF630a7D7e1e5885ae581FB0e61828A"
         }
       }
     },
@@ -1081,14 +1107,15 @@
       "id": 81,
       "description": "GRT / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x95A0D99507e9b248C18C4Dc111Af9EB66681992e",
-          "10": "0x444fd822CbCfDC0F24c78f7DD71F67785CddeA43",
-          "137": "0x4c71e0Ba1Fd02ABe66ae8877e1a9Ec881C59e8e3",
-          "421614": "0x75DD106b46017F9b5BF2c468f29Ee55f410b991c",
-          "11155420": "0xe910707155DeBdC435dD0e59b7f66cC37315ED93"
+          "ethereum-mainnet": "0x95A0D99507e9b248C18C4Dc111Af9EB66681992e",
+          "arbitrum-mainnet": "0x75DD106b46017F9b5BF2c468f29Ee55f410b991c",
+          "gnosis-mainnet": "0x18064eA9430Dd74E854162Aff10E34aC6Df3838B",
+          "optimism-mainnet": "0x444fd822CbCfDC0F24c78f7DD71F67785CddeA43",
+          "optimism-sepolia": "0xe910707155DeBdC435dD0e59b7f66cC37315ED93",
+          "polygon-mainnet": "0x4c71e0Ba1Fd02ABe66ae8877e1a9Ec881C59e8e3"
         }
       }
     },
@@ -1099,8 +1126,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xc5DFc3feaC05a9C3b4c1c2e5bE5546b74a1B5cc3",
-          "97": "0x8f0cfD1eA98427ae9FadC100E9981dEb342CE836"
+          "bsc-mainnet": "0xc5DFc3feaC05a9C3b4c1c2e5bE5546b74a1B5cc3",
+          "bsc-testnet": "0x8f0cfD1eA98427ae9FadC100E9981dEb342CE836"
         }
       }
     },
@@ -1111,9 +1138,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xF2cb4eaa89Efc51aa79bA31F815361EB47Be34c5",
-          "137": "0x57D5ec6A1c2FaA08C2826e8eAf16917244438667",
-          "421614": "0x1893d4951A6Bd8605B21fb4CD4B173e69d84688c"
+          "arbitrum-mainnet": "0x1893d4951A6Bd8605B21fb4CD4B173e69d84688c",
+          "bsc-mainnet": "0xF2cb4eaa89Efc51aa79bA31F815361EB47Be34c5",
+          "polygon-mainnet": "0x57D5ec6A1c2FaA08C2826e8eAf16917244438667"
         }
       }
     },
@@ -1124,7 +1151,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0xFf5247dB1a983F7405B5f848400D95770Dab75E1"
+          "arbitrum-mainnet": "0xFf5247dB1a983F7405B5f848400D95770Dab75E1"
         }
       }
     },
@@ -1135,8 +1162,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xd9D7e4944057864A14e40cDE203eD5305A27411d",
-          "250": "0xd867c068534Ad7d3BE0fE4f321AACddCe371DB1A"
+          "bsc-mainnet": "0xd9D7e4944057864A14e40cDE203eD5305A27411d",
+          "fantom-mainnet": "0xd867c068534Ad7d3BE0fE4f321AACddCe371DB1A"
         }
       }
     },
@@ -1147,7 +1174,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0x5ab0B1e2604d4B708721bc3cD1ce962958b4297E"
+          "arbitrum-mainnet": "0x5ab0B1e2604d4B708721bc3cD1ce962958b4297E",
+          "arbitrum-sepolia": "0xED14143c48E32D7f99D2E0c117a95260a9120caD"
         }
       }
     },
@@ -1158,7 +1186,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "43114": "0x5049D7927BB160267bDdA22ADD6Bd85e21eFFE77"
+          "avalanche-mainnet": "0x5049D7927BB160267bDdA22ADD6Bd85e21eFFE77"
         }
       }
     },
@@ -1169,7 +1197,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x45E3519330FB4D5C4afF22EcaF7876fe81ef1F2d"
+          "bsc-mainnet": "0x45E3519330FB4D5C4afF22EcaF7876fe81ef1F2d"
         }
       }
     },
@@ -1180,7 +1208,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "43114": "0x25E112615Cc5A81536273d6Cb0e62c638f0A2D4c"
+          "avalanche-mainnet": "0x25E112615Cc5A81536273d6Cb0e62c638f0A2D4c"
         }
       }
     },
@@ -1191,7 +1219,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xbC71031a5588b6bDfEA3C2974bD6fa0F5b81d49b"
+          "polygon-mainnet": "0xbC71031a5588b6bDfEA3C2974bD6fa0F5b81d49b"
         }
       }
     },
@@ -1202,8 +1230,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x3E313e778dA811F79A66570b8703c66204112Dfd",
-          "11155420": "0xCB3D0B98dfF8C88E2324a174F46bDF64EAedc5Bf"
+          "optimism-mainnet": "0x3E313e778dA811F79A66570b8703c66204112Dfd",
+          "optimism-sepolia": "0xCB3D0B98dfF8C88E2324a174F46bDF64EAedc5Bf"
         }
       }
     },
@@ -1214,7 +1242,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "324": "0xE5bad080AaDCeF1bA36CAfB7773086fa2B57d5Ea"
+          "zksync-mainnet": "0xE5bad080AaDCeF1bA36CAfB7773086fa2B57d5Ea"
         }
       }
     },
@@ -1225,7 +1253,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x0E9238c21CfaFadAF5E859CD63386b098218732B"
+          "bsc-mainnet": "0x0E9238c21CfaFadAF5E859CD63386b098218732B"
         }
       }
     },
@@ -1236,7 +1264,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "42220": "0xF9D3F1bb4B1A46548A9478225cC91a384b1B8dC8"
+          "celo-mainnet": "0xF9D3F1bb4B1A46548A9478225cC91a384b1B8dC8"
         }
       }
     },
@@ -1247,10 +1275,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x7303b6034C60BfaAC885883D6b0aE2382C668aa0",
-          "56": "0xc2311c3246688802AaA2E5F06FE2bf6406b6F588",
-          "137": "0x841739061000540466f511D3B3A27d4842B548e6",
-          "11155420": "0xF2eEf5c44a6c3357E6014e22519e6aA2f56620c3"
+          "bsc-mainnet": "0xc2311c3246688802AaA2E5F06FE2bf6406b6F588",
+          "optimism-mainnet": "0x7303b6034C60BfaAC885883D6b0aE2382C668aa0",
+          "optimism-sepolia": "0xF2eEf5c44a6c3357E6014e22519e6aA2f56620c3",
+          "polygon-mainnet": "0x841739061000540466f511D3B3A27d4842B548e6"
         }
       }
     },
@@ -1260,7 +1288,9 @@
       "chainlink_compatibility": {
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
-        "chainlink_aggregators": {}
+        "chainlink_aggregators": {
+          "kusama-moonriver": "0x78910475EfD30A7afc2b37C7E36f55C97c7434b3"
+        }
       }
     },
     "97": {
@@ -1270,9 +1300,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xa6fd4C151fA19032d1Db5D5634Ea46F285B84b8C",
-          "137": "0x28db4EFA5d3D1F7ec7CEA804576BbC3d4304E3Ae",
-          "421614": "0x575f3625F3465749b612aF2abbCf9d6498B95BD7"
+          "arbitrum-mainnet": "0x575f3625F3465749b612aF2abbCf9d6498B95BD7",
+          "bsc-mainnet": "0xa6fd4C151fA19032d1Db5D5634Ea46F285B84b8C",
+          "polygon-mainnet": "0x28db4EFA5d3D1F7ec7CEA804576BbC3d4304E3Ae"
         }
       }
     },
@@ -1280,13 +1310,13 @@
       "id": 98,
       "description": "TRY / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xc12eCeE46ed65D970EE5C899FCC7AE133AfF9b03",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xB996D9f788D1ff0516c033794F438f10d6D7190d",
-          "137": "0x98562c9E6fd9B54C07CCFda71eEcC778D7dD9903",
-          "43114": "0x725E90a77dA43e3B70FA5fbcc8313ca61c98A352",
-          "421614": "0x8548A931B2E5605a8936089B75F0bF66136e2393"
+          "ethereum-mainnet": "0xB996D9f788D1ff0516c033794F438f10d6D7190d",
+          "avalanche-mainnet": "0x725E90a77dA43e3B70FA5fbcc8313ca61c98A352",
+          "arbitrum-mainnet": "0x8548A931B2E5605a8936089B75F0bF66136e2393",
+          "polygon-mainnet": "0x98562c9E6fd9B54C07CCFda71eEcC778D7dD9903"
         }
       }
     },
@@ -1297,15 +1327,17 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x8AfC1cC622Be1Cd1644579c9c7eC3fbbA6bD02d2",
-          "56": "0x21D183Ab4AE2101D4088b50892dB72681550AEB6",
-          "97": "0xD048cC9Cd1833DcED3f92c1B29d59089aF69B334",
-          "137": "0x2AeBE03d31e904AdE377f651F9A75519d5d61135",
-          "324": "0xB3a51Fd02D9193209678f82077786f74040e6583",
-          "8453": "0xFa7fafD062112455EBF576cFDf4005F5324b97E0",
-          "421614": "0xbF1CD5Cb759f8E21c98A4367B665F43D607E8885",
-          "534352": "0xB7e22305E1baC145e3Bee3FdBd77f9c074624c1e",
-          "11155420": "0x34467fF6D45940dDd5C2D7517ffCCC0FCEc2E033"
+          "arbitrum-mainnet": "0xbF1CD5Cb759f8E21c98A4367B665F43D607E8885",
+          "arbitrum-sepolia": "0xb6E1EE156169442FDf76D0C84093F33213220fF3",
+          "base-mainnet": "0xFa7fafD062112455EBF576cFDf4005F5324b97E0",
+          "bsc-mainnet": "0x21D183Ab4AE2101D4088b50892dB72681550AEB6",
+          "bsc-testnet": "0xD048cC9Cd1833DcED3f92c1B29d59089aF69B334",
+          "gnosis-mainnet": "0x817A6F75fA1840847382ab23203EA38eDB7158f6",
+          "optimism-mainnet": "0x8AfC1cC622Be1Cd1644579c9c7eC3fbbA6bD02d2",
+          "optimism-sepolia": "0x34467fF6D45940dDd5C2D7517ffCCC0FCEc2E033",
+          "polygon-mainnet": "0x2AeBE03d31e904AdE377f651F9A75519d5d61135",
+          "scroll-mainnet": "0xB7e22305E1baC145e3Bee3FdBd77f9c074624c1e",
+          "zksync-mainnet": "0xB3a51Fd02D9193209678f82077786f74040e6583"
         }
       }
     },
@@ -1316,7 +1348,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xd635473093E34B364eECCACF346bb1ff585B9E5b"
+          "bsc-mainnet": "0xd635473093E34B364eECCACF346bb1ff585B9E5b"
         }
       }
     },
@@ -1327,8 +1359,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xB9E9a9D6c86c27F44e5B5b8566232056bDB122E9",
-          "421614": "0xd0DA1FE3A35359564CB7561F6a6AA69A1eCEc8d5"
+          "arbitrum-mainnet": "0xd0DA1FE3A35359564CB7561F6a6AA69A1eCEc8d5",
+          "polygon-mainnet": "0xB9E9a9D6c86c27F44e5B5b8566232056bDB122E9"
         }
       }
     },
@@ -1339,7 +1371,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0x834CE448A994CA9F4cfe2Bf0C6BB5Ab7F24B8920"
+          "base-mainnet": "0x834CE448A994CA9F4cfe2Bf0C6BB5Ab7F24B8920"
         }
       }
     },
@@ -1347,23 +1379,24 @@
       "id": 103,
       "description": "MATIC / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xC1e7D47ECfbb15B99a4B5F69E6931587000DD0b0",
-          "10": "0x1C1df24f0d06415fc3F58b1c1fDadd5fC85d2950",
-          "56": "0xFaA69Fc5efd347b9D6FD4709F7618d4E1449cA74",
-          "97": "0xCf895b663FD762c479Fa2A57064ff71cA66337a8",
-          "137": "0x15Cc6dbA96cD9482C3fd565d2d3ddfb595f71e67",
-          "1101": "0x3348053B13e22B2717c742CD4A60f5040564A530",
-          "1442": "0xD0B602A11Cf600B10b3ac6C255425ca44cD8919f",
-          "8453": "0x851a369f1c7e3F82a2AE8D75Ee94eaBfd9781805",
-          "43113": "0xF124eC06aE9f43D20dC63b255DbC6eDfF594Ca82",
-          "43114": "0xE0Ec7365936dd6e9a9fd930A46CA6853B36126fb",
-          "59140": "0xfCC63cd02A9c763a6F0f91260C1D8b8BcD263FbE",
-          "80002": "0x1F781De3B1340BCf46ea5CAe8df8d88Bb99f098C",
-          "421614": "0xA4A2b2000d447CC1086d15C077730008b0251FFD",
-          "11155420": "0x6d82d963B6684A1233CB84bDDc074948cb0E66d1"
+          "ethereum-mainnet": "0xC1e7D47ECfbb15B99a4B5F69E6931587000DD0b0",
+          "avalanche-mainnet": "0xE0Ec7365936dd6e9a9fd930A46CA6853B36126fb",
+          "avalanche-fuji": "0xF124eC06aE9f43D20dC63b255DbC6eDfF594Ca82",
+          "arbitrum-mainnet": "0xA4A2b2000d447CC1086d15C077730008b0251FFD",
+          "arbitrum-sepolia": "0xE6616a09e029D477183CbA6BB6133643b522C15c",
+          "base-mainnet": "0x851a369f1c7e3F82a2AE8D75Ee94eaBfd9781805",
+          "bsc-mainnet": "0xFaA69Fc5efd347b9D6FD4709F7618d4E1449cA74",
+          "bsc-testnet": "0xCf895b663FD762c479Fa2A57064ff71cA66337a8",
+          "linea-mainnet": "0xfCC63cd02A9c763a6F0f91260C1D8b8BcD263FbE",
+          "optimism-mainnet": "0x1C1df24f0d06415fc3F58b1c1fDadd5fC85d2950",
+          "optimism-sepolia": "0x6d82d963B6684A1233CB84bDDc074948cb0E66d1",
+          "polygon-mainnet": "0x15Cc6dbA96cD9482C3fd565d2d3ddfb595f71e67",
+          "polygon-amoy": "0x1F781De3B1340BCf46ea5CAe8df8d88Bb99f098C",
+          "polygon-zkevm-mainnet": "0x3348053B13e22B2717c742CD4A60f5040564A530",
+          "polygon-zkevm-cardona": "0xD0B602A11Cf600B10b3ac6C255425ca44cD8919f"
         }
       }
     },
@@ -1374,8 +1407,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x397c2082dA7A0962A4FBF14e62E72dbCefB7a7Dc",
-          "11155420": "0x4143a32E5E350606b46e08811790FA6eD2db231D"
+          "gnosis-mainnet": "0x736C15dB4e4f694c7c899AC91C05Bd5A795CfDD0",
+          "optimism-mainnet": "0x397c2082dA7A0962A4FBF14e62E72dbCefB7a7Dc",
+          "optimism-sepolia": "0x4143a32E5E350606b46e08811790FA6eD2db231D"
         }
       }
     },
@@ -1383,10 +1417,10 @@
       "id": 105,
       "description": "USDS / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x592700e4FcDd674dC54d2681DED3B63f54F63f9A"
+          "ethereum-mainnet": "0x592700e4FcDd674dC54d2681DED3B63f54F63f9A"
         }
       }
     },
@@ -1397,9 +1431,9 @@
         "base": "0x00000000000000000000000000000000000002c6",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xB239fBE4A78521023A4D2CA0069EfE04F49ca4B1",
-          "137": "0x5FfF21b62C5B08717058413Be0A4Da010ce402ae",
-          "421614": "0xAb5745A3bC42a8F73232d56F0566d5eb4E4095A7"
+          "arbitrum-mainnet": "0xAb5745A3bC42a8F73232d56F0566d5eb4E4095A7",
+          "bsc-mainnet": "0xB239fBE4A78521023A4D2CA0069EfE04F49ca4B1",
+          "polygon-mainnet": "0x5FfF21b62C5B08717058413Be0A4Da010ce402ae"
         }
       }
     },
@@ -1410,8 +1444,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x8246DA8357ef1B80Dda12e173A4E971c9C0500e9",
-          "137": "0x76ac0170D2ED1A37fDb43481903E077EE07eBccf"
+          "bsc-mainnet": "0x8246DA8357ef1B80Dda12e173A4E971c9C0500e9",
+          "polygon-mainnet": "0x76ac0170D2ED1A37fDb43481903E077EE07eBccf"
         }
       }
     },
@@ -1422,10 +1456,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x652fc7764aE7dfaBE8a2b390283Cc0BEaA134EB5",
-          "56": "0x45D744a1BeD5676bc34DadF0b1bB4886E19D4673",
-          "137": "0x971a7F084a637D7baB692A5A8946aC64c6812776",
-          "11155420": "0xF320587d69D2FF30B37088CCCA2c0F4816366e56"
+          "bsc-mainnet": "0x45D744a1BeD5676bc34DadF0b1bB4886E19D4673",
+          "optimism-mainnet": "0x652fc7764aE7dfaBE8a2b390283Cc0BEaA134EB5",
+          "optimism-sepolia": "0xF320587d69D2FF30B37088CCCA2c0F4816366e56",
+          "polygon-mainnet": "0x971a7F084a637D7baB692A5A8946aC64c6812776"
         }
       }
     },
@@ -1433,12 +1467,12 @@
       "id": 109,
       "description": "RSR / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x320623b8E4fF03373931769A31Fc52A4E78B5d70",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x4394595b7381A001fAA6a76CF47f4b9a04bF31A0",
-          "8453": "0xf3764B1fc0Ab831f75D3edd7435ABFE4Af675c9A",
-          "421614": "0x58DBe57Afe332Db719D1147E6145316cBCc51Ab9"
+          "ethereum-mainnet": "0x4394595b7381A001fAA6a76CF47f4b9a04bF31A0",
+          "arbitrum-mainnet": "0x58DBe57Afe332Db719D1147E6145316cBCc51Ab9",
+          "base-mainnet": "0xf3764B1fc0Ab831f75D3edd7435ABFE4Af675c9A"
         }
       }
     },
@@ -1446,18 +1480,20 @@
       "id": 110,
       "description": "UNI / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xdEf8C51d7c1040637A198efFc39613865B32EA51",
-          "10": "0x85A48ded8c35d82f8f29844e25dD51a70a23c93d",
-          "56": "0x44def9a23bceB396b33BDFDD6D244a8A7eF83c7e",
-          "137": "0x967BE855401E05CE2277CC6fa16B9DAEE00F3188",
-          "324": "0x693Fc964496DD2951e9c5A4Beea713eA256c14b6",
-          "43113": "0x288493e0Dafa6D5AB7409A36386614B7A29fb59f",
-          "43114": "0xC54d8293A7f98ef887BE882311E4C274BE67f927",
-          "421614": "0xeFc5061B7a8AeF31F789F1bA5b3b8256674F2B71",
-          "11155420": "0x02DaD1D8212C63d03228CA14f45e5AFC684dA5f5"
+          "ethereum-mainnet": "0xdEf8C51d7c1040637A198efFc39613865B32EA51",
+          "avalanche-mainnet": "0xC54d8293A7f98ef887BE882311E4C274BE67f927",
+          "avalanche-fuji": "0x288493e0Dafa6D5AB7409A36386614B7A29fb59f",
+          "arbitrum-mainnet": "0xeFc5061B7a8AeF31F789F1bA5b3b8256674F2B71",
+          "arbitrum-sepolia": "0x94154EB074A6334d34549939341fd9bE94aE05b6",
+          "bsc-mainnet": "0x44def9a23bceB396b33BDFDD6D244a8A7eF83c7e",
+          "gnosis-mainnet": "0x29b914B44169B04262Ae11173149d7F1131791bC",
+          "optimism-mainnet": "0x85A48ded8c35d82f8f29844e25dD51a70a23c93d",
+          "optimism-sepolia": "0x02DaD1D8212C63d03228CA14f45e5AFC684dA5f5",
+          "polygon-mainnet": "0x967BE855401E05CE2277CC6fa16B9DAEE00F3188",
+          "zksync-mainnet": "0x693Fc964496DD2951e9c5A4Beea713eA256c14b6"
         }
       }
     },
@@ -1468,9 +1504,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xaf4770537467871b4D684c69C7Db2Bf24c845B54",
-          "137": "0xcc0E20F014cE180e88884ACF49FD5bBE24687c61",
-          "421614": "0x01DD3Cf6118069DB13A2d64d7e1A09FECd587EDD"
+          "arbitrum-mainnet": "0x01DD3Cf6118069DB13A2d64d7e1A09FECd587EDD",
+          "bsc-mainnet": "0xaf4770537467871b4D684c69C7Db2Bf24c845B54",
+          "polygon-mainnet": "0xcc0E20F014cE180e88884ACF49FD5bBE24687c61"
         }
       }
     },
@@ -1481,10 +1517,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x90DC245bbF0a441651c23437F95705EBBF2498bd",
-          "56": "0xEe38B8F8B17Baa11ca558a3214E3261527a044cf",
-          "8453": "0x0F83393dB40FC0417D8aF7A2192212C57F62Be52",
-          "421614": "0x94cD888Bea0dE39DD0b41396a9311c5212635EB7"
+          "ethereum-mainnet": "0x90DC245bbF0a441651c23437F95705EBBF2498bd",
+          "arbitrum-mainnet": "0x94cD888Bea0dE39DD0b41396a9311c5212635EB7",
+          "base-mainnet": "0x0F83393dB40FC0417D8aF7A2192212C57F62Be52",
+          "bsc-mainnet": "0xEe38B8F8B17Baa11ca558a3214E3261527a044cf"
         }
       }
     },
@@ -1492,11 +1528,11 @@
       "id": 113,
       "description": "HIGH / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x71Ab77b7dbB4fa7e017BC15090b2163221420282",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x8c944f66a996b5399F51dc3d8d023E07Bb0767fD",
-          "56": "0xF9Fd3A9A36998425f31B23FBaE501445aAE65ec9"
+          "ethereum-mainnet": "0x8c944f66a996b5399F51dc3d8d023E07Bb0767fD",
+          "bsc-mainnet": "0xF9Fd3A9A36998425f31B23FBaE501445aAE65ec9"
         }
       }
     },
@@ -1507,7 +1543,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "42220": "0x505609B216713d64e1dCc8C553C9627b5008b99C"
+          "celo-mainnet": "0x505609B216713d64e1dCc8C553C9627b5008b99C"
         }
       }
     },
@@ -1515,15 +1551,15 @@
       "id": 115,
       "description": "APE / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x4d224452801ACEd8B2F0aebE155379bb5D594381",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x88db96ca551e0A0a2D8646999410b60197979311",
-          "10": "0x384547665C7BF2bb7927E67A8a321E9a0c91Fe59",
-          "137": "0x9c19be1fF177eF3B58910f26FF5c67dD167bfB91",
-          "43113": "0x8c4E5F5dcA2C2813EB97AAA06cFa0780692D8a9e",
-          "421614": "0x2C50f2Fe9427d120DEA2eb804c148d2780519d59",
-          "11155420": "0x3ec8593F930EA45ea58c968260e6e9FF53FC934f"
+          "ethereum-mainnet": "0x88db96ca551e0A0a2D8646999410b60197979311",
+          "avalanche-fuji": "0x8c4E5F5dcA2C2813EB97AAA06cFa0780692D8a9e",
+          "arbitrum-mainnet": "0x2C50f2Fe9427d120DEA2eb804c148d2780519d59",
+          "optimism-mainnet": "0x384547665C7BF2bb7927E67A8a321E9a0c91Fe59",
+          "optimism-sepolia": "0x3ec8593F930EA45ea58c968260e6e9FF53FC934f",
+          "polygon-mainnet": "0x9c19be1fF177eF3B58910f26FF5c67dD167bfB91"
         }
       }
     },
@@ -1534,11 +1570,11 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x9c41500de0162Cc0bC4798982C867860C1601a60",
-          "56": "0xdE1eDd2d23B5F654d0065d670bb7429d910206F5",
-          "97": "0xB87c2E86180947dcfA775491aeAd8Ad9d6ED885B",
-          "137": "0xD76bF1dd66cE111d0BE71A6134cb18d66975a429",
-          "11155420": "0x7f178f40eD83f0E48548b9F1055ab05f882616A5"
+          "bsc-mainnet": "0xdE1eDd2d23B5F654d0065d670bb7429d910206F5",
+          "bsc-testnet": "0xB87c2E86180947dcfA775491aeAd8Ad9d6ED885B",
+          "optimism-mainnet": "0x9c41500de0162Cc0bC4798982C867860C1601a60",
+          "optimism-sepolia": "0x7f178f40eD83f0E48548b9F1055ab05f882616A5",
+          "polygon-mainnet": "0xD76bF1dd66cE111d0BE71A6134cb18d66975a429"
         }
       }
     },
@@ -1549,7 +1585,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "42220": "0x2E5eddE44187c3099529eF63Ced87994F078FbdB"
+          "celo-mainnet": "0x2E5eddE44187c3099529eF63Ced87994F078FbdB"
         }
       }
     },
@@ -1557,19 +1593,20 @@
       "id": 118,
       "description": "COMP / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x24e3c657c27DfC7ea6f9f58e86387D846b3BaA59",
-          "10": "0xa7F0FF864196729787Cce72f78D769ecA926bA1D",
-          "56": "0xb3Ea5aFbd958dB1d36b007e8B5DcD7cD33C5Db02",
-          "137": "0x66C5601330530076c2744A8D2A56EFD8820883d2",
-          "8453": "0x6228A44Cd0Ec29c3373C9742e4bBAF6f2E536B9A",
-          "43113": "0xbb096Af55CD8e4A0055963639C94173D03f35c67",
-          "43114": "0xEBfd3f7FE2d4C1B017b41f5edAFaDF8AdCA4C034",
-          "421614": "0x52df0481c6D2Ad7E50889AFd03C8ddd8413ac63d",
-          "534352": "0x193e1f27BdCa01591045C7cdf265946B34B7572a",
-          "11155420": "0x3196cbA899B5D3E0e8D65a78E82413b930C53247"
+          "ethereum-mainnet": "0x24e3c657c27DfC7ea6f9f58e86387D846b3BaA59",
+          "avalanche-mainnet": "0xEBfd3f7FE2d4C1B017b41f5edAFaDF8AdCA4C034",
+          "avalanche-fuji": "0xbb096Af55CD8e4A0055963639C94173D03f35c67",
+          "arbitrum-mainnet": "0x52df0481c6D2Ad7E50889AFd03C8ddd8413ac63d",
+          "base-mainnet": "0x6228A44Cd0Ec29c3373C9742e4bBAF6f2E536B9A",
+          "bsc-mainnet": "0xb3Ea5aFbd958dB1d36b007e8B5DcD7cD33C5Db02",
+          "gnosis-mainnet": "0x7cfEA3C34FBEf2e9A53c188a75494aeDC3A743ff",
+          "optimism-mainnet": "0xa7F0FF864196729787Cce72f78D769ecA926bA1D",
+          "optimism-sepolia": "0x3196cbA899B5D3E0e8D65a78E82413b930C53247",
+          "polygon-mainnet": "0x66C5601330530076c2744A8D2A56EFD8820883d2",
+          "scroll-mainnet": "0x193e1f27BdCa01591045C7cdf265946B34B7572a"
         }
       }
     },
@@ -1580,9 +1617,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xb1B575DA673d67b1d10f4A9CbfBA2e106736E30b",
-          "137": "0xdADB7f8B44592fAE7F9396DaCCDbe14eF57C8174",
-          "11155420": "0x4Dd7Df57a3fb7c4eB86fE3d482F50B999aD58F7D"
+          "optimism-mainnet": "0xb1B575DA673d67b1d10f4A9CbfBA2e106736E30b",
+          "optimism-sepolia": "0x4Dd7Df57a3fb7c4eB86fE3d482F50B999aD58F7D",
+          "polygon-mainnet": "0xdADB7f8B44592fAE7F9396DaCCDbe14eF57C8174"
         }
       }
     },
@@ -1590,10 +1627,10 @@
       "id": 120,
       "description": "ENS / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x6Cc5173Ffd8d674C64f2DC7237730Ff021829865"
+          "ethereum-mainnet": "0x6Cc5173Ffd8d674C64f2DC7237730Ff021829865"
         }
       }
     },
@@ -1604,9 +1641,9 @@
         "base": "0x000000000000000000000000000000000000019a",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x265BaabD1d98D3dc405a142ed987eDb1fEf8be32",
-          "137": "0x1F39527eB065D04679a10219e7F0D7820ea9bf89",
-          "421614": "0x244ea8646Cc2342497dFD5D8f841f79e66e598cF"
+          "ethereum-mainnet": "0x265BaabD1d98D3dc405a142ed987eDb1fEf8be32",
+          "arbitrum-mainnet": "0x244ea8646Cc2342497dFD5D8f841f79e66e598cF",
+          "polygon-mainnet": "0x1F39527eB065D04679a10219e7F0D7820ea9bf89"
         }
       }
     },
@@ -1617,10 +1654,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x3cbF31Ff52974a71017c445d7CB10DFF3b448842",
-          "137": "0x3b089320DBEA1088432Fa380e8f0851b2792fB95",
-          "421614": "0x126b9a529Dd6f14C62c494F6b6b5AA73d9f6F849",
-          "11155420": "0xBCeBCcE16665Bde508e61ce31DE95e4dd80bBd83"
+          "arbitrum-mainnet": "0x126b9a529Dd6f14C62c494F6b6b5AA73d9f6F849",
+          "bsc-mainnet": "0x3cbF31Ff52974a71017c445d7CB10DFF3b448842",
+          "optimism-sepolia": "0xBCeBCcE16665Bde508e61ce31DE95e4dd80bBd83",
+          "polygon-mainnet": "0x3b089320DBEA1088432Fa380e8f0851b2792fB95"
         }
       }
     },
@@ -1628,11 +1665,11 @@
       "id": 123,
       "description": "MAVIA / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x24fcFC492C1393274B6bcd568ac9e225BEc93584",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x31EAf29E8F179E0877617c4A8b9A7fA51694efE5",
-          "8453": "0x9FE139104eef5B113e93859F185aa3C6E04e102B"
+          "ethereum-mainnet": "0x31EAf29E8F179E0877617c4A8b9A7fA51694efE5",
+          "base-mainnet": "0x9FE139104eef5B113e93859F185aa3C6E04e102B"
         }
       }
     },
@@ -1643,13 +1680,13 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xC2262cA31b16AE1Cfe6F7612f49E79B821e31162",
-          "56": "0x3e51a40C6A7124F27Dc39474Ec761A27366F7e19",
-          "97": "0x96Ece749Add6b2ED35BcF210112869361Db03cff",
-          "137": "0xcd6c03f397F67ed1A418Ee5EdA9921D0c45FF656",
-          "43114": "0x43bDe0bb499449084EE5Cb91cffF139b44DD9cD7",
-          "421614": "0xeFBC6F8C9806B066fa0Da149349450Be60e5e136",
-          "11155420": "0xb113F5A928BCfF189C998ab20d753a47F9dE5A61"
+          "avalanche-mainnet": "0x43bDe0bb499449084EE5Cb91cffF139b44DD9cD7",
+          "arbitrum-mainnet": "0xeFBC6F8C9806B066fa0Da149349450Be60e5e136",
+          "bsc-mainnet": "0x3e51a40C6A7124F27Dc39474Ec761A27366F7e19",
+          "bsc-testnet": "0x96Ece749Add6b2ED35BcF210112869361Db03cff",
+          "optimism-mainnet": "0xC2262cA31b16AE1Cfe6F7612f49E79B821e31162",
+          "optimism-sepolia": "0xb113F5A928BCfF189C998ab20d753a47F9dE5A61",
+          "polygon-mainnet": "0xcd6c03f397F67ed1A418Ee5EdA9921D0c45FF656"
         }
       }
     },
@@ -1660,7 +1697,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x4d5AcC9cd846A7d8c2117DE216816b849A52489A"
+          "polygon-mainnet": "0x4d5AcC9cd846A7d8c2117DE216816b849A52489A"
         }
       }
     },
@@ -1668,10 +1705,10 @@
       "id": 126,
       "description": "AMPL / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xd5090674b4653240cd94eE886484ca808c6E6694"
+          "ethereum-mainnet": "0xd5090674b4653240cd94eE886484ca808c6E6694"
         }
       }
     },
@@ -1682,8 +1719,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x46D96A0fd8a884cCB7682A515E733948Aa3E17A7",
-          "421614": "0x507c9aC4502d62a80d5898c17EB635ea46427670"
+          "arbitrum-mainnet": "0x507c9aC4502d62a80d5898c17EB635ea46427670",
+          "polygon-mainnet": "0x46D96A0fd8a884cCB7682A515E733948Aa3E17A7"
         }
       }
     },
@@ -1691,16 +1728,16 @@
       "id": 128,
       "description": "USDe / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xcC16f670129f965b396f2e81312F6e339FFDB18e",
-          "10": "0x6f0D003A0743F5acea5680B1D128bd433B07ffCE",
-          "137": "0xac5bc153F5Fd359c9Ad4b46e6A5c26e41315e20B",
-          "324": "0xBC7d402c12C362a48Bf4BCB52F8db6327d8998a8",
-          "8453": "0x29a0BF5D5e677d38f7AbBd4d292895a3574796C0",
-          "421614": "0xBc78D5f22ae6a7B86ab716c5d2F7DC61a8c1b61e",
-          "534352": "0x1B0196b24e7ADBD477A4bf7c74d71167d21b8dAc"
+          "ethereum-mainnet": "0xcC16f670129f965b396f2e81312F6e339FFDB18e",
+          "arbitrum-mainnet": "0xBc78D5f22ae6a7B86ab716c5d2F7DC61a8c1b61e",
+          "base-mainnet": "0x29a0BF5D5e677d38f7AbBd4d292895a3574796C0",
+          "optimism-mainnet": "0x6f0D003A0743F5acea5680B1D128bd433B07ffCE",
+          "polygon-mainnet": "0xac5bc153F5Fd359c9Ad4b46e6A5c26e41315e20B",
+          "scroll-mainnet": "0x1B0196b24e7ADBD477A4bf7c74d71167d21b8dAc",
+          "zksync-mainnet": "0xBC7d402c12C362a48Bf4BCB52F8db6327d8998a8"
         }
       }
     },
@@ -1710,7 +1747,9 @@
       "chainlink_compatibility": {
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
-        "chainlink_aggregators": {}
+        "chainlink_aggregators": {
+          "gnosis-mainnet": "0xcA16Ed36A7d1Ae2DC68873D62bce4f9BdCc2d378"
+        }
       }
     },
     "130": {
@@ -1720,10 +1759,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x7F053DE73E3003E77492bba2174Ee197b4eBE370",
-          "97": "0xbc278C46F5d9F92C8114C183C4bF2d7A60d64C58",
-          "137": "0x188069873B489A1A91B066C1C851aA9442124438",
-          "421614": "0xc195bA27455182e3Bb6F86dAB5838901604Ba72c"
+          "arbitrum-mainnet": "0xc195bA27455182e3Bb6F86dAB5838901604Ba72c",
+          "bsc-mainnet": "0x7F053DE73E3003E77492bba2174Ee197b4eBE370",
+          "bsc-testnet": "0xbc278C46F5d9F92C8114C183C4bF2d7A60d64C58",
+          "polygon-mainnet": "0x188069873B489A1A91B066C1C851aA9442124438"
         }
       }
     },
@@ -1731,33 +1770,36 @@
       "id": 131,
       "description": "USDC / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xc9E1a09622afdB659913fefE800fEaE5DBbFe9d7",
-          "10": "0xd1Cb03cc31caa72D34dba7eBE21897D9580c4AF0",
-          "56": "0x40821334DBd9838df7946122c474e06B40eD67e5",
-          "97": "0x3834cFaad23bb03A4145915006E5A98882651CE3",
-          "137": "0xcC741360BA810cD879B05ba8b5A462fB6311fbBe",
-          "250": "0x9C5a8b11CeE8c207753C313a566761526F2c7934",
-          "300": "0xD29F4Cc763A064b6C563B8816f09351b3Fbb61A0",
-          "324": "0x5b89d4C2551Babb5fC92DA71804EdDBB5fF17370",
-          "1088": "0x5969848719F7571bDFe0e899014C270Ed39B8384",
-          "1101": "0xa23aFD16a08194647Cb371e6d5a36763Eea91786",
-          "1442": "0xA966F9276d9eD5F31503D03BA62Ec48b3EF11a30",
-          "8453": "0x0Ee7145e1370653533e2F2E824424bE2AA95A4Aa",
-          "42220": "0x6854a6495F735c012616B4e0B5491cE138AE81E5",
-          "43113": "0x64d45610cF1F603D892CcC8f0F269516C45084eB",
-          "43114": "0x65527d2556ffFEe7e545C5eE5B81f5DAe925cE00",
-          "44787": "0x5dD468C0Cb7111192bc0171d1A24c67ca61EeB65",
-          "59140": "0xA6F72813b20758F08923b48926DF1BA54782F9FF",
-          "80002": "0x9072a70bdaEA9307aCc1694BB1F028f55875B1D1",
-          "84532": "0xf3138B59cAcbA1a4d7d24fA7b184c20B3941433e",
-          "421614": "0x2946220288DbBF77dF0030fCecc2a8348CbBE32C",
-          "534351": "0x518e45cc97ccBc9e5eACaA88990129df1310F9c1",
-          "534352": "0xEd746456ba6Ad119E3d80681b34E0474dA4e60F2",
-          "11155111": "0xf1D9390Cd51Eeb63193dc0Cc9f48321D03214F4b",
-          "11155420": "0x8a3d029338051B1B35eF06988c5F42eE2fAD81C4"
+          "ethereum-mainnet": "0xc9E1a09622afdB659913fefE800fEaE5DBbFe9d7",
+          "ethereum-sepolia": "0xf1D9390Cd51Eeb63193dc0Cc9f48321D03214F4b",
+          "avalanche-mainnet": "0x65527d2556ffFEe7e545C5eE5B81f5DAe925cE00",
+          "avalanche-fuji": "0x64d45610cF1F603D892CcC8f0F269516C45084eB",
+          "andromeda-mainnet": "0x5969848719F7571bDFe0e899014C270Ed39B8384",
+          "arbitrum-mainnet": "0x2946220288DbBF77dF0030fCecc2a8348CbBE32C",
+          "arbitrum-sepolia": "0xfe43Eb2649F3bcce80443F9E43C793146148C141",
+          "base-mainnet": "0x0Ee7145e1370653533e2F2E824424bE2AA95A4Aa",
+          "base-sepolia": "0xf3138B59cAcbA1a4d7d24fA7b184c20B3941433e",
+          "bsc-mainnet": "0x40821334DBd9838df7946122c474e06B40eD67e5",
+          "bsc-testnet": "0x3834cFaad23bb03A4145915006E5A98882651CE3",
+          "celo-mainnet": "0x6854a6495F735c012616B4e0B5491cE138AE81E5",
+          "celo-alfajores": "0x5dD468C0Cb7111192bc0171d1A24c67ca61EeB65",
+          "fantom-mainnet": "0x9C5a8b11CeE8c207753C313a566761526F2c7934",
+          "gnosis-mainnet": "0x30bA871Ee7a08dBd255CdD8e7e035DAd72014E27",
+          "linea-mainnet": "0xA6F72813b20758F08923b48926DF1BA54782F9FF",
+          "kusama-moonriver": "0x9D3586B4BAc987d43A360c3f0aaC53B425a7a06C",
+          "optimism-mainnet": "0xd1Cb03cc31caa72D34dba7eBE21897D9580c4AF0",
+          "optimism-sepolia": "0x8a3d029338051B1B35eF06988c5F42eE2fAD81C4",
+          "polygon-mainnet": "0xcC741360BA810cD879B05ba8b5A462fB6311fbBe",
+          "polygon-amoy": "0x9072a70bdaEA9307aCc1694BB1F028f55875B1D1",
+          "polygon-zkevm-mainnet": "0xa23aFD16a08194647Cb371e6d5a36763Eea91786",
+          "polygon-zkevm-cardona": "0xA966F9276d9eD5F31503D03BA62Ec48b3EF11a30",
+          "scroll-mainnet": "0xEd746456ba6Ad119E3d80681b34E0474dA4e60F2",
+          "scroll-sepolia": "0x518e45cc97ccBc9e5eACaA88990129df1310F9c1",
+          "zksync-mainnet": "0x5b89d4C2551Babb5fC92DA71804EdDBB5fF17370",
+          "zksync-sepolia": "0xD29F4Cc763A064b6C563B8816f09351b3Fbb61A0"
         }
       }
     },
@@ -1765,13 +1807,13 @@
       "id": 132,
       "description": "STG / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xAf5191B0De278C7286d6C7CC6ab6BB8A73bA2Cd6",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xFe5AFc4225E2626EB40Ca11A59962eBEEeb09E76",
-          "8453": "0x6f22C6925b27bCf9713fAE2Ab6f4397549D684b8",
-          "421614": "0x4c594a54c857c53eE03975c460c4030D67bdb1e4",
-          "534352": "0x2613814Ba7EF8146d9b44296e793074632b55299"
+          "ethereum-mainnet": "0xFe5AFc4225E2626EB40Ca11A59962eBEEeb09E76",
+          "arbitrum-mainnet": "0x4c594a54c857c53eE03975c460c4030D67bdb1e4",
+          "base-mainnet": "0x6f22C6925b27bCf9713fAE2Ab6f4397549D684b8",
+          "scroll-mainnet": "0x2613814Ba7EF8146d9b44296e793074632b55299"
         }
       }
     },
@@ -1782,7 +1824,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0xC18cC9B106A50D945024F0a25EfF16B6dC56D4B9"
+          "base-mainnet": "0xC18cC9B106A50D945024F0a25EfF16B6dC56D4B9"
         }
       }
     },
@@ -1793,13 +1835,13 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x9076A9cCEDf0694939068369Aaa9d9d2FF419C25",
-          "56": "0x7E9c7675f05DBC245b2f6168AaCAE5082f1473eA",
-          "1101": "0x2E8932D5662AD426FE335162b233680a524395eE",
-          "8453": "0x74f70D08c92f1cd4Ed70B9aa3F8edC0bA5496a01",
-          "43114": "0x7201fF7588B5bFfAC7b3Dd5ca177c71e2Bf90CFD",
-          "59140": "0xE77542c59677E831aC6941BdcA4e3A75180D8fB3",
-          "421614": "0xdecCf98Ab543E6fAca8E22dB33445c7DDc855df0"
+          "avalanche-mainnet": "0x7201fF7588B5bFfAC7b3Dd5ca177c71e2Bf90CFD",
+          "arbitrum-mainnet": "0xdecCf98Ab543E6fAca8E22dB33445c7DDc855df0",
+          "base-mainnet": "0x74f70D08c92f1cd4Ed70B9aa3F8edC0bA5496a01",
+          "bsc-mainnet": "0x7E9c7675f05DBC245b2f6168AaCAE5082f1473eA",
+          "linea-mainnet": "0xE77542c59677E831aC6941BdcA4e3A75180D8fB3",
+          "optimism-mainnet": "0x9076A9cCEDf0694939068369Aaa9d9d2FF419C25",
+          "polygon-zkevm-mainnet": "0x2E8932D5662AD426FE335162b233680a524395eE"
         }
       }
     },
@@ -1810,8 +1852,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x28FE62353a3461511b3De51b922b86c7d4cEA2e0",
-          "11155420": "0x6c8E8087A68fa799CCb4C9385BBFd6b7B375C249"
+          "optimism-mainnet": "0x28FE62353a3461511b3De51b922b86c7d4cEA2e0",
+          "optimism-sepolia": "0x6c8E8087A68fa799CCb4C9385BBFd6b7B375C249"
         }
       }
     },
@@ -1822,7 +1864,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x866c107127Ed90599E2723d3595d997dAcb06fB2"
+          "bsc-mainnet": "0x866c107127Ed90599E2723d3595d997dAcb06fB2"
         }
       }
     },
@@ -1830,14 +1872,14 @@
       "id": 137,
       "description": "sUSDe / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xe07f52971153dB2713ACe5ebAAf2eA8b0A9230B7",
-          "10": "0x06290b2dfCe23a8917d680FC6BB790F9bF72b999",
-          "137": "0x925cB7879e13f28e5dc43E0AF00Cf1141401B0B8",
-          "8453": "0x63a3b4E2aeea2d1Cc883987AEc22E9Aa88323b3c",
-          "421614": "0x37b300020b77d043F2A8cf7700f1b05d6d889090"
+          "ethereum-mainnet": "0xe07f52971153dB2713ACe5ebAAf2eA8b0A9230B7",
+          "arbitrum-mainnet": "0x37b300020b77d043F2A8cf7700f1b05d6d889090",
+          "base-mainnet": "0x63a3b4E2aeea2d1Cc883987AEc22E9Aa88323b3c",
+          "optimism-mainnet": "0x06290b2dfCe23a8917d680FC6BB790F9bF72b999",
+          "polygon-mainnet": "0x925cB7879e13f28e5dc43E0AF00Cf1141401B0B8"
         }
       }
     },
@@ -1845,13 +1887,13 @@
       "id": 138,
       "description": "BAT / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x1c9049C48C24111A3546a73C67FD2A4Fc6C86Fdc",
-          "137": "0xFfDbb95dDB9281633c206951053C8AEA35555Ac5",
-          "43113": "0x555F12d7014DBf252BE3842E768d6d0BBE2D007A",
-          "43114": "0x2C8E85dE52231228E17a8Cf8680250B6066130A5"
+          "ethereum-mainnet": "0x1c9049C48C24111A3546a73C67FD2A4Fc6C86Fdc",
+          "avalanche-mainnet": "0x2C8E85dE52231228E17a8Cf8680250B6066130A5",
+          "avalanche-fuji": "0x555F12d7014DBf252BE3842E768d6d0BBE2D007A",
+          "polygon-mainnet": "0xFfDbb95dDB9281633c206951053C8AEA35555Ac5"
         }
       }
     },
@@ -1862,11 +1904,11 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x903F58eE6d6c3c2Ca26427c8F917F6aE515827B1",
-          "324": "0x20561e34CD999C3A4aC0564da21Ef38232970C6C",
-          "8453": "0x814d854de623bA3F846e97895ebC3b9aCfAAEBBc",
-          "421614": "0x67db13c76Ce77E8FEef9B500616162eC142597ac",
-          "11155420": "0x8e2614aEc97203Db6B18582E695b57C0495B2B6A"
+          "arbitrum-mainnet": "0x67db13c76Ce77E8FEef9B500616162eC142597ac",
+          "base-mainnet": "0x814d854de623bA3F846e97895ebC3b9aCfAAEBBc",
+          "optimism-mainnet": "0x903F58eE6d6c3c2Ca26427c8F917F6aE515827B1",
+          "optimism-sepolia": "0x8e2614aEc97203Db6B18582E695b57C0495B2B6A",
+          "zksync-mainnet": "0x20561e34CD999C3A4aC0564da21Ef38232970C6C"
         }
       }
     },
@@ -1877,12 +1919,12 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xB42F9F7c0F9997f62AE521CEF14B20a58bd9E088",
-          "56": "0x14431D7Ed5D03888136bD32B634f95cD33de16e0",
-          "97": "0x05Bbc0Ec46261603110704F38066C75260b19180",
-          "137": "0x33b1B015bC2099614e0e77609d9754304d2D8E60",
-          "43114": "0x83679e183566935Ee70a3D03C683404E5a9C5A2a",
-          "11155420": "0xC0D5CE7d352D7131AFB10620255D827d325a0967"
+          "avalanche-mainnet": "0x83679e183566935Ee70a3D03C683404E5a9C5A2a",
+          "bsc-mainnet": "0x14431D7Ed5D03888136bD32B634f95cD33de16e0",
+          "bsc-testnet": "0x05Bbc0Ec46261603110704F38066C75260b19180",
+          "optimism-mainnet": "0xB42F9F7c0F9997f62AE521CEF14B20a58bd9E088",
+          "optimism-sepolia": "0xC0D5CE7d352D7131AFB10620255D827d325a0967",
+          "polygon-mainnet": "0x33b1B015bC2099614e0e77609d9754304d2D8E60"
         }
       }
     },
@@ -1890,18 +1932,19 @@
       "id": 141,
       "description": "YFI / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x525B031c1eE01502c113500a2d1A999cD3F9C98F",
-          "10": "0x6D95344ba8d22a7d1C5BF1822ed80A70f411740a",
-          "56": "0x20D31b15E56c0A0F4CCbE559277b71BE58948fa5",
-          "137": "0x670eD927ca98c5f712499879E35098e9ecc78F4f",
-          "250": "0x0cEe0aee5C6C0d1f99829E9Debf6F3cE39266160",
-          "8453": "0xdB793acA8bE40a123c34300Bb21b02F21F8ef501",
-          "43114": "0xcBA6A35775174A4929eD40b3a2D626b492778D02",
-          "421614": "0x660e7aF290F540205A84dccC1F40D0269fC936F5",
-          "11155420": "0xE5C19F82700fa45Ea3D6029Ff9a903c6feCD4Ac9"
+          "ethereum-mainnet": "0x525B031c1eE01502c113500a2d1A999cD3F9C98F",
+          "avalanche-mainnet": "0xcBA6A35775174A4929eD40b3a2D626b492778D02",
+          "arbitrum-mainnet": "0x660e7aF290F540205A84dccC1F40D0269fC936F5",
+          "base-mainnet": "0xdB793acA8bE40a123c34300Bb21b02F21F8ef501",
+          "bsc-mainnet": "0x20D31b15E56c0A0F4CCbE559277b71BE58948fa5",
+          "fantom-mainnet": "0x0cEe0aee5C6C0d1f99829E9Debf6F3cE39266160",
+          "gnosis-mainnet": "0x642736Bb512ac22D37171bf57eda17E48E977be8",
+          "optimism-mainnet": "0x6D95344ba8d22a7d1C5BF1822ed80A70f411740a",
+          "optimism-sepolia": "0xE5C19F82700fa45Ea3D6029Ff9a903c6feCD4Ac9",
+          "polygon-mainnet": "0x670eD927ca98c5f712499879E35098e9ecc78F4f"
         }
       }
     },
@@ -1909,10 +1952,10 @@
       "id": 142,
       "description": "XCN / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xA2cd3D43c775978A96BdBf12d733D5A1ED94fb18",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x3E9348C8a83549B594C51D5539f0Db4E3B0B5D90"
+          "ethereum-mainnet": "0x3E9348C8a83549B594C51D5539f0Db4E3B0B5D90"
         }
       }
     },
@@ -1923,9 +1966,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xB6b7B9b2362F87F204f1CCadDD8832D3a0557dce",
-          "421614": "0xC3a633B6f50e1a5103d8D7fA6D26A413ce480285",
-          "11155420": "0x4C13b93394c92D247aD7A87D7Bd3e2bd2BA2c32b"
+          "arbitrum-mainnet": "0xC3a633B6f50e1a5103d8D7fA6D26A413ce480285",
+          "optimism-mainnet": "0xB6b7B9b2362F87F204f1CCadDD8832D3a0557dce",
+          "optimism-sepolia": "0x4C13b93394c92D247aD7A87D7Bd3e2bd2BA2c32b"
         }
       }
     },
@@ -1936,7 +1979,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0xd9fCb26FE3D4589c3e2ecD6A2A3af54EdDB67240"
+          "arbitrum-mainnet": "0xd9fCb26FE3D4589c3e2ecD6A2A3af54EdDB67240"
         }
       }
     },
@@ -1947,12 +1990,13 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xfadcAf88F39649F2Bf51c49e93A2DE1f39C51318",
-          "10": "0x7E36B8C677D84556B4742F9d7791019bC7d408Db",
-          "43113": "0x8280e1F83CD11dB2cC1784C6AA013D16D01Ae612",
-          "59140": "0x854d46002b2524239b81Ef783AB47CAbd5b9AD4e",
-          "421614": "0x46de66F10343b59BAcc37dF9b3F67cD0CcC121A3",
-          "11155420": "0x4fB44FC4FA132d1a846Bd4143CcdC5a9f1870b06"
+          "ethereum-mainnet": "0xfadcAf88F39649F2Bf51c49e93A2DE1f39C51318",
+          "avalanche-fuji": "0x8280e1F83CD11dB2cC1784C6AA013D16D01Ae612",
+          "arbitrum-mainnet": "0x46de66F10343b59BAcc37dF9b3F67cD0CcC121A3",
+          "arbitrum-sepolia": "0x6eaE3676F1124D7201c541950f633E3766D056dA",
+          "linea-mainnet": "0x854d46002b2524239b81Ef783AB47CAbd5b9AD4e",
+          "optimism-mainnet": "0x7E36B8C677D84556B4742F9d7791019bC7d408Db",
+          "optimism-sepolia": "0x4fB44FC4FA132d1a846Bd4143CcdC5a9f1870b06"
         }
       }
     },
@@ -1963,9 +2007,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xcB62700BbAb28A0e7711F5fbDbE571a429F1F855",
-          "137": "0x1DE171A5F00E22Ddf096cc2c5cF39B4e2c58c240",
-          "421614": "0x5EB7Ca4678D60fF937274Fa1E091A86D0444770C"
+          "arbitrum-mainnet": "0x5EB7Ca4678D60fF937274Fa1E091A86D0444770C",
+          "bsc-mainnet": "0xcB62700BbAb28A0e7711F5fbDbE571a429F1F855",
+          "polygon-mainnet": "0x1DE171A5F00E22Ddf096cc2c5cF39B4e2c58c240"
         }
       }
     },
@@ -1973,12 +2017,12 @@
       "id": 147,
       "description": "USDV / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x0E573Ce2736Dd9637A0b21058352e1667925C7a8",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x77E0F572e4bDDB54A7197074A88877A90994ee3A",
-          "56": "0x89c741AA0009C2A4941C23D6453c6575e0622360",
-          "421614": "0xfe2C83E00d69Ba0c6e1108B98B3FA6a8F1cEDE2C"
+          "ethereum-mainnet": "0x77E0F572e4bDDB54A7197074A88877A90994ee3A",
+          "arbitrum-mainnet": "0xfe2C83E00d69Ba0c6e1108B98B3FA6a8F1cEDE2C",
+          "bsc-mainnet": "0x89c741AA0009C2A4941C23D6453c6575e0622360"
         }
       }
     },
@@ -1986,16 +2030,17 @@
       "id": 148,
       "description": "MKR / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xe9a6BCCdE4875F8c1228975F9c84598558a75AC8",
-          "10": "0x46D677b285728Bb641FDa3470873637372a587fd",
-          "137": "0x955dC0F1dD17D5D33f8dF78793D2e0E4Ff395d67",
-          "43113": "0x9aa3bD4bFEC1512566CB125eBF06feB0d717Fdd2",
-          "43114": "0xA16cD14cEaa7C03742E67Fa086e3F4e0546fd2cB",
-          "421614": "0x55EfafFC2764389a08FFDFcd36AEe2C30610d42c",
-          "11155420": "0x797BcC204ADc240517CD3d8fb930772be27297C5"
+          "ethereum-mainnet": "0xe9a6BCCdE4875F8c1228975F9c84598558a75AC8",
+          "avalanche-mainnet": "0xA16cD14cEaa7C03742E67Fa086e3F4e0546fd2cB",
+          "avalanche-fuji": "0x9aa3bD4bFEC1512566CB125eBF06feB0d717Fdd2",
+          "arbitrum-mainnet": "0x55EfafFC2764389a08FFDFcd36AEe2C30610d42c",
+          "gnosis-mainnet": "0x88403402B966Dee25724d24Adf56d398D1d7334e",
+          "optimism-mainnet": "0x46D677b285728Bb641FDa3470873637372a587fd",
+          "optimism-sepolia": "0x797BcC204ADc240517CD3d8fb930772be27297C5",
+          "polygon-mainnet": "0x955dC0F1dD17D5D33f8dF78793D2e0E4Ff395d67"
         }
       }
     },
@@ -2003,18 +2048,19 @@
       "id": 149,
       "description": "CRV / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xD533a949740bb3306d119CC777fa900bA034cd52",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xdA0DA298550E8E449b935CEA865c8100F3cA1b73",
-          "10": "0x7c56d3650f9aCD992b3Aa635C04A311c54Ad264c",
-          "56": "0x1CCd2D51CeB8DbaC8070c6AAefB331f77703f368",
-          "137": "0xC6c7Bb0d721e4Ef7318A16F682dd4c1013b430F0",
-          "250": "0xbfc6236cE03765739Db1393421C0d7675eeD8D7D",
-          "43114": "0xdae179d0782cE28d6fD0cedd965C69B54B794aB8",
-          "421614": "0x79DaA21a44D1415306Ec17C361e0090bdD4cFCbe",
-          "534352": "0xA9ED9258DE15CF5DfC8f85DE60836613B02a716a",
-          "11155420": "0xb42D8F610291Aaa08460bfBcEe1a81bC2DE2c10D"
+          "ethereum-mainnet": "0xdA0DA298550E8E449b935CEA865c8100F3cA1b73",
+          "avalanche-mainnet": "0xdae179d0782cE28d6fD0cedd965C69B54B794aB8",
+          "arbitrum-mainnet": "0x79DaA21a44D1415306Ec17C361e0090bdD4cFCbe",
+          "bsc-mainnet": "0x1CCd2D51CeB8DbaC8070c6AAefB331f77703f368",
+          "fantom-mainnet": "0xbfc6236cE03765739Db1393421C0d7675eeD8D7D",
+          "gnosis-mainnet": "0x88C76CccaA469614EAad7CED362050062DC2CCeB",
+          "optimism-mainnet": "0x7c56d3650f9aCD992b3Aa635C04A311c54Ad264c",
+          "optimism-sepolia": "0xb42D8F610291Aaa08460bfBcEe1a81bC2DE2c10D",
+          "polygon-mainnet": "0xC6c7Bb0d721e4Ef7318A16F682dd4c1013b430F0",
+          "scroll-mainnet": "0xA9ED9258DE15CF5DfC8f85DE60836613B02a716a"
         }
       }
     },
@@ -2025,12 +2071,13 @@
         "base": "0x00000000000000000000000000000000000002F4",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x5763Fc5FaBca9080Ad12bCAFae7a335023b1F9B4",
-          "56": "0xAA6778bD1313ff4BF4F07b671B3B89A12aDD0277",
-          "137": "0xfd8F457586779447A55Cc9e776C7C79BCf456Ec9",
-          "250": "0xfDB46212df397E25D96F646f9a2647dAEC3E3cCA",
-          "43114": "0x37FAb7e59f59a52870012A61314D95f2A9e52288",
-          "421614": "0xF56e6cb49304c2AD4a7C416665b55a1424014B1F"
+          "ethereum-mainnet": "0x5763Fc5FaBca9080Ad12bCAFae7a335023b1F9B4",
+          "avalanche-mainnet": "0x37FAb7e59f59a52870012A61314D95f2A9e52288",
+          "arbitrum-mainnet": "0xF56e6cb49304c2AD4a7C416665b55a1424014B1F",
+          "bsc-mainnet": "0xAA6778bD1313ff4BF4F07b671B3B89A12aDD0277",
+          "fantom-mainnet": "0xfDB46212df397E25D96F646f9a2647dAEC3E3cCA",
+          "gnosis-mainnet": "0x6E2482E011EC31a1960a938791B6B4Ff5BAa3217",
+          "polygon-mainnet": "0xfd8F457586779447A55Cc9e776C7C79BCf456Ec9"
         }
       }
     },
@@ -2041,7 +2088,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0x69Ff5b330f579229F9a842B9DD215B8E6833301d"
+          "arbitrum-mainnet": "0x69Ff5b330f579229F9a842B9DD215B8E6833301d"
         }
       }
     },
@@ -2052,11 +2099,11 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x0eDD9aC354033Ef766eCD45cb235d81139Df3d90",
-          "250": "0xa15CD3fF5EDF2AE2710C7bEfcF15EEEb53967BC1",
-          "43114": "0x8C8Da958396815469f289768b980DBCAcfE9F279",
-          "421614": "0xF6328F007A2FDc547875e24A3BC7e0603fd01727",
-          "11155420": "0x38FBcDA9DbE438587b38C8bdC11DF371682e609D"
+          "avalanche-mainnet": "0x8C8Da958396815469f289768b980DBCAcfE9F279",
+          "arbitrum-mainnet": "0xF6328F007A2FDc547875e24A3BC7e0603fd01727",
+          "fantom-mainnet": "0xa15CD3fF5EDF2AE2710C7bEfcF15EEEb53967BC1",
+          "optimism-mainnet": "0x0eDD9aC354033Ef766eCD45cb235d81139Df3d90",
+          "optimism-sepolia": "0x38FBcDA9DbE438587b38C8bdC11DF371682e609D"
         }
       }
     },
@@ -2067,7 +2114,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x841385263b2192A6f4b14353574C02bf0577473d"
+          "ethereum-mainnet": "0x841385263b2192A6f4b14353574C02bf0577473d"
         }
       }
     },
@@ -2077,20 +2124,23 @@
       "chainlink_compatibility": {
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
-        "chainlink_aggregators": {}
+        "chainlink_aggregators": {
+          "gnosis-mainnet": "0x9C1Dc429a8d8F10C8ebA522b608bC27F58d6ABE2"
+        }
       }
     },
     "155": {
       "id": 155,
       "description": "MIM / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x5406F7bfF74320e7EEB9ebf720E812599F71800c",
-          "250": "0x50a0a7C4066336203488c877958A8D7D3ab946FE",
-          "43114": "0x27665af435875E934Fc7F73802E360C1e4934261",
-          "421614": "0x0Ae17556F9698fC47C365A746AB9CddCB17F3809"
+          "ethereum-mainnet": "0x5406F7bfF74320e7EEB9ebf720E812599F71800c",
+          "avalanche-mainnet": "0x27665af435875E934Fc7F73802E360C1e4934261",
+          "arbitrum-mainnet": "0x0Ae17556F9698fC47C365A746AB9CddCB17F3809",
+          "fantom-mainnet": "0x50a0a7C4066336203488c877958A8D7D3ab946FE",
+          "kusama-moonriver": "0xf930aA2AbEA345b2020e4EE136a6336f28A54A18"
         }
       }
     },
@@ -2098,12 +2148,12 @@
       "id": 156,
       "description": "BUSD / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x793f1aEf27F38e93116725Ac26959E3E9a03704c",
-          "56": "0x8137C8d92798790950909B980A63B341D3Fd34Ec",
-          "97": "0xe4a831D928251A8ceF29A59303ED2410dEB33B03"
+          "ethereum-mainnet": "0x793f1aEf27F38e93116725Ac26959E3E9a03704c",
+          "bsc-mainnet": "0x8137C8d92798790950909B980A63B341D3Fd34Ec",
+          "bsc-testnet": "0xe4a831D928251A8ceF29A59303ED2410dEB33B03"
         }
       }
     },
@@ -2114,8 +2164,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0x9465CF4b4032080434E397F42fB99A8446c35376",
-          "421614": "0x338D614Af8c05eF9d77a33E9D33A92b770809ED4"
+          "arbitrum-mainnet": "0x338D614Af8c05eF9d77a33E9D33A92b770809ED4",
+          "base-mainnet": "0x9465CF4b4032080434E397F42fB99A8446c35376"
         }
       }
     },
@@ -2123,14 +2173,14 @@
       "id": 158,
       "description": "SPELL / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x090185f2135308BaD17527004364eBcC2D37e5F6",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x9959F0691dEE3Af699728977C37ee1E348E99202",
-          "56": "0x5A3b0851519Bfd72b681609137efF5b2E47C381b",
-          "250": "0x421CfF3FF719b5101f9c8Da487445C39838A566c",
-          "43114": "0x72470E4Cb2CA62C71783dE44259ef68DA6cBF78C",
-          "421614": "0xf6bACC7750c23A34b996A355A6E78b17Fc4BaEdC"
+          "ethereum-mainnet": "0x9959F0691dEE3Af699728977C37ee1E348E99202",
+          "avalanche-mainnet": "0x72470E4Cb2CA62C71783dE44259ef68DA6cBF78C",
+          "arbitrum-mainnet": "0xf6bACC7750c23A34b996A355A6E78b17Fc4BaEdC",
+          "bsc-mainnet": "0x5A3b0851519Bfd72b681609137efF5b2E47C381b",
+          "fantom-mainnet": "0x421CfF3FF719b5101f9c8Da487445C39838A566c"
         }
       }
     },
@@ -2141,7 +2191,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x60bddF874814e5994C6C4A6418157DE366e5D4DF"
+          "bsc-mainnet": "0x60bddF874814e5994C6C4A6418157DE366e5D4DF"
         }
       }
     },
@@ -2149,13 +2199,13 @@
       "id": 160,
       "description": "USDM / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x59D9356E565Ab3A36dD77763Fc0d87fEaf85508C",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x8226BD8e85F65B90F06E962AA2b57F7B9B25ceCE",
-          "10": "0x2559AFace3EdBF4F233f01C26dD2F86B6deA4b25",
-          "8453": "0x47c2FE5038bD59A3a80DA6026201F07b0eD76575",
-          "421614": "0xdDB2962ACFAc3755f946727450E41131068384FE"
+          "ethereum-mainnet": "0x8226BD8e85F65B90F06E962AA2b57F7B9B25ceCE",
+          "arbitrum-mainnet": "0xdDB2962ACFAc3755f946727450E41131068384FE",
+          "base-mainnet": "0x47c2FE5038bD59A3a80DA6026201F07b0eD76575",
+          "optimism-mainnet": "0x2559AFace3EdBF4F233f01C26dD2F86B6deA4b25"
         }
       }
     },
@@ -2166,7 +2216,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "43114": "0x4A5cE69A1aDA639042B30e1574Eb9D6e939388A3"
+          "avalanche-mainnet": "0x4A5cE69A1aDA639042B30e1574Eb9D6e939388A3"
         }
       }
     },
@@ -2177,7 +2227,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xeEefD49C268aA7b95c8A74D84e22ADc37187908E"
+          "bsc-mainnet": "0xeEefD49C268aA7b95c8A74D84e22ADc37187908E"
         }
       }
     },
@@ -2188,7 +2238,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x20141A70f958762391328Ef40268B5640B6F84d1"
+          "polygon-mainnet": "0x20141A70f958762391328Ef40268B5640B6F84d1"
         }
       }
     },
@@ -2199,12 +2249,12 @@
         "base": "0x00000000000000000000000000000000000003Da",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xCa80A73840718826a7A8b6b7216Bd5fDa12c121A",
-          "56": "0xf8DF0C154Ac233D52EEad6012aad1a786E95FB79",
-          "137": "0x96708ee1E2edF130E1A9e5c3550dD2aa37f9a49c",
-          "8453": "0x093e52c967391A87732956121509b9594B02F153",
-          "42220": "0x2e286970674b5BF22C829e5a41DA86Aa6712b062",
-          "421614": "0x5d750CC68ff61E2D68930003f77241f7346ADc84"
+          "arbitrum-mainnet": "0x5d750CC68ff61E2D68930003f77241f7346ADc84",
+          "base-mainnet": "0x093e52c967391A87732956121509b9594B02F153",
+          "bsc-mainnet": "0xf8DF0C154Ac233D52EEad6012aad1a786E95FB79",
+          "celo-mainnet": "0x2e286970674b5BF22C829e5a41DA86Aa6712b062",
+          "optimism-mainnet": "0xCa80A73840718826a7A8b6b7216Bd5fDa12c121A",
+          "polygon-mainnet": "0x96708ee1E2edF130E1A9e5c3550dD2aa37f9a49c"
         }
       }
     },
@@ -2215,8 +2265,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xb785e9aa87cDB29cC11a3f2b8bd17E6279275A35",
-          "11155420": "0x613288c55Db3467370369b80A864500F42Af83bE"
+          "optimism-mainnet": "0xb785e9aa87cDB29cC11a3f2b8bd17E6279275A35",
+          "optimism-sepolia": "0x613288c55Db3467370369b80A864500F42Af83bE"
         }
       }
     },
@@ -2227,7 +2277,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x43CB601A5869Fc67f5D3389fE91C6c6fBC6F880b"
+          "bsc-mainnet": "0x43CB601A5869Fc67f5D3389fE91C6c6fBC6F880b"
         }
       }
     },
@@ -2238,7 +2288,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "250": "0x755Dc32541B82eecE3F8aad681575f01985062C2"
+          "fantom-mainnet": "0x755Dc32541B82eecE3F8aad681575f01985062C2"
         }
       }
     },
@@ -2249,8 +2299,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xBae95c3247AA52738C52d2Df94ac6932b6b1907F",
-          "137": "0x43772948E7b69E3275d53f62E576036337Bbe352"
+          "ethereum-mainnet": "0xBae95c3247AA52738C52d2Df94ac6932b6b1907F",
+          "polygon-mainnet": "0x43772948E7b69E3275d53f62E576036337Bbe352"
         }
       }
     },
@@ -2261,8 +2311,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x57640993dbB9C8DAF6269f94f27F11586385AD65",
-          "11155420": "0x70BB0758a38ae43418ffcEd9A25273dd4e804D15"
+          "optimism-mainnet": "0x57640993dbB9C8DAF6269f94f27F11586385AD65",
+          "optimism-sepolia": "0x70BB0758a38ae43418ffcEd9A25273dd4e804D15"
         }
       }
     },
@@ -2273,10 +2323,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x73316EF731f3C7219482716682C063dBbd1602F2",
-          "56": "0x745176860624A6a909Eb4940eecb0CFcc20736DA",
-          "97": "0x6470ea3dE3F596BCfaEe34956242eb56b9472725",
-          "11155420": "0x70516829842748ce8AEF6C2532Eca65B0FA8f436"
+          "bsc-mainnet": "0x745176860624A6a909Eb4940eecb0CFcc20736DA",
+          "bsc-testnet": "0x6470ea3dE3F596BCfaEe34956242eb56b9472725",
+          "optimism-mainnet": "0x73316EF731f3C7219482716682C063dBbd1602F2",
+          "optimism-sepolia": "0x70516829842748ce8AEF6C2532Eca65B0FA8f436"
         }
       }
     },
@@ -2287,7 +2337,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xd49A730354913127D687FB794c4446E7AeFE94AD"
+          "polygon-mainnet": "0xd49A730354913127D687FB794c4446E7AeFE94AD"
         }
       }
     },
@@ -2298,7 +2348,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "11155111": "0xF6858C7a2030454A266e890DC909D9730dF224B7"
+          "ethereum-sepolia": "0xF6858C7a2030454A266e890DC909D9730dF224B7"
         }
       }
     },
@@ -2306,16 +2356,16 @@
       "id": 173,
       "description": "KNC / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x15D8Aac71A442ece966576c85438B0DFa7FcAbe1",
-          "10": "0xe4391393205B6265585250E7A026103a0D1E168d",
-          "56": "0x591ae4Ba58E3cF8f7C6cc4Ce59Ab6de029880F8E",
-          "137": "0x530a6F6e78391F80934de518f350affde5733663",
-          "43114": "0x38E41034eA72CaE98aC14c0fFa8fe992C57d78c5",
-          "421614": "0x20870D99455B6F9d7c0E6f2608245719d789ff53",
-          "11155420": "0x8db7757D4010753e6854D69c4dD11dD3B3fd0c56"
+          "ethereum-mainnet": "0x15D8Aac71A442ece966576c85438B0DFa7FcAbe1",
+          "avalanche-mainnet": "0x38E41034eA72CaE98aC14c0fFa8fe992C57d78c5",
+          "arbitrum-mainnet": "0x20870D99455B6F9d7c0E6f2608245719d789ff53",
+          "bsc-mainnet": "0x591ae4Ba58E3cF8f7C6cc4Ce59Ab6de029880F8E",
+          "optimism-mainnet": "0xe4391393205B6265585250E7A026103a0D1E168d",
+          "optimism-sepolia": "0x8db7757D4010753e6854D69c4dD11dD3B3fd0c56",
+          "polygon-mainnet": "0x530a6F6e78391F80934de518f350affde5733663"
         }
       }
     },
@@ -2323,10 +2373,10 @@
       "id": 174,
       "description": "PYUSD / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x39E31761911b9aaBAEF5fb81B18Fd1C24a60E884"
+          "ethereum-mainnet": "0x39E31761911b9aaBAEF5fb81B18Fd1C24a60E884"
         }
       }
     },
@@ -2334,11 +2384,11 @@
       "id": 175,
       "description": "CRVUSD / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xf3A0a2363Ee3e5FC1CcF923F4eA9c06BaC1A6834",
-          "421614": "0xa0A62496C42627379D865618a00849239ff69E66"
+          "ethereum-mainnet": "0xf3A0a2363Ee3e5FC1CcF923F4eA9c06BaC1A6834",
+          "arbitrum-mainnet": "0xa0A62496C42627379D865618a00849239ff69E66"
         }
       }
     },
@@ -2349,10 +2399,10 @@
         "base": "0x0000000000000000000000000000000000000164",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x28a6B219403c1Dac04172cBb8cC1aB8bF5925830",
-          "56": "0x0E8F55B887e12F251cabBE7125d076FA20c5CC28",
-          "137": "0x75cBCfE2776C0436ac8A87C0BE7e563A06543FfF",
-          "42220": "0xD0735E9432eA8CDE8A855D3c0e6C18aC24a92ffC"
+          "bsc-mainnet": "0x0E8F55B887e12F251cabBE7125d076FA20c5CC28",
+          "celo-mainnet": "0xD0735E9432eA8CDE8A855D3c0e6C18aC24a92ffC",
+          "optimism-mainnet": "0x28a6B219403c1Dac04172cBb8cC1aB8bF5925830",
+          "polygon-mainnet": "0x75cBCfE2776C0436ac8A87C0BE7e563A06543FfF"
         }
       }
     },
@@ -2363,15 +2413,16 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x0e3dd634FFbF7EA89BbDCF09Ccc463302FD5f903",
-          "10": "0x78F049f6da1aC1dcA50D6D8f184Acf47eB269852",
-          "56": "0xf0A05b001A5cAf01870E7C6C2745621B153dC14b",
-          "97": "0xEbea1B90894c248F958ba3c138ECC66Bb3C72299",
-          "137": "0x12cc6797D0Fb329baeC8d0ab588b1C1CF0EA71A5",
-          "43114": "0x10a1ac27D8e9dD6Ad255cD60432FdAC8828C2f07",
-          "421614": "0xd35B0e1Fd468Bd264570C64f28Ea48F778bc0DfC",
-          "11155111": "0x98B931Cd8e3188AA157978BB3b10297d8b652bc7",
-          "11155420": "0x010F96CB3a4c61F9BdD295DE65484eA8cA3cDCBE"
+          "ethereum-mainnet": "0x0e3dd634FFbF7EA89BbDCF09Ccc463302FD5f903",
+          "ethereum-sepolia": "0x98B931Cd8e3188AA157978BB3b10297d8b652bc7",
+          "avalanche-mainnet": "0x10a1ac27D8e9dD6Ad255cD60432FdAC8828C2f07",
+          "arbitrum-mainnet": "0xd35B0e1Fd468Bd264570C64f28Ea48F778bc0DfC",
+          "bsc-mainnet": "0xf0A05b001A5cAf01870E7C6C2745621B153dC14b",
+          "bsc-testnet": "0xEbea1B90894c248F958ba3c138ECC66Bb3C72299",
+          "gnosis-mainnet": "0x53BA6D580a9EAB65899Bbc1157c2062a83fa8D9E",
+          "optimism-mainnet": "0x78F049f6da1aC1dcA50D6D8f184Acf47eB269852",
+          "optimism-sepolia": "0x010F96CB3a4c61F9BdD295DE65484eA8cA3cDCBE",
+          "polygon-mainnet": "0x12cc6797D0Fb329baeC8d0ab588b1C1CF0EA71A5"
         }
       }
     },
@@ -2382,7 +2433,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x8A6bfB2B268301449DFf1dc07C17812240859133"
+          "polygon-mainnet": "0x8A6bfB2B268301449DFf1dc07C17812240859133"
         }
       }
     },
@@ -2393,10 +2444,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xc1c4a83d4707878d6D86C8D9C3f45c4D48473AA9",
-          "42220": "0x5FB8bFAEBe2dd6dB2AF308D293ea25e607D3A922",
-          "44787": "0x1e73B636AB0Ff7689eD234b5DCd847f55b020471",
-          "11155420": "0x01c4ff19f14797673E5256604dC915707c5430E4"
+          "celo-mainnet": "0x5FB8bFAEBe2dd6dB2AF308D293ea25e607D3A922",
+          "celo-alfajores": "0x1e73B636AB0Ff7689eD234b5DCd847f55b020471",
+          "optimism-mainnet": "0xc1c4a83d4707878d6D86C8D9C3f45c4D48473AA9",
+          "optimism-sepolia": "0x01c4ff19f14797673E5256604dC915707c5430E4"
         }
       }
     },
@@ -2407,8 +2458,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x382A5Cd7Ae6FDeFce5F4FEa4727f0Bc98936dF4E",
-          "42220": "0x9eb524dA226328d8ff69440F0F4bAE7DC0BFf34C"
+          "celo-mainnet": "0x9eb524dA226328d8ff69440F0F4bAE7DC0BFf34C",
+          "polygon-mainnet": "0x382A5Cd7Ae6FDeFce5F4FEa4727f0Bc98936dF4E"
         }
       }
     },
@@ -2419,8 +2470,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x0DB37D53870E903481C47b144F425C89284e00Cd",
-          "11155111": "0x5c021692158f7cC216851901CB2501FFbBaE1a32"
+          "ethereum-mainnet": "0x0DB37D53870E903481C47b144F425C89284e00Cd",
+          "ethereum-sepolia": "0x5c021692158f7cC216851901CB2501FFbBaE1a32"
         }
       }
     },
@@ -2440,8 +2491,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xa2a740744C8222d15B6343B71951a68f8Fcc69b7",
-          "11155420": "0xC146CB92ef10E5768756a256b6e13993c24F11ce"
+          "optimism-mainnet": "0xa2a740744C8222d15B6343B71951a68f8Fcc69b7",
+          "optimism-sepolia": "0xC146CB92ef10E5768756a256b6e13993c24F11ce"
         }
       }
     },
@@ -2461,7 +2512,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "43114": "0x15505bcC6D3c6f8F3cfC3d6D96f5A6301A08D2cc"
+          "avalanche-mainnet": "0x15505bcC6D3c6f8F3cfC3d6D96f5A6301A08D2cc"
         }
       }
     },
@@ -2472,13 +2523,14 @@
         "base": "0x0000000000000000000000000000000000000188",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xA0B5260BDfD1011C4bcdc7A099C75BFf6340B38C",
-          "10": "0xaE4c8567C942B974Af4A860380c99A8D03C6148E",
-          "56": "0x0885CFc31E09c42793c3c1dB48db7588E6F800CF",
-          "137": "0xDab0201ea013a3261fd2E5f13F91C46DF0E2b451",
-          "43114": "0xE91B9f158A6e89a43223e064331532e981Cf2DcA",
-          "421614": "0xadBf1c8a244d537C343d771e2Fa897F3654a1Ae4",
-          "11155111": "0x468A16a72E983Bf576b61952Ca0E83286553A38f"
+          "ethereum-mainnet": "0xA0B5260BDfD1011C4bcdc7A099C75BFf6340B38C",
+          "ethereum-sepolia": "0x468A16a72E983Bf576b61952Ca0E83286553A38f",
+          "avalanche-mainnet": "0xE91B9f158A6e89a43223e064331532e981Cf2DcA",
+          "arbitrum-mainnet": "0xadBf1c8a244d537C343d771e2Fa897F3654a1Ae4",
+          "bsc-mainnet": "0x0885CFc31E09c42793c3c1dB48db7588E6F800CF",
+          "gnosis-mainnet": "0xa5f05b6C586f21b7E6200b6A6a4ADE55eCAB0103",
+          "optimism-mainnet": "0xaE4c8567C942B974Af4A860380c99A8D03C6148E",
+          "polygon-mainnet": "0xDab0201ea013a3261fd2E5f13F91C46DF0E2b451"
         }
       }
     },
@@ -2489,17 +2541,20 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xA9845307Bb5F5637B136Ca70914746d1bb7d402a",
-          "10": "0x25dD1949cDb81f5fc38841a8abF342c4EF48dbfd",
-          "56": "0xa6E8fEe84f9Bd528aD71917c9DdbB1fd3214f280",
-          "97": "0xdbd22686749275932BF35D9A893Da23505CC2804",
-          "137": "0x30395Df79A543A2308ab0668661fCeFC229A19B2",
-          "250": "0x5Cd752a9493630cFbb6F545c78D342D638E90Fe3",
-          "8453": "0xbF477e69a0adF91b6e3d6e70cb67E5D1A27e88e3",
-          "43113": "0x0b6A02355d61FB67d9bE4b9D00c3e2f1141180e6",
-          "421614": "0x9c65Bc9C18f754129bA00c5298B539e69A32102d",
-          "534352": "0x30413D396Eb0611807840d8f50Af4ed61Dd04B90",
-          "11155420": "0xF9a98EC64cA90d712aDb5BB46545B6b9f9D184f0"
+          "ethereum-mainnet": "0xA9845307Bb5F5637B136Ca70914746d1bb7d402a",
+          "avalanche-fuji": "0x0b6A02355d61FB67d9bE4b9D00c3e2f1141180e6",
+          "arbitrum-mainnet": "0x9c65Bc9C18f754129bA00c5298B539e69A32102d",
+          "arbitrum-sepolia": "0x547D3C376373eb80D3737649460dD67032b68d16",
+          "base-mainnet": "0xbF477e69a0adF91b6e3d6e70cb67E5D1A27e88e3",
+          "bsc-mainnet": "0xa6E8fEe84f9Bd528aD71917c9DdbB1fd3214f280",
+          "bsc-testnet": "0xdbd22686749275932BF35D9A893Da23505CC2804",
+          "fantom-mainnet": "0x5Cd752a9493630cFbb6F545c78D342D638E90Fe3",
+          "gnosis-mainnet": "0x9Af55762115066D3e99AD4d237586344C4ABEAdD",
+          "kusama-moonriver": "0x1A19E4621Eb517bF45186F4E804242721224C6F7",
+          "optimism-mainnet": "0x25dD1949cDb81f5fc38841a8abF342c4EF48dbfd",
+          "optimism-sepolia": "0xF9a98EC64cA90d712aDb5BB46545B6b9f9D184f0",
+          "polygon-mainnet": "0x30395Df79A543A2308ab0668661fCeFC229A19B2",
+          "scroll-mainnet": "0x30413D396Eb0611807840d8f50Af4ed61Dd04B90"
         }
       }
     },
@@ -2510,8 +2565,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x593D02fFC0Ba6e5CFf1Cf7c026256D356D31ecaD",
-          "421614": "0x033809b88Cc5DE5944c70DdD9E25dAf36db823DF"
+          "arbitrum-mainnet": "0x033809b88Cc5DE5944c70DdD9E25dAf36db823DF",
+          "arbitrum-sepolia": "0x2f98e732173FCb089adD1F464168775566b916D8",
+          "bsc-mainnet": "0x593D02fFC0Ba6e5CFf1Cf7c026256D356D31ecaD"
         }
       }
     },
@@ -2522,10 +2578,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xcCb014Fe9d7d7FB0E50E3aE8f0BF25b26e6596c6",
-          "56": "0xDD746F1C05207D1478dC217F4e832786ABEd5C80",
-          "137": "0xfA98EF4Cab9D65B656299377937Ca8Db2b62C322",
-          "11155420": "0x5f3B52BB02401147179123d3C365bB1077D2454c"
+          "bsc-mainnet": "0xDD746F1C05207D1478dC217F4e832786ABEd5C80",
+          "optimism-mainnet": "0xcCb014Fe9d7d7FB0E50E3aE8f0BF25b26e6596c6",
+          "optimism-sepolia": "0x5f3B52BB02401147179123d3C365bB1077D2454c",
+          "polygon-mainnet": "0xfA98EF4Cab9D65B656299377937Ca8Db2b62C322"
         }
       }
     },
@@ -2533,13 +2589,13 @@
       "id": 190,
       "description": "RPL / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xD33526068D116cE69F19A9ee46F0bd304F21A51f",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x92455F206F6433f161c09a31B0E02A195AFcf23c",
-          "10": "0xAd1e27Afb932d835ff9829bD16534E5E2c4A6fEd",
-          "421614": "0x44D3ab6c4b98A3F9f241E1753b2475ad7e502051",
-          "11155420": "0x3503d314B82792E5aE892B48C68de464DcE9cBdf"
+          "ethereum-mainnet": "0x92455F206F6433f161c09a31B0E02A195AFcf23c",
+          "arbitrum-mainnet": "0x44D3ab6c4b98A3F9f241E1753b2475ad7e502051",
+          "optimism-mainnet": "0xAd1e27Afb932d835ff9829bD16534E5E2c4A6fEd",
+          "optimism-sepolia": "0x3503d314B82792E5aE892B48C68de464DcE9cBdf"
         }
       }
     },
@@ -2550,7 +2606,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x9D5763ca9a0BeC8bfC11603F37edA91Edca0CF2c"
+          "bsc-mainnet": "0x9D5763ca9a0BeC8bfC11603F37edA91Edca0CF2c"
         }
       }
     },
@@ -2561,8 +2617,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xB001D353633cd96B68000aa915C8A8A136d90A98",
-          "11155420": "0x2222190dD94d3f8f722b3F91CbD940A8221465cC"
+          "optimism-mainnet": "0xB001D353633cd96B68000aa915C8A8A136d90A98",
+          "optimism-sepolia": "0x2222190dD94d3f8f722b3F91CbD940A8221465cC"
         }
       }
     },
@@ -2573,7 +2629,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xCF4F7734a1DB7Be735cd936f35703fD4bd217968"
+          "optimism-mainnet": "0xCF4F7734a1DB7Be735cd936f35703fD4bd217968"
         }
       }
     },
@@ -2581,12 +2637,12 @@
       "id": 194,
       "description": "GHO / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xff221Bf2E61B62182210b3d42dE7f77da5b5b41F",
-          "421614": "0x41230419afFF6c7fFecF715fA57958D53F803De9",
-          "11155111": "0x997F482d5d7f49d50e7f96F89038235CFb057334"
+          "ethereum-mainnet": "0xff221Bf2E61B62182210b3d42dE7f77da5b5b41F",
+          "ethereum-sepolia": "0x997F482d5d7f49d50e7f96F89038235CFb057334",
+          "arbitrum-mainnet": "0x41230419afFF6c7fFecF715fA57958D53F803De9"
         }
       }
     },
@@ -2597,7 +2653,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0xf8abb3c41A3b21687Ad862C9Fd00D007E413EEAA"
+          "arbitrum-mainnet": "0xf8abb3c41A3b21687Ad862C9Fd00D007E413EEAA",
+          "arbitrum-sepolia": "0xffC47908525508141550A92890883a04e169a10C"
         }
       }
     },
@@ -2608,9 +2665,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x2aEb623AbF436E256d7975787BECc95f4a4bf89f",
-          "137": "0xc7199a0846bb92cc7c7Cc0539e502580131fEB04",
-          "11155420": "0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165"
+          "optimism-mainnet": "0x2aEb623AbF436E256d7975787BECc95f4a4bf89f",
+          "optimism-sepolia": "0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165",
+          "polygon-mainnet": "0xc7199a0846bb92cc7c7Cc0539e502580131fEB04"
         }
       }
     },
@@ -2621,7 +2678,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x7DBC514F75adf57F7a7Cb637fcBAd6F1c1b90eE5"
+          "bsc-mainnet": "0x7DBC514F75adf57F7a7Cb637fcBAd6F1c1b90eE5"
         }
       }
     },
@@ -2632,8 +2689,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xD5d053cdA4f56e7a1E3275ABc7496D0306529EE4",
-          "8453": "0x55012EF027ae9b4E2bb5a5f529E5a1184Bcc998D"
+          "base-mainnet": "0x55012EF027ae9b4E2bb5a5f529E5a1184Bcc998D",
+          "polygon-mainnet": "0xD5d053cdA4f56e7a1E3275ABc7496D0306529EE4"
         }
       }
     },
@@ -2641,19 +2698,20 @@
       "id": 199,
       "description": "SNX / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xc778E9686F0fde6Fe4D7d8fE4B481463Fce898fD",
-          "10": "0x584F57911b6EEDab5503E202f8e193663c9bd3DB",
-          "137": "0x9F8BE614411168952D53F37d915B57a8327ED887",
-          "250": "0x1F0C026D3f87b0c69e3c8399A53b8Da4aA6304C2",
-          "8453": "0x735326Bcc0479e3F23eD65DC83310d63eBA6250D",
-          "43113": "0xFAe598a7404bf957d0C0715837D1E951a0C1Cba6",
-          "43114": "0x0e3FabD2B77837597a477FD57354c09EB4A4B966",
-          "421614": "0x382f3C547e3EBd1D08cd0CAf6e5F0a7b0B350A11",
-          "11155111": "0xe1bf34faaa8b45ca30E60188dE75bf00e790272F",
-          "11155420": "0x1A98303B3931C162e7580dc6e28f4486a228Eae9"
+          "ethereum-mainnet": "0xc778E9686F0fde6Fe4D7d8fE4B481463Fce898fD",
+          "ethereum-sepolia": "0xe1bf34faaa8b45ca30E60188dE75bf00e790272F",
+          "avalanche-mainnet": "0x0e3FabD2B77837597a477FD57354c09EB4A4B966",
+          "avalanche-fuji": "0xFAe598a7404bf957d0C0715837D1E951a0C1Cba6",
+          "arbitrum-mainnet": "0x382f3C547e3EBd1D08cd0CAf6e5F0a7b0B350A11",
+          "base-mainnet": "0x735326Bcc0479e3F23eD65DC83310d63eBA6250D",
+          "fantom-mainnet": "0x1F0C026D3f87b0c69e3c8399A53b8Da4aA6304C2",
+          "gnosis-mainnet": "0x19e5234E9Aad5fb08f58c3569E8d0858664F0cF3",
+          "optimism-mainnet": "0x584F57911b6EEDab5503E202f8e193663c9bd3DB",
+          "optimism-sepolia": "0x1A98303B3931C162e7580dc6e28f4486a228Eae9",
+          "polygon-mainnet": "0x9F8BE614411168952D53F37d915B57a8327ED887"
         }
       }
     },
@@ -2664,7 +2722,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x8c434b25C0940f65577C59FB20796b67686AB548"
+          "bsc-mainnet": "0x8c434b25C0940f65577C59FB20796b67686AB548"
         }
       }
     },
@@ -2675,8 +2733,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x6D9d0440b5f5a2972ce1D190F3E228132d318250",
-          "11155420": "0x75bC5b0D319b1BcC58593D4535eD7522A321BB20"
+          "optimism-mainnet": "0x6D9d0440b5f5a2972ce1D190F3E228132d318250",
+          "optimism-sepolia": "0x75bC5b0D319b1BcC58593D4535eD7522A321BB20"
         }
       }
     },
@@ -2687,16 +2745,18 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x1DA1DdED0eFEB6eB7A5955502B892f8979af65DF",
-          "10": "0xa6d25eEBae9c841C44AD01c9176556a4c2189961",
-          "56": "0xaB5bade5d88dD07da54d5df87d05d67fAfe977a0",
-          "137": "0xa058f88B33C8Bd8291d20856A82D09A7B59c83e9",
-          "8453": "0x84efF9466d371ccAB94728e8bdFcd9Bc095D7Ca6",
-          "43113": "0x11FeeA5D7Ec56EE717D8a229e8aac5d8AdB238Aa",
-          "43114": "0xcfBfE648BA88Bf7D9776d970417a0B26c315feB4",
-          "421614": "0xcf17b68a40f10d3DcEedd9a092F1Df331cE3D9da",
-          "534352": "0x88926382559e24D1153d9F492554064C9f052A22",
-          "11155420": "0x69732985bC99a55A94ceb4462fC4Eeb2125E00F3"
+          "ethereum-mainnet": "0x1DA1DdED0eFEB6eB7A5955502B892f8979af65DF",
+          "avalanche-mainnet": "0xcfBfE648BA88Bf7D9776d970417a0B26c315feB4",
+          "avalanche-fuji": "0x11FeeA5D7Ec56EE717D8a229e8aac5d8AdB238Aa",
+          "arbitrum-mainnet": "0xcf17b68a40f10d3DcEedd9a092F1Df331cE3D9da",
+          "arbitrum-sepolia": "0x4E1a3500F8673c31d99BfD7AD7f787c8eb126bBf",
+          "base-mainnet": "0x84efF9466d371ccAB94728e8bdFcd9Bc095D7Ca6",
+          "bsc-mainnet": "0xaB5bade5d88dD07da54d5df87d05d67fAfe977a0",
+          "gnosis-mainnet": "0xB840C9dBC0964bcD89d6410f34091b2cb6733ADb",
+          "optimism-mainnet": "0xa6d25eEBae9c841C44AD01c9176556a4c2189961",
+          "optimism-sepolia": "0x69732985bC99a55A94ceb4462fC4Eeb2125E00F3",
+          "polygon-mainnet": "0xa058f88B33C8Bd8291d20856A82D09A7B59c83e9",
+          "scroll-mainnet": "0x88926382559e24D1153d9F492554064C9f052A22"
         }
       }
     },
@@ -2704,11 +2764,11 @@
       "id": 203,
       "description": "FDUSD / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x072eC2295E72815f4D0c6B378D67De0be9781100",
-          "56": "0xD1E056fF22947c951DF2f5ca4E61df787dE3f4D0"
+          "ethereum-mainnet": "0x072eC2295E72815f4D0c6B378D67De0be9781100",
+          "bsc-mainnet": "0xD1E056fF22947c951DF2f5ca4E61df787dE3f4D0"
         }
       }
     },
@@ -2716,17 +2776,18 @@
       "id": 204,
       "description": "SUSHI / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x658Aa21601C8c0bB511C21999F7cad35B6A15192",
-          "10": "0x82C3B7afEa9d8c799a75573cF9b8abd0AE042F2d",
-          "56": "0x5e54baAfaa95D7Cc131Ee5C162aB7cEfA7D9bB7A",
-          "137": "0xBEC3AFF142585905eC0436E7E3a14f1607Ca4a47",
-          "250": "0x649F04a23eE3708331A949395b61F37b3Fd94847",
-          "43114": "0x6C63b7B14380a4840B32c787f2842e27cdD0188a",
-          "421614": "0xe4A492420eBdA03B04973Ed1E46d5fe9F3b077EF",
-          "11155420": "0x5b42df627f45Ed1aF59a66241F88B20640DBc92d"
+          "ethereum-mainnet": "0x658Aa21601C8c0bB511C21999F7cad35B6A15192",
+          "avalanche-mainnet": "0x6C63b7B14380a4840B32c787f2842e27cdD0188a",
+          "arbitrum-mainnet": "0xe4A492420eBdA03B04973Ed1E46d5fe9F3b077EF",
+          "bsc-mainnet": "0x5e54baAfaa95D7Cc131Ee5C162aB7cEfA7D9bB7A",
+          "fantom-mainnet": "0x649F04a23eE3708331A949395b61F37b3Fd94847",
+          "gnosis-mainnet": "0x337D84cE7Cc5e4Da39dDc0e76698e79Ff3b40217",
+          "optimism-mainnet": "0x82C3B7afEa9d8c799a75573cF9b8abd0AE042F2d",
+          "optimism-sepolia": "0x5b42df627f45Ed1aF59a66241F88B20640DBc92d",
+          "polygon-mainnet": "0xBEC3AFF142585905eC0436E7E3a14f1607Ca4a47"
         }
       }
     },
@@ -2737,12 +2798,13 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xfC7608cf76F489191Cb319DD6167aEEE387Bb251",
-          "56": "0xfDeE651eB10140BCDE7346FdBCcf32E508Bcad39",
-          "97": "0x83DFA2fB235cB622620cb9e4875DBae321B47869",
-          "137": "0x53Ba81B50b47EE4dfe98F72Db287226580F2C912",
-          "421614": "0x2fB0A0cc872A43Ff74B95FeD874e95687c56fD0f",
-          "11155420": "0x3D4136A6057f2CA7c26a107697589CA7E2c7D81C"
+          "arbitrum-mainnet": "0x2fB0A0cc872A43Ff74B95FeD874e95687c56fD0f",
+          "arbitrum-sepolia": "0x5D2c5D8C6C7D70147aFf71e4063aB5abA505B8e8",
+          "bsc-mainnet": "0xfDeE651eB10140BCDE7346FdBCcf32E508Bcad39",
+          "bsc-testnet": "0x83DFA2fB235cB622620cb9e4875DBae321B47869",
+          "optimism-mainnet": "0xfC7608cf76F489191Cb319DD6167aEEE387Bb251",
+          "optimism-sepolia": "0x3D4136A6057f2CA7c26a107697589CA7E2c7D81C",
+          "polygon-mainnet": "0x53Ba81B50b47EE4dfe98F72Db287226580F2C912"
         }
       }
     },
@@ -2753,10 +2815,10 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xDAE05e337C56CD1b988Fd7a6B74e8BbD3028C4C6",
-          "10": "0x057B4ffE41aFb2104C3355a8396bab7c64E4017F",
-          "8453": "0x0C731e5985798B2B8374cA7e4F7AfDD174b1b74f",
-          "421614": "0xCD11B95945DEe19cFdfE45Bbb8C19F481a05233A"
+          "ethereum-mainnet": "0xDAE05e337C56CD1b988Fd7a6B74e8BbD3028C4C6",
+          "arbitrum-mainnet": "0xCD11B95945DEe19cFdfE45Bbb8C19F481a05233A",
+          "base-mainnet": "0x0C731e5985798B2B8374cA7e4F7AfDD174b1b74f",
+          "optimism-mainnet": "0x057B4ffE41aFb2104C3355a8396bab7c64E4017F"
         }
       }
     },
@@ -2767,8 +2829,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xba4a83372c28E4Ef0925d174f9FEf55743B87A4a",
-          "11155420": "0xc9195A013b6E31bb0FEb4DDDa97d467e5A7F957c"
+          "optimism-mainnet": "0xba4a83372c28E4Ef0925d174f9FEf55743B87A4a",
+          "optimism-sepolia": "0xc9195A013b6E31bb0FEb4DDDa97d467e5A7F957c"
         }
       }
     },
@@ -2776,34 +2838,37 @@
       "id": 208,
       "description": "LINK / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x96d6e33B411dc1f4E3F1e894A5A5d9CE0F96738D",
-          "10": "0x5d101824C693C70a68FFc3CDb0Cc394F3a4fb9Ec",
-          "56": "0x93DDef5BF5796d86Fc622073f7617bB0dd129a87",
-          "97": "0x78E69Bbaa75EB5179F8ea3fb235B3daD8826f479",
-          "137": "0x3ae597D61Ba81f17F846b20840dec8D94f8FdC1E",
-          "250": "0xF13148424cc6fDfa793eAe323B081c130fF839F1",
-          "300": "0xe8d07b1A703569E8dc7230F28A88BC20311d3dF5",
-          "324": "0x2d8404092B2ad831636B5816e6573a71E5422F79",
-          "1088": "0x86f1FCb32ac073951d3156929A93428902F30765",
-          "1101": "0x0E7197E7200a706e4B8E0ecfd39ef8c45CfF1422",
-          "1442": "0xb113F5A928BCfF189C998ab20d753a47F9dE5A61",
-          "4002": "0x37A8EA20344adfCF380F97a40d11Fa362271690C",
-          "8453": "0x72FC7950A832396720736e7e08D6F74C84C6909a",
-          "42220": "0x393B96d0C18C892f2e79C0C5e44D0069571Ec133",
-          "43113": "0x5F4a4f309Aefb6fb0Ab927A0421D0342fF92f194",
-          "43114": "0x9FC8683EFf42913f0F1F32EEc2f21340017FCDdB",
-          "44787": "0xaacC8DB282Dbfd29d6E2eee7212Cfe79514A3b1B",
-          "59140": "0x11c47eC06F771D0e3bb148301b416d79eA04CdF0",
-          "80002": "0xeBe9A7A5F6D83195d3d15a95f60C297e9d9211a0",
-          "84532": "0xAc6DB6d5538Cd07f58afee9dA736ce192119017B",
-          "421614": "0x9b8DdcF800a7BfCdEbaD6D65514dE59160a2C9CC",
-          "534351": "0x5ED6390A45ea1A6A63013CAedc0f0d2bAf67fC3C",
-          "534352": "0x4A295f37A7CA6D2842349cCa55607312216519aa",
-          "11155111": "0xa72a72ab0724976465598578cBC8A79fF619dc03",
-          "11155420": "0x999F70a78A480Ce1Ab5F89d5fC7D1Dd0481b804d"
+          "ethereum-mainnet": "0x96d6e33B411dc1f4E3F1e894A5A5d9CE0F96738D",
+          "ethereum-sepolia": "0xa72a72ab0724976465598578cBC8A79fF619dc03",
+          "avalanche-mainnet": "0x9FC8683EFf42913f0F1F32EEc2f21340017FCDdB",
+          "avalanche-fuji": "0x5F4a4f309Aefb6fb0Ab927A0421D0342fF92f194",
+          "andromeda-mainnet": "0x86f1FCb32ac073951d3156929A93428902F30765",
+          "arbitrum-mainnet": "0x9b8DdcF800a7BfCdEbaD6D65514dE59160a2C9CC",
+          "arbitrum-sepolia": "0x961AD289351459A45fC90884eF3AB0278ea95DDE",
+          "base-mainnet": "0x72FC7950A832396720736e7e08D6F74C84C6909a",
+          "base-sepolia": "0xAc6DB6d5538Cd07f58afee9dA736ce192119017B",
+          "bsc-mainnet": "0x93DDef5BF5796d86Fc622073f7617bB0dd129a87",
+          "bsc-testnet": "0x78E69Bbaa75EB5179F8ea3fb235B3daD8826f479",
+          "celo-mainnet": "0x393B96d0C18C892f2e79C0C5e44D0069571Ec133",
+          "celo-alfajores": "0xaacC8DB282Dbfd29d6E2eee7212Cfe79514A3b1B",
+          "fantom-mainnet": "0xF13148424cc6fDfa793eAe323B081c130fF839F1",
+          "fantom-testnet": "0x37A8EA20344adfCF380F97a40d11Fa362271690C",
+          "gnosis-mainnet": "0x813a79EfDfd6a4352b7C583d8d38B2B5d1151d7E",
+          "linea-mainnet": "0x11c47eC06F771D0e3bb148301b416d79eA04CdF0",
+          "kusama-moonriver": "0x2324E37178465805181526535b3C00759e627950",
+          "optimism-mainnet": "0x5d101824C693C70a68FFc3CDb0Cc394F3a4fb9Ec",
+          "optimism-sepolia": "0x999F70a78A480Ce1Ab5F89d5fC7D1Dd0481b804d",
+          "polygon-mainnet": "0x3ae597D61Ba81f17F846b20840dec8D94f8FdC1E",
+          "polygon-amoy": "0xeBe9A7A5F6D83195d3d15a95f60C297e9d9211a0",
+          "polygon-zkevm-mainnet": "0x0E7197E7200a706e4B8E0ecfd39ef8c45CfF1422",
+          "polygon-zkevm-cardona": "0xb113F5A928BCfF189C998ab20d753a47F9dE5A61",
+          "scroll-mainnet": "0x4A295f37A7CA6D2842349cCa55607312216519aa",
+          "scroll-sepolia": "0x5ED6390A45ea1A6A63013CAedc0f0d2bAf67fC3C",
+          "zksync-mainnet": "0x2d8404092B2ad831636B5816e6573a71E5422F79",
+          "zksync-sepolia": "0xe8d07b1A703569E8dc7230F28A88BC20311d3dF5"
         }
       }
     },
@@ -2811,10 +2876,10 @@
       "id": 209,
       "description": "USD0 / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x73A15FeD60Bf67631dC6cd7Bc5B6e8da8190aCF5",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x90Fb891e7EE51972f7D9309a6B812D04ED2643c7"
+          "ethereum-mainnet": "0x90Fb891e7EE51972f7D9309a6B812D04ED2643c7"
         }
       }
     },
@@ -2825,7 +2890,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0xaE4602716079C0Be7948c0b84553dEE0e6564a3d"
+          "base-mainnet": "0xaE4602716079C0Be7948c0b84553dEE0e6564a3d"
         }
       }
     },
@@ -2836,8 +2901,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0xA31289604833866940BD063d54e31b312b223b24",
-          "421614": "0xC6A1314E89d01517a90AE4b0d9d5e499A324B283"
+          "arbitrum-mainnet": "0xC6A1314E89d01517a90AE4b0d9d5e499A324B283",
+          "base-mainnet": "0xA31289604833866940BD063d54e31b312b223b24"
         }
       }
     },
@@ -2848,7 +2913,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x297542a584BDfa1F1C450ae3542137790C60B1EB"
+          "bsc-mainnet": "0x297542a584BDfa1F1C450ae3542137790C60B1EB"
         }
       }
     },
@@ -2859,11 +2924,11 @@
         "base": "0x00000000000000000000000000000000000002be",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xfed25Dff478d14b32cb983100cc15d44BFa54247",
-          "56": "0xd65648EAa2083A91A8e7aa86c2b0A3911DEf8CfD",
-          "137": "0x068b080722Eb04527B6ce15cde08D805c5934D5e",
-          "43114": "0x39b3e74A77206Df2683792c5DC8012Ea6bD39E4F",
-          "421614": "0x7DD7029668c78af259a27A7696d468a152F06E53"
+          "ethereum-mainnet": "0xfed25Dff478d14b32cb983100cc15d44BFa54247",
+          "avalanche-mainnet": "0x39b3e74A77206Df2683792c5DC8012Ea6bD39E4F",
+          "arbitrum-mainnet": "0x7DD7029668c78af259a27A7696d468a152F06E53",
+          "bsc-mainnet": "0xd65648EAa2083A91A8e7aa86c2b0A3911DEf8CfD",
+          "polygon-mainnet": "0x068b080722Eb04527B6ce15cde08D805c5934D5e"
         }
       }
     },
@@ -2874,7 +2939,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xC7c7eAc6c3Ec943Bb6D15F2FB7aa80aA0c9dAF32"
+          "polygon-mainnet": "0xC7c7eAc6c3Ec943Bb6D15F2FB7aa80aA0c9dAF32"
         }
       }
     },
@@ -2882,15 +2947,15 @@
       "id": 215,
       "description": "CVX / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xC27E191714b429C51e18FAfba6A4C31135B2e157",
-          "10": "0xc51C6af1B2c0184F101D9d23d059bDaD2fd330aF",
-          "137": "0x0d27C2703b3e6F1eAA719cd4bBb534C4a68f1e25",
-          "43114": "0x1C3BEDe28d09d5dc36D861E9345628bAaCfd88b8",
-          "421614": "0x3d62E33E97de1F0ce913dB62d5972722C2A7E4f6",
-          "11155420": "0x234a5fb5Bd614a7AA2FfAB244D603abFA0Ac5C5C"
+          "ethereum-mainnet": "0xC27E191714b429C51e18FAfba6A4C31135B2e157",
+          "avalanche-mainnet": "0x1C3BEDe28d09d5dc36D861E9345628bAaCfd88b8",
+          "arbitrum-mainnet": "0x3d62E33E97de1F0ce913dB62d5972722C2A7E4f6",
+          "optimism-mainnet": "0xc51C6af1B2c0184F101D9d23d059bDaD2fd330aF",
+          "optimism-sepolia": "0x234a5fb5Bd614a7AA2FfAB244D603abFA0Ac5C5C",
+          "polygon-mainnet": "0x0d27C2703b3e6F1eAA719cd4bBb534C4a68f1e25"
         }
       }
     },
@@ -2907,24 +2972,27 @@
       "id": 217,
       "description": "AAVE / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xd8B9aA6E811c935eF63e877CFA7Be276931293DA",
-          "10": "0x81cC0c227BF9bFB8088b14755DfcA65f7892203b",
-          "56": "0x9463B41e2AF85C767fD8b7A06dA5C0C4c3B2d2bA",
-          "97": "0xa11Da729FAe047b1Ab9261222Cbc81a478486ac6",
-          "137": "0xB51B767C68dfca5ab66bBb22Eb60aeB3FE08672D",
-          "250": "0xaDc59a292c274B438BD29de01897B07D40E9b408",
-          "324": "0x48a94042dE3004ADBEB11d7D39Ee53c812fbFe07",
-          "1088": "0x420AF689F50b9F7B67fe506237c877b98bb24dDA",
-          "1101": "0xd83729a90474d6aE09502ee3c58485cef40Ac872",
-          "1442": "0x39482c3c8ACb44672D98F41fe6F4184272cba2f6",
-          "43114": "0xc03C33937F4Ae48f72a9563abfDde76D46B8548F",
-          "59140": "0x462F8Eea5cf35Df6a7DF89C12107262bF134B380",
-          "421614": "0x3c6AbdA21358c15601A3175D8dd66D0c572cc904",
-          "534352": "0xD80196353308B3b0B34DA405b049F7F4f0E4C298",
-          "11155420": "0x56a43EB56Da12C0dc1D972ACb089c06a5dEF8e69"
+          "ethereum-mainnet": "0xd8B9aA6E811c935eF63e877CFA7Be276931293DA",
+          "avalanche-mainnet": "0xc03C33937F4Ae48f72a9563abfDde76D46B8548F",
+          "andromeda-mainnet": "0x420AF689F50b9F7B67fe506237c877b98bb24dDA",
+          "arbitrum-mainnet": "0x3c6AbdA21358c15601A3175D8dd66D0c572cc904",
+          "arbitrum-sepolia": "0x291E71A06d103FaF48BE7251BaC6C134c1b961f1",
+          "bsc-mainnet": "0x9463B41e2AF85C767fD8b7A06dA5C0C4c3B2d2bA",
+          "bsc-testnet": "0xa11Da729FAe047b1Ab9261222Cbc81a478486ac6",
+          "fantom-mainnet": "0xaDc59a292c274B438BD29de01897B07D40E9b408",
+          "gnosis-mainnet": "0xD2CCCa5Bb84CB2F6b72B98Ee82c61F67c82DD40B",
+          "linea-mainnet": "0x462F8Eea5cf35Df6a7DF89C12107262bF134B380",
+          "kusama-moonriver": "0x48b71f70306cF8Fa34fcc81333B5262fbbE081B5",
+          "optimism-mainnet": "0x81cC0c227BF9bFB8088b14755DfcA65f7892203b",
+          "optimism-sepolia": "0x56a43EB56Da12C0dc1D972ACb089c06a5dEF8e69",
+          "polygon-mainnet": "0xB51B767C68dfca5ab66bBb22Eb60aeB3FE08672D",
+          "polygon-zkevm-mainnet": "0xd83729a90474d6aE09502ee3c58485cef40Ac872",
+          "polygon-zkevm-cardona": "0x39482c3c8ACb44672D98F41fe6F4184272cba2f6",
+          "scroll-mainnet": "0xD80196353308B3b0B34DA405b049F7F4f0E4C298",
+          "zksync-mainnet": "0x48a94042dE3004ADBEB11d7D39Ee53c812fbFe07"
         }
       }
     },
@@ -2935,7 +3003,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x4f1D73341fdDEEd7Aa8E8a8f86085C72bb734678"
+          "bsc-mainnet": "0x4f1D73341fdDEEd7Aa8E8a8f86085C72bb734678"
         }
       }
     },
@@ -2946,7 +3014,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "8453": "0xeCA1EBFb5CA472C76328f5DdE011c6CcCF2a66F4"
+          "base-mainnet": "0xeCA1EBFb5CA472C76328f5DdE011c6CcCF2a66F4"
         }
       }
     },
@@ -2957,10 +3025,11 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x4F6dFDFd4d68F68b2692E79f9e94796fC8015770",
-          "8453": "0x23e47A253776F1Fce32e5F2D5D342ca5D6Edd226",
-          "421614": "0x0526ED34229425a10888C6972906CF2a820D6d13",
-          "11155420": "0x7345Bb00B785ddE39756426D675C71E50e8aD492"
+          "arbitrum-mainnet": "0x0526ED34229425a10888C6972906CF2a820D6d13",
+          "arbitrum-sepolia": "0x1D03be7d6D74932e1bc53A01A09893085abe90dC",
+          "base-mainnet": "0x23e47A253776F1Fce32e5F2D5D342ca5D6Edd226",
+          "optimism-mainnet": "0x4F6dFDFd4d68F68b2692E79f9e94796fC8015770",
+          "optimism-sepolia": "0x7345Bb00B785ddE39756426D675C71E50e8aD492"
         }
       }
     },
@@ -2971,7 +3040,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "11155111": "0xf64aD0079a875725d5cf477E32C151183D4E61b0"
+          "ethereum-sepolia": "0xf64aD0079a875725d5cf477E32C151183D4E61b0"
         }
       }
     },
@@ -2982,9 +3051,9 @@
         "base": "0x000000000000000000000000000000000000009c",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x8476b81b4dE6eD493383fA2A2851Ec590207ebAC",
-          "137": "0x60b840F14F59B927754C133553FeE367086e612E",
-          "421614": "0x1b9749e06817433a34D7efAaa0a7f6a94a41E432"
+          "ethereum-mainnet": "0x8476b81b4dE6eD493383fA2A2851Ec590207ebAC",
+          "arbitrum-mainnet": "0x1b9749e06817433a34D7efAaa0a7f6a94a41E432",
+          "polygon-mainnet": "0x60b840F14F59B927754C133553FeE367086e612E"
         }
       }
     },
@@ -2992,16 +3061,17 @@
       "id": 223,
       "description": "FRAX / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x8F73090a7c58B8BDcC9A93cBB6816e5cC4f01E8c",
-          "10": "0xaB544FDAD5F68f0F8e53284f942D76177635A3D6",
-          "56": "0xb208D9Ee1703674b7Ced85b615Db69d65430aF67",
-          "137": "0xED78A887422fbEf80CB3775Ea32057051025499a",
-          "250": "0xc2bD6467d9567Cfaf2783d7DE5F337bf98Fe62C1",
-          "43114": "0x5995b0D7A318E44ee654F5f188372E4a3a249c5d",
-          "421614": "0x5D041081725468Aa43e72ff0445Fde2Ad1aDE775"
+          "ethereum-mainnet": "0x8F73090a7c58B8BDcC9A93cBB6816e5cC4f01E8c",
+          "avalanche-mainnet": "0x5995b0D7A318E44ee654F5f188372E4a3a249c5d",
+          "arbitrum-mainnet": "0x5D041081725468Aa43e72ff0445Fde2Ad1aDE775",
+          "bsc-mainnet": "0xb208D9Ee1703674b7Ced85b615Db69d65430aF67",
+          "fantom-mainnet": "0xc2bD6467d9567Cfaf2783d7DE5F337bf98Fe62C1",
+          "kusama-moonriver": "0xA3A70d23c94229d4985057eFE9C9cE1039A5657C",
+          "optimism-mainnet": "0xaB544FDAD5F68f0F8e53284f942D76177635A3D6",
+          "polygon-mainnet": "0xED78A887422fbEf80CB3775Ea32057051025499a"
         }
       }
     },
@@ -3012,8 +3082,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x2D6147589Bdda5383165dA12ad7a7E81A778b00F",
-          "421614": "0x08fbE2551e223E8c861Cd6548dF8eAA9C1DcdFf1"
+          "arbitrum-mainnet": "0x08fbE2551e223E8c861Cd6548dF8eAA9C1DcdFf1",
+          "bsc-mainnet": "0x2D6147589Bdda5383165dA12ad7a7E81A778b00F"
         }
       }
     },
@@ -3021,12 +3091,12 @@
       "id": 225,
       "description": "LUSD / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x36A0448c46AaE145dD5BC320D5153426a2a586F5",
-          "10": "0x19dC743a5E9a73eefAbA7047C7CEeBc650F37336",
-          "421614": "0x20CD97619A51d1a6f1910ce62d98Aceb9a13d5e6"
+          "ethereum-mainnet": "0x36A0448c46AaE145dD5BC320D5153426a2a586F5",
+          "arbitrum-mainnet": "0x20CD97619A51d1a6f1910ce62d98Aceb9a13d5e6",
+          "optimism-mainnet": "0x19dC743a5E9a73eefAbA7047C7CEeBc650F37336"
         }
       }
     },
@@ -3037,7 +3107,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "43114": "0x6cBEE88E5af162c453311D12c6688D202613E749"
+          "avalanche-mainnet": "0x6cBEE88E5af162c453311D12c6688D202613E749"
         }
       }
     },
@@ -3048,9 +3118,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xADe1f55d13D3B8eA4a6605B58Dc38372d6af6132",
-          "421614": "0x4dE8e7D9503c9ADA0805BA71Ea5C6d2A4d8734c6",
-          "11155420": "0xe13f68e4c76B24AcCe9860C2758b3B2Ae49193B0"
+          "arbitrum-mainnet": "0x4dE8e7D9503c9ADA0805BA71Ea5C6d2A4d8734c6",
+          "optimism-mainnet": "0xADe1f55d13D3B8eA4a6605B58Dc38372d6af6132",
+          "optimism-sepolia": "0xe13f68e4c76B24AcCe9860C2758b3B2Ae49193B0"
         }
       }
     },
@@ -3061,7 +3131,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xEe2B6737b55e14b31fCa9247EA86593944F1c903"
+          "polygon-mainnet": "0xEe2B6737b55e14b31fCa9247EA86593944F1c903"
         }
       }
     },
@@ -3072,7 +3142,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "421614": "0xd896f8B9E7c1058bAde26323181dbD9765D38C21"
+          "arbitrum-mainnet": "0xd896f8B9E7c1058bAde26323181dbD9765D38C21",
+          "arbitrum-sepolia": "0xb2E329d75B3167122F543B38df2d1E78FA65A235"
         }
       }
     },
@@ -3083,8 +3154,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xa3884fd01b3f9FBCDA0B4268DAa332aFE6Edac20",
-          "11155111": "0xC13b8dDBCB8507edd9538BA07bEBefcE2B68c74B"
+          "ethereum-mainnet": "0xa3884fd01b3f9FBCDA0B4268DAa332aFE6Edac20",
+          "ethereum-sepolia": "0xC13b8dDBCB8507edd9538BA07bEBefcE2B68c74B"
         }
       }
     },
@@ -3095,8 +3166,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x18556Fe5b87DcAD8C1F5Af506b10C495069F5582",
-          "421614": "0x60cE55EF13992B45459C8a97D51D76EF5F41723A"
+          "arbitrum-mainnet": "0x60cE55EF13992B45459C8a97D51D76EF5F41723A",
+          "bsc-mainnet": "0x18556Fe5b87DcAD8C1F5Af506b10C495069F5582"
         }
       }
     },
@@ -3107,7 +3178,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x381FA26795F866c7FE760C0cca682f0f2563ad56"
+          "optimism-mainnet": "0x381FA26795F866c7FE760C0cca682f0f2563ad56"
         }
       }
     },
@@ -3118,9 +3189,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x544A5aBfD49782b68d58E69Bc52204b692A86d9E",
-          "137": "0xc39B61C574C3e97F539F4Cb11d802E82b1eC2f08",
-          "11155420": "0xeA4f0c778948454a168D6F4279D500a677275856"
+          "optimism-mainnet": "0x544A5aBfD49782b68d58E69Bc52204b692A86d9E",
+          "optimism-sepolia": "0xeA4f0c778948454a168D6F4279D500a677275856",
+          "polygon-mainnet": "0xc39B61C574C3e97F539F4Cb11d802E82b1eC2f08"
         }
       }
     },
@@ -3131,8 +3202,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "43114": "0x5bE2774141256E0423D1bC3Da7098ba7E0C9fc6E",
-          "421614": "0xa44BCD128E99188565c4849cdfFEea9C773f74ec"
+          "avalanche-mainnet": "0x5bE2774141256E0423D1bC3Da7098ba7E0C9fc6E",
+          "arbitrum-mainnet": "0xa44BCD128E99188565c4849cdfFEea9C773f74ec"
         }
       }
     },
@@ -3140,16 +3211,16 @@
       "id": 235,
       "description": "FXS / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xc1c54D09554Cf65d74a289805c2731cf6EA57373",
-          "10": "0xc2212835DE6cb9Ef5e26b04E64f7798472Ff2812",
-          "56": "0xBD25C33FFA560129E6346454faF0e8deBD0c0288",
-          "137": "0x9FB469455209B098AdE3A59D1049b2A09fCf3522",
-          "43114": "0x5F4e27875493C5143dA8b36b0cFD52aB0CeBd4F8",
-          "421614": "0xf8C6DE435CF8d06897a4A66b21df623D06d2A761",
-          "11155420": "0x6015436F679c68579e6eb9f5174c5a6C8Fe76B0D"
+          "ethereum-mainnet": "0xc1c54D09554Cf65d74a289805c2731cf6EA57373",
+          "avalanche-mainnet": "0x5F4e27875493C5143dA8b36b0cFD52aB0CeBd4F8",
+          "arbitrum-mainnet": "0xf8C6DE435CF8d06897a4A66b21df623D06d2A761",
+          "bsc-mainnet": "0xBD25C33FFA560129E6346454faF0e8deBD0c0288",
+          "optimism-mainnet": "0xc2212835DE6cb9Ef5e26b04E64f7798472Ff2812",
+          "optimism-sepolia": "0x6015436F679c68579e6eb9f5174c5a6C8Fe76B0D",
+          "polygon-mainnet": "0x9FB469455209B098AdE3A59D1049b2A09fCf3522"
         }
       }
     },
@@ -3157,33 +3228,36 @@
       "id": 236,
       "description": "USDT / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x0d5F4aADf3fde31BBB55dB5F42C080F18aD54Df5",
-          "10": "0xAc37790fF4aBf9483fAe2D1f62fC61fE6b8E4789",
-          "56": "0xcF7a2efb24dDD3E0CFD19A1a4E0233dFbD7c354B",
-          "97": "0xb7E02fD09871Db96c13A8eE02331Ec4031027050",
-          "137": "0x7bd7Bd17a2cD5C0A5c31747d4507e95bB991eAEA",
-          "250": "0x9Fe3826d53e76E877Ca6124ED2997A33b25896Ba",
-          "300": "0xD7f73D64D0Fd54F20a4250aee2BA65Bd4DEd9067",
-          "324": "0xa8a68eb87DF28D21Bb301aaDeA9437eb8bABDE40",
-          "1088": "0x49B7d3d231b993C9Aa29E122647e035aaf8B773B",
-          "1101": "0x67d0809Ada627aB5BD623640332A2F370B2C906F",
-          "1442": "0xcCFF6C2e770Faf4Ff90A7760E00007fd32Ff9A97",
-          "4002": "0x0296F999eCD63A90e0aB7f72d6Ba2e4869f900F5",
-          "8453": "0xDC2D2fA8E7b824A2c16128446E288280dcB12844",
-          "42220": "0x338357b4eaEc1db6Fc528cAd0EA3B3d9Aa4EBF4C",
-          "43113": "0xa47F3FaC2273d138295AEf7b4326630f301A3ab2",
-          "43114": "0xd761cFc03e833FEBB04297Cc1aB7291D80c9595f",
-          "44787": "0x82fdbd05b84948dF5BB47a439e38515437CB244D",
-          "59140": "0xa901c5741FAd401DfF8a750218aEB72527F86eD3",
-          "80002": "0x4D1763c3750a9dA215788f9bEE514D7085B7d46c",
-          "84532": "0xccAE8A015754a64f379550146360bDbAEc757D77",
-          "421614": "0xCb35fE6E53e71b30301Ec4a3948Da4Ad3c65ACe4",
-          "534351": "0xea158Dc9f67A53C17552714E4F7EdDE6650A0fd7",
-          "534352": "0xE863C747c127Ef8cd543F3f8975e7A4aB7aBb0F3",
-          "11155420": "0x389D11eBAD385C8D4f2231c64E2e3d5F5C5283Fc"
+          "ethereum-mainnet": "0x0d5F4aADf3fde31BBB55dB5F42C080F18aD54Df5",
+          "avalanche-mainnet": "0xd761cFc03e833FEBB04297Cc1aB7291D80c9595f",
+          "avalanche-fuji": "0xa47F3FaC2273d138295AEf7b4326630f301A3ab2",
+          "andromeda-mainnet": "0x49B7d3d231b993C9Aa29E122647e035aaf8B773B",
+          "arbitrum-mainnet": "0xCb35fE6E53e71b30301Ec4a3948Da4Ad3c65ACe4",
+          "arbitrum-sepolia": "0xa2b3137BeBe6f817fcb34e96339d04cbC5229B2c",
+          "base-mainnet": "0xDC2D2fA8E7b824A2c16128446E288280dcB12844",
+          "base-sepolia": "0xccAE8A015754a64f379550146360bDbAEc757D77",
+          "bsc-mainnet": "0xcF7a2efb24dDD3E0CFD19A1a4E0233dFbD7c354B",
+          "bsc-testnet": "0xb7E02fD09871Db96c13A8eE02331Ec4031027050",
+          "celo-mainnet": "0x338357b4eaEc1db6Fc528cAd0EA3B3d9Aa4EBF4C",
+          "celo-alfajores": "0x82fdbd05b84948dF5BB47a439e38515437CB244D",
+          "fantom-mainnet": "0x9Fe3826d53e76E877Ca6124ED2997A33b25896Ba",
+          "fantom-testnet": "0x0296F999eCD63A90e0aB7f72d6Ba2e4869f900F5",
+          "gnosis-mainnet": "0xc4D924b6baB6FEc909E482b93847D997463f0c79",
+          "linea-mainnet": "0xa901c5741FAd401DfF8a750218aEB72527F86eD3",
+          "kusama-moonriver": "0x77Fa465Ef3EC0E4b8ec0061587D790ecCfa77BF4",
+          "optimism-mainnet": "0xAc37790fF4aBf9483fAe2D1f62fC61fE6b8E4789",
+          "optimism-sepolia": "0x389D11eBAD385C8D4f2231c64E2e3d5F5C5283Fc",
+          "polygon-mainnet": "0x7bd7Bd17a2cD5C0A5c31747d4507e95bB991eAEA",
+          "polygon-amoy": "0x4D1763c3750a9dA215788f9bEE514D7085B7d46c",
+          "polygon-zkevm-mainnet": "0x67d0809Ada627aB5BD623640332A2F370B2C906F",
+          "polygon-zkevm-cardona": "0xcCFF6C2e770Faf4Ff90A7760E00007fd32Ff9A97",
+          "scroll-mainnet": "0xE863C747c127Ef8cd543F3f8975e7A4aB7aBb0F3",
+          "scroll-sepolia": "0xea158Dc9f67A53C17552714E4F7EdDE6650A0fd7",
+          "zksync-mainnet": "0xa8a68eb87DF28D21Bb301aaDeA9437eb8bABDE40",
+          "zksync-sepolia": "0xD7f73D64D0Fd54F20a4250aee2BA65Bd4DEd9067"
         }
       }
     },
@@ -3194,7 +3268,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "97": "0xfed98742ECdBb2C6f12Cd1CB40dBD9e08aE9302C"
+          "bsc-testnet": "0xfed98742ECdBb2C6f12Cd1CB40dBD9e08aE9302C"
         }
       }
     },
@@ -3205,8 +3279,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x663ed3D2aB9F8d5282a94BA4636E346e59bDdEB9",
-          "11155420": "0x9c2cE44DB32C8D750d8CE6aCB523e8291816C168"
+          "optimism-mainnet": "0x663ed3D2aB9F8d5282a94BA4636E346e59bDdEB9",
+          "optimism-sepolia": "0x9c2cE44DB32C8D750d8CE6aCB523e8291816C168"
         }
       }
     },
@@ -3217,11 +3291,11 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x1C1245eEfB57d50F90EFc4070b508f4f24c3aB7A",
-          "137": "0x6fC6d89b61A8a0D8CFbcB6e412fC887566dD70e6",
-          "1088": "0xFF8eD490a81EeDe19B8af9D91F7aB05674A7f1c1",
-          "43114": "0xCdE5431BCa66081d509d15c9bD036208Ee118081",
-          "421614": "0xc339c4c7c58cb1d964b7B66f846572D5C355441a"
+          "avalanche-mainnet": "0xCdE5431BCa66081d509d15c9bD036208Ee118081",
+          "andromeda-mainnet": "0xFF8eD490a81EeDe19B8af9D91F7aB05674A7f1c1",
+          "arbitrum-mainnet": "0xc339c4c7c58cb1d964b7B66f846572D5C355441a",
+          "optimism-mainnet": "0x1C1245eEfB57d50F90EFc4070b508f4f24c3aB7A",
+          "polygon-mainnet": "0x6fC6d89b61A8a0D8CFbcB6e412fC887566dD70e6"
         }
       }
     },
@@ -3232,8 +3306,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xfb391c19908c288799C32593B4aC674DF17fFE44",
-          "11155420": "0x18c0187C88040fdC13d5a102b69a9F187f322888"
+          "optimism-mainnet": "0xfb391c19908c288799C32593B4aC674DF17fFE44",
+          "optimism-sepolia": "0x18c0187C88040fdC13d5a102b69a9F187f322888"
         }
       }
     },
@@ -3244,14 +3318,16 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x13f11f2139C10A48eCD7A6A14d804f90b2cFC89A",
-          "56": "0x8BA079abb76AEFF5C3592c540a3Ea1Da79DFf7ef",
-          "137": "0x7A9Ad33f33B1a2B0518cBEA398E2fB3a5A572a6D",
-          "250": "0xd62d2aFe0196Ef7A80836F74f420B7E8976f46aE",
-          "4002": "0x1F920425189EB0d757eF19760CA3DB34b4D77ee0",
-          "43114": "0x64922B570edf432defD4d3C5647269727a667EDa",
-          "421614": "0x70001968d6ee8f909dE9e730E5b4e586565bbbF9",
-          "11155420": "0x16a4dda290a75E638634d33Ddf505B7fB48b4B13"
+          "avalanche-mainnet": "0x64922B570edf432defD4d3C5647269727a667EDa",
+          "arbitrum-mainnet": "0x70001968d6ee8f909dE9e730E5b4e586565bbbF9",
+          "arbitrum-sepolia": "0x8d8Adb7E89459738402a2a7f055232B331f96e95",
+          "bsc-mainnet": "0x8BA079abb76AEFF5C3592c540a3Ea1Da79DFf7ef",
+          "fantom-mainnet": "0xd62d2aFe0196Ef7A80836F74f420B7E8976f46aE",
+          "fantom-testnet": "0x1F920425189EB0d757eF19760CA3DB34b4D77ee0",
+          "kusama-moonriver": "0x4471818dc325f5f3e0f420031e186Cf004591c5a",
+          "optimism-mainnet": "0x13f11f2139C10A48eCD7A6A14d804f90b2cFC89A",
+          "optimism-sepolia": "0x16a4dda290a75E638634d33Ddf505B7fB48b4B13",
+          "polygon-mainnet": "0x7A9Ad33f33B1a2B0518cBEA398E2fB3a5A572a6D"
         }
       }
     },
@@ -3262,8 +3338,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x1aafcf49E103a71b31506Cb05FB072ED1B5b0414",
-          "11155420": "0xeB70BB005fa43A47892Fb2723c363a962a259e66"
+          "optimism-mainnet": "0x1aafcf49E103a71b31506Cb05FB072ED1B5b0414",
+          "optimism-sepolia": "0xeB70BB005fa43A47892Fb2723c363a962a259e66"
         }
       }
     },
@@ -3274,8 +3350,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xd01eED889846c7dB760Fec847d50DB9d935fd913",
-          "421614": "0xB4A1F9641186D822a941FEc71E374bB66cd27cdA"
+          "arbitrum-mainnet": "0xB4A1F9641186D822a941FEc71E374bB66cd27cdA",
+          "bsc-mainnet": "0xd01eED889846c7dB760Fec847d50DB9d935fd913"
         }
       }
     },
@@ -3286,12 +3362,13 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xE1f2671BAde2fba894DE982880c716592AB99dAa",
-          "56": "0xc9BD2A5d605B3Df807e1E954c57f5FD5E98DA357",
-          "43113": "0xa4a62AC010768470BdeAE264E3b139B6E9Af9a88",
-          "43114": "0xD74bBE6Db11AD5F3D4F7d4Ee23D9C9d5c301D4e0",
-          "421614": "0xbA4492A430fE9bEF7Abbd9C78b953A6E1aA48CFA",
-          "11155420": "0x383fC2B0bcCaC75B7A216d92836a93Cd641Ec582"
+          "avalanche-mainnet": "0xD74bBE6Db11AD5F3D4F7d4Ee23D9C9d5c301D4e0",
+          "avalanche-fuji": "0xa4a62AC010768470BdeAE264E3b139B6E9Af9a88",
+          "arbitrum-mainnet": "0xbA4492A430fE9bEF7Abbd9C78b953A6E1aA48CFA",
+          "arbitrum-sepolia": "0xE49ca825AAbab5F7116721b3f56cc8B16822E217",
+          "bsc-mainnet": "0xc9BD2A5d605B3Df807e1E954c57f5FD5E98DA357",
+          "optimism-mainnet": "0xE1f2671BAde2fba894DE982880c716592AB99dAa",
+          "optimism-sepolia": "0x383fC2B0bcCaC75B7A216d92836a93Cd641Ec582"
         }
       }
     },
@@ -3302,9 +3379,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0x3442bB3aD11957449D9Af5aCE9d17709240dcCe7",
-          "8453": "0xAa1399A25AB0f9a5464f44963BA77626937D1523",
-          "11155420": "0x0FB99723Aee6f420beAD13e6bBB79b7E6F034298"
+          "base-mainnet": "0xAa1399A25AB0f9a5464f44963BA77626937D1523",
+          "optimism-mainnet": "0x3442bB3aD11957449D9Af5aCE9d17709240dcCe7",
+          "optimism-sepolia": "0x0FB99723Aee6f420beAD13e6bBB79b7E6F034298"
         }
       }
     },
@@ -3315,7 +3392,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x613aDdf3ddE270581A33f63F22784C11eD7813b6"
+          "polygon-mainnet": "0x613aDdf3ddE270581A33f63F22784C11eD7813b6"
         }
       }
     },
@@ -3326,10 +3403,10 @@
         "base": "0x0000000000000000000000000000000000000260",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x696D72992Bc7a8D776E52c27ae68c5Bb6b695158",
-          "137": "0x08c0342e2d59A973101499992647f0595bcEc034",
-          "42220": "0xF80EEC3e2c9059180C5e6a002Bd93c4A6C3aAf8f",
-          "421614": "0x5E4C65194F6F33a8BF7E9B95F1D0Ca9d611F6D62"
+          "arbitrum-mainnet": "0x5E4C65194F6F33a8BF7E9B95F1D0Ca9d611F6D62",
+          "bsc-mainnet": "0x696D72992Bc7a8D776E52c27ae68c5Bb6b695158",
+          "celo-mainnet": "0xF80EEC3e2c9059180C5e6a002Bd93c4A6C3aAf8f",
+          "polygon-mainnet": "0x08c0342e2d59A973101499992647f0595bcEc034"
         }
       }
     },
@@ -3340,8 +3417,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xf33c6cD2707d8Bbe7587cECb31768219e63b6314",
-          "137": "0x57d09578FBd4B2208Ab9b02a408CBd5f6a74cA93"
+          "bsc-mainnet": "0xf33c6cD2707d8Bbe7587cECb31768219e63b6314",
+          "polygon-mainnet": "0x57d09578FBd4B2208Ab9b02a408CBd5f6a74cA93"
         }
       }
     },
@@ -3352,8 +3429,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "10": "0xE4003Ce4321FBd0a0b691690f917e3A82B97628c",
-          "11155420": "0x277280F8Dd2bd302D541d051d5C64d0055e0AC59"
+          "optimism-mainnet": "0xE4003Ce4321FBd0a0b691690f917e3A82B97628c",
+          "optimism-sepolia": "0x277280F8Dd2bd302D541d051d5C64d0055e0AC59"
         }
       }
     },
@@ -3361,13 +3438,13 @@
       "id": 250,
       "description": "ZRX / USD",
       "chainlink_compatibility": {
-        "base": null,
+        "base": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0xe88C679E2D42963acDC76810d21daC2e6a8D7c29",
-          "10": "0x1ff4e94C20Fa84e83B6aDB912bC36E6681F8fb33",
-          "43113": "0xcf22420062EFfE48AA8B3191dD5c76294DeeDe6b",
-          "11155420": "0x0358050316F971cE234763854699D9c716Bf685a"
+          "ethereum-mainnet": "0xe88C679E2D42963acDC76810d21daC2e6a8D7c29",
+          "avalanche-fuji": "0xcf22420062EFfE48AA8B3191dD5c76294DeeDe6b",
+          "optimism-mainnet": "0x1ff4e94C20Fa84e83B6aDB912bC36E6681F8fb33",
+          "optimism-sepolia": "0x0358050316F971cE234763854699D9c716Bf685a"
         }
       }
     },
@@ -3378,7 +3455,8 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1088": "0x526B00801b2a09Cb730b3d2132a85fD75D0D9A44"
+          "andromeda-mainnet": "0x526B00801b2a09Cb730b3d2132a85fD75D0D9A44",
+          "arbitrum-sepolia": "0x2aE4072A1e1b3CAFD7eF1b74Eb6C331e03fF332E"
         }
       }
     },
@@ -3389,9 +3467,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0x106C97AbC143718E6a7D380Caaee4564900A3854",
-          "43113": "0x5c75E6BB5aB64f70FcDBa640F52B32645655A8eC",
-          "43114": "0xbAa30e66208a21E7481e402cb178513A2D0FFdF8"
+          "avalanche-mainnet": "0xbAa30e66208a21E7481e402cb178513A2D0FFdF8",
+          "avalanche-fuji": "0x5c75E6BB5aB64f70FcDBa640F52B32645655A8eC",
+          "polygon-mainnet": "0x106C97AbC143718E6a7D380Caaee4564900A3854"
         }
       }
     },
@@ -3402,19 +3480,20 @@
         "base": "0x00000000000000000000000000000000000003d2",
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "1": "0x966Dad3B93C207A9EE3a79C336145e013C5cD3fc",
-          "10": "0xAA75acE4575AbBE1D237D991a7461f497a56a8F0",
-          "56": "0x45DFb7BC3BBc52848d00F5550d5527cC88ECaEDF",
-          "137": "0x47E2dcB778f429b19e48290058605a3c5B94a3B3",
-          "250": "0x69aE9C103F8F39dF5D35Fc6BFCF346223A71BA48",
-          "8453": "0x4b08a30c6208681eFF2980981057ce4C8bCB2310",
-          "42220": "0x9F25Ac5A8Cea4661EdB13e4Dcc4E6D2f67F5a7Fe",
-          "43114": "0x2B61A020bf32Ea02404BE6fdB5E69517d6f17d63",
-          "59140": "0xDa7Ed0f2Df6AF4eFC3539D91D47fA7d7cE32ee2a",
-          "80002": "0xd8d927e5d52Bb7cdb2C0ae6f55ACcB18e9a2B9D7",
-          "421614": "0x7AAeE6aD40a947A162DEAb5aFD0A1e12BE6FF871",
-          "11155111": "0xD404D68e5616e9C7045be2Dc1C5865EE328B6638",
-          "11155420": "0x934BF0E7D582e8C1EDcA37221573966b2a2a5801"
+          "ethereum-mainnet": "0x966Dad3B93C207A9EE3a79C336145e013C5cD3fc",
+          "ethereum-sepolia": "0xD404D68e5616e9C7045be2Dc1C5865EE328B6638",
+          "avalanche-mainnet": "0x2B61A020bf32Ea02404BE6fdB5E69517d6f17d63",
+          "arbitrum-mainnet": "0x7AAeE6aD40a947A162DEAb5aFD0A1e12BE6FF871",
+          "base-mainnet": "0x4b08a30c6208681eFF2980981057ce4C8bCB2310",
+          "bsc-mainnet": "0x45DFb7BC3BBc52848d00F5550d5527cC88ECaEDF",
+          "celo-mainnet": "0x9F25Ac5A8Cea4661EdB13e4Dcc4E6D2f67F5a7Fe",
+          "fantom-mainnet": "0x69aE9C103F8F39dF5D35Fc6BFCF346223A71BA48",
+          "gnosis-mainnet": "0x759be90a34E426042ed7d17916B78a5cD2567dd1",
+          "linea-mainnet": "0xDa7Ed0f2Df6AF4eFC3539D91D47fA7d7cE32ee2a",
+          "optimism-mainnet": "0xAA75acE4575AbBE1D237D991a7461f497a56a8F0",
+          "optimism-sepolia": "0x934BF0E7D582e8C1EDcA37221573966b2a2a5801",
+          "polygon-mainnet": "0x47E2dcB778f429b19e48290058605a3c5B94a3B3",
+          "polygon-amoy": "0xd8d927e5d52Bb7cdb2C0ae6f55ACcB18e9a2B9D7"
         }
       }
     },
@@ -3425,7 +3504,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0xD377b4D1ef943d0414Cc072ddAC1299940222A24"
+          "bsc-mainnet": "0xD377b4D1ef943d0414Cc072ddAC1299940222A24"
         }
       }
     },
@@ -3436,7 +3515,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "137": "0xc7fB8424b8309bc040508e957E38a9a6Bb64F677"
+          "polygon-mainnet": "0xc7fB8424b8309bc040508e957E38a9a6Bb64F677"
         }
       }
     },
@@ -3447,9 +3526,9 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "56": "0x8C328f0Deca45Eb4D1d3c36d06f77815E11b6791",
-          "137": "0x1A9a36A20d02E247ABceC3C32e155E498BE398f9",
-          "421614": "0x807EB1664b774F37E23d7Ea4a384028cC888c511"
+          "arbitrum-mainnet": "0x807EB1664b774F37E23d7Ea4a384028cC888c511",
+          "bsc-mainnet": "0x8C328f0Deca45Eb4D1d3c36d06f77815E11b6791",
+          "polygon-mainnet": "0x1A9a36A20d02E247ABceC3C32e155E498BE398f9"
         }
       }
     }

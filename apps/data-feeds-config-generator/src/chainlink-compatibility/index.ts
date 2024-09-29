@@ -65,8 +65,9 @@ async function getBlocksenseFeedsCompatibility(
 
       const baseAddress = isSupportedCurrencySymbol(base)
         ? currencySymbolToDenominationAddress[base]
-        : feedRegistryEvents[chainlinkAggregators['1'] ?? zeroAddress]?.asset ??
-          null;
+        : feedRegistryEvents[
+            chainlinkAggregators['ethereum-mainnet'] ?? zeroAddress
+          ]?.asset ?? null;
 
       acc = {
         ...acc,

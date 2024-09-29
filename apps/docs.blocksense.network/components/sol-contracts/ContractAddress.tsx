@@ -6,14 +6,14 @@ import { Tooltip } from '@/components/common/Tooltip';
 import { CopyButton } from '@/components/common/CopyButton';
 import { previewHexStringOrDefault } from '@/src/utils';
 import {
-  EthereumAddress,
-  explorerUrls,
+  getAddressExplorerUrl,
   isEthereumAddress,
+  NetworkName,
 } from '@blocksense/base-utils/evm-utils';
 import { cn } from '@/lib/utils';
 
 type ContractAddressProps = {
-  network?: string;
+  network?: NetworkName;
   address: string;
   enableCopy?: boolean;
   hasAbbreviation?: boolean;
@@ -43,9 +43,7 @@ export const ContractAddress = ({
         {hasAbbreviation && <Tooltip.Content>{address}</Tooltip.Content>}
         {network ? (
           <code className="hover:underline">
-            <Link
-              href={explorerUrls[network].address(address as EthereumAddress)}
-            >
+            <Link href={getAddressExplorerUrl(network, address)}>
               {addressToDisplay}
             </Link>
           </code>

@@ -13,9 +13,9 @@ import {
   parseNetworkName,
   parseChainId,
   parseNetwork,
-  chainIdToNetworkName,
-  explorerUrls,
-  networkNameToChainId,
+  getTxHashExplorerUrl,
+  getAddressExplorerUrl,
+  isTestnet,
 } from './networks';
 import { parseEthereumAddress, parseTxHash } from './hex-types';
 
@@ -92,41 +92,31 @@ describe('Network constants tests', () => {
     expect(() => parseNetwork({})).toThrowError();
   });
 
-  test(`'networkNameToChainId' should return the correct chain ID for each network`, () => {
-    expect(networkNameToChainId['ethereum-mainnet']).toBe(1);
-    expect(networkNameToChainId['ethereum-sepolia']).toBe(11155111);
-    expect(networkNameToChainId['ethereum-holesky']).toBe(17000);
-  });
-
-  test(`'chainIdToNetworkName' should return the network name for a valid chain ID`, () => {
-    expect(chainIdToNetworkName[1]).toBe('ethereum-mainnet');
-    expect(chainIdToNetworkName[11155111]).toBe('ethereum-sepolia');
-    expect(chainIdToNetworkName[17000]).toBe('ethereum-holesky');
+  test('`isTestnet` should return true for testnet networks', () => {
+    expect(isTestnet('ethereum-sepolia')).toBe(true);
+    expect(isTestnet('ethereum-mainnet')).toBe(false);
   });
 
   test('should return correct url for ethereum-mainnet', () => {
-    const txHash =
-      '0xe75fb554e433e03763a1560646ee22dcb74e5274b34c5ad644e7c0f619a7e1d0';
-    const address = '0x74c1e4b8cae59269ec1d85d3d4f324396048f4ac';
-    expect(explorerUrls['ethereum-mainnet'].tx(txHash)).toEqual(
+    const txHash = parseTxHash(
+      '0xe75fb554e433e03763a1560646ee22dcb74e5274b34c5ad644e7c0f619a7e1d0',
+    );
+    const address = parseEthereumAddress(
+      '0x74c1e4b8cae59269ec1d85d3d4f324396048f4ac',
+    );
+
+    expect(getTxHashExplorerUrl('ethereum-mainnet', txHash)).toEqual(
       `https://etherscan.io/tx/${txHash}`,
     );
-    expect(explorerUrls['ethereum-mainnet'].address(address)).toEqual(
+    expect(getAddressExplorerUrl('ethereum-mainnet', address)).toEqual(
       `https://etherscan.io/address/${address}`,
     );
 
-    expect(explorerUrls['avalanche-mainnet'].tx(txHash)).toEqual(
-      `https://snowtrace.io/tx/${txHash}`,
+    expect(getTxHashExplorerUrl('ethereum-sepolia', txHash)).toEqual(
+      `https://sepolia.etherscan.io/tx/${txHash}`,
     );
-    expect(explorerUrls['avalanche-mainnet'].address(address)).toEqual(
-      `https://snowtrace.io/address/${address}`,
-    );
-
-    expect(explorerUrls['bsc-mainnet'].tx(txHash)).toEqual(
-      `https://bscscan.com/tx/${txHash}`,
-    );
-    expect(explorerUrls['bsc-mainnet'].address(address)).toEqual(
-      `https://bscscan.com/address/${address}`,
+    expect(getAddressExplorerUrl('ethereum-sepolia', address)).toEqual(
+      `https://sepolia.etherscan.io/address/${address}`,
     );
   });
 });
