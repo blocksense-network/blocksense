@@ -437,6 +437,7 @@ __metadata:
   dependencies:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
+    "@blocksense/contracts": "workspace:*"
     "@effect/data": "npm:^0.18.7"
     "@effect/schema": "npm:^0.71.1"
     "@rollup/plugin-commonjs": "npm:^26.0.1"

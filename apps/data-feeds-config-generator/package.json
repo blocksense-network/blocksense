@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@blocksense/base-utils": "workspace:*",
+    "@blocksense/contracts": "workspace:*",
     "@effect/data": "^0.18.7",
     "@effect/schema": "^0.71.1",
     "@rollup/plugin-commonjs": "^26.0.1",
