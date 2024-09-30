@@ -10,7 +10,7 @@ import {
   writeArtifactFile,
 } from './utils/common';
 import { SolReflection } from './types';
-import { AbiStruct } from 'web3-types';
+import type { AbiStruct } from 'web3-types';
 
 export type ArtifactsRecord = Record<string, Record<string, any>>;
 

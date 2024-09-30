@@ -21,7 +21,7 @@ import {
 } from 'solidity-ast';
 import { SolcInput, SolcOutput } from 'solidity-ast/solc';
 
-import { AbiStruct } from 'web3-types';
+import type { AbiStruct } from 'web3-types';
 
 export enum OutputFormat {
   Raw = 'raw',
