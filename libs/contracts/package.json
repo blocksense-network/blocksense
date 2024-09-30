@@ -5,6 +5,10 @@
       "require": "./artifacts/docs/*.json",
       "import": "./artifacts/docs/*.json"
     },
+    "./abis/*.json": {
+      "require": "./abis/*.json",
+      "import": "./abis/*.json"
+    },
     "./abi.json": {
       "require": "./artifacts/docs/abi.json",
       "import": "./artifacts/docs/abi.json"
