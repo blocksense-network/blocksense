@@ -9,6 +9,7 @@ TODO: The CLI depends on spin and cargo being installed.
 ## Examples
 
 There is an example configuration in `/test`.
+Please copy the `.wasm` files from the sdk examples folder to `/test`
 
 ```sh
 # Build blocksense node reporter using the blocksense configuration json.
