@@ -186,7 +186,9 @@ impl TriggerExecutor for OracleTrigger {
         let engine = Arc::new(self.engine);
         if config.test {
             for component in self.queue_components.values() {
-                Self::execute_wasm(engine.clone(), component, vec![]).await?;
+                let settings: Vec<DataFeedSetting> =
+                    component.oracle_settings.clone().into_iter().collect();
+                Self::execute_wasm(engine.clone(), component, settings).await?;
             }
             return Ok(());
         }
