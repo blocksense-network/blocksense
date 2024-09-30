@@ -9,7 +9,9 @@
     "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -e .pre-commit-config.yaml -- $(git rev-parse --show-toplevel)",
     "format:check": "pre-commit run --all",
     "format:write": "pre-commit run --all || pre-commit run --all",
-    "generate-data-feeds-config": "yarn workspace '@blocksense/data-feeds-config-generator' generate"
+    "generate-data-feeds-config": "yarn workspace '@blocksense/data-feeds-config-generator' generate",
+    "build": "yarn workspaces foreach --from $0 -Rp --topological-dev run build",
+    "build:all": "yarn workspaces foreach --all -p --topological-dev run build"
   },
   "dependenciesMeta": {
     "@openzeppelin/contracts@5.0.2": {
