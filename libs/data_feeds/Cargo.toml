@@ -54,17 +54,17 @@ alloy = { git = "https://github.com/alloy-rs/alloy", rev = "6f4e397f7cf71812160a
 
 log = "0.4.21"
 anyhow = "1.0.89"
-thiserror = "1.0.61"
+thiserror = "1.0.64"
 tracing = { version = "0.1.40", features = ["async-await", "log"] }
 tracing-subscriber = { version = "0.3.18", features = ["json"] }
 serde_json = "1.0.128"
 serde = { version = "1.0.210", features = ["derive"] }
 erased-serde = "0.4.4"
-ringbuf = "0.4.0"
+ringbuf = "0.4.7"
 reqwest = { version = "0.12.4", features = ["blocking", "json"] }
 rand = "0.8.5"
 curl = "0.4.46"
-async-trait = "0.1.74"
+async-trait = "0.1.83"
 assert_cmd = "2.0.14"
 dirs = "5.0.1"
 strum = { version = "0.26.3", features = ["derive"] }
