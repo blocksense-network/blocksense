@@ -2,7 +2,7 @@
   "name": "@blocksense/docs.blocksense.network",
   "version": "0.0.0",
   "scripts": {
-    "build:deps": "yarn workspace @blocksense/docs-theme build && yarn workspace @blocksense/contracts sol-reflect && yarn workspace @blocksense/base-utils build && yarn workspace @blocksense/config-types build",
+    "build:deps": "yarn run -T build @blocksense/data-feeds-config-generator && yarn run -T build @blocksense/docs-theme && yarn workspace @blocksense/contracts sol-reflect",
     "build": "yarn build:deps && yarn build:tsc && yarn generate-contracts-mdx && yarn generate-data-feed-mdx && yarn generate-deployed-contracts-mdx && next build",
     "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
     "dev": "next",
