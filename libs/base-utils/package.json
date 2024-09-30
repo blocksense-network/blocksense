@@ -47,6 +47,11 @@
       "import": "./dist/esm/env.mjs",
       "types": "./dist/types/env.d.ts"
     },
+    "./numeric": {
+      "require": "./dist/cjs/numeric.cjs",
+      "import": "./dist/esm/numeric.mjs",
+      "types": "./dist/types/numeric.d.ts"
+    },
     "./string": {
       "require": "./dist/cjs/string.cjs",
       "import": "./dist/esm/string.mjs",

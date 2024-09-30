@@ -5,5 +5,6 @@ export * from './buffer-and-hex-utils';
 export * from './env';
 export * from './evm-utils';
 export * from './fs';
+export * from './numeric';
 export * from './string';
 export * from './syntax-highlighting';
