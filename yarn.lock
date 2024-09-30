@@ -419,7 +419,7 @@ __metadata:
     "@typechain/ethers-v6": "npm:^0.5.1"
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4"
-    "@types/mocha": "npm:^10.0.6"
+    "@types/mocha": "npm:^10.0.8"
     "@types/node": "npm:^22.3.0"
     chai: "npm:4"
     dotenv: "npm:^16.4.5"
@@ -615,7 +615,7 @@ __metadata:
   resolution: "@blocksense/sol-reflector@workspace:libs/sol-reflector"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
-    "@types/mocha": "npm:^7.0.2"
+    "@types/mocha": "npm:^10.0.8"
     "@types/node": "npm:^22.3.0"
     directory-tree: "npm:^3.5.2"
     hardhat: "npm:^2.22.8"
@@ -4787,17 +4787,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mocha@npm:^10.0.6":
-  version: 10.0.6
-  resolution: "@types/mocha@npm:10.0.6"
-  checksum: 10c0/4526c9e88388f9e1004c6d3937c5488a39908810f26b927173c58d52b43057f3895627dc06538e96706e08b88158885f869ec6311f6b58fd72bdef715f26d6c3
-  languageName: node
-  linkType: hard
-
-"@types/mocha@npm:^7.0.2":
-  version: 7.0.2
-  resolution: "@types/mocha@npm:7.0.2"
-  checksum: 10c0/52b4e6a461214ed9e880659dd49d59107e06bdda5b0d5ebf62ee2d052a08cead04bb0ba041be3dd0ce17dee04ff414b638ba4a3068cc4d2ace980fefe3412e2a
+"@types/mocha@npm:^10.0.8":
+  version: 10.0.8
+  resolution: "@types/mocha@npm:10.0.8"
+  checksum: 10c0/af01f70cf2888762e79e91219dcc28b5d82c85d9a1c8ba4606d3ae30748be7e2cb9f06d680ad36112c78f5e568d0423a65ba8b7c53d02d37b193787bbc03d088
   languageName: node
   linkType: hard
 
