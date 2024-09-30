@@ -69,11 +69,8 @@ jobs:
       - name: Install JS deps
         run: yarn install
 
-      - name: Build dependencies
-        run: yarn workspace @blocksense/contracts build:deps
-
       - name: Build all contracts
-        run: yarn workspace @blocksense/contracts build
+        run: yarn build @blocksense/contracts
 
       - name: Test all contracts
         run: yarn workspace @blocksense/contracts test
