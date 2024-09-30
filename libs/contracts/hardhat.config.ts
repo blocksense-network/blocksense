@@ -10,6 +10,14 @@ import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
 import '@blocksense/sol-reflector';
 
+import { fromEntries } from '@blocksense/base-utils/array-iter';
+import {
+  getRpcUrl,
+  getOptionalRpcUrl,
+  networkName,
+  networkMetadata,
+} from '@blocksense/base-utils/evm-utils';
+
 import './tasks';
 
 dotenv.config();
@@ -45,115 +53,25 @@ const config: HardhatUserConfig = {
   },
   defaultNetwork: 'hardhat',
   networks: {
-    localhost: {
-      url: 'http://localhost:8545/',
-    },
     hardhat: {
       forking: {
         blockNumber: 20576488,
         enabled: process.env.FORKING === 'true',
-        url: '' + process.env.RPC_URL_ETH_MAINNET,
+        url: getOptionalRpcUrl('ethereum-mainnet'),
       },
     },
-    sepolia: {
-      url: process.env.RPC_URL_ETH_SEPOLIA || '',
-      chainId: 11155111,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    holesky: {
-      url: process.env.RPC_URL_ETH_HOLESKY || '',
-      chainId: 17000,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    amoy: {
-      url: process.env.RPC_URL_POLYGON_AMOY || '',
-      chainId: 80002,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    mantaSepolia: {
-      url: process.env.RPC_URL_MANTA_SEPOLIA || '',
-      chainId: 3441006,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    fuji: {
-      url: process.env.RPC_URL_AVAX_FUJI || '',
-      gasPrice: 225000000000,
-      chainId: 43113,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    chiado: {
-      url: process.env.RPC_URL_GNOSIS_CHIADO || '',
-      chainId: 10200,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    opSepolia: {
-      url: process.env.RPC_URL_OPTIMISM_SEPOLIA || '',
-      chainId: 11155420,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    zkSyncSepolia: {
-      url: process.env.RPC_URL_ZKSYNC_SEPOLIA || '',
-      chainId: 300,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    baseSepolia: {
-      url: process.env.RPC_URL_BASE_SEPOLIA || '',
-      chainId: 84532,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    specular: {
-      url: process.env.RPC_URL_SPECULAR || '',
-      chainId: 13527,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    scrollSepolia: {
-      url: process.env.RPC_URL_SCROLL_SEPOLIA || '',
-      chainId: 534351,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    arbSepolia: {
-      url: process.env.RPC_URL_ARBITRUM_SEPOLIA || '',
-      chainId: 421614,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    artio: {
-      url: process.env.RPC_URL_BERA_ARTIO || '',
-      chainId: 80085,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
-    hekla: {
-      url: process.env.RPC_URL_TAIKO_HEKLA || '',
-      chainId: 167009,
-      accounts: process.env.SIGNER_PRIVATE_KEY
-        ? [process.env.SIGNER_PRIVATE_KEY]
-        : [],
-    },
+    ...fromEntries(
+      networkName.literals.map(network => [
+        network,
+        {
+          url: getOptionalRpcUrl(network),
+          chainId: networkMetadata[network].chainId,
+          accounts: process.env.SIGNER_PRIVATE_KEY
+            ? [process.env.SIGNER_PRIVATE_KEY]
+            : [],
+        },
+      ]),
+    ),
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS === 'true',
