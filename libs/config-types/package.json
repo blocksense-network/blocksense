@@ -17,6 +17,11 @@
       "require": "./dist/cjs/chainlink-compatibility/index.cjs",
       "import": "./dist/esm/chainlink-compatibility/index.mjs",
       "types": "./dist/types/chainlink-compatibility/index.d.ts"
+    },
+    "./evm-contracts-deployment":{
+      "require": "./dist/cjs/evm-contracts-deployment/index.cjs",
+      "import": "./dist/esm/evm-contracts-deployment/index.mjs",
+      "types": "./dist/types/evm-contracts-deployment/index.d.ts"
     }
   },
   "scripts": {
