@@ -1,3 +1,9 @@
-export { selectDirectory } from './fs';
-export { assertNotNull } from './asserts';
-export { getEnvString, rootDir } from './env';
+export * from './array-iter';
+export * from './asserts';
+export * from './async';
+export * from './buffer-and-hex-utils';
+export * from './env';
+export * from './evm-utils';
+export * from './fs';
+export * from './string';
+export * from './syntax-highlighting';

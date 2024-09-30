@@ -27,35 +27,35 @@
       "import": "./dist/esm/async.mjs",
       "types": "./dist/types/async.d.ts"
     },
-    "./fs": {
-      "require": "./dist/cjs/fs.cjs",
-      "import": "./dist/esm/fs.mjs",
-      "types": "./dist/types/fs.d.ts"
-    },
-    "./env": {
-      "require": "./dist/cjs/env.cjs",
-      "import": "./dist/esm/env.mjs",
-      "types": "./dist/types/env.d.ts"
-    },
-    "./syntax-highlighting": {
-      "require": "./dist/cjs/syntax-highlighting.cjs",
-      "import": "./dist/esm/syntax-highlighting.mjs",
-      "types": "./dist/types/syntax-highlighting.d.ts"
-    },
     "./buffer-and-hex-utils": {
       "require": "./dist/cjs/buffer-and-hex-utils/index.cjs",
       "import": "./dist/esm/buffer-and-hex-utils/index.mjs",
       "types": "./dist/types/buffer-and-hex-utils/index.d.ts"
+    },
+    "./fs": {
+      "require": "./dist/cjs/fs.cjs",
+      "import": "./dist/esm/fs.mjs",
+      "types": "./dist/types/fs.d.ts"
     },
     "./evm-utils": {
       "require": "./dist/cjs/evm-utils/index.cjs",
       "import": "./dist/esm/evm-utils/index.mjs",
       "types": "./dist/types/evm-utils/index.d.ts"
     },
+    "./env": {
+      "require": "./dist/cjs/env.cjs",
+      "import": "./dist/esm/env.mjs",
+      "types": "./dist/types/env.d.ts"
+    },
     "./string": {
       "require": "./dist/cjs/string.cjs",
       "import": "./dist/esm/string.mjs",
       "types": "./dist/types/string.d.ts"
+    },
+    "./syntax-highlighting": {
+      "require": "./dist/cjs/syntax-highlighting.cjs",
+      "import": "./dist/esm/syntax-highlighting.mjs",
+      "types": "./dist/types/syntax-highlighting.d.ts"
     }
   },
   "scripts": {
