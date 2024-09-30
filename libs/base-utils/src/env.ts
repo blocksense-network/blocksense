@@ -12,6 +12,15 @@ export const rootDir = getEnvString('GIT_ROOT');
  */
 export const configDir = join(rootDir, 'config');
 
+export const configFiles = {
+  ['feeds_config']: join(configDir, 'feeds_config.json'),
+  ['chainlink_compatibility']: join(configDir, 'chainlink_compatibility'),
+  ['evm_contracts_deployment_v1']: join(
+    configDir,
+    'evm_contracts_deployment_v1.json',
+  ),
+};
+
 /**
  * Retrieves the value of an environment variable.
  *
