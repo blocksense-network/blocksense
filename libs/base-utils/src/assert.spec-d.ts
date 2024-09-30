@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test } from 'vitest';
 
-import { assertIsObject } from './asserts';
+import { assertIsObject } from './assert';
 
 describe('`base-utils/asserts` tests', () => {
   test('`assertIsObject` should narrow the type of the `value` to `object` if it is an object', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { assertIsObject, assertNotNull } from './asserts';
+import { assertIsObject, assertNotNull } from './assert';
 
 describe('`base-utils/asserts` tests', () => {
   test(`'assertNotNull' should return the value if it is not null or undefined`, () => {

@@ -18,9 +18,9 @@
       "types": "./dist/types/array-iter.d.ts"
     },
     "./assert": {
-      "require": "./dist/cjs/asserts.cjs",
-      "import": "./dist/esm/asserts.mjs",
-      "types": "./dist/types/asserts.d.ts"
+      "require": "./dist/cjs/assert.cjs",
+      "import": "./dist/esm/assert.mjs",
+      "types": "./dist/types/assert.d.ts"
     },
     "./async": {
       "require": "./dist/cjs/async.cjs",

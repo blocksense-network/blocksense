@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-import { assertNotNull } from './asserts';
+import { assertNotNull } from './assert';
 
 /**
  * The root directory of the Git repository.

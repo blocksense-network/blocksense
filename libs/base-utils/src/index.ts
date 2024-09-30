@@ -1,5 +1,5 @@
 export * from './array-iter';
-export * from './asserts';
+export * from './assert';
 export * from './async';
 export * from './buffer-and-hex-utils';
 export * from './env';
