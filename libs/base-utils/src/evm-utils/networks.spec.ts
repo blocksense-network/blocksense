@@ -60,6 +60,9 @@ describe('Network constants tests', () => {
 
   test(`'parseChainId' should return the chain ID if it is valid`, () => {
     expect(parseChainId(1)).toBe(1);
+    expect(parseChainId(1n)).toBe(1);
+    expect(parseChainId('1')).toBe(1);
+    expect(parseChainId('0xa')).toBe(10);
   });
 
   test(`'parseChainId' should throw an error if the chain ID is not valid`, () => {

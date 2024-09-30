@@ -10,8 +10,7 @@ import * as S from '@effect/schema/Schema';
 import { getEnvString, getOptionalEnvString } from '../env';
 import { EthereumAddress, TxHash } from './hex-types';
 import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
-import { InverseOf } from '../type-level';
-import { entries, fromEntries } from '../array-iter';
+import { NumberFromSelfBigIntOrString } from '../numeric';
 
 const networks = [
   'local',
@@ -64,7 +63,10 @@ export const isNetworkName = S.is(networkName);
 export const parseNetworkName = S.decodeUnknownSync(networkName);
 export type NetworkName = S.Schema.Type<typeof networkName>;
 
-export const chainId = S.Literal(...chainIds);
+export const chainId = S.compose(
+  NumberFromSelfBigIntOrString,
+  S.Literal(...chainIds),
+);
 export const isChainId = S.is(chainId);
 export const parseChainId = S.decodeUnknownSync(chainId);
 export type ChainId = S.Schema.Type<typeof chainId>;
