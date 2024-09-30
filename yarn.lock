@@ -590,6 +590,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/monorepo@workspace:."
   dependencies:
+    "@blocksense/base-utils": "workspace:*"
     "@vercel/build-utils": "npm:^8.3.6"
     "@vercel/next": "npm:^4.3.6"
     "@vercel/nft": "npm:^0.27.3"

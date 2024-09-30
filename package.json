@@ -30,6 +30,7 @@
     }
   },
   "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
     "@vercel/build-utils": "^8.3.6",
     "@vercel/next": "^4.3.6",
     "@vercel/nft": "^0.27.3",
