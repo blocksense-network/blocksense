@@ -1,8 +1,7 @@
-import fs from 'fs/promises';
-import path from 'path';
 import { task } from 'hardhat/config';
 import { Artifacts } from 'hardhat/types';
 import { Wallet, ethers } from 'ethers';
+
 import Safe, {
   SafeAccountConfig,
   SafeFactory,
@@ -13,43 +12,76 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 import { getCreateCallDeployment } from '@safe-global/safe-deployments';
-import {
-  NetworkConfig,
-  NetworkNames,
-  ChainConfig,
-  ContractNames,
-  ContractsConfig,
-  CoreContract,
-  ChainlinkProxyData,
-} from './types';
 
-const fileName = '/deployments/deploymentV1.json';
+import { NetworkConfig, ContractNames } from './types';
+import {
+  EthereumAddress,
+  getNetworkNameByChainId,
+  getRpcUrl,
+  isNetworkName,
+  NetworkName,
+  parseChainId,
+  parseEthereumAddress,
+  parseTxHash,
+} from '@blocksense/base-utils/evm-utils';
+
+import { getEnvString, rootDir } from '@blocksense/base-utils';
+import { selectDirectory } from '@blocksense/base-utils/fs';
+import { kebabToSnakeCase } from '@blocksense/base-utils/string';
+
+import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
+import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
+import {
+  ChainlinkProxyData,
+  ContractsConfig,
+  CoreContracts,
+  DeploymentConfig,
+  DeploymentConfigSchema,
+} from '@blocksense/config-types/evm-contracts-deployment';
+
+const deploymentDir = `${rootDir}/libs/contracts/deployments`;
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
-  .addParam('configFile', 'Path to config file')
   .setAction(async (args, { ethers, artifacts }) => {
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
-    const testNetworks = Object.keys(NetworkNames);
     for (const network of networks) {
-      if (!testNetworks.includes(network)) {
+      if (!isNetworkName(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await initChain(network as keyof typeof NetworkNames));
+      configs.push(await initChain(network));
     }
 
-    const dataFeedConfig = JSON.parse(
-      await fs.readFile(args.configFile, 'utf8'),
-    ).feeds;
+    const { decodeJSON } = selectDirectory(`${rootDir}/config`);
+    const { feeds } = await decodeJSON(
+      { name: 'feeds_config' },
+      FeedsConfigSchema,
+    );
+    const chainlinkCompatibility = await decodeJSON(
+      { name: 'chainlink_compatibility' },
+      ChainlinkCompatibilityConfigSchema,
+    );
 
-    const chainsDeployment: ChainConfig = {};
+    const dataFeedConfig = feeds.map(feed => {
+      const { base, quote } =
+        chainlinkCompatibility.blocksenseFeedsCompatibility[feed.id]
+          .chainlink_compatibility;
+      return {
+        id: feed.id,
+        description: feed.description,
+        decimals: feed.decimals,
+        base,
+        quote,
+      };
+    });
+
+    const chainsDeployment: DeploymentConfig = {} as DeploymentConfig;
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
     for (const config of configs) {
-      const chainId = config.network.chainId.toString();
-
+      const chainId = parseChainId(Number(config.network.chainId));
       console.log(`\n\n// ChainId: ${config.network.chainId} //`);
       const multisig = await deployMultisig(config);
       const multisigAddress = await multisig.getAddress();
@@ -94,9 +126,9 @@ task('deploy', 'Deploy contracts')
           salt: ethers.id('registry'),
           value: 0n,
         },
-        ...dataFeedConfig.map((data: any) => {
+        ...dataFeedConfig.map(data => {
           return {
-            name: ContractNames.ChainlinkProxy,
+            name: ContractNames.ChainlinkProxy as const,
             argsTypes: ['string', 'uint8', 'uint32', 'address'],
             argsValues: [
               data.description,
@@ -106,16 +138,21 @@ task('deploy', 'Deploy contracts')
             ],
             salt: ethers.id('aggregator'),
             value: 0n,
-            data: data,
+            feedRegistryInfo: {
+              description: data.description,
+              base: data.base,
+              quote: data.quote,
+            },
           };
         }),
       ]);
 
-      chainsDeployment[chainId] = {
-        name: configs[0].network.name,
+      const networkName = getNetworkNameByChainId(chainId);
+      chainsDeployment[networkName] = {
+        chainId,
         contracts: {
           ...deployData,
-          SafeMultisig: multisigAddress,
+          SafeMultisig: parseEthereumAddress(multisigAddress),
         },
       };
 
@@ -173,31 +210,46 @@ const deployMultisig = async (config: NetworkConfig) => {
   });
 };
 
-const initChain = async (
-  chianName: keyof typeof NetworkNames,
-): Promise<NetworkConfig> => {
-  const envName = NetworkNames[chianName];
-  const rpc = process.env['RPC_URL_' + envName]!;
+const initChain = async (networkName: NetworkName): Promise<NetworkConfig> => {
+  const rpc = getRpcUrl(networkName);
   const provider = new ethers.JsonRpcProvider(rpc);
-  const wallet = new Wallet(process.env.SIGNER_PRIVATE_KEY!, provider);
-  const envOwners = process.env['OWNER_ADDRESSES_' + envName];
-  const owners: string[] = envOwners ? envOwners.split(',') : [];
-
+  const wallet = new Wallet(getEnvString('SIGNER_PRIVATE_KEY'), provider);
+  const envOwners =
+    process.env['OWNER_ADDRESSES_' + kebabToSnakeCase(networkName)];
+  const owners = envOwners
+    ? envOwners.split(',').map(address => parseEthereumAddress(address))
+    : [];
   return {
     rpc,
     provider,
     network: await provider.getNetwork(),
     signer: wallet,
-    owners: [...owners, wallet.address],
+    owners: [...owners, parseEthereumAddress(wallet.address)],
     safeAddresses: {
-      multiSendAddress: '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
-      multiSendCallOnlyAddress: '0x9641d764fc13c8B624c04430C7356C1C7C8102e2',
-      createCallAddress: '0x9b35Af71d77eaf8d7e40252370304687390A1A52',
-      safeSingletonAddress: '0x41675C099F32341bf84BFc5382aF534df5C7461a',
-      safeProxyFactoryAddress: '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
-      fallbackHandlerAddress: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
-      signMessageLibAddress: '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9',
-      simulateTxAccessorAddress: '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
+      multiSendAddress: parseEthereumAddress(
+        '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
+      ),
+      multiSendCallOnlyAddress: parseEthereumAddress(
+        '0x9641d764fc13c8B624c04430C7356C1C7C8102e2',
+      ),
+      createCallAddress: parseEthereumAddress(
+        '0x9b35Af71d77eaf8d7e40252370304687390A1A52',
+      ),
+      safeSingletonAddress: parseEthereumAddress(
+        '0x41675C099F32341bf84BFc5382aF534df5C7461a',
+      ),
+      safeProxyFactoryAddress: parseEthereumAddress(
+        '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
+      ),
+      fallbackHandlerAddress: parseEthereumAddress(
+        '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
+      ),
+      signMessageLibAddress: parseEthereumAddress(
+        '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9',
+      ),
+      simulateTxAccessorAddress: parseEthereumAddress(
+        '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
+      ),
     },
     threshold: 1,
   };
@@ -253,6 +305,7 @@ const multisigTxExec = async (
   // transactionResponse is of unknown type and there is no type def in the specs
   await (txResponse.transactionResponse as any).wait();
   console.log('-> tx hash', txResponse.hash);
+  return parseTxHash(txResponse.hash);
 };
 
 const deployContracts = async (
@@ -265,7 +318,11 @@ const deployContracts = async (
     argsValues: any[];
     salt: string;
     value: bigint;
-    data: any;
+    feedRegistryInfo?: {
+      description: string;
+      base: EthereumAddress | null;
+      quote: EthereumAddress | null;
+    };
   }[],
 ) => {
   const createCallAddress = config.safeAddresses.createCallAddress;
@@ -276,8 +333,8 @@ const deployContracts = async (
     config.signer,
   );
 
-  const contractAddresses = {} as ContractsConfig;
-  contractAddresses.coreContracts = {} as CoreContract;
+  const contractsConfig = {} as ContractsConfig;
+  contractsConfig.coreContracts = {} as CoreContracts;
 
   const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
@@ -302,7 +359,11 @@ const deployContracts = async (
       encodedArgs,
     );
 
-    console.log(`\nPredicted ${contract.name} address`, contractAddress);
+    const feedName = contract.feedRegistryInfo?.description;
+    const contractName = feedName
+      ? `ChainlinkProxy - ${feedName}`
+      : contract.name;
+    console.log(`Predicted address for '${contractName}': `, contractAddress);
 
     if (!(await checkAddressExists(config, contractAddress))) {
       const encodedData = createCall.interface.encodeFunctionData(
@@ -322,56 +383,16 @@ const deployContracts = async (
     }
 
     if (contract.name === ContractNames.ChainlinkProxy) {
-      if (!contractAddresses[contract.name]) {
-        contractAddresses[contract.name] = [];
-      }
-
-      let base = undefined;
-      let quote = undefined;
-      let chainlinkProxyAddress = undefined;
-
-      if (contract.data.chainlink_compatibility) {
-        if (typeof contract.data.chainlink_compatibility.base === 'string') {
-          base = contract.data.chainlink_compatibility.base;
-        } else if (
-          typeof contract.data.chainlink_compatibility.base === 'object'
-        ) {
-          base =
-            contract.data.chainlink_compatibility.base[
-              config.network.chainId.toString()
-            ];
-        }
-
-        if (typeof contract.data.chainlink_compatibility.quote === 'string') {
-          quote = contract.data.chainlink_compatibility.quote;
-        } else if (
-          typeof contract.data.chainlink_compatibility.quote === 'object'
-        ) {
-          quote =
-            contract.data.chainlink_compatibility.quote[
-              config.network.chainId.toString()
-            ];
-        }
-
-        if (contract.data.chainlink_compatibility.chainlink_proxy) {
-          chainlinkProxyAddress =
-            contract.data.chainlink_compatibility.chainlink_proxy[
-              config.network.chainId.toString()
-            ];
-        }
-      }
-
-      contractAddresses[contract.name].push({
-        description: contract.data.description,
-        base: base && quote ? base : undefined,
-        quote: base && quote ? quote : undefined,
-        address: contractAddress,
+      (contractsConfig[contract.name] ??= []).push({
+        description: contract.feedRegistryInfo?.description ?? '',
+        base: contract.feedRegistryInfo?.base ?? null,
+        quote: contract.feedRegistryInfo?.quote ?? null,
+        address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
-        chainlink_aggregator: chainlinkProxyAddress,
       });
     } else {
-      contractAddresses.coreContracts[contract.name] = {
-        address: contractAddress,
+      contractsConfig.coreContracts[contract.name] = {
+        address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
       };
     }
@@ -385,7 +406,7 @@ const deployContracts = async (
     await multisigTxExec(batch, multisig);
   }
 
-  return contractAddresses;
+  return contractsConfig;
 };
 
 const registerChainlinkProxies = async (
@@ -417,7 +438,7 @@ const registerChainlinkProxies = async (
     if (feed === ethers.ZeroAddress) {
       filteredData.push(data);
     } else {
-      console.log(' -> Feed already registered', {
+      console.log(` -> Feed '${data.description}' already registered`, {
         base: data.base,
         quote: data.quote,
         feed,
@@ -434,8 +455,8 @@ const registerChainlinkProxies = async (
       to: registry.target.toString(),
       value: '0',
       data: registry.interface.encodeFunctionData('setFeeds', [
-        batch.map(data => {
-          return { base: data.base, quote: data.quote, feed: data.address };
+        batch.map(({ base, quote, address }) => {
+          return { base, quote, feed: address };
         }),
       ]),
       operation: OperationType.Call,
@@ -447,22 +468,20 @@ const registerChainlinkProxies = async (
 
 const saveDeployment = async (
   configs: NetworkConfig[],
-  chainsDeployment: ChainConfig,
+  chainsDeployment: DeploymentConfig,
 ) => {
-  const file = process.cwd() + fileName;
-  try {
-    await fs.open(file, 'r');
-  } catch {
-    await fs.mkdir(path.dirname(file), { recursive: true });
-    await fs.writeFile(file, '{}');
-  }
-  const jsonData = await fs.readFile(file, 'utf8');
-  const parsedData = JSON.parse(jsonData);
+  const fileName = 'deploymentV1';
+  const { decodeJSON, writeJSON } = selectDirectory(deploymentDir);
+
+  const deploymentContent = await decodeJSON(
+    { name: fileName },
+    DeploymentConfigSchema,
+  ).catch(() => ({}) as DeploymentConfig);
 
   for (const config of configs) {
-    const chainId = config.network.chainId.toString();
-    parsedData[chainId] = chainsDeployment[chainId];
+    const chainId = Number(config.network.chainId);
+    const networkName = getNetworkNameByChainId(parseChainId(chainId));
+    deploymentContent[networkName] = chainsDeployment[networkName];
   }
-
-  await fs.writeFile(file, JSON.stringify(parsedData, null, 2), 'utf8');
+  await writeJSON({ name: fileName, content: deploymentContent });
 };
