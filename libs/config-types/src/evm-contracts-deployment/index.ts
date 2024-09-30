@@ -51,10 +51,12 @@ export type ContractsConfig = S.Schema.Type<typeof ContractsConfigSchema>;
 export const DeploymentConfigSchema = S.mutable(
   S.Record({
     key: networkName,
-    value: S.Struct({
-      chainId: chainId,
-      contracts: ContractsConfigSchema,
-    }),
+    value: S.UndefinedOr(
+      S.Struct({
+        chainId: chainId,
+        contracts: ContractsConfigSchema,
+      }),
+    ),
   }),
 );
 
