@@ -25,7 +25,7 @@ import {
   parseTxHash,
 } from '@blocksense/base-utils/evm-utils';
 
-import { getEnvString, rootDir } from '@blocksense/base-utils';
+import { getEnvString, configDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { kebabToSnakeCase } from '@blocksense/base-utils/string';
 
@@ -39,8 +39,6 @@ import {
   DeploymentConfigSchema,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
-const deploymentDir = `${rootDir}/libs/contracts/deployments`;
-
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
   .setAction(async (args, { ethers, artifacts }) => {
@@ -53,7 +51,7 @@ task('deploy', 'Deploy contracts')
       configs.push(await initChain(network));
     }
 
-    const { decodeJSON } = selectDirectory(`${rootDir}/config`);
+    const { decodeJSON } = selectDirectory(configDir);
     const { feeds } = await decodeJSON(
       { name: 'feeds_config' },
       FeedsConfigSchema,
@@ -81,7 +79,7 @@ task('deploy', 'Deploy contracts')
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
     for (const config of configs) {
-      const chainId = parseChainId(Number(config.network.chainId));
+      const chainId = parseChainId(config.network.chainId);
       console.log(`\n\n// ChainId: ${config.network.chainId} //`);
       const multisig = await deployMultisig(config);
       const multisigAddress = await multisig.getAddress();
@@ -470,8 +468,8 @@ const saveDeployment = async (
   configs: NetworkConfig[],
   chainsDeployment: DeploymentConfig,
 ) => {
-  const fileName = 'deploymentV1';
-  const { decodeJSON, writeJSON } = selectDirectory(deploymentDir);
+  const fileName = 'evm_contracts_deployment_v1';
+  const { decodeJSON, writeJSON } = selectDirectory(configDir);
 
   const deploymentContent = await decodeJSON(
     { name: fileName },
@@ -479,8 +477,9 @@ const saveDeployment = async (
   ).catch(() => ({}) as DeploymentConfig);
 
   for (const config of configs) {
-    const chainId = Number(config.network.chainId);
-    const networkName = getNetworkNameByChainId(parseChainId(chainId));
+    const networkName = getNetworkNameByChainId(
+      parseChainId(config.network.chainId),
+    );
     deploymentContent[networkName] = chainsDeployment[networkName];
   }
   await writeJSON({ name: fileName, content: deploymentContent });

@@ -1,47 +1,57 @@
-import fs from 'fs/promises';
+import { parse as parsePath } from 'path';
+
 import { task } from 'hardhat/config';
-import { ChainConfig, CoreContract } from './types';
-import { RunTaskFunction } from 'hardhat/types';
+
+import {
+  configFiles,
+  entries,
+  EthereumAddress,
+  parseNetworkName,
+  selectDirectory,
+} from '@blocksense/base-utils';
+
+import { DeploymentConfigSchema } from '@blocksense/config-types/evm-contracts-deployment';
+
+type VerifyTaskArgs = {
+  address: EthereumAddress;
+  constructorArgs: readonly any[];
+};
+
+const defaultDeployment = configFiles['evm_contracts_deployment_v1'];
 
 task('etherscan-verify', 'Verify contracts on Etherscan')
-  .addParam('deploymentFile', 'Path to deployment file')
+  .addParam('deploymentFile', 'Path to deployment file', defaultDeployment)
   .setAction(async (args, { run, network }) => {
-    const deployment: ChainConfig = JSON.parse(
-      await fs.readFile(args.deploymentFile, 'utf8'),
-    );
+    const verify = ({ address, constructorArgs }: VerifyTaskArgs) =>
+      run('verify:verify', {
+        address,
+        constructorArguments: constructorArgs,
+      }).catch(e => {
+        if (e.message.toLowerCase().includes('already verified')) {
+          console.log('Already verified!');
+        } else {
+          throw e;
+        }
+      });
 
-    const chainId = network.config.chainId?.toString();
-    const deploymentData = deployment[chainId as keyof typeof deployment];
+    const { dir, name } = parsePath(args.deploymentFile);
+    const { decodeJSON } = selectDirectory(dir);
+    const deployment = await decodeJSON({ name }, DeploymentConfigSchema);
+    const deploymentData = deployment[parseNetworkName(network.name)];
+    if (!deploymentData) {
+      console.error(`Deployment data not found for network: '${network.name}'`);
+      process.exit(1);
+    }
 
-    for (const contractName in deploymentData.contracts.coreContracts) {
-      const data =
-        deploymentData.contracts.coreContracts[
-          contractName as keyof CoreContract
-        ];
+    for (const [contractName, data] of entries(
+      deploymentData.contracts.coreContracts,
+    )) {
       console.log('-> Verifying contract:', contractName, data.address);
-      await verify(data, run);
+      await verify(data);
     }
 
     for (const data of deploymentData.contracts.ChainlinkProxy) {
       console.log('-> Verifying contract:', data.description, data.address);
-      await verify(data, run);
+      await verify(data);
     }
   });
-
-const verify = async (
-  data: { address: string; constructorArgs: any[] },
-  run: RunTaskFunction,
-) => {
-  try {
-    await run('verify:verify', {
-      address: data.address,
-      constructorArguments: data.constructorArgs,
-    });
-  } catch (e: any) {
-    if (e.message.toLowerCase().includes('already verified')) {
-      console.log('Already verified!');
-    } else {
-      console.log(e);
-    }
-  }
-};
