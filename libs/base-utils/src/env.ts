@@ -1,9 +1,16 @@
+import { join } from 'path';
+
 import { assertNotNull } from './asserts';
 
 /**
  * The root directory of the Git repository.
  */
 export const rootDir = getEnvString('GIT_ROOT');
+
+/**
+ * The root configuration directory.
+ */
+export const configDir = join(rootDir, 'config');
 
 /**
  * Retrieves the value of an environment variable.
