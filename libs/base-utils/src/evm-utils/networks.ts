@@ -10,6 +10,8 @@ import * as S from '@effect/schema/Schema';
 import { getEnvString, getOptionalEnvString } from '../env';
 import { EthereumAddress, TxHash } from './hex-types';
 import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
+import { InverseOf } from '../type-level';
+import { entries, fromEntries } from '../array-iter';
 
 const networks = [
   'local',
@@ -309,4 +311,13 @@ export function getRpcUrl(network: NetworkName): string {
 export function getOptionalRpcUrl(network: NetworkName): string {
   const envVar = getRpcUrlEnvVar(network);
   return getOptionalEnvString(envVar, '');
+}
+
+export function getNetworkNameByChainId(chainId: ChainId): NetworkName {
+  for (const [network, metadata] of Object.entries(networkMetadata)) {
+    if (metadata.chainId === chainId) {
+      return parseNetworkName(network);
+    }
+  }
+  throw new Error(`Unknown network for Chain Id: ${chainId}`);
 }
