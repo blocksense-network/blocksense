@@ -60,7 +60,7 @@ impl BuildConfig {
         let config: BlocksenseConfig = serde_json::from_str(&contents)?;
         let spin_config = SpinConfigToml::from(config);
         let toml = toml::to_string_pretty(&spin_config)?;
-        let mut file = fs::File::create(PathBuf::from(std::env::current_dir()?).join(SPIN)).await?;
+        let mut file = fs::File::create(std::env::current_dir()?.join(SPIN)).await?;
         file.write_all(toml.as_bytes()).await?;
 
         if self.up {
@@ -69,7 +69,7 @@ impl BuildConfig {
                 .env("RUST_LOG", "trigger=trace")
                 .arg("up")
                 .arg("-f")
-                .arg(PathBuf::from(std::env::current_dir()?).join(SPIN))
+                .arg(std::env::current_dir()?.join(SPIN))
                 .stdout(Stdio::inherit())
                 .stderr(Stdio::inherit())
                 .spawn()?

@@ -21,7 +21,7 @@ pub struct DataFeedResult {
     pub value: f64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Payload {
     pub values: Vec<DataFeedResult>,
 }

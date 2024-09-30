@@ -321,9 +321,8 @@ impl OracleTrigger {
             let _ = tokio::time::sleep(time_interval).await;
 
             let data_feed_signal = components
-                .iter()
-                .map(|(_, comp)| comp.oracle_settings.clone())
-                .flatten()
+                .values()
+                .flat_map(|comp| comp.oracle_settings.clone())
                 .collect();
             tracing::info!("Signal data feeds: {:?}", &data_feed_signal);
             let _ = signal_sender.send(data_feed_signal);
