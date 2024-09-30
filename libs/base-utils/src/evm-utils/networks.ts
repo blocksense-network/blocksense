@@ -12,6 +12,7 @@ import { EthereumAddress, TxHash } from './hex-types';
 import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
 
 const networks = [
+  'local',
   'ethereum-mainnet',
   'ethereum-sepolia',
   'ethereum-holesky',
@@ -76,6 +77,11 @@ export type Network = S.Schema.Type<typeof network>;
  * The URL generator functions take a transaction hash or an address as input and return the corresponding explorer URL.
  */
 export const networkMetadata = {
+  local: {
+    isTestnet: false,
+    chainId: undefined,
+    explorerUrl: undefined,
+  },
   'ethereum-mainnet': {
     chainId: 1,
     isTestnet: false,
@@ -258,9 +264,9 @@ export const networkMetadata = {
   },
 } satisfies {
   [Net in NetworkName]: {
-    chainId: ChainId;
+    chainId: ChainId | undefined;
     isTestnet: boolean;
-    explorerUrl: string;
+    explorerUrl: string | undefined;
   };
 };
 
