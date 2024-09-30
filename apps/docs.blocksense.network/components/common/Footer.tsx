@@ -22,9 +22,9 @@ export const Footer = () => {
             alt={config.adoptersAltLink}
             className="footer__social-icon-img relative w-6 h-6"
           />
-          <label className="footer__social-label text-gray-900 hidden lg:block">
-            <span className="font-semibold">Early Adopters</span>
-          </label>
+          <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
+            Early Adopters
+          </span>
         </a>
       </aside>
       <nav className="footer__social-nav flex items-center nx-justify-end">
@@ -41,9 +41,9 @@ export const Footer = () => {
                 alt={config.social_media.telegram._alt}
                 className="footer__social-icon-img relative w-6 h-6"
               />
-              <label className="footer__social-label text-gray-900 hidden lg:block">
-                <span className="font-semibold">Telegram</span>
-              </label>
+              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
+                Telegram
+              </span>
             </a>
           </li>
           <li className="footer__social-item flex items-center space-x-4 p-2">
@@ -58,9 +58,9 @@ export const Footer = () => {
                 alt={config.social_media.x._alt}
                 className="footer__social-icon-img relative w-6 h-6"
               />
-              <label className="footer__social-label text-gray-900 hidden lg:block">
-                <span className="font-semibold">Follow us</span>
-              </label>
+              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
+                Follow us
+              </span>
             </a>
           </li>
           <li className="footer__social-item flex items-center space-x-4 p-2">
@@ -75,9 +75,9 @@ export const Footer = () => {
                 alt={config.social_media.discord._alt}
                 className="footer__social-icon-img relative w-6 h-6"
               />
-              <label className="footer__social-label text-gray-900 hidden lg:block">
-                <span className="font-semibold">Join our community</span>
-              </label>
+              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
+                Join our community
+              </span>
             </a>
           </li>
         </ul>
