@@ -133,17 +133,71 @@ mod test {
         let json = r#"
 {
   "oracles": [{
-    "id": "revolut-example",
-    "oracle_script_wasm": "revolut-example.wasm",
-    "data_feeds": [{
-        "id": "USD/BTC",
-        "interval": 10
-      }, {
-        "id": "USD/ETH",
-        "interval": 15
-    }]
+    "id": "revolut",
+    "name": "Revolut",
+    "oracle_script_wasm": "revolut_oracle.wasm",
+    "allowed_outbound_hosts": ["https://pro-api.coinmarketcap.com"],
+    "capabilities": []
+  },{
+    "id": "yahoo",
+    "name": "yahoo",
+    "oracle_script_wasm": "yahoo_oracle.wasm",
+    "allowed_outbound_hosts": ["https://yfapi.net:443"],
+    "capabilities": []
+  },{
+    "id": "cmc",
+    "name": "cmc",
+    "oracle_script_wasm": "cmc_oracle.wasm",
+    "allowed_outbound_hosts": ["https://pro-api.coinmarketcap.com"],
+    "capabilities": []
   }],
-  "capabilities": []
+  "capabilities": [],
+  "dataFeeds": [{
+      "id": 0,
+      "name": "SAND",
+      "fullName": "",
+      "description": "SAND / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "SAND",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 6210,
+        "cmc_quote": "SAND"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "cmc"
+    },
+    {
+      "id": 1,
+      "name": "AVAX",
+      "fullName": "",
+      "description": "AVAX / USD",
+      "type": "Crypto",
+      "decimals": 8,
+      "pair": {
+        "base": "AVAX",
+        "quote": "USD"
+      },
+      "resources": {
+        "cmc_id": 5805,
+        "cmc_quote": "AVAX"
+      },
+      "report_interval_ms": 300000,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "quorum_percentage": 1,
+      "script": "yahoo"
+    }]
 }
     "#;
         let toml = r#"spin_manifest_version = 2
@@ -154,20 +208,39 @@ version = "0.1.0"
 authors = ["blocksense-network"]
 
 [application.trigger.settings]
-sequencer = "https://postman-echo.com/post"
+interval_time_in_seconds = 10
+sequencer = "http://gpu-server-001:8877/1"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
 
 [[trigger.oracle]]
-component = "revolut-example"
-data_feed = "USD/BTC"
-interval_secs = 10
+component = "revolut"
+data_feeds = []
 
 [[trigger.oracle]]
-component = "revolut-example"
-data_feed = "USD/ETH"
-interval_secs = 15
+component = "yahoo"
 
-[component.revolut-example]
-source = "revolut-example.wasm"
+[[trigger.oracle.data_feeds]]
+id = "1"
+data = '{"cmc_id":5805,"cmc_quote":"AVAX"}'
+
+[[trigger.oracle]]
+component = "cmc"
+
+[[trigger.oracle.data_feeds]]
+id = "0"
+data = '{"cmc_id":6210,"cmc_quote":"SAND"}'
+
+[component.revolut]
+source = "revolut_oracle.wasm"
+allowed_outbound_hosts = ["https://pro-api.coinmarketcap.com"]
+
+[component.yahoo]
+source = "yahoo_oracle.wasm"
+allowed_outbound_hosts = ["https://yfapi.net:443"]
+
+[component.cmc]
+source = "cmc_oracle.wasm"
+allowed_outbound_hosts = ["https://pro-api.coinmarketcap.com"]
 "#;
         let config: BlocksenseConfig = serde_json::from_str(json).expect("Failed to parse json.");
         let spin_config = AppManifest::from(config);
