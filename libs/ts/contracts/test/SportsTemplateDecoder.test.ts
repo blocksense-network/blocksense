@@ -52,8 +52,8 @@ function processFields(
           }
         }
 
-        const currentDim = dims[0];
-        const remainingDims = dims.slice(1);
+        const currentDim = dims[dims.length - 1];
+        const remainingDims = dims.slice(0, -1);
         const isCurrentDimDynamic = currentDim === '';
 
         if (isCurrentDimDynamic) {
@@ -137,9 +137,7 @@ describe('Decoder', () => {
 
   afterEach(async () => {
     if (fs.existsSync(tempFilePath)) {
-      fs.rm(tempFilePath, { force: true }, err => {
-        if (err) throw err;
-      });
+      fs.rmSync(tempFilePath, { force: true });
     }
   });
 
@@ -1124,10 +1122,135 @@ describe('Decoder', () => {
       ],
       1,
       [
-        [[100, 200], [300]],
+        [[100, 200], [300], [1, 2, 3]],
         [
-          [400, 500],
+          [400, 500, 600],
           [600, 700],
+        ],
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should decode multidimensional dynamic and fixed arrays of bytes, string, and uint', async () => {
+    const fields: Field = {
+      name: 'MultidimensionalMixedArrays',
+      values: [
+        {
+          name: 'bytesArray',
+          type: 'bytes[]',
+        },
+        {
+          name: 'stringArray',
+          type: 'string[][3]',
+        },
+        {
+          name: 'uintArray',
+          type: 'uint256[3][][2]',
+          size: 256,
+        },
+      ],
+    };
+    const values = [
+      ['0x1234', '0x5678', '0x9abc'],
+      [
+        ['Hello', 'World', 's'],
+        ['OpenAI', 'GPT', 'd', 'd'],
+        ['Ethereum', 'Blockchain'],
+      ],
+      [
+        [
+          [1, 2, 3],
+          [4, 5, 6],
+        ],
+        [
+          [7, 8, 9],
+          [10, 11, 12],
+          [13, 14, 15],
+        ],
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should decode fixed+dynamic+fixed arrays with different types of data', async () => {
+    const fields: Field = {
+      name: 'MixedArrayTypes',
+      values: [
+        {
+          name: 'fixedDynamicFixedArray',
+          type: 'uint32[2][]',
+          size: 32,
+        },
+        {
+          name: 'stringBytesArray',
+          type: 'string[2][]',
+        },
+      ],
+    };
+    const values = [
+      [
+        [1, 2],
+        [3, 4],
+        [5, 6],
+      ],
+      [
+        ['Hello', 'World'],
+        ['OpenAI', 'GPT'],
+        ['Ethereum', 'Blockchain'],
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should decode complex nested arrays with mixed types', async () => {
+    const fields: Field = {
+      name: 'ComplexNestedArrays',
+      values: [
+        {
+          name: 'nestedArray',
+          type: 'uint256[2][][3][]',
+          size: 256,
+        },
+        {
+          name: 'mixedTypeArray',
+          type: 'string[2][][3]',
+        },
+      ],
+    };
+    const values = [
+      [
+        [
+          [
+            [1, 2],
+            [3, 4],
+          ],
+          [[5, 6]],
+          [
+            [7, 8],
+            [9, 10],
+            [11, 12],
+          ],
+        ],
+        [
+          [[13, 14]],
+          [
+            [15, 16],
+            [17, 18],
+          ],
+          [[19, 20]],
+        ],
+      ],
+      [
+        [
+          ['Hello', 'World'],
+          ['OpenAI', 'GPT'],
+        ],
+        [['Ethereum', 'Blockchain']],
+        [
+          ['Solidity', 'language'],
+          ['Ethereum', 'Blockchain'],
+          ['Solidity', 'assembly'],
         ],
       ],
     ];
