@@ -17,6 +17,7 @@ import {
   decodeCoreContracts,
   decodeProxyContracts,
 } from '@/src/deployed-contracts/types';
+import { dataFeedUrl } from '@/src/constants';
 
 type DeployedContractsProps = {
   deployedCoreContractsString: string;
@@ -100,6 +101,7 @@ export const DeployedContracts = ({
             filters={filters}
             invisibleColumns={['network']}
             filterCell="description"
+            rowLink={dataFeedUrl}
           />
         </ContractItemWrapper>
       </div>

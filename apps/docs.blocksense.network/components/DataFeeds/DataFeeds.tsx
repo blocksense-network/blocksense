@@ -11,6 +11,7 @@ import {
   columns,
   dataFeedsColumnsTitles,
 } from '@/components/DataFeeds/columns';
+import { dataFeedUrl } from '@/src/constants';
 
 type ParametersProps = {
   dataFeedsOverviewString: string;
@@ -46,6 +47,7 @@ export const DataFeeds = ({ dataFeedsOverviewString }: ParametersProps) => {
           filterCell={'description'}
           filters={filters}
           columnsTitles={dataFeedsColumnsTitles}
+          rowLink={dataFeedUrl}
         />
       </ContractItemWrapper>
     </section>

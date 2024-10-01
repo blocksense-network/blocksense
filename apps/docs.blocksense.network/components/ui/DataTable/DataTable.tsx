@@ -1,8 +1,8 @@
 import * as React from 'react';
-
 import {
   ColumnDef,
   ColumnFiltersState,
+  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -12,6 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { useRouter } from 'next/router';
 
 import {
   Table,
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/table';
 import { DataTablePagination } from '@/components/ui/DataTable/DataTablePagination';
 import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar';
+import { cn } from '@/lib/utils';
 
 export type OptionType = {
   label: string;
@@ -46,6 +48,7 @@ interface DataTableProps<TData, TValue> {
   columnsTitles: ColumnsTitlesType;
   hasToolbar?: boolean;
   invisibleColumns?: string[];
+  rowLink?: string;
 }
 
 function getUniqueValuesFromColumns(
@@ -80,6 +83,7 @@ export function DataTable<TData, TValue>({
   columnsTitles,
   hasToolbar = true,
   invisibleColumns = [],
+  rowLink,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -93,6 +97,7 @@ export function DataTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 30,
   });
+  const router = useRouter();
 
   const table = useReactTable({
     data,
@@ -113,6 +118,22 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  function getRowLink(row: Row<TData>) {
+    return rowLink ? `${rowLink}${row.getValue('id')}` : '';
+  }
+
+  function onRowClick(e: React.MouseEvent, row: Row<TData>) {
+    e.ctrlKey || e.metaKey
+      ? window.open(getRowLink(row))
+      : router.push(getRowLink(row));
+  }
+
+  function onRowAuxClick(row: Row<TData>) {
+    const link = getRowLink(row);
+    if (!link) return;
+    window.open(link);
+  }
+
   return (
     <div className="space-y-4 mt-2">
       {hasToolbar && (
@@ -131,7 +152,7 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="pl-2">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -147,7 +168,12 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  onClick={e => onRowClick(e, row)}
+                  onAuxClick={() => onRowAuxClick(row)}
+                  className={cn(rowLink && 'cursor-pointer')}
+                >
                   {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id} className="px-2 py-2.5">
                       {flexRender(

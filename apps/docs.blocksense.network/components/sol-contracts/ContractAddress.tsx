@@ -43,7 +43,11 @@ export const ContractAddress = ({
         {hasAbbreviation && <Tooltip.Content>{address}</Tooltip.Content>}
         {network ? (
           <code className="hover:underline">
-            <Link href={getAddressExplorerUrl(network, address)}>
+            <Link
+              href={getAddressExplorerUrl(network, address)}
+              onClick={e => e.stopPropagation()}
+              target="_blank"
+            >
               {addressToDisplay}
             </Link>
           </code>

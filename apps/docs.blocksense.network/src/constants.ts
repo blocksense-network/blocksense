@@ -24,3 +24,5 @@ export const pagesDataFeedsFolder = path.join(
 
 export const ghContractFolder =
   'https://github.com/blocksense-network/blocksense/blob/main/libs/contracts/';
+
+export const dataFeedUrl = '/docs/data-feeds/feed/';

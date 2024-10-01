@@ -16,7 +16,8 @@ export const CopyButton = ({
 }: CopyButtonProps) => {
   const [isCopied, setIsCopied] = React.useState(false);
 
-  const onCopy = () => {
+  const onCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
     navigator.clipboard.writeText(textToCopy);
     setIsCopied(true);
     setTimeout(() => {

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import Link from 'next/link';
 
-import { ColumnDef, Row } from '@tanstack/react-table';
+import { ColumnDef } from '@tanstack/react-table';
 
-import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
+import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
 
 type DataFeed = {
   id: number;
@@ -37,11 +37,7 @@ export const columns: ColumnDef<DataFeed>[] = [
         sortingType={'number'}
       />
     ),
-    cell: ({ row }) => (
-      <strong>
-        <DataFeedLink row={row} placeholderId="id" />
-      </strong>
-    ),
+    cell: ({ row }) => <DataTableBadge>{row.getValue('id')}</DataTableBadge>,
   },
   {
     accessorKey: 'description',
@@ -53,12 +49,7 @@ export const columns: ColumnDef<DataFeed>[] = [
       />
     ),
     cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium whitespace-nowrap"
-      >
-        <DataFeedLink row={row} placeholderId="description" />
-      </Badge>
+      <DataTableBadge>{row.getValue('description')}</DataTableBadge>
     ),
   },
   {
@@ -90,28 +81,29 @@ export const columns: ColumnDef<DataFeed>[] = [
         sortingType={'string'}
       />
     ),
-    cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium"
-      >
-        <Link href={dataSourcesLinks[row.getValue('script') as string] || ''}>
-          {row.getValue('script')}
-        </Link>
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const dataSourceLink =
+        dataSourcesLinks[row.getValue('script') as string] || '';
+
+      function onLinkClick(e: React.MouseEvent<HTMLAnchorElement>) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (dataSourceLink) {
+          window.open(dataSourceLink);
+        }
+      }
+
+      return (
+        <DataTableBadge>
+          <Link
+            href={dataSourceLink}
+            onClick={onLinkClick}
+            onAuxClick={onLinkClick}
+          >
+            {row.getValue('script')}
+          </Link>
+        </DataTableBadge>
+      );
+    },
   },
 ];
-
-type DataFeedLinkProps = {
-  row: Row<DataFeed>;
-  placeholderId: string;
-};
-
-const DataFeedLink = ({ row, placeholderId }: DataFeedLinkProps) => {
-  return (
-    <Link href={`feed/${row.getValue('id')}`}>
-      {row.getValue(placeholderId)}
-    </Link>
-  );
-};
