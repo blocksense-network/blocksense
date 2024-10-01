@@ -5,7 +5,7 @@ type ImageProps = {
   src: string;
   alt?: string;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
 };
 
 export const ImageWrapper = ({
