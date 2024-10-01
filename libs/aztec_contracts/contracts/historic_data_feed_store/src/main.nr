@@ -92,6 +92,7 @@ contract HistoricDataFeedStore {
                 current_transmission_value[helper_index] = input_values[j];
                 helper_index += 1;
             }
+            // TODO(issue #494): Investigate how storage.at() works under the hood
             storage.historic_data_feeds.at(keys[i]).at(counter as Field).write(
                 Transmission { value: current_transmission_value, timestamp: context.timestamp() as Field }
             );
