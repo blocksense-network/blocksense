@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { getEnvString } from './env';
+import { getEnvString } from './functions';
 
 describe('getEnvString', () => {
   test('returns the value of an existing environment variable', () => {

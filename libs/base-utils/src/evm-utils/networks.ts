@@ -7,7 +7,7 @@
 
 import * as S from '@effect/schema/Schema';
 
-import { getEnvString, getOptionalEnvString } from '../env';
+import { getEnvString, getOptionalEnvString } from '../env/functions';
 import { EthereumAddress, TxHash } from './hex-types';
 import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
 import { NumberFromSelfBigIntOrString } from '../numeric';

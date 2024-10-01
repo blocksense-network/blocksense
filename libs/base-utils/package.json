@@ -43,9 +43,9 @@
       "types": "./dist/types/evm-utils/index.d.ts"
     },
     "./env": {
-      "require": "./dist/cjs/env.cjs",
-      "import": "./dist/esm/env.mjs",
-      "types": "./dist/types/env.d.ts"
+      "require": "./dist/cjs/env/index.cjs",
+      "import": "./dist/esm/env/index.mjs",
+      "types": "./dist/types/env/index.d.ts"
     },
     "./numeric": {
       "require": "./dist/cjs/numeric.cjs",
