@@ -22,7 +22,7 @@ pub async fn feeds_slots_manager_loop<
     spawn(async move {
         let collected_futures = FuturesUnordered::new();
 
-        let reg = app_state.registry.write().await;
+        let reg = app_state.registry.read().await;
 
         let keys = reg.get_keys();
 
