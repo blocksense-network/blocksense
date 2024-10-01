@@ -1,6 +1,6 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { CodeBlock } from '@/components/common/CodeBlock';
+import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
 
 export const DataFeedCardExtraContent: React.FC<{
   type: 'Price Feed Properties' | 'Oracle Script Info' | 'Feed Registry';
@@ -17,9 +17,9 @@ export const DataFeedCardExtraContent: React.FC<{
           </span>
           <div className="data-feed-card-content__value flex space-x-2">
             {dataProviders?.map(provider => (
-              <Badge className="mt-1" key={provider}>
+              <DataTableBadge className="mt-1" key={provider}>
                 {provider}
-              </Badge>
+              </DataTableBadge>
             ))}
           </div>
         </div>

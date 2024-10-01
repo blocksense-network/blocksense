@@ -1,13 +1,11 @@
 import * as React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 
-import { ColumnDef, Row } from '@tanstack/react-table';
+import { ColumnDef } from '@tanstack/react-table';
 
 import { ProxyContractData } from '@/src/deployed-contracts/types';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
-import { Badge } from '@/components/ui/badge';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
+import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
 
 export const proxyColumnsTitles: { [key: string]: string } = {
   description: 'Data Feed Name',
@@ -28,7 +26,9 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         title={proxyColumnsTitles[column.id]}
       />
     ),
-    cell: ({ row }) => <DataFeedLink row={row} placeholderId="description" />,
+    cell: ({ row }) => (
+      <DataTableBadge>{row.getValue('description')}</DataTableBadge>
+    ),
   },
   {
     accessorKey: 'id',
@@ -38,7 +38,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         title={proxyColumnsTitles[column.id]}
       />
     ),
-    cell: ({ row }) => <DataFeedLink row={row} placeholderId="id" />,
+    cell: ({ row }) => <DataTableBadge>{row.getValue('id')}</DataTableBadge>,
   },
   {
     accessorKey: 'address',
@@ -112,28 +112,3 @@ export const columns: ColumnDef<ProxyContractData>[] = [
     accessorKey: 'network',
   },
 ];
-
-type RowWrapper = {
-  row: Row<ProxyContractData>;
-  placeholderId: string;
-};
-
-const DataFeedLink = ({ row, placeholderId }: RowWrapper) => {
-  const feedId = row.original.id;
-  const router = useRouter();
-  const feedPageUrl = `${router.basePath}/docs/data-feeds/feed/${feedId}`;
-
-  const placeholderValue = row.getValue(placeholderId!);
-  return (
-    <Badge
-      variant="outline"
-      className={`justify-center border-solid border-slate-200 ${placeholderValue && 'cursor-pointer'} px-2 m-0 text-primary-600 bold font-medium whitespace-nowrap hover:bg-neutral-50 hover:border-gray-600`}
-    >
-      {placeholderValue ? (
-        <Link href={feedPageUrl}>{row.getValue(placeholderId!)}</Link>
-      ) : (
-        '-'
-      )}
-    </Badge>
-  );
-};

@@ -4,14 +4,13 @@ import Link from 'next/link';
 import { ColumnDef, Row } from '@tanstack/react-table';
 
 import {
-  EthereumAddress,
   getAddressExplorerUrl,
   NetworkName,
 } from '@blocksense/base-utils/evm-utils';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { CoreContract } from '@/src/deployed-contracts/types';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
-import { Badge } from '@/components/ui/badge';
+import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
 
 export const contractsColumnsTitles: { [key: string]: string } = {
   network: 'Network',
@@ -62,13 +61,11 @@ const NetworkAddressExplorerLink = ({ row }: RowWrapper) => {
   return (
     <aside className="space-y-1">
       {row.original.networks.map((network: NetworkName) => (
-        <Badge
-          key={network}
-          variant="outline"
-          className="border-solid border-slate-200 cursor-pointer m-0 text-primary-600 bold font-medium whitespace-nowrap"
-        >
-          <Link href={getAddressExplorerUrl(network, address)}>{network}</Link>
-        </Badge>
+        <DataTableBadge key={network}>
+          <Link href={getAddressExplorerUrl(network, address)} target="_blank">
+            {network}
+          </Link>
+        </DataTableBadge>
       ))}
     </aside>
   );
