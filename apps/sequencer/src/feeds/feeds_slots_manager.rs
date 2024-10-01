@@ -1,5 +1,5 @@
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
-use crate::feeds::feeds_state::FeedsState;
+use crate::sequencer_state::SequencerState;
 use actix_web::rt::spawn;
 use actix_web::web;
 use futures::stream::FuturesUnordered;
@@ -13,14 +13,14 @@ pub async fn feeds_slots_manager_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
     V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
 >(
-    app_state: web::Data<FeedsState>,
+    sequencer_state: web::Data<SequencerState>,
     vote_send: mpsc::UnboundedSender<(K, V)>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
-    let reports_clone = app_state.reports.clone();
+    let reports_clone = sequencer_state.reports.clone();
     spawn(async move {
         let collected_futures = FuturesUnordered::new();
 
-        let reg = app_state.registry.read().await;
+        let reg = sequencer_state.registry.read().await;
 
         let keys = reg.get_keys();
 
@@ -30,7 +30,7 @@ pub async fn feeds_slots_manager_loop<
 
             debug!("key = {} : value = {:?}", key, reg.get(key));
 
-            app_state
+            sequencer_state
                 .feed_aggregate_history
                 .write()
                 .await
@@ -42,9 +42,9 @@ pub async fn feeds_slots_manager_loop<
             };
 
             let name = feed.read().await.get_name().clone();
-            let feed_aggregate_history_cp = app_state.feed_aggregate_history.clone();
-            let reporters_cp = app_state.reporters.clone();
-            let feed_metrics_cp = app_state.feeds_metrics.clone();
+            let feed_aggregate_history_cp = sequencer_state.feed_aggregate_history.clone();
+            let reporters_cp = sequencer_state.reporters.clone();
+            let feed_metrics_cp = sequencer_state.feeds_metrics.clone();
 
             let feed_slots_processor = FeedSlotsProcessor::new(name, key);
 
@@ -156,7 +156,7 @@ mod tests {
             UnboundedSender<(String, String)>,
             UnboundedReceiver<(String, String)>,
         ) = mpsc::unbounded_channel();
-        let app_state = web::Data::new(FeedsState {
+        let sequencer_state = web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
             ))),
@@ -175,7 +175,7 @@ mod tests {
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         });
 
-        let _future = feeds_slots_manager_loop(app_state, vote_send.clone()).await;
+        let _future = feeds_slots_manager_loop(sequencer_state, vote_send.clone()).await;
 
         // Attempt to receive with a timeout of 2 seconds
         let received = tokio::time::timeout(

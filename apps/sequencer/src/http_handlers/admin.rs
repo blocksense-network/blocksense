@@ -1,6 +1,6 @@
-use super::super::feeds::feeds_state::FeedsState;
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::http_handlers::MAX_SIZE;
+use crate::sequencer_state::SequencerState;
 use actix_web::http::header::ContentType;
 use actix_web::{error, Error};
 use actix_web::{get, web, HttpRequest};
@@ -83,7 +83,7 @@ async fn get_key_from_contract(
 #[get("/deploy/{network}/{feed_type}")]
 pub async fn deploy(
     path: web::Path<(String, String)>,
-    app_state: web::Data<FeedsState>,
+    sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let span = info_span!("deploy");
     let _guard = span.enter();
@@ -102,7 +102,7 @@ pub async fn deploy(
             return Err(error::ErrorBadRequest(error_msg));
         }
     };
-    match deploy_contract(&network, &app_state.providers, repeatability).await {
+    match deploy_contract(&network, &sequencer_state.providers, repeatability).await {
         Ok(result) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
@@ -114,7 +114,10 @@ pub async fn deploy(
 }
 
 #[get("/get_key/{network}/{key}")] // network is the name provided in config, key is hex string
-pub async fn get_key(req: HttpRequest, app_state: web::Data<FeedsState>) -> impl Responder {
+pub async fn get_key(
+    req: HttpRequest,
+    sequencer_state: web::Data<SequencerState>,
+) -> impl Responder {
     let span = info_span!("get_key");
     let _guard = span.enter();
     let bad_input = error::ErrorBadRequest("Incorrect input.");
@@ -123,7 +126,7 @@ pub async fn get_key(req: HttpRequest, app_state: web::Data<FeedsState>) -> impl
     info!("getting key {} for network {} ...", key, network);
     let result = actix_web::rt::time::timeout(
         Duration::from_secs(7),
-        get_key_from_contract(&app_state.providers, &network, key),
+        get_key_from_contract(&sequencer_state.providers, &network, key),
     )
     .await;
     match result {
@@ -138,7 +141,7 @@ pub async fn get_key(req: HttpRequest, app_state: web::Data<FeedsState>) -> impl
 #[post("/main_log_level/{log_level}")]
 pub async fn set_log_level(
     req: HttpRequest,
-    app_state: web::Data<FeedsState>,
+    sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     if tokio_console_active("SEQUENCER") {
         return Ok(HttpResponse::NotAcceptable().into());
@@ -152,7 +155,7 @@ pub async fn set_log_level(
         info!("set_log_level called with {}", log_level);
         if let Some(val) = req.connection_info().realip_remote_addr() {
             if val == "127.0.0.1"
-                && app_state
+                && sequencer_state
                     .log_handle
                     .lock()
                     .expect("Could not acquire GLOBAL_LOG_HANDLE's mutex")
@@ -168,7 +171,7 @@ pub async fn set_log_level(
 #[get("/get_feed_report_interval/{feed_id}")]
 pub async fn get_feed_report_interval(
     req: HttpRequest,
-    app_state: web::Data<FeedsState>,
+    sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
@@ -179,7 +182,7 @@ pub async fn get_feed_report_interval(
     };
 
     let feed = {
-        let reg = app_state.registry.read().await;
+        let reg = sequencer_state.registry.read().await;
         debug!("getting feed_id = {}", &feed_id);
         match reg.get(feed_id) {
             Some(x) => x,
@@ -196,8 +199,10 @@ pub async fn get_feed_report_interval(
 }
 
 #[get("/get_feeds_config")]
-pub async fn get_feeds_config(app_state: web::Data<FeedsState>) -> Result<HttpResponse, Error> {
-    let feeds_config = app_state.feeds_config.read().await;
+pub async fn get_feeds_config(
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    let feeds_config = sequencer_state.feeds_config.read().await;
     let feeds_config_pretty = serde_json::to_string_pretty::<AllFeedsConfig>(&feeds_config)?;
 
     return Ok(HttpResponse::Ok()
@@ -208,7 +213,7 @@ pub async fn get_feeds_config(app_state: web::Data<FeedsState>) -> Result<HttpRe
 #[get("/get_feed_config/{feed_id}")]
 pub async fn get_feed_config(
     req: HttpRequest,
-    app_state: web::Data<FeedsState>,
+    sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
@@ -218,7 +223,7 @@ pub async fn get_feed_config(
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
 
-    let feeds_config = app_state.feeds_config.read().await.feeds.clone();
+    let feeds_config = sequencer_state.feeds_config.read().await.feeds.clone();
     let feed_config = feeds_config
         .into_iter()
         .find(|x| x.id == feed_id)
@@ -231,8 +236,10 @@ pub async fn get_feed_config(
 }
 
 #[get("/get_sequencer_config")]
-pub async fn get_sequencer_config(app_state: web::Data<FeedsState>) -> Result<HttpResponse, Error> {
-    let sequencer_config = app_state.sequencer_config.read().await;
+pub async fn get_sequencer_config(
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    let sequencer_config = sequencer_state.sequencer_config.read().await;
     let sequencer_config_pretty =
         serde_json::to_string_pretty::<SequencerConfig>(&sequencer_config)?;
 
@@ -258,7 +265,7 @@ async fn metrics() -> Result<HttpResponse, Error> {
 #[post("/register_asset_feed")]
 pub async fn register_asset_feed(
     mut payload: web::Payload,
-    app_state: web::Data<FeedsState>,
+    sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
@@ -276,7 +283,7 @@ pub async fn register_asset_feed(
     let new_feed_id;
     let new_name;
     {
-        let mut reg = app_state.registry.write().await;
+        let mut reg = sequencer_state.registry.write().await;
 
         let keys = reg.get_keys();
 
@@ -298,26 +305,31 @@ pub async fn register_asset_feed(
         reg.push(new_feed_id, new_feed_metadata);
     }
     {
-        let registered_feed_metadata = app_state.registry.read().await.get(new_feed_id).unwrap();
+        let registered_feed_metadata = sequencer_state
+            .registry
+            .read()
+            .await
+            .get(new_feed_id)
+            .unwrap();
 
         // update feeds slots processor
-        app_state
+        sequencer_state
             .feed_aggregate_history
             .write()
             .await
             .register_feed(new_feed_id, 10_000); //TODO(snikolov): How to avoid borrow?
 
-        let reporters = app_state.reporters.clone();
+        let reporters = sequencer_state.reporters.clone();
 
         let feed_slots_processor = FeedSlotsProcessor::new(new_name, new_feed_id);
 
         actix_web::rt::spawn(async move {
             feed_slots_processor
                 .start_loop(
-                    app_state.voting_send_channel.clone(),
+                    sequencer_state.voting_send_channel.clone(),
                     registered_feed_metadata,
-                    app_state.reports.clone(),
-                    app_state.feed_aggregate_history.clone(),
+                    sequencer_state.reports.clone(),
+                    sequencer_state.feed_aggregate_history.clone(),
                     reporters,
                     None,
                 )
@@ -377,7 +389,7 @@ mod tests {
             UnboundedSender<(String, String)>,
             UnboundedReceiver<(String, String)>,
         ) = mpsc::unbounded_channel();
-        let app_state = web::Data::new(FeedsState {
+        let sequencer_state = web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
             ))),
@@ -398,7 +410,7 @@ mod tests {
 
         let app = test::init_service(
             App::new()
-                .app_data(app_state.clone())
+                .app_data(sequencer_state.clone())
                 .service(get_feed_report_interval),
         )
         .await;
@@ -416,11 +428,11 @@ mod tests {
         assert_eq!(body_str, "300000");
     }
 
-    async fn create_app_state_from_sequencer_config(
+    async fn create_sequencer_state_from_sequencer_config(
         network: &str,
         key_path: &Path,
         anvil_endpoint: &str,
-    ) -> web::Data<FeedsState> {
+    ) -> web::Data<SequencerState> {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
         let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
         let sequencer_config_file = PathBuf::new()
@@ -430,7 +442,7 @@ mod tests {
         let sequencer_config =
             init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
 
-        let metrics_prefix = format!("create_app_state_from_sequencer_config_{network}");
+        let metrics_prefix = format!("create_sequencer_state_from_sequencer_config_{network}");
         let metrics_prefix = Some(metrics_prefix.as_str());
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
@@ -445,7 +457,7 @@ mod tests {
 
         let (_, feeds_config) = get_sequencer_and_feed_configs();
 
-        web::Data::new(FeedsState {
+        web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
             ))),
@@ -473,7 +485,7 @@ mod tests {
         let key_path = get_test_private_key_path();
         let network = "ETH_test_deploy_endpoint_success";
 
-        let app_state = create_app_state_from_sequencer_config(
+        let sequencer_state = create_sequencer_state_from_sequencer_config(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
@@ -481,7 +493,8 @@ mod tests {
         .await;
 
         // Initialize the service
-        let app = test::init_service(App::new().app_data(app_state.clone()).service(deploy)).await;
+        let app =
+            test::init_service(App::new().app_data(sequencer_state.clone()).service(deploy)).await;
 
         fn extract_eth_address(message: &str) -> Option<String> {
             let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -524,7 +537,7 @@ mod tests {
         let key_path = get_test_private_key_path();
         let network = "ETH_test_get_configs";
 
-        let app_state = create_app_state_from_sequencer_config(
+        let sequencer_state = create_sequencer_state_from_sequencer_config(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
@@ -533,7 +546,7 @@ mod tests {
 
         let app = test::init_service(
             App::new()
-                .app_data(app_state.clone())
+                .app_data(sequencer_state.clone())
                 .service(get_feeds_config)
                 .service(get_feed_config)
                 .service(get_sequencer_config),

@@ -4,7 +4,6 @@ use eyre::Result;
 use std::sync::Arc;
 use utils::time::current_unix_time;
 
-use super::super::feeds::feeds_state::FeedsState;
 use actix_web::web;
 use actix_web::{error, Error};
 use actix_web::{post, HttpResponse};
@@ -17,6 +16,7 @@ use uuid::Uuid;
 
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::http_handlers::MAX_SIZE;
+use crate::sequencer_state::SequencerState;
 use crypto::verify_signature;
 use crypto::Signature;
 use feed_registry::registry::FeedAggregateHistory;
@@ -55,7 +55,7 @@ pub fn check_signature(
 #[post("/post_report")]
 pub async fn post_report(
     mut payload: web::Payload,
-    app_state: web::Data<FeedsState>,
+    sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
@@ -80,7 +80,7 @@ pub async fn post_report(
 
     let feed_id: u32;
     let reporter = {
-        let reporters = app_state.reporters.read().await;
+        let reporters = sequencer_state.reporters.read().await;
         let reporter = reporters.get_key_value(&reporter_id);
         match reporter {
             Some(x) => {
@@ -143,7 +143,7 @@ pub async fn post_report(
         reporter_id
     );
     let feed = {
-        let reg = app_state.registry.read().await;
+        let reg = sequencer_state.registry.read().await;
         debug!("getting feed_id = {}", &feed_id);
         match reg.get(feed_id) {
             Some(x) => x,
@@ -166,7 +166,7 @@ pub async fn post_report(
 
     match report_relevance {
         ReportRelevance::Relevant => {
-            let mut reports = app_state.reports.write().await;
+            let mut reports = sequencer_state.reports.write().await;
             if reports.push(feed_id, reporter_id, result).await {
                 debug!(
                     "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
@@ -239,7 +239,7 @@ struct RegisterFeedResponse {
 #[post("/feed/register")]
 pub async fn register_feed(
     register_request: web::Json<RegisterFeedRequest>,
-    app_state: web::Data<FeedsState>,
+    sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     // STEP 1 - Read request
     let name = register_request.name.clone();
@@ -301,7 +301,7 @@ pub async fn register_feed(
     let voting_end_timestamp = Utc.timestamp_millis_opt(voting_end_time_ms as i64).unwrap();
 
     let feed_id = {
-        let mut allocator = app_state.feed_id_allocator.write().await;
+        let mut allocator = sequencer_state.feed_id_allocator.write().await;
         let feed_id_option = allocator.as_mut().unwrap().allocate(
             num_slots,
             schema_id,
@@ -312,27 +312,27 @@ pub async fn register_feed(
     };
 
     // Check FeedMetaDataRegistry does not already have element with feed_id. Should never happen
-    app_state
+    sequencer_state
         .registry
         .write()
         .await
         .push(feed_id, new_feed_metadata);
-    let registered_feed_metadata = app_state.registry.read().await.get(feed_id).unwrap();
+    let registered_feed_metadata = sequencer_state.registry.read().await.get(feed_id).unwrap();
 
     // update feeds slots processor
     let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
         Arc::new(RwLock::new(FeedAggregateHistory::new()));
 
-    let reporters = app_state.reporters.clone();
+    let reporters = sequencer_state.reporters.clone();
 
     let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
 
     actix_web::rt::spawn(async move {
         feed_slots_processor
             .start_loop(
-                app_state.voting_send_channel.clone(),
+                sequencer_state.voting_send_channel.clone(),
                 registered_feed_metadata,
-                app_state.reports.clone(),
+                sequencer_state.reports.clone(),
                 feed_aggregate_history,
                 reporters,
                 None,
@@ -400,7 +400,7 @@ mod tests {
             UnboundedSender<(String, String)>,
             UnboundedReceiver<(String, String)>,
         ) = mpsc::unbounded_channel();
-        let app_state = web::Data::new(FeedsState {
+        let sequencer_state = web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
             ))),
@@ -419,8 +419,12 @@ mod tests {
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         });
 
-        let app =
-            test::init_service(App::new().app_data(app_state.clone()).service(post_report)).await;
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(post_report),
+        )
+        .await;
 
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -464,14 +468,17 @@ mod tests {
         assert_eq!(resp.status(), 401);
     }
 
-    async fn create_app_state_from_sequencer_config(
+    async fn create_sequencer_state_from_sequencer_config(
         network: &str,
         key_path: &Path,
         anvil_endpoint: &str,
-    ) -> (UnboundedReceiver<(String, String)>, web::Data<FeedsState>) {
+    ) -> (
+        UnboundedReceiver<(String, String)>,
+        web::Data<SequencerState>,
+    ) {
         let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
 
-        let metrics_prefix = Some("create_app_state_from_sequencer_config");
+        let metrics_prefix = Some("create_sequencer_state_from_sequencer_config");
 
         let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
 
@@ -487,7 +494,7 @@ mod tests {
 
         (
             vote_recv,
-            web::Data::new(FeedsState {
+            web::Data::new(SequencerState {
                 registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                     &feeds_config,
                 ))),
@@ -528,16 +535,17 @@ mod tests {
         );
 
         // Create app state
-        let (voting_receive_channel, app_state) = create_app_state_from_sequencer_config(
-            network,
-            key_path.as_path(),
-            anvil.endpoint().as_str(),
-        )
-        .await;
+        let (voting_receive_channel, sequencer_state) =
+            create_sequencer_state_from_sequencer_config(
+                network,
+                key_path.as_path(),
+                anvil.endpoint().as_str(),
+            )
+            .await;
 
         // Prepare the workers outside of the spawned task
         let collected_futures =
-            prepare_app_workers(app_state.clone(), &cfg, voting_receive_channel).await;
+            prepare_app_workers(sequencer_state.clone(), &cfg, voting_receive_channel).await;
 
         // Start the async block in a separate task
         let _handle = tokio::spawn(async move {
@@ -560,7 +568,7 @@ mod tests {
         // Initialize the service
         let app = test::init_service(
             App::new()
-                .app_data(app_state.clone())
+                .app_data(sequencer_state.clone())
                 .service(register_feed)
                 .service(deploy)
                 .service(post_report),
@@ -592,7 +600,7 @@ mod tests {
 
             // Assert we can read bytecode from that address
             let extracted_address = Address::from_str(&contract_address).ok().unwrap();
-            let provider = app_state
+            let provider = sequencer_state
                 .providers
                 .read()
                 .await
