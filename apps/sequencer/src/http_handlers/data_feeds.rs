@@ -16,6 +16,7 @@ use tracing::{debug, info, trace, warn};
 use uuid::Uuid;
 
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
+use crate::http_handlers::MAX_SIZE;
 use crypto::verify_signature;
 use crypto::Signature;
 use feed_registry::registry::FeedAggregateHistory;
@@ -25,8 +26,6 @@ use prometheus::{inc_metric, inc_vec_metric};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::RwLock;
 use tokio::time::Duration;
-
-const MAX_SIZE: usize = 262_144; // max payload size is 256k
 
 pub fn check_signature(
     signature: &Signature,
@@ -417,6 +416,7 @@ mod tests {
             )),
             feeds_config: Arc::new(RwLock::new(feeds_config)),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         });
 
         let app =
@@ -505,6 +505,7 @@ mod tests {
                 )),
                 feeds_config: Arc::new(RwLock::new(feeds_config)),
                 sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+                feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             }),
         )
     }

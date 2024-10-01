@@ -1,8 +1,6 @@
-use config::{AllFeedsConfig, FeedConfig, SequencerConfig};
-use eyre::Result;
-use utils::logging::tokio_console_active;
-
 use super::super::feeds::feeds_state::FeedsState;
+use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
+use crate::http_handlers::MAX_SIZE;
 use actix_web::http::header::ContentType;
 use actix_web::{error, Error};
 use actix_web::{get, web, HttpRequest};
@@ -11,11 +9,15 @@ use alloy::{
     hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
     rpc::types::eth::TransactionRequest,
 };
+use config::{AllFeedsConfig, FeedConfig, SequencerConfig};
 use eyre::eyre;
+use eyre::Result;
+use futures::StreamExt;
+use utils::logging::tokio_console_active;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
-use feed_registry::types::FeedType;
 use feed_registry::types::Repeatability;
+use feed_registry::types::{FeedMetaData, FeedType};
 use prometheus::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
 use tracing::info_span;
@@ -253,6 +255,81 @@ async fn metrics() -> Result<HttpResponse, Error> {
         .body(output));
 }
 
+#[post("/register_asset_feed")]
+pub async fn register_asset_feed(
+    mut payload: web::Payload,
+    app_state: web::Data<FeedsState>,
+) -> Result<HttpResponse, Error> {
+    let mut body = web::BytesMut::new();
+    while let Some(chunk) = payload.next().await {
+        let chunk = chunk?;
+        // limit max size of in-memory payload
+        if (body.len() + chunk.len()) > MAX_SIZE {
+            return Err(error::ErrorBadRequest("overflow"));
+        }
+        body.extend_from_slice(&chunk);
+    }
+
+    debug!("body = {:?}!", body);
+
+    let new_feed_config: FeedConfig = serde_json::from_str(std::str::from_utf8(&body)?)?;
+    let new_feed_id;
+    let new_name;
+    {
+        let mut reg = app_state.registry.write().await;
+
+        let keys = reg.get_keys();
+
+        new_feed_id = new_feed_config.id;
+        new_name = new_feed_config.name.clone();
+
+        if keys.contains(&new_feed_id) {
+            return Err(error::ErrorBadRequest(format!(
+                "Can not register this data feed. Feed with ID {new_feed_id} already exists."
+            )));
+        }
+
+        let new_feed_metadata = FeedMetaData::new(
+            &new_name,
+            new_feed_config.report_interval_ms as u64,
+            new_feed_config.quorum_percentage,
+            new_feed_config.first_report_start_time,
+        );
+        reg.push(new_feed_id, new_feed_metadata);
+    }
+    {
+        let registered_feed_metadata = app_state.registry.read().await.get(new_feed_id).unwrap();
+
+        // update feeds slots processor
+        app_state
+            .feed_aggregate_history
+            .write()
+            .await
+            .register_feed(new_feed_id, 10_000); //TODO(snikolov): How to avoid borrow?
+
+        let reporters = app_state.reporters.clone();
+
+        let feed_slots_processor = FeedSlotsProcessor::new(new_name, new_feed_id);
+
+        actix_web::rt::spawn(async move {
+            feed_slots_processor
+                .start_loop(
+                    app_state.voting_send_channel.clone(),
+                    registered_feed_metadata,
+                    app_state.reports.clone(),
+                    app_state.feed_aggregate_history.clone(),
+                    reporters,
+                    None,
+                )
+                .await
+        });
+    }
+
+    info!("Registered new asset data feed: {:?}", new_feed_config);
+
+    Ok(HttpResponse::Ok().into())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -263,7 +340,9 @@ mod tests {
     use alloy::node_bindings::Anvil;
     use config::{get_sequencer_and_feed_configs, init_config};
     use config::{get_test_config_with_single_provider, AllFeedsConfig, SequencerConfig};
-    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
+    use feed_registry::registry::{
+        new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
+    };
     use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use std::env;
@@ -314,6 +393,7 @@ mod tests {
             )),
             feeds_config: Arc::new(RwLock::new(feeds_config)),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         });
 
         let app = test::init_service(
@@ -381,6 +461,7 @@ mod tests {
             )),
             feeds_config: Arc::new(RwLock::new(feeds_config)),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         })
     }
 

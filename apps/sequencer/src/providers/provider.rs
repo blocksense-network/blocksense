@@ -214,7 +214,6 @@ async fn get_rpc_providers(
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
 
     use super::*;
     use alloy::{
