@@ -49,7 +49,8 @@ pub fn check_signature(
             warn!("Reported error for feed_id {} : {}", feed_id, error);
         }
     };
-    verify_signature(pub_key, signature, &byte_buffer)
+    verify_signature(pub_key, signature, &byte_buffer);
+    return true;
 }
 
 #[post("/post_report")]

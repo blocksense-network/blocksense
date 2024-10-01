@@ -1,0 +1,183 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "HistoricConsumer",
+  "sourceName": "contracts/test/consumers/historic/HistoricConsumer.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "GetFeedByIdFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "name": "counters",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "dataFeedStore",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "key",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "counter",
+          "type": "uint32"
+        }
+      ],
+      "name": "getFeedAtCounter",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes24",
+              "name": "value",
+              "type": "bytes24"
+            },
+            {
+              "internalType": "uint64",
+              "name": "timestamp",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct IHistoricDataFeed.Transmission",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "key",
+          "type": "uint32"
+        }
+      ],
+      "name": "getFeedById",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes24",
+              "name": "value",
+              "type": "bytes24"
+            },
+            {
+              "internalType": "uint64",
+              "name": "timestamp",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct IHistoricDataFeed.Transmission",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "name": "latestDataFeeds",
+      "outputs": [
+        {
+          "internalType": "bytes24",
+          "name": "value",
+          "type": "bytes24"
+        },
+        {
+          "internalType": "uint64",
+          "name": "timestamp",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32[]",
+          "name": "keys",
+          "type": "uint32[]"
+        },
+        {
+          "internalType": "uint32[]",
+          "name": "counters_",
+          "type": "uint32[]"
+        }
+      ],
+      "name": "setMultipleFeedsAtCounter",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32[]",
+          "name": "keys",
+          "type": "uint32[]"
+        }
+      ],
+      "name": "setMultipleFetchedFeedsById",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32[]",
+          "name": "keys",
+          "type": "uint32[]"
+        }
+      ],
+      "name": "setMultipleLatestFeedsById",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

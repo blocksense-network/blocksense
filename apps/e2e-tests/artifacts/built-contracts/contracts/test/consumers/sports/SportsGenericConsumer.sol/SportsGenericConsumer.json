@@ -1,0 +1,17 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "SportsGenericConsumer",
+  "sourceName": "contracts/test/consumers/sports/SportsGenericConsumer.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "DataDecoded",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

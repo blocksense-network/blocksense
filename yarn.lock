@@ -564,6 +564,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/e2e-tests@workspace:apps/e2e-tests":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/e2e-tests@workspace:apps/e2e-tests"
+  dependencies:
+    "@blocksense/base-utils": "workspace:*"
+    "@blocksense/config-types": "workspace:*"
+    "@effect/data": "npm:^0.18.7"
+    "@effect/schema": "npm:^0.71.1"
+    "@types/node": "npm:^22.3.0"
+    effect: "npm:^3.7.0"
+    tsx: "npm:^4.17.0"
+    typescript: "npm:^5.5.4"
+    vitest: "npm:^2.0.4"
+    web3: "npm:^4.12.1"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/explorer.blocksense.network@workspace:apps/explorer.blocksense.network":
   version: 0.0.0-use.local
   resolution: "@blocksense/explorer.blocksense.network@workspace:apps/explorer.blocksense.network"

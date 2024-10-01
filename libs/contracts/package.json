@@ -19,7 +19,7 @@
     }
   },
   "scripts": {
-    "build:deps": "yarn workspace @blocksense/base-utils build && yarn workspace @blocksense/sol-reflector build",
+    "build:deps": "yarn workspace @blocksense/base-utils build && yarn workspace @blocksense/sol-reflector build && yarn workspace @blocksense/config-types build",
     "clean": "git clean -fdx -e .env",
     "build": "hardhat compile",
     "sol-reflect": "yarn build:deps && yarn hardhat reflect",
