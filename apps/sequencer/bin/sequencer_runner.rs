@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
 use actix_web::{web, App, HttpServer};
-use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
+use feed_registry::registry::{
+    new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
+};
 use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use tokio::sync::{mpsc, RwLock};
@@ -10,7 +12,7 @@ use sequencer::reporters::reporter::init_shared_reporters;
 
 use sequencer::http_handlers::admin::{
     deploy, get_feed_config, get_feed_report_interval, get_feeds_config, get_key,
-    get_sequencer_config, set_log_level,
+    get_sequencer_config, register_asset_feed, set_log_level,
 };
 use sequencer::http_handlers::data_feeds::{post_report, register_feed};
 use utils::logging::{
@@ -72,6 +74,7 @@ pub async fn prepare_app_state(
         )),
         feeds_config: Arc::new(RwLock::new(feeds_config)),
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+        feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
     });
 
     (vote_recv, app_state)
@@ -111,6 +114,7 @@ pub async fn prepare_http_servers(
                 .service(get_feeds_config)
                 .service(get_feed_config)
                 .service(get_sequencer_config)
+                .service(register_asset_feed)
         })
         .workers(1)
         .bind(("0.0.0.0", admin_port))

@@ -3,8 +3,7 @@ use crate::providers::provider::SharedRpcProviders;
 use crate::reporters::reporter::SharedReporters;
 use config::AllFeedsConfig;
 use config::SequencerConfig;
-use feed_registry::registry::AllFeedsReports;
-use feed_registry::registry::FeedMetaDataRegistry;
+use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
 use prometheus::metrics::FeedsMetrics;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
@@ -21,5 +20,6 @@ pub struct FeedsState {
     pub feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     pub feeds_config: Arc<RwLock<AllFeedsConfig>>,
     pub sequencer_config: Arc<RwLock<SequencerConfig>>,
+    pub feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }

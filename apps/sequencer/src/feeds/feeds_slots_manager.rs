@@ -2,12 +2,10 @@ use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::feeds::feeds_state::FeedsState;
 use actix_web::rt::spawn;
 use actix_web::web;
-use feed_registry::registry::FeedAggregateHistory;
 use futures::stream::FuturesUnordered;
 use std::fmt::Debug;
 use std::io::Error;
-use std::sync::Arc;
-use tokio::sync::{mpsc, RwLock};
+use tokio::sync::mpsc;
 use tracing::debug;
 use tracing::error;
 
@@ -26,16 +24,14 @@ pub async fn feeds_slots_manager_loop<
 
         let keys = reg.get_keys();
 
-        let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
-            Arc::new(RwLock::new(FeedAggregateHistory::new()));
-
         for key in keys {
             let send_channel: mpsc::UnboundedSender<(K, V)> = vote_send.clone();
             let rc = reports_clone.clone();
 
             debug!("key = {} : value = {:?}", key, reg.get(key));
 
-            feed_aggregate_history
+            app_state
+                .feed_aggregate_history
                 .write()
                 .await
                 .register_feed(key, 10_000); //TODO(snikolov): How to avoid borrow?
@@ -46,7 +42,7 @@ pub async fn feeds_slots_manager_loop<
             };
 
             let name = feed.read().await.get_name().clone();
-            let feed_aggregate_history_cp = feed_aggregate_history.clone();
+            let feed_aggregate_history_cp = app_state.feed_aggregate_history.clone();
             let reporters_cp = app_state.reporters.clone();
             let feed_metrics_cp = app_state.feeds_metrics.clone();
 
@@ -100,6 +96,7 @@ mod tests {
     use config::init_config;
     use config::SequencerConfig;
     use data_feeds::feeds_processing::naive_packing;
+    use feed_registry::registry::FeedAggregateHistory;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{FeedResult, FeedType};
     use prometheus::metrics::FeedsMetrics;
@@ -175,6 +172,7 @@ mod tests {
             )),
             feeds_config: Arc::new(RwLock::new(feeds_config)),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         });
 
         let _future = feeds_slots_manager_loop(app_state, vote_send.clone()).await;
