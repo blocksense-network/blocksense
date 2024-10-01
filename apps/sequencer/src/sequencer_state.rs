@@ -9,7 +9,7 @@ use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
 use utils::logging::SharedLoggingHandle;
 
-pub struct FeedsState {
+pub struct SequencerState {
     pub registry: Arc<RwLock<FeedMetaDataRegistry>>,
     pub reports: Arc<RwLock<AllFeedsReports>>,
     pub providers: SharedRpcProviders,

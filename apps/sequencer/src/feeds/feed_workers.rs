@@ -1,8 +1,8 @@
 use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
-use crate::feeds::feeds_state::FeedsState;
 use crate::feeds::votes_result_batcher::votes_result_batcher_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
+use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use config::SequencerConfig;
 use futures_util::stream::FuturesUnordered;
@@ -22,17 +22,20 @@ type BatchedVotesChannel = (
 /// - Votes result sender loop
 /// - Metrics collector loop
 pub async fn prepare_app_workers(
-    app_state: Data<FeedsState>,
+    sequencer_state: Data<SequencerState>,
     sequencer_config: &SequencerConfig,
     voting_receive_channel: UnboundedReceiver<(String, String)>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv): BatchedVotesChannel = mpsc::unbounded_channel();
 
-    let feeds_slots_manager_loop_fut =
-        feeds_slots_manager_loop(app_state.clone(), app_state.voting_send_channel.clone()).await;
+    let feeds_slots_manager_loop_fut = feeds_slots_manager_loop(
+        sequencer_state.clone(),
+        sequencer_state.voting_send_channel.clone(),
+    )
+    .await;
 
     let votes_batcher = votes_result_batcher_loop(
-        // app_state.voting_recv_channel.clone(),
+        // sequencer_state.voting_recv_channel.clone(),
         voting_receive_channel,
         batched_votes_send,
         sequencer_config.max_keys_to_batch,
@@ -41,7 +44,7 @@ pub async fn prepare_app_workers(
     .await;
 
     let votes_sender =
-        votes_result_sender_loop(batched_votes_recv, app_state.providers.clone()).await;
+        votes_result_sender_loop(batched_votes_recv, sequencer_state.providers.clone()).await;
 
     let metrics_collector = metrics_collector_loop().await;
 

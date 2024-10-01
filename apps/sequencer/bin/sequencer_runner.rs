@@ -4,8 +4,8 @@ use actix_web::{web, App, HttpServer};
 use feed_registry::registry::{
     new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
 };
-use sequencer::feeds::feeds_state::FeedsState;
 use sequencer::providers::provider::init_shared_rpc_providers;
+use sequencer::sequencer_state::SequencerState;
 use tokio::sync::{mpsc, RwLock};
 
 use sequencer::reporters::reporter::init_shared_reporters;
@@ -42,11 +42,11 @@ type VoteChannel = (
 );
 
 /// Given a Sequencer config is returns the app state need to start the Actix Sequencer server.
-pub async fn prepare_app_state(
+pub async fn prepare_sequencer_state(
     sequencer_config: &SequencerConfig,
     feeds_config: AllFeedsConfig,
     metrics_prefix: Option<&str>,
-) -> (UnboundedReceiver<(String, String)>, Data<FeedsState>) {
+) -> (UnboundedReceiver<(String, String)>, Data<SequencerState>) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();
 
     tokio::spawn(async move {
@@ -58,7 +58,7 @@ pub async fn prepare_app_state(
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (vote_send, vote_recv): VoteChannel = mpsc::unbounded_channel();
 
-    let app_state: Data<FeedsState> = web::Data::new(FeedsState {
+    let sequencer_state: Data<SequencerState> = web::Data::new(SequencerState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
             &feeds_config,
         ))),
@@ -77,22 +77,22 @@ pub async fn prepare_app_state(
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
     });
 
-    (vote_recv, app_state)
+    (vote_recv, sequencer_state)
 }
 
 pub async fn prepare_http_servers(
-    app_state: Data<FeedsState>,
+    sequencer_state: Data<SequencerState>,
     sequencer_config_main_port: u16,
     admin_port: u16,
 ) -> (
     JoinHandle<std::io::Result<()>>,
     JoinHandle<std::io::Result<()>>,
 ) {
-    let main_app_state: Data<FeedsState> = app_state.clone();
+    let main_sequencer_state: Data<SequencerState> = sequencer_state.clone();
     let main_http_server_fut: JoinHandle<std::io::Result<()>> = spawn(async move {
         HttpServer::new(move || {
             App::new()
-                .app_data(main_app_state.clone())
+                .app_data(main_sequencer_state.clone())
                 .service(post_report)
         })
         .bind(("0.0.0.0", sequencer_config_main_port))
@@ -101,11 +101,11 @@ pub async fn prepare_http_servers(
         .await
     });
 
-    let admin_app_state: Data<FeedsState> = app_state.clone();
+    let admin_sequencer_state: Data<SequencerState> = sequencer_state.clone();
     let admin_http_server_fut: JoinHandle<std::io::Result<()>> = spawn(async move {
         HttpServer::new(move || {
             App::new()
-                .app_data(admin_app_state.clone())
+                .app_data(admin_sequencer_state.clone())
                 .service(get_key)
                 .service(deploy)
                 .service(set_log_level)
@@ -192,16 +192,20 @@ async fn main() -> std::io::Result<()> {
 
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
-    let (voting_receive_channel, app_state): (
+    let (voting_receive_channel, sequencer_state): (
         UnboundedReceiver<(String, String)>,
-        Data<FeedsState>,
-    ) = prepare_app_state(&sequencer_config, feeds_config, None).await;
+        Data<SequencerState>,
+    ) = prepare_sequencer_state(&sequencer_config, feeds_config, None).await;
 
-    let collected_futures =
-        prepare_app_workers(app_state.clone(), &sequencer_config, voting_receive_channel).await;
+    let collected_futures = prepare_app_workers(
+        sequencer_state.clone(),
+        &sequencer_config,
+        voting_receive_channel,
+    )
+    .await;
 
     let (main_http_server_fut, admin_http_server_fut) = prepare_http_servers(
-        app_state,
+        sequencer_state,
         sequencer_config.main_port,
         sequencer_config.admin_port,
     )

@@ -11,13 +11,13 @@ use crate::{
 };
 
 pub async fn run_actix_server() -> std::io::Result<()> {
-    let app_state = web::Data::new(AppState {
+    let sequencer_state = web::Data::new(AppState {
         buffer: Mutex::new(String::new()),
     });
 
     HttpServer::new(move || {
         App::new()
-            .app_data(app_state.clone())
+            .app_data(sequencer_state.clone())
             .service(push_to_buffer)
             .service(pull_buffer)
     })
