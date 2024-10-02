@@ -41,6 +41,18 @@ export const columns: ColumnDef<ProxyContractData>[] = [
     cell: ({ row }) => <DataTableBadge>{row.getValue('id')}</DataTableBadge>,
   },
   {
+    accessorKey: 'network',
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title={proxyColumnsTitles[column.id]}
+      />
+    ),
+    cell: ({ row }) => (
+      <DataTableBadge>{row.getValue('network')}</DataTableBadge>
+    ),
+  },
+  {
     accessorKey: 'address',
     header: ({ column }) => (
       <DataTableColumnHeader
@@ -107,8 +119,5 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         hasAbbreviation
       />
     ),
-  },
-  {
-    accessorKey: 'network',
   },
 ];

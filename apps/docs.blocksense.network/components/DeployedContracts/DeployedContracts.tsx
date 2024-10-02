@@ -99,7 +99,6 @@ export const DeployedContracts = ({
             data={deployedProxyContracts}
             columnsTitles={proxyColumnsTitles}
             filters={filters}
-            invisibleColumns={['network']}
             filterCell="description"
             rowLink={dataFeedUrl}
           />
