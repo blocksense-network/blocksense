@@ -6,6 +6,7 @@ import { ProxyContractData } from '@/src/deployed-contracts/types';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
+import { NetworkAddressExplorerLink } from '@/components/DeployedContracts/NetworkAddressExplorerLink';
 
 export const proxyColumnsTitles: { [key: string]: string } = {
   description: 'Data Feed Name',
@@ -49,7 +50,10 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       />
     ),
     cell: ({ row }) => (
-      <DataTableBadge>{row.getValue('network')}</DataTableBadge>
+      <NetworkAddressExplorerLink
+        address={row.original.address}
+        networks={[row.original.network]}
+      />
     ),
   },
   {
