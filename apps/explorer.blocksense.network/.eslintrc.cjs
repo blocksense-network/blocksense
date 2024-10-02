@@ -7,8 +7,8 @@ const config = {
   plugins: ["@typescript-eslint"],
   extends: [
     "next/core-web-vitals",
-    "plugin:@typescript-eslint/recommended-type-checked",
-    "plugin:@typescript-eslint/stylistic-type-checked",
+    "plugin:@typescript-eslint/recommended", // Updated to use the standard recommended config
+    "plugin:@typescript-eslint/recommended-requiring-type-checking", // Added type-checking recommended configuration
   ],
   rules: {
     "@typescript-eslint/array-type": "off",
