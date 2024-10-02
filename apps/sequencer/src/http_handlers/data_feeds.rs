@@ -1,3 +1,4 @@
+use actix_web::http::StatusCode;
 use chrono::{TimeZone, Utc};
 use crypto::PublicKey;
 use eyre::Result;
@@ -11,7 +12,7 @@ use feed_registry::types::ReportRelevance;
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
-use tracing::{debug, info, trace, warn};
+use tracing::{debug, info, info_span, trace, warn};
 use uuid::Uuid;
 
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
@@ -52,28 +53,10 @@ pub fn check_signature(
     verify_signature(pub_key, signature, &byte_buffer)
 }
 
-#[post("/post_report")]
-pub async fn post_report(
-    mut payload: web::Payload,
-    sequencer_state: web::Data<SequencerState>,
-) -> Result<HttpResponse, Error> {
-    let mut body = web::BytesMut::new();
-    while let Some(chunk) = payload.next().await {
-        let chunk = chunk?;
-        // limit max size of in-memory payload
-        if (body.len() + chunk.len()) > MAX_SIZE {
-            return Err(error::ErrorBadRequest("overflow"));
-        }
-        body.extend_from_slice(&chunk);
-    }
-
-    // body is loaded, now we can deserialize serde-json
-    // let obj = serde_json::from_slice::<MyObj>(&body)?;
-    debug!("body = {:?}!", body);
-
-    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
-    let data_feed: DataFeedPayload = serde_json::from_value(v)?;
-
+async fn process_report(
+    sequencer_state: &web::Data<SequencerState>,
+    data_feed: DataFeedPayload,
+) -> HttpResponse {
     let reporter_id = data_feed.payload_metadata.reporter_id;
     let signature = data_feed.payload_metadata.signature;
     let msg_timestamp = data_feed.payload_metadata.timestamp;
@@ -91,7 +74,7 @@ pub async fn post_report(
                     Err(e) => {
                         inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
                         debug!("Error parsing input's feed_id: {}", e);
-                        return Ok(HttpResponse::BadRequest().into());
+                        return HttpResponse::BadRequest().into();
                     }
                 };
                 {
@@ -109,7 +92,7 @@ pub async fn post_report(
                             feed_id, reporter_id
                         );
                         inc_metric!(reporter_metrics, reporter_id, non_valid_signature);
-                        return Ok(HttpResponse::Unauthorized().into());
+                        return HttpResponse::Unauthorized().into();
                     }
                 }
                 reporter.clone()
@@ -119,7 +102,7 @@ pub async fn post_report(
                     "Recvd vote from reporter with unregistered ID = {}!",
                     reporter_id
                 );
-                return Ok(HttpResponse::Unauthorized().into());
+                return HttpResponse::Unauthorized().into();
             }
         }
     };
@@ -150,7 +133,7 @@ pub async fn post_report(
             None => {
                 drop(reg);
                 inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
-                return Ok(HttpResponse::BadRequest().into());
+                return HttpResponse::BadRequest().into();
             }
         }
     };
@@ -190,7 +173,7 @@ pub async fn post_report(
                     feed_id
                 );
             }
-            return Ok(HttpResponse::Ok().into()); // <- send response
+            return HttpResponse::Ok().into(); // <- send response
         }
         ReportRelevance::NonRelevantOld => {
             debug!(
@@ -217,7 +200,72 @@ pub async fn post_report(
             );
         }
     }
-    Ok(HttpResponse::BadRequest().into())
+    HttpResponse::BadRequest().into()
+}
+
+#[post("/post_report")]
+pub async fn post_report(
+    mut payload: web::Payload,
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    let mut body = web::BytesMut::new();
+    while let Some(chunk) = payload.next().await {
+        let chunk = chunk?;
+        // limit max size of in-memory payload
+        if (body.len() + chunk.len()) > MAX_SIZE {
+            return Err(error::ErrorBadRequest("overflow"));
+        }
+        body.extend_from_slice(&chunk);
+    }
+
+    // body is loaded, now we can deserialize serde-json
+    // let obj = serde_json::from_slice::<MyObj>(&body)?;
+    debug!("body = {:?}!", body);
+
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
+    let data_feed: DataFeedPayload = serde_json::from_value(v)?;
+
+    Ok(process_report(&sequencer_state, data_feed).await)
+}
+
+#[post("/post_reports_batch")]
+pub async fn post_reports_batch(
+    mut payload: web::Payload,
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    let span = info_span!("post_reports_batch");
+    let _guard: tracing::span::Entered<'_> = span.enter();
+    let mut body = web::BytesMut::new();
+    while let Some(chunk) = payload.next().await {
+        let chunk = chunk?;
+        // limit max size of in-memory payload
+        if (body.len() + chunk.len()) > MAX_SIZE {
+            return Err(error::ErrorBadRequest("overflow"));
+        }
+        body.extend_from_slice(&chunk);
+    }
+
+    // body is loaded, now we can deserialize serde-json
+    // let obj = serde_json::from_slice::<MyObj>(&body)?;
+    debug!("body = {body:?}!");
+
+    let mut errors_in_batch = Vec::new();
+
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
+    let data_feeds: Vec<DataFeedPayload> = serde_json::from_value(v)?;
+
+    for data_feed in data_feeds {
+        let res = process_report(&sequencer_state, data_feed).await;
+        if res.status() != StatusCode::OK || res.error().is_some() {
+            errors_in_batch.push(format!("{res:?}"));
+        }
+    }
+
+    if errors_in_batch.is_empty() {
+        Ok(HttpResponse::Ok().into())
+    } else {
+        Ok(HttpResponse::BadRequest().body(format!("{errors_in_batch:?}")))
+    }
 }
 
 #[derive(Serialize, Deserialize)]
