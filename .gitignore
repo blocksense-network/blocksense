@@ -164,3 +164,7 @@ process-compose.yml
 
 # Data files like chainlink feeds, cmc assets, etc.
 apps/data-feeds-config-generator/artifacts
+
+config/private/CMC_API_KEY
+config/private/YH_FINANCE_API_KEY
+

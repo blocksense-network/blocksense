@@ -1,0 +1,76 @@
+name: blocksense-hackaton
+services:
+  anvil-a:
+    image: ghcr.io/foundry-rs/foundry:nightly-0688b5ad19a637303c038d1a66aec62a73713e20
+    entrypoint: ['sh', '-c', 'anvil -p 8545 --host 0.0.0.0']
+    ports:
+      - '8545:8545'
+    networks:
+      - backend
+    healthcheck:
+      test: wget http://0.0.0.0:8545 2>&1 | grep -c 'Bad Request' > /dev/null
+      interval: 5s
+      timeout: 5s
+      retries: 1
+
+  anvil-b:
+    image: ghcr.io/foundry-rs/foundry:nightly-0688b5ad19a637303c038d1a66aec62a73713e20
+    entrypoint: ['sh', '-c', 'anvil -p 8546 --host 0.0.0.0']
+    ports:
+      - '8546:8546'
+    networks:
+      - backend
+    healthcheck:
+      test: wget http://0.0.0.0:8546 2>&1 | grep -c 'Bad Request' > /dev/null
+      interval: 5s
+      timeout: 5s
+      retries: 1
+
+  sequencer:
+    image: blocksense
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8877:8877'
+      - '5555:5555'
+      - '5556:5556'
+    networks:
+      - backend
+    healthcheck:
+      test:
+        [
+          CMD-SHELL,
+          'wget http://0.0.0.0:8877 2>&1 | grep -c "ERROR 404: Not Found" > /dev/null',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 1
+    depends_on:
+      anvil-a:
+        condition: service_healthy
+      anvil-b:
+        condition: service_healthy
+
+  reporter-a:
+    image: blocksense
+    entrypoint: ['/bin/sh', '-c', 'RUST_LOG=debug launch_reporter']
+    networks:
+      - backend
+    volumes:
+      - ./config/private/CMC_API_KEY:/usr/local/blocksense/apps/reporter/CMC_API_KEY
+      - ./config/private/YH_FINANCE_API_KEY:/usr/local/blocksense/apps/reporter/YH_FINANCE_API_KEY
+    depends_on:
+      sequencer:
+        condition: service_healthy
+
+  hello-world:
+    image: crccheck/hello-world
+    ports:
+      - '8000:8000'
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
