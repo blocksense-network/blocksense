@@ -75,6 +75,12 @@ in
         description = "The path to the reporter secret key.";
       };
 
+      YH_FINANCE_API_KEY_PATH = mkOption {
+        type = types.path;
+        default = "/secret-keys/YH_FINANCE_API_KEY";
+        description = "The path to the YH_FINANCE api key";
+      };
+
       CMC_API_KEY_PATH = mkOption {
         type = types.path;
         default = "/secret-keys/CMC_API_KEY";
