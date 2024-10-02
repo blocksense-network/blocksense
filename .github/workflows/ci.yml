@@ -168,6 +168,9 @@ jobs:
           eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
+      - name: e2e simulation
+        run: yarn && yarn workspace "@blocksense/base-utils" build && yarn workspace "@blocksense/e2e-tests" run-simulation-script
+
       - name: Build Rust workspace
         run: cargo build
 
