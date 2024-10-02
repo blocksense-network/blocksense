@@ -14,16 +14,16 @@ import {
   getContractInstanceFromDeployParams,
 } from '@aztec/aztec.js';
 import { getInitialTestAccountsWallets } from '@aztec/accounts/testing';
-import { describe, beforeAll, expect, test } from 'vitest'
+import { describe, beforeAll, expect, test } from 'vitest';
 
 const setupSandbox = async () => {
-  const { PXE_URL = "http://localhost:8080" } = process.env;
+  const { PXE_URL = 'http://localhost:8080' } = process.env;
   const pxe = createPXEClient(PXE_URL);
   await waitForPXE(pxe);
   return pxe;
 };
 
-describe("Data feed store contract", () => {
+describe('Data feed store contract', () => {
   let pxe: PXE;
   let wallets: AccountWallet[] = [];
   let accounts: CompleteAddress[] = [];
@@ -32,10 +32,10 @@ describe("Data feed store contract", () => {
     pxe = await setupSandbox();
 
     wallets = await getInitialTestAccountsWallets(pxe);
-    accounts = wallets.map((w) => w.getCompleteAddress());
+    accounts = wallets.map(w => w.getCompleteAddress());
   });
 
-  test("If it deploys the contract", async () => {
+  test('Deploying the contract', async () => {
     const salt = Fr.random();
     const dataFeedStoreContractArtifact = DataFeedStoreContractArtifact;
     const deployArgs = wallets[0].getCompleteAddress().address;
@@ -46,12 +46,12 @@ describe("Data feed store contract", () => {
         constructorArgs: [deployArgs],
         salt,
         deployer: wallets[0].getAddress(),
-      }
+      },
     );
 
     const deployer = new ContractDeployer(
       dataFeedStoreContractArtifact,
-      wallets[0]
+      wallets[0],
     );
     const tx = deployer.deploy(deployArgs).send({ contractAddressSalt: salt });
     const receipt = await tx.getReceipt();
@@ -59,32 +59,32 @@ describe("Data feed store contract", () => {
     expect(receipt).toEqual(
       expect.objectContaining({
         status: TxStatus.PENDING,
-        error: "",
-      })
+        error: '',
+      }),
     );
 
     const receiptAfterMined = await tx.wait({ wallet: wallets[0] });
 
     expect(await pxe.getContractInstance(deploymentData.address)).toBeDefined();
     expect(
-      await pxe.isContractPubliclyDeployed(deploymentData.address)
+      await pxe.isContractPubliclyDeployed(deploymentData.address),
     ).toBeDefined();
     expect(receiptAfterMined).toEqual(
       expect.objectContaining({
         status: TxStatus.SUCCESS,
-      })
+      }),
     );
 
     expect(receiptAfterMined.contract.instance.address).toEqual(
-      deploymentData.address
+      deploymentData.address,
     );
   }, 30000);
 
-  test("If the caller isn't the owner", async () => {
+  test('Calling the contract when not owner', async () => {
     const index_zero = new Fr(0);
     const data = Array.from(
       { length: 32 },
-      () => new Fr(Math.floor(Math.random() * 256))
+      () => new Fr(Math.floor(Math.random() * 256)),
     );
 
     const contract = await DataFeedStoreContract.deploy(wallets[0])
@@ -96,14 +96,14 @@ describe("Data feed store contract", () => {
         .withWallet(wallets[1])
         .methods.setFeed(data, index_zero)
         .send()
-        .wait()
-    ).rejects.toThrow("You are not the owner!");
+        .wait(),
+    ).rejects.toThrow('Caller is not the owner!');
   }, 30000);
 
-  test("If gets and sets 10 feeds in a single transaction", async () => {
+  test('Setting and getting 10 feeds', async () => {
     const data = Array.from(
       { length: 32 },
-      () => new Fr(Math.floor(Math.random() * 256))
+      () => new Fr(Math.floor(Math.random() * 256)),
     );
 
     const contract = await DataFeedStoreContract.deploy(wallets[0])
@@ -116,7 +116,7 @@ describe("Data feed store contract", () => {
       const get_feed_tx = await contract.methods.getFeed(index_i).simulate();
       for (let j = 0; j < 32; j++) {
         expect(Number(get_feed_tx[j])).toEqual(
-          parseInt(data[j].value.toString(16), 16)
+          parseInt(data[j].value.toString(16), 16),
         );
       }
     }

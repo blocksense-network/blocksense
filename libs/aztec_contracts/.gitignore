@@ -1,7 +1,4 @@
-contracts/data_feed_store/target/
-contracts/data_feed_store/src/artifacts/
-contracts/historic_data_feed_store/target/
-contracts/historic_data_feed_store/src/artifacts/
+contracts/**/target/
+contracts/**/codegenCache.json
+contracts/**/src/artifacts/
 node_modules/
-contracts/data_feed_store/codegenCache.json
-contracts/historic_data_feed_store/codegenCache.json

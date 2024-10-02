@@ -833,4 +833,3 @@ allowed_outbound_hosts = [
 
 [component.coinmarketcap.build]
 command = "cargo build --target wasm32-wasi --release"
-

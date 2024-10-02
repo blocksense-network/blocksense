@@ -17,7 +17,7 @@ contract DataFeedStore {
 
     #[aztec(public)]
     fn setFeed(data: [Field; DATA_FEED_BYTES_LEN], key: Field) {
-        assert(storage.owner.read().eq(context.msg_sender()), "You are not the owner!");
+        assert(storage.owner.read().eq(context.msg_sender()), "Caller is not the owner!");
         storage.data_feeds.at(key).write(data);
     }
 

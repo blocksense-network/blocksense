@@ -4,7 +4,10 @@ contract HistoricDataFeedStore {
 
     // Transmission's value which is 24 bytes.
     global TRANSMISSION_VALUE_BYTES_LEN = 24;
+    // TODO: Have a PoC for the maximal value of the feeds that can be set in a single function call.
     global MAX_FEEDS_NUMBER: u16 = 2;
+    // TODO: Research if you can increase the size to u16's max value.
+    global MAX_COUNTER_PER_FEED: u16 = 255;
     global MAX_FEEDS_BYTES_LEN = MAX_FEEDS_NUMBER * TRANSMISSION_VALUE_BYTES_LEN;
 
     struct Transmission {
@@ -22,7 +25,7 @@ contract HistoricDataFeedStore {
 
             for i in 0..24 {
                 let temp: Field = self.value[23 - i] as Field;
-                bytes_value = bytes_value + (temp * mul);
+                bytes_value += (temp * mul);
                 mul *= 256;
             }
 
@@ -71,21 +74,26 @@ contract HistoricDataFeedStore {
      *
      * @param keys The keys of each data feed, capped at MAX_FEEDS_NUMBER
      * @param input_values The values of the data feed, 24 bytes each, thus 24 * MAX_FEEDS_NUMBER bytes
+     * @param length The number of data feeds to set
      */
+    /**
+     * Currently 24 bytes are serialized in one Field element thus 24 * MAX_FEEDS_NUMBER bytes
+     * If you insert less than the MAX_FEEDS_NUMBER feeds, the rest of the fields are set to 0.
+     * This is where length comes in handy, because we iterate until the length is reached and
+     * thus store only the needed bytes.
+     * Тhe keys array values are Field elements to avoid redundant ACIR conversions.
+    */
     #[aztec(public)]
     fn set_feeds(
         keys: [Field; MAX_FEEDS_NUMBER],
         input_values: [u8; MAX_FEEDS_BYTES_LEN],
         length: u64
     ) {
-        assert(storage.owner.read().eq(context.msg_sender()), "You are not the owner!");
+        assert(storage.owner.read().eq(context.msg_sender()), "Caller is not the owner!");
 
         for i in 0..length {
             let mut counter = storage.counters.at(keys[i]).read() as u16;
-            counter = (counter + 1) % MAX_FEEDS_NUMBER;
-            if counter == 0 {
-                counter = 1;
-            }
+            counter = (counter + 1) % MAX_COUNTER_PER_FEED;
             let mut helper_index = 0;
             let mut current_transmission_value = [0 as u8; TRANSMISSION_VALUE_BYTES_LEN];
             for j in i * TRANSMISSION_VALUE_BYTES_LEN as u64..(i + 1) * TRANSMISSION_VALUE_BYTES_LEN as u64 {
