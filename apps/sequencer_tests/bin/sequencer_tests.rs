@@ -26,8 +26,16 @@ const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 const PROVIDERS_KEY_PREFIX: &str = "/tmp/key_";
 const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
-const REPORTER_SECRET_KEY: &str =
-    "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
+const REPORTERS_INFO: [(u64, &str); 2] = [
+    (
+        0,
+        "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003",
+    ),
+    (
+        1,
+        "4afe5f6c612e6b7f78e423bd8f102ebb8d5010ad8bf3085476f847853d1470ab",
+    ),
+];
 const SEQUENCER_MAIN_PORT: u16 = 8787;
 const SEQUENCER_ADMIN_PORT: u16 = 5557;
 
@@ -146,7 +154,7 @@ fn send_get_request(request: &str) -> String {
 
 fn send_report(payload_json: serde_json::Value) {
     let mut easy = Easy::new();
-    easy.url(format!("127.0.0.1:{}/post_report", SEQUENCER_MAIN_PORT).as_str())
+    easy.url(format!("127.0.0.1:{}/post_reports_batch", SEQUENCER_MAIN_PORT).as_str())
         .unwrap();
     easy.post(true).unwrap();
 
@@ -208,20 +216,25 @@ async fn main() -> Result<()> {
         .expect("System clock set before EPOCH")
         .as_millis();
 
-    let result = FeedResult::Result {
-        result: FeedType::Numerical(REPORT_VAL),
-    };
-    let signature = generate_signature(REPORTER_SECRET_KEY, FEED_ID, timestamp, &result).unwrap();
+    let mut payload = Vec::new();
 
-    let payload = DataFeedPayload {
-        payload_metadata: PayloadMetaData {
-            reporter_id: 0,
-            feed_id: FEED_ID.to_string(),
-            timestamp,
-            signature: JsonSerializableSignature { sig: signature },
-        },
-        result,
-    };
+    for (id, key) in REPORTERS_INFO {
+        let result = FeedResult::Result {
+            result: FeedType::Numerical(REPORT_VAL),
+        };
+
+        payload.push(DataFeedPayload {
+            payload_metadata: PayloadMetaData {
+                reporter_id: id,
+                feed_id: FEED_ID.to_string(),
+                timestamp,
+                signature: JsonSerializableSignature {
+                    sig: generate_signature(key, FEED_ID, timestamp, &result).unwrap(),
+                },
+            },
+            result: result,
+        })
+    }
 
     let serialized_payload = match serde_json::to_value(&payload) {
         Ok(payload) => payload,
