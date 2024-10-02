@@ -14,7 +14,8 @@ export const AbsolutePath = ({ absolutePath }: AbsolutePathProps) => {
   return (
     <Link
       className="absolute-path__link font-semibold text-sm flex gap-2 items-center"
-      href={`${ghContractFolder}${absolutePath}`}
+      // href={`${ghContractFolder}${absolutePath}`} //use it after our repo is public on GitHub
+      href={`/coming-soon`}
     >
       <GitHubIcon className="my-1" />
       {config.github}

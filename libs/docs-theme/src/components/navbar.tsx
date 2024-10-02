@@ -166,11 +166,7 @@ export function Navbar({ flatDirectories, items }: NavBarProps): ReactElement {
         })}
 
         {config.project.link ? (
-          <Anchor
-            className="nx-p-2 nx-text-current"
-            href={config.project.link}
-            newWindow
-          >
+          <Anchor className="nx-p-2 nx-text-current" href={'/coming-soon'}>
             {renderComponent(config.project.icon)}
           </Anchor>
         ) : null}

@@ -203,7 +203,8 @@ export const DEFAULT_THEME: DocsThemeConfig = {
   docsRepositoryBase: 'https://github.com/shuding/nextra',
   editLink: {
     component: function EditLink({ className, filePath, children }) {
-      const editUrl = useGitEditUrl(filePath);
+      // const editUrl = useGitEditUrl(filePath); //use it after our repo is public on GitHub
+      const editUrl = '/coming-soon';
       if (!editUrl) {
         return null;
       }

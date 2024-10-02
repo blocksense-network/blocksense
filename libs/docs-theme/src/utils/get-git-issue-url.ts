@@ -22,9 +22,11 @@ export const getGitIssueUrl = ({
     }`;
   }
   if (repo.resource.includes('github')) {
-    return `${repo.protocol}://${repo.resource}/${repo.owner}/${
-      repo.name
-    }/issues/new?title=${encodeURIComponent(title)}&labels=${labels || ''}`;
+    //use it after our repo is public on GitHub
+    // return `${repo.protocol}://${repo.resource}/${repo.owner}/${
+    //   repo.name
+    // }/issues/new?title=${encodeURIComponent(title)}&labels=${labels || ''}`;
+    return '/coming-soon';
   }
   return '#';
 };

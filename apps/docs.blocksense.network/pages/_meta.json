@@ -10,5 +10,10 @@
     "type": "page",
     "href": "/docs",
     "display": "hidden"
+  },
+  "coming-soon": {
+    "type": "page",
+    "href": "/coming-soon",
+    "display": "hidden"
   }
 }
