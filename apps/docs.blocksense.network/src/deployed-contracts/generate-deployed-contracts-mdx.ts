@@ -1,23 +1,28 @@
-import { selectDirectory } from '@blocksense/base-utils';
+import { parseNetworkName, selectDirectory } from '@blocksense/base-utils';
 
-import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
-import { decodeFeedsConfig } from '@blocksense/config-types';
+import {
+  decodeChainlinkCompatibilityConfig,
+  decodeDeploymentConfig,
+  DeploymentConfig,
+} from '@blocksense/config-types';
 
 import { pagesContractsFolder } from '@/src/constants';
 import { stringifyObject } from '@/src/utils';
 import { updateMetaJsonFile } from '@/src/utils-fs';
-import { decodeSupportedNetworks, SupportedNetworks } from '@/src/_mock/types';
-import SUPPORTED_NETWORKS from '@/src/_mock/supported-networks-mock.json';
 import { CoreContract, ProxyContractData } from './types';
 
-function getCoreContractsData(networksData: SupportedNetworks) {
+import CHAINLINK_COMPATIBILITY from '@blocksense/monorepo/chainlink_compatibility';
+import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/monorepo/evm_contracts_deployment_v1';
+
+function getCoreContractsData(networksData: DeploymentConfig) {
   const parsedCoreContracts: CoreContract[] = [];
 
-  Object.entries(networksData).forEach(([_, networkData]) => {
-    const networkName = networkData.name;
+  Object.entries(networksData).forEach(([_networkName, networkData]) => {
+    if (!networkData) return;
+    const networkName = parseNetworkName(_networkName);
     const coreContracts = networkData.contracts.coreContracts;
 
-    Object.entries(coreContracts).forEach(([contractName, contractAddress]) => {
+    Object.entries(coreContracts).forEach(([contractName, contractsData]) => {
       const existingContract = parsedCoreContracts.find(
         contract => contract.contract === contractName,
       );
@@ -27,7 +32,7 @@ function getCoreContractsData(networksData: SupportedNetworks) {
       } else {
         parsedCoreContracts.push({
           contract: contractName,
-          address: contractAddress,
+          address: contractsData.address,
           networks: [networkName],
         });
       }
@@ -36,20 +41,34 @@ function getCoreContractsData(networksData: SupportedNetworks) {
   return parsedCoreContracts;
 }
 
-function getProxyContractsContent(networksData: SupportedNetworks) {
-  const { feeds: dataFeeds } = decodeFeedsConfig(DATA_FEEDS);
-
+function getProxyContractsContent(networksData: DeploymentConfig) {
+  const { blocksenseFeedsCompatibility } = decodeChainlinkCompatibilityConfig(
+    CHAINLINK_COMPATIBILITY,
+  );
   const supportedNetworks: ProxyContractData[] = Object.entries(networksData)
-    .map(([_, network]) => {
-      const { name, contracts } = network;
-      const { ChainlinkProxy } = contracts;
+    .map(([_networkName, networkData]) => {
+      if (!networkData) return [];
+      const networkName = parseNetworkName(_networkName);
+      const { ChainlinkProxy } = networkData.contracts;
 
       return ChainlinkProxy.map(proxy => {
+        const compatibilityData = Object.entries(
+          blocksenseFeedsCompatibility,
+        ).find(([_id, data]) => data.description === proxy.description)?.[1];
+
+        if (!compatibilityData) {
+          throw new Error(
+            `No compatibility data found for ${proxy.description}`,
+          );
+        }
+
         return {
           ...proxy,
-          id: dataFeeds.find(feed => feed.description === proxy.description)
-            ?.id,
-          network: name,
+          id: compatibilityData.id,
+          network: networkName,
+          chainlink_proxy: Object.entries(
+            compatibilityData.chainlink_compatibility.chainlink_aggregators,
+          ).find(([network, _data]) => network === networkName)?.[1],
         };
       });
     })
@@ -58,7 +77,7 @@ function getProxyContractsContent(networksData: SupportedNetworks) {
 }
 
 function generateDeployedContractsContent(
-  networksData: SupportedNetworks,
+  networksData: DeploymentConfig,
 ): string {
   const parsedCoreContracts = getCoreContractsData(networksData);
   const parsedProxyContracts = getProxyContractsContent(networksData);
@@ -77,7 +96,7 @@ import { DeployedContracts } from '@/components/DeployedContracts/DeployedContra
 }
 
 async function generateDeployedContractsFile() {
-  const networksData = decodeSupportedNetworks(SUPPORTED_NETWORKS);
+  const networksData = decodeDeploymentConfig(CONTRACTS_DEPLOYMENT_CONFIG);
 
   const mdxFile = {
     name: 'deployed-contracts',
