@@ -57,17 +57,17 @@ export const DataFeedDetails: React.FC<{
           label: 'Category',
           value: typeof type === 'string' ? type : String(type),
         },
-        { label: 'Data Providers', value: script },
+        { label: 'Data Providers', value: 'No information yet' },
       ],
     },
     {
       title: 'Oracle Script Info',
       description:
         'Detail featured elements of an oracle script for precise and efficient execution',
-      items: [{ label: 'Script Name', value: script }],
+      items: [{ label: 'Script Name', value: 'No available script' }],
       extra: {
         type: 'Oracle Script Info' as const,
-        scriptArguments: resources,
+        scriptArguments: {},
       },
     },
     {
