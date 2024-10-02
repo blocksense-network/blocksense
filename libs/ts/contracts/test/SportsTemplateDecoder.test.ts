@@ -17,15 +17,10 @@ type TupleField = {
   components: (SimpleField | TupleField)[];
 };
 
-interface Field {
-  name: string;
-  values: (SimpleField | TupleField)[];
-}
-
 function processFields(
-  fields: Field['values'],
+  fields: (SimpleField | TupleField)[],
   values: any[],
-): [Field['values'], any[]] {
+): [(SimpleField | TupleField)[], any[]] {
   const processedFields = fields.map((field, i) => {
     if (field.type.includes('[')) {
       const dimensions = field.type
@@ -104,7 +99,7 @@ describe('Decoder', () => {
   const templatePath = path.join(__dirname, '../templates/decoder.sol.ejs');
   const tempFilePath = path.join(__dirname, `../contracts/${contractName}.sol`);
 
-  async function generateAndDeployDecoder(fields: Field) {
+  async function generateAndDeployDecoder(fields: TupleField) {
     const template = fs.readFileSync(templatePath, 'utf-8');
     const generatedCode = ejs.render(template, { fields });
     fs.writeFileSync(tempFilePath, generatedCode, 'utf-8');
@@ -115,20 +110,20 @@ describe('Decoder', () => {
     return await DecoderFactory.deploy();
   }
 
-  async function testDecoder(fields: Field, values: any[]) {
+  async function testDecoder(fields: TupleField, values: any[]) {
     const decoder = await generateAndDeployDecoder(fields);
     const clone = (items: any) =>
       items.map((item: any) => (Array.isArray(item) ? clone(item) : item));
     const compareValues = clone(values);
 
     const [processedFields, processedValues] = processFields(
-      fields.values,
-      values,
+      [fields],
+      [values],
     );
-    fields.values = processedFields;
+    fields.components = processedFields;
     values = processedValues;
     const packedData = ethers.solidityPacked(
-      fields.values.map(field => field.type),
+      fields.components.map(field => field.type),
       values,
     );
     const result: any = await decoder.decode(packedData);
@@ -142,9 +137,10 @@ describe('Decoder', () => {
   });
 
   it('should correctly decode packed sports data with boolean fields', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'GameData',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'isHomeTeam', type: 'bool', size: 8 },
         { name: 'isOvertime', type: 'bool', size: 8 },
         { name: 'score', type: 'uint16', size: 16 },
@@ -155,9 +151,10 @@ describe('Decoder', () => {
   });
 
   it('should correctly decode packed sports data with mixed field types and sizes', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'GameData',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'gameId', type: 'uint32', size: 32 },
         { name: 'teamName', type: 'bytes32', size: 256 },
         { name: 'playerCount', type: 'uint8', size: 8 },
@@ -168,9 +165,10 @@ describe('Decoder', () => {
   });
 
   it('should handle maximum values for each field type', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'MaxValues',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'maxUint8', type: 'uint8', size: 8 },
         { name: 'maxUint16', type: 'uint16', size: 16 },
         { name: 'maxUint32', type: 'uint32', size: 32 },
@@ -182,9 +180,10 @@ describe('Decoder', () => {
   });
 
   it('should handle mixed field types and sizes', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'MixedFields',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'isOvertime', type: 'bool', size: 8 },
         { name: 'isFinal', type: 'bool', size: 8 },
         { name: 'homeScore', type: 'uint16', size: 16 },
@@ -196,9 +195,10 @@ describe('Decoder', () => {
   });
 
   it('should correctly decode packed sports data with maximum values', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'MaxSportsData',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'maxUint8', type: 'uint8', size: 8 },
         { name: 'maxUint16', type: 'uint16', size: 16 },
         { name: 'maxUint32', type: 'uint32', size: 32 },
@@ -209,9 +209,10 @@ describe('Decoder', () => {
   });
 
   it('should handle different int sizes and address', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'IntAndAddress',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'int8Value', type: 'int8', size: 8 },
         { name: 'int16Value', type: 'int16', size: 16 },
         { name: 'int32Value', type: 'int32', size: 32 },
@@ -230,9 +231,10 @@ describe('Decoder', () => {
   });
 
   it('should handle different bytes sizes', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'BytesSizes',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'bytes1Value', type: 'bytes1', size: 8 },
         { name: 'bytes16Value', type: 'bytes16', size: 128 },
         { name: 'bytes32Value', type: 'bytes32', size: 256 },
@@ -247,9 +249,10 @@ describe('Decoder', () => {
   });
 
   it('should handle complex struct with mixed types', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'ComplexStruct',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'boolValue', type: 'bool', size: 8 },
         { name: 'uint24Value', type: 'uint24', size: 24 },
         { name: 'int48Value', type: 'int48', size: 48 },
@@ -268,9 +271,10 @@ describe('Decoder', () => {
   });
 
   it('should handle mixed types including negative integers', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'MixedWithNegatives',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'int16Value', type: 'int16', size: 16 },
         { name: 'uint32Value', type: 'uint32', size: 32 },
         { name: 'boolValue', type: 'bool', size: 8 },
@@ -289,9 +293,10 @@ describe('Decoder', () => {
   });
 
   it('should handle large unsigned integers and small bytes', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'LargeUintSmallBytes',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'uint128Value', type: 'uint128', size: 128 },
         { name: 'bytes2Value', type: 'bytes2', size: 16 },
         { name: 'uint8Value', type: 'uint8', size: 8 },
@@ -308,9 +313,10 @@ describe('Decoder', () => {
   });
 
   it('should handle multiple addresses and mixed integer sizes', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'MultiAddressMixedInts',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'address1', type: 'address', size: 160 },
         { name: 'uint40Value', type: 'uint40', size: 40 },
         { name: 'address2', type: 'address', size: 160 },
@@ -329,9 +335,10 @@ describe('Decoder', () => {
   });
 
   it('should handle uint32, bytes4, bytes16, int128, bytes32, and address', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'MixedTypes',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'uint32Value', type: 'uint32', size: 32 },
         { name: 'bytes4Value', type: 'bytes4', size: 32 },
         { name: 'bytes16Value', type: 'bytes16', size: 128 },
@@ -352,9 +359,10 @@ describe('Decoder', () => {
   });
 
   it('should handle fixed size array, uint256, bytes16, and bool', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'FixedArraysAndLargeInts',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'uint8Array1', type: 'uint8[4]', size: 8 },
         { name: 'uint256Value1', type: 'uint256', size: 256 },
         { name: 'uint8Array2', type: 'uint8[4]', size: 8 },
@@ -380,9 +388,10 @@ describe('Decoder', () => {
   });
 
   it('should handle fixed size arrays of different types and sizes', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'MixedFixedArrays',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'uint32Array', type: 'uint32[9]', size: 32 },
         { name: 'bytes4Array', type: 'bytes4[2]', size: 32 },
         { name: 'addressArray', type: 'address[2]', size: 160 },
@@ -410,9 +419,10 @@ describe('Decoder', () => {
   });
 
   it('should handle mixed types including fixed size arrays and single values', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'MixedTypesWithArrays',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'uint8Array', type: 'uint8[3]', size: 8 },
         { name: 'bytes32Value', type: 'bytes32', size: 256 },
         { name: 'int256Array', type: 'int256[2]', size: 256 },
@@ -442,9 +452,10 @@ describe('Decoder', () => {
   });
 
   it('should handle uint256 and bytes32 fixed arrays among other values', async () => {
-    const fields = {
+    const fields: TupleField = {
       name: 'LargeArraysWithMixedTypes',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'uint256Array', type: 'uint256[3]', size: 256 },
         { name: 'bytes32Array', type: 'bytes32[2]', size: 256 },
         { name: 'addressValue', type: 'address', size: 160 },
@@ -474,9 +485,10 @@ describe('Decoder', () => {
   });
 
   it('should handle nested structs', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'NestedStructs',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'outerUint', type: 'uint256', size: 256 },
         {
           name: 'innerStruct',
@@ -511,9 +523,10 @@ describe('Decoder', () => {
   });
 
   it('should handle nested structs with arrays', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'NestedStructsWithArrays',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'outerUint', type: 'uint256', size: 256 },
         {
           name: 'innerStructArray',
@@ -558,9 +571,10 @@ describe('Decoder', () => {
   });
 
   it('should handle struct fixed array', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'StructFixedArray',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'structArray',
           type: 'tuple[3]',
@@ -584,9 +598,10 @@ describe('Decoder', () => {
   });
 
   it('should handle structs with arrays of nested structs', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'StructWithArraysOfNestedStructs',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'mainStruct',
           type: 'tuple',
@@ -649,9 +664,10 @@ describe('Decoder', () => {
   });
 
   it('should handle dynamic array with different data types', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'DynamicArrayWithUint8Array',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'dynamicArray', type: 'bytes16[]', size: 128 },
         { name: 'uint8Array', type: 'uint8[2]', size: 8 },
         { name: 'uint256Value', type: 'uint256', size: 256 },
@@ -680,9 +696,10 @@ describe('Decoder', () => {
   });
 
   it('should handle dynamic array of addresses', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'DynamicArrayOfAddresses',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'addressArray', type: 'address[]', size: 160 },
         { name: 'uint256Value', type: 'uint256', size: 256 },
       ],
@@ -699,9 +716,10 @@ describe('Decoder', () => {
   });
 
   it('should handle dynamic array of booleans', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'DynamicArrayOfBooleans',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'boolArray', type: 'bool[]', size: 8 },
         { name: 'uint64Value', type: 'uint64', size: 64 },
       ],
@@ -711,9 +729,10 @@ describe('Decoder', () => {
   });
 
   it('should handle dynamic array of bytes', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'DynamicArrayOfBytes',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'bytesArray', type: 'bytes32[]', size: 256 },
         { name: 'int128Value', type: 'int128', size: 128 },
         { name: 'bytesArray2', type: 'bytes32[]', size: 256 },
@@ -736,9 +755,10 @@ describe('Decoder', () => {
   });
 
   it('should handle dynamic uint256 array', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'DynamicUint256Array',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'uint256Array', type: 'uint256[]', size: 256 },
         { name: 'int32Value', type: 'int32', size: 32 },
       ],
@@ -758,9 +778,10 @@ describe('Decoder', () => {
   });
 
   it('should handle nested fixed arrays', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'NestedDynamicArrays',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'nestedArray', type: 'uint32[3][3]', size: 32 },
         { name: 'bytes32Value', type: 'bytes32', size: 256 },
       ],
@@ -777,9 +798,10 @@ describe('Decoder', () => {
   });
 
   it('should handle 2D fixed array', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'TwoDimensionalFixedArray',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'array2D', type: 'uint16[2][3]', size: 16 },
         { name: 'int64Value', type: 'int64', size: 64 },
       ],
@@ -796,9 +818,10 @@ describe('Decoder', () => {
   });
 
   it('should handle 3D fixed array', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'ThreeDimensionalFixedArray',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'array3D', type: 'int8[4][3][2]', size: 8 },
         { name: 'uint128Value', type: 'uint128', size: 128 },
       ],
@@ -822,9 +845,10 @@ describe('Decoder', () => {
   });
 
   it('should handle 4D fixed array', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'FourDimensionalFixedArray',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'array4D', type: 'bool[3][2][3][2]', size: 8 },
         { name: 'bytes16Value', type: 'bytes16', size: 128 },
       ],
@@ -866,9 +890,10 @@ describe('Decoder', () => {
   });
 
   it('should handle 2x3 array of struct type', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'TwoDimensionalStructArray',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'structArray',
           type: 'tuple[3][2]',
@@ -898,9 +923,10 @@ describe('Decoder', () => {
   });
 
   it('should handle string and bytes', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'StringField',
-      values: [
+      type: 'tuple',
+      components: [
         { name: 'stringValue', type: 'string' },
         {
           name: 'stringValue2',
@@ -935,9 +961,10 @@ describe('Decoder', () => {
   });
 
   it('should handle fixed array of bytes and string', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'FixedArrayField',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'fixedStringArray',
           type: 'string[2]',
@@ -971,9 +998,10 @@ describe('Decoder', () => {
   });
 
   it('should handle struct with bytes and string fields', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'StructField',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'structValue',
           type: 'tuple',
@@ -1006,9 +1034,10 @@ describe('Decoder', () => {
   });
 
   it('should handle dynamic array of string and bytes', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'DynamicArrayField',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'dynamicStringArray',
           type: 'string[]',
@@ -1032,9 +1061,10 @@ describe('Decoder', () => {
   });
 
   it('should handle struct with array of bytes and string', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'StructWithArrays',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'structField',
           type: 'tuple',
@@ -1089,9 +1119,10 @@ describe('Decoder', () => {
   });
 
   it('should decode n-dimensional dynamic arrays', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'NDimensionalArrays',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'oneDimensional',
           type: 'uint256[]',
@@ -1133,9 +1164,10 @@ describe('Decoder', () => {
   });
 
   it('should decode multidimensional dynamic and fixed arrays of bytes, string, and uint', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'MultidimensionalMixedArrays',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'bytesArray',
           type: 'bytes[]',
@@ -1174,9 +1206,10 @@ describe('Decoder', () => {
   });
 
   it('should decode fixed+dynamic+fixed arrays with different types of data', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'MixedArrayTypes',
-      values: [
+      type: 'tuple',
+      components: [
         {
           name: 'fixedDynamicFixedArray',
           type: 'uint32[2][]',
@@ -1204,21 +1237,38 @@ describe('Decoder', () => {
   });
 
   it('should decode complex nested arrays with mixed types', async () => {
-    const fields: Field = {
+    const fields: TupleField = {
       name: 'ComplexNestedArrays',
-      values: [
+      type: 'tuple',
+      components: [
+        {
+          name: 'uint256Value1',
+          type: 'uint256',
+          size: 256,
+        },
         {
           name: 'nestedArray',
           type: 'uint256[2][][3][]',
           size: 256,
         },
         {
+          name: 'uint256Value2',
+          type: 'uint256',
+          size: 256,
+        },
+        {
           name: 'mixedTypeArray',
           type: 'string[2][][3]',
+        },
+        {
+          name: 'uint256Value3',
+          type: 'uint256',
+          size: 256,
         },
       ],
     };
     const values = [
+      1,
       [
         [
           [
@@ -1241,6 +1291,7 @@ describe('Decoder', () => {
           [[19, 20]],
         ],
       ],
+      2,
       [
         [
           ['Hello', 'World'],
@@ -1253,6 +1304,234 @@ describe('Decoder', () => {
           ['Solidity', 'assembly'],
         ],
       ],
+      3,
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should decode dynamic array of tuple', async () => {
+    const fields: TupleField = {
+      name: 'DynamicArrayOfTuple',
+      type: 'tuple',
+      components: [
+        { name: 'stringValue', type: 'string' },
+        {
+          name: 'tupleArray',
+          type: 'tuple[]',
+          components: [
+            {
+              name: 'uintField',
+              type: 'uint256',
+              size: 256,
+            },
+            {
+              name: 'stringField',
+              type: 'string',
+            },
+            {
+              name: 'boolField',
+              type: 'bool',
+              size: 8,
+            },
+          ],
+        },
+        {
+          name: 'boolValue',
+          type: 'bool',
+          size: 8,
+        },
+      ],
+    };
+    const values = [
+      'Dynamic array of tuple',
+      [
+        [100, 'First', true],
+        [200, 'Second', false],
+        [300, 'Third', true],
+      ],
+      true,
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should decode multidimensional dynamic and fixed arrays of tuple', async () => {
+    const fields: TupleField = {
+      name: 'DynamicArrayOfTuple',
+      type: 'tuple',
+      components: [
+        { name: 'stringValue', type: 'string' },
+        {
+          name: 'tupleArray',
+          type: 'tuple[3][2][]',
+          components: [
+            {
+              name: 'uintField',
+              type: 'uint256',
+              size: 256,
+            },
+            {
+              name: 'stringField',
+              type: 'string',
+            },
+            {
+              name: 'boolField',
+              type: 'bool',
+              size: 8,
+            },
+          ],
+        },
+        {
+          name: 'boolValue',
+          type: 'bool',
+          size: 8,
+        },
+      ],
+    };
+    const values = [
+      'Dynamic array of tuple',
+      [
+        [
+          [
+            [100, 'First', true],
+            [200, 'Second', false],
+            [300, 'Third', true],
+          ],
+          [
+            [400, 'Fourth', true],
+            [500, 'Fifth', false],
+            [600, 'Sixth', true],
+          ],
+        ],
+      ],
+      true,
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should return fixed array of main tuple', async () => {
+    const fields: TupleField = {
+      name: 'Values',
+      type: 'tuple[2][][1]',
+      components: [
+        { name: 'Uint8', type: 'uint8', size: 8 },
+        { name: 'Uint16', type: 'uint16', size: 16 },
+        { name: 'Uint32', type: 'uint32', size: 32 },
+        { name: 'Uint64', type: 'uint64', size: 64 },
+        { name: 'Uint128', type: 'uint128', size: 128 },
+        { name: 'Uint256', type: 'uint256', size: 256 },
+      ],
+    };
+    const values = [
+      [
+        [
+          [
+            1,
+            1234,
+            48743,
+            BigInt('18446744073709551615'),
+            BigInt('184467440737095515'),
+            6,
+          ],
+          [
+            2,
+            3455,
+            4376836,
+            BigInt('18446743709551615'),
+            BigInt('184467440739551615'),
+            5,
+          ],
+        ],
+        [
+          [
+            3,
+            44656,
+            32681,
+            BigInt('184444073709551615'),
+            BigInt('184467440737095515'),
+            4,
+          ],
+          [
+            4,
+            65535,
+            1,
+            BigInt('184467443709551615'),
+            BigInt('184467440737095515'),
+            3,
+          ],
+        ],
+        [
+          [
+            5,
+            34344,
+            323232,
+            BigInt('146744073709551615'),
+            BigInt('1467440737095515'),
+            2,
+          ],
+          [
+            6,
+            23356,
+            324687143,
+            BigInt('184467440737095516'),
+            BigInt('184467447095515'),
+            1,
+          ],
+        ],
+      ],
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should decode multidimensional dynamic and fixed arrays of tuple', async () => {
+    const fields: TupleField = {
+      name: 'DynamicArrayOfTuple',
+      type: 'tuple',
+      components: [
+        { name: 'stringValue', type: 'string' },
+        {
+          name: 'tupleArray',
+          type: 'tuple[3][][]',
+          components: [
+            {
+              name: 'uintField',
+              type: 'uint256',
+              size: 256,
+            },
+            {
+              name: 'stringField',
+              type: 'string',
+            },
+            {
+              name: 'boolField',
+              type: 'bool',
+              size: 8,
+            },
+          ],
+        },
+        {
+          name: 'boolValue',
+          type: 'bool',
+          size: 8,
+        },
+      ],
+    };
+    const values = [
+      'Dynamic array of tuple',
+      [
+        [
+          [
+            [100, 'First', true],
+            [200, 'Second', false],
+            [300, 'Third', true],
+          ],
+          [
+            [400, 'Fourth', true],
+            [500, 'Fifth', false],
+            [600, 'Sixth', true],
+          ],
+        ],
+      ],
+      true,
     ];
     await testDecoder(fields, values);
   });

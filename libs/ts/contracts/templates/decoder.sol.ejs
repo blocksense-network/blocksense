@@ -26,17 +26,31 @@ const expandFields = (values) => {
 }
 
 const expandArray = (baseType, dimensions, field) => {
-  if (dimensions.length === 0 || !dimensions.some(dim => dim !== '[]')) {
-    if (baseType.includes('tuple')) {
+  if (dimensions.length === 0 ||( !dimensions.some(dim => dim !== '[]') && !field.type.includes('tuple'))) {
+    if (baseType === 'tuple') {
       return expandFields(field.components);
     } else {
       return {
         name: field.name,
         type: baseType,
         size: field.size,
+        iterations: dimensions.length - 1,
         isDynamic: isDynamicType(baseType),
       };
     }
+  }
+
+  let lastDynamicDim = -1;
+  for (let i = dimensions.length - 1; i >= 0; i--) {
+    if (dimensions[i] !== '[]') {
+      break;
+    }
+    lastDynamicDim = i;
+  }
+
+  let changed = dimensions.length
+  if (lastDynamicDim > 0) {
+    dimensions.splice(lastDynamicDim, dimensions.length - lastDynamicDim);
   }
 
   const currentDimension = dimensions[dimensions.length - 1];
@@ -44,13 +58,20 @@ const expandArray = (baseType, dimensions, field) => {
   const size = currentDimension.match(/\[(\d*)\]/)[1];
   const arraySize = size ? parseInt(size) : 0;
 
-  if (currentDimension === '[]') {
+  if (currentDimension === '[]' || lastDynamicDim > -1) {
+    let components = []
+    if (lastDynamicDim === 0) {
+      components = expandArray(baseType.split('[')[0] + dimensions.slice(0, -1).join(''), dimensions.slice(0, -1), field);
+    } else {
+      components = expandArray(baseType + dimensions.join(''), dimensions, field);
+    }
     return {
       name: field.name,
       type: baseType,
       size: field.size,
+      iterations: changed - dimensions.length || 1,
       isDynamic: containsDynamicData = true,
-      components: expandArray(baseType.split('[')[0] + dimensions.slice(0, -1).join(''), dimensions.slice(0, -1), field),
+      components: Array.isArray(components) ? components : [components],
     };
   }
 
@@ -98,7 +119,7 @@ function organizeFieldsIntoStructs(values) {
 
   return structs;
 }
-const organizedStructs = organizeFieldsIntoStructs(fields.values);
+const organizedStructs = organizeFieldsIntoStructs(fields.components);
 
 let prevSizeSum = 0;
 function processFields(fields) {
@@ -109,6 +130,10 @@ function processFields(fields) {
     } else if ('components' in field) {
       // If the field is a struct, recursively process its components
       field.components = processFields(field.components);
+
+      if (field.isDynamic) {
+        prevSizeSum = 0;
+      }
     } else {
       field.shift = 0;
       const isBytes = field.type.startsWith('bytes') && field.type !== 'bytes' && !field.type.endsWith('[]');
@@ -148,7 +173,7 @@ function processFields(fields) {
   return fields;
 }
 
-const expandedFields = processFields(expandFields(fields.values));
+const expandedFields = processFields(expandFields([fields])).flat();
 
 let wordOffset = 32;
 let bitOffset = 0;
@@ -166,7 +191,7 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
 
     bitOffset += Array.isArray(field) || field.isDynamic ? 0 : field.size;
 
-    if (!Array.isArray(field) && prevSize + field.size >= 256) {
+    if (!Array.isArray(field) && (prevSize + (field.size ?? 0) >= 256 || bitOffset >= 256)) {
       wordOffset += prevSize / 8;
       bitOffset = field.isDynamic ? 0 : field.size;
       shouldUpdate = true;
@@ -208,7 +233,36 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
       const isBytes = field.type.startsWith('bytes') && field.type !== 'bytes' && field.type !== 'bytes[]';
       const isDynamic = !isBytes && (field.type.startsWith('bytes') || field.type.startsWith('string'));
 
-      function handleMultiDimensionalArray(dimensions, type, currentLocation, indentation, depth = 0) {
+      const getArrayDepth = value => Array.isArray(value) ? 1 + Math.max(0, ...value.map(getArrayDepth)) : 0;
+
+      function handleNestedDynamic(field, innerName, depth, innerIndex, indentation) {
+        const lines = [];
+        const innerLocation = `${innerName}_${depth}`;
+        lines.push('  {');
+        lines.push(`    let ${innerLocation} := mload(0x40)`);
+        if (!isNaN(innerIndex)) {
+          lines.push(`    mstore(${innerIndex ? `add(${innerName}, ${innerIndex})` : innerName}, ${innerLocation})`);
+        } else {
+          lines.push(`    mstore(add(${innerName}, mul(add(${innerIndex}, 1), 32)), ${innerLocation})`);
+        }
+        lines.push(`    mstore(0x40, add(${innerLocation}, ${(field.components || field).length * 32}))`);
+        const arrayDepth = getArrayDepth(field.components || field);
+        if (arrayDepth > 1) {
+          lines.push(...(field.components || field).map((innerField, index) => handleNestedDynamic(innerField, `${innerName}_${depth}`, depth + 1, index * 32, indentation + ' ')).flat(depth+1));
+        } else {
+          lines.push(...generateDecoderLines(field.components || field, innerLocation, 0, indentation + '  '));
+        }
+        if (wordOffset + prevSize / 8) {
+          lines.push(`    shift := add(shift, ${wordOffset + prevSize / 8})`);
+        }
+        lines.push('  }');
+        wordOffset = 0;
+        prevSize = 0;
+
+        return lines.map(line => line !== '' ? indentation + line : line)
+      }
+
+      function handleMultiDimensionalArray(iterations, type, currentLocation, indentation, depth = 0) {
         const innerType = type.slice(0, -2); // Remove last '[]'
         const innerName = `${location}_${depth}`;
         const innerIndex = `i_${location}_${depth}`;
@@ -231,27 +285,20 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
 
         wordOffset = 0;
 
-        if ('components' in field) {
-          const innerLocation = `${innerName}_${depth}`;
-          lines.push(indentation + `    let ${innerLocation} := mload(0x40)`);
-          lines.push(indentation + `    mstore(add(${innerName}, mul(add(${innerIndex}, 1), 32)), ${innerLocation})`);
-          lines.push(indentation + `    mstore(0x40, add(${innerLocation}, mul(${field.components.length}, 32)))`);
-          lines.push(...generateDecoderLines(field.components, innerLocation, 0, indentation + '    '));
-          lines.push(indentation + `    shift := add(shift, ${wordOffset + prevSize / 8})`);
-          lines.push(indentation + `    memData := mload(add(data, shift))`);
-          wordOffset = 0;
+        if ('components' in field && !iterations) {
+          lines.push(...handleNestedDynamic(field, innerName, depth, innerIndex, indentation + '  '));
+          lines.push(`  memData := mload(add(data, shift))`);
         } else {
-          handleCases({...field, type: innerType}, innerName, index, indentation + '    ', dimensions, depth + 1, `${innerIndex}`);
+          handleCases({...field, type: innerType}, innerName, index, indentation + '    ', iterations, depth + 1, `${innerIndex}`);
         }
 
         lines.push(indentation + '  }');
         lines.push(indentation + '}');
       }
 
-      function handleCases(field, location, index, indentation, dimensions, depth = 0, parentIndex) {
-        if (dimensions > 1) {
-          // current index should be inner for the recursion and yet use
-          handleMultiDimensionalArray(dimensions - 1, field.type, location, indentation, depth);
+      function handleCases(field, location, index, indentation, iterations, depth = 0, parentIndex) {
+        if (iterations) {
+          handleMultiDimensionalArray(iterations - 1, field.type, location, indentation, depth);
         } else {
           if (isBytes) {
             lines.push(...generateDecoderFixedBytesLines(field, location, index, indentation, parentIndex));
@@ -263,16 +310,9 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
         }
       }
 
-      const dimensions = (field.type.match(/\[\]/g)).length;
-      if ('components' in field) {
-        handleMultiDimensionalArray(dimensions - 1, field.type, location, indentation);
-      } else {
-        handleCases(field, location, index, indentation, dimensions);
-      }
+      handleCases(field, location, index, indentation, field.iterations);
 
-      // FIXME
       field.size = 0;
-
       wordOffset = 0;
       prevSize = 0;
       bitOffset = 0;
@@ -517,7 +557,7 @@ library Decoder {
 
   function decode(
     bytes memory data
-  ) external pure returns (<%= fields.name %> memory <%= name %>) {
+  ) external pure returns (<%= fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('') %> memory <%= name %>) {
     assembly {
       // First 32 bytes are the length of the data
       let memData := mload(add(data, 32))
