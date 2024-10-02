@@ -42,6 +42,7 @@
     "@vercel/build-utils": "^8.3.6",
     "@vercel/next": "^4.3.6",
     "@vercel/nft": "^0.27.3",
+    "eslint": "^9.11.1",
     "prettier": "^3.3.3",
     "react": "^18.3.1",
     "ts-node": "^10.9.2",
