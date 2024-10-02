@@ -27,6 +27,12 @@ let
 in
 {
   options = {
+    full-batch = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Sets reporter to report on all feeds in feed config";
+    };
+
     batch-size = mkOption {
       type = types.int;
       default = 3;
