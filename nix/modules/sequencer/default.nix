@@ -9,13 +9,6 @@
   flake.nixosModules =
     let
       inherit (self.lib) dashToUnderscore;
-      mkFeeds =
-        feeds:
-        lib.pipe feeds [
-          lib.attrsToList
-          (lib.map ({ name, value }: { name = name; } // value))
-          (lib.imap0 (id: config: { inherit id; } // config))
-        ];
 
       mkReporters = keys: lib.imap0 (id: pub_key: { inherit id pub_key; }) keys;
 
