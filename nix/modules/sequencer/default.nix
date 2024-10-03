@@ -39,11 +39,7 @@
           };
 
           reportersConfigJSON = builtins.mapAttrs (
-            n: v:
-            (configJSON cfg.reporters.${n} {
-              feeds = mkFeeds cfg.reporters.${n}.feeds;
-              prometheus_url = cfg.reporters.${n}.metrics-url;
-            })
+            n: v: (configJSON cfg.reporters.${n} { prometheus_url = cfg.reporters.${n}.metrics-url; })
           ) cfg.reporters;
         in
         with lib;
