@@ -129,6 +129,9 @@ function processFields(fields) {
       field = processFields(field);
     } else if ('components' in field) {
       // If the field is a struct, recursively process its components
+      if (field.isDynamic) {
+        prevSizeSum = 0;
+      }
       field.components = processFields(field.components);
 
       if (field.isDynamic) {
@@ -197,7 +200,6 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
       shouldUpdate = true;
       prevSize = 0;
     }
-
 
     if (shouldUpdate && (wordOffset > 32 || shift)) {
       lines.push('');
@@ -284,6 +286,8 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
         lines.push(indentation + `  for {let ${innerIndex} := 0} lt(${innerIndex}, ${innerName}_length) {${innerIndex} := add(${innerIndex}, 1)} {`);
 
         wordOffset = 0;
+        prevSize = 0;
+        bitOffset = 0;
 
         if ('components' in field && !iterations) {
           lines.push(...handleNestedDynamic(field, innerName, depth, innerIndex, indentation + '  '));
@@ -505,7 +509,6 @@ function generateDecoderStringBytes(field, location, index, indentation, parentI
 
   lines.push('');
   lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
-
 
   const fieldName = field.name + '_' + index;
 

@@ -1535,4 +1535,87 @@ describe('Decoder', () => {
     ];
     await testDecoder(fields, values);
   });
+
+  it('should decode nested dynamic tuples', async () => {
+    const fields: TupleField = {
+      name: 'NestedStructs',
+      type: 'tuple',
+      components: [
+        { name: 'outerUint', type: 'uint256', size: 256 },
+        {
+          name: 'stringValue',
+          type: 'string',
+        },
+        {
+          name: 'innerStruct',
+          type: 'tuple[]',
+          components: [
+            { name: 'innerBool', type: 'bool', size: 8 },
+            {
+              name: 'deeperStruct',
+              type: 'tuple[]',
+              components: [
+                { name: 'deeperAddress', type: 'address', size: 160 },
+                {
+                  name: 'deeperString',
+                  type: 'string',
+                },
+                { name: 'deeperInt', type: 'int64', size: 64 },
+              ],
+            },
+            {
+              name: 'innerString',
+              type: 'string',
+            },
+          ],
+        },
+        { name: 'outerBytes', type: 'bytes32', size: 256 },
+      ],
+    };
+    const values = [
+      BigInt('123456789012345678901234567890'),
+      'Dynamic array of tuple',
+      [
+        [
+          true,
+          [
+            [
+              '0x1234567890123456789012345678901234567890',
+              'Dynamic array of deeper tuple',
+              BigInt('-9223372036854775808'),
+            ],
+            [
+              '0xabc4567890123456789012345678901234567890',
+              'Dynamic array of deeper tuple once again',
+              BigInt('12345'),
+            ],
+          ],
+          'Dynamic array of inner tuple',
+        ],
+        [
+          false,
+          [
+            [
+              '0x1234567890123456789012345678901234567abc',
+              'Deeper tuple once more',
+              BigInt('-456789'),
+            ],
+            [
+              '0x1111567890123456789012345678901234567890',
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+              BigInt('1'),
+            ],
+            [
+              '0xa234567890123456789012345678901234567890',
+              'Some long string that is not going to fit in a single slot',
+              BigInt('-372036854775808'),
+            ],
+          ],
+          'Dynamic array of inner tuple once again',
+        ],
+      ],
+      '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+    ];
+    await testDecoder(fields, values);
+  });
 });
