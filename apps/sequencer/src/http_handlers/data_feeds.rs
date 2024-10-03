@@ -375,7 +375,7 @@ mod tests {
     use std::path::PathBuf;
     use std::str::FromStr;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
-    use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+    use tokio::sync::mpsc::UnboundedReceiver;
     use tokio::sync::{mpsc, RwLock};
     use utils::logging::init_shared_logging_handle;
 
@@ -396,10 +396,10 @@ mod tests {
 
         let (_, feeds_config) = get_sequencer_and_feed_configs();
 
-        let (vote_send, _vote_recv): (
-            UnboundedSender<(String, String)>,
-            UnboundedReceiver<(String, String)>,
-        ) = mpsc::unbounded_channel();
+        let (vote_send, mut _vote_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
+
         let sequencer_state = web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
@@ -417,6 +417,7 @@ mod tests {
             feeds_config: Arc::new(RwLock::new(feeds_config)),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            feeds_slots_manager_cmd_send,
         });
 
         let app = test::init_service(
@@ -486,11 +487,9 @@ mod tests {
 
         let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
-        let (vote_send, vote_recv): (
-            UnboundedSender<(String, String)>,
-            UnboundedReceiver<(String, String)>,
-        ) = mpsc::unbounded_channel();
-        let send_channel: UnboundedSender<(String, String)> = vote_send.clone();
+        let (vote_send, vote_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
 
         (
             vote_recv,
@@ -503,7 +502,7 @@ mod tests {
                 log_handle,
                 reporters: init_shared_reporters(&cfg, metrics_prefix),
                 feed_id_allocator: Arc::new(RwLock::new(Some(init_concurrent_allocator()))),
-                voting_send_channel: send_channel,
+                voting_send_channel: vote_send,
                 feeds_metrics: Arc::new(RwLock::new(
                     FeedsMetrics::new(
                         metrics_prefix.expect("Need to set metrics prefix in tests!"),
@@ -513,6 +512,7 @@ mod tests {
                 feeds_config: Arc::new(RwLock::new(feeds_config)),
                 sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
                 feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+                feeds_slots_manager_cmd_send,
             }),
         )
     }
@@ -543,9 +543,17 @@ mod tests {
             )
             .await;
 
+        let (_feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
+
         // Prepare the workers outside of the spawned task
-        let collected_futures =
-            prepare_app_workers(sequencer_state.clone(), &cfg, voting_receive_channel).await;
+        let collected_futures = prepare_app_workers(
+            sequencer_state.clone(),
+            &cfg,
+            voting_receive_channel,
+            feeds_slots_manager_cmd_recv,
+        )
+        .await;
 
         // Start the async block in a separate task
         let _handle = tokio::spawn(async move {

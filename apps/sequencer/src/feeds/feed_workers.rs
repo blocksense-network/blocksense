@@ -12,6 +12,8 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
 
+use super::feeds_slots_manager::FeedsSlotsManagerCmds;
+
 type BatchedVotesChannel = (
     UnboundedSender<HashMap<String, String>>,
     UnboundedReceiver<HashMap<String, String>>,
@@ -25,12 +27,14 @@ pub async fn prepare_app_workers(
     sequencer_state: Data<SequencerState>,
     sequencer_config: &SequencerConfig,
     voting_receive_channel: UnboundedReceiver<(String, String)>,
+    feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsSlotsManagerCmds>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv): BatchedVotesChannel = mpsc::unbounded_channel();
 
     let feeds_slots_manager_loop_fut = feeds_slots_manager_loop(
         sequencer_state.clone(),
         sequencer_state.voting_send_channel.clone(),
+        feeds_slots_manager_cmd_recv,
     )
     .await;
 

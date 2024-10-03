@@ -1,7 +1,8 @@
 use crate::reporters::reporter::SharedReporters;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
-use eyre::Report;
+use eyre::Result;
+use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::registry::{AllFeedsReports, SlotTimeTracker};
 use feed_registry::types::FeedResult;
 use feed_registry::types::FeedType;
@@ -18,7 +19,7 @@ use tracing::{debug, info};
 use utils::time::current_unix_time;
 use utils::to_hex_string;
 
-use feed_registry::registry::FeedAggregateHistory;
+use super::feeds_slots_manager::ProcessorResultValue;
 
 const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
@@ -43,7 +44,7 @@ impl FeedSlotsProcessor {
         history: Arc<RwLock<FeedAggregateHistory>>,
         reporters: SharedReporters,
         feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
-    ) -> Result<String, Report> {
+    ) -> Result<ProcessorResultValue> {
         let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
             let datafeed = feed.read().await;
             (
@@ -68,7 +69,9 @@ impl FeedSlotsProcessor {
 
         loop {
             if is_oneshot && is_processed {
-                return Ok(String::from("Oneshot feed processed"));
+                return Ok(ProcessorResultValue::ProcessorExitStatus(String::from(
+                    "Oneshot feed processed",
+                )));
             }
             feed_slots_time_tracker
                 .await_end_of_current_slot(&repeatability)

@@ -1,4 +1,4 @@
-use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
+use crate::feeds::feeds_slots_manager::{FeedsSlotsManagerCmds, RegisterNewAssetFeed};
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
 use actix_web::http::header::ContentType;
@@ -16,8 +16,8 @@ use futures::StreamExt;
 use utils::logging::tokio_console_active;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
+use feed_registry::types::FeedType;
 use feed_registry::types::Repeatability;
-use feed_registry::types::{FeedMetaData, FeedType};
 use prometheus::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
 use tracing::info_span;
@@ -277,67 +277,35 @@ pub async fn register_asset_feed(
         body.extend_from_slice(&chunk);
     }
 
-    debug!("body = {:?}!", body);
+    debug!("revcd body = {:?}!", body);
 
     let new_feed_config: FeedConfig = serde_json::from_str(std::str::from_utf8(&body)?)?;
-    let new_feed_id;
-    let new_name;
+
     {
-        let mut reg = sequencer_state.registry.write().await;
-
+        let reg = sequencer_state.registry.read().await;
         let keys = reg.get_keys();
-
-        new_feed_id = new_feed_config.id;
-        new_name = new_feed_config.name.clone();
+        let new_feed_id = new_feed_config.id;
 
         if keys.contains(&new_feed_id) {
-            return Err(error::ErrorBadRequest(format!(
+            let err_msg = format!(
                 "Can not register this data feed. Feed with ID {new_feed_id} already exists."
-            )));
+            );
+            error!(err_msg);
+            return Err(error::ErrorBadRequest(err_msg));
         }
-
-        let new_feed_metadata = FeedMetaData::new(
-            &new_name,
-            new_feed_config.report_interval_ms as u64,
-            new_feed_config.quorum_percentage,
-            new_feed_config.first_report_start_time,
-        );
-        reg.push(new_feed_id, new_feed_metadata);
     }
-    {
-        let registered_feed_metadata = sequencer_state
-            .registry
-            .read()
-            .await
-            .get(new_feed_id)
-            .unwrap();
-
-        // update feeds slots processor
-        sequencer_state
-            .feed_aggregate_history
-            .write()
-            .await
-            .register_feed(new_feed_id, 10_000); //TODO(snikolov): How to avoid borrow?
-
-        let reporters = sequencer_state.reporters.clone();
-
-        let feed_slots_processor = FeedSlotsProcessor::new(new_name, new_feed_id);
-
-        actix_web::rt::spawn(async move {
-            feed_slots_processor
-                .start_loop(
-                    sequencer_state.voting_send_channel.clone(),
-                    registered_feed_metadata,
-                    sequencer_state.reports.clone(),
-                    sequencer_state.feed_aggregate_history.clone(),
-                    reporters,
-                    None,
-                )
-                .await
-        });
-    }
-
-    info!("Registered new asset data feed: {:?}", new_feed_config);
+    match sequencer_state.feeds_slots_manager_cmd_send.send(
+        FeedsSlotsManagerCmds::RegisterNewAssetFeed(RegisterNewAssetFeed {
+            config: new_feed_config.clone(),
+        }),
+    ) {
+        Ok(_) => {
+            info!("Scheduled registration of new asset data feed: {new_feed_config:?}",);
+        }
+        Err(e) => {
+            panic!("Sequencer internal error, could not forward feed registration cmd {e}")
+        }
+    };
 
     Ok(HttpResponse::Ok().into())
 }
@@ -360,7 +328,6 @@ mod tests {
     use std::env;
     use std::path::{Path, PathBuf};
     use std::sync::Arc;
-    use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
     use tokio::sync::{mpsc, RwLock};
     use utils::constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE};
     use utils::get_config_file_path;
@@ -385,10 +352,10 @@ mod tests {
 
         let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
 
-        let (vote_send, _vote_recv): (
-            UnboundedSender<(String, String)>,
-            UnboundedReceiver<(String, String)>,
-        ) = mpsc::unbounded_channel();
+        let (vote_send, _vote_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
+
         let sequencer_state = web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
@@ -406,6 +373,7 @@ mod tests {
             feeds_config: Arc::new(RwLock::new(feeds_config)),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            feeds_slots_manager_cmd_send,
         });
 
         let app = test::init_service(
@@ -449,11 +417,9 @@ mod tests {
 
         let log_handle = init_shared_logging_handle("INFO", false);
 
-        let (vote_send, _vote_recv): (
-            UnboundedSender<(String, String)>,
-            UnboundedReceiver<(String, String)>,
-        ) = mpsc::unbounded_channel();
-        let send_channel: UnboundedSender<(String, String)> = vote_send.clone();
+        let (vote_send, _vote_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
 
         let (_, feeds_config) = get_sequencer_and_feed_configs();
 
@@ -466,7 +432,7 @@ mod tests {
             log_handle,
             reporters: init_shared_reporters(&cfg, metrics_prefix),
             feed_id_allocator: Arc::new(RwLock::new(None)),
-            voting_send_channel: send_channel,
+            voting_send_channel: vote_send,
             feeds_metrics: Arc::new(RwLock::new(
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
@@ -474,6 +440,7 @@ mod tests {
             feeds_config: Arc::new(RwLock::new(feeds_config)),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            feeds_slots_manager_cmd_send,
         })
     }
 

@@ -2,12 +2,37 @@ use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::sequencer_state::SequencerState;
 use actix_web::rt::spawn;
 use actix_web::web;
+use config::FeedConfig;
+use eyre::Result;
+use feed_registry::types::FeedMetaData;
+use futures::select;
 use futures::stream::FuturesUnordered;
+use futures::stream::StreamExt;
 use std::fmt::Debug;
 use std::io::Error;
+use std::sync::Arc;
 use tokio::sync::mpsc;
+use tokio::sync::RwLock;
 use tracing::debug;
 use tracing::error;
+use tracing::info;
+
+#[derive(Debug)]
+pub struct RegisterNewAssetFeed {
+    pub config: FeedConfig,
+}
+
+pub enum FeedsSlotsManagerCmds {
+    RegisterNewAssetFeed(RegisterNewAssetFeed),
+}
+
+pub enum ProcessorResultValue {
+    FeedsSlotsManagerCmds(
+        Box<FeedsSlotsManagerCmds>,
+        mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
+    ),
+    ProcessorExitStatus(String),
+}
 
 pub async fn feeds_slots_manager_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
@@ -15,10 +40,11 @@ pub async fn feeds_slots_manager_loop<
 >(
     sequencer_state: web::Data<SequencerState>,
     vote_send: mpsc::UnboundedSender<(K, V)>,
+    cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     let reports_clone = sequencer_state.reports.clone();
     spawn(async move {
-        let collected_futures = FuturesUnordered::new();
+        let mut collected_futures = FuturesUnordered::new();
 
         let reg = sequencer_state.registry.read().await;
 
@@ -61,30 +87,171 @@ pub async fn feeds_slots_manager_loop<
                     .await
             }));
         }
+
+        collected_futures.push(spawn(async move {
+            read_next_feed_slots_manager_cmd(cmd_channel).await
+        }));
+
         drop(reg);
-        let result = futures::future::join_all(collected_futures).await;
-        let mut all_results = String::new();
-        for v in result {
-            match v {
-                Ok(res) => {
-                    all_results += &match res {
-                        Ok(x) => x,
+
+        loop {
+            select! {
+                future_result = collected_futures.select_next_some() => {
+                    let res = match future_result {
+                        Ok(res) => res,
                         Err(e) => {
-                            let err = "ReportError:".to_owned() + &e.to_string();
-                            error!(err);
-                            err
+                            // We panic here, because this is a serious error.
+                            panic!("JoinError: {e}");
+                        },
+                    };
+
+                    let processor_result_val = match res {
+                        Ok(processor_result_val) => processor_result_val,
+                        Err(e) => {
+                            // We error here, to support the task returning errors.
+                            error!("Task terminated with error: {}", e.to_string());
+                            continue;
                         }
-                    }
-                }
-                Err(e) => {
-                    all_results += "JoinError:";
-                    all_results += &e.to_string();
-                }
+                    };
+
+                    handle_feed_slots_processor_result(
+                        sequencer_state.clone(),
+                        &collected_futures,
+                        processor_result_val).await;
+                },
+                complete => break,
             }
-            all_results += " "
         }
         Ok(())
     })
+}
+
+async fn handle_feed_slots_processor_result(
+    sequencer_state: web::Data<SequencerState>,
+    collected_futures: &FuturesUnordered<
+        tokio::task::JoinHandle<std::result::Result<ProcessorResultValue, eyre::Error>>,
+    >,
+    processor_result_val: ProcessorResultValue,
+) {
+    match processor_result_val {
+        ProcessorResultValue::FeedsSlotsManagerCmds(feeds_slots_manager_cmds, cmd_channel) => {
+            handle_feeds_slots_manager_cmd(
+                feeds_slots_manager_cmds,
+                sequencer_state,
+                cmd_channel,
+                collected_futures,
+            )
+            .await;
+        }
+        ProcessorResultValue::ProcessorExitStatus(msg) => {
+            info!("Task complete {}", msg);
+        }
+    }
+}
+
+async fn handle_feeds_slots_manager_cmd(
+    feeds_slots_manager_cmds: Box<FeedsSlotsManagerCmds>,
+    sequencer_state: web::Data<SequencerState>,
+    cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
+    collected_futures: &FuturesUnordered<
+        tokio::task::JoinHandle<std::result::Result<ProcessorResultValue, eyre::Error>>,
+    >,
+) {
+    match *feeds_slots_manager_cmds {
+        FeedsSlotsManagerCmds::RegisterNewAssetFeed(register_new_asset_feed) => {
+            match register_asset_feed(&sequencer_state, &register_new_asset_feed).await {
+                Ok(registered_feed_metadata) => {
+                    let new_name = register_new_asset_feed.config.name;
+                    let new_id = register_new_asset_feed.config.id;
+                    let feed_slots_processor = FeedSlotsProcessor::new(new_name, new_id);
+                    collected_futures.push(spawn(async move {
+                        feed_slots_processor
+                            .start_loop(
+                                sequencer_state.voting_send_channel.clone(),
+                                registered_feed_metadata,
+                                sequencer_state.reports.clone(),
+                                sequencer_state.feed_aggregate_history.clone(),
+                                sequencer_state.reporters.clone(),
+                                Some(sequencer_state.feeds_metrics.clone()),
+                            )
+                            .await
+                    }));
+                    info!("Registering feed id {new_id} complete!");
+                }
+                Err(e) => {
+                    error!("{}", e);
+                }
+            };
+        }
+    };
+    //Register reader task again once the command is processed
+    collected_futures.push(spawn(async move {
+        read_next_feed_slots_manager_cmd(cmd_channel).await
+    }));
+}
+
+async fn register_asset_feed(
+    sequencer_state: &web::Data<SequencerState>,
+    cmd: &RegisterNewAssetFeed,
+) -> Result<Arc<RwLock<FeedMetaData>>> {
+    let new_feed_config = &cmd.config;
+    let new_feed_id;
+    let new_name;
+    {
+        let mut reg = sequencer_state.registry.write().await;
+
+        let keys = reg.get_keys();
+
+        new_feed_id = new_feed_config.id;
+        new_name = new_feed_config.name.clone();
+
+        if keys.contains(&new_feed_id) {
+            eyre::bail!("Cannot register feed ID, feed with this ID {new_feed_id} already exists.");
+        }
+
+        let new_feed_metadata = FeedMetaData::new(
+            &new_name,
+            new_feed_config.report_interval_ms,
+            new_feed_config.quorum_percentage,
+            new_feed_config.first_report_start_time,
+        );
+        reg.push(new_feed_id, new_feed_metadata);
+    }
+    {
+        let mut feeds_config = sequencer_state.feeds_config.write().await;
+        feeds_config.feeds.push(new_feed_config.clone());
+    }
+    {
+        let registered_feed_metadata = sequencer_state
+            .registry
+            .read()
+            .await
+            .get(new_feed_id)
+            .unwrap();
+
+        // update feeds slots processor
+        sequencer_state
+            .feed_aggregate_history
+            .write()
+            .await
+            .register_feed(new_feed_id, 10_000); //TODO(snikolov): How to avoid borrow?
+
+        Ok(registered_feed_metadata)
+    }
+}
+
+async fn read_next_feed_slots_manager_cmd(
+    mut cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
+) -> Result<ProcessorResultValue> {
+    loop {
+        let cmd = cmd_channel.recv().await;
+        if let Some(cmd) = cmd {
+            return Ok(ProcessorResultValue::FeedsSlotsManagerCmds(
+                Box::new(cmd),
+                cmd_channel,
+            ));
+        }
+    }
 }
 
 #[cfg(test)]
@@ -105,10 +272,7 @@ mod tests {
     use std::sync::Arc;
     use std::time::Duration;
 
-    use tokio::sync::{
-        mpsc::{UnboundedReceiver, UnboundedSender},
-        RwLock,
-    };
+    use tokio::sync::RwLock;
     use utils::logging::init_shared_logging_handle;
     use utils::to_hex_string;
 
@@ -151,11 +315,10 @@ mod tests {
                 },
             )
             .await;
+        let (vote_send, mut vote_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
 
-        let (vote_send, mut vote_recv): (
-            UnboundedSender<(String, String)>,
-            UnboundedReceiver<(String, String)>,
-        ) = mpsc::unbounded_channel();
         let sequencer_state = web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
@@ -173,9 +336,15 @@ mod tests {
             feeds_config: Arc::new(RwLock::new(feeds_config)),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            feeds_slots_manager_cmd_send,
         });
 
-        let _future = feeds_slots_manager_loop(sequencer_state, vote_send.clone()).await;
+        let _future = feeds_slots_manager_loop(
+            sequencer_state,
+            vote_send.clone(),
+            feeds_slots_manager_cmd_recv,
+        )
+        .await;
 
         // Attempt to receive with a timeout of 2 seconds
         let received = tokio::time::timeout(

@@ -4,6 +4,7 @@ use actix_web::{web, App, HttpServer};
 use feed_registry::registry::{
     new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
 };
+use sequencer::feeds::feeds_slots_manager::FeedsSlotsManagerCmds;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
 use tokio::sync::{mpsc, RwLock};
@@ -46,7 +47,11 @@ pub async fn prepare_sequencer_state(
     sequencer_config: &SequencerConfig,
     feeds_config: AllFeedsConfig,
     metrics_prefix: Option<&str>,
-) -> (UnboundedReceiver<(String, String)>, Data<SequencerState>) {
+) -> (
+    UnboundedReceiver<(String, String)>,
+    UnboundedReceiver<FeedsSlotsManagerCmds>,
+    Data<SequencerState>,
+) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();
 
     tokio::spawn(async move {
@@ -57,6 +62,7 @@ pub async fn prepare_sequencer_state(
     let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (vote_send, vote_recv): VoteChannel = mpsc::unbounded_channel();
+    let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
 
     let sequencer_state: Data<SequencerState> = web::Data::new(SequencerState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -75,9 +81,10 @@ pub async fn prepare_sequencer_state(
         feeds_config: Arc::new(RwLock::new(feeds_config)),
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+        feeds_slots_manager_cmd_send,
     });
 
-    (vote_recv, sequencer_state)
+    (vote_recv, feeds_slots_manager_cmd_recv, sequencer_state)
 }
 
 pub async fn prepare_http_servers(
@@ -192,15 +199,14 @@ async fn main() -> std::io::Result<()> {
 
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
-    let (voting_receive_channel, sequencer_state): (
-        UnboundedReceiver<(String, String)>,
-        Data<SequencerState>,
-    ) = prepare_sequencer_state(&sequencer_config, feeds_config, None).await;
+    let (voting_receive_channel, feeds_slots_manager_cmd_recv, sequencer_state) =
+        prepare_sequencer_state(&sequencer_config, feeds_config, None).await;
 
     let collected_futures = prepare_app_workers(
         sequencer_state.clone(),
         &sequencer_config,
         voting_receive_channel,
+        feeds_slots_manager_cmd_recv,
     )
     .await;
 
