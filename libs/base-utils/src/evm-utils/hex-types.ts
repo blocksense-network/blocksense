@@ -7,7 +7,7 @@
 
 import * as S from '@effect/schema/Schema';
 
-import { hexDataString } from '../buffer-and-hex-utils';
+import { hexDataString } from '../buffer-and-hex';
 
 // Ethereum address
 

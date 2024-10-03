@@ -1,4 +1,4 @@
-import { previewHexString } from '@blocksense/base-utils/buffer-and-hex-utils';
+import { previewHexString } from '@blocksense/base-utils/buffer-and-hex';
 import { VariableDocItem } from '@blocksense/sol-reflector';
 
 export const filterConstants = (

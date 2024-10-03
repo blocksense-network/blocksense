@@ -27,10 +27,10 @@
       "import": "./dist/esm/async.mjs",
       "types": "./dist/types/async.d.ts"
     },
-    "./buffer-and-hex-utils": {
-      "require": "./dist/cjs/buffer-and-hex-utils/index.cjs",
-      "import": "./dist/esm/buffer-and-hex-utils/index.mjs",
-      "types": "./dist/types/buffer-and-hex-utils/index.d.ts"
+    "./buffer-and-hex": {
+      "require": "./dist/cjs/buffer-and-hex/index.cjs",
+      "import": "./dist/esm/buffer-and-hex/index.mjs",
+      "types": "./dist/types/buffer-and-hex/index.d.ts"
     },
     "./fs": {
       "require": "./dist/cjs/fs.cjs",
