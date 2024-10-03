@@ -34,7 +34,6 @@
             ];
 
           sequencerConfigJSON = configJSON cfg.sequencer {
-            feeds = mkFeeds cfg.sequencer.feeds;
             reporters = mkReporters cfg.sequencer.reporters;
             prometheus_port = cfg.sequencer.metrics-port;
           };
