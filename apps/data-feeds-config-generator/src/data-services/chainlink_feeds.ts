@@ -2,14 +2,14 @@ import { Web3 } from 'web3';
 
 import { assertIsObject } from '@blocksense/base-utils/assert';
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import { getRpcUrl } from '@blocksense/base-utils/evm-utils';
+import { getRpcUrl } from '@blocksense/base-utils/evm';
 
 import {
   NetworkName,
   EthereumAddress,
   parseEthereumAddress,
   isZeroAddress,
-} from '@blocksense/base-utils/evm-utils';
+} from '@blocksense/base-utils/evm';
 
 import {
   decodeConfirmedFeedEvent,

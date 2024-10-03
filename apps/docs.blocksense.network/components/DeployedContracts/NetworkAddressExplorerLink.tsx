@@ -5,7 +5,7 @@ import {
   getAddressExplorerUrl,
   NetworkName,
   EthereumAddress,
-} from '@blocksense/base-utils/evm-utils';
+} from '@blocksense/base-utils/evm';
 import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
 
 type NetworkAddressExplorerLinkProps = {

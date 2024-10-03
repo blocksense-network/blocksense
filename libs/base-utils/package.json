@@ -37,10 +37,10 @@
       "import": "./dist/esm/fs.mjs",
       "types": "./dist/types/fs.d.ts"
     },
-    "./evm-utils": {
-      "require": "./dist/cjs/evm-utils/index.cjs",
-      "import": "./dist/esm/evm-utils/index.mjs",
-      "types": "./dist/types/evm-utils/index.d.ts"
+    "./evm": {
+      "require": "./dist/cjs/evm/index.cjs",
+      "import": "./dist/esm/evm/index.mjs",
+      "types": "./dist/types/evm/index.d.ts"
     },
     "./env": {
       "require": "./dist/cjs/env/index.cjs",

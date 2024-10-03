@@ -1,10 +1,7 @@
 import { tuple, fromEntries } from '@blocksense/base-utils/array-iter';
 import { assert } from '@blocksense/base-utils/assert';
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import {
-  parseEthereumAddress,
-  zeroAddress,
-} from '@blocksense/base-utils/evm-utils';
+import { parseEthereumAddress, zeroAddress } from '@blocksense/base-utils/evm';
 
 import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import {

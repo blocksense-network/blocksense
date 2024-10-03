@@ -2,7 +2,7 @@ import * as S from '@effect/schema/Schema';
 import * as ParseResult from '@effect/schema/ParseResult';
 import * as bigInt_ from 'effect/BigInt';
 
-import { NetworkName, ethereumAddress } from '@blocksense/base-utils/evm-utils';
+import { NetworkName, ethereumAddress } from '@blocksense/base-utils/evm';
 
 export const chainlinkSupportedNetworkFileNames = [
   'feeds-avalanche-fuji-testnet.json',

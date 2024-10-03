@@ -4,11 +4,7 @@ import Web3 from 'web3';
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { everyAsync, filterAsync } from '@blocksense/base-utils/async';
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import {
-  getRpcUrl,
-  isTestnet,
-  NetworkName,
-} from '@blocksense/base-utils/evm-utils';
+import { getRpcUrl, isTestnet, NetworkName } from '@blocksense/base-utils/evm';
 
 import {
   Feed,

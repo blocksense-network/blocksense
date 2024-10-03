@@ -1,6 +1,6 @@
 import * as S from '@effect/schema/Schema';
 
-import { ethereumAddress, networkName } from '@blocksense/base-utils/evm-utils';
+import { ethereumAddress, networkName } from '@blocksense/base-utils/evm';
 
 const CoreContractSchema = S.mutable(
   S.Struct({

@@ -16,7 +16,7 @@ import {
   getOptionalRpcUrl,
   networkName,
   networkMetadata,
-} from '@blocksense/base-utils/evm-utils';
+} from '@blocksense/base-utils/evm';
 
 import './tasks';
 

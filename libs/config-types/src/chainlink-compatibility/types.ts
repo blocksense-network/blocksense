@@ -1,6 +1,6 @@
 import * as S from '@effect/schema/Schema';
 
-import { networkName, ethereumAddress } from '@blocksense/base-utils/evm-utils';
+import { networkName, ethereumAddress } from '@blocksense/base-utils/evm';
 
 const [_local, ...networkNames] = networkName.literals;
 

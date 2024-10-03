@@ -5,7 +5,7 @@ import {
   ethereumAddress,
   networkName,
   txHash,
-} from '@blocksense/base-utils/evm-utils';
+} from '@blocksense/base-utils/evm';
 
 const ParameterType = S.Union(ethereumAddress, S.String, S.Number, S.Boolean);
 

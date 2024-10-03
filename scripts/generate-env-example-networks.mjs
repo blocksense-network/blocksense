@@ -1,4 +1,4 @@
-import { networkName, getRpcUrlEnvVar } from '@blocksense/base-utils/evm-utils';
+import { networkName, getRpcUrlEnvVar } from '@blocksense/base-utils/evm';
 import { kebabToSnakeCase } from '@blocksense/base-utils/string';
 
 const res = networkName.literals

@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@blocksense/base-utils/evm-utils';
+import { EthereumAddress } from '@blocksense/base-utils/evm';
 import { JsonRpcProvider, Network, Wallet } from 'ethers';
 
 export interface NetworkConfig {

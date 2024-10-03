@@ -23,7 +23,7 @@ import {
   parseChainId,
   parseEthereumAddress,
   parseTxHash,
-} from '@blocksense/base-utils/evm-utils';
+} from '@blocksense/base-utils/evm';
 
 import { getEnvString, configDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';

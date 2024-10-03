@@ -9,7 +9,7 @@ import {
   getAddressExplorerUrl,
   isEthereumAddress,
   NetworkName,
-} from '@blocksense/base-utils/evm-utils';
+} from '@blocksense/base-utils/evm';
 import { cn } from '@/lib/utils';
 
 type ContractAddressProps = {

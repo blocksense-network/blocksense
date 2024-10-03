@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import type { EthereumAddress } from '@blocksense/base-utils/evm-utils';
+import type { EthereumAddress } from '@blocksense/base-utils/evm';
 
 export const currencySymbolToDenominationAddress = {
   ETH: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' as EthereumAddress,
