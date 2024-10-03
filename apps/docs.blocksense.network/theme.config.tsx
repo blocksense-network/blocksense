@@ -21,14 +21,14 @@ export default {
   },
   useNextSeoProps() {
     return {
-      titleTemplate: 'Blocksense - %s',
+      titleTemplate: 'Blocksense | %s',
     };
   },
   head: (
     <>
       <meta
         name="description"
-        content="Blocksense is the ZK rollup for scaling oracle data to infinity. Everyone will be able to create secure oracles in minutes."
+        content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
       />
       <link rel="icon" href="/images/blocksense-favicon.png" type="image/png" />
       {fonts.map(font => (
