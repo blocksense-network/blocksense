@@ -30,4 +30,5 @@ cat > $DIR/trigger-oracle.json << EOF
 EOF
 
 set -x
-spin plugin install --file $DIR/trigger-oracle.json --yes
+MY_SPIN="${SPIN_BIN:-spin}"
+$MY_SPIN plugin install --file $DIR/trigger-oracle.json --yes

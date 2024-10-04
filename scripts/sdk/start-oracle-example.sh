@@ -7,7 +7,8 @@ DIR="$ROOT/libs/sdk/examples"
 
 example_name="$1"
 
+MY_SPIN="${SPIN_BIN:-spin}"
 (
   cd "$DIR/$example_name"
-  RUST_LOG=trigger=trace spin build --up
+  RUST_LOG=trigger=trace $MY_SPIN build --up
 )
