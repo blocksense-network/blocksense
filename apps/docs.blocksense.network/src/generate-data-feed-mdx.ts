@@ -47,6 +47,10 @@ function generateIndividualDataFeedPageContent(feed: Feed): string {
   const dataFeedString = stringifyObject(feed);
 
   const content = `
+---
+title: ${feed.description} | ${feed.id}
+---
+
 import { DataFeedDetails } from '@/components/DataFeeds/DataFeedDetails';
 
 <DataFeedDetails
