@@ -11,11 +11,11 @@
   darwin,
   filesets,
   autoPatchelfHook,
+  version ? "dev",
 }:
 let
   sharedAttrs = {
     pname = "blocksense";
-    version = "alpha";
     inherit (filesets.rustSrc) src;
 
     nativeBuildInputs = [
@@ -42,6 +42,6 @@ let
     '';
   };
 
-  cargoArtifacts = craneLib.buildDepsOnly sharedAttrs;
+  cargoArtifacts = craneLib.buildDepsOnly (sharedAttrs // { name = "blocksense-cargo-deps"; });
 in
-craneLib.buildPackage (sharedAttrs // { inherit cargoArtifacts; })
+craneLib.buildPackage (sharedAttrs // { inherit version cargoArtifacts; })

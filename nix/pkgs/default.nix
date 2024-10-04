@@ -5,14 +5,10 @@
     let
       rust = self'.legacyPackages.rustToolchain;
 
-      rustPlatform = pkgs.makeRustPlatform {
-        cargo = rust;
-        rustc = rust;
-      };
-
       craneLib = (inputs.mcl-blockchain.inputs.crane.mkLib pkgs).overrideToolchain rust;
 
       blocksense-rs = pkgs.callPackage ./blocksense-rs {
+        version = "dev-${pkgs.lib.removeSuffix "-dirty" (self.shortRev or self.dirtyShortRev)}";
         inherit (self.lib) filesets;
         inherit craneLib;
       };
