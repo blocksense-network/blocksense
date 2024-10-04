@@ -7,12 +7,14 @@ type CopyButtonProps = {
   textToCopy: string;
   tooltipPosition?: 'top' | 'right' | 'bottom' | 'left';
   copyButtonClasses?: string;
+  disabled?: boolean;
 };
 
 export const CopyButton = ({
   textToCopy,
   tooltipPosition = 'bottom',
   copyButtonClasses = '',
+  disabled = false,
 }: CopyButtonProps) => {
   const [isCopied, setIsCopied] = React.useState(false);
 
@@ -24,6 +26,11 @@ export const CopyButton = ({
       setIsCopied(false);
     }, 2000);
   };
+
+  disabled
+    ? (copyButtonClasses +=
+        ' opacity-40 cursor-not-allowed pointer-events-none')
+    : null;
 
   return (
     <aside className={`signature__copy-button ${copyButtonClasses}`}>
