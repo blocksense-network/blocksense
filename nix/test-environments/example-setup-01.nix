@@ -4,8 +4,16 @@
     enable = true;
 
     anvil = {
-      a.port = 8546;
-      b.port = 1234;
+      a = {
+        port = 8546;
+        chain-id = 99999999999;
+        fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
+      };
+      b = {
+        port = 8547;
+        chain-id = 99999999999;
+        fork-url = "wss://ethereum-holesky-rpc.publicnode.com";
+      };
     };
 
     sequencer = {

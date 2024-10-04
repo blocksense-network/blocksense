@@ -29,10 +29,32 @@ let
 
   anvilInstances = lib.mapAttrs' (
     name:
-    { port }:
+    {
+      port,
+      chain-id,
+      fork-url,
+    }:
     {
       name = "anvil-${name}";
-      value.process-compose.command = "${foundry}/bin/anvil -p ${builtins.toString port}";
+      value.process-compose = {
+        command =
+          ''
+            ${foundry}/bin/anvil \
+              --port ${toString port} \
+              --chain-id ${toString chain-id} \
+          ''
+          + lib.optionalString (fork-url != null) ''
+            --fork-url ${fork-url}
+          '';
+        readiness_probe = {
+          exec.command = ''
+            curl -fsSL http://127.0.0.1:${toString port}/ \
+              -H 'content-type: application/json' \
+              --data-raw '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":0}'
+          '';
+          timeout_seconds = 30;
+        };
+      };
     }
   ) cfg.anvil;
 
