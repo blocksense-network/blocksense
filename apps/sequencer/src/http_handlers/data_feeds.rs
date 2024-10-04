@@ -25,7 +25,7 @@ use feed_registry::types::FeedMetaData;
 use feed_registry::types::{DataFeedPayload, FeedResult, Timestamp};
 use prometheus::{inc_metric, inc_vec_metric};
 use std::time::{SystemTime, UNIX_EPOCH};
-use tokio::sync::RwLock;
+use tokio::sync::{mpsc, RwLock};
 use tokio::time::Duration;
 
 pub fn check_signature(
@@ -374,6 +374,7 @@ pub async fn register_feed(
     let reporters = sequencer_state.reporters.clone();
 
     let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+    let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
     actix_web::rt::spawn(async move {
         feed_slots_processor
@@ -384,6 +385,8 @@ pub async fn register_feed(
                 feed_aggregate_history,
                 reporters,
                 None,
+                cmd_recv,
+                Some(cmd_send),
             )
             .await
     });

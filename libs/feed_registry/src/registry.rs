@@ -50,6 +50,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         start,
         "Numerical".to_string(),
         "Average".to_string(),
+        None,
     );
     let fmd2 = FeedMetaData::new(
         "BTS/USD",
@@ -58,6 +59,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         start,
         "Numerical".to_string(),
         "Average".to_string(),
+        None,
     );
     let fmd3 = FeedMetaData::new(
         "ETH/USD",
@@ -66,6 +68,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         start,
         "Numerical".to_string(),
         "Average".to_string(),
+        None,
     );
 
     let mut fmdr = FeedMetaDataRegistry::new();
@@ -90,6 +93,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
                 feed.first_report_start_time,
                 feed.value_type.clone(),
                 feed.aggregate_type.clone(),
+                None, // Will be filled once FeedsSlotsManager is started and processors are up and running.
             ),
         );
     }
@@ -184,18 +188,6 @@ impl AllFeedsReports {
     pub fn get(&self, feed_id: u32) -> Option<Arc<RwLock<FeedReports>>> {
         self.reports.get(&feed_id).cloned()
     }
-}
-
-pub fn get_feed_id(name: &str) -> Option<u32> {
-    if name.contains("YahooFinance.DOGE/USDC") {
-        return Some(0);
-    } else if name.contains("YahooFinance.BTC/USD") {
-        return Some(1);
-    } else if name.contains("YahooFinance.ETH/USD") {
-        return Some(2);
-    }
-    None
-    // TODO: get from registry
 }
 
 pub struct SlotTimeTracker {
@@ -523,6 +515,7 @@ mod tests {
             current_system_time,
             "Numeric".to_string(),
             "Average".to_string(),
+            None,
         );
 
         // setup messages
@@ -565,14 +558,6 @@ mod tests {
             FeedMetaData::time_to_slot_end_ms(&regular_feed, message_with_future_timestamp),
             20000
         );
-    }
-
-    #[test]
-    fn test_get_feed_id() {
-        assert_eq!(super::get_feed_id("YahooFinance.DOGE/USDC"), Some(0));
-        assert_eq!(super::get_feed_id("YahooFinance.BTC/USD"), Some(1));
-        assert_eq!(super::get_feed_id("YahooFinance.ETH/USD"), Some(2));
-        assert_eq!(super::get_feed_id("NonExistentName"), None);
     }
 
     #[tokio::test]

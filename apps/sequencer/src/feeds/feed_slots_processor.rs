@@ -4,14 +4,15 @@ use data_feeds::feeds_processing::naive_packing;
 use eyre::Result;
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::registry::{AllFeedsReports, SlotTimeTracker};
-use feed_registry::types::FeedResult;
 use feed_registry::types::FeedType;
 use feed_registry::types::{FeedMetaData, Repeatability};
+use feed_registry::types::{FeedResult, FeedsSlotProcessorCmds};
 use prometheus::{inc_metric, metrics::FeedsMetrics};
 use ringbuf::traits::consumer::Consumer;
 use std::fmt::Debug;
 use std::sync::Arc;
 use std::time::Duration;
+use tokio::sync::mpsc;
 use tokio::sync::{mpsc::UnboundedSender, RwLock};
 use tracing::error;
 use tracing::warn;
@@ -33,6 +34,17 @@ impl FeedSlotsProcessor {
         FeedSlotsProcessor { name, key }
     }
 
+    async fn read_cmd(
+        cmd_channel: &mut mpsc::UnboundedReceiver<FeedsSlotProcessorCmds>,
+    ) -> FeedsSlotProcessorCmds {
+        loop {
+            let cmd = cmd_channel.recv().await;
+            if let Some(cmd) = cmd {
+                return cmd;
+            }
+        }
+    }
+
     pub async fn start_loop<
         K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
         V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
@@ -44,6 +56,8 @@ impl FeedSlotsProcessor {
         history: Arc<RwLock<FeedAggregateHistory>>,
         reporters: SharedReporters,
         feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+        mut cmd_channel: mpsc::UnboundedReceiver<FeedsSlotProcessorCmds>,
+        _cmd_sender: Option<mpsc::UnboundedSender<FeedsSlotProcessorCmds>>,
     ) -> Result<ProcessorResultValue> {
         let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
             let datafeed = feed.read().await;
@@ -73,136 +87,149 @@ impl FeedSlotsProcessor {
                     "Oneshot feed processed",
                 )));
             }
-            feed_slots_time_tracker
-                .await_end_of_current_slot(&repeatability)
-                .await;
-            is_processed = true;
 
-            let result_post_to_contract: FeedType; //TODO(snikolov): This needs to be enforced as Bytes32
-            let key_post: u32;
-            let mut is_quorum_reached = true;
+            tokio::select! {
+                processor_cmd = FeedSlotsProcessor::read_cmd(&mut cmd_channel) => {
+                    match processor_cmd {
+                        FeedsSlotProcessorCmds::Terminate() => {
+                            let msg = format!("Terminating processor for feed {} with id {} ", self.name, self.key);
+                            debug!(msg);
+                            return Ok(ProcessorResultValue::ProcessorExitStatus(msg));
+                        },
+                    }
+                }
 
-            {
-                let current_time_as_ms = current_unix_time();
+                _ = feed_slots_time_tracker
+                .await_end_of_current_slot(&repeatability) => {
+                    is_processed = true;
 
-                let slot = feed.read().await.get_slot(current_time_as_ms);
+                    let result_post_to_contract: FeedType; //TODO(snikolov): This needs to be enforced as Bytes32
+                    let key_post: u32;
+                    let mut is_quorum_reached = true;
 
-                info!(
-                    "Processing votes for {} with id {} for slot {} rep_interval {}.",
-                    self.name, self.key, slot, report_interval_ms
-                );
+                    {
+                        let current_time_as_ms = current_unix_time();
 
-                let reports: Arc<RwLock<feed_registry::registry::FeedReports>> =
-                    match reports.read().await.get(self.key) {
-                        Some(x) => x,
-                        None => {
-                            info!("No reports found!");
+                        let slot = feed.read().await.get_slot(current_time_as_ms);
+
+                        info!(
+                            "Processing votes for {} with id {} for slot {} rep_interval {}.",
+                            self.name, self.key, slot, report_interval_ms
+                        );
+
+                        let reports: Arc<RwLock<feed_registry::registry::FeedReports>> =
+                            match reports.read().await.get(self.key) {
+                                Some(x) => x,
+                                None => {
+                                    info!("No reports found!");
+                                    continue;
+                                }
+                            };
+                        debug!("found the following reports:");
+                        debug!("reports = {:?}", reports);
+
+                        let mut reports = reports.write().await;
+                        // Process the reports:
+                        let mut values: Vec<&FeedType> = vec![];
+                        for kv in &reports.report {
+                            match kv.1 {
+                                FeedResult::Result { result } => values.push(result),
+                                FeedResult::Error { .. } => {
+                                    warn!(
+                                        "Got error from reporter {} for feed id {} slot {}",
+                                        kv.0, self.key, slot
+                                    );
+                                }
+                            }
+                        }
+
+                        if values.is_empty() {
+                            info!("No reports found for feed: {} slot: {}!", self.name, &slot);
                             continue;
                         }
-                    };
-                debug!("found the following reports:");
-                debug!("reports = {:?}", reports);
 
-                let mut reports = reports.write().await;
-                // Process the reports:
-                let mut values: Vec<&FeedType> = vec![];
-                for kv in &reports.report {
-                    match kv.1 {
-                        FeedResult::Result { result } => values.push(result),
-                        FeedResult::Error { .. } => {
+                        let total_votes_count = values.len() as f32;
+                        let required_votes_count = quorum_percentage * reporters.read().await.len() as f32;
+
+                        if total_votes_count < required_votes_count {
                             warn!(
-                                "Got error from reporter {} for feed id {} slot {}",
-                                kv.0, self.key, slot
-                            );
+                            "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
+                            self.name, &slot, quorum_percentage, total_votes_count, reporters.read().await.len()
+                        );
+                            is_quorum_reached = false;
                         }
-                    }
-                }
 
-                if values.is_empty() {
-                    info!("No reports found for feed: {} slot: {}!", self.name, &slot);
-                    continue;
-                }
-
-                let total_votes_count = values.len() as f32;
-                let required_votes_count = quorum_percentage * reporters.read().await.len() as f32;
-
-                if total_votes_count < required_votes_count {
-                    warn!(
-                    "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
-                    self.name, &slot, quorum_percentage, total_votes_count, reporters.read().await.len()
-                );
-                    is_quorum_reached = false;
-                }
-
-                key_post = self.key;
-                if let Some(feed_metrics) = &feed_metrics {
-                    if is_quorum_reached {
-                        inc_metric!(feed_metrics, key_post, quorums_reached);
-                    } else {
-                        inc_metric!(feed_metrics, key_post, failures_to_reach_quorum);
-                    }
-                }
-
-                result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
-
-                // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
-                if !is_oneshot {
-                    {
-                        let mut history_guard = history.write().await;
-                        history_guard.push(self.key, result_post_to_contract.clone())
-                    }
-
-                    let history_lock = history.read().await;
-
-                    // The first slice is from the current read position to the end of the array
-                    // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
-                    let (first, last) = history_lock
-                        .collect(self.key)
-                        .expect("Missing key from History!")
-                        .as_slices();
-
-                    let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
-                    let numerical_vec: Vec<f64> = history_vec
-                        .iter()
-                        .filter_map(|feed| {
-                            if let FeedType::Numerical(value) = feed {
-                                Some(*value)
-                            } else if let FeedType::Text(_) = feed {
-                                warn!(
-                                "Anomaly Detection not implemented for FeedType::Text, skipping..."
-                            );
-                                None
+                        key_post = self.key;
+                        if let Some(feed_metrics) = &feed_metrics {
+                            if is_quorum_reached {
+                                inc_metric!(feed_metrics, key_post, quorums_reached);
                             } else {
-                                warn!("Anomaly Detection does not recognize FeedType, skipping...");
-                                None
-                            }
-                        })
-                        .collect();
-
-                    // Get AD prediction only if enough data is present
-                    if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
-                        match anomaly_detector_aggregate(numerical_vec) {
-                            Ok(ad_score) => {
-                                info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
-                            }
-                            Err(e) => {
-                                error!("Anomaly Detection failed with error - {}", e);
+                                inc_metric!(feed_metrics, key_post, failures_to_reach_quorum);
                             }
                         }
+
+                        result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
+
+                        // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
+                        if !is_oneshot {
+                            {
+                                let mut history_guard = history.write().await;
+                                history_guard.push(self.key, result_post_to_contract.clone())
+                            }
+
+                            let history_lock = history.read().await;
+
+                            // The first slice is from the current read position to the end of the array
+                            // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
+                            let (first, last) = history_lock
+                                .collect(self.key)
+                                .expect("Missing key from History!")
+                                .as_slices();
+
+                            let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
+                            let numerical_vec: Vec<f64> = history_vec
+                                .iter()
+                                .filter_map(|feed| {
+                                    if let FeedType::Numerical(value) = feed {
+                                        Some(*value)
+                                    } else if let FeedType::Text(_) = feed {
+                                        warn!(
+                                        "Anomaly Detection not implemented for FeedType::Text, skipping..."
+                                    );
+                                        None
+                                    } else {
+                                        warn!("Anomaly Detection does not recognize FeedType, skipping...");
+                                        None
+                                    }
+                                })
+                                .collect();
+
+                            // Get AD prediction only if enough data is present
+                            if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
+                                match anomaly_detector_aggregate(numerical_vec) {
+                                    Ok(ad_score) => {
+                                        info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
+                                    }
+                                    Err(e) => {
+                                        error!("Anomaly Detection failed with error - {}", e);
+                                    }
+                                }
+                            }
+                        }
+
+                        info!("result_post_to_contract = {:?}", result_post_to_contract);
+                        reports.clear();
+                    }
+                    if is_quorum_reached {
+                        result_send
+                            .send((
+                                to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
+                                naive_packing(result_post_to_contract).into(),
+                            ))
+                            .unwrap();
                     }
                 }
-
-                info!("result_post_to_contract = {:?}", result_post_to_contract);
-                reports.clear();
-            }
-            if is_quorum_reached {
-                result_send
-                    .send((
-                        to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
-                        naive_packing(result_post_to_contract).into(),
-                    ))
-                    .unwrap();
-            }
+            };
         }
     }
 }
@@ -233,6 +260,7 @@ mod tests {
             first_report_start_time,
             "Numerical".to_string(),
             "Average".to_string(),
+            None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
         let all_feeds_reports = AllFeedsReports::new();
@@ -274,6 +302,8 @@ mod tests {
 
         tokio::spawn(async move {
             let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
+
             feed_slots_processor
                 .start_loop(
                     tx,
@@ -282,6 +312,8 @@ mod tests {
                     history_cp,
                     Arc::new(RwLock::new(HashMap::new())),
                     None,
+                    cmd_recv,
+                    Some(cmd_send),
                 )
                 .await
                 .unwrap();
@@ -369,6 +401,7 @@ mod tests {
         let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
             Arc::new(RwLock::new(FeedAggregateHistory::new()));
         let feed_aggregate_history_clone = Arc::clone(&feed_aggregate_history);
+        let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
         tokio::spawn(async move {
             let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
             feed_slots_processor
@@ -379,6 +412,8 @@ mod tests {
                     feed_aggregate_history_clone,
                     Arc::new(RwLock::new(HashMap::new())),
                     None,
+                    cmd_recv,
+                    Some(cmd_send),
                 )
                 .await
                 .unwrap();

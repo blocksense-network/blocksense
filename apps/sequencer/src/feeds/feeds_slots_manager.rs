@@ -74,6 +74,10 @@ pub async fn feeds_slots_manager_loop<
 
             let feed_slots_processor = FeedSlotsProcessor::new(name, key);
 
+            let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
+
+            feed.write().await.set_processor_cmd_chan(cmd_send);
+
             collected_futures.push(spawn(async move {
                 feed_slots_processor
                     .start_loop(
@@ -83,6 +87,8 @@ pub async fn feeds_slots_manager_loop<
                         feed_aggregate_history_cp,
                         reporters_cp,
                         Some(feed_metrics_cp),
+                        cmd_recv,
+                        None,
                     )
                     .await
             }));
@@ -164,6 +170,17 @@ async fn handle_feeds_slots_manager_cmd(
                     let new_name = register_new_asset_feed.config.name;
                     let new_id = register_new_asset_feed.config.id;
                     let feed_slots_processor = FeedSlotsProcessor::new(new_name, new_id);
+                    let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
+
+                    {
+                        let reg = sequencer_state.registry.read().await;
+                        let feed = match reg.get(new_id) {
+                            Some(x) => x,
+                            None => panic!("Error feed was not registered."),
+                        };
+                        feed.write().await.set_processor_cmd_chan(cmd_send);
+                    }
+
                     collected_futures.push(spawn(async move {
                         feed_slots_processor
                             .start_loop(
@@ -173,6 +190,8 @@ async fn handle_feeds_slots_manager_cmd(
                                 sequencer_state.feed_aggregate_history.clone(),
                                 sequencer_state.reporters.clone(),
                                 Some(sequencer_state.feeds_metrics.clone()),
+                                cmd_recv,
+                                None,
                             )
                             .await
                     }));
@@ -216,6 +235,7 @@ async fn register_asset_feed(
             new_feed_config.first_report_start_time,
             new_feed_config.value_type.clone(),
             new_feed_config.aggregate_type.clone(),
+            None,
         );
         reg.push(new_feed_id, new_feed_metadata);
     }

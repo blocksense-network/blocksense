@@ -5,6 +5,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 use thiserror::Error;
+use tokio::sync::mpsc::UnboundedSender;
 use tracing::debug;
 
 use crypto::JsonSerializableSignature;
@@ -25,6 +26,10 @@ pub enum ReportRelevance {
     NonRelevantInFuture,
 }
 
+pub enum FeedsSlotProcessorCmds {
+    Terminate(),
+}
+
 #[derive(Debug)]
 pub struct FeedMetaData {
     name: String,
@@ -35,6 +40,7 @@ pub struct FeedMetaData {
     feed_aggregator: Box<dyn FeedAggregate>,
     pub value_type: String,
     pub aggregate_type: String,
+    processor_cmd_chan: Option<UnboundedSender<FeedsSlotProcessorCmds>>,
 }
 
 impl FeedMetaData {
@@ -53,6 +59,7 @@ impl FeedMetaData {
             feed_aggregator: Box::new(AverageAggregator {}),
             value_type: "Numeric".to_string(),
             aggregate_type: "Average".to_string(),
+            processor_cmd_chan: None,
         }
     }
 
@@ -63,6 +70,7 @@ impl FeedMetaData {
         first_report_start_time: SystemTime,
         value_type: String,
         aggregate_type: String,
+        processor_cmd_chan: Option<UnboundedSender<FeedsSlotProcessorCmds>>,
     ) -> FeedMetaData {
         FeedMetaData {
             name: name.to_string(),
@@ -73,7 +81,12 @@ impl FeedMetaData {
             feed_aggregator: get_aggregator(aggregate_type.as_str()), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
             value_type,
             aggregate_type,
+            processor_cmd_chan,
         }
+    }
+
+    pub fn set_processor_cmd_chan(&mut self, send_chan: UnboundedSender<FeedsSlotProcessorCmds>) {
+        self.processor_cmd_chan = Some(send_chan);
     }
 
     pub fn get_name(&self) -> &String {
