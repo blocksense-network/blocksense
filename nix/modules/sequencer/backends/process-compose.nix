@@ -33,6 +33,7 @@ let
       port,
       chain-id,
       fork-url,
+      contract-deployment,
     }:
     {
       name = "anvil-${name}";
@@ -56,6 +57,29 @@ let
         };
       };
     }
+  ) cfg.anvil;
+
+  smartContractDeploymentInstances = lib.mapAttrs' (
+    name:
+    { port, contract-deployment, ... }:
+    {
+      name = "smartContract-${name}";
+      value.process-compose = lib.mkIf contract-deployment.enable {
+        command = ''
+          yarn && \
+          yarn build @blocksense/contracts && \
+          yarn workspace '@blocksense/contracts' hardhat deploy --networks local
+        '';
+        environment = [
+          "RPC_URL_LOCAL=http://127.0.0.1:${toString port}/"
+          "SEQUENCER_ADDRESS=0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+          "SIGNER_PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+        ];
+        depends_on."anvil-${name}".condition = "process_healthy";
+      };
+
+    }
+
   ) cfg.anvil;
 
   reporterInstances = lib.mapAttrs' (name: conf: {
@@ -86,6 +110,7 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    processes = sequencerInstance // anvilInstances // reporterInstances;
+    processes =
+      sequencerInstance // anvilInstances // smartContractDeploymentInstances // reporterInstances;
   };
 }

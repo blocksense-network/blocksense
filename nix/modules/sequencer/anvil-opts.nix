@@ -1,5 +1,18 @@
 { lib, ... }:
 with lib;
+let
+  walletOpts = {
+    address.file = mkOption {
+      type = with types; nullOr path;
+      description = "The path to the wallet address";
+    };
+    private-key.file = mkOption {
+      type = with types; nullOr path;
+      default = null;
+      description = "The path of the wallet private key";
+    };
+  };
+in
 {
   options = {
     port = mkOption {
@@ -18,6 +31,12 @@ with lib;
       type = types.nullOr types.str;
       default = null;
       description = "The fork URL to use for the Anvil instance.";
+    };
+
+    contract-deployment = {
+      enable = mkEnableOption "Enable deployment of Blocksense contracts on Anvil simulation environment.";
+      deployer = walletOpts;
+      sequencer = walletOpts;
     };
   };
 }
