@@ -48,19 +48,22 @@ let
       shutdown.signal = 9;
     };
   }) cfg.reporters;
+
+  sequencerInstance = {
+    blocksense-sequencer.process-compose = {
+      command = "${sequencer.program}";
+      environment = [
+        "FEEDS_CONFIG_DIR=${../../../../config}"
+        "SEQUENCER_CONFIG_DIR=${sequencerConfigJSON}"
+        "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
+      ];
+      shutdown.signal = 9;
+    };
+  };
+
 in
 {
   config = lib.mkIf cfg.enable {
-    processes = {
-      blocksense-sequencer.process-compose = {
-        command = "${sequencer.program}";
-        environment = [
-          "FEEDS_CONFIG_DIR=${../../../../config}"
-          "SEQUENCER_CONFIG_DIR=${sequencerConfigJSON}"
-          "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
-        ];
-        shutdown.signal = 9;
-      };
-    } // anvilInstances // reporterInstances;
+    processes = sequencerInstance // anvilInstances // reporterInstances;
   };
 }
