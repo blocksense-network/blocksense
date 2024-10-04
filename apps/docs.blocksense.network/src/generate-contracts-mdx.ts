@@ -11,10 +11,17 @@ import { stringifyObject } from './utils';
 
 const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
 
-function generateMarkdownContent(sourceUnit: SourceUnitDocItem): string {
+function generateMarkdownContent(
+  sourceUnit: SourceUnitDocItem,
+  name: string,
+): string {
   const sourceUnitJsonString = stringifyObject(sourceUnit);
 
   const content = `
+---
+title: ${name}
+---
+
 import { SourceUnit } from '@/sol-contracts-components/SourceUnit';
 
 <SourceUnit sourceUnitJsonString={${sourceUnitJsonString}} />
@@ -45,10 +52,13 @@ function generateOverviewContent(contractsMetaJSON: {
 }
 
 function generateSolRefDocFiles(): Promise<string[]> {
-  const mdxFiles = solReflection.map(sourceUnit => ({
-    name: path.parse(sourceUnit.absolutePath).name,
-    content: generateMarkdownContent(sourceUnit),
-  }));
+  const mdxFiles = solReflection.map(sourceUnit => {
+    const name = path.parse(sourceUnit.absolutePath).name;
+    return {
+      name,
+      content: generateMarkdownContent(sourceUnit, name),
+    };
+  });
 
   let metaJSON = mdxFiles.reduce(
     (obj, { name }) => ({ [name]: name, ...obj }),
