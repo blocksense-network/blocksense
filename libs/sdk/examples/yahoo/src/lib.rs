@@ -111,8 +111,10 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     req.method(Method::Get);
     req.uri(url);
     //TODO(adikov): Implement API key as capability of the reporter and add it to the header
-    // in the oracle trigger
-    req.header("x-api-key", "97yVrb3jKQaLw2vU1istq7LcVmTUgPaPavoL7HYn");
+    //in the oracle trigger
+
+    // Please provide your own API key until capabilities are implemented.
+    req.header("x-api-key", "");
     req.header("Accepts", "application/json");
 
     let req = req.build();
