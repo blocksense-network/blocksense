@@ -35,6 +35,7 @@ export const DataFeedCardExtraContent: React.FC<{
             code={JSON.stringify(scriptArguments, null, 2)}
             lang="json"
             theme="github-light"
+            copy={{ haveButton: true, disabled: true }}
           />
         </div>
       );
