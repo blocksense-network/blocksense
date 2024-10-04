@@ -27,10 +27,10 @@ services:
       retries: 1
 
   sequencer:
-    image: blocksense
+    image: blocksense-sequencer
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-sequencer
     ports:
       - '8877:8877'
       - '5555:5555'
@@ -53,8 +53,10 @@ services:
         condition: service_healthy
 
   reporter-a:
-    image: blocksense
-    entrypoint: ['/bin/sh', '-c', 'RUST_LOG=debug launch_reporter']
+    image: blocksense-reporter
+    build:
+      context: .
+      dockerfile: Dockerfile-reporter
     networks:
       - backend
     volumes:

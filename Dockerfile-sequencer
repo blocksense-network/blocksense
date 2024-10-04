@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/root/.cargo/registry --mount=type=cache,target=/r
     && strip out/sequencer \
     && strip out/launch_reporter;
 
-FROM ubuntu:24.04 AS blocksense
+FROM ubuntu:24.04 AS blocksense-sequencer
 RUN apt-get update
 RUN apt-get install -y wget curl
 
