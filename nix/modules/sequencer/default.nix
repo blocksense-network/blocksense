@@ -2,7 +2,6 @@
   lib,
   self,
   inputs,
-  config,
   ...
 }:
 {
@@ -57,17 +56,7 @@
             };
 
             anvil = mkOption {
-              type = types.attrsOf (
-                types.submodule {
-                  options = {
-                    port = mkOption {
-                      type = types.int;
-                      default = 8545;
-                      description = "The port to use for the Anvil instance.";
-                    };
-                  };
-                }
-              );
+              type = types.attrsOf (types.submoduleWith { modules = [ ./anvil-opts.nix ]; });
               default = { };
               description = mdDoc "The Anvil instance to use.";
             };
