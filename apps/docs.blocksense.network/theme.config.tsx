@@ -30,6 +30,19 @@ export default {
         name="description"
         content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
       />
+      <meta
+        property="og:description"
+        content="The ZK rollup for verifiable data and compute services. Soon everyone will be able to create secure oracles in minutes."
+      />
+      <meta property="og:image" content="/images/blocksense-og.png" />
+      <meta property="og:type" content="website" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Blocksense Network" />
+      <meta
+        name="twitter:description"
+        content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
+      />
+      <meta name="twitter:image" content="/images/blocksense-og.png" />
       <link rel="icon" href="/images/blocksense-favicon.png" type="image/png" />
       {fonts.map(font => (
         <link
