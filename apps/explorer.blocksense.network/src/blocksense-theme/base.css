@@ -52,7 +52,7 @@
     @apply border border-slate-200;
   }
 
-  [role="dialog"] pre {
+  [role='dialog'] pre {
     border: none;
   }
 
