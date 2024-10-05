@@ -1,4 +1,7 @@
 { config, ... }:
+let
+  testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
+in
 {
   services.blocksense = {
     enable = true;
@@ -8,11 +11,31 @@
         port = 8546;
         chain-id = 99999999999;
         fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
+        contract-deployment = {
+          enable = true;
+          deployer = {
+            private-key.file = "${testKeysDir}/deployer-private-key";
+          };
+          sequencer = {
+            address.file = "${testKeysDir}/sequencer-address";
+            private-key.file = "${testKeysDir}/sequencer-address";
+          };
+        };
       };
       b = {
         port = 8547;
         chain-id = 99999999999;
         fork-url = "wss://ethereum-holesky-rpc.publicnode.com";
+        contract-deployment = {
+          enable = true;
+          deployer = {
+            private-key.file = "${testKeysDir}/deployer-private-key";
+          };
+          sequencer = {
+            address.file = "${testKeysDir}/sequencer-address";
+            private-key.file = "${testKeysDir}/sequencer-address";
+          };
+        };
       };
     };
 
@@ -29,11 +52,11 @@
           # self-contained.
           # In a production environment, use a secret manager like Agenix, to
           # prevent secrets from being copyed to the Nix Store.
-          private_key_path = ./test-keys/anvil-acc1-private-key;
+          private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c";
         };
         b = {
-          private_key_path = ./test-keys/anvil-acc1-private-key;
+          private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c";
         };
       };
