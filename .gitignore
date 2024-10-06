@@ -164,3 +164,5 @@ process-compose.yml
 
 # Data files like chainlink feeds, cmc assets, etc.
 apps/data-feeds-config-generator/artifacts
+
+*storybook.log
