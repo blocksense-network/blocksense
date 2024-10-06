@@ -1,4 +1,7 @@
 {
   "name": "@blockesense/design-system",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "vite": "^5.4.8"
+  }
 }
