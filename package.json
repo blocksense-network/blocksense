@@ -19,7 +19,19 @@
     "@openzeppelin/contracts@5.0.2": {
       "unplugged": true
     },
+    "@storybook/core@8.3.5": {
+      "unplugged": true
+    },
+    "@storybook/react-dom-shim@8.3.5": {
+      "unplugged": true
+    },
     "next@14.2.5": {
+      "unplugged": true
+    },
+    "react@18.3.1": {
+      "unplugged": true
+    },
+    "react-dom@18.3.1": {
       "unplugged": true
     }
   },
