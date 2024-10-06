@@ -353,6 +353,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blockesense/design-system@workspace:libs/design-system":
+  version: 0.0.0-use.local
+  resolution: "@blockesense/design-system@workspace:libs/design-system"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/base-utils@workspace:*, @blocksense/base-utils@workspace:libs/base-utils":
   version: 0.0.0-use.local
   resolution: "@blocksense/base-utils@workspace:libs/base-utils"
