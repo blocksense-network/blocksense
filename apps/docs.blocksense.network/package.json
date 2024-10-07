@@ -18,7 +18,7 @@
   },
   "types": "./src/index.ts",
   "devDependencies": {
-    "@types/node": "^22.3.0",
+    "@types/node": "^22.7.4",
     "@types/react": "^18.3.3",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",
