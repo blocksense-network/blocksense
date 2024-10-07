@@ -463,9 +463,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/docs-theme@workspace:*, @blocksense/docs-theme@workspace:libs/docs-theme":
+"@blocksense/docs-theme@workspace:*, @blocksense/docs-theme@workspace:libs/ts/docs-theme":
   version: 0.0.0-use.local
-  resolution: "@blocksense/docs-theme@workspace:libs/docs-theme"
+  resolution: "@blocksense/docs-theme@workspace:libs/ts/docs-theme"
   dependencies:
     "@blocksense/contracts": "workspace:*"
     "@headlessui/react": "npm:^2.1.2"
