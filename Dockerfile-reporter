@@ -26,9 +26,19 @@ RUN --mount=type=cache,target=/root/.cargo/registry --mount=type=cache,target=/r
     && mv target/release/launch_reporter out/launch_reporter \
     && strip out/launch_reporter;
 
+
 FROM ubuntu:24.04 AS blocksense-reporter
 RUN apt-get update
 RUN apt-get install -y wget curl
+
+RUN apt-get install -y build-essential git clang curl \
+    librust-openssl-dev libusb-dev \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup.sh \
+    && chmod +x ./rustup.sh \
+    && ./rustup.sh --default-toolchain 1.80.0 -y
+
+# Install SPIN
+RUN curl -fsSL https://developer.fermyon.com/downloads/install.sh | bash -s -- -v v2.7.0
 
 COPY --from=build-environment /opt/blocksense/out/launch_reporter /usr/local/bin/launch_reporter
 WORKDIR /usr/local/blocksense
