@@ -13,6 +13,6 @@ utils = { path = "../utils" }
 # alias the framework.
 prometheus_framework = { package = "prometheus", version = "0.13.4" }
 actix-web = "4.5.1"
-reqwest = "0.12.4"
+reqwest = "0.12.8"
 anyhow = "1.0.89"
 lazy_static = "1.4.0"

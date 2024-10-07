@@ -64,9 +64,9 @@ actix-multipart = "0.7.2"
 actix-test = "0.1.5"
 serde_json = "1.0.128"
 serde = { version = "1.0.210", features = ["derive"]}
-futures = "0.3.30"
+futures = "0.3.31"
 envload = "0.1.1"
-once_cell = "1.20.1"
+once_cell = "1.20.2"
 async-channel = "2.3.0"
 tracing = { version = "0.1.40", features = ["async-await", "log"] }
 tracing-subscriber = { version = "0.3.18", features = ["json"] }
