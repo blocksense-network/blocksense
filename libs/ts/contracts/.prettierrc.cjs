@@ -1,4 +1,4 @@
-const defaultConfig = require('../../.prettierrc.cjs');
+const defaultConfig = require('../../../.prettierrc.cjs');
 
 const config = {
   ...defaultConfig,

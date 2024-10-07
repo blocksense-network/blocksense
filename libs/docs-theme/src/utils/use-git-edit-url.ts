@@ -13,7 +13,7 @@ export function useGitEditUrl(filePath = ''): string {
 
   if (filePath.includes('reference-documentation')) {
     const contractFileName = path.basename(filePath).replace('.mdx', '.sol');
-    let gitAbsolutePath = 'edit/main/libs/contracts/';
+    let gitAbsolutePath = 'edit/main/libs/ts/contracts/';
     SOL_REFLECTION_JSON.some((sourceUnit: any) => {
       if (sourceUnit.absolutePath.includes(contractFileName)) {
         gitAbsolutePath += sourceUnit.absolutePath;

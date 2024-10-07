@@ -399,9 +399,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/contracts@workspace:*, @blocksense/contracts@workspace:libs/contracts":
+"@blocksense/contracts@workspace:*, @blocksense/contracts@workspace:libs/ts/contracts":
   version: 0.0.0-use.local
-  resolution: "@blocksense/contracts@workspace:libs/contracts"
+  resolution: "@blocksense/contracts@workspace:libs/ts/contracts"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"

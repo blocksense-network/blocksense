@@ -38,7 +38,7 @@ export function constructFileTreeStructure(
 export async function contractsFileStructureAsJSON(userConfig?: Config) {
   const contractsPath = path.resolve(
     __dirname,
-    `${rootDir}/libs/contracts/contracts`,
+    `${rootDir}/libs/ts/contracts/contracts`,
   );
   const tree = dirTree(contractsPath);
   const contractsFileStructure = constructFileTreeStructure(tree);

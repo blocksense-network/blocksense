@@ -3,7 +3,7 @@
 source "${BASH_SOURCE%/*}/utils/paths.sh"
 
 REMAPPING_FILE_NAME="remappings.txt"
-CONTRACTS_DIR="$ROOT/libs/contracts"
+CONTRACTS_DIR="$ROOT/libs/ts/contracts"
 
 OPENZEPPELIN_LIB="$(find "$ROOT"/.yarn/unplugged -maxdepth 1 -type d -name '@openzeppelin-*')/node_modules/@openzeppelin/"
 OPENZEPPELIN_REMAP="@openzeppelin/=$OPENZEPPELIN_LIB"
