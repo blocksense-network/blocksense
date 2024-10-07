@@ -376,9 +376,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/config-types@workspace:*, @blocksense/config-types@workspace:libs/config-types":
+"@blocksense/config-types@workspace:*, @blocksense/config-types@workspace:libs/ts/config-types":
   version: 0.0.0-use.local
-  resolution: "@blocksense/config-types@workspace:libs/config-types"
+  resolution: "@blocksense/config-types@workspace:libs/ts/config-types"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
     "@effect/schema": "npm:^0.71.1"
