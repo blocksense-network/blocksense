@@ -607,9 +607,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/sol-reflector@workspace:*, @blocksense/sol-reflector@workspace:libs/sol-reflector":
+"@blocksense/sol-reflector@workspace:*, @blocksense/sol-reflector@workspace:libs/ts/sol-reflector":
   version: 0.0.0-use.local
-  resolution: "@blocksense/sol-reflector@workspace:libs/sol-reflector"
+  resolution: "@blocksense/sol-reflector@workspace:libs/ts/sol-reflector"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
     "@types/mocha": "npm:^10.0.8"
