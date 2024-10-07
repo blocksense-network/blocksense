@@ -353,9 +353,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blocksense/base-utils@workspace:*, @blocksense/base-utils@workspace:libs/base-utils":
+"@blocksense/base-utils@workspace:*, @blocksense/base-utils@workspace:libs/ts/base-utils":
   version: 0.0.0-use.local
-  resolution: "@blocksense/base-utils@workspace:libs/base-utils"
+  resolution: "@blocksense/base-utils@workspace:libs/ts/base-utils"
   dependencies:
     "@effect/schema": "npm:^0.71.1"
     "@rollup/plugin-commonjs": "npm:^28.0.0"
