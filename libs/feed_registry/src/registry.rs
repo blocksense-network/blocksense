@@ -187,6 +187,7 @@ impl AllFeedsReports {
         }
     }
     pub async fn push(&mut self, feed_id: u32, reporter_id: u64, data: FeedResult) -> bool {
+        println!("@@2 Pushing a new report feed_id: {:?}, reporter_id: {:?}, data: {:?}", feed_id, reporter_id, data);
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
