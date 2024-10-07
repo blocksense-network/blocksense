@@ -1,10 +1,11 @@
 import * as React from 'react';
 
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { Tooltip } from '@/components/common/Tooltip';
 import { CopyButton } from '@/components/common/CopyButton';
-import { previewHexStringOrDefault } from '@/src/utils';
+import { onLinkClick, previewHexStringOrDefault } from '@/src/utils';
 import {
   getAddressExplorerUrl,
   isEthereumAddress,
@@ -25,6 +26,8 @@ export const ContractAddress = ({
   enableCopy,
   hasAbbreviation,
 }: ContractAddressProps) => {
+  const router = useRouter();
+
   if (!address) {
     return '-';
   }
@@ -45,8 +48,22 @@ export const ContractAddress = ({
           <code className="hover:underline">
             <Link
               href={getAddressExplorerUrl(network, address)}
-              onClick={e => e.stopPropagation()}
-              target="_blank"
+              onClick={e =>
+                onLinkClick(
+                  e,
+                  router,
+                  getAddressExplorerUrl(network, address),
+                  true,
+                )
+              }
+              onAuxClick={e =>
+                onLinkClick(
+                  e,
+                  router,
+                  getAddressExplorerUrl(network, address),
+                  true,
+                )
+              }
             >
               {addressToDisplay}
             </Link>

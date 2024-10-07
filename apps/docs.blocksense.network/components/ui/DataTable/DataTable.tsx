@@ -25,6 +25,7 @@ import {
 import { DataTablePagination } from '@/components/ui/DataTable/DataTablePagination';
 import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar';
 import { cn } from '@/lib/utils';
+import { onLinkClick } from '@/src/utils';
 
 export type OptionType = {
   label: string;
@@ -122,18 +123,6 @@ export function DataTable<TData, TValue>({
     return rowLink ? `${rowLink}${row.getValue('id')}` : '';
   }
 
-  function onRowClick(e: React.MouseEvent, row: Row<TData>) {
-    e.ctrlKey || e.metaKey
-      ? window.open(getRowLink(row))
-      : router.push(getRowLink(row));
-  }
-
-  function onRowAuxClick(row: Row<TData>) {
-    const link = getRowLink(row);
-    if (!link) return;
-    window.open(link);
-  }
-
   return (
     <div className="space-y-4 mt-2">
       {hasToolbar && (
@@ -170,8 +159,10 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map(row => (
                 <TableRow
                   key={row.id}
-                  onClick={e => onRowClick(e, row)}
-                  onAuxClick={() => onRowAuxClick(row)}
+                  onClick={e => onLinkClick(e, router, getRowLink(row))}
+                  onAuxClick={e =>
+                    onLinkClick(e, router, getRowLink(row), true)
+                  }
                   className={cn(rowLink && 'cursor-pointer')}
                 >
                   {row.getVisibleCells().map(cell => (
