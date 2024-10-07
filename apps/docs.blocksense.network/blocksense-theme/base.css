@@ -291,3 +291,10 @@ main {
     @apply text-blue-700;
   }
 }
+
+.announcement__icon {
+  border-right: 1px solid black;
+  padding-right: 23px;
+  line-height: 48px;
+  margin-right: 20px;
+}
