@@ -11,7 +11,7 @@ type CodeBlockProps = {
   lang?: string;
   theme?: string;
   copy?: {
-    haveButton: boolean;
+    hasCopyButton: boolean;
     disabled: boolean;
   };
 };
@@ -21,7 +21,7 @@ const JitCodeBlock = ({
   code = '',
   lang = 'text',
   theme = 'material-theme-lighter',
-  copy = { haveButton: true, disabled: false },
+  copy = { hasCopyButton: true, disabled: false },
 }: CodeBlockProps) => {
   const [html, setHtml] = React.useState('');
 
@@ -34,7 +34,7 @@ const JitCodeBlock = ({
 
   return (
     <div className="relative">
-      {copy.haveButton && (
+      {copy.hasCopyButton && (
         <CopyButton
           textToCopy={code}
           tooltipPosition="left"
@@ -53,11 +53,11 @@ const JitCodeBlock = ({
 const PrecompiledCodeBlock = ({
   code = '',
   precompiledHtml = '',
-  copy = { haveButton: true, disabled: false },
+  copy = { hasCopyButton: true, disabled: false },
 }: CodeBlockProps) => {
   return (
     <div className="relative">
-      {copy.haveButton && (
+      {copy.hasCopyButton && (
         <CopyButton
           textToCopy={code}
           tooltipPosition="left"
@@ -78,7 +78,7 @@ export const CodeBlock = ({
   precompiledHtml = '',
   lang = 'text',
   theme = 'material-theme-lighter',
-  copy = { haveButton: true, disabled: false },
+  copy = { hasCopyButton: true, disabled: false },
 }: CodeBlockProps) => {
   return precompiledHtml ? (
     <PrecompiledCodeBlock
@@ -95,7 +95,7 @@ export const OverviewCodeBlock = ({
   code,
   lang = 'solidity',
   theme = 'material-theme-lighter',
-  copy = { haveButton: true, disabled: false },
+  copy = { hasCopyButton: true, disabled: false },
 }: CodeBlockProps) => {
   const router = useRouter();
   const [html, setHtml] = React.useState('');
@@ -117,7 +117,7 @@ export const OverviewCodeBlock = ({
 
   return (
     <div style={{ position: 'relative' }}>
-      {copy.haveButton && (
+      {copy.hasCopyButton && (
         <CopyButton
           textToCopy={code}
           tooltipPosition="left"
