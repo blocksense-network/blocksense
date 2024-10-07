@@ -361,7 +361,7 @@ impl OracleTrigger {
 
                 let payload_json = DataFeedPayload {
                     payload_metadata: PayloadMetaData {
-                        reporter_id: 1,
+                        reporter_id: 0,
                         feed_id: id,
                         timestamp,
                         signature: JsonSerializableSignature { sig: signature },

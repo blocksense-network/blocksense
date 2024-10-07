@@ -26,6 +26,10 @@ RUN --mount=type=cache,target=/root/.cargo/registry --mount=type=cache,target=/r
     && mv target/release/launch_reporter out/launch_reporter \
     && strip out/launch_reporter;
 
+RUN cd /opt/blocksense/apps/trigger-oracle \
+    && cargo build --release \
+    && tar czf "/opt/blocksense/apps/trigger-oracle/trigger-oracle.tar.gz" -C "/opt/blocksense/target/release" ./trigger-oracle
+
 
 FROM ubuntu:24.04 AS blocksense-reporter
 RUN apt-get update
@@ -43,11 +47,19 @@ RUN curl -fsSL https://developer.fermyon.com/downloads/install.sh | bash -s -- -
 COPY --from=build-environment /opt/blocksense/out/launch_reporter /usr/local/bin/launch_reporter
 WORKDIR /usr/local/blocksense
 
+
 ENV REPORTER_CONFIG_DIR=/usr/local/blocksense/apps/reporter
 ENV FEEDS_CONFIG_DIR=/usr/local/blocksense
+
+RUN mkdir -p $REPORTER_CONFIG_DIR
+COPY --from=build-environment /opt/blocksense/apps/trigger-oracle/trigger-oracle.tar.gz $REPORTER_CONFIG_DIR/trigger-oracle.tar.gz
+COPY config/docker/install_trigger_oracle_in_spin.sh  /opt/blocksense/apps/trigger-oracle/install_trigger_oracle_in_spin.sh
+RUN bash -c /opt/blocksense/apps/trigger-oracle/install_trigger_oracle_in_spin.sh
+
+
 
 COPY config/docker/feeds_config.json     /usr/local/blocksense/feeds_config.json
 COPY config/docker/reporter_config.json  /usr/local/blocksense/apps/reporter/reporter_config.json
 COPY config/docker/reporter_secret_key   /usr/local/blocksense/apps/reporter/reporter_secret_key
 
-ENTRYPOINT ["/bin/sh", "-c", "RUST_LOG=debug launch_reporter"]
+ENTRYPOINT ["/bin/sh", "-c", "cd /usr/local/blocksense/oracles/yahoo && /spin up"]

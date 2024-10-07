@@ -62,10 +62,11 @@ services:
     volumes:
       - ./config/private/CMC_API_KEY:/usr/local/blocksense/apps/reporter/CMC_API_KEY
       - ./config/private/YH_FINANCE_API_KEY:/usr/local/blocksense/apps/reporter/YH_FINANCE_API_KEY
+      - ./libs/sdk/examples/yahoo:/usr/local/blocksense/oracles/yahoo
+
     depends_on:
       sequencer:
         condition: service_healthy
-
 
 networks:
   backend:
