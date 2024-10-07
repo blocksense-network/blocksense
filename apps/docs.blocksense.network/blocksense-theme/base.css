@@ -292,7 +292,9 @@ main {
   }
 }
 
-.announcement__icon {
+.announcement__icon,
+.error-404__icon,
+.error-500__icon {
   border-right: 1px solid black;
   padding-right: 23px;
   line-height: 48px;

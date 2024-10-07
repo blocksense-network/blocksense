@@ -15,5 +15,13 @@
     "type": "page",
     "href": "/coming-soon",
     "display": "hidden"
+  },
+  "404": {
+    "type": "page",
+    "display": "hidden"
+  },
+  "500": {
+    "type": "page",
+    "display": "hidden"
   }
 }
