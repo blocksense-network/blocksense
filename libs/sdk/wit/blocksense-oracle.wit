@@ -5,14 +5,29 @@ interface oracle-types {
     id: string,
     data: string,
   }
+
+  record capability {
+    id: string,
+    data: string,
+  }
+
   record settings {
     data-feeds: list<data-feed>,
+    capabilities: list<capability>,
+  }
+
+  variant data-feed-result-value {
+    none,
+    error(string),
+    numerical(f64),
+    text(string),
   }
 
   record data-feed-result {
     id: string,
-    value: f64,
+    value: data-feed-result-value,
   }
+
   record payload {
     values: list<data-feed-result>
   }

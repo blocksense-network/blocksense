@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [application.trigger.settings]
 interval_time_in_seconds = 10
-sequencer = "http://gpu-server-001:8877/1"
+sequencer = "http://gpu-server-001:8877/post_report"
 secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
 
 [[trigger.oracle]]
@@ -820,6 +820,9 @@ id = "247"
 data = '{"cmc_id":1659,"cmc_quote":"GNO"}'
 id = "248"
 
+[[trigger.oracle.capabilities]]
+data = "4c0373b2-36c0-4d4a-8317-31553c5d25e0"
+id = "CMC_API_KEY"
 
 [component.coinmarketcap]
 source = "target/wasm32-wasi/release/cmc_oracle.wasm"

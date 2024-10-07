@@ -18,9 +18,9 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 #preamble
             }
             impl self::preamble::Guest for preamble::BlocksenseOracle {
-                fn handle_oracle_request(payload: self::preamble::blocksense::oracle::oracle_types::Settings) -> Result<(self::preamble::blocksense::oracle::oracle_types::Payload), self::preamble::blocksense::oracle::oracle_types::Error> {
+                fn handle_oracle_request(settings: self::preamble::blocksense::oracle::oracle_types::Settings) -> Result<(self::preamble::blocksense::oracle::oracle_types::Payload), self::preamble::blocksense::oracle::oracle_types::Error> {
                     ::blocksense_sdk::spin::http::run(async move {
-                        match super::#func_name(payload.try_into().expect("cannot convert from Blocksense Oracle settings"))#await_postfix {
+                        match super::#func_name(settings.try_into().expect("cannot convert from Blocksense Oracle settings"))#await_postfix {
                             Ok(payload) => Ok(payload.try_into().expect("cannot convert from Blocksense Oracle payload")),
                             Err(e) => {
                                 eprintln!("{}", e);
@@ -40,9 +40,21 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
 
+            impl From<self::preamble::blocksense::oracle::oracle_types::Capability> for ::blocksense_sdk::oracle::Capability {
+                fn from(capability: self::preamble::blocksense::oracle::oracle_types::Capability) -> Self {
+                    Self {
+                        id: capability.id,
+                        data: capability.data,
+                    }
+                }
+            }
+
             impl From<self::preamble::blocksense::oracle::oracle_types::Settings> for ::blocksense_sdk::oracle::Settings {
                 fn from(settings: self::preamble::blocksense::oracle::oracle_types::Settings) -> Self {
-                    Self { data_feeds: settings.data_feeds.into_iter().map(From::from).collect() }
+                    Self {
+                        data_feeds: settings.data_feeds.into_iter().map(From::from).collect(),
+                        capabilities: settings.capabilities.into_iter().map(From::from).collect(),
+                    }
                 }
             }
 
@@ -50,7 +62,7 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 fn from(res: ::blocksense_sdk::oracle::DataFeedResult) -> Self {
                     Self {
                         id: res.id,
-                        value: res.value,
+                        value: res.value.into(),
                     }
                 }
             }
@@ -58,6 +70,17 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
             impl From<::blocksense_sdk::oracle::Payload> for self::preamble::blocksense::oracle::oracle_types::Payload {
                 fn from(payload: ::blocksense_sdk::oracle::Payload) -> Self {
                     Self { values: payload.values.into_iter().map(From::from).collect() }
+                }
+            }
+
+            impl From<::blocksense_sdk::oracle::DataFeedResultValue> for self::preamble::blocksense::oracle::oracle_types::DataFeedResultValue {
+                fn from(value: ::blocksense_sdk::oracle::DataFeedResultValue) -> Self {
+                    match value {
+                        ::blocksense_sdk::oracle::DataFeedResultValue::None => Self::None,
+                        ::blocksense_sdk::oracle::DataFeedResultValue::Numerical(value) => Self::Numerical(value),
+                        ::blocksense_sdk::oracle::DataFeedResultValue::Text(value) => Self::Text(value),
+                        ::blocksense_sdk::oracle::DataFeedResultValue::Error(error) => Self::Error(error),
+                    }
                 }
             }
         }

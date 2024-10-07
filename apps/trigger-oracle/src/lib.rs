@@ -30,7 +30,7 @@ use wasmtime_wasi_http::{
 
 use crypto::JsonSerializableSignature;
 use data_feeds::connector::post::generate_signature;
-use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
+use feed_registry::types::{DataFeedPayload, FeedError, FeedResult, FeedType, PayloadMetaData};
 
 wasmtime::component::bindgen!({
     path: "../../libs/sdk/wit",
@@ -101,18 +101,26 @@ impl Borrow<String> for DataFeedSetting {
     }
 }
 
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct CapabilitySetting {
+    pub id: String,
+    pub data: String,
+}
+
 // Per-component settings (raw serialization format)
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct OracleTriggerConfig {
     component: String,
     data_feeds: Vec<DataFeedSetting>,
+    capabilities: Option<Vec<CapabilitySetting>>,
 }
 
 #[derive(Clone, Debug)]
 struct Component {
     pub id: String,
     pub oracle_settings: HashSet<DataFeedSetting>,
+    pub capabilities: Vec<CapabilitySetting>,
 }
 
 // This is a placeholder - we don't yet detect any situations that would require
@@ -161,11 +169,16 @@ impl TriggerExecutor for OracleTrigger {
         let queue_components = engine
             .trigger_configs()
             .map(|(_, config)| {
+                let mut capabilities = vec![];
+                if let Some(cap) = &config.capabilities {
+                    capabilities = cap.clone();
+                }
                 (
                     config.component.clone(),
                     Component {
                         id: config.component.clone(),
                         oracle_settings: HashSet::from_iter(config.data_feeds.iter().cloned()),
+                        capabilities,
                     },
                 )
             })
@@ -326,7 +339,7 @@ impl OracleTrigger {
                 .values()
                 .flat_map(|comp| comp.oracle_settings.clone())
                 .collect();
-            tracing::info!("Signal data feeds: {:?}", &data_feed_signal);
+            // tracing::info!("Signal data feeds: {:?}", &data_feed_signal);
             let _ = signal_sender.send(data_feed_signal);
         }
 
@@ -353,9 +366,22 @@ impl OracleTrigger {
             //TODO(adikov): Implement a way to send multiple results to the sequencer and properly
             //handle this here.
             for oracle::DataFeedResult { id, value } in payload.values {
-                let result = FeedResult::Result {
-                    result: FeedType::Numerical(value),
+                let result = match value {
+                    oracle::DataFeedResultValue::Numerical(value) => FeedResult::Result {
+                        result: FeedType::Numerical(value),
+                    },
+                    oracle::DataFeedResultValue::Text(value) => FeedResult::Result {
+                        result: FeedType::Text(value),
+                    },
+                    oracle::DataFeedResultValue::Error(error_string) => FeedResult::Error {
+                        error: FeedError::APIError(error_string),
+                    },
+                    oracle::DataFeedResultValue::None => {
+                        //TODO(adikov): Handle properly None result
+                        continue;
+                    }
                 };
+
                 let signature =
                     generate_signature(&secret_key, id.as_str(), timestamp, &result).unwrap();
 
@@ -427,6 +453,15 @@ impl OracleTrigger {
                 .map(|feed| oracle::DataFeed {
                     id: feed.id,
                     data: feed.data,
+                })
+                .collect(),
+            capabilities: component
+                .capabilities
+                .iter()
+                .cloned()
+                .map(|capability| oracle::Capability {
+                    id: capability.id,
+                    data: capability.data,
                 })
                 .collect(),
         };

@@ -1,6 +1,6 @@
 use anyhow::Result;
 use blocksense_sdk::{
-    oracle::{DataFeedResult, Payload, Settings},
+    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
     spin::http::{send, Method, Request, Response},
 };
@@ -114,7 +114,10 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     //in the oracle trigger
 
     // Please provide your own API key until capabilities are implemented.
-    req.header("x-api-key", "");
+    req.header(
+        "x-api-key",
+        settings.capabilities.first().unwrap().data.clone(),
+    );
     req.header("Accepts", "application/json");
 
     let req = req.build();
@@ -137,20 +140,22 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
                 let yahoo = value.quote_response.result.swap_remove(index);
                 DataFeedResult {
                     id: feed_id.clone(),
-                    value: yahoo
-                        .regular_market_price
-                        .unwrap_or(yahoo.regular_market_previous_close.unwrap_or(0.0)),
+                    value: DataFeedResultValue::Numerical(
+                        yahoo
+                            .regular_market_price
+                            .unwrap_or(yahoo.regular_market_previous_close.unwrap_or(0.0)),
+                    ),
                 }
             }
             None => {
-                println!(
+                let error = format!(
                     "Yahoo data feed with symbol {} is not found",
                     data.yf_symbol
                 );
                 //TODO: Start reporting error.
                 DataFeedResult {
                     id: feed_id.clone(),
-                    value: 0.0,
+                    value: DataFeedResultValue::Error(error),
                 }
             }
         });

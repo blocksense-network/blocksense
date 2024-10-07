@@ -1,6 +1,6 @@
 use anyhow::Result;
 use blocksense_sdk::{
-    oracle::{DataFeedResult, Payload, Settings},
+    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
     spin::http::{send, Method, Request, Response},
 };
@@ -42,7 +42,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let mut payload: Payload = Payload::new();
     payload.values.push(DataFeedResult {
         id: data_feed.id.clone(),
-        value: value.rate,
+        value: DataFeedResultValue::Numerical(value.rate),
     });
     Ok(payload)
 }

@@ -1,6 +1,6 @@
 use anyhow::Result;
 use blocksense_sdk::{
-    oracle::{DataFeedResult, Payload, Settings},
+    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
     spin::http::{send, Method, Request, Response},
 };
@@ -141,7 +141,10 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     //in the oracle trigger
 
     // Please provide your own API key until capabilities are implemented.
-    req.header("X-CMC_PRO_API_KEY", "");
+    req.header(
+        "X-CMC_PRO_API_KEY",
+        settings.capabilities.first().unwrap().data.clone(),
+    );
     req.header("Accepts", "application/json");
 
     let req = req.build();
@@ -156,18 +159,19 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
         payload.values.push(match value.data.get(&data.cmc_id) {
             Some(cmc) => DataFeedResult {
                 id: feed_id.clone(),
-                value: cmc
-                    .quote
-                    .get("USD")
-                    .unwrap_or(&CmcValue { price: 0.0 })
-                    .price,
+                value: DataFeedResultValue::Numerical(
+                    cmc.quote
+                        .get("USD")
+                        .unwrap_or(&CmcValue { price: 0.0 })
+                        .price,
+                ),
             },
             None => {
-                println!("CMC data feed with id {} is not found", data.cmc_id);
+                let error = format!("CMC data feed with id {} is not found", data.cmc_id);
                 //TODO: Start reporting error.
                 DataFeedResult {
                     id: feed_id.clone(),
-                    value: 0.0,
+                    value: DataFeedResultValue::Error(error),
                 }
             }
         });
