@@ -3,6 +3,7 @@ members = [
   "apps/reporter",
   "apps/sequencer",
   "apps/sequencer_tests",
+  "apps/schemamanager",
   "libs/anomaly_detection",
   "libs/cli",
   "libs/data_feeds",

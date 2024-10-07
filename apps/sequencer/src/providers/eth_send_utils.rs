@@ -441,7 +441,6 @@ mod tests {
                 ..Default::default()
             })
             .await;
-        println!("@@0b result: {:?}", result);
         assert!(result.is_ok(), "Call to getFeedById failed");
         let output = result.unwrap();
         assert_eq!(output.len(), 64, "Invalid output length");

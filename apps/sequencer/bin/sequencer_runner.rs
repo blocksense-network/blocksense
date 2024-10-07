@@ -87,6 +87,7 @@ pub async fn prepare_http_servers(
             App::new()
                 .app_data(main_app_state.clone())
                 .service(post_report)
+                .service(register_feed)
         })
         .bind(("0.0.0.0", sequencer_config_main_port))
         .expect("Main HTTP server could not bind to port.")

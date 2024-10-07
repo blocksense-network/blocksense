@@ -8,7 +8,7 @@ use uuid::Uuid;
 pub struct Allocation {
     storage_index: u32,
     number_of_slots: u8,
-    schema_id: Uuid,
+    schema_id: String,
     allocation_timestamp: DateTime<Utc>,
     voting_start_timestamp: DateTime<Utc>,
     voting_end_timestamp: DateTime<Utc>,
@@ -18,7 +18,7 @@ impl Allocation {
     pub fn new(
         storage_index: u32,
         number_of_slots: u8,
-        schema_id: Uuid,
+        schema_id: String,
         allocation_timestamp: DateTime<Utc>,
         voting_start_timestamp: DateTime<Utc>,
         voting_end_timestamp: DateTime<Utc>,
@@ -87,7 +87,7 @@ impl Allocator {
     pub fn allocate(
         &mut self,
         number_of_slots: u8,
-        schema_id: Uuid,
+        schema_id: String,
         voting_start_timestamp: DateTime<Utc>,
         voting_end_timestamp: DateTime<Utc>,
     ) -> Result<u32, String> {
@@ -162,7 +162,7 @@ impl ConcurrentAllocator {
     pub fn allocate(
         &self,
         number_of_slots: u8,
-        schema_id: Uuid,
+        schema_id: String,
         voting_start_timestamp: DateTime<Utc>,
         voting_end_timestamp: DateTime<Utc>,
     ) -> Result<u32, String> {
@@ -218,7 +218,8 @@ mod tests {
     fn test_allocation_get_expired_index() {
         // setup
         let number_of_slots: u8 = 1;
-        let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        // let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        let schema_id = String::from("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8");
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
@@ -257,13 +258,14 @@ mod tests {
 
         // allocate 1 slot
         let number_of_slots: u8 = 1;
-        let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        // let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        let schema_id = String::from("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8");
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
         let allocate_request_1 = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -277,25 +279,25 @@ mod tests {
         // fill space
         let _ = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
         let _ = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
         let _ = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
         let _ = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -310,7 +312,8 @@ mod tests {
     fn test_allocation_free_space() {
         // setup
         let number_of_slots: u8 = 1;
-        let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        // let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        let schema_id = String::from("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8");
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
@@ -346,13 +349,14 @@ mod tests {
 
         // allocate 1 slot
         let number_of_slots: u8 = 1;
-        let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        // let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        let schema_id = String::from("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8");
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: TimeDelta = TimeDelta::new(10, 0).unwrap();
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
         let allocate_request_1 = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -364,7 +368,7 @@ mod tests {
         // fill space
         let allocate_request_2 = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -372,7 +376,7 @@ mod tests {
 
         let allocate_request_3 = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -380,7 +384,7 @@ mod tests {
 
         let allocate_request_4 = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -388,7 +392,7 @@ mod tests {
 
         let allocate_request_5 = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -397,7 +401,7 @@ mod tests {
         // space is full and no expired allocates
         let allocate_request_6 = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -411,7 +415,7 @@ mod tests {
         // allocate
         let allocate_request_7 = allocator.allocate(
             number_of_slots,
-            schema_id,
+            schema_id.clone(),
             voting_start_timestamp,
             voting_end_timestamp,
         );
@@ -425,7 +429,8 @@ mod tests {
         let allocator = Arc::new(ConcurrentAllocator::new(1..=5));
 
         let number_of_slots: u8 = 1;
-        let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        // let schema_id: Uuid = Uuid::parse_str("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8").unwrap();
+        let schema_id = String::from("a1a2a3a4b1b2c1c2d1d2d3d4d5d6d7d8");
         let voting_start_timestamp: DateTime<Utc> = Utc::now();
         let ten_seconds: Duration = Duration::from_secs(10);
         let voting_end_timestamp: DateTime<Utc> = voting_start_timestamp.add(ten_seconds);
@@ -433,7 +438,7 @@ mod tests {
         let handles: Vec<_> = (0..5)
             .map(|_| {
                 let allocator = Arc::clone(&allocator);
-                let schema_id = schema_id;
+                let schema_id = schema_id.clone();
                 thread::spawn(move || {
                     allocator.allocate(
                         number_of_slots,

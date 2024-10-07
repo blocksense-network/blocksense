@@ -134,8 +134,9 @@ impl FeedSlotsProcessor {
                         inc_metric!(feed_metrics, key_post, failures_to_reach_quorum);
                     }
                 }
-
+                println!("@@5a aggregating values {:?}", values);
                 result_post_to_contract = feed.read().await.get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
+                println!("@@5b aggregated value {:?}", result_post_to_contract);
 
                 // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
                 if !is_oneshot {

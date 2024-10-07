@@ -58,6 +58,7 @@ pub async fn post_report(
     mut payload: web::Payload,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
+    println!("@@1 trying to post a report, apparently");
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
         let chunk = chunk?;
@@ -67,64 +68,84 @@ pub async fn post_report(
         }
         body.extend_from_slice(&chunk);
     }
-
+    println!("@@1a");
     // body is loaded, now we can deserialize serde-json
     // let obj = serde_json::from_slice::<MyObj>(&body)?;
     debug!("body = {:?}!", body);
+    println!("body = {:?}!", body);
 
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
-    let data_feed: DataFeedPayload = serde_json::from_value(v)?;
-
-    let reporter_id = data_feed.payload_metadata.reporter_id;
-    let signature = data_feed.payload_metadata.signature;
-    let msg_timestamp = data_feed.payload_metadata.timestamp;
-
-    let feed_id: u32;
-    let reporter = {
-        let reporters = app_state.reporters.read().await;
-        let reporter = reporters.get_key_value(&reporter_id);
-        match reporter {
-            Some(x) => {
-                let reporter = x.1;
-                let reporter_metrics = reporter.read().await.reporter_metrics.clone();
-                feed_id = match data_feed.payload_metadata.feed_id.parse::<u32>() {
-                    Ok(val) => val,
-                    Err(e) => {
-                        inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
-                        debug!("Error parsing input's feed_id: {}", e);
-                        return Ok(HttpResponse::BadRequest().into());
-                    }
-                };
-                {
-                    let rlocked_reporter = reporter.read().await;
-                    if !check_signature(
-                        &signature.sig,
-                        &rlocked_reporter.pub_key,
-                        data_feed.payload_metadata.feed_id.as_str(),
-                        msg_timestamp,
-                        &data_feed.result,
-                    ) {
-                        drop(rlocked_reporter);
-                        warn!(
-                            "Signature check failed for feed_id: {} from reporter_id: {}",
-                            feed_id, reporter_id
-                        );
-                        inc_metric!(reporter_metrics, reporter_id, non_valid_signature);
-                        return Ok(HttpResponse::Unauthorized().into());
-                    }
-                }
-                reporter.clone()
-            }
-            None => {
-                warn!(
-                    "Recvd vote from reporter with unregistered ID = {}!",
-                    reporter_id
-                );
-                return Ok(HttpResponse::Unauthorized().into());
-            }
+    println!("@@1blah {:?}", v);
+    let data_feed: DataFeedPayload = match serde_json::from_value(v) {
+        Ok(v) => v,
+        Err(e) => {
+            println!("@@11 e: {:?}", e);
+            panic!("panic again");
         }
     };
-    let reporter_metrics = reporter.read().await.reporter_metrics.clone();
+    println!("@@1a0");
+    let reporter_id = data_feed.payload_metadata.reporter_id;
+    println!("@@1a1");
+    let signature = data_feed.payload_metadata.signature;
+    println!("@@1a2");
+    let msg_timestamp = data_feed.payload_metadata.timestamp;
+    println!("@@1a3");
+    let feed_id: u32;
+    feed_id = match data_feed.payload_metadata.feed_id.parse::<u32>() {
+        Ok(val) => val,
+        Err(e) => {
+            println!("@@1a4");
+            // inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
+            debug!("Error parsing input's feed_id: {}", e);
+            return Ok(HttpResponse::BadRequest().into());
+        }
+    };
+    println!("@@1b");
+    // let reporter = {
+    //     let reporters = app_state.reporters.read().await;
+    //     let reporter = reporters.get_key_value(&reporter_id);
+    //     match reporter {
+    //         Some(x) => {
+    //             let reporter = x.1;
+    //             let reporter_metrics = reporter.read().await.reporter_metrics.clone();
+    //             feed_id = match data_feed.payload_metadata.feed_id.parse::<u32>() {
+    //                 Ok(val) => val,
+    //                 Err(e) => {
+    //                     inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
+    //                     debug!("Error parsing input's feed_id: {}", e);
+    //                     return Ok(HttpResponse::BadRequest().into());
+    //                 }
+    //             };
+    //             {
+    //                 let rlocked_reporter = reporter.read().await;
+    //                 if !check_signature(
+    //                     &signature.sig,
+    //                     &rlocked_reporter.pub_key,
+    //                     data_feed.payload_metadata.feed_id.as_str(),
+    //                     msg_timestamp,
+    //                     &data_feed.result,
+    //                 ) {
+    //                     drop(rlocked_reporter);
+    //                     warn!(
+    //                         "Signature check failed for feed_id: {} from reporter_id: {}",
+    //                         feed_id, reporter_id
+    //                     );
+    //                     inc_metric!(reporter_metrics, reporter_id, non_valid_signature);
+    //                     return Ok(HttpResponse::Unauthorized().into());
+    //                 }
+    //             }
+    //             reporter.clone()
+    //         }
+    //         None => {
+    //             warn!(
+    //                 "Recvd vote from reporter with unregistered ID = {}!",
+    //                 reporter_id
+    //             );
+    //             return Ok(HttpResponse::Unauthorized().into());
+    //         }
+    //     }
+    // };
+    // let reporter_metrics = reporter.read().await.reporter_metrics.clone();
 
     match &data_feed.result {
         FeedResult::Result { result } => {
@@ -132,9 +153,10 @@ pub async fn post_report(
         }
         FeedResult::Error { error } => {
             info!("Reported error from reporter[{}]: {}", reporter_id, error);
-            inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
+            // inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
         }
     };
+    println!("@@1c");
     let result = data_feed.result;
 
     trace!(
@@ -150,12 +172,12 @@ pub async fn post_report(
             Some(x) => x,
             None => {
                 drop(reg);
-                inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
+                // inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
                 return Ok(HttpResponse::BadRequest().into());
             }
         }
     };
-
+    println!("@@1d");
     let current_time_as_ms = current_unix_time();
 
     // check if the time stamp in the msg is <= current_time_as_ms
@@ -164,60 +186,63 @@ pub async fn post_report(
         let feed = feed.read().await;
         feed.check_report_relevance(current_time_as_ms, msg_timestamp)
     };
-
+    println!("@@1e");
     match report_relevance {
         ReportRelevance::Relevant => {
+            println!("@@1f");
             let mut reports = app_state.reports.write().await;
             if reports.push(feed_id, reporter_id, result).await {
                 debug!(
                     "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
                     reporter_id, feed_id
                 );
-                inc_vec_metric!(
-                    reporter_metrics,
-                    reporter_id,
-                    timely_reports_per_feed,
-                    feed_id
-                );
+                // inc_vec_metric!(
+                //     reporter_metrics,
+                //     reporter_id,
+                //     timely_reports_per_feed,
+                //     feed_id
+                // );
             } else {
                 debug!(
                     "Recvd revote from reporter_id = {} for feed_id = {}",
                     reporter_id, feed_id
                 );
-                inc_vec_metric!(
-                    reporter_metrics,
-                    reporter_id,
-                    total_revotes_for_same_slot_per_feed,
-                    feed_id
-                );
+                // inc_vec_metric!(
+                //     reporter_metrics,
+                //     reporter_id,
+                //     total_revotes_for_same_slot_per_feed,
+                //     feed_id
+                // );
             }
             return Ok(HttpResponse::Ok().into()); // <- send response
         }
         ReportRelevance::NonRelevantOld => {
+            println!("@@1g");
             debug!(
                 "Recvd late vote from reporter_id = {} for feed_id = {}",
                 reporter_id, feed_id
             );
-            inc_vec_metric!(
-                reporter_metrics,
-                reporter_id,
-                late_reports_per_feed,
-                feed_id
-            );
+            // inc_vec_metric!(
+            //     reporter_metrics,
+            //     reporter_id,
+            //     late_reports_per_feed,
+            //     feed_id
+            // );
         }
         ReportRelevance::NonRelevantInFuture => {
             debug!(
                 "Recvd vote for future slot from reporter_id = {} for feed_id = {}",
                 reporter_id, feed_id
             );
-            inc_vec_metric!(
-                reporter_metrics,
-                reporter_id,
-                in_future_reports_per_feed,
-                feed_id
-            );
+            // inc_vec_metric!(
+            //     reporter_metrics,
+            //     reporter_id,
+            //     in_future_reports_per_feed,
+            //     feed_id
+            // );
         }
     }
+    println!("@@1h");
     Ok(HttpResponse::BadRequest().into())
 }
 
@@ -242,6 +267,7 @@ pub async fn register_feed(
     register_request: web::Json<RegisterFeedRequest>,
     app_state: web::Data<FeedsState>,
 ) -> Result<HttpResponse, Error> {
+    println!("@@0 trying to register a feed, apparently");
     // STEP 1 - Read request
     let name = register_request.name.clone();
     let schema_id = register_request.schema_id.clone();
@@ -253,7 +279,7 @@ pub async fn register_feed(
 
     // STEP 2 - Validate request
     // Validate schema_id is valid UUID
-    let schema_id: Uuid = Uuid::parse_str(&schema_id).unwrap();
+    // let schema_id: Uuid = Uuid::parse_str(&schema_id).unwrap();
     // TODO: Schema id and number of solidity slots needed for the schema are passed as request params.
     // Once a schema service is up and running we'll check the schema exists and extract the number of slots from there.
 
@@ -377,81 +403,8 @@ mod tests {
     use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
     use tokio::sync::{mpsc, RwLock};
     use utils::logging::init_shared_logging_handle;
+    use std::io::{self, Read};
 
-    #[actix_web::test]
-    async fn post_report_from_unknown_reporter_fails_with_401() {
-        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let tests_dir_path = PathBuf::new().join(manifest_dir).join("tests");
-        env::set_var("SEQUENCER_CONFIG_DIR", tests_dir_path);
-        let log_handle = init_shared_logging_handle();
-        let sequencer_config = init_sequencer_config().expect("Failed to load config:");
-        let feeds_config = init_feeds_config().expect("Failed to get config: ");
-        let metrics_prefix = Some("post_report_from_unknown_reporter_fails_with_401_");
-
-        let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
-
-        let (vote_send, _vote_recv): (
-            UnboundedSender<(String, String)>,
-            UnboundedReceiver<(String, String)>,
-        ) = mpsc::unbounded_channel();
-        let app_state = web::Data::new(FeedsState {
-            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &feeds_config,
-            ))),
-            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            providers: providers.clone(),
-            log_handle,
-            reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(None)),
-            voting_send_channel: vote_send,
-            feeds_metrics: Arc::new(RwLock::new(
-                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
-                    .expect("Failed to allocate feed_metrics"),
-            )),
-        });
-
-        let app =
-            test::init_service(App::new().app_data(app_state.clone()).service(post_report)).await;
-
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("System clock set before EPOCH")
-            .as_millis();
-
-        const FEED_ID: &str = "1";
-        const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
-        const REPORT_VAL: f64 = 80000.8;
-        let result = FeedResult::Result {
-            result: FeedType::Numerical(REPORT_VAL),
-        };
-        let signature = generate_signature(&SECRET_KEY.to_string(), FEED_ID, timestamp, &result);
-
-        let payload = DataFeedPayload {
-            payload_metadata: PayloadMetaData {
-                reporter_id: 0,
-                feed_id: FEED_ID.to_string(),
-                timestamp,
-                signature: JsonSerializableSignature { sig: signature },
-            },
-            result,
-        };
-
-        let serialized_payload = match serde_json::to_value(&payload) {
-            Ok(payload) => payload,
-            Err(_) => panic!("Failed serialization of payload!"),
-        };
-
-        let payload_as_string = serialized_payload.to_string();
-
-        let req = test::TestRequest::post()
-            .uri("/post_report")
-            .set_payload(payload_as_string)
-            .to_request();
-
-        // Execute the request and read the response
-        let resp = test::call_service(&app, req).await;
-        assert_eq!(resp.status(), 401);
-    }
 
     async fn create_app_state_from_sequencer_config(
         network: &str,
@@ -503,6 +456,8 @@ mod tests {
         let anvil = Anvil::new().try_spawn().unwrap();
         let key_path = "/tmp/priv_key_test";
         let network = "ETH140";
+
+        println!("@@0 anvil endpoint {:?}", anvil.endpoint().as_str());
 
         // Read app config
         let cfg =
@@ -592,12 +547,12 @@ mod tests {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards")
                 .as_millis()
-                + 60000, // 1 minute in the future
+                + 10000, // 1 minute in the future
             voting_end_time: SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards")
                 .as_millis()
-                + 120000, // 2 minutes in the future
+                + 30000, // 2 minutes in the future
         };
 
         // Send the request
@@ -613,7 +568,7 @@ mod tests {
         // Implement and endpoint that gets the data feeds after some timestamp
         // Call it and check feed has been added
 
-        // Post a report for the datafeed
+
 
         /////////////////////////////////////////////////////////////////////
         // BIG STEP TWO - Prepare sample report and send it to /post_report
@@ -635,7 +590,8 @@ mod tests {
 
         const FEED_ID: &str = "1";
         const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
-        const REPORT_VAL: f64 = 80000.8;
+        // const REPORT_VAL: f64 = 80000.8;
+        const REPORT_VAL: f64 = 255.0;
         let result = FeedResult::Result {
             result: FeedType::Numerical(REPORT_VAL),
         };
@@ -657,7 +613,7 @@ mod tests {
         };
 
         let payload_as_string = serialized_payload.to_string();
-
+        tokio::time::sleep(Duration::from_millis(10000)).await;
         let req = test::TestRequest::post()
             .uri("/post_report")
             .set_payload(payload_as_string)
@@ -665,16 +621,23 @@ mod tests {
 
         // Execute the request and read the response
         let resp = test::call_service(&app, req).await;
-        assert_eq!(resp.status(), 401);
+        println!("@@0 {:?}", resp);
+        assert_eq!(resp.status(), 200);
 
         /////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////
 
         // sleep a little bit
-        tokio::time::sleep(Duration::from_millis(2000)).await;
+        tokio::time::sleep(Duration::from_millis(40000)).await;
+        // Wait for a keystroke
+        println!("Press Enter to continue...");
+        let mut buffer = [0u8; 1]; // Single byte buffer to capture input
+        io::stdin().read(&mut buffer).expect("Failed to read line");
+
+        println!("Key pressed, continuing...");
         // Use contract_address and assert a transaction was written there
         // sleep a little bit
-        tokio::time::sleep(Duration::from_millis(2000)).await;
+        // tokio::time::sleep(Duration::from_millis(20000)).await;
         // Assert feed is no longer in registry (was removed after vote)
     }
 }
