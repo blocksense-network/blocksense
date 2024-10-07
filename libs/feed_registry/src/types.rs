@@ -40,7 +40,7 @@ pub struct FeedMetaData {
     feed_aggregator: Box<dyn FeedAggregate>,
     pub value_type: String,
     pub aggregate_type: String,
-    processor_cmd_chan: Option<UnboundedSender<FeedsSlotProcessorCmds>>,
+    pub processor_cmd_chan: Option<UnboundedSender<FeedsSlotProcessorCmds>>,
 }
 
 impl FeedMetaData {

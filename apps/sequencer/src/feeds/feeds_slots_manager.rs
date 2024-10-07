@@ -4,26 +4,28 @@ use actix_web::rt::spawn;
 use actix_web::web;
 use config::FeedConfig;
 use eyre::Result;
-use feed_registry::types::FeedMetaData;
+use feed_registry::types::{FeedMetaData, FeedsSlotProcessorCmds::Terminate};
 use futures::select;
-use futures::stream::FuturesUnordered;
-use futures::stream::StreamExt;
+use futures::stream::{FuturesUnordered, StreamExt};
 use std::fmt::Debug;
 use std::io::Error;
 use std::sync::Arc;
-use tokio::sync::mpsc;
-use tokio::sync::RwLock;
-use tracing::debug;
-use tracing::error;
-use tracing::info;
+use tokio::sync::{mpsc, RwLock};
+use tracing::{debug, error, info, warn};
 
 #[derive(Debug)]
 pub struct RegisterNewAssetFeed {
     pub config: FeedConfig,
 }
 
+#[derive(Debug)]
+pub struct DeleteAssetFeed {
+    pub id: u32,
+}
+
 pub enum FeedsSlotsManagerCmds {
     RegisterNewAssetFeed(RegisterNewAssetFeed),
+    DeleteAssetFeed(DeleteAssetFeed),
 }
 
 pub enum ProcessorResultValue {
@@ -202,6 +204,45 @@ async fn handle_feeds_slots_manager_cmd(
                 }
             };
         }
+        FeedsSlotsManagerCmds::DeleteAssetFeed(delete_asset_feed) => {
+            {
+                let reg = sequencer_state.registry.read().await;
+                let feed = match reg.get(delete_asset_feed.id) {
+                    Some(x) => x,
+                    None => panic!("Error feed was not registered."),
+                };
+
+                let _ = match &feed.read().await.processor_cmd_chan {
+                    Some(chan) => {
+                        match chan.send(Terminate()) {
+                            Ok(_) => {
+                                debug!(
+                                    "Feeds manager sent Terminate cmd to processor for feed id {}",
+                                    delete_asset_feed.id
+                                );
+                            }
+                            Err(e) => {
+                                error!(
+                                    "Error sending to processot for feed id {}: {:?}",
+                                    delete_asset_feed.id, e
+                                );
+                            }
+                        };
+                    }
+                    None => {
+                        error!("No channel for feed {} management!", delete_asset_feed.id)
+                    }
+                };
+            }
+            match deregister_asset_feed(&sequencer_state, &delete_asset_feed).await {
+                Ok(_) => {
+                    info!("Delete asset feed {delete_asset_feed:?} complete!");
+                }
+                Err(e) => {
+                    warn!("Failed to deregister asset feed {delete_asset_feed:?}: {e}");
+                }
+            };
+        }
     };
     //Register reader task again once the command is processed
     collected_futures.push(spawn(async move {
@@ -240,8 +281,8 @@ async fn register_asset_feed(
         reg.push(new_feed_id, new_feed_metadata);
     }
     {
-        let mut feeds_config = sequencer_state.feeds_config.write().await;
-        feeds_config.feeds.push(new_feed_config.clone());
+        let mut active_feeds = sequencer_state.active_feeds.write().await;
+        active_feeds.insert(new_feed_config.id, new_feed_config.clone());
     }
     {
         let registered_feed_metadata = sequencer_state
@@ -260,6 +301,36 @@ async fn register_asset_feed(
 
         Ok(registered_feed_metadata)
     }
+}
+
+async fn deregister_asset_feed(
+    sequencer_state: &web::Data<SequencerState>,
+    cmd: &DeleteAssetFeed,
+) -> Result<()> {
+    let feed_id = cmd.id;
+    {
+        let mut reg = sequencer_state.registry.write().await;
+
+        let keys = reg.get_keys();
+
+        if !keys.contains(&feed_id) {
+            eyre::bail!("Cannot deregister feed ID, feed with this ID {feed_id} does not exists.");
+        }
+
+        reg.remove(feed_id);
+    }
+    {
+        let mut active_feeds = sequencer_state.active_feeds.write().await;
+        active_feeds.remove(&feed_id);
+    }
+
+    sequencer_state
+        .feed_aggregate_history
+        .write()
+        .await
+        .deregister_feed(feed_id);
+
+    Ok(())
 }
 
 async fn read_next_feed_slots_manager_cmd(
@@ -355,7 +426,13 @@ mod tests {
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
             )),
-            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            active_feeds: Arc::new(RwLock::new(
+                feeds_config
+                    .feeds
+                    .into_iter()
+                    .map(|feed| (feed.id, feed))
+                    .collect(),
+            )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_slots_manager_cmd_send,

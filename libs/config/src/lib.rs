@@ -79,6 +79,12 @@ pub struct FeedConfig {
     pub aggregate_type: String,
 }
 
+impl FeedConfig {
+    pub fn compare(left: &FeedConfig, right: &FeedConfig) -> std::cmp::Ordering {
+        left.id.cmp(&right.id)
+    }
+}
+
 impl Validated for FeedConfig {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
         if self.report_interval_ms == 0 {

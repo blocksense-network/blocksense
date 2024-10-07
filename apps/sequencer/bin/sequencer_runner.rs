@@ -12,8 +12,9 @@ use tokio::sync::{mpsc, RwLock};
 use sequencer::reporters::reporter::init_shared_reporters;
 
 use sequencer::http_handlers::admin::{
-    deploy, disable_provider, enable_provider, get_feed_config, get_feed_report_interval,
-    get_feeds_config, get_key, get_sequencer_config, register_asset_feed, set_log_level,
+    delete_asset_feed, deploy, disable_provider, enable_provider, get_feed_config,
+    get_feed_report_interval, get_feeds_config, get_key, get_sequencer_config, register_asset_feed,
+    set_log_level,
 };
 use sequencer::http_handlers::data_feeds::{post_report, post_reports_batch, register_feed};
 use utils::logging::{
@@ -78,7 +79,13 @@ pub async fn prepare_sequencer_state(
             FeedsMetrics::new(metrics_prefix.unwrap_or(""))
                 .expect("Failed to allocate feed_metrics"),
         )),
-        feeds_config: Arc::new(RwLock::new(feeds_config)),
+        active_feeds: Arc::new(RwLock::new(
+            feeds_config
+                .feeds
+                .into_iter()
+                .map(|feed| (feed.id, feed))
+                .collect(),
+        )),
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         feeds_slots_manager_cmd_send,
@@ -123,6 +130,7 @@ pub async fn prepare_http_servers(
                 .service(get_feed_config)
                 .service(get_sequencer_config)
                 .service(register_asset_feed)
+                .service(delete_asset_feed)
                 .service(disable_provider)
                 .service(enable_provider)
         })

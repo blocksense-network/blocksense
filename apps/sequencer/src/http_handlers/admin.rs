@@ -1,4 +1,6 @@
-use crate::feeds::feeds_slots_manager::{FeedsSlotsManagerCmds, RegisterNewAssetFeed};
+use crate::feeds::feeds_slots_manager::{
+    DeleteAssetFeed, FeedsSlotsManagerCmds, RegisterNewAssetFeed,
+};
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
 use actix_web::http::header::ContentType;
@@ -202,7 +204,12 @@ pub async fn get_feed_report_interval(
 pub async fn get_feeds_config(
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
-    let feeds_config = sequencer_state.feeds_config.read().await;
+    let active_feeds = sequencer_state.active_feeds.read().await;
+    let mut feeds_config = AllFeedsConfig { feeds: Vec::new() };
+    for (_id, feed) in active_feeds.iter() {
+        feeds_config.feeds.push(feed.clone());
+    }
+    feeds_config.feeds.sort_by(FeedConfig::compare);
     let feeds_config_pretty = serde_json::to_string_pretty::<AllFeedsConfig>(&feeds_config)?;
 
     Ok(HttpResponse::Ok()
@@ -223,12 +230,11 @@ pub async fn get_feed_config(
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
 
-    let feeds_config = sequencer_state.feeds_config.read().await.feeds.clone();
-    let feed_config = feeds_config
-        .into_iter()
-        .find(|x| x.id == feed_id)
+    let active_feeds = sequencer_state.active_feeds.read().await;
+    let feed_config = active_feeds
+        .get(&feed_id)
         .ok_or(error::ErrorNotFound("Data feed with this ID not found"))?;
-    let feed_config_pretty = serde_json::to_string_pretty::<FeedConfig>(&feed_config)?;
+    let feed_config_pretty = serde_json::to_string_pretty::<FeedConfig>(feed_config)?;
 
     Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
@@ -267,6 +273,7 @@ pub async fn register_asset_feed(
     mut payload: web::Payload,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
+    let _span = info_span!("register_asset_feed");
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
         let chunk = chunk?;
@@ -388,6 +395,53 @@ pub async fn enable_provider(
     set_provider_is_enabled(req, sequencer_state, true).await
 }
 
+#[post("/delete_asset_feed/{feed_id}")]
+pub async fn delete_asset_feed(
+    req: HttpRequest,
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    let _span = info_span!("delete_asset_feed");
+    let bad_input = error::ErrorBadRequest("Incorrect input.");
+    let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
+
+    let feed_id: u32 = match feed_id.parse() {
+        Ok(r) => r,
+        Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
+    };
+
+    let feed = {
+        let reg = sequencer_state.registry.read().await;
+        debug!("getting feed_id = {}", &feed_id);
+        match reg.get(feed_id) {
+            Some(x) => x,
+            None => {
+                drop(reg);
+                return Ok(HttpResponse::BadRequest().into());
+            }
+        }
+    };
+
+    match sequencer_state
+        .feeds_slots_manager_cmd_send
+        .send(FeedsSlotsManagerCmds::DeleteAssetFeed(DeleteAssetFeed {
+            id: feed_id,
+        })) {
+        Ok(_) => {
+            info!("Scheduled deletion for feed_id: {feed_id}",);
+        }
+        Err(e) => {
+            error!(
+                "Sequencer internal error, could not forward feed deletion cmd {}",
+                e
+            )
+        }
+    };
+
+    return Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(format!("{}", feed.read().await.get_report_interval_ms())));
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -448,7 +502,13 @@ mod tests {
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
             )),
-            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            active_feeds: Arc::new(RwLock::new(
+                feeds_config
+                    .feeds
+                    .into_iter()
+                    .map(|feed| (feed.id, feed))
+                    .collect(),
+            )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_slots_manager_cmd_send,
@@ -515,7 +575,13 @@ mod tests {
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
             )),
-            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            active_feeds: Arc::new(RwLock::new(
+                feeds_config
+                    .feeds
+                    .into_iter()
+                    .map(|feed| (feed.id, feed))
+                    .collect(),
+            )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_slots_manager_cmd_send,
@@ -598,7 +664,7 @@ mod tests {
         )
         .await;
 
-        let (_, feeds_config) = get_sequencer_and_feed_configs();
+        let (_, mut feeds_config) = get_sequencer_and_feed_configs();
 
         {
             // test get_feeds_config
@@ -613,10 +679,13 @@ mod tests {
             let body = test::read_body(resp).await;
             let body_str = std::str::from_utf8(&body).expect("Failed to read body");
 
-            let recvd_data: AllFeedsConfig =
+            let mut recvd_data: AllFeedsConfig =
                 serde_json::from_str(body_str).expect("recvd_data is not valid JSON!");
 
-            assert_eq!(recvd_data, feeds_config);
+            assert_eq!(
+                recvd_data.feeds.sort_by(FeedConfig::compare),
+                feeds_config.feeds.sort_by(FeedConfig::compare)
+            );
         }
 
         {

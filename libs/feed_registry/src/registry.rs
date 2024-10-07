@@ -38,6 +38,9 @@ impl FeedMetaDataRegistry {
     pub fn get_keys(&self) -> Vec<u32> {
         self.registered_feeds.keys().copied().collect()
     }
+    pub fn remove(&mut self, id: u32) {
+        self.registered_feeds.remove(&id);
+    }
 }
 
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
@@ -134,6 +137,10 @@ impl FeedAggregateHistory {
         let shared_rb = SharedRb::new(buf_size);
 
         self.aggregate_history.insert(feed_id, shared_rb);
+    }
+
+    pub fn deregister_feed(&mut self, feed_id: u32) {
+        self.aggregate_history.remove(&feed_id);
     }
 
     pub fn collect(&self, feed_id: u32) -> Option<&SharedRb<Heap<FeedType>>> {

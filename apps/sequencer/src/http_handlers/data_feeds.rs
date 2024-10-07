@@ -465,7 +465,13 @@ mod tests {
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
             )),
-            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            active_feeds: Arc::new(RwLock::new(
+                feeds_config
+                    .feeds
+                    .into_iter()
+                    .map(|feed| (feed.id, feed))
+                    .collect(),
+            )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_slots_manager_cmd_send,
@@ -560,7 +566,13 @@ mod tests {
                     )
                     .expect("Failed to allocate feed_metrics"),
                 )),
-                feeds_config: Arc::new(RwLock::new(feeds_config)),
+                active_feeds: Arc::new(RwLock::new(
+                    feeds_config
+                        .feeds
+                        .into_iter()
+                        .map(|feed| (feed.id, feed))
+                        .collect(),
+                )),
                 sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
                 feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
                 feeds_slots_manager_cmd_send,
