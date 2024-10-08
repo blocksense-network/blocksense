@@ -11,7 +11,7 @@ export function Breadcrumb({
   activePath: Item[];
 }): ReactElement {
   return (
-    <div className="nextra-breadcrumb nx-mt-12 nx-flex nx-items-center nx-gap-1 nx-overflow-hidden nx-text-sm">
+    <div className="nextra-breadcrumb nx-mt-18 nx-flex nx-items-center nx-gap-1 nx-overflow-hidden nx-text-sm">
       {activePath.map((item, index) => {
         const isLink = !item.children || item.withIndexPage;
         const isActive = index === activePath.length - 1;

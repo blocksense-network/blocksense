@@ -13,10 +13,6 @@
   outline: none;
 }
 
-main {
-  margin-top: 20px;
-}
-
 #__next {
   margin-top: calc(-1 * var(--nextra-navbar-height));
 }
@@ -299,4 +295,10 @@ main {
   padding-right: 23px;
   line-height: 48px;
   margin-right: 20px;
+}
+
+.announcement,
+.error-404,
+.error-500 {
+  margin-top: calc(1 * var(--nextra-navbar-height) / 2);
 }
