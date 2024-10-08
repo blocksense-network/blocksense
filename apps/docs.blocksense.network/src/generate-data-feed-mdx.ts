@@ -117,7 +117,7 @@ async function generateDataFeedsPages() {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
 
   await generateDataFeedsOverviewFile(feedsConfig);
-  await generateIndividualDataFeedPages(feedsConfig);
+  // await generateIndividualDataFeedPages(feedsConfig);
 }
 
 generateDataFeedsPages()
