@@ -19,6 +19,7 @@ function getCoreContractsData(networksData: DeploymentConfig) {
 
   Object.entries(networksData).forEach(([_networkName, networkData]) => {
     if (!networkData) return;
+    if (_networkName === 'local') return;
     const networkName = parseNetworkName(_networkName);
     const coreContracts = networkData.contracts.coreContracts;
 
@@ -48,6 +49,7 @@ function getProxyContractsContent(networksData: DeploymentConfig) {
   const supportedNetworks: ProxyContractData[] = Object.entries(networksData)
     .map(([_networkName, networkData]) => {
       if (!networkData) return [];
+      if (_networkName === 'local') return [];
       const networkName = parseNetworkName(_networkName);
       const { ChainlinkProxy } = networkData.contracts;
 
