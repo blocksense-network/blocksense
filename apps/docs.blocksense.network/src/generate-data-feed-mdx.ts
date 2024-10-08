@@ -140,7 +140,7 @@ async function generateDataFeedsPages() {
   ).contracts.ChainlinkProxy;
 
   await generateDataFeedsOverviewFile(feedsConfig);
-  await generateIndividualDataFeedPages(feedsConfig, feedsDeploymentInfo);
+  // await generateIndividualDataFeedPages(feedsConfig);
 }
 
 generateDataFeedsPages()
