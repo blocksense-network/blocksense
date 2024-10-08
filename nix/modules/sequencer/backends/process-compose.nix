@@ -59,6 +59,13 @@ let
     }
   ) cfg.anvil;
 
+  smartContractsBuildInstance = {
+    smartContractsBuild.process-compose = {
+      command = "yarn && yarn build @blocksense/contracts";
+      shutdown.signal = 9;
+    };
+  };
+
   smartContractDeploymentInstances = lib.mapAttrs' (
     name:
     { port, contract-deployment, ... }:
@@ -66,8 +73,6 @@ let
       name = "smartContract-${name}";
       value.process-compose = lib.mkIf contract-deployment.enable {
         command = ''
-          yarn && \
-          yarn build @blocksense/contracts && \
           yarn workspace '@blocksense/contracts' hardhat deploy --networks local
         '';
         environment = [
@@ -75,7 +80,10 @@ let
           "SEQUENCER_ADDRESS=0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
           "SIGNER_PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
         ];
-        depends_on."anvil-${name}".condition = "process_healthy";
+        depends_on = {
+          smartContractsBuild.condition = "process_completed_successfully";
+          "anvil-${name}".condition = "process_healthy";
+        };
       };
 
     }
@@ -111,6 +119,10 @@ in
 {
   config = lib.mkIf cfg.enable {
     processes =
-      sequencerInstance // anvilInstances // smartContractDeploymentInstances // reporterInstances;
+      sequencerInstance
+      // anvilInstances
+      // smartContractsBuildInstance
+      // smartContractDeploymentInstances
+      // reporterInstances;
   };
 }
