@@ -18,11 +18,11 @@ data = '{"yf_symbol":"EURUSD=X"}'
 id = "253"
 
 [[trigger.oracle.data_feeds]]
-data = '{"yf_symbol":"BTCUSD=X"}'
+data = '{"yf_symbol":"BTC-USD"}'
 id = "31"
 
 [[trigger.oracle.data_feeds]]
-data = '{"yf_symbol":"ETHUSD=X"}'
+data = '{"yf_symbol":"ETH-USD"}'
 id = "47"
 
 [component.yahoo]

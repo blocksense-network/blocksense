@@ -114,7 +114,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     //in the oracle trigger
 
     // Please provide your own API key until capabilities are implemented.
-    req.header("x-api-key", "97yVrb3jKQaLw2vU1istq7LcVmTUgPaPavoL7HYn");
+    req.header("x-api-key", "xfbfACKQNe2ibfIEuXt1q1uVgYHMnFjW6mENHC7V");
     req.header("Accepts", "application/json");
 
     let req = req.build();
