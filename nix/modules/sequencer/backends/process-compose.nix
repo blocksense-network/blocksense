@@ -99,6 +99,7 @@ let
         "REPORTER_CONFIG_DIR=${reportersConfigJSON.${name}}/reporter-${name}"
         "RUST_LOG=${conf.log-level}"
       ];
+      depends_on.blocksense-sequencer.condition = "process_started";
       shutdown.signal = 9;
     };
   }) cfg.reporters;
@@ -112,6 +113,10 @@ let
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
       ];
       shutdown.signal = 9;
+      depends_on = {
+        "smartContract-a".condition = "process_completed_successfully";
+        "smartContract-b".condition = "process_completed_successfully";
+      };
     };
   };
 
