@@ -24,6 +24,7 @@ use tokio::io::AsyncWriteExt;
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 const PROVIDERS_KEY_PREFIX: &str = "/tmp/key_";
+const BATCHED_REPORT_VAL: f64 = 100000.1;
 const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
 const REPORTERS_INFO: [(u64, &str); 2] = [
@@ -87,7 +88,7 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
         .expect("Feeds array empty!")
         .clone();
     feed.id = 1;
-    feed.report_interval_ms = 7000;
+    feed.report_interval_ms = 3000;
     feed.quorum_percentage = 0.001;
 
     let feeds = json!({
@@ -152,9 +153,9 @@ fn send_get_request(request: &str) -> String {
     format!("{}", String::from_utf8_lossy(&easy.get_ref().0))
 }
 
-fn send_report(payload_json: serde_json::Value) {
+fn send_report(endpoint: &str, payload_json: serde_json::Value) {
     let mut easy = Easy::new();
-    easy.url(format!("127.0.0.1:{}/post_reports_batch", SEQUENCER_MAIN_PORT).as_str())
+    easy.url(format!("127.0.0.1:{SEQUENCER_MAIN_PORT}/{endpoint}").as_str())
         .unwrap();
     easy.post(true).unwrap();
 
@@ -166,6 +167,49 @@ fn send_report(payload_json: serde_json::Value) {
         .unwrap();
 
     easy.perform().unwrap();
+}
+
+async fn wait_for_value_to_be_updated_to_contracts() -> Result<()> {
+    let report_time_interval_ms: u64 = send_get_request(
+        format!(
+            "http://127.0.0.1:{}/get_feed_report_interval/{}",
+            SEQUENCER_ADMIN_PORT, FEED_ID
+        )
+        .as_str(),
+    )
+    .parse()?;
+    let mut interval = time::interval(Duration::from_millis(report_time_interval_ms + 1000)); // give 1 second tolerance
+    interval.tick().await; // The first tick completes immediately.
+    interval.tick().await;
+    Ok(())
+}
+
+fn verify_expected_data_in_contracts(expected_value: f64) {
+    println!(
+        "ETH1 value = {}",
+        send_get_request(
+            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_ADMIN_PORT).as_str()
+        )
+    );
+    println!(
+        "ETH2 value = {}",
+        send_get_request(
+            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_ADMIN_PORT).as_str()
+        )
+    );
+
+    // Verify expected data is set to contract in ETH1
+    assert!(
+        send_get_request(
+            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_ADMIN_PORT).as_str()
+        ) == format!("{}", expected_value)
+    );
+    // Verify expected data is set to contract in ETH2
+    assert!(
+        send_get_request(
+            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_ADMIN_PORT).as_str()
+        ) == format!("{}", expected_value)
+    );
 }
 
 fn cleanup_spawned_processes() {
@@ -211,77 +255,88 @@ async fn main() -> Result<()> {
 
     deploy_contract_to_networks(vec!["ETH1", "ETH2"]);
 
-    let timestamp = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("System clock set before EPOCH")
-        .as_millis();
+    // Send single update and verify value posted to contract:
+    {
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("System clock set before EPOCH")
+            .as_millis();
 
-    let mut payload = Vec::new();
-
-    for (id, key) in REPORTERS_INFO {
         let result = FeedResult::Result {
             result: FeedType::Numerical(REPORT_VAL),
         };
+        let (id, key) = REPORTERS_INFO[0];
+        let signature = generate_signature(key, FEED_ID, timestamp, &result).unwrap();
 
-        payload.push(DataFeedPayload {
+        let payload = DataFeedPayload {
             payload_metadata: PayloadMetaData {
                 reporter_id: id,
                 feed_id: FEED_ID.to_string(),
                 timestamp,
-                signature: JsonSerializableSignature {
-                    sig: generate_signature(key, FEED_ID, timestamp, &result).unwrap(),
-                },
+                signature: JsonSerializableSignature { sig: signature },
             },
-            result: result,
-        })
+            result,
+        };
+
+        let serialized_payload = match serde_json::to_value(&payload) {
+            Ok(payload) => payload,
+            Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
+        };
+
+        println!("serialized_payload={}", serialized_payload);
+
+        send_report("post_report", serialized_payload);
+
+        wait_for_value_to_be_updated_to_contracts()
+            .await
+            .expect("Error while waiting for value to be updated to contracts.");
+
+        verify_expected_data_in_contracts(REPORT_VAL);
     }
 
-    let serialized_payload = match serde_json::to_value(&payload) {
-        Ok(payload) => payload,
-        Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
-    };
-
-    println!("serialized_payload={}", serialized_payload);
-
-    send_report(serialized_payload);
-
+    // Send batched update and verify value posted to contract:
     {
-        let report_time_interval_ms: u64 = send_get_request(
-            format!(
-                "http://127.0.0.1:{}/get_feed_report_interval/{}",
-                SEQUENCER_ADMIN_PORT, FEED_ID
-            )
-            .as_str(),
-        )
-        .parse()?;
-        let mut interval = time::interval(Duration::from_millis(report_time_interval_ms + 1000)); // give 1 second tolerance
-        interval.tick().await; // The first tick completes immediately.
-        interval.tick().await;
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("System clock set before EPOCH")
+            .as_millis();
+
+        let mut payload = Vec::new();
+
+        // Prepare the batch to be sent
+        for (id, key) in REPORTERS_INFO {
+            let result = FeedResult::Result {
+                result: FeedType::Numerical(BATCHED_REPORT_VAL),
+            };
+
+            payload.push(DataFeedPayload {
+                payload_metadata: PayloadMetaData {
+                    reporter_id: id,
+                    feed_id: FEED_ID.to_string(),
+                    timestamp,
+                    signature: JsonSerializableSignature {
+                        sig: generate_signature(key, FEED_ID, timestamp, &result).unwrap(),
+                    },
+                },
+                result,
+            })
+        }
+
+        let serialized_payload = match serde_json::to_value(&payload) {
+            Ok(payload) => payload,
+            Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
+        };
+
+        println!("serialized_payload={}", serialized_payload);
+
+        send_report("post_reports_batch", serialized_payload);
+
+        wait_for_value_to_be_updated_to_contracts()
+            .await
+            .expect("Error while waiting for value to be updated to contracts.");
+
+        verify_expected_data_in_contracts(BATCHED_REPORT_VAL);
     }
-
-    println!(
-        "ETH1 value = {}",
-        send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_ADMIN_PORT).as_str()
-        )
-    );
-    println!(
-        "ETH2 value = {}",
-        send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_ADMIN_PORT).as_str()
-        )
-    );
-
-    assert!(
-        send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_ADMIN_PORT).as_str()
-        ) == format!("{}", REPORT_VAL)
-    );
-    assert!(
-        send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_ADMIN_PORT).as_str()
-        ) == format!("{}", REPORT_VAL)
-    );
 
     cleanup_spawned_processes();
 
