@@ -3,7 +3,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 # Historic Data Feed Store
 
-Historic Data Feed Store contract is where all data is stored and where all contract read from. It is written in Solidity assembly and contains only one function: `fallback`.
+Historic Data Feed Store contract is where all data is stored and where all contracts read from. It is written in Solidity assembly and contains only one function: `fallback`.
+
+<Callout type="info" emoji="⚠️">
+  This contract serves as the core logic that dictates how the [UpgradeableProxy](../reference-documentation/UpgradeableProxy.mdx) contract manages its own storage,
+  handling both data writing and reading operations. It's crucial to understand that all data is exclusively stored within the **UpgradeableProxy** contract.
+  To access this data, users must interact with the `fallback` function of the **UpgradeableProxy** contract which underneath calls the `fallback` function of the **HistoricDataFeedStore** contract.
+</Callout>
 
 ## Code Examples
 
@@ -169,7 +175,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 ### Solidity Hardhat Example
 
-<Callout type="info">
+<Callout type="info" emoji="💡">
   You can find a working Hardhat project [here](/coming-soon). Clone the repo
   and follow the setup instructions to run the example locally.
 </Callout>

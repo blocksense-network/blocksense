@@ -100,6 +100,10 @@ The historic data feed store contracts include:
 
 These contracts store historical data feed values, allowing users to retrieve past data points for specific data feed keys.
 
+In practice, the `UpgradeableProxy` contract serves as the central storage for all data. The `HistoricDataFeedStore` contracts provide the logic for reading from and writing to the `UpgradeableProxy` contract's storage.
+
+This architecture ensures efficient data management and allows for seamless upgrades to the data handling mechanisms without affecting the underlying storage structure.
+
 ## Test Contracts
 
 The `test` folder includes example consumer contracts and reference implementations primarily for gas comparison purposes during testing. These examples provide a basis evaluation for the gas efficiency.
