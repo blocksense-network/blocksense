@@ -1,11 +1,12 @@
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
+import hre from 'hardhat';
 import fs from 'fs';
 import path from 'path';
 import ejs from 'ejs';
-import { run } from 'hardhat';
 
-type SimpleField = {
+const { ethers, run } = hre;
+
+type PrimitiveField = {
   name: string;
   type: string;
   size?: number;
@@ -14,13 +15,13 @@ type SimpleField = {
 type TupleField = {
   name: string;
   type: string;
-  components: (SimpleField | TupleField)[];
+  components: (PrimitiveField | TupleField)[];
 };
 
 function processFields(
-  fields: (SimpleField | TupleField)[],
+  fields: (PrimitiveField | TupleField)[],
   values: any[],
-): [(SimpleField | TupleField)[], any[]] {
+): [(PrimitiveField | TupleField)[], any[]] {
   const processedFields = fields.map((field, i) => {
     if (field.type.includes('[')) {
       const dimensions = field.type
@@ -99,6 +100,10 @@ describe('Decoder', () => {
   const templatePath = path.join(__dirname, '../templates/decoder.sol.ejs');
   const tempFilePath = path.join(__dirname, `../contracts/${contractName}.sol`);
 
+  before(() => {
+    hre.config.solidity.compilers[0].settings.viaIR = true;
+  });
+
   async function generateAndDeployDecoder(fields: TupleField) {
     const template = fs.readFileSync(templatePath, 'utf-8');
     const generatedCode = ejs.render(template, { fields });
@@ -126,7 +131,7 @@ describe('Decoder', () => {
       fields.components.map(field => field.type),
       values,
     );
-    const result: any = await decoder.decode(packedData);
+    const result = await decoder.decode(packedData);
     expect(result).to.deep.equal(compareValues);
   }
 
@@ -134,6 +139,10 @@ describe('Decoder', () => {
     if (fs.existsSync(tempFilePath)) {
       fs.rmSync(tempFilePath, { force: true });
     }
+  });
+
+  after(() => {
+    hre.config.solidity.compilers[0].settings.viaIR = false;
   });
 
   it('should correctly decode packed sports data with boolean fields', async () => {
@@ -1097,6 +1106,11 @@ describe('Decoder', () => {
               type: 'bool',
               size: 8,
             },
+            {
+              name: 'bytes16Field',
+              type: 'bytes16[]',
+              size: 128,
+            },
           ],
         },
       ],
@@ -1113,6 +1127,7 @@ describe('Decoder', () => {
         ['First string', 'Second string', 'Third string with more data'],
         [100, 200, 300],
         true,
+        [ethers.hexlify(ethers.randomBytes(16))],
       ],
     ];
     await testDecoder(fields, values);
@@ -1354,7 +1369,7 @@ describe('Decoder', () => {
     await testDecoder(fields, values);
   });
 
-  it('should decode multidimensional dynamic and fixed arrays of tuple', async () => {
+  it('should decode multidimensional dynamic in-between fixed arrays of tuple', async () => {
     const fields: TupleField = {
       name: 'DynamicArrayOfTuple',
       type: 'tuple',
@@ -1362,7 +1377,7 @@ describe('Decoder', () => {
         { name: 'stringValue', type: 'string' },
         {
           name: 'tupleArray',
-          type: 'tuple[3][2][]',
+          type: 'tuple[3][][1]',
           components: [
             {
               name: 'uintField',
@@ -1615,6 +1630,88 @@ describe('Decoder', () => {
         ],
       ],
       '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+    ];
+    await testDecoder(fields, values);
+  });
+
+  it('should decode main dynamic tuple array with nested dynamic tuple array', async () => {
+    const fields = {
+      name: 'MainDynamicTupleArrayWithNested',
+      type: 'tuple[]',
+      components: [
+        {
+          name: 'uint32Array',
+          type: 'uint32[]',
+          size: 32,
+        },
+        {
+          name: 'mainArray',
+          type: 'tuple[]',
+          components: [
+            { name: 'id', type: 'uint256', size: 256 },
+            { name: 'name', type: 'string' },
+            {
+              name: 'nestedArray',
+              type: 'tuple[]',
+              components: [{ name: 'nestedId', type: 'uint256', size: 256 }],
+            },
+            {
+              name: 'uint32Array',
+              type: 'uint16[]',
+              size: 16,
+            },
+          ],
+        },
+        {
+          name: 'stringValue',
+          type: 'string',
+        },
+        {
+          name: 'uintValue',
+          type: 'uint256',
+          size: 256,
+        },
+      ],
+    };
+    const values = [
+      [
+        [1, 2, 3, 4],
+        [
+          [
+            BigInt('1'),
+            'Main Item 1',
+            [[BigInt('11')], [BigInt('12')]],
+            [1, 2],
+          ],
+          [
+            BigInt('2'),
+            'Main Item 2',
+            [[BigInt('21')], [BigInt('22')], [BigInt('23')]],
+            [3, 4],
+          ],
+        ],
+        'Dynamic array of tuple',
+        1,
+      ],
+      [
+        [5, 6, 7, 8],
+        [
+          [
+            BigInt('3'),
+            'Main Item 3',
+            [[BigInt('31')], [BigInt('32')], [BigInt('33')]],
+            [5, 6],
+          ],
+          [
+            BigInt('4'),
+            'Main Item 4',
+            [[BigInt('41')], [BigInt('42')], [BigInt('43')]],
+            [7, 8],
+          ],
+        ],
+        'Dynamic array of tuple once again',
+        2,
+      ],
     ];
     await testDecoder(fields, values);
   });

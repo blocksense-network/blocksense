@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 <%_
-let name = fields.name.charAt(0).toLowerCase() + fields.name.slice(1);
+let mainStructName = fields.name.charAt(0).toLowerCase() + fields.name.slice(1);
 let containsDynamicData = false;
 
 const expandFields = (values) => {
@@ -172,7 +172,6 @@ function processFields(fields) {
     }
   });
 
-
   return fields;
 }
 
@@ -237,6 +236,7 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
 
       const getArrayDepth = value => Array.isArray(value) ? 1 + Math.max(0, ...value.map(getArrayDepth)) : 0;
 
+      // handles the fixed part of the type; handles dynamic arrays of tuples
       function handleNestedDynamic(field, innerName, depth, innerIndex, indentation) {
         const lines = [];
         const innerLocation = `${innerName}_${depth}`;
@@ -264,22 +264,29 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
         return lines.map(line => line !== '' ? indentation + line : line)
       }
 
+      // handles the '[]' part of the type
       function handleMultiDimensionalArray(iterations, type, currentLocation, indentation, depth = 0) {
         const innerType = type.slice(0, -2); // Remove last '[]'
-        const innerName = `${location}_${depth}`;
         const innerIndex = `i_${location}_${depth}`;
+        let innerName = `${location}_${depth}`;
         lines.push('');
         lines.push(indentation + `shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
         lines.push(indentation + '{');
         lines.push(indentation + `  // Get address of array at depth ${depth}`);
-        lines.push(indentation + `  let ${innerName} := mload(0x40)`);
-        lines.push(indentation + `  let ${innerName}_length := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
-        if (depth > 0) {
-          lines.push(indentation + `  mstore(add(${currentLocation}, mul(add(i_${location}_${depth - 1}, 1), 32)), ${innerName})`);
+        // when main struct is a dynamic array
+        if (currentLocation === mainStructName && fields.type.endsWith('[]')) {
+          innerName = currentLocation
+          lines.push(indentation + `  let ${innerName}_length := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
         } else {
-          lines.push(indentation + `  mstore(${index ? `add(${currentLocation}, ${index * 0x20})` : currentLocation}, ${innerName})`);
+          lines.push(indentation + `  let ${innerName} := mload(0x40)`);
+          lines.push(indentation + `  let ${innerName}_length := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+          if (depth > 0) {
+            lines.push(indentation + `  mstore(add(${currentLocation}, mul(add(i_${location}_${depth - 1}, 1), 32)), ${innerName})`);
+          } else {
+            lines.push(indentation + `  mstore(${index ? `add(${currentLocation}, ${index * 0x20})` : currentLocation}, ${innerName})`);
+          }
+          lines.push(indentation + `  mstore(0x40, add(${innerName}, mul(add(${innerName}_length, 1), 32)))`);
         }
-        lines.push(indentation + `  mstore(0x40, add(${innerName}, mul(add(${innerName}_length, 1), 32)))`);
         lines.push(indentation + `  mstore(${innerName}, ${innerName}_length)`);
         lines.push(indentation + `  memData := mload(add(data, shift))`);
         lines.push(indentation + '');
@@ -327,6 +334,7 @@ function generateDecoderLines(expandedFields, name, startIndex = 0, indentation 
   return lines.map(line => line !== '' ? indentation + line : line);
 }
 
+// dynamic array of bytes or string data
 function generateDecoderDynamicDataLines(field, location, index, indentation, parentIndex) {
   const lines = [];
 
@@ -335,76 +343,33 @@ function generateDecoderDynamicDataLines(field, location, index, indentation, pa
   lines.push('');
   lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
   lines.push(`{`)
-  lines.push(`  let ${field.name} := mload(0x40)`)
-  lines.push(`  let size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
-  if (parentIndex) {
-    lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${field.name})`);
-  } else {
-    lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.name})`);
-  }
-  lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`)
-  lines.push(`  mstore(${field.name}, size)`)
+  lines.push(...generateMemoryAssignment(field.name, location, index, parentIndex));
   lines.push(`  memData := mload(add(data, shift))`)
   lines.push(`  for {`)
   lines.push(`    let ${dataName}_i := 0`)
-  lines.push(`  } lt(${dataName}_i, size) {`)
+  lines.push(`  } lt(${dataName}_i, ${field.name}_size) {`)
   lines.push(`    ${dataName}_i := add(${dataName}_i, 1)`)
   lines.push(`  } {`)
-  lines.push(`    shift := add(shift, 4)`)
-  lines.push(`    {`)
-  lines.push(`      let ${dataName} := mload(0x40)`)
-  lines.push(`      let dynamicSize := and(shr(224, memData), 0xFFFFFFFF)`)
-  lines.push(`      mstore(`)
-  lines.push(`        add(${field.name}, mul(add(${dataName}_i, 1), 32)),`)
-  lines.push(`        ${dataName}`)
-  lines.push(`      )`)
-  lines.push(`      mstore(`)
-  lines.push(`        0x40,`)
-  lines.push(`        add(${dataName}, mul(add(div(dynamicSize, 32), 2), 32))`)
-  lines.push(`      )`)
-  lines.push(`      mstore(${dataName}, dynamicSize)`)
-  lines.push(`      let ${dataName}_j := 32`)
-  lines.push(`      for {`)
-  lines.push(`      } lt(${dataName}_j, dynamicSize) {`)
-  lines.push(`        ${dataName}_j := add(${dataName}_j, 32)`)
-  lines.push(`        shift := add(shift, 32)`)
-  lines.push(`      } {`)
-  lines.push(`        memData := mload(add(data, shift))`)
-  lines.push(`        mstore(add(${dataName}, ${dataName}_j), memData)`)
-  lines.push(`      }`)
-  lines.push(`      memData := mload(add(data, shift))`)
-  lines.push(`      mstore(add(${dataName}, ${dataName}_j), memData)`)
-  lines.push(`      let shiftSize := mod(dynamicSize, 32)`)
-  lines.push(`      switch shiftSize`)
-  lines.push(`      case 0 {`)
-  lines.push(`        shift := add(shift, 32)`)
-  lines.push(`      }`)
-  lines.push(`      default {`)
-  lines.push(`        shift := add(shift, shiftSize)`)
-  lines.push(`      }`)
-  lines.push(`      memData := mload(add(data, shift))`)
-  lines.push(`    }`)
+
+  wordOffset = 0;
+  prevSize = 0;
+  bitOffset = 0;
+
+  lines.push(...generateDecoderStringBytes(field, field.name, index, '    ', dataName + '_i'));
   lines.push(`  }`)
   lines.push(`}`)
 
   return lines.map(line => line !== '' ? indentation + line : line);
 }
 
+// primitive types that are not bytes<num> are shifted to the right for Solidity to read
 function generateDecoderPrimitiveLines(field, location, index, indentation, parentIndex) {
   const lines = [];
 
   lines.push('');
   lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
   lines.push(`{`);
-  lines.push(`  let ${field.name} := mload(0x40)`);
-  lines.push(`  let size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
-  if (parentIndex) {
-    lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${field.name})`);
-  } else {
-    lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.name})`);
-  }
-  lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`);
-  lines.push(`  mstore(${field.name}, size)`);
+  lines.push(...generateMemoryAssignment(field.name, location, index, parentIndex));
   if (field.size < 256) {
     lines.push(`  let prevSizeSum := 0`);
     lines.push(`  let offset := ${field.size + 32}`);
@@ -414,7 +379,7 @@ function generateDecoderPrimitiveLines(field, location, index, indentation, pare
   if (field.size >= 256) {
     lines.push(`    let shiftBytes := 0`);
   }
-  lines.push(`  } lt(${field.name}_i, size) {`);
+  lines.push(`  } lt(${field.name}_i, ${field.name}_size) {`);
   lines.push(`    ${field.name}_i := add(${field.name}_i, 1)`);
   if (field.size < 256) {
     lines.push(`    offset := add(offset, ${field.size})`);
@@ -440,13 +405,7 @@ function generateDecoderPrimitiveLines(field, location, index, indentation, pare
   lines.push(`    )`);
   lines.push(`  }`);
   if (field.size < 256) {
-    lines.push(`  switch gt(offset, 256)`);
-    lines.push(`  case 1 {`);
-    lines.push(`    shift := add(shift, div(prevSizeSum, 8))`);
-    lines.push(`  }`);
-    lines.push(`  default {`);
-    lines.push(`    shift := add(shift, div(sub(offset, ${field.size + 32}), 8))`);
-    lines.push(`  }`);
+    lines.push(...generateSwitchCase(field.size, 'gt(offset, 256)'));
   } else {
     lines.push(`  shift := add(shift, 32)`);
   }
@@ -456,26 +415,19 @@ function generateDecoderPrimitiveLines(field, location, index, indentation, pare
   return lines.map(line => line !== '' ? indentation + line : line);
 }
 
+// bytes<num> are shifted to the left for Solidity to read
 function generateDecoderFixedBytesLines(field, location, index, indentation, parentIndex) {
   const lines = [];
 
   lines.push('');
   lines.push(`shift := add(shift, ${wordOffset + prevSize / 8 + 4})`);
   lines.push(`{`);
-  lines.push(`  let ${field.name} := mload(0x40)`);
-  lines.push(`  let size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
-  if (parentIndex) {
-    lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${field.name})`);
-  } else {
-    lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.name})`);
-  }
-  lines.push(`  mstore(0x40, add(${field.name}, mul(add(size, 1), 32)))`);
-  lines.push(`  mstore(${field.name}, size)`);
+  lines.push(...generateMemoryAssignment(field.name, location, index, parentIndex));
   lines.push(`  let prevSizeSum := 0`);
-  lines.push(`  let offset := 32`);
+  lines.push(`  let offset := ${bitOffset + 32}`);
   lines.push(`  for {`);
   lines.push(`    let ${field.name}_i := 0`);
-  lines.push(`  } lt(${field.name}_i, size) {`);
+  lines.push(`  } lt(${field.name}_i, ${field.name}_size) {`);
   lines.push(`    ${field.name}_i := add(${field.name}_i, 1)`);
   lines.push(`    offset := add(offset, ${field.size})`);
   lines.push(`    prevSizeSum := add(prevSizeSum, ${field.size})`);
@@ -491,17 +443,26 @@ function generateDecoderFixedBytesLines(field, location, index, indentation, par
   lines.push(`      shl(offset, memData)`);
   lines.push(`    )`);
   lines.push(`  }`);
-  lines.push(`  switch gt(add(offset, ${field.size}), 256)`);
-  lines.push(`  case 1 {`);
-  lines.push(`    shift := add(shift, div(prevSizeSum, 8))`);
-  lines.push(`  }`);
-  lines.push(`  default {`);
-  lines.push(`    shift := add(shift, div(sub(offset, ${field.size + 32}), 8))`);
-  lines.push(`  }`);
+  lines.push(...generateSwitchCase(field.size, `gt(add(offset, ${field.size}), 256)`));
   lines.push(`  memData := mload(add(data, shift))`);
   lines.push(`}`);
 
   return lines.map(line => line !== '' ? indentation + line : line);
+}
+
+// for generateDecoderFixedBytesLines(...) and generateDecoderPrimitiveLines(...) to align the memData shift
+function generateSwitchCase(fieldSize, condition) {
+  const lines = [];
+
+  lines.push(`  switch ${condition}`);
+  lines.push(`  case 1 {`);
+  lines.push(`    shift := add(shift, div(prevSizeSum, 8))`);
+  lines.push(`  }`);
+  lines.push(`  default {`);
+  lines.push(`    shift := add(shift, div(sub(offset, ${fieldSize + 32}), 8))`);
+  lines.push(`  }`);
+
+  return lines;
 }
 
 function generateDecoderStringBytes(field, location, index, indentation, parentIndex) {
@@ -514,17 +475,18 @@ function generateDecoderStringBytes(field, location, index, indentation, parentI
 
   lines.push(`{`);
   lines.push(`  let ${fieldName} := mload(0x40)`);
-  lines.push(`  let dynamicSize := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+  lines.push(`  let ${fieldName}_size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
   if (parentIndex) {
     lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${fieldName})`);
   } else {
     lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${fieldName})`);
   }
-  lines.push(`  mstore(0x40, add(${fieldName}, and(add(dynamicSize, 64), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFe0)))`);
-  lines.push(`  mstore(${fieldName}, dynamicSize)`);
+  // take a mod of 32 to update the free memory pointer
+  lines.push(`  mstore(0x40, add(${fieldName}, and(add(${fieldName}_size, 64), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFe0)))`);
+  lines.push(`  mstore(${fieldName}, ${fieldName}_size)`);
   lines.push(`  let ${fieldName}_j := 32`);
   lines.push(`  for {`);
-  lines.push(`  } lt(${fieldName}_j, dynamicSize) {`);
+  lines.push(`  } lt(${fieldName}_j, ${fieldName}_size) {`);
   lines.push(`    ${fieldName}_j := add(${fieldName}_j, 32)`);
   lines.push(`    shift := add(shift, 32)`);
   lines.push(`  } {`);
@@ -533,18 +495,32 @@ function generateDecoderStringBytes(field, location, index, indentation, parentI
   lines.push(`  }`);
   lines.push(`  memData := mload(add(data, shift))`);
   lines.push(`  mstore(add(${fieldName}, ${fieldName}_j), memData)`);
-  lines.push(`  let shiftSize := mod(dynamicSize, 32)`);
-  lines.push(`  switch shiftSize`);
-  lines.push(`  case 0 {`);
-  lines.push(`    shift := add(shift, 32)`);
-  lines.push(`  }`);
-  lines.push(`  default {`);
-  lines.push(`    shift := add(shift, shiftSize)`);
-  lines.push(`  }`);
+  lines.push(`  ${fieldName}_j := mod(${fieldName}_size, 32)`)
+  lines.push(`  if iszero(${fieldName}_j) {`)
+  lines.push(`    ${fieldName}_j := 32`)
+  lines.push(`  }`)
+  lines.push(`  shift := add(shift, ${fieldName}_j)`)
   lines.push(`  memData := mload(add(data, shift))`);
   lines.push(`}`);
 
   return lines.map(line => line !== '' ? indentation + line : line);
+}
+
+// init memory allocation of free memory pointer for dynamic arrays
+function generateMemoryAssignment(fieldName, location, index, parentIndex) {
+  const lines = [];
+
+  lines.push(`  let ${fieldName} := mload(0x40)`);
+  lines.push(`  let ${fieldName}_size := and(shr(${256 - bitOffset - 32}, memData), 0xFFFFFFFF)`);
+  if (parentIndex) {
+    lines.push(`  mstore(add(${location}, mul(add(${parentIndex}, 1), 32)), ${fieldName})`);
+  } else {
+    lines.push(`  mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${fieldName})`);
+  }
+  lines.push(`  mstore(0x40, add(${fieldName}, mul(add(${fieldName}_size, 1), 32)))`);
+  lines.push(`  mstore(${fieldName}, ${fieldName}_size)`);
+
+  return lines;
 }
 -%>
 
@@ -560,12 +536,12 @@ library Decoder {
 
   function decode(
     bytes memory data
-  ) external pure returns (<%= fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('') %> memory <%= name %>) {
+  ) external pure returns (<%= fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('') %> memory <%= mainStructName %>) {
     assembly {
       // First 32 bytes are the length of the data
       let memData := mload(add(data, 32))
       <%= containsDynamicData ? 'let shift := 0' : '' %>
-      <%= generateDecoderLines(expandedFields, name).join('\n      ') %>
+      <%= generateDecoderLines(expandedFields, mainStructName).join('\n      ') %>
     }
   }
 }
