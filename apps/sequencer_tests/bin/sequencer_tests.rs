@@ -27,6 +27,9 @@ const PROVIDERS_KEY_PREFIX: &str = "/tmp/key_";
 const BATCHED_REPORT_VAL: f64 = 100000.1;
 const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
+// We use the second value to generate a wrong signature in a batch
+const CORRECT_AND_WRONG_VALS: [f64; 2] = [115000.5, 110000.1];
+
 const REPORTERS_INFO: [(u64, &str); 2] = [
     (
         0,
@@ -153,20 +156,31 @@ fn send_get_request(request: &str) -> String {
     format!("{}", String::from_utf8_lossy(&easy.get_ref().0))
 }
 
-fn send_report(endpoint: &str, payload_json: serde_json::Value) {
+fn send_report(endpoint: &str, payload_json: serde_json::Value) -> String {
+    let mut result = Vec::new();
     let mut easy = Easy::new();
-    easy.url(format!("127.0.0.1:{SEQUENCER_MAIN_PORT}/{endpoint}").as_str())
-        .unwrap();
-    easy.post(true).unwrap();
+    {
+        easy.url(format!("127.0.0.1:{SEQUENCER_MAIN_PORT}/{endpoint}").as_str())
+            .unwrap();
 
-    easy.post_fields_copy(payload_json.to_string().as_bytes())
-        .unwrap();
+        easy.post(true).unwrap();
 
-    // Set a closure to handle the response
-    easy.write_function(|data| Ok(std::io::Write::write(&mut stdout(), data).unwrap()))
-        .unwrap();
+        easy.post_fields_copy(payload_json.to_string().as_bytes())
+            .unwrap();
 
-    easy.perform().unwrap();
+        let mut transfer = easy.transfer();
+
+        // Set a closure to handle the response
+        transfer
+            .write_function(|data: &[u8]| {
+                result.extend_from_slice(data);
+                Ok(std::io::Write::write(&mut stdout(), data).unwrap())
+            })
+            .unwrap();
+
+        transfer.perform().unwrap();
+    }
+    String::from_utf8(result).expect("returned bytes must be valid utf8")
 }
 
 async fn wait_for_value_to_be_updated_to_contracts() -> Result<()> {
@@ -255,7 +269,7 @@ async fn main() -> Result<()> {
 
     deploy_contract_to_networks(vec!["ETH1", "ETH2"]);
 
-    // Send single update and verify value posted to contract:
+    println!("\n * Send single update and verify value posted to contract:\n");
     {
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -294,7 +308,7 @@ async fn main() -> Result<()> {
         verify_expected_data_in_contracts(REPORT_VAL);
     }
 
-    // Send batched update and verify value posted to contract:
+    println!("\n * Send batched update and verify value posted to contract:\n");
     {
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -336,6 +350,58 @@ async fn main() -> Result<()> {
             .expect("Error while waiting for value to be updated to contracts.");
 
         verify_expected_data_in_contracts(BATCHED_REPORT_VAL);
+    }
+
+    println!("\n * Send batched update with one valid and one non-valid signature and verify value posted to contract:\n");
+    {
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("System clock set before EPOCH")
+            .as_millis();
+
+        let mut payload = Vec::new();
+
+        // Prepare the batch to be sent
+        for (i, (id, key)) in REPORTERS_INFO.iter().enumerate() {
+            payload.push(DataFeedPayload {
+                payload_metadata: PayloadMetaData {
+                    reporter_id: *id,
+                    feed_id: FEED_ID.to_string(),
+                    timestamp,
+                    signature: JsonSerializableSignature {
+                        sig: generate_signature(
+                            key,
+                            FEED_ID,
+                            timestamp,
+                            &FeedResult::Result {
+                                // This will cause a corrupted signature on the second iteration,
+                                // since the value we sign will not be the value we send below.
+                                result: FeedType::Numerical(CORRECT_AND_WRONG_VALS[0]),
+                            },
+                        )
+                        .unwrap(),
+                    },
+                },
+                result: FeedResult::Result {
+                    result: FeedType::Numerical(CORRECT_AND_WRONG_VALS[i]),
+                },
+            })
+        }
+
+        let serialized_payload = match serde_json::to_value(&payload) {
+            Ok(payload) => payload,
+            Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
+        };
+
+        println!("serialized_payload={}", serialized_payload);
+
+        assert!(send_report("post_reports_batch", serialized_payload).contains("401 Unauthorized"));
+
+        wait_for_value_to_be_updated_to_contracts()
+            .await
+            .expect("Error while waiting for value to be updated to contracts.");
+
+        verify_expected_data_in_contracts(CORRECT_AND_WRONG_VALS[0]);
     }
 
     cleanup_spawned_processes();
