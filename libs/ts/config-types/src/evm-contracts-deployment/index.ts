@@ -4,7 +4,6 @@ import {
   chainId,
   ethereumAddress,
   networkName,
-  txHash,
 } from '@blocksense/base-utils/evm';
 
 const ParameterType = S.Union(ethereumAddress, S.String, S.Number, S.Boolean);
@@ -18,7 +17,7 @@ const ContractDataSchema = S.Struct({
 
 export type ContractData = S.Schema.Type<typeof ContractDataSchema>;
 
-const ChainlinkProxyDataSchema = S.Struct({
+export const ChainlinkProxyDataSchema = S.Struct({
   description: S.String,
   address: ethereumAddress,
   base: S.NullOr(ethereumAddress),
