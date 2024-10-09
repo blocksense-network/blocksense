@@ -38,37 +38,6 @@ pub struct Status {
 #[serde(rename_all = "camelCase")]
 pub struct CmcData {
     id: i64,
-    // pub name: String,
-    // pub symbol: String,
-    // pub slug: String,
-    // #[serde(rename = "num_market_pairs")]
-    // pub num_market_pairs: Option<i64>,
-    // #[serde(rename = "date_added")]
-    // pub date_added: Option<String>,
-    // pub tags: Vec<Tag>,
-    // #[serde(rename = "max_supply")]
-    // pub max_supply: Option<i64>,
-    // #[serde(rename = "circulating_supply")]
-    // pub circulating_supply: Option<f64>,
-    // #[serde(rename = "total_supply")]
-    // pub total_supply: Option<f64>,
-    // #[serde(rename = "is_active")]
-    // pub is_active: Option<f64>,
-    // #[serde(rename = "infinite_supply")]
-    // pub infinite_supply: Option<bool>,
-    // pub platform: Value,
-    // #[serde(rename = "cmc_rank")]
-    // pub cmc_rank: Option<i64>,
-    // #[serde(rename = "is_fiat")]
-    // pub is_fiat: Option<i64>,
-    // #[serde(rename = "self_reported_circulating_supply")]
-    // pub self_reported_circulating_supply: Value,
-    // #[serde(rename = "self_reported_market_cap")]
-    // pub self_reported_market_cap: Value,
-    // #[serde(rename = "tvl_ratio")]
-    // pub tvl_ratio: Value,
-    // #[serde(rename = "last_updated")]
-    // pub last_updated: Option<String>,
     quote: HashMap<String, CmcValue>,
 }
 
@@ -86,31 +55,6 @@ pub struct Tag {
 #[serde(rename_all = "camelCase")]
 pub struct CmcValue {
     pub price: f64,
-    // #[serde(rename = "volume_24h")]
-    // pub volume_24h: Option<f64>,
-    // #[serde(rename = "volume_change_24h")]
-    // pub volume_change_24h: Option<f64>,
-    // #[serde(rename = "percent_change_1h")]
-    // pub percent_change_1h: Option<f64>,
-    // #[serde(rename = "percent_change_24h")]
-    // pub percent_change_24h: Option<f64>,
-    // #[serde(rename = "percent_change_7d")]
-    // pub percent_change_7d: Option<f64>,
-    // #[serde(rename = "percent_change_30d")]
-    // pub percent_change_30d: Option<f64>,
-    // #[serde(rename = "percent_change_60d")]
-    // pub percent_change_60d: Option<f64>,
-    // #[serde(rename = "percent_change_90d")]
-    // pub percent_change_90d: Option<f64>,
-    // #[serde(rename = "market_cap")]
-    // pub market_cap: Option<f64>,
-    // #[serde(rename = "market_cap_dominance")]
-    // pub market_cap_dominance: Option<f64>,
-    // #[serde(rename = "fully_diluted_market_cap")]
-    // pub fully_diluted_market_cap: Option<f64>,
-    // pub tvl: Value,
-    // #[serde(rename = "last_updated")]
-    // pub last_updated: Option<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -143,7 +87,12 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     // Please provide your own API key until capabilities are implemented.
     req.header(
         "X-CMC_PRO_API_KEY",
-        settings.capabilities.first().unwrap().data.clone(),
+        settings
+            .capabilities
+            .first()
+            .expect("We expect only one capability.")
+            .data
+            .clone(),
     );
     req.header("Accepts", "application/json");
 
@@ -157,18 +106,23 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     for (feed_id, data) in resources.iter() {
         payload.values.push(match value.data.get(&data.cmc_id) {
-            Some(cmc) => DataFeedResult {
-                id: feed_id.clone(),
-                value: DataFeedResultValue::Numerical(
-                    cmc.quote
-                        .get("USD")
-                        .unwrap_or(&CmcValue { price: 0.0 })
-                        .price,
-                ),
-            },
+            Some(cmc) => {
+                let value = if let Some(&CmcValue { price }) = cmc.quote.get("USD") {
+                    DataFeedResultValue::Numerical(price)
+                } else {
+                    DataFeedResultValue::Error(format!(
+                        "No price in USD for data feed with id {}",
+                        data.cmc_id
+                    ))
+                };
+
+                DataFeedResult {
+                    id: feed_id.clone(),
+                    value,
+                }
+            }
             None => {
                 let error = format!("CMC data feed with id {} is not found", data.cmc_id);
-                //TODO: Start reporting error.
                 DataFeedResult {
                     id: feed_id.clone(),
                     value: DataFeedResultValue::Error(error),
