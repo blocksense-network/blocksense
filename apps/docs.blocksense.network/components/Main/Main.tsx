@@ -1,12 +1,11 @@
 import React from 'react';
 
 import { gettingStartedConfig } from '@/config';
-import { FigureBackdrop } from '@/components/common/FigureBackdrop';
 import { LinkButton } from '@/components/common/LinkButton';
 
 export const Main = () => {
   return (
-    <section className="getting-started w-full flex h-[calc(100%_+_5rem)]">
+    <section className="getting-started w-full flex h-[calc(100%_+_5rem)] bg-[url('/images/blocksense-bg.jpg')] bg-cover bg-center bg-no-repeat">
       <article className="getting-started__content flex flex-col justify-center items-start gap-4">
         <h1 className="getting-started__title tracking-tight text-3xl md:text-4xl lg:text-5xl dark:text-white max-w-screen-xl">
           {gettingStartedConfig.title}
@@ -26,7 +25,6 @@ export const Main = () => {
           />
         </div>
       </article>
-      <FigureBackdrop />
     </section>
   );
 };
