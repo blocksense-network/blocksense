@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result, Error};
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
@@ -13,7 +13,7 @@ use url::Url;
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Root {
-    pub quote_response: Option<QuoteResponse>,
+    pub quote_response: QuoteResponse,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -74,12 +74,17 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let body = resp.into_body();
     let string = String::from_utf8(body)?;
-    let value: Root = serde_json::from_str(&string)?;
+    let value = match serde_json::from_str::<Root>(&string) {
+        Ok(value) => value,
+        Err(err) => return Result::Err(Error::msg(format!(
+        "Serde failed to parse response from YahooFinance
+Raw response: [{string}].
+Error from serde: [{err}].
+"))),
+    };
 
     let mut payload: Payload = Payload::new();
-    let mut quote_response = value
-        .quote_response
-        .ok_or(anyhow::anyhow!("No Yahoo response."))?;
+    let mut quote_response = value.quote_response;
 
     for (feed_id, data) in resources.iter() {
         let position = quote_response

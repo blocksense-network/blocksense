@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result, Error};
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
@@ -101,7 +101,14 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let body = resp.into_body();
     let string = String::from_utf8(body)?;
-    let value: Root = serde_json::from_str(&string)?;
+    let value = match serde_json::from_str::<Root>(&string) {
+        Ok(value) => value,
+        Err(err) => return Result::Err(Error::msg(format!(
+        "Serde failed to parse response from CMC
+Raw response: [{string}].
+Error from serde: [{err}].
+"))),
+    };
     let mut payload: Payload = Payload::new();
 
     for (feed_id, data) in resources.iter() {
