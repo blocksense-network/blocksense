@@ -9,6 +9,7 @@ edition = "2021"
 data_feeds = { path = "../../libs/data_feeds"}
 feed_registry = { path = "../../libs/feed_registry"}
 crypto = { path = "../../libs/crypto"}
+utils = { path = "../../libs/utils"}
 
 anyhow = "1.0.89"
 clap = { version = "3.1.15", features = ["derive", "env"] }

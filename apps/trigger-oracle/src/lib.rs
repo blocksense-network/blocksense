@@ -6,7 +6,6 @@ use std::{
     collections::{HashMap, HashSet},
     hash::{Hash, Hasher},
     sync::Arc,
-    time::{SystemTime, UNIX_EPOCH},
 };
 
 use http::uri::Scheme;
@@ -31,6 +30,7 @@ use wasmtime_wasi_http::{
 use crypto::JsonSerializableSignature;
 use data_feeds::connector::post::generate_signature;
 use feed_registry::types::{DataFeedPayload, FeedError, FeedResult, FeedType, PayloadMetaData};
+use utils::time::current_unix_time;
 
 wasmtime::component::bindgen!({
     path: "../../libs/sdk/wit",
@@ -58,6 +58,7 @@ pub struct OracleTrigger {
     engine: TriggerAppEngine<Self>,
     sequencer: String,
     secret_key: String,
+    reporter_id: u64,
     interval_time_in_seconds: u64,
     queue_components: HashMap<String, Component>,
 }
@@ -75,6 +76,7 @@ struct TriggerMetadata {
     interval_time_in_seconds: Option<u64>,
     sequencer: Option<String>,
     secret_key: Option<String>,
+    reporter_id: Option<u64>,
 }
 
 #[derive(Clone, Eq, Debug, Default, Deserialize, Serialize)]
@@ -162,6 +164,7 @@ impl TriggerExecutor for OracleTrigger {
             .expect("Report time interval not provided");
         let sequencer = metadata.sequencer.expect("Sequencer URL is not provided");
         let secret_key = metadata.secret_key.expect("Secret key is not provided");
+        let reporter_id = metadata.reporter_id.expect("Reporter ID is not provided");
         // TODO(adikov) There is a specific case in which one reporter receives task to report multiple
         // data feeds which are gathered from one wasm component. For example -
         // USD/BTC and USD/ETH. In that case we need to optimize calling the component once and
@@ -190,6 +193,7 @@ impl TriggerExecutor for OracleTrigger {
             engine,
             sequencer,
             secret_key,
+            reporter_id,
             interval_time_in_seconds,
             queue_components,
         })
@@ -242,7 +246,12 @@ impl TriggerExecutor for OracleTrigger {
         );
         loops.push(orchestrator);
 
-        let manager = Self::start_manager(data_feed_receiver, &self.sequencer, &self.secret_key);
+        let manager = Self::start_manager(
+            data_feed_receiver,
+            &self.sequencer,
+            &self.secret_key,
+            self.reporter_id,
+        );
         loops.push(manager);
 
         let (tr, _, rest) = futures::future::select_all(loops).await;
@@ -350,8 +359,10 @@ impl OracleTrigger {
         rx: UnboundedReceiver<(String, Payload)>,
         sequencer: &str,
         secret_key: &str,
+        reporter_id: u64,
     ) -> tokio::task::JoinHandle<TerminationReason> {
-        let future = Self::process_payload(rx, sequencer.to_owned(), secret_key.to_owned());
+        let future =
+            Self::process_payload(rx, sequencer.to_owned(), secret_key.to_owned(), reporter_id);
 
         tokio::task::spawn(future)
     }
@@ -360,6 +371,7 @@ impl OracleTrigger {
         mut rx: UnboundedReceiver<(String, Payload)>,
         sequencer: String,
         secret_key: String,
+        reporter_id: u64,
     ) -> TerminationReason {
         while let Some((_component_id, payload)) = rx.recv().await {
             let timestamp = current_unix_time();
@@ -387,7 +399,7 @@ impl OracleTrigger {
 
                 let payload_json = DataFeedPayload {
                     payload_metadata: PayloadMetaData {
-                        reporter_id: 1,
+                        reporter_id,
                         feed_id: id,
                         timestamp,
                         signature: JsonSerializableSignature { sig: signature },
@@ -559,11 +571,4 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
             wasmtime_wasi::runtime::spawn(response_handle),
         ))
     }
-}
-
-pub fn current_unix_time() -> u128 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("SystemTime before UNIX EPOCH!")
-        .as_secs() as u128
 }
