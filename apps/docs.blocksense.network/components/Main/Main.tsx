@@ -14,10 +14,7 @@ export const Main = () => {
           {gettingStartedConfig.description}
         </p>
         <div className="flex flex-wrap mt-2">
-          <LinkButton
-            href="/docs/overview/getting-started"
-            label="Get Started"
-          />
+          <LinkButton href="/docs/overview/introduction" label="Get Started" />
           <LinkButton
             href="/docs/overview/roadmap"
             label="Roadmap"

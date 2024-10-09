@@ -23,5 +23,5 @@ export const config = {
 export const gettingStartedConfig = {
   title: 'The ZK rollup for verifiable data and compute services',
   description:
-    'A fully decentralized protocol with ground-breaking cost efficiency. Everyone will be able to create secure oracles in minutes.',
+    'A fully decentralized protocol with groundbreaking cost efficiency. Everyone will finally be able to create secure oracles in minutes.',
 };
