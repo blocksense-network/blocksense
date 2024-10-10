@@ -3,8 +3,10 @@ import React from 'react';
 import { DataFeedCardSection } from '@/components/DataFeeds/DataFeedCardSection';
 import { DataFeedCardContentItem } from '@/components/DataFeeds/DataFeedCardContentItem';
 import { decodeIndividualDataFeedPageData } from '@/src/generate-data-feed-mdx-types';
+import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
+import { CopyButton } from '@/components/common/CopyButton';
 
-import { QuestionsCardContent } from '@/components/DataFeeds/QuestionsCardContent';
+import { QuestionsCardContent } from './QuestionsCardContent';
 
 export const DataFeedDetails: React.FC<{
   feedJsonString: string;
@@ -21,10 +23,57 @@ export const DataFeedDetails: React.FC<{
     type,
   } = feedData.feed;
 
+  const { base, quote, address } = feedData.contracts;
+
   const feedRegistry = {
-    baseAddress: '0xBaseAddress',
-    quoteAddress: '0xQuoteAddress',
-    aggregatorProxyAddress: '0xAggregatorProxyAddress',
+    directAccess: (
+      <div className="text-sm text-gray-500 ml-2">
+        {
+          <div className="flex gap-2 justify-between ">
+            Feed id:
+            <span className="flex gap-2">
+              <code className="inline">{id}</code>
+              <CopyButton
+                textToCopy={`${id}`}
+                tooltipPosition="top"
+                copyButtonClasses="translate-x-1"
+              />
+            </span>
+          </div>
+        }
+      </div>
+    ),
+    chainlinkStyleRegistry:
+      base && quote ? (
+        <div className="text-sm text-gray-500 ml-2">
+          <div className="flex gap-2 justify-between">
+            base:{' '}
+            <ContractAddress
+              address={base}
+              enableCopy
+              abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+            />
+          </div>
+          <div className="flex gap-2 justify-between">
+            quote:{''}
+            <ContractAddress
+              address={quote}
+              enableCopy
+              abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+            />
+          </div>
+        </div>
+      ) : undefined,
+    aggregatorProxyAddress: (
+      <div className="text-sm text-gray-500 ml-2 flex gap-2 justify-between">
+        address:{' '}
+        <ContractAddress
+          address={address}
+          enableCopy
+          abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+        />
+      </div>
+    ),
   };
 
   const dataFeedCardArray = [
@@ -56,19 +105,6 @@ export const DataFeedDetails: React.FC<{
         { label: 'Data Providers', value: 'No information yet' },
       ],
     },
-    {
-      title: 'Feed Registry',
-      description:
-        'Highlight detail components of a feed registry for effective data management',
-      items: [
-        { label: 'Base Address', value: feedRegistry.baseAddress },
-        { label: 'Quote Address', value: feedRegistry.quoteAddress },
-      ],
-      extra: {
-        type: 'Feed Registry' as const,
-        aggregatorProxyAddress: feedRegistry.aggregatorProxyAddress,
-      },
-    },
   ];
 
   return (
@@ -95,6 +131,58 @@ export const DataFeedDetails: React.FC<{
             </div>
           </DataFeedCardSection>
         ))}
+        <DataFeedCardSection
+          key={dataFeedCardArray.length}
+          title="EVM Access Info"
+          description="To access that from this feed on-chain you can use one of the following approaches:"
+        >
+          <DataFeedCardContentItem
+            label={
+              <a
+                href="/docs/contracts/guide/historic-data-feed"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h5 className="hover:underline">
+                  ProxyCall for direct access:
+                </h5>
+              </a>
+            }
+            value={feedRegistry.directAccess}
+          />
+          <DataFeedCardContentItem
+            label={
+              <a
+                href="/docs/contracts/guide/chainlink-proxy"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <h5 className="hover:underline">
+                  Chainlink-style AggregatorProxy:
+                </h5>
+              </a>
+            }
+            value={feedRegistry.aggregatorProxyAddress}
+          />
+          {feedRegistry.chainlinkStyleRegistry && (
+            <div className="data-feed-card-content">
+              <DataFeedCardContentItem
+                label={
+                  <a
+                    href="/docs/contracts/guide/feed-registry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <h5 className="hover:underline">
+                      Chainlink-style FeedRegistry:
+                    </h5>
+                  </a>
+                }
+                value={feedRegistry.chainlinkStyleRegistry}
+              />
+            </div>
+          )}
+        </DataFeedCardSection>
         <DataFeedCardSection
           key={dataFeedCardArray.length}
           title="Questions?"
