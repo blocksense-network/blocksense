@@ -135,7 +135,7 @@ describe('Decoder', () => {
     expect(result).to.deep.equal(compareValues);
   }
 
-  afterEach(async () => {
+  afterEach(() => {
     if (fs.existsSync(tempFilePath)) {
       fs.rmSync(tempFilePath, { force: true });
     }
@@ -1584,6 +1584,17 @@ describe('Decoder', () => {
             },
           ],
         },
+        {
+          name: 'innerStruct2',
+          type: 'tuple[]',
+          components: [
+            { name: 'innerBool', type: 'bool', size: 8 },
+            {
+              name: 'bytesValue',
+              type: 'bytes',
+            },
+          ],
+        },
         { name: 'outerBytes', type: 'bytes32', size: 256 },
       ],
     };
@@ -1628,6 +1639,11 @@ describe('Decoder', () => {
           ],
           'Dynamic array of inner tuple once again',
         ],
+      ],
+      [
+        [true, ethers.hexlify(ethers.randomBytes(32))],
+        [false, ethers.hexlify(ethers.randomBytes(68))],
+        [true, ethers.hexlify(ethers.randomBytes(99))],
       ],
       '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
     ];
