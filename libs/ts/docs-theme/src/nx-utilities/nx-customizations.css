@@ -257,6 +257,16 @@ article details > summary:before {
   height: 1.2em;
 }
 
+.nextra-nav {
+  background-color: white;
+}
+
+@media (min-width: 768px) {
+  .nextra-nav {
+    background-color: transparent;
+  }
+}
+
 @media (min-width: 768px) {
   .nextra-toc > .div,
   .nextra-sidebar-container {
