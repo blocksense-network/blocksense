@@ -1,13 +1,15 @@
 import React from 'react';
-import { decodeFeed } from '@blocksense/config-types/data-feeds-config';
+
 import { DataFeedCardSection } from '@/components/DataFeeds/DataFeedCardSection';
 import { DataFeedCardContentItem } from '@/components/DataFeeds/DataFeedCardContentItem';
-import { QuestionsCardContent } from './QuestionsCardContent';
+import { decodeIndividualDataFeedPageData } from '@/src/generate-data-feed-mdx-types';
+
+import { QuestionsCardContent } from '@/components/DataFeeds/QuestionsCardContent';
 
 export const DataFeedDetails: React.FC<{
   feedJsonString: string;
 }> = ({ feedJsonString }) => {
-  const feed = decodeFeed(JSON.parse(feedJsonString));
+  const feedData = decodeIndividualDataFeedPageData(JSON.parse(feedJsonString));
 
   const {
     id,
@@ -17,7 +19,7 @@ export const DataFeedDetails: React.FC<{
     report_interval_ms,
     quorum_percentage,
     type,
-  } = feed;
+  } = feedData.feed;
 
   const feedRegistry = {
     baseAddress: '0xBaseAddress',
