@@ -69,7 +69,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         network={row.original.network}
         address={row.getValue('address')}
         enableCopy
-        hasAbbreviation
+        abbreviation={{ hasAbbreviation: true }}
       />
     ),
   },
@@ -86,7 +86,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         network={row.original.network}
         address={row.getValue('base')}
         enableCopy
-        hasAbbreviation
+        abbreviation={{ hasAbbreviation: true }}
       />
     ),
   },
@@ -103,7 +103,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         network={row.original.network}
         address={row.getValue('quote')}
         enableCopy
-        hasAbbreviation
+        abbreviation={{ hasAbbreviation: true }}
       />
     ),
   },
@@ -120,7 +120,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
         network={row.original.network}
         address={row.getValue('chainlink_proxy')}
         enableCopy
-        hasAbbreviation
+        abbreviation={{ hasAbbreviation: true }}
       />
     ),
   },

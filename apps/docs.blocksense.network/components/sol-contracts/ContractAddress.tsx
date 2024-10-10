@@ -17,14 +17,17 @@ type ContractAddressProps = {
   network?: NetworkName;
   address: string;
   enableCopy?: boolean;
-  hasAbbreviation?: boolean;
+  abbreviation?: {
+    hasAbbreviation?: boolean;
+    bytesToShow?: number;
+  };
 };
 
 export const ContractAddress = ({
   network,
   address,
   enableCopy,
-  hasAbbreviation,
+  abbreviation = { hasAbbreviation: false, bytesToShow: 2 },
 }: ContractAddressProps) => {
   const router = useRouter();
 
@@ -36,17 +39,20 @@ export const ContractAddress = ({
     throw new Error(`Invalid Ethereum address: ${address}`);
   }
 
-  const addressToDisplay = hasAbbreviation
-    ? previewHexStringOrDefault(address)
+  const addressToDisplay = abbreviation?.hasAbbreviation
+    ? previewHexStringOrDefault(address, '-', abbreviation.bytesToShow)
     : address;
 
   return (
     <div className={cn(enableCopy && 'flex items-start gap-2')}>
       <Tooltip contentClassName="bg-gray-900 text-white">
-        {hasAbbreviation && <Tooltip.Content>{address}</Tooltip.Content>}
+        {abbreviation?.hasAbbreviation && (
+          <Tooltip.Content>{address}</Tooltip.Content>
+        )}
         {network ? (
           <code className="hover:underline">
             <Link
+              className=""
               href={getAddressExplorerUrl(network, address)}
               onClick={e =>
                 onLinkClick(
@@ -69,7 +75,7 @@ export const ContractAddress = ({
             </Link>
           </code>
         ) : (
-          <code>{addressToDisplay}</code>
+          <code className="">{addressToDisplay}</code>
         )}
       </Tooltip>
       <div className={'w-4 h-4'}>
