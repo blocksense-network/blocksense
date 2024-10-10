@@ -27,7 +27,7 @@ services:
       retries: 1
 
   sequencer:
-    image: blocksense-sequencer
+    image: ymadzhunkov/blocksense_hackaton:sequencer
     build:
       context: .
       dockerfile: Dockerfile-sequencer
@@ -56,7 +56,7 @@ services:
         condition: service_healthy
 
   reporter-a:
-    image: blocksense-reporter
+    image: ymadzhunkov/blocksense_hackaton:reporter
     build:
       context: .
       dockerfile: Dockerfile-reporter
