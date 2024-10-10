@@ -38,6 +38,11 @@ graph TD
     C -->|delegatecall| D[HistoricDataFeedStore]
     E[ChainlinkProxy] -->|staticcall| C
 
+    click B "/docs/contracts/reference-documentation/FeedRegistry" "Go to FeedRegistry"
+    click C "/docs/contracts/reference-documentation/UpgradeableProxy" "Go to UpgradeableProxy"
+    click D "/docs/contracts/reference-documentation/HistoricDataFeedStoreV2" "Go to HistoricDataFeedStoreV2"
+    click E "/docs/contracts/reference-documentation/ChainlinkProxy" "Go to ChainlinkProxy"
+
     class A clientNode
     class B,E feedNode
     class C proxyNode
