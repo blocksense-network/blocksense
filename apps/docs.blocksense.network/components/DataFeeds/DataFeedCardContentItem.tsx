@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
 type DataFeedCardContentItemProps = {
-  label: string;
+  label: string | ReactNode;
   value: ReactNode;
 };
 
@@ -9,12 +9,12 @@ export const DataFeedCardContentItem = ({
   label,
   value,
 }: DataFeedCardContentItemProps) => (
-  <div className="data-feed-card-content__item">
+  <div className="data-feed-card-content__item mb-2">
     <span className="data-feed-card-content__label text-sm text-gray-500">
       {label}
     </span>
-    <p className="data-feed-card-content__value text-sm font-noto-sans-bold text-gray-900 leading-snug">
+    <div className="data-feed-card-content__value text-sm font-noto-sans-bold text-gray-900 leading-snug">
       {value}
-    </p>
+    </div>
   </div>
 );

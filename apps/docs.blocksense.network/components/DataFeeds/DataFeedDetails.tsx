@@ -2,7 +2,7 @@ import React from 'react';
 import { decodeFeed } from '@blocksense/config-types/data-feeds-config';
 import { DataFeedCardSection } from '@/components/DataFeeds/DataFeedCardSection';
 import { DataFeedCardContentItem } from '@/components/DataFeeds/DataFeedCardContentItem';
-import { DataFeedCardExtraContent } from '@/components/DataFeeds/DataFeedCardExtraContent';
+import { QuestionsCardContent } from './QuestionsCardContent';
 
 export const DataFeedDetails: React.FC<{
   feedJsonString: string;
@@ -15,15 +15,10 @@ export const DataFeedDetails: React.FC<{
     decimals,
     pair,
     report_interval_ms,
-    first_report_start_time,
     quorum_percentage,
-    script,
     type,
-    resources,
   } = feed;
 
-  const oracleScriptId = 1;
-  const scriptVersion = '0.0.0';
   const feedRegistry = {
     baseAddress: '0xBaseAddress',
     quoteAddress: '0xQuoteAddress',
@@ -39,7 +34,6 @@ export const DataFeedDetails: React.FC<{
         { label: 'Name', value: description },
         { label: 'Feed ID', value: id },
         { label: 'Quorum Percentage', value: `${quorum_percentage * 100}%` },
-        // { label: 'Genesis Time', value: 'N/A' },
       ],
     },
     {
@@ -59,16 +53,6 @@ export const DataFeedDetails: React.FC<{
         },
         { label: 'Data Providers', value: 'No information yet' },
       ],
-    },
-    {
-      title: 'Oracle Script Info',
-      description:
-        'Detail featured elements of an oracle script for precise and efficient execution',
-      items: [{ label: 'Script Name', value: 'No available script' }],
-      extra: {
-        type: 'Oracle Script Info' as const,
-        scriptArguments: {},
-      },
     },
     {
       title: 'Feed Registry',
@@ -106,16 +90,16 @@ export const DataFeedDetails: React.FC<{
                   value={item.value}
                 />
               ))}
-              {section.extra && (
-                <DataFeedCardExtraContent
-                  type={section.extra.type}
-                  scriptArguments={section.extra.scriptArguments}
-                  aggregatorProxyAddress={section.extra.aggregatorProxyAddress}
-                />
-              )}
             </div>
           </DataFeedCardSection>
         ))}
+        <DataFeedCardSection
+          key={dataFeedCardArray.length}
+          title="Questions?"
+          description="If you have any questions speak with our team on one of the following platforms:"
+        >
+          <DataFeedCardContentItem label="" value={<QuestionsCardContent />} />
+        </DataFeedCardSection>
       </div>
     </div>
   );
