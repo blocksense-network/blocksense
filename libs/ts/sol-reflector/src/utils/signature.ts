@@ -11,7 +11,7 @@ export function getSignature(node: ASTNode): Signature | undefined {
   switch (node.nodeType) {
     case 'ContractDefinition':
       return {
-        codeSnippet: `contract ${node.name}`,
+        codeSnippet: `${node.contractKind} ${node.name}`,
         signatureCodeSnippetHTML: '',
       };
 
