@@ -50,7 +50,11 @@ export function getOverviewCodeContent(contract: ContractDocItem): string {
     .concat(formatComponentData('Modifiers', contract.modifiers))
     .concat(formatComponentData('Functions', contract.functions));
 
-  let contractData = `${contract.signature?.codeSnippet} {\n${content}}`;
+  const parentContractsData = contract._baseContracts.length
+    ? ` is ${contract._baseContracts.join(', ')}`
+    : '';
+
+  let contractData = `${contract.signature?.codeSnippet}${parentContractsData} {\n${content}}`;
 
   return contractData;
 }

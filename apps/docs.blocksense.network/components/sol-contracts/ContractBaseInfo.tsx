@@ -70,7 +70,7 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
                 >
                   <ABIModal
                     abi={contract.abi}
-                    name={`${contract.contractKind} ${contract.name}`}
+                    name={`${contract.signature?.codeSnippet}`}
                   />
                 </div>
               )}
