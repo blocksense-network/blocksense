@@ -26,3 +26,4 @@ export const ghContractFolder =
   'https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/';
 
 export const dataFeedUrl = '/docs/data-feeds/feed/';
+export const contractsUrl = '/docs/contracts/reference-documentation/';

@@ -7,6 +7,7 @@ import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractOverview } from './ContractOverview';
 import { ImageWrapper } from '@/components/common/ImageWrapper';
+import { ContractAnchorLink } from '@/components/sol-contracts/ContractAnchorLink';
 
 export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
   return (
@@ -81,14 +82,12 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
                 <h3 className="contract-base-info__base-contracts-title text-xl font-semibold text-gray-800 ml-2">
                   Base Contracts
                 </h3>
-                <ul className="contract-base-info__base-contracts-list ml-6 mt-2 mb-2 list-image-none list-outside text-gray-700">
+                <ul className="contract-base-info__base-contracts-list overview__list ml-6 mt-2 mb-2 list-image-none list-outside text-gray-700">
                   {contract._baseContracts.map(baseContract => (
-                    <li
-                      className="contract-base-info__base-contracts-item"
+                    <ContractAnchorLink
                       key={baseContract}
-                    >
-                      {baseContract}
-                    </li>
+                      label={baseContract}
+                    />
                   ))}
                 </ul>
               </div>
