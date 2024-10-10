@@ -1,8 +1,6 @@
 import { DiagramImageWrapper } from '@/components/common/DiagramImageWrapper'
 
-# What is Blocksense?
-
-Blocksense is a decentralized and permissionless protocol designed for the efficient creation and consumption of oracle data feeds, implemented as a ZK-Rollup. The protocol ensures reliable data feeds by leveraging cryptographic methods and game-theoretic incentives.
+# Blocksense Architecture
 
 <DiagramImageWrapper className="mt-3" src="/diagrams/BlocksenseArchitecture.png" alt="Blocksense Architecture"/>
 
@@ -10,77 +8,25 @@ Blocksense is a decentralized and permissionless protocol designed for the effic
 
 ### 1. Data Feed Collection
 
-- **Internet Real World Data**: Sources from the internet, such as APIs, websites, and other data services, provide raw data for processing.
-- **Reporters**: Nodes in the Blocksense network fetch, process, and report data from these sources. Multiple reporters work in parallel to ensure redundancy and reliability. They execute predefined scripts or algorithms to process collected data and package it into a report.
+- **Internet Real World Data**: Sources from the internet, such as APIs, websites and other data services, provide raw data for processing.
+- **Reporters**: Nodes in the Blocksense network fetch, process and report data from these sources. Multiple reporters work in parallel to ensure redundancy and reliability. They execute predefined scripts or algorithms to process collected data and package it into a report.
 
 ### 2. Reporting and Aggregation
 
-- **Reporters' Role**: Publish the obtained value and are rewarded or penalized based on alignment with the majority, using the Schelling Coin principle. This ensures that the most rational strategy is to publish accurate data.
-- **Sequencer**: Aggregates reports from multiple reporters, sequences them into structured transactions, and validates them using cryptographic techniques and game-theoretic principles.
+- **Reporters**: Publish the obtained value and are rewarded.
+- **Sequencer**: Aggregates reports from multiple reporters and sequences them into structured transactions.
 
 ### 3. Sequencing and Validation
 
-- **Creating Transactions**: Validated reports are aggregated and packaged into transactions ready for publication on the target blockchains.
-- **Zero-Knowledge Proofs**: Ensure compliance with protocol rules and confirm that data is backed by the majority stake.
-
-## Data Publication and Target Chains
-
-- **EVM Based Blockchains**: Ethereum, Gnosis, and Polygon receive the sequenced transactions. These blockchains host decentralized applications that consume the accurate and validated oracle data feeds from Blocksense.
-
-## Preventing Bribery and Collusion
-
-Blocksense employs zero-knowledge proving systems:
-
-- **Secret Committee Election**: Nodes responsible for updates are selected randomly and covertly, making it difficult for malicious actors to target specific nodes.
-- **Vote Secrecy**: Updates from nodes are concealed, revealing only aggregated results to prevent malicious actors from confirming bribed actions.
-
-## Security Against 51% Attacks
-
-- **Stake and Reputation**: Voting power is determined by both stake and reputation. Nodes start with low reputation, increasing with demonstrated proper operation. User credits can be delegated to increase node operators' voting power.
-- **Super-Majority Threshold**: May be required to accept new data feed values, enhancing security against 51% attacks.
+- ** Creating Transactions**: Validated reports are aggregated and packaged into transactions ready for publication on the target blockchains.
 
 ## Ensuring Timely Updates
 
-- **Assignment**: In the Blocksense node software, subsets of feeds are assigned randomly to ensure timely updates. While the specific feeds change, the roles of reporters and sequencers remain fixed. This committee of reporters and sequencers handles different feeds without altering their roles, securing consistent and efficient data feed management.
-- **Reporters**: Reporters are given a fixed time slot in which they have to compute the required values and to send them to the Aggregator to avoid slashing.
+- **Assignment**: In the Blocksense node software, feeds are assigned to ensure timely updates. While the specific feeds change, the roles of reporters and sequencers remain fixed. This committee of reporters and sequencers handles different feeds without altering their roles, securing consistent and efficient data feed management.
+- **Reporters**: Are given a fixed time slot in which they must compute the required values and send them to the Aggregator to avoid slashing.
 - **Aggregators**: Package updates into bundles for re-broadcasting.
 - **Block Builders**: Combine bundles into final blocks for publication.
 
 ## Creating New Data Feeds
 
-New data feeds can be written by easily using the Blocksense SDK. Oracle scripts can be bootstrapped with initial funds and become self-sufficient through on-chain data access fees. The protocol supports various types of oracles, from simple URL contents to complex GPU scripts for ML inference.
-
-## System Requirements
-
-The Blocksense oracle node software runs on a wide range of hardware, requiring minimal disk space and a persistent internet connection. Reporters with certain computing power can opt to participate for feeds that require such capabilities in order to earn additional rewards, allowing users with GPUs to earn more.
-
-## Current Status and Future Plans
-
-Blocksense is still in the research phase. The protocol targets multiple chains, with zero-knowledge proofs verifiable on EVM compatible chains and others based on WebAssembly.
-
-## Data Flow Diagram
-
-### Components
-
-- **Internet Real World Data**: Diverse sources from the internet.
-- **Reporters**: Nodes fetching, processing, and reporting data.
-  - **Receives Data Feed**: Collects raw data.
-  - **Processes Data**: Executes scripts or algorithms.
-  - **Generates Reports**: Processes and signs data.
-- **Sequencer**: Aggregates and sequences reports into transactions.
-  - **Collecting Reports**: Gathers from reporters.
-  - **Validating Reports**: Ensures accuracy using cryptographic methods.
-  - **Aggregate Reports**: Compiles validated reports into a consensus value.
-  - **Creating Transactions**: Compile aggregate value into transaction.
-- **EVM Based Blockchains**: Ethereum, Gnosis, Polygon.
-  - **Transaction Publication**: Publishes transactions on blockchains.
-  - **Data Consumption**: dApps and smart contracts consume the data feeds.
-
-### Additional Components
-
-- **Game-Theoretic Incentives**: Ensures data accuracy through rewards and penalties based on the Schelling-Coin principle.
-- **Zero-Knowledge Proofs**: Ensure protocol rule compliance without revealing underlying information.
-
-## Summary
-
-Blocksense protocol integrates multiple layers of data collection, processing, validation, and publication to create a robust system for oracle data feeds. Decentralized reporters, a sequencer for data aggregation, and publishing on multiple EVM-based blockchains ensure that accurate and trustworthy data is available for decentralized applications. Game-theoretic incentives and zero-knowledge proofs further enhance the protocol’s security and reliability.
+New data feeds can be written easily using the **Blocksense SDK**. Oracle scripts can be bootstrapped with initial funds and become self-sufficient through on-chain data access fees. The protocol supports various types of oracles, from simple URL contents to complex GPU scripts for ML inference.

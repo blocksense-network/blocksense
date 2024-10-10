@@ -33,7 +33,7 @@ In the initial phase, Blocksense is secured by a Proof of Authority (PoA) networ
 
 Every round, a random subset of the reporters in the network are chosen to vote on a random subset of data feeds. This stochastic process prevents malicious actors from targeting node operators as they can’t know which node operators will vote for which data feeds at a given time. When the protocol chooses a particular reporter to report on a data feed, the node software will execute the specified oracle script and ‘vote’ on the result. The most common vote is taken as the correct answer, such that all reporters voting the most common answer are rewarded, while anyone voting a differing answer is slashed. No reporter can know who any of the other reporters are, and votes cannot be shared without exposing one’s private key. The integrity of the voting process is attested to by ZK proofs. Because in any voting round there will be many incorrect answers and only one correct answer, the Naish Equilibrium in the SchellingCoin game is honesty. This is for a simple but elegant reason: without the opportunity for collusion or bribery, the chances of the most commonly reported answer being false are slim.
 
-## What is an oracle script?
+### What is an oracle script?
 
 Oracle scripts are how Blocksense developers create new data feeds. Builders can choose any of the growing set of languages that compile to WebAssembly. Our SDK allows anyone to permissionlessly develop and deploy new oracle scripts on the Blocksense network.
 
