@@ -122,6 +122,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let body = resp.into_body();
     let string = String::from_utf8(body)?;
+    println!("body = {}", &string);
     let mut value: Root = serde_json::from_str(&string)?;
 
     let mut payload: Payload = Payload::new();
