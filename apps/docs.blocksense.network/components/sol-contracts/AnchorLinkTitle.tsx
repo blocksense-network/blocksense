@@ -19,7 +19,7 @@ const titleStyles = {
 const accordionStyles = 'text-gray-900';
 
 const borderStyles =
-  'nx-border-b nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400  py-4';
+  'nx-border-b nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400  py-3';
 
 export const AnchorLinkTitle = ({
   title,
