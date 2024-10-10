@@ -29,6 +29,9 @@ flowchart TD
   A[Client] -->|get feed's data| CP[ChainlinkProxy]
   CP -->|reads from| DFS[HistoricDataFeedStore]
 
+  click CP "/docs/contracts/reference-documentation/ChainlinkProxy" "Go to ChainlinkProxy"
+  click DFS "/docs/contracts/reference-documentation/HistoricDataFeedStoreV2" "Go to HistoricDataFeedStoreV2"
+
   class A,CP,DFS node
 ```
 

@@ -30,6 +30,9 @@ flowchart TD
   A[Client] -->|get latest round data| FR[FeedRegistry]
   FR -->|reads from| DFS[HistoricDataFeedStore]
 
+  click FR "/docs/contracts/reference-documentation/FeedRegistry" "Go to FeedRegistry"
+  click DFS "/docs/contracts/reference-documentation/HistoricDataFeedStoreV2" "Go to HistoricDataFeedStoreV2"
+
   class A,FR,DFS node
 ```
 
