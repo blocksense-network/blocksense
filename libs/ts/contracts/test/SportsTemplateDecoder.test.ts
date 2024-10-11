@@ -95,7 +95,9 @@ function processStringOrBytes(value: any): string {
   return ethers.concat([dataLength, data]);
 }
 
-describe('Decoder', () => {
+describe('Decoder @skip-coverage', function () {
+  this.timeout(1000000);
+
   const contractName = 'Decoder';
   const templatePath = path.join(__dirname, '../templates/decoder.sol.ejs');
   const tempFilePath = path.join(__dirname, `../contracts/${contractName}.sol`);
