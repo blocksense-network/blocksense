@@ -1,5 +1,5 @@
 use blocksense_sdk::{
-    oracle::{DataFeedResult, Payload, Settings},
+    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
     spin::{
         http::{send, Method, IntoResponse, Request, Response},
@@ -18,7 +18,7 @@ fn oracle_{{project-name | snake_case}}(settings: Settings) -> anyhow::Result<Pa
     let mut payload: Payload = Payload::new();
     payload.values.push(DataFeedResult {
         id,
-        value
+        value: DataFeedResultValue::Numerical(value),
     });
     Ok(payload)
 }

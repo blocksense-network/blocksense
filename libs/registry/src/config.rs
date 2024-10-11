@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::time::SystemTime;
 
 //TODO(melatron): This is duplicated from the config crate
@@ -30,6 +31,10 @@ pub struct FeedConfig {
 #[serde(deny_unknown_fields)]
 #[serde(rename_all = "camelCase")]
 pub struct BlocksenseConfig {
+    /// Reporter ID
+    pub reporter_id: u64,
+    /// Reporter secret key
+    pub secret_key: String,
     /// List of all the oracle scripts
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub oracles: Vec<OracleScript>,
@@ -53,9 +58,12 @@ pub struct OracleScript {
     pub oracle_script_wasm: String,
     /// Allowed hosts
     pub allowed_outbound_hosts: Vec<String>,
+    /// Needed capabilities
+    pub capabilities: HashSet<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Capability {
     pub id: String,
+    pub data: String,
 }

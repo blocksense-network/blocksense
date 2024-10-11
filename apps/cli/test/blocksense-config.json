@@ -1,24 +1,32 @@
 {
+  "reporterId": 0,
+  "secretKey": "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003",
   "oracles": [{
     "id": "revolut",
     "name": "Revolut",
     "oracle_script_wasm": "revolut_oracle.wasm",
-    "allowed_outbound_hosts": ["https://pro-api.coinmarketcap.com"],
+    "allowed_outbound_hosts": ["https://www.revolut.com"],
     "capabilities": []
   },{
     "id": "yahoo",
     "name": "yahoo",
     "oracle_script_wasm": "yahoo_oracle.wasm",
     "allowed_outbound_hosts": ["https://yfapi.net:443"],
-    "capabilities": []
+    "capabilities": ["YAHOO_API_KEY"]
   },{
     "id": "cmc",
     "name": "cmc",
     "oracle_script_wasm": "cmc_oracle.wasm",
     "allowed_outbound_hosts": ["https://pro-api.coinmarketcap.com"],
-    "capabilities": []
+    "capabilities": ["CMC_API_KEY"]
   }],
-  "capabilities": [],
+  "capabilities": [{
+    "id": "YAHOO_API_KEY",
+    "data": "97yVrb3jKQaLw2vU1istq7LcVmTUgPaPavoL7HYn"
+  }, {
+    "id": "CMC_API_KEY",
+    "data": "4c0373b2-36c0-4d4a-8317-31553c5d25e0"
+  }],
   "dataFeeds": [
     {
       "id": 0,
