@@ -43,10 +43,7 @@ async function generateDataFeedsOverviewFile(
 
   return Promise.all([
     write({ ext: '.mdx', ...mdxFile }),
-    writeJSON({
-      base: '_meta.json',
-      content: { overview: 'Overview' },
-    }),
+    updateMetaJsonFile(pagesDataFeedsFolder, { overview: 'Overview' }),
   ]);
 }
 
