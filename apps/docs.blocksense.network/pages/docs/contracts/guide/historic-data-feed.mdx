@@ -1,14 +1,16 @@
 import { Callout } from '@blocksense/docs-theme';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-# Historic Data Feed Store
+# Historical Data Feed Store
 
-Historic Data Feed Store contract is where all data is stored and where all contracts read from. It is written in Solidity assembly and contains only one function: `fallback`.
+Historical Data Feed Store contract is where all data is stored and where all contracts read from. It is written in Solidity assembly and contains only one function: `fallback`.
 
 <Callout type="info" emoji="⚠️">
+  <p className="mt-4 nx-border-b nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400 py-6">
   This contract serves as the core logic that dictates how the [UpgradeableProxy](../reference-documentation/UpgradeableProxy.mdx) contract manages its own storage,
   handling both data writing and reading operations. It's crucial to understand that all data is exclusively stored within the **UpgradeableProxy** contract.
   To access this data, users must interact with the `fallback` function of the **UpgradeableProxy** contract which underneath calls the `fallback` function of the **HistoricDataFeedStore** contract.
+  </p>
 </Callout>
 
 ## Code Examples

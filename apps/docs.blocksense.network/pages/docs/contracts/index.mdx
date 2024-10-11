@@ -59,7 +59,6 @@ graph TD
 
 - **ChainlinkProxy**: Proxy instance, that allows users and clients to retrieve data for a specific feed through Chainlink interface methods.
 
-
 ### Functional Significance
 
 Each component plays an important role in maintaining the integrity and operational efficiency of Blocksense decentralized application infrastructure. Smart contracts automate and enforce agreements, ensuring that transactions are executed according to predefined rules without the need for intermediaries. This approach not only enhances transparency and trust but also reduces costs and eliminates single points of failure traditionally associated with centralized systems.
@@ -102,6 +101,8 @@ The historical data feed store contracts include:
 These contracts store historical data feed values, allowing users to retrieve past data points for specific data feed keys.
 
 In practice, the `UpgradeableProxy` contract serves as the central storage for all data. The `HistoricDataFeedStore` contracts provide the logic for reading from and writing to the `UpgradeableProxy` contract's storage.
+
+This architecture ensures efficient data management and allows for seamless upgrades to the data handling mechanisms without affecting the underlying storage structure.
 
 This architecture ensures efficient data management and allows for seamless upgrades to the data handling mechanisms without affecting the underlying storage structure.
 
