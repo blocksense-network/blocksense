@@ -12,7 +12,7 @@ const titleStyles = {
   2: 'text-3xl',
   3: 'text-2xl',
   4: 'text-xl',
-  5: 'text-md max-w-[280px] px-4 sm:max-w-none sm:whitespace-normal sm:overflow-visible truncate sm:truncate-none',
+  5: 'text-md max-w-[280px] px-4 truncate lg:max-w-none lg:whitespace-normal lg:overflow-visible lg:truncate-none',
   6: 'text-sm px-4',
 };
 
