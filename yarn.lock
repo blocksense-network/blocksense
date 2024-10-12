@@ -1073,8 +1073,12 @@ __metadata:
     "@storybook/react": "npm:^8.3.5"
     "@storybook/react-vite": "npm:^8.3.5"
     "@storybook/test": "npm:^8.3.5"
+    "@types/node": "npm:^22.7.4"
     prop-types: "npm:^15.8.1"
     storybook: "npm:^8.3.5"
+    tailwind-merge: "npm:^2.5.2"
+    tailwindcss: "npm:^3.4.10"
+    tailwindcss-animate: "npm:^1.0.7"
     vite: "npm:^5.4.8"
   languageName: unknown
   linkType: soft
