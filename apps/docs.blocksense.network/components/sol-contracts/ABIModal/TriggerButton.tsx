@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button } from '@/components/common/Button';
-import { Tooltip } from '@/components/common/Tooltip';
+import { Tooltip } from '@blocksense/design-system/Tooltip';
 
 type TriggerButtonProps = {
   tooltipContent?: string;

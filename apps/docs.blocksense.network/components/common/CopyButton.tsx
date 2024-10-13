@@ -2,7 +2,7 @@
 
 import { MouseEvent, useState } from 'react';
 
-import { Tooltip } from '@/components/common/Tooltip';
+import { Tooltip } from '@blocksense/design-system/Tooltip';
 import { ImageWrapper } from '@/components/common/ImageWrapper';
 
 type CopyButtonProps = {
