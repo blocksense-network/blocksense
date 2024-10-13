@@ -32,6 +32,7 @@
     "@blocksense/config-types": "workspace:*",
     "@blocksense/contracts": "workspace:*",
     "@blocksense/data-feeds-config-generator": "workspace:*",
+    "@blocksense/design-system": "workspace:*",
     "@blocksense/nextra-theme-docs": "workspace:*",
     "@blocksense/sol-reflector": "workspace:*",
     "@emotion/react": "^11.14.0",
