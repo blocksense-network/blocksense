@@ -4,10 +4,11 @@ import { Callout } from '@blocksense/docs-theme';
 
 The Feed Registry serves as a blockchain-based directory that links assets to their corresponding data feeds. This system allows for direct querying of Blocksense data feeds using asset addresses, eliminating the need-to-know specific feed contract addresses. As a result, smart contracts can efficiently retrieve up-to-date asset prices through a single function call to a unified contract interface.
 
-
 <Callout type="info" emoji="💡">
-  The Feed Registry exclusively includes feeds associated with canonical token addresses on a given network. Feeds without a corresponding token address,
-  such as those for stock indices, are not included in the registry due to the lack of a canonical token representation.
+  The Feed Registry exclusively includes feeds associated with canonical token
+  addresses on a given network. Feeds without a corresponding token address,
+  such as those for stock indices, are not included in the registry due to the
+  lack of a canonical token representation.
 </Callout>
 
 For a complete list of functions and parameters for the FeedRegistry contract, see the [Feed Registry Reference Documentation](../../reference-documentation/FeedRegistry.mdx).
