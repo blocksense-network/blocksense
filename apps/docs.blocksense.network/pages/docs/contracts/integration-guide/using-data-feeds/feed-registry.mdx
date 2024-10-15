@@ -23,7 +23,9 @@ config:
     signalTextColor: "#808080"
 ---
 flowchart TD
-  classDef node fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
+  classDef clientNode fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
+  classDef feedNode,dataNode fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
+  classDef feedNode:hover,dataNode:hover fill:#fafafa,color:#0000EE,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace, text-decoration: underline, text-underline-offset: 4px;
 
   linkStyle default fill:none,stroke-width:1px,stroke:#1c1917
 
@@ -33,7 +35,9 @@ flowchart TD
   click FR "/docs/contracts/reference-documentation/FeedRegistry" "Go to FeedRegistry"
   click DFS "/docs/contracts/reference-documentation/HistoricDataFeedStoreV2" "Go to HistoricDataFeedStoreV2"
 
-  class A,FR,DFS node
+  class A clientNode
+  class FR feedNode
+  class DFS dataNode
 ```
 
 <Callout type="info" emoji="💡">
