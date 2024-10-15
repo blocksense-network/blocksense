@@ -210,7 +210,7 @@ export const networkMetadata = {
   'manta-sepolia': {
     chainId: 3441006,
     isTestnet: true,
-    explorerUrl: '    `https://pacific-explorer.sepolia-testnet.manta.network',
+    explorerUrl: 'https://pacific-explorer.sepolia-testnet.manta.network',
   },
   'kusama-moonriver': {
     chainId: 1285,
