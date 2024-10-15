@@ -80,7 +80,11 @@ task('deploy', 'Deploy contracts')
 
     for (const config of configs) {
       const chainId = parseChainId(config.network.chainId);
-      console.log(`\n\n// ChainId: ${config.network.chainId} //`);
+      console.log(`\n\n// ChainId: ${config.network.chainId}`);
+      console.log(`// Signer: ${config.signer.address}`);
+      const signerBalance = await config.provider.getBalance(config.signer);
+      console.log(`// balance: ${signerBalance} //`);
+
       const multisig = await deployMultisig(config);
       const multisigAddress = await multisig.getAddress();
 
@@ -196,6 +200,8 @@ const deployMultisig = async (config: NetworkConfig) => {
       safeAddress: predictedDeploySafeAddress,
       signer: config.signer.privateKey,
     });
+  } else {
+    console.log(' -> Safe not found, deploying...');
   }
 
   // Deploy Safe
