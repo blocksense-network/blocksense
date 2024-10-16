@@ -199,6 +199,9 @@ const deployMultisig = async (config: NetworkConfig) => {
       provider: config.rpc,
       safeAddress: predictedDeploySafeAddress,
       signer: config.signer.privateKey,
+      contractNetworks: {
+        [config.network.chainId.toString()]: config.safeAddresses,
+      },
     });
   } else {
     console.log(' -> Safe not found, deploying...');
@@ -208,6 +211,9 @@ const deployMultisig = async (config: NetworkConfig) => {
   return safeFactory.deploySafe({
     safeAccountConfig,
     saltNonce,
+    options: {
+      nonce: await config.provider.getTransactionCount(config.signer.address),
+    },
     callback: (txHash: string) => {
       console.log('-> Safe deployment tx hash:', txHash);
     },
@@ -290,6 +296,8 @@ async function checkAddressExists(
 const multisigTxExec = async (
   transactions: SafeTransactionDataPartial[],
   safe: Safe,
+  config: NetworkConfig,
+  gasLimit: bigint,
 ) => {
   if (transactions.length === 0) {
     console.log('No transactions to execute');
@@ -304,7 +312,10 @@ const multisigTxExec = async (
 
   console.log('\nProposing transaction...');
 
-  const txResponse = await safe.executeTransaction(safeTransaction);
+  const txResponse = await safe.executeTransaction(safeTransaction, {
+    gasLimit: (gasLimit + 100_000n).toString(),
+    nonce: await config.provider.getTransactionCount(config.signer.address),
+  });
 
   // transactionResponse is of unknown type and there is no type def in the specs
   await (txResponse.transactionResponse as any).wait();
@@ -407,7 +418,12 @@ const deployContracts = async (
   const batches = Math.ceil(transactions.length / BATCH_LENGTH);
   for (let i = 0; i < batches; i++) {
     const batch = transactions.slice(i * BATCH_LENGTH, (i + 1) * BATCH_LENGTH);
-    await multisigTxExec(batch, multisig);
+    await multisigTxExec(
+      batch,
+      multisig,
+      config,
+      500_000n * BigInt(batch.length),
+    );
   }
 
   return contractsConfig;
@@ -466,7 +482,12 @@ const registerChainlinkProxies = async (
       operation: OperationType.Call,
     };
 
-    await multisigTxExec([safeTransactionData], multisig);
+    await multisigTxExec(
+      [safeTransactionData],
+      multisig,
+      config,
+      60_000n * BigInt(batch.length),
+    );
   }
 };
 
