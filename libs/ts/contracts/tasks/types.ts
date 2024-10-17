@@ -16,6 +16,8 @@ export interface NetworkConfig {
     fallbackHandlerAddress: EthereumAddress;
     signMessageLibAddress: EthereumAddress;
     simulateTxAccessorAddress: EthereumAddress;
+    safeWebAuthnSharedSignerAddress: EthereumAddress;
+    safeWebAuthnSignerFactoryAddress: EthereumAddress;
   };
   threshold: number;
 }

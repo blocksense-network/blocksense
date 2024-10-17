@@ -260,6 +260,14 @@ const initChain = async (networkName: NetworkName): Promise<NetworkConfig> => {
       simulateTxAccessorAddress: parseEthereumAddress(
         '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
       ),
+      safeWebAuthnSharedSignerAddress: parseEthereumAddress(
+        // https://github.com/safe-global/safe-modules-deployments/blob/v2.2.4/src/assets/safe-passkey-module/v0.2.1/safe-webauthn-shared-signer.json#L6gs
+        '0x94a4F6affBd8975951142c3999aEAB7ecee555c2',
+      ),
+      safeWebAuthnSignerFactoryAddress: parseEthereumAddress(
+        // https://github.com/safe-global/safe-modules-deployments/blob/v2.2.4/src/assets/safe-passkey-module/v0.2.1/safe-webauthn-signer-factory.json#L6
+        '0x1d31F259eE307358a26dFb23EB365939E8641195',
+      ),
     },
     threshold: 1,
   };
