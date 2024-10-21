@@ -43,9 +43,30 @@ impl FeedMetaDataRegistry {
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let start = SystemTime::now();
 
-    let fmd1 = FeedMetaData::new("DOGE/USD", 60000, 0.6, start);
-    let fmd2 = FeedMetaData::new("BTS/USD", 30000, 0.6, start);
-    let fmd3 = FeedMetaData::new("ETH/USD", 60000, 0.6, start);
+    let fmd1 = FeedMetaData::new(
+        "DOGE/USD",
+        60000,
+        0.6,
+        start,
+        "Numerical".to_string(),
+        "Average".to_string(),
+    );
+    let fmd2 = FeedMetaData::new(
+        "BTS/USD",
+        30000,
+        0.6,
+        start,
+        "Numerical".to_string(),
+        "Average".to_string(),
+    );
+    let fmd3 = FeedMetaData::new(
+        "ETH/USD",
+        60000,
+        0.6,
+        start,
+        "Numerical".to_string(),
+        "Average".to_string(),
+    );
 
     let mut fmdr = FeedMetaDataRegistry::new();
 
@@ -67,6 +88,8 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
                 feed.report_interval_ms,
                 feed.quorum_percentage,
                 feed.first_report_start_time,
+                feed.value_type.clone(),
+                feed.aggregate_type.clone(),
             ),
         );
     }
@@ -498,6 +521,8 @@ mod tests {
             voting_wait_duration_ms,
             QUORUM_PERCENTAGE,
             current_system_time,
+            "Numeric".to_string(),
+            "Average".to_string(),
         );
 
         // setup messages

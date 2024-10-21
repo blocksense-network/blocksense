@@ -1,4 +1,9 @@
-use std::fmt::{Debug, Display};
+use std::{
+    collections::HashMap,
+    fmt::{Debug, Display},
+};
+
+use tracing::error;
 
 use super::types::FeedType;
 
@@ -33,17 +38,63 @@ impl Display for AverageAggregator {
 impl FeedAggregate for AverageAggregator {
     fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
         let num_elements = values.len() as f64;
+        let mut filtered = Vec::new();
 
-        let values: Vec<&f64> = values
-            .into_iter()
-            .map(|value| match value {
-                FeedType::Numerical(x) => x,
-                _ => panic!("Attempting to perform arithmetic on non-numerical type!"), //TODO(snikolov): What level of error?
-            })
-            .collect();
+        for value in values {
+            match value {
+                FeedType::Numerical(x) => filtered.push(x),
+                _ => error!("Attempting to perform arithmetic on non-numerical type!"), //TODO(snikolov): What level of error?
+            };
+        }
 
-        let sum: f64 = values.into_iter().sum();
+        let sum: f64 = filtered.into_iter().sum();
         FeedType::Numerical(sum / num_elements)
+    }
+}
+
+pub struct MedianAggregator {}
+
+impl FeedAggregate for MedianAggregator {
+    fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
+        let size = values.len();
+        values[size / 2].clone()
+    }
+}
+
+pub fn get_aggregator(aggredate_type: &str) -> Box<dyn FeedAggregate> {
+    match aggredate_type {
+        "Median" => Box::new(MedianAggregator {}),
+        "Majority" => Box::new(MajorityVoteAggregator {}),
+        "Average" => Box::new(AverageAggregator {}),
+
+        _ => panic!("Unknown aggregate type: {}", aggredate_type),
+    }
+}
+
+pub struct MajorityVoteAggregator {}
+
+impl FeedAggregate for MajorityVoteAggregator {
+    fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
+        let mut frequency_map = HashMap::new();
+
+        // Count the occurrences of each string
+        for v in values {
+            match v {
+                FeedType::Text(t) => *frequency_map.entry(t).or_insert(0) += 1,
+                _ => {
+                    error!("Attempting to perform frequency_map on f64!");
+                }
+            }
+        }
+
+        // Find the string with the maximum occurrences
+        let result = frequency_map
+            .into_iter()
+            .max_by_key(|&(_, count)| count)
+            .map(|(s, _)| s)
+            .expect("Aggregating empty set of values!")
+            .clone();
+        FeedType::Text(result)
     }
 }
 

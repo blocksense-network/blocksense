@@ -214,6 +214,8 @@ async fn register_asset_feed(
             new_feed_config.report_interval_ms,
             new_feed_config.quorum_percentage,
             new_feed_config.first_report_start_time,
+            new_feed_config.value_type.clone(),
+            new_feed_config.aggregate_type.clone(),
         );
         reg.push(new_feed_id, new_feed_metadata);
     }

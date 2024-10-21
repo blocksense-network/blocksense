@@ -143,7 +143,7 @@ impl FeedSlotsProcessor {
                     }
                 }
 
-                result_post_to_contract = feed.read().await.get_feed_type().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
+                result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
 
                 // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
                 if !is_oneshot {
@@ -231,6 +231,8 @@ mod tests {
             report_interval_ms,
             quorum_percentage,
             first_report_start_time,
+            "Numerical".to_string(),
+            "Average".to_string(),
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
         let all_feeds_reports = AllFeedsReports::new();

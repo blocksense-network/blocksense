@@ -75,6 +75,8 @@ pub struct FeedConfig {
     pub resources: HashMap<String, String>, // TODO(snikolov): Find best way to handle various types of resource data
     pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
     pub script: String,
+    pub value_type: String,
+    pub aggregate_type: String,
 }
 
 impl Validated for FeedConfig {

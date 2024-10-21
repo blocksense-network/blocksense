@@ -21,7 +21,9 @@
       "resources": {
         "cmc_id": 20801,
         "cmc_quote": "FOXY"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 1,
@@ -44,7 +46,9 @@
       "resources": {
         "cmc_id": 6950,
         "cmc_quote": "PERP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 2,
@@ -67,7 +71,9 @@
       "resources": {
         "cmc_id": 1191,
         "cmc_quote": "MEME"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 3,
@@ -90,7 +96,9 @@
       "resources": {
         "cmc_id": 5426,
         "cmc_quote": "SOL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 4,
@@ -113,7 +121,9 @@
       "resources": {
         "cmc_id": 12409,
         "cmc_quote": "WSTETH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 5,
@@ -136,7 +146,9 @@
       "resources": {
         "cmc_id": 22974,
         "cmc_quote": "TAO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 6,
@@ -159,7 +171,9 @@
       "resources": {
         "cmc_id": 6210,
         "cmc_quote": "SAND"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 7,
@@ -181,7 +195,9 @@
       },
       "resources": {
         "yf_symbol": "JPM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 8,
@@ -204,7 +220,9 @@
       "resources": {
         "cmc_id": 1958,
         "cmc_quote": "TRX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 9,
@@ -227,7 +245,9 @@
       "resources": {
         "cmc_id": 2927,
         "cmc_quote": "SUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 10,
@@ -250,7 +270,9 @@
       "resources": {
         "cmc_id": 4195,
         "cmc_quote": "FTT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 11,
@@ -273,7 +295,9 @@
       "resources": {
         "cmc_id": 4066,
         "cmc_quote": "CHZ"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 12,
@@ -296,7 +320,9 @@
       "resources": {
         "cmc_id": 7102,
         "cmc_quote": "LINA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 13,
@@ -319,7 +345,9 @@
       "resources": {
         "cmc_id": 10603,
         "cmc_quote": "IMX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 14,
@@ -342,7 +370,9 @@
       "resources": {
         "cmc_id": 4558,
         "cmc_quote": "FLOW"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 15,
@@ -365,7 +395,9 @@
       "resources": {
         "cmc_id": 18411,
         "cmc_quote": "TIA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 16,
@@ -387,7 +419,9 @@
       },
       "resources": {
         "yf_symbol": "ILSUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 17,
@@ -410,7 +444,9 @@
       "resources": {
         "cmc_id": 11188,
         "cmc_quote": "DPX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 18,
@@ -433,7 +469,9 @@
       "resources": {
         "cmc_id": 7048,
         "cmc_quote": "WING"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 19,
@@ -456,7 +494,9 @@
       "resources": {
         "cmc_id": 1772,
         "cmc_quote": "STORJ"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 20,
@@ -479,7 +519,9 @@
       "resources": {
         "cmc_id": 20947,
         "cmc_quote": "SUI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 21,
@@ -502,7 +544,9 @@
       "resources": {
         "cmc_id": 4705,
         "cmc_quote": "PAXG"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 22,
@@ -525,7 +569,9 @@
       "resources": {
         "cmc_id": 3077,
         "cmc_quote": "VET"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 23,
@@ -548,7 +594,9 @@
       "resources": {
         "cmc_id": 32376,
         "cmc_quote": "AVAIL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 24,
@@ -571,7 +619,9 @@
       "resources": {
         "cmc_id": 15853,
         "cmc_quote": "AXL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 25,
@@ -594,7 +644,9 @@
       "resources": {
         "cmc_id": 5728,
         "cmc_quote": "BAL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 26,
@@ -617,7 +669,9 @@
       "resources": {
         "cmc_id": 7055,
         "cmc_quote": "DPI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 27,
@@ -640,7 +694,9 @@
       "resources": {
         "cmc_id": 8613,
         "cmc_quote": "ALCX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 28,
@@ -663,7 +719,9 @@
       "resources": {
         "cmc_id": 5994,
         "cmc_quote": "SHIB"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 29,
@@ -686,7 +744,9 @@
       "resources": {
         "cmc_id": 23095,
         "cmc_quote": "BONK"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 30,
@@ -709,7 +769,9 @@
       "resources": {
         "cmc_id": 3783,
         "cmc_quote": "ANKR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 31,
@@ -732,7 +794,9 @@
       "resources": {
         "cmc_id": 1,
         "cmc_quote": "BTC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 32,
@@ -755,7 +819,9 @@
       "resources": {
         "cmc_id": 18037,
         "cmc_quote": "MAV"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 33,
@@ -778,7 +844,9 @@
       "resources": {
         "cmc_id": 4943,
         "cmc_quote": "DAI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 34,
@@ -801,7 +869,9 @@
       "resources": {
         "cmc_id": 10746,
         "cmc_quote": "BSW"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 35,
@@ -824,7 +894,9 @@
       "resources": {
         "cmc_id": 8206,
         "cmc_quote": "QUICK"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 36,
@@ -847,7 +919,9 @@
       "resources": {
         "cmc_id": 8104,
         "cmc_quote": "1INCH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 37,
@@ -870,7 +944,9 @@
       "resources": {
         "cmc_id": 1552,
         "cmc_quote": "MLN"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 38,
@@ -893,7 +969,9 @@
       "resources": {
         "cmc_id": 28675,
         "cmc_quote": "COQ"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 39,
@@ -916,7 +994,9 @@
       "resources": {
         "cmc_id": 2563,
         "cmc_quote": "TUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 40,
@@ -938,7 +1018,9 @@
       },
       "resources": {
         "yf_symbol": "MRNA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 41,
@@ -961,7 +1043,9 @@
       "resources": {
         "cmc_id": 3792,
         "cmc_quote": "USDE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 42,
@@ -984,7 +1068,9 @@
       "resources": {
         "cmc_id": 7334,
         "cmc_quote": "CFX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 43,
@@ -1007,7 +1093,9 @@
       "resources": {
         "cmc_id": 3717,
         "cmc_quote": "WBTC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 44,
@@ -1030,7 +1118,9 @@
       "resources": {
         "cmc_id": 7288,
         "cmc_quote": "XVS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 45,
@@ -1053,7 +1143,9 @@
       "resources": {
         "cmc_id": 8353,
         "cmc_quote": "BETH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 46,
@@ -1075,7 +1167,9 @@
       },
       "resources": {
         "yf_symbol": "UST"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 47,
@@ -1098,7 +1192,9 @@
       "resources": {
         "cmc_id": 1027,
         "cmc_quote": "ETH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 48,
@@ -1121,7 +1217,9 @@
       "resources": {
         "cmc_id": 131,
         "cmc_quote": "DASH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 49,
@@ -1143,7 +1241,9 @@
       },
       "resources": {
         "yf_symbol": "MXNUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 50,
@@ -1165,7 +1265,9 @@
       },
       "resources": {
         "yf_symbol": "GME"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 51,
@@ -1188,7 +1290,9 @@
       "resources": {
         "cmc_id": 6951,
         "cmc_quote": "REEF"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 52,
@@ -1211,7 +1315,9 @@
       "resources": {
         "cmc_id": 4279,
         "cmc_quote": "SXP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 53,
@@ -1233,7 +1339,9 @@
       },
       "resources": {
         "yf_symbol": "WTI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 54,
@@ -1255,7 +1363,9 @@
       },
       "resources": {
         "yf_symbol": "NZDUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 55,
@@ -1278,7 +1388,9 @@
       "resources": {
         "cmc_id": 28752,
         "cmc_quote": "WIF"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 56,
@@ -1301,7 +1413,9 @@
       "resources": {
         "cmc_id": 52,
         "cmc_quote": "XRP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 57,
@@ -1324,7 +1438,9 @@
       "resources": {
         "cmc_id": 3794,
         "cmc_quote": "ATOM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 58,
@@ -1347,7 +1463,9 @@
       "resources": {
         "cmc_id": 3330,
         "cmc_quote": "USDP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 59,
@@ -1370,7 +1488,9 @@
       "resources": {
         "cmc_id": 8536,
         "cmc_quote": "MASK"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 60,
@@ -1393,7 +1513,9 @@
       "resources": {
         "cmc_id": 512,
         "cmc_quote": "XLM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 61,
@@ -1416,7 +1538,9 @@
       "resources": {
         "cmc_id": 7186,
         "cmc_quote": "CAKE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 62,
@@ -1438,7 +1562,9 @@
       },
       "resources": {
         "yf_symbol": "GBPUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 63,
@@ -1461,7 +1587,9 @@
       "resources": {
         "cmc_id": 4846,
         "cmc_quote": "KAVA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 64,
@@ -1484,7 +1612,9 @@
       "resources": {
         "cmc_id": 328,
         "cmc_quote": "XMR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 65,
@@ -1507,7 +1637,9 @@
       "resources": {
         "cmc_id": 20641,
         "cmc_quote": "EURC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 66,
@@ -1529,7 +1661,9 @@
       },
       "resources": {
         "yf_symbol": "GC=F"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 67,
@@ -1552,7 +1686,9 @@
       "resources": {
         "cmc_id": 3773,
         "cmc_quote": "FET"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 68,
@@ -1575,7 +1711,9 @@
       "resources": {
         "cmc_id": 6783,
         "cmc_quote": "AXS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 69,
@@ -1598,7 +1736,9 @@
       "resources": {
         "cmc_id": 6636,
         "cmc_quote": "DOT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 70,
@@ -1621,7 +1761,9 @@
       "resources": {
         "cmc_id": 3155,
         "cmc_quote": "QNT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 71,
@@ -1644,7 +1786,9 @@
       "resources": {
         "cmc_id": 28324,
         "cmc_quote": "DYDX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 72,
@@ -1667,7 +1811,9 @@
       "resources": {
         "cmc_id": 27075,
         "cmc_quote": "MNT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 73,
@@ -1690,7 +1836,9 @@
       "resources": {
         "cmc_id": 5617,
         "cmc_quote": "UMA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 74,
@@ -1713,7 +1861,9 @@
       "resources": {
         "cmc_id": 28803,
         "cmc_quote": "ZERO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 75,
@@ -1736,7 +1886,9 @@
       "resources": {
         "cmc_id": 31504,
         "cmc_quote": "ULTI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 76,
@@ -1759,7 +1911,9 @@
       "resources": {
         "cmc_id": 1861,
         "cmc_quote": "STX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 77,
@@ -1781,7 +1935,9 @@
       },
       "resources": {
         "yf_symbol": "CADUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 78,
@@ -1804,7 +1960,9 @@
       "resources": {
         "cmc_id": 5034,
         "cmc_quote": "KSM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 79,
@@ -1827,7 +1985,9 @@
       "resources": {
         "cmc_id": 28541,
         "cmc_quote": "JTO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 80,
@@ -1850,7 +2010,9 @@
       "resources": {
         "cmc_id": 32824,
         "cmc_quote": "USDz"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 81,
@@ -1873,7 +2035,9 @@
       "resources": {
         "cmc_id": 6719,
         "cmc_quote": "GRT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 82,
@@ -1896,7 +2060,9 @@
       "resources": {
         "cmc_id": 18069,
         "cmc_quote": "GMT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 83,
@@ -1918,7 +2084,9 @@
       },
       "resources": {
         "yf_symbol": "GOOGL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 84,
@@ -1941,7 +2109,9 @@
       "resources": {
         "cmc_id": 11726,
         "cmc_quote": "XAI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 85,
@@ -1964,7 +2134,9 @@
       "resources": {
         "cmc_id": 8707,
         "cmc_quote": "ALPACA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 86,
@@ -1987,7 +2159,9 @@
       "resources": {
         "cmc_id": 14783,
         "cmc_quote": "MAGIC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 87,
@@ -2010,7 +2184,9 @@
       "resources": {
         "cmc_id": 9797,
         "cmc_quote": "XAVA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 88,
@@ -2032,7 +2208,9 @@
       },
       "resources": {
         "yf_symbol": "PFE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 89,
@@ -2055,7 +2233,9 @@
       "resources": {
         "cmc_id": 8510,
         "cmc_quote": "QI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 90,
@@ -2078,7 +2258,9 @@
       "resources": {
         "cmc_id": 7859,
         "cmc_quote": "BADGER"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 91,
@@ -2101,7 +2283,9 @@
       "resources": {
         "cmc_id": 10804,
         "cmc_quote": "FLOKI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 92,
@@ -2124,7 +2308,9 @@
       "resources": {
         "cmc_id": 24091,
         "cmc_quote": "ZK"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 93,
@@ -2147,7 +2333,9 @@
       "resources": {
         "cmc_id": 3870,
         "cmc_quote": "LIT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 94,
@@ -2169,7 +2357,9 @@
       },
       "resources": {
         "yf_symbol": "XOFUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 95,
@@ -2192,7 +2382,9 @@
       "resources": {
         "cmc_id": 2011,
         "cmc_quote": "XTZ"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 96,
@@ -2215,7 +2407,9 @@
       "resources": {
         "cmc_id": 9285,
         "cmc_quote": "MOVR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 97,
@@ -2237,7 +2431,9 @@
       },
       "resources": {
         "yf_symbol": "AMZN"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 98,
@@ -2259,7 +2455,9 @@
       },
       "resources": {
         "yf_symbol": "TRYUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 99,
@@ -2282,7 +2480,9 @@
       "resources": {
         "cmc_id": 74,
         "cmc_quote": "DOGE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 100,
@@ -2304,7 +2504,9 @@
       },
       "resources": {
         "yf_symbol": "NFLX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 101,
@@ -2326,7 +2528,9 @@
       },
       "resources": {
         "yf_symbol": "SEKUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 102,
@@ -2349,7 +2553,9 @@
       "resources": {
         "cmc_id": 30126,
         "cmc_quote": "MEW"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 103,
@@ -2372,7 +2578,9 @@
       "resources": {
         "cmc_id": 3890,
         "cmc_quote": "MATIC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 104,
@@ -2395,7 +2603,9 @@
       "resources": {
         "cmc_id": 2469,
         "cmc_quote": "ZIL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 105,
@@ -2418,7 +2628,9 @@
       "resources": {
         "cmc_id": 33039,
         "cmc_quote": "USDS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 106,
@@ -2440,7 +2652,9 @@
       },
       "resources": {
         "yf_symbol": "ZARUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 107,
@@ -2462,7 +2676,9 @@
       },
       "resources": {
         "yf_symbol": "THBUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 108,
@@ -2485,7 +2701,9 @@
       "resources": {
         "cmc_id": 1765,
         "cmc_quote": "EOS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 109,
@@ -2508,7 +2726,9 @@
       "resources": {
         "cmc_id": 3964,
         "cmc_quote": "RSR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 110,
@@ -2531,7 +2751,9 @@
       "resources": {
         "cmc_id": 4307,
         "cmc_quote": "UNI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 111,
@@ -2553,7 +2775,9 @@
       },
       "resources": {
         "yf_symbol": "AAPL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 112,
@@ -2576,7 +2800,9 @@
       "resources": {
         "cmc_id": 21106,
         "cmc_quote": "RDNT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 113,
@@ -2599,7 +2825,9 @@
       "resources": {
         "cmc_id": 11232,
         "cmc_quote": "HIGH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 114,
@@ -2621,7 +2849,9 @@
       },
       "resources": {
         "yf_symbol": "KESUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 115,
@@ -2644,7 +2874,9 @@
       "resources": {
         "cmc_id": 7257,
         "cmc_quote": "APE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 116,
@@ -2667,7 +2899,9 @@
       "resources": {
         "cmc_id": 1831,
         "cmc_quote": "BCH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 117,
@@ -2690,7 +2924,9 @@
       "resources": {
         "cmc_id": 7236,
         "cmc_quote": "CUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 118,
@@ -2713,7 +2949,9 @@
       "resources": {
         "cmc_id": 5692,
         "cmc_quote": "COMP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 119,
@@ -2736,7 +2974,9 @@
       "resources": {
         "cmc_id": 1437,
         "cmc_quote": "ZEC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 120,
@@ -2759,7 +2999,9 @@
       "resources": {
         "cmc_id": 13855,
         "cmc_quote": "ENS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 121,
@@ -2781,7 +3023,9 @@
       },
       "resources": {
         "yf_symbol": "KRWUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 122,
@@ -2803,7 +3047,9 @@
       },
       "resources": {
         "yf_symbol": "TSLA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 123,
@@ -2826,7 +3072,9 @@
       "resources": {
         "cmc_id": 28829,
         "cmc_quote": "MAVIA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 124,
@@ -2849,7 +3097,9 @@
       "resources": {
         "cmc_id": 2010,
         "cmc_quote": "ADA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 125,
@@ -2872,7 +3122,9 @@
       "resources": {
         "cmc_id": 7046,
         "cmc_quote": "GHST"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 126,
@@ -2895,7 +3147,9 @@
       "resources": {
         "cmc_id": 4056,
         "cmc_quote": "AMPL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 127,
@@ -2918,7 +3172,9 @@
       "resources": {
         "cmc_id": 13663,
         "cmc_quote": "GNS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 128,
@@ -2941,7 +3197,9 @@
       "resources": {
         "cmc_id": 29470,
         "cmc_quote": "USDe"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 129,
@@ -2964,7 +3222,9 @@
       "resources": {
         "cmc_id": 1659,
         "cmc_quote": "GNO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 130,
@@ -2987,7 +3247,9 @@
       "resources": {
         "cmc_id": 7224,
         "cmc_quote": "DODO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 131,
@@ -3010,7 +3272,9 @@
       "resources": {
         "cmc_id": 3408,
         "cmc_quote": "USDC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 132,
@@ -3033,7 +3297,9 @@
       "resources": {
         "cmc_id": 18934,
         "cmc_quote": "STG"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 133,
@@ -3056,7 +3322,9 @@
       "resources": {
         "cmc_id": 17706,
         "cmc_quote": "AERO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 134,
@@ -3079,7 +3347,9 @@
       "resources": {
         "cmc_id": 28321,
         "cmc_quote": "POL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 135,
@@ -3102,7 +3372,9 @@
       "resources": {
         "cmc_id": 25028,
         "cmc_quote": "ORDI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 136,
@@ -3125,7 +3397,9 @@
       "resources": {
         "cmc_id": 2092,
         "cmc_quote": "NULS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 137,
@@ -3148,7 +3422,9 @@
       "resources": {
         "cmc_id": 29471,
         "cmc_quote": "sUSDe"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 138,
@@ -3171,7 +3447,9 @@
       "resources": {
         "cmc_id": 1697,
         "cmc_quote": "BAT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 139,
@@ -3194,7 +3472,9 @@
       "resources": {
         "cmc_id": 22454,
         "cmc_quote": "PEPE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 140,
@@ -3217,7 +3497,9 @@
       "resources": {
         "cmc_id": 2280,
         "cmc_quote": "FIL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 141,
@@ -3240,7 +3522,9 @@
       "resources": {
         "cmc_id": 5864,
         "cmc_quote": "YFI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 142,
@@ -3263,7 +3547,9 @@
       "resources": {
         "cmc_id": 501,
         "cmc_quote": "XCN"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 143,
@@ -3286,7 +3572,9 @@
       "resources": {
         "cmc_id": 8000,
         "cmc_quote": "LDO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 144,
@@ -3309,7 +3597,9 @@
       "resources": {
         "cmc_id": 19891,
         "cmc_quote": "USDD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 145,
@@ -3332,7 +3622,9 @@
       "resources": {
         "cmc_id": 938,
         "cmc_quote": "ARB"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 146,
@@ -3354,7 +3646,9 @@
       },
       "resources": {
         "yf_symbol": "MSFT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 147,
@@ -3377,7 +3671,9 @@
       "resources": {
         "cmc_id": 28443,
         "cmc_quote": "USDV"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 148,
@@ -3400,7 +3696,9 @@
       "resources": {
         "cmc_id": 1518,
         "cmc_quote": "MKR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 149,
@@ -3423,7 +3721,9 @@
       "resources": {
         "cmc_id": 6538,
         "cmc_quote": "CRV"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 150,
@@ -3445,7 +3745,9 @@
       },
       "resources": {
         "yf_symbol": "CHFUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 151,
@@ -3468,7 +3770,9 @@
       "resources": {
         "cmc_id": 2777,
         "cmc_quote": "IOTX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 152,
@@ -3491,7 +3795,9 @@
       "resources": {
         "cmc_id": 11857,
         "cmc_quote": "GMX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 153,
@@ -3513,7 +3819,9 @@
       },
       "resources": {
         "yf_symbol": "SHV"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 154,
@@ -3536,7 +3844,9 @@
       "resources": {
         "cmc_id": 2539,
         "cmc_quote": "REN"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 155,
@@ -3559,7 +3869,9 @@
       "resources": {
         "cmc_id": 162,
         "cmc_quote": "MIM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 156,
@@ -3582,7 +3894,9 @@
       "resources": {
         "cmc_id": 4687,
         "cmc_quote": "BUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 157,
@@ -3605,7 +3919,9 @@
       "resources": {
         "cmc_id": 20317,
         "cmc_quote": "USD+"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 158,
@@ -3628,7 +3944,9 @@
       "resources": {
         "cmc_id": 11289,
         "cmc_quote": "SPELL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 159,
@@ -3651,7 +3969,9 @@
       "resources": {
         "cmc_id": 10903,
         "cmc_quote": "C98"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 160,
@@ -3674,7 +3994,9 @@
       "resources": {
         "cmc_id": 29569,
         "cmc_quote": "USDM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 161,
@@ -3697,7 +4019,9 @@
       "resources": {
         "cmc_id": 32864,
         "cmc_quote": "AUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 162,
@@ -3719,7 +4043,9 @@
       },
       "resources": {
         "yf_symbol": "QQQ"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 163,
@@ -3742,7 +4068,9 @@
       "resources": {
         "cmc_id": 6536,
         "cmc_quote": "OM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 164,
@@ -3764,7 +4092,9 @@
       },
       "resources": {
         "yf_symbol": "BRLUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 165,
@@ -3787,7 +4117,9 @@
       "resources": {
         "cmc_id": 23121,
         "cmc_quote": "BLUR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 166,
@@ -3810,7 +4142,9 @@
       "resources": {
         "cmc_id": 4206,
         "cmc_quote": "WIN"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 167,
@@ -3833,7 +4167,9 @@
       "resources": {
         "cmc_id": 9608,
         "cmc_quote": "BOO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 168,
@@ -3855,7 +4191,9 @@
       },
       "resources": {
         "yf_symbol": "IDRUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 169,
@@ -3878,7 +4216,9 @@
       "resources": {
         "cmc_id": 1503,
         "cmc_quote": "JUP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 170,
@@ -3901,7 +4241,9 @@
       "resources": {
         "cmc_id": 7226,
         "cmc_quote": "INJ"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 171,
@@ -3924,7 +4266,9 @@
       "resources": {
         "cmc_id": 109,
         "cmc_quote": "DGB"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 172,
@@ -3947,7 +4291,9 @@
       "resources": {
         "cmc_id": 9421,
         "cmc_quote": "FORTH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 173,
@@ -3970,7 +4316,9 @@
       "resources": {
         "cmc_id": 9444,
         "cmc_quote": "KNC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 174,
@@ -3993,7 +4341,9 @@
       "resources": {
         "cmc_id": 27772,
         "cmc_quote": "PYUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 175,
@@ -4016,7 +4366,9 @@
       "resources": {
         "cmc_id": 24927,
         "cmc_quote": "CRVUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 176,
@@ -4038,7 +4390,9 @@
       },
       "resources": {
         "yf_symbol": "INRUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 177,
@@ -4060,7 +4414,9 @@
       },
       "resources": {
         "yf_symbol": "SI-F"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 178,
@@ -4082,7 +4438,9 @@
       },
       "resources": {
         "yf_symbol": "XPT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 179,
@@ -4105,7 +4463,9 @@
       "resources": {
         "cmc_id": 5567,
         "cmc_quote": "CELO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 180,
@@ -4127,7 +4487,9 @@
       },
       "resources": {
         "yf_symbol": "COPUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 181,
@@ -4149,7 +4511,9 @@
       },
       "resources": {
         "yf_symbol": "CSPXUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 182,
@@ -4172,7 +4536,9 @@
       "resources": {
         "cmc_id": 6836,
         "cmc_quote": "GLMR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 183,
@@ -4195,7 +4561,9 @@
       "resources": {
         "cmc_id": 23149,
         "cmc_quote": "SEI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 184,
@@ -4217,7 +4585,9 @@
       },
       "resources": {
         "yf_symbol": "mSOL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 185,
@@ -4240,7 +4610,9 @@
       "resources": {
         "cmc_id": 7232,
         "cmc_quote": "ALPHA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 186,
@@ -4262,7 +4634,9 @@
       },
       "resources": {
         "yf_symbol": "JPYUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 187,
@@ -4285,7 +4659,9 @@
       "resources": {
         "cmc_id": 1839,
         "cmc_quote": "BNB"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 188,
@@ -4307,7 +4683,9 @@
       },
       "resources": {
         "yf_symbol": "SPY"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 189,
@@ -4330,7 +4708,9 @@
       "resources": {
         "cmc_id": 8916,
         "cmc_quote": "ICP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 190,
@@ -4353,7 +4733,9 @@
       "resources": {
         "cmc_id": 2943,
         "cmc_quote": "RPL"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 191,
@@ -4376,7 +4758,9 @@
       "resources": {
         "cmc_id": 7824,
         "cmc_quote": "VAI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 192,
@@ -4399,7 +4783,9 @@
       "resources": {
         "cmc_id": 13502,
         "cmc_quote": "WLD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 193,
@@ -4422,7 +4808,9 @@
       "resources": {
         "cmc_id": 23839,
         "cmc_quote": "SATS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 194,
@@ -4445,7 +4833,9 @@
       "resources": {
         "cmc_id": 23508,
         "cmc_quote": "GHO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 195,
@@ -4468,7 +4858,9 @@
       "resources": {
         "cmc_id": 7548,
         "cmc_quote": "WEMIX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 196,
@@ -4491,7 +4883,9 @@
       "resources": {
         "cmc_id": 4030,
         "cmc_quote": "ALGO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 197,
@@ -4514,7 +4908,9 @@
       "resources": {
         "cmc_id": 4679,
         "cmc_quote": "BAND"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 198,
@@ -4537,7 +4933,9 @@
       "resources": {
         "cmc_id": 5117,
         "cmc_quote": "OGN"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 199,
@@ -4560,7 +4958,9 @@
       "resources": {
         "cmc_id": 2586,
         "cmc_quote": "SNX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 200,
@@ -4582,7 +4982,9 @@
       },
       "resources": {
         "yf_symbol": "MS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 201,
@@ -4605,7 +5007,9 @@
       "resources": {
         "cmc_id": 2130,
         "cmc_quote": "ENJ"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 202,
@@ -4628,7 +5032,9 @@
       "resources": {
         "cmc_id": 5805,
         "cmc_quote": "AVAX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 203,
@@ -4651,7 +5057,9 @@
       "resources": {
         "cmc_id": 26081,
         "cmc_quote": "FDUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 204,
@@ -4674,7 +5082,9 @@
       "resources": {
         "cmc_id": 6758,
         "cmc_quote": "SUSHI"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 205,
@@ -4697,7 +5107,9 @@
       "resources": {
         "cmc_id": 2,
         "cmc_quote": "LTC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 206,
@@ -4720,7 +5132,9 @@
       "resources": {
         "cmc_id": 5776,
         "cmc_quote": "TBTC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 207,
@@ -4743,7 +5157,9 @@
       "resources": {
         "cmc_id": 8911,
         "cmc_quote": "STRK"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 208,
@@ -4766,7 +5182,9 @@
       "resources": {
         "cmc_id": 1975,
         "cmc_quote": "LINK"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 209,
@@ -4789,7 +5207,9 @@
       "resources": {
         "cmc_id": 32307,
         "cmc_quote": "USD0"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 210,
@@ -4812,7 +5232,9 @@
       "resources": {
         "cmc_id": 24276,
         "cmc_quote": "DEGEN"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 211,
@@ -4835,7 +5257,9 @@
       "resources": {
         "cmc_id": 26997,
         "cmc_quote": "ZRO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 212,
@@ -4858,7 +5282,9 @@
       "resources": {
         "cmc_id": 3978,
         "cmc_quote": "CHR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 213,
@@ -4880,7 +5306,9 @@
       },
       "resources": {
         "yf_symbol": "SGDUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 214,
@@ -4903,7 +5331,9 @@
       "resources": {
         "cmc_id": 2416,
         "cmc_quote": "THETA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 215,
@@ -4926,7 +5356,9 @@
       "resources": {
         "cmc_id": 9903,
         "cmc_quote": "CVX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 216,
@@ -4949,7 +5381,9 @@
       "resources": {
         "cmc_id": 6187,
         "cmc_quote": "SRM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 217,
@@ -4972,7 +5406,9 @@
       "resources": {
         "cmc_id": 7278,
         "cmc_quote": "AAVE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 218,
@@ -4995,7 +5431,9 @@
       "resources": {
         "cmc_id": 2566,
         "cmc_quote": "ONT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 219,
@@ -5018,7 +5456,9 @@
       "resources": {
         "cmc_id": 27659,
         "cmc_quote": "MOG"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 220,
@@ -5041,7 +5481,9 @@
       "resources": {
         "cmc_id": 11840,
         "cmc_quote": "OP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 221,
@@ -5063,7 +5505,9 @@
       },
       "resources": {
         "yf_symbol": "CZKUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 222,
@@ -5085,7 +5529,9 @@
       },
       "resources": {
         "yf_symbol": "CNYUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 223,
@@ -5108,7 +5554,9 @@
       "resources": {
         "cmc_id": 6952,
         "cmc_quote": "FRAX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 224,
@@ -5130,7 +5578,9 @@
       },
       "resources": {
         "yf_symbol": "NVDA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 225,
@@ -5153,7 +5603,9 @@
       "resources": {
         "cmc_id": 9566,
         "cmc_quote": "LUSD"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 226,
@@ -5176,7 +5628,9 @@
       "resources": {
         "cmc_id": 3702,
         "cmc_quote": "BEAM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 227,
@@ -5199,7 +5653,9 @@
       "resources": {
         "cmc_id": 9481,
         "cmc_quote": "PENDLE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 228,
@@ -5222,7 +5678,9 @@
       "resources": {
         "cmc_id": 5824,
         "cmc_quote": "SLP"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 229,
@@ -5245,7 +5703,9 @@
       "resources": {
         "cmc_id": 12885,
         "cmc_quote": "ASTR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 230,
@@ -5267,7 +5727,9 @@
       },
       "resources": {
         "yf_symbol": "IBTAUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 231,
@@ -5289,7 +5751,9 @@
       },
       "resources": {
         "yf_symbol": "COIN"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 232,
@@ -5312,7 +5776,9 @@
       "resources": {
         "cmc_id": 7127,
         "cmc_quote": "VELO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 233,
@@ -5335,7 +5801,9 @@
       "resources": {
         "cmc_id": 1321,
         "cmc_quote": "ETC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 234,
@@ -5358,7 +5826,9 @@
       "resources": {
         "cmc_id": 11396,
         "cmc_quote": "JOE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 235,
@@ -5381,7 +5851,9 @@
       "resources": {
         "cmc_id": 6953,
         "cmc_quote": "FXS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 236,
@@ -5404,7 +5876,9 @@
       "resources": {
         "cmc_id": 825,
         "cmc_quote": "USDT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 237,
@@ -5427,7 +5901,9 @@
       "resources": {
         "cmc_id": 9175,
         "cmc_quote": "MBOX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 238,
@@ -5450,7 +5926,9 @@
       "resources": {
         "cmc_id": 2324,
         "cmc_quote": "ONE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 239,
@@ -5473,7 +5951,9 @@
       "resources": {
         "cmc_id": 10238,
         "cmc_quote": "MIMATIC"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 240,
@@ -5496,7 +5976,9 @@
       "resources": {
         "cmc_id": 4944,
         "cmc_quote": "TRB"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 241,
@@ -5519,7 +6001,9 @@
       "resources": {
         "cmc_id": 3513,
         "cmc_quote": "FTM"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 242,
@@ -5542,7 +6026,9 @@
       "resources": {
         "cmc_id": 4157,
         "cmc_quote": "RUNE"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 243,
@@ -5564,7 +6050,9 @@
       },
       "resources": {
         "yf_symbol": "META"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 244,
@@ -5587,7 +6075,9 @@
       "resources": {
         "cmc_id": 6535,
         "cmc_quote": "NEAR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 245,
@@ -5610,7 +6100,9 @@
       "resources": {
         "cmc_id": 13473,
         "cmc_quote": "APT"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 246,
@@ -5632,7 +6124,9 @@
       },
       "resources": {
         "yf_symbol": "PLNUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 247,
@@ -5654,7 +6148,9 @@
       },
       "resources": {
         "yf_symbol": "PHPUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 248,
@@ -5677,7 +6173,9 @@
       "resources": {
         "cmc_id": 4256,
         "cmc_quote": "KLAY"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 249,
@@ -5700,7 +6198,9 @@
       "resources": {
         "cmc_id": 28177,
         "cmc_quote": "PYTH"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 250,
@@ -5723,7 +6223,9 @@
       "resources": {
         "cmc_id": 1896,
         "cmc_quote": "ZRX"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 251,
@@ -5746,7 +6248,9 @@
       "resources": {
         "cmc_id": 9640,
         "cmc_quote": "METIS"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 252,
@@ -5769,7 +6273,9 @@
       "resources": {
         "cmc_id": 1966,
         "cmc_quote": "MANA"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 253,
@@ -5791,7 +6297,9 @@
       },
       "resources": {
         "yf_symbol": "EURUSD=X"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 254,
@@ -5814,7 +6322,9 @@
       "resources": {
         "cmc_id": 3217,
         "cmc_quote": "ONG"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 255,
@@ -5837,7 +6347,9 @@
       "resources": {
         "cmc_id": 4642,
         "cmc_quote": "HBAR"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     },
     {
       "id": 256,
@@ -5860,7 +6372,9 @@
       "resources": {
         "cmc_id": 7501,
         "cmc_quote": "WOO"
-      }
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median"
     }
   ]
 }

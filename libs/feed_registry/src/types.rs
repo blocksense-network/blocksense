@@ -10,7 +10,7 @@ use tracing::debug;
 use crypto::JsonSerializableSignature;
 use num::BigUint;
 
-use crate::aggregate::{AverageAggregator, FeedAggregate};
+use crate::aggregate::{get_aggregator, AverageAggregator, FeedAggregate};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Repeatability {
@@ -32,7 +32,9 @@ pub struct FeedMetaData {
     pub report_interval_ms: u64, // Consider oneshot feeds.
     quorum_percentage: f32,
     first_report_start_time: SystemTime,
-    feed_type: Box<dyn FeedAggregate>,
+    feed_aggregator: Box<dyn FeedAggregate>,
+    pub value_type: String,
+    pub aggregate_type: String,
 }
 
 impl FeedMetaData {
@@ -48,23 +50,29 @@ impl FeedMetaData {
             report_interval_ms,
             quorum_percentage,
             first_report_start_time,
-            feed_type: Box::new(AverageAggregator {}),
+            feed_aggregator: Box::new(AverageAggregator {}),
+            value_type: "Numeric".to_string(),
+            aggregate_type: "Average".to_string(),
         }
     }
 
     pub fn new(
-        n: &str,
-        r: u64, // Consider oneshot feeds.
-        q: f32,
-        f: SystemTime,
+        name: &str,
+        report_interval_ms: u64, // Consider oneshot feeds.
+        quorum_percentage: f32,
+        first_report_start_time: SystemTime,
+        value_type: String,
+        aggregate_type: String,
     ) -> FeedMetaData {
         FeedMetaData {
-            name: n.to_string(),
+            name: name.to_string(),
             voting_repeatability: Repeatability::Periodic,
-            report_interval_ms: r,
-            quorum_percentage: q,
-            first_report_start_time: f,
-            feed_type: Box::new(AverageAggregator {}), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
+            report_interval_ms,
+            quorum_percentage,
+            first_report_start_time,
+            feed_aggregator: get_aggregator(aggregate_type.as_str()), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
+            value_type,
+            aggregate_type,
         }
     }
 
@@ -92,8 +100,8 @@ impl FeedMetaData {
         ((current_time_as_ms - self.get_first_report_start_time_ms())
             / self.report_interval_ms as u128) as u64
     }
-    pub fn get_feed_type(&self) -> &dyn FeedAggregate {
-        self.feed_type.as_ref()
+    pub fn get_feed_aggregator(&self) -> &dyn FeedAggregate {
+        self.feed_aggregator.as_ref()
     }
     pub fn check_report_relevance(
         &self,
