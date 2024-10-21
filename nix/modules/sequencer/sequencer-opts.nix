@@ -33,16 +33,6 @@ let
           type = types.str;
           description = mdDoc "The Historical Data Feed contract address.";
         };
-
-        data_feed_store_byte_code = mkOption {
-          type = types.str;
-          description = mdDoc "The Historical Data Feed store bytecode. ( UpgradableProxy contract )";
-        };
-
-        data_feed_sports_byte_code = mkOption {
-          type = types.str;
-          description = mdDoc "The Historical Data Feed sports bytecode.";
-        };
       };
     };
 in
