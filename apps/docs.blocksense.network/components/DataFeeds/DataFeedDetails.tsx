@@ -139,7 +139,7 @@ export const DataFeedDetails: React.FC<{
           <DataFeedCardContentItem
             label={
               <a
-                href="/docs/contracts/guide/historic-data-feed"
+                href="/docs/contracts/integration-guide/using-data-feeds/historic-data-feed"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -153,7 +153,7 @@ export const DataFeedDetails: React.FC<{
           <DataFeedCardContentItem
             label={
               <a
-                href="/docs/contracts/guide/chainlink-proxy"
+                href="/docs/contracts/integration-guide/using-data-feeds/chainlink-proxy"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -169,7 +169,7 @@ export const DataFeedDetails: React.FC<{
               <DataFeedCardContentItem
                 label={
                   <a
-                    href="/docs/contracts/guide/feed-registry"
+                    href="/docs/contracts/integration-guide/using-data-feeds/feed-registry"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
