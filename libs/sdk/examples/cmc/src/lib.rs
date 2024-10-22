@@ -81,8 +81,6 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let mut req = Request::builder();
     req.method(Method::Get);
     req.uri(url);
-    //TODO(adikov): Implement API key as capability of the reporter and add it to the header
-    //in the oracle trigger
 
     // Please provide your own API key until capabilities are implemented.
     req.header(

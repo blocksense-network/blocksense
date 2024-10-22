@@ -13,15 +13,18 @@ reporter_id = 0
 
 [[trigger.oracle]]
 component = "revolut-api-fetcher"
-  [[trigger.oracle.data_feeds]]
-  id = "3"
-  data = "USD/ETH"
 
-[[trigger.oracle]]
-component = "revolut-api-fetcher"
-  [[trigger.oracle.data_feeds]]
-  id = "4"
-  data = "USD/BTC"
+[[trigger.oracle.data_feeds]]
+id = "47"
+data = "ETHUSD"
+
+[[trigger.oracle.data_feeds]]
+id = "31"
+data = "BTCUSD"
+
+[[trigger.oracle.data_feeds]]
+id = "253"
+data = "EURUSD"
 
 [component.revolut-api-fetcher]
 source = "target/wasm32-wasi/release/revolut_oracle.wasm"
