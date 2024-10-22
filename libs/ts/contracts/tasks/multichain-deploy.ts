@@ -1,5 +1,6 @@
 import { task } from 'hardhat/config';
 import { Artifacts } from 'hardhat/types';
+import { boolean } from 'hardhat/internal/core/params/argumentTypes';
 import { Wallet, ethers } from 'ethers';
 
 import Safe, {
@@ -39,10 +40,30 @@ import {
   DeploymentConfigSchema,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
+type Contracts = {
+  name: Exclude<ContractNames, ContractNames.SafeMultisig>;
+  argsTypes: string[];
+  argsValues: any[];
+  salt: string;
+  value: bigint;
+  feedRegistryInfo?: {
+    description: string;
+    base: EthereumAddress | null;
+    quote: EthereumAddress | null;
+  };
+}[];
+
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
+  .addParam(
+    'chainlinkCompatibility',
+    'Whether to deploy Chainlink compatibility contracts',
+    undefined,
+    boolean,
+  )
   .setAction(async (args, { ethers, artifacts }) => {
     const networks = args.networks.split(',');
+    const chainlinkCompatibilityFlag = args.chainlinkCompatibility;
     const configs: NetworkConfig[] = [];
     for (const network of networks) {
       if (!isNetworkName(network)) {
@@ -106,7 +127,7 @@ task('deploy', 'Deploy contracts')
         ),
       );
 
-      const deployData = await deployContracts(config, multisig, artifacts, [
+      const contractsToDeploy: Contracts = [
         {
           name: ContractNames.HistoricDataFeedStoreV2,
           argsTypes: ['address'],
@@ -121,33 +142,45 @@ task('deploy', 'Deploy contracts')
           salt: ethers.id('proxy'),
           value: 0n,
         },
-        {
-          name: ContractNames.FeedRegistry,
-          argsTypes: ['address', 'address'],
-          argsValues: [multisigAddress, upgradeableProxyAddress],
-          salt: ethers.id('registry'),
-          value: 0n,
-        },
-        ...dataFeedConfig.map(data => {
-          return {
-            name: ContractNames.ChainlinkProxy as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
-            argsValues: [
-              data.description,
-              data.decimals,
-              data.id,
-              upgradeableProxyAddress,
-            ],
-            salt: ethers.id('aggregator'),
+      ];
+
+      if (chainlinkCompatibilityFlag) {
+        contractsToDeploy.push(
+          {
+            name: ContractNames.FeedRegistry,
+            argsTypes: ['address', 'address'],
+            argsValues: [multisigAddress, upgradeableProxyAddress],
+            salt: ethers.id('registry'),
             value: 0n,
-            feedRegistryInfo: {
-              description: data.description,
-              base: data.base,
-              quote: data.quote,
-            },
-          };
-        }),
-      ]);
+          },
+          ...dataFeedConfig.map(data => {
+            return {
+              name: ContractNames.ChainlinkProxy as const,
+              argsTypes: ['string', 'uint8', 'uint32', 'address'],
+              argsValues: [
+                data.description,
+                data.decimals,
+                data.id,
+                upgradeableProxyAddress,
+              ],
+              salt: ethers.id('aggregator'),
+              value: 0n,
+              feedRegistryInfo: {
+                description: data.description,
+                base: data.base,
+                quote: data.quote,
+              },
+            };
+          }),
+        );
+      }
+
+      const deployData = await deployContracts(
+        config,
+        multisig,
+        artifacts,
+        contractsToDeploy,
+      );
 
       const networkName = getNetworkNameByChainId(chainId);
       chainsDeployment[networkName] = {
@@ -158,7 +191,8 @@ task('deploy', 'Deploy contracts')
         },
       };
 
-      await registerChainlinkProxies(config, multisig, deployData, artifacts);
+      if (chainlinkCompatibilityFlag)
+        await registerChainlinkProxies(config, multisig, deployData, artifacts);
     }
 
     await saveDeployment(configs, chainsDeployment);
@@ -335,18 +369,7 @@ const deployContracts = async (
   config: NetworkConfig,
   multisig: Safe,
   artifacts: Artifacts,
-  contracts: {
-    name: Exclude<ContractNames, ContractNames.SafeMultisig>;
-    argsTypes: string[];
-    argsValues: any[];
-    salt: string;
-    value: bigint;
-    feedRegistryInfo?: {
-      description: string;
-      base: EthereumAddress | null;
-      quote: EthereumAddress | null;
-    };
-  }[],
+  contracts: Contracts,
 ) => {
   const createCallAddress = config.safeAddresses.createCallAddress;
 
