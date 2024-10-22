@@ -41,10 +41,7 @@ export function getSignature(node: ASTNode): Signature | undefined {
         );
       }
 
-      overviewCodeSnippet = res
-        .filter(el => !el.includes('returns'))
-        .join(' ')
-        .concat(';');
+      overviewCodeSnippet = res.join(' ').concat(';');
       codeSnippet = res.join(' ').concat(';');
 
       return {
