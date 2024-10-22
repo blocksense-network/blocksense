@@ -26,8 +26,11 @@ async fn my_function(settings: Settings) -> Result<Payload> {
 Currently we support request/response oracle scripts that receive `Settings` as parameter and should return
 `Result<Payload>`
 
-- `Settings` provide you with an array of data feed IDs and resources.
-- `Payload` is the Oracle result which which is an array of data feed results .
+- `Settings` provide you with
+  - An array of data feed IDs and data(String representation of the resource property from the data feed configuration).
+  - An array of capabilities - IDs and data.
+- `Payload` is the Oracle result which is an array of data feed results.
+  - Numerical - f64
 
 ## HTTP library
 
