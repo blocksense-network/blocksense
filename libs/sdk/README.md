@@ -5,8 +5,8 @@
 
 ## SDK Macro
 
-The oracle macro main purpose is to wrap everything related to WASM and WIT, so that implementing
-oracle scripts using rust is more straight forward.
+The oracle macro's main purpose is to wrap everything related to WASM and WIT, so that implementing
+oracle scripts using rust is more straightforward.
 
 Usage:
 
@@ -34,7 +34,7 @@ Currently we support request/response oracle scripts that receive `Settings` as 
 
 ## HTTP library
 
-For a HTTP library we are using the [The Spin Rust SDK](https://github.com/fermyon/spin-rust-sdk/tree/main)
+For an HTTP library we are using [The Spin Rust SDK](https://github.com/fermyon/spin-rust-sdk/tree/main)
 
 Usage:
 
