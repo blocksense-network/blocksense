@@ -243,33 +243,33 @@ authors = ["blocksense-network"]
 
 [application.trigger.settings]
 interval_time_in_seconds = 10
-reporter_id = 10
-secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
 sequencer = "http://gpu-server-001:8877/post_report"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+reporter_id = 10
 
 [[trigger.oracle]]
 component = "revolut"
-capabilities = []
 data_feeds = []
+capabilities = []
 
 [[trigger.oracle]]
 component = "yahoo"
 capabilities = []
 
 [[trigger.oracle.data_feeds]]
-data = '{"cmc_id":5805,"cmc_quote":"AVAX"}'
 id = "1"
+data = '{"cmc_id":5805,"cmc_quote":"AVAX"}'
 
 [[trigger.oracle]]
 component = "cmc"
 
-[[trigger.oracle.capabilities]]
-data = ""
-id = "1"
-
 [[trigger.oracle.data_feeds]]
-data = '{"cmc_id":6210,"cmc_quote":"SAND"}'
 id = "0"
+data = '{"cmc_id":6210,"cmc_quote":"SAND"}'
+
+[[trigger.oracle.capabilities]]
+id = "1"
+data = ""
 
 [component.revolut]
 source = "revolut_oracle.wasm"
