@@ -7,10 +7,11 @@ import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumn
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
 import { NetworkAddressExplorerLink } from '@/components/DeployedContracts/NetworkAddressExplorerLink';
+import { Tooltip } from '@/components/common/Tooltip';
 
 export const proxyColumnsTitles: { [key: string]: string } = {
   description: 'Data Feed Name',
-  id: 'ID',
+  id: 'Id',
   address: 'Blocksense Proxy Address',
   base: 'Base Address',
   quote: 'Quote Address',
@@ -20,18 +21,6 @@ export const proxyColumnsTitles: { [key: string]: string } = {
 
 export const columns: ColumnDef<ProxyContractData>[] = [
   {
-    accessorKey: 'description',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={proxyColumnsTitles[column.id]}
-      />
-    ),
-    cell: ({ row }) => (
-      <DataTableBadge>{row.getValue('description')}</DataTableBadge>
-    ),
-  },
-  {
     accessorKey: 'id',
     header: ({ column }) => (
       <DataTableColumnHeader
@@ -40,6 +29,21 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       />
     ),
     cell: ({ row }) => <DataTableBadge>{row.getValue('id')}</DataTableBadge>,
+  },
+  {
+    accessorKey: 'description',
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title={proxyColumnsTitles[column.id]}
+      />
+    ),
+    cell: ({ row }) => (
+      <Tooltip position="right">
+        <Tooltip.Content>Data Feed Info</Tooltip.Content>
+        <DataTableBadge>{row.getValue('description')}</DataTableBadge>
+      </Tooltip>
+    ),
   },
   {
     accessorKey: 'network',

@@ -4,6 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
+import { Tooltip } from '@/components/common/Tooltip';
 
 type DataFeed = {
   id: number;
@@ -41,7 +42,10 @@ export const columns: ColumnDef<DataFeed>[] = [
       />
     ),
     cell: ({ row }) => (
-      <DataTableBadge>{row.getValue('description')}</DataTableBadge>
+      <Tooltip position="right">
+        <Tooltip.Content>Data Feed Info</Tooltip.Content>
+        <DataTableBadge>{row.getValue('description')}</DataTableBadge>{' '}
+      </Tooltip>
     ),
   },
   {
