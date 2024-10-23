@@ -193,9 +193,9 @@ pub async fn get_feed_report_interval(
         }
     };
 
-    return Ok(HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
-        .body(format!("{}", feed.read().await.get_report_interval_ms())));
+        .body(format!("{}", feed.read().await.get_report_interval_ms())))
 }
 
 #[get("/get_feeds_config")]
@@ -205,9 +205,9 @@ pub async fn get_feeds_config(
     let feeds_config = sequencer_state.feeds_config.read().await;
     let feeds_config_pretty = serde_json::to_string_pretty::<AllFeedsConfig>(&feeds_config)?;
 
-    return Ok(HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
-        .body(feeds_config_pretty.to_string()));
+        .body(feeds_config_pretty.to_string()))
 }
 
 #[get("/get_feed_config/{feed_id}")]
@@ -230,9 +230,9 @@ pub async fn get_feed_config(
         .ok_or(error::ErrorNotFound("Data feed with this ID not found"))?;
     let feed_config_pretty = serde_json::to_string_pretty::<FeedConfig>(&feed_config)?;
 
-    return Ok(HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
-        .body(feed_config_pretty.to_string()));
+        .body(feed_config_pretty.to_string()))
 }
 
 #[get("/get_sequencer_config")]
@@ -243,9 +243,9 @@ pub async fn get_sequencer_config(
     let sequencer_config_pretty =
         serde_json::to_string_pretty::<SequencerConfig>(&sequencer_config)?;
 
-    return Ok(HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
-        .body(sequencer_config_pretty.to_string()));
+        .body(sequencer_config_pretty.to_string()))
 }
 
 #[get("/metrics")]
@@ -257,9 +257,9 @@ async fn metrics() -> Result<HttpResponse, Error> {
         }
     };
 
-    return Ok(HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
-        .body(output));
+        .body(output))
 }
 
 #[post("/register_asset_feed")]
