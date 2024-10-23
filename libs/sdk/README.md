@@ -30,7 +30,8 @@ Currently we support request/response oracle scripts that receive `Settings` as 
   - An array of data feed IDs and data(String representation of the resource property from the data feed configuration).
   - An array of capabilities - IDs and data.
 - `Payload` is the Oracle result which is an array of data feed results.
-  - Numerical - f64
+  - Numerical - `f64`
+  - Text - `String`
 
 ## HTTP library
 
