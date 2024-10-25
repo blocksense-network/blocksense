@@ -39,6 +39,7 @@ pub async fn prepare_app_workers(
         batched_votes_send,
         sequencer_config.max_keys_to_batch,
         sequencer_config.keys_batch_duration,
+        sequencer_state.blockchain_db.clone(),
     )
     .await;
 

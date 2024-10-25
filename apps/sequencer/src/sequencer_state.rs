@@ -2,6 +2,7 @@ use crate::feeds::feed_allocator::ConcurrentAllocator;
 use crate::feeds::feeds_slots_manager::FeedsSlotsManagerCmds;
 use crate::providers::provider::SharedRpcProviders;
 use crate::reporters::reporter::SharedReporters;
+use blockchain_data_model::in_mem_db::InMemDb;
 use config::FeedConfig;
 use config::SequencerConfig;
 use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
@@ -24,5 +25,6 @@ pub struct SequencerState {
     pub sequencer_config: Arc<RwLock<SequencerConfig>>,
     pub feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>>,
     pub feeds_slots_manager_cmd_send: mpsc::UnboundedSender<FeedsSlotsManagerCmds>,
+    pub blockchain_db: Arc<RwLock<InMemDb>>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }

@@ -14,7 +14,8 @@ members = [
   "libs/utils",
   "libs/config",
   "libs/crypto",
-  "libs/feed_registry"]
+  "libs/feed_registry",
+  "libs/blockchain_data_model"]
 resolver = "2"
 
 [workspace.package]
