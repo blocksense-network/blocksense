@@ -12,11 +12,7 @@
   } // (import ./lib lib);
 
   perSystem =
-    {
-      inputs',
-      pkgs,
-      ...
-    }:
+    { inputs', pkgs, ... }:
     let
       rustToolchain =
         with inputs'.fenix.packages;

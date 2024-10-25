@@ -1,8 +1,7 @@
 use crate::providers::eth_send_utils::eth_batch_send_to_all_contracts;
-use crate::sequencer_state::SequencerState;
+use crate::{sequencer_state::SequencerState, UpdateToSend};
 use actix_web::web::Data;
 use feed_registry::types::Repeatability::Periodic;
-use std::collections::HashMap;
 use std::fmt::Debug;
 use std::io::Error;
 use tokio::sync::mpsc::UnboundedReceiver;
@@ -12,7 +11,7 @@ pub async fn votes_result_sender_loop<
     K: Debug + Clone + std::string::ToString + 'static,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
-    mut batched_votes_recv: UnboundedReceiver<HashMap<K, V>>,
+    mut batched_votes_recv: UnboundedReceiver<UpdateToSend<K, V>>,
     sequencer_state: Data<SequencerState>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -45,13 +44,15 @@ fn async_send_to_contracts<
     V: Debug + Clone + std::string::ToString + 'static,
 >(
     sequencer_state: Data<SequencerState>,
-    updates: HashMap<K, V>,
+    updates: UpdateToSend<K, V>,
     batch_count: usize,
 ) {
     let sender = tokio::task::Builder::new()
         .name(format!("batch_sender_{batch_count}").as_str())
         .spawn_local(async move {
-            match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
+            match eth_batch_send_to_all_contracts(sequencer_state, updates.kv_updates, Periodic)
+                .await
+            {
                 Ok(res) => info!("Sending updates complete {}.", res),
                 Err(err) => error!("ERROR Sending updates {}", err),
             };

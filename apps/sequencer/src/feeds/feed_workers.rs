@@ -3,10 +3,10 @@ use crate::feeds::votes_result_batcher::votes_result_batcher_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
 use crate::sequencer_state::SequencerState;
+use crate::UpdateToSend;
 use actix_web::web::Data;
 use config::SequencerConfig;
 use futures_util::stream::FuturesUnordered;
-use std::collections::HashMap;
 use std::io::Error;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
@@ -15,8 +15,8 @@ use tokio::task::JoinHandle;
 use super::feeds_slots_manager::FeedsSlotsManagerCmds;
 
 type BatchedVotesChannel = (
-    UnboundedSender<HashMap<String, String>>,
-    UnboundedReceiver<HashMap<String, String>>,
+    UnboundedSender<UpdateToSend<String, String>>,
+    UnboundedReceiver<UpdateToSend<String, String>>,
 );
 /// Given an app state and a sequencer configuration in launches the following app workers:
 /// - Feeds slots manager loop

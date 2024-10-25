@@ -9,12 +9,14 @@ use tokio::time::Duration;
 use tracing::{debug, error, info, info_span};
 use utils::time::current_unix_time;
 
+use crate::UpdateToSend;
+
 pub async fn votes_result_batcher_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
     mut vote_recv: UnboundedReceiver<(K, V)>,
-    batched_votes_send: UnboundedSender<HashMap<K, V>>,
+    batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
     max_keys_to_batch: usize,
     timeout_duration: u64,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
@@ -73,7 +75,10 @@ pub async fn votes_result_batcher_loop<
                     };
                 }
                 if updates.keys().len() > 0 {
-                    if let Err(e) = batched_votes_send.send(updates) {
+                    if let Err(e) = batched_votes_send.send(UpdateToSend {
+                        block_height: 0,
+                        kv_updates: updates,
+                    }) {
                         error!(
                             "Channel for propagating batched updates to sender failed: {}",
                             e.to_string()
