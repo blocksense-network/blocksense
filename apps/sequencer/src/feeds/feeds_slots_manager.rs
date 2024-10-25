@@ -376,6 +376,7 @@ mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
+    use blockchain_data_model::in_mem_db::InMemDb;
     use config::get_sequencer_and_feed_configs;
     use config::init_config;
     use config::SequencerConfig;
@@ -454,6 +455,7 @@ mod tests {
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_slots_manager_cmd_send,
+            blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
         });
 
         let _future = feeds_slots_manager_loop(sequencer_state, feeds_slots_manager_cmd_recv).await;

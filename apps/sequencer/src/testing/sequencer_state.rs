@@ -5,6 +5,7 @@ use std::{
 };
 
 use actix_web::web;
+use blockchain_data_model::in_mem_db::InMemDb;
 use config::{
     get_sequencer_and_feed_configs, get_test_config_with_single_provider, init_config,
     SequencerConfig,
@@ -90,6 +91,7 @@ pub async fn create_sequencer_state_from_sequencer_config_file(
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         feeds_slots_manager_cmd_send,
+        blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
     })
 }
 
@@ -134,6 +136,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_slots_manager_cmd_send,
+            blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
         }),
         vote_recv,
     )

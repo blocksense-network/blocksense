@@ -12,7 +12,8 @@ config = { path = "../../libs/config" }
 blocksense-registry = { path = "../../libs/registry" }
 crypto = { path = "../../libs/crypto" }
 utils = { path = "../../libs/utils" }
-feed_registry = { path = "../../libs/feed_registry"}
+feed_registry = { path = "../../libs/feed_registry" }
+blockchain_data_model = { path = "../../libs/blockchain_data_model" }
 
 alloy = { version = "0.8", features = [
     "sol-types",

@@ -517,6 +517,7 @@ mod tests {
     use actix_test::to_bytes;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
+    use blockchain_data_model::in_mem_db::InMemDb;
     use config::{get_sequencer_and_feed_configs, init_config};
     use config::{AllFeedsConfig, SequencerConfig};
     use feed_registry::registry::{
@@ -579,6 +580,7 @@ mod tests {
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_slots_manager_cmd_send,
+            blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
         });
 
         let app = test::init_service(

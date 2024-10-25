@@ -1,12 +1,14 @@
+use blockchain_data_model::in_mem_db::InMemDb;
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::Repeatability;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::io::Error;
-// use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::sync::RwLock;
 use tokio::time::Duration;
-use tracing::{debug, error, info, info_span};
+use tracing::{debug, error, info, info_span, trace};
 use utils::time::current_unix_time;
 
 use crate::UpdateToSend;
@@ -19,6 +21,7 @@ pub async fn votes_result_batcher_loop<
     batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
     max_keys_to_batch: usize,
     timeout_duration: u64,
+    blockchain_db: Arc<RwLock<InMemDb>>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("votes_result_batcher")
@@ -74,9 +77,24 @@ pub async fn votes_result_batcher_loop<
                         }
                     };
                 }
+                let block_height;
+                {
+                    let mut blockchain_db = blockchain_db.write().await;
+                    let (header, feed_updates) = blockchain_db.create_new_block(&updates);
+                    trace!(
+                        "Generated new block {:?} with hash {:?}",
+                        header,
+                        InMemDb::node_to_hash(InMemDb::calc_merkle_root(&mut header.clone()))
+                    );
+                    blockchain_db
+                        .add_next_block(header, feed_updates)
+                        .expect("Failed to add block!");
+                    block_height = blockchain_db.get_latest_block_height();
+                }
+
                 if updates.keys().len() > 0 {
                     if let Err(e) = batched_votes_send.send(UpdateToSend {
-                        block_height: 0,
+                        block_height: block_height,
                         kv_updates: updates,
                     }) {
                         error!(
@@ -84,8 +102,8 @@ pub async fn votes_result_batcher_loop<
                             e.to_string()
                         );
                     }
+                    stt.reset_report_start_time();
                 }
-                stt.reset_report_start_time();
             }
         })
         .expect("Failed to spawn votes result batcher!")
@@ -93,12 +111,14 @@ pub async fn votes_result_batcher_loop<
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-    // use std::sync::{Arc, RwLock};
+    use blockchain_data_model::in_mem_db::InMemDb;
+    use std::sync::Arc;
     use std::time::Duration;
-    use tokio::sync::mpsc;
     use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+    use tokio::sync::{mpsc, RwLock};
     use tokio::time;
+
+    use crate::UpdateToSend;
 
     #[actix_web::test]
     async fn test_votes_result_batcher_loop() {
@@ -107,12 +127,12 @@ mod tests {
         let duration = 100;
 
         let (vote_send, vote_recv): (
-            UnboundedSender<(&str, &str)>,
-            UnboundedReceiver<(&str, &str)>,
+            UnboundedSender<(String, String)>,
+            UnboundedReceiver<(String, String)>,
         ) = mpsc::unbounded_channel();
         let (batched_votes_send, mut batched_votes_recv): (
-            UnboundedSender<HashMap<&str, &str>>,
-            UnboundedReceiver<HashMap<&str, &str>>,
+            UnboundedSender<UpdateToSend<String, String>>,
+            UnboundedReceiver<UpdateToSend<String, String>>,
         ) = mpsc::unbounded_channel();
 
         super::votes_result_batcher_loop(
@@ -121,21 +141,22 @@ mod tests {
             batched_votes_send,
             batch_size,
             duration,
+            Arc::new(RwLock::new(InMemDb::new())),
         )
         .await;
 
         // Send test votes
-        let k1 = "test_key_1";
-        let v1 = "test_val_1";
+        let k1 = "ab000001".to_owned();
+        let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000".to_owned();
         vote_send.send((k1, v1)).unwrap();
-        let k2 = "test_key_2";
-        let v2 = "test_val_2";
+        let k2 = "ac000002".to_owned();
+        let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000".to_owned();
         vote_send.send((k2, v2)).unwrap();
-        let k3 = "test_key_3";
-        let v3 = "test_val_3";
+        let k3 = "ad000003".to_owned();
+        let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000".to_owned();
         vote_send.send((k3, v3)).unwrap();
-        let k4 = "test_key_4";
-        let v4 = "test_val_4";
+        let k4 = "af000004".to_owned();
+        let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000".to_owned();
         vote_send.send((k4, v4)).unwrap();
 
         // Wait for a while to let the loop process the message
@@ -144,7 +165,7 @@ mod tests {
 
         // Validate
         if let Some(batched) = batched_votes_recv.recv().await {
-            assert_eq!(batched.len(), 3);
+            assert_eq!(batched.kv_updates.len(), 3);
         } else {
             panic!("Batched votes were not received");
         }

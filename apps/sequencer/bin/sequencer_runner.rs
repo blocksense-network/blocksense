@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use actix_web::{web, App, HttpServer};
+use blockchain_data_model::in_mem_db::InMemDb;
 use feed_registry::registry::{
     new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
 };
@@ -90,6 +91,7 @@ pub async fn prepare_sequencer_state(
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         feeds_slots_manager_cmd_send,
+        blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
     });
 
     (vote_recv, feeds_slots_manager_cmd_recv, sequencer_state)
