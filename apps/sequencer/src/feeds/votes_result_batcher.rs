@@ -1,12 +1,15 @@
+use blockchain_data_model::in_mem_db::InMemDb;
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::Repeatability;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::io::Error;
+use std::sync::Arc;
+use tokio::sync::RwLock;
 // use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
-use tracing::{debug, error, info, info_span};
+use tracing::{debug, error, info, info_span, trace};
 use utils::time::current_unix_time;
 
 use crate::UpdateToSend;
@@ -19,6 +22,7 @@ pub async fn votes_result_batcher_loop<
     batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
     max_keys_to_batch: usize,
     timeout_duration: u64,
+    blockchain_db: Arc<RwLock<InMemDb>>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("votes_result_batcher")
@@ -74,9 +78,24 @@ pub async fn votes_result_batcher_loop<
                         }
                     };
                 }
+                let block_height;
+                {
+                    let mut blockchain_db = blockchain_db.write().await;
+                    let (header, feed_updates) = blockchain_db.create_new_block(&updates);
+                    trace!(
+                        "Generated new block {:?} with hash {:?}",
+                        header,
+                        InMemDb::node_to_hash(InMemDb::calc_merkle_root(&mut header.clone()))
+                    );
+                    blockchain_db
+                        .add_next_block(header, feed_updates)
+                        .expect("Failed to add block!");
+                    block_height = blockchain_db.get_latest_block_height();
+                }
+
                 if updates.keys().len() > 0 {
                     if let Err(e) = batched_votes_send.send(UpdateToSend {
-                        block_height: 0,
+                        block_height: block_height,
                         kv_updates: updates,
                     }) {
                         error!(
@@ -84,8 +103,8 @@ pub async fn votes_result_batcher_loop<
                             e.to_string()
                         );
                     }
+                    stt.reset_report_start_time();
                 }
-                stt.reset_report_start_time();
             }
         })
         .expect("Failed to spawn votes result batcher!")

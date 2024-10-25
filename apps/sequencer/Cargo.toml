@@ -11,7 +11,8 @@ anomaly_detection = { path = "../../libs/anomaly_detection" }
 config = { path = "../../libs/config" }
 crypto = { path = "../../libs/crypto" }
 utils = { path = "../../libs/utils" }
-feed_registry = { path = "../../libs/feed_registry"}
+feed_registry = { path = "../../libs/feed_registry" }
+blockchain_data_model = { path = "../../libs/blockchain_data_model" }
 
 alloy = { version = "0.7", features = [
     "sol-types",
