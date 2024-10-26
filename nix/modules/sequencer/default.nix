@@ -17,6 +17,21 @@
         let
           cfg = config.services.blocksense;
 
+          inherit (config.services) blocksense;
+
+          specialArgs = {
+            inherit
+              blocksense
+              ;
+          };
+
+          mkSubmodule =
+            module:
+            lib.types.submoduleWith {
+              inherit specialArgs;
+              modules = [ module ];
+            };
+
           configJSON =
             config: extraArgs:
             lib.pipe config [
@@ -50,13 +65,13 @@
             sequencer = import ./sequencer-opts.nix lib;
 
             reporters = mkOption {
-              type = types.attrsOf (types.submodule (import ./reporter-opts.nix lib config));
+              type = types.attrsOf (mkSubmodule ./reporter-opts.nix);
               default = { };
               description = mdDoc "The set of reporter instances to run.";
             };
 
             anvil = mkOption {
-              type = types.attrsOf (types.submoduleWith { modules = [ ./anvil-opts.nix ]; });
+              type = types.attrsOf (mkSubmodule ./anvil-opts.nix);
               default = { };
               description = mdDoc "The Anvil instance to use.";
             };

@@ -1,4 +1,6 @@
-lib: config: with lib; {
+{ lib, blocksense, ... }:
+with lib;
+{
   options = {
     full-batch = mkOption {
       type = types.bool;
@@ -14,7 +16,7 @@ lib: config: with lib; {
 
     sequencer-url = mkOption {
       type = types.str;
-      default = "http://127.0.0.1:${toString config.services.blocksense.sequencer.main-port}";
+      default = "http://127.0.0.1:${toString blocksense.sequencer.main-port}";
       description = "The url of the sequencer.";
     };
 
