@@ -19,7 +19,7 @@
       allEnvironments = lib.pipe allEnvironmentNames [
         (builtins.map (name: {
           inherit name;
-          file = config.devenv.shells.${name}.process-managers.process-compose.configFile;
+          file = config.devenv.shells.${name}.process.managers.process-compose.configFile;
         }))
       ];
 

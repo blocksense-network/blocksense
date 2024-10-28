@@ -11,6 +11,6 @@
   ];
 
   enterShell = ''
-    ln -fs ${config.process-managers.process-compose.configFile} ${config.devenv.root}/process-compose.yml
+    ln -fs ${config.process.managers.process-compose.configFile} ${config.devenv.root}/process-compose.yml
   '';
 }
