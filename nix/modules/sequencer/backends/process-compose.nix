@@ -1,4 +1,4 @@
-{ self, inputs }:
+{ self', ... }:
 {
   config,
   lib,
@@ -8,9 +8,8 @@
 let
   cfg = config.services.blocksense;
 
-  inherit (pkgs) system;
-  inherit (self.apps.${system}) sequencer reporter;
-  inherit (self.legacyPackages.${system}) foundry;
+  inherit (self'.apps) sequencer reporter;
+  inherit (self'.legacyPackages) foundry;
 
   sequencerConfigJSON = pkgs.runCommandLocal "sequencer_config" { } ''
     mkdir -p $out
@@ -85,9 +84,7 @@ let
           "anvil-${name}".condition = "process_healthy";
         };
       };
-
     }
-
   ) cfg.anvil;
 
   reporterInstances = lib.mapAttrs' (name: conf: {
@@ -119,7 +116,6 @@ let
       };
     };
   };
-
 in
 {
   config = lib.mkIf cfg.enable {

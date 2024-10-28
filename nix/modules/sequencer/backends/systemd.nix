@@ -1,15 +1,10 @@
-{ self, inputs }:
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ self', ... }:
+{ config, lib, ... }:
 let
   cfg = config.services.blocksense;
-  inherit (pkgs) system;
-  inherit (self.apps.${system}) sequencer reporter;
-  inherit (self.legacyPackages.${system}) foundry;
+
+  inherit (self'.apps) sequencer reporter;
+  inherit (self'.legacyPackages) foundry;
 
   anvilInstances = lib.mapAttrs' (
     name:

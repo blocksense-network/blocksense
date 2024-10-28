@@ -2,6 +2,7 @@
   lib,
   self,
   inputs,
+  withSystem,
   ...
 }:
 {
@@ -13,14 +14,19 @@
 
       mkModule =
         backend:
-        { config, ... }:
+        { config, pkgs, ... }:
         let
           cfg = config.services.blocksense;
 
+          inherit (withSystem pkgs.stdenv.hostPlatform.system (args: args)) inputs' self';
           inherit (config.services) blocksense;
 
           specialArgs = {
             inherit
+              self
+              self'
+              inputs
+              inputs'
               blocksense
               ;
           };
@@ -97,7 +103,7 @@
             );
           };
 
-          imports = [ (import backend { inherit self inputs; }) ];
+          imports = [ (import backend specialArgs) ];
         };
     in
     {
