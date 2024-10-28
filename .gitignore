@@ -157,7 +157,9 @@ apps/docs.blocksense.network/pages/docs/contracts/reference-documentation/_meta.
 apps/docs.blocksense.network/pages/docs/contracts/deployed-contracts.mdx
 apps/docs.blocksense.network/pages/docs/data-feeds/feed/_meta.json
 apps/docs.blocksense.network/pages/docs/data-feeds/**/*.mdx
-!apps/docs.blocksense.network/pages/docs/data-feeds/creating-data-feeds.mdx
+!apps/docs.blocksense.network/pages/docs/data-feeds/feed/\[feed\].mdx
+
+
 
 # Process Compose
 process-compose.yml
