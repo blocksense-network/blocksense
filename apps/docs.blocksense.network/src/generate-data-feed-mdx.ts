@@ -1,6 +1,5 @@
 import {
   decodeFeedsConfig,
-  Feed,
   FeedsConfig,
 } from '@blocksense/config-types/data-feeds-config';
 import {
@@ -10,7 +9,6 @@ import {
 import { assertNotNull, selectDirectory } from '@blocksense/base-utils';
 
 import { stringifyObject } from '@/src/utils';
-import { updateMetaJsonFile } from '@/src/utils-fs';
 
 import { pagesDataFeedsFolder } from '@/src/constants';
 
@@ -47,92 +45,6 @@ async function generateDataFeedsOverviewFile(
   ]);
 }
 
-function generateIndividualDataFeedPageContent(
-  feedData: IndividualDataFeedPageData,
-): string {
-  const dataFeedString = stringifyObject(feedData);
-
-  const content = `
----
-title: ${feedData.feed.description} | ${feedData.feed.id}
----
-
-import { DataFeedDetails } from '@/components/DataFeeds/DataFeedDetails';
-
-<DataFeedDetails
-  feedJsonString={${dataFeedString}}
-/>
-`;
-
-  return content;
-}
-
-async function generateIndividualDataFeedPages(
-  feedsConfig: FeedsConfig,
-  feedsDeploymentInfo: ChainlinkProxyData[],
-): Promise<any> {
-  const feedsFolder = `${pagesDataFeedsFolder}/feed`;
-  const { write, writeJSON } = selectDirectory(feedsFolder);
-
-  const dataFeedPages = feedsConfig.feeds.map((feed: Feed) => {
-    const feedDeploymentInfo = feedsDeploymentInfo.find(
-      (info: ChainlinkProxyData) => info.description === feed.description,
-    );
-
-    if (!feedDeploymentInfo) {
-      throw new Error(
-        `No deployment info found for feed: ${feed.description} (${feed.id})`,
-      );
-    }
-
-    return {
-      description: feed.description,
-      name: `${feed.id}`,
-      content: generateIndividualDataFeedPageContent({
-        feed: feed,
-        contracts: feedDeploymentInfo,
-      }),
-    };
-  });
-
-  const metaJSON = dataFeedPages.reduce(
-    (obj, { name, description }) => ({
-      ...obj,
-      [name]: {
-        title: description,
-        display: 'hidden',
-      },
-    }),
-    {},
-  );
-
-  const { writeJSON: writeRootMetaFile, readJSON } =
-    selectDirectory(pagesDataFeedsFolder);
-
-  let rootMetaFileContent = await readJSON({ name: '_meta' });
-  rootMetaFileContent = {
-    ...rootMetaFileContent,
-    feed: {
-      title: 'Supported Data Feeds',
-      display: 'children',
-    },
-  };
-
-  return Promise.all([
-    ...dataFeedPages.map(args => write({ ext: '.mdx', ...args })),
-    writeJSON({
-      base: '_meta.json',
-      content: metaJSON,
-    }),
-    updateMetaJsonFile(pagesDataFeedsFolder, {
-      feed: {
-        title: 'Supported Data Feeds',
-        display: 'children',
-      },
-    }),
-  ]);
-}
-
 async function generateDataFeedsPages() {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
   const feedsDeploymentInfo = assertNotNull(
@@ -140,7 +52,6 @@ async function generateDataFeedsPages() {
   ).contracts.ChainlinkProxy;
 
   await generateDataFeedsOverviewFile(feedsConfig);
-  // await generateIndividualDataFeedPages(feedsConfig);
 }
 
 generateDataFeedsPages()
