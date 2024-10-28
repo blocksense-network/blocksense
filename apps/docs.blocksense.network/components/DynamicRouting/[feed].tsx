@@ -16,7 +16,6 @@ import type {
 
 export const getStaticPaths = (async () => {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
-
   const paths = feedsConfig.feeds.map(feed => ({
     params: { feed: String(feed.id) },
   }));
@@ -39,14 +38,14 @@ export const getStaticProps = (async context => {
     return { notFound: true };
   }
 
-  return { props: { feed } };
+  return { props: { feed }, revalidate: false };
 }) satisfies GetStaticProps<{
   feed: Feed;
 }>;
 
-export default function Page({
+export const DataFeedPage = ({
   feed,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   const {
     id,
     description,
@@ -127,37 +126,31 @@ export default function Page({
   ];
 
   return (
-    <div className="data-feed-details">
-      <h1 className="text-2xl font-bold text-gray-900 mt-10">
-        {description} | ID: {id}
-      </h1>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full lg:w-[42rem] xl:w-[45rem]">
-        {dataFeedCardArray.map((section, index) => (
-          <DataFeedCardSection
-            key={index}
-            title={section.title}
-            description={section.description}
-          >
-            <div className="data-feed-card-content grid grid-cols-2 gap-4">
-              {section.items.map((item, idx) => (
-                <DataFeedCardContentItem
-                  key={idx}
-                  label={item.label}
-                  value={item.value}
-                />
-              ))}
-              {section.extra && (
-                <DataFeedCardExtraContent
-                  type={section.extra.type}
-                  scriptArguments={section.extra.scriptArguments}
-                  aggregatorProxyAddress={section.extra.aggregatorProxyAddress}
-                />
-              )}
-            </div>
-          </DataFeedCardSection>
-        ))}
-      </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full lg:w-[42rem] xl:w-[45rem]">
+      {dataFeedCardArray.map((section, index) => (
+        <DataFeedCardSection
+          key={index}
+          title={section.title}
+          description={section.description}
+        >
+          <div className="data-feed-card-content grid grid-cols-2 gap-4">
+            {section.items.map((item, idx) => (
+              <DataFeedCardContentItem
+                key={idx}
+                label={item.label}
+                value={item.value}
+              />
+            ))}
+            {section.extra && (
+              <DataFeedCardExtraContent
+                type={section.extra.type}
+                scriptArguments={section.extra.scriptArguments}
+                aggregatorProxyAddress={section.extra.aggregatorProxyAddress}
+              />
+            )}
+          </div>
+        </DataFeedCardSection>
+      ))}
     </div>
   );
-}
+};

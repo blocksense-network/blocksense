@@ -12,7 +12,6 @@ import {
   DataTable,
   getFacetedFilters,
 } from '@/components/ui/DataTable/DataTable';
-import { Callout } from '@blocksense/docs-theme';
 
 type ParametersProps = {
   dataFeedsOverviewString: string;
