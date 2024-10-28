@@ -1,10 +1,7 @@
-{ pkgs, ... }:
+{ ... }:
 {
   pre-commit.hooks = {
-    nixfmt = {
-      enable = true;
-      package = pkgs.nixfmt-rfc-style;
-    };
+    nixfmt-rfc-style.enable = true;
     editorconfig-checker = {
       excludes = [ "libs/sdk/wit/deps" ];
       enable = true;
