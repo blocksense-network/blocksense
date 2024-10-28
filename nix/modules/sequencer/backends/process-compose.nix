@@ -9,7 +9,6 @@ let
   cfg = config.services.blocksense;
 
   inherit (self'.apps) sequencer reporter;
-  inherit (self'.legacyPackages) foundry;
 
   sequencerConfigJSON = pkgs.runCommandLocal "sequencer_config" { } ''
     mkdir -p $out
@@ -28,24 +27,11 @@ let
 
   anvilInstances = lib.mapAttrs' (
     name:
-    {
-      port,
-      chain-id,
-      fork-url,
-      contract-deployment,
-    }:
+    { port, _command, ... }:
     {
       name = "anvil-${name}";
       value.process-compose = {
-        command =
-          ''
-            ${foundry}/bin/anvil \
-              --port ${toString port} \
-              --chain-id ${toString chain-id} \
-          ''
-          + lib.optionalString (fork-url != null) ''
-            --fork-url ${fork-url}
-          '';
+        command = _command;
         readiness_probe = {
           exec.command = ''
             curl -fsSL http://127.0.0.1:${toString port}/ \

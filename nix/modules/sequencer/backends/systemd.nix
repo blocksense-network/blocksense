@@ -4,18 +4,17 @@ let
   cfg = config.services.blocksense;
 
   inherit (self'.apps) sequencer reporter;
-  inherit (self'.legacyPackages) foundry;
 
   anvilInstances = lib.mapAttrs' (
     name:
-    { port }:
+    { _command, ... }:
     {
       name = "blocksense-anvil-${name}";
       value = {
         description = "Anvil ${name}";
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
-          ExecStart = "${foundry}/bin/anvil -p ${builtins.toString port}";
+          ExecStart = _command;
         };
       };
     }

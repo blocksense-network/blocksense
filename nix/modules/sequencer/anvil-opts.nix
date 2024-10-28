@@ -1,6 +1,13 @@
-{ lib, ... }:
+{
+  lib,
+  self',
+  config,
+  ...
+}:
 with lib;
 let
+  inherit (self'.legacyPackages) foundry;
+
   walletOpts = {
     address.file = mkOption {
       type = with types; nullOr path;
@@ -15,6 +22,11 @@ let
 in
 {
   options = {
+    package = mkOption {
+      type = types.package;
+      default = foundry;
+    };
+
     port = mkOption {
       type = types.int;
       default = 8544;
@@ -37,6 +49,19 @@ in
       enable = mkEnableOption "Enable deployment of Blocksense contracts on Anvil simulation environment.";
       deployer = walletOpts;
       sequencer = walletOpts;
+    };
+
+    _command = mkOption {
+      type = types.str;
+      default =
+        ''
+          ${config.package}/bin/anvil \
+            --port ${toString config.port} \
+            --chain-id ${toString config.chain-id} \
+        ''
+        + lib.optionalString (config.fork-url != null) ''
+          --fork-url ${config.fork-url}
+        '';
     };
   };
 }
