@@ -52,7 +52,7 @@
           };
 
           reportersConfigJSON = builtins.mapAttrs (
-            n: v: (configJSON cfg.reporters.${n} { prometheus_url = cfg.reporters.${n}.metrics-url; })
+            n: v: (configJSON v { prometheus_url = cfg.reporters.${n}.metrics-url; })
           ) cfg.reporters;
         in
         with lib;
@@ -97,7 +97,7 @@
 
           config.services.blocksense = {
             sequencer.providers = lib.mkIf (cfg.anvil != { }) (
-              lib.mapAttrs (name: value: {
+              lib.mapAttrs (_name: value: {
                 "url" = lib.mkDefault "http://127.0.0.1:${toString value.port}";
               }) cfg.anvil
             );

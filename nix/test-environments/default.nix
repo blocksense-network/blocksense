@@ -3,8 +3,6 @@
   perSystem =
     {
       pkgs,
-      inputs',
-      self',
       config,
       lib,
       ...
@@ -14,7 +12,7 @@
         (lib.filterAttrs (
           name: value: (lib.hasSuffix ".nix" name) && name != "default.nix" && value == "regular"
         ))
-        (builtins.attrNames)
+        builtins.attrNames
         (builtins.map (name: lib.removeSuffix ".nix" name))
       ];
 

@@ -11,7 +11,7 @@ let
     {
       name = "blocksense-anvil-${name}";
       value = {
-        description = "Anvil ${name}";
+        description = "Blocksense Anvil ${name}";
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
           ExecStart = _command;
@@ -37,7 +37,7 @@ let
     };
   }) cfg.reporters;
 
-  etcEnv = lib.mapAttrs' (name: conf: {
+  etcEnv = lib.mapAttrs' (name: _conf: {
     name = "blocksense/reporter-${name}/reporter_config.json";
     value.text = cfg._reporters-config-txt.${name};
   }) cfg.reporters;

@@ -4,7 +4,7 @@ let
 in
 with lib.fileset;
 {
-  trace = lib.fileset.trace;
+  inherit (lib.fileset) trace;
 
   rustSrc = rec {
     fileset = unions [

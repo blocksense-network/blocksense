@@ -1,9 +1,4 @@
-{
-  pkgs,
-  inputs',
-  self',
-  ...
-}:
+{ pkgs, self', ... }:
 {
   packages =
     with pkgs;

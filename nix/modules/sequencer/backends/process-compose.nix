@@ -17,11 +17,11 @@ let
   '';
 
   reportersConfigJSON = builtins.mapAttrs (
-    n: v:
+    name: _value:
     pkgs.runCommandLocal "reporter_config" { } ''
-      mkdir -p $out/reporter-${n}
-      echo '${cfg._reporters-config-txt.${n}}' \
-        | ${lib.getExe pkgs.jq} > $out/reporter-${n}/reporter_config.json
+      mkdir -p $out/reporter-${name}
+      echo '${cfg._reporters-config-txt.${name}}' \
+        | ${lib.getExe pkgs.jq} > $out/reporter-${name}/reporter_config.json
     ''
   ) cfg.reporters;
 
