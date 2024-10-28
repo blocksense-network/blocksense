@@ -11,7 +11,7 @@ use tracing::debug;
 use crypto::JsonSerializableSignature;
 use num::BigUint;
 
-use crate::aggregate::{get_aggregator, AverageAggregator, FeedAggregate};
+use crate::aggregate::{get_aggregator, FeedAggregate, MajorityVoteAggregator};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Repeatability {
@@ -56,8 +56,8 @@ impl FeedMetaData {
             report_interval_ms,
             quorum_percentage,
             first_report_start_time,
-            feed_aggregator: Box::new(AverageAggregator {}),
-            value_type: "Numeric".to_string(),
+            feed_aggregator: Box::new(MajorityVoteAggregator {}),
+            value_type: "Text".to_string(),
             aggregate_type: "Average".to_string(),
             processor_cmd_chan: None,
         }

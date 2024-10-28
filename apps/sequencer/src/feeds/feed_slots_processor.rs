@@ -57,6 +57,7 @@ impl FeedSlotsProcessor {
         let result_send = sequencer_state.voting_send_channel.clone();
         let reports = sequencer_state.reports.clone();
         let reporters = sequencer_state.reporters.clone();
+        let feed_type = feed.read().await.value_type.clone();
 
         let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
             let datafeed = feed.read().await;
@@ -132,7 +133,24 @@ impl FeedSlotsProcessor {
                         let mut values: Vec<&FeedType> = vec![];
                         for kv in &reports.report {
                             match kv.1 {
-                                FeedResult::Result { result } => values.push(result),
+                                FeedResult::Result { result } => {
+                                    match &result {
+                                        FeedType::Numerical(_) => {
+                                            if feed_type == "Numerical" {
+                                                values.push(result)
+                                            } else {
+                                                warn!("Wrong value type reported by reporter {} for feed id {} slot {}! value_type = Numerical expected", kv.0, self.key, slot);
+                                            }
+                                        },
+                                        FeedType::Text(_) => {
+                                            if feed_type == "Text" {
+                                                values.push(result)
+                                            } else {
+                                                warn!("Wrong value type reported by reporter {} for feed id {} slot {}! value_type = Text expected", kv.0, self.key, slot);
+                                            }
+                                        }
+                                    };
+                                },
                                 FeedResult::Error { .. } => {
                                     warn!(
                                         "Got error from reporter {} for feed id {} slot {}",
@@ -380,7 +398,7 @@ mod tests {
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
 
-        let original_report_data = FeedType::Numerical(13.0);
+        let original_report_data = FeedType::Text("13.00".to_string());
 
         let network = "ETH2";
         let key_path = get_test_private_key_path();

@@ -3,7 +3,8 @@ use std::{
     fmt::{Debug, Display},
 };
 
-use tracing::error;
+use num::Integer;
+use tracing::{error, info_span};
 
 use super::types::FeedType;
 
@@ -37,6 +38,9 @@ impl Display for AverageAggregator {
 
 impl FeedAggregate for AverageAggregator {
     fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
+        let span = info_span!("AverageAggregator");
+        let _guard = span.enter();
+        assert!(!values.is_empty());
         let num_elements = values.len() as f64;
         let mut filtered = Vec::new();
 
@@ -56,8 +60,29 @@ pub struct MedianAggregator {}
 
 impl FeedAggregate for MedianAggregator {
     fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
-        let size = values.len();
-        values[size / 2].clone()
+        let span = info_span!("MedianAggregator");
+        let _guard = span.enter();
+        let mut filtered = Vec::new();
+
+        for value in values {
+            match value {
+                FeedType::Numerical(x) => filtered.push(x),
+                _ => error!("Attempting to perform arithmetic on non-numerical type!"), //TODO(snikolov): What level of error?
+            };
+        }
+        let size = filtered.len();
+        assert!(size > 0);
+        filtered.sort_by(|a, b| {
+            a.partial_cmp(b)
+                .expect("Ordering between elements does not exists.")
+        });
+
+        let middle = size / 2;
+        if size.is_odd() {
+            FeedType::Numerical(*filtered[middle])
+        } else {
+            FeedType::Numerical((filtered[middle] + filtered[middle - 1]) / 2.0)
+        }
     }
 }
 
@@ -75,6 +100,9 @@ pub struct MajorityVoteAggregator {}
 
 impl FeedAggregate for MajorityVoteAggregator {
     fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
+        let span = info_span!("MajorityVoteAggregator");
+        let _guard = span.enter();
+
         let mut frequency_map = HashMap::new();
 
         // Count the occurrences of each string
