@@ -6,14 +6,14 @@ import {
   initWrappers,
   printGasUsage,
   setDataFeeds,
-} from './utils/helpers/common';
+} from '../utils/helpers/common';
 import {
   HistoricalDataFeedStoreConsumerBaseWrapper,
   HistoricalDataFeedStoreConsumerV1Wrapper,
   HistoricalDataFeedStoreConsumerV2Wrapper,
   HistoricalDataFeedStoreGenericConsumerV1Wrapper,
-} from './utils/wrappers';
-import { compareConsumerGasUsed } from './utils/helpers/consumerGasHelpers';
+} from '../utils/wrappers';
+import { compareConsumerGasUsed } from '../utils/helpers/consumerGasHelpers';
 
 let contractWrappers: HistoricalDataFeedStoreConsumerBaseWrapper<HistoricalDataFeedStore>[] =
   [];

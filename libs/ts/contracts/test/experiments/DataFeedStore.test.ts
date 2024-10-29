@@ -4,8 +4,8 @@ import {
   DataFeedStore,
   GenericDataFeedStore,
   initWrappers,
-} from './utils/helpers/common';
-import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
+} from '../utils/helpers/common';
+import { compareGasUsed } from '../utils/helpers/dataFeedGasHelpers';
 import {
   DataFeedStoreGenericV1Wrapper,
   DataFeedStoreGenericV2Wrapper,
@@ -13,7 +13,7 @@ import {
   DataFeedStoreV1Wrapper,
   DataFeedStoreV2Wrapper,
   DataFeedStoreV3Wrapper,
-} from './utils/wrappers';
+} from '../utils/wrappers';
 import { ethers } from 'ethers';
 
 let contractWrappers: DataFeedStoreBaseWrapper<DataFeedStore>[] = [];

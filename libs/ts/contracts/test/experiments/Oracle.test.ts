@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
-import { CLV1Wrapper, CLV2Wrapper } from './utils/wrappers';
-import { OracleWrapper } from './utils/wrappers';
-import { callAndCompareOracles } from './utils/helpers/oracleGasHelper';
+import { CLV1Wrapper, CLV2Wrapper } from '../utils/wrappers';
+import { OracleWrapper } from '../utils/wrappers';
+import { callAndCompareOracles } from '../utils/helpers/oracleGasHelper';
 import { expect } from 'chai';
 
 let oracles: OracleWrapper[];

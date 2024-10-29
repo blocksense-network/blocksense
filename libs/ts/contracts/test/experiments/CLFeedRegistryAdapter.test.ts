@@ -5,12 +5,12 @@ import {
   CLV2Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
-} from './utils/wrappers';
+} from '../utils/wrappers';
 import {
   HistoricalDataFeedStore,
   TOKENS,
   assertRegistry,
-} from './utils/helpers/common';
+} from '../utils/helpers/common';
 import { ethers } from 'hardhat';
 
 let contractWrapperV1: CLRegistryBaseWrapper;

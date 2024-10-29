@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {SportsDecoder} from '../../../libraries/SportsDecoder.sol';
+import {SportsDecoder} from '../../libraries/SportsDecoder.sol';
 import {SportsDataFeedStoreGenericV1} from '../../sports/SportsDataFeedStoreGenericV1.sol';
 import {SportsGenericConsumer} from './SportsGenericConsumer.sol';
 

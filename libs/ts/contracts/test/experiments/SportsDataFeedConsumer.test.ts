@@ -1,13 +1,13 @@
-import { SportsConsumer, SportsGenericConsumer } from '../typechain';
-import { initWrappers } from './utils/helpers/common';
-import { compareSportsConsumerGasUsed } from './utils/helpers/sportsConsumerGasHelpers';
+import { SportsConsumer, SportsGenericConsumer } from '../../typechain';
+import { initWrappers } from '../utils/helpers/common';
+import { compareSportsConsumerGasUsed } from '../utils/helpers/sportsConsumerGasHelpers';
 import {
   SportsDataFeedStoreConsumerBaseWrapper,
   SportsDataFeedStoreConsumerV1Wrapper,
   SportsDataFeedStoreConsumerV2Wrapper,
   SportsDataFeedStoreGenericConsumerV1Wrapper,
   SportsDataFeedStoreGenericConsumerV2Wrapper,
-} from './utils/wrappers';
+} from '../utils/wrappers';
 
 let contractWrappers: SportsDataFeedStoreConsumerBaseWrapper<SportsConsumer>[] =
   [];

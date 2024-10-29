@@ -1,13 +1,13 @@
 import { ethers } from 'hardhat';
-import { initWrappers } from './utils/helpers/common';
-import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
+import { initWrappers } from '../utils/helpers/common';
+import { compareGasUsed } from '../utils/helpers/dataFeedGasHelpers';
 import {
   HistoricalDataFeedStoreBaseWrapper,
   HistoricalDataFeedStoreGenericBaseWrapper,
   HistoricalDataFeedStoreV1Wrapper,
   HistoricalDataFeedStoreGenericV1Wrapper,
   HistoricalDataFeedStoreV2Wrapper,
-} from './utils/wrappers';
+} from '../utils/wrappers';
 
 let contractWrappers: HistoricalDataFeedStoreBaseWrapper[] = [];
 let genericContractWrappers: HistoricalDataFeedStoreGenericBaseWrapper[] = [];

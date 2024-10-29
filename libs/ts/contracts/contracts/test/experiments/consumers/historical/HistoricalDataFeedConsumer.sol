@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import './HistoricalConsumer.sol';
-import {Blocksense} from '../../../libraries/Blocksense.sol';
+import {Blocksense} from '../../../../libraries/Blocksense.sol';
 
 contract HistoricalDataFeedConsumer is HistoricalConsumer {
   constructor(address _dataFeedStore) HistoricalConsumer(_dataFeedStore) {}
