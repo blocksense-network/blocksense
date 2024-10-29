@@ -28,10 +28,9 @@ export const DeployedContracts = ({
   deployedCoreContractsString,
   deployedProxyContractsString,
 }: DeployedContractsProps) => {
-  const deployedContracts = decodeCoreContracts(
+  const deployedCoreContracts = decodeCoreContracts(
     JSON.parse(deployedCoreContractsString),
   );
-
   const deployedProxyContracts = decodeProxyContracts(
     JSON.parse(deployedProxyContractsString),
   );
@@ -53,7 +52,7 @@ export const DeployedContracts = ({
       <ContractItemWrapper
         title="Core Contracts"
         titleLevel={2}
-        itemsLength={deployedContracts.length}
+        itemsLength={deployedCoreContracts.length}
       >
         <article className="mt-4 mb-6">
           <span className="text-gray-500 text-md">
