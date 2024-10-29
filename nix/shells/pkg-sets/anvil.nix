@@ -1,9 +1,4 @@
-{ pkgs, self', ... }:
+{ self', ... }:
 {
-  packages =
-    with pkgs;
-    [
-      # ...
-    ]
-    ++ lib.optionals stdenv.isLinux [ self'.legacyPackages.foundry ];
+  packages = [ self'.legacyPackages.foundry ];
 }
