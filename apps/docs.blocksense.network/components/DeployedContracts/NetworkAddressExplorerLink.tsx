@@ -22,9 +22,9 @@ export const NetworkAddressExplorerLink = ({
   const router = useRouter();
 
   return (
-    <aside className="space-y-1">
+    <div>
       {networks.map((network: NetworkName) => (
-        <DataTableBadge key={network}>
+        <DataTableBadge className="mt-1 mr-1" key={network}>
           <Link
             onClick={e =>
               onLinkClick(
@@ -48,6 +48,6 @@ export const NetworkAddressExplorerLink = ({
           </Link>
         </DataTableBadge>
       ))}
-    </aside>
+    </div>
   );
 };

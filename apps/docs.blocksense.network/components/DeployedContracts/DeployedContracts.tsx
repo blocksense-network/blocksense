@@ -5,14 +5,11 @@ import {
   getFacetedFilters,
 } from '@/components/ui/DataTable/DataTable';
 import {
-  columns as coreContractsColumns,
-  contractsColumnsTitles,
-} from '@/components/DeployedContracts/coreContractsColumns';
-import {
   columns as proxyContractsColumns,
   proxyColumnsTitles,
 } from '@/components/DeployedContracts/proxyContractsColumns';
 import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
+import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';
 import {
   decodeCoreContracts,
   decodeProxyContracts,
@@ -71,12 +68,18 @@ export const DeployedContracts = ({
             documentation section.
           </span>
         </article>
-        <DataTable
-          hasToolbar={false}
-          columns={coreContractsColumns}
-          data={deployedContracts}
-          columnsTitles={contractsColumnsTitles}
-        />
+        <div className="container px-0">
+          {deployedCoreContracts.map(contract => (
+            <CoreContractCard
+              key={contract.address}
+              contract={{
+                name: contract.contract,
+                address: contract.address,
+                networks: contract.networks,
+              }}
+            />
+          ))}
+        </div>
       </ContractItemWrapper>
 
       <div className="mt-6">
