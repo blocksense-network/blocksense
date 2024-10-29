@@ -1,5 +1,5 @@
+use crate::feeds::block_creator::block_creator_loop;
 use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
-use crate::feeds::votes_result_batcher::votes_result_batcher_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
 use crate::sequencer_state::SequencerState;
@@ -34,7 +34,8 @@ pub async fn prepare_app_workers(
     let feeds_slots_manager_loop_fut =
         feeds_slots_manager_loop(sequencer_state.clone(), feeds_slots_manager_cmd_recv).await;
 
-    let votes_batcher = votes_result_batcher_loop(
+    let votes_batcher = block_creator_loop(
+        // sequencer_state.voting_recv_channel.clone(),
         voting_receive_channel,
         batched_votes_send,
         sequencer_config.max_keys_to_batch,
