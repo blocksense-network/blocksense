@@ -41,6 +41,7 @@ pub struct AssetFeedUpdate {
 }
 
 pub type FeedUpdatesChunk = [Option<AssetFeedUpdate>; 32];
+pub type FeedUpdatesInBlock = [FeedUpdatesChunk; 16];
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct BlockHeader {
@@ -54,7 +55,7 @@ pub struct BlockHeader {
 #[derive(Debug, PartialEq, SimpleSerialize, Default)]
 pub struct FeedUpdates {
     block_height: u64,
-    asset_feed_updates: [FeedUpdatesChunk; 16],
+    asset_feed_updates: FeedUpdatesInBlock,
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
@@ -63,3 +64,9 @@ pub struct AddRemoveFeeds {
     new_feeds: [Option<FeedConfig>; 32],
     feed_ids_to_rm: [Option<u32>; 32],
 }
+
+pub const MAX_ASSET_FEED_UPDATES_IN_BLOCK: usize = {
+    let asset_feed_updates_len =
+        std::mem::size_of::<FeedUpdatesInBlock>() / std::mem::size_of::<Option<AssetFeedUpdate>>();
+    asset_feed_updates_len
+};
