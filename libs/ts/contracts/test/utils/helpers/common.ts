@@ -7,10 +7,10 @@ import {
   DataFeedStoreV1,
   DataFeedStoreV2,
   DataFeedStoreV3,
-  HistoricConsumer,
-  HistoricDataFeedStoreGenericV1,
-  HistoricDataFeedStoreV1,
-  HistoricDataFeedStoreV2,
+  HistoricalConsumer,
+  HistoricalDataFeedStoreGenericV1,
+  HistoricalDataFeedStoreV1,
+  HistoricalDataFeedStoreV2,
   SportsConsumer as BaseSportsConsumer,
   SportsGenericConsumer,
 } from '../../../typechain';
@@ -24,12 +24,12 @@ export type DataFeedStore = DataFeedStoreV1 | DataFeedStoreV2 | DataFeedStoreV3;
 
 export type DataFeed = DataFeedStore | GenericDataFeedStore;
 
-export type HistoricDataFeedStore =
-  | HistoricDataFeedStoreV1
-  | HistoricDataFeedStoreV2;
-export type GenericHistoricDataFeedStore = HistoricDataFeedStoreGenericV1;
+export type HistoricalDataFeedStore =
+  | HistoricalDataFeedStoreV1
+  | HistoricalDataFeedStoreV2;
+export type GenericHistoricalDataFeedStore = HistoricalDataFeedStoreGenericV1;
 
-export type Consumer = BaseConsumer | HistoricConsumer;
+export type Consumer = BaseConsumer | HistoricalConsumer;
 
 export type SportsConsumer = BaseSportsConsumer | SportsGenericConsumer;
 

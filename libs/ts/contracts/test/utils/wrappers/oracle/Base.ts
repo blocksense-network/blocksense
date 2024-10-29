@@ -1,14 +1,17 @@
 import { BaseContract } from 'ethers';
-import { ChainlinkProxy, IChainlinkAggregator } from '../../../../typechain';
+import {
+  CLAggregatorAdapter,
+  IChainlinkAggregator,
+} from '../../../../typechain';
 
 export abstract class OracleBaseWrapper<T extends BaseContract> {
   public name: string;
   public contract!: T;
-  public underliers!: (ChainlinkProxy | IChainlinkAggregator)[];
+  public underliers!: (CLAggregatorAdapter | IChainlinkAggregator)[];
 
   constructor(
     name: string,
-    underliers: (ChainlinkProxy | IChainlinkAggregator)[],
+    underliers: (CLAggregatorAdapter | IChainlinkAggregator)[],
   ) {
     this.name = name;
     this.underliers = underliers;

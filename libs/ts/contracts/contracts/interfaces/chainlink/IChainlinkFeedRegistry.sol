@@ -87,10 +87,10 @@ interface IChainlinkFeedRegistry {
       uint80 answeredInRound
     );
 
-  /// @notice Get the ChainlinkProxy contract for a feed pair
+  /// @notice Get the CLAggregatorAdapter contract for a feed pair
   /// @param base The base asset of the feed
   /// @param quote The quote asset of the feed
-  /// @return aggregator The ChainlinkProxy contract given pair
+  /// @return aggregator The CLAggregatorAdapter contract given pair
   function getFeed(
     address base,
     address quote

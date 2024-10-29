@@ -32,16 +32,16 @@ export async function main(
     'contracts/DataFeedStoreV1.sol',
     'contracts/DataFeedStoreV2.sol',
     'contracts/DataFeedStoreV3.sol',
-    'contracts/HistoricDataFeedStoreV1.sol',
-    'contracts/HistoricDataFeedStoreV2.sol',
+    'contracts/HistoricalDataFeedStoreV1.sol',
+    'contracts/HistoricalDataFeedStoreV2.sol',
     'contracts/UpgradeableProxy.sol',
-    'contracts/chainlink-proxies/ChainlinkProxy.sol',
-    'contracts/chainlink-proxies/registries/FeedRegistry.sol',
-    'contracts/interfaces/IAggregator.sol',
-    'contracts/interfaces/IFeedRegistry.sol',
+    'contracts/cl-adapters/CLAggregatorAdapter.sol',
+    'contracts/cl-adapters/registries/CLFeedRegistryAdapter.sol',
+    'contracts/interfaces/ICLAggregatorAdapter.sol',
+    'contracts/interfaces/ICLFeedRegistryAdapter.sol',
     'contracts/interfaces/chainlink/IChainlinkAggregator.sol',
     'contracts/interfaces/chainlink/IChainlinkFeedRegistry.sol',
-    'contracts/libraries/ProxyCall.sol',
+    'contracts/libraries/Blocksense.sol',
   ];
 
   const solFiles = filterRelevantFiles(build.output, config).filter(

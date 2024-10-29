@@ -6,13 +6,13 @@ import { DataFeedStoreV3Wrapper } from './basic/V3';
 import { DataFeedStoreGenericV1Wrapper } from './basic/GenericV1';
 import { DataFeedStoreGenericV2Wrapper } from './basic/GenericV2';
 
-import { HistoricDataFeedStoreBaseWrapper } from './historic/Base';
-import { HistoricDataFeedStoreWrapper } from './historic/WrapperBase';
-import { HistoricDataFeedStoreV1Wrapper } from './historic/V1';
-import { HistoricDataFeedStoreV2Wrapper } from './historic/V2';
+import { HistoricalDataFeedStoreBaseWrapper } from './historical/Base';
+import { HistoricalDataFeedStoreWrapper } from './historical/WrapperBase';
+import { HistoricalDataFeedStoreV1Wrapper } from './historical/V1';
+import { HistoricalDataFeedStoreV2Wrapper } from './historical/V2';
 
-import { HistoricDataFeedStoreGenericBaseWrapper } from './historic/WrapperGenericBase';
-import { HistoricDataFeedStoreGenericV1Wrapper } from './historic/GenericV1';
+import { HistoricalDataFeedStoreGenericBaseWrapper } from './historical/WrapperGenericBase';
+import { HistoricalDataFeedStoreGenericV1Wrapper } from './historical/GenericV1';
 
 import { DataFeedStoreConsumerBaseWrapper } from './consumers/Base';
 import { DataFeedStoreConsumerV1Wrapper } from './consumers/V1';
@@ -21,10 +21,10 @@ import { DataFeedStoreConsumerV3Wrapper } from './consumers/V3';
 import { DataFeedStoreGenericConsumerV1Wrapper } from './consumers/GenericV1';
 import { DataFeedStoreGenericConsumerV2Wrapper } from './consumers/GenericV2';
 
-import { HistoricDataFeedStoreConsumerBaseWrapper } from './consumers/historic/Base';
-import { HistoricDataFeedStoreConsumerV1Wrapper } from './consumers/historic/V1';
-import { HistoricDataFeedStoreConsumerV2Wrapper } from './consumers/historic/V2';
-import { HistoricDataFeedStoreGenericConsumerV1Wrapper } from './consumers/historic/GenericV1';
+import { HistoricalDataFeedStoreConsumerBaseWrapper } from './consumers/historical/Base';
+import { HistoricalDataFeedStoreConsumerV1Wrapper } from './consumers/historical/V1';
+import { HistoricalDataFeedStoreConsumerV2Wrapper } from './consumers/historical/V2';
+import { HistoricalDataFeedStoreGenericConsumerV1Wrapper } from './consumers/historical/GenericV1';
 
 import { SportsDataFeedStoreBaseWrapper } from './sports/Base';
 import { SportsDataFeedStoreV1Wrapper } from './sports/V1';
@@ -44,16 +44,16 @@ import { UpgradeableProxyDataFeedStoreV2Wrapper } from './upgradeable/V2';
 import { UpgradeableProxyDataFeedStoreV3Wrapper } from './upgradeable/V3';
 import { UpgradeableProxyDataFeedStoreV1GenericWrapper } from './upgradeable/GenericV1';
 import { UpgradeableProxyDataFeedStoreV2GenericWrapper } from './upgradeable/GenericV2';
-import { UpgradeableProxyHistoricBaseWrapper } from './upgradeable/historic/Base';
-import { UpgradeableProxyHistoricDataFeedStoreV1Wrapper } from './upgradeable/historic/V1';
-import { UpgradeableProxyHistoricDataFeedStoreV2Wrapper } from './upgradeable/historic/V2';
-import { UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper } from './upgradeable/historic/GenericV1';
+import { UpgradeableProxyHistoricalBaseWrapper } from './upgradeable/historical/Base';
+import { UpgradeableProxyHistoricalDataFeedStoreV1Wrapper } from './upgradeable/historical/V1';
+import { UpgradeableProxyHistoricalDataFeedStoreV2Wrapper } from './upgradeable/historical/V2';
+import { UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper } from './upgradeable/historical/GenericV1';
 
-import { ChainlinkBaseWrapper } from './chainlink/Base';
-import { ChainlinkV1Wrapper } from './chainlink/V1';
-import { ChainlinkV2Wrapper } from './chainlink/V2';
+import { CLBaseWrapper } from './chainlink/Base';
+import { CLV1Wrapper } from './chainlink/V1';
+import { CLV2Wrapper } from './chainlink/V2';
 
-import { ChainlinkRegistryBaseWrapper } from './chainlink/registry/Base';
+import { CLRegistryBaseWrapper } from './chainlink/registry/Base';
 
 import { OracleBaseWrapper } from './oracle/Base';
 import { OracleWrapper } from './oracle/Oracle';
@@ -62,8 +62,8 @@ import { RegistryWrapper } from './oracle/registry/Base';
 import { IBaseWrapper } from './interfaces/IBaseWrapper';
 import { ISetWrapper } from './interfaces/ISetWrapper';
 import { IConsumerWrapper } from './interfaces/IConsumerWrapper';
-import { IHistoricConsumerWrapper } from './interfaces/IHistoricConsumerWrapper';
-import { IHistoricWrapper } from './interfaces/IHistoricWrapper';
+import { IHistoricalConsumerWrapper } from './interfaces/IHistoricalConsumerWrapper';
+import { IHistoricalWrapper } from './interfaces/IHistoricalWrapper';
 import { ISportsWrapper } from './interfaces/ISportsWrapper';
 import { ISportsConsumerWrapper } from './interfaces/ISportsConsumerWrapper';
 
@@ -75,13 +75,13 @@ export {
   DataFeedStoreGenericV1Wrapper,
   DataFeedStoreGenericV2Wrapper,
 
-  // historic
-  HistoricDataFeedStoreBaseWrapper,
-  HistoricDataFeedStoreWrapper,
-  HistoricDataFeedStoreV1Wrapper,
-  HistoricDataFeedStoreV2Wrapper,
-  HistoricDataFeedStoreGenericBaseWrapper,
-  HistoricDataFeedStoreGenericV1Wrapper,
+  // historical
+  HistoricalDataFeedStoreBaseWrapper,
+  HistoricalDataFeedStoreWrapper,
+  HistoricalDataFeedStoreV1Wrapper,
+  HistoricalDataFeedStoreV2Wrapper,
+  HistoricalDataFeedStoreGenericBaseWrapper,
+  HistoricalDataFeedStoreGenericV1Wrapper,
 
   // consumers
   DataFeedStoreConsumerBaseWrapper,
@@ -91,11 +91,11 @@ export {
   DataFeedStoreGenericConsumerV1Wrapper,
   DataFeedStoreGenericConsumerV2Wrapper,
 
-  // historic consumers
-  HistoricDataFeedStoreConsumerBaseWrapper,
-  HistoricDataFeedStoreConsumerV1Wrapper,
-  HistoricDataFeedStoreConsumerV2Wrapper,
-  HistoricDataFeedStoreGenericConsumerV1Wrapper,
+  // historical consumers
+  HistoricalDataFeedStoreConsumerBaseWrapper,
+  HistoricalDataFeedStoreConsumerV1Wrapper,
+  HistoricalDataFeedStoreConsumerV2Wrapper,
+  HistoricalDataFeedStoreGenericConsumerV1Wrapper,
 
   // sports
   SportsDataFeedStoreBaseWrapper,
@@ -119,19 +119,19 @@ export {
   UpgradeableProxyDataFeedStoreV1GenericWrapper,
   UpgradeableProxyDataFeedStoreV2GenericWrapper,
 
-  // upgradable historic proxy
-  UpgradeableProxyHistoricBaseWrapper,
-  UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
-  UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
-  UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper,
+  // upgradable historical proxy
+  UpgradeableProxyHistoricalBaseWrapper,
+  UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
+  UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
+  UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper,
 
-  // chainlink proxy interface
-  ChainlinkBaseWrapper,
-  ChainlinkV1Wrapper,
-  ChainlinkV2Wrapper,
+  // chainlink aggregator
+  CLBaseWrapper,
+  CLV1Wrapper,
+  CLV2Wrapper,
 
-  // chainlink registry interface
-  ChainlinkRegistryBaseWrapper,
+  // chainlink registry
+  CLRegistryBaseWrapper,
 
   // oracle
   OracleBaseWrapper,
@@ -144,8 +144,8 @@ export {
   IBaseWrapper,
   ISetWrapper as IWrapper,
   IConsumerWrapper,
-  IHistoricConsumerWrapper,
-  IHistoricWrapper,
+  IHistoricalConsumerWrapper,
+  IHistoricalWrapper,
   ISportsWrapper,
   ISportsConsumerWrapper,
 };

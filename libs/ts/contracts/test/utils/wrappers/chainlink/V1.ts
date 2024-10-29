@@ -1,29 +1,32 @@
-import { ChainlinkProxy, HistoricDataFeedStoreV1 } from '../../../../typechain';
+import {
+  CLAggregatorAdapter,
+  HistoricalDataFeedStoreV1,
+} from '../../../../typechain';
 import { deployContract } from '../../helpers/common';
-import { ChainlinkBaseWrapper } from './Base';
-import { UpgradeableProxyHistoricDataFeedStoreV1Wrapper } from '../upgradeable/historic/V1';
-import { UpgradeableProxyHistoricBaseWrapper } from '../upgradeable/historic/Base';
+import { CLBaseWrapper } from './Base';
+import { UpgradeableProxyHistoricalDataFeedStoreV1Wrapper } from '../upgradeable/historical/V1';
+import { UpgradeableProxyHistoricalBaseWrapper } from '../upgradeable/historical/Base';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 
-export class ChainlinkV1Wrapper extends ChainlinkBaseWrapper<HistoricDataFeedStoreV1> {
+export class CLV1Wrapper extends CLBaseWrapper<HistoricalDataFeedStoreV1> {
   public override async init(
     description: string,
     decimals: number,
     key: number,
     proxyData:
-      | UpgradeableProxyHistoricBaseWrapper<HistoricDataFeedStoreV1>
+      | UpgradeableProxyHistoricalBaseWrapper<HistoricalDataFeedStoreV1>
       | HardhatEthersSigner,
   ) {
     let proxy;
     if (proxyData instanceof HardhatEthersSigner) {
-      proxy = new UpgradeableProxyHistoricDataFeedStoreV1Wrapper();
+      proxy = new UpgradeableProxyHistoricalDataFeedStoreV1Wrapper();
       await proxy.init(proxyData);
     } else {
       proxy = proxyData;
     }
 
-    this.contract = await deployContract<ChainlinkProxy>(
-      'ChainlinkProxy',
+    this.contract = await deployContract<CLAggregatorAdapter>(
+      'CLAggregatorAdapter',
       description,
       decimals,
       key,
@@ -35,6 +38,6 @@ export class ChainlinkV1Wrapper extends ChainlinkBaseWrapper<HistoricDataFeedSto
   }
 
   public override getName(): string {
-    return 'ChainlinkProxyHistoricDataFeedStoreV1';
+    return 'CLAggregatorAdapterHistoricalDataFeedStoreV1';
   }
 }

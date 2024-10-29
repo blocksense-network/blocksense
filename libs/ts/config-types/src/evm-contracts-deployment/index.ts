@@ -17,7 +17,7 @@ const ContractDataSchema = S.Struct({
 
 export type ContractData = S.Schema.Type<typeof ContractDataSchema>;
 
-export const ChainlinkProxyDataSchema = S.Struct({
+export const CLAggregatorAdapterDataSchema = S.Struct({
   description: S.String,
   address: ethereumAddress,
   base: S.NullOr(ethereumAddress),
@@ -25,13 +25,15 @@ export const ChainlinkProxyDataSchema = S.Struct({
   constructorArgs: FunctionArgs,
 });
 
-export type ChainlinkProxyData = S.Schema.Type<typeof ChainlinkProxyDataSchema>;
+export type CLAggregatorAdapterData = S.Schema.Type<
+  typeof CLAggregatorAdapterDataSchema
+>;
 
 const CoreContractsSchema = S.mutable(
   S.Struct({
-    HistoricDataFeedStoreV2: ContractDataSchema,
+    HistoricalDataFeedStoreV2: ContractDataSchema,
     UpgradeableProxy: ContractDataSchema,
-    FeedRegistry: ContractDataSchema,
+    CLFeedRegistryAdapter: ContractDataSchema,
   }),
 );
 
@@ -40,7 +42,7 @@ export type CoreContracts = S.Schema.Type<typeof CoreContractsSchema>;
 const ContractsConfigSchema = S.mutable(
   S.Struct({
     coreContracts: CoreContractsSchema,
-    ChainlinkProxy: S.mutable(S.Array(ChainlinkProxyDataSchema)),
+    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
     SafeMultisig: ethereumAddress,
   }),
 );

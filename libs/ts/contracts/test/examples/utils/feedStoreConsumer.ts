@@ -11,7 +11,7 @@ export const getLatestAnswer = async (
   config: DataFeedStoreConfig,
   key: number,
 ) => {
-  const historicDataFeedStore = new ethers.Contract(
+  const historicalDataFeedStore = new ethers.Contract(
     config.address,
     config.abiJson,
     config.provider,
@@ -19,7 +19,7 @@ export const getLatestAnswer = async (
   const data = '0x' + ((key | 0x80000000) >>> 0).toString(16).padStart(8, '0');
 
   const res = await config.provider.call!({
-    to: historicDataFeedStore.target,
+    to: historicalDataFeedStore.target,
     data,
   });
 
@@ -36,7 +36,7 @@ export const getRoundData = async (
   key: number,
   roundId: number,
 ) => {
-  const historicDataFeedStore = new ethers.Contract(
+  const historicalDataFeedStore = new ethers.Contract(
     config.address,
     config.abiJson,
     config.provider,
@@ -45,7 +45,7 @@ export const getRoundData = async (
   const data = '0x' + ((key | 0x20000000) >>> 0).toString(16).padStart(8, '0');
 
   const res = await config.provider.call!({
-    to: historicDataFeedStore.target,
+    to: historicalDataFeedStore.target,
     data: ethers.solidityPacked(['bytes4', 'uint256'], [data, roundId]),
   });
 
@@ -61,7 +61,7 @@ export const getLatestRound = async (
   config: DataFeedStoreConfig,
   key: number,
 ) => {
-  const historicDataFeedStore = new ethers.Contract(
+  const historicalDataFeedStore = new ethers.Contract(
     config.address,
     config.abiJson,
     config.provider,
@@ -69,7 +69,7 @@ export const getLatestRound = async (
   const data = '0x' + ((key | 0x40000000) >>> 0).toString(16).padStart(8, '0');
 
   const res = await config.provider.call!({
-    to: historicDataFeedStore.target,
+    to: historicalDataFeedStore.target,
     data,
   });
 
@@ -82,7 +82,7 @@ export const getLatestRoundData = async (
   config: DataFeedStoreConfig,
   key: number,
 ) => {
-  const historicDataFeedStore = new ethers.Contract(
+  const historicalDataFeedStore = new ethers.Contract(
     config.address,
     config.abiJson,
     config.provider,
@@ -90,7 +90,7 @@ export const getLatestRoundData = async (
   const data = '0x' + ((key | 0xc0000000) >>> 0).toString(16).padStart(8, '0');
 
   const res = await config.provider.call!({
-    to: historicDataFeedStore.target,
+    to: historicalDataFeedStore.target,
     data,
   });
 

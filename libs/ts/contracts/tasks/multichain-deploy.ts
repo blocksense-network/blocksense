@@ -32,7 +32,7 @@ import { kebabToSnakeCase } from '@blocksense/base-utils/string';
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
 import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 import {
-  ChainlinkProxyData,
+  CLAggregatorAdapterData,
   ContractsConfig,
   CoreContracts,
   DeploymentConfig,
@@ -91,7 +91,7 @@ task('deploy', 'Deploy contracts')
       const dataFeedStoreAddress = await predictAddress(
         artifacts,
         config,
-        ContractNames.HistoricDataFeedStoreV2,
+        ContractNames.HistoricalDataFeedStoreV2,
         ethers.id('dataFeedStore'),
         abiCoder.encode(['address'], [process.env.SEQUENCER_ADDRESS]),
       );
@@ -108,7 +108,7 @@ task('deploy', 'Deploy contracts')
 
       const deployData = await deployContracts(config, multisig, artifacts, [
         {
-          name: ContractNames.HistoricDataFeedStoreV2,
+          name: ContractNames.HistoricalDataFeedStoreV2,
           argsTypes: ['address'],
           argsValues: [process.env.SEQUENCER_ADDRESS],
           salt: ethers.id('dataFeedStore'),
@@ -122,7 +122,7 @@ task('deploy', 'Deploy contracts')
           value: 0n,
         },
         {
-          name: ContractNames.FeedRegistry,
+          name: ContractNames.CLFeedRegistryAdapter,
           argsTypes: ['address', 'address'],
           argsValues: [multisigAddress, upgradeableProxyAddress],
           salt: ethers.id('registry'),
@@ -130,7 +130,7 @@ task('deploy', 'Deploy contracts')
         },
         ...dataFeedConfig.map(data => {
           return {
-            name: ContractNames.ChainlinkProxy as const,
+            name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint32', 'address'],
             argsValues: [
               data.description,
@@ -161,7 +161,12 @@ task('deploy', 'Deploy contracts')
       console.log(`// balance: ${signerBalancePost} //`);
       console.log(`// balance diff: ${signerBalance - signerBalancePost} //`);
 
-      await registerChainlinkProxies(config, multisig, deployData, artifacts);
+      await registerCLAggregatorAdapters(
+        config,
+        multisig,
+        deployData,
+        artifacts,
+      );
     }
 
     await saveDeployment(configs, chainsDeployment);
@@ -387,7 +392,7 @@ const deployContracts = async (
 
     const feedName = contract.feedRegistryInfo?.description;
     const contractName = feedName
-      ? `ChainlinkProxy - ${feedName}`
+      ? `CLAggregatorAdapter - ${feedName}`
       : contract.name;
     console.log(`Predicted address for '${contractName}': `, contractAddress);
 
@@ -408,7 +413,7 @@ const deployContracts = async (
       console.log(' -> Contract already deployed!');
     }
 
-    if (contract.name === ContractNames.ChainlinkProxy) {
+    if (contract.name === ContractNames.CLAggregatorAdapter) {
       (contractsConfig[contract.name] ??= []).push({
         description: contract.feedRegistryInfo?.description ?? '',
         base: contract.feedRegistryInfo?.base ?? null,
@@ -440,27 +445,27 @@ const deployContracts = async (
   return contractsConfig;
 };
 
-const registerChainlinkProxies = async (
+const registerCLAggregatorAdapters = async (
   config: NetworkConfig,
   multisig: Safe,
   deployData: ContractsConfig,
   artifacts: Artifacts,
 ) => {
-  // The difference between setting n and n+1 feeds via FeedRegistry::setFeeds is slightly above 55k gas.
-  console.log('\nRegistering ChainlinkProxies in FeedRegistry...');
+  // The difference between setting n and n+1 feeds via CLFeedRegistryAdapter::setFeeds is slightly above 55k gas.
+  console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
 
   const registry = new ethers.Contract(
-    deployData.coreContracts.FeedRegistry.address,
-    artifacts.readArtifactSync(ContractNames.FeedRegistry).abi,
+    deployData.coreContracts.CLFeedRegistryAdapter.address,
+    artifacts.readArtifactSync(ContractNames.CLFeedRegistryAdapter).abi,
     config.signer,
   );
 
   // Split into batches of 100
   const BATCH_LENGTH = 100;
-  const batches: Array<Array<ChainlinkProxyData>> = [];
-  const proxyData = deployData.ChainlinkProxy.filter(d => d.base);
+  const batches: Array<Array<CLAggregatorAdapterData>> = [];
+  const aggregatorData = deployData.CLAggregatorAdapter.filter(d => d.base);
   const filteredData = [];
-  for (const data of proxyData) {
+  for (const data of aggregatorData) {
     const feed = await registry.connect(config.signer).getFunction('getFeed')(
       data.base,
       data.quote,

@@ -4,8 +4,8 @@ import { expect } from 'chai';
 import {
   DataFeedStore,
   GenericDataFeedStore,
-  GenericHistoricDataFeedStore,
-  HistoricDataFeedStore,
+  GenericHistoricalDataFeedStore,
+  HistoricalDataFeedStore,
   initWrappers,
 } from './utils/helpers/common';
 import {
@@ -15,10 +15,10 @@ import {
   UpgradeableProxyDataFeedStoreV2GenericWrapper,
   UpgradeableProxyDataFeedStoreV2Wrapper,
   UpgradeableProxyDataFeedStoreV3Wrapper,
-  UpgradeableProxyHistoricBaseWrapper,
-  UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper,
-  UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
-  UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
+  UpgradeableProxyHistoricalBaseWrapper,
+  UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper,
+  UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
+  UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
 } from './utils/wrappers';
 import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
 import { ITransparentUpgradeableProxy__factory } from '../typechain';
@@ -181,47 +181,47 @@ describe('UpgradeableProxy', function () {
     }
   });
 
-  describe('Compare gas usage for historic contracts', function () {
-    let historicContractWrappers: UpgradeableProxyHistoricBaseWrapper<HistoricDataFeedStore>[] =
+  describe('Compare gas usage for historical contracts', function () {
+    let historicalContractWrappers: UpgradeableProxyHistoricalBaseWrapper<HistoricalDataFeedStore>[] =
       [];
-    let historicContractGenericWrappers: UpgradeableProxyHistoricBaseWrapper<GenericHistoricDataFeedStore>[] =
+    let historicalContractGenericWrappers: UpgradeableProxyHistoricalBaseWrapper<GenericHistoricalDataFeedStore>[] =
       [];
 
     beforeEach(async function () {
-      historicContractWrappers = [];
-      historicContractGenericWrappers = [];
+      historicalContractWrappers = [];
+      historicalContractGenericWrappers = [];
 
       await initWrappers(
-        historicContractWrappers,
+        historicalContractWrappers,
         [
-          UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
-          UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
+          UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
+          UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
         ],
         ...Array(2).fill([await admin.getAddress()]),
       );
 
       await initWrappers(
-        historicContractGenericWrappers,
-        [UpgradeableProxyHistoricDataFeedStoreGenericV1Wrapper],
+        historicalContractGenericWrappers,
+        [UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper],
         ...Array(1).fill([await admin.getAddress()]),
       );
     });
 
     for (let i = 0; i < 2; i++) {
-      describe(`Proxy HistoricDataFeedStoreV${i + 1}`, function () {
+      describe(`Proxy HistoricalDataFeedStoreV${i + 1}`, function () {
         this.timeout(1000000);
 
         it('Should set and get correct values', async function () {
           const key = 1;
           const value = ethers.encodeBytes32String('value');
 
-          const receipt = await historicContractWrappers[i].setFeeds(
+          const receipt = await historicalContractWrappers[i].setFeeds(
             [key],
             [value],
           );
 
-          await historicContractWrappers[i].checkSetValues([key], [value]);
-          await historicContractWrappers[i].checkSetTimestamps(
+          await historicalContractWrappers[i].checkSetValues([key], [value]);
+          await historicalContractWrappers[i].checkSetTimestamps(
             [key],
             [receipt.blockNumber],
           );
@@ -231,8 +231,8 @@ describe('UpgradeableProxy', function () {
           const key = 1;
           const value = ethers.encodeBytes32String('value');
 
-          await historicContractWrappers[i].setFeeds([key], [value]);
-          await historicContractWrappers[i].checkLatestCounter(key, 1);
+          await historicalContractWrappers[i].setFeeds([key], [value]);
+          await historicalContractWrappers[i].checkLatestCounter(key, 1);
         });
 
         it('Should get the current counter after 10 iterations', async function () {
@@ -240,10 +240,10 @@ describe('UpgradeableProxy', function () {
           const value = ethers.encodeBytes32String('value');
 
           for (let j = 0; j < 10; j++) {
-            await historicContractWrappers[i].setFeeds([key], [value]);
+            await historicalContractWrappers[i].setFeeds([key], [value]);
           }
 
-          await historicContractWrappers[i].checkLatestCounter(key, 10);
+          await historicalContractWrappers[i].checkLatestCounter(key, 10);
         });
 
         it('Should get value at counter 5', async function () {
@@ -253,7 +253,7 @@ describe('UpgradeableProxy', function () {
 
           for (let j = 1; j <= 10; j++) {
             const value = ethers.encodeBytes32String('value ' + j);
-            const receipt = await historicContractWrappers[i].setFeeds(
+            const receipt = await historicalContractWrappers[i].setFeeds(
               [key],
               [value],
             );
@@ -261,7 +261,7 @@ describe('UpgradeableProxy', function () {
               blockNumber = receipt.blockNumber;
             }
           }
-          await historicContractWrappers[i].checkValueAtCounter(
+          await historicalContractWrappers[i].checkValueAtCounter(
             key,
             counter,
             ethers.encodeBytes32String('value ' + counter),
@@ -274,19 +274,19 @@ describe('UpgradeableProxy', function () {
     for (let i = 1; i <= 100; i *= 10) {
       it(`Should set ${i} feeds in a single transaction`, async function () {
         await compareGasUsed(
-          historicContractGenericWrappers,
-          historicContractWrappers,
+          historicalContractGenericWrappers,
+          historicalContractWrappers,
           i,
         );
         const { keys, values, receipts, receiptsGeneric } =
           await compareGasUsed(
-            historicContractGenericWrappers,
-            historicContractWrappers,
+            historicalContractGenericWrappers,
+            historicalContractWrappers,
             i,
           );
 
         for (const [i, key] of keys.entries()) {
-          for (const [j, wrapper] of historicContractWrappers.entries()) {
+          for (const [j, wrapper] of historicalContractWrappers.entries()) {
             await wrapper.checkLatestCounter(key, 2);
             await wrapper.checkSetTimestamps([key], [receipts[j].blockNumber]);
             await wrapper.checkValueAtCounter(
@@ -300,7 +300,7 @@ describe('UpgradeableProxy', function () {
           for (const [
             j,
             wrapper,
-          ] of historicContractGenericWrappers.entries()) {
+          ] of historicalContractGenericWrappers.entries()) {
             await wrapper.checkLatestCounter(key, 2);
             await wrapper.checkSetTimestamps(
               [key],

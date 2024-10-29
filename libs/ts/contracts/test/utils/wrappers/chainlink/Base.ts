@@ -1,11 +1,11 @@
-import { ChainlinkProxy } from '../../../../typechain';
+import { CLAggregatorAdapter } from '../../../../typechain';
 import { BaseContract } from 'ethers';
 import { expect } from 'chai';
-import { UpgradeableProxyHistoricBaseWrapper } from '../upgradeable/historic/Base';
+import { UpgradeableProxyHistoricalBaseWrapper } from '../upgradeable/historical/Base';
 
-export abstract class ChainlinkBaseWrapper<T extends BaseContract> {
-  public contract!: ChainlinkProxy;
-  public proxy!: UpgradeableProxyHistoricBaseWrapper<T>;
+export abstract class CLBaseWrapper<T extends BaseContract> {
+  public contract!: CLAggregatorAdapter;
+  public proxy!: UpgradeableProxyHistoricalBaseWrapper<T>;
   public key!: number;
 
   public async setFeed(value: string): Promise<any> {

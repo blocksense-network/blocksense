@@ -1,24 +1,22 @@
 import {
-  ChainlinkBaseWrapper,
-  ChainlinkRegistryBaseWrapper,
-  ChainlinkV1Wrapper,
-  ChainlinkV2Wrapper,
+  CLBaseWrapper,
+  CLRegistryBaseWrapper,
+  CLV1Wrapper,
+  CLV2Wrapper,
   RegistryWrapper,
-  UpgradeableProxyHistoricDataFeedStoreV1Wrapper,
-  UpgradeableProxyHistoricDataFeedStoreV2Wrapper,
+  UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
+  UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
 } from './utils/wrappers';
 import { callAndCompareRegistries } from './utils/helpers/registryGasHelper';
-import { HistoricDataFeedStore, TOKENS } from './utils/helpers/common';
+import { HistoricalDataFeedStore, TOKENS } from './utils/helpers/common';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
-let registryWrapperV1: ChainlinkRegistryBaseWrapper;
-let registryWrapperV2: ChainlinkRegistryBaseWrapper;
+let registryWrapperV1: CLRegistryBaseWrapper;
+let registryWrapperV2: CLRegistryBaseWrapper;
 
-let chainlinkProxyWrappersV1: ChainlinkBaseWrapper<HistoricDataFeedStore>[] =
-  [];
-let chainlinkProxyWrappersV2: ChainlinkBaseWrapper<HistoricDataFeedStore>[] =
-  [];
+let aggregatorWrappersV1: CLBaseWrapper<HistoricalDataFeedStore>[] = [];
+let aggregatorWrappersV2: CLBaseWrapper<HistoricalDataFeedStore>[] = [];
 
 let data = [
   {
@@ -43,22 +41,22 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
     }
 
     const admin = (await ethers.getSigners())[5];
-    const proxyV1 = new UpgradeableProxyHistoricDataFeedStoreV1Wrapper();
+    const proxyV1 = new UpgradeableProxyHistoricalDataFeedStoreV1Wrapper();
     await proxyV1.init(admin);
 
-    const proxyV2 = new UpgradeableProxyHistoricDataFeedStoreV2Wrapper();
+    const proxyV2 = new UpgradeableProxyHistoricalDataFeedStoreV2Wrapper();
     await proxyV2.init(admin);
 
     for (const d of data) {
-      chainlinkProxyWrappersV1.push(new ChainlinkV1Wrapper());
-      chainlinkProxyWrappersV2.push(new ChainlinkV2Wrapper());
+      aggregatorWrappersV1.push(new CLV1Wrapper());
+      aggregatorWrappersV2.push(new CLV2Wrapper());
 
-      await chainlinkProxyWrappersV1[chainlinkProxyWrappersV1.length - 1].init(
+      await aggregatorWrappersV1[aggregatorWrappersV1.length - 1].init(
         ...Object.values(d),
         proxyV1,
       );
 
-      await chainlinkProxyWrappersV2[chainlinkProxyWrappersV2.length - 1].init(
+      await aggregatorWrappersV2[aggregatorWrappersV2.length - 1].init(
         ...Object.values(d),
         proxyV2,
       );
@@ -71,27 +69,27 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       .zeroPadValue(ethers.toUtf8Bytes('3123434'), 24)
       .padEnd(66, '0');
     for (const [i, value] of [valueETH, valueBTC].entries()) {
-      await chainlinkProxyWrappersV1[i].setFeed(value);
-      await chainlinkProxyWrappersV2[i].setFeed(value);
+      await aggregatorWrappersV1[i].setFeed(value);
+      await aggregatorWrappersV2[i].setFeed(value);
     }
 
     const owner = (await ethers.getSigners())[2];
 
-    registryWrapperV1 = new ChainlinkRegistryBaseWrapper(
-      'ChainlinkRegistryV1',
+    registryWrapperV1 = new CLRegistryBaseWrapper(
+      'CLRegistryV1',
       proxyV1.contract,
     );
     await registryWrapperV1.init(owner);
 
-    registryWrapperV2 = new ChainlinkRegistryBaseWrapper(
-      'ChainlinkRegistryV2',
+    registryWrapperV2 = new CLRegistryBaseWrapper(
+      'CLRegistryV2',
       proxyV2.contract,
     );
     await registryWrapperV2.init(owner);
 
     const registryV1 = new RegistryWrapper(
       'Blocksense V1',
-      chainlinkProxyWrappersV1.map(wrapper => wrapper.contract),
+      aggregatorWrappersV1.map(wrapper => wrapper.contract),
     );
     await registryV1.init(
       owner.address,
@@ -100,7 +98,7 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
 
     const registryV2 = new RegistryWrapper(
       'Blocksense V2',
-      chainlinkProxyWrappersV2.map(wrapper => wrapper.contract),
+      aggregatorWrappersV2.map(wrapper => wrapper.contract),
     );
     await registryV2.init(
       owner.address,
@@ -111,12 +109,12 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       {
         base: TOKENS.ETH,
         quote: TOKENS.USD,
-        feed: chainlinkProxyWrappersV1[0],
+        feed: aggregatorWrappersV1[0],
       },
       {
         base: TOKENS.BTC,
         quote: TOKENS.USD,
-        feed: chainlinkProxyWrappersV1[1],
+        feed: aggregatorWrappersV1[1],
       },
     ]);
 
@@ -124,24 +122,24 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       {
         base: TOKENS.ETH,
         quote: TOKENS.USD,
-        feed: chainlinkProxyWrappersV2[0],
+        feed: aggregatorWrappersV2[0],
       },
       {
         base: TOKENS.BTC,
         quote: TOKENS.USD,
-        feed: chainlinkProxyWrappersV2[1],
+        feed: aggregatorWrappersV2[1],
       },
     ]);
 
-    registryV1.underliers = chainlinkProxyWrappersV1.map(
+    registryV1.underliers = aggregatorWrappersV1.map(
       wrapper => wrapper.contract,
     );
-    registryV2.underliers = chainlinkProxyWrappersV2.map(
+    registryV2.underliers = aggregatorWrappersV2.map(
       wrapper => wrapper.contract,
     );
 
     const chainlinkFeedRegistry = await ethers.getContractAt(
-      'IFeedRegistry',
+      'ICLFeedRegistryAdapter',
       '0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf',
     );
 
@@ -332,7 +330,7 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
     });
   });
 
-  describe('Chainlink vs Blocksense registry historic functions', async function () {
+  describe('Chainlink vs Blocksense registry historical functions', async function () {
     it('Should compare setLatestRoundData', async () => {
       await callAndCompareRegistries(
         registries,

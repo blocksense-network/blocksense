@@ -24,8 +24,8 @@ export interface NetworkConfig {
 
 export enum ContractNames {
   SafeMultisig = 'SafeMultisig',
-  FeedRegistry = 'FeedRegistry',
-  ChainlinkProxy = 'ChainlinkProxy',
-  HistoricDataFeedStoreV2 = 'HistoricDataFeedStoreV2',
+  CLFeedRegistryAdapter = 'CLFeedRegistryAdapter',
+  CLAggregatorAdapter = 'CLAggregatorAdapter',
+  HistoricalDataFeedStoreV2 = 'HistoricalDataFeedStoreV2',
   UpgradeableProxy = 'UpgradeableProxy',
 }

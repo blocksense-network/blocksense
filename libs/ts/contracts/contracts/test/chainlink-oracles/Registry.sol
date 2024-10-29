@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IFeedRegistry} from '../../interfaces/IFeedRegistry.sol';
+import {ICLFeedRegistryAdapter} from '../../interfaces/ICLFeedRegistryAdapter.sol';
 import {IChainlinkAggregator} from '../../interfaces/chainlink/IChainlinkAggregator.sol';
 
 contract Registry {
-  IFeedRegistry public immutable registry;
+  ICLFeedRegistryAdapter public immutable registry;
 
   string public description;
   uint256 public price;
@@ -15,7 +15,7 @@ contract Registry {
   uint8 public decimals;
 
   constructor(address _registry) {
-    registry = IFeedRegistry(_registry);
+    registry = ICLFeedRegistryAdapter(_registry);
   }
 
   function setDecimals(address base, address quote) external {

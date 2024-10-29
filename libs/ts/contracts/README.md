@@ -6,19 +6,21 @@ The `contracts` folder has the following structure:
 
 ```text
 contracts
-├── chainlink-proxies
+├── cl-adapters
 │   ├── registries
-│   │   └── FeedRegistry.sol
-│   └── ChainlinkProxy.sol
+│   │   └── CLFeedRegistryAdapter.sol
+│   └── CLAggregatorAdapter.sol
 ├── interfaces
-│   ├── IAggregator.sol
-│   ├── IChainlinkAggregator.sol
-│   └── IFeedRegistry.sol
+│   ├── chainlink
+│   │   ├── IChainlinkAggregator.sol
+│   │   └── IChainlinkFeedRegistry.sol
+│   ├── ICLAggregatorAdapter.sol
+│   └── ICLFeedRegistryAdapter.sol
 ├── libraries
-│   └── ProxyCall.sol
+│   └── Blocksense.sol
 ├── test
 │   ├── consumers
-│   │   ├── historic
+│   │   ├── historical
 │   │   │   └── ...
 │   │   └── ...
 │   ├── interfaces
@@ -26,34 +28,34 @@ contracts
 │   ├── DataFeedStoreGeneric.sol
 │   ├── DataFeedStoreGenericV1.sol
 │   ├── DataFeedStoreGenericV2.sol
-│   └── HistoricDataFeedStoreGenericV1.sol
+│   └── HistoricalDataFeedStoreGenericV1.sol
 ├── DataFeedStoreV1.sol
 ├── DataFeedStoreV2.sol
 ├── DataFeedStoreV3.sol
-├── HistoricDataFeedStoreV1.sol
-├── HistoricDataFeedStoreV2.sol
+├── HistoricalDataFeedStoreV1.sol
+├── HistoricalDataFeedStoreV2.sol
 └── UpgradeableProxy.sol
 ```
 
-The `chainlink-proxies` folder contains the Chainlink proxy contract - ChainlinkProxy.sol. The Chainlink proxy contract implements the Chainlink aggregator interface. It interacts with the UpgradeabilityProxy contract to make calls to the data feed store contracts. The `registries` folder contains the FeedRegistry contract which is used to register new data feeds. It stores the immutable data from Chainlink proxy contracts (key, description and decimals) and directly calls the upgradeable historic data feed contract to retrieve data.
+The `cl-adapters` folder contains the Chainlink aggregator contract - CLAggregatorAdapter.sol. The Chainlink aggregator contract implements the Chainlink aggregator interface. It interacts with the UpgradeableProxy contract to make calls to the data feed store contracts. The `registries` folder contains the CLFeedRegistryAdapter contract which is used to register new data feeds. It stores the immutable data from Chainlink aggregator contracts (key, description and decimals) and directly calls the upgradeable historical data feed contract to retrieve data.
 
-The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - IFeedRegistry.sol and the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - IAggregator.sol.
+The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - ICLFeedRegistryAdapter.sol and the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - IAggregator.sol.
 
-The `libraries` folder contains the ProxyCall library which is used to make calls to either the data feed store contracts or the UpgradeableProxy before them. The ProxyCall library is used by the Chainlink proxy contracts and the FeedRegistry contracts.
+The `libraries` folder contains the Blocksense library which is used to make calls to either the data feed store contracts or the UpgradeableProxy before them. The Blocksense library is used by the Chainlink aggregator contracts and the CLFeedRegistryAdapter contracts.
 
-The `test` folder contains example consumer contracts (under `consumers`) and reference implementations of data feed store - DataFeedStoreGenericV1.sol, DataFeedStoreGenericV2.sol and HistoricDataFeedStoreGenericV1.sol.
+The `test` folder contains example consumer contracts (under `consumers`) and reference implementations of data feed store - DataFeedStoreGenericV1.sol, DataFeedStoreGenericV2.sol and HistoricalDataFeedStoreGenericV1.sol.
 
 Each of the data feed store implementations (DataFeedStoreV1.sol, DataFeedStoreV2.sol, DataFeedStoreV3.sol) is a contract that stores data feed values for a specific data feed key. The data feed key is a maximum of 31 bit integer that uniquely identifies a data feed. The data feed value is stored as `bytes32`. The data feed value is updated by the data feed store contract owner.
 
-The historic data feed contracts (HistoricDataFeedStoreV1.sol, HistoricDataFeedStoreV2.sol) store historic data feed values for a specific data feed key. The data feed key is a maximum of 29 bit integer that uniquely identifies a data feed. The data feed value is stored as packed `bytes32` which consists of `bytes24 value` and `uint64 timestamp`. When a new value is set, a counter representing the contiguous history of the stored values is incremented. The data feed value is updated by the data feed store contract owner.
+The historical data feed contracts (HistoricalDataFeedStoreV1.sol, HistoricalDataFeedStoreV2.sol) store historical data feed values for a specific data feed key. The data feed key is a maximum of 29 bit integer that uniquely identifies a data feed. The data feed value is stored as packed `bytes32` which consists of `bytes24 value` and `uint64 timestamp`. When a new value is set, a counter representing the contiguous history of the stored values is incremented. The data feed value is updated by the data feed store contract owner.
 
 ```mermaid
 graph TD
     A[Client] -->|invoke| E
     A -->|invoke| B
-    B[FeedRegistry] -->|staticcall| C[UpgradeableProxy]
-    C -->|delegatecall| D[HistoricDataFeedStore]
-    E[ChainlinkProxy] -->|staticcall| C
+    B[CLFeedRegistryAdapter] -->|staticcall| C[UpgradeableProxy]
+    C -->|delegatecall| D[HistoricalDataFeedStore]
+    E[CLAggregatorAdapter] -->|staticcall| C
 ```
 
 ### Calls
@@ -69,7 +71,7 @@ All calls are handled by a fallback function based on the selector:
   - For `DataFeedStoreV1.sol` the selector is `0x00000000` + a key which should not be greater than a predefined constant `CONTRACT_MANAGEMENT_SELECTOR` (e.g. `0x00...0001ffff`);
   - For `DataFeedStoreV2.sol` and `DataFeedStoreV3.sol` the selector is `0x80000000` + key which enables the key to be a 31 bit integer. The most significant bit of the selector defines the type of the call (getter or setter).
 
-#### HistoricDataFeedStore
+#### HistoricalDataFeedStore
 
 - Getter:
   - There are 3 types of selectors:
@@ -86,9 +88,9 @@ All calls are handled by a fallback function based on the selector:
   - `mapping(uint32 key => bytes32 value) dataFeed`
 - `DataFeedStoreV3.sol`:
   - `bytes32[] dataFeed`
-- `HistoricDataFeedStoreV1.sol`:
+- `HistoricalDataFeedStoreV1.sol`:
   - array[key] -> array[counter] -> Transmission { value, timestamp }
-- `HistoricDataFeedStoreV2.sol`:
+- `HistoricalDataFeedStoreV2.sol`:
   - `mapping(uint32 key => mapping(uint256 counter => Transmission { value, timestamp })) dataFeed`
   - `uint256[] latestCounters`
 

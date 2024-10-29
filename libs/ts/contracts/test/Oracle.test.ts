@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { ChainlinkV1Wrapper, ChainlinkV2Wrapper } from './utils/wrappers';
+import { CLV1Wrapper, CLV2Wrapper } from './utils/wrappers';
 import { OracleWrapper } from './utils/wrappers';
 import { callAndCompareOracles } from './utils/helpers/oracleGasHelper';
 import { expect } from 'chai';
@@ -7,8 +7,8 @@ import { expect } from 'chai';
 let oracles: OracleWrapper[];
 let chainlinkOracle: OracleWrapper;
 
-let proxyV1: ChainlinkV1Wrapper;
-let proxyV2: ChainlinkV2Wrapper;
+let proxyV1: CLV1Wrapper;
+let proxyV2: CLV2Wrapper;
 
 let data = {
   description: 'ETH / USD',
@@ -24,28 +24,28 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
 
     const signer = (await ethers.getSigners())[5];
 
-    proxyV1 = new ChainlinkV1Wrapper();
+    proxyV1 = new CLV1Wrapper();
     await proxyV1.init(data.description, data.decimals, data.key, signer);
 
-    proxyV2 = new ChainlinkV2Wrapper();
+    proxyV2 = new CLV2Wrapper();
     await proxyV2.init(data.description, data.decimals, data.key, signer);
 
     const value = ethers.encodeBytes32String('312343354');
     await proxyV1.setFeed(value);
     await proxyV2.setFeed(value);
 
-    const chainlinkProxy = await ethers.getContractAt(
+    const aggregator = await ethers.getContractAt(
       'IChainlinkAggregator',
       '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
     );
 
     const oracleV1 = new OracleWrapper('Blocksense V1', [proxyV1.contract]);
     const oracleV2 = new OracleWrapper('Blocksense V2', [proxyV2.contract]);
-    chainlinkOracle = new OracleWrapper('Chainlink', [chainlinkProxy]);
+    chainlinkOracle = new OracleWrapper('Chainlink', [aggregator]);
 
     await oracleV1.init(await proxyV1.contract.getAddress());
     await oracleV2.init(await proxyV2.contract.getAddress());
-    await chainlinkOracle.init(await chainlinkProxy.getAddress());
+    await chainlinkOracle.init(await aggregator.getAddress());
 
     oracles = [oracleV1, oracleV2];
   });
@@ -121,7 +121,7 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
     });
   });
 
-  describe('Chainlink vs Blocksense historic functions', async function () {
+  describe('Chainlink vs Blocksense historical functions', async function () {
     it('Should compare setLatestRoundData', async () => {
       await callAndCompareOracles(
         oracles,

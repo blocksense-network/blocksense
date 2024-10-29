@@ -50,7 +50,7 @@ task('etherscan-verify', 'Verify contracts on Etherscan')
       await verify(data);
     }
 
-    for (const data of deploymentData.contracts.ChainlinkProxy) {
+    for (const data of deploymentData.contracts.CLAggregatorAdapter) {
       console.log('-> Verifying contract:', data.description, data.address);
       await verify(data);
     }

@@ -1,16 +1,22 @@
-import { FeedRegistry, UpgradeableProxy } from '../../../../../typechain';
-import { ChainlinkBaseWrapper } from '../Base';
+import {
+  CLFeedRegistryAdapter,
+  UpgradeableProxy,
+} from '../../../../../typechain';
+import { CLBaseWrapper } from '../Base';
 import { expect } from 'chai';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { HistoricDataFeedStore, deployContract } from '../../../helpers/common';
+import {
+  HistoricalDataFeedStore,
+  deployContract,
+} from '../../../helpers/common';
 
-export class ChainlinkRegistryBaseWrapper {
+export class CLRegistryBaseWrapper {
   public name!: string;
-  public contract!: FeedRegistry;
+  public contract!: CLFeedRegistryAdapter;
   public owner!: HardhatEthersSigner;
   public map: Record<
     string,
-    Record<string, ChainlinkBaseWrapper<HistoricDataFeedStore>>
+    Record<string, CLBaseWrapper<HistoricalDataFeedStore>>
   > = {};
   public dataFeedStore!: UpgradeableProxy;
 
@@ -23,7 +29,7 @@ export class ChainlinkRegistryBaseWrapper {
     feeds: {
       base: string;
       quote: string;
-      feed: ChainlinkBaseWrapper<HistoricDataFeedStore>;
+      feed: CLBaseWrapper<HistoricalDataFeedStore>;
     }[],
   ) {
     for (const feedData of feeds) {
@@ -110,11 +116,11 @@ export class ChainlinkRegistryBaseWrapper {
 
   public async init(owner: HardhatEthersSigner) {
     this.owner = owner;
-    this.contract = (await deployContract<FeedRegistry>(
-      'FeedRegistry',
+    this.contract = (await deployContract<CLFeedRegistryAdapter>(
+      'CLFeedRegistryAdapter',
       owner.address,
       this.dataFeedStore.target,
-    )) as FeedRegistry;
+    )) as CLFeedRegistryAdapter;
   }
 
   public getName(): string {

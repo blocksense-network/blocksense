@@ -1,30 +1,30 @@
 import { artifacts, ethers } from 'hardhat';
 import {
-  ProxyCallFeedStoreConsumer,
+  BlocksenseFeedStoreConsumer,
   RawCallFeedStoreConsumer,
 } from '../../typechain';
 import { deployContract } from '../utils/helpers/common';
-import { HistoricDataFeedStoreV2Wrapper } from '../utils/wrappers';
+import { HistoricalDataFeedStoreV2Wrapper } from '../utils/wrappers';
 import * as utils from './utils/feedStoreConsumer';
 import { expect } from 'chai';
 
 describe('Example: FeedStoreConsumer', function () {
-  let dataFeedStore: HistoricDataFeedStoreV2Wrapper;
-  let proxyCallFeedStoreConsumer: ProxyCallFeedStoreConsumer;
+  let dataFeedStore: HistoricalDataFeedStoreV2Wrapper;
+  let blocksenseFeedStoreConsumer: BlocksenseFeedStoreConsumer;
   let rawCallFeedStoreConsumer: RawCallFeedStoreConsumer;
   const key = 1;
 
   beforeEach(async function () {
-    dataFeedStore = new HistoricDataFeedStoreV2Wrapper();
+    dataFeedStore = new HistoricalDataFeedStoreV2Wrapper();
     await dataFeedStore.init();
 
     const value = ethers.encodeBytes32String('value');
 
     await dataFeedStore.setFeeds([key], [value]);
 
-    proxyCallFeedStoreConsumer =
-      await deployContract<ProxyCallFeedStoreConsumer>(
-        'ProxyCallFeedStoreConsumer',
+    blocksenseFeedStoreConsumer =
+      await deployContract<BlocksenseFeedStoreConsumer>(
+        'BlocksenseFeedStoreConsumer',
         dataFeedStore.contract.target,
       );
     rawCallFeedStoreConsumer = await deployContract<RawCallFeedStoreConsumer>(
@@ -51,7 +51,7 @@ describe('Example: FeedStoreConsumer', function () {
     data: any[],
     functionName: keyof typeof utils,
   ) => {
-    const proxyCallData = await proxyCallFeedStoreConsumer.getFunction(
+    const blocksenseData = await blocksenseFeedStoreConsumer.getFunction(
       functionName,
     )(...data);
     const rawCallData = await rawCallFeedStoreConsumer.getFunction(
@@ -60,12 +60,12 @@ describe('Example: FeedStoreConsumer', function () {
 
     const config = {
       address: dataFeedStore.contract.target,
-      abiJson: (await artifacts.readArtifact('HistoricDataFeedStoreV2')).abi,
+      abiJson: (await artifacts.readArtifact('HistoricalDataFeedStoreV2')).abi,
       provider: dataFeedStore.contract.runner!,
     };
     const utilData = await utils[functionName](config, ...data);
 
-    expect(proxyCallData).to.deep.equal(utilData);
+    expect(blocksenseData).to.deep.equal(utilData);
     expect(rawCallData).to.deep.equal(utilData);
   };
 });
