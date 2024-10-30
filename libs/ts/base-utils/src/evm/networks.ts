@@ -50,13 +50,15 @@ const networks = [
   'scroll-sepolia',
   'zksync-mainnet',
   'zksync-sepolia',
+  'morph-holesky',
+  'citrea-testnet',
 ] as const;
 
 const chainIds = [
   99999999999, 1, 11155111, 17000, 43114, 43113, 1088, 42161, 421614, 8453,
   84532, 80084, 56, 97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009,
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
-  534352, 534351, 324, 300,
+  534352, 534351, 324, 300, 2810, 5115,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -266,6 +268,16 @@ export const networkMetadata = {
     chainId: 300,
     isTestnet: true,
     explorerUrl: 'https://zksync-sepolia.blockscout.com',
+  },
+  'morph-holesky': {
+    chainId: 2810,
+    isTestnet: true,
+    explorerUrl: 'https://explorer-holesky.morphl2.io',
+  },
+  'citrea-testnet': {
+    chainId: 5115,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.citrea.xyz',
   },
 } satisfies {
   [Net in NetworkName]: {
