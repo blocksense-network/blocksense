@@ -25,7 +25,7 @@ in
           };
           sequencer = {
             address.file = "${testKeysDir}/sequencer-address";
-            private-key.file = "${testKeysDir}/sequencer-address";
+            private-key.file = "${testKeysDir}/sequencer-private-key";
           };
         };
       };
@@ -40,7 +40,7 @@ in
           };
           sequencer = {
             address.file = "${testKeysDir}/sequencer-address";
-            private-key.file = "${testKeysDir}/sequencer-address";
+            private-key.file = "${testKeysDir}/sequencer-private-key";
           };
         };
       };
