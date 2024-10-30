@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -12,6 +11,7 @@ import {
   NetworkName,
 } from '@blocksense/base-utils/evm';
 import { cn } from '@/lib/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 type ContractAddressProps = {
   network?: NetworkName;
@@ -27,9 +27,10 @@ export const ContractAddress = ({
   network,
   address,
   enableCopy,
-  abbreviation = { hasAbbreviation: false, bytesToShow: 2 },
+  abbreviation = { hasAbbreviation: false, bytesToShow: 6 },
 }: ContractAddressProps) => {
   const router = useRouter();
+  const isDesktop = useMediaQuery('(min-width: 890px)');
 
   if (!address) {
     return '-';
@@ -39,12 +40,19 @@ export const ContractAddress = ({
     throw new Error(`Invalid Ethereum address: ${address}`);
   }
 
-  const addressToDisplay = abbreviation?.hasAbbreviation
-    ? previewHexStringOrDefault(address, '-', abbreviation.bytesToShow)
-    : address;
+  const addressToDisplay = isDesktop
+    ? abbreviation?.hasAbbreviation
+      ? previewHexStringOrDefault(address, '-', abbreviation.bytesToShow)
+      : address
+    : previewHexStringOrDefault(address, '-', 6);
 
   return (
-    <div className={cn(enableCopy && 'flex items-start gap-2')}>
+    <div
+      className={cn(
+        enableCopy && 'flex items-start gap-2',
+        'sm:text-base text-sm',
+      )}
+    >
       <Tooltip contentClassName="bg-gray-900 text-white">
         {abbreviation?.hasAbbreviation && (
           <Tooltip.Content>{address}</Tooltip.Content>

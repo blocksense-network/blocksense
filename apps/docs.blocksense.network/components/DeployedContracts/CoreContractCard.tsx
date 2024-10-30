@@ -26,7 +26,7 @@ export const CoreContractCard = ({
       className="w-full flex justify-center cursor-pointer"
       onClick={() => setIsExpanded(!isExpanded)}
     >
-      <Card className="w-full max-w-3xl px-4">
+      <Card className="w-full max-w-3xl sm:px-4">
         <CardHeader>
           <CardTitle className="flex justify-between items-center cursor-pointer">
             <span>{contract.name}</span>
@@ -45,7 +45,7 @@ export const CoreContractCard = ({
         </CardHeader>
         <CardContent>
           <h3 className="font-semibold mb-2">Address:</h3>
-          <div className="flex items-center space-x2">
+          <div className="flex items-center space-x-2">
             <ContractAddress address={contract.address} enableCopy />
           </div>
           {isExpanded && (
