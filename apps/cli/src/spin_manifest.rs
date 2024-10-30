@@ -243,7 +243,7 @@ authors = ["blocksense-network"]
 
 [application.trigger.settings]
 interval_time_in_seconds = 10
-sequencer = "http://gpu-server-001:8877/post_report"
+sequencer = "http://gpu-server-001:8877/post_reports_batch"
 secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
 reporter_id = 10
 

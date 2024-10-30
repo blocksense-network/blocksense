@@ -375,8 +375,7 @@ impl OracleTrigger {
     ) -> TerminationReason {
         while let Some((_component_id, payload)) = rx.recv().await {
             let timestamp = current_unix_time();
-            //TODO(adikov): Implement a way to send multiple results to the sequencer and properly
-            //handle this here.
+            let mut batch_payload = vec![];
             for oracle::DataFeedResult { id, value } in payload.values {
                 let result = match value {
                     oracle::DataFeedResultValue::Numerical(value) => FeedResult::Result {
@@ -397,7 +396,7 @@ impl OracleTrigger {
                 let signature =
                     generate_signature(&secret_key, id.as_str(), timestamp, &result).unwrap();
 
-                let payload_json = DataFeedPayload {
+                batch_payload.push(DataFeedPayload {
                     payload_metadata: PayloadMetaData {
                         reporter_id,
                         feed_id: id,
@@ -405,23 +404,25 @@ impl OracleTrigger {
                         signature: JsonSerializableSignature { sig: signature },
                     },
                     result,
-                };
-                let client = reqwest::Client::new();
-                match client
-                    .post(sequencer.clone())
-                    .json(&payload_json)
-                    .send()
-                    .await
-                {
-                    Ok(res) => {
-                        let contents = res.text().await.unwrap();
-                        tracing::trace!("Sequencer responded with: {}", &contents);
-                    }
-                    Err(e) => {
-                        tracing::error!("Sequencer failed to respond with: {}", &e);
-                    }
-                };
+                });
             }
+            //TODO(adikov): Potential better implementation would be to send results to the
+            //sequencer every few seconds in which we can gather batches of data feed payloads.
+            let client = reqwest::Client::new();
+            match client
+                .post(sequencer.clone())
+                .json(&batch_payload)
+                .send()
+                .await
+            {
+                Ok(res) => {
+                    let contents = res.text().await.unwrap();
+                    tracing::trace!("Sequencer responded with: {}", &contents);
+                }
+                Err(e) => {
+                    tracing::error!("Sequencer failed to respond with: {}", &e);
+                }
+            };
         }
 
         TerminationReason::SequencerExitRequested
