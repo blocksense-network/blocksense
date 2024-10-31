@@ -8,7 +8,7 @@ const res = networkName.literals
       '\n' +
       `${getRpcUrlEnvVar(n)}="<RPC_URL>"` +
       '\n' +
-      `OWNER_ADDRESSES_${kebabToSnakeCase(n)}="<OWNER_ADDRESSES>"`,
+      `EXTRA_SIGNERS_${kebabToSnakeCase(n)}="<EXTRA_SIGNERS>"`,
   )
   .join('\n\n');
 
