@@ -86,5 +86,20 @@ in
         };
       };
     };
+
+    oracle-scripts = {
+      cmc = {
+        path = config.devenv.root + "/libs/sdk/examples/cmc";
+      };
+      yahoo = {
+        path = config.devenv.root + "/libs/sdk/examples/yahoo";
+      };
+    };
+
+    reporters-v2 = {
+      a = {
+        spin-config = config.devenv.root + "/apps/cli/test/spin.toml";
+      };
+    };
   };
 }

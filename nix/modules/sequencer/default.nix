@@ -82,6 +82,18 @@
               description = mdDoc "The set of reporter instances to run.";
             };
 
+            oracle-scripts = mkOption {
+              type = types.attrsOf (mkSubmodule ./oracle-script-opts.nix);
+              default = { };
+              description = mdDoc "The set of oracle scripts to build.";
+            };
+
+            reporters-v2 = mkOption {
+              type = types.attrsOf (mkSubmodule ./reporter-opts-v2.nix);
+              default = { };
+              description = mdDoc "The set of reporter instances to run.";
+            };
+
             anvil = mkOption {
               type = types.attrsOf (mkSubmodule ./anvil-opts.nix);
               default = { };

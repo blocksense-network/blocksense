@@ -86,6 +86,38 @@ let
     };
   }) cfg.reporters;
 
+  oracleScriptBuilder = lib.mapAttrs' (
+    name:
+    { path, build-command, ... }:
+    {
+      name = "oracle-script-builder-${name}";
+      value.process-compose = {
+        command = build-command;
+        working_dir = path;
+      };
+    }
+  ) cfg.oracle-scripts;
+
+  reporterV2Instances = lib.mapAttrs' (
+    name:
+    { spin-config, log-level, ... }:
+    {
+      name = "reporter-v2-${name}";
+      value.process-compose = {
+        command = "spin build --from ${spin-config} --up";
+        environment = [ "RUST_LOG=${log-level}" ];
+        depends_on =
+          let
+            oracle-scripts = lib.mapAttrs' (
+              key: _value:
+              lib.nameValuePair "oracle-script-builder-${key}" { condition = "process_completed_successfully"; }
+            ) cfg.oracle-scripts;
+          in
+          oracle-scripts // { blocksense-sequencer.condition = "process_started"; };
+      };
+    }
+  ) cfg.reporters-v2;
+
   sequencerInstance = {
     blocksense-sequencer.process-compose = {
       command = "${sequencer.program}";
@@ -107,6 +139,11 @@ in
 {
   config = lib.mkIf cfg.enable {
     processes =
-      anvilImpersonateAndFundInstances // sequencerInstance // anvilInstances // reporterInstances;
+      anvilImpersonateAndFundInstances
+      // oracleScriptBuilder
+      // reporterV2Instances
+      // sequencerInstance
+      // anvilInstances
+      // reporterInstances;
   };
 }
