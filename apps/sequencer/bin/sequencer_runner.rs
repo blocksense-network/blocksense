@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use actix_web::{web, App, HttpServer};
 use blockchain_data_model::in_mem_db::InMemDb;
+use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::{
     new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
 };
-use sequencer::feeds::feeds_slots_manager::FeedsSlotsManagerCmds;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
 use tokio::sync::{mpsc, RwLock};
@@ -47,7 +47,7 @@ pub async fn prepare_sequencer_state(
     metrics_prefix: Option<&str>,
 ) -> (
     UnboundedReceiver<(String, String)>,
-    UnboundedReceiver<FeedsSlotsManagerCmds>,
+    UnboundedReceiver<FeedsManagementCmds>,
     Data<SequencerState>,
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();

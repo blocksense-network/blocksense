@@ -6,13 +6,12 @@ use crate::sequencer_state::SequencerState;
 use crate::UpdateToSend;
 use actix_web::web::Data;
 use config::SequencerConfig;
+use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use futures_util::stream::FuturesUnordered;
 use std::io::Error;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
-
-use super::feeds_slots_manager::FeedsSlotsManagerCmds;
 
 type BatchedVotesChannel = (
     UnboundedSender<UpdateToSend<String, String>>,
@@ -27,7 +26,7 @@ pub async fn prepare_app_workers(
     sequencer_state: Data<SequencerState>,
     sequencer_config: &SequencerConfig,
     voting_receive_channel: UnboundedReceiver<(String, String)>,
-    feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsSlotsManagerCmds>,
+    feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv): BatchedVotesChannel = mpsc::unbounded_channel();
 

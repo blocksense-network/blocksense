@@ -1,44 +1,21 @@
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::sequencer_state::SequencerState;
 use actix_web::web;
-use config::FeedConfig;
 use eyre::Result;
+use feed_registry::feed_registration_cmds::{
+    DeleteAssetFeed, FeedsManagementCmds, ProcessorResultValue, RegisterNewAssetFeed,
+};
 use feed_registry::types::{FeedMetaData, FeedsSlotProcessorCmds::Terminate};
 use futures::select;
 use futures::stream::{FuturesUnordered, StreamExt};
-use std::fmt::Debug;
 use std::io::Error;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
 use tracing::{debug, error, info, warn};
 
-#[derive(Debug)]
-pub struct RegisterNewAssetFeed {
-    pub config: FeedConfig,
-}
-
-#[derive(Debug)]
-pub struct DeleteAssetFeed {
-    pub id: u32,
-}
-
-#[allow(clippy::large_enum_variant)]
-pub enum FeedsSlotsManagerCmds {
-    RegisterNewAssetFeed(RegisterNewAssetFeed),
-    DeleteAssetFeed(DeleteAssetFeed),
-}
-
-pub enum ProcessorResultValue {
-    FeedsSlotsManagerCmds(
-        Box<FeedsSlotsManagerCmds>,
-        mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
-    ),
-    ProcessorExitStatus(String),
-}
-
 pub async fn feeds_slots_manager_loop(
     sequencer_state: web::Data<SequencerState>,
-    cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
+    cmd_channel: mpsc::UnboundedReceiver<FeedsManagementCmds>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("feeds_slots_manager")
@@ -143,7 +120,7 @@ async fn handle_feed_slots_processor_result(
     processor_result_val: ProcessorResultValue,
 ) {
     match processor_result_val {
-        ProcessorResultValue::FeedsSlotsManagerCmds(feeds_slots_manager_cmds, cmd_channel) => {
+        ProcessorResultValue::FeedsManagementCmds(feeds_slots_manager_cmds, cmd_channel) => {
             handle_feeds_slots_manager_cmd(
                 feeds_slots_manager_cmds,
                 sequencer_state,
@@ -159,15 +136,15 @@ async fn handle_feed_slots_processor_result(
 }
 
 async fn handle_feeds_slots_manager_cmd(
-    feeds_slots_manager_cmds: Box<FeedsSlotsManagerCmds>,
+    feeds_slots_manager_cmds: Box<FeedsManagementCmds>,
     sequencer_state: web::Data<SequencerState>,
-    cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
+    cmd_channel: mpsc::UnboundedReceiver<FeedsManagementCmds>,
     collected_futures: &FuturesUnordered<
         tokio::task::JoinHandle<std::result::Result<ProcessorResultValue, eyre::Error>>,
     >,
 ) {
     match *feeds_slots_manager_cmds {
-        FeedsSlotsManagerCmds::RegisterNewAssetFeed(register_new_asset_feed) => {
+        FeedsManagementCmds::RegisterNewAssetFeed(register_new_asset_feed) => {
             match register_asset_feed(&sequencer_state, &register_new_asset_feed).await {
                 Ok(registered_feed_metadata) => {
                     let new_name = register_new_asset_feed.config.name;
@@ -215,7 +192,7 @@ async fn handle_feeds_slots_manager_cmd(
                 }
             };
         }
-        FeedsSlotsManagerCmds::DeleteAssetFeed(delete_asset_feed) => {
+        FeedsManagementCmds::DeleteAssetFeed(delete_asset_feed) => {
             {
                 let reg = sequencer_state.registry.read().await;
                 let feed = match reg.get(delete_asset_feed.id) {
@@ -357,13 +334,13 @@ async fn deregister_asset_feed(
 }
 
 async fn read_next_feed_slots_manager_cmd(
-    mut cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
+    mut cmd_channel: mpsc::UnboundedReceiver<FeedsManagementCmds>,
 ) -> Result<ProcessorResultValue> {
     loop {
         debug!("Waiting for command...");
         let cmd = cmd_channel.recv().await;
         if let Some(cmd) = cmd {
-            return Ok(ProcessorResultValue::FeedsSlotsManagerCmds(
+            return Ok(ProcessorResultValue::FeedsManagementCmds(
                 Box::new(cmd),
                 cmd_channel,
             ));
