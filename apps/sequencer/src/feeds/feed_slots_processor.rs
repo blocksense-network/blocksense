@@ -5,6 +5,7 @@ use alloy::primitives::map::HashMap;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
 use eyre::{eyre, Result};
+use feed_registry::feed_registration_cmds::ProcessorResultValue;
 use eyre::{Context, ContextCompat};
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::registry::AllFeedsReports;
@@ -25,8 +26,6 @@ use tracing::warn;
 use tracing::{debug, info};
 use utils::time::current_unix_time;
 use utils::to_hex_string;
-
-use super::feeds_slots_manager::ProcessorResultValue;
 
 const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 

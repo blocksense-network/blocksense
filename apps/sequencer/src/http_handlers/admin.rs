@@ -1,6 +1,3 @@
-use crate::feeds::feeds_slots_manager::{
-    DeleteAssetFeed, FeedsSlotsManagerCmds, RegisterNewAssetFeed,
-};
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
 use actix_web::http::header::ContentType;
@@ -15,6 +12,9 @@ use blocksense_registry::config::{OracleScript, OraclesResponse};
 use config::{AllFeedsConfig, FeedConfig, SequencerConfig};
 use eyre::eyre;
 use eyre::Result;
+use feed_registry::feed_registration_cmds::{
+    DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
+};
 use futures::StreamExt;
 use std::collections::HashSet;
 use utils::logging::tokio_console_active;
@@ -299,7 +299,7 @@ pub async fn register_asset_feed(
         }
     }
     match sequencer_state.feeds_slots_manager_cmd_send.send(
-        FeedsSlotsManagerCmds::RegisterNewAssetFeed(RegisterNewAssetFeed {
+        FeedsManagementCmds::RegisterNewAssetFeed(RegisterNewAssetFeed {
             config: new_feed_config.clone(),
         }),
     ) {
@@ -426,7 +426,7 @@ pub async fn delete_asset_feed(
 
     match sequencer_state
         .feeds_slots_manager_cmd_send
-        .send(FeedsSlotsManagerCmds::DeleteAssetFeed(DeleteAssetFeed {
+        .send(FeedsManagementCmds::DeleteAssetFeed(DeleteAssetFeed {
             id: feed_id,
         })) {
         Ok(_) => {
