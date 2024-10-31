@@ -3,6 +3,7 @@ use actix_web::web::Data;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
 use eyre::Result;
+use feed_registry::feed_registration_cmds::ProcessorResultValue;
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::FeedType;
@@ -19,8 +20,6 @@ use tracing::warn;
 use tracing::{debug, info};
 use utils::time::current_unix_time;
 use utils::to_hex_string;
-
-use super::feeds_slots_manager::ProcessorResultValue;
 
 const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
