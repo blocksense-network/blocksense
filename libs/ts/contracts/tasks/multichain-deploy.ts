@@ -157,6 +157,9 @@ task('deploy', 'Deploy contracts')
           SafeMultisig: parseEthereumAddress(multisigAddress),
         },
       };
+      const signerBalancePost = await config.provider.getBalance(config.signer);
+      console.log(`// balance: ${signerBalancePost} //`);
+      console.log(`// balance diff: ${signerBalance - signerBalancePost} //`);
 
       await registerChainlinkProxies(config, multisig, deployData, artifacts);
     }
