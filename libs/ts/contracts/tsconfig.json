@@ -8,17 +8,17 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "rootDirs": [
-      "./scripts",
-      "./test",
-    ],
+    "rootDirs": ["./scripts", "./test"],
   },
   "include": [
     "./scripts",
     "./test",
-    "./typechain"
+    "./typechain",
+    "../../../apps/docs.blocksense.network/src/click.ts",
   ],
   "files": [
-    "./hardhat.config.ts"
-  ]
+    "hardhat.config.evm.ts",
+    "hardhat.config.zksync.ts",
+    "hardhat.config.ts",
+  ],
 }

@@ -33,6 +33,10 @@
     "@blocksense/base-utils": "workspace:*",
     "@blocksense/config-types": "workspace:*",
     "@blocksense/sol-reflector": "workspace:*",
+    "@matterlabs/hardhat-zksync-deploy": "^1.5.0",
+    "@matterlabs/hardhat-zksync-ethers": "^1.2.1",
+    "@matterlabs/hardhat-zksync-node": "^1.1.1",
+    "@matterlabs/hardhat-zksync-solc": "^1.2.4",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
     "@nomicfoundation/hardhat-ethers": "^3.0.6",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
@@ -40,14 +44,14 @@
     "@nomicfoundation/hardhat-verify": "^2.0.9",
     "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@openzeppelin/contracts": "^5.0.2",
-    "@safe-global/protocol-kit": "^4.0.2",
-    "@safe-global/safe-core-sdk-types": "^5.0.3",
-    "@safe-global/safe-deployments": "^1.37.2",
+    "@safe-global/protocol-kit": "^5.0.4",
+    "@safe-global/safe-core-sdk-types": "^5.1.0",
+    "@safe-global/safe-deployments": "^1.37.14",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "@types/chai": "4",
     "@types/mocha": "^10.0.8",
-    "@types/node": "^22.7.4",
+    "@types/node": "^22.8.6",
     "chai": "4",
     "dotenv": "^16.4.5",
     "ethers": "^6.13.2",
@@ -56,6 +60,7 @@
     "hardhat-gas-reporter": "^2.2.1",
     "solidity-coverage": "^0.8.12",
     "ts-node": "^10.9.2",
-    "typechain": "^8.3.2"
+    "typechain": "^8.3.2",
+    "zksync-ethers": "^6.15.0"
   }
 }

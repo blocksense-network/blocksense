@@ -4,6 +4,7 @@ import { JsonRpcProvider, Network, Wallet } from 'ethers';
 export interface NetworkConfig {
   rpc: string;
   provider: JsonRpcProvider;
+  zksync: boolean;
   network: Network;
   signer: Wallet;
   owners: EthereumAddress[];

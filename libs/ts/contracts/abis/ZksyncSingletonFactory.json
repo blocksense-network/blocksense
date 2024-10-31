@@ -1,0 +1,31 @@
+[
+  {
+      "inputs": [
+          {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+          },
+          {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+          },
+          {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+          }
+      ],
+      "name": "create2",
+      "outputs": [
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+  }
+]
