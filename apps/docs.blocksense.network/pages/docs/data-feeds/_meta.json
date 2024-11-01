@@ -1,8 +1,4 @@
 {
   "overview": "Overview",
-  "feed": {
-    "title": "Supported Data Feeds",
-    "display": "children"
-  },
   "creating-data-feeds": "Creating Data Feeds"
 }
