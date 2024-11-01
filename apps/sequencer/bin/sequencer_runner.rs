@@ -65,7 +65,7 @@ pub async fn prepare_sequencer_state(
     let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (vote_send, vote_recv): VoteChannel = mpsc::unbounded_channel();
-    let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
+    let (feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
 
     let sequencer_state: Data<SequencerState> = web::Data::new(SequencerState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -90,11 +90,11 @@ pub async fn prepare_sequencer_state(
         )),
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-        feeds_slots_manager_cmd_send,
+        feeds_management_cmd_send,
         blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
     });
 
-    (vote_recv, feeds_slots_manager_cmd_recv, sequencer_state)
+    (vote_recv, feeds_management_cmd_recv, sequencer_state)
 }
 
 pub async fn prepare_http_servers(

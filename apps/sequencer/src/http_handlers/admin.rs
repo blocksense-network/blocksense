@@ -300,11 +300,13 @@ pub async fn register_asset_feed(
             return Err(error::ErrorBadRequest(err_msg));
         }
     }
-    match sequencer_state.feeds_slots_manager_cmd_send.send(
-        FeedsManagementCmds::RegisterNewAssetFeed(RegisterNewAssetFeed {
-            config: new_feed_config.clone(),
-        }),
-    ) {
+    match sequencer_state
+        .feeds_management_cmd_send
+        .send(FeedsManagementCmds::RegisterNewAssetFeed(
+            RegisterNewAssetFeed {
+                config: new_feed_config.clone(),
+            },
+        )) {
         Ok(_) => {
             info!("Scheduled registration of new asset data feed: {new_feed_config:?}",);
         }
@@ -427,7 +429,7 @@ pub async fn delete_asset_feed(
     };
 
     match sequencer_state
-        .feeds_slots_manager_cmd_send
+        .feeds_management_cmd_send
         .send(FeedsManagementCmds::DeleteAssetFeed(DeleteAssetFeed {
             id: feed_id,
         })) {

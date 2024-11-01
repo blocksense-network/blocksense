@@ -1,6 +1,7 @@
 use actix_web::rt::spawn;
 use blockchain_data_model::in_mem_db::InMemDb;
 use blockchain_data_model::MAX_ASSET_FEED_UPDATES_IN_BLOCK;
+use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::Repeatability;
 use std::collections::HashMap;
@@ -21,6 +22,8 @@ pub async fn block_creator_loop<
     V: Debug + Clone + std::string::ToString + 'static,
 >(
     mut vote_recv: UnboundedReceiver<(K, V)>,
+    mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
+    feed_manager_cmds_send: UnboundedSender<FeedsManagementCmds>,
     batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
     mut max_keys_to_batch: usize,
     timeout_duration: u64,
@@ -74,6 +77,18 @@ pub async fn block_creator_loop<
                                 info!("Woke up on empty channel");
                             }
                         };
+                    }
+
+                    feed_management_cmd = feed_management_cmds_recv.recv() => {
+                        match feed_management_cmd {
+                            Some(cmd) => {
+                                match feed_manager_cmds_send.send(cmd) {
+                                    Ok(val) => info!("forward cmd {val:?}"),
+                                    Err(e) => info!("Could not forward cmd: {e}"),
+                                };
+                            },
+                            None => info!("Woke up on empty channel - feed_management_cmds_recv"),
+                        }
                     }
                 }
             }
