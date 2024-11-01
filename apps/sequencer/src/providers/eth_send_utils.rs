@@ -80,9 +80,6 @@ pub async fn deploy_contract(
 
     let tx = TransactionRequest::default()
         .from(wallet.address())
-        .with_gas_limit(2e5 as u128)
-        .with_max_fee_per_gas(base_fee + base_fee)
-        .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
         .with_chain_id(chain_id)
         .with_deploy_code(bytecode);
 
@@ -188,9 +185,6 @@ pub async fn eth_batch_send_to_contract<
     let tx = TransactionRequest::default()
         .to(contract_address)
         .from(wallet.address())
-        .with_gas_limit(2e5 as u128)
-        .with_max_fee_per_gas(base_fee + base_fee)
-        .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
         .with_chain_id(chain_id)
         .input(Some(input).into());
 

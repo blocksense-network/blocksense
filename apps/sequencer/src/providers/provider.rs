@@ -247,10 +247,6 @@ mod tests {
             .with_from(alice)
             .with_to(bob)
             .with_value(U256::from(100))
-            // Notice that without the `GasEstimatorLayer`, you need to set the gas related fields.
-            .with_gas_limit(21000_u128)
-            .with_max_fee_per_gas(20e9 as u128)
-            .with_max_priority_fee_per_gas(1e9 as u128)
             // It is required to set the chain_id for EIP-1559 transactions.
             .with_chain_id(anvil.chain_id());
 
