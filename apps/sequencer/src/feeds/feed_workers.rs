@@ -19,16 +19,17 @@ type BatchedVotesChannel = (
 );
 /// Given an app state and a sequencer configuration in launches the following app workers:
 /// - Feeds slots manager loop
-/// - Votes result batcher loop
+/// - Block creator loop
 /// - Votes result sender loop
 /// - Metrics collector loop
 pub async fn prepare_app_workers(
     sequencer_state: Data<SequencerState>,
     sequencer_config: &SequencerConfig,
     voting_receive_channel: UnboundedReceiver<(String, String)>,
-    feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
+    feeds_management_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv): BatchedVotesChannel = mpsc::unbounded_channel();
+    let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
 
     let feeds_slots_manager_loop_fut =
         feeds_slots_manager_loop(sequencer_state.clone(), feeds_slots_manager_cmd_recv).await;
@@ -36,6 +37,8 @@ pub async fn prepare_app_workers(
     let votes_batcher = block_creator_loop(
         // sequencer_state.voting_recv_channel.clone(),
         voting_receive_channel,
+        feeds_management_cmd_recv,
+        feeds_slots_manager_cmd_send,
         batched_votes_send,
         sequencer_config.max_keys_to_batch,
         sequencer_config.keys_batch_duration,
