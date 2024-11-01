@@ -5,6 +5,8 @@ use actix_web::http::header::ContentType;
 use actix_web::{error, Error};
 use actix_web::{get, web, HttpRequest};
 use actix_web::{post, HttpResponse, Responder};
+use alloy::network::{Ethereum, EthereumWallet, NetworkWallet};
+use alloy::primitives::Address;
 use alloy::{
     hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
     rpc::types::eth::TransactionRequest,
@@ -59,7 +61,7 @@ async fn get_key_from_contract(
         Bytes::from_hex(selector).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
     let tx = TransactionRequest::default()
         .to(*addr)
-        .from(wallet.address())
+        .from(<EthereumWallet as NetworkWallet<Ethereum>>::default_signer_address(wallet))
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(1e9 as u128)
         .with_chain_id(provider.get_chain_id().await?)

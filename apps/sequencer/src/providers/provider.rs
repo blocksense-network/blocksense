@@ -2,14 +2,19 @@ use alloy::providers::Provider;
 use alloy::transports::http::Http;
 use alloy::{
     hex,
-    network::{Ethereum, EthereumSigner},
+    network::Ethereum,
     primitives::Address,
     providers::{
-        fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, SignerFiller},
+        fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller},
         Identity, ProviderBuilder, RootProvider,
     },
-    signers::wallet::LocalWallet,
 };
+
+use alloy::{
+    network::{EthereumWallet, TransactionBuilder},
+    signers::local::PrivateKeySigner,
+};
+
 use reqwest::{Client, Url};
 
 use config::SequencerConfig;
@@ -24,8 +29,17 @@ use tracing::{debug, error, info, warn};
 
 pub type ProviderType = FillProvider<
     JoinFill<
-        JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
-        SignerFiller<EthereumSigner>,
+        JoinFill<
+            Identity,
+            JoinFill<
+                GasFiller,
+                JoinFill<
+                    alloy::providers::fillers::BlobGasFiller,
+                    JoinFill<NonceFiller, ChainIdFiller>,
+                >,
+            >,
+        >,
+        alloy::providers::fillers::WalletFiller<EthereumWallet>,
     >,
     RootProvider<Http<Client>>,
     Http<Client>,
@@ -40,7 +54,7 @@ pub fn parse_contract_address(addr: &str) -> Option<Address> {
 #[derive(Debug)]
 pub struct RpcProvider {
     pub provider: ProviderType,
-    pub wallet: LocalWallet,
+    pub wallet: EthereumWallet,
     pub contract_address: Option<Address>,
     pub event_contract_address: Option<Address>,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
@@ -59,13 +73,7 @@ pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr:
             return false;
         }
     };
-    let bytecode = match provider
-        .lock()
-        .await
-        .provider
-        .get_code_at(*addr, latest_block.into())
-        .await
-    {
+    let bytecode = match provider.lock().await.provider.get_code_at(*addr).await {
         Ok(result) => result,
         Err(e) => {
             error!("Could not get bytecode of contract: {}", e);
@@ -155,13 +163,17 @@ async fn get_rpc_providers(
                 key, priv_key_path
             )
         });
-        let wallet: LocalWallet = priv_key
+
+        let signer: PrivateKeySigner = priv_key
             .trim()
             .parse()
             .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
+
+        let wallet = EthereumWallet::from(signer);
+
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()
-            .signer(EthereumSigner::from(wallet.clone()))
+            .wallet(wallet.clone())
             .on_http(rpc_url);
         let address = match &p.contract_address {
             Some(x) => parse_contract_address(x.as_str()),

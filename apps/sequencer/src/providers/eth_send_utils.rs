@@ -1,3 +1,4 @@
+use alloy::network::{Ethereum, EthereumWallet, NetworkWallet};
 use alloy::{
     hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
     rpc::types::eth::TransactionRequest,
@@ -26,6 +27,10 @@ use std::time::Instant;
 use tracing::info_span;
 use tracing::{debug, error, info};
 
+fn get_wallet_address(wallet: &EthereumWallet) -> Address {
+    <EthereumWallet as NetworkWallet<Ethereum>>::default_signer_address(wallet)
+}
+
 pub async fn deploy_contract(
     network: &String,
     providers: &SharedRpcProviders,
@@ -38,6 +43,9 @@ pub async fn deploy_contract(
         return Err(eyre!("No provider for network {}", network));
     };
     drop(providers);
+
+    info!("DEBUG: drop(providers) ");
+
     let mut p = p.lock().await;
     let wallet = &p.wallet;
     let provider = &p.provider;
@@ -46,12 +54,16 @@ pub async fn deploy_contract(
     // Get the base fee for the block.
     let base_fee = provider.get_gas_price().await?;
 
+    info!("DEBUG: base fee ");
+
     // Deploy the contract.
     let bytecode = if feed_type == Periodic {
         p.data_feed_store_byte_code.clone()
     } else {
         p.data_feed_sports_byte_code.clone()
     };
+
+    info!("DEBUG: bytecode ");
 
     let Some(mut bytecode) = bytecode else {
         return Err(eyre!("Byte code unavailable"));
@@ -71,17 +83,23 @@ pub async fn deploy_contract(
         get_chain_id
     );
 
-    let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(Address::from_private_key(
-        wallet.signer(),
-    ))]);
+    info!("DEBUG: before message_value ");
+
+    let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(get_wallet_address(wallet))]);
+
+    info!("DEBUG: after message_value ");
 
     let mut encoded_arg = message_value.abi_encode();
     bytecode.append(&mut encoded_arg);
 
+    info!("DEBUG: bytecode.append ");
+
     let tx = TransactionRequest::default()
-        .from(wallet.address())
+        .from(get_wallet_address(wallet))
         .with_chain_id(chain_id)
         .with_deploy_code(bytecode);
+
+    info!("DEBUG: tx create ");
 
     let deploy_time = Instant::now();
     let contract_address = provider
@@ -184,7 +202,7 @@ pub async fn eth_batch_send_to_contract<
 
     let tx = TransactionRequest::default()
         .to(contract_address)
-        .from(wallet.address())
+        .from(get_wallet_address(wallet))
         .with_chain_id(chain_id)
         .input(Some(input).into());
 
