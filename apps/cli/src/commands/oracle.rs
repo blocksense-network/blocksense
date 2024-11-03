@@ -6,8 +6,7 @@ use anyhow::Result;
 
 use blocksense_registry::config::get_blocksense_config_dummy;
 use clap::{Parser, Subcommand};
-use tokio::io::{AsyncBufReadExt, BufReader, BufWriter};
-use tokio::{fs::File, process::Command};
+use tokio::process::Command;
 use tracing::error;
 
 /// Commands for working with the capabilities.
@@ -105,44 +104,44 @@ impl Init {
         let mut child = Command::new("spin")
             .arg("new")
             .arg("-t")
-            // .arg("oracle-rust") //TODO(snikolov): There is no template oracle-rust
             .arg("http-rust")
+            .stdin(Stdio::inherit())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
             .spawn()?;
 
-        if let Some(stdout) = child.stdout.take() {
-            let reader = BufReader::new(stdout);
-            let mut lines = reader.lines();
-
-            // First line of the `spin new` command is the name of the spin component and its' folder
-            if let Ok(Some(relative_directory)) = lines.next_line().await {
-                let dir_path = current_dir.join(&relative_directory);
-                if dir_path.exists() {
-                    let blocksense_config_path = dir_path.join("blocksense-config.json");
-
-                    // Create and write to the temp file
-                    let mut config_file = File::create(&blocksense_config_path).await?;
-                    let config_json = serde_json::to_string_pretty(&get_blocksense_config_dummy())?;
-
-                    fs::write(&blocksense_config_path, config_json)?;
-
-                    println!(
-                        "Dummy BlocksenseConfig generated at: {:?}",
-                        blocksense_config_path
-                    );
-                } else {
-                    error!("Directory does not exist: {}", relative_directory);
-                }
-            }
-        }
-
         let status = child.wait().await?;
+
+        if !status.success() {
+            error!("`spin new` command failed with status: {}", status);
+            return Err(anyhow::anyhow!("spin new command failed"));
+        }
+        let entries = fs::read_dir(&current_dir)?;
+
+        let newest_dir = entries
+            .filter_map(|entry| entry.ok())
+            .filter(|entry| entry.file_type().map(|ft| ft.is_dir()).unwrap_or(false))
+            .max_by_key(|entry| entry.metadata().unwrap().modified().unwrap());
+
+        if let Some(dir_entry) = newest_dir {
+            let dir_path = dir_entry.path();
+            let blocksense_config_path = dir_path.join("blocksense-config.json");
+
+            // Create and write to the config file
+            let config_json = serde_json::to_string_pretty(&get_blocksense_config_dummy())?;
+            fs::write(&blocksense_config_path, config_json)?;
+
+            println!(
+                "Dummy BlocksenseConfig generated at: {:?}",
+                blocksense_config_path
+            );
+        } else {
+            error!("No new directory was created");
+        }
 
         Ok(())
     }
 }
-
 #[derive(Parser, Debug)]
 pub struct Publish {
     /// Specifies the path to the entity.
