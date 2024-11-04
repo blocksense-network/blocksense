@@ -14,12 +14,12 @@ pub struct AssetPair {
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct Resources {
-    pub cmc_id: u32,
-    pub cmc_quote: DataChunk,
+    pub resource_keys: [Option<DataChunk>; 32],
+    pub resource_values: [Option<DataChunk>; 32],
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
-pub struct FeedConfig {
+pub struct BlockFeedConfig {
     pub id: u32,
     pub name: DataChunk,
     pub full_name: DataChunk,
@@ -49,7 +49,7 @@ pub struct BlockHeader {
     timestamp: u64,
     prev_block_hash: HashType,
     feed_updates_merkle_root: HashType,
-    add_remove_feeds_merkle_root: AddRemoveFeeds,
+    add_remove_feeds_merkle_root: HashType,
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default)]
@@ -61,8 +61,8 @@ pub struct FeedUpdates {
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct AddRemoveFeeds {
     block_height: u64,
-    new_feeds: [Option<FeedConfig>; 32],
-    feed_ids_to_rm: [Option<u32>; 32],
+    new_feeds: [Option<BlockFeedConfig>; MAX_NEW_FEEDS_IN_BLOCK],
+    feed_ids_to_rm: [Option<u32>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
 }
 
 pub const MAX_ASSET_FEED_UPDATES_IN_BLOCK: usize = {
@@ -70,3 +70,6 @@ pub const MAX_ASSET_FEED_UPDATES_IN_BLOCK: usize = {
         std::mem::size_of::<FeedUpdatesInBlock>() / std::mem::size_of::<Option<AssetFeedUpdate>>();
     asset_feed_updates_len
 };
+
+pub const MAX_NEW_FEEDS_IN_BLOCK: usize = 32;
+pub const MAX_FEED_ID_TO_DELETE_IN_BLOCK: usize = 32;

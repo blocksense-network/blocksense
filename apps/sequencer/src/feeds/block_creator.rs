@@ -1,6 +1,9 @@
 use actix_web::rt::spawn;
 use blockchain_data_model::in_mem_db::InMemDb;
-use blockchain_data_model::MAX_ASSET_FEED_UPDATES_IN_BLOCK;
+use blockchain_data_model::{
+    BlockFeedConfig, DataChunk, Resources, MAX_ASSET_FEED_UPDATES_IN_BLOCK,
+    MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
+};
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::Repeatability;
@@ -8,6 +11,7 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 use std::io::Error;
 use std::sync::Arc;
+use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::RwLock;
 // use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
@@ -48,12 +52,21 @@ pub async fn block_creator_loop<
         loop {
             // Loop forever
             let mut updates: HashMap<K, V> = Default::default();
+            let mut new_feeds_to_register = Vec::new();
+            let mut feeds_ids_to_delete = Vec::new();
             loop {
                 // Loop collecting data, until it is time to emit a block
                 tokio::select! {
                     _ = stt
                     .await_end_of_current_slot(&Repeatability::Periodic) => { // This is the block generation slot
-                        generate_block(updates, &batched_votes_send, &blockchain_db).await;
+                        generate_block(
+                            updates,
+                            new_feeds_to_register,
+                            feeds_ids_to_delete,
+                            &batched_votes_send,
+                            &blockchain_db,
+                            &feed_manager_cmds_send
+                        ).await;
                         stt.reset_report_start_time();
                         break;
                     }
@@ -68,7 +81,14 @@ pub async fn block_creator_loop<
                                 );
                                 updates.insert(key, val);
                                 if updates.keys().len() >= max_keys_to_batch {
-                                    generate_block(updates, &batched_votes_send, &blockchain_db).await;
+                                    generate_block(
+                                        updates,
+                                        new_feeds_to_register,
+                                        feeds_ids_to_delete,
+                                        &batched_votes_send,
+                                        &blockchain_db,
+                                        &feed_manager_cmds_send
+                                    ).await;
                                     stt.reset_report_start_time();
                                     break;
                                 }
@@ -82,10 +102,28 @@ pub async fn block_creator_loop<
                     feed_management_cmd = feed_management_cmds_recv.recv() => {
                         match feed_management_cmd {
                             Some(cmd) => {
-                                match feed_manager_cmds_send.send(cmd) {
-                                    Ok(val) => info!("forward cmd {val:?}"),
-                                    Err(e) => info!("Could not forward cmd: {e}"),
-                                };
+                                match &cmd {
+                                    FeedsManagementCmds::RegisterNewAssetFeed(_) => {
+                                        new_feeds_to_register.push(cmd);
+                                    },
+                                    FeedsManagementCmds::DeleteAssetFeed(_) => {
+                                        feeds_ids_to_delete.push(cmd);
+                                    },
+                                }
+                                if new_feeds_to_register.len() >= MAX_NEW_FEEDS_IN_BLOCK ||
+                                   feeds_ids_to_delete.len() >= MAX_FEED_ID_TO_DELETE_IN_BLOCK
+                                {
+                                    generate_block(
+                                        updates,
+                                        new_feeds_to_register,
+                                        feeds_ids_to_delete,
+                                        &batched_votes_send,
+                                        &blockchain_db,
+                                        &feed_manager_cmds_send
+                                    ).await;
+                                    stt.reset_report_start_time();
+                                    break;
+                                }
                             },
                             None => info!("Woke up on empty channel - feed_management_cmds_recv"),
                         }
@@ -96,29 +134,121 @@ pub async fn block_creator_loop<
     })
 }
 
+// Helper function to convert SystemTime to u64 (seconds since UNIX_EPOCH)
+fn system_time_to_u64(time: SystemTime) -> u64 {
+    time.duration_since(UNIX_EPOCH)
+        .expect("SystemTime should be after UNIX_EPOCH")
+        .as_secs()
+}
+
+// Helper function to convert f32 to [u8; 4]
+fn f32_to_u8_array(value: f32) -> [u8; 4] {
+    value.to_be_bytes()
+}
+
+// Helper function to convert String to DataChunk ([u8; 32])
+fn string_to_data_chunk(input: &str) -> DataChunk {
+    let mut chunk = [0u8; 32];
+    let bytes = input.as_bytes();
+    let len = bytes.len().min(32); // Truncate if longer than 32 bytes
+    chunk[..len].copy_from_slice(&bytes[..len]);
+    chunk
+}
+
+// Function to convert HashMap<String, String> to Resources struct
+fn convert_resources(map: &HashMap<String, String>) -> Resources {
+    // Initialize arrays with None
+    let mut resource_keys: [Option<DataChunk>; 32] = Default::default();
+    let mut resource_values: [Option<DataChunk>; 32] = Default::default();
+
+    // Iterate over the HashMap, up to 32 entries
+    for (i, (key, value)) in map.into_iter().take(32).enumerate() {
+        resource_keys[i] = Some(string_to_data_chunk(&key));
+        resource_values[i] = Some(string_to_data_chunk(&value));
+    }
+
+    Resources {
+        resource_keys,
+        resource_values,
+    }
+}
+
+fn feed_config_to_block(feed_config: &config::FeedConfig) -> BlockFeedConfig {
+    BlockFeedConfig {
+        id: feed_config.id,
+        name: string_to_data_chunk(&feed_config.name),
+        full_name: string_to_data_chunk(&feed_config.full_name),
+        description: string_to_data_chunk(&feed_config.description),
+        _type: string_to_data_chunk(&feed_config._type),
+        decimals: feed_config.decimals,
+        pair: blockchain_data_model::AssetPair {
+            base: string_to_data_chunk(feed_config.pair.base.as_str()),
+            quote: string_to_data_chunk(feed_config.pair.quote.as_str()),
+        },
+        report_interval_ms: feed_config.report_interval_ms,
+        first_report_start_time: system_time_to_u64(feed_config.first_report_start_time),
+        resources: convert_resources(&feed_config.resources),
+        quorum_percentage: f32_to_u8_array(feed_config.quorum_percentage),
+        script: string_to_data_chunk(&feed_config.script),
+    }
+}
+
 async fn generate_block<
     K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
     updates: HashMap<K, V>,
+    new_feeds_to_register: Vec<FeedsManagementCmds>,
+    feeds_ids_to_delete: Vec<FeedsManagementCmds>,
     batched_votes_send: &UnboundedSender<UpdateToSend<K, V>>,
     blockchain_db: &Arc<RwLock<InMemDb>>,
+    feed_manager_cmds_send: &UnboundedSender<FeedsManagementCmds>,
 ) {
+    let mut new_feeds_in_block = Vec::new();
+    for cmd in &new_feeds_to_register {
+        match cmd {
+            FeedsManagementCmds::RegisterNewAssetFeed(register_new_asset_feed) => {
+                new_feeds_in_block.push(feed_config_to_block(&register_new_asset_feed.config));
+            }
+            FeedsManagementCmds::DeleteAssetFeed(_) => {
+                panic!("Logical error: this set should only contan new feeds!")
+            }
+        }
+    }
+
+    let mut feeds_ids_to_delete_in_block = Vec::new();
+    for cmd in &feeds_ids_to_delete {
+        match cmd {
+            FeedsManagementCmds::RegisterNewAssetFeed(_) => {
+                panic!("Logical error: this set should only contan feeds ids to delete!")
+            }
+            FeedsManagementCmds::DeleteAssetFeed(delete_feed_id_cmd) => {
+                feeds_ids_to_delete_in_block.push(delete_feed_id_cmd.id);
+            }
+        }
+    }
+
     let block_height;
     {
+        // Create the block that will contain the new feeds, deleted feeds and updates of feed values
         let mut blockchain_db = blockchain_db.write().await;
-        let (header, feed_updates) = blockchain_db.create_new_block(&updates);
+        let (header, feed_updates, add_remove_feeds) = blockchain_db.create_new_block(
+            &updates,
+            new_feeds_in_block,
+            feeds_ids_to_delete_in_block,
+        );
         trace!(
             "Generated new block {:?} with hash {:?}",
             header,
             InMemDb::node_to_hash(InMemDb::calc_merkle_root(&mut header.clone()))
         );
         blockchain_db
-            .add_next_block(header, feed_updates)
+            .add_next_block(header, feed_updates, add_remove_feeds)
             .expect("Failed to add block!");
         block_height = blockchain_db.get_latest_block_height();
     }
 
+    // Process feed updates:
     if updates.keys().len() > 0 {
         if let Err(e) = batched_votes_send.send(UpdateToSend {
             block_height: block_height,
@@ -129,6 +259,22 @@ async fn generate_block<
                 e.to_string()
             );
         }
+    }
+
+    // Process cmds to register new feeds:
+    for cmd in new_feeds_to_register {
+        match feed_manager_cmds_send.send(cmd) {
+            Ok(_) => info!("forward register cmd"),
+            Err(e) => info!("Could not forward register cmd: {e}"),
+        };
+    }
+
+    // Process cmds to delete existing feeds:
+    for cmd in feeds_ids_to_delete {
+        match feed_manager_cmds_send.send(cmd) {
+            Ok(_) => info!("forward delete cmd"),
+            Err(e) => info!("Could not forward delete cmd: {e}"),
+        };
     }
 }
 
