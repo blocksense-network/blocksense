@@ -54,34 +54,34 @@ prometheus = { path = "../../libs/prometheus" }
 
 reqwest = { version = "0.12", features = ["multipart", "blocking"] }
 # async
-tokio = { version = "1.4.0", features = ["full", "tracing"] }
+tokio = { version = "1.41.0", features = ["full", "tracing"] }
 
 # misc
 eyre = "0.6.12"
-openssl-sys = "0.9.102"
+openssl-sys = "0.9.104"
 actix-web = "4.6.0"
 actix-multipart = "0.7.2"
 actix-test = "0.1.5"
-serde_json = "1.0.128"
-serde = { version = "1.0.210", features = ["derive"]}
+serde_json = "1.0.132"
+serde = { version = "1.0.214", features = ["derive"]}
 futures = "0.3.31"
 envload = "0.1.1"
 once_cell = "1.20.2"
 async-channel = "2.3.0"
 tracing = { version = "0.1.40", features = ["async-await", "log"] }
 tracing-subscriber = { version = "0.3.18", features = ["json"] }
-bytes = "1.7.2"
+bytes = "1.8.0"
 futures-util = "0.3.30"
 rand = "0.8.5"
 paste = "1.0.15"
-regex = "1.11.0"
+regex = "1.11.1"
 tempfile = "3.13.0"
 time = "0.3.36"
 conv = "0.3.3"
-uuid = { version = "1.8.0", features = ["v4"] }
+uuid = { version = "1.11.0", features = ["v4"] }
 chrono = "0.4.38"
 ringbuf = "0.4.7"
-console-subscriber = "0.4.0"
+console-subscriber = "0.4.1"
 
 [[bin]]
 name = "sequencer"
