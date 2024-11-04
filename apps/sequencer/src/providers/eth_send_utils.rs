@@ -24,7 +24,7 @@ use prometheus::{inc_metric, inc_metric_by};
 use std::fmt::Debug;
 use std::time::Instant;
 use tracing::info_span;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 
 pub async fn deploy_contract(
     network: &String,
@@ -276,9 +276,16 @@ pub async fn eth_batch_send_to_all_contracts<
     for v in result {
         match v {
             Ok(res) => match res {
-                (Ok(x), net, _provider) => {
-                    all_results += &format!("success from {} -> {:?}", net, x);
-                }
+                (Ok(x), net, _provider) => match x {
+                    Ok(y) => {
+                        all_results += &format!("success from network {} -> {:?}", net, y);
+                    }
+                    Err(error_message) => {
+                        warn!("Network responded with error: {error_message}");
+                        all_results +=
+                            &format!("error from network {} -> {:?}", net, error_message);
+                    }
+                },
                 (Err(e), net, provider) => {
                     let err = format!("Timed out transaction for network {} -> {}", net, e);
                     error!(err);
