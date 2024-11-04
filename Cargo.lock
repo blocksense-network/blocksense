@@ -2072,6 +2072,7 @@ dependencies = [
  "hex-literal",
  "serde 1.0.215",
  "ssz_rs",
+ "tracing",
  "utils",
 ]
 
