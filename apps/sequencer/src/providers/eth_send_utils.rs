@@ -278,12 +278,12 @@ pub async fn eth_batch_send_to_all_contracts<
             Ok(res) => match res {
                 (Ok(x), net, _provider) => match x {
                     Ok(y) => {
-                        all_results += &format!("success from network {} -> {:?}", net, y);
+                        all_results += &format!("result from network {}: Ok -> {:?}", net, y);
                     }
                     Err(error_message) => {
-                        warn!("Network responded with error: {error_message}");
+                        warn!("Network {net} responded with error: {error_message}");
                         all_results +=
-                            &format!("error from network {} -> {:?}", net, error_message);
+                            &format!("result from network {}: Err -> {:?}", net, error_message);
                     }
                 },
                 (Err(e), net, provider) => {
