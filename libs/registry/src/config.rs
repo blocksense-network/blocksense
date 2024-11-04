@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use std::time::SystemTime;
 
 //TODO(melatron): This is duplicated from the config crate
@@ -58,4 +59,56 @@ pub struct OracleScript {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Capability {
     pub id: String,
+}
+
+pub fn get_blocksense_config_dummy() -> BlocksenseConfig {
+    let oracle_scripts = vec![
+        OracleScript {
+            id: "oracle1".to_string(),
+            name: Some("price_oracle".to_string()),
+            description: Some("An oracle for fetching price data".to_string()),
+            oracle_script_wasm: "local.wasm".to_string(),
+            allowed_outbound_hosts: vec!["host1.com".to_string(), "host2.com".to_string()],
+        },
+        OracleScript {
+            id: "oracle2".to_string(),
+            name: None,
+            description: None,
+            oracle_script_wasm: "local.wasm".to_string(),
+            allowed_outbound_hosts: vec!["host3.com".to_string()],
+        },
+    ];
+
+    let capabilities = vec![
+        Capability {
+            id: "capability1".to_string(),
+        },
+        Capability {
+            id: "capability2".to_string(),
+        },
+    ];
+
+    let data_feeds = vec![FeedConfig {
+        id: 1,
+        name: "BTC/USD".to_string(),
+        full_name: "BTC/USD".to_string(),
+        description: "Feed for Bitcoin price in USD".to_string(),
+        _type: "crypto".to_string(),
+        decimals: 8,
+        pair: AssetPair {
+            base: "BTC".to_string(),
+            quote: "USD".to_string(),
+        },
+        report_interval_ms: 60000,
+        first_report_start_time: SystemTime::now(),
+        resources: json!({"api_key": 0, "ticker": "BTC"}),
+        quorum_percentage: 66.6,
+        script: "price_oracle".to_string(),
+    }];
+
+    BlocksenseConfig {
+        oracles: oracle_scripts,
+        capabilities,
+        data_feeds,
+    }
 }
