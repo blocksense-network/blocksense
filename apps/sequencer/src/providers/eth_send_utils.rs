@@ -251,21 +251,19 @@ pub async fn eth_batch_send_to_all_contracts<
 
     let collected_futures = FuturesUnordered::new();
 
-    for (net, p) in
-        <HashMap<std::string::String, Arc<tokio::sync::Mutex<RpcProvider>>> as Clone>::clone(
-            &providers,
-        )
-        .into_iter()
-    {
+    for (net, p) in providers.iter() {
         let updates = updates.clone();
         let timeout = p.lock().await.transcation_timeout_secs as u64;
+
+        let net = net.clone();
+        let provider = p.clone();
         collected_futures.push(spawn(async move {
             let result = actix_web::rt::time::timeout(
                 Duration::from_secs(timeout),
-                eth_batch_send_to_contract(net.clone(), p.clone(), updates, feed_type),
+                eth_batch_send_to_contract(net.clone(), provider.clone(), updates, feed_type),
             )
             .await;
-            (result, net.clone(), p.clone())
+            (result, net, provider)
         }));
     }
 

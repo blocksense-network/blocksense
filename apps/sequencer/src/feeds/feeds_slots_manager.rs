@@ -326,7 +326,7 @@ mod tests {
                 &feeds_config,
             ))),
             reports: all_feeds_reports_arc,
-            providers: providers.clone(),
+            providers,
             log_handle,
             reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
             feed_id_allocator: Arc::new(RwLock::new(None)),

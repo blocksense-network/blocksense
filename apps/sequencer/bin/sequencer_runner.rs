@@ -69,7 +69,7 @@ pub async fn prepare_sequencer_state(
             &feeds_config,
         ))),
         reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-        providers: providers.clone(),
+        providers,
         log_handle,
         reporters: init_shared_reporters(sequencer_config, metrics_prefix),
         feed_id_allocator: Arc::new(RwLock::new(Some(feed_id_allocator))),
