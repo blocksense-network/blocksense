@@ -6,6 +6,7 @@ use reqwest::Client;
 use utils::get_env_var;
 
 use crate::{
+    metrics::BUILD_INFO,
     registry::{pull_buffer, push_to_buffer},
     AppState,
 };
@@ -32,6 +33,8 @@ pub async fn handle_prometheus_metrics(
     encoder: &TextEncoder,
 ) -> Result<(), anyhow::Error> {
     let mut buffer = String::new();
+
+    BUILD_INFO.set(1);
 
     let metric_families = prometheus_framework::gather();
     encoder.encode_utf8(&metric_families, &mut buffer).unwrap();

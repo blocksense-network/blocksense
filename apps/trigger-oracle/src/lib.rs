@@ -30,6 +30,14 @@ use wasmtime_wasi_http::{
 use crypto::JsonSerializableSignature;
 use data_feeds::connector::post::generate_signature;
 use feed_registry::types::{DataFeedPayload, FeedError, FeedResult, FeedType, PayloadMetaData};
+use prometheus::{
+    actix_server::handle_prometheus_metrics,
+    metrics::{
+        REPORTER_BATCH_COUNTER, REPORTER_FAILED_SEQ_REQUESTS, REPORTER_FAILED_WASM_EXECS,
+        REPORTER_FEED_COUNTER,
+    },
+    TextEncoder,
+};
 use utils::time::current_unix_time;
 
 wasmtime::component::bindgen!({
@@ -57,6 +65,7 @@ pub struct CliArgs {
 pub struct OracleTrigger {
     engine: TriggerAppEngine<Self>,
     sequencer: String,
+    prometheus_url: Option<String>,
     secret_key: String,
     reporter_id: u64,
     interval_time_in_seconds: u64,
@@ -75,6 +84,7 @@ struct TriggerMetadataParent {
 struct TriggerMetadata {
     interval_time_in_seconds: Option<u64>,
     sequencer: Option<String>,
+    prometheus_url: Option<String>,
     secret_key: Option<String>,
     reporter_id: Option<u64>,
 }
@@ -163,6 +173,7 @@ impl TriggerExecutor for OracleTrigger {
             .interval_time_in_seconds
             .expect("Report time interval not provided");
         let sequencer = metadata.sequencer.expect("Sequencer URL is not provided");
+        let prometheus_url = metadata.prometheus_url;
         let secret_key = metadata.secret_key.expect("Secret key is not provided");
         let reporter_id = metadata.reporter_id.expect("Reporter ID is not provided");
         // TODO(adikov) There is a specific case in which one reporter receives task to report multiple
@@ -176,6 +187,11 @@ impl TriggerExecutor for OracleTrigger {
                 if let Some(cap) = &config.capabilities {
                     capabilities = cap.clone();
                 }
+
+                REPORTER_FEED_COUNTER
+                    .lock()
+                    .unwrap()
+                    .inc_by(config.data_feeds.len() as u64);
                 (
                     config.component.clone(),
                     Component {
@@ -192,6 +208,7 @@ impl TriggerExecutor for OracleTrigger {
         Ok(Self {
             engine,
             sequencer,
+            prometheus_url,
             secret_key,
             reporter_id,
             interval_time_in_seconds,
@@ -243,6 +260,7 @@ impl TriggerExecutor for OracleTrigger {
             tokio::time::Duration::from_secs(self.interval_time_in_seconds),
             components,
             signal_data_feed_sender.clone(),
+            self.prometheus_url,
         );
         loops.push(orchestrator);
 
@@ -329,8 +347,10 @@ impl OracleTrigger {
         time_interval: tokio::time::Duration,
         components: HashMap<String, Component>,
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
+        prometheus_url: Option<String>,
     ) -> tokio::task::JoinHandle<TerminationReason> {
-        let future = Self::signal_data_feeds(time_interval, components, signal_sender);
+        let future =
+            Self::signal_data_feeds(time_interval, components, signal_sender, prometheus_url);
 
         tokio::task::spawn(future)
     }
@@ -339,9 +359,11 @@ impl OracleTrigger {
         time_interval: tokio::time::Duration,
         components: HashMap<String, Component>,
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
+        prometheus_url: Option<String>,
     ) -> TerminationReason {
         //TODO(adikov): Implement proper logic and remove dummy values
         loop {
+            REPORTER_BATCH_COUNTER.lock().unwrap().inc();
             let _ = tokio::time::sleep(time_interval).await;
 
             let data_feed_signal = components
@@ -350,6 +372,23 @@ impl OracleTrigger {
                 .collect();
             // tracing::info!("Signal data feeds: {:?}", &data_feed_signal);
             let _ = signal_sender.send(data_feed_signal);
+
+            if prometheus_url.is_none() {
+                continue;
+            }
+
+            let metrics_result = handle_prometheus_metrics(
+                &reqwest::Client::new(),
+                prometheus_url
+                    .clone()
+                    .expect("Prometheus URL should be provided.")
+                    .as_str(),
+                &TextEncoder::new(),
+            )
+            .await;
+            if let Err(e) = metrics_result {
+                tracing::debug!("Error handling Prometheus metrics: {:?}", e);
+            }
         }
 
         //TerminationReason::Other("Signal data feed loop terminated".to_string())
@@ -420,6 +459,13 @@ impl OracleTrigger {
                     tracing::trace!("Sequencer responded with: {}", &contents);
                 }
                 Err(e) => {
+                    //TODO(adikov): Add code from the error - e.status()
+                    REPORTER_FAILED_SEQ_REQUESTS
+                        .lock()
+                        .unwrap()
+                        .with_label_values(&["404"])
+                        .inc();
+
                     tracing::error!("Sequencer failed to respond with: {}", &e);
                 }
             };
@@ -488,10 +534,20 @@ impl OracleTrigger {
             }
             Ok(Err(e)) => {
                 tracing::warn!("Component {component_id} returned error {:?}", e);
+                REPORTER_FAILED_WASM_EXECS
+                    .lock()
+                    .unwrap()
+                    .with_label_values(&[&component_id.clone()])
+                    .inc();
                 Err(anyhow::anyhow!("Component {component_id} returned error")) // TODO: more details when WIT provides them
             }
             Err(e) => {
                 tracing::error!("error running component {component_id}: {:?}", e);
+                REPORTER_FAILED_WASM_EXECS
+                    .lock()
+                    .unwrap()
+                    .with_label_values(&[&component_id.clone()])
+                    .inc();
                 Err(anyhow::anyhow!("Error executing component {component_id}"))
             }
         }

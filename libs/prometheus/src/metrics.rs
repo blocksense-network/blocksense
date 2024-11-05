@@ -4,6 +4,8 @@ use prometheus_framework::{
     IntCounter, IntCounterVec, IntGauge, IntGaugeVec,
 };
 
+use std::sync::Mutex;
+
 use utils::build_info::{
     BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
     VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
@@ -46,6 +48,22 @@ lazy_static::lazy_static! {
                 "compiler" => VERGEN_RUSTC_SEMVER,
             }
         )).unwrap();
+}
+
+lazy_static::lazy_static! {
+    pub static ref REPORTER_FEED_COUNTER: Mutex<IntCounter> =
+        Mutex::new(register_int_counter!("FEED_COUNTER", "Available feed count").unwrap());
+
+    pub static ref REPORTER_BATCH_COUNTER: Mutex<IntCounter> =
+        Mutex::new(register_int_counter!("BATCH_COUNTER", "number of batches served").unwrap());
+
+    pub static ref REPORTER_FAILED_WASM_EXECS: Mutex<IntCounterVec> =
+        Mutex::new(register_int_counter_vec!("REPORTER_FAILED_WASM_EXECS",
+            "Count of failed wasm executions", &["oracle_id"]).unwrap());
+
+    pub static ref REPORTER_FAILED_SEQ_REQUESTS: Mutex<IntCounterVec> =
+        Mutex::new(register_int_counter_vec!("REPORTER_FAILED_SEQ_REQUESTS",
+            "Count of failed sequncer requests", &["code"]).unwrap());
 }
 
 #[macro_export]

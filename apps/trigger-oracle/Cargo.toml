@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+prometheus = { path = "../../libs/prometheus" }
 data_feeds = { path = "../../libs/data_feeds"}
 feed_registry = { path = "../../libs/feed_registry"}
 crypto = { path = "../../libs/crypto"}

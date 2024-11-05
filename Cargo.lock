@@ -10742,6 +10742,7 @@ dependencies = [
  "is-terminal",
  "log",
  "outbound-http",
+ "prometheus 0.1.1",
  "reqwest 0.12.9",
  "serde 1.0.215",
  "serde_json",
