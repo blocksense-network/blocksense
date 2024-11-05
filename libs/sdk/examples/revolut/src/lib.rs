@@ -37,7 +37,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
         // Get the body of the response and parse it using serde_json crate.
         let body = resp.into_body();
         let string = String::from_utf8(body).expect("Our bytes should be valid utf8");
-        let value: Rate = serde_json::from_str(&string).unwrap();
+        let value: Rate = serde_json::from_str(&string)?;
 
         println!("{:?}", value);
 

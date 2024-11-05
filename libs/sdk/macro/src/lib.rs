@@ -23,8 +23,10 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         match super::#func_name(settings.try_into().expect("cannot convert from Blocksense Oracle settings"))#await_postfix {
                             Ok(payload) => Ok(payload.try_into().expect("cannot convert from Blocksense Oracle payload")),
                             Err(e) => {
-                                eprintln!("{}", e);
-                                Err(self::preamble::blocksense::oracle::oracle_types::Error::Other("err".to_string()))
+                                //TODO(adikov): Potentially include more types of wit Errors and
+                                //implement a from trait for them. This way we can use the
+                                //different Errors in the oracle components implementation.
+                                Err(self::preamble::blocksense::oracle::oracle_types::Error::Other(e.to_string()))
                             },
                         }
                     })
