@@ -162,9 +162,9 @@ fn convert_resources(map: &HashMap<String, String>) -> Resources {
     let mut resource_values: [Option<DataChunk>; 32] = Default::default();
 
     // Iterate over the HashMap, up to 32 entries
-    for (i, (key, value)) in map.into_iter().take(32).enumerate() {
-        resource_keys[i] = Some(string_to_data_chunk(&key));
-        resource_values[i] = Some(string_to_data_chunk(&value));
+    for (i, (key, value)) in map.iter().take(32).enumerate() {
+        resource_keys[i] = Some(string_to_data_chunk(key));
+        resource_values[i] = Some(string_to_data_chunk(value));
     }
 
     Resources {
@@ -251,7 +251,7 @@ async fn generate_block<
     // Process feed updates:
     if updates.keys().len() > 0 {
         if let Err(e) = batched_votes_send.send(UpdateToSend {
-            block_height: block_height,
+            block_height,
             kv_updates: updates,
         }) {
             error!(
@@ -280,15 +280,11 @@ async fn generate_block<
 
 #[cfg(test)]
 mod tests {
-    use blockchain_data_model::in_mem_db::InMemDb;
     use std::sync::Arc;
+    use blockchain_data_model::in_mem_db::InMemDb;
     use std::time::Duration;
-    use tokio::sync::mpsc;
-    use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-    use tokio::sync::RwLock;
+    use tokio::sync::{mpsc, RwLock};
     use tokio::time;
-
-    use crate::UpdateToSend;
 
     #[actix_web::test]
     async fn test_block_creator_loop() {
@@ -296,18 +292,17 @@ mod tests {
         let batch_size = 3;
         let duration = 100;
 
-        let (vote_send, vote_recv): (
-            UnboundedSender<(String, String)>,
-            UnboundedReceiver<(String, String)>,
-        ) = mpsc::unbounded_channel();
-        let (batched_votes_send, mut batched_votes_recv): (
-            UnboundedSender<UpdateToSend<String, String>>,
-            UnboundedReceiver<UpdateToSend<String, String>>,
-        ) = mpsc::unbounded_channel();
+        let (vote_send, vote_recv) = mpsc::unbounded_channel();
+        let (_feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
+        let (batched_votes_send, mut batched_votes_recv) = mpsc::unbounded_channel();
 
         super::block_creator_loop(
             //Arc::new(RwLock::new(vote_recv)),
             vote_recv,
+            feeds_management_cmd_recv,
+            feeds_slots_manager_cmd_send,
             batched_votes_send,
             batch_size,
             duration,
@@ -316,17 +311,17 @@ mod tests {
         .await;
 
         // Send test votes
-        let k1 = "ab000001".to_owned();
-        let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000".to_owned();
+        let k1 = "ab000001";
+        let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         vote_send.send((k1, v1)).unwrap();
-        let k2 = "ac000002".to_owned();
-        let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000".to_owned();
+        let k2 = "ac000002";
+        let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000";
         vote_send.send((k2, v2)).unwrap();
-        let k3 = "ad000003".to_owned();
-        let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000".to_owned();
+        let k3 = "ad000003";
+        let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000";
         vote_send.send((k3, v3)).unwrap();
-        let k4 = "af000004".to_owned();
-        let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000".to_owned();
+        let k4 = "af000004";
+        let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000";
         vote_send.send((k4, v4)).unwrap();
 
         // Wait for a while to let the loop process the message

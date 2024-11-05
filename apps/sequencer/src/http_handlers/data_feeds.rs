@@ -558,8 +558,7 @@ mod tests {
         let (_, feeds_config) = get_sequencer_and_feed_configs();
 
         let (vote_send, mut _vote_recv) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
+        let (feeds_management_cmd_send, _feeds_management_cmd_recv) = mpsc::unbounded_channel();
 
         let sequencer_state = web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -584,7 +583,7 @@ mod tests {
             )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-            feeds_slots_manager_cmd_send,
+            feeds_management_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
         });
 
@@ -654,8 +653,7 @@ mod tests {
         let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
         let (vote_send, vote_recv) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
+        let (feeds_management_cmd_send, _feeds_management_cmd_recv) = mpsc::unbounded_channel();
 
         (
             vote_recv,
@@ -684,7 +682,7 @@ mod tests {
                 )),
                 sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
                 feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-                feeds_slots_manager_cmd_send,
+                feeds_management_cmd_send,
                 blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
             }),
         )
@@ -897,7 +895,7 @@ mod tests {
         let log_handle = init_shared_logging_handle("INFO", false);
         let metrics_prefix = Some(metrix_prefix);
         let (vote_send, _vote_recv) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+        let (feeds_management_cmd_send, _feeds_slots_manager_cmd_recv) =
             mpsc::unbounded_channel();
         let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
 
@@ -925,7 +923,7 @@ mod tests {
             )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-            feeds_slots_manager_cmd_send,
+            feeds_management_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
         }
     }
