@@ -159,9 +159,9 @@ fn convert_resources(map: &HashMap<String, String>) -> Resources {
     let mut resource_values: [Option<DataChunk>; 32] = Default::default();
 
     // Iterate over the HashMap, up to 32 entries
-    for (i, (key, value)) in map.into_iter().take(32).enumerate() {
-        resource_keys[i] = Some(string_to_data_chunk(&key));
-        resource_values[i] = Some(string_to_data_chunk(&value));
+    for (i, (key, value)) in map.iter().take(32).enumerate() {
+        resource_keys[i] = Some(string_to_data_chunk(key));
+        resource_values[i] = Some(string_to_data_chunk(value));
     }
 
     Resources {
@@ -248,7 +248,7 @@ async fn generate_block<
     // Process feed updates:
     if updates.keys().len() > 0 {
         if let Err(e) = batched_votes_send.send(UpdateToSend {
-            block_height: block_height,
+            block_height,
             kv_updates: updates,
         }) {
             error!(
@@ -277,11 +277,11 @@ async fn generate_block<
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
+    use std::sync::Arc;
     // use std::sync::{Arc, RwLock};
+    use blockchain_data_model::in_mem_db::InMemDb;
     use std::time::Duration;
-    use tokio::sync::mpsc;
-    use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+    use tokio::sync::{mpsc, RwLock};
     use tokio::time;
 
     #[actix_web::test]
@@ -290,36 +290,36 @@ mod tests {
         let batch_size = 3;
         let duration = 100;
 
-        let (vote_send, vote_recv): (
-            UnboundedSender<(&str, &str)>,
-            UnboundedReceiver<(&str, &str)>,
-        ) = mpsc::unbounded_channel();
-        let (batched_votes_send, mut batched_votes_recv): (
-            UnboundedSender<HashMap<&str, &str>>,
-            UnboundedReceiver<HashMap<&str, &str>>,
-        ) = mpsc::unbounded_channel();
+        let (vote_send, vote_recv) = mpsc::unbounded_channel();
+        let (_feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
+        let (batched_votes_send, mut batched_votes_recv) = mpsc::unbounded_channel();
 
         super::block_creator_loop(
             //Arc::new(RwLock::new(vote_recv)),
             vote_recv,
+            feeds_management_cmd_recv,
+            feeds_slots_manager_cmd_send,
             batched_votes_send,
             batch_size,
             duration,
+            Arc::new(RwLock::new(InMemDb::new())),
         )
         .await;
 
         // Send test votes
-        let k1 = "test_key_1";
-        let v1 = "test_val_1";
+        let k1 = "ab000001";
+        let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         vote_send.send((k1, v1)).unwrap();
-        let k2 = "test_key_2";
-        let v2 = "test_val_2";
+        let k2 = "ac000002";
+        let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000";
         vote_send.send((k2, v2)).unwrap();
-        let k3 = "test_key_3";
-        let v3 = "test_val_3";
+        let k3 = "ad000003";
+        let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000";
         vote_send.send((k3, v3)).unwrap();
-        let k4 = "test_key_4";
-        let v4 = "test_val_4";
+        let k4 = "af000004";
+        let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000";
         vote_send.send((k4, v4)).unwrap();
 
         // Wait for a while to let the loop process the message
@@ -328,7 +328,7 @@ mod tests {
 
         // Validate
         if let Some(batched) = batched_votes_recv.recv().await {
-            assert_eq!(batched.len(), 3);
+            assert_eq!(batched.kv_updates.len(), 3);
         } else {
             panic!("Batched votes were not received");
         }

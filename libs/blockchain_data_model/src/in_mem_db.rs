@@ -76,25 +76,25 @@ impl InMemDb {
             error!("Trying to insert in block more feed updates {} than supported {}. All above supported limit will be dropped!", updates.len(), MAX_ASSET_FEED_UPDATES_IN_BLOCK)
         }
 
-        let mut iter = updates.into_iter();
+        let mut iter = updates.iter();
         for i in 0..feed_updates.asset_feed_updates.len() {
             for j in 0..feed_updates.asset_feed_updates[i].len() {
                 if let Some((key, val)) = iter.next() {
                     feed_updates.asset_feed_updates[i][j] = Some(AssetFeedUpdate {
-                        id: <FeedIdChunk>::from_hex(key.to_string()).expect(
-                            format!(
-                                "Feed ID must be exactly 4 bytes. Found {}",
-                                key.to_string().len()
+                        id: <FeedIdChunk>::from_hex(key.to_string()).unwrap_or_else(|_| {
+                            panic!(
+                                "Feed ID must be exactly 8 bytes hex, found {} key = {:?}",
+                                key.to_string().len(),
+                                key
                             )
-                            .as_str(),
-                        ),
-                        feed_data: <DataChunk>::from_hex(val.to_string()).expect(
-                            format!(
-                                "Feed Value must be exactly 32 bytes. Found {}",
-                                key.to_string().len()
+                        }),
+                        feed_data: <DataChunk>::from_hex(val.to_string()).unwrap_or_else(|_| {
+                            panic!(
+                                "Feed Value must be exactly 64 bytes hex, found {} val = {:?}",
+                                val.to_string().len(),
+                                val
                             )
-                            .as_str(),
-                        ),
+                        }),
                     });
                 } else {
                     feed_updates.asset_feed_updates[i][j] = None;
@@ -219,5 +219,11 @@ impl InMemDb {
 
         self.latest_block_height = next_block_height;
         Ok(())
+    }
+}
+
+impl Default for InMemDb {
+    fn default() -> Self {
+        Self::new()
     }
 }

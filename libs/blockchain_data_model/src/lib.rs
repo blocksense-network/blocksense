@@ -65,11 +65,8 @@ pub struct AddRemoveFeeds {
     feed_ids_to_rm: [Option<u32>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
 }
 
-pub const MAX_ASSET_FEED_UPDATES_IN_BLOCK: usize = {
-    let asset_feed_updates_len =
-        std::mem::size_of::<FeedUpdatesInBlock>() / std::mem::size_of::<Option<AssetFeedUpdate>>();
-    asset_feed_updates_len
-};
+pub const MAX_ASSET_FEED_UPDATES_IN_BLOCK: usize =
+    std::mem::size_of::<FeedUpdatesInBlock>() / std::mem::size_of::<Option<AssetFeedUpdate>>();
 
 pub const MAX_NEW_FEEDS_IN_BLOCK: usize = 32;
 pub const MAX_FEED_ID_TO_DELETE_IN_BLOCK: usize = 32;

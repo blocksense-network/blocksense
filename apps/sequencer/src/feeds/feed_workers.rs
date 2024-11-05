@@ -3,20 +3,15 @@ use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
 use crate::sequencer_state::SequencerState;
-use crate::UpdateToSend;
 use actix_web::web::Data;
 use config::SequencerConfig;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use futures_util::stream::FuturesUnordered;
 use std::io::Error;
 use tokio::sync::mpsc;
-use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::task::JoinHandle;
 
-type BatchedVotesChannel = (
-    UnboundedSender<UpdateToSend<String, String>>,
-    UnboundedReceiver<UpdateToSend<String, String>>,
-);
 /// Given an app state and a sequencer configuration in launches the following app workers:
 /// - Feeds slots manager loop
 /// - Block creator loop
@@ -28,13 +23,13 @@ pub async fn prepare_app_workers(
     voting_receive_channel: UnboundedReceiver<(String, String)>,
     feeds_management_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
-    let (batched_votes_send, batched_votes_recv): BatchedVotesChannel = mpsc::unbounded_channel();
+    let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
     let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
 
     let feeds_slots_manager_loop_fut =
         feeds_slots_manager_loop(sequencer_state.clone(), feeds_slots_manager_cmd_recv).await;
 
-    let votes_batcher = block_creator_loop(
+    let block_creator = block_creator_loop(
         // sequencer_state.voting_recv_channel.clone(),
         voting_receive_channel,
         feeds_management_cmd_recv,
@@ -53,7 +48,7 @@ pub async fn prepare_app_workers(
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();
     collected_futures.push(feeds_slots_manager_loop_fut);
-    collected_futures.push(votes_batcher);
+    collected_futures.push(block_creator);
     collected_futures.push(votes_sender);
     collected_futures.push(metrics_collector);
 
