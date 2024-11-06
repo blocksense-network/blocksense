@@ -60,7 +60,7 @@ async fn get_key_from_contract(
     let tx = TransactionRequest::default()
         .to(*addr)
         .from(wallet.address())
-        .with_gas_limit(2e7 as u128)
+        .with_gas_limit(75e5 as u128)
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(1e9 as u128)
         .with_chain_id(provider.get_chain_id().await?)
