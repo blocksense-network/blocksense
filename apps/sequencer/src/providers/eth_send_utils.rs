@@ -3,10 +3,18 @@ use alloy::{
     rpc::types::eth::TransactionRequest,
 };
 use eyre::Result;
+use prometheus::metrics::FeedsMetrics;
+use tokio::sync::mpsc;
+use utils::logging::get_shared_logging_handle;
 // use reqwest::Client;
+use crate::reporters::reporter::init_shared_reporters;
+use crate::sequencer_state::SequencerState;
+use actix_web::web::Data;
+use config::get_sequencer_and_feed_configs;
+use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 use tokio::time::Duration;
 
 use alloy::{dyn_abi::DynSolValue, primitives::Address};
@@ -276,7 +284,7 @@ pub async fn eth_batch_send_to_all_contracts<
     K: Debug + Clone + std::string::ToString + 'static,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
-    providers: SharedRpcProviders,
+    sequencer_state: Data<SequencerState>,
     updates: HashMap<K, V>,
     feed_type: Repeatability,
 ) -> Result<String> {
@@ -284,9 +292,10 @@ pub async fn eth_batch_send_to_all_contracts<
     let _guard = span.enter();
     debug!("updates: {:?}", updates);
 
-    let providers = providers.read().await;
-
     let collected_futures = FuturesUnordered::new();
+
+    let providers = sequencer_state.providers.read().await;
+    let providers_config = &sequencer_state.sequencer_config.read().await.providers;
 
     for (net, p) in providers.iter() {
         let updates = updates.clone();
@@ -294,6 +303,12 @@ pub async fn eth_batch_send_to_all_contracts<
 
         let net = net.clone();
         let provider = p.clone();
+        if !providers_config.get(&net).unwrap().is_enabled {
+            warn!("Network `{net}` is not enabled; skipping it during reporting");
+            continue;
+        } else {
+            info!("Network `{net}` is enabled; reporting...");
+        }
         collected_futures.push(spawn(async move {
             let result = actix_web::rt::time::timeout(
                 Duration::from_secs(timeout),
@@ -305,6 +320,10 @@ pub async fn eth_batch_send_to_all_contracts<
     }
 
     drop(providers);
+
+    if collected_futures.is_empty() {
+        warn!("There are no enabled networks; not reporting to anybody");
+    }
 
     let result = futures::future::join_all(collected_futures).await;
     let mut all_results = String::new();
@@ -518,7 +537,7 @@ mod tests {
         let anvil_network2 = Anvil::new().try_spawn().unwrap();
         let network2 = "ETH375";
 
-        let cfg = get_test_config_with_multiple_providers(vec![
+        let sequencer_config = get_test_config_with_multiple_providers(vec![
             (
                 network1,
                 key_path.as_path(),
@@ -530,10 +549,39 @@ mod tests {
                 anvil_network2.endpoint().as_str(),
             ),
         ]);
+        let (_, mut feeds_config) = get_sequencer_and_feed_configs();
 
-        let providers =
-            init_shared_rpc_providers(&cfg, Some("test_eth_batch_send_to_all_oneshot_contracts_"))
-                .await;
+        let providers = init_shared_rpc_providers(
+            &sequencer_config,
+            Some("test_eth_batch_send_to_all_oneshot_contracts_"),
+        )
+        .await;
+
+        let (vote_send, mut vote_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
+
+        let metrics_prefix = Some("test_eth_batch_send_to_all_oneshot_contracts");
+
+        // Most of these fields are not used. SequencerState is used as a global reference to the
+        // system state, so that different parts of the system can affect each other when needed.
+        let sequencer_state = Data::new(SequencerState {
+            registry: Arc::new(RwLock::new(FeedMetaDataRegistry::new())),
+            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+            providers: providers.clone(),
+            log_handle: get_shared_logging_handle(),
+            reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
+            feed_id_allocator: Arc::new(RwLock::new(None)),
+            voting_send_channel: vote_send,
+            feeds_metrics: Arc::new(RwLock::new(
+                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
+                    .expect("Failed to allocate feed_metrics"),
+            )),
+            feeds_config: Arc::new(RwLock::new(feeds_config)),
+            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            feeds_slots_manager_cmd_send,
+        });
 
         // run
         let result = deploy_contract(&String::from(network1), &providers, Oneshot).await;
@@ -575,7 +623,8 @@ mod tests {
         let mut updates_oneshot: HashMap<String, String> = HashMap::new();
         updates_oneshot.insert(String::from("00000003"), value1);
 
-        let result = eth_batch_send_to_all_contracts(providers, updates_oneshot, Oneshot).await;
+        let result =
+            eth_batch_send_to_all_contracts(sequencer_state, updates_oneshot, Oneshot).await;
         // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
         // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
         // followups

@@ -39,7 +39,6 @@ pub async fn prepare_app_workers(
     .await;
 
     let votes_batcher = votes_result_batcher_loop(
-        // sequencer_state.voting_recv_channel.clone(),
         voting_receive_channel,
         batched_votes_send,
         sequencer_config.max_keys_to_batch,
@@ -47,8 +46,7 @@ pub async fn prepare_app_workers(
     )
     .await;
 
-    let votes_sender =
-        votes_result_sender_loop(batched_votes_recv, sequencer_state.providers.clone()).await;
+    let votes_sender = votes_result_sender_loop(batched_votes_recv, sequencer_state).await;
 
     let metrics_collector = metrics_collector_loop().await;
 

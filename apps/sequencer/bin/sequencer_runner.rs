@@ -12,8 +12,8 @@ use tokio::sync::{mpsc, RwLock};
 use sequencer::reporters::reporter::init_shared_reporters;
 
 use sequencer::http_handlers::admin::{
-    deploy, get_feed_config, get_feed_report_interval, get_feeds_config, get_key,
-    get_sequencer_config, register_asset_feed, set_log_level,
+    deploy, disable_provider, enable_provider, get_feed_config, get_feed_report_interval,
+    get_feeds_config, get_key, get_sequencer_config, register_asset_feed, set_log_level,
 };
 use sequencer::http_handlers::data_feeds::{post_report, post_reports_batch, register_feed};
 use utils::logging::{
@@ -123,6 +123,8 @@ pub async fn prepare_http_servers(
                 .service(get_feed_config)
                 .service(get_sequencer_config)
                 .service(register_asset_feed)
+                .service(disable_provider)
+                .service(enable_provider)
         })
         .workers(1)
         .bind(("0.0.0.0", admin_port))

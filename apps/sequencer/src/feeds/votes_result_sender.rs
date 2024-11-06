@@ -1,6 +1,7 @@
 use crate::providers::eth_send_utils::eth_batch_send_to_all_contracts;
-use crate::providers::provider::SharedRpcProviders;
+use crate::sequencer_state::SequencerState;
 use actix_web::rt::spawn;
+use actix_web::web::Data;
 use feed_registry::types::Repeatability::Periodic;
 use std::collections::HashMap;
 use std::fmt::Debug;
@@ -13,7 +14,7 @@ pub async fn votes_result_sender_loop<
     V: Debug + Clone + std::string::ToString + 'static,
 >(
     mut batched_votes_recv: UnboundedReceiver<HashMap<K, V>>,
-    providers: SharedRpcProviders,
+    sequencer_state: Data<SequencerState>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     spawn(async move {
         loop {
@@ -21,9 +22,9 @@ pub async fn votes_result_sender_loop<
             match recvd {
                 Some(updates) => {
                     info!("sending updates to contract:");
-                    let providers_clone = providers.clone();
+                    let sequencer_state = sequencer_state.clone();
                     spawn(async move {
-                        match eth_batch_send_to_all_contracts(providers_clone, updates, Periodic)
+                        match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic)
                             .await
                         {
                             Ok(res) => info!("Sending updates complete {}.", res),

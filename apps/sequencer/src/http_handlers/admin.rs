@@ -310,6 +310,84 @@ pub async fn register_asset_feed(
     Ok(HttpResponse::Ok().into())
 }
 
+async fn set_provider_is_enabled(
+    req: HttpRequest,
+    sequencer_state: web::Data<SequencerState>,
+    is_enabled: bool,
+) -> Result<HttpResponse, Error> {
+    let network_name = req.match_info().get("network_name");
+
+    let network_name: String = match network_name {
+        Some(network_name) => network_name.parse()?,
+        None => {
+            let message = "Missing field 'network_name'";
+            debug!("{message}");
+            return Err(error::ErrorBadRequest(message));
+        }
+    };
+
+    info!("reading previous state of 'is_enabled' for network {network_name}");
+
+    let sequencer_config = sequencer_state.sequencer_config.read().await;
+    let provider: &config::Provider = match sequencer_config.providers.get(&network_name) {
+        Some(provider) => provider,
+        None => {
+            let message = format!("No provider for network {network_name}");
+            debug!("{message}");
+            return Err(error::ErrorBadRequest(message));
+        }
+    };
+    info!("{network_name}.is_enabled = {}", provider.is_enabled);
+    if provider.is_enabled == is_enabled {
+        let message = if is_enabled {
+            // Keeping this code less pretty so that it's easier to search for "already
+            // enabled"/"already disabled", if the message shows up in logs.
+            format!("Posting to {network_name} already enabled")
+        } else {
+            format!("Posting to {network_name} already disabled")
+        };
+        debug!("{message}");
+        return Err(error::ErrorBadRequest(message));
+    }
+
+    // Important to drop read lock, otherwise trying to acquire a write lock will deadlock.
+    drop(sequencer_config);
+
+    let mut sequencer_config = sequencer_state.sequencer_config.write().await;
+    let provider: &mut config::Provider =
+        sequencer_config.providers.get_mut(&network_name).unwrap();
+    provider.is_enabled = is_enabled;
+
+    let message = if is_enabled {
+        format!("posting to {network_name} successfully enabled")
+    } else {
+        format!("Posting to {network_name} successfully disabled")
+    };
+    info!("{message}");
+
+    Ok(HttpResponse::Ok().into())
+}
+
+/// Disable posting to provider for the given network.
+#[post("/disable_provider/{network_name}")]
+pub async fn disable_provider(
+    req: HttpRequest,
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    info!("endpoint disable_provider called");
+    set_provider_is_enabled(req, sequencer_state, false).await
+}
+
+/// Enable posting to provider for the given network.
+#[post("/enable_provider/{network_name}")]
+pub async fn enable_provider(
+    req: HttpRequest,
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    info!("endpoint enable_provider called");
+    set_provider_is_enabled(req, sequencer_state, true).await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -428,7 +506,7 @@ mod tests {
                 &feeds_config,
             ))),
             reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            providers: providers.clone(),
+            providers,
             log_handle,
             reporters: init_shared_reporters(&cfg, metrics_prefix),
             feed_id_allocator: Arc::new(RwLock::new(None)),
@@ -615,5 +693,67 @@ mod tests {
 
             assert_eq!(recvd_data, sequencer_config);
         }
+    }
+
+    #[actix_web::test]
+    async fn disable_provider_does_not_crash() {
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = get_test_private_key_path();
+        let network = "ETH_disable_provider_changes_state";
+
+        let sequencer_state = create_sequencer_state_from_sequencer_config(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+        )
+        .await;
+
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(disable_provider),
+        )
+        .await;
+
+        let req = test::TestRequest::post()
+            .uri(format!("/disable_provider/{network}").as_str())
+            .to_request();
+
+        // Execute the request and read the response
+        let _resp = test::call_service(&app, req).await;
+
+        // This test just tests that the call completes and there is no crash.
+        // The testing harness is not robust enough to test the logic yet.
+    }
+
+    #[actix_web::test]
+    async fn enable_provider_does_not_crash() {
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = get_test_private_key_path();
+        let network = "ETH_enable_provider_changes_state";
+
+        let sequencer_state = create_sequencer_state_from_sequencer_config(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+        )
+        .await;
+
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(enable_provider),
+        )
+        .await;
+
+        let req = test::TestRequest::post()
+            .uri(format!("/enable_provider/{network}").as_str())
+            .to_request();
+
+        // Execute the request and read the response
+        let _resp = test::call_service(&app, req).await;
+
+        // This test just tests that the call completes and there is no crash.
+        // The testing harness is not robust enough to test the logic yet.
     }
 }
