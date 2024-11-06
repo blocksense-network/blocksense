@@ -585,6 +585,7 @@ mod tests {
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_management_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+            kafka_endpoint: None,
         });
 
         let app = test::init_service(
@@ -684,6 +685,7 @@ mod tests {
                 feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
                 feeds_management_cmd_send,
                 blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+                kafka_endpoint: None,
             }),
         )
     }
@@ -924,6 +926,7 @@ mod tests {
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_management_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+            kafka_endpoint: None,
         }
     }
 

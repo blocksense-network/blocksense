@@ -433,6 +433,7 @@ mod tests {
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_management_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+            kafka_endpoint: None,
         });
 
         let _future = feeds_slots_manager_loop(sequencer_state, feeds_management_cmd_recv).await;

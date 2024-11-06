@@ -244,6 +244,11 @@ pub struct BlockConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct KafkaReportEndpoint {
+    pub url: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct SequencerConfig {
     pub main_port: u16,
     pub admin_port: u16,
@@ -251,6 +256,7 @@ pub struct SequencerConfig {
     pub block_config: BlockConfig,
     pub providers: HashMap<String, Provider>,
     pub reporters: Vec<Reporter>,
+    pub kafka_report_endpoint: KafkaReportEndpoint,
 }
 
 impl Validated for SequencerConfig {
@@ -347,6 +353,7 @@ pub fn get_test_config_with_single_provider(
             },
         )]),
         reporters: Vec::new(),
+        kafka_report_endpoint: KafkaReportEndpoint{url: None},
     }
 }
 
@@ -388,6 +395,7 @@ pub fn get_test_config_with_multiple_providers(
         },
         providers,
         reporters: Vec::new(),
+        kafka_report_endpoint: KafkaReportEndpoint { url: None },
     }
 }
 

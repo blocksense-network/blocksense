@@ -6,6 +6,8 @@ use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::{
     new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
 };
+use rdkafka::producer::FutureProducer;
+use rdkafka::ClientConfig;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
 use tokio::sync::{mpsc, RwLock};
@@ -39,6 +41,15 @@ type VoteChannel = (
     UnboundedSender<(String, String)>,
     UnboundedReceiver<(String, String)>,
 );
+
+fn create_kafka_producer(
+    bootstrap_server: &str,
+) -> Result<FutureProducer, Box<dyn std::error::Error>> {
+    Ok(ClientConfig::new()
+        .set("bootstrap.servers", bootstrap_server)
+        .set("queue.buffering.max.ms", "0")
+        .create()?)
+}
 
 /// Given a Sequencer config is returns the app state need to start the Actix Sequencer server.
 pub async fn prepare_sequencer_state(
@@ -94,6 +105,13 @@ pub async fn prepare_sequencer_state(
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         feeds_management_cmd_send,
         blockchain_db: Arc::new(db),
+        kafka_endpoint: sequencer_config
+            .kafka_report_endpoint
+            .url
+            .as_ref()
+            .map(|url| {
+                create_kafka_producer(url).expect("Could not create kafka communication channel.")
+            }),
     });
 
     (vote_recv, feeds_management_cmd_recv, sequencer_state)

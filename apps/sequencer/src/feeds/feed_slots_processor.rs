@@ -626,6 +626,7 @@ pub mod tests {
                 feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
                 feeds_management_cmd_send,
                 blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+                kafka_endpoint: None,
             }),
             vote_recv,
         )
@@ -668,6 +669,7 @@ pub mod tests {
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
             feeds_management_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+            kafka_endpoint: None,
         };
         (sequencer_state, vote_recv)
     }

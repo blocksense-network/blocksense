@@ -89,5 +89,6 @@ pub async fn create_sequencer_state_from_sequencer_config_file(
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         feeds_management_cmd_send,
         blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+        kafka_endpoint: None,
     })
 }
