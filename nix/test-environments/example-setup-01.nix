@@ -72,7 +72,7 @@ in
         "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e"
       ];
 
-      log-level = "debug";
+      log-level = "info";
     };
 
     reporters = {
