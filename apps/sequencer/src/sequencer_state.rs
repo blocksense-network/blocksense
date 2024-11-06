@@ -7,6 +7,7 @@ use config::SequencerConfig;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
 use prometheus::metrics::FeedsMetrics;
+use rdkafka::producer::FutureProducer;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
@@ -26,5 +27,6 @@ pub struct SequencerState {
     pub feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>>,
     pub feeds_management_cmd_send: mpsc::UnboundedSender<FeedsManagementCmds>,
     pub blockchain_db: Arc<RwLock<InMemDb>>,
+    pub kafka_endpoint: Option<FutureProducer>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }
