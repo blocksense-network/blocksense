@@ -111,6 +111,48 @@ pub async fn deploy_contract(
     Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
 }
 
+/// Serializes the `updates` hash map into a string, but also filters out some feed ids when the
+/// network is a specific one.
+///
+/// TODO(#613): this is a temporary hack and should be reverted when we have a more robust solution that
+/// introduces a provider blacklist to the feed config.
+fn compute_keys_vals<
+    K: Debug + Clone + std::string::ToString + 'static,
+    V: Debug + Clone + std::string::ToString + 'static,
+>(
+    net: &str,
+    updates: HashMap<K, V>,
+) -> String {
+    let mut keys_vals: String = Default::default();
+
+    let special_network = "ethereum-holesky";
+    let special_feed_ids = [31 /* BTC/USD */, 47 /* ETH/USD */];
+
+    info!("Preparing a batch of feeds to network `{net}`");
+    let mut num_reported_feeds = 0;
+    for (key, val) in updates.into_iter() {
+        if net == special_network {
+            // if special net: add only special feeds
+            let feed_id = i64::from_str_radix(&key.to_string(), 16).unwrap();
+            if special_feed_ids.contains(&feed_id) {
+                num_reported_feeds += 1;
+                keys_vals += key.to_string().as_str();
+                keys_vals += val.to_string().as_str();
+            } else {
+                debug!("Skipping feed id {feed_id} for special network `{net}`");
+            }
+        } else {
+            // if not special: always add
+            num_reported_feeds += 1;
+            keys_vals += key.to_string().as_str();
+            keys_vals += val.to_string().as_str();
+        }
+    }
+    info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
+
+    keys_vals
+}
+
 pub async fn eth_batch_send_to_contract<
     K: Debug + Clone + std::string::ToString + 'static,
     V: Debug + Clone + std::string::ToString + 'static,
@@ -142,12 +184,7 @@ pub async fn eth_batch_send_to_contract<
 
     let selector = "0x1a2d80ac";
 
-    let mut keys_vals: String = Default::default();
-
-    for (key, val) in updates.into_iter() {
-        keys_vals += key.to_string().as_str();
-        keys_vals += val.to_string().as_str();
-    }
+    let keys_vals = compute_keys_vals(&net, updates);
 
     let calldata_str = (selector.to_owned() + keys_vals.as_str()).to_string();
 
