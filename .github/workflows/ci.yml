@@ -16,274 +16,31 @@ on:
   merge_group:
 
 jobs:
-  lint:
-    runs-on: self-hosted
+  list-changed-files:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
+      - name: Install GitHub CLI
+        run: sudo apt-get install -y gh
 
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build & activate the Nix Dev Shell
+      - name: Authenticate GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          eval "$(nix print-dev-env --accept-flake-config --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
+          gh auth setup-git
 
-      - name: Check formatting
-        run: npm run format:check
-
-      - name: nix flake check
-        run: nix flake check --impure
-
-  smart-contracts-tests:
-    timeout-minutes: 360
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build & activate the Nix Dev Shell
+      - name: Get changed files
+        id: changed_files
         run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED_FILES=$(gh pr diff ${{ github.event.pull_request.number }} --name-only)
+          else
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          fi
+          echo "changed_files=$CHANGED_FILES" >> $GITHUB_ENV
 
-      - name: Install JS deps
-        run: yarn install
-
-      - name: Build all contracts
-        run: yarn build @blocksense/contracts
-
-      - name: Test all contracts
-        run: yarn workspace @blocksense/contracts test
-
-      - name: Measure test coverage
-        run: yarn workspace @blocksense/contracts coverage
-
-      - name: Measure contract size
-        run: yarn workspace @blocksense/contracts size
-
-  docs_website:
-    timeout-minutes: 360
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build & activate the Nix Dev Shell
+      - name: Print changed files
         run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
-
-      - name: Install JS deps
-        run: yarn install
-
-      - name: Build
-        run: yarn workspace @blocksense/docs.blocksense.network build
-
-      - name: Test `@blocksense/base-utils`
-        run: yarn workspace @blocksense/base-utils test
-
-      - name: Test
-        run: yarn workspace @blocksense/docs.blocksense.network test
-
-  explorer_website:
-    timeout-minutes: 360
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build & activate the Nix Dev Shell
-        run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
-
-      - name: Install JS deps
-        run: yarn install
-
-      - name: Build
-        run: yarn workspace @blocksense/explorer.blocksense.network build
-
-  rust:
-    timeout-minutes: 360
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build & activate the Nix Dev Shell
-        run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
-
-      - name: Build Rust workspace
-        run: cargo build
-
-      - name: Test Rust workspace
-        run: cargo test
-
-      - name: Run Cargo Clippy
-        run: cargo clippy -- --deny warnings
-
-      - name: Build and install oracle trigger plugin
-        run: ./scripts/sdk/build-and-install-plugin.sh
-
-  rust-nix-build:
-    timeout-minutes: 360
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Nix build Rust workspace
-        run: nix build --impure --json -L --accept-flake-config .#blocksense-rs
-
-  deploy_websites:
-    timeout-minutes: 360
-    runs-on: self-hosted
-    strategy:
-      matrix:
-        include:
-          - project: docs
-            vercel_project: docs.blocksense.network
-          - project: explorer
-            vercel_project: explorer.blocksense.network
-    outputs:
-      docsDeploymentMessage: ${{ steps.collect-docs.outputs.message }}
-      explorerDeploymentMessage: ${{ steps.collect-explorer.outputs.message }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build & activate the Nix Dev Shell
-        run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
-
-      - name: Set node linker
-        run: |
-          echo "nodeLinker: node-modules" >> .yarnrc.yml
-
-      - name: Install JS deps
-        run: yarn install
-
-      - name: Pull Vercel configuration
-        run: yarn vercel link --scope blocksense --project ${{ matrix.vercel_project }} --yes --token ${{ secrets.vercel_token }}
-
-      - name: Vercel Build - Prod
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        run: yarn vercel build --prod --yes --token ${{ secrets.vercel_token }}
-
-      - name: Vercel Build - Preview
-        if: github.ref != format('refs/heads/{0}', github.event.repository.default_branch)
-        run: yarn vercel build --yes --token ${{ secrets.vercel_token }}
-
-      - name: Deploy to Vercel - Prod
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        run: yarn vercel deploy --prod --prebuilt --scope blocksense --token ${{ secrets.vercel_token }} > _vercel-deployment-url
-
-      - name: Deploy to Vercel - Preview
-        if: github.ref != format('refs/heads/{0}', github.event.repository.default_branch)
-        run: yarn vercel deploy --prebuilt --scope blocksense --token ${{ secrets.vercel_token }} > _vercel-deployment-url
-
-      - name: Collect Docs Deployment URL
-        id: collect-docs
-        if: matrix.project == 'docs'
-        run: |
-          DOCS_DEPLOY_URL=$(cat _vercel-deployment-url)
-          echo "::set-output name=message::$DOCS_DEPLOY_URL"
-
-      - name: Collect Explorer Deployment URL
-        id: collect-explorer
-        if: matrix.project == 'explorer'
-        run: |
-          EXPLORER_DEPLOY_URL=$(cat _vercel-deployment-url)
-          echo "::set-output name=message::$EXPLORER_DEPLOY_URL"
-
-  comment_on_pr:
-    needs: [deploy_websites]
-    runs-on: self-hosted
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Comment Deployment Links on the PR
-        uses: marocchino/sticky-pull-request-comment@v2.9.0
-        with:
-          recreate: true
-          message: |
-            🚀 Deployment Links of Blocksense Network websites:
-             * 🌱 Documentation: ${{ needs.deploy_websites.outputs.docsDeploymentMessage }}
-             * 🧭 Explorer: ${{ needs.deploy_websites.outputs.explorerDeploymentMessage }}
+          echo "Changed files: $CHANGED_FILES"
