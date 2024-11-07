@@ -696,7 +696,7 @@ mod tests {
     }
 
     #[actix_web::test]
-    async fn disable_provider_does_not_crash() {
+    async fn disable_provider_changes_sequencer_state() {
         let anvil = Anvil::new().try_spawn().unwrap();
         let key_path = get_test_private_key_path();
         let network = "ETH_disable_provider_changes_state";
@@ -707,6 +707,22 @@ mod tests {
             anvil.endpoint().as_str(),
         )
         .await;
+
+        let mut sequencer_config = sequencer_state.sequencer_config.write().await;
+        sequencer_config.providers.insert(
+            network.to_string(),
+            config::Provider {
+                private_key_path: "".to_string(),
+                url: "".to_string(),
+                contract_address: None,
+                event_contract_address: None,
+                transcation_timeout_secs: 42,
+                data_feed_store_byte_code: None,
+                data_feed_sports_byte_code: None,
+                is_enabled: true,
+            },
+        );
+        drop(sequencer_config);
 
         let app = test::init_service(
             App::new()
@@ -720,14 +736,19 @@ mod tests {
             .to_request();
 
         // Execute the request and read the response
-        let _resp = test::call_service(&app, req).await;
+        let resp = test::call_service(&app, req).await;
+        info!("{resp:?}");
+        assert_eq!(200, resp.status());
 
-        // This test just tests that the call completes and there is no crash.
-        // The testing harness is not robust enough to test the logic yet.
+        let sequencer_config = sequencer_state.sequencer_config.read().await;
+        assert_eq!(
+            false,
+            sequencer_config.providers.get(network).unwrap().is_enabled
+        );
     }
 
     #[actix_web::test]
-    async fn enable_provider_does_not_crash() {
+    async fn enable_provider_changes_sequencer_state() {
         let anvil = Anvil::new().try_spawn().unwrap();
         let key_path = get_test_private_key_path();
         let network = "ETH_enable_provider_changes_state";
@@ -738,6 +759,22 @@ mod tests {
             anvil.endpoint().as_str(),
         )
         .await;
+
+        let mut sequencer_config = sequencer_state.sequencer_config.write().await;
+        sequencer_config.providers.insert(
+            network.to_string(),
+            config::Provider {
+                private_key_path: "".to_string(),
+                url: "".to_string(),
+                contract_address: None,
+                event_contract_address: None,
+                transcation_timeout_secs: 42,
+                data_feed_store_byte_code: None,
+                data_feed_sports_byte_code: None,
+                is_enabled: false,
+            },
+        );
+        drop(sequencer_config);
 
         let app = test::init_service(
             App::new()
@@ -751,9 +788,14 @@ mod tests {
             .to_request();
 
         // Execute the request and read the response
-        let _resp = test::call_service(&app, req).await;
+        let resp = test::call_service(&app, req).await;
+        info!("{resp:?}");
+        assert_eq!(200, resp.status());
 
-        // This test just tests that the call completes and there is no crash.
-        // The testing harness is not robust enough to test the logic yet.
+        let sequencer_config = sequencer_state.sequencer_config.read().await;
+        assert_eq!(
+            true,
+            sequencer_config.providers.get(network).unwrap().is_enabled
+        );
     }
 }
