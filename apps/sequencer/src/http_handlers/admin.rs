@@ -437,9 +437,9 @@ pub async fn delete_asset_feed(
         }
     };
 
-    return Ok(HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
-        .body(format!("{}", feed.read().await.get_report_interval_ms())));
+        .body(format!("{}", feed.read().await.get_report_interval_ms())))
 }
 
 #[cfg(test)]

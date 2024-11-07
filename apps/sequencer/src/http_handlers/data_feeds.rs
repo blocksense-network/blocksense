@@ -371,19 +371,15 @@ pub async fn register_feed(
     let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
         Arc::new(RwLock::new(FeedAggregateHistory::new()));
 
-    let reporters = sequencer_state.reporters.clone();
-
     let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
     let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
     actix_web::rt::spawn(async move {
         feed_slots_processor
             .start_loop(
-                sequencer_state.voting_send_channel.clone(),
+                sequencer_state,
                 registered_feed_metadata,
-                sequencer_state.reports.clone(),
                 feed_aggregate_history,
-                reporters,
                 None,
                 cmd_recv,
                 Some(cmd_send),

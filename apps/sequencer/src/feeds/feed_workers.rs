@@ -31,12 +31,8 @@ pub async fn prepare_app_workers(
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv): BatchedVotesChannel = mpsc::unbounded_channel();
 
-    let feeds_slots_manager_loop_fut = feeds_slots_manager_loop(
-        sequencer_state.clone(),
-        sequencer_state.voting_send_channel.clone(),
-        feeds_slots_manager_cmd_recv,
-    )
-    .await;
+    let feeds_slots_manager_loop_fut =
+        feeds_slots_manager_loop(sequencer_state.clone(), feeds_slots_manager_cmd_recv).await;
 
     let votes_batcher = votes_result_batcher_loop(
         voting_receive_channel,

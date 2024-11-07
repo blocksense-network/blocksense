@@ -23,6 +23,7 @@ pub struct DeleteAssetFeed {
     pub id: u32,
 }
 
+#[allow(clippy::large_enum_variant)]
 pub enum FeedsSlotsManagerCmds {
     RegisterNewAssetFeed(RegisterNewAssetFeed),
     DeleteAssetFeed(DeleteAssetFeed),
@@ -36,15 +37,10 @@ pub enum ProcessorResultValue {
     ProcessorExitStatus(String),
 }
 
-pub async fn feeds_slots_manager_loop<
-    K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
-    V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
->(
+pub async fn feeds_slots_manager_loop(
     sequencer_state: web::Data<SequencerState>,
-    vote_send: mpsc::UnboundedSender<(K, V)>,
     cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
-    let reports_clone = sequencer_state.reports.clone();
     spawn(async move {
         let mut collected_futures = FuturesUnordered::new();
 
@@ -53,9 +49,6 @@ pub async fn feeds_slots_manager_loop<
         let keys = reg.get_keys();
 
         for key in keys {
-            let send_channel: mpsc::UnboundedSender<(K, V)> = vote_send.clone();
-            let rc = reports_clone.clone();
-
             debug!("key = {} : value = {:?}", key, reg.get(key));
 
             sequencer_state
@@ -71,7 +64,6 @@ pub async fn feeds_slots_manager_loop<
 
             let name = feed.read().await.get_name().clone();
             let feed_aggregate_history_cp = sequencer_state.feed_aggregate_history.clone();
-            let reporters_cp = sequencer_state.reporters.clone();
             let feed_metrics_cp = sequencer_state.feeds_metrics.clone();
 
             let feed_slots_processor = FeedSlotsProcessor::new(name, key);
@@ -80,14 +72,13 @@ pub async fn feeds_slots_manager_loop<
 
             feed.write().await.set_processor_cmd_chan(cmd_send);
 
+            let sequencer_state = sequencer_state.clone();
             collected_futures.push(spawn(async move {
                 feed_slots_processor
                     .start_loop(
-                        send_channel,
+                        sequencer_state,
                         feed,
-                        rc,
                         feed_aggregate_history_cp,
-                        reporters_cp,
                         Some(feed_metrics_cp),
                         cmd_recv,
                         None,
@@ -183,15 +174,16 @@ async fn handle_feeds_slots_manager_cmd(
                         feed.write().await.set_processor_cmd_chan(cmd_send);
                     }
 
+                    let sequencer_state = sequencer_state.clone();
                     collected_futures.push(spawn(async move {
+                        let feed_aggregate_history = sequencer_state.feed_aggregate_history.clone();
+                        let feeds_metrics = sequencer_state.feeds_metrics.clone();
                         feed_slots_processor
                             .start_loop(
-                                sequencer_state.voting_send_channel.clone(),
+                                sequencer_state,
                                 registered_feed_metadata,
-                                sequencer_state.reports.clone(),
-                                sequencer_state.feed_aggregate_history.clone(),
-                                sequencer_state.reporters.clone(),
-                                Some(sequencer_state.feeds_metrics.clone()),
+                                feed_aggregate_history,
+                                Some(feeds_metrics),
                                 cmd_recv,
                                 None,
                             )
@@ -212,7 +204,7 @@ async fn handle_feeds_slots_manager_cmd(
                     None => panic!("Error feed was not registered."),
                 };
 
-                let _ = match &feed.read().await.processor_cmd_chan {
+                match &feed.read().await.processor_cmd_chan {
                     Some(chan) => {
                         match chan.send(Terminate()) {
                             Ok(_) => {
@@ -229,9 +221,7 @@ async fn handle_feeds_slots_manager_cmd(
                             }
                         };
                     }
-                    None => {
-                        error!("No channel for feed {} management!", delete_asset_feed.id)
-                    }
+                    None => error!("No channel for feed {} management!", delete_asset_feed.id),
                 };
             }
             match deregister_asset_feed(&sequencer_state, &delete_asset_feed).await {

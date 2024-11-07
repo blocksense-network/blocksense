@@ -1,19 +1,19 @@
-use crate::reporters::reporter::SharedReporters;
+use crate::sequencer_state::SequencerState;
+use actix_web::web::Data;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
 use eyre::Result;
 use feed_registry::registry::FeedAggregateHistory;
-use feed_registry::registry::{AllFeedsReports, SlotTimeTracker};
+use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::FeedType;
 use feed_registry::types::{FeedMetaData, Repeatability};
 use feed_registry::types::{FeedResult, FeedsSlotProcessorCmds};
 use prometheus::{inc_metric, metrics::FeedsMetrics};
 use ringbuf::traits::consumer::Consumer;
-use std::fmt::Debug;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc;
-use tokio::sync::{mpsc::UnboundedSender, RwLock};
+use tokio::sync::RwLock;
 use tracing::error;
 use tracing::warn;
 use tracing::{debug, info};
@@ -45,20 +45,19 @@ impl FeedSlotsProcessor {
         }
     }
 
-    pub async fn start_loop<
-        K: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
-        V: Debug + Clone + std::string::ToString + 'static + std::convert::From<std::string::String>,
-    >(
+    pub async fn start_loop(
         &self,
-        result_send: UnboundedSender<(K, V)>,
+        sequencer_state: Data<SequencerState>,
         feed: Arc<RwLock<FeedMetaData>>,
-        reports: Arc<RwLock<AllFeedsReports>>,
         history: Arc<RwLock<FeedAggregateHistory>>,
-        reporters: SharedReporters,
         feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
         mut cmd_channel: mpsc::UnboundedReceiver<FeedsSlotProcessorCmds>,
         _cmd_sender: Option<mpsc::UnboundedSender<FeedsSlotProcessorCmds>>,
     ) -> Result<ProcessorResultValue> {
+        let result_send = sequencer_state.voting_send_channel.clone();
+        let reports = sequencer_state.reports.clone();
+        let reporters = sequencer_state.reporters.clone();
+
         let (is_oneshot, report_interval_ms, first_report_start_time, quorum_percentage) = {
             let datafeed = feed.read().await;
             (
@@ -223,8 +222,8 @@ impl FeedSlotsProcessor {
                     if is_quorum_reached {
                         result_send
                             .send((
-                                to_hex_string(key_post.to_be_bytes().to_vec(), None).into(),
-                                naive_packing(result_post_to_contract).into(),
+                                to_hex_string(key_post.to_be_bytes().to_vec(), None),
+                                naive_packing(result_post_to_contract),
                             ))
                             .unwrap();
                     }
