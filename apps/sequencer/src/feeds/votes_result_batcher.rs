@@ -7,7 +7,7 @@ use std::io::Error;
 // use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
-use tracing::{debug, error, info, info_span};
+use tracing::{error, info, info_span, trace};
 use utils::time::current_unix_time;
 
 pub async fn votes_result_batcher_loop<
@@ -54,11 +54,11 @@ pub async fn votes_result_batcher_loop<
                         send_to_contract = updates.keys().len() >= max_keys_to_batch;
                     }
                     Ok(None) => {
-                        debug!("Woke up on empty channel. Flushing batched updates.");
+                        trace!("Woke up on empty channel. Flushing batched updates.");
                         send_to_contract = true;
                     }
                     Err(err) => {
-                        debug!(
+                        trace!(
                             "Woke up due to: {}. Flushing batched updates",
                             err.to_string()
                         );
