@@ -6,6 +6,7 @@ use std::{
     collections::{HashMap, HashSet},
     hash::{Hash, Hasher},
     sync::Arc,
+    time::Instant,
 };
 
 use http::uri::Scheme;
@@ -34,7 +35,7 @@ use prometheus::{
     actix_server::handle_prometheus_metrics,
     metrics::{
         REPORTER_BATCH_COUNTER, REPORTER_FAILED_SEQ_REQUESTS, REPORTER_FAILED_WASM_EXECS,
-        REPORTER_FEED_COUNTER,
+        REPORTER_FEED_COUNTER, REPORTER_WASM_EXECUTION_TIME_GAUGE,
     },
     TextEncoder,
 };
@@ -188,10 +189,7 @@ impl TriggerExecutor for OracleTrigger {
                     capabilities = cap.clone();
                 }
 
-                REPORTER_FEED_COUNTER
-                    .lock()
-                    .unwrap()
-                    .inc_by(config.data_feeds.len() as u64);
+                REPORTER_FEED_COUNTER.inc_by(config.data_feeds.len() as u64);
                 (
                     config.component.clone(),
                     Component {
@@ -363,7 +361,7 @@ impl OracleTrigger {
     ) -> TerminationReason {
         //TODO(adikov): Implement proper logic and remove dummy values
         loop {
-            REPORTER_BATCH_COUNTER.lock().unwrap().inc();
+            REPORTER_BATCH_COUNTER.inc();
             let _ = tokio::time::sleep(time_interval).await;
 
             let data_feed_signal = components
@@ -461,8 +459,6 @@ impl OracleTrigger {
                 Err(e) => {
                     //TODO(adikov): Add code from the error - e.status()
                     REPORTER_FAILED_SEQ_REQUESTS
-                        .lock()
-                        .unwrap()
                         .with_label_values(&["404"])
                         .inc();
 
@@ -524,19 +520,25 @@ impl OracleTrigger {
                 })
                 .collect(),
         };
-        match instance
+
+        let start_time = Instant::now();
+        let result = instance
             .call_handle_oracle_request(&mut store, &wit_settings)
-            .await
-        {
+            .await;
+        let elapsed_time_ms = start_time.elapsed().as_millis();
+        REPORTER_WASM_EXECUTION_TIME_GAUGE
+            .with_label_values(&[&component_id.clone()])
+            .set(elapsed_time_ms as i64);
+
+        match result {
             Ok(Ok(payload)) => {
                 tracing::info!("Component {component_id} completed okay");
+
                 Ok(payload)
             }
             Ok(Err(e)) => {
                 tracing::warn!("Component {component_id} returned error {:?}", e);
                 REPORTER_FAILED_WASM_EXECS
-                    .lock()
-                    .unwrap()
                     .with_label_values(&[&component_id.clone()])
                     .inc();
                 Err(anyhow::anyhow!("Component {component_id} returned error")) // TODO: more details when WIT provides them
@@ -544,8 +546,6 @@ impl OracleTrigger {
             Err(e) => {
                 tracing::error!("error running component {component_id}: {:?}", e);
                 REPORTER_FAILED_WASM_EXECS
-                    .lock()
-                    .unwrap()
                     .with_label_values(&[&component_id.clone()])
                     .inc();
                 Err(anyhow::anyhow!("Error executing component {component_id}"))

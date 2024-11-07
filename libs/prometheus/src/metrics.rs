@@ -4,8 +4,6 @@ use prometheus_framework::{
     IntCounter, IntCounterVec, IntGauge, IntGaugeVec,
 };
 
-use std::sync::Mutex;
-
 use utils::build_info::{
     BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
     VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
@@ -51,19 +49,24 @@ lazy_static::lazy_static! {
 }
 
 lazy_static::lazy_static! {
-    pub static ref REPORTER_FEED_COUNTER: Mutex<IntCounter> =
-        Mutex::new(register_int_counter!("FEED_COUNTER", "Available feed count").unwrap());
+pub static ref REPORTER_FEED_COUNTER: IntCounter =
+    register_int_counter!("FEED_COUNTER", "Available feed count").unwrap();
 
-    pub static ref REPORTER_BATCH_COUNTER: Mutex<IntCounter> =
-        Mutex::new(register_int_counter!("BATCH_COUNTER", "number of batches served").unwrap());
+pub static ref REPORTER_BATCH_COUNTER: IntCounter =
+    register_int_counter!("BATCH_COUNTER", "number of batches served").unwrap();
 
-    pub static ref REPORTER_FAILED_WASM_EXECS: Mutex<IntCounterVec> =
-        Mutex::new(register_int_counter_vec!("REPORTER_FAILED_WASM_EXECS",
-            "Count of failed wasm executions", &["oracle_id"]).unwrap());
+pub static ref REPORTER_FAILED_WASM_EXECS: IntCounterVec =
+    register_int_counter_vec!("FAILED_WASM_EXECS",
+        "Count of failed wasm executions", &["oracle_id"]).unwrap();
 
-    pub static ref REPORTER_FAILED_SEQ_REQUESTS: Mutex<IntCounterVec> =
-        Mutex::new(register_int_counter_vec!("REPORTER_FAILED_SEQ_REQUESTS",
-            "Count of failed sequncer requests", &["code"]).unwrap());
+pub static ref REPORTER_FAILED_SEQ_REQUESTS: IntCounterVec =
+    register_int_counter_vec!("FAILED_SEQ_REQUESTS",
+        "Count of failed sequncer requests", &["code"]).unwrap();
+
+pub static ref REPORTER_WASM_EXECUTION_TIME_GAUGE: IntGaugeVec =
+    register_int_gauge_vec!("WASM_EXECUTION_TIME_GAUGE",
+        "Time(ms) to execute current wasm component", &["oracle_id"]).unwrap();
+
 }
 
 #[macro_export]
@@ -94,38 +97,38 @@ macro_rules! process_provider_getter {
 
 #[macro_export]
 macro_rules! inc_metric (
-    ($_component: ident, $_comp_index: ident, $_metric: ident) => (
-        $_component
-        .read() // Holding a read lock here suffice, since the counters are atomic.
-        .await
-        .$_metric
-        .with_label_values(&[&$_comp_index.to_string()])
-        .inc();
-    );
+($_component: ident, $_comp_index: ident, $_metric: ident) => (
+    $_component
+    .read() // Holding a read lock here suffice, since the counters are atomic.
+    .await
+    .$_metric
+    .with_label_values(&[&$_comp_index.to_string()])
+    .inc();
+);
 );
 
 #[macro_export]
 macro_rules! inc_metric_by (
-    ($_component: ident, $_comp_index: ident, $_metric: ident, $_inc_val: ident) => (
-        $_component
-        .read() // Holding a read lock here suffice, since the counters are atomic.
-        .await
-        .$_metric
-        .with_label_values(&[&$_comp_index.to_string()])
-        .inc_by($_inc_val as u64);
-    );
+($_component: ident, $_comp_index: ident, $_metric: ident, $_inc_val: ident) => (
+    $_component
+    .read() // Holding a read lock here suffice, since the counters are atomic.
+    .await
+    .$_metric
+    .with_label_values(&[&$_comp_index.to_string()])
+    .inc_by($_inc_val as u64);
+);
 );
 
 #[macro_export]
 macro_rules! inc_vec_metric (
-    ($_component: ident, $_comp_index: ident, $_metric: ident, $_index: ident) => (
-        $_component
-        .read() // Holding a read lock here suffice, since the counters are atomic.
-        .await
-        .$_metric
-        .with_label_values(&[&$_comp_index.to_string(), &$_index.to_string()])
-        .inc();
-    );
+($_component: ident, $_comp_index: ident, $_metric: ident, $_index: ident) => (
+    $_component
+    .read() // Holding a read lock here suffice, since the counters are atomic.
+    .await
+    .$_metric
+    .with_label_values(&[&$_comp_index.to_string(), &$_index.to_string()])
+    .inc();
+);
 );
 
 #[derive(Debug)]
@@ -151,45 +154,45 @@ pub struct ProviderMetrics {
 impl ProviderMetrics {
     pub fn new(prefix: &str) -> Result<ProviderMetrics> {
         Ok(ProviderMetrics {
-            total_tx_sent: register_int_counter_vec!(
-                format!("{}total_tx_sent", prefix),
-                "Total number of tx sent",
-                &["Network"]
-            )?,
-            gas_used: register_int_counter_vec!(
-                format!("{}gas_used", prefix),
-                "Total amount of gas spend for network",
-                &["Network"]
-            )?,
-            effective_gas_price: register_int_counter_vec!(
-                format!("{}effective_gas_price", prefix),
-                "Total amount of Wei spend for network",
-                &["Network"]
-            )?,
-            transaction_confirmation_times: register_histogram_vec!(
-                format!("{}transaction_confirmation_times", prefix),
-                "Histogram tracking the time it took for update transaction to be confirmed",
-                &["Network"],
-                (1..).take(40).map(|x| x as f64 * 15000.0).collect(),
-            )?,
-            gas_price: register_histogram_vec!(
-                format!("{}gas_price", prefix),
-                "Histogram tracking the gas price in Gwei reported by the provider",
-                &["Network"],
-                (1..).take(40).map(|x| x as f64).collect(),
-            )?,
-            failed_send_tx: register_int_counter_vec!(
-                format!("{}failed_send_tx", prefix),
-                "Total number of failed tx for network",
-                &["Network"]
-            )?,
-            failed_get_receipt: register_int_counter_vec!(
-                format!("{}failed_get_receipt", prefix),
-                "Total number of failed get_receipt req-s for network",
-                &["Network"]
-            )?,
-            failed_get_gas_price: register_int_counter_vec!(
-                format!("{}failed_get_gas_price", prefix),
+        total_tx_sent: register_int_counter_vec!(
+            format!("{}total_tx_sent", prefix),
+            "Total number of tx sent",
+            &["Network"]
+        )?,
+        gas_used: register_int_counter_vec!(
+            format!("{}gas_used", prefix),
+            "Total amount of gas spend for network",
+            &["Network"]
+        )?,
+        effective_gas_price: register_int_counter_vec!(
+            format!("{}effective_gas_price", prefix),
+            "Total amount of Wei spend for network",
+            &["Network"]
+        )?,
+        transaction_confirmation_times: register_histogram_vec!(
+            format!("{}transaction_confirmation_times", prefix),
+            "Histogram tracking the time it took for update transaction to be confirmed",
+            &["Network"],
+            (1..).take(40).map(|x| x as f64 * 15000.0).collect(),
+        )?,
+        gas_price: register_histogram_vec!(
+            format!("{}gas_price", prefix),
+            "Histogram tracking the gas price in Gwei reported by the provider",
+            &["Network"],
+            (1..).take(40).map(|x| x as f64).collect(),
+        )?,
+        failed_send_tx: register_int_counter_vec!(
+            format!("{}failed_send_tx", prefix),
+            "Total number of failed tx for network",
+            &["Network"]
+        )?,
+        failed_get_receipt: register_int_counter_vec!(
+            format!("{}failed_get_receipt", prefix),
+            "Total number of failed get_receipt req-s for network",
+            &["Network"]
+        )?,
+        failed_get_gas_price: register_int_counter_vec!(
+            format!("{}failed_get_gas_price", prefix),
                 "Total number of failed get_gas_price req-s for network",
                 &["Network"]
             )?,
