@@ -119,8 +119,18 @@ fn compute_keys_vals<
 ) -> String {
     let mut keys_vals: String = Default::default();
 
-    let special_network = "ethereum-holesky";
-    let special_feed_ids = [31 /* BTC/USD */, 47 /* ETH/USD */];
+    let special_network = "citrea-testnet";
+    let special_feed_ids = [
+        31,  // BTC/USD
+        47,  // ETH/USD
+        65,  // EURC/USD
+        236, // USDT/USD
+        131, // USDC/USD
+        21,  // PAXG/USD
+        206, // TBTC/USD
+        43,  // WBTC/USD
+        4,   // WSTETH/USD
+    ];
 
     info!("Preparing a batch of feeds to network `{net}`");
     let mut num_reported_feeds = 0;
