@@ -83,7 +83,7 @@ jobs:
 
   docs_website:
     timeout-minutes: 360
-    runs-on: self-hosted
+    runs-on: [self-hosted, nixos, x86-64-v3]
 
     steps:
       - uses: actions/checkout@v4
@@ -118,7 +118,7 @@ jobs:
 
   explorer_website:
     timeout-minutes: 360
-    runs-on: self-hosted
+    runs-on: [self-hosted, nixos, x86-64-v3]
 
     steps:
       - uses: actions/checkout@v4
@@ -147,7 +147,7 @@ jobs:
 
   rust:
     timeout-minutes: 360
-    runs-on: self-hosted
+    runs-on: [self-hosted, nixos, x86-64-v3]
 
     steps:
       - uses: actions/checkout@v4
@@ -203,7 +203,7 @@ jobs:
 
   deploy_websites:
     timeout-minutes: 360
-    runs-on: self-hosted
+    runs-on: [self-hosted, nixos, x86-64-v3]
     strategy:
       matrix:
         include:
