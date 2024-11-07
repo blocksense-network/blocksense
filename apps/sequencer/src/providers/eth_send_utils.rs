@@ -1,38 +1,24 @@
-use alloy::{
-    hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
-    rpc::types::eth::TransactionRequest,
-};
-use eyre::Result;
-use prometheus::metrics::FeedsMetrics;
-use tokio::sync::mpsc;
-use utils::logging::get_shared_logging_handle;
-// use reqwest::Client;
-use crate::reporters::reporter::init_shared_reporters;
 use crate::sequencer_state::SequencerState;
-use actix_web::web::Data;
-use config::get_sequencer_and_feed_configs;
-use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
+use actix_web::{rt::spawn, web::Data};
+use alloy::{
+    dyn_abi::DynSolValue, hex::FromHex, network::TransactionBuilder, primitives::Address,
+    primitives::Bytes, providers::Provider, rpc::types::eth::TransactionRequest,
+};
+use eyre::{eyre, Result};
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::{Mutex, RwLock};
-use tokio::time::Duration;
-
-use alloy::{dyn_abi::DynSolValue, primitives::Address};
+use tokio::{sync::Mutex, time::Duration};
 
 use crate::providers::provider::{RpcProvider, SharedRpcProviders};
-use actix_web::rt::spawn;
-use eyre::eyre;
 use prometheus::process_provider_getter;
 
-use feed_registry::types::Repeatability;
-use feed_registry::types::Repeatability::Periodic;
+use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_metric_by};
 use std::fmt::Debug;
 use std::time::Instant;
-use tracing::info_span;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info, info_span, warn};
 
 pub async fn deploy_contract(
     network: &String,
@@ -365,14 +351,21 @@ mod tests {
     use super::*;
 
     use crate::providers::provider::{can_read_contract_bytecode, init_shared_rpc_providers};
+    use crate::reporters::reporter::init_shared_reporters;
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
+    use config::get_sequencer_and_feed_configs;
     use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
+    use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
     use feed_registry::types::Repeatability::Oneshot;
+    use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use std::collections::HashMap;
     use std::str::FromStr;
+    use tokio::sync::mpsc;
+    use tokio::sync::RwLock;
+    use utils::logging::get_shared_logging_handle;
     use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
