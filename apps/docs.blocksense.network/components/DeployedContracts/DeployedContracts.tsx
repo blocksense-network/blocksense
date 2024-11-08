@@ -84,10 +84,8 @@ export const DeployedContracts = ({
         >
           <article className="mt-4 mb-6">
             <span className="text-gray-500 text-md">
-              Explore the deployed core contracts, including their addresses and
-              networks where they are available. These contracts are key
-              components of the Blocksense platform and provide essential
-              functionalities that support the ecosystem.
+              These contracts are key components of the Blocksense platform and
+              provide essential functionalities that support the ecosystem.
               <br />
               Discover more into our smart contracts
               <a
