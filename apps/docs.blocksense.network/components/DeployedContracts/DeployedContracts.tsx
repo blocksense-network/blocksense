@@ -38,6 +38,14 @@ export const DeployedContracts = ({
   const [selectedNetwork, setSelectedNetwork] = React.useState<string | null>(
     null,
   );
+  const contractsRef = React.useRef<HTMLDivElement | null>(null);
+
+  const handleNetworkClick = (network: string) => {
+    setSelectedNetwork(network);
+    setTimeout(() => {
+      contractsRef.current?.scrollIntoView({ behavior: 'smooth' }); // Scrolls into view after a delay
+    }, 300);
+  };
 
   const filters = React.useMemo(
     () =>
@@ -71,78 +79,85 @@ export const DeployedContracts = ({
             <NetworkIcon
               key={network}
               network={network}
-              onClick={() => setSelectedNetwork(network)}
+              onClick={() => {
+                handleNetworkClick(network);
+              }}
             />
           ))}
         </div>
       </ContractItemWrapper>
-      {selectedNetwork && (
-        <ContractItemWrapper
-          title="Core Contracts"
-          titleLevel={2}
-          itemsLength={deployedCoreContracts.length}
-        >
-          <article className="mt-4 mb-6">
-            <span className="text-gray-500 text-md">
-              These contracts are key components of the Blocksense platform and
-              provide essential functionalities that support the ecosystem.
-              <br />
-              Discover more into our smart contracts
-              <a
-                href={smartContractsUrl}
-                className="nx-text-primary-600 nx-underline nx-decoration-from-font [text-underline-position:from-font] mx-1"
-              >
-                architecture
-              </a>
-              documentation section.
-            </span>
-          </article>
-          <div className="container px-0">
-            {deployedCoreContracts.map(contract => (
-              <CoreContractCard
-                key={contract.address}
-                contract={{
-                  name: contract.contract,
-                  address: contract.address,
-                  networks: selectedNetwork
-                    ? contract.networks.filter(
-                        network => network == parseNetworkName(selectedNetwork),
-                      )
-                    : contract.networks,
-                }}
-              />
-            ))}
-          </div>
-        </ContractItemWrapper>
-      )}
-      {selectedNetwork && (
-        <div className="mt-6">
+      <div ref={contractsRef}>
+        {selectedNetwork && (
           <ContractItemWrapper
-            title="Aggregator Proxy Contracts"
+            title="Core Contracts"
             titleLevel={2}
-            itemsLength={deployedProxyContracts.length}
+            itemsLength={deployedCoreContracts.length}
           >
             <article className="mt-4 mb-6">
               <span className="text-gray-500 text-md">
-                Blocksense aggregator proxy contracts table allows users to
-                explore contracts that serve as an alternative to the Chainlink
-                proxy contracts. Additionally, the table provides information
-                about data feed names, IDs, and relevant addresses.
+                These contracts are key components of the Blocksense platform
+                and provide essential functionalities that support the
+                ecosystem.
+                <br />
+                Discover more into our smart contracts
+                <a
+                  href={smartContractsUrl}
+                  className="nx-text-primary-600 nx-underline nx-decoration-from-font [text-underline-position:from-font] mx-1"
+                >
+                  architecture
+                </a>
+                documentation section.
               </span>
             </article>
-            <DataTable
-              columns={proxyContractsColumns}
-              data={deployedProxyContracts.filter(
-                element => element.network === selectedNetwork,
-              )}
-              columnsTitles={proxyColumnsTitles}
-              filters={filters}
-              filterCell="description"
-              rowLink={dataFeedUrl}
-            />
+            <div className="container px-0">
+              {deployedCoreContracts.map(contract => (
+                <CoreContractCard
+                  key={contract.address}
+                  contract={{
+                    name: contract.contract,
+                    address: contract.address,
+                    networks: selectedNetwork
+                      ? contract.networks.filter(
+                          network =>
+                            network == parseNetworkName(selectedNetwork),
+                        )
+                      : contract.networks,
+                  }}
+                />
+              ))}
+            </div>
           </ContractItemWrapper>
-        </div>
-      )}
+        )}
+        {selectedNetwork && (
+          <div className="mt-6">
+            <ContractItemWrapper
+              title="Aggregator Proxy Contracts"
+              titleLevel={2}
+              itemsLength={deployedProxyContracts.length}
+            >
+              <article className="mt-4 mb-6">
+                <span className="text-gray-500 text-md">
+                  Blocksense aggregator proxy contracts table allows users to
+                  explore contracts that serve as an alternative to the
+                  Chainlink proxy contracts. Additionally, the table provides
+                  information about data feed names, IDs, and relevant
+                  addresses.
+                </span>
+              </article>
+              <DataTable
+                columns={proxyContractsColumns}
+                data={deployedProxyContracts.filter(
+                  element => element.network === selectedNetwork,
+                )}
+                columnsTitles={proxyColumnsTitles}
+                filters={filters}
+                filterCell="description"
+                rowLink={dataFeedUrl}
+              />
+            </ContractItemWrapper>
+          </div>
+        )}
+      </div>
     </section>
   );
 };
