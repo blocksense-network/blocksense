@@ -15,6 +15,7 @@ import {
   decodeProxyContracts,
 } from '@/src/deployed-contracts/types';
 import { dataFeedUrl } from '@/src/constants';
+import { NetworkIcon } from '@/components/DeployedContracts/NetworkIcon';
 
 type DeployedContractsProps = {
   deployedCoreContractsString: string;
@@ -32,6 +33,8 @@ export const DeployedContracts = ({
     JSON.parse(deployedProxyContractsString),
   );
 
+  console.log(deployedCoreContracts);
+
   const filters = React.useMemo(
     () =>
       getFacetedFilters(
@@ -46,6 +49,17 @@ export const DeployedContracts = ({
 
   return (
     <section className="mt-4">
+      <ContractItemWrapper
+        title="Supported Networks"
+        titleLevel={2}
+        itemsLength={1}
+      >
+        <div className="flex flex-wrap justify-center gap-4 pt-3">
+          {deployedCoreContracts[0].networks.map(network => (
+            <NetworkIcon network={network} />
+          ))}
+        </div>
+      </ContractItemWrapper>
       <ContractItemWrapper
         title="Core Contracts"
         titleLevel={2}
