@@ -14,6 +14,7 @@
     "generate-contracts-mdx": "yarn ts ./src/generate-contracts-mdx.ts && yarn prettier --write ./pages/docs/contracts --log-level silent",
     "generate-data-feed-mdx": "yarn ts ./src/generate-data-feed-mdx.ts && yarn prettier --write ./pages/docs/data-feeds --log-level silent",
     "generate-deployed-contracts-mdx": "yarn ts ./src/deployed-contracts/generate-deployed-contracts-mdx.ts && yarn prettier --write ./pages/docs/contracts/deployed-contracts.mdx --log-level silent",
+    "generate-search-json": "yarn ts ./src/generate-search-json.ts",
     "watch:docs-theme": "nodemon -w ../../libs/docs-theme -e js,jsx,ts,tsx,css --exec 'yarn workspace @blocksense/docs-theme build'"
   },
   "types": "./src/index.ts",
