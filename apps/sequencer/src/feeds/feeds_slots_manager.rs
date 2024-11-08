@@ -428,12 +428,7 @@ mod tests {
             feeds_slots_manager_cmd_send,
         });
 
-        let _future = feeds_slots_manager_loop(
-            sequencer_state,
-            vote_send.clone(),
-            feeds_slots_manager_cmd_recv,
-        )
-        .await;
+        let _future = feeds_slots_manager_loop(sequencer_state, feeds_slots_manager_cmd_recv).await;
 
         // Attempt to receive with a timeout of 2 seconds
         let received = tokio::time::timeout(

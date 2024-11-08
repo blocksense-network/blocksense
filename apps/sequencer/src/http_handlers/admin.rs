@@ -447,18 +447,19 @@ mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::reporters::reporter::init_shared_reporters;
+    use crate::testing::sequencer_state::create_sequencer_state_from_sequencer_config_file;
     use actix_test::to_bytes;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
     use config::{get_sequencer_and_feed_configs, init_config};
-    use config::{get_test_config_with_single_provider, AllFeedsConfig, SequencerConfig};
+    use config::{AllFeedsConfig, SequencerConfig};
     use feed_registry::registry::{
         new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
     };
     use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use std::env;
-    use std::path::{Path, PathBuf};
+    use std::path::PathBuf;
     use std::sync::Arc;
     use tokio::sync::{mpsc, RwLock};
     use utils::constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE};
@@ -534,60 +535,6 @@ mod tests {
         assert_eq!(body_str, "300000");
     }
 
-    async fn create_sequencer_state_from_sequencer_config(
-        network: &str,
-        key_path: &Path,
-        anvil_endpoint: &str,
-    ) -> web::Data<SequencerState> {
-        let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
-        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let sequencer_config_file = PathBuf::new()
-            .join(manifest_dir)
-            .join("tests")
-            .join("sequencer_config.json");
-        let sequencer_config =
-            init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
-
-        let metrics_prefix = format!("create_sequencer_state_from_sequencer_config_{network}");
-        let metrics_prefix = Some(metrics_prefix.as_str());
-
-        let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
-
-        let log_handle = init_shared_logging_handle("INFO", false);
-
-        let (vote_send, _vote_recv) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
-
-        let (_, feeds_config) = get_sequencer_and_feed_configs();
-
-        web::Data::new(SequencerState {
-            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &feeds_config,
-            ))),
-            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            providers,
-            log_handle,
-            reporters: init_shared_reporters(&cfg, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(None)),
-            voting_send_channel: vote_send,
-            feeds_metrics: Arc::new(RwLock::new(
-                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
-                    .expect("Failed to allocate feed_metrics"),
-            )),
-            active_feeds: Arc::new(RwLock::new(
-                feeds_config
-                    .feeds
-                    .into_iter()
-                    .map(|feed| (feed.id, feed))
-                    .collect(),
-            )),
-            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-            feeds_slots_manager_cmd_send,
-        })
-    }
-
     #[actix_web::test]
     async fn test_deploy_endpoint_success() {
         const HTTP_STATUS_SUCCESS: u16 = 200;
@@ -596,10 +543,12 @@ mod tests {
         let key_path = get_test_private_key_path();
         let network = "ETH_test_deploy_endpoint_success";
 
-        let sequencer_state = create_sequencer_state_from_sequencer_config(
+        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
+            None,
+            None,
         )
         .await;
 
@@ -648,10 +597,12 @@ mod tests {
         let key_path = get_test_private_key_path();
         let network = "ETH_test_get_configs";
 
-        let sequencer_state = create_sequencer_state_from_sequencer_config(
+        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
+            None,
+            None,
         )
         .await;
 
@@ -770,10 +721,12 @@ mod tests {
         let key_path = get_test_private_key_path();
         let network = "ETH_disable_provider_changes_state";
 
-        let sequencer_state = create_sequencer_state_from_sequencer_config(
+        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
+            None,
+            None,
         )
         .await;
 
@@ -822,10 +775,12 @@ mod tests {
         let key_path = get_test_private_key_path();
         let network = "ETH_enable_provider_changes_state";
 
-        let sequencer_state = create_sequencer_state_from_sequencer_config(
+        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
+            None,
+            None,
         )
         .await;
 

@@ -235,14 +235,17 @@ impl FeedSlotsProcessor {
 
 #[cfg(test)]
 mod tests {
+    use crate::testing::sequencer_state::create_sequencer_state_from_sequencer_config;
+
     use super::*;
+    use config::get_test_config_with_single_provider;
     use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::AllFeedsReports;
     use feed_registry::types::FeedMetaData;
-    use std::collections::HashMap;
     use std::sync::Arc;
     use std::time::{Duration, SystemTime};
-    use tokio::sync::{mpsc::unbounded_channel, RwLock};
+    use tokio::sync::RwLock;
+    use utils::test_env::get_test_private_key_path;
     const QUORUM_PERCENTAGE: f32 = 0.001;
 
     #[tokio::test]
@@ -262,19 +265,29 @@ mod tests {
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
-        let all_feeds_reports = AllFeedsReports::new();
-        let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
         let history = Arc::new(RwLock::new(FeedAggregateHistory::new()));
 
-        let (tx, mut rx) = unbounded_channel::<(String, String)>();
-
         let original_report_data = FeedType::Numerical(13.0);
+
+        let network = "ETH2";
+        let key_path = get_test_private_key_path();
+
+        let cfg = get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            "http://localhost:8545",
+        );
+
+        let (sequencer_state, mut rx) =
+            create_sequencer_state_from_sequencer_config(cfg, "test_feed_slots_processor_loop")
+                .await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
             let feed_id = 1;
             let reporter_id = 42;
-            all_feeds_reports_arc
+            sequencer_state
+                .reports
                 .write()
                 .await
                 .push(
@@ -291,13 +304,10 @@ mod tests {
         let feed_id = 1;
         let name = name.to_string();
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
-        let all_feeds_reports_arc_clone = Arc::clone(&all_feeds_reports_arc);
         {
             let mut history_guard = history.write().await;
             history_guard.register_feed(feed_id, 10_000);
         }
-
-        let history_cp = history.clone();
 
         tokio::spawn(async move {
             let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
@@ -305,11 +315,9 @@ mod tests {
 
             feed_slots_processor
                 .start_loop(
-                    tx,
+                    sequencer_state,
                     feed_metadata_arc_clone,
-                    all_feeds_reports_arc_clone,
-                    history_cp,
-                    Arc::new(RwLock::new(HashMap::new())),
+                    history,
                     None,
                     cmd_recv,
                     Some(cmd_send),
@@ -371,15 +379,26 @@ mod tests {
         let all_feeds_reports = AllFeedsReports::new();
         let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
 
-        let (tx, mut rx) = unbounded_channel::<(String, String)>();
-
         let original_report_data = FeedType::Numerical(13.0);
+
+        let network = "ETH2";
+        let key_path = get_test_private_key_path();
+
+        let cfg = get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            "http://localhost:8545",
+        );
+
+        let (sequencer_state, mut rx) =
+            create_sequencer_state_from_sequencer_config(cfg, "test_process_oneshot_feed").await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
             let feed_id = 1;
             let reporter_id = 42;
-            all_feeds_reports_arc
+            sequencer_state
+                .reports
                 .write()
                 .await
                 .push(
@@ -396,20 +415,16 @@ mod tests {
         let feed_id = 1;
         let name = name.to_string();
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
-        let all_feeds_reports_arc_clone = Arc::clone(&all_feeds_reports_arc);
         let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =
             Arc::new(RwLock::new(FeedAggregateHistory::new()));
-        let feed_aggregate_history_clone = Arc::clone(&feed_aggregate_history);
         let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
         tokio::spawn(async move {
             let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
             feed_slots_processor
                 .start_loop(
-                    tx,
+                    sequencer_state,
                     feed_metadata_arc_clone,
-                    all_feeds_reports_arc_clone,
-                    feed_aggregate_history_clone,
-                    Arc::new(RwLock::new(HashMap::new())),
+                    feed_aggregate_history,
                     None,
                     cmd_recv,
                     Some(cmd_send),

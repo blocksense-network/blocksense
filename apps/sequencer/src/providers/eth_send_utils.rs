@@ -361,21 +361,16 @@ mod tests {
     use super::*;
 
     use crate::providers::provider::{can_read_contract_bytecode, init_shared_rpc_providers};
-    use crate::reporters::reporter::init_shared_reporters;
+    use crate::testing::sequencer_state::create_sequencer_state_from_sequencer_config_file;
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
-    use config::get_sequencer_and_feed_configs;
     use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
-    use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
     use feed_registry::types::Repeatability::Oneshot;
-    use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use std::collections::HashMap;
     use std::str::FromStr;
     use tokio::sync::mpsc;
-    use tokio::sync::RwLock;
-    use utils::logging::get_shared_logging_handle;
     use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
@@ -552,7 +547,6 @@ mod tests {
                 anvil_network2.endpoint().as_str(),
             ),
         ]);
-        let (_, mut feeds_config) = get_sequencer_and_feed_configs();
 
         let providers = init_shared_rpc_providers(
             &sequencer_config,
@@ -560,31 +554,27 @@ mod tests {
         )
         .await;
 
-        let (vote_send, mut vote_recv) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = get_test_private_key_path();
+        let network = "ETH_test_eth_batch_send_to_all_oneshot_contracts";
 
-        let metrics_prefix = Some("test_eth_batch_send_to_all_oneshot_contracts");
+        let (vote_send, _) = mpsc::unbounded_channel();
+        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+            Some(vote_send),
+            Some(sequencer_config),
+        )
+        .await;
 
-        // Most of these fields are not used. SequencerState is used as a global reference to the
-        // system state, so that different parts of the system can affect each other when needed.
-        let sequencer_state = Data::new(SequencerState {
-            registry: Arc::new(RwLock::new(FeedMetaDataRegistry::new())),
-            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            providers: providers.clone(),
-            log_handle: get_shared_logging_handle(),
-            reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(None)),
-            voting_send_channel: vote_send,
-            feeds_metrics: Arc::new(RwLock::new(
-                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
-                    .expect("Failed to allocate feed_metrics"),
-            )),
-            feeds_config: Arc::new(RwLock::new(feeds_config)),
-            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-            feeds_slots_manager_cmd_send,
-        });
+        let mut actual_providers = sequencer_state.providers.write().await;
+        let providers_contents = providers.read().await;
+        for (k, v) in providers_contents.iter() {
+            actual_providers.insert(k.clone(), v.clone());
+        }
+        drop(providers_contents);
+        drop(actual_providers);
 
         // run
         let result = deploy_contract(&String::from(network1), &providers, Oneshot).await;
