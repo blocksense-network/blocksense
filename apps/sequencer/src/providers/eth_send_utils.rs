@@ -119,37 +119,71 @@ fn compute_keys_vals<
 ) -> String {
     let mut keys_vals: String = Default::default();
 
-    let special_network = "citrea-testnet";
-    let special_feed_ids = [
-        31,  // BTC/USD
-        47,  // ETH/USD
-        65,  // EURC/USD
-        236, // USDT/USD
-        131, // USDC/USD
-        21,  // PAXG/USD
-        206, // TBTC/USD
-        43,  // WBTC/USD
-        4,   // WSTETH/USD
-    ];
+    // If a network is in the map, only the feeds from `updates` that have ids in the list of feed
+    // ids that it's mapped to will be added to the result. Otherwise, all feeds in `updates` will
+    // be added.
+    // The lists come from this doc:
+    // https://coda.io/d/R-D_dqNv6ZkeyaI/Deployment-specifics_suGn49Sv?searchClick=d58713a6-4574-4004-8450-f7b7b64a4c90_qNv6ZkeyaI
+    let network_to_feeds_subset = HashMap::<&str, Vec<i64>>::from([
+        (
+            "berachain-bartio",
+            vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                65,  // EURC/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                21,  // PAXG/USD
+            ],
+        ),
+        (
+            "citrea-testnet",
+            vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                65,  // EURC/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                21,  // PAXG/USD
+                206, // TBTC/USD
+                43,  // WBTC/USD
+                4,   // WSTETH/USD
+            ],
+        ),
+        (
+            "manta-sepolia",
+            vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                43,  // WBTC/USD
+            ],
+        ),
+    ]);
+    let special_feed_ids = network_to_feeds_subset.get(net);
 
     info!("Preparing a batch of feeds to network `{net}`");
     let mut num_reported_feeds = 0;
     for (key, val) in updates.into_iter() {
-        if net == special_network {
-            // if special net: add only special feeds
-            let feed_id = i64::from_str_radix(&key.to_string(), 16).unwrap();
-            if special_feed_ids.contains(&feed_id) {
+        match special_feed_ids {
+            Some(special_feed_ids) => {
+                // if special net: add only special feeds
+                let feed_id = i64::from_str_radix(&key.to_string(), 16).unwrap();
+                if special_feed_ids.contains(&feed_id) {
+                    num_reported_feeds += 1;
+                    keys_vals += key.to_string().as_str();
+                    keys_vals += val.to_string().as_str();
+                } else {
+                    debug!("Skipping feed id {feed_id} for special network `{net}`");
+                }
+            }
+            None => {
+                // if not special: always add
                 num_reported_feeds += 1;
                 keys_vals += key.to_string().as_str();
                 keys_vals += val.to_string().as_str();
-            } else {
-                debug!("Skipping feed id {feed_id} for special network `{net}`");
             }
-        } else {
-            // if not special: always add
-            num_reported_feeds += 1;
-            keys_vals += key.to_string().as_str();
-            keys_vals += val.to_string().as_str();
         }
     }
     info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
@@ -632,5 +666,44 @@ mod tests {
         // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
         // followups
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn compute_keys_vals_ignores_networks_not_on_the_list() {
+        let network = "dont_filter_me";
+        let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
+
+        let keys_vals = compute_keys_vals(network, updates);
+
+        // It is undeterministic what the order will be, so checking both possibilities.
+        assert!(["0fffbye001fhi", "001fhi0fffbye"].contains(&keys_vals.as_str()));
+    }
+
+    #[test]
+    fn compute_keys_vals_filters_updates_for_networks_on_the_list() {
+        // Citrea
+        let network = "citrea-testnet";
+        let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
+
+        let keys_vals = compute_keys_vals(network, updates);
+
+        // Note: bye is filtered out:
+        assert_eq!(keys_vals, "001fhi");
+
+        // Berachain
+        let network = "berachain-bartio";
+        let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
+
+        let keys_vals = compute_keys_vals(network, updates);
+
+        assert_eq!(keys_vals, "001fhi");
+
+        // Manta
+        let network = "manta-sepolia";
+        let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
+
+        let keys_vals = compute_keys_vals(network, updates);
+
+        assert_eq!(keys_vals, "001fhi");
     }
 }
