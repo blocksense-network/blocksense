@@ -47,16 +47,6 @@ export const DeployedContracts = ({
     }, 300);
   };
 
-  const filters = React.useMemo(
-    () =>
-      getFacetedFilters(
-        ['network'],
-        deployedProxyContracts,
-        proxyColumnsTitles,
-      ),
-    [deployedProxyContracts],
-  );
-
   const smartContractsUrl = './#smart-contract-architecture';
 
   return (
@@ -150,7 +140,6 @@ export const DeployedContracts = ({
                   element => element.network === selectedNetwork,
                 )}
                 columnsTitles={proxyColumnsTitles}
-                filters={filters}
                 filterCell="description"
                 rowLink={dataFeedUrl}
               />
