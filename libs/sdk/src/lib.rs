@@ -1,3 +1,5 @@
+pub mod api;
+
 /// Exports the procedural macros for writing handlers for Spin components.
 pub use blocksense_macro::*;
 
