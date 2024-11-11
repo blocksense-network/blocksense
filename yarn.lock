@@ -967,7 +967,7 @@ __metadata:
     git-url-parse: "npm:^15.0.0"
     intersection-observer: "npm:^0.12.2"
     jsdom: "npm:^25.0.0"
-    match-sorter: "npm:^6.3.1"
+    match-sorter: "npm:^8.0.0"
     next: "npm:^14.2.5"
     next-seo: "npm:^6.0.0"
     next-themes: "npm:^0.3.0"
@@ -13715,13 +13715,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"match-sorter@npm:^6.3.1":
-  version: 6.3.4
-  resolution: "match-sorter@npm:6.3.4"
+"match-sorter@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "match-sorter@npm:8.0.0"
   dependencies:
     "@babel/runtime": "npm:^7.23.8"
     remove-accents: "npm:0.5.0"
-  checksum: 10c0/35d2a6b6df003c677d9ec87ecd4683657638f5bce856f43f9cf90b03e357ed2f09813ebbac759defa7e7438706936dd34dc2bfe1a18771f7d2541f14d639b4ad
+  checksum: 10c0/eb475c73ff85611ff0bda595f01b3d5083d15f449a2a22173d39752ff3a0eb7fba06b49c7c89d3dc0ea752f6fb36dc71ce4a59177553bce9255a69ad2dafc06d
   languageName: node
   linkType: hard
 
