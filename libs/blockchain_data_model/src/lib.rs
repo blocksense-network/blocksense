@@ -34,7 +34,7 @@ pub struct BlockFeedConfig {
     pub script: DataChunk,
 }
 
-#[derive(Debug, PartialEq, SimpleSerialize, Default)]
+#[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct AssetFeedUpdate {
     id: FeedIdChunk,
     feed_data: DataChunk,
@@ -51,11 +51,23 @@ pub struct BlockHeader {
     add_remove_feeds_merkle_root: HashType,
 }
 
+impl BlockHeader {
+    pub fn serialize(&mut self) -> Vec<u8> {
+        ssz_rs::serialize(self).expect("Serialization of BlockHeader failed")
+    }
+}
+
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct FeedActions {
     block_height: u64,
     new_feeds: [Option<BlockFeedConfig>; MAX_NEW_FEEDS_IN_BLOCK],
     feed_ids_to_rm: [Option<u32>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
+}
+
+impl FeedActions {
+    pub fn serialize(&mut self) -> Vec<u8> {
+        ssz_rs::serialize(self).expect("Serialization of AddRemoveFeeds failed")
+    }
 }
 
 pub const MAX_ASSET_FEED_UPDATES_IN_BLOCK: usize =

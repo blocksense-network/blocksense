@@ -1,3 +1,5 @@
+use actix_web::web::Data;
+use alloy::hex;
 use blockchain_data_model::in_mem_db::InMemDb;
 use blockchain_data_model::{
     BlockFeedConfig, DataChunk, Resources, MAX_ASSET_FEED_UPDATES_IN_BLOCK,
@@ -9,31 +11,32 @@ use feed_registry::feed_registration_cmds::{
 };
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::Repeatability;
+use rdkafka::producer::FutureRecord;
+use rdkafka::util::Timeout;
+use serde_json::json;
 use std::collections::{HashMap, VecDeque};
 use std::fmt::Debug;
 use std::io::Error;
 use std::mem;
-use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
-use tokio::sync::RwLock;
-// use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
-use tracing::{error, info, info_span, warn};
+use tracing::{debug, error, info, info_span, warn};
 use utils::time::{current_unix_time, system_time_to_millis};
 
+use crate::sequencer_state::SequencerState;
 use crate::UpdateToSend;
 
 pub async fn block_creator_loop<
     K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
+    sequencer_state: Data<SequencerState>,
     mut vote_recv: UnboundedReceiver<(K, V)>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
     feed_manager_cmds_send: UnboundedSender<FeedsManagementCmds>,
     batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
     block_config: BlockConfig,
-    blockchain_db: Arc<RwLock<InMemDb>>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("block_creator")
@@ -90,7 +93,7 @@ pub async fn block_creator_loop<
                                 new_feeds_to_register,
                                 feeds_ids_to_delete,
                                 &batched_votes_send,
-                                &blockchain_db,
+                                &sequencer_state,
                                 &feed_manager_cmds_send,
                                 (block_generation_time_tracker.get_last_slot() + 1) as u64,
                             ).await {
@@ -260,7 +263,7 @@ async fn generate_block<
     new_feeds_to_register: &mut Vec<RegisterNewAssetFeed>,
     feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
     batched_votes_send: &UnboundedSender<UpdateToSend<K, V>>,
-    blockchain_db: &Arc<RwLock<InMemDb>>,
+    sequencer_state: &Data<SequencerState>,
     feed_manager_cmds_send: &UnboundedSender<FeedsManagementCmds>,
     block_height: u64,
 ) -> eyre::Result<()> {
@@ -278,10 +281,13 @@ async fn generate_block<
         feeds_ids_to_delete_in_block.push(delete_feed_id_cmd.id);
     }
 
-    if !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() {
-        // At this point we create new blocks only to register/deregister feeds.
-        // Create the block that will contain the new feeds, deleted feeds and in future - updates of feed values
-        let mut blockchain_db = blockchain_db.write().await;
+    let block_is_empty = new_feeds_to_register.is_empty() && feeds_ids_to_delete.is_empty();
+    let mut serialized_header = Vec::new();
+    let mut serialized_add_remove_feeds = Vec::new();
+    // Block holding the db write mutex:
+    if !block_is_empty {
+        // Create the block that will contain the new feeds, deleted feeds and updates of feed values
+        let mut blockchain_db = sequencer_state.blockchain_db.write().await;
         let (header, add_remove_feeds) = blockchain_db
             .create_new_block(
                 block_height,
@@ -289,6 +295,8 @@ async fn generate_block<
                 feeds_ids_to_delete_in_block,
             )
             .map_err(|e| eyre::eyre!(e.to_string()))?;
+        serialized_header = header.clone().serialize();
+        serialized_add_remove_feeds = add_remove_feeds.clone().serialize();
         let header_merkle_root = InMemDb::calc_merkle_root(&mut header.clone())
             .map_err(|e| eyre::eyre!(e.to_string()))?;
         info!(
@@ -296,7 +304,6 @@ async fn generate_block<
             header,
             InMemDb::node_to_hash(header_merkle_root).map_err(|e| eyre::eyre!(e.to_string()))?
         );
-
         if let Err(e) = blockchain_db.add_next_block(header, add_remove_feeds) {
             eyre::bail!(e.to_string());
         }
@@ -330,17 +337,41 @@ async fn generate_block<
             Err(e) => error!("Could not forward delete cmd: {e}"),
         };
     }
+
+    if !block_is_empty {
+        let block_to_kafka = json!({
+            "BlockHeader": hex::encode(serialized_header),
+            "AddRemoveFeeds": hex::encode(serialized_add_remove_feeds),
+        });
+
+        if let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint {
+            match kafka_endpoint
+                .send(
+                    FutureRecord::<(), _>::to("blockchain").payload(&block_to_kafka.to_string()),
+                    Timeout::Never,
+                )
+                .await
+            {
+                Ok(res) => debug!("Successfully sent block to kafka endpoint: {res:?}"),
+                Err(e) => error!("Failed to send to kafka endpoint! {e:?}"),
+            }
+        } else {
+            warn!("No Kafka endpoint set to stream blocks");
+        }
+    }
+
     Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    use blockchain_data_model::in_mem_db::InMemDb;
     use config::BlockConfig;
-    use std::sync::Arc;
     use std::time::Duration;
-    use tokio::sync::{mpsc, RwLock};
+    use tokio::sync::mpsc;
     use tokio::time;
+    use utils::test_env::get_test_private_key_path;
+
+    use crate::testing::sequencer_state::create_sequencer_state_from_sequencer_config_file;
 
     #[actix_web::test]
     async fn test_block_creator_loop() {
@@ -357,14 +388,26 @@ mod tests {
             mpsc::unbounded_channel();
         let (batched_votes_send, mut batched_votes_recv) = mpsc::unbounded_channel();
 
+        let key_path = get_test_private_key_path();
+        let network = "ETH_test_block_creator_loop";
+
+        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
+            network,
+            key_path.as_path(),
+            "https://127.0.0.1:1234",
+            None,
+            None,
+        )
+        .await;
+
         super::block_creator_loop(
             //Arc::new(RwLock::new(vote_recv)),
+            sequencer_state,
             vote_recv,
             feeds_management_cmd_recv,
             feeds_slots_manager_cmd_send,
             batched_votes_send,
             block_config,
-            Arc::new(RwLock::new(InMemDb::new())),
         )
         .await;
 
