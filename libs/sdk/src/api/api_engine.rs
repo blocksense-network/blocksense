@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use feed_registry::types::{Asset, FeedResult, Timestamp};
+use feed_registry::types::{Asset, FeedId, FeedResult, Timestamp};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Policy {
@@ -60,7 +60,7 @@ impl<T: APIInterface> APIEngine<T> {
     }
 
     async fn poll_batch_fallback(&mut self, assets: &[Asset]) -> HashMap<Asset, FeedResult> {
-        let mut results_map: HashMap<u32, FeedResult> = HashMap::new();
+        let mut results_map: HashMap<FeedId, FeedResult> = HashMap::new();
         let mut remaining_assets = assets.to_vec();
 
         for api in &mut self.apis {

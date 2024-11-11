@@ -246,16 +246,17 @@ impl FeedType {
 }
 
 pub type Timestamp = u128;
+pub type FeedId = u32;
 
 #[derive(Debug, Clone)]
 pub struct Asset {
     pub resources: HashMap<String, String>,
-    pub feed_id: u32,
+    pub feed_id: FeedId,
 }
 
 impl IntoIterator for Asset {
-    type Item = u32;
-    type IntoIter = std::option::IntoIter<u32>;
+    type Item = FeedId;
+    type IntoIter = std::option::IntoIter<FeedId>;
 
     fn into_iter(self) -> Self::IntoIter {
         Some(self.feed_id).into_iter()
