@@ -31,12 +31,12 @@ pub async fn prepare_app_workers(
 
     let block_creator = block_creator_loop(
         // sequencer_state.voting_recv_channel.clone(),
+        sequencer_state.clone(),
         voting_receive_channel,
         feeds_management_cmd_recv,
         feeds_slots_manager_cmd_send,
         batched_votes_send,
         sequencer_config.block_config.clone(),
-        sequencer_state.blockchain_db.clone(),
     )
     .await;
 
