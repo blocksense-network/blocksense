@@ -9332,7 +9332,6 @@ dependencies = [
  "futures-util",
  "gnosis_safe",
  "once_cell",
- "openssl-sys",
  "paste",
  "prometheus 0.1.1",
  "rand 0.8.5",
