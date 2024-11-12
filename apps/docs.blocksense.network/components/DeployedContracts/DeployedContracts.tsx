@@ -10,6 +10,7 @@ import {
   columns as proxyContractsColumns,
   proxyColumnsTitles,
 } from '@/components/DeployedContracts/proxyContractsColumns';
+import { Callout } from '@blocksense/docs-theme';
 import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
 import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';
 import {
@@ -43,28 +44,28 @@ export const DeployedContracts = ({
   const handleNetworkClick = (network: string) => {
     setSelectedNetwork(network);
     setTimeout(() => {
-      contractsRef.current?.scrollIntoView({ behavior: 'smooth' }); // Scrolls into view after a delay
+      contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
   };
 
   const smartContractsUrl = './#smart-contract-architecture';
 
   return (
-    <section className="mt-4">
+    <section className="mt-4 mb-2">
       <ContractItemWrapper
         title="Supported Networks"
         titleLevel={2}
         itemsLength={1}
       >
-        <article className="mt-4 mb-6">
+        <Callout type="info" emoji="💡">
           <span className="text-gray-500 text-md">
-            We have deployed our contracts on the following networks. Select a
-            network to view detailed information about the deployed contracts.
-            <br />
+            We have deployed our contracts on the following networks. <br />
+            Select a network to view detailed information about the deployed
+            contracts.
           </span>
-        </article>
+        </Callout>
 
-        <div className="flex flex-wrap justify-center gap-4 pt-3">
+        <div className="flex flex-wrap mt-4 gap-1.5 md:gap-2.5">
           {deployedCoreContracts[0].networks.map(network => (
             <NetworkIcon
               key={network}
@@ -76,20 +77,18 @@ export const DeployedContracts = ({
           ))}
         </div>
       </ContractItemWrapper>
-      <div ref={contractsRef}>
+      <div ref={contractsRef} className="mt-4">
         {selectedNetwork && (
           <ContractItemWrapper
             title="Core Contracts"
             titleLevel={2}
             itemsLength={deployedCoreContracts.length}
           >
-            <article className="mt-4 mb-6">
+            <Callout type="info" emoji="💡">
               <span className="text-gray-500 text-md">
                 These contracts are key components of the Blocksense platform
                 and provide essential functionalities that support the
-                ecosystem.
-                <br />
-                Discover more into our smart contracts
+                ecosystem. Discover more into our smart contracts
                 <a
                   href={smartContractsUrl}
                   className="nx-text-primary-600 nx-underline nx-decoration-from-font [text-underline-position:from-font] mx-1"
@@ -98,8 +97,8 @@ export const DeployedContracts = ({
                 </a>
                 documentation section.
               </span>
-            </article>
-            <div className="container px-0">
+            </Callout>
+            <div className="container px-0 flex flex-wrap bg-white">
               {deployedCoreContracts.map(contract => (
                 <CoreContractCard
                   key={contract.address}
@@ -125,7 +124,7 @@ export const DeployedContracts = ({
               titleLevel={2}
               itemsLength={deployedProxyContracts.length}
             >
-              <article className="mt-4 mb-6">
+              <Callout type="info" emoji="💡">
                 <span className="text-gray-500 text-md">
                   Blocksense aggregator proxy contracts table allows users to
                   explore contracts that serve as an alternative to the
@@ -133,7 +132,7 @@ export const DeployedContracts = ({
                   information about data feed names, IDs, and relevant
                   addresses.
                 </span>
-              </article>
+              </Callout>
               <DataTable
                 columns={proxyContractsColumns}
                 data={deployedProxyContracts.filter(

@@ -13,14 +13,14 @@ export const NetworkIcon = ({ network, onClick }: NetworkIconProps) => {
   const iconPath = `/images/network-icons/${network.split('-')[0]}.png`;
   return (
     <Button
-      className="p-2 bg-gray-100 text-black w-36 h-36 aspect-square flex flex-col items-center justify-center rounded-md"
+      className="transition-all duration-300 ease-in-out p-2 bg-zinc-100/50 text-black w-[7.2rem] h-[7.2rem] md:w-[7.6rem] md:h-[7.6rem] md:p-1 aspect-square flex flex-col items-center justify-center rounded-sm hover:bg-slate-300/25"
       onClick={onClick}
     >
       {' '}
       <ImageWrapper
         src={iconPath}
         alt={network}
-        className="relative w-16 h-16"
+        className="relative w-10 h-10"
       />
       <div className="pt-2 font-bold text-xs">{network}</div>
       <div className="pt-2 font-semibold text-xs">ChainId:{chainId}</div>

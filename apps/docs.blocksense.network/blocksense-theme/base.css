@@ -44,6 +44,13 @@
     border: 1px solid;
     @apply border-slate-200 max-w-96 mt-10;
   }
+
+  .core-contract-card {
+    margin-top: 1rem;
+  }
+  .core-contract-card__container {
+    margin-top: 0;
+  }
   .roadmap {
     border: 1px solid;
     @apply bg-zinc-50 border-slate-200 max-w-96;
