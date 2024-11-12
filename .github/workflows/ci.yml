@@ -147,7 +147,14 @@ jobs:
 
   rust:
     timeout-minutes: 360
-    runs-on: [self-hosted, nixos, x86-64-v3]
+    strategy:
+      matrix:
+        include:
+          - runner: [self-hosted, nixos, x86-64-v3]
+            system: x86_64-linux
+          - runner: macos-latest-xlarge
+            system: aarch64-darwin
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - uses: actions/checkout@v4
@@ -158,23 +165,33 @@ jobs:
         with:
           extra-conf: accept-flake-config = true
 
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+        if: runner.os == 'macOS'
+
       - uses: cachix/cachix-action@v15
         with:
           name: ${{ vars.CACHIX_CACHE }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
+      - name: Install current Bash on macOS
+        if: runner.os == 'macOS'
+        run: brew install bash
+
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.${{ matrix.system }}.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Build Rust workspace
+        if: ${{ runner.environment == 'self-hosted' }}
         run: cargo build
 
       - name: Test Rust workspace
+        if: ${{ runner.environment == 'self-hosted' }}
         run: cargo test
 
       - name: Run Cargo Clippy
+        if: ${{ runner.environment == 'self-hosted' }}
         run: cargo clippy -- --deny warnings
 
   rust-nix-build:
