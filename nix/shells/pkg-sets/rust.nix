@@ -22,16 +22,10 @@
     fi
   '';
 
-  packages =
-    [
-      self'.legacyPackages.cargoWrapped
-      self'.legacyPackages.spinWrapped
-      self'.legacyPackages.rustToolchain
-    ]
-    ++ (with pkgs; [
-      openssl
-      pkg-config
-      cargo-tarpaulin
-      rdkafka
-    ]);
+  packages = self'.packages.blocksense-rs.buildInputs ++ [
+    self'.legacyPackages.cargoWrapped
+    self'.legacyPackages.spinWrapped
+    self'.legacyPackages.rustToolchain
+    pkgs.cargo-tarpaulin
+  ];
 }
