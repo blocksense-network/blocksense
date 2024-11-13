@@ -221,13 +221,21 @@ impl Validated for Reporter {
         Ok(())
     }
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct BlockConfig {
+    pub max_feed_updates_to_batch: usize,
+    pub block_generation_period: u64,
+    pub feed_updates_store_limit: Option<u32>,
+    pub genesis_block_timestamp: Option<SystemTime>,
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct SequencerConfig {
     pub main_port: u16,
     pub admin_port: u16,
     pub prometheus_port: u16,
-    pub max_keys_to_batch: usize,
-    pub keys_batch_duration: u64,
+    pub block_config: BlockConfig,
     pub providers: HashMap<String, Provider>,
     pub reporters: Vec<Reporter>,
 }
@@ -304,8 +312,12 @@ pub fn get_test_config_with_single_provider(
         main_port: 8877,
         admin_port: 5556,
         prometheus_port: 5555,
-        max_keys_to_batch: 1,
-        keys_batch_duration: 500,
+        block_config: BlockConfig{
+            max_feed_updates_to_batch: 1,
+            block_generation_period: 500,
+            feed_updates_store_limit: None,
+            genesis_block_timestamp: None,
+        },
         providers: HashMap::from([(
             network.to_string(),
             Provider {
@@ -357,8 +369,12 @@ pub fn get_test_config_with_multiple_providers(
         main_port: 8877,
         admin_port: 5556,
         prometheus_port: 5555,
-        max_keys_to_batch: 1,
-        keys_batch_duration: 500,
+        block_config: BlockConfig {
+            max_feed_updates_to_batch: 1,
+            block_generation_period: 500,
+            feed_updates_store_limit: None,
+            genesis_block_timestamp: None,
+        },
         providers,
         reporters: Vec::new(),
     }

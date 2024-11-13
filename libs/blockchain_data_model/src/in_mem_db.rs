@@ -20,9 +20,11 @@ pub struct InMemDb {
     block_height_to_header_hash: HashMap<u64, HashType>,
     block_header_hash_to_header: HashMap<HashType, BlockHeader>,
     // The key is the feed_updates_merkle_root from the block header.
-    asset_feed_updates: HashMap<HashType, FeedUpdates>,
+    latest_asset_feed_updates: HashMap<HashType, FeedUpdates>,
+    history_asset_feed_updates: HashMap<HashType, FeedUpdates>,
     // The feeds that will be registered after this block is applied to the state + the feed ID-s that will be deleted. The key is the Merkle root of the structure, which is in the block header.
     add_remove_feeds: HashMap<HashType, AddRemoveFeeds>,
+    feed_updates_store_limit: Option<u32>,
 }
 
 impl InMemDb {
@@ -31,8 +33,22 @@ impl InMemDb {
             latest_block_height: 0,
             block_height_to_header_hash: HashMap::new(),
             block_header_hash_to_header: HashMap::new(),
-            asset_feed_updates: HashMap::new(),
+            latest_asset_feed_updates: HashMap::new(),
+            history_asset_feed_updates: HashMap::new(),
             add_remove_feeds: HashMap::new(),
+            feed_updates_store_limit: None,
+        }
+    }
+
+    pub fn new_with_feed_updates_limit(limit: u32) -> InMemDb {
+        InMemDb {
+            latest_block_height: 0,
+            block_height_to_header_hash: HashMap::new(),
+            block_header_hash_to_header: HashMap::new(),
+            latest_asset_feed_updates: HashMap::new(),
+            history_asset_feed_updates: HashMap::new(),
+            add_remove_feeds: HashMap::new(),
+            feed_updates_store_limit: Some(limit),
         }
     }
 
@@ -175,8 +191,15 @@ impl InMemDb {
         self.block_header_hash_to_header
             .insert(new_header_hash, header);
 
-        self.asset_feed_updates
+        self.latest_asset_feed_updates
             .insert(feed_updates_merkle_root, updates);
+
+        if let Some(limit) = self.feed_updates_store_limit {
+            if self.latest_asset_feed_updates.len() >= limit as usize {
+                self.history_asset_feed_updates =
+                    std::mem::take(&mut self.latest_asset_feed_updates);
+            }
+        }
 
         self.add_remove_feeds.insert(
             Self::node_to_hash(Self::calc_merkle_root(&mut add_remove_feeds)),

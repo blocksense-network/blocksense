@@ -67,6 +67,11 @@ pub async fn prepare_sequencer_state(
     let (vote_send, vote_recv): VoteChannel = mpsc::unbounded_channel();
     let (feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
 
+    let db = match &sequencer_config.block_config.feed_updates_store_limit {
+        Some(limit) => RwLock::new(InMemDb::new_with_feed_updates_limit(*limit)),
+        None => RwLock::new(InMemDb::new()),
+    };
+
     let sequencer_state: Data<SequencerState> = web::Data::new(SequencerState {
         registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
             &feeds_config,
@@ -91,7 +96,7 @@ pub async fn prepare_sequencer_state(
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         feeds_management_cmd_send,
-        blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+        blockchain_db: Arc::new(db),
     });
 
     (vote_recv, feeds_management_cmd_recv, sequencer_state)
