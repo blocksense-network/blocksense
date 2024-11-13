@@ -2,10 +2,7 @@ import * as React from 'react';
 
 import { parseNetworkName } from '@blocksense/base-utils/evm';
 
-import {
-  DataTable,
-  getFacetedFilters,
-} from '@/components/ui/DataTable/DataTable';
+import { DataTable } from '@/components/ui/DataTable/DataTable';
 import {
   columns as proxyContractsColumns,
   proxyColumnsTitles,
@@ -43,7 +40,7 @@ export const DeployedContracts = ({
   const handleNetworkClick = (network: string) => {
     setSelectedNetwork(network);
     setTimeout(() => {
-      contractsRef.current?.scrollIntoView({ behavior: 'smooth' }); // Scrolls into view after a delay
+      contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
   };
 
@@ -76,8 +73,8 @@ export const DeployedContracts = ({
           ))}
         </div>
       </ContractItemWrapper>
-      <div ref={contractsRef}>
-        {selectedNetwork && (
+      {selectedNetwork && (
+        <div ref={contractsRef}>
           <ContractItemWrapper
             title="Core Contracts"
             titleLevel={2}
@@ -117,8 +114,6 @@ export const DeployedContracts = ({
               ))}
             </div>
           </ContractItemWrapper>
-        )}
-        {selectedNetwork && (
           <div className="mt-6">
             <ContractItemWrapper
               title="Aggregator Proxy Contracts"
@@ -145,8 +140,8 @@ export const DeployedContracts = ({
               />
             </ContractItemWrapper>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 };
