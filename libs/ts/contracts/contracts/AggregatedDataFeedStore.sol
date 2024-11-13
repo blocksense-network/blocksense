@@ -18,26 +18,27 @@ contract AggregatedDataFeedStore {
       // Load selector from memory
       let selector := calldataload(0x00)
 
-      /* <selector 1b> <stride 1b> <feedId 16b> (<round 2b> <slots 1b> | <slots 1b>) */
-
+      /* <selector 1b> <stride 1b> <X feedId length in bytes 1b> <feedId Xb> (<round 2b> <slots 4b> | <slots 4b>) */
       if and(
         selector,
         0x7000000000000000000000000000000000000000000000000000000000000000
       ) {
-        let stride := shr(248, shl(8, selector))
-        let feedId := shr(128, shl(16, selector))
+        let stride := byte(1, selector)
+        let feedIdLength := byte(2, selector)
+        let feedId := shr(sub(256, shl(3, feedIdLength)), shl(24, selector))
+        let data := calldataload(add(feedIdLength, 3))
 
-        // getFeedAtRound(uint8 stride, uint128 feedId, uint16 round, uint8 slots) returns (bytes)
+        // getFeedAtRound(uint8 stride, uintX feedId, uint16 round, uint32 slots) returns (bytes)
         if and(
           selector,
           0x1000000000000000000000000000000000000000000000000000000000000000
         ) {
-          let round := shr(240, shl(144, selector))
+          let round := shr(240, data)
 
           let len := 0
           let ptr := mload(0x40)
 
-          let slots := shr(248, shl(160, selector))
+          let slots := shr(224, shl(16, data))
           stride := add(stride, 1)
           // (feedId * 2**13 + round) * (stride + 1)
           let initialPos := add(
@@ -51,15 +52,15 @@ contract AggregatedDataFeedStore {
             i := add(i, 1)
             len := add(len, 32)
           } {
-            let data := sload(add(initialPos, i))
-            mstore(add(ptr, len), data)
+            let feedData := sload(add(initialPos, i))
+            mstore(add(ptr, len), feedData)
           }
 
           return(ptr, len)
         }
 
         // 0x600000000...000 will call both getLatestData and getLatestRound
-        // getLatestRound(uint8 stride, uint128 feedId) returns (uint16)
+        // getLatestRound(uint8 stride, uintX feedId) returns (uint16)
         // (2**115 * stride + feedId)/16
         let roundAddress := add(
           ROUND_ADDRESS,
@@ -87,12 +88,12 @@ contract AggregatedDataFeedStore {
           mstore(ptr, round)
         }
 
-        // getLatestData(uint8 stride, uint128 feedId, uint8 slots) returns (bytes)
+        // getLatestData(uint8 stride, uintX feedId, uint32 slots) returns (bytes)
         if and(
           selector,
           0x2000000000000000000000000000000000000000000000000000000000000000
         ) {
-          let slots := shr(248, shl(144, selector))
+          let slots := shr(224, data)
           stride := add(stride, 1)
           // (feedId * 2**13 + round) * (stride + 1)
           let initialPos := add(
@@ -106,8 +107,8 @@ contract AggregatedDataFeedStore {
             i := add(i, 1)
             len := add(len, 32)
           } {
-            let data := sload(add(initialPos, i))
-            mstore(add(ptr, len), data)
+            let feedData := sload(add(initialPos, i))
+            mstore(add(ptr, len), feedData)
           }
         }
 
@@ -118,8 +119,7 @@ contract AggregatedDataFeedStore {
     /* WRITE */
     address _owner = owner;
 
-    // TODO it is possible to have length for (feedId,round)
-    // 0x1a2d80ac <blockNumber 8b> <N number of feeds 4b> <feed1: stride(1b),(feedId,round)(16b),slots(1b),data> <feed2> ... <feedN>
+    // 0x00 <blockNumber 8b> <N number of feeds 4b> <feed1: stride(1b),indexLength(1b)(feedId,round)(Xb),bytesLength(1b),bytesToWrite(Yb),data> <feed2> ... <feedN>
     // the rest is round table updates in the form of <16b index><32b data>
     // note: (feedId,round) is the sum of the feedId and round and should be a single value
     assembly {
@@ -128,32 +128,21 @@ contract AggregatedDataFeedStore {
         revert(0x00, 0x00)
       }
 
-      // TODO can be done via calldataload() -> change `data` loading
-      // Store selector in memory at location 0
-      calldatacopy(0x1C, 0x00, 0x04)
-
-      let selector := mload(0x00)
+      let data := calldataload(0)
       // setFeeds(bytes)
-      if eq(selector, 0) {
+      if eq(byte(0, data), 0) {
         // check if internal blocknumber is already set
         let prevBlockNumber := sload(0x00)
-        let data := calldataload(0x04)
-        let newBlockNumber := shr(192, data)
+        let newBlockNumber := shr(184, data)
 
         if eq(prevBlockNumber, newBlockNumber) {
           revert(0x00, 0x00)
         }
         sstore(0x00, newBlockNumber)
 
-        let pointer := 16
+        let pointer := 13
         let len := calldatasize()
-        let feedsCount := shr(
-          160,
-          and(
-            data,
-            0x0000000000000000FFFFFFFF0000000000000000000000000000000000000000
-          )
-        )
+        let feedsCount := shr(224, shl(72, data))
 
         /* feed updates */
         /*
@@ -179,43 +168,43 @@ contract AggregatedDataFeedStore {
         } lt(i, feedsCount) {
           i := add(i, 0x01)
         } {
-          // TODO check if calldatacopy for each value will be cheaper
           let metadata := calldataload(pointer)
           let stride := byte(0, metadata)
           let strideAddress := shl(stride, DATA_FEED_ADDRESS)
 
-          let indexShift := 16
-          if gt(stride, 0) {
-            indexShift := add(17, shr(3, stride))
-          }
+          let indexLength := byte(1, metadata)
+          let indexLengthBits := shl(3, indexLength)
+          let index := shr(sub(256, indexLengthBits), shl(16, metadata))
 
-          let shifted := shl(3, indexShift)
-          let index := shr(
-            sub(248, shifted),
-            and(
-              metadata,
-              shr(
-                8,
-                shl(
-                  sub(160, shifted),
-                  0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000000
-                )
-              )
-            )
+          // 5b
+          let bytesLength := byte(add(2, indexLength), metadata)
+          let bytesToWrite := shr(
+            sub(256, shl(3, bytesLength)),
+            shl(add(24, indexLengthBits), metadata)
           )
 
-          // TODO may be more than 1b; or use number of bytes to read?
-          let slots := byte(add(1, indexShift), metadata)
+          pointer := add(pointer, add(3, add(indexLength, bytesLength)))
 
-          pointer := add(pointer, add(2, indexShift))
-
+          let cycles := shr(5, bytesToWrite)
           for {
             let j := 0x00
-          } lt(j, slots) {
+          } lt(j, cycles) {
             j := add(j, 0x01)
             pointer := add(pointer, 0x20)
           } {
             sstore(add(strideAddress, add(index, j)), calldataload(pointer))
+          }
+
+          // last cycle
+          let lastCycle := mod(bytesToWrite, 0x20)
+
+          if gt(lastCycle, 0x00) {
+            let lastCycleData := calldataload(pointer)
+            sstore(
+              add(strideAddress, add(index, cycles)),
+              shr(sub(256, shl(3, lastCycle)), lastCycleData)
+            )
+            pointer := add(pointer, lastCycle)
           }
         }
 

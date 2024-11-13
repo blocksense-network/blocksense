@@ -15,7 +15,6 @@ interface Feed {
   id: bigint;
   round: bigint;
   stride: bigint;
-  slots: bigint;
   data: string;
 }
 
@@ -24,36 +23,31 @@ const feeds: Feed[] = [
     id: 1n,
     round: 6n,
     stride: 1n,
-    slots: 1n,
-    data: ethers.encodeBytes32String('0x1234'),
+    data: '0x12343267643573',
   },
   {
     id: 2n,
     round: 5n,
     stride: 0n,
-    slots: 1n,
-    data: ethers.encodeBytes32String('0x2456'),
+    data: '0x2456',
   },
   {
     id: 3n,
     round: 4n,
     stride: 0n,
-    slots: 1n,
-    data: ethers.encodeBytes32String('0x3678'),
+    data: '0x3678',
   },
   {
     id: 4n,
     round: 3n,
     stride: 0n,
-    slots: 1n,
-    data: ethers.encodeBytes32String('0x4890'),
+    data: '0x4890',
   },
   {
     id: 5n,
     round: 2n,
     stride: 0n,
-    slots: 1n,
-    data: ethers.encodeBytes32String('0x5abc'),
+    data: '0x5abc',
   },
 ];
 
@@ -63,7 +57,7 @@ describe('AggregatedDataFeedStore', () => {
 
   beforeEach(async () => {
     signers = await ethers.getSigners();
-    console.log(signers[0].address);
+
     contract = await deployContract<AggregatedDataFeedStore>(
       'AggregatedDataFeedStore',
       signers[0].address,
@@ -71,10 +65,12 @@ describe('AggregatedDataFeedStore', () => {
   });
 
   it('Should get latest round', async () => {
-    await signers[0].sendTransaction({
+    const writeTx = await signers[0].sendTransaction({
       to: contract.target,
       data: encodeDataWrite(feeds),
     });
+
+    console.log('write gas:', (await writeTx.wait())!.gasUsed);
 
     for (const feed of feeds) {
       const data = encodeDataRead(ReadOp.GetLatestRound, feed);
@@ -87,10 +83,12 @@ describe('AggregatedDataFeedStore', () => {
   });
 
   it('Should get latest data', async () => {
-    await signers[0].sendTransaction({
+    const writeTx = await signers[0].sendTransaction({
       to: contract.target,
       data: encodeDataWrite(feeds),
     });
+
+    console.log('write gas:', (await writeTx.wait())!.gasUsed);
 
     for (const feed of feeds) {
       const data = encodeDataRead(ReadOp.GetLatestFeed, feed);
@@ -98,25 +96,29 @@ describe('AggregatedDataFeedStore', () => {
         to: contract.target,
         data,
       });
-      expect(res).to.be.equal(feed.data);
+      expect(res).to.be.equal(formatData(feed.data));
     }
   });
 
   it('Should get historical feed at round', async () => {
-    await signers[0].sendTransaction({
+    const writeTx = await signers[0].sendTransaction({
       to: contract.target,
       data: encodeDataWrite(feeds),
     });
+
+    console.log('write gas:', (await writeTx.wait())!.gasUsed);
 
     const updatedFeeds = feeds.map(feed => {
       feed.round++;
       return feed;
     });
 
-    await signers[0].sendTransaction({
+    const writeTx2 = await signers[0].sendTransaction({
       to: contract.target,
       data: encodeDataWrite(updatedFeeds),
     });
+
+    console.log('write gas:', (await writeTx2.wait())!.gasUsed);
 
     for (const feed of feeds) {
       const data = encodeDataRead(ReadOp.GetFeedAtRound, feed);
@@ -124,7 +126,7 @@ describe('AggregatedDataFeedStore', () => {
         to: contract.target,
         data,
       });
-      expect(res).to.be.equal(feed.data);
+      expect(res).to.be.equal(formatData(feed.data));
     }
 
     for (const feed of updatedFeeds) {
@@ -133,25 +135,29 @@ describe('AggregatedDataFeedStore', () => {
         to: contract.target,
         data,
       });
-      expect(res).to.be.equal(feed.data);
+      expect(res).to.be.equal(formatData(feed.data));
     }
   });
 
   it('Should get latest feed and round after update', async () => {
-    await signers[0].sendTransaction({
+    const writeTx = await signers[0].sendTransaction({
       to: contract.target,
       data: encodeDataWrite(feeds),
     });
+
+    console.log('write gas:', (await writeTx.wait())!.gasUsed);
 
     const updatedFeeds = feeds.map(feed => {
       feed.round++;
       return feed;
     });
 
-    await signers[0].sendTransaction({
+    const writeTx2 = await signers[0].sendTransaction({
       to: contract.target,
       data: encodeDataWrite(updatedFeeds),
     });
+
+    console.log('write gas:', (await writeTx2.wait())!.gasUsed);
 
     for (const feed of updatedFeeds) {
       const data = encodeDataRead(ReadOp.GetLatestFeedAndRound, feed);
@@ -160,38 +166,36 @@ describe('AggregatedDataFeedStore', () => {
         data,
       });
       expect(res).to.be.equal(
-        ethers.toBeHex(feed.round, 32).concat(
-          ethers
-            .toBeHex(feed.data)
-            .padEnd(Number(feed.slots) * 32)
-            .slice(2),
-        ),
+        ethers.toBeHex(feed.round, 32).concat(formatData(feed.data).slice(2)),
       );
     }
   });
 });
 
 const encodeDataWrite = (feeds: Feed[]) => {
+  const blockNumber = Date.now() + 100;
   const prefix = ethers.solidityPacked(
-    ['bytes4', 'uint64', 'uint32'],
-    ['0x00000000', Date.now(), feeds.length],
+    ['bytes1', 'uint64', 'uint32'],
+    ['0x00', blockNumber, feeds.length],
   );
 
   const data = feeds.map(feed => {
+    const index = (feed.id * 2n ** 13n + feed.round) * 2n ** feed.stride;
+    const indexInBytesLength = Math.ceil(index.toString(2).length / 8);
+    const bytes = (feed.data.length - 2) / 2;
+    const bytesLength = Math.ceil(bytes.toString(2).length / 8);
+
     return ethers
       .solidityPacked(
         [
           'uint8',
-          `uint${((feed.stride > 0 ? 17n + feed.stride / 8n : 16n) * 8n).toString()}`,
           'uint8',
+          `uint${8n * BigInt(indexInBytesLength)}`,
+          'uint8',
+          `uint${8n * BigInt(bytesLength)}`,
           'bytes',
         ],
-        [
-          feed.stride,
-          (feed.id * 2n ** 13n + feed.round) * 2n ** feed.stride,
-          feed.slots,
-          feed.data,
-        ],
+        [feed.stride, indexInBytesLength, index, bytesLength, bytes, feed.data],
       )
       .slice(2);
   });
@@ -239,16 +243,16 @@ const encodeDataWrite = (feeds: Feed[]) => {
 };
 
 const encodeDataRead = (operation: ReadOp, feed: Feed) => {
+  const feedIdInBytesLength = Math.ceil(feed.id.toString(2).length / 4);
   const prefix = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint128'],
-    [operation, feed.stride, feed.id],
+    ['bytes1', 'uint8', 'uint8', `uint${8n * BigInt(feedIdInBytesLength)}`],
+    [operation, feed.stride, feedIdInBytesLength, feed.id],
   );
+  const slots = Math.ceil((feed.data.length - 2) / 64);
 
   if (operation === ReadOp.GetFeedAtRound) {
     return prefix.concat(
-      ethers
-        .solidityPacked(['uint16', 'uint8'], [feed.round, feed.slots])
-        .slice(2),
+      ethers.solidityPacked(['uint16', 'uint32'], [feed.round, slots]).slice(2),
     );
   }
 
@@ -256,10 +260,13 @@ const encodeDataRead = (operation: ReadOp, feed: Feed) => {
     operation === ReadOp.GetLatestFeed ||
     operation === ReadOp.GetLatestFeedAndRound
   ) {
-    return prefix.concat(
-      ethers.solidityPacked(['uint8'], [feed.slots]).slice(2),
-    );
+    return prefix.concat(ethers.solidityPacked(['uint32'], [slots]).slice(2));
   }
 
   return prefix;
+};
+
+const formatData = (data: string) => {
+  const slots = Math.ceil((data.length - 2) / 64);
+  return '0x' + data.slice(2).padStart(slots * 64, '0');
 };
