@@ -4,6 +4,7 @@ use blockchain_data_model::{
     BlockFeedConfig, DataChunk, Resources, MAX_ASSET_FEED_UPDATES_IN_BLOCK,
     MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
 };
+use config::BlockConfig;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::Repeatability;
@@ -29,22 +30,30 @@ pub async fn block_creator_loop<
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
     feed_manager_cmds_send: UnboundedSender<FeedsManagementCmds>,
     batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
-    mut max_keys_to_batch: usize,
-    timeout_duration: u64,
+    block_config: BlockConfig,
     blockchain_db: Arc<RwLock<InMemDb>>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     spawn(async move {
         let span = info_span!("VotesResultBatcher");
         let _guard = span.enter();
-        info!("max_keys_to_batch set to {}", max_keys_to_batch);
-        if max_keys_to_batch > MAX_ASSET_FEED_UPDATES_IN_BLOCK {
-            warn!("max_keys_to_batch set to {}, which is above what can fit in a block. Value will be reduced to {}", max_keys_to_batch, MAX_ASSET_FEED_UPDATES_IN_BLOCK);
-            max_keys_to_batch = MAX_ASSET_FEED_UPDATES_IN_BLOCK;
-        }
-        info!("timeout_duration set to {}", timeout_duration);
+        let mut max_feed_updates_to_batch = block_config.max_feed_updates_to_batch;
+        let block_generation_period = block_config.block_generation_period;
 
-        let mut stt =
-            SlotTimeTracker::new("block_creator_loop".to_string(), Duration::from_millis(timeout_duration), current_unix_time());
+        info!(
+            "max_feed_updates_to_batch set to {}",
+            max_feed_updates_to_batch
+        );
+        if max_feed_updates_to_batch > MAX_ASSET_FEED_UPDATES_IN_BLOCK {
+            warn!("max_feed_updates_to_batch set to {}, which is above what can fit in a block. Value will be reduced to {}", max_feed_updates_to_batch, MAX_ASSET_FEED_UPDATES_IN_BLOCK);
+            max_feed_updates_to_batch = MAX_ASSET_FEED_UPDATES_IN_BLOCK;
+        }
+        info!("block_generation_period set to {}", block_generation_period);
+
+        let mut stt = SlotTimeTracker::new(
+            "block_creator_loop".to_string(),
+            Duration::from_millis(block_generation_period),
+            current_unix_time(),
+        );
 
         loop {
             // Loop forever
@@ -77,7 +86,7 @@ pub async fn block_creator_loop<
                                     val.to_string()
                                 );
                                 updates.insert(key, val);
-                                if updates.keys().len() >= max_keys_to_batch {
+                                if updates.keys().len() >= max_feed_updates_to_batch {
                                     generate_block(
                                         updates,
                                         new_feeds_to_register,
@@ -280,6 +289,7 @@ mod tests {
     use std::sync::Arc;
     // use std::sync::{Arc, RwLock};
     use blockchain_data_model::in_mem_db::InMemDb;
+    use config::BlockConfig;
     use std::time::Duration;
     use tokio::sync::{mpsc, RwLock};
     use tokio::time;
@@ -287,8 +297,12 @@ mod tests {
     #[actix_web::test]
     async fn test_block_creator_loop() {
         // Setup
-        let batch_size = 3;
-        let duration = 100;
+        let block_config = BlockConfig {
+            max_feed_updates_to_batch: 3,
+            block_generation_period: 100,
+            feed_updates_store_limit: None,
+            genesis_block_timestamp: None,
+        };
 
         let (vote_send, vote_recv) = mpsc::unbounded_channel();
         let (_feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
@@ -302,8 +316,7 @@ mod tests {
             feeds_management_cmd_recv,
             feeds_slots_manager_cmd_send,
             batched_votes_send,
-            batch_size,
-            duration,
+            block_config,
             Arc::new(RwLock::new(InMemDb::new())),
         )
         .await;

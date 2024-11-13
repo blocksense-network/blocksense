@@ -35,8 +35,7 @@ pub async fn prepare_app_workers(
         feeds_management_cmd_recv,
         feeds_slots_manager_cmd_send,
         batched_votes_send,
-        sequencer_config.max_keys_to_batch,
-        sequencer_config.keys_batch_duration,
+        sequencer_config.block_config.clone(),
         sequencer_state.blockchain_db.clone(),
     )
     .await;
