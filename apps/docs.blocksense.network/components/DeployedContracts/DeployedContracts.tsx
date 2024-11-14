@@ -15,6 +15,7 @@ import {
 } from '@/src/deployed-contracts/types';
 import { dataFeedUrl } from '@/src/constants';
 import { NetworkIcon } from '@/components/DeployedContracts/NetworkIcon';
+import { Callout } from '@blocksense/docs-theme';
 
 type DeployedContractsProps = {
   deployedCoreContractsString: string;
@@ -53,19 +54,19 @@ export const DeployedContracts = ({
         titleLevel={2}
         itemsLength={1}
       >
-        <article className="mt-4 mb-6">
+        <Callout type="info" emoji="💡">
           <span className="text-gray-500 text-md">
             We have deployed our contracts on the following networks. Select a
             network to view detailed information about the deployed contracts.
-            <br />
           </span>
-        </article>
+        </Callout>
 
-        <div className="flex flex-wrap justify-center gap-4 pt-3">
+        <div className="flex flex-wrap justify-center gap-4 pt-4">
           {deployedCoreContracts[0].networks.map(network => (
             <NetworkIcon
               key={network}
               network={network}
+              isSelected={selectedNetwork === network}
               onClick={() => {
                 handleNetworkClick(network);
               }}
@@ -80,7 +81,7 @@ export const DeployedContracts = ({
             titleLevel={2}
             itemsLength={deployedCoreContracts.length}
           >
-            <article className="mt-4 mb-6">
+            <Callout type="info" emoji="💡">
               <span className="text-gray-500 text-md">
                 These contracts are key components of the Blocksense platform
                 and provide essential functionalities that support the
@@ -95,7 +96,7 @@ export const DeployedContracts = ({
                 </a>
                 documentation section.
               </span>
-            </article>
+            </Callout>
             <div className="container px-0">
               {deployedCoreContracts.map(contract => (
                 <CoreContractCard
@@ -103,12 +104,9 @@ export const DeployedContracts = ({
                   contract={{
                     name: contract.contract,
                     address: contract.address,
-                    networks: selectedNetwork
-                      ? contract.networks.filter(
-                          network =>
-                            network == parseNetworkName(selectedNetwork),
-                        )
-                      : contract.networks,
+                    networks: contract.networks.filter(
+                      network => network === parseNetworkName(selectedNetwork),
+                    ),
                   }}
                 />
               ))}
@@ -120,7 +118,7 @@ export const DeployedContracts = ({
               titleLevel={2}
               itemsLength={deployedProxyContracts.length}
             >
-              <article className="mt-4 mb-6">
+              <Callout type="info" emoji="💡">
                 <span className="text-gray-500 text-md">
                   Blocksense aggregator proxy contracts table allows users to
                   explore contracts that serve as an alternative to the
@@ -128,11 +126,12 @@ export const DeployedContracts = ({
                   information about data feed names, IDs, and relevant
                   addresses.
                 </span>
-              </article>
+              </Callout>
               <DataTable
                 columns={proxyContractsColumns}
                 data={deployedProxyContracts.filter(
-                  element => element.network === selectedNetwork,
+                  element =>
+                    element.network === parseNetworkName(selectedNetwork),
                 )}
                 columnsTitles={proxyColumnsTitles}
                 filterCell="description"
