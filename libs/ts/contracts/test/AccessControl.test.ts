@@ -4,11 +4,6 @@ import { ethers } from 'hardhat';
 import { deployContract } from './utils/helpers/common';
 import { expect } from 'chai';
 
-enum Selector {
-  CheckAdminRole = '0xe386be2e',
-  SetAdmins = '0xaccc1d5e',
-}
-
 describe('AccessControl', () => {
   let accessControl: AccessControl;
   let signers: HardhatEthersSigner[];
@@ -21,7 +16,7 @@ describe('AccessControl', () => {
       signers[0].address,
     );
 
-    admins = signers.slice(1).map(signer => signer.address);
+    admins = signers.slice(1, 2).map(signer => signer.address);
 
     const encodedData = ethers.solidityPacked(
       [...admins.map(() => 'address')],
@@ -30,15 +25,15 @@ describe('AccessControl', () => {
 
     await signers[0].sendTransaction({
       to: accessControl.target,
-      data: Selector.SetAdmins.concat(encodedData.slice(2)),
+      data: encodedData,
     });
   });
 
   it('Should return true for admin', async () => {
     for (const admin of admins) {
-      const res = await signers[0].call({
+      const res = await signers[5].call({
         to: accessControl.target,
-        data: Selector.CheckAdminRole.concat(admin.slice(2)),
+        data: admin,
       });
 
       expect(res).to.be.equal(1n);
@@ -46,22 +41,27 @@ describe('AccessControl', () => {
   });
 
   it('Should return false when not admin', async () => {
-    const res = await signers[0].call({
+    const res = await signers[5].call({
       to: accessControl.target,
-      data: Selector.CheckAdminRole.concat(signers[0].address.slice(2)),
+      data: signers[0].address,
     });
 
     expect(res).to.be.equal(0n);
   });
 
-  it('Should revert on setting admins when not owner', async () => {
-    await expect(
-      signers[1].sendTransaction({
-        to: accessControl.target,
-        data: Selector.SetAdmins.concat(
-          ethers.solidityPacked(['address'], [signers[0].address]).slice(2),
-        ),
-      }),
-    ).to.be.reverted;
+  it('Should not set admin if not owner', async () => {
+    const newAdmin = ethers.Wallet.createRandom().address;
+
+    await signers[5].sendTransaction({
+      to: accessControl.target,
+      data: newAdmin,
+    });
+
+    const res = await signers[5].call({
+      to: accessControl.target,
+      data: newAdmin,
+    });
+
+    expect(res).to.be.equal(0n);
   });
 });

@@ -6,10 +6,10 @@ contract AggregatedDataFeedStore {
     0x0000000100000000000000000000000000000000;
   address internal constant ROUND_ADDRESS =
     0x0000000000000000000000000000000000001000;
-  address internal immutable owner;
+  address internal immutable ACCESS_CONTROL;
 
-  constructor(address owner_) {
-    owner = owner_;
+  constructor(address accessControl) {
+    ACCESS_CONTROL = accessControl;
   }
 
   fallback() external payable {
@@ -117,16 +117,34 @@ contract AggregatedDataFeedStore {
     }
 
     /* WRITE */
-    address _owner = owner;
+    address accessControl = ACCESS_CONTROL;
 
-    // 0x00 <blockNumber 8b> <N number of feeds 4b> <feed1: stride(1b),indexLength(1b)(feedId,round)(Xb),bytesLength(1b),bytesToWrite(Yb),data> <feed2> ... <feedN>
-    // the rest is round table updates in the form of <16b index><32b data>
-    // note: (feedId,round) is the sum of the feedId and round and should be a single value
+    /*
+                                                                                                                        ┌--------------------- round table data --------------------┐
+                                                                                                                        │                                                           │
+                                      ┌---------------------- feed 1 ----------------------------┬-- feed 2 .. feed N --┼-------------- row 1 --------------┬---- row 2 .. row N ---┤
+      ┌────────┬───────────┬──────────┬──────┬────────────┬──────────────┬────────────┬─────┬────┬──────────────────────┬────────────┬─────┬────────────────┬───────────────────────┐
+      │selector│blocknumber│# of feeds│stride│index length│feedId + round│bytes length│bytes│data│          ..          │index length│index│round table data│           ..          │
+      ├────────┼───────────┼──────────┼──────┼────────────┼──────────────┼────────────┼─────┼────┼──────────────────────┼────────────┼─────┼────────────────┼───────────────────────┤
+      │   1b   │    8b     │    4b    │  1b  │     1b     │      Xb      │     1b     │ Yb  │ Zb │          ..          │     1b     │ Xb  │      32b       │           ..          │
+      └────────┴───────────┴──────────┴──────┴────────────┴──────────────┴────────────┴─────┴────┴──────────────────────┴────────────┴─────┴────────────────┴───────────────────────┘
+                                                    │             ▲         │           ▲ │    ▲                              │         ▲
+                                                    └-------------┘         └-----------┘ └----┘                              └---------┘
+                                                    X=index length        Y=bytes length Z=bytes                             X=index length
+    */
     assembly {
-      // Check if sender is owner
-      if iszero(eq(_owner, caller())) {
-        revert(0x00, 0x00)
+      let ptr := mload(0x40)
+      mstore(ptr, shl(96, caller()))
+
+      // call AC and store return value (32 bytes) at memory location ptr
+      let success := staticcall(gas(), accessControl, ptr, 20, ptr, 32)
+
+      // revert if call failed or caller not authorized
+      if iszero(and(success, mload(ptr))) {
+        revert(0, 0)
       }
+
+      mstore(ptr, 0)
 
       let data := calldataload(0)
       // setFeeds(bytes)
@@ -232,12 +250,17 @@ contract AggregatedDataFeedStore {
         for {
 
         } lt(pointer, len) {
-          pointer := add(pointer, 48)
+
         } {
-          sstore(
-            add(ROUND_ADDRESS, shr(128, calldataload(pointer))),
-            calldataload(add(pointer, 16))
+          let roundTableData := calldataload(pointer)
+          let indexLength := shr(248, roundTableData)
+          let index := shr(
+            sub(256, shl(3, indexLength)),
+            shl(8, roundTableData)
           )
+
+          pointer := add(pointer, add(indexLength, 33))
+          sstore(add(ROUND_ADDRESS, index), calldataload(sub(pointer, 32)))
         }
 
         return(0x00, 0x00)

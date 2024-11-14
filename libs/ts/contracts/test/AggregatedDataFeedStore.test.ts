@@ -3,6 +3,7 @@ import { AggregatedDataFeedStore } from '../typechain/contracts/AggregatedDataFe
 import { deployContract } from './utils/helpers/common';
 import { ethers } from 'hardhat';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { AccessControl } from '../typechain/contracts/AccessControl';
 
 enum ReadOp {
   GetFeedAtRound = '0x10',
@@ -53,19 +54,34 @@ const feeds: Feed[] = [
 
 describe('AggregatedDataFeedStore', () => {
   let contract: AggregatedDataFeedStore;
+  let accessControl: AccessControl;
   let signers: HardhatEthersSigner[];
+  let accessControlOwner: HardhatEthersSigner;
+  let sequencer: HardhatEthersSigner;
 
   beforeEach(async () => {
     signers = await ethers.getSigners();
+    sequencer = signers[0];
+    accessControlOwner = signers[1];
+
+    accessControl = await deployContract<AccessControl>(
+      'AccessControl',
+      accessControlOwner.address,
+    );
 
     contract = await deployContract<AggregatedDataFeedStore>(
       'AggregatedDataFeedStore',
-      signers[0].address,
+      accessControl.target,
     );
+
+    await accessControlOwner.sendTransaction({
+      to: accessControl.target,
+      data: sequencer.address,
+    });
   });
 
   it('Should get latest round', async () => {
-    const writeTx = await signers[0].sendTransaction({
+    const writeTx = await sequencer.sendTransaction({
       to: contract.target,
       data: encodeDataWrite(feeds),
     });
@@ -74,7 +90,7 @@ describe('AggregatedDataFeedStore', () => {
 
     for (const feed of feeds) {
       const data = encodeDataRead(ReadOp.GetLatestRound, feed);
-      const res = await signers[0].call({
+      const res = await sequencer.call({
         to: contract.target,
         data,
       });
@@ -83,7 +99,7 @@ describe('AggregatedDataFeedStore', () => {
   });
 
   it('Should get latest data', async () => {
-    const writeTx = await signers[0].sendTransaction({
+    const writeTx = await sequencer.sendTransaction({
       to: contract.target,
       data: encodeDataWrite(feeds),
     });
@@ -92,7 +108,7 @@ describe('AggregatedDataFeedStore', () => {
 
     for (const feed of feeds) {
       const data = encodeDataRead(ReadOp.GetLatestFeed, feed);
-      const res = await signers[0].call({
+      const res = await sequencer.call({
         to: contract.target,
         data,
       });
@@ -101,7 +117,7 @@ describe('AggregatedDataFeedStore', () => {
   });
 
   it('Should get historical feed at round', async () => {
-    const writeTx = await signers[0].sendTransaction({
+    const writeTx = await sequencer.sendTransaction({
       to: contract.target,
       data: encodeDataWrite(feeds),
     });
@@ -113,7 +129,7 @@ describe('AggregatedDataFeedStore', () => {
       return feed;
     });
 
-    const writeTx2 = await signers[0].sendTransaction({
+    const writeTx2 = await sequencer.sendTransaction({
       to: contract.target,
       data: encodeDataWrite(updatedFeeds),
     });
@@ -122,7 +138,7 @@ describe('AggregatedDataFeedStore', () => {
 
     for (const feed of feeds) {
       const data = encodeDataRead(ReadOp.GetFeedAtRound, feed);
-      const res = await signers[0].call({
+      const res = await sequencer.call({
         to: contract.target,
         data,
       });
@@ -131,7 +147,7 @@ describe('AggregatedDataFeedStore', () => {
 
     for (const feed of updatedFeeds) {
       const data = encodeDataRead(ReadOp.GetFeedAtRound, feed);
-      const res = await signers[0].call({
+      const res = await sequencer.call({
         to: contract.target,
         data,
       });
@@ -140,7 +156,7 @@ describe('AggregatedDataFeedStore', () => {
   });
 
   it('Should get latest feed and round after update', async () => {
-    const writeTx = await signers[0].sendTransaction({
+    const writeTx = await sequencer.sendTransaction({
       to: contract.target,
       data: encodeDataWrite(feeds),
     });
@@ -152,7 +168,7 @@ describe('AggregatedDataFeedStore', () => {
       return feed;
     });
 
-    const writeTx2 = await signers[0].sendTransaction({
+    const writeTx2 = await sequencer.sendTransaction({
       to: contract.target,
       data: encodeDataWrite(updatedFeeds),
     });
@@ -161,7 +177,7 @@ describe('AggregatedDataFeedStore', () => {
 
     for (const feed of updatedFeeds) {
       const data = encodeDataRead(ReadOp.GetLatestFeedAndRound, feed);
-      const res = await signers[0].call({
+      const res = await sequencer.call({
         to: contract.target,
         data,
       });
@@ -169,6 +185,15 @@ describe('AggregatedDataFeedStore', () => {
         ethers.toBeHex(feed.round, 32).concat(formatData(feed.data).slice(2)),
       );
     }
+  });
+
+  it('Should revert on write when not in access control', async () => {
+    await expect(
+      signers[2].sendTransaction({
+        to: contract.target,
+        data: encodeDataWrite(feeds),
+      }),
+    ).to.be.reverted;
   });
 });
 
@@ -226,20 +251,22 @@ const encodeDataWrite = (feeds: Feed[]) => {
       batchFeeds[rowIndex].slice(position + 6);
   });
 
-  const roundData = ethers.solidityPacked(
-    [
-      ...Object.keys(batchFeeds)
-        .map(() => ['uint128', 'bytes32'].flat())
-        .flat(),
-    ],
-    [
-      ...Object.keys(batchFeeds)
-        .map(k => [k, batchFeeds[k]].flat())
-        .flat(),
-    ],
-  );
+  const roundData = Object.keys(batchFeeds)
+    .map(index => {
+      const indexInBytesLength = Math.ceil(
+        BigInt(index).toString(2).length / 8,
+      );
 
-  return prefix.concat(data.join('')).concat(roundData.slice(2));
+      return ethers
+        .solidityPacked(
+          ['uint8', `uint${8n * BigInt(indexInBytesLength)}`, 'bytes32'],
+          [indexInBytesLength, BigInt(index), batchFeeds[index]],
+        )
+        .slice(2);
+    })
+    .join('');
+
+  return prefix.concat(data.join('')).concat(roundData);
 };
 
 const encodeDataRead = (operation: ReadOp, feed: Feed) => {
