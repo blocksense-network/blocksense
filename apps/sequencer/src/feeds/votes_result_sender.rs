@@ -27,7 +27,7 @@ pub async fn votes_result_sender_loop<
                         async_send_to_contracts(sequencer_state, updates, batch_count);
                     }
                     None => {
-                        error!("Sender got RecvError");
+                        panic!("Sender got RecvError"); // This error indicates a severe internal error.
                     }
                 }
                 batch_count += 1;
