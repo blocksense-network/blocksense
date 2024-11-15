@@ -1,4 +1,7 @@
 import React from 'react';
+import type { GetStaticProps, GetStaticPaths } from 'next';
+import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
+import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/monorepo/evm_contracts_deployment_v1';
 import {
   decodeFeedsConfig,
   Feed,
@@ -14,11 +17,6 @@ import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { CopyButton } from '@/components/common/CopyButton';
 
 import { QuestionsCardContent } from '@/components/DataFeeds/QuestionsCardContent';
-
-import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
-import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/monorepo/evm_contracts_deployment_v1';
-
-import type { GetStaticProps, GetStaticPaths } from 'next';
 
 export const getStaticPaths = (async () => {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
@@ -62,10 +60,12 @@ export const getStaticProps = (async context => {
   feedDeploymentInfo: ChainlinkProxyData;
 }>;
 
-export const DataFeedPage = (feedData: {
+type FeedDataProps = {
   feed: Feed;
   feedDeploymentInfo: ChainlinkProxyData;
-}) => {
+};
+
+export const DataFeedPage = ({ feed, feedDeploymentInfo }: FeedDataProps) => {
   const {
     id,
     description,
@@ -74,9 +74,9 @@ export const DataFeedPage = (feedData: {
     report_interval_ms,
     quorum_percentage,
     type,
-  } = feedData.feed;
+  } = feed;
 
-  const { base, quote, address } = feedData.feedDeploymentInfo;
+  const { base, quote, address } = feedDeploymentInfo;
 
   const feedRegistry = {
     directAccess: (
