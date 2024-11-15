@@ -35,9 +35,11 @@ export const createGetStaticProps: (title: string) => GetStaticProps<{
   return { props: { sourceUnit }, revalidate: false };
 };
 
-export const SourceUnit = (contractData: { sourceUnit: SourceUnitDocItem }) => {
-  const { sourceUnit } = contractData;
+type SourceUnitProps = {
+  sourceUnit: SourceUnitDocItem;
+};
 
+export const SourceUnit = ({ sourceUnit }: SourceUnitProps) => {
   return (
     <section className="source-unit mt-6">
       <section className="source-unit__header flex gap-2 py-2.5">
