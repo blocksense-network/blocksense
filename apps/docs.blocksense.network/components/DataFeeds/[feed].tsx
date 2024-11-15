@@ -1,10 +1,13 @@
 import React from 'react';
+import type { GetStaticProps, GetStaticPaths } from 'next';
+import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
+import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/monorepo/evm_contracts_deployment_v1';
 import {
   decodeFeedsConfig,
   Feed,
 } from '@blocksense/config-types/data-feeds-config';
 import {
-  CLAggregatorAdapterData,
+  ChainlinkProxyData,
   decodeDeploymentConfig,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
@@ -14,11 +17,6 @@ import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { CopyButton } from '@/components/common/CopyButton';
 
 import { QuestionsCardContent } from '@/components/DataFeeds/QuestionsCardContent';
-
-import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
-import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/monorepo/evm_contracts_deployment_v1';
-
-import type { GetStaticProps, GetStaticPaths } from 'next';
 
 export const getStaticPaths = (async () => {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
@@ -39,7 +37,7 @@ export const getStaticProps = (async context => {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
   const feedsDeploymentInfo = decodeDeploymentConfig(
     CONTRACTS_DEPLOYMENT_CONFIG,
-  )['ethereum-sepolia']?.contracts?.CLAggregatorAdapter;
+  )['ethereum-sepolia']?.contracts?.ChainlinkProxy;
   const feed = feedsConfig.feeds.find(feed => feed.id === Number(feedId));
 
   if (!feed) {
@@ -47,7 +45,7 @@ export const getStaticProps = (async context => {
   }
 
   const feedDeploymentInfo = feedsDeploymentInfo?.find(
-    (info: CLAggregatorAdapterData) => info.description === feed.description,
+    (info: ChainlinkProxyData) => info.description === feed.description,
   );
 
   if (!feedDeploymentInfo) {
@@ -59,13 +57,15 @@ export const getStaticProps = (async context => {
   return { props: { feed, feedDeploymentInfo }, revalidate: false };
 }) satisfies GetStaticProps<{
   feed: Feed;
-  feedDeploymentInfo: CLAggregatorAdapterData;
+  feedDeploymentInfo: ChainlinkProxyData;
 }>;
 
-export const DataFeedPage = (feedData: {
+type FeedDataProps = {
   feed: Feed;
-  feedDeploymentInfo: CLAggregatorAdapterData;
-}) => {
+  feedDeploymentInfo: ChainlinkProxyData;
+};
+
+export const DataFeedPage = ({ feed, feedDeploymentInfo }: FeedDataProps) => {
   const {
     id,
     description,
@@ -74,9 +74,9 @@ export const DataFeedPage = (feedData: {
     report_interval_ms,
     quorum_percentage,
     type,
-  } = feedData.feed;
+  } = feed;
 
-  const { base, quote, address } = feedData.feedDeploymentInfo;
+  const { base, quote, address } = feedDeploymentInfo;
 
   const feedRegistry = {
     directAccess: (

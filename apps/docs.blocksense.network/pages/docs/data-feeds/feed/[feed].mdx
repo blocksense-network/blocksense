@@ -4,12 +4,12 @@ title: 'Data Feed'
 
 import React from 'react';
 
-import { DataFeedPage } from '@/components/DynamicRouting/[feed].tsx';
+import { DataFeedPage } from '@/components/DataFeeds/[feed].tsx';
 import { Error404 } from '@/components/common/Error404';
 export {
   getStaticPaths,
   getStaticProps,
-} from '@/components/DynamicRouting/[feed].tsx';
+} from '@/components/DataFeeds/[feed].tsx';
 
 export default function FeedPage({ feed, feedDeploymentInfo }) {
   if (!feed) {
