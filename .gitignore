@@ -152,12 +152,6 @@ _vercel-deployment-url
 .idea/
 
 # Auto-generated doc files
-apps/docs.blocksense.network/pages/docs/contracts/reference-documentation/*.mdx
-apps/docs.blocksense.network/pages/docs/contracts/reference-documentation/_meta.json
-apps/docs.blocksense.network/pages/docs/contracts/deployed-contracts.mdx
-apps/docs.blocksense.network/pages/docs/data-feeds/overview.mdx
-
-# Auto-generated doc files
 apps/docs.blocksense.network.v2/pages/docs/contracts/reference-documentation/*.mdx
 apps/docs.blocksense.network.v2/pages/docs/contracts/reference-documentation/_meta.json
 apps/docs.blocksense.network.v2/pages/docs/contracts/deployed-contracts.mdx
