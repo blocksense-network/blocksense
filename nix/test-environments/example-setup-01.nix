@@ -65,6 +65,13 @@ in
         b = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyContractAddress;
+          allow_feeds = [
+            31 # BTC/USD
+            47 # ETH/USD
+            236 # USDT/USD
+            131 # USDC/USD
+            43 # WBTC/USD
+          ];
         };
       };
 

@@ -167,7 +167,8 @@ impl FeedSlotsProcessor {
                             }
                         }
 
-                        result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(values); // Dispatch to concrete FeedAggregate implementation.
+                        // Dispatch to concrete FeedAggregate implementation.
+                        result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(values);
 
                         // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
                         if !is_oneshot {

@@ -23,6 +23,12 @@ let
           description = mdDoc "The URL of the provider.";
         };
 
+        allow_feeds = mkOption {
+          type = types.listOf types.int;
+          default = [ ];
+          description = mdDoc "List of allowed feed ids to be published";
+        };
+
         transcation_timeout_secs = mkOption {
           type = types.int;
           default = 50;

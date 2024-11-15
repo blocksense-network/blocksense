@@ -108,69 +108,26 @@ pub async fn deploy_contract(
 /// Serializes the `updates` hash map into a string, but also filters out some feed ids when the
 /// network is a specific one.
 ///
-/// TODO(#613): this is a temporary hack and should be reverted when we have a more robust solution that
-/// introduces a provider blacklist to the feed config.
+/// If a allowed_feed_ids is specified only the feeds from `updates` that are allowed
+/// will be added to the result. Otherwise, all feeds in `updates` will be added.
 fn compute_keys_vals<
     K: Debug + Clone + std::string::ToString + 'static,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
     net: &str,
     updates: HashMap<K, V>,
+    allowed_feed_ids: &Option<Vec<u32>>,
 ) -> String {
     let mut keys_vals: String = Default::default();
-
-    // If a network is in the map, only the feeds from `updates` that have ids in the list of feed
-    // ids that it's mapped to will be added to the result. Otherwise, all feeds in `updates` will
-    // be added.
-    // The lists come from this doc:
-    // https://coda.io/d/R-D_dqNv6ZkeyaI/Deployment-specifics_suGn49Sv?searchClick=d58713a6-4574-4004-8450-f7b7b64a4c90_qNv6ZkeyaI
-    let network_to_feeds_subset = HashMap::<&str, Vec<i64>>::from([
-        (
-            "berachain-bartio",
-            vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                65,  // EURC/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                21,  // PAXG/USD
-            ],
-        ),
-        (
-            "citrea-testnet",
-            vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                65,  // EURC/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                21,  // PAXG/USD
-                206, // TBTC/USD
-                43,  // WBTC/USD
-                4,   // WSTETH/USD
-            ],
-        ),
-        (
-            "manta-sepolia",
-            vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                43,  // WBTC/USD
-            ],
-        ),
-    ]);
-    let special_feed_ids = network_to_feeds_subset.get(net);
 
     info!("Preparing a batch of feeds to network `{net}`");
     let mut num_reported_feeds = 0;
     for (key, val) in updates.into_iter() {
-        match special_feed_ids {
+        match allowed_feed_ids {
             Some(special_feed_ids) => {
                 // if special net: add only special feeds
-                let feed_id = i64::from_str_radix(&key.to_string(), 16).unwrap();
-                if special_feed_ids.contains(&feed_id) {
+                let feed_id = i64::from_str_radix(&key.to_string(), 16).unwrap() as u32;
+                if special_feed_ids.is_empty() || special_feed_ids.contains(&feed_id) {
                     num_reported_feeds += 1;
                     keys_vals += key.to_string().as_str();
                     keys_vals += val.to_string().as_str();
@@ -199,6 +156,7 @@ pub async fn eth_batch_send_to_contract<
     provider: Arc<Mutex<RpcProvider>>,
     updates: HashMap<K, V>,
     feed_type: Repeatability,
+    allow_list: Option<Vec<u32>>,
 ) -> Result<String> {
     let provider = provider.lock().await;
     let wallet = &provider.wallet;
@@ -222,7 +180,7 @@ pub async fn eth_batch_send_to_contract<
 
     let selector = "0x1a2d80ac";
 
-    let keys_vals = compute_keys_vals(&net, updates);
+    let keys_vals = compute_keys_vals(&net, updates, &allow_list);
 
     let calldata_str = (selector.to_owned() + keys_vals.as_str()).to_string();
 
@@ -333,20 +291,33 @@ pub async fn eth_batch_send_to_all_contracts<
 
         let net = net.clone();
         let provider = p.clone();
-        if !providers_config.get(&net).unwrap().is_enabled {
-            warn!("Network `{net}` is not enabled; skipping it during reporting");
-            continue;
+
+        if let Some(provider_settings) = providers_config.get(&net) {
+            if !provider_settings.is_enabled {
+                warn!("Network `{net}` is not enabled; skipping it during reporting");
+                continue;
+            } else {
+                info!("Network `{net}` is enabled; reporting...");
+            }
+            let allow_feeds = provider_settings.allow_feeds.clone();
+            collected_futures.push(spawn(async move {
+                let result = actix_web::rt::time::timeout(
+                    Duration::from_secs(timeout),
+                    eth_batch_send_to_contract(
+                        net.clone(),
+                        provider.clone(),
+                        updates,
+                        feed_type,
+                        allow_feeds,
+                    ),
+                )
+                .await;
+                (result, net, provider)
+            }));
         } else {
-            info!("Network `{net}` is enabled; reporting...");
+            warn!("Network `{net}` is not configured in sequencer; skipping it during reporting");
+            continue;
         }
-        collected_futures.push(spawn(async move {
-            let result = actix_web::rt::time::timeout(
-                Duration::from_secs(timeout),
-                eth_batch_send_to_contract(net.clone(), provider.clone(), updates, feed_type),
-            )
-            .await;
-            (result, net, provider)
-        }));
     }
 
     drop(providers);
@@ -525,9 +496,14 @@ mod tests {
         let result_value = format!("{}{}{}", number_of_slots, payload, description);
         let mut updates_oneshot: HashMap<String, String> = HashMap::new();
         updates_oneshot.insert(result_key, result_value);
-        let result =
-            eth_batch_send_to_contract(net.clone(), provider.clone(), updates_oneshot, Oneshot)
-                .await;
+        let result = eth_batch_send_to_contract(
+            net.clone(),
+            provider.clone(),
+            updates_oneshot,
+            Oneshot,
+            None,
+        )
+        .await;
         assert!(result.is_ok());
         // getter calldata will be:
         // 0x800000030000000000000000000000000000000000000000000000000000000000000002
@@ -663,7 +639,7 @@ mod tests {
         let network = "dont_filter_me";
         let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
-        let keys_vals = compute_keys_vals(network, updates);
+        let keys_vals = compute_keys_vals(network, updates, &None);
 
         // It is undeterministic what the order will be, so checking both possibilities.
         assert!(["0fffbye001fhi", "001fhi0fffbye"].contains(&keys_vals.as_str()));
@@ -675,7 +651,21 @@ mod tests {
         let network = "citrea-testnet";
         let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
-        let keys_vals = compute_keys_vals(network, updates);
+        let keys_vals = compute_keys_vals(
+            network,
+            updates,
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                65,  // EURC/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                21,  // PAXG/USD
+                206, // TBTC/USD
+                43,  // WBTC/USD
+                4,   // WSTETH/USD
+            ]),
+        );
 
         // Note: bye is filtered out:
         assert_eq!(keys_vals, "001fhi");
@@ -684,7 +674,18 @@ mod tests {
         let network = "berachain-bartio";
         let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
-        let keys_vals = compute_keys_vals(network, updates);
+        let keys_vals = compute_keys_vals(
+            network,
+            updates,
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                65,  // EURC/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                21,  // PAXG/USD
+            ]),
+        );
 
         assert_eq!(keys_vals, "001fhi");
 
@@ -692,7 +693,17 @@ mod tests {
         let network = "manta-sepolia";
         let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
-        let keys_vals = compute_keys_vals(network, updates);
+        let keys_vals = compute_keys_vals(
+            network,
+            updates,
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                43,  // WBTC/USD
+            ]),
+        );
 
         assert_eq!(keys_vals, "001fhi");
     }
