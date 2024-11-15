@@ -314,6 +314,10 @@ impl SlotTimeTracker {
     pub fn reset_report_start_time(&mut self) {
         self.start_time_ms = current_unix_time();
     }
+
+    pub fn get_last_slot(&self) -> u128 {
+        (current_unix_time() - self.start_time_ms) / self.slot_interval.as_millis()
+    }
 }
 
 pub async fn await_time(time_to_await_ms: u64) {

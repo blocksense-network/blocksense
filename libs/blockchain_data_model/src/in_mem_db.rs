@@ -81,6 +81,7 @@ impl InMemDb {
         V: Debug + Clone + std::string::ToString + 'static,
     >(
         &self,
+        new_block_height: u64,
         updates: &HashMap<K, V>,
         new_feeds_in_block: Vec<BlockFeedConfig>,
         feed_ids_to_delete_in_block: Vec<u32>,
@@ -150,7 +151,6 @@ impl InMemDb {
         let mut block_header = BlockHeader::default();
         let latest_height = self.get_latest_block_height();
         block_header.timestamp = current_unix_time() as u64;
-        let new_block_height = latest_height + 1;
         block_header.block_height = new_block_height;
         feed_updates.block_height = new_block_height;
         add_remove_feeds.block_height = new_block_height;
@@ -171,17 +171,18 @@ impl InMemDb {
         (block_header, feed_updates, add_remove_feeds)
     }
 
-    pub fn add_block_at_height(
+    pub fn add_block(
         &mut self,
         mut header: BlockHeader,
         mut updates: FeedUpdates,
         mut add_remove_feeds: AddRemoveFeeds,
-        block_height: u64,
     ) -> Result<()> {
         let feed_updates_merkle_root = Self::node_to_hash(Self::calc_merkle_root(&mut updates));
         if feed_updates_merkle_root != header.feed_updates_merkle_root {
             anyhow::bail!("New block header does not refer the associated updates!");
         }
+
+        let block_height = header.block_height;
 
         let new_header_hash = Self::node_to_hash(Self::calc_merkle_root(&mut header));
 
@@ -216,12 +217,13 @@ impl InMemDb {
         add_remove_feeds: AddRemoveFeeds,
     ) -> Result<()> {
         // Check if block can be added as next in blockchain:
-        let next_block_height = self.get_latest_block_height() + 1;
-        if header.block_height != next_block_height {
+        let latest_block_height = self.get_latest_block_height();
+        let block_height = header.block_height;
+        if block_height <= latest_block_height {
             anyhow::bail!(
-                "Block height not as expected, got {}, expected {}!",
-                header.block_height,
-                next_block_height
+                "Block height not as expected, got {}, expected higher than {}!",
+                block_height,
+                latest_block_height
             );
         }
         if self.get_latest_block_height() == 0 {
@@ -238,9 +240,9 @@ impl InMemDb {
             }
         }
 
-        self.add_block_at_height(header, updates, add_remove_feeds, next_block_height)?;
+        self.add_block(header, updates, add_remove_feeds)?;
 
-        self.latest_block_height = next_block_height;
+        self.latest_block_height = block_height;
         Ok(())
     }
 }
