@@ -1,26 +1,35 @@
 import * as React from 'react';
-
-import { decodeFeedsConfig } from '@blocksense/config-types/data-feeds-config';
-
+import type { GetStaticProps } from 'next';
+import {
+  decodeFeedsConfig,
+  FeedsConfig,
+} from '@blocksense/config-types/data-feeds-config';
+import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import {
   columns,
   dataFeedsColumnsTitles,
 } from '@/components/DataFeeds/columns';
 import { dataFeedUrl } from '@/src/constants';
+
 import {
   DataTable,
   getFacetedFilters,
 } from '@/components/ui/DataTable/DataTable';
-import { Callout } from '@blocksense/docs-theme';
 
-type ParametersProps = {
-  dataFeedsOverviewString: string;
+export const getStaticProps = (() => {
+  const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
+
+  return { props: { feedsConfig }, revalidate: false };
+}) satisfies GetStaticProps<{
+  feedsConfig: FeedsConfig;
+}>;
+
+type DataFeedsProps = {
+  feedsConfig: FeedsConfig;
 };
 
-export const DataFeeds = ({ dataFeedsOverviewString }: ParametersProps) => {
-  const { feeds } = decodeFeedsConfig(JSON.parse(dataFeedsOverviewString));
-
+export const DataFeeds = ({ feedsConfig: { feeds } }: DataFeedsProps) => {
   const filters = React.useMemo(
     () => getFacetedFilters(['id'], feeds, dataFeedsColumnsTitles),
     [feeds],
