@@ -1,0 +1,12 @@
+{
+  "index": "Overview",
+  "Blocksense": "Blocksense",
+  "IChainlinkFeedRegistry": "IChainlinkFeedRegistry",
+  "IChainlinkAggregator": "IChainlinkAggregator",
+  "ICLFeedRegistryAdapter": "ICLFeedRegistryAdapter",
+  "ICLAggregatorAdapter": "ICLAggregatorAdapter",
+  "CLFeedRegistryAdapter": "CLFeedRegistryAdapter",
+  "CLAggregatorAdapter": "CLAggregatorAdapter",
+  "AggregatedDataFeedStore": "AggregatedDataFeedStore",
+  "AccessControl": "AccessControl"
+}
