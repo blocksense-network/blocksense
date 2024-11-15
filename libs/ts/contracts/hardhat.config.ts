@@ -54,10 +54,17 @@ const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
+      accounts: process.env.SIGNER_PRIVATE_KEY
+        ? [
+            {
+              privateKey: process.env.SIGNER_PRIVATE_KEY,
+              balance: '10000000000000000000000000000000',
+            },
+          ]
+        : [],
       forking: {
-        blockNumber: 20576488,
         enabled: process.env.FORKING === 'true',
-        url: getOptionalRpcUrl('ethereum-mainnet'),
+        url: getOptionalRpcUrl('ethereum-sepolia'),
       },
     },
     ...fromEntries(
