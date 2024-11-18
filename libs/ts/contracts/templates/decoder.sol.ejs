@@ -158,7 +158,7 @@ function processFields(fields) {
           field.shift = -prevSizeSum;
           prevSizeSum += fieldSize;
         } else {
-          prevSizeSum = 0;
+          prevSizeSum = fieldSize;
         }
       } else if (!isDynamic) {
         // Handle non-bytes fields

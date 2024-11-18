@@ -1733,4 +1733,59 @@ describe('Decoder @skip-coverage', function () {
     ];
     await testDecoder(fields, values);
   });
+
+  it('should handle fixed size arrays of different types and sizes', async () => {
+    const fields: TupleField = {
+      name: 'MixedFixedArrays',
+      type: 'tuple',
+      components: [
+        { name: 'uint32Array', type: 'uint32[19]', size: 32 },
+        { name: 'bytes4Array', type: 'bytes4[21]', size: 32 },
+        { name: 'addressArray', type: 'address[2]', size: 160 },
+        { name: 'int128Array', type: 'int128[2]', size: 128 },
+        { name: 'boolArray', type: 'bool[4]', size: 8 },
+      ],
+    };
+    const values = [
+      [
+        1234567890, 2345678901, 3456789012, 456789012, 567890124, 678901345,
+        780123456, 890123456, 912345678, 1234567890, 2345678901, 3456789012,
+        456789012, 567890124, 678901345, 780123456, 890123456, 912345678,
+        912345678,
+      ],
+      [
+        '0x1a2b3c4d',
+        '0x5e6f7a8b',
+        '0x9c0d1e2f',
+        '0x3a4b5c6d',
+        '0x7e8f9a0b',
+        '0x2c3d4e5f',
+        '0x6a7b8c9d',
+        '0x0e1f2a3b',
+        '0x4c5d6e7f',
+        '0x8a9b0c1d',
+        '0x2e3f4a5b',
+        '0x6c7d8e9f',
+        '0x1e2f3a4b',
+        '0x5c6d7e8f',
+        '0x9a0b1c2d',
+        '0x3e4f5a6b',
+        '0x7c8d9e0f',
+        '0x0a1b2c3d',
+        '0x4e5f6a7b',
+        '0x8c9d0e1f',
+        '0x2a3b4c5d',
+      ],
+      [
+        '0x1111111111111111111111111111111111111111',
+        '0x2222222222222222222222222222222222222222',
+      ],
+      [
+        BigInt('-170141183460469231731687303715884105728'),
+        BigInt('170141183460469231731687303715884105727'),
+      ],
+      [true, false, true, false],
+    ];
+    await testDecoder(fields, values);
+  });
 });
