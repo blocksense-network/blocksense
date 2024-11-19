@@ -195,7 +195,7 @@ pub async fn eth_batch_send_to_contract<
         get_gas_price
     );
 
-    debug!("Observed gas price (base_fee) = {}", base_fee);
+    debug!("Observed gas price (base_fee) for network {net} = {base_fee}");
     provider_metrics
         .read()
         .await
