@@ -105,12 +105,11 @@ pub async fn deploy_contract(
     Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
 }
 
-/// Serializes the `updates` hash map into a string, but also filters out some feed ids when the
-/// network is a specific one.
+/// Serializes the `updates` hash map into a string.
 ///
-/// If a allowed_feed_ids is specified only the feeds from `updates` that are allowed
+/// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
 /// will be added to the result. Otherwise, all feeds in `updates` will be added.
-fn compute_keys_vals<
+fn serialize_updates<
     K: Debug + Clone + std::string::ToString + 'static,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
@@ -118,19 +117,19 @@ fn compute_keys_vals<
     updates: HashMap<K, V>,
     allowed_feed_ids: &Option<Vec<u32>>,
 ) -> String {
-    let mut keys_vals: String = Default::default();
+    let mut result: String = Default::default();
 
     info!("Preparing a batch of feeds to network `{net}`");
     let mut num_reported_feeds = 0;
     for (key, val) in updates.into_iter() {
         match allowed_feed_ids {
-            Some(special_feed_ids) => {
+            Some(allowed_feed_ids) => {
                 // if special net: add only special feeds
                 let feed_id = i64::from_str_radix(&key.to_string(), 16).unwrap() as u32;
-                if special_feed_ids.is_empty() || special_feed_ids.contains(&feed_id) {
+                if allowed_feed_ids.is_empty() || allowed_feed_ids.contains(&feed_id) {
                     num_reported_feeds += 1;
-                    keys_vals += key.to_string().as_str();
-                    keys_vals += val.to_string().as_str();
+                    result += key.to_string().as_str();
+                    result += val.to_string().as_str();
                 } else {
                     debug!("Skipping feed id {feed_id} for special network `{net}`");
                 }
@@ -138,14 +137,14 @@ fn compute_keys_vals<
             None => {
                 // if not special: always add
                 num_reported_feeds += 1;
-                keys_vals += key.to_string().as_str();
-                keys_vals += val.to_string().as_str();
+                result += key.to_string().as_str();
+                result += val.to_string().as_str();
             }
         }
     }
     info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
 
-    keys_vals
+    result
 }
 
 pub async fn eth_batch_send_to_contract<
@@ -180,9 +179,9 @@ pub async fn eth_batch_send_to_contract<
 
     let selector = "0x1a2d80ac";
 
-    let keys_vals = compute_keys_vals(&net, updates, &allow_list);
+    let serialized_updates = serialize_updates(&net, updates, &allow_list);
 
-    let calldata_str = (selector.to_owned() + keys_vals.as_str()).to_string();
+    let calldata_str = (selector.to_owned() + serialized_updates.as_str()).to_string();
 
     let input = match Bytes::from_hex(calldata_str) {
         Err(e) => panic!("Key is not valid hex string: {}", e), // We panic here, because the http handler on the recv side must filter out wrong input.
@@ -639,10 +638,10 @@ mod tests {
         let network = "dont_filter_me";
         let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
-        let keys_vals = compute_keys_vals(network, updates, &None);
+        let serialized_updates = serialize_updates(network, updates, &None);
 
         // It is undeterministic what the order will be, so checking both possibilities.
-        assert!(["0fffbye001fhi", "001fhi0fffbye"].contains(&keys_vals.as_str()));
+        assert!(["0fffbye001fhi", "001fhi0fffbye"].contains(&serialized_updates.as_str()));
     }
 
     #[test]
@@ -651,7 +650,7 @@ mod tests {
         let network = "citrea-testnet";
         let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
-        let keys_vals = compute_keys_vals(
+        let serialized_updates = serialize_updates(
             network,
             updates,
             &Some(vec![
@@ -668,13 +667,13 @@ mod tests {
         );
 
         // Note: bye is filtered out:
-        assert_eq!(keys_vals, "001fhi");
+        assert_eq!(serialized_updates, "001fhi");
 
         // Berachain
         let network = "berachain-bartio";
         let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
-        let keys_vals = compute_keys_vals(
+        let serialized_updates = serialize_updates(
             network,
             updates,
             &Some(vec![
@@ -687,13 +686,13 @@ mod tests {
             ]),
         );
 
-        assert_eq!(keys_vals, "001fhi");
+        assert_eq!(serialized_updates, "001fhi");
 
         // Manta
         let network = "manta-sepolia";
         let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
-        let keys_vals = compute_keys_vals(
+        let serialized_updates = serialize_updates(
             network,
             updates,
             &Some(vec![
@@ -705,6 +704,6 @@ mod tests {
             ]),
         );
 
-        assert_eq!(keys_vals, "001fhi");
+        assert_eq!(serialized_updates, "001fhi");
     }
 }
