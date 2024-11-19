@@ -29,11 +29,6 @@ export async function main(
 
   // TODO(issue #476): Remove whitelist, once sol-reflector works with sports data smart contracts.
   const whitelist = [
-    'contracts/DataFeedStoreV1.sol',
-    'contracts/DataFeedStoreV2.sol',
-    'contracts/DataFeedStoreV3.sol',
-    'contracts/HistoricalDataFeedStoreV1.sol',
-    'contracts/HistoricalDataFeedStoreV2.sol',
     'contracts/UpgradeableProxy.sol',
     'contracts/cl-adapters/CLAggregatorAdapter.sol',
     'contracts/cl-adapters/registries/CLFeedRegistryAdapter.sol',
