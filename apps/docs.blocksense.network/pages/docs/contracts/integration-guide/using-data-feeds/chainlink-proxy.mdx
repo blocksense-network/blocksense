@@ -10,7 +10,7 @@ The Chainlink Proxy is a smart contract that acts as a proxy for a Blocksense fe
   representation.
 </Callout>
 
-For a complete list of functions and parameters for the ChainlinkProxy contract, see the [Chainlink Proxy Reference Documentation](../../reference-documentation/ChainlinkProxy.mdx).
+For a complete list of functions and parameters for the CLAggregatorAdapter contract, see the [Chainlink Proxy Reference Documentation](../../reference-documentation/CLAggregatorAdapter.mdx).
 
 ```mermaid
 ---
@@ -28,24 +28,24 @@ flowchart TD
 
   linkStyle default fill:none,stroke-width:1px,stroke:#1c1917
 
-  A[Client] -->|get feed's data| CP[ChainlinkProxy]
-  CP -->|reads from| DFS[HistoricDataFeedStore]
+  A[Client] -->|get feed's data| CP[CLAggregatorAdapter]
+  CP -->|reads from| DFS[HistoricalDataFeedStore]
 
-  click CP "/docs/contracts/reference-documentation/ChainlinkProxy" "Go to ChainlinkProxy"
-  click DFS "/docs/contracts/reference-documentation/HistoricDataFeedStoreV2" "Go to HistoricDataFeedStoreV2"
+  click CP "/docs/contracts/reference-documentation/CLAggregatorAdapter" "Go to CLAggregatorAdapter"
+  click DFS "/docs/contracts/reference-documentation/HistoricalDataFeedStoreV2" "Go to HistoricalDataFeedStoreV2"
 
   class A clientNode
   class CP proxyNode
   class DFS dataNode
 ```
 
-For a complete list of functions and parameters for the ChainlinkProxy contract, see the [Chainlink Proxy Reference Documentation](../../reference-documentation/ChainlinkProxy.mdx).
+For a complete list of functions and parameters for the CLAggregatorAdapter contract, see the [Chainlink Proxy Reference Documentation](../../reference-documentation/CLAggregatorAdapter.mdx).
 
 ## Code Examples
 
 ### Solidity
 
-To consume price data from the Chainlink Proxy, your smart contract should reference [`IAggregator`](/coming-soon), which defines the external functions implemented by the Chainlink Proxy.
+To consume price data from the Chainlink Proxy, your smart contract should reference [`ICLAggregatorAdapter`](/coming-soon), which defines the external functions implemented by the Chainlink Proxy.
 
 ```solidity showLineNumbers copy filename="ChainlinkProxyConsumer.sol"
 // SPDX-License-Identifier: MIT

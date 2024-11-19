@@ -13,7 +13,7 @@ Historical Data Feed Store contract is where all data is stored and where all co
   within the **UpgradeableProxy** contract. To access this data, users must
   interact with the `fallback` function of the **UpgradeableProxy** contract
   which underneath calls the `fallback` function of the
-  **HistoricDataFeedStore** contract.
+  **HistoricalDataFeedStore** contract.
 </Callout>
 
 ## Code Examples
@@ -21,7 +21,7 @@ Historical Data Feed Store contract is where all data is stored and where all co
 ### Solidity
 
 <Callout type="info" emoji="💡">
-  Use [ProxyCall library](/coming-soon) for easy and gas optimised interaction
+  Use [Blocksense library](/coming-soon) for easy and gas optimised interaction
   with the contract.
 </Callout>
 
@@ -31,7 +31,7 @@ Here is a complete working example. After that, there are more details on how to
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {ProxyCall} from 'lib/ProxyCall.sol';
+import {Blocksense} from 'lib/Blocksense.sol';
 
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
@@ -47,7 +47,7 @@ contract UpgradeableProxyConsumer {
   function getDataById(
     uint32 key
   ) external view returns (uint256 value, uint64 timestamp) {
-    bytes32 data = ProxyCall._callDataFeed(
+    bytes32 data = Blocksense._callDataFeed(
       dataFeedStore,
       abi.encodePacked(0x80000000 | key)
     );
@@ -59,7 +59,7 @@ contract UpgradeableProxyConsumer {
     uint32 key,
     uint32 counter
   ) external view returns (uint256 value, uint64 timestamp) {
-    bytes32 data = ProxyCall._callDataFeed(
+    bytes32 data = Blocksense._callDataFeed(
       dataFeedStore,
       abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
     );
@@ -68,13 +68,13 @@ contract UpgradeableProxyConsumer {
   }
 
   function getLatestCounter(uint32 key) external view returns (uint32 counter) {
-    return uint32(ProxyCall._latestRound(key, dataFeedStore));
+    return uint32(Blocksense._latestRound(key, dataFeedStore));
   }
 
   function getLatestRoundData(
     uint32 key
   ) external view returns (int256 value, uint256 timestamp, uint80 counter) {
-    (counter, value, timestamp, , ) = ProxyCall._latestRoundData(
+    (counter, value, timestamp, , ) = Blocksense._latestRoundData(
       key,
       dataFeedStore
     );
@@ -96,7 +96,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
       function getDataById(
         uint32 key
       ) external view returns (uint256 value, uint64 timestamp) {
-        bytes32 data = ProxyCall._callDataFeed(
+        bytes32 data = Blocksense._callDataFeed(
           dataFeedStore,
           abi.encodePacked(0x80000000 | key)
         );
@@ -137,7 +137,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
         uint32 key,
         uint32 counter
       ) external view returns (uint256 value, uint64 timestamp) {
-        bytes32 data = ProxyCall._callDataFeed(
+        bytes32 data = Blocksense._callDataFeed(
           dataFeedStore,
           abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
         );
@@ -176,7 +176,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
     <TabsContent value="proxy-call">
       ```solidity copy filename="solidity"
       function getLatestCounter(uint32 key) external view returns (uint32 counter) {
-        return uint32(ProxyCall._latestRound(key, dataFeedStore));
+        return uint32(Blocksense._latestRound(key, dataFeedStore));
       }
       ```
     </TabsContent>
@@ -208,7 +208,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
       function getDataById(
         uint32 key
       ) external view returns (int256 value, uint256 timestamp, uint80 counter) {
-        (counter, value, timestamp, , ) = ProxyCall
+        (counter, value, timestamp, , ) = Blocksense
           ._latestRoundData(key, dataFeedStore);
       }
       ```

@@ -12,7 +12,7 @@ import { Tooltip } from '@/components/common/Tooltip';
 export const proxyColumnsTitles: { [key: string]: string } = {
   description: 'Data Feed Name',
   id: 'Id',
-  address: 'Blocksense Proxy Address',
+  address: 'Blocksense Aggregator Address',
   base: 'Base Address',
   quote: 'Quote Address',
   chainlink_proxy: 'CL Aggregator Proxy Address',

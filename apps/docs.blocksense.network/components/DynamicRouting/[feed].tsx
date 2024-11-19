@@ -4,7 +4,7 @@ import {
   Feed,
 } from '@blocksense/config-types/data-feeds-config';
 import {
-  ChainlinkProxyData,
+  CLAggregatorAdapterData,
   decodeDeploymentConfig,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
@@ -39,7 +39,7 @@ export const getStaticProps = (async context => {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
   const feedsDeploymentInfo = decodeDeploymentConfig(
     CONTRACTS_DEPLOYMENT_CONFIG,
-  )['ethereum-sepolia']?.contracts?.ChainlinkProxy;
+  )['ethereum-sepolia']?.contracts?.CLAggregatorAdapter;
   const feed = feedsConfig.feeds.find(feed => feed.id === Number(feedId));
 
   if (!feed) {
@@ -47,7 +47,7 @@ export const getStaticProps = (async context => {
   }
 
   const feedDeploymentInfo = feedsDeploymentInfo?.find(
-    (info: ChainlinkProxyData) => info.description === feed.description,
+    (info: CLAggregatorAdapterData) => info.description === feed.description,
   );
 
   if (!feedDeploymentInfo) {
@@ -59,12 +59,12 @@ export const getStaticProps = (async context => {
   return { props: { feed, feedDeploymentInfo }, revalidate: false };
 }) satisfies GetStaticProps<{
   feed: Feed;
-  feedDeploymentInfo: ChainlinkProxyData;
+  feedDeploymentInfo: CLAggregatorAdapterData;
 }>;
 
 export const DataFeedPage = (feedData: {
   feed: Feed;
-  feedDeploymentInfo: ChainlinkProxyData;
+  feedDeploymentInfo: CLAggregatorAdapterData;
 }) => {
   const {
     id,
@@ -197,7 +197,7 @@ export const DataFeedPage = (feedData: {
                 rel="noopener noreferrer"
               >
                 <h5 className="hover:underline">
-                  ProxyCall for direct access:
+                  Blocksense library for direct access:
                 </h5>
               </a>
             }
@@ -211,7 +211,7 @@ export const DataFeedPage = (feedData: {
                 rel="noopener noreferrer"
               >
                 <h5 className="hover:underline">
-                  Chainlink-style AggregatorProxy:
+                  Chainlink-style Aggregator Adapter:
                 </h5>
               </a>
             }
@@ -227,7 +227,7 @@ export const DataFeedPage = (feedData: {
                     rel="noopener noreferrer"
                   >
                     <h5 className="hover:underline">
-                      Chainlink-style FeedRegistry:
+                      Chainlink-style Feed Registry Adapter:
                     </h5>
                   </a>
                 }

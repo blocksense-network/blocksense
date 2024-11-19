@@ -144,7 +144,7 @@ export const DataFeedDetails: React.FC<{
                 rel="noopener noreferrer"
               >
                 <h5 className="hover:underline">
-                  ProxyCall for direct access:
+                  Blocksense library for direct access:
                 </h5>
               </a>
             }
@@ -158,7 +158,7 @@ export const DataFeedDetails: React.FC<{
                 rel="noopener noreferrer"
               >
                 <h5 className="hover:underline">
-                  Chainlink-style AggregatorProxy:
+                  Chainlink-style Aggregator Adapter:
                 </h5>
               </a>
             }
@@ -174,7 +174,7 @@ export const DataFeedDetails: React.FC<{
                     rel="noopener noreferrer"
                   >
                     <h5 className="hover:underline">
-                      Chainlink-style FeedRegistry:
+                      Chainlink-style Feed Registry Adapter:
                     </h5>
                   </a>
                 }

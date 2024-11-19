@@ -51,21 +51,23 @@ function getProxyContractsContent(networksData: DeploymentConfig) {
       if (!networkData) return [];
       if (_networkName === 'local') return [];
       const networkName = parseNetworkName(_networkName);
-      const { ChainlinkProxy } = networkData.contracts;
+      const { CLAggregatorAdapter } = networkData.contracts;
 
-      return ChainlinkProxy.map(proxy => {
+      return CLAggregatorAdapter.map(aggregator => {
         const compatibilityData = Object.entries(
           blocksenseFeedsCompatibility,
-        ).find(([_id, data]) => data.description === proxy.description)?.[1];
+        ).find(
+          ([_id, data]) => data.description === aggregator.description,
+        )?.[1];
 
         if (!compatibilityData) {
           throw new Error(
-            `No compatibility data found for ${proxy.description}`,
+            `No compatibility data found for ${aggregator.description}`,
           );
         }
 
         return {
-          ...proxy,
+          ...aggregator,
           id: compatibilityData.id,
           network: networkName,
           chainlink_proxy: Object.entries(
