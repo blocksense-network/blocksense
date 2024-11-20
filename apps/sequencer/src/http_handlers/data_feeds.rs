@@ -5,8 +5,9 @@ use eyre::Result;
 use std::sync::Arc;
 use utils::time::current_unix_time;
 
+use actix_web::error::{ErrorBadRequest, ErrorInternalServerError};
 use actix_web::web;
-use actix_web::{error, Error};
+use actix_web::Error;
 use actix_web::{post, HttpResponse};
 use feed_registry::types::ReportRelevance;
 use futures::StreamExt;
@@ -213,7 +214,7 @@ pub async fn post_report(
         let chunk = chunk?;
         // limit max size of in-memory payload
         if (body.len() + chunk.len()) > MAX_SIZE {
-            return Err(error::ErrorBadRequest("overflow"));
+            return Err(ErrorBadRequest("overflow"));
         }
         body.extend_from_slice(&chunk);
     }
@@ -240,7 +241,7 @@ pub async fn post_reports_batch(
         let chunk = chunk?;
         // limit max size of in-memory payload
         if (body.len() + chunk.len()) > MAX_SIZE {
-            return Err(error::ErrorBadRequest("overflow"));
+            return Err(ErrorBadRequest("overflow"));
         }
         body.extend_from_slice(&chunk);
     }
@@ -300,13 +301,14 @@ pub async fn register_feed(
 
     // STEP 2 - Validate request
     // Validate schema_id is valid UUID
-    let schema_id: Uuid = Uuid::parse_str(&schema_id).unwrap();
+    let schema_id = Uuid::parse_str(&schema_id).map_err(|e| ErrorBadRequest(e.to_string()))?;
+
     // TODO: Schema id and number of solidity slots needed for the schema are passed as request params.
     // Once a schema service is up and running we'll check the schema exists and extract the number of slots from there.
 
     // Validate repeatability
     if repeatability != "event_feed" {
-        return Ok(HttpResponse::BadRequest().body("Invalid repeatability"));
+        return Err(ErrorBadRequest("Invalid repeatability"));
     }
 
     // Validate voting_start_time and voting_end_time are in the future and start < end
@@ -316,17 +318,17 @@ pub async fn register_feed(
         .as_millis();
 
     if voting_start_time_ms <= current_time {
-        return Ok(HttpResponse::BadRequest().body("voting_start_time must be in the future"));
+        return Err(ErrorBadRequest("voting_start_time must be in the future"));
     }
 
     if voting_end_time_ms <= current_time {
-        return Ok(HttpResponse::BadRequest().body("voting_end_time must be in the future"));
+        return Err(ErrorBadRequest("voting_end_time must be in the future"));
     }
 
     if voting_start_time_ms >= voting_end_time_ms {
-        return Ok(
-            HttpResponse::BadRequest().body("voting_start_time must be less than voting_end_time")
-        );
+        return Err(ErrorBadRequest(
+            "voting_start_time must be less than voting_end_time",
+        ));
     }
 
     // STEP 3 - Update Sequencer registers
@@ -341,22 +343,46 @@ pub async fn register_feed(
         quorum_percentage,
         voting_start_system_time,
     );
-    //let voting_start_timestamp = Utc.timestamp_millis(voting_start_time_ms as i64);
-    let voting_start_timestamp = Utc
+    let voting_start_timestamp = match Utc
         .timestamp_millis_opt(voting_start_time_ms as i64)
-        .unwrap();
-    //let voting_end_timestamp = Utc.timestamp_millis(voting_end_time_ms as i64);
-    let voting_end_timestamp = Utc.timestamp_millis_opt(voting_end_time_ms as i64).unwrap();
+        .single()
+    {
+        Some(v) => v,
+        _ => {
+            return Err(ErrorBadRequest("voting_start_time parsing error"));
+        }
+    };
+    let voting_end_timestamp = match Utc.timestamp_millis_opt(voting_end_time_ms as i64).single() {
+        Some(v) => v,
+        _ => {
+            return Err(ErrorBadRequest("voting_end_time_ms parsing error"));
+        }
+    };
 
     let feed_id = {
         let mut allocator = sequencer_state.feed_id_allocator.write().await;
-        let feed_id_option = allocator.as_mut().unwrap().allocate(
-            num_slots,
-            schema_id,
-            voting_start_timestamp,
-            voting_end_timestamp,
-        );
-        feed_id_option.unwrap()
+        match allocator.as_mut() {
+            Some(a) => {
+                match a.allocate(
+                    num_slots,
+                    schema_id,
+                    voting_start_timestamp,
+                    voting_end_timestamp,
+                ) {
+                    Ok(feed_id) => feed_id,
+                    Err(e) => {
+                        return Err(ErrorInternalServerError(format!(
+                            "Error when allocating feed_id {e}"
+                        )));
+                    }
+                }
+            }
+            None => {
+                return Err(ErrorInternalServerError(
+                    "Error when allocating feed_id".to_string(),
+                ));
+            }
+        }
     };
 
     // Check FeedMetaDataRegistry does not already have element with feed_id. Should never happen
@@ -365,7 +391,15 @@ pub async fn register_feed(
         .write()
         .await
         .push(feed_id, new_feed_metadata);
-    let registered_feed_metadata = sequencer_state.registry.read().await.get(feed_id).unwrap();
+
+    let registered_feed_metadata = match sequencer_state.registry.read().await.get(feed_id) {
+        Some(x) => x,
+        None => {
+            return Err(ErrorInternalServerError(format!(
+                "Error when reading from feed registry for feed_id={feed_id}"
+            )));
+        }
+    };
 
     // update feeds slots processor
     let feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>> =

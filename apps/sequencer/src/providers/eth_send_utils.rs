@@ -116,7 +116,7 @@ fn serialize_updates<
     net: &str,
     updates: HashMap<K, V>,
     allowed_feed_ids: &Option<Vec<u32>>,
-) -> String {
+) -> Result<String> {
     let mut result: String = Default::default();
 
     info!("Preparing a batch of feeds to network `{net}`");
@@ -125,7 +125,9 @@ fn serialize_updates<
         match allowed_feed_ids {
             Some(allowed_feed_ids) => {
                 // if special net: add only special feeds
-                let feed_id = i64::from_str_radix(&key.to_string(), 16).unwrap() as u32;
+                let feed_id = i64::from_str_radix(&key.to_string(), 16)
+                    .map(|x| x as u32)
+                    .map_err(|err| eyre!("Parsing error {err}"))?;
                 if allowed_feed_ids.is_empty() || allowed_feed_ids.contains(&feed_id) {
                     num_reported_feeds += 1;
                     result += key.to_string().as_str();
@@ -144,7 +146,7 @@ fn serialize_updates<
     }
     info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
 
-    result
+    Ok(result)
 }
 
 pub async fn eth_batch_send_to_contract<
@@ -162,12 +164,12 @@ pub async fn eth_batch_send_to_contract<
     let contract_address = if feed_type == Periodic {
         provider
             .contract_address
-            .unwrap_or_else(|| panic!("Contract address not set for network {}.", net))
+            .ok_or(eyre!("Contract address not set for network {net}."))
     } else {
         provider
             .event_contract_address
-            .unwrap_or_else(|| panic!("Event contract address not set for network {}.", net))
-    };
+            .ok_or(eyre!("Event contract address not set for network {net}."))
+    }?;
 
     info!(
         "sending data to address `{}` in network `{}`",
@@ -181,12 +183,10 @@ pub async fn eth_batch_send_to_contract<
 
     let serialized_updates = serialize_updates(&net, updates, &allow_list);
 
-    let calldata_str = (selector.to_owned() + serialized_updates.as_str()).to_string();
+    let calldata_str = (selector.to_owned() + serialized_updates?.as_str()).to_string();
 
-    let input = match Bytes::from_hex(calldata_str) {
-        Err(e) => panic!("Key is not valid hex string: {}", e), // We panic here, because the http handler on the recv side must filter out wrong input.
-        Ok(x) => x,
-    };
+    let input =
+        Bytes::from_hex(calldata_str).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
 
     let base_fee = process_provider_getter!(
         provider.get_gas_price().await,
@@ -641,7 +641,11 @@ mod tests {
         let serialized_updates = serialize_updates(network, updates, &None);
 
         // It is undeterministic what the order will be, so checking both possibilities.
-        assert!(["0fffbye001fhi", "001fhi0fffbye"].contains(&serialized_updates.as_str()));
+        assert!(["0fffbye001fhi", "001fhi0fffbye"].contains(
+            &serialized_updates
+                .expect("Serialize updates failed!")
+                .as_str()
+        ));
     }
 
     #[test]
@@ -664,7 +668,8 @@ mod tests {
                 43,  // WBTC/USD
                 4,   // WSTETH/USD
             ]),
-        );
+        )
+        .expect("Serialize updates failed!");
 
         // Note: bye is filtered out:
         assert_eq!(serialized_updates, "001fhi");
@@ -684,7 +689,8 @@ mod tests {
                 131, // USDC/USD
                 21,  // PAXG/USD
             ]),
-        );
+        )
+        .expect("Serialize updates failed!");
 
         assert_eq!(serialized_updates, "001fhi");
 
@@ -702,7 +708,8 @@ mod tests {
                 131, // USDC/USD
                 43,  // WBTC/USD
             ]),
-        );
+        )
+        .expect("Serialize updates failed!");
 
         assert_eq!(serialized_updates, "001fhi");
     }

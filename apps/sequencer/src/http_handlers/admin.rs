@@ -361,8 +361,14 @@ async fn set_provider_is_enabled(
     drop(sequencer_config);
 
     let mut sequencer_config = sequencer_state.sequencer_config.write().await;
-    let provider: &mut config::Provider =
-        sequencer_config.providers.get_mut(&network_name).unwrap();
+    let provider: &mut config::Provider = match sequencer_config.providers.get_mut(&network_name) {
+        Some(v) => v,
+        None => {
+            return Err(error::ErrorInternalServerError(format!(
+                "Network {network_name} seem to disapear. This should never happen!"
+            )));
+        }
+    };
     provider.is_enabled = is_enabled;
 
     let message = if is_enabled {
