@@ -93,7 +93,7 @@ impl FeedSlotsProcessor {
                     match processor_cmd {
                         FeedsSlotProcessorCmds::Terminate() => {
                             let msg = format!("Terminating processor for feed {} with id {} ", self.name, self.key);
-                            debug!(msg);
+                            info!(msg);
                             return Ok(ProcessorResultValue::ProcessorExitStatus(msg));
                         },
                     }
@@ -110,14 +110,17 @@ impl FeedSlotsProcessor {
                     {
                         let current_time_as_ms = current_unix_time();
 
+                        debug!("Get a read lock on feed meta");
                         let slot = feed.read().await.get_slot(current_time_as_ms);
+                        debug!("Release the read lock on feed meta");
 
                         info!(
                             "Processing votes for {} with id {} for slot {} rep_interval {}.",
                             self.name, self.key, slot, report_interval_ms
                         );
 
-                        let reports: Arc<RwLock<feed_registry::registry::FeedReports>> =
+                        debug!("Get a read lock on all reports");
+                        let reports =
                             match reports.read().await.get(self.key) {
                                 Some(x) => x,
                                 None => {
@@ -125,10 +128,14 @@ impl FeedSlotsProcessor {
                                     continue;
                                 }
                             };
+                        debug!("Release the read lock on all reports");
+
                         debug!("found the following reports:");
                         debug!("reports = {:?}", reports);
 
+                        debug!("Get a write lock on reports for feed id {}", self.key);
                         let mut reports = reports.write().await;
+                        debug!("Acquired a write lock on reports for feed id {}", self.key);
                         // Process the reports:
                         let mut values: Vec<&FeedType> = vec![];
                         for kv in &reports.report {
@@ -162,16 +169,21 @@ impl FeedSlotsProcessor {
 
                         if values.is_empty() {
                             info!("No reports found for feed: {} slot: {}!", self.name, &slot);
+                            debug!("Release the write lock on reports for feed id {}", self.key);
                             continue;
                         }
 
+                        debug!("Get a read lock on all reporters");
+                        let all_reporters_count = reporters.read().await.len();
+                        debug!("Release the read lock on all reports");
+
                         let total_votes_count = values.len() as f32;
-                        let required_votes_count = quorum_percentage * reporters.read().await.len() as f32;
+                        let required_votes_count = quorum_percentage * all_reporters_count as f32;
 
                         if total_votes_count < required_votes_count {
                             warn!(
                             "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
-                            self.name, &slot, quorum_percentage, total_votes_count, reporters.read().await.len()
+                            self.name, &slot, quorum_percentage, total_votes_count, all_reporters_count
                         );
                             is_quorum_reached = false;
                         }
@@ -185,16 +197,22 @@ impl FeedSlotsProcessor {
                             }
                         }
 
+                        debug!("Get a read lock on feed meta to aggregate votes");
                         // Dispatch to concrete FeedAggregate implementation.
                         result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(values);
+                        debug!("Release the read lock on feed meta to aggregate votes");
 
                         // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
                         if !is_oneshot {
                             {
+                                debug!("Get a write lock on history");
                                 let mut history_guard = history.write().await;
-                                history_guard.push(self.key, result_post_to_contract.clone())
+                                debug!("Push result that will be posted to contract to history");
+                                history_guard.push(self.key, result_post_to_contract.clone());
+                                debug!("Release the write lock on history");
                             }
 
+                            debug!("Get a read lock on history");
                             let history_lock = history.read().await;
 
                             // The first slice is from the current read position to the end of the array
@@ -237,6 +255,8 @@ impl FeedSlotsProcessor {
 
                         info!("result_post_to_contract = {:?}", result_post_to_contract);
                         reports.clear();
+                        debug!("Release the read lock on history");
+                        debug!("Release the write lock on reports for feed id {}", self.key);
                     }
                     if is_quorum_reached {
                         result_send
