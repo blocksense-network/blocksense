@@ -1,0 +1,16 @@
+export default {
+  index: 'Overview',
+  ProxyCall: 'ProxyCall',
+  IChainlinkFeedRegistry: 'IChainlinkFeedRegistry',
+  IChainlinkAggregator: 'IChainlinkAggregator',
+  IFeedRegistry: 'IFeedRegistry',
+  IAggregator: 'IAggregator',
+  FeedRegistry: 'FeedRegistry',
+  ChainlinkProxy: 'ChainlinkProxy',
+  UpgradeableProxy: 'UpgradeableProxy',
+  HistoricDataFeedStoreV2: 'HistoricDataFeedStoreV2',
+  HistoricDataFeedStoreV1: 'HistoricDataFeedStoreV1',
+  DataFeedStoreV3: 'DataFeedStoreV3',
+  DataFeedStoreV2: 'DataFeedStoreV2',
+  DataFeedStoreV1: 'DataFeedStoreV1',
+};
