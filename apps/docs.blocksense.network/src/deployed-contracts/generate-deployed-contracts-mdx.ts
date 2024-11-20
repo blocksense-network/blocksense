@@ -8,7 +8,7 @@ import {
 
 import { pagesContractsFolder } from '@/src/constants';
 import { stringifyObject } from '@/src/utils';
-import { updateMetaJsonFile } from '@/src/utils-fs';
+// import { updateMetaJsonFile } from '@/src/utils-fs';
 import { CoreContract, ProxyContractData } from './types';
 
 import CHAINLINK_COMPATIBILITY from '@blocksense/monorepo/chainlink_compatibility';
@@ -109,9 +109,9 @@ async function generateDeployedContractsFile() {
 
   return Promise.all([
     write({ ext: '.mdx', ...mdxFile }),
-    updateMetaJsonFile(pagesContractsFolder, {
-      'deployed-contracts': 'Deployed Contracts',
-    }),
+    // updateMetaJsonFile(pagesContractsFolder, {
+    //   'deployed-contracts': 'Deployed Contracts',
+    // }),
   ]);
 }
 
