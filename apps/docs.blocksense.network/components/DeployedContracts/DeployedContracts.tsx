@@ -15,7 +15,7 @@ import {
 } from '@/src/deployed-contracts/types';
 import { dataFeedUrl } from '@/src/constants';
 import { NetworkIcon } from '@/components/DeployedContracts/NetworkIcon';
-import { Callout } from '@blocksense/docs-theme';
+import { Callout } from 'nextra/components';
 
 type DeployedContractsProps = {
   deployedCoreContractsString: string;

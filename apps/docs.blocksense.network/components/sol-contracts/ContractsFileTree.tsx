@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileTree } from '@blocksense/docs-theme';
+import { FileTree } from 'nextra/components';
 import { ghContractFolder } from '@/src/constants';
 
 type TreeNode = {
