@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-use std::time::Duration;
-
+use crate::api::api_engine::APIError;
+use crate::api::api_engine::APIInterface;
 use async_trait::async_trait;
 use feed_registry::types::Asset;
 use feed_registry::types::FeedError;
@@ -8,35 +7,52 @@ use feed_registry::types::FeedResult;
 use feed_registry::types::FeedType;
 use reqwest::Client;
 use serde_derive::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::time::Duration;
 
-use crate::api::api_engine::APIError;
-use crate::api::api_engine::APIInterface;
-
-const BINANCE_API_URL: &str = "https://api.binance.com/api/v3/ticker/price";
+const BYBIT_API_URL: &str = "https://api.bybit.com/v5/market/tickers";
 const TIMEOUT_DURATION: u64 = 2; // 2 seconds timeout
-const ERROR_STRING: &str = "Binance API Error";
-
-pub type BinanceResponse = Vec<BinanceAsset>;
+const ERROR_STRING: &str = "ByBit API Error";
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct BinanceAsset {
-    pub symbol: String,
-    pub price: String,
+pub struct ByBitResponse {
+    pub ret_code: i64,
+    pub ret_msg: String,
+    pub result: bybitResult,
+    pub ret_ext_info: RetExtInfo,
+    pub time: i64,
 }
 
-pub struct BinanceAPI {
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RetExtInfo {}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct bybitResult {
+    pub category: String,
+    pub list: Vec<List>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct List {
+    pub symbol: String,
+    pub last_price: String,
+}
+
+pub struct ByBitAPI {
     client: Client,
 }
 
-impl BinanceAPI {
+impl ByBitAPI {
     pub fn new() -> Self {
         let client = Client::builder()
             .timeout(Duration::from_secs(TIMEOUT_DURATION))
             .build()
             .unwrap_or_default();
-
-        BinanceAPI { client }
+        ByBitAPI { client }
     }
 
     fn parse_price(price_str: &str) -> Result<f64, APIError> {
@@ -47,11 +63,11 @@ impl BinanceAPI {
 }
 
 #[async_trait]
-impl APIInterface for BinanceAPI {
+impl APIInterface for ByBitAPI {
     type Output = f64;
     type Error = APIError;
 
-    async fn poll(&mut self, asset: &str) -> Result<Option<Self::Output>, Self::Error> {
+    async fn poll(&mut self, _asset: &str) -> Result<Option<Self::Output>, Self::Error> {
         unimplemented!();
     }
 
@@ -59,33 +75,32 @@ impl APIInterface for BinanceAPI {
         &mut self,
         assets: &[Asset],
     ) -> Result<HashMap<Asset, FeedResult>, anyhow::Error> {
+        let url = format!("{}?category=spot", BYBIT_API_URL);
         let response = self
             .client
-            .get(BINANCE_API_URL)
+            .get(&url)
             .send()
             .await
             .map_err(|e| anyhow::anyhow!("Connection error: {}", e))?;
 
-        //TODO:(snikolov): Fill a Hashmap with error values
         if !response.status().is_success() {
             return Err(anyhow::anyhow!("API request failed"));
         }
 
-        let binance_response: BinanceResponse = response
+        let bybit_response: ByBitResponse = response
             .json()
             .await
             .map_err(|e| anyhow::anyhow!("Failed to parse response: {}", e))?;
 
         let mut results = HashMap::new();
-
         for asset in assets {
-            if let Some(price_data) = binance_response.iter().find(|p| {
+            if let Some(price_data) = bybit_response.result.list.iter().find(|p| {
                 asset
                     .resources
-                    .get("binance_ticker")
+                    .get("bybit_ticker")
                     .map_or(false, |ticker| p.symbol == *ticker)
             }) {
-                match Self::parse_price(&price_data.price) {
+                match Self::parse_price(&price_data.last_price) {
                     Ok(price) => {
                         results.insert(
                             asset.clone(),
@@ -112,7 +127,6 @@ impl APIInterface for BinanceAPI {
                 );
             }
         }
-
         Ok(results)
     }
 }

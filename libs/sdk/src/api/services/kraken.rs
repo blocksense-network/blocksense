@@ -14,7 +14,7 @@ const TIMEOUT_DURATION: u64 = 2; // 2 seconds timeout
 #[serde(rename_all = "camelCase")]
 pub struct KrakenResponse {
     pub error: Vec<String>,
-    pub result: HashMap<String, KrakenAsset>
+    pub result: HashMap<String, KrakenAsset>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -49,14 +49,14 @@ impl KrakenAPI {
             .timeout(Duration::from_secs(TIMEOUT_DURATION))
             .build()
             .unwrap_or_default();
-        
+
         KrakenAPI { client }
     }
 
     fn parse_price(price_str: String) -> Result<f64, APIError> {
-        price_str.parse::<f64>().map_err(|e| {
-            APIError::ApiError(format!("Failed to parse price: {}", e))
-        })
+        price_str
+            .parse::<f64>()
+            .map_err(|e| APIError::ApiError(format!("Failed to parse price: {}", e)))
     }
 }
 
@@ -73,14 +73,14 @@ impl APIInterface for KrakenAPI {
         &mut self,
         assets: &[Asset],
     ) -> Result<HashMap<Asset, FeedResult>, anyhow::Error> {
-
-        let response = self.client
+        let response = self
+            .client
             .get(KRAKEN_API_URL)
             .send()
             .await
             .map_err(|e| anyhow::anyhow!("Connection error: {}", e))?;
 
-        //TODO:(snikolov): Fill a Hashmap with error values 
+        //TODO:(snikolov): Fill a Hashmap with error values
         if !response.status().is_success() {
             return Err(anyhow::anyhow!("API request failed"));
         }
@@ -91,7 +91,10 @@ impl APIInterface for KrakenAPI {
             .map_err(|e| anyhow::anyhow!("Failed to parse response: {}", e))?;
 
         if !kraken_response.error.is_empty() {
-            return Err(anyhow::anyhow!("API error: {}", kraken_response.error.join(", ")));
+            return Err(anyhow::anyhow!(
+                "API error: {}",
+                kraken_response.error.join(", ")
+            ));
         }
 
         let mut results = HashMap::new();
@@ -104,7 +107,9 @@ impl APIInterface for KrakenAPI {
                     .get(kraken_symbol)
                     .map_or(false, |ticker| **p == *ticker)
             }) {
-                match Self::parse_price(kraken_response.result.get(asset_data).unwrap().c[2].clone()) {
+                match Self::parse_price(
+                    kraken_response.result.get(asset_data).unwrap().c[2].clone(),
+                ) {
                     Ok(price) => {
                         results.insert(
                             asset.clone(),
@@ -122,7 +127,7 @@ impl APIInterface for KrakenAPI {
                         );
                     }
                 }
-            } 
+            }
         }
 
         Ok(results)
