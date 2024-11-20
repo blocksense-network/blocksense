@@ -7,7 +7,7 @@ use std::io::Error;
 // use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
-use tracing::{error, info, info_span, trace};
+use tracing::{debug, error, info, info_span, trace};
 use utils::time::current_unix_time;
 
 pub async fn votes_result_batcher_loop<
@@ -41,8 +41,10 @@ pub async fn votes_result_batcher_loop<
                     0
                 };
                 let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
+                debug!("Slot waiting for {time_to_await:?} to pass...");
                 let var: Result<Option<(K, V)>, tokio::time::error::Elapsed> =
                     actix_web::rt::time::timeout(time_to_await, vote_recv.recv()).await;
+                debug!("Slot woke up");
                 match var {
                     Ok(Some((key, val))) => {
                         info!(

@@ -65,6 +65,7 @@ in
         b = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyContractAddress;
+          transaction_gas_limit = 20000000;
           allow_feeds = [
             31 # BTC/USD
             47 # ETH/USD

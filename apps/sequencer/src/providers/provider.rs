@@ -44,7 +44,8 @@ pub struct RpcProvider {
     pub contract_address: Option<Address>,
     pub event_contract_address: Option<Address>,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
-    pub transcation_timeout_secs: u32,
+    pub transaction_timeout_secs: u32,
+    pub transaction_gas_limit: u32,
     pub data_feed_store_byte_code: Option<Vec<u8>>,
     pub data_feed_sports_byte_code: Option<Vec<u8>>,
 }
@@ -178,7 +179,8 @@ async fn get_rpc_providers(
             provider,
             wallet,
             provider_metrics: provider_metrics.clone(),
-            transcation_timeout_secs: p.transcation_timeout_secs,
+            transaction_timeout_secs: p.transaction_timeout_secs,
+            transaction_gas_limit: p.transaction_gas_limit,
             data_feed_store_byte_code: p.data_feed_store_byte_code.clone().map(|byte_code| {
                 hex::decode(byte_code.clone())
                     .expect("data_feed_store_byte_code for provider is not valid hex string!")

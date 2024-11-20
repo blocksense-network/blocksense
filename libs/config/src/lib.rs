@@ -147,7 +147,8 @@ pub struct Provider {
     pub url: String,
     pub contract_address: Option<String>,
     pub event_contract_address: Option<String>,
-    pub transcation_timeout_secs: u32,
+    pub transaction_timeout_secs: u32,
+    pub transaction_gas_limit: u32,
     pub data_feed_store_byte_code: Option<String>,
     pub data_feed_sports_byte_code: Option<String>,
 
@@ -166,8 +167,11 @@ fn default_is_enabled() -> bool {
 
 impl Validated for Provider {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
-        if self.transcation_timeout_secs == 0 {
-            anyhow::bail!("{}: transcation_timeout_secs cannot be set to 0", context);
+        if self.transaction_timeout_secs == 0 {
+            anyhow::bail!("{}: transaction_timeout_secs cannot be set to 0", context);
+        }
+        if self.transaction_gas_limit == 0 {
+            anyhow::bail!("{}: transaction_gas_limit cannot be set to 0", context);
         }
         Ok(())
     }
@@ -283,7 +287,8 @@ pub fn get_test_config_with_single_provider(
                 url: url.to_string(),
                 contract_address: None,
                 event_contract_address: None,
-                transcation_timeout_secs: 50,
+                transaction_timeout_secs: 50,
+                transaction_gas_limit: 7500000,
                 data_feed_store_byte_code: Some("0x60a060405234801561001057600080fd5b503360805260805160e761002d60003960006045015260e76000f3fe6080604052348015600f57600080fd5b506000366060600060046000601c37506000516201ffff811015604357600f60fc1b6020526005601c205460005260206000f35b7f0000000000000000000000000000000000000000000000000000000000000000338114606f57600080fd5b631a2d80ac8281109083101760ac57600f60fc1b6004523660045b8181101560aa57600481600037600560002060048201359055602401608a565b005b600080fdfea264697066735822122015800ed562cf954d8d71346ded5d44d9d6c459e49b37d67049ba43a5524b430764736f6c63430008180033".to_string()),
                 data_feed_sports_byte_code: Some("0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033".to_string()),
                 is_enabled: true,
@@ -310,7 +315,8 @@ pub fn get_test_config_with_multiple_providers(
                 url: url.to_string(),
                 contract_address: None,
                 event_contract_address: None,
-                transcation_timeout_secs: 50,
+                transaction_timeout_secs: 50,
+                transaction_gas_limit: 7500000,
                 data_feed_store_byte_code: Some("".to_string()),
                 data_feed_sports_byte_code: Some("".to_string()),
                 is_enabled: true,

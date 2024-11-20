@@ -29,10 +29,16 @@ let
           description = mdDoc "List of allowed feed ids to be published";
         };
 
-        transcation_timeout_secs = mkOption {
+        transaction_timeout_secs = mkOption {
           type = types.int;
           default = 50;
           description = mdDoc "The timeout for transactions.";
+        };
+
+        transaction_gas_limit = mkOption {
+          type = types.int;
+          default = 7500000;
+          description = mdDoc "Transaction GAS limit for the provider.";
         };
 
         contract_address = mkOption {
@@ -81,13 +87,15 @@ in
       "ETH1" = {
         "private_key_path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8545";
-        "transcation_timeout_secs" = 50;
+        "transaction_timeout_secs" = 50;
+        "transaction_gas_limit" = 7500000;
         "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
       "ETH2" = {
         "private_key_path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8546";
-        "transcation_timeout_secs" = 50;
+        "transaction_timeout_secs" = 50;
+        "transaction_gas_limit" = 7500000;
         "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
     };
