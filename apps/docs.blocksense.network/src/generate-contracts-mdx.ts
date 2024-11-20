@@ -6,7 +6,8 @@ import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
+// import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
+import SOL_REFLECTION_JSON from '/home/kalin/blocksense/libs/contracts/artifacts/docs/fine.json';
 import { stringifyObject } from './utils';
 
 const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
@@ -69,14 +70,19 @@ function generateSolRefDocFiles(): Promise<string[]> {
 
   mdxFiles.push({ name: 'index', content: overviewContent });
   metaJSON = { index: 'Overview', ...metaJSON };
+  const metaContent = `export default ${JSON.stringify(metaJSON, null, 2)};`;
 
   const { write, writeJSON } = selectDirectory(pagesContractRefDocFolder);
 
   return Promise.all([
     ...mdxFiles.map(args => write({ ext: '.mdx', ...args })),
-    writeJSON({
-      base: '_meta.json',
-      content: metaJSON,
+    // writeJSON({
+    //   base: '_meta.json',
+    //   content: metaJSON,
+    // }),
+    write({
+      base: '_meta.ts',
+      content: metaContent,
     }),
   ]);
 }
