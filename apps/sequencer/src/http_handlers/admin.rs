@@ -365,7 +365,7 @@ async fn set_provider_is_enabled(
         Some(v) => v,
         None => {
             return Err(error::ErrorInternalServerError(format!(
-                "Network {network_name} seem to disapear. This should never happen!"
+                "Network {network_name} seems to disapear. This should never happen!"
             )));
         }
     };
