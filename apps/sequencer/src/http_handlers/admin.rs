@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use crate::feeds::feeds_slots_manager::{
     DeleteAssetFeed, FeedsSlotsManagerCmds, RegisterNewAssetFeed,
 };
@@ -17,6 +16,7 @@ use config::{AllFeedsConfig, FeedConfig, SequencerConfig};
 use eyre::eyre;
 use eyre::Result;
 use futures::StreamExt;
+use std::collections::HashSet;
 use utils::logging::tokio_console_active;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};

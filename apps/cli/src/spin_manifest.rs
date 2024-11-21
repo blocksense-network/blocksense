@@ -159,11 +159,11 @@ mod test {
     fn serialize_to_spin_toml() {
         let json = r#"
 {
-  "reporterInfo": {
-    "intervalTimeInSeconds": 10,
+  "reporter_info": {
+    "interval_time_in_seconds": 10,
     "sequencer": "http://127.0.0.1:8546",
-    "secretKey": "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003",
-    "reporterId": 1
+    "secret_key": "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003",
+    "reporter_id": 1
   },
   "oracles": [{
     "id": "revolut",
@@ -188,7 +188,7 @@ mod test {
       "id": "1",
       "data": ""
   }],
-  "dataFeeds": [{
+  "data_feeds": [{
       "id": 0,
       "name": "SAND",
       "fullName": "",
