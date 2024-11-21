@@ -1093,6 +1093,7 @@ __metadata:
     "@vercel/build-utils": "npm:^8.3.6"
     "@vercel/next": "npm:^4.3.6"
     "@vercel/nft": "npm:^0.27.3"
+    acorn: "npm:^8.14.0"
     prettier: "npm:^3.3.3"
     react: "npm:^18.3.1"
     ts-node: "npm:^10.9.2"
