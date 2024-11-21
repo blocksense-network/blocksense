@@ -8,7 +8,7 @@
 let
   cfg = config.services.blocksense;
 
-  inherit (self'.apps) sequencer reporter;
+  inherit (self'.apps) sequencer reporter blocksense;
 
   logsConfig = {
     fields_order = [
@@ -35,6 +35,10 @@ let
       echo '${cfg._reporters-config-txt.${name}}' \
         | ${lib.getExe pkgs.jq} > $out/reporter-${name}/reporter_config.json
     ''
+  ) cfg.reporters;
+
+  reportersV2ConfigJSON = builtins.mapAttrs (
+    name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
   ) cfg.reporters;
 
   anvilInstances = lib.mapAttrs' (
@@ -88,32 +92,41 @@ let
 
   oracleScriptBuilder = lib.mapAttrs' (
     name:
-    { path, build-command, ... }:
+    {
+      path,
+      source,
+      build-command,
+      ...
+    }:
     {
       name = "oracle-script-builder-${name}";
       value.process-compose = {
-        command = build-command;
+        command = ''
+          ${build-command} &&
+          cp -v ${source} ${cfg.oracle-scripts.base-dir}
+        '';
         working_dir = path;
       };
     }
-  ) cfg.oracle-scripts;
+  ) cfg.oracle-scripts.oracles;
 
   reporterV2Instances = lib.mapAttrs' (
     name:
-    { spin-config, log-level, ... }:
+    { log-level, ... }:
     {
       name = "reporter-v2-${name}";
       value.process-compose = {
-        command = "spin build --from ${spin-config} --up";
+        command = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
         environment = [ "RUST_LOG=${log-level}" ];
         depends_on =
           let
             oracle-scripts = lib.mapAttrs' (
               key: _value:
               lib.nameValuePair "oracle-script-builder-${key}" { condition = "process_completed_successfully"; }
-            ) cfg.oracle-scripts;
+            ) cfg.oracle-scripts.oracles;
           in
           oracle-scripts // { blocksense-sequencer.condition = "process_started"; };
+        working_dir = cfg.oracle-scripts.base-dir;
       };
     }
   ) cfg.reporters-v2;

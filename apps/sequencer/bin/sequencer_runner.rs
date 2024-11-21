@@ -14,7 +14,7 @@ use sequencer::reporters::reporter::init_shared_reporters;
 use sequencer::http_handlers::admin::{
     delete_asset_feed, deploy, disable_provider, enable_provider, get_feed_config,
     get_feed_report_interval, get_feeds_config, get_key, get_sequencer_config, register_asset_feed,
-    set_log_level,
+    set_log_level, get_oracle_scripts
 };
 use sequencer::http_handlers::data_feeds::{post_report, post_reports_batch, register_feed};
 use utils::logging::{
@@ -145,6 +145,7 @@ pub async fn prepare_http_servers(
                     .service(delete_asset_feed)
                     .service(disable_provider)
                     .service(enable_provider)
+                    .service(get_oracle_scripts)
             })
             .workers(1)
             .bind(("0.0.0.0", admin_port))

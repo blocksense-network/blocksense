@@ -1,12 +1,12 @@
-use std::{convert::From, path::PathBuf};
+use std::{convert::From, path::PathBuf, process::Stdio};
 
 use tokio::{fs, io::AsyncWriteExt, process::Command};
 
 use anyhow::Result;
 use clap::Parser;
-use std::process::Stdio;
+use url::Url;
 
-use blocksense_registry::config::BlocksenseConfig;
+use blocksense_registry::config::{BlocksenseConfig, FeedsResponse, OraclesResponse};
 
 use crate::opts::{APP_MANIFEST_FILE_OPT, BUILD_UP_OPT};
 
@@ -57,7 +57,40 @@ impl BuildConfig {
                 &self.file_path.display()
             );
         }
-        let config: BlocksenseConfig = serde_json::from_str(&contents)?;
+        let mut config: BlocksenseConfig = serde_json::from_str(&contents)?;
+        if config.data_feeds.is_empty() {
+            let base = Url::parse(&config.reporter_info.registry)?;
+            let url = base.join("/get_feeds_config")?;
+            tracing::info!("Getting data feed config from {:?}", url);
+
+            let body = reqwest::get(url.clone()).await?.text().await?;
+
+            let response_json: FeedsResponse = serde_json::from_str(&body)?;
+            config.data_feeds = response_json
+                .feeds
+                .into_iter()
+                .map(|mut feed| {
+                    if feed.script == "YahooFinance" {
+                        feed.script = "yahoo".to_string();
+                    } else if feed.script == "CoinMarketCap" {
+                        feed.script = "cmc".to_string();
+                    }
+                    feed
+                })
+                .collect();
+        }
+
+        if config.oracles.is_empty() {
+            let base = Url::parse(&config.reporter_info.registry)?;
+            let url = base.join("/get_oracle_scripts")?;
+            tracing::info!("Getting oracles config from {:?}", url);
+
+            let body = reqwest::get(url.clone()).await?.text().await?;
+
+            let response_json: OraclesResponse = serde_json::from_str(&body)?;
+            config.oracles = response_json.oracles
+        }
+
         let spin_config = SpinConfigToml::from(config);
         let toml = toml::to_string_pretty(&spin_config)?;
         let mut file = fs::File::create(std::env::current_dir()?.join(SPIN)).await?;

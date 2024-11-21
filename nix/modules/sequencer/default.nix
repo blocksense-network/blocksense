@@ -46,6 +46,13 @@
               builtins.toJSON
             ];
 
+          configJSON2 =
+            config: extraArgs:
+            lib.pipe config [
+              dashToUnderscore
+              (params: params // extraArgs)
+            ];
+
           sequencerConfigJSON = configJSON cfg.sequencer {
             reporters = mkReporters cfg.sequencer.reporters;
             prometheus_port = cfg.sequencer.metrics-port;
@@ -54,6 +61,28 @@
           reportersConfigJSON = builtins.mapAttrs (
             n: v: (configJSON v { prometheus_url = cfg.reporters.${n}.metrics-url; })
           ) cfg.reporters;
+
+          blocksenseConfigJSON = lib.pipe cfg.reporters-v2 [
+            (builtins.mapAttrs (
+              _n: v:
+              (
+
+                (builtins.removeAttrs
+                  (configJSON2 v {
+                    capabilities = builtins.attrValues (builtins.mapAttrs (id: data: { inherit id data; }) v.api-keys);
+                  })
+                  [
+                    "api_keys"
+                    "log_level"
+                  ]
+                )
+                // {
+                  oracles = [ ];
+                  data_feeds = [ ];
+                }
+              )
+            ))
+          ];
         in
         with lib;
         {
@@ -82,10 +111,16 @@
               description = mdDoc "The set of reporter instances to run.";
             };
 
-            oracle-scripts = mkOption {
-              type = types.attrsOf (mkSubmodule ./oracle-script-opts.nix);
-              default = { };
-              description = mdDoc "The set of oracle scripts to build.";
+            oracle-scripts = {
+              base-dir = mkOption {
+                type = types.path;
+                description = mdDoc "Base dir for oracles.";
+              };
+              oracles = mkOption {
+                type = types.attrsOf (mkSubmodule ./oracle-script-opts.nix);
+                default = { };
+                description = mdDoc "The set of oracle scripts to build.";
+              };
             };
 
             reporters-v2 = mkOption {
@@ -110,6 +145,12 @@
               type = types.attrsOf types.str;
               description = "The materialized configuration for the reporters.";
               default = reportersConfigJSON;
+            };
+
+            _blocksense-config-txt = mkOption {
+              type = types.attrsOf types.raw;
+              description = "The materialized configuration for the reporters v2.";
+              default = blocksenseConfigJSON;
             };
           };
 

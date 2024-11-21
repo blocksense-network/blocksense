@@ -88,17 +88,34 @@ in
     };
 
     oracle-scripts = {
-      cmc = {
-        path = config.devenv.root + "/libs/sdk/examples/cmc";
-      };
-      yahoo = {
-        path = config.devenv.root + "/libs/sdk/examples/yahoo";
+      base-dir = config.devenv.root + "/libs/sdk/oracles";
+      oracles = {
+        cmc = rec {
+          path = config.devenv.root + "/libs/sdk/examples/cmc";
+          source = path + "/target/wasm32-wasi/release/cmc_oracle.wasm";
+        };
+        yahoo = rec {
+          path = config.devenv.root + "/libs/sdk/examples/yahoo";
+          source = path + "/target/wasm32-wasi/release/yahoo_oracle.wasm";
+        };
+        revolut = rec {
+          path = config.devenv.root + "/libs/sdk/examples/revolut";
+          source = path + "/target/wasm32-wasi/release/revolut_oracle.wasm";
+        };
       };
     };
 
     reporters-v2 = {
       a = {
-        spin-config = config.devenv.root + "/apps/cli/test/spin.toml";
+        reporter-info = {
+          reporter_id = 0;
+          interval_time_in_seconds = 10;
+          secret_key = builtins.readFile "${testKeysDir}/reporter_secret_key";
+        };
+        api-keys = {
+          CMC_API_KEY = builtins.readFile "${testKeysDir}/CMC_API_KEY";
+          YAHOO_API_KEY = builtins.readFile "${testKeysDir}/YH_FINANCE_API_KEY";
+        };
       };
     };
   };

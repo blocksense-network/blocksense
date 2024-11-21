@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub(crate) type Map<K, V> = indexmap::IndexMap<K, V>;
 
-use crate::opts::{APP_NAME, AUTHOR, SEQUENCER_URL, SPIN_MANIFEST_VERSION, TIME_INTERVAL, VERSION};
+use crate::opts::{APP_NAME, AUTHOR, SPIN_MANIFEST_VERSION, VERSION};
 use blocksense_registry::config::BlocksenseConfig;
 
 //TODO(adikov): Transition to using - https://github.com/fermyon/spin/blob/main/crates/manifest/src/schema/v2.rs when
@@ -58,32 +58,29 @@ impl From<BlocksenseConfig> for AppManifest {
     fn from(config: BlocksenseConfig) -> Self {
         let mut components: Map<String, Component> = Map::<String, Component>::new();
         let mut trigger_global_configs = Map::new();
-        //TODO(adikov): Get all configuration from our blocksense config.
-        let mut settings_table = toml::Table::new();
-        settings_table.insert(
+        let mut table = toml::Table::new();
+        table.insert(
             "interval_time_in_seconds".to_string(),
-            toml::Value::Integer(TIME_INTERVAL as i64),
+            toml::Value::Integer(config.reporter_info.interval_time_in_seconds as i64),
         );
-        settings_table.insert(
-            "sequencer".to_string(),
-            toml::Value::String(SEQUENCER_URL.to_string()),
-        );
-        settings_table.insert(
-            "secret_key".to_string(),
-            toml::Value::String(config.secret_key),
-        );
-        settings_table.insert(
+        table.insert(
             "reporter_id".to_string(),
-            toml::Value::Integer(config.reporter_id as i64),
+            toml::Value::Integer(config.reporter_info.reporter_id as i64),
         );
-
-        trigger_global_configs.insert("settings".to_string(), settings_table);
+        table.insert(
+            "sequencer".to_string(),
+            toml::Value::String(config.reporter_info.sequencer),
+        );
+        table.insert(
+            "secret_key".to_string(),
+            toml::Value::String(config.reporter_info.secret_key),
+        );
+        trigger_global_configs.insert("settings".to_string(), table);
 
         let mut oracles: Vec<Trigger> = vec![];
         for oracle in config.oracles.iter() {
             let mut table = toml::Table::new();
             let mut feeds: Vec<toml::Value> = vec![];
-            let mut capabilities: Vec<toml::Value> = vec![];
             for data_feed in config.data_feeds.iter() {
                 if data_feed.script != oracle.id {
                     continue;
@@ -102,6 +99,7 @@ impl From<BlocksenseConfig> for AppManifest {
             }
             table.insert("data_feeds".to_string(), toml::Value::Array(feeds));
 
+            let mut capabilities: Vec<toml::Value> = vec![];
             for capability in config.capabilities.iter() {
                 if !oracle.capabilities.contains(&capability.id) {
                     continue;
@@ -161,8 +159,12 @@ mod test {
     fn serialize_to_spin_toml() {
         let json = r#"
 {
-  "reporterId": 10,
-  "secretKey": "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003",
+  "reporterInfo": {
+    "intervalTimeInSeconds": 10,
+    "sequencer": "http://127.0.0.1:8546",
+    "secretKey": "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003",
+    "reporterId": 1
+  },
   "oracles": [{
     "id": "revolut",
     "name": "Revolut",
@@ -243,9 +245,9 @@ authors = ["blocksense-network"]
 
 [application.trigger.settings]
 interval_time_in_seconds = 10
-sequencer = "http://gpu-server-001:8877/post_reports_batch"
+reporter_id = 1
+sequencer = "http://127.0.0.1:8546"
 secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
-reporter_id = 10
 
 [[trigger.oracle]]
 component = "revolut"
