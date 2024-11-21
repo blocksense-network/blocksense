@@ -2,13 +2,13 @@ use alloy::providers::Provider;
 use alloy::transports::http::Http;
 use alloy::{
     hex,
-    network::{Ethereum, EthereumSigner},
+    network::{Ethereum, EthereumWallet},
     primitives::Address,
     providers::{
-        fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, SignerFiller},
+        fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, WalletFiller},
         Identity, ProviderBuilder, RootProvider,
     },
-    signers::wallet::LocalWallet,
+    signers::local::PrivateKeySigner,
 };
 use reqwest::{Client, Url};
 
@@ -25,7 +25,7 @@ use tracing::{debug, error, info, warn};
 pub type ProviderType = FillProvider<
     JoinFill<
         JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
-        SignerFiller<EthereumSigner>,
+        WalletFiller<EthereumWallet>,
     >,
     RootProvider<Http<Client>>,
     Http<Client>,
@@ -40,7 +40,7 @@ pub fn parse_contract_address(addr: &str) -> Option<Address> {
 #[derive(Debug)]
 pub struct RpcProvider {
     pub provider: ProviderType,
-    pub wallet: LocalWallet,
+    pub signer: PrivateKeySigner,
     pub contract_address: Option<Address>,
     pub event_contract_address: Option<Address>,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
@@ -53,20 +53,7 @@ pub struct RpcProvider {
 pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
 pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
-    let latest_block = match provider.lock().await.provider.get_block_number().await {
-        Ok(result) => result,
-        Err(e) => {
-            error!("Could not get block number: {}", e);
-            return false;
-        }
-    };
-    let bytecode = match provider
-        .lock()
-        .await
-        .provider
-        .get_code_at(*addr, latest_block.into())
-        .await
-    {
+    let bytecode = match provider.lock().await.provider.get_code_at(*addr).await {
         Ok(result) => result,
         Err(e) => {
             error!("Could not get bytecode of contract: {}", e);
@@ -156,13 +143,13 @@ async fn get_rpc_providers(
                 key, priv_key_path
             )
         });
-        let wallet: LocalWallet = priv_key
+        let signer: PrivateKeySigner = priv_key
             .trim()
             .parse()
             .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()
-            .signer(EthereumSigner::from(wallet.clone()))
+            .wallet(EthereumWallet::from(signer.clone()))
             .on_http(rpc_url);
         let address = match &p.contract_address {
             Some(x) => parse_contract_address(x.as_str()),
@@ -177,7 +164,7 @@ async fn get_rpc_providers(
             contract_address: address,
             event_contract_address: event_address,
             provider,
-            wallet,
+            signer,
             provider_metrics: provider_metrics.clone(),
             transaction_timeout_secs: p.transaction_timeout_secs,
             transaction_gas_limit: p.transaction_gas_limit,
@@ -259,7 +246,7 @@ mod tests {
         // Send the transaction, the nonce (0) is automatically managed by the provider.
         let builder = provider.send_transaction(tx.clone()).await?;
         let node_hash = *builder.tx_hash();
-        let pending_tx = provider.get_transaction_by_hash(node_hash).await?;
+        let pending_tx = provider.get_transaction_by_hash(node_hash).await?.unwrap();
         assert_eq!(pending_tx.nonce, 0);
 
         println!("Transaction sent with nonce: {}", pending_tx.nonce);
@@ -283,7 +270,7 @@ mod tests {
         let providers = get_rpc_providers(&cfg, "test_get_wallet_success_").await;
 
         // Call the function
-        let wallet = &providers[network].lock().await.wallet;
+        let wallet = &providers[network].lock().await.signer;
 
         // Check if the wallet's address matches the expected address
         assert_eq!(wallet.address().to_string(), expected_wallet_address);

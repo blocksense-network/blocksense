@@ -1,8 +1,8 @@
 use crate::sequencer_state::SequencerState;
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
-    dyn_abi::DynSolValue, hex::FromHex, network::TransactionBuilder, primitives::Address,
-    primitives::Bytes, providers::Provider, rpc::types::eth::TransactionRequest,
+    dyn_abi::DynSolValue, hex::FromHex, network::TransactionBuilder, primitives::Bytes,
+    providers::Provider, rpc::types::eth::TransactionRequest,
 };
 use eyre::{eyre, Result};
 use std::collections::HashMap;
@@ -33,7 +33,7 @@ pub async fn deploy_contract(
     };
     drop(providers);
     let mut p = p.lock().await;
-    let wallet = &p.wallet;
+    let signer = &p.signer;
     let provider = &p.provider;
     let provider_metrics = &p.provider_metrics;
 
@@ -65,9 +65,7 @@ pub async fn deploy_contract(
         get_chain_id
     );
 
-    let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(Address::from_private_key(
-        wallet.signer(),
-    ))]);
+    let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
 
     let mut encoded_arg = message_value.abi_encode();
     bytecode.append(&mut encoded_arg);
@@ -75,7 +73,7 @@ pub async fn deploy_contract(
     let gas_limit = p.transaction_gas_limit;
 
     let tx = TransactionRequest::default()
-        .from(wallet.address())
+        .from(signer.address())
         .with_gas_limit(gas_limit as u128)
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
@@ -162,7 +160,7 @@ pub async fn eth_batch_send_to_contract<
     allow_list: Option<Vec<u32>>,
 ) -> Result<String> {
     let provider = provider.lock().await;
-    let wallet = &provider.wallet;
+    let signer = &provider.signer;
     let contract_address = if feed_type == Periodic {
         provider
             .contract_address
@@ -224,7 +222,7 @@ pub async fn eth_batch_send_to_contract<
 
     let tx = TransactionRequest::default()
         .to(contract_address)
-        .from(wallet.address())
+        .from(signer.address())
         .with_gas_limit(gas_limit as u128)
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(max_priority_fee_per_gas)

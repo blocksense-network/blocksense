@@ -41,7 +41,7 @@ async fn get_key_from_contract(
     drop(providers);
     let p = p.lock().await;
 
-    let wallet = &p.wallet;
+    let signer = &p.signer;
     let provider = &p.provider;
     let contract_address = &p.contract_address;
     let Some(addr) = contract_address else {
@@ -61,7 +61,7 @@ async fn get_key_from_contract(
         Bytes::from_hex(selector).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
     let tx = TransactionRequest::default()
         .to(*addr)
-        .from(wallet.address())
+        .from(signer.address())
         .with_gas_limit(75e5 as u128)
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(1e9 as u128)
