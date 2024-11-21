@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     fmt::{self, Display},
+    hash::{Hash, Hasher},
     time::{SystemTime, UNIX_EPOCH},
 };
 use thiserror::Error;
@@ -258,12 +259,36 @@ impl FeedType {
 }
 
 pub type Timestamp = u128;
+pub type FeedId = u32;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Asset {
     pub resources: HashMap<String, String>,
-    pub feed_id: u32,
+    pub feed_id: FeedId,
 }
+
+impl IntoIterator for Asset {
+    type Item = FeedId;
+    type IntoIter = std::option::IntoIter<FeedId>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Some(self.feed_id).into_iter()
+    }
+}
+
+impl Hash for Asset {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.feed_id.hash(state);
+    }
+}
+
+impl PartialEq for Asset {
+    fn eq(&self, other: &Self) -> bool {
+        self.feed_id == other.feed_id
+    }
+}
+
+impl Eq for Asset {}
 
 #[derive(Debug, Serialize)]
 pub struct Bytes32(pub [u8; 32]);
