@@ -41,6 +41,10 @@ export async function contractsFileStructureAsJSON(userConfig?: Config) {
     `${rootDir}/libs/ts/contracts/contracts`,
   );
   const tree = dirTree(contractsPath);
+  // Filter out test and experiments folders. Leave only production contracts.
+  tree.children = tree.children!.filter(
+    el => el.name !== 'test' && el.name !== 'experiments',
+  );
   const contractsFileStructure = constructFileTreeStructure(tree);
   const config = { ...defaults, ...userConfig };
   await writeArtifactFile(
