@@ -253,7 +253,7 @@ contract AggregatedDataFeedStore {
 
         } {
           let roundTableData := calldataload(pointer)
-          let indexLength := shr(248, roundTableData)
+          let indexLength := byte(0, roundTableData)
           let index := shr(
             sub(256, shl(3, indexLength)),
             shl(8, roundTableData)

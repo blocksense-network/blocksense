@@ -195,6 +195,26 @@ describe('AggregatedDataFeedStore', () => {
       }),
     ).to.be.reverted;
   });
+
+  it('Should revert if blockNumber same as previous block', async () => {
+    const blockNumber = 1;
+    const prefix = ethers.solidityPacked(
+      ['bytes1', 'uint64', 'uint32'],
+      ['0x00', blockNumber, 0],
+    );
+    const writeTx = await sequencer.sendTransaction({
+      to: contract.target,
+      data: prefix,
+    });
+    await writeTx.wait();
+
+    await expect(
+      sequencer.sendTransaction({
+        to: contract.target,
+        data: prefix,
+      }),
+    ).to.be.reverted;
+  });
 });
 
 const encodeDataWrite = (feeds: Feed[]) => {
