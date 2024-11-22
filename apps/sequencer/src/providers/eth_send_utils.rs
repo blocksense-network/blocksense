@@ -37,9 +37,6 @@ pub async fn deploy_contract(
     let provider = &p.provider;
     let provider_metrics = &p.provider_metrics;
 
-    // Get the base fee for the block.
-    let base_fee = provider.get_gas_price().await?;
-
     // Deploy the contract.
     let bytecode = if feed_type == Periodic {
         p.data_feed_store_byte_code.clone()
@@ -51,7 +48,7 @@ pub async fn deploy_contract(
         return Err(eyre!("Byte code unavailable"));
     };
 
-    let max_priority_fee_per_gas = process_provider_getter!(
+    let _max_priority_fee_per_gas = process_provider_getter!(
         provider.get_max_priority_fee_per_gas().await,
         network,
         provider_metrics,
@@ -69,8 +66,6 @@ pub async fn deploy_contract(
 
     let mut encoded_arg = message_value.abi_encode();
     bytecode.append(&mut encoded_arg);
-
-    let gas_limit = p.transaction_gas_limit;
 
     let tx = TransactionRequest::default()
         .from(signer.address())
@@ -174,7 +169,6 @@ pub async fn eth_batch_send_to_contract<
     );
 
     let provider_metrics = &provider.provider_metrics;
-    let gas_limit = provider.transaction_gas_limit;
     let provider = &provider.provider;
 
     let selector = "0x1a2d80ac";
@@ -201,7 +195,7 @@ pub async fn eth_batch_send_to_contract<
         .with_label_values(&[net.as_str()])
         .observe((base_fee as f64) / 1000000000.0);
 
-    let max_priority_fee_per_gas = process_provider_getter!(
+    let _max_priority_fee_per_gas = process_provider_getter!(
         provider.get_max_priority_fee_per_gas().await,
         net,
         provider_metrics,
@@ -214,8 +208,6 @@ pub async fn eth_batch_send_to_contract<
         provider_metrics,
         get_chain_id
     );
-
-    debug!("Batch send to network {net} with gas limit {gas_limit}");
 
     let tx = TransactionRequest::default()
         .to(contract_address)

@@ -52,8 +52,6 @@ async fn get_key_from_contract(
         addr, network
     );
 
-    let base_fee = provider.get_gas_price().await?;
-
     let mut selector = key;
     selector.replace_range(0..1, "8"); // 8 indicates we want to take the latest value.
                                        // key: 0x00000000
