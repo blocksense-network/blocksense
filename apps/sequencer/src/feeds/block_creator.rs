@@ -17,7 +17,7 @@ use tokio::sync::RwLock;
 // use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
-use tracing::{debug, error, info, info_span, warn};
+use tracing::{error, info, info_span, warn};
 use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::UpdateToSend;
@@ -241,16 +241,17 @@ async fn generate_block<
         }
     }
 
-    {
-        // Create the block that will contain the new feeds, deleted feeds and updates of feed values
+    if !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() {
+        // At this point we create new blocks only to register/deregister feeds.
+        // Create the block that will contain the new feeds, deleted feeds and in future - updates of feed values
         let mut blockchain_db = blockchain_db.write().await;
         let (header, feed_updates, add_remove_feeds) = blockchain_db.create_new_block(
             block_height,
-            &updates,
+            &HashMap::<String, String>::new(), // At this point we do not put the feed updates into the blocks.
             new_feeds_in_block,
             feeds_ids_to_delete_in_block,
         );
-        debug!(
+        info!(
             "Generated new block {:?} with hash {:?}",
             header,
             InMemDb::node_to_hash(InMemDb::calc_merkle_root(&mut header.clone()))
