@@ -109,33 +109,35 @@ impl FeedSlotsProcessor {
 
                     {
                         let current_time_as_ms = current_unix_time();
+                        let feed_id = self.key;
 
-                        debug!("Get a read lock on feed meta");
+                        debug!("Get a read lock on feed meta [feed {feed_id}]");
                         let slot = feed.read().await.get_slot(current_time_as_ms);
-                        debug!("Release the read lock on feed meta");
+                        debug!("Release the read lock on feed meta [feed {feed_id}]");
 
                         info!(
                             "Processing votes for {} with id {} for slot {} rep_interval {}.",
                             self.name, self.key, slot, report_interval_ms
                         );
 
-                        debug!("Get a read lock on all reports");
+                        debug!("Get a read lock on all reports [feed {feed_id}]");
                         let reports =
                             match reports.read().await.get(self.key) {
                                 Some(x) => x,
                                 None => {
                                     info!("No reports found!");
+                                    debug!("Release the read lock on all reports (continue) [feed {feed_id}]");
                                     continue;
                                 }
                             };
-                        debug!("Release the read lock on all reports");
+                        debug!("Release the read lock on all reports [feed {feed_id}]");
 
-                        debug!("found the following reports:");
-                        debug!("reports = {:?}", reports);
+                        debug!("found the following reports: [feed {feed_id}]");
+                        debug!("reports = {reports:?} [feed {feed_id}]");
 
-                        debug!("Get a write lock on reports for feed id {}", self.key);
+                        debug!("Get a write lock on reports [feed {feed_id}]");
                         let mut reports = reports.write().await;
-                        debug!("Acquired a write lock on reports for feed id {}", self.key);
+                        debug!("Acquired a write lock on reports [feed {feed_id}]");
                         // Process the reports:
                         let mut values: Vec<&FeedType> = vec![];
                         for kv in &reports.report {
@@ -169,13 +171,13 @@ impl FeedSlotsProcessor {
 
                         if values.is_empty() {
                             info!("No reports found for feed: {} slot: {}!", self.name, &slot);
-                            debug!("Release the write lock on reports for feed id {}", self.key);
+                            debug!("Release the write lock on reports [feed {feed_id}]");
                             continue;
                         }
 
-                        debug!("Get a read lock on all reporters");
+                        debug!("Get a read lock on all reporters [feed {feed_id}]");
                         let all_reporters_count = reporters.read().await.len();
-                        debug!("Release the read lock on all reports");
+                        debug!("Release the read lock on all reports [feed {feed_id}]");
 
                         let total_votes_count = values.len() as f32;
                         let required_votes_count = quorum_percentage * all_reporters_count as f32;
@@ -197,22 +199,22 @@ impl FeedSlotsProcessor {
                             }
                         }
 
-                        debug!("Get a read lock on feed meta to aggregate votes");
+                        debug!("Get a read lock on feed meta to aggregate votes [feed {feed_id}]");
                         // Dispatch to concrete FeedAggregate implementation.
                         result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(values);
-                        debug!("Release the read lock on feed meta to aggregate votes");
+                        debug!("Release the read lock on feed meta to aggregate votes [feed {feed_id}]");
 
                         // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
                         if !is_oneshot {
                             {
-                                debug!("Get a write lock on history");
+                                debug!("Get a write lock on history [feed {feed_id}]");
                                 let mut history_guard = history.write().await;
-                                debug!("Push result that will be posted to contract to history");
+                                debug!("Push result that will be posted to contract to history [feed {feed_id}]");
                                 history_guard.push(self.key, result_post_to_contract.clone());
-                                debug!("Release the write lock on history");
+                                debug!("Release the write lock on history [feed {feed_id}]");
                             }
 
-                            debug!("Get a read lock on history");
+                            debug!("Get a read lock on history [feed {feed_id}]");
                             let history_lock = history.read().await;
 
                             // The first slice is from the current read position to the end of the array
@@ -240,6 +242,9 @@ impl FeedSlotsProcessor {
                                 })
                                 .collect();
 
+                            drop(history_lock);
+                            debug!("Release the read lock on history [feed {feed_id}]");
+
                             // Get AD prediction only if enough data is present
                             if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
                                 match anomaly_detector_aggregate(numerical_vec) {
@@ -254,9 +259,9 @@ impl FeedSlotsProcessor {
                         }
 
                         info!("result_post_to_contract = {:?}", result_post_to_contract);
+
                         reports.clear();
-                        debug!("Release the read lock on history");
-                        debug!("Release the write lock on reports for feed id {}", self.key);
+                        debug!("Release the write lock on reports [feed {feed_id}]");
                     }
                     if is_quorum_reached {
                         result_send
