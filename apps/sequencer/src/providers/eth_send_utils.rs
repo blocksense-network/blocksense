@@ -74,7 +74,7 @@ pub async fn deploy_contract(
 
     let tx = TransactionRequest::default()
         .from(signer.address())
-        .with_gas_limit(gas_limit as u128)
+        .with_gas_limit(gas_limit as u64)
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
         .with_chain_id(chain_id)
@@ -223,7 +223,7 @@ pub async fn eth_batch_send_to_contract<
     let tx = TransactionRequest::default()
         .to(contract_address)
         .from(signer.address())
-        .with_gas_limit(gas_limit as u128)
+        .with_gas_limit(gas_limit as u64)
         .with_max_fee_per_gas(base_fee + base_fee)
         .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
         .with_chain_id(chain_id)

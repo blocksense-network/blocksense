@@ -5,7 +5,10 @@ use alloy::{
     network::{Ethereum, EthereumWallet},
     primitives::Address,
     providers::{
-        fillers::{ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, WalletFiller},
+        fillers::{
+            BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller,
+            WalletFiller,
+        },
         Identity, ProviderBuilder, RootProvider,
     },
     signers::local::PrivateKeySigner,
@@ -24,7 +27,10 @@ use tracing::{debug, error, info, warn};
 
 pub type ProviderType = FillProvider<
     JoinFill<
-        JoinFill<JoinFill<JoinFill<Identity, GasFiller>, NonceFiller>, ChainIdFiller>,
+        JoinFill<
+            Identity,
+            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
+        >,
         WalletFiller<EthereumWallet>,
     >,
     RootProvider<Http<Client>>,
@@ -203,7 +209,6 @@ async fn get_rpc_providers(
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use alloy::{
         network::TransactionBuilder, node_bindings::Anvil, primitives::U256,
@@ -213,6 +218,7 @@ mod tests {
     use utils::test_env::get_test_private_key_path;
 
     use crate::providers::provider::get_rpc_providers;
+    use alloy::consensus::Transaction;
     use alloy::providers::Provider as AlloyProvider;
     use config::get_test_config_with_single_provider;
 
@@ -237,7 +243,7 @@ mod tests {
             .with_to(bob)
             .with_value(U256::from(100))
             // Notice that without the `GasEstimatorLayer`, you need to set the gas related fields.
-            .with_gas_limit(21000_u128)
+            .with_gas_limit(21000_u64)
             .with_max_fee_per_gas(20e9 as u128)
             .with_max_priority_fee_per_gas(1e9 as u128)
             // It is required to set the chain_id for EIP-1559 transactions.
@@ -247,9 +253,9 @@ mod tests {
         let builder = provider.send_transaction(tx.clone()).await?;
         let node_hash = *builder.tx_hash();
         let pending_tx = provider.get_transaction_by_hash(node_hash).await?.unwrap();
-        assert_eq!(pending_tx.nonce, 0);
+        assert_eq!(pending_tx.nonce(), 0);
 
-        println!("Transaction sent with nonce: {}", pending_tx.nonce);
+        println!("Transaction sent with nonce: {}", pending_tx.nonce());
 
         // Send the transaction, the nonce (1) is automatically managed by the provider.
         let _builder = provider.send_transaction(tx).await?;
