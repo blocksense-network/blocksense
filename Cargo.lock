@@ -8758,6 +8758,7 @@ dependencies = [
  "actix-test",
  "actix-web",
  "alloy",
+ "alloy-primitives",
  "anomaly_detection",
  "async-channel 2.3.1",
  "bytes 1.8.0",

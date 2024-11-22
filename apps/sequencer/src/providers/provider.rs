@@ -214,6 +214,7 @@ mod tests {
         network::TransactionBuilder, node_bindings::Anvil, primitives::U256,
         rpc::types::eth::request::TransactionRequest,
     };
+    use alloy_primitives::address;
     use eyre::Result;
     use utils::test_env::get_test_private_key_path;
 
@@ -258,7 +259,13 @@ mod tests {
         println!("Transaction sent with nonce: {}", pending_tx.nonce());
 
         // Send the transaction, the nonce (1) is automatically managed by the provider.
-        let _builder = provider.send_transaction(tx).await?;
+        let tx = provider.send_transaction(tx).await?;
+
+        let receipt = tx.get_receipt().await.unwrap();
+
+        assert_eq!(receipt.effective_gas_price, 1_875_175_000);
+        assert_eq!(receipt.gas_used, 21000);
+
         Ok(())
     }
 
@@ -280,6 +287,29 @@ mod tests {
 
         // Check if the wallet's address matches the expected address
         assert_eq!(wallet.address().to_string(), expected_wallet_address);
+    }
+
+    // Copied from the alloy source code as an example.
+    #[tokio::test]
+    async fn no_gas_price_or_limit() {
+        let provider = ProviderBuilder::new()
+            .with_recommended_fillers()
+            .on_anvil_with_wallet();
+
+        // GasEstimationLayer requires chain_id to be set to handle EIP-1559 tx
+        let tx = TransactionRequest {
+            value: Some(U256::from(100)),
+            to: Some(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045").into()),
+            chain_id: Some(31337),
+            ..Default::default()
+        };
+
+        let tx = provider.send_transaction(tx).await.unwrap();
+
+        let receipt = tx.get_receipt().await.unwrap();
+
+        assert_eq!(receipt.effective_gas_price, 1_000_000_001);
+        assert_eq!(receipt.gas_used, 21000);
     }
 
     #[tokio::test]

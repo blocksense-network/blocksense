@@ -36,6 +36,8 @@ alloy = { version = "0.6", features = [
     "pubsub",
 ] }
 
+alloy-primitives = "0.8.12"
+
 prometheus = { path = "../../libs/prometheus" }
 
 reqwest = { version = "0.12", features = ["multipart", "blocking"] }
