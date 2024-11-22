@@ -74,9 +74,6 @@ pub async fn deploy_contract(
 
     let tx = TransactionRequest::default()
         .from(signer.address())
-        .with_gas_limit(gas_limit as u64)
-        .with_max_fee_per_gas(base_fee + base_fee)
-        .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
         .with_chain_id(chain_id)
         .with_deploy_code(bytecode);
 
@@ -223,9 +220,6 @@ pub async fn eth_batch_send_to_contract<
     let tx = TransactionRequest::default()
         .to(contract_address)
         .from(signer.address())
-        .with_gas_limit(gas_limit as u64)
-        .with_max_fee_per_gas(base_fee + base_fee)
-        .with_max_priority_fee_per_gas(max_priority_fee_per_gas)
         .with_chain_id(chain_id)
         .input(Some(input).into());
 
@@ -260,6 +254,11 @@ pub async fn eth_batch_send_to_contract<
         effective_gas_price,
         effective_gas_price_inc
     );
+
+    let tx_hash = receipt.transaction_hash;
+    let tx_fee = receipt.gas_used * receipt.effective_gas_price;
+    let tx_fee = (tx_fee as f64) / 1e9;
+    info!("Transaction with hash {tx_hash} on `{net}` cost {tx_fee} ETH");
 
     provider_metrics
         .read()
