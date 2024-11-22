@@ -4447,9 +4447,9 @@ dependencies = [
 
 [[package]]
 name = "hdbscan"
-version = "0.8.3"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3bda2db562337307b23eb2830e880d58efca878e16035d4b9c5ec0d1313fe0f8"
+checksum = "f780b68c332f0ddc933771cb6025e3433f16f9175f7eac64fc1b3753c916a4ca"
 dependencies = [
  "kdtree",
  "num-traits 0.2.19",
@@ -7436,9 +7436,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.91"
+version = "1.0.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "307e3004becf10f5a6e0d59d20f3cd28231b0e0827a96cd3e0ce6d14bc1e4bb3"
+checksum = "37d3544b3f2748c54e147655edb5025752e2303145b5aefb3c3ea2c78b973bb0"
 dependencies = [
  "unicode-ident",
 ]
