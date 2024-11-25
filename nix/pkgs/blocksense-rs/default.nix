@@ -2,7 +2,7 @@
   lib,
   craneLib,
   pkg-config,
-  libusb,
+  libusb1,
   git,
   openssl,
   libgcc,
@@ -25,7 +25,7 @@ let
     ];
 
     buildInputs = [
-      libusb
+      libusb1
       openssl
       zstd
     ] ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
