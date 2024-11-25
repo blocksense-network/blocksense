@@ -13,6 +13,8 @@ in
   services.blocksense = {
     enable = true;
 
+    logsDir = config.devenv.root + "/logs/blocksense";
+
     anvil = {
       a = {
         port = 8546;

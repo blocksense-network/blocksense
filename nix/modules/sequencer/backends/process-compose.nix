@@ -10,6 +10,18 @@ let
 
   inherit (self'.apps) sequencer reporter;
 
+  logsConfig = {
+    fields_order = [
+      "time"
+      "level"
+      "message"
+    ];
+    no_metadata = true;
+    disable_json = true;
+    add_timestamp = true;
+    flush_each_line = true;
+  };
+
   sequencerConfigJSON = pkgs.runCommandLocal "sequencer_config" { } ''
     mkdir -p $out
     echo '${cfg._sequencer-config-txt}' \
@@ -40,6 +52,8 @@ let
           '';
           timeout_seconds = 30;
         };
+        log_configuration = logsConfig;
+        log_location = cfg.logsDir + "/anvil-${name}.log";
       };
     }
   ) cfg.anvil;
@@ -69,6 +83,8 @@ let
           smartContractsBuild.condition = "process_completed_successfully";
           "anvil-${name}".condition = "process_healthy";
         };
+        log_configuration = logsConfig;
+        log_location = cfg.logsDir + "/smart-contracts-deploy-${name}.log";
       };
     }
   ) cfg.anvil;
@@ -84,6 +100,8 @@ let
       ];
       depends_on.blocksense-sequencer.condition = "process_started";
       shutdown.signal = 9;
+      log_configuration = logsConfig;
+      log_location = cfg.logsDir + "/reporter-${name}.log";
     };
   }) cfg.reporters;
 
@@ -100,6 +118,8 @@ let
         "smartContract-a".condition = "process_completed_successfully";
         "smartContract-b".condition = "process_completed_successfully";
       };
+      log_configuration = logsConfig;
+      log_location = cfg.logsDir + "/sequencer.log";
     };
   };
 in

@@ -62,6 +62,12 @@
               Enable the Blocksense sequencer and reporter node services.
             '');
 
+            logsDir = mkOption {
+              type = types.nullOr types.path;
+              default = null;
+              description = mdDoc "The directory to store the logs.";
+            };
+
             package = mkOption {
               type = types.package;
               default = pkgs.erigon;
