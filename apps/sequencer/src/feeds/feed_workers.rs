@@ -1,3 +1,4 @@
+use crate::blocks_reader::blocks_reader_loop;
 use crate::feeds::block_creator::block_creator_loop;
 use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
@@ -40,9 +41,11 @@ pub async fn prepare_app_workers(
     )
     .await;
 
-    let votes_sender = votes_result_sender_loop(batched_votes_recv, sequencer_state).await;
+    let votes_sender = votes_result_sender_loop(batched_votes_recv, sequencer_state.clone()).await;
 
     let metrics_collector = metrics_collector_loop().await;
+
+    let blocks_reader = blocks_reader_loop(sequencer_state).await;
 
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();
@@ -50,6 +53,7 @@ pub async fn prepare_app_workers(
     collected_futures.push(block_creator);
     collected_futures.push(votes_sender);
     collected_futures.push(metrics_collector);
+    collected_futures.push(blocks_reader);
 
     collected_futures
 }

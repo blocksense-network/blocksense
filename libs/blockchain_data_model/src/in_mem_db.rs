@@ -57,6 +57,7 @@ impl InMemDb {
 
     pub fn create_new_block(
         &self,
+        sequencer_id: u64,
         new_block_height: u64,
         new_feeds_in_block: Vec<BlockFeedConfig>,
         feed_ids_to_delete_in_block: Vec<u32>,
@@ -94,6 +95,7 @@ impl InMemDb {
         let latest_height = self.get_latest_block_height();
         block_header.timestamp = current_unix_time() as u64;
         block_header.block_height = new_block_height;
+        block_header.issuer_id = sequencer_id;
         add_remove_feeds.block_height = new_block_height;
         if latest_height == 0 {
             block_header.prev_block_hash = GENESIS_HASH;

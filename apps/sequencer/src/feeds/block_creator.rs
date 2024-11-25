@@ -19,7 +19,7 @@ use std::io::Error;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
-use tracing::{debug, error, info, info_span, warn};
+use tracing::{debug, error, info, warn};
 use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::sequencer_state::SequencerState;
@@ -37,8 +37,6 @@ pub async fn block_creator_loop<
     block_config: BlockConfig,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     spawn(async move {
-        let span = info_span!("VotesResultBatcher");
-        let _guard = span.enter();
         let mut max_feed_updates_to_batch = block_config.max_feed_updates_to_batch;
         let block_generation_period = block_config.block_generation_period;
 
@@ -205,6 +203,8 @@ fn feed_config_to_block(feed_config: &config::FeedConfig) -> BlockFeedConfig {
         resources: convert_resources(&feed_config.resources),
         quorum_percentage: f32_to_u8_array(feed_config.quorum_percentage),
         script: string_to_data_chunk(&feed_config.script),
+        value_type: string_to_data_chunk(&feed_config.value_type),
+        aggregate_type: string_to_data_chunk(&feed_config.aggregate_type),
     }
 }
 
@@ -220,6 +220,8 @@ async fn generate_block<
     feed_manager_cmds_send: &UnboundedSender<FeedsManagementCmds>,
     block_height: u64,
 ) {
+    let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
+
     let mut new_feeds_in_block = Vec::new();
     for cmd in &new_feeds_to_register {
         match cmd {
@@ -252,6 +254,7 @@ async fn generate_block<
         // Create the block that will contain the new feeds, deleted feeds and updates of feed values
         let mut blockchain_db = sequencer_state.blockchain_db.write().await;
         let (header, add_remove_feeds) = blockchain_db.create_new_block(
+            sequencer_id,
             block_height,
             new_feeds_in_block,
             feeds_ids_to_delete_in_block,

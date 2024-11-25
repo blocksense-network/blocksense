@@ -211,6 +211,7 @@ pub struct KafkaReportEndpoint {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct SequencerConfig {
+    pub sequencer_id: u64,
     pub main_port: u16,
     pub admin_port: u16,
     pub prometheus_port: u16,
@@ -289,6 +290,7 @@ pub fn get_test_config_with_single_provider(
     url: &str,
 ) -> SequencerConfig {
     SequencerConfig {
+        sequencer_id: 1,
         main_port: 8877,
         admin_port: 5556,
         prometheus_port: 5555,
@@ -346,6 +348,7 @@ pub fn get_test_config_with_multiple_providers(
     }
 
     SequencerConfig {
+        sequencer_id: 1,
         main_port: 8877,
         admin_port: 5556,
         prometheus_port: 5555,

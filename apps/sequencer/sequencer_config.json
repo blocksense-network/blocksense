@@ -1,4 +1,5 @@
 {
+  "sequencer_id": 1,
   "main_port": 8877,
   "admin_port": 5556,
   "prometheus_port": 5555,
