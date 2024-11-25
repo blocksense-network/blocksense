@@ -57,8 +57,8 @@ pub async fn prepare_sequencer_state(
     feeds_config: AllFeedsConfig,
     metrics_prefix: Option<&str>,
 ) -> (
-    UnboundedReceiver<(String, String)>,
-    UnboundedReceiver<FeedsManagementCmds>,
+    UnboundedReceiver<(String, String)>,    // voting_receive_channel
+    UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
     Data<SequencerState>,
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();

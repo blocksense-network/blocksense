@@ -31,7 +31,10 @@ pub struct BlockFeedConfig {
     pub first_report_start_time: u64,
     pub resources: Resources,
     pub quorum_percentage: [u8; 4], // The percentage of votes needed to aggregate and post result to contract.
+    pub skip_publish_if_less_then_percentage: [u8; 4],
     pub script: DataChunk,
+    pub value_type: DataChunk,
+    pub aggregate_type: DataChunk,
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
@@ -45,28 +48,37 @@ pub type FeedUpdatesInBlock = [FeedUpdatesChunk; 16];
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct BlockHeader {
-    block_height: u64,
-    timestamp: u64,
-    prev_block_hash: HashType,
-    add_remove_feeds_merkle_root: HashType,
+    pub issuer_id: u64,
+    pub block_height: u64,
+    pub timestamp: u64,
+    pub prev_block_hash: HashType,
+    pub add_remove_feeds_merkle_root: HashType,
 }
 
 impl BlockHeader {
     pub fn serialize(&mut self) -> Vec<u8> {
         ssz_rs::serialize(self).expect("Serialization of BlockHeader failed")
     }
+
+    pub fn deserialize(serialized: &[u8]) -> BlockHeader {
+        ssz_rs::deserialize(serialized).expect("Serialization of BlockHeader failed")
+    }
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct FeedActions {
-    block_height: u64,
-    new_feeds: [Option<BlockFeedConfig>; MAX_NEW_FEEDS_IN_BLOCK],
-    feed_ids_to_rm: [Option<u32>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
+    pub block_height: u64,
+    pub new_feeds: [Option<BlockFeedConfig>; MAX_NEW_FEEDS_IN_BLOCK],
+    pub feed_ids_to_rm: [Option<u32>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
 }
 
 impl FeedActions {
     pub fn serialize(&mut self) -> Vec<u8> {
         ssz_rs::serialize(self).expect("Serialization of AddRemoveFeeds failed")
+    }
+
+    pub fn deserialize(serialized: &[u8]) -> FeedActions {
+        ssz_rs::deserialize(serialized).expect("Serialization of AddRemoveFeeds failed")
     }
 }
 

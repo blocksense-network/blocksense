@@ -251,7 +251,12 @@ fn feed_config_to_block(feed_config: &config::FeedConfig) -> BlockFeedConfig {
         first_report_start_time: system_time_to_u64(feed_config.first_report_start_time),
         resources: convert_resources(&feed_config.resources),
         quorum_percentage: f32_to_u8_array(feed_config.quorum_percentage),
+        skip_publish_if_less_then_percentage: f32_to_u8_array(
+            feed_config.skip_publish_if_less_then_percentage,
+        ),
         script: string_to_data_chunk(&feed_config.script),
+        value_type: string_to_data_chunk(&feed_config.value_type),
+        aggregate_type: string_to_data_chunk(&feed_config.aggregate_type),
     }
 }
 
@@ -267,6 +272,7 @@ async fn generate_block<
     feed_manager_cmds_send: &UnboundedSender<FeedsManagementCmds>,
     block_height: u64,
 ) -> eyre::Result<()> {
+    let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
     let new_feeds_to_register = mem::take(new_feeds_to_register);
     let feeds_ids_to_delete = mem::take(feeds_ids_to_delete);
     let updates = mem::take(updates);
@@ -290,6 +296,7 @@ async fn generate_block<
         let mut blockchain_db = sequencer_state.blockchain_db.write().await;
         let (header, add_remove_feeds) = blockchain_db
             .create_new_block(
+                sequencer_id,
                 block_height,
                 new_feeds_in_block,
                 feeds_ids_to_delete_in_block,
@@ -341,7 +348,7 @@ async fn generate_block<
     if !block_is_empty {
         let block_to_kafka = json!({
             "BlockHeader": hex::encode(serialized_header),
-            "AddRemoveFeeds": hex::encode(serialized_add_remove_feeds),
+            "FeedActions": hex::encode(serialized_add_remove_feeds),
         });
 
         if let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint {
