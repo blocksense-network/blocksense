@@ -19,7 +19,10 @@
   '';
 
   packages =
-    [ self'.legacyPackages.rustToolchain ]
+    [
+      self'.legacyPackages.cargoWrapped
+      self'.legacyPackages.rustToolchain
+    ]
     ++ (with pkgs; [
       openssl
       pkg-config
