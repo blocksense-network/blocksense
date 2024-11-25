@@ -16,6 +16,8 @@ extendConfig(config => {
 });
 
 task('reflect', async (_, hre) => {
+  console.log('Starting sol-reflector...');
+
   await hre.run('clean');
   await hre.run('compile');
 
