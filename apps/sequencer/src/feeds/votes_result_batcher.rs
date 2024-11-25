@@ -1,4 +1,3 @@
-use actix_web::rt::spawn;
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::Repeatability;
 use std::collections::HashMap;
@@ -7,7 +6,7 @@ use std::io::Error;
 // use std::sync::{Arc, RwLock};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
-use tracing::{debug, error, info, info_span, trace};
+use tracing::{debug, error, info, info_span};
 use utils::time::current_unix_time;
 
 pub async fn votes_result_batcher_loop<
@@ -19,66 +18,72 @@ pub async fn votes_result_batcher_loop<
     max_keys_to_batch: usize,
     timeout_duration: u64,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
-    spawn(async move {
-        let span = info_span!("VotesResultBatcher");
-        let _guard = span.enter();
-        info!("max_keys_to_batch set to {}", max_keys_to_batch);
-        info!("timeout_duration set to {}", timeout_duration);
+    tokio::task::Builder::new()
+        .name("votes_result_batcher")
+        .spawn_local(async move {
+            let span = info_span!("VotesResultBatcher");
+            let _guard = span.enter();
+            info!("max_keys_to_batch set to {}", max_keys_to_batch);
+            info!("timeout_duration set to {}", timeout_duration);
 
-        let mut stt =
-            SlotTimeTracker::new(Duration::from_millis(timeout_duration), current_unix_time());
+            let mut stt = SlotTimeTracker::new(
+                "votes_result_batcher".to_string(),
+                Duration::from_millis(timeout_duration),
+                current_unix_time(),
+            );
 
-        loop {
-            let mut updates: HashMap<K, V> = Default::default();
-            let mut send_to_contract = false;
-            while !send_to_contract {
-                let end_of_voting_slot_ms: i128 =
-                    stt.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
-                // Cannot await negative amount of milliseconds; Turn negative to zero;
-                let time_to_await_ms: u64 = if end_of_voting_slot_ms > 0 {
-                    end_of_voting_slot_ms as u64
-                } else {
-                    0
-                };
-                let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
-                debug!("Slot waiting for {time_to_await:?} to pass...");
-                let var: Result<Option<(K, V)>, tokio::time::error::Elapsed> =
-                    actix_web::rt::time::timeout(time_to_await, vote_recv.recv()).await;
-                debug!("Slot woke up");
-                match var {
-                    Ok(Some((key, val))) => {
-                        info!(
-                            "adding {} => {} to updates",
-                            key.to_string(),
-                            val.to_string()
-                        );
-                        updates.insert(key, val);
-                        send_to_contract = updates.keys().len() >= max_keys_to_batch;
-                    }
-                    Ok(None) => {
-                        trace!("Woke up on empty channel. Flushing batched updates.");
-                        send_to_contract = true;
-                    }
-                    Err(err) => {
-                        trace!(
-                            "Woke up due to: {}. Flushing batched updates",
-                            err.to_string()
-                        );
-                        send_to_contract = true;
-                    }
-                };
-            }
-            if updates.keys().len() > 0 {
-                if let Err(e) = batched_votes_send.send(updates) {
-                    error!(
-                        "Channel for propagating batched updates to sender failed: {}",
-                        e.to_string()
-                    );
+            loop {
+                let mut updates: HashMap<K, V> = Default::default();
+                let mut send_to_contract = false;
+                while !send_to_contract {
+                    let end_of_voting_slot_ms: i128 =
+                        stt.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
+                    // Cannot await negative amount of milliseconds; Turn negative to zero;
+                    let time_to_await_ms: u64 = if end_of_voting_slot_ms > 0 {
+                        end_of_voting_slot_ms as u64
+                    } else {
+                        0
+                    };
+                    let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
+                    debug!("Slot waiting for {time_to_await:?} to pass...");
+                    let var: Result<Option<(K, V)>, tokio::time::error::Elapsed> =
+                        actix_web::rt::time::timeout(time_to_await, vote_recv.recv()).await;
+                    debug!("Slot woke up");
+                    match var {
+                        Ok(Some((key, val))) => {
+                            info!(
+                                "adding {} => {} to updates",
+                                key.to_string(),
+                                val.to_string()
+                            );
+                            updates.insert(key, val);
+                            send_to_contract = updates.keys().len() >= max_keys_to_batch;
+                        }
+                        Ok(None) => {
+                            debug!("Woke up on empty channel. Flushing batched updates.");
+                            send_to_contract = true;
+                        }
+                        Err(err) => {
+                            debug!(
+                                "Woke up due to: {}. Flushing batched updates",
+                                err.to_string()
+                            );
+                            send_to_contract = true;
+                        }
+                    };
                 }
+                if updates.keys().len() > 0 {
+                    if let Err(e) = batched_votes_send.send(updates) {
+                        error!(
+                            "Channel for propagating batched updates to sender failed: {}",
+                            e.to_string()
+                        );
+                    }
+                }
+                stt.reset_report_start_time();
             }
-            stt.reset_report_start_time();
-        }
-    })
+        })
+        .expect("Failed to spawn votes result batcher!")
 }
 
 #[cfg(test)]

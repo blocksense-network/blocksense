@@ -1,6 +1,5 @@
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::sequencer_state::SequencerState;
-use actix_web::rt::spawn;
 use actix_web::web;
 use config::FeedConfig;
 use eyre::Result;
@@ -41,88 +40,100 @@ pub async fn feeds_slots_manager_loop(
     sequencer_state: web::Data<SequencerState>,
     cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
-    spawn(async move {
-        let mut collected_futures = FuturesUnordered::new();
+    tokio::task::Builder::new()
+        .name("feeds_slots_manager")
+        .spawn_local(async move {
+            let mut collected_futures = FuturesUnordered::new();
 
-        let reg = sequencer_state.registry.read().await;
+            let reg = sequencer_state.registry.read().await;
 
-        let keys = reg.get_keys();
+            let keys = reg.get_keys();
 
-        for key in keys {
-            debug!("key = {} : value = {:?}", key, reg.get(key));
+            for key in keys {
+                debug!("key = {} : value = {:?}", key, reg.get(key));
 
-            sequencer_state
-                .feed_aggregate_history
-                .write()
-                .await
-                .register_feed(key, 10_000); //TODO(snikolov): How to avoid borrow?
-
-            let feed = match reg.get(key) {
-                Some(x) => x,
-                None => panic!("Error timer for feed that was not registered."),
-            };
-
-            let name = feed.read().await.get_name().clone();
-            let feed_aggregate_history_cp = sequencer_state.feed_aggregate_history.clone();
-            let feed_metrics_cp = sequencer_state.feeds_metrics.clone();
-
-            let feed_slots_processor = FeedSlotsProcessor::new(name, key);
-
-            let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
-
-            feed.write().await.set_processor_cmd_chan(cmd_send);
-
-            let sequencer_state = sequencer_state.clone();
-            collected_futures.push(spawn(async move {
-                feed_slots_processor
-                    .start_loop(
-                        sequencer_state,
-                        feed,
-                        feed_aggregate_history_cp,
-                        Some(feed_metrics_cp),
-                        cmd_recv,
-                        None,
-                    )
+                sequencer_state
+                    .feed_aggregate_history
+                    .write()
                     .await
-            }));
-        }
+                    .register_feed(key, 10_000); //TODO(snikolov): How to avoid borrow?
 
-        collected_futures.push(spawn(async move {
-            read_next_feed_slots_manager_cmd(cmd_channel).await
-        }));
+                let feed = match reg.get(key) {
+                    Some(x) => x,
+                    None => panic!("Error timer for feed that was not registered."),
+                };
 
-        drop(reg);
+                let name = feed.read().await.get_name().clone();
+                let feed_aggregate_history_cp = sequencer_state.feed_aggregate_history.clone();
+                let feed_metrics_cp = sequencer_state.feeds_metrics.clone();
 
-        loop {
-            select! {
-                future_result = collected_futures.select_next_some() => {
-                    let res = match future_result {
-                        Ok(res) => res,
-                        Err(e) => {
-                            // We panic here, because this is a serious error.
-                            panic!("JoinError: {e}");
-                        },
-                    };
+                let feed_slots_processor = FeedSlotsProcessor::new(name, key);
 
-                    let processor_result_val = match res {
-                        Ok(processor_result_val) => processor_result_val,
-                        Err(e) => {
-                            // We error here, to support the task returning errors.
-                            error!("Task terminated with error: {}", e.to_string());
-                            continue;
-                        }
-                    };
+                let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
-                    handle_feed_slots_processor_result(
-                        sequencer_state.clone(),
-                        &collected_futures,
-                        processor_result_val).await;
-                },
-                complete => break,
+                feed.write().await.set_processor_cmd_chan(cmd_send);
+
+                let sequencer_state = sequencer_state.clone();
+                collected_futures.push(
+                    tokio::task::Builder::new()
+                        .name(format!("feed_processor_{key}").as_str())
+                        .spawn_local(async move {
+                            feed_slots_processor
+                                .start_loop(
+                                    sequencer_state,
+                                    key,
+                                    feed,
+                                    feed_aggregate_history_cp,
+                                    Some(feed_metrics_cp),
+                                    cmd_recv,
+                                    None,
+                                )
+                                .await
+                        })
+                        .expect("Failed to spawn processor for feed {key}!"),
+                );
             }
-        }
-        Ok(())
-    })
+
+            collected_futures.push(
+                tokio::task::Builder::new()
+                    .name("fsm_command_watcher")
+                    .spawn_local(async move { read_next_feed_slots_manager_cmd(cmd_channel).await })
+                    .expect("Failed to spawn feed slots manager command watcher!"),
+            );
+
+            drop(reg);
+
+            loop {
+                select! {
+                    future_result = collected_futures.select_next_some() => {
+                        let res = match future_result {
+                            Ok(res) => res,
+                            Err(e) => {
+                                // We panic here, because this is a serious error.
+                                panic!("JoinError: {e}");
+                            },
+                        };
+
+                        let processor_result_val = match res {
+                            Ok(processor_result_val) => processor_result_val,
+                            Err(e) => {
+                                // We error here, to support the task returning errors.
+                                error!("Task terminated with error: {}", e.to_string());
+                                continue;
+                            }
+                        };
+
+                        handle_feed_slots_processor_result(
+                            sequencer_state.clone(),
+                            &collected_futures,
+                            processor_result_val).await;
+                    },
+                    complete => break,
+                }
+            }
+            Ok(())
+        })
+        .expect("Failed to spawn feed slots manager!")
 }
 
 async fn handle_feed_slots_processor_result(
@@ -175,20 +186,30 @@ async fn handle_feeds_slots_manager_cmd(
                     }
 
                     let sequencer_state = sequencer_state.clone();
-                    collected_futures.push(spawn(async move {
-                        let feed_aggregate_history = sequencer_state.feed_aggregate_history.clone();
-                        let feeds_metrics = sequencer_state.feeds_metrics.clone();
-                        feed_slots_processor
-                            .start_loop(
-                                sequencer_state,
-                                registered_feed_metadata,
-                                feed_aggregate_history,
-                                Some(feeds_metrics),
-                                cmd_recv,
-                                None,
-                            )
-                            .await
-                    }));
+                    let processor_future = tokio::task::Builder::new()
+                        .name(format!("dynamic_feed_processor_{new_id}").as_str())
+                        .spawn_local(async move {
+                            let feed_aggregate_history =
+                                sequencer_state.feed_aggregate_history.clone();
+                            let feeds_metrics = sequencer_state.feeds_metrics.clone();
+                            feed_slots_processor
+                                .start_loop(
+                                    sequencer_state,
+                                    new_id,
+                                    registered_feed_metadata,
+                                    feed_aggregate_history,
+                                    Some(feeds_metrics),
+                                    cmd_recv,
+                                    None,
+                                )
+                                .await
+                        });
+                    match processor_future {
+                        Ok(processor_future) => collected_futures.push(processor_future),
+                        Err(err) => error!(
+                            "Failed to spawn dynamic processor for feed {new_id} due to {err}"
+                        ),
+                    };
                     info!("Registering feed id {new_id} complete!");
                 }
                 Err(e) => {
@@ -235,9 +256,15 @@ async fn handle_feeds_slots_manager_cmd(
         }
     };
     //Register reader task again once the command is processed
-    collected_futures.push(spawn(async move {
-        read_next_feed_slots_manager_cmd(cmd_channel).await
-    }));
+    let command_watcher = tokio::task::Builder::new()
+        .name("restarted_fsm_command_watcher")
+        .spawn_local(async move { read_next_feed_slots_manager_cmd(cmd_channel).await });
+    match command_watcher {
+        Ok(command_watcher) => collected_futures.push(command_watcher),
+        Err(err) => {
+            error!("Failed to spawn restarted feed slots manager command watcher due to {err}")
+        }
+    };
 }
 
 async fn register_asset_feed(
@@ -327,6 +354,7 @@ async fn read_next_feed_slots_manager_cmd(
     mut cmd_channel: mpsc::UnboundedReceiver<FeedsSlotsManagerCmds>,
 ) -> Result<ProcessorResultValue> {
     loop {
+        debug!("Waiting for command...");
         let cmd = cmd_channel.recv().await;
         if let Some(cmd) = cmd {
             return Ok(ProcessorResultValue::FeedsSlotsManagerCmds(

@@ -22,7 +22,6 @@ use utils::logging::{
     SharedLoggingHandle,
 };
 
-use actix_web::rt::spawn;
 use actix_web::web::Data;
 use config::{get_sequencer_and_feed_configs, AllFeedsConfig, SequencerConfig};
 use prometheus::metrics::FeedsMetrics;
@@ -32,6 +31,7 @@ use sequencer::http_handlers::admin::metrics;
 use std::env;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
+use tracing::info;
 
 use utils::build_info::{
     BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
@@ -55,10 +55,15 @@ pub async fn prepare_sequencer_state(
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();
 
-    tokio::spawn(async move {
-        tokio::signal::ctrl_c().await.unwrap();
-        std::process::exit(0);
-    });
+    tokio::task::Builder::new()
+        .name("interrupt_watcher")
+        .spawn_local(async move {
+            info!("Watching for Ctrl-C...");
+            tokio::signal::ctrl_c().await.unwrap();
+            info!("Ctrl-C detected; terminating...");
+            std::process::exit(0);
+        })
+        .expect("Failed to spawn interrupt watcher!");
 
     let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
@@ -103,43 +108,51 @@ pub async fn prepare_http_servers(
     JoinHandle<std::io::Result<()>>,
 ) {
     let main_sequencer_state: Data<SequencerState> = sequencer_state.clone();
-    let main_http_server_fut: JoinHandle<std::io::Result<()>> = spawn(async move {
-        HttpServer::new(move || {
-            App::new()
-                .app_data(main_sequencer_state.clone())
-                .service(post_report)
-                .service(post_reports_batch)
+    let main_http_server_fut: JoinHandle<std::io::Result<()>> = tokio::task::Builder::new()
+        .name("main_http_server")
+        .spawn_local(async move {
+            info!("Starting main HTTP server on port {sequencer_config_main_port}...");
+            HttpServer::new(move || {
+                App::new()
+                    .app_data(main_sequencer_state.clone())
+                    .service(post_report)
+                    .service(post_reports_batch)
+            })
+            .bind(("0.0.0.0", sequencer_config_main_port))
+            .expect("Main HTTP server could not bind to port.")
+            .run()
+            .await
         })
-        .bind(("0.0.0.0", sequencer_config_main_port))
-        .expect("Main HTTP server could not bind to port.")
-        .run()
-        .await
-    });
+        .expect("Failed to spawn main HTTP server!");
 
     let admin_sequencer_state: Data<SequencerState> = sequencer_state.clone();
-    let admin_http_server_fut: JoinHandle<std::io::Result<()>> = spawn(async move {
-        HttpServer::new(move || {
-            App::new()
-                .app_data(admin_sequencer_state.clone())
-                .service(get_key)
-                .service(deploy)
-                .service(set_log_level)
-                .service(get_feed_report_interval)
-                .service(register_feed)
-                .service(get_feeds_config)
-                .service(get_feed_config)
-                .service(get_sequencer_config)
-                .service(register_asset_feed)
-                .service(delete_asset_feed)
-                .service(disable_provider)
-                .service(enable_provider)
+    let admin_http_server_fut: JoinHandle<std::io::Result<()>> = tokio::task::Builder::new()
+        .name("admin_http_server")
+        .spawn_local(async move {
+            info!("Starting admin HTTP server on port {admin_port}...");
+            HttpServer::new(move || {
+                App::new()
+                    .app_data(admin_sequencer_state.clone())
+                    .service(get_key)
+                    .service(deploy)
+                    .service(set_log_level)
+                    .service(get_feed_report_interval)
+                    .service(register_feed)
+                    .service(get_feeds_config)
+                    .service(get_feed_config)
+                    .service(get_sequencer_config)
+                    .service(register_asset_feed)
+                    .service(delete_asset_feed)
+                    .service(disable_provider)
+                    .service(enable_provider)
+            })
+            .workers(1)
+            .bind(("0.0.0.0", admin_port))
+            .expect("Admin HTTP server could not bind to port.")
+            .run()
+            .await
         })
-        .workers(1)
-        .bind(("0.0.0.0", admin_port))
-        .expect("Admin HTTP server could not bind to port.")
-        .run()
-        .await
-    });
+        .expect("Failed to spawn admin HTTP server!");
 
     (main_http_server_fut, admin_http_server_fut)
 }
@@ -232,14 +245,19 @@ async fn main() -> std::io::Result<()> {
     collected_futures.push(admin_http_server_fut);
 
     if start_metrics_server {
-        let prometheus_http_server_fut = spawn(async move {
-            HttpServer::new(move || App::new().service(metrics))
-                .workers(1)
-                .bind(("0.0.0.0", sequencer_config.prometheus_port))
-                .expect("Prometheus HTTP server could not bind to port.")
-                .run()
-                .await
-        });
+        let prometheus_http_server_fut = tokio::task::Builder::new()
+            .name("prometheus_http_server")
+            .spawn_local(async move {
+                let port = sequencer_config.prometheus_port;
+                info!("Starting prometheus HTTP server on port {port}...");
+                HttpServer::new(move || App::new().service(metrics))
+                    .workers(1)
+                    .bind(("0.0.0.0", port))
+                    .expect("Prometheus HTTP server could not bind to port.")
+                    .run()
+                    .await
+            })
+            .expect("Failed to spawn prometheus server!");
         collected_futures.push(prometheus_http_server_fut);
     }
 

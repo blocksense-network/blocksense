@@ -8,7 +8,7 @@ use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use config::AllFeedsConfig;
 use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
 use tokio::{sync::RwLock, time};
-use tracing::{info, trace};
+use tracing::{debug, info};
 use utils::time::current_unix_time;
 
 /// Map representing feed_id -> FeedMetaData
@@ -198,13 +198,15 @@ impl AllFeedsReports {
 }
 
 pub struct SlotTimeTracker {
+    name: String,
     slot_interval: Duration,
     start_time_ms: u128,
 }
 
 impl SlotTimeTracker {
-    pub fn new(slot_interval: Duration, start_time_ms: u128) -> SlotTimeTracker {
+    pub fn new(name: String, slot_interval: Duration, start_time_ms: u128) -> SlotTimeTracker {
         SlotTimeTracker {
+            name,
             slot_interval,
             start_time_ms,
         }
@@ -241,16 +243,30 @@ impl SlotTimeTracker {
         let current_slot_end_time = current_slot_start_time + self.slot_interval.as_millis();
         let result_ms = current_slot_end_time as i128 - current_time_as_ms as i128;
 
-        trace!("current_time_as_ms      = {}", current_time_as_ms);
-        trace!("slots_count             = {}", slot_number);
-        trace!("current_slot_start_time = {}", current_slot_start_time);
-        trace!("current_slot_end_time   = {}", current_slot_end_time);
-        trace!(
-            "uncorrected sleep time  = {}",
+        debug!(
+            "[stt_name={}] current_time_as_ms      = {}",
+            self.name, current_time_as_ms
+        );
+        debug!(
+            "[stt_name={}] slots_count             = {}",
+            self.name, slot_number
+        );
+        debug!(
+            "[stt_name={}] current_slot_start_time = {}",
+            self.name, current_slot_start_time
+        );
+        debug!(
+            "[stt_name={}] current_slot_end_time   = {}",
+            self.name, current_slot_end_time
+        );
+        debug!(
+            "[stt_name={}] uncorrected sleep time  = {}",
+            self.name,
             current_time_as_ms + self.slot_interval.as_millis()
         );
-        trace!(
-            "diff                    = {}",
+        debug!(
+            "[stt_name={}] diff                    = {}",
+            self.name,
             current_time_as_ms + self.slot_interval.as_millis() - current_slot_end_time
         );
 
@@ -635,7 +651,11 @@ mod tests {
         // setup
         const SLOT_INTERVAL: Duration = Duration::from_secs(1);
         const START_TIME_MS: u128 = 0;
-        let time_tracker = SlotTimeTracker::new(SLOT_INTERVAL, START_TIME_MS);
+        let time_tracker = SlotTimeTracker::new(
+            "test_await_end_of_current_slot".to_string(),
+            SLOT_INTERVAL,
+            START_TIME_MS,
+        );
 
         // run
         let start_time = Instant::now();
@@ -658,7 +678,11 @@ mod tests {
         // setup
         const SLOT_INTERVAL: Duration = Duration::from_secs(1);
         const START_TIME_MS: u128 = 0;
-        let mut time_tracker = SlotTimeTracker::new(SLOT_INTERVAL, START_TIME_MS);
+        let mut time_tracker = SlotTimeTracker::new(
+            "test_get_duration_until_end_of_current_slot_periodic".to_string(),
+            SLOT_INTERVAL,
+            START_TIME_MS,
+        );
 
         // run
         let duration_ms =
@@ -681,7 +705,11 @@ mod tests {
         // setup
         let slot_interval: Duration = Duration::from_secs(3);
         let start_time_ms: u128 = current_unix_time() + 6000;
-        let time_tracker = SlotTimeTracker::new(slot_interval, start_time_ms);
+        let time_tracker = SlotTimeTracker::new(
+            "test_get_duration_until_end_of_current_slot_oneshot".to_string(),
+            slot_interval,
+            start_time_ms,
+        );
 
         // run
         let duration_ms =

@@ -45,9 +45,11 @@ impl FeedSlotsProcessor {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn start_loop(
         &self,
         sequencer_state: Data<SequencerState>,
+        feed_id: u32,
         feed: Arc<RwLock<FeedMetaData>>,
         history: Arc<RwLock<FeedAggregateHistory>>,
         feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
@@ -70,6 +72,7 @@ impl FeedSlotsProcessor {
         };
 
         let feed_slots_time_tracker = SlotTimeTracker::new(
+            format!("feed_processor_{feed_id}"),
             Duration::from_millis(report_interval_ms),
             first_report_start_time,
         );
@@ -360,6 +363,7 @@ mod tests {
             feed_slots_processor
                 .start_loop(
                     sequencer_state,
+                    feed_id,
                     feed_metadata_arc_clone,
                     history,
                     None,
@@ -467,6 +471,7 @@ mod tests {
             feed_slots_processor
                 .start_loop(
                     sequencer_state,
+                    feed_id,
                     feed_metadata_arc_clone,
                     feed_aggregate_history,
                     None,

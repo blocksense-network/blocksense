@@ -13,7 +13,7 @@ use feed_registry::types::ReportRelevance;
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
-use tracing::{debug, info, info_span, trace, warn};
+use tracing::{debug, error, info, info_span, trace, warn};
 use uuid::Uuid;
 
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
@@ -408,19 +408,24 @@ pub async fn register_feed(
     let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
     let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
-    actix_web::rt::spawn(async move {
-        feed_slots_processor
-            .start_loop(
-                sequencer_state,
-                registered_feed_metadata,
-                feed_aggregate_history,
-                None,
-                cmd_recv,
-                Some(cmd_send),
-            )
-            .await
-    });
-
+    if let Err(err) = tokio::task::Builder::new()
+        .name(format!("manual_feed_processor_{feed_id}").as_str())
+        .spawn_local(async move {
+            feed_slots_processor
+                .start_loop(
+                    sequencer_state,
+                    feed_id,
+                    registered_feed_metadata,
+                    feed_aggregate_history,
+                    None,
+                    cmd_recv,
+                    Some(cmd_send),
+                )
+                .await
+        })
+    {
+        error!("Failed to spawn manual processor for feed {feed_id} due to {err}!");
+    }
     // STEP 4 - Prep response
     let response = RegisterFeedResponse {
         feed_id: feed_id.to_string(),
