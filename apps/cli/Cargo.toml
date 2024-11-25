@@ -24,7 +24,7 @@ toml = "0.8.13"
 toml_edit = "0.22.22"
 tracing = { version = "0.1.40" , features=["log"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-url = "2.5.0"
+url = "2.5.4"
 
 blocksense-registry = { path = "../../libs/registry" }
 utils = { path = "../../libs/utils"}
