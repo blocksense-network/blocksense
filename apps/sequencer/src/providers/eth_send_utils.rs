@@ -1,8 +1,12 @@
-use crate::sequencer_state::SequencerState;
+use crate::{providers::provider::parse_eth_address, sequencer_state::SequencerState};
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
-    dyn_abi::DynSolValue, hex::FromHex, network::TransactionBuilder, primitives::Bytes,
-    providers::Provider, rpc::types::eth::TransactionRequest,
+    dyn_abi::DynSolValue,
+    hex::FromHex,
+    network::TransactionBuilder,
+    primitives::Bytes,
+    providers::{Provider, ProviderBuilder},
+    rpc::types::eth::TransactionRequest,
 };
 use eyre::{eyre, Result};
 use std::collections::HashMap;
@@ -150,6 +154,7 @@ pub async fn eth_batch_send_to_contract<
     updates: HashMap<K, V>,
     feed_type: Repeatability,
     allow_list: Option<Vec<u32>>,
+    impersonated_anvil_account: Option<String>,
 ) -> Result<String> {
     let provider = provider.lock().await;
     let signer = &provider.signer;
@@ -209,20 +214,40 @@ pub async fn eth_batch_send_to_contract<
         get_chain_id
     );
 
+    let (sender_address, is_impersonated) = match impersonated_anvil_account {
+        Some(impersonated_anvil_account) => {
+            debug!(
+                "Using impersonated anvil account with address: {}",
+                impersonated_anvil_account
+            );
+            (
+                parse_eth_address(&impersonated_anvil_account).unwrap(),
+                true,
+            )
+        }
+        None => {
+            debug!("Using signer address: {}", signer.address());
+            (signer.address(), false)
+        }
+    };
+
     let tx = TransactionRequest::default()
         .to(contract_address)
-        .from(signer.address())
+        .from(sender_address)
         .with_chain_id(chain_id)
         .input(Some(input).into());
 
     let tx_time = Instant::now();
 
-    let receipt_future = process_provider_getter!(
-        provider.send_transaction(tx).await,
-        net,
-        provider_metrics,
-        send_tx
-    );
+    let tx_result = if is_impersonated {
+        let rpc_url = provider.client().transport().url().parse()?;
+        let provider = ProviderBuilder::new().on_http(rpc_url);
+        provider.send_transaction(tx).await
+    } else {
+        provider.send_transaction(tx).await
+    };
+
+    let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
 
     let receipt = process_provider_getter!(
         receipt_future.get_receipt().await,
@@ -293,6 +318,7 @@ pub async fn eth_batch_send_to_all_contracts<
                 info!("Network `{net}` is enabled; reporting...");
             }
             let allow_feeds = provider_settings.allow_feeds.clone();
+            let impersonated_anvil_account = provider_settings.impersonated_anvil_account.clone();
             collected_futures.push(spawn(async move {
                 let result = actix_web::rt::time::timeout(
                     Duration::from_secs(timeout),
@@ -302,6 +328,7 @@ pub async fn eth_batch_send_to_all_contracts<
                         updates,
                         feed_type,
                         allow_feeds,
+                        impersonated_anvil_account,
                     ),
                 )
                 .await;
@@ -494,6 +521,7 @@ mod tests {
             provider.clone(),
             updates_oneshot,
             Oneshot,
+            None,
             None,
         )
         .await;
