@@ -771,11 +771,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1732493136,
-        "narHash": "sha256-Sy+usq5fIJb9wm/tfBIsqvfKSqfIK5R6LCqqC73Ii6Q=",
+        "lastModified": 1732600555,
+        "narHash": "sha256-0dQKTAaeYlb7CjDgn0wTYnwOEsTSeb3FX1y8vtU7a5k=",
         "owner": "metacraft-labs",
         "repo": "nix-blockchain-development",
-        "rev": "0bb6e3b7ebf61689c945c1d099a504de29d52ad0",
+        "rev": "3c64504cde76da531f7c882373e054594eb29dbf",
         "type": "github"
       },
       "original": {
@@ -976,16 +976,16 @@
     },
     "nixos-2411": {
       "locked": {
-        "lastModified": 1731755305,
-        "narHash": "sha256-v5P3dk5JdiT+4x69ZaB18B8+Rcu3TIOrcdG4uEX7WZ8=",
+        "lastModified": 1732493954,
+        "narHash": "sha256-sRq0GxKiKFkoPfa7h23UgVFaHNMOq7T7xykzLdjo5Go=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "057f63b6dc1a2c67301286152eb5af20747a9cb4",
+        "rev": "7c57e4c3e26c247f93791a9aafbd89260e661504",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "nixos-24.11",
+        "ref": "staging-next-24.11",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -1099,11 +1099,11 @@
         "vscode-server": "vscode-server"
       },
       "locked": {
-        "lastModified": 1732430952,
-        "narHash": "sha256-SvjEzP4eT6U4vOmeGjj98oqW14i2v4gzz0Lm8XGTMyo=",
+        "lastModified": 1732563039,
+        "narHash": "sha256-Q2ubsgss/PTWfPBvU8JD4nbmp60OmKOioAtsk3NLNj4=",
         "owner": "metacraft-labs",
         "repo": "nixos-modules",
-        "rev": "4d5ee91c5950441d14f7c5910498d505ae1e0771",
+        "rev": "beb84f2aa1ff159e050ac4e6b076f34a3a2b3fd6",
         "type": "github"
       },
       "original": {
