@@ -745,6 +745,7 @@ mod tests {
                 data_feed_sports_byte_code: None,
                 is_enabled: true,
                 allow_feeds: None,
+                impersonated_anvil_account: None,
             },
         );
         drop(sequencer_config);
@@ -801,6 +802,7 @@ mod tests {
                 data_feed_sports_byte_code: None,
                 is_enabled: false,
                 allow_feeds: None,
+                impersonated_anvil_account: None,
             },
         );
         drop(sequencer_config);

@@ -38,7 +38,7 @@ pub type ProviderType = FillProvider<
     Ethereum,
 >;
 
-pub fn parse_contract_address(addr: &str) -> Option<Address> {
+pub fn parse_eth_address(addr: &str) -> Option<Address> {
     let contract_address: Option<Address> = addr.parse().ok();
     contract_address
 }
@@ -54,6 +54,7 @@ pub struct RpcProvider {
     pub transaction_gas_limit: u32,
     pub data_feed_store_byte_code: Option<Vec<u8>>,
     pub data_feed_sports_byte_code: Option<Vec<u8>>,
+    pub impersonated_anvil_account: Option<Address>,
 }
 
 pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
@@ -83,7 +84,7 @@ async fn verify_contract_exists(
     rpc_provider: Arc<Mutex<RpcProvider>>,
 ) {
     if let Some(addr_str) = address {
-        if let Some(addr) = parse_contract_address(addr_str.as_str()) {
+        if let Some(addr) = parse_eth_address(addr_str.as_str()) {
             info!(
                 "Contract address for network {} set to {}. Checking if contract exists ...",
                 key, addr
@@ -158,11 +159,15 @@ async fn get_rpc_providers(
             .wallet(EthereumWallet::from(signer.clone()))
             .on_http(rpc_url);
         let address = match &p.contract_address {
-            Some(x) => parse_contract_address(x.as_str()),
+            Some(x) => parse_eth_address(x.as_str()),
             None => None,
         };
         let event_address = match &p.event_contract_address {
-            Some(x) => parse_contract_address(x.as_str()),
+            Some(x) => parse_eth_address(x.as_str()),
+            None => None,
+        };
+        let impersonated_anvil_account = match &p.impersonated_anvil_account {
+            Some(x) => parse_eth_address(x.as_str()),
             None => None,
         };
 
@@ -182,6 +187,7 @@ async fn get_rpc_providers(
                 hex::decode(byte_code.clone())
                     .expect("data_feed_sports_byte_code for provider is not valid hex string!")
             }),
+            impersonated_anvil_account,
         }));
 
         providers.insert(key.clone(), rpc_provider.clone());
