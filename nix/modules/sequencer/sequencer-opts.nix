@@ -45,6 +45,13 @@ let
           type = types.str;
           description = mdDoc "The Historical Data Feed contract address.";
         };
+
+        impersonated_anvil_account = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = mdDoc "The account to impersonate for the provider.";
+        };
+
       };
     };
 in
