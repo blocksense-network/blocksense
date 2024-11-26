@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   # Function to read and parse the JSON file
   readJson = path: builtins.fromJSON (builtins.readFile path);
@@ -6,8 +6,13 @@ let
   testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
   deploymentFilePath = config.devenv.root + "/config/evm_contracts_deployment_v1.json";
 
-  upgradeableProxyContractAddress =
-    (readJson deploymentFilePath)."local".contracts.coreContracts.UpgradeableProxy.address;
+  upgradeableProxyContractAddressSepolia =
+    (readJson deploymentFilePath)."ethereum-sepolia".contracts.coreContracts.UpgradeableProxy.address;
+  upgradeableProxyContractAddressHolesky =
+    (readJson deploymentFilePath)."ethereum-holesky".contracts.coreContracts.UpgradeableProxy.address;
+
+  impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
+
 in
 {
   services.blocksense = {
@@ -20,31 +25,11 @@ in
         port = 8546;
         chain-id = 99999999999;
         fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
-        contract-deployment = {
-          enable = true;
-          deployer = {
-            private-key.file = "${testKeysDir}/deployer-private-key";
-          };
-          sequencer = {
-            address.file = "${testKeysDir}/sequencer-address";
-            private-key.file = "${testKeysDir}/sequencer-private-key";
-          };
-        };
       };
       b = {
         port = 8547;
         chain-id = 99999999999;
         fork-url = "wss://ethereum-holesky-rpc.publicnode.com";
-        contract-deployment = {
-          enable = true;
-          deployer = {
-            private-key.file = "${testKeysDir}/deployer-private-key";
-          };
-          sequencer = {
-            address.file = "${testKeysDir}/sequencer-address";
-            private-key.file = "${testKeysDir}/sequencer-private-key";
-          };
-        };
       };
     };
 
@@ -52,7 +37,7 @@ in
       main-port = 9856;
       admin-port = 5553;
       metrics-port = 5551;
-      max-keys-to-batch = 1;
+      max-keys-to-batch = 300;
       keys-batch-duration = 500;
 
       providers = {
@@ -62,11 +47,12 @@ in
           # In a production environment, use a secret manager like Agenix, to
           # prevent secrets from being copyed to the Nix Store.
           private_key_path = "${testKeysDir}/sequencer-private-key";
-          contract_address = upgradeableProxyContractAddress;
+          contract_address = upgradeableProxyContractAddressSepolia;
+          impersonated_anvil_account = impersonationAddress;
         };
         b = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
-          contract_address = upgradeableProxyContractAddress;
+          contract_address = upgradeableProxyContractAddressHolesky;
           transaction_gas_limit = 20000000;
           allow_feeds = [
             31 # BTC/USD
@@ -75,6 +61,7 @@ in
             131 # USDC/USD
             43 # WBTC/USD
           ];
+          impersonated_anvil_account = impersonationAddress;
         };
       };
 

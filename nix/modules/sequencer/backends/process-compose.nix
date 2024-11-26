@@ -58,36 +58,17 @@ let
     }
   ) cfg.anvil;
 
-  smartContractsBuildInstance = {
-    smartContractsBuild.process-compose = {
-      command = "yarn && yarn build @blocksense/contracts";
+  anvilImpersonateAndFundInstances = lib.mapAttrs' (name: provider: {
+    name = "anvil-impersonate-and-fund-${name}";
+    value.process-compose = {
+      command = "cast rpc --rpc-url ${toString provider.url} anvil_impersonateAccount ${toString provider.impersonated_anvil_account} && \
+        cast send --rpc-url ${toString provider.url} ${toString provider.impersonated_anvil_account} --value 1000ether --from 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f --unlocked";
       shutdown.signal = 9;
-    };
-  };
-
-  smartContractDeploymentInstances = lib.mapAttrs' (
-    name:
-    { port, contract-deployment, ... }:
-    {
-      name = "smartContract-${name}";
-      value.process-compose = lib.mkIf contract-deployment.enable {
-        command = ''
-          yarn workspace '@blocksense/contracts' hardhat deploy --networks local
-        '';
-        environment = [
-          "RPC_URL_LOCAL=http://127.0.0.1:${toString port}/"
-          "SEQUENCER_ADDRESS=0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
-          "SIGNER_PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-        ];
-        depends_on = {
-          smartContractsBuild.condition = "process_completed_successfully";
-          "anvil-${name}".condition = "process_healthy";
-        };
-        log_configuration = logsConfig;
-        log_location = cfg.logsDir + "/smart-contracts-deploy-${name}.log";
+      depends_on = {
+        "anvil-${name}".condition = "process_healthy";
       };
-    }
-  ) cfg.anvil;
+    };
+  }) cfg.sequencer.providers;
 
   reporterInstances = lib.mapAttrs' (name: conf: {
     name = "blocksense-reporter-${name}";
@@ -115,8 +96,8 @@ let
       ];
       shutdown.signal = 9;
       depends_on = {
-        "smartContract-a".condition = "process_completed_successfully";
-        "smartContract-b".condition = "process_completed_successfully";
+        "anvil-impersonate-and-fund-a".condition = "process_completed_successfully";
+        "anvil-impersonate-and-fund-b".condition = "process_completed_successfully";
       };
       log_configuration = logsConfig;
       log_location = cfg.logsDir + "/sequencer.log";
@@ -126,10 +107,6 @@ in
 {
   config = lib.mkIf cfg.enable {
     processes =
-      sequencerInstance
-      // anvilInstances
-      // smartContractsBuildInstance
-      // smartContractDeploymentInstances
-      // reporterInstances;
+      anvilImpersonateAndFundInstances // sequencerInstance // anvilInstances // reporterInstances;
   };
 }

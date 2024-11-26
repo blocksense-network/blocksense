@@ -45,12 +45,6 @@ in
       description = "The fork URL to use for the Anvil instance.";
     };
 
-    contract-deployment = {
-      enable = mkEnableOption "Enable deployment of Blocksense contracts on Anvil simulation environment.";
-      deployer = walletOpts;
-      sequencer = walletOpts;
-    };
-
     _command = mkOption {
       type = types.str;
       default =
@@ -58,6 +52,7 @@ in
           ${config.package}/bin/anvil \
             --port ${toString config.port} \
             --chain-id ${toString config.chain-id} \
+            --auto-impersonate \
         ''
         + lib.optionalString (config.fork-url != null) ''
           --fork-url ${config.fork-url}
