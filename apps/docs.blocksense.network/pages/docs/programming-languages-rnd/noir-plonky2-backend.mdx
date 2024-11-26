@@ -58,23 +58,55 @@ A simple programming language to write ZK programs, with fast-to-generate, distr
   As mentioned, the PLONKY2 Noir backend is still under active development and is **not** stable! Expect to find bugs and limitations!
 </Callout>
 
-We're now ready to create our first proof! Issue a:
+We're now ready to create our first proof!
 
-```bash
-nargo new my_program
-```
+1. Create a new project:
 
-Navigate to the folder and create the proof:
+    ```bash
+    nargo new my_program
+    ```
 
-```bash
-cd my_program
-nargo prove
-```
+2. Navigate to the folder:
 
-Congratulations 🎉, you've made your first proof! Now we can verify it:
+    ```bash
+    cd my_program
+    ```
 
-```bash
-nargo verify
-```
+3. Update `src/main.nr` with your favorite text editor to:
 
-You are now ready to write Noir programs and prove them! Head over to [noir-lang.org](https://noir-lang.org/) and start learning about the language.
+    ```rust
+    fn main(x: pub u32, y: u32) {
+        assert(x % y == 0);
+    }
+    ```
+
+    This program takes a public `x` and a secret `y`, then checks whether `x` is divisible by `y`.
+
+4. Run a small check to generate what you need:
+
+    ```bash
+    nargo check
+    ```
+
+5. We're almost there, change `Prover.toml` to:
+
+    ```toml
+    x = "10"
+    y = "5"
+    ```
+
+6. Finally, we're ready to start proving:
+
+    ```bash
+    nargo prove
+    ```
+
+    Congratulations 🎉, you've made your first proof! Now we can verify it:
+
+    ```bash
+    nargo verify
+    ```
+
+You've now successfully written and proven a Noir program! Feel free to play around, for example, if you change `y` to `6` in `Prover.toml`, you'll get a prove error.
+
+Once you're done, head over to [noir-lang.org](https://noir-lang.org/) and start learning about the language.
