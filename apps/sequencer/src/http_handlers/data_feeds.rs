@@ -413,10 +413,9 @@ pub async fn register_feed(
         .spawn_local(async move {
             feed_slots_processor
                 .start_loop(
-                    sequencer_state,
-                    feed_id,
-                    registered_feed_metadata,
-                    feed_aggregate_history,
+                    &sequencer_state,
+                    &registered_feed_metadata,
+                    &feed_aggregate_history,
                     None,
                     cmd_recv,
                     Some(cmd_send),

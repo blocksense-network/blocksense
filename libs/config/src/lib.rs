@@ -74,9 +74,27 @@ pub struct FeedConfig {
     #[serde(deserialize_with = "deserialize_resources_as_string")]
     pub resources: HashMap<String, String>, // TODO(snikolov): Find best way to handle various types of resource data
     pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
+    #[serde(default = "min_deviation_percentage_default")]
+    pub min_deviation_percentage: f32, // The percentage of value change needed to trigger publishing on blockchain ahear of timewindow end
+    #[serde(default = "skip_publish_if_less_then_percentage_default")]
+    pub skip_publish_if_less_then_percentage: f32,
+    #[serde(default = "period_to_check_for_diviation_ms_default")]
+    pub period_to_check_for_diviation_ms: u64,
     pub script: String,
     pub value_type: String,
     pub aggregate_type: String,
+}
+
+fn min_deviation_percentage_default() -> f32 {
+    0.0
+}
+
+fn skip_publish_if_less_then_percentage_default() -> f32 {
+    0.0
+}
+
+fn period_to_check_for_diviation_ms_default() -> u64 {
+    0
 }
 
 impl FeedConfig {
@@ -87,6 +105,8 @@ impl FeedConfig {
 
 impl Validated for FeedConfig {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
+        let min_percentage = 0.0;
+        let max_percentage = 1.0;
         if self.report_interval_ms == 0 {
             anyhow::bail!(
                 "{}: report_interval_ms for feed {} with id {} cannot be set to 0",
@@ -95,13 +115,33 @@ impl Validated for FeedConfig {
                 self.id
             );
         }
-        if self.quorum_percentage < 0.0 || self.quorum_percentage > 1.0 {
+        if self.quorum_percentage < min_percentage || self.quorum_percentage > max_percentage {
             anyhow::bail!(
-                "{}: quorum_percentage for feed {} with id {} must be between 0.0 and 1.0",
+                "{}: quorum_percentage for feed {} with id {} must be between {min_percentage} and {max_percentage}",
                 context,
                 self.name,
                 self.id
             );
+        }
+        if self.min_deviation_percentage < min_percentage
+            || self.min_deviation_percentage > max_percentage
+        {
+            anyhow::bail!(
+                "{}: min_deviation_percentage for feed {} with id {} must be between {min_percentage} and {max_percentage}",
+                context,
+                self.name,
+                self.id
+            );
+        }
+        if self.skip_publish_if_less_then_percentage < min_percentage
+            || self.skip_publish_if_less_then_percentage > max_percentage
+        {
+            anyhow::bail!(
+            "{}: skip_publish_if_less_then_percentage for feed {} with id {} must be between {min_percentage} and {max_percentage}",
+            context,
+            self.name,
+            self.id
+        );
         }
         Ok(())
     }

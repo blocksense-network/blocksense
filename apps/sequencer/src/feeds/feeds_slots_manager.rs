@@ -80,10 +80,9 @@ pub async fn feeds_slots_manager_loop(
                         .spawn_local(async move {
                             feed_slots_processor
                                 .start_loop(
-                                    sequencer_state,
-                                    key,
-                                    feed,
-                                    feed_aggregate_history_cp,
+                                    &sequencer_state,
+                                    &feed,
+                                    &feed_aggregate_history_cp,
                                     Some(feed_metrics_cp),
                                     cmd_recv,
                                     None,
@@ -194,10 +193,9 @@ async fn handle_feeds_slots_manager_cmd(
                             let feeds_metrics = sequencer_state.feeds_metrics.clone();
                             feed_slots_processor
                                 .start_loop(
-                                    sequencer_state,
-                                    new_id,
-                                    registered_feed_metadata,
-                                    feed_aggregate_history,
+                                    &sequencer_state,
+                                    &registered_feed_metadata,
+                                    &feed_aggregate_history,
                                     Some(feeds_metrics),
                                     cmd_recv,
                                     None,
@@ -290,6 +288,9 @@ async fn register_asset_feed(
             &new_name,
             new_feed_config.report_interval_ms,
             new_feed_config.quorum_percentage,
+            new_feed_config.min_deviation_percentage,
+            new_feed_config.skip_publish_if_less_then_percentage,
+            new_feed_config.period_to_check_for_diviation_ms,
             new_feed_config.first_report_start_time,
             new_feed_config.value_type.clone(),
             new_feed_config.aggregate_type.clone(),

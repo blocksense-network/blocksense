@@ -35,7 +35,10 @@ pub struct FeedMetaData {
     name: String,
     voting_repeatability: Repeatability,
     pub report_interval_ms: u64, // Consider oneshot feeds.
-    quorum_percentage: f32,
+    pub quorum_percentage: f32,
+    pub min_deviation_percentage: f32,
+    pub skip_publish_if_less_then_percentage: f32,
+    pub period_to_check_for_diviation_ms: u64,
     first_report_start_time: SystemTime,
     feed_aggregator: Box<dyn FeedAggregate>,
     pub value_type: String,
@@ -50,11 +53,17 @@ impl FeedMetaData {
         quorum_percentage: f32,
         first_report_start_time: SystemTime,
     ) -> FeedMetaData {
+        let min_deviation_percentage = 0.0f32;
+        let skip_publish_if_less_then_percentage = 0.0f32;
+        let period_to_check_for_diviation_ms = 0;
         FeedMetaData {
             name,
             voting_repeatability: Repeatability::Oneshot,
             report_interval_ms,
             quorum_percentage,
+            min_deviation_percentage,
+            skip_publish_if_less_then_percentage,
+            period_to_check_for_diviation_ms,
             first_report_start_time,
             feed_aggregator: Box::new(MajorityVoteAggregator {}),
             value_type: "Text".to_string(),
@@ -63,10 +72,14 @@ impl FeedMetaData {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         name: &str,
         report_interval_ms: u64, // Consider oneshot feeds.
         quorum_percentage: f32,
+        min_deviation_percentage: f32,
+        skip_publish_if_less_then_percentage: f32,
+        period_to_check_for_diviation_ms: u64,
         first_report_start_time: SystemTime,
         value_type: String,
         aggregate_type: String,
@@ -77,6 +90,9 @@ impl FeedMetaData {
             voting_repeatability: Repeatability::Periodic,
             report_interval_ms,
             quorum_percentage,
+            min_deviation_percentage,
+            skip_publish_if_less_then_percentage,
+            period_to_check_for_diviation_ms,
             first_report_start_time,
             feed_aggregator: get_aggregator(aggregate_type.as_str()), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
             value_type,
@@ -95,8 +111,17 @@ impl FeedMetaData {
     pub fn get_report_interval_ms(&self) -> u64 {
         self.report_interval_ms
     }
+    pub fn get_peridic_diviation_check_ms(&self) -> u64 {
+        self.period_to_check_for_diviation_ms
+    }
     pub fn get_quorum_percentage(&self) -> f32 {
         self.quorum_percentage
+    }
+    pub fn get_skip_publish_if_less_then_percentage(&self) -> f32 {
+        self.skip_publish_if_less_then_percentage
+    }
+    pub fn get_min_deviation_percentage(&self) -> f32 {
+        self.min_deviation_percentage
     }
     pub fn get_first_report_start_time_ms(&self) -> u128 {
         let since_the_epoch = self

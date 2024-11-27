@@ -49,11 +49,16 @@ impl FeedMetaDataRegistry {
 
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let start = SystemTime::now();
-
+    let min_diviation_percentage = 1.0f32;
+    let skip_publish_if_less_then_percentage = 0.0f32;
+    let period_to_check_for_diviation_ms = 0;
     let fmd1 = FeedMetaData::new(
         "DOGE/USD",
         60000,
         0.6,
+        min_diviation_percentage,
+        skip_publish_if_less_then_percentage,
+        period_to_check_for_diviation_ms,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -63,6 +68,9 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         "BTS/USD",
         30000,
         0.6,
+        min_diviation_percentage,
+        skip_publish_if_less_then_percentage,
+        period_to_check_for_diviation_ms,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -72,6 +80,9 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         "ETH/USD",
         60000,
         0.6,
+        min_diviation_percentage,
+        skip_publish_if_less_then_percentage,
+        period_to_check_for_diviation_ms,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -97,6 +108,9 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
                 &feed.name,
                 feed.report_interval_ms,
                 feed.quorum_percentage,
+                feed.min_deviation_percentage,
+                feed.skip_publish_if_less_then_percentage,
+                feed.period_to_check_for_diviation_ms,
                 feed.first_report_start_time,
                 feed.value_type.clone(),
                 feed.aggregate_type.clone(),
@@ -163,8 +177,8 @@ impl FeedAggregateHistory {
         }
     }
 
-    pub fn last(&mut self, feed_id: u32) -> Option<&FeedType> {
-        if let Some(rb) = self.aggregate_history.get_mut(&feed_id) {
+    pub fn last(&self, feed_id: u32) -> Option<&FeedType> {
+        if let Some(rb) = self.aggregate_history.get(&feed_id) {
             rb.last()
         } else {
             info!(
@@ -312,6 +326,8 @@ mod tests {
     use tokio::sync::RwLock;
 
     const QUORUM_PERCENTAGE: f32 = 0.001;
+    const MIN_DEVIATION_PERCENTAGE: f32 = 0.05f32;
+    const SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE: f32 = 0.01f32;
 
     #[tokio::test]
     async fn basic_test() {
@@ -547,10 +563,14 @@ mod tests {
             QUORUM_PERCENTAGE,
             voting_start_time,
         );
+        let period_to_check_for_diviation_ms = 0u64;
         let regular_feed = FeedMetaData::new(
             "TestFeed",
             voting_wait_duration_ms,
             QUORUM_PERCENTAGE,
+            MIN_DEVIATION_PERCENTAGE,
+            SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE,
+            period_to_check_for_diviation_ms,
             current_system_time,
             "Numeric".to_string(),
             "Average".to_string(),
