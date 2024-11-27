@@ -15,7 +15,11 @@ import {
   UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
 } from '../utils/wrappers';
-import { HistoricalDataFeedStoreV2, UpgradeableProxy } from '../../typechain';
+import {
+  HistoricalDataFeedStoreV2,
+  OnlySequencersGuard,
+  UpgradeableProxy,
+} from '../../typechain';
 import { parseEthereumAddress } from '@blocksense/base-utils';
 import Safe, {
   SafeAccountConfig,
@@ -119,7 +123,7 @@ describe('UpgradeableProxy', function () {
             '0x1d31F259eE307358a26dFb23EB365939E8641195',
           ),
         },
-        threshold: 1,
+        threshold: 7,
       };
 
       const safeVersion = '1.4.1';
@@ -163,6 +167,34 @@ describe('UpgradeableProxy', function () {
         historical.target,
         await admin.getAddress(),
       );
+
+      // Only Sequencer Guard
+
+      const guard = await deployContract<OnlySequencersGuard>(
+        'OnlySequencersGuard',
+        multisigAddress,
+      );
+
+      await guard.connect(wallet).setSequencer(wallet.address, true);
+
+      const tx = await multisig.createEnableGuardTx(guard.target.toString());
+      let safeTransaction = tx; //await multisig.signTransaction(safeTx);
+      const safeAddress = await multisig.getAddress();
+
+      for (const owner of ownerAddresses) {
+        const apiKit = await Safe.init({
+          provider: config.rpc,
+          safeAddress: safeAddress,
+          signer: owner,
+          contractNetworks: {
+            [config.network.chainId.toString()]: config.safeAddresses,
+          },
+        });
+        safeTransaction = await apiKit.signTransaction(safeTransaction);
+      }
+
+      const txResponse = await multisig.executeTransaction(safeTransaction);
+      await (txResponse.transactionResponse as any).wait();
     });
 
     const i = 10;
@@ -201,10 +233,11 @@ describe('UpgradeableProxy', function () {
       });
       console.log('Tx created');
 
-      let safeTransaction = await multisig.signTransaction(safeTx);
+      let safeTransaction = safeTx; //await multisig.signTransaction(safeTx);
       const safeAddress = await multisig.getAddress();
 
-      for (const owner of ownerAddresses.slice(2)) {
+      // sign with other owners
+      for (const owner of ownerAddresses.slice(0)) {
         const apiKit = await Safe.init({
           provider: config.rpc,
           safeAddress: safeAddress,
@@ -218,6 +251,19 @@ describe('UpgradeableProxy', function () {
 
       console.log('\nProposing transaction...');
 
+      // sign with a non-sequencer (`wallet` is considered a sequencer)
+      // const apiKit = await Safe.init({
+      //   provider: config.rpc,
+      //   safeAddress: safeAddress,
+      //   signer:
+      //     '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e',
+      //   contractNetworks: {
+      //     [config.network.chainId.toString()]: config.safeAddresses,
+      //   },
+      // });
+
+      // the signer executing the transaction doesn't need to sign it
+      // their signature is counted from msg.sender
       const txResponse = await multisig.executeTransaction(safeTransaction);
 
       // transactionResponse is of unknown type and there is no type def in the specs
