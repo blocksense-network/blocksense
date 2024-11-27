@@ -1,5 +1,6 @@
 use std::{error::Error, fs::File, path::Path};
 
+use anyhow::Context;
 use csv::ReaderBuilder;
 
 use crate::{extended_isolation_forest::make_f64_forest, hdbscan_detector::make_f64_hdbscan};
@@ -32,7 +33,9 @@ pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error
     const DIM: usize = 1; // Dimensionality of data
 
     let values_array: Vec<[f64; DIM]> = values.iter().map(|&x| [x]).collect();
-    let last_value = *values_array.last().unwrap();
+    let last_value = *values_array
+        .last()
+        .context("Not enough values for anomaly detection")?;
 
     let forest = make_f64_forest::<DIM>(values_array)?;
 
@@ -40,7 +43,8 @@ pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error
 
     let values_array = values.iter().map(|&x| vec![x]).collect();
 
-    let detector_result = make_f64_hdbscan(values_array).unwrap();
+    let detector_result =
+        make_f64_hdbscan(values_array).context("hdbscan error during anomaly detection")?;
 
     let hdbscan_result = f64::from(*detector_result.last().unwrap() == -1_i32);
 
