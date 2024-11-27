@@ -76,7 +76,7 @@ pub async fn create_sequencer_state_from_sequencer_config_file(
         log_handle,
         reporters: init_shared_reporters(&cfg, Some(metrics_prefix.as_str())),
         feed_id_allocator: Arc::new(RwLock::new(None)),
-        voting_send_channel: vote_send,
+        aggregated_votes_to_block_creator_send: vote_send,
         feeds_metrics: Arc::new(RwLock::new(
             FeedsMetrics::new(metrics_prefix.as_str()).expect("Failed to allocate feed_metrics"),
         )),

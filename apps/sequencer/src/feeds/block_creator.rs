@@ -329,7 +329,10 @@ async fn generate_block<
 
     // Process cmds to register new feeds:
     for cmd in new_feeds_to_register {
-        match sequencer_state.feeds_slots_manager_cmd_send.send(FeedsManagementCmds::RegisterNewAssetFeed(cmd)) {
+        match sequencer_state
+            .feeds_slots_manager_cmd_send
+            .send(FeedsManagementCmds::RegisterNewAssetFeed(cmd))
+        {
             Ok(_) => info!("forward register cmd"),
             Err(e) => error!("Could not forward register cmd: {e}"),
         };
@@ -337,7 +340,10 @@ async fn generate_block<
 
     // Process cmds to delete existing feeds:
     for cmd in feeds_ids_to_delete {
-        match sequencer_state.feeds_slots_manager_cmd_send.send(FeedsManagementCmds::DeleteAssetFeed(cmd)) {
+        match sequencer_state
+            .feeds_slots_manager_cmd_send
+            .send(FeedsManagementCmds::DeleteAssetFeed(cmd))
+        {
             Ok(_) => info!("forward delete cmd"),
             Err(e) => error!("Could not forward delete cmd: {e}"),
         };
@@ -389,8 +395,6 @@ mod tests {
 
         let (vote_send, vote_recv) = mpsc::unbounded_channel();
         let (_feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
         let (batched_votes_send, mut batched_votes_recv) = mpsc::unbounded_channel();
 
         let key_path = get_test_private_key_path();
@@ -410,7 +414,6 @@ mod tests {
             sequencer_state,
             vote_recv,
             feeds_management_cmd_recv,
-            feeds_slots_manager_cmd_send,
             batched_votes_send,
             block_config,
         )

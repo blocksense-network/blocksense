@@ -555,7 +555,12 @@ mod tests {
         let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
 
         let (vote_send, _vote_recv) = mpsc::unbounded_channel();
-        let (feeds_management_cmd_send, _feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
+        let (
+            feeds_management_cmd_to_block_creator_send,
+            _feeds_management_cmd_to_block_creator_recv,
+        ) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
 
         let sequencer_state = web::Data::new(SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -566,7 +571,7 @@ mod tests {
             log_handle,
             reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
             feed_id_allocator: Arc::new(RwLock::new(None)),
-            voting_send_channel: vote_send,
+            aggregated_votes_to_block_creator_send: vote_send,
             feeds_metrics: Arc::new(RwLock::new(
                 FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
                     .expect("Failed to allocate feed_metrics"),
@@ -580,7 +585,8 @@ mod tests {
             )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
             feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-            feeds_management_cmd_send,
+            feeds_management_cmd_to_block_creator_send,
+            feeds_slots_manager_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
             kafka_endpoint: None,
         });

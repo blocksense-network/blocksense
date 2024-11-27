@@ -57,7 +57,7 @@ pub async fn prepare_sequencer_state(
     feeds_config: AllFeedsConfig,
     metrics_prefix: Option<&str>,
 ) -> (
-    UnboundedReceiver<(String, String)>,    // voting_receive_channel
+    UnboundedReceiver<(String, String)>, // aggregated_votes_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
     Data<SequencerState>,
@@ -76,7 +76,7 @@ pub async fn prepare_sequencer_state(
 
     let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
-    let (vote_send, vote_recv): VoteChannel = mpsc::unbounded_channel();
+    let (aggregated_votes_to_block_creator_send, aggregated_votes_to_block_creator_recv): VoteChannel = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
         mpsc::unbounded_channel();
     let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
@@ -92,7 +92,7 @@ pub async fn prepare_sequencer_state(
         log_handle,
         reporters: init_shared_reporters(sequencer_config, metrics_prefix),
         feed_id_allocator: Arc::new(RwLock::new(Some(feed_id_allocator))),
-        voting_send_channel: vote_send,
+        aggregated_votes_to_block_creator_send,
         feeds_metrics: Arc::new(RwLock::new(
             FeedsMetrics::new(metrics_prefix.unwrap_or(""))
                 .expect("Failed to allocate feed_metrics"),
@@ -119,7 +119,7 @@ pub async fn prepare_sequencer_state(
     });
 
     (
-        vote_recv,
+        aggregated_votes_to_block_creator_recv,
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
         sequencer_state,
@@ -239,7 +239,7 @@ async fn main() -> std::io::Result<()> {
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
     let (
-        voting_receive_channel,
+        aggregated_votes_to_block_creator_recv,
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
         sequencer_state,
@@ -248,7 +248,7 @@ async fn main() -> std::io::Result<()> {
     let collected_futures = prepare_app_workers(
         sequencer_state.clone(),
         &sequencer_config,
-        voting_receive_channel,
+        aggregated_votes_to_block_creator_recv,
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
     )

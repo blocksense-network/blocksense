@@ -321,7 +321,9 @@ impl FeedSlotsProcessor {
             debug!("Release the write lock on history [feed {feed_id}]");
         }
         let key_post = self.key;
-        let result_send = sequencer_state.voting_send_channel.clone();
+        let result_send = sequencer_state
+            .aggregated_votes_to_block_creator_send
+            .clone();
         result_send
             .send((
                 to_hex_string(key_post.to_be_bytes().to_vec(), None),
