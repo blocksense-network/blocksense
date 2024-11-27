@@ -21,7 +21,7 @@ use tokio::task::JoinHandle;
 pub async fn prepare_app_workers(
     sequencer_state: Data<SequencerState>,
     sequencer_config: &SequencerConfig,
-    voting_receive_channel: UnboundedReceiver<(String, String)>,
+    aggregated_votes_to_block_creator_recv: UnboundedReceiver<(String, String)>,
     feeds_management_cmd_to_block_creator_recv: UnboundedReceiver<FeedsManagementCmds>,
     feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
@@ -33,7 +33,7 @@ pub async fn prepare_app_workers(
     let block_creator = block_creator_loop(
         // sequencer_state.voting_recv_channel.clone(),
         sequencer_state.clone(),
-        voting_receive_channel,
+        aggregated_votes_to_block_creator_recv,
         feeds_management_cmd_to_block_creator_recv,
         batched_votes_send,
         sequencer_config.block_config.clone(),

@@ -20,7 +20,7 @@ pub struct SequencerState {
     pub log_handle: SharedLoggingHandle,
     pub reporters: SharedReporters,
     pub feed_id_allocator: Arc<RwLock<Option<ConcurrentAllocator>>>,
-    pub voting_send_channel: mpsc::UnboundedSender<(String, String)>,
+    pub aggregated_votes_to_block_creator_send: mpsc::UnboundedSender<(String, String)>,
     pub feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     pub active_feeds: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     pub sequencer_config: Arc<RwLock<SequencerConfig>>,

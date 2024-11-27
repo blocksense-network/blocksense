@@ -55,7 +55,9 @@ impl FeedSlotsProcessor {
         mut cmd_channel: mpsc::UnboundedReceiver<FeedsSlotProcessorCmds>,
         _cmd_sender: Option<mpsc::UnboundedSender<FeedsSlotProcessorCmds>>,
     ) -> Result<ProcessorResultValue> {
-        let result_send = sequencer_state.voting_send_channel.clone();
+        let result_send = sequencer_state
+            .aggregated_votes_to_block_creator_send
+            .clone();
         let reports = sequencer_state.reports.clone();
         let reporters = sequencer_state.reporters.clone();
         let feed_type = feed.read().await.value_type.clone();

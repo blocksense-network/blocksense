@@ -344,8 +344,6 @@ mod tests {
 
         let (vote_send, vote_recv) = mpsc::unbounded_channel();
         let (_feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
         let (batched_votes_send, mut batched_votes_recv) = mpsc::unbounded_channel();
 
         let key_path = get_test_private_key_path();
@@ -365,7 +363,6 @@ mod tests {
             sequencer_state,
             vote_recv,
             feeds_management_cmd_recv,
-            feeds_slots_manager_cmd_send,
             batched_votes_send,
             block_config,
         )
