@@ -234,7 +234,7 @@ impl SlotTimeTracker {
         let time_to_await_ms: u64 = if end_of_voting_slot_ms > 0 {
             end_of_voting_slot_ms as u64
         } else {
-            return;
+            0
         };
         let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
         let mut interval = time::interval(time_to_await);
