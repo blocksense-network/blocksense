@@ -32,6 +32,7 @@ pub struct BlockFeedConfig {
     pub resources: Resources,
     pub quorum_percentage: [u8; 4], // The percentage of votes needed to aggregate and post result to contract.
     pub skip_publish_if_less_then_percentage: [u8; 4],
+    pub always_publish_heartbeat_ms: Option<u128>,
     pub script: DataChunk,
     pub value_type: DataChunk,
     pub aggregate_type: DataChunk,

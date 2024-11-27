@@ -61,7 +61,9 @@ pub async fn create_sequencer_state_from_sequencer_config_file(
         }
     };
 
-    let (feeds_management_cmd_send, _feeds_management_cmd_recv) = mpsc::unbounded_channel();
+    let (feeds_management_cmd_to_block_creator_send, _feeds_management_cmd_to_block_creator_recv) =
+        mpsc::unbounded_channel();
+    let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
 
     let (_, feeds_config) = get_sequencer_and_feed_configs();
 
@@ -87,7 +89,8 @@ pub async fn create_sequencer_state_from_sequencer_config_file(
         )),
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-        feeds_management_cmd_send,
+        feeds_management_cmd_to_block_creator_send,
+        feeds_slots_manager_cmd_send,
         blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
         kafka_endpoint: None,
     })

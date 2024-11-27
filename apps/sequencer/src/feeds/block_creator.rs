@@ -34,7 +34,6 @@ pub async fn block_creator_loop<
     sequencer_state: Data<SequencerState>,
     mut vote_recv: UnboundedReceiver<(K, V)>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
-    feed_manager_cmds_send: UnboundedSender<FeedsManagementCmds>,
     batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
     block_config: BlockConfig,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
@@ -94,7 +93,6 @@ pub async fn block_creator_loop<
                                 feeds_ids_to_delete,
                                 &batched_votes_send,
                                 &sequencer_state,
-                                &feed_manager_cmds_send,
                                 (block_generation_time_tracker.get_last_slot() + 1) as u64,
                             ).await {
                                 panic!("Failed to generate block! {e}");
@@ -254,6 +252,7 @@ fn feed_config_to_block(feed_config: &config::FeedConfig) -> BlockFeedConfig {
         skip_publish_if_less_then_percentage: f32_to_u8_array(
             feed_config.skip_publish_if_less_then_percentage,
         ),
+        always_publish_heartbeat_ms: feed_config.always_publish_heartbeat_ms,
         script: string_to_data_chunk(&feed_config.script),
         value_type: string_to_data_chunk(&feed_config.value_type),
         aggregate_type: string_to_data_chunk(&feed_config.aggregate_type),
@@ -269,7 +268,6 @@ async fn generate_block<
     feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
     batched_votes_send: &UnboundedSender<UpdateToSend<K, V>>,
     sequencer_state: &Data<SequencerState>,
-    feed_manager_cmds_send: &UnboundedSender<FeedsManagementCmds>,
     block_height: u64,
 ) -> eyre::Result<()> {
     let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
@@ -331,7 +329,7 @@ async fn generate_block<
 
     // Process cmds to register new feeds:
     for cmd in new_feeds_to_register {
-        match feed_manager_cmds_send.send(FeedsManagementCmds::RegisterNewAssetFeed(cmd)) {
+        match sequencer_state.feeds_slots_manager_cmd_send.send(FeedsManagementCmds::RegisterNewAssetFeed(cmd)) {
             Ok(_) => info!("forward register cmd"),
             Err(e) => error!("Could not forward register cmd: {e}"),
         };
@@ -339,7 +337,7 @@ async fn generate_block<
 
     // Process cmds to delete existing feeds:
     for cmd in feeds_ids_to_delete {
-        match feed_manager_cmds_send.send(FeedsManagementCmds::DeleteAssetFeed(cmd)) {
+        match sequencer_state.feeds_slots_manager_cmd_send.send(FeedsManagementCmds::DeleteAssetFeed(cmd)) {
             Ok(_) => info!("forward delete cmd"),
             Err(e) => error!("Could not forward delete cmd: {e}"),
         };

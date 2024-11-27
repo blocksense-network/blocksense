@@ -144,6 +144,7 @@ fn block_feed_to_feed_config(block_feed: &BlockFeedConfig) -> config::FeedConfig
         skip_publish_if_less_then_percentage: u8_array_to_f32(
             block_feed.skip_publish_if_less_then_percentage,
         ),
+        always_publish_heartbeat_ms: block_feed.always_publish_heartbeat_ms,
         script: data_chunk_to_string(&block_feed.script),
         value_type: data_chunk_to_string(&block_feed.value_type),
         aggregate_type: data_chunk_to_string(&block_feed.aggregate_type),

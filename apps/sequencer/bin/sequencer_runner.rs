@@ -58,6 +58,7 @@ pub async fn prepare_sequencer_state(
     metrics_prefix: Option<&str>,
 ) -> (
     UnboundedReceiver<(String, String)>,    // voting_receive_channel
+    UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
     Data<SequencerState>,
 ) {
@@ -76,7 +77,9 @@ pub async fn prepare_sequencer_state(
     let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (vote_send, vote_recv): VoteChannel = mpsc::unbounded_channel();
-    let (feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
+    let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
+        mpsc::unbounded_channel();
+    let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
 
     let db = RwLock::new(InMemDb::new());
 
@@ -103,7 +106,8 @@ pub async fn prepare_sequencer_state(
         )),
         sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
         feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-        feeds_management_cmd_send,
+        feeds_management_cmd_to_block_creator_send,
+        feeds_slots_manager_cmd_send,
         blockchain_db: Arc::new(db),
         kafka_endpoint: sequencer_config
             .kafka_report_endpoint
@@ -114,7 +118,12 @@ pub async fn prepare_sequencer_state(
             }),
     });
 
-    (vote_recv, feeds_management_cmd_recv, sequencer_state)
+    (
+        vote_recv,
+        feeds_management_cmd_to_block_creator_recv,
+        feeds_slots_manager_cmd_recv,
+        sequencer_state,
+    )
 }
 
 pub async fn prepare_http_servers(
@@ -229,13 +238,18 @@ async fn main() -> std::io::Result<()> {
 
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
-    let (voting_receive_channel, feeds_slots_manager_cmd_recv, sequencer_state) =
-        prepare_sequencer_state(&sequencer_config, feeds_config, None).await;
+    let (
+        voting_receive_channel,
+        feeds_management_cmd_to_block_creator_recv,
+        feeds_slots_manager_cmd_recv,
+        sequencer_state,
+    ) = prepare_sequencer_state(&sequencer_config, feeds_config, None).await;
 
     let collected_futures = prepare_app_workers(
         sequencer_state.clone(),
         &sequencer_config,
         voting_receive_channel,
+        feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
     )
     .await;
