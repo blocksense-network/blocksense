@@ -6,7 +6,11 @@ use std::{
 
 use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use config::AllFeedsConfig;
-use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
+use ringbuf::{
+    storage::Heap,
+    traits::{Consumer, RingBuffer},
+    HeapRb, SharedRb,
+};
 use tokio::{sync::RwLock, time};
 use tracing::{debug, info};
 use utils::time::current_unix_time;
@@ -158,6 +162,18 @@ impl FeedAggregateHistory {
             );
         }
     }
+
+    pub fn last(&mut self, feed_id: u32) -> Option<&FeedType> {
+        if let Some(rb) = self.aggregate_history.get_mut(&feed_id) {
+            rb.last()
+        } else {
+            info!(
+                "Feed Id: {}, not registered in FeedAggregateHistory!",
+                feed_id
+            );
+            None
+        }
+    }
 }
 
 // This struct holds all the Feeds by ID (the key in the map) and the received votes for them
@@ -218,7 +234,7 @@ impl SlotTimeTracker {
         let time_to_await_ms: u64 = if end_of_voting_slot_ms > 0 {
             end_of_voting_slot_ms as u64
         } else {
-            0
+            return;
         };
         let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
         let mut interval = time::interval(time_to_await);
