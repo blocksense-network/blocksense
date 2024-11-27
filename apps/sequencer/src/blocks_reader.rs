@@ -94,12 +94,33 @@ pub async fn blocks_reader_loop(
                                                                     "new_feed_config = {:?}",
                                                                     new_feed_config
                                                                 );
+                                                                let cmd = FeedsManagementCmds::RegisterNewAssetFeed(
+                                                                    RegisterNewAssetFeed {
+                                                                        config: new_feed_config.clone(),
+                                                                    },
+                                                                );
+                                                                match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
+                                                                    Ok(_) => info!("forward register cmd"),
+                                                                    Err(e) => info!("Could not forward register cmd: {e}"),
+                                                                };
                                                             }
                                                         }
                                                         for rm_feed_id in
                                                             add_remove_feeds.feed_ids_to_rm
                                                         {
-                                                            if let Some(rm_feed_id) = rm_feed_id {}
+                                                            if let Some(rm_feed_id) = rm_feed_id {
+                                                                info!(
+                                                                    "rm_feed_id = {:?}",
+                                                                    rm_feed_id
+                                                                );
+                                                                let cmd = FeedsManagementCmds::DeleteAssetFeed(DeleteAssetFeed {
+                                                                    id: rm_feed_id,
+                                                                });
+                                                                match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
+                                                                    Ok(_) => info!("forward register cmd"),
+                                                                    Err(e) => info!("Could not forward register cmd: {e}"),
+                                                                };
+                                                            }
                                                         }
                                                     }
                                                 }

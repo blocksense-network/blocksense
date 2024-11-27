@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::Debug;
 
+pub mod block_creator;
 pub mod blocks_reader;
 pub mod feeds;
 pub mod http_handlers;

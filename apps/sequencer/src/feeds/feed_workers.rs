@@ -1,5 +1,5 @@
+use crate::block_creator::block_creator_loop;
 use crate::blocks_reader::blocks_reader_loop;
-use crate::feeds::block_creator::block_creator_loop;
 use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
