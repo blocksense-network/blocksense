@@ -158,18 +158,18 @@ async fn get_rpc_providers(
             .with_recommended_fillers()
             .wallet(EthereumWallet::from(signer.clone()))
             .on_http(rpc_url);
-        let address = match &p.contract_address {
-            Some(x) => parse_eth_address(x.as_str()),
-            None => None,
-        };
-        let event_address = match &p.event_contract_address {
-            Some(x) => parse_eth_address(x.as_str()),
-            None => None,
-        };
-        let impersonated_anvil_account = match &p.impersonated_anvil_account {
-            Some(x) => parse_eth_address(x.as_str()),
-            None => None,
-        };
+        let address = p
+            .contract_address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
+        let event_address = p
+            .event_contract_address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
+        let impersonated_anvil_account = p
+            .impersonated_anvil_account
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
 
         let rpc_provider = Arc::new(Mutex::new(RpcProvider {
             contract_address: address,
