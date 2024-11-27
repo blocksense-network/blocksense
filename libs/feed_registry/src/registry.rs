@@ -6,7 +6,11 @@ use std::{
 
 use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
 use config::AllFeedsConfig;
-use ringbuf::{storage::Heap, traits::RingBuffer, HeapRb, SharedRb};
+use ringbuf::{
+    storage::Heap,
+    traits::{Consumer, RingBuffer},
+    HeapRb, SharedRb,
+};
 use tokio::{sync::RwLock, time};
 use tracing::{debug, info};
 use utils::time::current_unix_time;
@@ -156,6 +160,18 @@ impl FeedAggregateHistory {
                 "Feed Id: {}, not registered in FeedAggregateHistory!",
                 feed_id
             );
+        }
+    }
+
+    pub fn last(&mut self, feed_id: u32) -> Option<&FeedType> {
+        if let Some(rb) = self.aggregate_history.get_mut(&feed_id) {
+            rb.last()
+        } else {
+            info!(
+                "Feed Id: {}, not registered in FeedAggregateHistory!",
+                feed_id
+            );
+            None
         }
     }
 }
