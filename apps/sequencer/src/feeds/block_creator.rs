@@ -32,7 +32,6 @@ pub async fn block_creator_loop<
     sequencer_state: Data<SequencerState>,
     mut vote_recv: UnboundedReceiver<(K, V)>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
-    feed_manager_cmds_send: UnboundedSender<FeedsManagementCmds>,
     batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
     block_config: BlockConfig,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
@@ -90,7 +89,6 @@ pub async fn block_creator_loop<
                                 feeds_ids_to_delete,
                                 &batched_votes_send,
                                 &sequencer_state,
-                                &feed_manager_cmds_send,
                                 (block_generation_time_tracker.get_last_slot() + 1) as u64,
                             ).await;
                         }
@@ -217,7 +215,6 @@ async fn generate_block<
     feeds_ids_to_delete: Vec<FeedsManagementCmds>,
     batched_votes_send: &UnboundedSender<UpdateToSend<K, V>>,
     sequencer_state: &Data<SequencerState>,
-    feed_manager_cmds_send: &UnboundedSender<FeedsManagementCmds>,
     block_height: u64,
 ) {
     let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
@@ -288,7 +285,7 @@ async fn generate_block<
 
     // Process cmds to register new feeds:
     for cmd in new_feeds_to_register {
-        match feed_manager_cmds_send.send(cmd) {
+        match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
             Ok(_) => info!("forward register cmd"),
             Err(e) => info!("Could not forward register cmd: {e}"),
         };
@@ -296,7 +293,7 @@ async fn generate_block<
 
     // Process cmds to delete existing feeds:
     for cmd in feeds_ids_to_delete {
-        match feed_manager_cmds_send.send(cmd) {
+        match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
             Ok(_) => info!("forward delete cmd"),
             Err(e) => info!("Could not forward delete cmd: {e}"),
         };

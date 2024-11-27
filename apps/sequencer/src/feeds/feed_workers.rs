@@ -22,10 +22,10 @@ pub async fn prepare_app_workers(
     sequencer_state: Data<SequencerState>,
     sequencer_config: &SequencerConfig,
     voting_receive_channel: UnboundedReceiver<(String, String)>,
-    feeds_management_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
+    feeds_management_cmd_to_block_creator_recv: UnboundedReceiver<FeedsManagementCmds>,
+    feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
-    let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
 
     let feeds_slots_manager_loop_fut =
         feeds_slots_manager_loop(sequencer_state.clone(), feeds_slots_manager_cmd_recv).await;
@@ -34,8 +34,7 @@ pub async fn prepare_app_workers(
         // sequencer_state.voting_recv_channel.clone(),
         sequencer_state.clone(),
         voting_receive_channel,
-        feeds_management_cmd_recv,
-        feeds_slots_manager_cmd_send,
+        feeds_management_cmd_to_block_creator_recv,
         batched_votes_send,
         sequencer_config.block_config.clone(),
     )
