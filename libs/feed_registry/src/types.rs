@@ -11,7 +11,7 @@ use tracing::debug;
 use crypto::JsonSerializableSignature;
 use num::BigUint;
 
-use crate::aggregate::{get_aggregator, FeedAggregate, MajorityVoteAggregator};
+use crate::aggregate::{get_aggregator, FeedAggregate};
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Repeatability {
@@ -35,9 +35,10 @@ pub struct FeedMetaData {
     name: String,
     voting_repeatability: Repeatability,
     pub report_interval_ms: u64, // Consider oneshot feeds.
-    quorum_percentage: f32,
+    pub quorum_percentage: f32,
+    pub skip_publish_if_less_then_percentage: f32,
     first_report_start_time: SystemTime,
-    feed_aggregator: Box<dyn FeedAggregate>,
+    feed_aggregator: FeedAggregate,
     pub value_type: String,
     pub aggregate_type: String,
     pub processor_cmd_chan: Option<UnboundedSender<FeedsSlotProcessorCmds>>,
@@ -50,23 +51,27 @@ impl FeedMetaData {
         quorum_percentage: f32,
         first_report_start_time: SystemTime,
     ) -> FeedMetaData {
+        let skip_publish_if_less_then_percentage = 0.0f32;
         FeedMetaData {
             name,
             voting_repeatability: Repeatability::Oneshot,
             report_interval_ms,
             quorum_percentage,
+            skip_publish_if_less_then_percentage,
             first_report_start_time,
-            feed_aggregator: Box::new(MajorityVoteAggregator {}),
+            feed_aggregator: FeedAggregate::MajorityVoteAggregator,
             value_type: "Text".to_string(),
             aggregate_type: "Average".to_string(),
             processor_cmd_chan: None,
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         name: &str,
         report_interval_ms: u64, // Consider oneshot feeds.
         quorum_percentage: f32,
+        skip_publish_if_less_then_percentage: f32,
         first_report_start_time: SystemTime,
         value_type: String,
         aggregate_type: String,
@@ -77,6 +82,7 @@ impl FeedMetaData {
             voting_repeatability: Repeatability::Periodic,
             report_interval_ms,
             quorum_percentage,
+            skip_publish_if_less_then_percentage,
             first_report_start_time,
             feed_aggregator: get_aggregator(aggregate_type.as_str()), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
             value_type,
@@ -98,6 +104,9 @@ impl FeedMetaData {
     pub fn get_quorum_percentage(&self) -> f32 {
         self.quorum_percentage
     }
+    pub fn get_skip_publish_if_less_then_percentage(&self) -> f32 {
+        self.skip_publish_if_less_then_percentage
+    }
     pub fn get_first_report_start_time_ms(&self) -> u128 {
         let since_the_epoch = self
             .first_report_start_time
@@ -113,8 +122,8 @@ impl FeedMetaData {
         ((current_time_as_ms - self.get_first_report_start_time_ms())
             / self.report_interval_ms as u128) as u64
     }
-    pub fn get_feed_aggregator(&self) -> &dyn FeedAggregate {
-        self.feed_aggregator.as_ref()
+    pub fn get_feed_aggregator(&self) -> FeedAggregate {
+        self.feed_aggregator
     }
     pub fn check_report_relevance(
         &self,
@@ -255,6 +264,17 @@ impl FeedType {
             }
         }
     }
+
+    pub fn enum_type_to_string(&self) -> &str {
+        match self {
+            FeedType::Numerical(_) => "FeedType::Numerical",
+            FeedType::Text(_) => "FeedType::Text",
+        }
+    }
+
+    pub fn same_enum_type_as(&self, other: &FeedType) -> bool {
+        std::mem::discriminant(self) == std::mem::discriminant(other)
+    }
 }
 
 pub type Timestamp = u128;
@@ -284,12 +304,7 @@ pub struct DataFeedPayload {
     pub result: FeedResult,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(untagged)]
-pub enum FeedResult {
-    Result { result: FeedType },
-    Error { error: FeedError },
-}
+pub type FeedResult = Result<FeedType, FeedError>;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]

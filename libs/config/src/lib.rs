@@ -74,9 +74,15 @@ pub struct FeedConfig {
     #[serde(deserialize_with = "deserialize_resources_as_string")]
     pub resources: HashMap<String, String>, // TODO(snikolov): Find best way to handle various types of resource data
     pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
+    #[serde(default = "skip_publish_if_less_then_percentage_default")]
+    pub skip_publish_if_less_then_percentage: f32,
     pub script: String,
     pub value_type: String,
     pub aggregate_type: String,
+}
+
+fn skip_publish_if_less_then_percentage_default() -> f32 {
+    0.0
 }
 
 impl FeedConfig {
@@ -87,6 +93,7 @@ impl FeedConfig {
 
 impl Validated for FeedConfig {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
+        let range_percentage = 0.0f32..=1.0f32;
         if self.report_interval_ms == 0 {
             anyhow::bail!(
                 "{}: report_interval_ms for feed {} with id {} cannot be set to 0",
@@ -95,13 +102,25 @@ impl Validated for FeedConfig {
                 self.id
             );
         }
-        if self.quorum_percentage < 0.0 || self.quorum_percentage > 1.0 {
+        if !range_percentage.contains(&self.quorum_percentage) {
             anyhow::bail!(
-                "{}: quorum_percentage for feed {} with id {} must be between 0.0 and 1.0",
+                "{}: quorum_percentage for feed {} with id {} must be between {} and {}",
+                range_percentage.start(),
+                range_percentage.end(),
                 context,
                 self.name,
                 self.id
             );
+        }
+        if !range_percentage.contains(&self.skip_publish_if_less_then_percentage) {
+            anyhow::bail!(
+            "{}: skip_publish_if_less_then_percentage for feed {} with id {} must be between {} and {}",
+            range_percentage.start(),
+            range_percentage.end(),
+            context,
+            self.name,
+            self.id
+        );
         }
         Ok(())
     }

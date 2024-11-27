@@ -19,7 +19,7 @@ use derive::{ApiConnect, Historical};
 use crate::interfaces::{api_connect::ApiConnect, data_feed::DataFeed, historical::Historical};
 use crate::services::common::get_generic_feed_error;
 use feed_registry::{
-    aggregate::{AverageAggregator, ConsensusMetric},
+    aggregate::FeedAggregate,
     api::DataFeedAPI,
     types::{FeedResult, FeedType, Timestamp},
 };
@@ -88,40 +88,36 @@ fn get_feed_result(response_json: &Value, idx: usize, asset: &str) -> FeedResult
     let price = get_yf_json_price(&response_json.clone(), idx, asset);
 
     match price {
-        Ok(price) => FeedResult::Result {
-            result: FeedType::Numerical(price),
-        },
+        Ok(price) => Ok(FeedType::Numerical(price)),
         Err(e) => {
             error!(
                 "{}",
                 format!("Error occured while getting {} price! - {}", asset, e)
             );
 
-            get_generic_feed_error("YahooFinance")
+            Err(get_generic_feed_error("YahooFinance"))
         }
     }
 }
 
 fn get_feed_result_from_hashmap(asset: &str, map: &HashMap<String, f64>) -> FeedResult {
     match map.get(asset) {
-        Some(&price) => FeedResult::Result {
-            result: FeedType::Numerical(price),
-        },
+        Some(&price) => Ok(FeedType::Numerical(price)),
         None => {
             error!(
                 "{}",
                 format!("Error occured while getting {} price!", asset)
             );
 
-            get_generic_feed_error("YahooFinance")
+            Err(get_generic_feed_error("YahooFinance"))
         }
     }
 }
 
 #[async_trait]
 impl DataFeed for YahooFinanceDataFeed {
-    fn score_by(&self) -> ConsensusMetric {
-        ConsensusMetric::Mean(AverageAggregator {})
+    fn score_by(&self) -> FeedAggregate {
+        FeedAggregate::AverageAggregator
     }
 
     fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
@@ -159,13 +155,19 @@ impl DataFeed for YahooFinanceDataFeed {
             } else {
                 error!("Request failed with status: {}", response.status());
 
-                (get_generic_feed_error("YahooFinance"), current_unix_time())
+                (
+                    Err(get_generic_feed_error("YahooFinance")),
+                    current_unix_time(),
+                )
             }
         } else {
             //TODO(snikolov): Figure out how to handle the Error if it occurs
             error!("Request failed with error");
 
-            (get_generic_feed_error("YahooFinance"), current_unix_time())
+            (
+                Err(get_generic_feed_error("YahooFinance")),
+                current_unix_time(),
+            )
         }
     }
 
@@ -256,7 +258,7 @@ impl DataFeed for YahooFinanceDataFeed {
                     .iter()
                     .map(|(_, id)| {
                         (
-                            get_generic_feed_error("YahooFinance"),
+                            Err(get_generic_feed_error("YahooFinance")),
                             *id,
                             current_unix_time(),
                         )
@@ -271,7 +273,7 @@ impl DataFeed for YahooFinanceDataFeed {
                 .iter()
                 .map(|(_, id)| {
                     (
-                        get_generic_feed_error("YahooFinance"),
+                        Err(get_generic_feed_error("YahooFinance")),
                         *id,
                         current_unix_time(),
                     )

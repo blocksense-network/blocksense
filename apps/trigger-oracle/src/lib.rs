@@ -30,7 +30,7 @@ use wasmtime_wasi_http::{
 
 use crypto::JsonSerializableSignature;
 use data_feeds::connector::post::generate_signature;
-use feed_registry::types::{DataFeedPayload, FeedError, FeedResult, FeedType, PayloadMetaData};
+use feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
 use prometheus::{
     actix_server::handle_prometheus_metrics,
     metrics::{
@@ -417,15 +417,11 @@ impl OracleTrigger {
             let mut batch_payload = vec![];
             for oracle::DataFeedResult { id, value } in payload.values {
                 let result = match value {
-                    oracle::DataFeedResultValue::Numerical(value) => FeedResult::Result {
-                        result: FeedType::Numerical(value),
-                    },
-                    oracle::DataFeedResultValue::Text(value) => FeedResult::Result {
-                        result: FeedType::Text(value),
-                    },
-                    oracle::DataFeedResultValue::Error(error_string) => FeedResult::Error {
-                        error: FeedError::APIError(error_string),
-                    },
+                    oracle::DataFeedResultValue::Numerical(value) => Ok(FeedType::Numerical(value)),
+                    oracle::DataFeedResultValue::Text(value) => Ok(FeedType::Text(value)),
+                    oracle::DataFeedResultValue::Error(error_string) => {
+                        Err(FeedError::APIError(error_string))
+                    }
                     oracle::DataFeedResultValue::None => {
                         //TODO(adikov): Handle properly None result
                         continue;

@@ -44,10 +44,10 @@ pub fn check_signature(
         .collect();
 
     match feed_result {
-        FeedResult::Result { result } => {
+        Ok(result) => {
             byte_buffer.extend(result.as_bytes());
         }
-        FeedResult::Error { error } => {
+        Err(error) => {
             warn!("Reported error for feed_id {} : {}", feed_id, error);
         }
     };
@@ -110,10 +110,10 @@ async fn process_report(
     let reporter_metrics = reporter.read().await.reporter_metrics.clone();
 
     match &data_feed.result {
-        FeedResult::Result { result } => {
+        Ok(result) => {
             debug!("Recvd result from reporter[{}]: {:?}", reporter_id, result);
         }
-        FeedResult::Error { error } => {
+        Err(error) => {
             info!("Reported error from reporter[{}]: {}", reporter_id, error);
             inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
         }
@@ -414,10 +414,9 @@ pub async fn register_feed(
         .spawn_local(async move {
             feed_slots_processor
                 .start_loop(
-                    sequencer_state,
-                    feed_id,
-                    registered_feed_metadata,
-                    feed_aggregate_history,
+                    &sequencer_state,
+                    &registered_feed_metadata,
+                    &feed_aggregate_history,
                     None,
                     cmd_recv,
                     Some(cmd_send),
@@ -453,7 +452,7 @@ mod tests {
     use crypto::JsonSerializableSignature;
     use data_feeds::connector::post::generate_signature;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
-    use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
+    use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
     use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use std::collections::HashMap;
@@ -528,9 +527,7 @@ mod tests {
         const FEED_ID: &str = "1";
         const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
         const REPORT_VAL: f64 = 80000.8;
-        let result = FeedResult::Result {
-            result: FeedType::Numerical(REPORT_VAL),
-        };
+        let result = Ok(FeedType::Numerical(REPORT_VAL));
         let signature = generate_signature(SECRET_KEY, FEED_ID, timestamp, &result);
 
         let payload = DataFeedPayload {
@@ -773,9 +770,7 @@ mod tests {
         const FEED_ID: &str = "1";
         const SECRET_KEY: &str = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
         const REPORT_VAL: f64 = 80000.8;
-        let result = FeedResult::Result {
-            result: FeedType::Numerical(REPORT_VAL),
-        };
+        let result = Ok(FeedType::Numerical(REPORT_VAL));
         let signature = generate_signature(SECRET_KEY, FEED_ID, timestamp, &result);
 
         let payload = DataFeedPayload {

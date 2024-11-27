@@ -49,11 +49,12 @@ impl FeedMetaDataRegistry {
 
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let start = SystemTime::now();
-
+    let skip_publish_if_less_then_percentage = 0.0f32;
     let fmd1 = FeedMetaData::new(
         "DOGE/USD",
         60000,
         0.6,
+        skip_publish_if_less_then_percentage,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -63,6 +64,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         "BTS/USD",
         30000,
         0.6,
+        skip_publish_if_less_then_percentage,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -72,6 +74,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         "ETH/USD",
         60000,
         0.6,
+        skip_publish_if_less_then_percentage,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -97,6 +100,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
                 &feed.name,
                 feed.report_interval_ms,
                 feed.quorum_percentage,
+                feed.skip_publish_if_less_then_percentage,
                 feed.first_report_start_time,
                 feed.value_type.clone(),
                 feed.aggregate_type.clone(),
@@ -163,8 +167,8 @@ impl FeedAggregateHistory {
         }
     }
 
-    pub fn last(&mut self, feed_id: u32) -> Option<&FeedType> {
-        if let Some(rb) = self.aggregate_history.get_mut(&feed_id) {
+    pub fn last(&self, feed_id: u32) -> Option<&FeedType> {
+        if let Some(rb) = self.aggregate_history.get(&feed_id) {
             rb.last()
         } else {
             info!(
@@ -236,10 +240,7 @@ impl SlotTimeTracker {
         } else {
             0
         };
-        let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
-        let mut interval = time::interval(time_to_await);
-        interval.tick().await; // The first tick completes immediately.
-        interval.tick().await;
+        await_time(time_to_await_ms).await;
     }
 
     // Return the number of milliseconds until the end of the voting slot.
@@ -294,6 +295,14 @@ impl SlotTimeTracker {
     }
 }
 
+pub async fn await_time(time_to_await_ms: u64) {
+    let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
+    let mut interval = time::interval(time_to_await);
+    interval.tick().await;
+    // The first tick completes immediately.
+    interval.tick().await;
+}
+
 #[cfg(test)]
 mod tests {
     use utils::time::current_unix_time;
@@ -312,6 +321,7 @@ mod tests {
     use tokio::sync::RwLock;
 
     const QUORUM_PERCENTAGE: f32 = 0.001;
+    const SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE: f32 = 0.01f32;
 
     #[tokio::test]
     async fn basic_test() {
@@ -551,6 +561,7 @@ mod tests {
             "TestFeed",
             voting_wait_duration_ms,
             QUORUM_PERCENTAGE,
+            SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE,
             current_system_time,
             "Numeric".to_string(),
             "Average".to_string(),
@@ -634,13 +645,7 @@ mod tests {
                 reports
                     .write()
                     .await
-                    .push(
-                        DATA_FEED_ID,
-                        i.into(),
-                        FeedResult::Result {
-                            result: FeedType::Numerical(0.1),
-                        },
-                    )
+                    .push(DATA_FEED_ID, i.into(), Ok(FeedType::Numerical(0.1)))
                     .await;
 
                 println!("this is thread number {}", i);

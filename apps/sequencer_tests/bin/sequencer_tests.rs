@@ -8,7 +8,8 @@ use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
 use data_feeds::connector::post::generate_signature;
 use eyre::Result;
-use feed_registry::types::{DataFeedPayload, FeedResult, FeedType, PayloadMetaData};
+use feed_registry::registry::await_time;
+use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
 use json_patch::merge;
 use port_scanner::scan_port;
 use serde_json::json;
@@ -16,8 +17,6 @@ use std::io::stdout;
 use std::process::Command;
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
-use tokio::time;
-use tokio::time::Duration;
 
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
@@ -117,9 +116,7 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
 async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
     let now = SystemTime::now();
     while !scan_port(SEQUENCER_MAIN_PORT) {
-        let mut interval = time::interval(Duration::from_millis(500));
-        interval.tick().await; // The first tick completes immediately.
-        interval.tick().await;
+        await_time(500).await;
         match now.elapsed() {
             Ok(elapsed) => {
                 if elapsed.as_secs() > max_time_to_wait_secs {
@@ -192,9 +189,7 @@ async fn wait_for_value_to_be_updated_to_contracts() -> Result<()> {
         .as_str(),
     )
     .parse()?;
-    let mut interval = time::interval(Duration::from_millis(report_time_interval_ms + 1000)); // give 1 second tolerance
-    interval.tick().await; // The first tick completes immediately.
-    interval.tick().await;
+    await_time(report_time_interval_ms + 1000).await; // give 1 second tolerance
     Ok(())
 }
 
@@ -276,9 +271,7 @@ async fn main() -> Result<()> {
             .expect("System clock set before EPOCH")
             .as_millis();
 
-        let result = FeedResult::Result {
-            result: FeedType::Numerical(REPORT_VAL),
-        };
+        let result = Ok(FeedType::Numerical(REPORT_VAL));
         let (id, key) = REPORTERS_INFO[0];
         let signature = generate_signature(key, FEED_ID, timestamp, &result).unwrap();
 
@@ -319,10 +312,7 @@ async fn main() -> Result<()> {
 
         // Prepare the batch to be sent
         for (id, key) in REPORTERS_INFO {
-            let result = FeedResult::Result {
-                result: FeedType::Numerical(BATCHED_REPORT_VAL),
-            };
-
+            let result = Ok(FeedType::Numerical(BATCHED_REPORT_VAL));
             payload.push(DataFeedPayload {
                 payload_metadata: PayloadMetaData {
                     reporter_id: id,
@@ -373,18 +363,14 @@ async fn main() -> Result<()> {
                             key,
                             FEED_ID,
                             timestamp,
-                            &FeedResult::Result {
-                                // This will cause a corrupted signature on the second iteration,
-                                // since the value we sign will not be the value we send below.
-                                result: FeedType::Numerical(CORRECT_AND_WRONG_VALS[0]),
-                            },
+                            // This will cause a corrupted signature on the second iteration,
+                            // since the value we sign will not be the value we send below.
+                            &Ok(FeedType::Numerical(CORRECT_AND_WRONG_VALS[0])),
                         )
                         .unwrap(),
                     },
                 },
-                result: FeedResult::Result {
-                    result: FeedType::Numerical(CORRECT_AND_WRONG_VALS[i]),
-                },
+                result: Ok(FeedType::Numerical(CORRECT_AND_WRONG_VALS[i])),
             })
         }
 

@@ -31,12 +31,11 @@ pub fn generate_signature(
         .chain(timestamp.to_be_bytes().to_vec())
         .collect();
 
-    //TODO(adikov): Refactor FeedResult to be normal rust Result.
     match feed_result {
-        FeedResult::Result { result } => {
+        Ok(result) => {
             byte_buffer.extend(result.as_bytes());
         }
-        FeedResult::Error { error } => {
+        Err(error) => {
             warn!("Error parsing recvd result of vote: {}", error);
         }
     };

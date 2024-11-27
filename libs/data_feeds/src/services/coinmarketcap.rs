@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use async_trait::async_trait;
 use feed_registry::{
-    aggregate::{AverageAggregator, ConsensusMetric},
+    aggregate::FeedAggregate,
     api::DataFeedAPI,
     types::{Asset, FeedResult, FeedType, Timestamp},
 };
@@ -59,21 +59,18 @@ fn get_feed_result(response_json: &Value, asset: &str) -> FeedResult {
     let price = get_cmc_json_price(response_json.clone(), asset);
 
     match price {
-        Some(price) => FeedResult::Result {
-            result: FeedType::Numerical(price),
-        },
+        Some(price) => Ok(FeedType::Numerical(price)),
         None => {
             error!("Could not parse CMC Response Json!");
-
-            get_generic_feed_error("CoinMarketCap")
+            Err(get_generic_feed_error("CoinMarketCap"))
         }
     }
 }
 
 #[async_trait]
 impl DataFeed for CoinMarketCapDataFeed {
-    fn score_by(&self) -> ConsensusMetric {
-        ConsensusMetric::Mean(AverageAggregator {})
+    fn score_by(&self) -> FeedAggregate {
+        FeedAggregate::AverageAggregator
     }
 
     fn poll(&mut self, asset: &str) -> (FeedResult, Timestamp) {
@@ -110,13 +107,19 @@ impl DataFeed for CoinMarketCapDataFeed {
             } else {
                 error!("Request failed with status: {}", response.status());
 
-                (get_generic_feed_error("CoinMarketCap"), current_unix_time())
+                (
+                    Err(get_generic_feed_error("CoinMarketCap")),
+                    current_unix_time(),
+                )
             }
         } else {
             //TODO(snikolov): Figure out how to handle the Error if it occurs
             error!("Request failed with error");
 
-            (get_generic_feed_error("CoinMarketCap"), current_unix_time())
+            (
+                Err(get_generic_feed_error("CoinMarketCap")),
+                current_unix_time(),
+            )
         }
     }
 
@@ -189,7 +192,7 @@ impl DataFeed for CoinMarketCapDataFeed {
                     .iter()
                     .map(|(_, id)| {
                         (
-                            get_generic_feed_error("CoinMarketCap"),
+                            Err(get_generic_feed_error("CoinMarketCap")),
                             *id,
                             current_unix_time(),
                         )
@@ -204,7 +207,7 @@ impl DataFeed for CoinMarketCapDataFeed {
                 .iter()
                 .map(|(_, id)| {
                     (
-                        get_generic_feed_error("CoinMarketCap"),
+                        Err(get_generic_feed_error("CoinMarketCap")),
                         *id,
                         current_unix_time(),
                     )
