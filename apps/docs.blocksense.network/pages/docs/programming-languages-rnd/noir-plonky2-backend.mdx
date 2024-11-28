@@ -26,7 +26,7 @@ A simple programming language to write ZK programs, with fast-to-generate, distr
 
 0. Install dependencies, you'll only need two things: the [nix package manager](https://nixos.org/download/) and [direnv](https://direnv.net/docs/installation.html). They're compatible with most OSes and will **not** collide with your system.
 
-1. Clone our repository with SSH:
+1. Clone [our repository](https://github.com/blocksense-network/noir/) with SSH:
 
     ```bash
     git clone git@github.com:blocksense-network/noir.git
@@ -52,6 +52,8 @@ A simple programming language to write ZK programs, with fast-to-generate, distr
     cargo test zk_dungeon
     ```
 
+    This will also take a little bit of time, until the project fully compiles.
+
 ## Using
 
 <Callout type="error" emoji="🛑">
@@ -75,7 +77,7 @@ We're now ready to create our first proof!
 3. Update `src/main.nr` with your favorite text editor to:
 
     ```rust
-    fn main(x: pub u32, y: u32) {
+    fn main(x: pub u64, y: u64) {
         assert(x % y == 0);
     }
     ```
