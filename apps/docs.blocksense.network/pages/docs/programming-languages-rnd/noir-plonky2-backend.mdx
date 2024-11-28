@@ -26,6 +26,10 @@ A simple programming language to write ZK programs, with fast-to-generate, distr
 
 0. Install dependencies, you'll only need two things: the [nix package manager](https://nixos.org/download/) and [direnv](https://direnv.net/docs/installation.html). They're compatible with most OSes and will **not** collide with your system.
 
+    <Callout type="warning" emoji="⚠️">
+      After installing `direnv` do not forget to [add the hook](https://direnv.net/docs/hook.html)!
+    </Callout>
+
 1. Clone [our repository](https://github.com/blocksense-network/noir/) with SSH:
 
     ```bash
@@ -43,6 +47,16 @@ A simple programming language to write ZK programs, with fast-to-generate, distr
     ```bash
     direnv allow
     ```
+
+    <Callout type="warning" emoji="⚠️">
+      Depending on your `nix` installation, you may get a `Permission denied` error. In that case, it's best to start a superuser shell and continue from there:
+
+      ```bash
+      sudo su                      # Start superuser shell
+      eval "$(direnv hook bash)"   # Setup the direnv hook
+      direnv allow
+      ```
+    </Callout>
 
     This should result in a plethora of things happening in the background and foreground. Sit back, relax, and wait it out. By the end you'll have everything ready to start work.
 
