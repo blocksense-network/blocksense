@@ -7,7 +7,7 @@ use feed_registry::feed_registration_cmds::{
 };
 use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
-use rdkafka::message::Message;
+use rdkafka::message::{BorrowedMessage, Message};
 use std::collections::HashMap;
 use std::io::Error;
 use std::time::SystemTime;
@@ -50,91 +50,12 @@ pub async fn blocks_reader_loop(
         let mut message_stream = consumer.stream();
 
         let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
-        let db = sequencer_state.blockchain_db.clone();
 
         loop {
             if let Some(message_result) = message_stream.next().await {
                 match message_result {
                     Ok(message) => {
-                        // Process the message
-                        if let Some(payload) = message.payload() {
-                            info!(
-                                "Key: {:?}, Payload: {}, Offset: {}, Partition: {}",
-                                message.key(),
-                                String::from_utf8_lossy(payload),
-                                message.offset(),
-                                message.partition()
-                            );
-                            match serde_json::from_str::<serde_json::Value>(
-                                &String::from_utf8_lossy(payload),
-                            ) {
-                                Ok(val) => {
-                                    if let Some(header) = val["BlockHeader"].as_str() {
-                                        if let Ok(bytes) = hex::decode(header) {
-                                            let header = BlockHeader::deserialize(&bytes);
-                                            let process_block = header.issuer_id != sequencer_id
-                                                || (header.issuer_id == sequencer_id
-                                                    && db.read().await.get_latest_block_height()
-                                                        < header.block_height);
-                                            if process_block {
-                                                if let Some(add_remove_feeds) =
-                                                    val["FeedActions"].as_str()
-                                                {
-                                                    if let Ok(bytes) = hex::decode(add_remove_feeds)
-                                                    {
-                                                        let add_remove_feeds =
-                                                            FeedActions::deserialize(&bytes);
-                                                        for new_feed in add_remove_feeds.new_feeds {
-                                                            if let Some(new_block_feed) = new_feed {
-                                                                let new_feed_config =
-                                                                    block_feed_to_feed_config(
-                                                                        &new_block_feed,
-                                                                    );
-                                                                info!(
-                                                                    "new_feed_config = {:?}",
-                                                                    new_feed_config
-                                                                );
-                                                                let cmd = FeedsManagementCmds::RegisterNewAssetFeed(
-                                                                    RegisterNewAssetFeed {
-                                                                        config: new_feed_config.clone(),
-                                                                    },
-                                                                );
-                                                                match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
-                                                                    Ok(_) => info!("forward register cmd"),
-                                                                    Err(e) => info!("Could not forward register cmd: {e}"),
-                                                                };
-                                                            }
-                                                        }
-                                                        for rm_feed_id in
-                                                            add_remove_feeds.feed_ids_to_rm
-                                                        {
-                                                            if let Some(rm_feed_id) = rm_feed_id {
-                                                                info!(
-                                                                    "rm_feed_id = {:?}",
-                                                                    rm_feed_id
-                                                                );
-                                                                let cmd = FeedsManagementCmds::DeleteAssetFeed(DeleteAssetFeed {
-                                                                    id: rm_feed_id,
-                                                                });
-                                                                match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
-                                                                    Ok(_) => info!("forward register cmd"),
-                                                                    Err(e) => info!("Could not forward register cmd: {e}"),
-                                                                };
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            info!("Decoding failed!");
-                                        }
-                                    }
-                                }
-                                Err(e) => {
-                                    warn!("Error parsing block: {e}");
-                                }
-                            };
-                        }
+                        process_msg_from_stream(sequencer_id, &sequencer_state, message).await;
                     }
                     Err(err) => {
                         // Handle message errors
@@ -146,6 +67,86 @@ pub async fn blocks_reader_loop(
     })
 }
 
+async fn process_msg_from_stream(
+    sequencer_id: u64,
+    sequencer_state: &Data<SequencerState>,
+    message: BorrowedMessage<'_>,
+) {
+    // Process the message
+    if let Some(payload) = message.payload() {
+        info!(
+            "Key: {:?}, Payload: {}, Offset: {}, Partition: {}",
+            message.key(),
+            String::from_utf8_lossy(payload),
+            message.offset(),
+            message.partition()
+        );
+        match serde_json::from_str::<serde_json::Value>(&String::from_utf8_lossy(payload)) {
+            Ok(block) => {
+                process_block(sequencer_id, sequencer_state, block).await;
+            }
+            Err(e) => {
+                warn!("Error parsing block: {e}");
+            }
+        };
+    }
+}
+
+async fn process_block(
+    sequencer_id: u64,
+    sequencer_state: &Data<SequencerState>,
+    block: serde_json::Value,
+) {
+    if let Some(header) = block["BlockHeader"].as_str() {
+        if let Ok(bytes) = hex::decode(header) {
+            let header = BlockHeader::deserialize(&bytes);
+            let process_block = header.issuer_id != sequencer_id
+                || sequencer_state
+                    .blockchain_db
+                    .read()
+                    .await
+                    .get_latest_block_height()
+                    < header.block_height;
+            if process_block {
+                if let Some(add_remove_feeds) = block["FeedActions"].as_str() {
+                    if let Ok(bytes) = hex::decode(add_remove_feeds) {
+                        let add_remove_feeds = FeedActions::deserialize(&bytes);
+                        for new_block_feed in add_remove_feeds.new_feeds.into_iter().flatten() {
+                            let new_feed_config = block_feed_to_feed_config(&new_block_feed);
+                            info!("new_feed_config = {:?}", new_feed_config);
+                            let cmd =
+                                FeedsManagementCmds::RegisterNewAssetFeed(RegisterNewAssetFeed {
+                                    config: new_feed_config.clone(),
+                                });
+                            match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
+                                Ok(_) => info!("forward register cmd"),
+                                Err(e) => {
+                                    info!("Could not forward register cmd: {e}")
+                                }
+                            };
+                        }
+                        for rm_feed_id in add_remove_feeds.feed_ids_to_rm.into_iter().flatten() {
+                            info!("rm_feed_id = {:?}", rm_feed_id);
+                            let cmd = FeedsManagementCmds::DeleteAssetFeed(DeleteAssetFeed {
+                                id: rm_feed_id,
+                            });
+                            match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
+                                Ok(_) => info!("forward register cmd"),
+                                Err(e) => {
+                                    info!("Could not forward register cmd: {e}")
+                                }
+                            };
+                        }
+                    }
+                }
+            }
+        } else {
+            info!("Decoding failed!");
+        }
+    }
+}
+
+// Functions for conversion of BlockFeedConfig to FeedConfig:
 fn block_feed_to_feed_config(block_feed: &BlockFeedConfig) -> config::FeedConfig {
     config::FeedConfig {
         id: block_feed.id,

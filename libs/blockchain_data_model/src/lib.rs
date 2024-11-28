@@ -75,11 +75,11 @@ pub struct FeedActions {
 
 impl FeedActions {
     pub fn serialize(&mut self) -> Vec<u8> {
-        ssz_rs::serialize(self).expect("Serialization of AddRemoveFeeds failed")
+        ssz_rs::serialize(self).expect("Serialization of FeedActions failed")
     }
 
     pub fn deserialize(serialized: &[u8]) -> FeedActions {
-        ssz_rs::deserialize(serialized).expect("Serialization of AddRemoveFeeds failed")
+        ssz_rs::deserialize(serialized).expect("Serialization of FeedActions failed")
     }
 }
 

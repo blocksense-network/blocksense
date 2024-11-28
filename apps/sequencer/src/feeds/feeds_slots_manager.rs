@@ -410,7 +410,7 @@ mod tests {
             feeds_management_cmd_to_block_creator_send,
             feeds_management_cmd_to_block_creator_recv,
         ) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) =
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
             mpsc::unbounded_channel();
 
         let sequencer_state = web::Data::new(SequencerState {
