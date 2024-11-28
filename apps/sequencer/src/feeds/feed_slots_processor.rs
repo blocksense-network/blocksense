@@ -142,21 +142,21 @@ impl FeedSlotsProcessor {
                         let mut reports = reports.write().await;
                         debug!("Acquired a write lock on reports [feed {feed_id}]");
                         // Process the reports:
-                        let mut values: Vec<&FeedType> = vec![];
+                        let mut values: Vec<FeedType> = vec![];
                         for kv in &reports.report {
                             match kv.1 {
                                 FeedResult::Result { result } => {
                                     match &result {
                                         FeedType::Numerical(_) => {
                                             if feed_type == "Numerical" {
-                                                values.push(result)
+                                                values.push(result.clone())
                                             } else {
                                                 warn!("Wrong value type reported by reporter {} for feed id {} slot {}! value_type = Numerical expected", kv.0, self.key, slot);
                                             }
                                         },
                                         FeedType::Text(_) => {
                                             if feed_type == "Text" {
-                                                values.push(result)
+                                                values.push(result.clone())
                                             } else {
                                                 warn!("Wrong value type reported by reporter {} for feed id {} slot {}! value_type = Text expected", kv.0, self.key, slot);
                                             }
@@ -172,9 +172,12 @@ impl FeedSlotsProcessor {
                             }
                         }
 
+                        reports.clear();
+                        drop(reports);
+                        debug!("Release the write lock on reports [feed {feed_id}]");
+
                         if values.is_empty() {
                             info!("No reports found for feed: {} slot: {}!", self.name, &slot);
-                            debug!("Release the write lock on reports [feed {feed_id}]");
                             continue;
                         }
 
@@ -204,7 +207,7 @@ impl FeedSlotsProcessor {
 
                         debug!("Get a read lock on feed meta to aggregate votes [feed {feed_id}]");
                         // Dispatch to concrete FeedAggregate implementation.
-                        result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(values);
+                        result_post_to_contract = feed.read().await.get_feed_aggregator().aggregate(&values[..]);
                         debug!("Release the read lock on feed meta to aggregate votes [feed {feed_id}]");
 
                         // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
@@ -262,9 +265,6 @@ impl FeedSlotsProcessor {
                         }
 
                         info!("result_post_to_contract = {:?}", result_post_to_contract);
-
-                        reports.clear();
-                        debug!("Release the write lock on reports [feed {feed_id}]");
                     }
                     if is_quorum_reached {
                         result_send

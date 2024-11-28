@@ -25,7 +25,7 @@ impl Display for ConsensusMetric {
 }
 
 pub trait FeedAggregate: Send + Sync {
-    fn aggregate(&self, values: Vec<&FeedType>) -> FeedType;
+    fn aggregate(&self, values: &[FeedType]) -> FeedType;
 }
 
 pub struct AverageAggregator {}
@@ -37,7 +37,7 @@ impl Display for AverageAggregator {
 }
 
 impl FeedAggregate for AverageAggregator {
-    fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
+    fn aggregate(&self, values: &[FeedType]) -> FeedType {
         let span = info_span!("AverageAggregator");
         let _guard = span.enter();
         assert!(!values.is_empty());
@@ -59,7 +59,7 @@ impl FeedAggregate for AverageAggregator {
 pub struct MedianAggregator {}
 
 impl FeedAggregate for MedianAggregator {
-    fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
+    fn aggregate(&self, values: &[FeedType]) -> FeedType {
         let span = info_span!("MedianAggregator");
         let _guard = span.enter();
         let mut filtered = Vec::new();
@@ -99,7 +99,7 @@ pub fn get_aggregator(aggredate_type: &str) -> Box<dyn FeedAggregate> {
 pub struct MajorityVoteAggregator {}
 
 impl FeedAggregate for MajorityVoteAggregator {
-    fn aggregate(&self, values: Vec<&FeedType>) -> FeedType {
+    fn aggregate(&self, values: &[FeedType]) -> FeedType {
         let span = info_span!("MajorityVoteAggregator");
         let _guard = span.enter();
 
@@ -151,7 +151,7 @@ mod tests {
             .map(FeedType::Numerical)
             .collect();
 
-        let result = aggregator.aggregate(values.iter().collect());
+        let result = aggregator.aggregate(&values[..]);
         let expected_result = (2. + 2. + 3.) / 3.;
         assert_eq!(FeedType::Numerical(expected_result), result);
     }
@@ -165,7 +165,7 @@ mod tests {
             .map(FeedType::Numerical)
             .collect();
 
-        let result = aggregator.aggregate(values.iter().collect());
+        let result = aggregator.aggregate(&values[..]);
 
         assert_eq!(result, FeedType::Numerical(0.));
     }
@@ -182,7 +182,7 @@ mod tests {
         .map(FeedType::Numerical)
         .collect();
 
-        let result = aggregator.aggregate(values.iter().collect());
+        let result = aggregator.aggregate(&values[..]);
 
         assert_eq!(
             result,
@@ -196,7 +196,7 @@ mod tests {
 
         let values: Vec<FeedType> = vec![0., 0.].into_iter().map(FeedType::Numerical).collect();
 
-        let result = aggregator.aggregate(values.iter().collect());
+        let result = aggregator.aggregate(&values[..]);
 
         assert_ne!(result, FeedType::Numerical(0.00000000001));
     }
