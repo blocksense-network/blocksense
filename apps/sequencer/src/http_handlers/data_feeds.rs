@@ -254,6 +254,7 @@ pub async fn post_reports_batch(
 
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
     let data_feeds: Vec<DataFeedPayload> = serde_json::from_value(v)?;
+    info!("Received batches {}", data_feeds.len());
 
     for data_feed in data_feeds {
         let res = process_report(&sequencer_state, data_feed).await;

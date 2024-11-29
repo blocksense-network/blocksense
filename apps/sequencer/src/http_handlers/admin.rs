@@ -450,7 +450,6 @@ pub async fn get_oracle_scripts(
     _sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let mut oracle_scripts = OraclesResponse::default();
-    debug!("oracle config - {:?}", oracle_scripts);
     oracle_scripts.oracles = vec![
         OracleScript {
             id: "cmc".to_string(),
@@ -478,13 +477,22 @@ pub async fn get_oracle_scripts(
         },
     ];
 
-    debug!("oracle config filled - {:?}", oracle_scripts);
     let oracles_config_pretty = serde_json::to_string_pretty(&oracle_scripts)?;
-    debug!("oracle response - {:?}", oracles_config_pretty);
 
     Ok(HttpResponse::Ok()
         .content_type(ContentType::plaintext())
         .body(oracles_config_pretty.to_string()))
+}
+
+#[get("/health")]
+pub async fn health(_sequencer_state: web::Data<SequencerState>) -> Result<HttpResponse, Error> {
+    //TODO(adikov): Check if we have connection to:
+    // * All blockchain networks
+    // * Kafka
+    // * ...
+    Ok(HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body("".to_string()))
 }
 
 #[cfg(test)]
