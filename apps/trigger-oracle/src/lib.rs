@@ -262,9 +262,11 @@ impl TriggerExecutor for OracleTrigger {
         );
         loops.push(orchestrator);
 
+        let url = url::Url::parse(&self.sequencer.clone())?;
+        let sequencer_url = url.join("/post_reoprts_batch")?;
         let manager = Self::start_manager(
             data_feed_receiver,
-            &self.sequencer,
+            &sequencer_url,
             &self.secret_key,
             self.reporter_id,
         );
@@ -394,7 +396,7 @@ impl OracleTrigger {
 
     fn start_manager(
         rx: UnboundedReceiver<(String, Payload)>,
-        sequencer: &str,
+        sequencer: &url::Url,
         secret_key: &str,
         reporter_id: u64,
     ) -> tokio::task::JoinHandle<TerminationReason> {
@@ -406,7 +408,7 @@ impl OracleTrigger {
 
     async fn process_payload(
         mut rx: UnboundedReceiver<(String, Payload)>,
-        sequencer: String,
+        sequencer: url::Url,
         secret_key: String,
         reporter_id: u64,
     ) -> TerminationReason {
@@ -445,6 +447,7 @@ impl OracleTrigger {
             }
             //TODO(adikov): Potential better implementation would be to send results to the
             //sequencer every few seconds in which we can gather batches of data feed payloads.
+
             let client = reqwest::Client::new();
             match client
                 .post(sequencer.clone())

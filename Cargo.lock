@@ -10804,6 +10804,7 @@ dependencies = [
  "tokio-scoped",
  "tracing",
  "tracing-subscriber",
+ "url",
  "utils",
  "wasmtime",
  "wasmtime-wasi",

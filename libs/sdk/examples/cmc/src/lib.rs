@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
@@ -59,7 +59,7 @@ pub struct CmcValue {
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct CmcResource {
-    pub cmc_id: u64,
+    pub cmc_id: String,
     pub cmc_quote: String,
 }
 
@@ -68,9 +68,9 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let mut resources: HashMap<String, CmcResource> = HashMap::new();
     let mut ids: Vec<String> = vec![];
     for feed in settings.data_feeds.iter() {
-        let data: CmcResource = serde_json::from_str(&feed.data)?;
+        let data: CmcResource = serde_json::from_str(&feed.data).context("Couldn't parse Data Feed resource properly")?;
         resources.insert(feed.id.clone(), data.clone());
-        ids.push(data.cmc_id.to_string());
+        ids.push(data.cmc_id);
     }
 
     let url = Url::parse_with_params(
@@ -99,11 +99,11 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let body = resp.into_body();
     let string = String::from_utf8(body)?;
-    let value: Root = serde_json::from_str(&string)?;
+    let value: Root = serde_json::from_str(&string).context("Couldn't parse CMC response properly")?;
     let mut payload: Payload = Payload::new();
 
     for (feed_id, data) in resources.iter() {
-        payload.values.push(match value.data.get(&data.cmc_id) {
+        payload.values.push(match value.data.get(&data.cmc_id.parse::<u64>()?) {
             Some(cmc) => {
                 let value = if let Some(&CmcValue { price }) = cmc.quote.get("USD") {
                     DataFeedResultValue::Numerical(price)

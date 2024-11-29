@@ -202,7 +202,7 @@ data = '{"yf_symbol":"mSOL"}'
 id = "246"
 
 [[trigger.oracle.capabilities]]
-data = "97yVrb3jKQaLw2vU1istq7LcVmTUgPaPavoL7HYn"
+data = "KuTOFAJo9w7uZPCBS3Bnz3qfuojGHlRP8rZAPGeg"
 id = "YAHOO_API_KEY"
 
 [component.yahoo]

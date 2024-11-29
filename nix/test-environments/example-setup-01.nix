@@ -109,12 +109,18 @@ in
       a = {
         reporter-info = {
           reporter_id = 0;
-          interval_time_in_seconds = 10;
-          secret_key = builtins.readFile "${testKeysDir}/reporter_secret_key";
+          interval_time_in_seconds = 100;
+          secret_key = builtins.replaceStrings [ "\n" ] [ "" ] (
+            builtins.readFile "${testKeysDir}/reporter_secret_key"
+          );
         };
         api-keys = {
-          CMC_API_KEY = builtins.readFile "${testKeysDir}/CMC_API_KEY";
-          YAHOO_API_KEY = builtins.readFile "${testKeysDir}/YH_FINANCE_API_KEY";
+          CMC_API_KEY = builtins.replaceStrings [ "\n" ] [ "" ] (
+            builtins.readFile "${testKeysDir}/CMC_API_KEY"
+          );
+          YAHOO_API_KEY = builtins.replaceStrings [ "\n" ] [ "" ] (
+            builtins.readFile "${testKeysDir}/YH_FINANCE_API_KEY"
+          );
         };
       };
     };
