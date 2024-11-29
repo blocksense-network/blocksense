@@ -263,7 +263,7 @@ impl TriggerExecutor for OracleTrigger {
         loops.push(orchestrator);
 
         let url = url::Url::parse(&self.sequencer.clone())?;
-        let sequencer_url = url.join("/post_reoprts_batch")?;
+        let sequencer_url = url.join("/post_reports_batch")?;
         let manager = Self::start_manager(
             data_feed_receiver,
             &sequencer_url,
@@ -448,6 +448,11 @@ impl OracleTrigger {
             //TODO(adikov): Potential better implementation would be to send results to the
             //sequencer every few seconds in which we can gather batches of data feed payloads.
 
+            tracing::trace!(
+                "Sending to url - {}; {} batches",
+                sequencer.clone(),
+                batch_payload.len()
+            );
             let client = reqwest::Client::new();
             match client
                 .post(sequencer.clone())
