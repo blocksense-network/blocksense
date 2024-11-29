@@ -452,11 +452,11 @@ impl FeedSlotsProcessor {
         let history_guard = history.read().await;
         let res = match history_guard.last(feed_id) {
             Some(FeedType::Numerical(last)) => {
-                    let a = f64::abs(*last);
-                    let b = f64::abs(candidate_value);
-                    let diff = f64::abs(last - candidate_value);
-                    diff < skip_publish_if_less_then_percentage * f64::max(a, b)
-            },
+                let a = f64::abs(*last);
+                let b = f64::abs(candidate_value);
+                let diff = f64::abs(last - candidate_value);
+                diff < skip_publish_if_less_then_percentage * f64::max(a, b)
+            }
             _ => false,
         };
         debug!("Release the read lock on history [feed {feed_id}]");
