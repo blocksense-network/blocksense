@@ -1,9 +1,5 @@
 import * as S from '@effect/schema/Schema';
 
-import { selectDirectory } from '@blocksense/base-utils/fs';
-
-import { artifactsDir } from '../../paths';
-
 /**
  * Schema for the information about symbols received from Binance.
  */
@@ -49,14 +45,6 @@ export async function fetchBinanceSymbolsInfo(): Promise<
   const data = (await response.json()) as { symbols: unknown[] };
 
   const supportedBinanceSymbols = decodeBinanceSymbolInfo(data.symbols);
-
-  {
-    const { writeJSON } = selectDirectory(artifactsDir);
-    await writeJSON({
-      content: { supportedBinanceSymbols },
-      name: 'binance_symbols',
-    });
-  }
 
   return supportedBinanceSymbols;
 }

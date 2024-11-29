@@ -1,8 +1,6 @@
 import { assertNotNull } from '@blocksense/base-utils/assert';
-import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { CMCInfo, decodeCMCInfo } from '../types';
-import { artifactsDir } from '../../paths';
 
 export async function getCMCCryptoList(): Promise<readonly CMCInfo[]> {
   const url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map';
@@ -29,14 +27,6 @@ ${await response.text()}`,
   const typedData = (await response.json()) as { data: unknown[] };
 
   const supportedCMCCurrencies = decodeCMCInfo(typedData.data);
-
-  {
-    const { writeJSON } = selectDirectory(artifactsDir);
-    await writeJSON({
-      content: { supportedCMCCurrencies },
-      name: 'cmc_currencies',
-    });
-  }
 
   return supportedCMCCurrencies;
 }

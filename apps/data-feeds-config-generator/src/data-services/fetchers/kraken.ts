@@ -1,6 +1,4 @@
-import { selectDirectory } from '@blocksense/base-utils/fs';
 import * as S from '@effect/schema/Schema';
-import { artifactsDir } from '../../paths';
 
 /**
  * Schema for the information about symbols received from Kraken.
@@ -64,14 +62,6 @@ export async function fetchKrakenSymbolsInfo(): Promise<
       ...(value as Object),
     })),
   );
-
-  {
-    const { writeJSON } = selectDirectory(artifactsDir);
-    await writeJSON({
-      content: { supportedKrakenSymbols },
-      name: 'kraken_symbols',
-    });
-  }
 
   return supportedKrakenSymbols;
 }
