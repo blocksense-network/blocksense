@@ -43,7 +43,7 @@ export const decodeChainLinkFeedsInfo = S.decodeUnknownSync(
 /**
  * Schema for the information about currencies received from CoinMarketCap.
  */
-const CMCInfoSchema = S.Struct({
+export const CMCInfoSchema = S.Struct({
   id: S.Number,
   rank: S.Number,
   name: S.String,

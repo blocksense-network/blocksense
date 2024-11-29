@@ -1,32 +1,24 @@
-import { assertNotNull } from '@blocksense/base-utils/assert';
+import * as S from '@effect/schema/Schema';
 
-import { CMCInfo, decodeCMCInfo } from '../types';
+import { getEnvString } from '@blocksense/base-utils/env';
+import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+
+import { CMCInfo, CMCInfoSchema } from '../types';
 
 export async function getCMCCryptoList(): Promise<readonly CMCInfo[]> {
   const url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map';
-  const headers = {
-    'X-CMC_PRO_API_KEY': assertNotNull(
-      process.env['CMC_API_KEY'],
-      'CMC_API_KEY env variable not set',
-    ),
-    Accept: 'application/json',
-  };
 
-  const fullUrl = `${url}`;
+  const t = S.Struct({
+    data: S.Array(CMCInfoSchema),
+  });
 
-  const response = await fetch(fullUrl, { headers });
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch CoinMarketCap crypto list;
-response:
-  status=${response.status};
-  text=
-${await response.text()}`,
-    );
-  }
-  const typedData = (await response.json()) as { data: unknown[] };
+  const typedData = await fetchAndDecodeJSON(t, url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+      'X-CMC_PRO_API_KEY': getEnvString('CMC_API_KEY'),
+    },
+  });
 
-  const supportedCMCCurrencies = decodeCMCInfo(typedData.data);
-
-  return supportedCMCCurrencies;
+  return typedData.data;
 }

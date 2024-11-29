@@ -1,5 +1,7 @@
 import * as S from '@effect/schema/Schema';
 
+import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+
 /**
  * Schema for the information about symbols received from Bybit.
  */
@@ -11,6 +13,14 @@ const BybitSymbolInfoSchema = S.Struct({
   lotSizeFilter: S.Struct({
     basePrecision: S.String,
     quotePrecision: S.String,
+  }),
+});
+
+const BybitInstrumentsInfoRespSchema = S.Struct({
+  retCode: S.Number,
+  retMsg: S.String,
+  result: S.Struct({
+    list: S.Array(S.Unknown),
   }),
 });
 
@@ -32,30 +42,23 @@ export const decodeBybitSymbolInfo = S.decodeUnknownSync(
 export async function fetchBybitSymbolsInfo(): Promise<
   readonly BybitSymbolInfo[]
 > {
-  const instrumentsInfoUrl = 'https://api.bybit.com/v5/market/instruments-info';
-  const params = new URLSearchParams({ category: 'spot' });
-  const headers = { Accept: 'application/json' };
+  const instrumentsInfoUrl =
+    'https://api.bybit.com/v5/market/instruments-info?category=spot';
 
-  const response = await fetch(`${instrumentsInfoUrl}?${params.toString()}`, {
-    method: 'GET',
-    headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status} ${response.statusText}`);
-  }
-
-  const data = (await response.json()) as {
-    retCode: number;
-    retMsg: string;
-    result?: { list: unknown[] };
-  };
+  const data = await fetchAndDecodeJSON(
+    BybitInstrumentsInfoRespSchema,
+    instrumentsInfoUrl,
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    },
+  );
 
   if (data.retCode !== 0) {
     throw new Error(`Error: ${data.retCode} ${data.retMsg}`);
   }
 
-  const supportedBybitSymbols = decodeBybitSymbolInfo(data.result?.list);
-
-  return supportedBybitSymbols;
+  return decodeBybitSymbolInfo(data.result?.list);
 }

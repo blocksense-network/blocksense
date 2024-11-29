@@ -1,5 +1,7 @@
 import * as S from '@effect/schema/Schema';
 
+import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+
 /**
  * Schema for the information about symbols received from Upbit.
  */
@@ -11,6 +13,14 @@ const UpbitSymbolInfoSchema = S.Struct({
   quote: S.String,
   english_name: S.String,
 });
+
+const UpbitMarketRespSchema = S.Array(
+  S.Struct({
+    market: S.String,
+    korean_name: S.String,
+    english_name: S.String,
+  }),
+);
 
 /**
  * Type for the information about symbols received from Upbit.
@@ -26,22 +36,20 @@ export const decodeUpbitSymbolInfo = S.decodeUnknownSync(
 
 /**
  * Function to fetch detailed information about symbols from Upbit.
+ *
+ * Ref: https://global-docs.upbit.com/reference/listing-market-list
  */
 export async function fetchUpbitSymbolsInfo(): Promise<
   readonly UpbitSymbolInfo[]
 > {
   const marketUrl = 'https://api.upbit.com/v1/market/all';
 
-  const marketResponse = await fetch(marketUrl);
-  if (!marketResponse.ok) {
-    throw new Error(`Failed to fetch markets: ${marketResponse.statusText}`);
-  }
-
-  const markets = (await marketResponse.json()) as {
-    market: string;
-    korean_name: string;
-    english_name: string;
-  }[];
+  const markets = await fetchAndDecodeJSON(UpbitMarketRespSchema, marketUrl, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
 
   const supportedUpbitSymbols = decodeUpbitSymbolInfo(
     markets.map(market => {

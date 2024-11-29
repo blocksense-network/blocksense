@@ -1,5 +1,7 @@
 import * as S from '@effect/schema/Schema';
 
+import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+
 /**
  * Schema for the information about symbols received from Kraken.
  */
@@ -15,10 +17,13 @@ const KrakenSymbolInfoSchema = S.Struct({
   pair_decimals: S.Number,
 });
 
-/**
- * Type for the information about symbols received from Kraken.
- */
-export type KrakenSymbolInfo = S.Schema.Type<typeof KrakenSymbolInfoSchema>;
+const KrakenAssetPairsRespSchema = S.Struct({
+  error: S.Array(S.Any),
+  result: S.Record({
+    key: S.String,
+    value: S.Unknown,
+  }),
+});
 
 /**
  * Function to decode Kraken symbol information.
@@ -28,29 +33,30 @@ export const decodeKrakenSymbolInfo = S.decodeUnknownSync(
 );
 
 /**
+ * Type for the information about symbols received from Kraken.
+ */
+export type KrakenSymbolInfo = S.Schema.Type<typeof KrakenSymbolInfoSchema>;
+
+/**
  * Function to fetch detailed information about symbols from Kraken.
+ *
+ * Ref: https://docs.kraken.com/api/docs/rest-api/get-tradable-asset-pairs
  */
 export async function fetchKrakenSymbolsInfo(): Promise<
   readonly KrakenSymbolInfo[]
 > {
   const assetPairsUrl = 'https://api.kraken.com/0/public/AssetPairs';
 
-  // Fetch all trading pairs
-  const pairsResponse = await fetch(assetPairsUrl, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
+  const pairsData = await fetchAndDecodeJSON(
+    KrakenAssetPairsRespSchema,
+    assetPairsUrl,
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
     },
-  });
-
-  if (!pairsResponse.ok) {
-    throw new Error(`Failed to fetch asset pairs: ${pairsResponse.status}`);
-  }
-
-  const pairsData = (await pairsResponse.json()) as {
-    error: unknown[];
-    result: Record<string, unknown>;
-  };
+  );
 
   if (pairsData.error.length > 0) {
     throw new Error(`Found errors in paris data: ${pairsData.error}`);
