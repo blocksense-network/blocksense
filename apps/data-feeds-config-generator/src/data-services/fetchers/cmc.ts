@@ -1,8 +1,8 @@
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import { CMCInfo, decodeCMCInfo } from './types';
-import { artifactsDir } from '../paths';
+import { CMCInfo, decodeCMCInfo } from '../types';
+import { artifactsDir } from '../../paths';
 
 export async function getCMCCryptoList(): Promise<readonly CMCInfo[]> {
   const url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/map';

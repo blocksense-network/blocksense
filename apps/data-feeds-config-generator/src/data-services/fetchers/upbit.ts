@@ -2,7 +2,7 @@ import * as S from '@effect/schema/Schema';
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import { artifactsDir } from '../paths';
+import { artifactsDir } from '../../paths';
 
 /**
  * Schema for the information about symbols received from Upbit.

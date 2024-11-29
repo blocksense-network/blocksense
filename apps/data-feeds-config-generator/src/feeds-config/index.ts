@@ -21,8 +21,8 @@ import {
   RawDataFeeds,
   CMCInfo,
 } from '../data-services/types';
-import { getCMCCryptoList } from '../data-services/cmc';
-import { isFeedSupportedByYF } from '../data-services/yf';
+import { getCMCCryptoList } from '../data-services/fetchers/cmc';
+import { isFeedSupportedByYF } from '../data-services/fetchers/yf';
 import { artifactsDir } from '../paths';
 import {
   chainlinkNetworkNameToChainId,

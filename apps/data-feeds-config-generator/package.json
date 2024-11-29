@@ -15,7 +15,8 @@
     "ts": "yarn node --import tsx",
     "get-chainlink-feeds": "yarn ts src/scripts/get_chainlink_feeds.ts",
     "generate-data-feeds-config": "yarn ts src/scripts/generate-feeds-config.ts",
-    "generate": "yarn get-chainlink-feeds && yarn generate-data-feeds-config"
+    "generate": "yarn get-chainlink-feeds && yarn generate-data-feeds-config",
+    "fetch-symbols": "yarn ts src/data-services/fetchers/fetch-symbols.ts"
   },
   "devDependencies": {
     "@blocksense/base-utils": "workspace:*",
