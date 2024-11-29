@@ -47,6 +47,11 @@
       "import": "./dist/esm/env/index.mjs",
       "types": "./dist/types/env/index.d.ts"
     },
+    "./http": {
+      "require": "./dist/cjs/http.cjs",
+      "import": "./dist/esm/http.mjs",
+      "types": "./dist/types/http.d.ts"
+    },
     "./numeric": {
       "require": "./dist/cjs/numeric.cjs",
       "import": "./dist/esm/numeric.mjs",
