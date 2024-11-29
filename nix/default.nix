@@ -12,11 +12,7 @@
   } // (import ./lib lib);
 
   perSystem =
-    {
-      inputs',
-      pkgs,
-      ...
-    }:
+    { inputs', pkgs, ... }:
     let
       rustToolchain =
         with inputs'.fenix.packages;
@@ -28,7 +24,7 @@
           rust-src
           rustc
           rustfmt
-          targets.wasm32-wasi.latest.rust-std
+          targets.wasm32-wasip1.latest.rust-std
         ];
 
       ldLibraryPath = lib.makeLibraryPath [

@@ -10,7 +10,7 @@ with lib;
     build-command = mkOption {
       type = types.str;
       description = mdDoc "Command for building the oracle scripts to wasm.";
-      default = "cargo build --target wasm32-wasi --release";
+      default = "cargo build --target wasm32-wasip1 --release";
     };
 
     source = mkOption {

@@ -851,8 +851,8 @@ data = "1ae0fbaf-5590-424a-865c-71daf04defb1"
 id = "CMC_API_KEY"
 
 [component.coinmarketcap]
-source = "target/wasm32-wasi/release/cmc_oracle.wasm"
+source = "target/wasm32-wasip1/release/cmc_oracle.wasm"
 allowed_outbound_hosts = ["https://pro-api.coinmarketcap.com"]
 
 [component.coinmarketcap.build]
-command = "cargo build --target wasm32-wasi --release"
+command = "cargo build --target wasm32-wasip1 --release"

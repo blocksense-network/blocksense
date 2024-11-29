@@ -92,15 +92,15 @@ in
       oracles = {
         cmc = rec {
           path = config.devenv.root + "/libs/sdk/examples/cmc";
-          source = path + "/target/wasm32-wasi/release/cmc_oracle.wasm";
+          source = path + "/target/wasm32-wasip1/release/cmc_oracle.wasm";
         };
         yahoo = rec {
           path = config.devenv.root + "/libs/sdk/examples/yahoo";
-          source = path + "/target/wasm32-wasi/release/yahoo_oracle.wasm";
+          source = path + "/target/wasm32-wasip1/release/yahoo_oracle.wasm";
         };
         revolut = rec {
           path = config.devenv.root + "/libs/sdk/examples/revolut";
-          source = path + "/target/wasm32-wasi/release/revolut_oracle.wasm";
+          source = path + "/target/wasm32-wasip1/release/revolut_oracle.wasm";
         };
       };
     };

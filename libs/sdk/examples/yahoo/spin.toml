@@ -206,9 +206,9 @@ data = "KuTOFAJo9w7uZPCBS3Bnz3qfuojGHlRP8rZAPGeg"
 id = "YAHOO_API_KEY"
 
 [component.yahoo]
-source = "target/wasm32-wasi/release/yahoo_oracle.wasm"
+source = "target/wasm32-wasip1/release/yahoo_oracle.wasm"
 allowed_outbound_hosts = [
   "https://yfapi.net:443",
 ]
 [component.yahoo.build]
-command = "cargo build --target wasm32-wasi --release"
+command = "cargo build --target wasm32-wasip1 --release"
