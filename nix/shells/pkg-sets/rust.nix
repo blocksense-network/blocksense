@@ -21,6 +21,7 @@
   packages =
     [
       self'.legacyPackages.cargoWrapped
+      self'.legacyPackages.spinWrapped
       self'.legacyPackages.rustToolchain
     ]
     ++ (with pkgs; [
