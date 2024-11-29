@@ -2,6 +2,10 @@
 with lib;
 {
   options = {
+    enable = mkEnableOption (mdDoc ''
+      Enable reporter v1 service.
+    '');
+
     full-batch = mkOption {
       type = types.bool;
       default = true;

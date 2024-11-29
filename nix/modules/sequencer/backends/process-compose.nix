@@ -77,7 +77,7 @@ let
   reporterInstances = lib.mapAttrs' (name: conf: {
     name = "blocksense-reporter-${name}";
     value.process-compose = {
-      command = "${reporter.program}";
+      command = "true";
       environment = [
         "FEEDS_CONFIG_DIR=${../../../../config}"
         "REPORTER_CONFIG_DIR=${reportersConfigJSON.${name}}/reporter-${name}"
@@ -125,7 +125,7 @@ let
               lib.nameValuePair "oracle-script-builder-${key}" { condition = "process_completed_successfully"; }
             ) cfg.oracle-scripts.oracles;
           in
-          oracle-scripts // { blocksense-sequencer.condition = "process_started"; };
+          oracle-scripts // { blocksense-sequencer.condition = "process_healthy"; };
         working_dir = cfg.oracle-scripts.base-dir;
       };
     }
@@ -134,6 +134,13 @@ let
   sequencerInstance = {
     blocksense-sequencer.process-compose = {
       command = "${sequencer.program}";
+      readiness_probe = {
+        exec.command = ''
+          curl -fsSL http://127.0.0.1:${toString cfg.sequencer.admin-port}/health \
+            -H 'content-type: application/json'
+        '';
+        timeout_seconds = 30;
+      };
       environment = [
         "FEEDS_CONFIG_DIR=${../../../../config}"
         "SEQUENCER_CONFIG_DIR=${sequencerConfigJSON}"
