@@ -58,5 +58,48 @@
             ./${name}.nix
           ];
         });
+
+      # You can run the test with the following command:
+      # `nix run .#checks.x86_64-linux.example-setup-01.driver --impure`
+      checks = lib.genAttrs allEnvironmentNames (
+        name:
+        pkgs.testers.runNixOSTest {
+          name = "sequencer-test";
+
+          nodes.machine = {
+            options.devenv.root = lib.mkOption {
+              type = lib.types.path;
+              default = builtins.getEnv "PWD";
+            };
+            config = {
+              virtualisation = {
+                graphics = false;
+                cores = 8;
+                memorySize = 16384;
+                diskSize = 4096;
+              };
+            };
+
+            imports = [
+              self.nixosModules.blocksense-systemd
+
+              ./${name}.nix
+            ];
+          };
+
+          testScript = ''
+            machine.wait_for_unit("default.target")
+            freeRam = machine.execute("free -h")
+            systemdAnvil = machine.execute("cat /etc/systemd/system/blocksense-anvil-a.service")
+            systemdSequencer = machine.execute("cat /etc/systemd/system/blocksense-sequencer.service")
+            systemdReporter = machine.execute("cat /etc/systemd/system/blocksense-reporter-a.service")
+
+            print(freeRam)
+            print(systemdAnvil)
+            print(systemdSequencer)
+            print(systemdReporter)
+          '';
+        }
+      );
     };
 }
