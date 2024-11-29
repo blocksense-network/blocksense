@@ -786,8 +786,10 @@ __metadata:
     ethers: "npm:^6.13.4"
     hardhat: "npm:^2.22.17"
     hardhat-contract-sizer: "npm:^2.10.0"
-    hardhat-gas-reporter: "npm:^2.2.2"
-    solidity-coverage: "npm:^0.8.14"
+    hardhat-gas-reporter: "npm:^2.2.1"
+    prettier: "npm:^3.4.1"
+    prettier-plugin-solidity: "npm:^1.4.1"
+    solidity-coverage: "npm:^0.8.12"
     ts-node: "npm:^10.9.2"
     typechain: "npm:^8.3.2"
   languageName: unknown
@@ -11851,7 +11853,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat-gas-reporter@npm:^2.2.2":
+"hardhat-gas-reporter@npm:^2.2.1":
   version: 2.2.2
   resolution: "hardhat-gas-reporter@npm:2.2.2"
   dependencies:
@@ -16872,7 +16874,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.4.2":
+"prettier@npm:^3.4.1, prettier@npm:^3.4.2":
   version: 3.4.2
   resolution: "prettier@npm:3.4.2"
   bin:
@@ -18476,7 +18478,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"solidity-coverage@npm:^0.8.14":
+"solidity-coverage@npm:^0.8.12":
   version: 0.8.14
   resolution: "solidity-coverage@npm:0.8.14"
   dependencies:

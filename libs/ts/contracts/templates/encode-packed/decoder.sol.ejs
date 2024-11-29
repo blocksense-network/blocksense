@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+/// @notice Decoder for stored packed sports data
+library EncodePackedDecoder {
+  /// @notice User defined struct
+  /// @dev Using structs avoids hitting the EVM stack limit
+<%= structs.map((struct) => {
+  return `  struct ${struct.name} {
+  ${struct.fields.map((fields) => `  ${fields.type} ${fields.name};`).join('\n  ')}
+  }`
+}).join('\n\n') %>
+
+  function decode(
+    bytes memory data
+  ) external pure returns (<%= returnType %> memory <%= mainStructName %>) {
+    assembly {
+      // First 32 bytes are the length of the data
+      let memData := mload(add(data, 32))
+      <%= containsDynamicData ? 'let shift := 0' : '' %>
+      <%= lines.join('\n') %>
+    }
+  }
+}
