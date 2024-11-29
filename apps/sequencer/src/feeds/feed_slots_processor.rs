@@ -231,6 +231,7 @@ impl FeedSlotsProcessor {
                                 .as_slices();
 
                             let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
+                            debug!("Get a read lock on history [feed {feed_id}]");
                             let numerical_vec: Vec<f64> = history_vec
                                 .iter()
                                 .filter_map(|feed| {
@@ -253,14 +254,17 @@ impl FeedSlotsProcessor {
 
                             // Get AD prediction only if enough data is present
                             if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
+                                debug!("Starting anomaly detection for [feed {feed_id}]");
                                 match anomaly_detector_aggregate(numerical_vec) {
                                     Ok(ad_score) => {
-                                        info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
+                                        info!("AD_score for {:?} is {} [feed {feed_id}]", result_post_to_contract, ad_score);
                                     }
                                     Err(e) => {
-                                        error!("Anomaly Detection failed with error - {}", e);
+                                        error!("Anomaly Detection failed with error - {} [feed {feed_id}]", e);
                                     }
                                 }
+                            } else {
+                                debug!("Skipping anomaly detection; numerical_vec.len()={}", numerical_vec.len());
                             }
                         }
 
