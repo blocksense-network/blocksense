@@ -14,7 +14,7 @@ members = [
   "libs/utils",
   "libs/config",
   "libs/crypto",
-  "libs/feed_registry"]
+  "libs/feed_registry", "apps/gnosis-safe-transaction-signer"]
 resolver = "2"
 
 [workspace.package]
