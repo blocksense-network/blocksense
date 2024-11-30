@@ -4,7 +4,7 @@ use anyhow::Context;
 use csv::ReaderBuilder;
 use tracing::debug;
 
-use crate::{extended_isolation_forest::make_f64_forest, hdbscan_detector::make_f64_hdbscan};
+// use crate::{extended_isolation_forest::make_f64_forest, hdbscan_detector::make_f64_hdbscan};
 
 pub fn read_csv_to_vec(file_path: &str, column: &str) -> Result<Vec<f64>, Box<dyn Error>> {
     let file = File::open(Path::new(file_path))?;
@@ -31,6 +31,8 @@ pub fn read_csv_to_vec(file_path: &str, column: &str) -> Result<Vec<f64>, Box<dy
 /// The last value of `values` will be checked for anomalies
 /// Sending an empty `values` vector will result in a panic!
 pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error> {
+    debug!("[AD] input: values={values:?}");
+
     const DIM: usize = 1; // Dimensionality of data
 
     debug!(
@@ -44,6 +46,9 @@ pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error
         .last()
         .context("Not enough values for anomaly detection")?;
 
+    debug!("[AD] bypassing and returning last_value={last_value:?}");
+    Ok(last_value[0])
+    /*
     debug!("[AD] about to make forest...; last_value={last_value:?}");
     let forest = make_f64_forest::<DIM>(values_array)?;
     debug!("[AD] done making forest");
@@ -68,4 +73,5 @@ pub fn anomaly_detector_aggregate(values: Vec<f64>) -> Result<f64, anyhow::Error
     debug!("[AD] aggregate_result = {aggregate_result}");
 
     Ok(aggregate_result)
+    */
 }
