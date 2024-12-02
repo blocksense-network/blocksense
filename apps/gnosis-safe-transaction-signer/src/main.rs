@@ -99,6 +99,10 @@ async fn main() -> Result<()> {
             signature,
             signer_address,
         });
+
+        // Verify message recovery
+        let recovered_address = signature.recover_address_from_prehash(&tx_hash).unwrap();
+        assert_eq!(signer_address, recovered_address);
     }
 
     // Gnosis safe requires signatures to be sorted by signer address
