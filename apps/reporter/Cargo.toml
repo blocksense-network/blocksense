@@ -15,7 +15,7 @@ config = { path = "../../libs/config" }
 feed_registry = { path = "../../libs/feed_registry"}
 
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-tracing-subscriber = { version = "0.3.18", features = ["json"] }
+tracing-subscriber = { version = "0.3.19", features = ["json"] }
 serde_json = "1.0.128"
 
 [[bin]]
