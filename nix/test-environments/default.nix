@@ -89,15 +89,8 @@
 
           testScript = ''
             machine.wait_for_unit("default.target")
-            freeRam = machine.execute("free -h")
-            systemdAnvil = machine.execute("cat /etc/systemd/system/blocksense-anvil-a.service")
-            systemdSequencer = machine.execute("cat /etc/systemd/system/blocksense-sequencer.service")
-            systemdReporter = machine.execute("cat /etc/systemd/system/blocksense-reporter-a.service")
-
-            print(freeRam)
-            print(systemdAnvil)
-            print(systemdSequencer)
-            print(systemdReporter)
+            machine.wait_for_unit("blocksense-sequencer.service")
+            machine.succeed("curl localhost:5551/metrics")
           '';
         }
       );

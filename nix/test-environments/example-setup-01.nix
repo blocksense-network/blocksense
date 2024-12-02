@@ -1,4 +1,8 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  ...
+}:
 let
   # Function to read and parse the JSON file
   readJson = path: builtins.fromJSON (builtins.readFile path);
@@ -12,7 +16,6 @@ let
     (readJson deploymentFilePath)."ethereum-holesky".contracts.coreContracts.UpgradeableProxy.address;
 
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
-
 in
 {
   services.blocksense = {
@@ -21,16 +24,16 @@ in
     logsDir = config.devenv.root + "/logs/blocksense";
 
     anvil = {
-      a = {
-        port = 8546;
-        chain-id = 99999999999;
-        fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
-      };
-      b = {
-        port = 8547;
-        chain-id = 99999999999;
-        fork-url = "wss://ethereum-holesky-rpc.publicnode.com";
-      };
+      # a = {
+      #   port = 8546;
+      #   chain-id = 99999999999;
+      #   fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
+      # };
+      # b = {
+      #   port = 8547;
+      #   chain-id = 99999999999;
+      #   fork-url = "wss://ethereum-holesky-rpc.publicnode.com";
+      # };
     };
 
     sequencer = {
@@ -41,28 +44,28 @@ in
       keys-batch-duration = 500;
 
       providers = {
-        a = {
-          # NOTE: this is an example key included directly to make the setup
-          # self-contained.
-          # In a production environment, use a secret manager like Agenix, to
-          # prevent secrets from being copyed to the Nix Store.
-          private_key_path = "${testKeysDir}/sequencer-private-key";
-          contract_address = upgradeableProxyContractAddressSepolia;
-          impersonated_anvil_account = impersonationAddress;
-        };
-        b = {
-          private_key_path = "${testKeysDir}/sequencer-private-key";
-          contract_address = upgradeableProxyContractAddressHolesky;
-          transaction_gas_limit = 20000000;
-          allow_feeds = [
-            31 # BTC/USD
-            47 # ETH/USD
-            236 # USDT/USD
-            131 # USDC/USD
-            43 # WBTC/USD
-          ];
-          impersonated_anvil_account = impersonationAddress;
-        };
+        # a = {
+        #   # NOTE: this is an example key included directly to make the setup
+        #   # self-contained.
+        #   # In a production environment, use a secret manager like Agenix, to
+        #   # prevent secrets from being copyed to the Nix Store.
+        #   private_key_path = "${testKeysDir}/sequencer-private-key";
+        #   contract_address = upgradeableProxyContractAddressSepolia;
+        #   impersonated_anvil_account = impersonationAddress;
+        # };
+        # b = {
+        #   private_key_path = "${testKeysDir}/sequencer-private-key";
+        #   contract_address = upgradeableProxyContractAddressHolesky;
+        #   transaction_gas_limit = 20000000;
+        #   allow_feeds = [
+        #     31 # BTC/USD
+        #     47 # ETH/USD
+        #     236 # USDT/USD
+        #     131 # USDC/USD
+        #     43 # WBTC/USD
+        #   ];
+        #   impersonated_anvil_account = impersonationAddress;
+        # };
       };
 
       reporters = [
