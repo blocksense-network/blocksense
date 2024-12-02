@@ -1,3 +1,5 @@
+use std::io::IsTerminal;
+
 use anyhow::*;
 
 use blocksense_cli::commands::{dev::DevCommands, node::NodeCommands};
@@ -71,6 +73,12 @@ impl BlocksenseApp {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .with_ansi(std::io::stderr().is_terminal())
+        .init();
+
     let blocksense = BlocksenseApp::parse();
     blocksense.run().await
 }
