@@ -1293,7 +1293,7 @@ mod tests {
         {
             let feed_id = 1;
             let reporter_id = 42;
-            let original_report_data = FeedType::Numerical(115.0); // 102*1.1 = 112.2 which is lower then 115, this should be published
+            let original_report_data = FeedType::Numerical(115.0); // 102*1.1 = 112.2 which is lower then 115, this should be published fast !
 
             sequencer_state
                 .reports
@@ -1355,6 +1355,111 @@ mod tests {
             }
             Err(_) => {
                 panic!("The channel did not receive any data within the timeout period");
+            }
+        }
+    }
+
+
+    #[tokio::test]
+    async fn test_feed_slots_processor_loop_diviation_report_based_on_threshold_2() {
+        // setup
+        let name = "test_feed_slots_processor_loop_diviation_report_based_on_threshold_2";
+        let report_interval_ms = 2000; // 2.0 second interval
+        let quorum_percentage = QUORUM_PERCENTAGE;
+        let min_deviation_percentage = 0.1f32; // 10 %
+        let skip_publish_if_less_then_percentage = 0.0f32;
+        let first_report_start_time = SystemTime::now();
+        let period_to_check_for_diviation_ms = 50; // 50 ms
+        let feed_metadata = FeedMetaData::new(
+            name,
+            report_interval_ms,
+            quorum_percentage,
+            min_deviation_percentage,
+            skip_publish_if_less_then_percentage,
+            period_to_check_for_diviation_ms,
+            first_report_start_time,
+            "Numerical".to_string(),
+            "Average".to_string(),
+            None,
+        );
+        let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
+        let history = Arc::new(RwLock::new(FeedAggregateHistory::new()));
+
+        let network = "ETH2";
+        let key_path = get_test_private_key_path();
+
+        let cfg = get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            "http://localhost:8545",
+        );
+
+        let (sequencer_state, mut rx) = create_sequencer_state_from_sequencer_config(
+            cfg,
+            "test_feed_slots_processor_loop_diviation_report_based_on_threshold_2",
+        )
+        .await;
+
+        // we are specifically sending only one report message as we don't want to test the average processor
+        {
+            let feed_id = 1;
+            let reporter_id = 42;
+            let original_report_data = FeedType::Numerical(108.0); // 102*1.1 = 112.2 which is lower then 108, this should be published slow, therefore this test should end with timeout
+
+            sequencer_state
+                .reports
+                .write()
+                .await
+                .push(
+                    feed_id,
+                    reporter_id,
+                    FeedResult::Result {
+                        result: original_report_data.clone(),
+                    },
+                )
+                .await;
+        }
+
+        // run
+        let feed_id = 1;
+        let name = name.to_string();
+        let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
+        {
+            let mut history_guard = history.write().await;
+            history_guard.register_feed(feed_id, 10_000);
+            history_guard.push(feed_id, FeedType::Numerical(130.0));
+            history_guard.push(feed_id, FeedType::Numerical(120.0));
+            history_guard.push(feed_id, FeedType::Numerical(102.0));
+        }
+
+        tokio::spawn(async move {
+            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
+
+            feed_slots_processor
+                .start_loop(
+                    &sequencer_state,
+                    &feed_metadata_arc_clone,
+                    &history,
+                    None,
+                    cmd_recv,
+                    Some(cmd_send),
+                )
+                .await
+                .unwrap();
+        });
+
+        // Attempt to receive with a timeout of 0.2 seconds
+        let received = tokio::time::timeout(Duration::from_millis(200), rx.recv()).await;
+        match received {
+            Ok(Some((_key, _result))) => {
+                panic!("This update should be skipped based on diviation criteria");
+            }
+            Ok(None) => {
+                panic!("The channel was closed before receiving any data");
+            }
+            Err(_) => {
+                info!("This looks fine");
             }
         }
     }
