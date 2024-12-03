@@ -7,7 +7,7 @@ import {
 } from './types';
 
 export const expandFields = (values: ComponentField): ExpandedField[] => {
-  const ExpandedField = values.map(field => {
+  const expandedField = values.map(field => {
     let data: ExpandedFieldOrArray | PrimitiveField | TupleField;
     if ('components' in field && field.type === 'tuple') {
       // This is a tuple field
@@ -23,7 +23,7 @@ export const expandFields = (values: ComponentField): ExpandedField[] => {
     return JSON.parse(JSON.stringify(data));
   });
 
-  return ExpandedField;
+  return expandedField;
 };
 
 export const expandArray = (
