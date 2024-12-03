@@ -1727,4 +1727,22 @@ describe('EncodePackedDecoder @skip-coverage', function () {
     const values = [[1], [[5]]];
     await testDecoder(fields, values);
   });
+
+  it('should handle mixed fixed and dynamic arrays', async () => {
+    const fields: utils.TupleField = {
+      name: 'MixedArrayTypes',
+      type: 'tuple',
+      components: [
+        { name: 'fixedArray', type: 'uint32[3]', size: 32 },
+        { name: 'dynamicArray', type: 'uint32[]', size: 32 },
+        { name: 'fixedArray2', type: 'uint32[2]', size: 32 },
+      ],
+    };
+    const values = [
+      [11, 12, 13],
+      [14, 15, 16, 17],
+      [18, 19],
+    ];
+    await testDecoder(fields, values);
+  });
 });

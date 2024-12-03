@@ -27,7 +27,7 @@ export const generateDecoderPrimitiveLines = (
   );
   if (field.size < 256) {
     lines.push(`  let prevSizeSum := 0`);
-    lines.push(`  let offset := ${field.size + 32}`);
+    lines.push(`  let offset := ${field.size + 32 + config.bitOffset}`);
   }
   lines.push(`  for {`);
   lines.push(`    let ${field.name}_i := 0`);
