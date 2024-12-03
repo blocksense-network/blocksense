@@ -6,10 +6,10 @@ import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { AccessControl } from '../typechain/contracts/AccessControl';
 
 enum ReadOp {
-  GetFeedAtRound = '0x10',
-  GetLatestFeed = '0x20',
-  GetLatestRound = '0x40',
-  GetLatestFeedAndRound = '0x60',
+  GetFeedAtRound = 0x04,
+  GetLatestFeed = 0x02,
+  GetLatestRound = 0x01,
+  GetLatestFeedAndRound = 0x03,
 }
 
 interface Feed {
@@ -293,7 +293,12 @@ const encodeDataRead = (operation: ReadOp, feed: Feed) => {
   const feedIdInBytesLength = Math.ceil(feed.id.toString(2).length / 4);
   const prefix = ethers.solidityPacked(
     ['bytes1', 'uint8', 'uint8', `uint${8n * BigInt(feedIdInBytesLength)}`],
-    [operation, feed.stride, feedIdInBytesLength, feed.id],
+    [
+      ethers.toBeHex(operation | 0x80),
+      feed.stride,
+      feedIdInBytesLength,
+      feed.id,
+    ],
   );
   const slots = Math.ceil((feed.data.length - 2) / 64);
 

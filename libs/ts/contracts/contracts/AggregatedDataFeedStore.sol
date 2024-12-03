@@ -13,7 +13,7 @@ contract AggregatedDataFeedStore {
   }
 
   fallback() external payable {
-    /* READ */
+    /* READ - 1st bit of selector is 1 */
     assembly {
       // Load selector from memory
       let selector := calldataload(0x00)
@@ -21,7 +21,7 @@ contract AggregatedDataFeedStore {
       /* <selector 1b> <stride 1b> <X feedId length in bytes 1b> <feedId Xb> (<round 2b> <slots 4b> | <slots 4b>) */
       if and(
         selector,
-        0x7000000000000000000000000000000000000000000000000000000000000000
+        0x8000000000000000000000000000000000000000000000000000000000000000
       ) {
         let stride := byte(1, selector)
         let feedIdLength := byte(2, selector)
@@ -31,7 +31,7 @@ contract AggregatedDataFeedStore {
         // getFeedAtRound(uint8 stride, uintX feedId, uint16 round, uint32 slots) returns (bytes)
         if and(
           selector,
-          0x1000000000000000000000000000000000000000000000000000000000000000
+          0x0400000000000000000000000000000000000000000000000000000000000000
         ) {
           let round := shr(240, data)
 
@@ -59,7 +59,7 @@ contract AggregatedDataFeedStore {
           return(ptr, len)
         }
 
-        // 0x600000000...000 will call both getLatestData and getLatestRound
+        // 0x030000000...000 will call both getLatestData and getLatestRound
         // getLatestRound(uint8 stride, uintX feedId) returns (uint16)
         // (2**115 * stride + feedId)/16
         let roundAddress := add(
@@ -82,7 +82,7 @@ contract AggregatedDataFeedStore {
         let ptr := mload(0x40)
         if and(
           selector,
-          0x4000000000000000000000000000000000000000000000000000000000000000
+          0x0100000000000000000000000000000000000000000000000000000000000000
         ) {
           len := 32
           mstore(ptr, round)
@@ -91,7 +91,7 @@ contract AggregatedDataFeedStore {
         // getLatestData(uint8 stride, uintX feedId, uint32 slots) returns (bytes)
         if and(
           selector,
-          0x2000000000000000000000000000000000000000000000000000000000000000
+          0x0200000000000000000000000000000000000000000000000000000000000000
         ) {
           let slots := shr(224, data)
           stride := add(stride, 1)
@@ -116,7 +116,7 @@ contract AggregatedDataFeedStore {
       }
     }
 
-    /* WRITE */
+    /* WRITE - 1st bit of selector is 0 */
     address accessControl = ACCESS_CONTROL;
 
     /*
