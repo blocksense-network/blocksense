@@ -49,40 +49,34 @@ export const generateDecoderLines = (
       }
 
       if (shouldUpdate && (config.wordOffset > 32 || shift)) {
-        lines.push('');
-        if (config.wordOffset > 0) {
-          lines.push(`// Offset data with ${config.wordOffset} bytes`);
-        }
-        lines.push(
-          `memData := mload(add(data, ${shift ? (config.wordOffset > 0 ? `add(shift, ${config.wordOffset})` : 'shift') : config.wordOffset}))`,
-        );
-        lines.push('');
+        lines.push(`
+
+          ${config.wordOffset > 0 ? `// Offset data with ${config.wordOffset} bytes` : ''}
+          memData := mload(add(data, ${shift ? (config.wordOffset > 0 ? `add(shift, ${config.wordOffset})` : 'shift') : config.wordOffset}))
+        `);
         shouldUpdate = false;
       }
 
       if (Array.isArray(field)) {
         const innerName = name + '_' + index;
-        lines.push('');
-        lines.push('{');
-        lines.push(`  // Get address of field at slot ${index} of ${name}`);
-        lines.push(
-          `  let ${innerName} := mload(${index ? `add(${name}, ${index * 0x20})` : name})`,
-        );
-        const innerLines = generateDecoderLines(field, innerName, 0);
-        lines.push(...innerLines);
-        lines.push('}');
+        lines.push(`
+
+          {
+            // Get address of field at slot ${index} of ${name}
+            let ${innerName} := mload(${index ? `add(${name}, ${index * 0x20})` : name})
+            ${generateDecoderLines(field, innerName, 0).join('\n')}
+          }
+        `);
       } else if (!field.isDynamic) {
         config.prevSize += field.size;
-        lines.push(
-          `// Store the next ${field.size} bits of memData at slot ${index} of ${location} for ${field.name}`,
-        );
-        lines.push(
-          `mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.shift === 0 ? 'memData' : field.shift! < 0 ? `shl(${Math.abs(field.shift!)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)`})`,
-        );
+        lines.push(`
+          // Store the next ${field.size} bits of memData at slot ${index} of ${location} for ${field.name}
+          mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${field.shift === 0 ? 'memData' : field.shift! < 0 ? `shl(${Math.abs(field.shift!)}, memData)` : field.size < 256 ? `and(shr(${field.shift}, memData), ${'0x' + 'F'.repeat(field.size / 4)})` : `shr(${field.shift}, memData)`})
+        `);
       } else if (field.type === 'bytes' || field.type === 'string') {
         shift = true;
         lines.push(
-          ...generateDecoderStringBytes({ config, field, location, index }),
+          generateDecoderStringBytes({ config, field, location, index }),
         );
 
         config.wordOffset = 0;
@@ -141,7 +135,7 @@ export const generateDecoderLines = (
       } else {
         if (isBytes) {
           lines.push(
-            ...generateDecoderFixedBytesLines(
+            generateDecoderFixedBytesLines(
               {
                 ...data,
                 location: currentLocation,
@@ -151,7 +145,7 @@ export const generateDecoderLines = (
           );
         } else if (isDynamic) {
           lines.push(
-            ...generateDecoderDynamicDataLines(
+            generateDecoderDynamicDataLines(
               {
                 ...data,
                 location: currentLocation,
@@ -161,7 +155,7 @@ export const generateDecoderLines = (
           );
         } else {
           lines.push(
-            ...generateDecoderPrimitiveLines(
+            generateDecoderPrimitiveLines(
               {
                 ...data,
                 location: currentLocation,
@@ -188,45 +182,39 @@ export const generateDecoderLines = (
       const innerType = type.slice(0, -2); // Remove last '[]'
       const innerIndex = `i_${location}_${depth}`;
       let innerName = `${location}_${depth}`;
-      lines.push('');
-      lines.push(
-        `// Decode ${type.slice(-2)} of ${field.type} for ${field.name}`,
-      );
-      lines.push(
-        `shift := add(shift, ${config.wordOffset + config.prevSize / 8 + 4})`,
-      );
-      lines.push('{');
-      lines.push(`  // Get address of array at depth ${depth}`);
+      lines.push(`
+
+        // Decode ${type.slice(-2)} of ${field.type} for ${field.name}
+        shift := add(shift, ${config.wordOffset + config.prevSize / 8 + 4})
+        {
+          // Get address of array at depth ${depth}
+      `);
+
       // when main struct is a dynamic array
       if (currentLocation === mainStructName && isMainStructDynamic) {
         innerName = currentLocation;
         lines.push(
-          `  let ${innerName}_length := and(shr(${256 - config.bitOffset - 32}, memData), 0xFFFFFFFF)`,
+          `let ${innerName}_length := and(shr(${256 - config.bitOffset - 32}, memData), 0xFFFFFFFF)`,
         );
       } else {
-        lines.push(`  let ${innerName} := mload(0x40)`);
-        lines.push(
-          `  let ${innerName}_length := and(shr(${256 - config.bitOffset - 32}, memData), 0xFFFFFFFF)`,
-        );
-        if (depth > 0) {
-          lines.push(
-            `  mstore(add(${currentLocation}, mul(add(i_${location}_${depth - 1}, 1), 32)), ${innerName})`,
-          );
-        } else {
-          lines.push(
-            `  mstore(${index ? `add(${currentLocation}, ${index * 0x20})` : currentLocation}, ${innerName})`,
-          );
-        }
-        lines.push(
-          `  mstore(0x40, add(${innerName}, mul(add(${innerName}_length, 1), 32)))`,
-        );
+        lines.push(`
+          let ${innerName} := mload(0x40)
+          let ${innerName}_length := and(shr(${256 - config.bitOffset - 32}, memData), 0xFFFFFFFF)
+          ${
+            depth > 0
+              ? `mstore(add(${currentLocation}, mul(add(i_${location}_${depth - 1}, 1), 32)), ${innerName})`
+              : `mstore(${index ? `add(${currentLocation}, ${index * 0x20})` : currentLocation}, ${innerName})`
+          }
+          mstore(0x40, add(${innerName}, mul(add(${innerName}_length, 1), 32)))
+        `);
       }
-      lines.push(`  mstore(${innerName}, ${innerName}_length)`);
-      lines.push(`  memData := mload(add(data, shift))`);
-      lines.push('');
-      lines.push(
-        `  for {let ${innerIndex} := 0} lt(${innerIndex}, ${innerName}_length) {${innerIndex} := add(${innerIndex}, 1)} {`,
-      );
+
+      lines.push(`
+        mstore(${innerName}, ${innerName}_length)
+        memData := mload(add(data, shift))
+
+        for {let ${innerIndex} := 0} lt(${innerIndex}, ${innerName}_length) {${innerIndex} := add(${innerIndex}, 1)} {
+      `);
 
       config.wordOffset = 0;
       config.prevSize = 0;
@@ -234,9 +222,11 @@ export const generateDecoderLines = (
 
       if ('components' in field && !iterations) {
         lines.push(
-          ...handleNestedDynamic(config, field, innerName, depth, innerIndex),
+          `
+            ${handleNestedDynamic(config, field, innerName, depth, innerIndex).join('\n')}
+            memData := mload(add(data, shift))
+          `,
         );
-        lines.push(`    memData := mload(add(data, shift))`);
       } else {
         lines.push(
           ...handleCases(
@@ -252,8 +242,10 @@ export const generateDecoderLines = (
         );
       }
 
-      lines.push('  }');
-      lines.push('}');
+      lines.push(`
+          }
+        }
+      `);
 
       return lines;
     }
@@ -266,48 +258,47 @@ export const generateDecoderLines = (
       depth: number,
       innerIndex: number | string,
     ) {
-      const lines: string[] = [];
       const innerLocation = `${innerName}_${depth}`;
       const data = Array.isArray(field) ? field : field.components!;
-      if (!Array.isArray(field)) {
-        lines.push(`  // Decode ${field.type} for ${field.name}`);
-      }
-      lines.push('  {');
-      lines.push(`    let ${innerLocation} := mload(0x40)`);
-      if (typeof innerIndex === 'number') {
-        lines.push(
-          `    mstore(${innerIndex ? `add(${innerName}, ${innerIndex})` : innerName}, ${innerLocation})`,
-        );
-      } else {
-        lines.push(
-          `    mstore(add(${innerName}, mul(add(${innerIndex}, 1), 32)), ${innerLocation})`,
-        );
-      }
-      lines.push(
-        `    mstore(0x40, add(${innerLocation}, ${data.length * 32}))`,
-      );
       const arrayDepth = getArrayDepth(data);
-      if (arrayDepth > 1) {
-        lines.push(
-          ...data.flatMap((innerField: ExpandedFieldOrArray, index: number) =>
-            handleNestedDynamic(
-              config,
-              innerField,
-              `${innerName}_${depth}`,
-              depth + 1,
-              index * 32,
-            ),
-          ),
-        );
-      } else {
-        lines.push(...generateDecoderLines(data, innerLocation, 0));
-      }
-      if (config.wordOffset + config.prevSize / 8) {
-        lines.push(
-          `    shift := add(shift, ${config.wordOffset + config.prevSize / 8})`,
-        );
-      }
-      lines.push('  }');
+      const lines: string[] = [
+        `
+        ${
+          !Array.isArray(field)
+            ? `// Decode ${field.type} for ${field.name}`
+            : ''
+        }
+        {
+          let ${innerLocation} := mload(0x40)
+          ${
+            typeof innerIndex === 'number'
+              ? `mstore(${innerIndex ? `add(${innerName}, ${innerIndex})` : innerName}, ${innerLocation})`
+              : `mstore(add(${innerName}, mul(add(${innerIndex}, 1), 32)), ${innerLocation})`
+          }
+          mstore(0x40, add(${innerLocation}, ${data.length * 32}))
+          ${
+            arrayDepth > 1
+              ? `${data
+                  .flatMap((innerField: ExpandedFieldOrArray, index: number) =>
+                    handleNestedDynamic(
+                      config,
+                      innerField,
+                      `${innerName}_${depth}`,
+                      depth + 1,
+                      index * 32,
+                    ),
+                  )
+                  .join('\n')}`
+              : `${generateDecoderLines(data, innerLocation, 0).join('\n')}`
+          }
+          ${
+            config.wordOffset + config.prevSize / 8
+              ? `shift := add(shift, ${config.wordOffset + config.prevSize / 8})`
+              : ''
+          }
+        }
+      `,
+      ];
       config.wordOffset = 0;
       config.prevSize = 0;
 
