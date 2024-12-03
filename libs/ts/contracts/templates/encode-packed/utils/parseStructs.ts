@@ -1,7 +1,7 @@
-import { ComponentField, TupleField } from './types';
+import { ComponentField, Struct, TupleField } from './types';
 
 export const organizeFieldsIntoStructs = (fields: TupleField) => {
-  let structs = [];
+  let structs: Struct[] = [];
   let mainStruct = { name: fields.name, fields: [] };
 
   fields.components.forEach(field => {
@@ -9,15 +9,19 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
   });
   structs.unshift(mainStruct);
 
-  return Array.from(new Set(structs.map(struct => struct.name))).map(name =>
-    structs.find(struct => struct.name === name),
-  );
+  // Remove duplicate structs (identified by name).
+  return structs.reduce((acc: Struct[], struct) => {
+    if (!acc.some(s => s.name === struct.name)) {
+      acc.push(struct);
+    }
+    return acc;
+  }, []);
 };
 
 const processField = (field: ComponentField[number], parentStruct: any) => {
-  const structs = [];
+  const structs: Struct[] = [];
   if (field.type.includes('tuple')) {
-    let newStruct = {
+    let newStruct: Struct = {
       name: field.name.charAt(0).toUpperCase() + field.name.slice(1),
       fields: [],
     };

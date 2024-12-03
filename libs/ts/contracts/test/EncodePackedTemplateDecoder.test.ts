@@ -1700,4 +1700,31 @@ describe('EncodePackedDecoder @skip-coverage', function () {
     ];
     await testDecoder(fields, values);
   });
+
+  it('should handle when same tuple exists multiple times', async () => {
+    const fields: utils.TupleField = {
+      name: 'TupleWithMultiple',
+      type: 'tuple',
+      components: [
+        {
+          name: 'Tuple1',
+          type: 'tuple',
+          components: [{ name: 'uint32Field', type: 'uint32', size: 32 }],
+        },
+        {
+          name: 'Tuple2',
+          type: 'tuple',
+          components: [
+            {
+              name: 'Tuple1',
+              type: 'tuple',
+              components: [{ name: 'uint32Field', type: 'uint32', size: 32 }],
+            },
+          ],
+        },
+      ],
+    };
+    const values = [[1], [[5]]];
+    await testDecoder(fields, values);
+  });
 });

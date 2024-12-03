@@ -6,6 +6,7 @@ import {
   ExpandedFieldOrArray,
   GenerateDecoderConfig,
   DecoderData,
+  Struct,
 } from './types';
 import { organizeFieldsIntoStructs } from './parseStructs';
 import { processFieldsAndEncodeData } from './encodeData';
@@ -23,6 +24,7 @@ export {
   ExpandedFieldOrArray,
   GenerateDecoderConfig,
   DecoderData,
+  Struct,
 
   // helpers
   helpers,

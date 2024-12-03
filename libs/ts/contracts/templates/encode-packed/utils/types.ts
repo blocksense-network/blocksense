@@ -36,3 +36,8 @@ export type DecoderData = {
   location: string;
   index: number;
 };
+
+export type Struct = {
+  name: string;
+  fields: PrimitiveField[];
+};
