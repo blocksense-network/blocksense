@@ -135,40 +135,11 @@ async function isFeedDataSameOnChain(
   }
 }
 
-export async function generateFeedConfig(
-  rawDataFeeds: RawDataFeeds,
-): Promise<FeedsConfig> {
-  let filteredFeeds = Object.entries(rawDataFeeds).filter(
-    ([_feedName, feedData]) =>
-      Object.entries(feedData.networks).some(([chainlinkFileName, _feedData]) =>
-        chainLinkFileNameIsNotTestnet(chainlinkFileName),
-      ),
-  );
-
-  const allPossibleFeeds: Omit<Feed, 'id' | 'script'>[] = filteredFeeds.map(
-    ([_feedName, feedData]) => {
-      const maxEntry = Object.entries(feedData.networks).reduce<
-        ChainLinkFeedInfo | undefined
-      >((max, [chainlinkFileName, data]) => {
-        if (!chainLinkFileNameIsNotTestnet(chainlinkFileName)) return max;
-        return !max || data.decimals > max.decimals ? data : max;
-      }, undefined);
-
-      return { ...feedFromChainLinkFeedInfo(maxEntry!) };
-    },
-  );
-
-  const supportedCMCCurrencies = await getCMCCryptoList();
-
-  const usdPairFeeds = allPossibleFeeds.filter(
-    feed => feed.pair.quote === 'USD',
-  );
-
-  const feeds = await filterAsync(usdPairFeeds, feed =>
-    isFeedSupported(feed, supportedCMCCurrencies),
-  );
-
-  let flatedNonTestnetSupportedFeeds = filteredFeeds
+async function checkOnChainData(
+  rawDataFeedsOnMainnets: any[],
+  feeds: Omit<Feed, 'id' | 'script'>[],
+) {
+  let flatedNonTestnetSupportedFeeds = rawDataFeedsOnMainnets
     .filter(([feedName, _feedData]) =>
       feeds.some(feed => feed.description === feedName),
     )
@@ -187,11 +158,84 @@ export async function generateFeedConfig(
 
   if (
     !(await everyAsync(flatedNonTestnetSupportedFeeds, x =>
-      isFeedDataSameOnChain(assertNotNull(x.network), x.feed),
+      isFeedDataSameOnChain(
+        assertNotNull(x.network),
+        x.feed as ChainLinkFeedInfo,
+      ),
     ))
   ) {
     throw new Error("Feed data doesn't match on chain");
   }
+}
+
+export async function generateFeedConfig(
+  rawDataFeeds: RawDataFeeds,
+): Promise<FeedsConfig> {
+  // Filter out the data feeds that are not present on any mainnet.
+  let rawDataFeedsOnMainnets = Object.entries(rawDataFeeds).filter(
+    ([_feedName, feedData]) =>
+      // If the data feed is not present on any mainnet, we don't include it.
+      Object.entries(feedData.networks).some(([chainlinkFileName, _feedData]) =>
+        chainLinkFileNameIsNotTestnet(chainlinkFileName),
+      ),
+  );
+
+  /**
+   * Filters out testnet entries from the list of network files.
+   */
+  function filterMainnetNetworks(
+    networks: Record<string, ChainLinkFeedInfo>,
+  ): [string, ChainLinkFeedInfo][] {
+    return Object.entries(networks).filter(([chainlinkFileName]) =>
+      chainLinkFileNameIsNotTestnet(chainlinkFileName),
+    );
+  }
+
+  /**
+   * Finds the network entry with the highest decimals value.
+   */
+  function findMaxDecimalsNetwork(
+    validNetworks: [string, ChainLinkFeedInfo][],
+  ): ChainLinkFeedInfo | undefined {
+    return validNetworks.reduce<ChainLinkFeedInfo | undefined>(
+      (max, [, data]) => (!max || data.decimals > max.decimals ? data : max),
+      undefined,
+    );
+  }
+
+  /**
+   * Processes a single raw data feed entry to extract and convert the
+   *  "best" feed data to Feed structure.
+   */
+  function convertRawDataFeed(feedData: {
+    networks: Record<string, ChainLinkFeedInfo>;
+  }): Omit<Feed, 'id' | 'script'> | null {
+    const validNetworks = filterMainnetNetworks(feedData.networks);
+    const maxEntry = findMaxDecimalsNetwork(validNetworks);
+
+    if (!maxEntry) {
+      return null;
+    }
+
+    return { ...feedFromChainLinkFeedInfo(maxEntry) };
+  }
+
+  const dataFeedsOnMainnetWithMaxDecimals: Omit<Feed, 'id' | 'script'>[] =
+    rawDataFeedsOnMainnets
+      .map(([_feedName, feedData]) => convertRawDataFeed(feedData))
+      .filter((feed): feed is Omit<Feed, 'id' | 'script'> => feed !== null); // Filter out null entries
+
+  const supportedCMCCurrencies = await getCMCCryptoList();
+
+  const usdPairFeeds = dataFeedsOnMainnetWithMaxDecimals.filter(
+    feed => feed.pair.quote === 'USD',
+  );
+
+  const feeds = await filterAsync(usdPairFeeds, feed =>
+    isFeedSupported(feed, supportedCMCCurrencies),
+  );
+
+  checkOnChainData(rawDataFeedsOnMainnets, feeds);
 
   const feedsSortedByDescription = feeds.sort((a, b) => {
     // We hash the descriptions here, to avoid an obvious ordering.
