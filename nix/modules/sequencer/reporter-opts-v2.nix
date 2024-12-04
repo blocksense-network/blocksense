@@ -25,19 +25,19 @@ with lib;
         description = "The period in seconds to poll for new data.";
       };
       secret_key = mkOption {
-        type = types.str;
+        type = types.path;
         description = "The path to the reporter secret key.";
       };
     };
 
     api-keys = {
       CMC_API_KEY = mkOption {
-        type = types.str;
+        type = types.path;
         description = "The path to the CMC api key.";
       };
 
       YAHOO_API_KEY = mkOption {
-        type = types.str;
+        type = types.path;
         description = "The path to the YF api key.";
       };
     };

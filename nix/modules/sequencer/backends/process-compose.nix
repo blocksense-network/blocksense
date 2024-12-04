@@ -127,6 +127,8 @@ let
           in
           oracle-scripts // { blocksense-sequencer.condition = "process_healthy"; };
         working_dir = cfg.oracle-scripts.base-dir;
+        log_configuration = logsConfig;
+        log_location = cfg.logsDir + "/reporter-v2-${name}.log";
       };
     }
   ) cfg.reporters-v2;
