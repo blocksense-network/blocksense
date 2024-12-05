@@ -48,14 +48,7 @@ pub struct BlockHeader {
     block_height: u64,
     timestamp: u64,
     prev_block_hash: HashType,
-    feed_updates_merkle_root: HashType,
     add_remove_feeds_merkle_root: HashType,
-}
-
-#[derive(Debug, PartialEq, SimpleSerialize, Default)]
-pub struct FeedUpdates {
-    block_height: u64,
-    asset_feed_updates: FeedUpdatesInBlock,
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]

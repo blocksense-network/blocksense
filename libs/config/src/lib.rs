@@ -226,7 +226,6 @@ impl Validated for Reporter {
 pub struct BlockConfig {
     pub max_feed_updates_to_batch: usize,
     pub block_generation_period: u64,
-    pub feed_updates_store_limit: Option<u32>,
     pub genesis_block_timestamp: Option<SystemTime>,
 }
 
@@ -315,7 +314,6 @@ pub fn get_test_config_with_single_provider(
         block_config: BlockConfig{
             max_feed_updates_to_batch: 1,
             block_generation_period: 500,
-            feed_updates_store_limit: None,
             genesis_block_timestamp: None,
         },
         providers: HashMap::from([(
@@ -372,7 +370,6 @@ pub fn get_test_config_with_multiple_providers(
         block_config: BlockConfig {
             max_feed_updates_to_batch: 1,
             block_generation_period: 500,
-            feed_updates_store_limit: None,
             genesis_block_timestamp: None,
         },
         providers,

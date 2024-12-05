@@ -245,9 +245,8 @@ async fn generate_block<
         // At this point we create new blocks only to register/deregister feeds.
         // Create the block that will contain the new feeds, deleted feeds and in future - updates of feed values
         let mut blockchain_db = blockchain_db.write().await;
-        let (header, feed_updates, add_remove_feeds) = blockchain_db.create_new_block(
+        let (header, add_remove_feeds) = blockchain_db.create_new_block(
             block_height,
-            &HashMap::<String, String>::new(), // At this point we do not put the feed updates into the blocks.
             new_feeds_in_block,
             feeds_ids_to_delete_in_block,
         );
@@ -257,7 +256,7 @@ async fn generate_block<
             InMemDb::node_to_hash(InMemDb::calc_merkle_root(&mut header.clone()))
         );
         blockchain_db
-            .add_next_block(header, feed_updates, add_remove_feeds)
+            .add_next_block(header, add_remove_feeds)
             .expect("Failed to add block!");
     }
 
@@ -306,7 +305,6 @@ mod tests {
         let block_config = BlockConfig {
             max_feed_updates_to_batch: 3,
             block_generation_period: 100,
-            feed_updates_store_limit: None,
             genesis_block_timestamp: None,
         };
 
