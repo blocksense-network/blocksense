@@ -1,6 +1,5 @@
 use crate::{
-    AddRemoveFeeds, AssetFeedUpdate, BlockFeedConfig, BlockHeader, DataChunk, FeedIdChunk,
-    FeedUpdates, HashType, MAX_ASSET_FEED_UPDATES_IN_BLOCK, MAX_FEED_ID_TO_DELETE_IN_BLOCK,
+    AddRemoveFeeds, BlockFeedConfig, BlockHeader, HashType, MAX_FEED_ID_TO_DELETE_IN_BLOCK,
     MAX_NEW_FEEDS_IN_BLOCK,
 };
 use anyhow::Result;
@@ -8,7 +7,6 @@ use hex::FromHex;
 use hex_literal::hex;
 use ssz_rs::{Node, SimpleSerialize};
 use std::collections::HashMap;
-use std::fmt::Debug;
 use tracing::error;
 use utils::time::current_unix_time;
 
@@ -19,12 +17,8 @@ pub struct InMemDb {
     latest_block_height: u64,
     block_height_to_header_hash: HashMap<u64, HashType>,
     block_header_hash_to_header: HashMap<HashType, BlockHeader>,
-    // The key is the feed_updates_merkle_root from the block header.
-    latest_asset_feed_updates: HashMap<HashType, FeedUpdates>,
-    history_asset_feed_updates: HashMap<HashType, FeedUpdates>,
     // The feeds that will be registered after this block is applied to the state + the feed ID-s that will be deleted. The key is the Merkle root of the structure, which is in the block header.
     add_remove_feeds: HashMap<HashType, AddRemoveFeeds>,
-    feed_updates_store_limit: Option<u32>,
 }
 
 impl InMemDb {
@@ -33,22 +27,7 @@ impl InMemDb {
             latest_block_height: 0,
             block_height_to_header_hash: HashMap::new(),
             block_header_hash_to_header: HashMap::new(),
-            latest_asset_feed_updates: HashMap::new(),
-            history_asset_feed_updates: HashMap::new(),
             add_remove_feeds: HashMap::new(),
-            feed_updates_store_limit: None,
-        }
-    }
-
-    pub fn new_with_feed_updates_limit(limit: u32) -> InMemDb {
-        InMemDb {
-            latest_block_height: 0,
-            block_height_to_header_hash: HashMap::new(),
-            block_header_hash_to_header: HashMap::new(),
-            latest_asset_feed_updates: HashMap::new(),
-            history_asset_feed_updates: HashMap::new(),
-            add_remove_feeds: HashMap::new(),
-            feed_updates_store_limit: Some(limit),
         }
     }
 
@@ -76,49 +55,12 @@ impl InMemDb {
         &self.block_header_hash_to_header[&header_hash]
     }
 
-    pub fn create_new_block<
-        K: Debug + Clone + std::string::ToString + 'static,
-        V: Debug + Clone + std::string::ToString + 'static,
-    >(
+    pub fn create_new_block(
         &self,
         new_block_height: u64,
-        updates: &HashMap<K, V>,
         new_feeds_in_block: Vec<BlockFeedConfig>,
         feed_ids_to_delete_in_block: Vec<u32>,
-    ) -> (BlockHeader, FeedUpdates, AddRemoveFeeds) {
-        // Populate feed updates into block:
-        let mut feed_updates = FeedUpdates::default();
-
-        if updates.len() > MAX_ASSET_FEED_UPDATES_IN_BLOCK {
-            error!("Trying to insert in block more feed updates {} than supported {}. All above supported limit will be dropped!", updates.len(), MAX_ASSET_FEED_UPDATES_IN_BLOCK)
-        }
-
-        let mut iter = updates.iter();
-        for i in 0..feed_updates.asset_feed_updates.len() {
-            for j in 0..feed_updates.asset_feed_updates[i].len() {
-                if let Some((key, val)) = iter.next() {
-                    feed_updates.asset_feed_updates[i][j] = Some(AssetFeedUpdate {
-                        id: <FeedIdChunk>::from_hex(key.to_string()).unwrap_or_else(|_| {
-                            panic!(
-                                "Feed ID must be exactly 8 bytes hex, found {} key = {:?}",
-                                key.to_string().len(),
-                                key
-                            )
-                        }),
-                        feed_data: <DataChunk>::from_hex(val.to_string()).unwrap_or_else(|_| {
-                            panic!(
-                                "Feed Value must be exactly 64 bytes hex, found {} val = {:?}",
-                                val.to_string().len(),
-                                val
-                            )
-                        }),
-                    });
-                } else {
-                    feed_updates.asset_feed_updates[i][j] = None;
-                }
-            }
-        }
-
+    ) -> (BlockHeader, AddRemoveFeeds) {
         // Populate new and to be removed feeds in block:
         let mut add_remove_feeds = AddRemoveFeeds::default();
 
@@ -152,7 +94,6 @@ impl InMemDb {
         let latest_height = self.get_latest_block_height();
         block_header.timestamp = current_unix_time() as u64;
         block_header.block_height = new_block_height;
-        feed_updates.block_height = new_block_height;
         add_remove_feeds.block_height = new_block_height;
         if latest_height == 0 {
             block_header.prev_block_hash = GENESIS_HASH;
@@ -161,27 +102,19 @@ impl InMemDb {
             let latest_hash = Self::calc_merkle_root(&mut latest_header);
             block_header.prev_block_hash = Self::node_to_hash(latest_hash);
         }
-        let feed_updates_merkle_root = Self::calc_merkle_root(&mut feed_updates);
-        block_header.feed_updates_merkle_root = Self::node_to_hash(feed_updates_merkle_root);
 
         let add_remove_feeds_merkle_root = Self::calc_merkle_root(&mut add_remove_feeds);
         block_header.add_remove_feeds_merkle_root =
             Self::node_to_hash(add_remove_feeds_merkle_root);
 
-        (block_header, feed_updates, add_remove_feeds)
+        (block_header, add_remove_feeds)
     }
 
     pub fn add_block(
         &mut self,
         mut header: BlockHeader,
-        mut updates: FeedUpdates,
         mut add_remove_feeds: AddRemoveFeeds,
     ) -> Result<()> {
-        let feed_updates_merkle_root = Self::node_to_hash(Self::calc_merkle_root(&mut updates));
-        if feed_updates_merkle_root != header.feed_updates_merkle_root {
-            anyhow::bail!("New block header does not refer the associated updates!");
-        }
-
         let block_height = header.block_height;
 
         let new_header_hash = Self::node_to_hash(Self::calc_merkle_root(&mut header));
@@ -191,16 +124,6 @@ impl InMemDb {
 
         self.block_header_hash_to_header
             .insert(new_header_hash, header);
-
-        self.latest_asset_feed_updates
-            .insert(feed_updates_merkle_root, updates);
-
-        if let Some(limit) = self.feed_updates_store_limit {
-            if self.latest_asset_feed_updates.len() >= limit as usize {
-                self.history_asset_feed_updates =
-                    std::mem::take(&mut self.latest_asset_feed_updates);
-            }
-        }
 
         self.add_remove_feeds.insert(
             Self::node_to_hash(Self::calc_merkle_root(&mut add_remove_feeds)),
@@ -213,7 +136,6 @@ impl InMemDb {
     pub fn add_next_block(
         &mut self,
         header: BlockHeader,
-        updates: FeedUpdates,
         add_remove_feeds: AddRemoveFeeds,
     ) -> Result<()> {
         // Check if block can be added as next in blockchain:
@@ -240,7 +162,7 @@ impl InMemDb {
             }
         }
 
-        self.add_block(header, updates, add_remove_feeds)?;
+        self.add_block(header, add_remove_feeds)?;
 
         self.latest_block_height = block_height;
         Ok(())
