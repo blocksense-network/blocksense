@@ -37,12 +37,9 @@ export const decodeBinanceSymbolInfo = S.decodeUnknownSync(
 export async function fetchBinanceSymbolsInfo(): Promise<
   readonly BinanceSymbolInfo[]
 > {
-  const exchangeInfoUrl = 'https://api.binance.com/api/v3/exchangeInfo';
+  const url = 'https://api.binance.com/api/v3/exchangeInfo';
 
-  return fetchAndDecodeJSON(BinanceExchangeInfoRespSchema, exchangeInfoUrl, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
-  }).then(r => r.symbols);
+  return fetchAndDecodeJSON(BinanceExchangeInfoRespSchema, url).then(
+    r => r.symbols,
+  );
 }

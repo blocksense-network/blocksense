@@ -42,19 +42,9 @@ export const decodeBybitSymbolInfo = S.decodeUnknownSync(
 export async function fetchBybitSymbolsInfo(): Promise<
   readonly BybitSymbolInfo[]
 > {
-  const instrumentsInfoUrl =
-    'https://api.bybit.com/v5/market/instruments-info?category=spot';
+  const url = 'https://api.bybit.com/v5/market/instruments-info?category=spot';
 
-  const data = await fetchAndDecodeJSON(
-    BybitInstrumentsInfoRespSchema,
-    instrumentsInfoUrl,
-    {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-  );
+  const data = await fetchAndDecodeJSON(BybitInstrumentsInfoRespSchema, url);
 
   if (data.retCode !== 0) {
     throw new Error(`Error: ${data.retCode} ${data.retMsg}`);

@@ -42,14 +42,9 @@ export const decodeUpbitSymbolInfo = S.decodeUnknownSync(
 export async function fetchUpbitSymbolsInfo(): Promise<
   readonly UpbitSymbolInfo[]
 > {
-  const marketUrl = 'https://api.upbit.com/v1/market/all';
+  const url = 'https://api.upbit.com/v1/market/all';
 
-  const markets = await fetchAndDecodeJSON(UpbitMarketRespSchema, marketUrl, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
-  });
+  const markets = await fetchAndDecodeJSON(UpbitMarketRespSchema, url);
 
   const supportedUpbitSymbols = decodeUpbitSymbolInfo(
     markets.map(market => {

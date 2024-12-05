@@ -13,9 +13,7 @@ export async function getCMCCryptoList(): Promise<readonly CMCInfo[]> {
   });
 
   const typedData = await fetchAndDecodeJSON(t, url, {
-    method: 'GET',
     headers: {
-      Accept: 'application/json',
       'X-CMC_PRO_API_KEY': getEnvString('CMC_API_KEY'),
     },
   });

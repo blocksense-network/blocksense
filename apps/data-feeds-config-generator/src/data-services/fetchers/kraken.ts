@@ -45,18 +45,9 @@ export type KrakenSymbolInfo = S.Schema.Type<typeof KrakenSymbolInfoSchema>;
 export async function fetchKrakenSymbolsInfo(): Promise<
   readonly KrakenSymbolInfo[]
 > {
-  const assetPairsUrl = 'https://api.kraken.com/0/public/AssetPairs';
+  const url = 'https://api.kraken.com/0/public/AssetPairs';
 
-  const pairsData = await fetchAndDecodeJSON(
-    KrakenAssetPairsRespSchema,
-    assetPairsUrl,
-    {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-  );
+  const pairsData = await fetchAndDecodeJSON(KrakenAssetPairsRespSchema, url);
 
   if (pairsData.error.length > 0) {
     throw new Error(`Found errors in paris data: ${pairsData.error}`);

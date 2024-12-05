@@ -5,7 +5,12 @@ export function fetchAndDecodeJSON<A, I>(
   url: string | URL | globalThis.Request,
   fetchOptions?: RequestInit,
 ): Promise<S.Schema.Type<typeof schema>> {
-  return fetch(url, fetchOptions)
+  return fetch(url, {
+    headers: {
+      Accept: 'application/json',
+    },
+    ...fetchOptions,
+  })
     .then(response => {
       if (!response.ok) {
         throw new Error(
