@@ -40,10 +40,26 @@ export const DeployedContracts = ({
 
   const handleNetworkClick = (network: string) => {
     setSelectedNetwork(network);
+    history.pushState(null, '', `?network=${network}`);
     setTimeout(() => {
       contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
   };
+
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const networkFromUrl = urlParams.get('network');
+    const isValidNetwork =
+      networkFromUrl &&
+      deployedCoreContracts[0].networks.some(n => n === networkFromUrl);
+
+    if (isValidNetwork) {
+      setSelectedNetwork(networkFromUrl);
+      contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      if (networkFromUrl) window.location.href = '/404';
+    }
+  }, [deployedCoreContracts]);
 
   const smartContractsUrl = './#smart-contract-architecture';
 
