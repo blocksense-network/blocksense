@@ -1,19 +1,35 @@
 import * as S from '@effect/schema/Schema';
 
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
 
 /**
- * Schema for the information about symbols received from Upbit.
+ * Class to fetch assets information from Upbit.
  */
-const UpbitSymbolInfoSchema = S.Struct({
-  symbol: S.String,
-  market: S.String,
-  name: S.String,
-  base: S.String,
-  quote: S.String,
-  english_name: S.String,
-});
+export class UpbitAssetsFetcher
+  implements ExchangeAssetsFetcher<UpbitAssetInfo>
+{
+  async fetchAssets(): Promise<AssetInfo<UpbitAssetInfo>[]> {
+    const assets = await fetchUpbitSymbolsInfo();
+    return assets.map(asset => {
+      const [quote, base] = asset.market.split('-');
 
+      return {
+        pair: {
+          base,
+          quote,
+        },
+        data: {
+          market: asset.market,
+        },
+      };
+    });
+  }
+}
+
+/**
+ * Schema for the market information received from Upbit.
+ */
 const UpbitMarketRespSchema = S.Array(
   S.Struct({
     market: S.String,
@@ -22,43 +38,28 @@ const UpbitMarketRespSchema = S.Array(
   }),
 );
 
-/**
- * Type for the information about symbols received from Upbit.
- */
-export type UpbitSymbolInfo = S.Schema.Type<typeof UpbitSymbolInfoSchema>;
+export type UpbitMarketResp = S.Schema.Type<typeof UpbitMarketRespSchema>;
 
 /**
- * Function to decode Upbit symbol information.
+ * Schema for the data relevant to a Upbit oracle.
+ *
+ * Ref: https://global-docs.upbit.com/docs/rest-api#1-market-information-and-ticker
  */
-export const decodeUpbitSymbolInfo = S.decodeUnknownSync(
-  S.Array(UpbitSymbolInfoSchema),
+const UpbitAssetInfoSchema = S.mutable(
+  S.Struct({
+    market: S.String,
+  }),
 );
 
+export type UpbitAssetInfo = S.Schema.Type<typeof UpbitAssetInfoSchema>;
+
 /**
- * Function to fetch detailed information about symbols from Upbit.
+ * Function to fetch market information from Upbit.
  *
  * Ref: https://global-docs.upbit.com/reference/listing-market-list
  */
-export async function fetchUpbitSymbolsInfo(): Promise<
-  readonly UpbitSymbolInfo[]
-> {
+export async function fetchUpbitSymbolsInfo(): Promise<UpbitMarketResp> {
   const url = 'https://api.upbit.com/v1/market/all';
 
-  const markets = await fetchAndDecodeJSON(UpbitMarketRespSchema, url);
-
-  const supportedUpbitSymbols = decodeUpbitSymbolInfo(
-    markets.map(market => {
-      const [quote, base] = market.market.split('-');
-      return {
-        symbol: market.market,
-        market: market.market,
-        name: `${base}/${quote}`,
-        base,
-        quote,
-        english_name: market.english_name,
-      };
-    }),
-  );
-
-  return supportedUpbitSymbols;
+  return await fetchAndDecodeJSON(UpbitMarketRespSchema, url);
 }

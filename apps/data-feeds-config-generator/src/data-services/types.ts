@@ -40,39 +40,6 @@ export const decodeChainLinkFeedsInfo = S.decodeUnknownSync(
   S.Array(ChainLinkFeedInfoSchema),
 );
 
-/**
- * Schema for the information about currencies received from CoinMarketCap.
- */
-export const CMCInfoSchema = S.Struct({
-  id: S.Number,
-  rank: S.Number,
-  name: S.String,
-  symbol: S.String,
-  slug: S.String,
-  is_active: S.Number,
-  first_historical_data: S.NullishOr(S.Date),
-  last_historical_data: S.NullishOr(S.Date),
-  platform: S.NullishOr(
-    S.Struct({
-      id: S.Number,
-      name: S.String,
-      symbol: S.String,
-      slug: S.String,
-      token_address: S.String,
-    }),
-  ),
-}).annotations({ identifier: 'CMCInfo' });
-
-/**
- * Type for the information about currencies received from CoinMarketCap.
- */
-export type CMCInfo = S.Schema.Type<typeof CMCInfoSchema>;
-
-/**
- * Function to decode CoinMarketCap information.
- */
-export const decodeCMCInfo = S.decodeUnknownSync(S.Array(CMCInfoSchema));
-
 export const RawDataFeedsSchema = S.mutable(
   S.Record({
     key: S.String,

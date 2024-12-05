@@ -3,43 +3,66 @@ import * as S from '@effect/schema/Schema';
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 
 /**
- * Schema for the information about symbols received from Binance.
+ * Class to fetch assets information from Binance.
  */
-const BinanceSymbolInfoSchema = S.Struct({
-  symbol: S.String,
-  baseAsset: S.String,
-  quoteAsset: S.String,
-  baseAssetPrecision: S.Number,
-  quoteAssetPrecision: S.Number,
-});
-
-const BinanceExchangeInfoRespSchema = S.Struct({
-  symbols: S.Array(BinanceSymbolInfoSchema),
-});
+export class BinanceAssetsFetcher
+  implements ExchangeAssetsFetcher<BinanceAssetInfo>
+{
+  async fetchAssets(): Promise<AssetInfo<BinanceAssetInfo>[]> {
+    const assets = (await fetchBinanceSymbolsInfo()).symbols;
+    return assets.map(asset => ({
+      pair: {
+        base: asset.baseAsset,
+        quote: asset.quoteAsset,
+      },
+      data: {
+        symbol: asset.symbol,
+      },
+    }));
+  }
+}
+import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
 
 /**
- * Type for the information about symbols received from Binance.
+ * Schema for the relevant information about symbols received from Binance.
  */
-export type BinanceSymbolInfo = S.Schema.Type<typeof BinanceSymbolInfoSchema>;
-
-/**
- * Function to decode Binance symbol information.
- */
-export const decodeBinanceSymbolInfo = S.decodeUnknownSync(
-  S.Array(BinanceSymbolInfoSchema),
+const BinanceExchangeInfoRespSchema = S.mutable(
+  S.Struct({
+    symbols: S.mutable(
+      S.Array(
+        S.Struct({
+          symbol: S.String,
+          baseAsset: S.String,
+          quoteAsset: S.String,
+        }),
+      ),
+    ),
+  }),
 );
 
+export type BinanceExchangeInfoResp = S.Schema.Type<
+  typeof BinanceExchangeInfoRespSchema
+>;
+
 /**
- * Function to fetch detailed information about symbols from Binance.
+ * Schema for the data relevant to a Binance oracle.
+ * Ref: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/public-api-endpoints#symbol-price-ticker
+ */
+const BinanceAssetInfoSchema = S.mutable(
+  S.Struct({
+    symbol: S.String,
+  }),
+);
+
+export type BinanceAssetInfo = S.Schema.Type<typeof BinanceAssetInfoSchema>;
+
+/**
+ * Function to fetch symbols information from Binance.
  *
  * Ref: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/public-api-endpoints#exchange-information
  */
-export async function fetchBinanceSymbolsInfo(): Promise<
-  readonly BinanceSymbolInfo[]
-> {
+export async function fetchBinanceSymbolsInfo(): Promise<BinanceExchangeInfoResp> {
   const url = 'https://api.binance.com/api/v3/exchangeInfo';
 
-  return fetchAndDecodeJSON(BinanceExchangeInfoRespSchema, url).then(
-    r => r.symbols,
-  );
+  return fetchAndDecodeJSON(BinanceExchangeInfoRespSchema, url);
 }

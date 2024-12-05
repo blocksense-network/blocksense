@@ -1,18 +1,26 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import { fetchBinanceSymbolsInfo } from './binance';
-import { fetchBybitSymbolsInfo } from './bybit';
-import { getCMCCryptoList } from './cmc';
-import { fetchKrakenSymbolsInfo } from './kraken';
-import { fetchUpbitSymbolsInfo } from './upbit';
+import { BinanceAssetsFetcher } from './binance';
+import { BybitAssetsFetcher } from './bybit';
+import { CMCAssetFetcher } from './cmc';
+import { KrakenAssetsFetcher } from './kraken';
+import { UpbitAssetsFetcher } from './upbit';
 import { artifactsDir } from '../../paths';
 
 export async function fetchSymbols() {
-  const supportedBinanceSymbols = await fetchBinanceSymbolsInfo();
-  const supportedBybitSymbols = await fetchBybitSymbolsInfo();
-  const supportedUpbitSymbols = await fetchUpbitSymbolsInfo();
-  const supportedKrakenSymbols = await fetchKrakenSymbolsInfo();
-  const supportedCMCCurrencies = await getCMCCryptoList();
+  const [
+    supportedBinanceSymbols,
+    supportedBybitSymbols,
+    supportedUpbitSymbols,
+    supportedKrakenSymbols,
+    supportedCMCCurrencies,
+  ] = await Promise.all([
+    new BinanceAssetsFetcher().fetchAssets(),
+    new BybitAssetsFetcher().fetchAssets(),
+    new UpbitAssetsFetcher().fetchAssets(),
+    new KrakenAssetsFetcher().fetchAssets(),
+    new CMCAssetFetcher().fetchAssets(),
+  ]);
 
   {
     const { writeJSON } = selectDirectory(artifactsDir);
