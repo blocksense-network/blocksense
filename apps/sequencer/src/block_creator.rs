@@ -274,7 +274,7 @@ async fn generate_block<
     if updates.keys().len() > 0 {
         if let Err(e) = batched_votes_send.send(UpdateToSend {
             block_height,
-            kv_updates: updates,
+            kv_updates: updates.clone(), // This code will be removed once 2 phase consensus is finalized
         }) {
             error!(
                 "Channel for propagating batched updates to sender failed: {}",
@@ -299,13 +299,14 @@ async fn generate_block<
         };
     }
 
-    if !block_is_empty {
-        let block_to_kafka = json!({
-            "BlockHeader": hex::encode(serialized_header),
-            "AddRemoveFeeds": hex::encode(serialized_add_remove_feeds),
-        });
+    if let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint {
+        if !block_is_empty {
+            // Stream block updates
+            let block_to_kafka = json!({
+                "BlockHeader": hex::encode(serialized_header),
+                "AddRemoveFeeds": hex::encode(serialized_add_remove_feeds),
+            });
 
-        if let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint {
             match kafka_endpoint
                 .send(
                     FutureRecord::<(), _>::to("blockchain").payload(&block_to_kafka.to_string()),
@@ -316,9 +317,12 @@ async fn generate_block<
                 Ok(res) => debug!("Successfully sent block to kafka endpoint: {res:?}"),
                 Err(e) => error!("Failed to send to kafka endpoint! {e:?}"),
             }
-        } else {
-            warn!("No Kafka endpoint set to stream blocks");
         }
+        if updates.keys().len() > 0 {
+            // TODO: post command to aggregated_results_consensus_manager_loop
+        }
+    } else {
+        warn!("No Kafka endpoint set to stream blocks and batches of updates!");
     }
 }
 

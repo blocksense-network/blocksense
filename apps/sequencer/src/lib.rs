@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::Debug;
 
+pub mod aggregated_results_consensus_manager;
 pub mod block_creator;
 pub mod blocks_reader;
 pub mod feeds;
