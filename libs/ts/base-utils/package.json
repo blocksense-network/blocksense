@@ -52,6 +52,11 @@
       "import": "./dist/esm/http.mjs",
       "types": "./dist/types/http.d.ts"
     },
+    "./logging": {
+      "require": "./dist/cjs/logging.cjs",
+      "import": "./dist/esm/logging.mjs",
+      "types": "./dist/types/logging.d.ts"
+    },
     "./numeric": {
       "require": "./dist/cjs/numeric.cjs",
       "import": "./dist/esm/numeric.mjs",
