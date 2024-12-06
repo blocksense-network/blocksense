@@ -1,67 +1,41 @@
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { AccessControl } from '../typechain/contracts/AccessControl';
 import { ethers } from 'hardhat';
-import { deployContract } from './utils/helpers/common';
-import { expect } from 'chai';
+import { AccessControlWrapper } from './utils/wrappers/adfs/AccessControl';
 
 describe('AccessControl', () => {
-  let accessControl: AccessControl;
+  let accessControl: AccessControlWrapper;
   let signers: HardhatEthersSigner[];
-  let admins: string[];
+  let admins: HardhatEthersSigner[];
 
   beforeEach(async () => {
     signers = await ethers.getSigners();
-    accessControl = await deployContract<AccessControl>(
-      'AccessControl',
-      signers[0].address,
+    accessControl = new AccessControlWrapper();
+    await accessControl.init(signers[0]);
+
+    admins = signers.slice(1, 6);
+
+    await accessControl.set(
+      signers[0],
+      admins.map(signer => signer.address),
     );
-
-    admins = signers.slice(1, 2).map(signer => signer.address);
-
-    const encodedData = ethers.solidityPacked(
-      [...admins.map(() => 'address')],
-      [...admins],
-    );
-
-    await signers[0].sendTransaction({
-      to: accessControl.target,
-      data: encodedData,
-    });
   });
 
   it('Should return true for admin', async () => {
-    for (const admin of admins) {
-      const res = await signers[5].call({
-        to: accessControl.target,
-        data: admin,
-      });
-
-      expect(res).to.be.equal(1n);
-    }
+    await accessControl.checkAdmin(
+      signers[10],
+      admins.map(signer => signer.address),
+      admins.map(() => 1n),
+    );
   });
 
   it('Should return false when not admin', async () => {
-    const res = await signers[5].call({
-      to: accessControl.target,
-      data: signers[0].address,
-    });
-
-    expect(res).to.be.equal(0n);
+    await accessControl.checkAdmin(signers[1], [signers[10].address], [0n]);
   });
 
   it('Should not set admin if not owner', async () => {
-    const newAdmin = ethers.Wallet.createRandom().address;
+    const newAdmin = signers[10];
 
-    await signers[5].sendTransaction({
-      to: accessControl.target,
-      data: newAdmin,
-    });
-
-    const res = await signers[5].call({
-      to: accessControl.target,
-      data: newAdmin,
-    });
-
-    expect(res).to.be.equal(0n);
+    await accessControl.set(signers[5], [newAdmin.address]);
+    await accessControl.checkAdmin(signers[10], [newAdmin.address], [0n]);
   });
 });
