@@ -10,9 +10,9 @@ import {
   SportsDataFeedStoreGenericV2Wrapper,
   SportsDataFeedStoreV1Wrapper,
   SportsDataFeedStoreV2Wrapper,
-} from '../utils/wrappers';
-import { initWrappers } from '../utils/helpers/common';
-import { compareGasUsed } from '../utils/helpers/sportsDataFeedGasHelpers';
+} from './utils/wrappers';
+import { initWrappers } from './utils/helpers/common';
+import { compareGasUsed } from './utils/helpers/sportsDataFeedGasHelpers';
 
 let contractWrappers: SportsDataFeedStoreBaseWrapper<
   SportsDataFeedStoreV1 | SportsDataFeedStoreV2

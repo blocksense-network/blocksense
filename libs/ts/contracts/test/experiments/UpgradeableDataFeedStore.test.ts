@@ -7,7 +7,7 @@ import {
   GenericHistoricalDataFeedStore,
   HistoricalDataFeedStore,
   initWrappers,
-} from '../utils/helpers/common';
+} from './utils/helpers/common';
 import {
   UpgradeableProxyBaseWrapper,
   UpgradeableProxyDataFeedStoreV1GenericWrapper,
@@ -19,8 +19,8 @@ import {
   UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
-} from '../utils/wrappers';
-import { compareGasUsed } from '../utils/helpers/dataFeedGasHelpers';
+} from './utils/wrappers';
+import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
 import { ITransparentUpgradeableProxy__factory } from '../../typechain';
 
 let contractWrappers: UpgradeableProxyBaseWrapper<DataFeedStore>[] = [];

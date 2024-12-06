@@ -6,9 +6,9 @@ import {
   RegistryWrapper,
   UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
-} from '../utils/wrappers';
-import { callAndCompareRegistries } from '../utils/helpers/registryGasHelper';
-import { HistoricalDataFeedStore, TOKENS } from '../utils/helpers/common';
+} from './utils/wrappers';
+import { callAndCompareRegistries } from './utils/helpers/registryGasHelper';
+import { HistoricalDataFeedStore, TOKENS } from './utils/helpers/common';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 

@@ -3,8 +3,8 @@ import {
   BlocksenseFeedStoreConsumer,
   RawCallFeedStoreConsumer,
 } from '../../typechain';
-import { deployContract } from '../utils/helpers/common';
-import { HistoricalDataFeedStoreV2Wrapper } from '../utils/wrappers';
+import { deployContract } from '../experiments/utils/helpers/common';
+import { HistoricalDataFeedStoreV2Wrapper } from '../experiments/utils/wrappers';
 import * as utils from './utils/feedStoreConsumer';
 import { expect } from 'chai';
 

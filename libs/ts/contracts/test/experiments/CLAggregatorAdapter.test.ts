@@ -1,11 +1,11 @@
-import { HistoricalDataFeedStore } from '../utils/helpers/common';
+import { HistoricalDataFeedStore } from './utils/helpers/common';
 import {
   CLBaseWrapper,
   CLV1Wrapper,
   CLV2Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
-} from '../utils/wrappers';
+} from './utils/wrappers';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 

@@ -4,8 +4,8 @@ import {
   DataFeed,
   GenericDataFeedStore,
   initWrappers,
-} from '../utils/helpers/common';
-import { compareConsumerGasUsed } from '../utils/helpers/consumerGasHelpers';
+} from './utils/helpers/common';
+import { compareConsumerGasUsed } from './utils/helpers/consumerGasHelpers';
 import {
   DataFeedStoreConsumerBaseWrapper,
   DataFeedStoreConsumerV1Wrapper,
@@ -13,7 +13,7 @@ import {
   DataFeedStoreConsumerV3Wrapper,
   DataFeedStoreGenericConsumerV1Wrapper,
   DataFeedStoreGenericConsumerV2Wrapper,
-} from '../utils/wrappers';
+} from './utils/wrappers';
 
 let contractWrappers: DataFeedStoreConsumerBaseWrapper<DataFeed>[] = [];
 let genericContractWrappers: DataFeedStoreConsumerBaseWrapper<GenericDataFeedStore>[] =
