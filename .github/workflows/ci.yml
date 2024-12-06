@@ -4,13 +4,12 @@ on:
   # Enable option to manually run the action:
   workflow_dispatch:
 
-  # Run on the `main` branch or on PRs that target it:
+  # Run on the `main` branch
   push:
     branches:
       - main
+  # Run on all on PRs
   pull_request:
-    branches:
-      - main
 
   # Run the pipeline for each PR part of merge queues as well
   merge_group:
