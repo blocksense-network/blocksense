@@ -1,3 +1,5 @@
+import { IADFSWrapper } from './interfaces/IADFSWrapper';
+
 export enum ReadOp {
   GetFeedAtRound = 0x04,
   GetLatestFeed = 0x02,
@@ -11,3 +13,8 @@ export interface Feed {
   stride: bigint;
   data: string;
 }
+
+export type UpgradeableProxyCallMethods = Omit<
+  IADFSWrapper,
+  'init' | 'getName' | 'contract' | 'accessControl'
+>;
