@@ -1,10 +1,10 @@
 import { artifacts, ethers } from 'hardhat';
 import { CLAggregatorAdapterConsumer } from '../../typechain';
-import { deployContract } from '../utils/helpers/common';
+import { deployContract } from '../experiments/utils/helpers/common';
 import {
   CLV2Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
-} from '../utils/wrappers';
+} from '../experiments/utils/wrappers';
 import * as utils from './utils/clAggregatorAdapterConsumer';
 import { expect } from 'chai';
 

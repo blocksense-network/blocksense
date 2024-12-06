@@ -1,11 +1,11 @@
 import { artifacts, ethers } from 'hardhat';
 import { CLFeedRegistryAdapterConsumer } from '../../typechain';
-import { TOKENS, deployContract } from '../utils/helpers/common';
+import { TOKENS, deployContract } from '../experiments/utils/helpers/common';
 import {
   CLRegistryBaseWrapper,
   CLV2Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
-} from '../utils/wrappers';
+} from '../experiments/utils/wrappers';
 import * as utils from './utils/clFeedRegistryAdapterConsumer';
 import { expect } from 'chai';
 
