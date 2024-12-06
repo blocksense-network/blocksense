@@ -1,0 +1,20 @@
+---
+title: 'Data Feed'
+---
+
+import React from 'react';
+
+import { DataFeedPage } from '@/components/DynamicRouting/[feed].tsx';
+import { Error404 } from '@/components/common/Error404';
+export {
+  getStaticPaths,
+  getStaticProps,
+} from '@/components/DynamicRouting/[feed].tsx';
+
+export default function FeedPage({ feed, feedDeploymentInfo }) {
+  if (!feed) {
+    return <Error404 />;
+  } else {
+    return <DataFeedPage feed={feed} feedDeploymentInfo={feedDeploymentInfo} />;
+  }
+}
