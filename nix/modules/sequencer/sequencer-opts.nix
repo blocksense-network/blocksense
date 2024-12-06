@@ -5,55 +5,86 @@ lib:
 # in
 with lib;
 let
-  providerOpts =
-    # {config, ...}: let
-    #   providerName = config._module.args.name;
-    #   inherit (cfg.anvil."${providerName}") port;
-    # in
-    {
-      options = {
-        private_key_path = mkOption {
-          type = types.path;
-          description = mdDoc "The path to the private key.";
-        };
+  providerOpts = {
+    options = {
+      private_key_path = mkOption {
+        type = types.path;
+        description = mdDoc "The path to the private key.";
+      };
 
-        url = mkOption {
-          type = types.str;
-          # default = "http://127.0.0.1:${toString port}";
-          description = mdDoc "The URL of the provider.";
-        };
+      url = mkOption {
+        type = types.str;
+        # default = "http://127.0.0.1:${toString port}";
+        description = mdDoc "The URL of the provider.";
+      };
 
-        allow_feeds = mkOption {
-          type = types.listOf types.int;
-          default = [ ];
-          description = mdDoc "List of allowed feed ids to be published";
-        };
+      allow_feeds = mkOption {
+        type = types.listOf types.int;
+        default = [ ];
+        description = mdDoc "List of allowed feed ids to be published";
+      };
 
-        transaction_timeout_secs = mkOption {
-          type = types.int;
-          default = 50;
-          description = mdDoc "The timeout for transactions.";
-        };
+      transaction_timeout_secs = mkOption {
+        type = types.int;
+        default = 50;
+        description = mdDoc "The timeout for transactions.";
+      };
 
-        transaction_gas_limit = mkOption {
-          type = types.int;
-          default = 7500000;
-          description = mdDoc "Transaction GAS limit for the provider.";
-        };
+      transaction_gas_limit = mkOption {
+        type = types.int;
+        default = 7500000;
+        description = mdDoc "Transaction GAS limit for the provider.";
+      };
 
-        contract_address = mkOption {
-          type = types.str;
-          description = mdDoc "The Historical Data Feed contract address.";
-        };
+      contract_address = mkOption {
+        type = types.str;
+        description = mdDoc "The Historical Data Feed contract address.";
+      };
 
-        impersonated_anvil_account = mkOption {
-          type = types.nullOr types.str;
-          default = null;
-          description = mdDoc "The account to impersonate for the provider.";
-        };
-
+      impersonated_anvil_account = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = mdDoc "The account to impersonate for the provider.";
       };
     };
+  };
+
+  blockConfigOpts = {
+    options = {
+      max_feed_updates_to_batch = mkOption {
+        type = types.int;
+        default = 1;
+        description = mdDoc "The maximum number of keys to batch together before sending a report.";
+      };
+
+      block_generation_period = mkOption {
+        type = types.int;
+        default = 500;
+        description = mdDoc "The maximum duration (in ms) to wait before sending aggregating the votes.";
+      };
+
+      genesis_block_timestamp = mkOption {
+        type = types.nullOr (types.submodule systemTimeOpts);
+        description = mdDoc "Time of genesis of blockchain.";
+      };
+    };
+  };
+
+  systemTimeOpts = {
+    options = {
+      secs_since_epoch = mkOption {
+        type = types.int;
+        default = 0;
+        description = mdDoc "Whole seconds since UNIX epoch.";
+      };
+
+      nanos_since_epoch = mkOption {
+        type = types.int;
+        default = 0;
+        description = mdDoc "Nanosecond part of time since UNIX epoch.";
+      };
+    };
+  };
 in
 {
   main-port = mkOption {
@@ -74,16 +105,9 @@ in
     description = mdDoc "The port the sequencer will listen on for prometheus metrics.";
   };
 
-  max-keys-to-batch = mkOption {
-    type = types.int;
-    default = 1;
-    description = mdDoc "The maximum number of keys to batch together before sending a report.";
-  };
-
-  keys-batch-duration = mkOption {
-    type = types.int;
-    default = 500;
-    description = mdDoc "The maximum duration (in ms) to wait before sending aggregating the votes.";
+  block-config = mkOption {
+    type = types.submodule blockConfigOpts;
+    description = mdDoc "Block creation configuration.";
   };
 
   providers = mkOption {
