@@ -27,5 +27,6 @@
       openssl
       pkg-config
       cargo-tarpaulin
+      rdkafka
     ]);
 }
