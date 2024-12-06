@@ -79,6 +79,23 @@ export const isNetwork = S.is(network);
 export const parseNetwork = S.decodeUnknownSync(network);
 export type Network = S.Schema.Type<typeof network>;
 
+export enum Currency {
+  ETH = 'ETH',
+  AVAX = 'AVAX',
+  METIS = 'METIS',
+  BNB = 'BNB',
+  tBNB = 'tBNB',
+  CELO = 'CELO',
+  FTM = 'FTM',
+  tFTM = 'tFTM',
+  xDAI = 'xDAI',
+  MOVR = 'MOVR',
+  MATIC = 'MATIC',
+  POL = 'POL',
+  cBTC = 'cBTC',
+  BERA = 'BERA',
+}
+
 /**
  * Mapping of network names to explorer URLs
  * The URL generator functions take a transaction hash or an address as input and return the corresponding explorer URL.
@@ -88,202 +105,242 @@ export const networkMetadata = {
     chainId: 99999999999,
     isTestnet: false,
     explorerUrl: undefined,
+    currency: Currency.ETH,
   },
   'ethereum-mainnet': {
     chainId: 1,
     isTestnet: false,
     explorerUrl: 'https://etherscan.io',
+    currency: Currency.ETH,
   },
   'ethereum-sepolia': {
     chainId: 11155111,
     isTestnet: true,
     explorerUrl: 'https://sepolia.etherscan.io',
+    currency: Currency.ETH,
   },
   'ethereum-holesky': {
     chainId: 17000,
     isTestnet: true,
     explorerUrl: 'https://holesky.etherscan.io',
+    currency: Currency.ETH,
   },
   'avalanche-mainnet': {
     chainId: 43114,
     isTestnet: false,
     explorerUrl: 'https://snowtrace.io',
+    currency: Currency.AVAX,
   },
   'avalanche-fuji': {
     chainId: 43113,
     isTestnet: true,
     explorerUrl: 'https://testnet.snowtrace.io',
+    currency: Currency.AVAX,
   },
   'andromeda-mainnet': {
     chainId: 1088,
     isTestnet: false,
     explorerUrl: 'https://andromeda.guru.com',
+    currency: Currency.METIS,
   },
   'arbitrum-mainnet': {
     chainId: 42161,
     isTestnet: false,
     explorerUrl: 'https://arbiscan.io',
+    currency: Currency.ETH,
   },
   'arbitrum-sepolia': {
     chainId: 421614,
     isTestnet: true,
     explorerUrl: 'https://sepolia.arbiscan.io',
+    currency: Currency.ETH,
   },
   'base-mainnet': {
     chainId: 8453,
     isTestnet: false,
     explorerUrl: 'https://basescan.org',
+    currency: Currency.ETH,
   },
   'base-sepolia': {
     chainId: 84532,
     isTestnet: true,
     explorerUrl: 'https://sepolia.basescan.org',
+    currency: Currency.ETH,
   },
   'berachain-bartio': {
     chainId: 80084,
     isTestnet: true,
     explorerUrl: 'https://bartio.beratrail.io',
+    currency: Currency.BERA,
   },
   'bsc-mainnet': {
     chainId: 56,
     isTestnet: false,
     explorerUrl: 'https://bscscan.com',
+    currency: Currency.BNB,
   },
   'bsc-testnet': {
     chainId: 97,
     isTestnet: true,
     explorerUrl: 'https://testnet.bscscan.com',
+    currency: Currency.tBNB,
   },
   'celo-mainnet': {
     chainId: 42220,
     isTestnet: false,
     explorerUrl: 'https://celoscan.com',
+    currency: Currency.CELO,
   },
   'celo-alfajores': {
     chainId: 44787,
     isTestnet: true,
     explorerUrl: 'https://alfajores.celoscan.com',
+    currency: Currency.CELO,
   },
   'fantom-mainnet': {
     chainId: 250,
     isTestnet: false,
     explorerUrl: 'https://ftmscan.com',
+    currency: Currency.FTM,
   },
   'fantom-testnet': {
     chainId: 4002,
     isTestnet: true,
     explorerUrl: 'https://testnet.ftmscan.com',
+    currency: Currency.tFTM,
   },
   'gnosis-mainnet': {
     chainId: 100,
     isTestnet: false,
     explorerUrl: 'https://gnosisscan.io',
+    currency: Currency.xDAI,
   },
   'gnosis-chiado': {
     chainId: 10200,
     isTestnet: true,
     explorerUrl: 'https://gnosis-chiado.blockscout.com',
+    currency: Currency.xDAI,
   },
   'taiko-mainnet': {
     chainId: 167000,
     isTestnet: false,
     explorerUrl: 'https://taikoscan.io',
+    currency: Currency.ETH,
   },
   'taiko-hekla': {
     chainId: 167009,
     isTestnet: true,
     explorerUrl: 'https://hekla.taikoscan.io',
+    currency: Currency.ETH,
   },
   'linea-mainnet': {
     chainId: 59144,
     isTestnet: false,
     explorerUrl: 'https://lineascan.build',
+    currency: Currency.ETH,
   },
   'linea-sepolia': {
     chainId: 59141,
     isTestnet: true,
     explorerUrl: 'https://sepolia.lineascan.build',
+    currency: Currency.ETH,
   },
   'manta-mainnet': {
     chainId: 169,
     isTestnet: false,
     explorerUrl: 'https://pacific-explorer.manta.network',
+    currency: Currency.ETH,
   },
   'manta-sepolia': {
     chainId: 3441006,
     isTestnet: true,
     explorerUrl: 'https://pacific-explorer.sepolia-testnet.manta.network',
+    currency: Currency.ETH,
   },
   'kusama-moonriver': {
     chainId: 1285,
     isTestnet: false,
     explorerUrl: 'https://moonriver.moonscan.io',
+    currency: Currency.MOVR,
   },
   'optimism-mainnet': {
     chainId: 10,
     isTestnet: false,
     explorerUrl: 'https://optimistic.etherscan.io',
+    currency: Currency.ETH,
   },
   'optimism-sepolia': {
     chainId: 11155420,
     isTestnet: true,
     explorerUrl: 'https://sepolia-optimism.etherscan.io',
+    currency: Currency.ETH,
   },
   'polygon-mainnet': {
     chainId: 137,
     isTestnet: false,
     explorerUrl: 'https://polygonscan.com',
+    currency: Currency.MATIC,
   },
   'polygon-amoy': {
     chainId: 80002,
     isTestnet: true,
     explorerUrl: 'https://amoy.polygonscan.com',
+    currency: Currency.POL,
   },
   'polygon-zkevm-mainnet': {
     chainId: 1101,
     isTestnet: false,
     explorerUrl: 'https://zkevm.polygonscan.com',
+    currency: Currency.ETH,
   },
   'polygon-zkevm-cardona': {
     chainId: 2442,
     isTestnet: true,
     explorerUrl: 'https://cardona-zkevm.polygonscan.com',
+    currency: Currency.ETH,
   },
   'scroll-mainnet': {
     chainId: 534352,
     isTestnet: false,
     explorerUrl: 'https://scroll.io',
+    currency: Currency.ETH,
   },
   'scroll-sepolia': {
     chainId: 534351,
     isTestnet: true,
     explorerUrl: 'https://sepolia.scrollscan.com',
+    currency: Currency.ETH,
   },
   'zksync-mainnet': {
     chainId: 324,
     isTestnet: false,
     explorerUrl: 'https://zksync.blockscout.com',
+    currency: Currency.ETH,
   },
   'zksync-sepolia': {
     chainId: 300,
     isTestnet: true,
     explorerUrl: 'https://zksync-sepolia.blockscout.com',
+    currency: Currency.ETH,
   },
   'morph-holesky': {
     chainId: 2810,
     isTestnet: true,
     explorerUrl: 'https://explorer-holesky.morphl2.io',
+    currency: Currency.ETH,
   },
   'citrea-testnet': {
     chainId: 5115,
     isTestnet: true,
     explorerUrl: 'https://explorer.testnet.citrea.xyz',
+    currency: Currency.cBTC,
   },
 } satisfies {
   [Net in NetworkName]: {
     chainId: ChainId | undefined;
     isTestnet: boolean;
     explorerUrl: string | undefined;
+    currency: Currency;
   };
 };
 
