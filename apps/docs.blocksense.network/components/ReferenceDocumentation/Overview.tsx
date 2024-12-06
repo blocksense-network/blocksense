@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContractAnchorLink } from '@/components/sol-contracts/ContractAnchorLink';
+import { ContractAnchorLink } from '@/sol-contracts-components/ContractAnchorLink';
 
 export const Overview = () => {
   return (

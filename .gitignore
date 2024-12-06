@@ -84,6 +84,7 @@ web_modules/
 .parcel-cache
 
 # Next.js build output
+_pagefind
 .next
 out
 
