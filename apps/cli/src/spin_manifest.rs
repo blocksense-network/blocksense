@@ -208,7 +208,7 @@ mod test {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "script": "cmc"
     },
     {
@@ -231,7 +231,7 @@ mod test {
         "secs_since_epoch": 0,
         "nanos_since_epoch": 0
       },
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "script": "yahoo"
     }]
 }

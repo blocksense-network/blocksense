@@ -93,7 +93,7 @@ impl FeedConfig {
 
 impl Validated for FeedConfig {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
-        let range_percentage = 0.0f32..=1.0f32;
+        let range_percentage = 0.0f32..=100.0f32;
         if self.report_interval_ms == 0 {
             anyhow::bail!(
                 "{}: report_interval_ms for feed {} with id {} cannot be set to 0",
@@ -105,22 +105,28 @@ impl Validated for FeedConfig {
         if !range_percentage.contains(&self.quorum_percentage) {
             anyhow::bail!(
                 "{}: quorum_percentage for feed {} with id {} must be between {} and {}",
-                range_percentage.start(),
-                range_percentage.end(),
                 context,
                 self.name,
-                self.id
+                self.id,
+                range_percentage.start(),
+                range_percentage.end(),
             );
         }
         if !range_percentage.contains(&self.skip_publish_if_less_then_percentage) {
             anyhow::bail!(
             "{}: skip_publish_if_less_then_percentage for feed {} with id {} must be between {} and {}",
-            range_percentage.start(),
-            range_percentage.end(),
             context,
             self.name,
-            self.id
+            self.id,
+            range_percentage.start(),
+            range_percentage.end(),
         );
+        }
+        if self.skip_publish_if_less_then_percentage > 0.0f32 {
+            info!(
+                "{}: Skipping updates in feed {} with id {} that deviate less then {} %",
+                context, self.name, self.id, self.skip_publish_if_less_then_percentage,
+            );
         }
         Ok(())
     }

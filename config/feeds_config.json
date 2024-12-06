@@ -7,7 +7,7 @@
       "description": "FOXY / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -32,7 +32,7 @@
       "description": "PERP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -57,7 +57,7 @@
       "description": "MEME / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -82,7 +82,7 @@
       "description": "SOL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -107,8 +107,8 @@
       "description": "WSTETH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
-      "skip_publish_if_less_then_percentage": 0.001,
+      "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -133,7 +133,7 @@
       "description": "TAO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -158,7 +158,7 @@
       "description": "SAND / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -183,7 +183,7 @@
       "description": "JPM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -207,7 +207,7 @@
       "description": "TRX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -232,7 +232,7 @@
       "description": "SUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -257,7 +257,7 @@
       "description": "FTT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -282,7 +282,7 @@
       "description": "CHZ / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -307,7 +307,7 @@
       "description": "LINA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -332,7 +332,7 @@
       "description": "IMX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -357,7 +357,7 @@
       "description": "FLOW / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -382,7 +382,7 @@
       "description": "TIA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -407,7 +407,7 @@
       "description": "ILS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -431,7 +431,7 @@
       "description": "DPX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -456,7 +456,7 @@
       "description": "WING / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -481,7 +481,7 @@
       "description": "STORJ / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -506,7 +506,7 @@
       "description": "SUI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -531,8 +531,8 @@
       "description": "PAXG / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
-      "skip_publish_if_less_then_percentage": 0.01,
+      "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 1,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -557,7 +557,7 @@
       "description": "VET / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -582,7 +582,7 @@
       "description": "AVAIL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -607,7 +607,7 @@
       "description": "AXL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -632,7 +632,7 @@
       "description": "BAL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -657,7 +657,7 @@
       "description": "DPI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -682,7 +682,7 @@
       "description": "ALCX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -707,7 +707,7 @@
       "description": "SHIB / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -732,7 +732,7 @@
       "description": "BONK / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -757,7 +757,7 @@
       "description": "ANKR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -782,7 +782,7 @@
       "description": "BTC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -807,7 +807,7 @@
       "description": "MAV / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -832,7 +832,7 @@
       "description": "DAI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -857,7 +857,7 @@
       "description": "BSW / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -882,7 +882,7 @@
       "description": "QUICK / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -907,7 +907,7 @@
       "description": "1INCH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -932,7 +932,7 @@
       "description": "MLN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -957,7 +957,7 @@
       "description": "COQ / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -982,7 +982,7 @@
       "description": "TUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1007,7 +1007,7 @@
       "description": "MRNA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -1031,7 +1031,7 @@
       "description": "USDE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1056,7 +1056,7 @@
       "description": "CFX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1081,7 +1081,7 @@
       "description": "WBTC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1106,7 +1106,7 @@
       "description": "XVS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1131,7 +1131,7 @@
       "description": "BETH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1156,7 +1156,7 @@
       "description": "UST / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "YahooFinance",
       "pair": {
@@ -1180,7 +1180,7 @@
       "description": "ETH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1205,7 +1205,7 @@
       "description": "DASH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1230,7 +1230,7 @@
       "description": "MXN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -1254,7 +1254,7 @@
       "description": "GME / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -1278,7 +1278,7 @@
       "description": "REEF / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1303,7 +1303,7 @@
       "description": "SXP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1328,7 +1328,7 @@
       "description": "WTI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Commodities",
       "script": "YahooFinance",
       "pair": {
@@ -1352,7 +1352,7 @@
       "description": "NZD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -1376,7 +1376,7 @@
       "description": "WIF / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1401,7 +1401,7 @@
       "description": "XRP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1426,7 +1426,7 @@
       "description": "ATOM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1451,7 +1451,7 @@
       "description": "USDP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1476,7 +1476,7 @@
       "description": "MASK / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1501,7 +1501,7 @@
       "description": "XLM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1526,7 +1526,7 @@
       "description": "CAKE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1551,7 +1551,7 @@
       "description": "GBP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -1575,7 +1575,7 @@
       "description": "KAVA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1600,7 +1600,7 @@
       "description": "XMR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1625,7 +1625,7 @@
       "description": "EURC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1650,7 +1650,7 @@
       "description": "XAG / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Commodities",
       "script": "YahooFinance",
       "pair": {
@@ -1674,7 +1674,7 @@
       "description": "FET / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1699,7 +1699,7 @@
       "description": "AXS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1724,7 +1724,7 @@
       "description": "DOT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1749,7 +1749,7 @@
       "description": "QNT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1774,7 +1774,7 @@
       "description": "DYDX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1799,7 +1799,7 @@
       "description": "MNT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1824,7 +1824,7 @@
       "description": "UMA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1849,7 +1849,7 @@
       "description": "ZERO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1874,7 +1874,7 @@
       "description": "ULTI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1899,7 +1899,7 @@
       "description": "STX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1924,7 +1924,7 @@
       "description": "CAD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -1948,7 +1948,7 @@
       "description": "KSM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1973,7 +1973,7 @@
       "description": "JTO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1998,7 +1998,7 @@
       "description": "USDz / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2023,7 +2023,7 @@
       "description": "GRT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2048,7 +2048,7 @@
       "description": "GMT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2073,7 +2073,7 @@
       "description": "GOOGL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2097,7 +2097,7 @@
       "description": "XAI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2122,7 +2122,7 @@
       "description": "ALPACA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2147,7 +2147,7 @@
       "description": "MAGIC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2172,7 +2172,7 @@
       "description": "XAVA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2197,7 +2197,7 @@
       "description": "PFE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2221,7 +2221,7 @@
       "description": "QI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2246,7 +2246,7 @@
       "description": "BADGER / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2271,7 +2271,7 @@
       "description": "FLOKI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2296,7 +2296,7 @@
       "description": "ZK / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2321,7 +2321,7 @@
       "description": "LIT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2346,7 +2346,7 @@
       "description": "XOF / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -2370,7 +2370,7 @@
       "description": "XTZ / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2395,7 +2395,7 @@
       "description": "MOVR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2420,7 +2420,7 @@
       "description": "AMZN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2444,7 +2444,7 @@
       "description": "TRY / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -2468,7 +2468,7 @@
       "description": "DOGE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2493,7 +2493,7 @@
       "description": "NFLX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2517,7 +2517,7 @@
       "description": "SEK / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -2541,7 +2541,7 @@
       "description": "MEW / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2566,7 +2566,7 @@
       "description": "MATIC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2591,7 +2591,7 @@
       "description": "ZIL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2616,7 +2616,7 @@
       "description": "USDS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2641,7 +2641,7 @@
       "description": "ZAR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -2665,7 +2665,7 @@
       "description": "THB / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -2689,7 +2689,7 @@
       "description": "EOS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2714,7 +2714,7 @@
       "description": "RSR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2739,7 +2739,7 @@
       "description": "UNI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2764,7 +2764,7 @@
       "description": "AAPL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2788,7 +2788,7 @@
       "description": "RDNT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2813,7 +2813,7 @@
       "description": "HIGH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2838,7 +2838,7 @@
       "description": "KES / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -2862,7 +2862,7 @@
       "description": "APE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2887,7 +2887,7 @@
       "description": "BCH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2912,7 +2912,7 @@
       "description": "CUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2937,7 +2937,7 @@
       "description": "COMP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2962,7 +2962,7 @@
       "description": "ZEC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2987,7 +2987,7 @@
       "description": "ENS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3012,7 +3012,7 @@
       "description": "KRW / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -3036,7 +3036,7 @@
       "description": "TSLA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -3060,7 +3060,7 @@
       "description": "MAVIA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3085,7 +3085,7 @@
       "description": "ADA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3110,7 +3110,7 @@
       "description": "GHST / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3135,7 +3135,7 @@
       "description": "AMPL / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3160,7 +3160,7 @@
       "description": "GNS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3185,7 +3185,7 @@
       "description": "USDe / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3210,7 +3210,7 @@
       "description": "GNO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3235,7 +3235,7 @@
       "description": "DODO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3260,7 +3260,7 @@
       "description": "USDC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3285,7 +3285,7 @@
       "description": "STG / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3310,7 +3310,7 @@
       "description": "AERO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3335,7 +3335,7 @@
       "description": "POL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3360,7 +3360,7 @@
       "description": "ORDI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3385,7 +3385,7 @@
       "description": "NULS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3410,7 +3410,7 @@
       "description": "sUSDe / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3435,7 +3435,7 @@
       "description": "BAT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3460,7 +3460,7 @@
       "description": "PEPE / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3485,7 +3485,7 @@
       "description": "FIL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3510,7 +3510,7 @@
       "description": "YFI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3535,7 +3535,7 @@
       "description": "XCN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3560,7 +3560,7 @@
       "description": "LDO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3585,7 +3585,7 @@
       "description": "USDD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3610,7 +3610,7 @@
       "description": "ARB / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3635,7 +3635,7 @@
       "description": "MSFT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -3659,7 +3659,7 @@
       "description": "USDV / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3684,7 +3684,7 @@
       "description": "MKR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3709,7 +3709,7 @@
       "description": "CRV / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3734,7 +3734,7 @@
       "description": "CHF / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -3758,7 +3758,7 @@
       "description": "IOTX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3783,7 +3783,7 @@
       "description": "GMX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3808,7 +3808,7 @@
       "description": "SHV / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -3832,7 +3832,7 @@
       "description": "REN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3857,7 +3857,7 @@
       "description": "MIM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3882,7 +3882,7 @@
       "description": "BUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3907,7 +3907,7 @@
       "description": "USD+ / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3932,7 +3932,7 @@
       "description": "SPELL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3957,7 +3957,7 @@
       "description": "C98 / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3982,7 +3982,7 @@
       "description": "USDM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4007,7 +4007,7 @@
       "description": "AUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4032,7 +4032,7 @@
       "description": "QQQ / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -4056,7 +4056,7 @@
       "description": "OM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4081,7 +4081,7 @@
       "description": "BRL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -4105,7 +4105,7 @@
       "description": "BLUR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4130,7 +4130,7 @@
       "description": "WIN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4155,7 +4155,7 @@
       "description": "BOO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4180,7 +4180,7 @@
       "description": "IDR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -4204,7 +4204,7 @@
       "description": "JUP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4229,7 +4229,7 @@
       "description": "INJ / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4254,7 +4254,7 @@
       "description": "DGB / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4279,7 +4279,7 @@
       "description": "FORTH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4304,7 +4304,7 @@
       "description": "KNC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4329,7 +4329,7 @@
       "description": "PYUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4354,7 +4354,7 @@
       "description": "CRVUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4379,7 +4379,7 @@
       "description": "INR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -4403,7 +4403,7 @@
       "description": "XAU / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Commodities",
       "script": "YahooFinance",
       "pair": {
@@ -4427,7 +4427,7 @@
       "description": "XPT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Commodities",
       "script": "YahooFinance",
       "pair": {
@@ -4451,7 +4451,7 @@
       "description": "CELO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4476,7 +4476,7 @@
       "description": "COP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Fiat",
       "script": "YahooFinance",
       "pair": {
@@ -4500,7 +4500,7 @@
       "description": "CSPX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -4524,7 +4524,7 @@
       "description": "GLMR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4549,7 +4549,7 @@
       "description": "SEI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4574,7 +4574,7 @@
       "description": "mSOL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "YahooFinance",
       "pair": {
@@ -4598,7 +4598,7 @@
       "description": "ALPHA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4623,7 +4623,7 @@
       "description": "JPY / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -4647,7 +4647,7 @@
       "description": "BNB / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4672,7 +4672,7 @@
       "description": "SPY / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -4696,7 +4696,7 @@
       "description": "ICP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4721,7 +4721,7 @@
       "description": "RPL / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4746,7 +4746,7 @@
       "description": "VAI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4771,7 +4771,7 @@
       "description": "WLD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4796,7 +4796,7 @@
       "description": "SATS / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4821,7 +4821,7 @@
       "description": "GHO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4846,7 +4846,7 @@
       "description": "WEMIX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4871,7 +4871,7 @@
       "description": "ALGO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4896,7 +4896,7 @@
       "description": "BAND / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4921,7 +4921,7 @@
       "description": "OGN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4946,7 +4946,7 @@
       "description": "SNX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4971,7 +4971,7 @@
       "description": "MS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -4995,7 +4995,7 @@
       "description": "ENJ / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5020,7 +5020,7 @@
       "description": "AVAX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5045,7 +5045,7 @@
       "description": "FDUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5070,7 +5070,7 @@
       "description": "SUSHI / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5095,7 +5095,7 @@
       "description": "LTC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5120,7 +5120,7 @@
       "description": "TBTC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5145,7 +5145,7 @@
       "description": "STRK / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5170,7 +5170,7 @@
       "description": "LINK / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5195,7 +5195,7 @@
       "description": "USD0 / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5220,7 +5220,7 @@
       "description": "DEGEN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5245,7 +5245,7 @@
       "description": "ZRO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5270,7 +5270,7 @@
       "description": "CHR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5295,7 +5295,7 @@
       "description": "SGD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -5319,7 +5319,7 @@
       "description": "THETA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5344,7 +5344,7 @@
       "description": "CVX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5369,7 +5369,7 @@
       "description": "SRM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5394,7 +5394,7 @@
       "description": "AAVE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5419,7 +5419,7 @@
       "description": "ONT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5444,7 +5444,7 @@
       "description": "MOG / USD",
       "decimals": 18,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5469,7 +5469,7 @@
       "description": "OP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5494,7 +5494,7 @@
       "description": "CZK / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -5518,7 +5518,7 @@
       "description": "CNY / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -5542,7 +5542,7 @@
       "description": "FRAX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5567,7 +5567,7 @@
       "description": "NVDA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -5591,7 +5591,7 @@
       "description": "LUSD / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5616,7 +5616,7 @@
       "description": "BEAM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5641,7 +5641,7 @@
       "description": "PENDLE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5666,7 +5666,7 @@
       "description": "SLP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5691,7 +5691,7 @@
       "description": "ASTR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5716,7 +5716,7 @@
       "description": "IBTA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -5740,7 +5740,7 @@
       "description": "COIN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -5764,7 +5764,7 @@
       "description": "VELO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5789,7 +5789,7 @@
       "description": "ETC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5814,7 +5814,7 @@
       "description": "JOE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5839,7 +5839,7 @@
       "description": "FXS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5864,7 +5864,7 @@
       "description": "USDT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5889,7 +5889,7 @@
       "description": "MBOX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5914,7 +5914,7 @@
       "description": "ONE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5939,7 +5939,7 @@
       "description": "MIMATIC / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5964,7 +5964,7 @@
       "description": "TRB / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5989,7 +5989,7 @@
       "description": "FTM / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6014,7 +6014,7 @@
       "description": "RUNE / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6039,7 +6039,7 @@
       "description": "META / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -6063,7 +6063,7 @@
       "description": "NEAR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6088,7 +6088,7 @@
       "description": "APT / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6113,7 +6113,7 @@
       "description": "PLN / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -6137,7 +6137,7 @@
       "description": "PHP / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -6161,7 +6161,7 @@
       "description": "KLAY / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6186,7 +6186,7 @@
       "description": "PYTH / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6211,7 +6211,7 @@
       "description": "ZRX / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6236,7 +6236,7 @@
       "description": "METIS / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6261,7 +6261,7 @@
       "description": "MANA / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6286,7 +6286,7 @@
       "description": "EUR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -6310,7 +6310,7 @@
       "description": "ONG / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6335,7 +6335,7 @@
       "description": "HBAR / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6360,7 +6360,7 @@
       "description": "WOO / USD",
       "decimals": 8,
       "report_interval_ms": 300000,
-      "quorum_percentage": 1,
+      "quorum_percentage": 100,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {

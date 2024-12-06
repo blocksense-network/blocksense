@@ -91,7 +91,7 @@ async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()>
         .clone();
     feed.id = 1;
     feed.report_interval_ms = 3000;
-    feed.quorum_percentage = 0.001;
+    feed.quorum_percentage = 0.1;
 
     let feeds = json!({
         "feeds": [

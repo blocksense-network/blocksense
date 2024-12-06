@@ -111,7 +111,7 @@ impl FeedSlotsProcessor {
             }
         } else {
             let total_votes_count = values.len() as f32;
-            let required_votes_count = quorum_percentage * (num_valid_reporters as f32);
+            let required_votes_count = quorum_percentage * 0.01f32 * (num_valid_reporters as f32);
             let is_quorum_reached = required_votes_count <= total_votes_count;
             let mut skip_publishing = false;
             if !is_quorum_reached {
@@ -278,8 +278,7 @@ impl FeedSlotsProcessor {
             let feed_id = self.key;
             info!(
                 "Skipping publishing for feed_id = {} change is lower then threshold of {} %",
-                feed_id,
-                skip_publish_if_less_then_percentage * 100.0f64
+                feed_id, skip_publish_if_less_then_percentage
             );
             return Ok(());
         }
@@ -338,7 +337,7 @@ impl FeedSlotsProcessor {
                 let a = f64::abs(*last);
                 let b = f64::abs(candidate_value);
                 let diff = f64::abs(last - candidate_value);
-                diff < skip_publish_if_less_then_percentage * f64::max(a, b)
+                diff * 100.0f64 < skip_publish_if_less_then_percentage * f64::max(a, b)
             }
             _ => false,
         };
@@ -555,16 +554,14 @@ mod tests {
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::RwLock;
     use utils::test_env::get_test_private_key_path;
-    const QUORUM_PERCENTAGE: f32 = 0.001;
-    const SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE: f32 = 1.0f32;
 
     #[tokio::test]
     async fn test_feed_slots_processor_loop() {
         // setup
         let name = "test_feed";
         let report_interval_ms = 1000; // 1 second interval
-        let quorum_percentage = QUORUM_PERCENTAGE;
-        let skip_publish_if_less_then_percentage = SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE;
+        let quorum_percentage = 100.0; // 100%
+        let skip_publish_if_less_then_percentage = 10.0; // 10%
         let first_report_start_time = SystemTime::now();
         let feed_metadata = FeedMetaData::new(
             name,
@@ -667,18 +664,11 @@ mod tests {
         // voting will be 3 seconds long
         let voting_wait_duration_ms = 3000;
 
-        let _feed = FeedMetaData::new_oneshot(
-            "TestFeed".to_string(),
-            voting_wait_duration_ms,
-            QUORUM_PERCENTAGE,
-            voting_start_time,
-        );
-
         let name = "test_feed";
         let feed_metadata = FeedMetaData::new_oneshot(
             name.to_string(),
             voting_wait_duration_ms,
-            QUORUM_PERCENTAGE,
+            100.0, // 100%
             voting_start_time,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -789,8 +779,8 @@ mod tests {
         // setup
         let name = "test_feed_with_quorum";
         let report_interval_ms = 100; // 0.1 second interval
-        let quorum_percentage = 0.6f32;
-        let skip_publish_if_less_then_percentage = SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE;
+        let quorum_percentage = 60.0f32;
+        let skip_publish_if_less_then_percentage = 10.0f32; // 10%
         let first_report_start_time = SystemTime::now();
         let feed_metadata = FeedMetaData::new(
             name,
@@ -890,8 +880,8 @@ mod tests {
         // setup
         let name = "test_feed_low_diviation";
         let report_interval_ms = 100; // 0.1 second interval
-        let quorum_percentage = QUORUM_PERCENTAGE;
-        let skip_publish_if_less_then_percentage = 0.1f32;
+        let quorum_percentage = 100.0f32; //100%
+        let skip_publish_if_less_then_percentage = 10.0f32; // 10%
         let first_report_start_time = SystemTime::now();
         let feed_metadata = FeedMetaData::new(
             name,
@@ -1001,8 +991,8 @@ mod tests {
         // setup
         let name = "test_feed_low_diviation_2";
         let report_interval_ms = 100; // 0.1 second interval
-        let quorum_percentage = QUORUM_PERCENTAGE;
-        let skip_publish_if_less_then_percentage = 0.1f32;
+        let quorum_percentage = 100.0f32; // 100%
+        let skip_publish_if_less_then_percentage = 10.0f32; // 10%
         let first_report_start_time = SystemTime::now();
         let feed_metadata = FeedMetaData::new(
             name,

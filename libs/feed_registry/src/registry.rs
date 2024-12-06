@@ -49,11 +49,11 @@ impl FeedMetaDataRegistry {
 
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let start = SystemTime::now();
-    let skip_publish_if_less_then_percentage = 0.0f32;
+    let skip_publish_if_less_then_percentage = 0.0f32; // 0%
     let fmd1 = FeedMetaData::new(
         "DOGE/USD",
         60000,
-        0.6,
+        60.0f32, // 60%
         skip_publish_if_less_then_percentage,
         start,
         "Numerical".to_string(),
@@ -63,7 +63,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let fmd2 = FeedMetaData::new(
         "BTS/USD",
         30000,
-        0.6,
+        60.0f32, // 60%
         skip_publish_if_less_then_percentage,
         start,
         "Numerical".to_string(),
@@ -73,7 +73,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let fmd3 = FeedMetaData::new(
         "ETH/USD",
         60000,
-        0.6,
+        60.0f32, // 60%
         skip_publish_if_less_then_percentage,
         start,
         "Numerical".to_string(),
@@ -341,9 +341,6 @@ mod tests {
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::RwLock;
 
-    const QUORUM_PERCENTAGE: f32 = 0.001;
-    const SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE: f32 = 0.01f32;
-
     #[tokio::test]
     async fn basic_test() {
         let fmdr = new_feeds_meta_data_reg_with_test_data();
@@ -485,7 +482,7 @@ mod tests {
         let feed = FeedMetaData::new_oneshot(
             "TestFeed".to_string(),
             voting_wait_duration_ms,
-            QUORUM_PERCENTAGE,
+            10.0f32, // 10%
             voting_start_time,
         );
 
@@ -575,14 +572,14 @@ mod tests {
         let oneshot_feed = FeedMetaData::new_oneshot(
             "TestFeed".to_string(),
             voting_wait_duration_ms,
-            QUORUM_PERCENTAGE,
+            10.0f32, // 10%
             voting_start_time,
         );
         let regular_feed = FeedMetaData::new(
             "TestFeed",
             voting_wait_duration_ms,
-            QUORUM_PERCENTAGE,
-            SKIP_PUBLISH_IF_LESS_THEN_PERCENTAGE,
+            10.0f32, // 10%
+            1.0f32,  // 1%
             current_system_time,
             "Numeric".to_string(),
             "Average".to_string(),
