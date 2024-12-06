@@ -5,6 +5,7 @@
   libusb1,
   git,
   openssl,
+  rdkafka,
   libgcc,
   zstd,
   stdenv,
@@ -25,6 +26,7 @@ let
     ];
 
     buildInputs = [
+      rdkafka
       libusb1
       openssl
       zstd
