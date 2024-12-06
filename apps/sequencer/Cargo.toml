@@ -72,7 +72,7 @@ uuid = { version = "1.8.0", features = ["v4"] }
 chrono = "0.4.39"
 ringbuf = "0.4.7"
 console-subscriber = "0.4.0"
-rdkafka = "0.36.2"
+rdkafka = { version = "0.36.2", features = ["dynamic-linking"] }
 tokio-stream = "0.1.16"
 
 [[bin]]
