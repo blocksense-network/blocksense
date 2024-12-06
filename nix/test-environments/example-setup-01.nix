@@ -1,4 +1,8 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  ...
+}:
 let
   # Function to read and parse the JSON file
   readJson = path: builtins.fromJSON (builtins.readFile path);
@@ -12,7 +16,6 @@ let
     (readJson deploymentFilePath)."ethereum-holesky".contracts.coreContracts.UpgradeableProxy.address;
 
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
-
 in
 {
   services.blocksense = {
@@ -37,8 +40,15 @@ in
       main-port = 9856;
       admin-port = 5553;
       metrics-port = 5551;
-      max-keys-to-batch = 300;
-      keys-batch-duration = 500;
+
+      block-config = {
+        max_feed_updates_to_batch = 300;
+        block_generation_period = 500;
+        genesis_block_timestamp = {
+          secs_since_epoch = 1;
+          nanos_since_epoch = 1;
+        };
+      };
 
       providers = {
         a = {
