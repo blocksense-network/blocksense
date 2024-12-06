@@ -194,6 +194,10 @@ contract AggregatedDataFeedStore {
         } {
           let metadata := calldataload(pointer)
           let stride := byte(0, metadata)
+          if gt(stride, 31) {
+            revert(0, 0)
+          }
+
           let strideAddress := shl(stride, DATA_FEED_ADDRESS)
 
           let indexLength := byte(1, metadata)
@@ -264,6 +268,9 @@ contract AggregatedDataFeedStore {
             sub(256, shl(3, indexLength)),
             shl(8, roundTableData)
           )
+          if gt(index, shl(115, 2)) {
+            revert(0, 0)
+          }
 
           pointer := add(pointer, add(indexLength, 33))
           sstore(add(ROUND_ADDRESS, index), calldataload(sub(pointer, 32)))
