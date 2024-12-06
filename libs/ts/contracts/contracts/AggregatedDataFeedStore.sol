@@ -8,6 +8,12 @@ contract AggregatedDataFeedStore {
     0x0000000000000000000000000000000000001000;
   address internal immutable ACCESS_CONTROL;
 
+  /*
+    0x0000 - latest blocknumber
+    0x0001 - implementation slot (UpgradeableProxy)
+    0x0002 - admin slot (UpgradeableProxy)
+  */
+
   constructor(address accessControl) {
     ACCESS_CONTROL = accessControl;
   }
