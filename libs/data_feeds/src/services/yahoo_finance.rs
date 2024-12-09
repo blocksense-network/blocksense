@@ -156,19 +156,13 @@ impl DataFeed for YahooFinanceDataFeed {
             } else {
                 error!("Request failed with status: {}", response.status());
 
-                (
-                    Err(get_generic_feed_error("YahooFinance")),
-                    current_unix_time(),
-                )
+                (Err(get_generic_feed_error("YahooFinance")), current_unix_time())
             }
         } else {
             //TODO(snikolov): Figure out how to handle the Error if it occurs
             error!("Request failed with error");
 
-            (
-                Err(get_generic_feed_error("YahooFinance")),
-                current_unix_time(),
-            )
+            (Err(get_generic_feed_error("YahooFinance")), current_unix_time())
         }
     }
 
@@ -232,51 +226,12 @@ fn convert_response_into_vector(
 ) -> Vec<(FeedResult, u32, Timestamp)> {
     let mut results_vec: Vec<(FeedResult, u32, Timestamp)> = Vec::new();
 
-    if let Ok(response) = response {
-        if response.status().is_success() {
-            let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
-
-            let symbol_price_map: HashMap<String, f64> = resp_json["quoteResponse"]["result"]
-                .as_array()
-                .unwrap_or(&vec![]) // Provide an empty vec if result is not an array
-                .iter()
-                .filter_map(|result| {
-                    let symbol = result["symbol"].as_str();
-                    let price = result["regularMarketPrice"].as_f64();
-                    match (symbol, price) {
-                        (Some(symbol), Some(price)) => Some((symbol.to_string(), price)),
-                        _ => None, // TODO(snikolov): How to react to invalid entries?
-                    }
-                })
-                .collect();
-
-            for (asset, feed_id) in asset_id_vec.iter() {
-                trace!("Feed Asset pair: {} ... Feed Id: {}", asset, feed_id);
-                results_vec.push((
-                    get_feed_result_from_hashmap(asset, &symbol_price_map),
-                    *feed_id,
-                    current_unix_time(),
-                ));
-            }
-
-            results_vec
-        } else {
-            error!("Request failed with status: {}", response.status());
-
-            asset_id_vec
-                .iter()
-                .map(|(_, id)| {
-                    (
-                        Err(get_generic_feed_error("YahooFinance")),
-                        *id,
-                        current_unix_time(),
-                    )
-                })
-                .collect()
-        }
-    } else {
+    fn handle_error(
+        log_message: &str,
+        asset_id_vec: Vec<(String, u32)>,
+    ) -> Vec<(FeedResult, u32, Timestamp)> {
         //TODO(snikolov): Figure out how to handle the Error if it occurs
-        error!("Request failed with error!");
+        error!(log_message);
 
         asset_id_vec
             .iter()
@@ -288,6 +243,49 @@ fn convert_response_into_vector(
                 )
             })
             .collect()
+    }
+
+    if let Ok(response) = response {
+        if response.status().is_success() {
+            match response.json::<Value>() {
+                Ok(resp_json) => {
+                    let symbol_price_map: HashMap<String, f64> = resp_json["quoteResponse"]
+                        ["result"]
+                        .as_array()
+                        .unwrap_or(&vec![]) // Provide an empty vec if result is not an array
+                        .iter()
+                        .filter_map(|result| {
+                            let symbol = result["symbol"].as_str();
+                            let price = result["regularMarketPrice"].as_f64();
+                            match (symbol, price) {
+                                (Some(symbol), Some(price)) => Some((symbol.to_string(), price)),
+                                _ => None, // TODO(snikolov): How to react to invalid entries?
+                            }
+                        })
+                        .collect();
+
+                    for (asset, feed_id) in asset_id_vec.iter() {
+                        trace!("Feed Asset pair: {} ... Feed Id: {}", asset, feed_id);
+                        results_vec.push((
+                            get_feed_result_from_hashmap(asset, &symbol_price_map),
+                            *feed_id,
+                            current_unix_time(),
+                        ));
+                    }
+
+                    results_vec
+                }
+                Err(err) => {
+                    let log_message = format!("Request failed due to parse failure: {}", err);
+                    handle_error(log_message.as_str(), asset_id_vec)
+                }
+            }
+        } else {
+            let log_message = format!("Request failed with status: {}", response.status());
+            handle_error(log_message.as_str(), asset_id_vec)
+        }
+    } else {
+        handle_error("Request failed with error!", asset_id_vec)
     }
 }
 
@@ -364,7 +362,6 @@ mod tests {
         assert_eq!(result_values, expected_values);
     }
 
-    #[ignore]
     #[test]
     fn convert_response_into_vector_returns_err_on_single_colon() {
         // setup phase
