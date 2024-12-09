@@ -13,6 +13,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
+    "downlevelIteration": true
   },
   "include": [
     "src/**/*"
