@@ -3288,6 +3288,7 @@ dependencies = [
  "erased-serde",
  "feed_registry",
  "fred-rs",
+ "http 1.2.0",
  "log",
  "prometheus 0.1.1",
  "rand 0.8.5",

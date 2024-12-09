@@ -1,7 +1,8 @@
 use std::collections::HashMap;
+use std::result::Result;
 use std::time::Duration;
 
-use anyhow::{anyhow, Result};
+use anyhow::anyhow;
 use async_trait::async_trait;
 use feed_registry::types::Asset;
 use reqwest::blocking::Client;
@@ -221,53 +222,46 @@ impl DataFeed for YahooFinanceDataFeed {
             .headers(headers)
             .send();
 
-        let mut results_vec: Vec<(FeedResult, u32, Timestamp)> = Vec::new();
+        convert_response_into_vector(response, asset_id_vec)
+    }
+}
 
-        if let Ok(response) = response {
-            if response.status().is_success() {
-                let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
+fn convert_response_into_vector(
+    response: Result<reqwest::blocking::Response, reqwest::Error>,
+    asset_id_vec: Vec<(String, u32)>,
+) -> Vec<(FeedResult, u32, Timestamp)> {
+    let mut results_vec: Vec<(FeedResult, u32, Timestamp)> = Vec::new();
 
-                let symbol_price_map: HashMap<String, f64> = resp_json["quoteResponse"]["result"]
-                    .as_array()
-                    .unwrap_or(&vec![]) // Provide an empty vec if result is not an array
-                    .iter()
-                    .filter_map(|result| {
-                        let symbol = result["symbol"].as_str();
-                        let price = result["regularMarketPrice"].as_f64();
-                        match (symbol, price) {
-                            (Some(symbol), Some(price)) => Some((symbol.to_string(), price)),
-                            _ => None, // TODO(snikolov): How to react to invalid entries?
-                        }
-                    })
-                    .collect();
+    if let Ok(response) = response {
+        if response.status().is_success() {
+            let resp_json: Value = response.json().unwrap(); //TODO(snikolov): Idiomatic way to handle
 
-                for (asset, feed_id) in asset_id_vec.iter() {
-                    trace!("Feed Asset pair: {} ... Feed Id: {}", asset, feed_id);
-                    results_vec.push((
-                        get_feed_result_from_hashmap(asset, &symbol_price_map),
-                        *feed_id,
-                        current_unix_time(),
-                    ));
-                }
+            let symbol_price_map: HashMap<String, f64> = resp_json["quoteResponse"]["result"]
+                .as_array()
+                .unwrap_or(&vec![]) // Provide an empty vec if result is not an array
+                .iter()
+                .filter_map(|result| {
+                    let symbol = result["symbol"].as_str();
+                    let price = result["regularMarketPrice"].as_f64();
+                    match (symbol, price) {
+                        (Some(symbol), Some(price)) => Some((symbol.to_string(), price)),
+                        _ => None, // TODO(snikolov): How to react to invalid entries?
+                    }
+                })
+                .collect();
 
-                results_vec
-            } else {
-                error!("Request failed with status: {}", response.status());
-
-                asset_id_vec
-                    .iter()
-                    .map(|(_, id)| {
-                        (
-                            Err(get_generic_feed_error("YahooFinance")),
-                            *id,
-                            current_unix_time(),
-                        )
-                    })
-                    .collect()
+            for (asset, feed_id) in asset_id_vec.iter() {
+                trace!("Feed Asset pair: {} ... Feed Id: {}", asset, feed_id);
+                results_vec.push((
+                    get_feed_result_from_hashmap(asset, &symbol_price_map),
+                    *feed_id,
+                    current_unix_time(),
+                ));
             }
+
+            results_vec
         } else {
-            //TODO(snikolov): Figure out how to handle the Error if it occurs
-            error!("Request failed with error!");
+            error!("Request failed with status: {}", response.status());
 
             asset_id_vec
                 .iter()
@@ -280,5 +274,115 @@ impl DataFeed for YahooFinanceDataFeed {
                 })
                 .collect()
         }
+    } else {
+        //TODO(snikolov): Figure out how to handle the Error if it occurs
+        error!("Request failed with error!");
+
+        asset_id_vec
+            .iter()
+            .map(|(_, id)| {
+                (
+                    Err(get_generic_feed_error("YahooFinance")),
+                    *id,
+                    current_unix_time(),
+                )
+            })
+            .collect()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::services::yahoo_finance::convert_response_into_vector;
+    use feed_registry::types::{FeedError, FeedResult, Timestamp};
+    use reqwest::blocking;
+
+    /// Helper function that makes tests more readable.
+    fn extract_values_only(result: Vec<(FeedResult, u32, Timestamp)>) -> Vec<FeedResult> {
+        result
+            .into_iter()
+            .map(|(value, _, _)| value)
+            .collect::<Vec<FeedResult>>()
+    }
+
+    #[test]
+    fn convert_response_into_vector_succeeds_on_empty_map_response() {
+        // setup phase
+        let http_response = http::response::Builder::new()
+            .status(200)
+            .body("{}")
+            .unwrap();
+        let response = blocking::Response::from(http_response);
+
+        // test phase
+        let result = convert_response_into_vector(Ok(response), vec![]);
+
+        // check phase
+        assert_eq!(result, vec![]);
+    }
+
+    #[test]
+    fn convert_response_into_vector_succeeds_on_failed_response() {
+        // setup phase
+        let http_response = http::response::Builder::new()
+            .status(404)
+            .body("foo")
+            .unwrap();
+        let response = blocking::Response::from(http_response);
+
+        // test phase
+        let result = convert_response_into_vector(Ok(response), vec![]);
+
+        // check phase
+        assert_eq!(result, vec![]);
+    }
+
+    #[test]
+    fn convert_response_into_vector_returns_vec_of_errors_on_failed_response() {
+        // setup phase
+        let http_response = http::response::Builder::new()
+            .status(404)
+            .body("foo")
+            .unwrap();
+        let response = blocking::Response::from(http_response);
+        let assets = vec![
+            ("FOO".to_owned(), 1),
+            ("BAR".to_owned(), 2),
+            ("BAZ".to_owned(), 3),
+        ];
+
+        // test phase
+        let result = convert_response_into_vector(Ok(response), assets);
+
+        // check phase
+        let result_values = extract_values_only(result);
+        let expected_values = vec![
+            Err(FeedError::APIError("YahooFinance poll failed!".to_string())),
+            Err(FeedError::APIError("YahooFinance poll failed!".to_string())),
+            Err(FeedError::APIError("YahooFinance poll failed!".to_string())),
+        ];
+        assert_eq!(result_values, expected_values);
+    }
+
+    #[ignore]
+    #[test]
+    fn convert_response_into_vector_returns_err_on_single_colon() {
+        // setup phase
+        let http_response = http::response::Builder::new()
+            .status(200)
+            .body(":")
+            .unwrap();
+        let response = blocking::Response::from(http_response);
+        let assets = vec![("FOO".to_owned(), 1)];
+
+        // test phase
+        let result = convert_response_into_vector(Ok(response), assets);
+
+        // check phase
+        let result_values = extract_values_only(result);
+        let expected_values = vec![Err(FeedError::APIError(
+            "YahooFinance poll failed!".to_string(),
+        ))];
+        assert_eq!(result_values, expected_values);
     }
 }

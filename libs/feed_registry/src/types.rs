@@ -332,7 +332,7 @@ pub struct PostRegisterOracle {
     pub oracle_script_wasm: String,
 }
 
-#[derive(Debug, Error, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Error, Clone, Serialize, Deserialize)]
 pub enum FeedError {
     #[error("API error ocurred: {0}")]
     APIError(String),
