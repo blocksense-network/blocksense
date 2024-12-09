@@ -413,10 +413,8 @@ impl FeedSlotsProcessor {
             quorum_percentage,
             skip_publish_if_less_then_percentage,
             aggregator,
-            slot,
             feed_type,
         ) = {
-            let current_time_as_ms = current_unix_time();
             debug!("Get a read lock on feed meta [feed {feed_id}]");
             let datafeed = feed.read().await;
             (
@@ -426,7 +424,6 @@ impl FeedSlotsProcessor {
                 datafeed.get_quorum_percentage(),
                 datafeed.get_skip_publish_if_less_then_percentage() as f64,
                 datafeed.get_feed_aggregator(),
-                datafeed.get_slot(current_time_as_ms),
                 datafeed.value_type.clone(),
             )
         };
@@ -462,6 +459,16 @@ impl FeedSlotsProcessor {
                     "Oneshot feed processed",
                 )));
             }
+            let current_time_as_ms = current_unix_time();
+            let slot = {
+                if is_oneshot {
+                    // Oneshots only have the zero slot
+                    0_u64
+                } else {
+                    ((current_time_as_ms - first_report_start_time) / report_interval_ms as u128)
+                        as u64
+                }
+            };
 
             // The tokio::select! macro allows waiting on multiple async computations and returns when a single computation completes.
             // The branch that does not complete is dropped. I
