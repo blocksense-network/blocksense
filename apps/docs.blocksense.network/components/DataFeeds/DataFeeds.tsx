@@ -1,40 +1,22 @@
 import * as React from 'react';
-import type { GetStaticProps } from 'next';
 import {
   decodeFeedsConfig,
   FeedsConfig,
 } from '@blocksense/config-types/data-feeds-config';
 import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import {
-  columns,
-  dataFeedsColumnsTitles,
-} from '@/components/DataFeeds/columns';
-import { dataFeedUrl } from '@/src/constants';
+import { DataFeedsTable } from '@/components/DataFeeds/DataFeedsTable';
 
-import {
-  DataTable,
-  getFacetedFilters,
-} from '@/components/ui/DataTable/DataTable';
-
-export const getStaticProps = (() => {
+export function getFeedsConfig() {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
-
-  return { props: { feedsConfig }, revalidate: false };
-}) satisfies GetStaticProps<{
-  feedsConfig: FeedsConfig;
-}>;
+  return feedsConfig;
+}
 
 type DataFeedsProps = {
   feedsConfig: FeedsConfig;
 };
 
 export const DataFeeds = ({ feedsConfig: { feeds } }: DataFeedsProps) => {
-  const filters = React.useMemo(
-    () => getFacetedFilters(['id'], feeds, dataFeedsColumnsTitles),
-    [feeds],
-  );
-
   return (
     <section className="mt-4">
       <ContractItemWrapper
@@ -51,14 +33,7 @@ export const DataFeeds = ({ feedsConfig: { feeds } }: DataFeedsProps) => {
             the Blocksense Network.
           </p>
         </article>
-        <DataTable
-          columns={columns}
-          data={feeds}
-          filterCell={'description'}
-          filters={filters}
-          columnsTitles={dataFeedsColumnsTitles}
-          rowLink={dataFeedUrl}
-        />
+        <DataFeedsTable feeds={feeds} />
       </ContractItemWrapper>
     </section>
   );
