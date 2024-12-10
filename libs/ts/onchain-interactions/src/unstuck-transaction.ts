@@ -1,18 +1,27 @@
 import assert from 'node:assert';
-import Web3 from 'web3';
 import yargs from 'yargs';
+import Web3 from 'web3';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
+import fs from 'fs/promises';
 
 async function getWeb3(
   providerUrl: string,
   account: string,
   privateKey: string,
-): Promise<{ web3: Web3; account: EthereumAddress }> {
+): Promise<{
+  web3: Web3;
+  account: EthereumAddress;
+  signer: {
+    address: string;
+    privateKey: string;
+    signTransaction: (txData: any) => Promise<any>;
+  };
+}> {
   try {
     if (!providerUrl || !account || !privateKey) {
       throw new Error('providerUrl, account, and privateKey are required.');
@@ -23,43 +32,112 @@ async function getWeb3(
       : `0x${privateKey}`;
 
     const parsedAccount = parseEthereumAddress(account);
+
     const web3 = new Web3(providerUrl);
+    const accountFromKey =
+      web3.eth.accounts.privateKeyToAccount(normalizedPrivateKey);
 
-    if (!web3.currentProvider) {
-      throw new Error(`Invalid providerUrl: ${providerUrl}`);
-    }
-
-    web3.eth.accounts.wallet.add(normalizedPrivateKey);
-
-    const walletAccount = web3.eth.accounts.wallet[0];
-    if (!walletAccount || !walletAccount.address) {
-      throw new Error('Failed to retrieve the account from the Web3 wallet.');
-    }
-
-    const address = parseEthereumAddress(walletAccount.address);
-
-    assert.equal(
-      parsedAccount,
-      address,
+    assert.strictEqual(
+      accountFromKey.address.toLowerCase(),
+      parsedAccount.toLowerCase(),
       `Provided private key does not match the expected account: '${parsedAccount}'`,
     );
 
-    return { web3, account: parsedAccount };
+    web3.eth.accounts.wallet.add(accountFromKey);
+
+    return { web3, account: parsedAccount, signer: accountFromKey };
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(chalk.red(`Error in getWeb3: ${error.message}`));
+      throw new Error(chalk.red(`Error in getEthers: ${error.message}`));
     } else {
-      throw new Error(chalk.red('Unknown error occurred in getWeb3.'));
+      throw new Error(chalk.red('Unknown error occurred in getEthers.'));
     }
   }
 }
+
+async function replaceTransaction(
+  web3: Web3,
+  signer: {
+    address: string;
+    privateKey: string;
+    signTransaction: (txData: any) => Promise<any>;
+  },
+): Promise<void> {
+  const account = signer.address;
+
+  const nextNonce = await web3.eth.getTransactionCount(account, 'latest');
+  const chainID = await web3.eth.getChainId();
+
+  console.log(chalk.blue(`Resetting nonce for account: '${account}'`));
+  console.log(chalk.blue(`On chainID: '${chainID}'`));
+  console.log(chalk.blue(`Latest nonce: ${nextNonce}`));
+
+  let currentGasPrice = await web3.eth.getGasPrice();
+  let multiplier = 1.4;
+
+  console.log(
+    chalk.magenta('Sending replacement transaction with higher priority...'),
+  );
+
+  const txData = {
+    to: account,
+    value: '0',
+    data: '0x',
+    nonce: nextNonce,
+    gas: 21000,
+    gasPrice: Math.floor(Number(currentGasPrice) * multiplier).toString(),
+  };
+
+  console.log(chalk.magenta('Transaction data:'), txData);
+
+  while (multiplier <= 4) {
+    try {
+      const signedTx = await web3.eth.accounts.signTransaction(
+        txData,
+        signer.privateKey,
+      );
+      const receipt = await web3.eth.sendSignedTransaction(
+        signedTx.rawTransaction,
+      );
+
+      console.log(chalk.green('Tx hash:'), receipt.transactionHash);
+      console.log(chalk.green('Transaction confirmed'));
+      break;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('underpriced')) {
+      } else {
+        console.error(
+          chalk.red(`Transaction failed at multiplier ${multiplier}:`),
+          error,
+        );
+      }
+
+      multiplier += 0.2;
+      if (multiplier > 4) {
+        console.error(chalk.red('Maximum multiplier reached, aborting.'));
+        break;
+      }
+
+      console.log(
+        chalk.yellow(
+          `Retrying with higher gas price (x${multiplier.toFixed(1)})...`,
+        ),
+      );
+      txData.gasPrice = Math.floor(
+        Number(currentGasPrice) * multiplier,
+      ).toString();
+    }
+  }
+}
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const main = async (): Promise<void> => {
   const currentSequencerAddress = '0xd756119012CcabBC59910dE0ecEbE406B5b952bE';
 
   const argv = await yargs(hideBin(process.argv))
     .usage(
-      'Usage: $0 --providerUrl <url> --privateKey <key> [--address <ethereum address>]',
+      'Usage: $0 --providerUrl <url> --privateKeyPath <path> [--address <ethereum address>]',
     )
     .option('providerUrl', {
       alias: 'p',
@@ -67,9 +145,9 @@ const main = async (): Promise<void> => {
       type: 'string',
       demandOption: true,
     })
-    .option('privateKey', {
-      alias: 'k',
-      describe: 'Private key for the Ethereum account',
+    .option('privateKeyPath', {
+      alias: 'pkp',
+      describe: 'Private key path for the Ethereum account',
       type: 'string',
       demandOption: true,
     })
@@ -83,7 +161,11 @@ const main = async (): Promise<void> => {
     .alias('help', 'h')
     .parse();
 
-  const { providerUrl, privateKey, address: rawAddress } = argv;
+  const { providerUrl, privateKeyPath, address: rawAddress } = argv;
+  const privateKey = (await fs.readFile(privateKeyPath, 'utf8')).replace(
+    /(\r\n|\n|\r)/gm,
+    '',
+  );
   const address = parseEthereumAddress(rawAddress);
 
   console.log(
@@ -95,77 +177,47 @@ const main = async (): Promise<void> => {
   );
 
   try {
-    const { web3, account } = await getWeb3(providerUrl, address, privateKey);
+    const { web3, signer, account } = await getWeb3(
+      providerUrl,
+      address,
+      privateKey,
+    );
 
     console.log(chalk.green('Successfully connected to Web3.'));
 
-    const nextNonce = await web3.eth.getTransactionCount(account, 'latest');
-    const chainID = await web3.eth.getChainId();
+    let pendingNonce = await web3.eth.getTransactionCount(account, 'pending');
+    let latestNonce = await web3.eth.getTransactionCount(account, 'latest');
+    console.log('pendingNonce:', pendingNonce);
+    console.log('latestNonce:', latestNonce);
 
-    console.log(chalk.blue(`Resetting nonce for account: '${account}'`));
-    console.log(chalk.blue(`On chainID: '${chainID}'`));
-    console.log(chalk.blue(`Latest nonce: ${nextNonce}`));
-
-    const pendingTx = await web3.eth.getTransactionFromBlock(
-      'pending',
-      nextNonce,
-    );
-    if (!pendingTx) {
-      throw new Error('No pending transaction found at the given nonce.');
-    }
-
-    console.log(chalk.yellow('Found pending transaction:'), pendingTx);
-
-    let newGasPrice: string | undefined;
-    let maxFeePerGas: string | undefined;
-    let maxPriorityFeePerGas: string | undefined;
-
-    if ('maxFeePerGas' in pendingTx && 'maxPriorityFeePerGas' in pendingTx) {
-      if (
-        pendingTx.maxFeePerGas === undefined ||
-        pendingTx.maxPriorityFeePerGas === undefined
-      ) {
-        throw new Error('EIP-1559 transaction is missing required fee fields.');
-      }
-
-      maxFeePerGas = ((BigInt(pendingTx.maxFeePerGas) * 15n) / 10n).toString();
-      maxPriorityFeePerGas = (
-        (BigInt(pendingTx.maxPriorityFeePerGas) * 15n) /
-        10n
-      ).toString();
-    } else if ('gasPrice' in pendingTx) {
-      if (pendingTx.gasPrice === undefined) {
-        throw new Error('Legacy transaction is missing gasPrice.');
-      }
-
-      newGasPrice = ((BigInt(pendingTx.gasPrice) * 15n) / 10n).toString();
-    } else {
-      throw new Error(
-        'Could not determine gas price for the pending transaction.',
+    let counter = 5;
+    while (true) {
+      console.log('Blocks passed without a change:', counter);
+      const currentNonce = await web3.eth.getTransactionCount(
+        account,
+        'latest',
       );
+      console.log('currentNonce: ', currentNonce);
+      if (currentNonce >= pendingNonce) {
+        console.log(
+          'All pending transactions passed, current nonce: ',
+          currentNonce,
+        );
+        process.exit(0);
+      }
+      if (currentNonce > latestNonce) {
+        latestNonce = currentNonce;
+        console.log('latestNonce is now: ', latestNonce);
+        counter = 0;
+      } else {
+        counter++;
+        if (counter > 5) {
+          await replaceTransaction(web3, signer);
+          counter = 0;
+        }
+      }
+      await delay(500); // Poll every 1/2 second
     }
-
-    console.log(
-      chalk.magenta('Sending replacement transaction with higher priority...'),
-    );
-    const txData = {
-      from: account,
-      to: pendingTx.to ? parseEthereumAddress(pendingTx.to) : account,
-      value: pendingTx.value || '0',
-      data: pendingTx.input || '0x',
-      nonce: nextNonce,
-      gas: pendingTx.gas || 21000,
-      gasPrice: newGasPrice,
-      maxFeePerGas,
-      maxPriorityFeePerGas,
-    };
-
-    console.log(chalk.magenta('Transaction data:'), txData);
-
-    const tx = await web3.eth.sendTransaction(txData);
-
-    console.log(chalk.green('Tx hash:'), tx.transactionHash);
-    console.log(chalk.green('Transaction confirmed'));
   } catch (error) {
     if (error instanceof Error) {
       console.error(chalk.red(`Error in main: ${error.message}`));
