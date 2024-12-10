@@ -156,13 +156,19 @@ impl DataFeed for YahooFinanceDataFeed {
             } else {
                 error!("Request failed with status: {}", response.status());
 
-                (Err(get_generic_feed_error("YahooFinance")), current_unix_time())
+                (
+                    Err(get_generic_feed_error("YahooFinance")),
+                    current_unix_time(),
+                )
             }
         } else {
             //TODO(snikolov): Figure out how to handle the Error if it occurs
             error!("Request failed with error");
 
-            (Err(get_generic_feed_error("YahooFinance")), current_unix_time())
+            (
+                Err(get_generic_feed_error("YahooFinance")),
+                current_unix_time(),
+            )
         }
     }
 
