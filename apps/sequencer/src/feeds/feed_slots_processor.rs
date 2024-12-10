@@ -4,8 +4,8 @@ use actix_web::web::Data;
 use alloy::primitives::map::HashMap;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use data_feeds::feeds_processing::naive_packing;
-//use eyre::Ok;
 use eyre::{eyre, Result};
+use eyre::{Context, ContextCompat};
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::registry::AllFeedsReports;
 use feed_registry::registry::FeedAggregateHistory;
@@ -265,11 +265,11 @@ impl FeedSlotsProcessor {
         skip_publish_if_less_then_percentage: f64,
         history: &Arc<RwLock<FeedAggregateHistory>>,
         sequencer_state: &Data<SequencerState>,
-    ) {
+    ) -> Result<()> {
         self.increase_quorum_metric(feed_metrics, consumed_reports.is_quorum_reached)
             .await;
         if !consumed_reports.is_quorum_reached {
-            return;
+            return Ok(());
         }
         if consumed_reports.skip_publishing {
             let feed_id = self.key;
@@ -278,12 +278,13 @@ impl FeedSlotsProcessor {
                 feed_id,
                 skip_publish_if_less_then_percentage * 100.0f64
             );
-            return;
+            return Ok(());
         }
-        if let Some(result_post_to_contract) = consumed_reports.result_post_to_contract {
-            self.post_to_contract(history, result_post_to_contract, sequencer_state)
-                .await;
-        }
+        let result_post_to_contract = consumed_reports.result_post_to_contract.context(
+            "[post_consumed_reports]: Impossible, quorum reached but no value is reported",
+        )?;
+        self.post_to_contract(history, result_post_to_contract, sequencer_state)
+            .await
     }
 
     async fn post_to_contract(
@@ -291,7 +292,7 @@ impl FeedSlotsProcessor {
         history: &Arc<RwLock<FeedAggregateHistory>>,
         result_post_to_contract: FeedType,
         sequencer_state: &Data<SequencerState>,
-    ) {
+    ) -> Result<()> {
         {
             let feed_id = self.key;
             debug!("Get a write lock on history [feed {feed_id}]");
@@ -307,7 +308,7 @@ impl FeedSlotsProcessor {
                 to_hex_string(key_post.to_be_bytes().to_vec(), None),
                 naive_packing(result_post_to_contract),
             ))
-            .unwrap();
+            .map_err(|e| eyre!("[post_to_contract]: {e}"))
     }
 
     async fn check_skip_publish_if_less_then_percentage(
@@ -338,47 +339,57 @@ impl FeedSlotsProcessor {
         candidate_value: f64,
     ) -> Result<f64, eyre::Error> {
         let feed_id = self.key;
-        debug!("Get a read lock on history [feed {feed_id}]");
-        let history_lock = history.read().await;
+        let history = history.clone();
+        let anomaly_detection_future = async move {
+            debug!("Get a read lock on history [feed {feed_id}]");
+            let history_lock = history.read().await;
 
-        // The first slice is from the current read position to the end of the array
-        // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
-        let (first, last) = history_lock
-            .collect(self.key)
-            .expect("Missing key from History!")
-            .as_slices();
+            // The first slice is from the current read position to the end of the array
+            // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
+            let heap = history_lock
+                .collect(feed_id)
+                .context("Missing key from History!")?;
+            let (first, last) = heap.as_slices();
+            let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
+            let mut numerical_vec: Vec<f64> = history_vec
+                .iter()
+                .filter_map(|feed| {
+                    if let FeedType::Numerical(value) = feed {
+                        Some(*value)
+                    } else if let FeedType::Text(_) = feed {
+                        warn!("Anomaly Detection not implemented for FeedType::Text, skipping...");
+                        None
+                    } else {
+                        warn!("Anomaly Detection does not recognize FeedType, skipping...");
+                        None
+                    }
+                })
+                .collect();
 
-        let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
-        let mut numerical_vec: Vec<f64> = history_vec
-            .iter()
-            .filter_map(|feed| {
-                if let FeedType::Numerical(value) = feed {
-                    Some(*value)
-                } else if let FeedType::Text(_) = feed {
-                    warn!("Anomaly Detection not implemented for FeedType::Text, skipping...");
-                    None
-                } else {
-                    warn!("Anomaly Detection does not recognize FeedType, skipping...");
-                    None
-                }
-            })
-            .collect();
+            drop(history_lock);
+            debug!("Release the read lock on history [feed {feed_id}]");
 
-        drop(history_lock);
-        debug!("Release the read lock on history [feed {feed_id}]");
+            numerical_vec.push(candidate_value);
 
-        numerical_vec.push(candidate_value);
-        // Get AD prediction only if enough data is present
-        if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
-            debug!("Starting anomaly detection for [feed {feed_id}]");
-            anomaly_detector_aggregate(numerical_vec).map_err(|e| eyre!("{e}"))
-        } else {
-            Err(eyre!(
-                "Skipping anomaly detection; numerical_vec.len() = {} threshold: {}",
-                numerical_vec.len(),
-                AD_MIN_DATA_POINTS_THRESHOLD
-            ))
-        }
+            // Get AD prediction only if enough data is present
+            if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
+                debug!("Starting anomaly detection for [feed {feed_id}]");
+                anomaly_detector_aggregate(numerical_vec).map_err(|e| eyre!("{e}"))
+            } else {
+                Err(eyre!(
+                    "Skipping anomaly detection; numerical_vec.len() = {} threshold: {}",
+                    numerical_vec.len(),
+                    AD_MIN_DATA_POINTS_THRESHOLD
+                ))
+            }
+        };
+
+        tokio::task::Builder::new()
+            .name("anomaly_detection")
+            .spawn(anomaly_detection_future)
+            .context("Failed to spawn feed slots manager anomaly detection!")?
+            .await
+            .context("Failed to join feed slots manager anomaly detection!")?
     }
 
     async fn increase_quorum_metric(
@@ -498,7 +509,9 @@ impl FeedSlotsProcessor {
                         history,
                         ).await {
                             Ok(consumed_reports) => {
-                                self.post_consumed_reports(consumed_reports, feed_metrics.clone(), skip_publish_if_less_then_percentage, history, sequencer_state).await;
+                                if let Err(e) = self.post_consumed_reports(consumed_reports, feed_metrics.clone(), skip_publish_if_less_then_percentage, history, sequencer_state).await {
+                                    error!("{e}")
+                                }
                             }
                             Err(e) => {
                                 error!("{e}");

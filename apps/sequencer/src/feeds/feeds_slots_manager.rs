@@ -375,7 +375,7 @@ mod tests {
     use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::FeedAggregateHistory;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
-    use feed_registry::types::{FeedResult, FeedType};
+    use feed_registry::types::FeedType;
     use prometheus::metrics::FeedsMetrics;
     use std::env;
     use std::path::PathBuf;
