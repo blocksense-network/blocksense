@@ -3,8 +3,7 @@ lib:
 # let
 #   cfg = config.services.blocksense;
 # in
-with lib;
-let
+with lib; let
   providerOpts = {
     options = {
       is_enabled = mkOption {
@@ -26,7 +25,7 @@ let
 
       allow_feeds = mkOption {
         type = types.listOf types.int;
-        default = [ ];
+        default = [];
         description = mdDoc "List of allowed feed ids to be published";
       };
 
@@ -38,7 +37,7 @@ let
 
       transaction_timeout_secs = mkOption {
         type = types.int;
-        default = 50;
+        default = 420;
         description = mdDoc "The timeout for transactions.";
       };
 
@@ -125,8 +124,7 @@ let
       };
     };
   };
-in
-{
+in {
   sequencer-id = mkOption {
     type = types.int;
     default = 1;
@@ -158,20 +156,20 @@ in
 
   providers = mkOption {
     type = types.attrsOf (types.submodule providerOpts);
-    default = { };
+    default = {};
     description = mdDoc "The Ethereum JSON-RPC provider to use for sending tx.";
     example = {
       "ETH1" = {
         "private_key_path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8545";
-        "transaction_timeout_secs" = 50;
+        "transaction_timeout_secs" = 420;
         "transaction_gas_limit" = 7500000;
         "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
       "ETH2" = {
         "private_key_path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8546";
-        "transaction_timeout_secs" = 50;
+        "transaction_timeout_secs" = 420;
         "transaction_gas_limit" = 7500000;
         "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
@@ -180,7 +178,7 @@ in
 
   reporters = mkOption {
     type = types.listOf types.str;
-    default = [ ];
+    default = [];
     description = mdDoc "The list of whitelisted reporter public keys.";
     example = [
       "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e"
@@ -190,7 +188,7 @@ in
 
   kafka-report-endpoint = mkOption {
     type = types.submodule kafkaReportEndpointOpts;
-    default = { };
+    default = {};
     description = mdDoc "URL to Apache Kafka server that facilitates decentralized communication.";
     example = {
       "url" = "localhost:9092";

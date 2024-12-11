@@ -252,6 +252,9 @@ pub async fn eth_batch_send_to_contract(
         get_chain_id
     );
 
+    let receipt;
+    let tx_time = Instant::now();
+
     let (sender_address, is_impersonated) = match &provider_settings.impersonated_anvil_account {
         Some(impersonated_anvil_account) => {
             debug!(
@@ -266,30 +269,83 @@ pub async fn eth_batch_send_to_contract(
         }
     };
 
-    let tx = TransactionRequest::default()
-        .to(contract_address)
-        .from(sender_address)
-        .with_chain_id(chain_id)
-        .input(Some(input).into());
+    let mut timed_out = 0;
 
-    let tx_time = Instant::now();
+    loop {
+        let tx;
+        if timed_out == 0 {
+            tx = TransactionRequest::default()
+                .to(contract_address)
+                .from(sender_address)
+                .with_chain_id(chain_id)
+                .input(Some(input.clone()).into());
+        } else {
+            let nonce = provider
+                .get_transaction_count(contract_address.clone())
+                .latest()
+                .await?;
+            let price_increment = 1.0 + timed_out as f64 / 10 as f64;
+            let gas_price = provider.get_gas_price().await?;
+            let mut priority_fee = provider.get_max_priority_fee_per_gas().await?;
+            priority_fee = (priority_fee as f64 * price_increment) as u128;
+            let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
+            max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
+            tx = TransactionRequest::default()
+                .to(contract_address)
+                .nonce(nonce)
+                .from(sender_address)
+                .max_fee_per_gas(max_fee_per_gas)
+                .max_priority_fee_per_gas(priority_fee)
+                .with_chain_id(chain_id)
+                .input(Some(input.clone()).into());
+        }
 
-    let tx_result = if is_impersonated {
-        let rpc_url = prov.client().transport().url().parse()?;
-        let provider = ProviderBuilder::new().on_http(rpc_url);
-        provider.send_transaction(tx).await
-    } else {
-        prov.send_transaction(tx).await
-    };
+        let tx_str = format!("{tx:?}");
 
-    let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
+        let tx_result = if is_impersonated {
+            let rpc_url = prov.client().transport().url().parse()?;
+            let provider = ProviderBuilder::new().on_http(rpc_url);
+            provider.send_transaction(tx).await
+        } else {
+            prov.send_transaction(tx).await
+        };
 
-    let receipt = process_provider_getter!(
-        receipt_future.get_receipt().await,
-        net,
-        provider_metrics,
-        get_receipt
-    );
+        let tx_result_str = format!("{tx_result:?}");
+
+        let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
+
+        let receipt_result = spawn(async move {
+            let result =
+                actix_web::rt::time::timeout(Duration::from_secs(50), receipt_future.get_receipt())
+                    .await;
+            result
+        })
+        .await;
+
+        match receipt_result {
+            Ok(outer_result) => {
+                match outer_result {
+                    Ok(inner_result) => match inner_result {
+                        Ok(r) => {
+                            receipt = r;
+                            break;
+                        }
+                        Err(e) => {
+                            warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}: {e}");
+                            timed_out += 1;
+                        }
+                    },
+                    Err(e) => {
+                        warn!("Timed out  tx={tx_str}, tx_result={tx_result_str}: {e}");
+                        timed_out += 1;
+                    }
+                }
+            }
+            Err(e) => {
+                panic!("Join error tx={tx_str}, tx_result={tx_result_str}: {e}");
+            }
+        }
+    }
 
     let transaction_time = tx_time.elapsed().as_millis();
     info!(
