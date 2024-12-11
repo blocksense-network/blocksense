@@ -31,7 +31,7 @@ let
 
         transaction_timeout_secs = mkOption {
           type = types.int;
-          default = 50;
+          default = 420;
           description = mdDoc "The timeout for transactions.";
         };
 
@@ -51,7 +51,6 @@ let
           default = null;
           description = mdDoc "The account to impersonate for the provider.";
         };
-
       };
     };
 in
@@ -94,14 +93,14 @@ in
       "ETH1" = {
         "private_key_path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8545";
-        "transaction_timeout_secs" = 50;
+        "transaction_timeout_secs" = 420;
         "transaction_gas_limit" = 7500000;
         "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
       "ETH2" = {
         "private_key_path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8546";
-        "transaction_timeout_secs" = 50;
+        "transaction_timeout_secs" = 420;
         "transaction_gas_limit" = 7500000;
         "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
