@@ -1,4 +1,3 @@
-use actix_web::rt::spawn;
 use blockchain_data_model::in_mem_db::InMemDb;
 use blockchain_data_model::{
     BlockFeedConfig, DataChunk, Resources, MAX_ASSET_FEED_UPDATES_IN_BLOCK,
@@ -33,117 +32,120 @@ pub async fn block_creator_loop<
     block_config: BlockConfig,
     blockchain_db: Arc<RwLock<InMemDb>>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
-    spawn(async move {
-        let span = info_span!("VotesResultBatcher");
-        let _guard = span.enter();
-        let mut max_feed_updates_to_batch = block_config.max_feed_updates_to_batch;
-        let block_generation_period = block_config.block_generation_period;
+    tokio::task::Builder::new()
+        .name("block_creator")
+        .spawn_local(async move {
+            let span = info_span!("BlockCreator");
+            let _guard = span.enter();
+            let mut max_feed_updates_to_batch = block_config.max_feed_updates_to_batch;
+            let block_generation_period = block_config.block_generation_period;
 
-        info!(
-            "max_feed_updates_to_batch set to {}",
-            max_feed_updates_to_batch
-        );
-        if max_feed_updates_to_batch > MAX_ASSET_FEED_UPDATES_IN_BLOCK {
-            warn!("max_feed_updates_to_batch set to {}, which is above what can fit in a block. Value will be reduced to {}", max_feed_updates_to_batch, MAX_ASSET_FEED_UPDATES_IN_BLOCK);
-            max_feed_updates_to_batch = MAX_ASSET_FEED_UPDATES_IN_BLOCK;
-        }
-        info!("block_generation_period set to {}", block_generation_period);
-
-        let block_genesis_time = match block_config.genesis_block_timestamp {
-            Some(genesis_time) => system_time_to_millis(genesis_time),
-            None => current_unix_time(),
-        };
-
-        let block_generation_time_tracker = SlotTimeTracker::new(
-            "block_creator_loop".to_string(),
-            Duration::from_millis(block_generation_period),
-            block_genesis_time,
-        );
-
-        // Updates that overflowed the capacity of a block
-        let mut backlog_updates = VecDeque::new();
-
-        loop {
-            // Loop forever
-            let mut updates: HashMap<K, V> = Default::default();
-            // Fill the updates that overflowed the capacity of the last block
-            for _ in 0..max_feed_updates_to_batch {
-                if let Some((k, v)) = backlog_updates.pop_front() {
-                    updates.insert(k, v);
-                } else {
-                    break;
-                }
+            info!(
+                "max_feed_updates_to_batch set to {}",
+                max_feed_updates_to_batch
+            );
+            if max_feed_updates_to_batch > MAX_ASSET_FEED_UPDATES_IN_BLOCK {
+                warn!("max_feed_updates_to_batch set to {}, which is above what can fit in a block. Value will be reduced to {}", max_feed_updates_to_batch, MAX_ASSET_FEED_UPDATES_IN_BLOCK);
+                max_feed_updates_to_batch = MAX_ASSET_FEED_UPDATES_IN_BLOCK;
             }
+            info!("block_generation_period set to {}", block_generation_period);
 
-            let mut new_feeds_to_register = Vec::new();
-            let mut feeds_ids_to_delete = Vec::new();
+            let block_genesis_time = match block_config.genesis_block_timestamp {
+                Some(genesis_time) => system_time_to_millis(genesis_time),
+                None => current_unix_time(),
+            };
+
+            let block_generation_time_tracker = SlotTimeTracker::new(
+                "block_creator_loop".to_string(),
+                Duration::from_millis(block_generation_period),
+                block_genesis_time,
+            );
+
+            // Updates that overflowed the capacity of a block
+            let mut backlog_updates = VecDeque::new();
+
             loop {
-                // Loop collecting data, until it is time to emit a block
-                tokio::select! {
-                    _ = block_generation_time_tracker
-                    .await_end_of_current_slot(&Repeatability::Periodic) => { // This is the block generation slot
-                        if !updates.is_empty() || !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() { // Only emit a block if data is present
-                            generate_block(
-                                updates,
-                                new_feeds_to_register,
-                                feeds_ids_to_delete,
-                                &batched_votes_send,
-                                &blockchain_db,
-                                &feed_manager_cmds_send,
-                                (block_generation_time_tracker.get_last_slot() + 1) as u64,
-                            ).await;
-                        }
+                // Loop forever
+                let mut updates: HashMap<K, V> = Default::default();
+                // Fill the updates that overflowed the capacity of the last block
+                for _ in 0..max_feed_updates_to_batch {
+                    if let Some((k, v)) = backlog_updates.pop_front() {
+                        updates.insert(k, v);
+                    } else {
                         break;
                     }
+                }
 
-                    feed_update = vote_recv.recv() => {
-                        match feed_update {
-                            Some((key, val)) => {
-                                info!(
-                                    "adding {} => {} to updates",
-                                    key.to_string(),
-                                    val.to_string()
-                                );
-                                if updates.keys().len() < max_feed_updates_to_batch {
-                                    updates.insert(key, val);
-                                } else {
-                                    warn!("updates.keys().len() >= max_feed_updates_to_batch ({} >= {})", updates.keys().len(), max_feed_updates_to_batch);
-                                    backlog_updates.push_back((key, val));
-                                }
-                            },
-                            None => {
-                                info!("Woke up on empty channel");
+                let mut new_feeds_to_register = Vec::new();
+                let mut feeds_ids_to_delete = Vec::new();
+                loop {
+                    // Loop collecting data, until it is time to emit a block
+                    tokio::select! {
+                        _ = block_generation_time_tracker
+                        .await_end_of_current_slot(&Repeatability::Periodic) => { // This is the block generation slot
+                            if !updates.is_empty() || !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() { // Only emit a block if data is present
+                                generate_block(
+                                    updates,
+                                    new_feeds_to_register,
+                                    feeds_ids_to_delete,
+                                    &batched_votes_send,
+                                    &blockchain_db,
+                                    &feed_manager_cmds_send,
+                                    (block_generation_time_tracker.get_last_slot() + 1) as u64,
+                                ).await;
                             }
-                        };
-                    }
+                            break;
+                        }
 
-                    feed_management_cmd = feed_management_cmds_recv.recv() => {
-                        match feed_management_cmd {
-                            Some(cmd) => {
-                                match &cmd {
-                                    FeedsManagementCmds::RegisterNewAssetFeed(_) => {
-                                        if new_feeds_to_register.len() < MAX_NEW_FEEDS_IN_BLOCK {
-                                            new_feeds_to_register.push(cmd);
-                                        } else {
-                                            error!("new_feeds_to_register.len() >= MAX_NEW_FEEDS_IN_BLOCK ({} >= {})", new_feeds_to_register.len(), MAX_NEW_FEEDS_IN_BLOCK);
-                                        }
-                                    },
-                                    FeedsManagementCmds::DeleteAssetFeed(_) => {
-                                        if feeds_ids_to_delete.len() < MAX_FEED_ID_TO_DELETE_IN_BLOCK {
-                                            feeds_ids_to_delete.push(cmd);
-                                        } else {
-                                            error!("feeds_ids_to_delete.len() < MAX_FEED_ID_TO_DELETE_IN_BLOCK ({} >= {})", feeds_ids_to_delete.len(), MAX_FEED_ID_TO_DELETE_IN_BLOCK);
-                                        }
-                                    },
+                        feed_update = vote_recv.recv() => {
+                            match feed_update {
+                                Some((key, val)) => {
+                                    info!(
+                                        "adding {} => {} to updates",
+                                        key.to_string(),
+                                        val.to_string()
+                                    );
+                                    if updates.keys().len() < max_feed_updates_to_batch {
+                                        updates.insert(key, val);
+                                    } else {
+                                        warn!("updates.keys().len() >= max_feed_updates_to_batch ({} >= {})", updates.keys().len(), max_feed_updates_to_batch);
+                                        backlog_updates.push_back((key, val));
+                                    }
+                                },
+                                None => {
+                                    info!("Woke up on empty channel");
                                 }
-                            },
-                            None => info!("Woke up on empty channel - feed_management_cmds_recv"),
+                            };
+                        }
+
+                        feed_management_cmd = feed_management_cmds_recv.recv() => {
+                            match feed_management_cmd {
+                                Some(cmd) => {
+                                    match &cmd {
+                                        FeedsManagementCmds::RegisterNewAssetFeed(_) => {
+                                            if new_feeds_to_register.len() < MAX_NEW_FEEDS_IN_BLOCK {
+                                                new_feeds_to_register.push(cmd);
+                                            } else {
+                                                error!("new_feeds_to_register.len() >= MAX_NEW_FEEDS_IN_BLOCK ({} >= {})", new_feeds_to_register.len(), MAX_NEW_FEEDS_IN_BLOCK);
+                                            }
+                                        },
+                                        FeedsManagementCmds::DeleteAssetFeed(_) => {
+                                            if feeds_ids_to_delete.len() < MAX_FEED_ID_TO_DELETE_IN_BLOCK {
+                                                feeds_ids_to_delete.push(cmd);
+                                            } else {
+                                                error!("feeds_ids_to_delete.len() < MAX_FEED_ID_TO_DELETE_IN_BLOCK ({} >= {})", feeds_ids_to_delete.len(), MAX_FEED_ID_TO_DELETE_IN_BLOCK);
+                                            }
+                                        },
+                                    }
+                                },
+                                None => info!("Woke up on empty channel - feed_management_cmds_recv"),
+                            }
                         }
                     }
                 }
             }
-        }
-    })
+        })
+        .expect("Failed to spawn block creator!")
 }
 
 // Helper function to convert SystemTime to u64 (seconds since UNIX_EPOCH)
