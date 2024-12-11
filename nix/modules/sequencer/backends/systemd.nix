@@ -1,5 +1,9 @@
 { self', ... }:
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  ...
+}:
 let
   cfg = config.services.blocksense;
 
@@ -15,6 +19,7 @@ let
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
           ExecStart = _command;
+          Restart = "on-failure";
         };
       };
     }
@@ -33,6 +38,7 @@ let
       };
       serviceConfig = {
         ExecStart = reporter.program;
+        Restart = "on-failure";
       };
     };
   }) cfg.reporters;
@@ -65,6 +71,7 @@ in
         };
         serviceConfig = {
           ExecStart = sequencer.program;
+          Restart = "on-failure";
         };
       };
     } // anvilInstances // reporterInstances;
