@@ -6,10 +6,10 @@ use std::sync::Arc;
 use utils::time::current_unix_time;
 
 use actix_web::error::{ErrorBadRequest, ErrorInternalServerError};
-use actix_web::web;
+use actix_web::web::{self};
 use actix_web::Error;
-use actix_web::{post, HttpResponse};
-use feed_registry::types::ReportRelevance;
+use actix_web::{get, post, HttpResponse};
+use feed_registry::types::{GetLastPublishedRequestData, LastPublishedValue, ReportRelevance};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
@@ -229,13 +229,64 @@ pub async fn post_report(
     Ok(process_report(&sequencer_state, data_feed).await)
 }
 
-#[post("/post_reports_batch")]
-pub async fn post_reports_batch(
-    mut payload: web::Payload,
+#[get("/get_last_published_value_and_time")]
+pub async fn get_last_published_value_and_time(
+    payload: web::Payload,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
-    let span = info_span!("post_reports_batch");
+    let span = info_span!("get_last_published_value_and_time");
     let _guard: tracing::span::Entered<'_> = span.enter();
+
+    let requested_data_feeds: Vec<GetLastPublishedRequestData> =
+        deserialize_payload_to_vec::<GetLastPublishedRequestData>(payload).await?;
+    let history = sequencer_state.feed_aggregate_history.read().await;
+    let mut results: Vec<LastPublishedValue> = vec![];
+    for r in requested_data_feeds {
+        let v = match r.feed_id.parse::<u32>() {
+            Ok(feed_id) => {
+                if history.is_registered_feed(feed_id) {
+                    if let Some(last) = history.last(feed_id) {
+                        LastPublishedValue {
+                            feed_id: r.feed_id.clone(),
+                            value: Some(last.value.clone()),
+                            timeslot_end: last.end_slot_timestamp,
+                            error: None,
+                        }
+                    } else {
+                        LastPublishedValue {
+                            feed_id: r.feed_id.clone(),
+                            value: None,
+                            timeslot_end: 0,
+                            error: None,
+                        }
+                    }
+                } else {
+                    LastPublishedValue {
+                        feed_id: r.feed_id.clone(),
+                        value: None,
+                        timeslot_end: 0,
+                        error: Some("Feed is not registered".to_string()),
+                    }
+                }
+            }
+            Err(e) => LastPublishedValue {
+                feed_id: r.feed_id.clone(),
+                value: None,
+                timeslot_end: 0,
+                error: Some(format!("{e}")),
+            },
+        };
+        results.push(v);
+    }
+    Ok(HttpResponse::Ok().json(results))
+}
+
+use serde::de::DeserializeOwned;
+
+async fn deserialize_payload_to_vec<T>(mut payload: web::Payload) -> Result<Vec<T>, Error>
+where
+    T: DeserializeOwned,
+{
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
         let chunk = chunk?;
@@ -250,12 +301,24 @@ pub async fn post_reports_batch(
     // let obj = serde_json::from_slice::<MyObj>(&body)?;
     debug!("body = {body:?}!");
 
-    let mut errors_in_batch = Vec::new();
-
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
-    let data_feeds: Vec<DataFeedPayload> = serde_json::from_value(v)?;
+    let vec_t: Vec<T> = serde_json::from_value(v)?;
+    Ok(vec_t)
+}
+
+#[post("/post_reports_batch")]
+pub async fn post_reports_batch(
+    payload: web::Payload,
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    let span = info_span!("post_reports_batch");
+    let _guard: tracing::span::Entered<'_> = span.enter();
+
+    let data_feeds: Vec<DataFeedPayload> =
+        deserialize_payload_to_vec::<DataFeedPayload>(payload).await?;
     info!("Received batches {}", data_feeds.len());
 
+    let mut errors_in_batch = Vec::new();
     for data_feed in data_feeds {
         let res = process_report(&sequencer_state, data_feed).await;
         if res.status() != StatusCode::OK || res.error().is_some() {
@@ -445,6 +508,11 @@ mod tests {
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
     use alloy::primitives::Address;
+    use config::get_test_config_with_multiple_providers;
+    use config::AllFeedsConfig;
+    use config::AssetPair;
+    use config::FeedConfig;
+
     use config::{
         get_sequencer_and_feed_configs, get_test_config_with_single_provider, init_config,
         SequencerConfig,
@@ -810,5 +878,417 @@ mod tests {
         // sleep a little bit
         tokio::time::sleep(Duration::from_millis(2000)).await;
         // Assert feed is no longer in registry (was removed after vote)
+    }
+
+    async fn new_test_sequencer_state(
+        sequencer_config: &SequencerConfig,
+        feeds_config: &AllFeedsConfig,
+        metrix_prefix: &str,
+    ) -> SequencerState {
+        let log_handle = init_shared_logging_handle("INFO", false);
+        let metrics_prefix = Some(metrix_prefix);
+        let (vote_send, _vote_recv) = mpsc::unbounded_channel();
+        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
+            mpsc::unbounded_channel();
+        let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
+
+        SequencerState {
+            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
+                &feeds_config,
+            ))),
+            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+            providers: providers.clone(),
+            log_handle,
+            reporters: init_shared_reporters(sequencer_config, metrics_prefix),
+            feed_id_allocator: Arc::new(RwLock::new(None)),
+            voting_send_channel: vote_send,
+            feeds_metrics: Arc::new(RwLock::new(
+                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
+                    .expect("Failed to allocate feed_metrics"),
+            )),
+            active_feeds: Arc::new(RwLock::new(
+                feeds_config
+                    .feeds
+                    .clone()
+                    .into_iter()
+                    .map(|feed| (feed.id, feed))
+                    .collect(),
+            )),
+            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            feeds_slots_manager_cmd_send,
+        }
+    }
+
+    #[actix_web::test]
+    async fn test_get_last_published_value_and_timestamp_empty_success() {
+        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let feed_config = AllFeedsConfig { feeds: vec![] };
+        let sequencer_state = new_test_sequencer_state(
+            &sequencer_config,
+            &feed_config,
+            "test_get_last_published_value_and_timestamp_empty_success",
+        )
+        .await;
+        let sequencer_state = web::Data::new(sequencer_state);
+
+        // Initialize the service
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(get_last_published_value_and_time),
+        )
+        .await;
+
+        let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> = vec![];
+
+        // Send the request
+        let req = test::TestRequest::get()
+            .uri("/get_last_published_value_and_time")
+            .set_json(&get_last_published_value_and_time_request)
+            .to_request();
+
+        const HTTP_STATUS_SUCCESS: u16 = 200;
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+    }
+
+    #[actix_web::test]
+    async fn test_get_last_published_value_and_timestamp_wrong_feed_id() {
+        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let feed_config = AllFeedsConfig { feeds: vec![] };
+        let sequencer_state = new_test_sequencer_state(
+            &sequencer_config,
+            &feed_config,
+            "test_get_last_published_value_and_timestamp_wrong_feed_id",
+        )
+        .await;
+        let sequencer_state = web::Data::new(sequencer_state);
+
+        // Initialize the service
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(get_last_published_value_and_time),
+        )
+        .await;
+
+        let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
+            vec![GetLastPublishedRequestData {
+                feed_id: "wrong_id".to_string(),
+            }];
+
+        // Send the request
+        let req = test::TestRequest::get()
+            .uri("/get_last_published_value_and_time")
+            .set_json(&get_last_published_value_and_time_request)
+            .to_request();
+
+        const HTTP_STATUS_SUCCESS: u16 = 200;
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+        let body_bytes = test::read_body(resp).await;
+        let v: serde_json::Value = serde_json::from_str(
+            std::str::from_utf8(&body_bytes).expect("response body is not valid utf8"),
+        )
+        .expect("Response is not a valid json");
+        let last_values: Vec<LastPublishedValue> =
+            serde_json::from_value(v).expect("Can't parse repsonse");
+        assert_eq!(last_values.len(), 1);
+        assert_eq!(last_values[0].feed_id, "wrong_id".to_string());
+        assert_eq!(last_values[0].value, None);
+        assert!(last_values[0].error.is_some())
+    }
+
+    #[actix_web::test]
+    async fn test_get_last_published_value_and_timestamp_unregistered_feed_id() {
+        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let feed_config = AllFeedsConfig { feeds: vec![] };
+        let sequencer_state = new_test_sequencer_state(
+            &sequencer_config,
+            &feed_config,
+            "test_get_last_published_value_and_timestamp_unregistered_feed_id",
+        )
+        .await;
+        let sequencer_state = web::Data::new(sequencer_state);
+
+        // Initialize the service
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(get_last_published_value_and_time),
+        )
+        .await;
+
+        let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
+            vec![GetLastPublishedRequestData {
+                feed_id: "1".to_string(),
+            }];
+
+        // Send the request
+        let req = test::TestRequest::get()
+            .uri("/get_last_published_value_and_time")
+            .set_json(&get_last_published_value_and_time_request)
+            .to_request();
+
+        const HTTP_STATUS_SUCCESS: u16 = 200;
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+        let body_bytes = test::read_body(resp).await;
+        let v: serde_json::Value = serde_json::from_str(
+            std::str::from_utf8(&body_bytes).expect("response body is not valid utf8"),
+        )
+        .expect("Response is not a valid json");
+        let last_values: Vec<LastPublishedValue> =
+            serde_json::from_value(v).expect("Can't parse repsonse");
+        assert_eq!(last_values.len(), 1);
+        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].value, None);
+        // TODO, maybe we can expect error, that the feed is not registered !?
+        assert!(last_values[0].error.is_some());
+        assert_eq!(
+            last_values[0].error,
+            Some("Feed is not registered".to_string())
+        );
+    }
+
+    fn some_feed_config_with_id_1() -> FeedConfig {
+        FeedConfig {
+            id: 1,
+            name: "name".to_string(),
+            full_name: "full_name".to_string(),
+            description: "description".to_string(),
+            decimals: 10,
+            _type: "Crypto".to_string(),
+            pair: AssetPair {
+                base: "".to_string(),
+                quote: "".to_string(),
+            },
+            report_interval_ms: 300,
+            first_report_start_time: SystemTime::now(),
+            resources: HashMap::from([]),
+            quorum_percentage: 1.0f32,
+            skip_publish_if_less_then_percentage: 0.0f32,
+            script: "script".to_string(),
+            value_type: "Numerical".to_string(),
+            aggregate_type: "Average".to_string(),
+        }
+    }
+
+    #[actix_web::test]
+    async fn test_get_last_published_value_and_timestamp_registered_feed_id_no_data() {
+        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let all_feeds_config = AllFeedsConfig {
+            feeds: vec![some_feed_config_with_id_1()],
+        };
+
+        let sequencer_state = new_test_sequencer_state(
+            &sequencer_config,
+            &all_feeds_config,
+            "test_get_last_published_value_and_timestamp_registered_feed_id_no_data",
+        )
+        .await;
+        {
+            let mut history = sequencer_state.feed_aggregate_history.write().await;
+            history.register_feed(1, 100);
+        }
+        let sequencer_state = web::Data::new(sequencer_state);
+
+        // Initialize the service
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(get_last_published_value_and_time),
+        )
+        .await;
+
+        let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
+            vec![GetLastPublishedRequestData {
+                feed_id: "1".to_string(),
+            }];
+
+        // Send the request
+        let req = test::TestRequest::get()
+            .uri("/get_last_published_value_and_time")
+            .set_json(&get_last_published_value_and_time_request)
+            .to_request();
+
+        const HTTP_STATUS_SUCCESS: u16 = 200;
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+        let body_bytes = test::read_body(resp).await;
+        let v: serde_json::Value = serde_json::from_str(
+            std::str::from_utf8(&body_bytes).expect("response body is not valid utf8"),
+        )
+        .expect("Response is not a valid json");
+        let last_values: Vec<LastPublishedValue> =
+            serde_json::from_value(v).expect("Can't parse repsonse");
+        assert_eq!(last_values.len(), 1);
+        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].value, None);
+        assert!(last_values[0].error.is_none())
+    }
+
+    #[actix_web::test]
+    async fn test_get_last_published_value_and_timestamp_registered_feed_id_with_data() {
+        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+
+        let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
+        let all_feeds_config = AllFeedsConfig {
+            feeds: vec![some_feed_config_with_id_1()],
+        };
+
+        let sequencer_state = new_test_sequencer_state(
+            &sequencer_config,
+            &all_feeds_config,
+            "test_get_last_published_value_and_timestamp_registered_feed_id_with_data",
+        )
+        .await;
+        {
+            let mut history = sequencer_state.feed_aggregate_history.write().await;
+            let feed_id = 1_u32;
+            history.register_feed(feed_id, 100);
+            let feed_value = FeedType::Numerical(102754.0f64);
+            let end_slot_timestamp = first_report_start_time
+                .duration_since(UNIX_EPOCH)
+                .expect("Unknown error")
+                .as_millis()
+                + 300_u128 * 10_u128;
+            history.push(feed_id, feed_value, end_slot_timestamp);
+        }
+        let sequencer_state = web::Data::new(sequencer_state);
+
+        // Initialize the service
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(get_last_published_value_and_time),
+        )
+        .await;
+
+        let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
+            vec![GetLastPublishedRequestData {
+                feed_id: "1".to_string(),
+            }];
+
+        // Send the request
+        let req = test::TestRequest::get()
+            .uri("/get_last_published_value_and_time")
+            .set_json(&get_last_published_value_and_time_request)
+            .to_request();
+
+        const HTTP_STATUS_SUCCESS: u16 = 200;
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+        let body_bytes = test::read_body(resp).await;
+        let v: serde_json::Value = serde_json::from_str(
+            std::str::from_utf8(&body_bytes).expect("response body is not valid utf8"),
+        )
+        .expect("Response is not a valid json");
+        let last_values: Vec<LastPublishedValue> =
+            serde_json::from_value(v).expect("Can't parse repsonse");
+        assert_eq!(last_values.len(), 1);
+        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].value, Some(FeedType::Numerical(102754.0)));
+        assert_eq!(last_values[0].timeslot_end, 1524885325000);
+        assert!(last_values[0].error.is_none())
+    }
+
+    #[actix_web::test]
+    async fn test_get_last_published_value_and_timestamp_registered_feed_id_with_more_data() {
+        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+
+        let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
+        let all_feeds_config = AllFeedsConfig {
+            feeds: vec![some_feed_config_with_id_1()],
+        };
+
+        let sequencer_state = new_test_sequencer_state(
+            &sequencer_config,
+            &all_feeds_config,
+            "test_get_last_published_value_and_timestamp_registered_feed_id_with_more_data",
+        )
+        .await;
+        let end_slot_timestamp = first_report_start_time
+            .duration_since(UNIX_EPOCH)
+            .expect("Unknown error")
+            .as_millis()
+            + 300_u128 * 10_u128;
+        {
+            let mut history = sequencer_state.feed_aggregate_history.write().await;
+            let feed_id = 1_u32;
+            history.register_feed(feed_id, 3);
+
+            history.push(
+                feed_id,
+                FeedType::Numerical(102754.2f64),
+                end_slot_timestamp + 300_u128 * 0,
+            );
+            history.push(
+                feed_id,
+                FeedType::Numerical(122756.7f64),
+                end_slot_timestamp + 300_u128 * 1,
+            );
+            history.push(
+                feed_id,
+                FeedType::Numerical(102753.0f64),
+                end_slot_timestamp + 300_u128 * 2,
+            );
+            history.push(
+                feed_id,
+                FeedType::Numerical(102244.3f64),
+                end_slot_timestamp + 300_u128 * 3,
+            );
+            history.push(
+                feed_id,
+                FeedType::Numerical(112754.2f64),
+                end_slot_timestamp + 300_u128 * 4,
+            );
+        }
+        let sequencer_state = web::Data::new(sequencer_state);
+
+        // Initialize the service
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .service(get_last_published_value_and_time),
+        )
+        .await;
+
+        let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
+            vec![GetLastPublishedRequestData {
+                feed_id: "1".to_string(),
+            }];
+
+        // Send the request
+        let req = test::TestRequest::get()
+            .uri("/get_last_published_value_and_time")
+            .set_json(&get_last_published_value_and_time_request)
+            .to_request();
+
+        const HTTP_STATUS_SUCCESS: u16 = 200;
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
+        let body_bytes = test::read_body(resp).await;
+        let v: serde_json::Value = serde_json::from_str(
+            std::str::from_utf8(&body_bytes).expect("response body is not valid utf8"),
+        )
+        .expect("Response is not a valid json");
+        let last_values: Vec<LastPublishedValue> =
+            serde_json::from_value(v).expect("Can't parse repsonse");
+        assert_eq!(last_values.len(), 1);
+        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].value, Some(FeedType::Numerical(112754.2f64)));
+        assert_eq!(
+            last_values[0].timeslot_end,
+            end_slot_timestamp + 300_u128 * 4
+        );
+        assert!(last_values[0].error.is_none())
     }
 }

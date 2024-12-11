@@ -321,6 +321,26 @@ pub struct PayloadMetaData {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
+pub struct GetLastPublishedRequestData {
+    /// data feed id
+    pub feed_id: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct LastPublishedValue {
+    /// data feed id
+    pub feed_id: String,
+    /// last published value
+    pub value: Option<FeedType>,
+    /// when the timeslot ended and the value is published
+    pub timeslot_end: Timestamp,
+    /// option to pass error as string
+    pub error: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct PostRegisterOracle {
     #[serde(default)]
     pub name: u64,

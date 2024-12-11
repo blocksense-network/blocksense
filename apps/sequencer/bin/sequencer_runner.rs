@@ -16,7 +16,9 @@ use sequencer::http_handlers::admin::{
     get_feed_report_interval, get_feeds_config, get_key, get_oracle_scripts, get_sequencer_config,
     health, register_asset_feed, set_log_level,
 };
-use sequencer::http_handlers::data_feeds::{post_report, post_reports_batch, register_feed};
+use sequencer::http_handlers::data_feeds::{
+    get_last_published_value_and_time, post_report, post_reports_batch, register_feed,
+};
 use utils::logging::{
     get_log_level, get_shared_logging_handle, init_shared_logging_handle, tokio_console_active,
     SharedLoggingHandle,
@@ -117,6 +119,7 @@ pub async fn prepare_http_servers(
                     .app_data(main_sequencer_state.clone())
                     .service(post_report)
                     .service(post_reports_batch)
+                    .service(get_last_published_value_and_time)
             })
             .bind(("0.0.0.0", sequencer_config_main_port))
             .expect("Main HTTP server could not bind to port.")

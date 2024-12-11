@@ -11,7 +11,7 @@ use feed_registry::registry::AllFeedsReports;
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::FeedType;
-use feed_registry::types::{FeedMetaData, Repeatability};
+use feed_registry::types::{FeedMetaData, Repeatability, Timestamp};
 use feed_registry::types::{FeedResult, FeedsSlotProcessorCmds};
 use prometheus::{inc_metric, metrics::FeedsMetrics};
 use ringbuf::traits::consumer::Consumer;
@@ -263,6 +263,7 @@ impl FeedSlotsProcessor {
     async fn post_consumed_reports(
         &self,
         consumed_reports: ConsumedReports,
+        end_slot_timestamp: Timestamp,
         feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
         skip_publish_if_less_then_percentage: f64,
         history: &Arc<RwLock<FeedAggregateHistory>>,
@@ -285,14 +286,20 @@ impl FeedSlotsProcessor {
         let result_post_to_contract = consumed_reports.result_post_to_contract.context(
             "[post_consumed_reports]: Impossible, quorum reached but no value is reported",
         )?;
-        self.post_to_contract(history, result_post_to_contract, sequencer_state)
-            .await
+        self.post_to_contract(
+            history,
+            result_post_to_contract,
+            end_slot_timestamp,
+            sequencer_state,
+        )
+        .await
     }
 
     async fn post_to_contract(
         &self,
         history: &Arc<RwLock<FeedAggregateHistory>>,
         result_post_to_contract: FeedType,
+        end_slot_timestamp: Timestamp,
         sequencer_state: &Data<SequencerState>,
     ) -> Result<()> {
         {
@@ -300,7 +307,11 @@ impl FeedSlotsProcessor {
             debug!("Get a write lock on history [feed {feed_id}]");
             let mut history_guard = history.write().await;
             debug!("Push result that will be posted to contract to history [feed {feed_id}]");
-            history_guard.push(self.key, result_post_to_contract.clone());
+            history_guard.push(
+                self.key,
+                result_post_to_contract.clone(),
+                end_slot_timestamp,
+            );
             debug!("Release the write lock on history [feed {feed_id}]");
         }
         let key_post = self.key;
@@ -322,7 +333,7 @@ impl FeedSlotsProcessor {
         let feed_id = self.key;
         debug!("Get a read lock on history [feed {feed_id}]");
         let history_guard = history.read().await;
-        let res = match history_guard.last(feed_id) {
+        let res = match history_guard.last_value(feed_id) {
             Some(FeedType::Numerical(last)) => {
                 let a = f64::abs(*last);
                 let b = f64::abs(candidate_value);
@@ -352,7 +363,8 @@ impl FeedSlotsProcessor {
                 .collect(feed_id)
                 .context("Missing key from History!")?;
             let (first, last) = heap.as_slices();
-            let history_vec: Vec<&FeedType> = first.iter().chain(last.iter()).collect();
+            let history_vec: Vec<&FeedType> =
+                first.iter().chain(last.iter()).map(|h| &h.value).collect();
             let mut numerical_vec: Vec<f64> = history_vec
                 .iter()
                 .filter_map(|feed| {
@@ -511,7 +523,11 @@ impl FeedSlotsProcessor {
                         history,
                         ).await {
                             Ok(consumed_reports) => {
-                                if let Err(e) = self.post_consumed_reports(consumed_reports, feed_metrics.clone(), skip_publish_if_less_then_percentage, history, sequencer_state).await {
+                                let end_slot_timestamp = first_report_start_time + (report_interval_ms as u128) * (slot as u128 + 1);
+                                if let Err(e) = self.post_consumed_reports(consumed_reports,
+                                    end_slot_timestamp,
+                                     feed_metrics.clone(),
+                                skip_publish_if_less_then_percentage, history, sequencer_state).await {
                                     error!("{e}")
                                 }
                             }
@@ -536,7 +552,7 @@ mod tests {
     use feed_registry::registry::AllFeedsReports;
     use feed_registry::types::FeedMetaData;
     use std::sync::Arc;
-    use std::time::{Duration, SystemTime};
+    use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::RwLock;
     use utils::test_env::get_test_private_key_path;
     const QUORUM_PERCENTAGE: f32 = 0.001;
@@ -926,9 +942,25 @@ mod tests {
         {
             let mut history_guard = history.write().await;
             history_guard.register_feed(feed_id, 10_000);
-            history_guard.push(feed_id, FeedType::Numerical(130.0));
-            history_guard.push(feed_id, FeedType::Numerical(120.0));
-            history_guard.push(feed_id, FeedType::Numerical(102.0));
+            let since_the_epoch = first_report_start_time
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards");
+            let slot_start_in_ms = since_the_epoch.as_millis();
+            history_guard.push(
+                feed_id,
+                FeedType::Numerical(130.0),
+                slot_start_in_ms + 1 * report_interval_ms as u128,
+            );
+            history_guard.push(
+                feed_id,
+                FeedType::Numerical(120.0),
+                slot_start_in_ms + 2 * report_interval_ms as u128,
+            );
+            history_guard.push(
+                feed_id,
+                FeedType::Numerical(102.0),
+                slot_start_in_ms + 3 * report_interval_ms as u128,
+            );
         }
 
         tokio::spawn(async move {
@@ -1021,9 +1053,25 @@ mod tests {
         {
             let mut history_guard = history.write().await;
             history_guard.register_feed(feed_id, 10_000);
-            history_guard.push(feed_id, FeedType::Numerical(130.0));
-            history_guard.push(feed_id, FeedType::Numerical(120.0));
-            history_guard.push(feed_id, FeedType::Numerical(102.0));
+            let since_the_epoch = first_report_start_time
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards");
+            let slot_start_in_ms = since_the_epoch.as_millis();
+            history_guard.push(
+                feed_id,
+                FeedType::Numerical(130.0),
+                slot_start_in_ms + 1 * report_interval_ms as u128,
+            );
+            history_guard.push(
+                feed_id,
+                FeedType::Numerical(120.0),
+                slot_start_in_ms + 2 * report_interval_ms as u128,
+            );
+            history_guard.push(
+                feed_id,
+                FeedType::Numerical(102.0),
+                slot_start_in_ms + 3 * report_interval_ms as u128,
+            );
         }
 
         tokio::spawn(async move {

@@ -270,6 +270,13 @@ async fn register_asset_feed(
     cmd: &RegisterNewAssetFeed,
 ) -> Result<Arc<RwLock<FeedMetaData>>> {
     let new_feed_config = &cmd.config;
+    register_feed_with_config(sequencer_state, new_feed_config).await
+}
+
+pub async fn register_feed_with_config(
+    sequencer_state: &web::Data<SequencerState>,
+    new_feed_config: &FeedConfig,
+) -> Result<Arc<RwLock<FeedMetaData>>> {
     let new_feed_id;
     let new_name;
     {

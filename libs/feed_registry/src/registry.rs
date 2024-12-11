@@ -4,7 +4,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability};
+use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability, Timestamp};
 use config::AllFeedsConfig;
 use ringbuf::{
     storage::Heap,
@@ -124,8 +124,13 @@ impl FeedReports {
     }
 }
 
+pub struct HistoryEntry {
+    pub value: FeedType,
+    pub end_slot_timestamp: Timestamp,
+}
+
 pub struct FeedAggregateHistory {
-    aggregate_history: HashMap<u32, HeapRb<FeedType>>,
+    aggregate_history: HashMap<u32, HeapRb<HistoryEntry>>,
 }
 
 impl Default for FeedAggregateHistory {
@@ -151,14 +156,26 @@ impl FeedAggregateHistory {
         self.aggregate_history.remove(&feed_id);
     }
 
-    pub fn collect(&self, feed_id: u32) -> Option<&SharedRb<Heap<FeedType>>> {
+    pub fn is_registered_feed(&self, feed_id: u32) -> bool {
+        self.aggregate_history.contains_key(&feed_id)
+    }
+
+    pub fn collect(&self, feed_id: u32) -> Option<&SharedRb<Heap<HistoryEntry>>> {
         self.aggregate_history.get(&feed_id)
     }
 
-    pub fn push(&mut self, feed_id: u32, aggregate_result: FeedType) {
+    pub fn push(
+        &mut self,
+        feed_id: u32,
+        aggregate_result: FeedType,
+        end_slot_timestamp: Timestamp,
+    ) {
         if let Some(rb) = self.aggregate_history.get_mut(&feed_id) {
             // Push the aggregate_result into the ring buffer
-            rb.push_overwrite(aggregate_result);
+            rb.push_overwrite(HistoryEntry {
+                value: aggregate_result,
+                end_slot_timestamp,
+            });
         } else {
             info!(
                 "Feed Id: {}, not registered in FeedAggregateHistory!",
@@ -167,7 +184,7 @@ impl FeedAggregateHistory {
         }
     }
 
-    pub fn last(&self, feed_id: u32) -> Option<&FeedType> {
+    pub fn last(&self, feed_id: u32) -> Option<&HistoryEntry> {
         if let Some(rb) = self.aggregate_history.get(&feed_id) {
             rb.last()
         } else {
@@ -177,6 +194,10 @@ impl FeedAggregateHistory {
             );
             None
         }
+    }
+
+    pub fn last_value(&self, feed_id: u32) -> Option<&FeedType> {
+        self.last(feed_id).map(|h| &h.value)
     }
 }
 
