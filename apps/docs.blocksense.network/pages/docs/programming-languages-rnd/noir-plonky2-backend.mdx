@@ -32,26 +32,26 @@ A simple programming language to write ZK programs, with fast-to-generate, distr
 
 1. Clone [our repository](https://github.com/blocksense-network/noir/) with SSH:
 
-    ```bash
+    ```bash copy
     git clone git@github.com:blocksense-network/noir.git
     ```
 
 2. Navigate to the folder `noir`.
 
-    ```bash
+    ```bash copy
     cd noir
     ```
 
 3. Run direnv command:
 
-    ```bash
+    ```bash copy
     direnv allow
     ```
 
     <Callout type="warning" emoji="⚠️">
       Depending on your `nix` installation, you may get a `Permission denied` error. In that case, it's best to start a superuser shell and continue from there:
 
-      ```bash
+      ```bash copy
       sudo su                      # Start superuser shell
       eval "$(direnv hook bash)"   # Setup the direnv hook
       direnv allow
@@ -62,7 +62,7 @@ A simple programming language to write ZK programs, with fast-to-generate, distr
 
 4. Test if everything works:
 
-    ```bash
+    ```bash copy
     cargo test zk_dungeon
     ```
 
@@ -78,19 +78,19 @@ We're now ready to create our first proof!
 
 1. Create a new project:
 
-    ```bash
+    ```bash copy
     nargo new my_program
     ```
 
 2. Navigate to the folder:
 
-    ```bash
+    ```bash copy
     cd my_program
     ```
 
-3. Update `src/main.nr` with your favorite text editor to:
+3. Update the program with your favorite text editor to:
 
-    ```rust
+    ```rust copy filename="src/main.nr"
     fn main(x: pub u64, y: u64) {
         assert(x % y == 0);
     }
@@ -100,26 +100,26 @@ We're now ready to create our first proof!
 
 4. Run a small check to generate what you need:
 
-    ```bash
+    ```bash copy
     nargo check
     ```
 
-5. We're almost there, change `Prover.toml` to:
+5. We're almost there, change prove inputs to:
 
-    ```toml
+    ```toml copy filename="Prover.toml"
     x = "4611686014132420609"
     y = "2147483647"
     ```
 
 6. Finally, we're ready to start proving:
 
-    ```bash
+    ```bash copy
     nargo prove
     ```
 
     Congratulations 🎉, you've made your first proof! Now we can verify it:
 
-    ```bash
+    ```bash copy
     nargo verify
     ```
 
