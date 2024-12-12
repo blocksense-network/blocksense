@@ -52,7 +52,7 @@ pub struct BlockHeader {
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
-pub struct AddRemoveFeeds {
+pub struct FeedActions {
     block_height: u64,
     new_feeds: [Option<BlockFeedConfig>; MAX_NEW_FEEDS_IN_BLOCK],
     feed_ids_to_rm: [Option<u32>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
