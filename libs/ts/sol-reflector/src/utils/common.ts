@@ -77,13 +77,6 @@ async function writeDocFile(
   console.log(`Wrote documentation to ${filePath}`);
 }
 
-// export type TreeNode = {
-//   name: string;
-//   path?: string;
-//   children?: TreeNode[];
-//   icon?: 'folder' | 'solidity';
-//   id?: number;
-// };
 export async function writeArtifactFile(
   artifactsRecord:
     | ArtifactsRecord

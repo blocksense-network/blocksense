@@ -3,7 +3,7 @@ import path from 'path';
 import { Config, defaults } from './config';
 import { writeArtifactFile, generateFileTree } from './utils/common';
 import { TreeNode } from './types';
-import { rootDir } from '@blocksense/base-utils';
+import { rootDir, selectDirectory } from '@blocksense/base-utils';
 
 function constructFileTreeStructure(
   {
@@ -38,10 +38,14 @@ function constructFileTreeStructure(
 }
 
 export async function enableFileTree(userConfig?: Config) {
+  const config = { ...defaults, ...userConfig };
+
   const contractsPath = path.resolve(
     __dirname,
     `${rootDir}/libs/ts/contracts/contracts`,
   );
+  const outDir = path.resolve(config.root, config.outputDir);
+
   const tree = await generateFileTree(contractsPath);
   // Filter out test and experiments folders. Leave only production contracts.
   tree.children = tree.children!.filter(
@@ -49,9 +53,10 @@ export async function enableFileTree(userConfig?: Config) {
   );
 
   const contractsFileStructure = constructFileTreeStructure(tree);
-  await writeArtifactFile(
-    contractsFileStructure,
-    { ...defaults, ...userConfig },
-    'contractsFileStructure',
-  );
+  const { writeJSON } = selectDirectory(outDir);
+
+  await writeJSON({
+    name: 'contractsFileStructure',
+    content: contractsFileStructure,
+  });
 }
