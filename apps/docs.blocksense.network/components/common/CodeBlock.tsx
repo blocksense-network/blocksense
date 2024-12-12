@@ -1,9 +1,9 @@
+'use client';
 import React from 'react';
 import { codeToHtml } from 'shiki';
 import { CopyButton } from './CopyButton';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import { transformerOverviewLineLink } from '@/src/contract-overview';
-import { boolean } from 'effect/Equivalence';
 
 type CodeBlockProps = {
   code: string;
@@ -98,6 +98,7 @@ export const OverviewCodeBlock = ({
   copy = { hasCopyButton: true, disabled: false },
 }: CodeBlockProps) => {
   const router = useRouter();
+  const pathName = usePathname();
   const [html, setHtml] = React.useState('');
 
   React.useEffect(() => {
@@ -106,7 +107,7 @@ export const OverviewCodeBlock = ({
       theme,
       transformers: [
         transformerOverviewLineLink({
-          routeLink: router.route,
+          routeLink: pathName,
           classes: [
             'border border-natural-200 rounded-md p-1 hover:bg-stone-100 cursor-pointer',
           ],
