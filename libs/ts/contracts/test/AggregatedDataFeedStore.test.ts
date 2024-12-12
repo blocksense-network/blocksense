@@ -50,7 +50,11 @@ describe('AggregatedDataFeedStore', () => {
 
     contract = new ADFSWrapper();
     await contract.init(accessControlOwner);
-    await contract.accessControl.set(accessControlOwner, [sequencer.address]);
+    await contract.accessControl.set(
+      accessControlOwner,
+      [sequencer.address],
+      [true],
+    );
   });
 
   it('Should get latest round', async () => {
@@ -95,13 +99,10 @@ describe('AggregatedDataFeedStore', () => {
 
   it('Should revert if blockNumber same as previous block', async () => {
     const blockNumber = 1;
-    const prefix = ethers.solidityPacked(
-      ['bytes1', 'uint64', 'uint32'],
-      ['0x00', blockNumber, 0],
-    );
-    await contract.setFeeds(sequencer, feeds, prefix);
+    await contract.setFeeds(sequencer, feeds, { blockNumber });
 
-    await expect(contract.setFeeds(sequencer, feeds, prefix)).to.be.reverted;
+    await expect(contract.setFeeds(sequencer, feeds, { blockNumber })).to.be
+      .reverted;
   });
 
   it('Should revert when stride is bigger than 31', async () => {

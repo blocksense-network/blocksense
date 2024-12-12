@@ -18,22 +18,25 @@ contract AccessControl {
     assembly {
       let _caller := caller()
 
-      // function setAdmins(address[] calldata addresses) external {
+      // function setAdmins(bytes) external {
+      // bytes: <address1 (20b)><isAdmin1 (1b)>...<addressN><isAdminN>
       if eq(_caller, _owner) {
         let length := calldatasize()
         for {
           let pointer := 0
         } lt(pointer, length) {
-          pointer := add(pointer, 20)
+          pointer := add(pointer, 21)
         } {
+          let metadata := calldataload(pointer)
           let admin := and(
-            calldataload(pointer),
+            metadata,
             0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000000
           )
+          let isAdmin := byte(20, metadata)
 
           mstore(0, or(ADMIN_LOCATION, admin))
 
-          sstore(keccak256(0, 0x20), 1)
+          sstore(keccak256(0, 0x20), isAdmin)
         }
 
         return(0, 0)
