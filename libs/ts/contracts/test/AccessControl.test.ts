@@ -17,6 +17,7 @@ describe('AccessControl', () => {
     await accessControl.set(
       signers[0],
       admins.map(signer => signer.address),
+      admins.map(() => true),
     );
   });
 
@@ -35,7 +36,13 @@ describe('AccessControl', () => {
   it('Should not set admin if not owner', async () => {
     const newAdmin = signers[10];
 
-    await accessControl.set(signers[5], [newAdmin.address]);
+    await accessControl.set(signers[5], [newAdmin.address], [true]);
     await accessControl.checkAdmin(signers[10], [newAdmin.address], [0n]);
+  });
+
+  it('Should unset admin', async () => {
+    await accessControl.checkAdmin(signers[10], [admins[0].address], [1n]);
+    await accessControl.set(signers[0], [admins[0].address], [false]);
+    await accessControl.checkAdmin(signers[10], [admins[0].address], [0n]);
   });
 });

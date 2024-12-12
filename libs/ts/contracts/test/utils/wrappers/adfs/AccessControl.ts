@@ -22,10 +22,14 @@ export class AccessControlWrapper {
     return 'AccessControl';
   }
 
-  public async set(signer: HardhatEthersSigner, addresses: string[]) {
+  public async set(
+    signer: HardhatEthersSigner,
+    addresses: string[],
+    states: boolean[],
+  ) {
     const encodedData = ethers.solidityPacked(
-      [...addresses.map(() => 'address')],
-      [...addresses],
+      [...addresses.map(() => ['address', 'bool']).flat()],
+      [...addresses.map((addr, i) => [addr, states[i]]).flat()],
     );
 
     await signer.sendTransaction({

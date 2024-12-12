@@ -13,26 +13,30 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   public async setFeeds(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    prefix?: string,
-    ...args: any[]
+    opts: {
+      blockNumber?: number;
+      txData?: any;
+    } = {},
   ): Promise<any> {
     return sequencer.sendTransaction({
       to: this.contract.target,
-      data: prefix ?? this.encodeDataWrite(feeds),
-      ...args,
+      data: this.encodeDataWrite(feeds, opts.blockNumber),
+      ...opts.txData,
     });
   }
 
   public async checkLatestValue(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    ...args: any[]
+    opts: {
+      txData?: any;
+    } = {},
   ): Promise<void> {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
         data: this.encodeDataRead(ReadOp.GetLatestFeed, feed),
-        ...args,
+        ...opts.txData,
       });
 
       expect(storedValue).to.equal(this.formatData(feed.data));
@@ -42,13 +46,15 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   public async checkLatestRound(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    ...args: any[]
+    opts: {
+      txData?: any;
+    } = {},
   ): Promise<void> {
     for (const feed of feeds) {
       const round = await sequencer.call({
         to: this.contract.target,
         data: this.encodeDataRead(ReadOp.GetLatestRound, feed),
-        ...args,
+        ...opts.txData,
       });
 
       expect(+round).to.equal(feed.round);
@@ -58,13 +64,15 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   public async checkValueAtRound(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    ...args: any[]
+    opts: {
+      txData?: any;
+    } = {},
   ): Promise<void> {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
         data: this.encodeDataRead(ReadOp.GetFeedAtRound, feed),
-        ...args,
+        ...opts.txData,
       });
 
       expect(storedValue).to.equal(this.formatData(feed.data));
@@ -74,13 +82,15 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   public async checkLatestFeedAndRound(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    ...args: any[]
+    opts: {
+      txData?: any;
+    } = {},
   ): Promise<void> {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
         data: this.encodeDataRead(ReadOp.GetLatestFeedAndRound, feed),
-        ...args,
+        ...opts.txData,
       });
 
       expect(storedValue).to.be.equal(
@@ -91,8 +101,33 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     }
   }
 
-  public encodeDataWrite = (feeds: Feed[]) => {
-    const blockNumber = Date.now() + 100;
+  public async getValues(
+    caller: HardhatEthersSigner,
+    feeds: Feed[],
+    opts: {
+      operations?: ReadOp[];
+      txData?: any;
+    } = {},
+  ): Promise<string[]> {
+    const results: string[] = [];
+    for (const [index, feed] of feeds.entries()) {
+      const res = await caller.call({
+        to: this.contract.target,
+        data: this.encodeDataRead(
+          opts.operations ? opts.operations[index] : ReadOp.GetLatestFeed,
+          feed,
+        ),
+        ...opts.txData,
+      });
+
+      results.push(res);
+    }
+
+    return results;
+  }
+
+  public encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
+    blockNumber ??= Date.now() + 100;
     const prefix = ethers.solidityPacked(
       ['bytes1', 'uint64', 'uint32'],
       ['0x00', blockNumber, feeds.length],
