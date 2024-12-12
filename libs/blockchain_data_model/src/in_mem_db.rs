@@ -1,5 +1,5 @@
 use crate::{
-    AddRemoveFeeds, BlockFeedConfig, BlockHeader, HashType, MAX_FEED_ID_TO_DELETE_IN_BLOCK,
+    BlockFeedConfig, BlockHeader, FeedActions, HashType, MAX_FEED_ID_TO_DELETE_IN_BLOCK,
     MAX_NEW_FEEDS_IN_BLOCK,
 };
 use anyhow::Result;
@@ -18,7 +18,7 @@ pub struct InMemDb {
     block_height_to_header_hash: HashMap<u64, HashType>,
     block_header_hash_to_header: HashMap<HashType, BlockHeader>,
     // The feeds that will be registered after this block is applied to the state + the feed ID-s that will be deleted. The key is the Merkle root of the structure, which is in the block header.
-    add_remove_feeds: HashMap<HashType, AddRemoveFeeds>,
+    add_remove_feeds: HashMap<HashType, FeedActions>,
 }
 
 impl InMemDb {
@@ -31,15 +31,15 @@ impl InMemDb {
         }
     }
 
-    pub fn node_to_hash(node: Node) -> HashType {
+    pub fn node_to_hash(node: Node) -> Result<HashType> {
         let hex = node.to_string();
-        <HashType>::from_hex(hex.strip_prefix("0x").unwrap_or(&hex))
-            .expect("Failed to convert node to HashType")
+        let result = <HashType>::from_hex(hex.strip_prefix("0x").unwrap_or(&hex))?;
+        Ok(result)
     }
 
-    pub fn calc_merkle_root(obj: &mut impl SimpleSerialize) -> Node {
-        obj.hash_tree_root()
-            .expect("Failed to calculate Merkle root")
+    pub fn calc_merkle_root(obj: &mut impl SimpleSerialize) -> Result<Node> {
+        let result = obj.hash_tree_root()?;
+        Ok(result)
     }
 
     pub fn get_latest_block_height(&self) -> u64 {
@@ -60,9 +60,9 @@ impl InMemDb {
         new_block_height: u64,
         new_feeds_in_block: Vec<BlockFeedConfig>,
         feed_ids_to_delete_in_block: Vec<u32>,
-    ) -> (BlockHeader, AddRemoveFeeds) {
+    ) -> Result<(BlockHeader, FeedActions)> {
         // Populate new and to be removed feeds in block:
-        let mut add_remove_feeds = AddRemoveFeeds::default();
+        let mut add_remove_feeds = FeedActions::default();
 
         if new_feeds_in_block.len() > MAX_NEW_FEEDS_IN_BLOCK {
             error!("Trying to insert in block more newly registered feeds {} than supported {}. All above supported limit will be dropped!", new_feeds_in_block.len(), MAX_NEW_FEEDS_IN_BLOCK)
@@ -99,25 +99,25 @@ impl InMemDb {
             block_header.prev_block_hash = GENESIS_HASH;
         } else {
             let mut latest_header = self.get_block_header_by_height(latest_height).clone();
-            let latest_hash = Self::calc_merkle_root(&mut latest_header);
-            block_header.prev_block_hash = Self::node_to_hash(latest_hash);
+            let latest_hash = Self::calc_merkle_root(&mut latest_header)?;
+            block_header.prev_block_hash = Self::node_to_hash(latest_hash)?;
         }
 
-        let add_remove_feeds_merkle_root = Self::calc_merkle_root(&mut add_remove_feeds);
+        let add_remove_feeds_merkle_root = Self::calc_merkle_root(&mut add_remove_feeds)?;
         block_header.add_remove_feeds_merkle_root =
-            Self::node_to_hash(add_remove_feeds_merkle_root);
+            Self::node_to_hash(add_remove_feeds_merkle_root)?;
 
-        (block_header, add_remove_feeds)
+        Ok((block_header, add_remove_feeds))
     }
 
     pub fn add_block(
         &mut self,
         mut header: BlockHeader,
-        mut add_remove_feeds: AddRemoveFeeds,
+        mut add_remove_feeds: FeedActions,
     ) -> Result<()> {
         let block_height = header.block_height;
 
-        let new_header_hash = Self::node_to_hash(Self::calc_merkle_root(&mut header));
+        let new_header_hash = Self::node_to_hash(Self::calc_merkle_root(&mut header)?)?;
 
         self.block_height_to_header_hash
             .insert(block_height, new_header_hash);
@@ -126,7 +126,7 @@ impl InMemDb {
             .insert(new_header_hash, header);
 
         self.add_remove_feeds.insert(
-            Self::node_to_hash(Self::calc_merkle_root(&mut add_remove_feeds)),
+            Self::node_to_hash(Self::calc_merkle_root(&mut add_remove_feeds)?)?,
             add_remove_feeds,
         );
 
@@ -136,7 +136,7 @@ impl InMemDb {
     pub fn add_next_block(
         &mut self,
         header: BlockHeader,
-        add_remove_feeds: AddRemoveFeeds,
+        add_remove_feeds: FeedActions,
     ) -> Result<()> {
         // Check if block can be added as next in blockchain:
         let latest_block_height = self.get_latest_block_height();
@@ -148,16 +148,18 @@ impl InMemDb {
                 latest_block_height
             );
         }
-        if self.get_latest_block_height() == 0 {
-            if header.prev_block_hash != GENESIS_HASH {
-                anyhow::bail!("First block does not refer genesis in blockchain!");
-            }
-        } else {
-            let latest_block_header =
-                self.get_block_header_by_height(self.get_latest_block_height());
-            if header.prev_block_hash
-                != Self::node_to_hash(Self::calc_merkle_root(&mut latest_block_header.clone()))
-            {
+
+        if self.get_latest_block_height() == 0 && header.prev_block_hash != GENESIS_HASH {
+            anyhow::bail!("First block does not refer genesis in blockchain!");
+        }
+
+        if self.get_latest_block_height() != 0 {
+            let mut latest_block_header = self
+                .get_block_header_by_height(self.get_latest_block_height())
+                .clone();
+            let latest_block_header_hash =
+                Self::node_to_hash(Self::calc_merkle_root(&mut latest_block_header)?)?;
+            if header.prev_block_hash != latest_block_header_hash {
                 anyhow::bail!("New block does not refer latest in blockchain!");
             }
         }

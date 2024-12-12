@@ -4,12 +4,15 @@ use blockchain_data_model::{
     MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
 };
 use config::BlockConfig;
-use feed_registry::feed_registration_cmds::FeedsManagementCmds;
+use feed_registry::feed_registration_cmds::{
+    DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
+};
 use feed_registry::registry::SlotTimeTracker;
 use feed_registry::types::Repeatability;
 use std::collections::{HashMap, VecDeque};
 use std::fmt::Debug;
 use std::io::Error;
+use std::mem;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::RwLock;
@@ -63,89 +66,131 @@ pub async fn block_creator_loop<
 
             // Updates that overflowed the capacity of a block
             let mut backlog_updates = VecDeque::new();
+            let mut updates: HashMap<K, V> = Default::default();
+
+            let mut new_feeds_to_register = Vec::new();
+            let mut feeds_ids_to_delete = Vec::new();
+
+            let backlog_updates = &mut backlog_updates;
+            let updates = &mut updates;
+
+            let new_feeds_to_register = &mut new_feeds_to_register;
+            let feeds_ids_to_delete = &mut feeds_ids_to_delete;
 
             loop {
                 // Loop forever
-                let mut updates: HashMap<K, V> = Default::default();
-                // Fill the updates that overflowed the capacity of the last block
-                for _ in 0..max_feed_updates_to_batch {
-                    if let Some((k, v)) = backlog_updates.pop_front() {
-                        updates.insert(k, v);
-                    } else {
-                        break;
-                    }
-                }
-
-                let mut new_feeds_to_register = Vec::new();
-                let mut feeds_ids_to_delete = Vec::new();
-                loop {
-                    // Loop collecting data, until it is time to emit a block
-                    tokio::select! {
-                        _ = block_generation_time_tracker
-                        .await_end_of_current_slot(&Repeatability::Periodic) => { // This is the block generation slot
-                            if !updates.is_empty() || !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() { // Only emit a block if data is present
-                                generate_block(
-                                    updates,
-                                    new_feeds_to_register,
-                                    feeds_ids_to_delete,
-                                    &batched_votes_send,
-                                    &blockchain_db,
-                                    &feed_manager_cmds_send,
-                                    (block_generation_time_tracker.get_last_slot() + 1) as u64,
-                                ).await;
-                            }
-                            break;
-                        }
-
-                        feed_update = vote_recv.recv() => {
-                            match feed_update {
-                                Some((key, val)) => {
-                                    info!(
-                                        "adding {} => {} to updates",
-                                        key.to_string(),
-                                        val.to_string()
-                                    );
-                                    if updates.keys().len() < max_feed_updates_to_batch {
-                                        updates.insert(key, val);
-                                    } else {
-                                        warn!("updates.keys().len() >= max_feed_updates_to_batch ({} >= {})", updates.keys().len(), max_feed_updates_to_batch);
-                                        backlog_updates.push_back((key, val));
-                                    }
-                                },
-                                None => {
-                                    info!("Woke up on empty channel");
-                                }
+                tokio::select! {
+                     // This is the block generation slot
+                    _ = block_generation_time_tracker
+                    .await_end_of_current_slot(&Repeatability::Periodic) => {
+                         // Only emit a block if data is present
+                        if !updates.is_empty() || !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() {
+                            if let Err(e) = generate_block(
+                                updates,
+                                new_feeds_to_register,
+                                feeds_ids_to_delete,
+                                &batched_votes_send,
+                                &blockchain_db,
+                                &feed_manager_cmds_send,
+                                (block_generation_time_tracker.get_last_slot() + 1) as u64,
+                            ).await {
+                                panic!("Failed to generate block! {e}");
                             };
-                        }
 
-                        feed_management_cmd = feed_management_cmds_recv.recv() => {
-                            match feed_management_cmd {
-                                Some(cmd) => {
-                                    match &cmd {
-                                        FeedsManagementCmds::RegisterNewAssetFeed(_) => {
-                                            if new_feeds_to_register.len() < MAX_NEW_FEEDS_IN_BLOCK {
-                                                new_feeds_to_register.push(cmd);
-                                            } else {
-                                                error!("new_feeds_to_register.len() >= MAX_NEW_FEEDS_IN_BLOCK ({} >= {})", new_feeds_to_register.len(), MAX_NEW_FEEDS_IN_BLOCK);
-                                            }
-                                        },
-                                        FeedsManagementCmds::DeleteAssetFeed(_) => {
-                                            if feeds_ids_to_delete.len() < MAX_FEED_ID_TO_DELETE_IN_BLOCK {
-                                                feeds_ids_to_delete.push(cmd);
-                                            } else {
-                                                error!("feeds_ids_to_delete.len() < MAX_FEED_ID_TO_DELETE_IN_BLOCK ({} >= {})", feeds_ids_to_delete.len(), MAX_FEED_ID_TO_DELETE_IN_BLOCK);
-                                            }
-                                        },
-                                    }
-                                },
-                                None => info!("Woke up on empty channel - feed_management_cmds_recv"),
+                            updates.clear();
+                            new_feeds_to_register.clear();
+                            feeds_ids_to_delete.clear();
+
+                            // Fill the updates that overflowed the capacity of the last block
+                            while let Some((k, v)) = backlog_updates.pop_front() {
+                                if updates.len() == max_feed_updates_to_batch {
+                                    break;
+                                }
+                                updates.insert(k, v);
                             }
                         }
+                    }
+
+                    feed_update = vote_recv.recv() => {
+                        recvd_feed_update_to_block(feed_update, updates, backlog_updates, max_feed_updates_to_batch);
+                    }
+
+                    feed_management_cmd = feed_management_cmds_recv.recv() => {
+                        recvd_feed_management_cmd_to_block(feed_management_cmd, new_feeds_to_register, feeds_ids_to_delete);
                     }
                 }
             }
         })
         .expect("Failed to spawn block creator!")
+}
+
+// When we recv feed updates that have passed aggregation, we prepare them to be placed in the next generated block
+fn recvd_feed_update_to_block<
+    K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
+    V: Debug + Clone + std::string::ToString + 'static,
+>(
+    recvd_feed_update: Option<(K, V)>,
+    updates_to_block: &mut HashMap<K, V>,
+    backlog_updates: &mut VecDeque<(K, V)>,
+    max_feed_updates_to_batch: usize,
+) {
+    match recvd_feed_update {
+        Some((key, val)) => {
+            info!(
+                "adding {} => {} to updates",
+                key.to_string(),
+                val.to_string()
+            );
+            if updates_to_block.keys().len() < max_feed_updates_to_batch {
+                updates_to_block.insert(key, val);
+            } else {
+                warn!(
+                    "updates.keys().len() >= max_feed_updates_to_batch ({} >= {})",
+                    updates_to_block.keys().len(),
+                    max_feed_updates_to_batch
+                );
+                backlog_updates.push_back((key, val));
+            }
+        }
+        None => {
+            info!("Woke up on empty channel");
+        }
+    };
+}
+
+// When we recv feed management commands, we prepare them to be placed in the next generated block
+fn recvd_feed_management_cmd_to_block(
+    feed_management_cmd: Option<FeedsManagementCmds>,
+    new_feeds_to_register: &mut Vec<RegisterNewAssetFeed>,
+    feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
+) {
+    match feed_management_cmd {
+        Some(cmd) => match cmd {
+            FeedsManagementCmds::RegisterNewAssetFeed(reg_cmd) => {
+                if new_feeds_to_register.len() < MAX_NEW_FEEDS_IN_BLOCK {
+                    new_feeds_to_register.push(reg_cmd);
+                } else {
+                    error!(
+                        "new_feeds_to_register.len() >= MAX_NEW_FEEDS_IN_BLOCK ({} >= {})",
+                        new_feeds_to_register.len(),
+                        MAX_NEW_FEEDS_IN_BLOCK
+                    );
+                }
+            }
+            FeedsManagementCmds::DeleteAssetFeed(rm_cmd) => {
+                if feeds_ids_to_delete.len() < MAX_FEED_ID_TO_DELETE_IN_BLOCK {
+                    feeds_ids_to_delete.push(rm_cmd);
+                } else {
+                    error!(
+                        "feeds_ids_to_delete.len() < MAX_FEED_ID_TO_DELETE_IN_BLOCK ({} >= {})",
+                        feeds_ids_to_delete.len(),
+                        MAX_FEED_ID_TO_DELETE_IN_BLOCK
+                    );
+                }
+            }
+        },
+        None => info!("Woke up on empty channel - feed_management_cmds_recv"),
+    }
 }
 
 // Helper function to convert SystemTime to u64 (seconds since UNIX_EPOCH)
@@ -211,55 +256,50 @@ async fn generate_block<
     K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
-    updates: HashMap<K, V>,
-    new_feeds_to_register: Vec<FeedsManagementCmds>,
-    feeds_ids_to_delete: Vec<FeedsManagementCmds>,
+    updates: &mut HashMap<K, V>,
+    new_feeds_to_register: &mut Vec<RegisterNewAssetFeed>,
+    feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
     batched_votes_send: &UnboundedSender<UpdateToSend<K, V>>,
     blockchain_db: &Arc<RwLock<InMemDb>>,
     feed_manager_cmds_send: &UnboundedSender<FeedsManagementCmds>,
     block_height: u64,
-) {
+) -> eyre::Result<()> {
+    let new_feeds_to_register = mem::take(new_feeds_to_register);
+    let feeds_ids_to_delete = mem::take(feeds_ids_to_delete);
+    let updates = mem::take(updates);
+
     let mut new_feeds_in_block = Vec::new();
-    for cmd in &new_feeds_to_register {
-        match cmd {
-            FeedsManagementCmds::RegisterNewAssetFeed(register_new_asset_feed) => {
-                new_feeds_in_block.push(feed_config_to_block(&register_new_asset_feed.config));
-            }
-            FeedsManagementCmds::DeleteAssetFeed(_) => {
-                panic!("Logical error: this set should only contan new feeds!")
-            }
-        }
+    for register_new_asset_feed in &new_feeds_to_register {
+        new_feeds_in_block.push(feed_config_to_block(&register_new_asset_feed.config));
     }
 
     let mut feeds_ids_to_delete_in_block = Vec::new();
-    for cmd in &feeds_ids_to_delete {
-        match cmd {
-            FeedsManagementCmds::RegisterNewAssetFeed(_) => {
-                panic!("Logical error: this set should only contan feeds ids to delete!")
-            }
-            FeedsManagementCmds::DeleteAssetFeed(delete_feed_id_cmd) => {
-                feeds_ids_to_delete_in_block.push(delete_feed_id_cmd.id);
-            }
-        }
+    for delete_feed_id_cmd in &feeds_ids_to_delete {
+        feeds_ids_to_delete_in_block.push(delete_feed_id_cmd.id);
     }
 
     if !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() {
         // At this point we create new blocks only to register/deregister feeds.
         // Create the block that will contain the new feeds, deleted feeds and in future - updates of feed values
         let mut blockchain_db = blockchain_db.write().await;
-        let (header, add_remove_feeds) = blockchain_db.create_new_block(
-            block_height,
-            new_feeds_in_block,
-            feeds_ids_to_delete_in_block,
-        );
+        let (header, add_remove_feeds) = blockchain_db
+            .create_new_block(
+                block_height,
+                new_feeds_in_block,
+                feeds_ids_to_delete_in_block,
+            )
+            .map_err(|e| eyre::eyre!(e.to_string()))?;
+        let header_merkle_root = InMemDb::calc_merkle_root(&mut header.clone())
+            .map_err(|e| eyre::eyre!(e.to_string()))?;
         info!(
             "Generated new block {:?} with hash {:?}",
             header,
-            InMemDb::node_to_hash(InMemDb::calc_merkle_root(&mut header.clone()))
+            InMemDb::node_to_hash(header_merkle_root).map_err(|e| eyre::eyre!(e.to_string()))?
         );
-        blockchain_db
-            .add_next_block(header, add_remove_feeds)
-            .expect("Failed to add block!");
+
+        if let Err(e) = blockchain_db.add_next_block(header, add_remove_feeds) {
+            eyre::bail!(e.to_string());
+        }
     }
 
     // Process feed updates:
@@ -277,26 +317,27 @@ async fn generate_block<
 
     // Process cmds to register new feeds:
     for cmd in new_feeds_to_register {
-        match feed_manager_cmds_send.send(cmd) {
+        match feed_manager_cmds_send.send(FeedsManagementCmds::RegisterNewAssetFeed(cmd)) {
             Ok(_) => info!("forward register cmd"),
-            Err(e) => info!("Could not forward register cmd: {e}"),
+            Err(e) => error!("Could not forward register cmd: {e}"),
         };
     }
 
     // Process cmds to delete existing feeds:
     for cmd in feeds_ids_to_delete {
-        match feed_manager_cmds_send.send(cmd) {
+        match feed_manager_cmds_send.send(FeedsManagementCmds::DeleteAssetFeed(cmd)) {
             Ok(_) => info!("forward delete cmd"),
-            Err(e) => info!("Could not forward delete cmd: {e}"),
+            Err(e) => error!("Could not forward delete cmd: {e}"),
         };
     }
+    Ok(())
 }
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Arc;
     use blockchain_data_model::in_mem_db::InMemDb;
     use config::BlockConfig;
+    use std::sync::Arc;
     use std::time::Duration;
     use tokio::sync::{mpsc, RwLock};
     use tokio::time;

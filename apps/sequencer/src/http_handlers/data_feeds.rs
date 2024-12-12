@@ -895,8 +895,7 @@ mod tests {
         let log_handle = init_shared_logging_handle("INFO", false);
         let metrics_prefix = Some(metrix_prefix);
         let (vote_send, _vote_recv) = mpsc::unbounded_channel();
-        let (feeds_management_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
+        let (feeds_management_cmd_send, _feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
         let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
 
         SequencerState {
