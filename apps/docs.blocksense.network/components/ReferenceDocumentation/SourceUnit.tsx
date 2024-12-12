@@ -8,7 +8,7 @@ const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
 
 import { SourceUnitClient } from '@/components/ReferenceDocumentation/SourceUnitClient';
 
-export async function getSourceUnit(title: string) {
+export function getSourceUnit(title: string) {
   const sourceUnit = solReflection.find((info: SourceUnitDocItem) => {
     if (!info || !info.absolutePath) {
       return false;

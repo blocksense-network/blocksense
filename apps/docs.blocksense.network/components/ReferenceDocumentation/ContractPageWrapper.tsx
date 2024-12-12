@@ -6,8 +6,8 @@ type ContractPageWrapperProps = {
   title: string;
 };
 
-export async function ContractPageWrapper({ title }: ContractPageWrapperProps) {
-  const sourceUnit = await getSourceUnit(title);
+export function ContractPageWrapper({ title }: ContractPageWrapperProps) {
+  const sourceUnit = getSourceUnit(title);
 
   if (!sourceUnit) {
     return <Error404 />;
