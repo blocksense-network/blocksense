@@ -3,9 +3,9 @@ import {
   IUpgradeableProxy__factory,
   UpgradeableProxyADFS,
 } from '../../../../typechain';
-import { deployContract } from '../../../experiments/utils/helpers/common';
 import { ADFSWrapper } from './ADFS';
 import { Feed, UpgradeableProxyCallMethods } from '../types';
+import { deployContract } from '../../../experiments/utils/helpers/common';
 
 export class UpgradeableProxyADFSWrapper {
   public contract!: UpgradeableProxyADFS;
@@ -32,6 +32,9 @@ export class UpgradeableProxyADFSWrapper {
   public async upgradeImplementation(
     newImplementation: ADFSWrapper,
     admin: HardhatEthersSigner,
+    opts: {
+      txData?: any;
+    } = {},
   ) {
     this.implementation = newImplementation;
 
@@ -39,7 +42,8 @@ export class UpgradeableProxyADFSWrapper {
       to: this.contract.target,
       data: IUpgradeableProxy__factory.createInterface()
         .getFunction('upgradeTo')
-        .selector.concat(newImplementation.contract.target.toString()),
+        .selector.concat(newImplementation.contract.target.toString().slice(2)),
+      ...opts.txData,
     });
   }
 
@@ -48,7 +52,7 @@ export class UpgradeableProxyADFSWrapper {
       to: this.contract.target,
       data: IUpgradeableProxy__factory.createInterface()
         .getFunction('setAdmin')
-        .selector.concat(newAdmin),
+        .selector.concat(newAdmin.slice(2)),
     });
   }
 
@@ -58,6 +62,11 @@ export class UpgradeableProxyADFSWrapper {
     feeds: Feed[],
     ...args: any[]
   ) {
-    return this.implementation[method](sequencer, feeds, ...args);
+    return this.implementation[method](sequencer, feeds, {
+      txData: {
+        to: this.contract.target,
+      },
+      ...args,
+    });
   }
 }
