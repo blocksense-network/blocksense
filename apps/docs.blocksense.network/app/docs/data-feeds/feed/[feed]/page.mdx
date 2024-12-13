@@ -1,0 +1,12 @@
+---
+title: 'Data Feed'
+---
+
+import React from 'react';
+import DataFeedPage, { generateStaticParams } from '@/components/DataFeeds/[feed]';
+
+export { generateStaticParams };
+
+export default function FeedPage({ params }) {
+  return <DataFeedPage params={params} />;
+}
