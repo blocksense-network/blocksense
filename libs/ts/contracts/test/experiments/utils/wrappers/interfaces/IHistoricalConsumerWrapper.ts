@@ -2,7 +2,7 @@ import { BaseContract } from 'ethers';
 import { IConsumerWrapper } from './IConsumerWrapper';
 import { IHistoricalWrapper } from './IHistoricalWrapper';
 import { TransmissionData } from '../../helpers/common';
-import { IHistoricalDataFeed } from '../../../../typechain/contracts/test/consumers/historical/HistoricalConsumer';
+import { IHistoricalDataFeed } from '../../../../../typechain/contracts/test/experiments/consumers/historical/HistoricalConsumer';
 
 export interface IHistoricalConsumerWrapper<
   T extends BaseContract,

@@ -5,11 +5,5 @@ export interface IBaseWrapper<T extends BaseContract> {
 
   init(...args: any[]): Promise<void>;
 
-  checkSetValues(
-    keys: number[],
-    values: string[],
-    ...args: any[]
-  ): Promise<void>;
-
   getName(): string;
 }
