@@ -5,6 +5,7 @@ import * as S from '@effect/schema/Schema';
  */
 export const FeedTypeSchema = S.Union(
   S.Literal(''),
+  S.Literal('crypto'),
   S.Literal('Crypto'),
   S.Literal('Currency'),
   S.Literal('Equities'),
@@ -16,6 +17,7 @@ export const FeedTypeSchema = S.Union(
   S.Literal('Forex'),
   S.Literal('Economic index'),
   S.Literal('US Treasuries'),
+  S.Literal('Tokenized Asset'),
 ).annotations({ identifier: 'FeedType' });
 
 /**
