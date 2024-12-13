@@ -25,17 +25,27 @@ import {
   parseNetworkFilename,
 } from '../chainlink-compatibility/types';
 
+function getBaseQuote(data: ChainLinkFeedInfo) {
+  if (data.docs && data.docs.baseAsset && data.docs.quoteAsset) {
+    return { base: data.docs.baseAsset, quote: data.docs.quoteAsset };
+  }
+  if (data.pair.length === 2 && data.pair[0] && data.pair[1]) {
+    return { base: data.pair[0], quote: data.pair[1] };
+  }
+  const [base, quote] = data.name.split(' / ');
+  return { base, quote };
+}
+
 function feedFromChainLinkFeedInfo(
   data: ChainLinkFeedInfo,
 ): Omit<Feed, 'id' | 'script'> {
-  const [base, quote] = data.name.split(' / ');
   return {
-    name: base,
+    name: data.name,
     fullName: data.assetName,
     description: data.name,
     type: data.feedType,
     decimals: data.decimals,
-    pair: { base, quote },
+    pair: getBaseQuote(data),
     resources: {},
     report_interval_ms: 300_000,
     first_report_start_time: {
