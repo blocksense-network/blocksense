@@ -6,7 +6,7 @@ import { IHistoricalWrapper } from '../../../../utils/wrappers/interfaces/IHisto
 import { ethers } from 'hardhat';
 import { IHistoricalConsumerWrapper } from '../../../../utils/wrappers/interfaces/IHistoricalConsumerWrapper';
 import { TransmissionData } from '../../../helpers/common';
-import { IHistoricalDataFeed } from '../../../../../typechain/contracts/test/consumers/historical/HistoricalConsumer';
+import { IHistoricalDataFeed } from '../../../../../../typechain/contracts/test/experiments/consumers/historical/HistoricalConsumer';
 
 export abstract class HistoricalDataFeedStoreConsumerBaseWrapper<
     U extends BaseContract,

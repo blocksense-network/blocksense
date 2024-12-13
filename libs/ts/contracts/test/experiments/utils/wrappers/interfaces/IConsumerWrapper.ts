@@ -12,4 +12,10 @@ export interface IConsumerWrapper<
   getFeedById(key: number): Promise<string | TransmissionData>;
 
   setMultipleFetchedFeedsById(keys: number[]): Promise<any>;
+
+  checkSetValues(
+    keys: number[],
+    values: string[],
+    ...args: any[]
+  ): Promise<void>;
 }
