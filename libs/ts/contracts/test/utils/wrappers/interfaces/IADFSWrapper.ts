@@ -2,28 +2,26 @@ import { Feed, ReadOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { AggregatedDataFeedStore } from '../../../../typechain';
 import { AccessControlWrapper } from '../adfs/AccessControl';
+import { IBaseWrapper } from '../../../experiments/utils/wrappers';
+import { TransactionResponse } from 'ethers';
 
-export interface IADFSWrapper {
+export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
   contract: AggregatedDataFeedStore;
   accessControl: AccessControlWrapper;
-
-  init(...args: any[]): Promise<void>;
-
-  getName(): string;
 
   setFeeds(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    options: {
+    opts?: {
       blockNumber?: number;
       txData?: any;
     },
-  ): Promise<any>;
+  ): Promise<TransactionResponse>;
 
   checkLatestValue(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    options: {
+    opts?: {
       txData?: any;
     },
   ): Promise<void>;
@@ -31,7 +29,7 @@ export interface IADFSWrapper {
   checkLatestRound(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    options: {
+    opts?: {
       txData?: any;
     },
   ): Promise<void>;
@@ -39,7 +37,7 @@ export interface IADFSWrapper {
   checkValueAtRound(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    options: {
+    opts?: {
       txData?: any;
     },
   ): Promise<void>;
@@ -47,7 +45,7 @@ export interface IADFSWrapper {
   checkLatestFeedAndRound(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
-    options: {
+    opts?: {
       txData?: any;
     },
   ): Promise<void>;
@@ -55,7 +53,7 @@ export interface IADFSWrapper {
   getValues(
     caller: HardhatEthersSigner,
     feeds: Feed[],
-    options: {
+    opts?: {
       txData?: any;
       operations?: ReadOp[];
     },
