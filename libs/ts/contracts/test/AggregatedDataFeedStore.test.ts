@@ -3,6 +3,15 @@ import { ethers } from 'hardhat';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { Feed } from './utils/wrappers/types';
 import { ADFSWrapper } from './utils/wrappers';
+import {
+  HistoricalDataFeedStoreBaseWrapper,
+  HistoricalDataFeedStoreGenericBaseWrapper,
+  HistoricalDataFeedStoreGenericV1Wrapper,
+  HistoricalDataFeedStoreV1Wrapper,
+  HistoricalDataFeedStoreV2Wrapper,
+} from './experiments/utils/wrappers';
+import { initWrappers } from './experiments/utils/helpers/common';
+import { compareGasUsed } from './utils/helpers/compareGasWithExperiments';
 
 const feeds: Feed[] = [
   {
@@ -150,5 +159,94 @@ describe('AggregatedDataFeedStore', () => {
         data,
       }),
     ).to.be.reverted;
+  });
+
+  describe('Compare gas usage', function () {
+    let contractWrappers: HistoricalDataFeedStoreBaseWrapper[] = [];
+    let genericContractWrappers: HistoricalDataFeedStoreGenericBaseWrapper[] =
+      [];
+
+    beforeEach(async function () {
+      contractWrappers = [];
+      genericContractWrappers = [];
+
+      await initWrappers(contractWrappers, [
+        HistoricalDataFeedStoreV1Wrapper,
+        HistoricalDataFeedStoreV2Wrapper,
+      ]);
+
+      await initWrappers(genericContractWrappers, [
+        HistoricalDataFeedStoreGenericV1Wrapper,
+      ]);
+
+      contract = new ADFSWrapper();
+      await contract.init(accessControlOwner);
+      await contract.accessControl.set(
+        accessControlOwner,
+        [sequencer.address],
+        [true],
+      );
+
+      // store no data first time in ADFS to avoid first sstore of blocknumber
+      await contract.setFeeds(sequencer, []);
+
+      // TODO make a generic ADFS contract and a test wrapper for it
+    });
+
+    for (let i = 1; i <= 100; i *= 10) {
+      it(`Should set ${i} data feeds consecutively`, async function () {
+        await compareGasUsed(
+          sequencer,
+          genericContractWrappers,
+          contractWrappers,
+          [contract],
+          [],
+          i,
+          {
+            round: 1n,
+          },
+        );
+
+        await compareGasUsed(
+          sequencer,
+          genericContractWrappers,
+          contractWrappers,
+          [contract],
+          [],
+          i,
+          {
+            round: 2n,
+          },
+        );
+      });
+
+      it(`Should set ${i} data feeds every 16 id`, async function () {
+        await compareGasUsed(
+          sequencer,
+          genericContractWrappers,
+          contractWrappers,
+          [contract],
+          [],
+          i,
+          {
+            skip: 16,
+            round: 1n,
+          },
+        );
+
+        await compareGasUsed(
+          sequencer,
+          genericContractWrappers,
+          contractWrappers,
+          [contract],
+          [],
+          i,
+          {
+            skip: 16,
+            round: 2n,
+          },
+        );
+      });
+    }
   });
 });

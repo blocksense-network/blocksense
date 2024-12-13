@@ -17,7 +17,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       blockNumber?: number;
       txData?: any;
     } = {},
-  ): Promise<any> {
+  ) {
     return sequencer.sendTransaction({
       to: this.contract.target,
       data: this.encodeDataWrite(feeds, opts.blockNumber),
@@ -31,7 +31,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     opts: {
       txData?: any;
     } = {},
-  ): Promise<void> {
+  ) {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
@@ -49,7 +49,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     opts: {
       txData?: any;
     } = {},
-  ): Promise<void> {
+  ) {
     for (const feed of feeds) {
       const round = await sequencer.call({
         to: this.contract.target,
@@ -67,7 +67,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     opts: {
       txData?: any;
     } = {},
-  ): Promise<void> {
+  ) {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
@@ -85,7 +85,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     opts: {
       txData?: any;
     } = {},
-  ): Promise<void> {
+  ) {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
@@ -192,6 +192,10 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
         const indexInBytesLength = Math.ceil(
           BigInt(index).toString(2).length / 8,
         );
+
+        if (batchFeeds[index] === ethers.toBeHex(0, 32)) {
+          return ''; // skip empty updates
+        }
 
         return ethers
           .solidityPacked(

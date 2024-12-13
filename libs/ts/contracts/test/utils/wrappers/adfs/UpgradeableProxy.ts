@@ -6,8 +6,11 @@ import {
 import { ADFSWrapper } from './ADFS';
 import { Feed, UpgradeableProxyCallMethods } from '../types';
 import { deployContract } from '../../../experiments/utils/helpers/common';
+import { IUpgradeableProxyADFSWrapper } from '../interfaces/IUpgradeableProxyADFSWarpper';
 
-export class UpgradeableProxyADFSWrapper {
+export class UpgradeableProxyADFSWrapper
+  implements IUpgradeableProxyADFSWrapper
+{
   public contract!: UpgradeableProxyADFS;
   public implementation!: ADFSWrapper;
 
@@ -61,12 +64,12 @@ export class UpgradeableProxyADFSWrapper {
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
     ...args: any[]
-  ) {
+  ): Promise<ReturnType<UpgradeableProxyCallMethods[T]>> {
     return this.implementation[method](sequencer, feeds, {
       txData: {
         to: this.contract.target,
       },
       ...args,
-    });
+    }) as ReturnType<UpgradeableProxyCallMethods[T]>;
   }
 }

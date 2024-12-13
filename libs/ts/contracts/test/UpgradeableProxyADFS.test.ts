@@ -4,6 +4,18 @@ import { ADFSWrapper, UpgradeableProxyADFSWrapper } from './utils/wrappers';
 import { expect } from 'chai';
 import { Feed } from './utils/wrappers/types';
 import { IUpgradeableProxy__factory } from '../typechain';
+import {
+  HistoricalDataFeedStore,
+  GenericHistoricalDataFeedStore,
+  initWrappers,
+} from './experiments/utils/helpers/common';
+import {
+  UpgradeableProxyHistoricalBaseWrapper,
+  UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
+  UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
+  UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper,
+} from './experiments/utils/wrappers';
+import { compareGasUsed } from './utils/helpers/compareGasWithExperiments';
 
 const feed: Feed = {
   id: 0n,
@@ -93,12 +105,9 @@ describe('UpgradeableProxyADFS', function () {
       'ProxyDeniedAdminAccess',
     );
 
-    tx = proxy.proxyCall('getValues', admin, [feed]);
-
-    await expect(tx).to.be.revertedWithCustomError(
-      proxy.contract,
-      'ProxyDeniedAdminAccess',
-    );
+    await expect(
+      proxy.proxyCall('getValues', admin, [feed]),
+    ).to.be.revertedWithCustomError(proxy.contract, 'ProxyDeniedAdminAccess');
   });
 
   it('Should revert if non-owner calls set feed', async function () {
@@ -142,5 +151,102 @@ describe('UpgradeableProxyADFS', function () {
   it('Should revert if non-admin tries to change admin', async function () {
     const newAdmin = (await ethers.getSigners())[11];
     await expect(proxy.setAdmin(sequencer, newAdmin.address)).to.be.reverted;
+  });
+
+  describe('Compare gas usage', function () {
+    let historicalContractWrappers: UpgradeableProxyHistoricalBaseWrapper<HistoricalDataFeedStore>[] =
+      [];
+    let historicalContractGenericWrappers: UpgradeableProxyHistoricalBaseWrapper<GenericHistoricalDataFeedStore>[] =
+      [];
+
+    beforeEach(async function () {
+      historicalContractWrappers = [];
+      historicalContractGenericWrappers = [];
+
+      await initWrappers(
+        historicalContractWrappers,
+        [
+          UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
+          UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
+        ],
+        ...Array(2).fill([await admin.getAddress()]),
+      );
+
+      await initWrappers(
+        historicalContractGenericWrappers,
+        [UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper],
+        ...Array(1).fill([await admin.getAddress()]),
+      );
+
+      proxy = new UpgradeableProxyADFSWrapper();
+      await proxy.init(await admin.getAddress(), accessControlAdmin);
+
+      await proxy.implementation.accessControl.set(
+        accessControlAdmin,
+        [sequencer.address],
+        [true],
+      );
+
+      // store no data first time in ADFS to avoid first sstore of blocknumber
+      await proxy.proxyCall('setFeeds', sequencer, []);
+
+      // TODO make a generic upgradeable ADFS contract and a test wrapper for it
+    });
+
+    for (let i = 1; i <= 100; i *= 10) {
+      it(`Should set ${i} data feeds`, async function () {
+        await compareGasUsed(
+          sequencer,
+          historicalContractGenericWrappers,
+          historicalContractWrappers,
+          [proxy],
+          [],
+          i,
+          {
+            round: 1n,
+          },
+        );
+
+        await compareGasUsed(
+          sequencer,
+          historicalContractGenericWrappers,
+          historicalContractWrappers,
+          [proxy],
+          [],
+          i,
+          {
+            round: 2n,
+          },
+        );
+      });
+
+      it(`Should set ${i} data feeds every 16 id`, async function () {
+        await compareGasUsed(
+          sequencer,
+          historicalContractGenericWrappers,
+          historicalContractWrappers,
+          [proxy],
+          [],
+          i,
+          {
+            skip: 16,
+            round: 1n,
+          },
+        );
+
+        await compareGasUsed(
+          sequencer,
+          historicalContractGenericWrappers,
+          historicalContractWrappers,
+          [proxy],
+          [],
+          i,
+          {
+            skip: 16,
+            round: 2n,
+          },
+        );
+      });
+    }
   });
 });
