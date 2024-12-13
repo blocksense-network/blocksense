@@ -26,6 +26,11 @@ const ChainLinkFeedInfoSchema = S.Struct({
   assetName: S.String,
   feedType: FeedTypeSchema,
   decimals: S.Number,
+  docs: S.Struct({
+    assetName: S.NullishOr(S.String),
+    baseAsset: S.NullishOr(S.String),
+    quoteAsset: S.NullishOr(S.String),
+  }),
 }).annotations({ identifier: 'ChainLinkFeedInfo' });
 
 /**
