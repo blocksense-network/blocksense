@@ -11,14 +11,8 @@ use tokio::sync::{mpsc, RwLock};
 
 use sequencer::reporters::reporter::init_shared_reporters;
 
-use sequencer::http_handlers::admin::{
-    delete_asset_feed, deploy, disable_provider, enable_provider, get_feed_config,
-    get_feed_report_interval, get_feeds_config, get_key, get_oracle_scripts, get_sequencer_config,
-    health, register_asset_feed, set_log_level,
-};
-use sequencer::http_handlers::data_feeds::{
-    get_last_published_value_and_time, post_report, post_reports_batch, register_feed,
-};
+use sequencer::http_handlers::admin::add_admin_services;
+use sequencer::http_handlers::data_feeds::add_main_services;
 use utils::logging::{
     get_log_level, get_shared_logging_handle, init_shared_logging_handle, tokio_console_active,
     SharedLoggingHandle,
@@ -117,9 +111,7 @@ pub async fn prepare_http_servers(
             HttpServer::new(move || {
                 App::new()
                     .app_data(main_sequencer_state.clone())
-                    .service(post_report)
-                    .service(post_reports_batch)
-                    .service(get_last_published_value_and_time)
+                    .configure(add_main_services)
             })
             .bind(("0.0.0.0", sequencer_config_main_port))
             .expect("Main HTTP server could not bind to port.")
@@ -136,20 +128,7 @@ pub async fn prepare_http_servers(
             HttpServer::new(move || {
                 App::new()
                     .app_data(admin_sequencer_state.clone())
-                    .service(get_key)
-                    .service(deploy)
-                    .service(set_log_level)
-                    .service(get_feed_report_interval)
-                    .service(register_feed)
-                    .service(get_feeds_config)
-                    .service(get_feed_config)
-                    .service(get_sequencer_config)
-                    .service(register_asset_feed)
-                    .service(delete_asset_feed)
-                    .service(disable_provider)
-                    .service(enable_provider)
-                    .service(get_oracle_scripts)
-                    .service(health)
+                    .configure(add_admin_services)
             })
             .workers(1)
             .bind(("0.0.0.0", admin_port))

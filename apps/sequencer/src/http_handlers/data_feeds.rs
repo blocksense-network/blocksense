@@ -6,7 +6,7 @@ use std::sync::Arc;
 use utils::time::current_unix_time;
 
 use actix_web::error::{ErrorBadRequest, ErrorInternalServerError};
-use actix_web::web::{self};
+use actix_web::web::{self, ServiceConfig};
 use actix_web::Error;
 use actix_web::{get, post, HttpResponse};
 use feed_registry::types::{GetLastPublishedRequestData, LastPublishedValue, ReportRelevance};
@@ -496,6 +496,12 @@ pub async fn register_feed(
     Ok(HttpResponse::Ok().json(response))
 }
 
+pub fn add_main_services(cfg: &mut ServiceConfig) {
+    cfg.service(post_report)
+        .service(post_reports_batch)
+        .service(get_last_published_value_and_time);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -583,7 +589,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(post_report),
+                .configure(add_main_services),
         )
         .await;
 
@@ -936,7 +942,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(get_last_published_value_and_time),
+                .configure(add_main_services),
         )
         .await;
 
@@ -970,7 +976,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(get_last_published_value_and_time),
+                .configure(add_main_services),
         )
         .await;
 
@@ -1018,7 +1024,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(get_last_published_value_and_time),
+                .configure(add_main_services),
         )
         .await;
 
@@ -1101,7 +1107,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(get_last_published_value_and_time),
+                .configure(add_main_services),
         )
         .await;
 
@@ -1166,7 +1172,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(get_last_published_value_and_time),
+                .configure(add_main_services),
         )
         .await;
 
@@ -1256,7 +1262,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(get_last_published_value_and_time),
+                .configure(add_main_services),
         )
         .await;
 

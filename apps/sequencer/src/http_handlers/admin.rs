@@ -4,6 +4,7 @@ use crate::feeds::feeds_slots_manager::{
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
 use actix_web::http::header::ContentType;
+use actix_web::web::ServiceConfig;
 use actix_web::{error, Error};
 use actix_web::{get, web, HttpRequest};
 use actix_web::{post, HttpResponse, Responder};
@@ -20,6 +21,7 @@ use std::collections::HashSet;
 use utils::logging::tokio_console_active;
 
 use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
+use crate::http_handlers::data_feeds::register_feed;
 use feed_registry::types::FeedType;
 use feed_registry::types::Repeatability;
 use prometheus::metrics_collector::gather_and_dump_metrics;
@@ -489,6 +491,23 @@ pub async fn health(_sequencer_state: web::Data<SequencerState>) -> Result<HttpR
         .body("".to_string()))
 }
 
+pub fn add_admin_services(cfg: &mut ServiceConfig) {
+    cfg.service(get_key)
+        .service(deploy)
+        .service(set_log_level)
+        .service(get_feed_report_interval)
+        .service(register_feed)
+        .service(get_feeds_config)
+        .service(get_feed_config)
+        .service(get_sequencer_config)
+        .service(register_asset_feed)
+        .service(delete_asset_feed)
+        .service(disable_provider)
+        .service(enable_provider)
+        .service(get_oracle_scripts)
+        .service(health);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -565,7 +584,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(get_feed_report_interval),
+                .configure(add_admin_services),
         )
         .await;
 
@@ -656,9 +675,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(get_feeds_config)
-                .service(get_feed_config)
-                .service(get_sequencer_config),
+                .configure(add_admin_services),
         )
         .await;
 
@@ -799,7 +816,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(disable_provider),
+                .configure(add_admin_services),
         )
         .await;
 
@@ -856,7 +873,7 @@ mod tests {
         let app = test::init_service(
             App::new()
                 .app_data(sequencer_state.clone())
-                .service(enable_provider),
+                .configure(add_admin_services),
         )
         .await;
 
