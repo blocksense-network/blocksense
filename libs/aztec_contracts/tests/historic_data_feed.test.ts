@@ -12,9 +12,9 @@ import {
 } from '@aztec/aztec.js';
 import { beforeAll, describe, expect, test } from 'vitest';
 import {
-  HistoricDataFeedStoreContract,
-  HistoricDataFeedStoreContractArtifact,
-} from '../contracts/historic_data_feed_store/src/artifacts/HistoricDataFeedStore.js';
+  HistoricalDataFeedStoreContract,
+  HistoricalDataFeedStoreContractArtifact,
+} from '../contracts/historic_data_feed_store/src/artifacts/HistoricalDataFeedStore.js';
 
 const setupSandbox = async () => {
   const { PXE_URL = 'http://localhost:8080' } = process.env;
@@ -37,7 +37,8 @@ describe('Data feed store contract', () => {
 
   test('Deploying the contract', async () => {
     const salt = Fr.random();
-    const dataFeedStoreContractArtifact = HistoricDataFeedStoreContractArtifact;
+    const dataFeedStoreContractArtifact =
+      HistoricalDataFeedStoreContractArtifact;
     const deployArgs = wallets[0].getCompleteAddress().address;
 
     const deploymentData = getContractInstanceFromDeployParams(
@@ -89,7 +90,7 @@ describe('Data feed store contract', () => {
       { length: 48 },
       () => Math.floor(Math.random() * 256) as number | bigint,
     );
-    const contract = await HistoricDataFeedStoreContract.deploy(wallets[0])
+    const contract = await HistoricalDataFeedStoreContract.deploy(wallets[0])
       .send()
       .deployed();
 

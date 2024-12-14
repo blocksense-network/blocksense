@@ -1,7 +1,7 @@
 import {
   DataFeedStoreContractArtifact,
   DataFeedStoreContract,
-} from '../contracts/data_feed_store/src/artifacts/DataFeedStore';
+} from '../contracts/data_feed_store/src/artifacts/DataFeedStore.js';
 import {
   AccountWallet,
   CompleteAddress,
