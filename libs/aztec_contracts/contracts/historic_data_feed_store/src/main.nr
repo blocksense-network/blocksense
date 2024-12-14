@@ -66,6 +66,27 @@ contract HistoricalDataFeedStore {
         storage.owner.initialize(context.msg_sender());
     }
 
+    /**
+     * Sets a historical data feed
+     *
+     * Represent all values as one monolith array.
+     * Using sentinel value like 0 for indexing the end
+     * of the bytes in the input values.
+     *
+     * @note Using `current_transmission_value` as a portion
+     * of the whole `input_values` array.
+     *
+     * @param keys The keys of each data feed, capped at MAX_FEEDS_NUMBER
+     * @param input_values The values of the data feed, 24 bytes each, thus 24 * MAX_FEEDS_NUMBER bytes
+     * @param length The number of data feeds to set
+     */
+    /**
+     * Currently 24 bytes are serialized in one Field element thus 24 * MAX_FEEDS_NUMBER bytes
+     * If you insert less than the MAX_FEEDS_NUMBER feeds, the rest of the fields are set to 0.
+     * This is where length comes in handy, because we iterate until the length is reached and
+     * thus store only the needed bytes.
+     * The keys array values are Field elements to avoid redundant ACIR conversions.
+     */
     #[public]
     fn set_feeds(
         keys: [Field; MAX_FEEDS_NUMBER],
