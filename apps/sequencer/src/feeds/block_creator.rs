@@ -65,22 +65,19 @@ pub async fn block_creator_loop<
 
             // Updates that overflowed the capacity of a block
             let mut backlog_updates = VecDeque::new();
+            let mut updates: HashMap<K, V> = Default::default();
+
+            let mut new_feeds_to_register = Vec::new();
+            let mut feeds_ids_to_delete = Vec::new();
+
+            let mut backlog_updates = &mut backlog_updates;
+            let mut updates = &mut updates;
+
+            let mut new_feeds_to_register = &mut new_feeds_to_register;
+            let mut feeds_ids_to_delete = &mut feeds_ids_to_delete;
 
             loop {
                 // Loop forever
-                let mut updates: HashMap<K, V> = Default::default();
-                // Fill the updates that overflowed the capacity of the last block
-                for _ in 0..max_feed_updates_to_batch {
-                    if let Some((k, v)) = backlog_updates.pop_front() {
-                        updates.insert(k, v);
-                    } else {
-                        break;
-                    }
-                }
-
-                let mut new_feeds_to_register = Vec::new();
-                let mut feeds_ids_to_delete = Vec::new();
-                loop {
                     // Loop collecting data, until it is time to emit a block
                     tokio::select! {
                          // This is the block generation slot
@@ -97,10 +94,21 @@ pub async fn block_creator_loop<
                                     &feed_manager_cmds_send,
                                     (block_generation_time_tracker.get_last_slot() + 1) as u64,
                                 ).await {
-                                    error!("Failed to generate block! {e}");
+                                    panic!("Failed to generate block! {e}");
                                 };
+
+                                updates.clear();
+                                new_feeds_to_register.clear();
+                                feeds_ids_to_delete.clear();
+
+                                // Fill the updates that overflowed the capacity of the last block
+                                while let Some((k, v)) = backlog_updates.pop_front() {
+                                    if updates.len() == max_feed_updates_to_batch {
+                                        break;
+                                    }
+                                    updates.insert(k, v);
+                                }
                             }
-                            break;
                         }
 
                         feed_update = vote_recv.recv() => {
@@ -111,7 +119,6 @@ pub async fn block_creator_loop<
                             recvd_feed_management_cmd_to_block(feed_management_cmd, & mut new_feeds_to_register, & mut feeds_ids_to_delete);
                         }
                     }
-                }
             }
         })
         .expect("Failed to spawn block creator!")
@@ -249,21 +256,21 @@ async fn generate_block<
     K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
     V: Debug + Clone + std::string::ToString + 'static,
 >(
-    updates: HashMap<K, V>,
-    new_feeds_to_register: Vec<RegisterNewAssetFeed>,
-    feeds_ids_to_delete: Vec<DeleteAssetFeed>,
+    updates: &HashMap<K, V>,
+    new_feeds_to_register: &Vec<RegisterNewAssetFeed>,
+    feeds_ids_to_delete: &Vec<DeleteAssetFeed>,
     batched_votes_send: &UnboundedSender<UpdateToSend<K, V>>,
     blockchain_db: &Arc<RwLock<InMemDb>>,
     feed_manager_cmds_send: &UnboundedSender<FeedsManagementCmds>,
     block_height: u64,
 ) -> eyre::Result<()> {
     let mut new_feeds_in_block = Vec::new();
-    for register_new_asset_feed in &new_feeds_to_register {
+    for register_new_asset_feed in new_feeds_to_register {
         new_feeds_in_block.push(feed_config_to_block(&register_new_asset_feed.config));
     }
 
     let mut feeds_ids_to_delete_in_block = Vec::new();
-    for delete_feed_id_cmd in &feeds_ids_to_delete {
+    for delete_feed_id_cmd in feeds_ids_to_delete {
         feeds_ids_to_delete_in_block.push(delete_feed_id_cmd.id);
     }
 
@@ -291,7 +298,7 @@ async fn generate_block<
     if updates.keys().len() > 0 {
         if let Err(e) = batched_votes_send.send(UpdateToSend {
             block_height,
-            kv_updates: updates,
+            kv_updates: updates.clone(),
         }) {
             error!(
                 "Channel for propagating batched updates to sender failed: {}",
@@ -302,7 +309,7 @@ async fn generate_block<
 
     // Process cmds to register new feeds:
     for cmd in new_feeds_to_register {
-        match feed_manager_cmds_send.send(FeedsManagementCmds::RegisterNewAssetFeed(cmd)) {
+        match feed_manager_cmds_send.send(FeedsManagementCmds::RegisterNewAssetFeed(cmd.clone())) {
             Ok(_) => info!("forward register cmd"),
             Err(e) => error!("Could not forward register cmd: {e}"),
         };
@@ -310,7 +317,7 @@ async fn generate_block<
 
     // Process cmds to delete existing feeds:
     for cmd in feeds_ids_to_delete {
-        match feed_manager_cmds_send.send(FeedsManagementCmds::DeleteAssetFeed(cmd)) {
+        match feed_manager_cmds_send.send(FeedsManagementCmds::DeleteAssetFeed(cmd.clone())) {
             Ok(_) => info!("forward delete cmd"),
             Err(e) => error!("Could not forward delete cmd: {e}"),
         };
