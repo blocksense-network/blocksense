@@ -11,6 +11,7 @@ import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 import { chainlinkFeedsDir, artifactsDir, configDir } from '../paths';
 import {
   collectRawDataFeeds,
+  aggregateNetworkInfoPerField,
   getAllProposedFeedsInRegistry,
 } from '../data-services/chainlink_feeds';
 import { RawDataFeedsSchema } from '../data-services/types';
@@ -62,6 +63,12 @@ async function main(chainlinkFeedsDir: string) {
     'raw_chainlink_feeds',
     RawDataFeedsSchema,
     () => collectRawDataFeeds(chainlinkFeedsDir),
+  );
+
+  const aggregatedDataFeeds = await getOrCreateArtifact(
+    'aggregated_chainlink_feeds',
+    null,
+    async () => aggregateNetworkInfoPerField(rawDataFeeds),
   );
 
   const feedConfig = await getOrCreateArtifact(

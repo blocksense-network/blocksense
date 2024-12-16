@@ -12,10 +12,13 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import {
+  chainlinkNetworkNameToChainId,
   decodeConfirmedFeedEvent,
   FeedRegistryEventsPerAggregator,
+  parseNetworkFilename,
 } from '../chainlink-compatibility/types';
 import { RawDataFeeds, decodeChainLinkFeedsInfo } from './types';
+import { keysOf } from '@blocksense/base-utils/array-iter';
 
 export async function collectRawDataFeeds(directoryPath: string) {
   const { readAllJSONFiles } = selectDirectory(directoryPath);
@@ -36,6 +39,67 @@ export async function collectRawDataFeeds(directoryPath: string) {
   }
 
   return rawDataFeeds;
+}
+
+type FeedData = RawDataFeeds[string]['networks'][string];
+type FeedDataFieldName = keyof FeedData;
+
+type AggregatedFeedInfo = {
+  [F in FeedDataFieldName]: {
+    [networkName in Exclude<NetworkName, 'local'>]: FeedData[F];
+  };
+};
+
+type CookedDataFeeds = {
+  [feedName: string]: AggregatedFeedInfo;
+};
+
+export function aggregateNetworkInfoPerField(
+  rawDataFeeds: RawDataFeeds,
+): CookedDataFeeds {
+  const cookedDataFeeds: CookedDataFeeds = {};
+
+  for (const feedName of Object.keys(rawDataFeeds)) {
+    const feedData = rawDataFeeds[feedName].networks;
+
+    const firstFeedData = feedData[keysOf(feedData)[0]];
+    const fieldNames = keysOf(firstFeedData);
+
+    const aggregatedFeedInfo: AggregatedFeedInfo = {} as AggregatedFeedInfo;
+
+    for (const fieldName of fieldNames) {
+      for (const chainlinkNetworkFilename of keysOf(feedData)) {
+        const chainlinkNetworkName = parseNetworkFilename(
+          chainlinkNetworkFilename,
+        );
+
+        const networkName = chainlinkNetworkNameToChainId[chainlinkNetworkName];
+        if (!networkName) {
+          // `Skipping feed '${feedName}' on network '${chainlinkNetworkName}'`,
+          continue;
+        }
+
+        const perNetworkFeedData = feedData[chainlinkNetworkFilename];
+        const fieldValue = perNetworkFeedData[fieldName];
+        aggregatedFeedInfo[fieldName] ??= {} as any;
+        aggregatedFeedInfo[fieldName][networkName] = fieldValue;
+      }
+
+      if (!aggregatedFeedInfo[fieldName]) {
+        // `Skipping field '${fieldName}' for feed '${feedName}' because it has no values`,
+        continue;
+      }
+
+      const values = new Set(Object.values(aggregatedFeedInfo[fieldName]));
+      if (values.size == 1) {
+        aggregatedFeedInfo[fieldName] = values.values().next().value;
+      }
+    }
+
+    cookedDataFeeds[feedName] = aggregatedFeedInfo;
+  }
+
+  return cookedDataFeeds;
 }
 
 export const feedRegistries: {
