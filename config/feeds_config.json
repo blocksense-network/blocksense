@@ -532,6 +532,7 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 1,
+      "skip_publish_if_less_then_percentage": 0.01,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
