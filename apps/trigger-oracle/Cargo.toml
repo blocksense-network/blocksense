@@ -13,7 +13,7 @@ crypto = { path = "../../libs/crypto"}
 utils = { path = "../../libs/utils"}
 
 anyhow = "1.0.89"
-clap = { version = "3.1.15", features = ["derive", "env"] }
+clap = { version = "4.5.22", features = ["derive", "env"] }
 futures = "0.3"
 is-terminal = "0.4.12"
 log = "0.4.21"
