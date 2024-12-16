@@ -19,9 +19,9 @@ import { generateFeedConfig } from '../feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../chainlink-compatibility/index';
 import { FeedRegistryEventsPerAggregatorSchema } from '../chainlink-compatibility/types';
 
-async function getOrCreateArtifact<A, I>(
+async function getOrCreateArtifact<A, I = A>(
   name: string,
-  schema: Schema<A, I, never>,
+  schema: Schema<A, I, never> | null,
   create: () => Promise<A>,
 ) {
   const { readJSON, writeJSON } = selectDirectory(artifactsDir);
@@ -39,7 +39,7 @@ async function getOrCreateArtifact<A, I>(
     json = await create();
     await writeJSON({ name, content: json });
   }
-  return decodeUnknownSync(schema)(json);
+  return schema ? decodeUnknownSync(schema)(json) : (json as A);
 }
 
 async function saveConfigsToDir(
