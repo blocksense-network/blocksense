@@ -7,11 +7,12 @@ import { ADFSWrapper } from '../adfs/ADFS';
 import { Feed, UpgradeableProxyCallMethods } from '../types';
 import { TransactionResponse } from 'ethers';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { ADFSGenericWrapper } from '../adfs/ADFSGeneric';
 
 export interface IUpgradeableProxyADFSWrapper
   extends IBaseWrapper<AggregatedDataFeedStore> {
   contract: UpgradeableProxyADFS;
-  implementation: ADFSWrapper;
+  implementation: ADFSWrapper | ADFSGenericWrapper;
 
   upgradeImplementation(
     newImplementation: ADFSWrapper,
