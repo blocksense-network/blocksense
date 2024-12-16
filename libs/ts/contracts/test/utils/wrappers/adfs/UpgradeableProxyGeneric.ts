@@ -1,15 +1,15 @@
 import { deployContract } from '../../../experiments/utils/helpers/common';
 import { UpgradeableProxyADFS } from '../../../../typechain';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { ADFSGenericWrapper } from './ADFSGeneric';
 import { UpgradeableProxyADFSBaseWrapper } from './UpgradeableProxyBase';
-import { ADFSWrapper } from './ADFS';
 
-export class UpgradeableProxyADFSWrapper extends UpgradeableProxyADFSBaseWrapper {
+export class UpgradeableProxyADFSGenericWrapper extends UpgradeableProxyADFSBaseWrapper {
   public async init(
     adminAddress: string,
     accessControlData: HardhatEthersSigner | string,
   ) {
-    this.implementation = new ADFSWrapper();
+    this.implementation = new ADFSGenericWrapper();
     await this.implementation.init(accessControlData);
 
     this.contract = await deployContract<UpgradeableProxyADFS>(
@@ -20,6 +20,6 @@ export class UpgradeableProxyADFSWrapper extends UpgradeableProxyADFSBaseWrapper
   }
 
   public getName(): string {
-    return 'UpgradeableProxyADFS';
+    return 'UpgradeableProxyADFSGeneric';
   }
 }

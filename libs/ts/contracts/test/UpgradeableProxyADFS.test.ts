@@ -1,6 +1,10 @@
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
-import { ADFSWrapper, UpgradeableProxyADFSWrapper } from './utils/wrappers';
+import {
+  ADFSWrapper,
+  UpgradeableProxyADFSGenericWrapper,
+  UpgradeableProxyADFSWrapper,
+} from './utils/wrappers';
 import { expect } from 'chai';
 import { Feed } from './utils/wrappers/types';
 import { IUpgradeableProxy__factory } from '../typechain';
@@ -159,6 +163,8 @@ describe('UpgradeableProxyADFS', function () {
     let historicalContractGenericWrappers: UpgradeableProxyHistoricalBaseWrapper<GenericHistoricalDataFeedStore>[] =
       [];
 
+    let genericProxy: UpgradeableProxyADFSGenericWrapper;
+
     beforeEach(async function () {
       historicalContractWrappers = [];
       historicalContractGenericWrappers = [];
@@ -187,10 +193,19 @@ describe('UpgradeableProxyADFS', function () {
         [true],
       );
 
+      genericProxy = new UpgradeableProxyADFSGenericWrapper();
+      await genericProxy.init(await admin.getAddress(), accessControlAdmin);
+
+      await genericProxy.implementation.accessControl.set(
+        accessControlAdmin,
+        [sequencer.address],
+        [true],
+      );
+
       // store no data first time in ADFS to avoid first sstore of blocknumber
       await proxy.proxyCall('setFeeds', sequencer, []);
 
-      // TODO make a generic upgradeable ADFS contract and a test wrapper for it
+      await genericProxy.proxyCall('setFeeds', sequencer, []);
     });
 
     for (let i = 1; i <= 100; i *= 10) {
@@ -200,7 +215,7 @@ describe('UpgradeableProxyADFS', function () {
           historicalContractGenericWrappers,
           historicalContractWrappers,
           [proxy],
-          [],
+          [genericProxy],
           i,
           {
             round: 1n,
@@ -212,7 +227,7 @@ describe('UpgradeableProxyADFS', function () {
           historicalContractGenericWrappers,
           historicalContractWrappers,
           [proxy],
-          [],
+          [genericProxy],
           i,
           {
             round: 2n,
@@ -226,7 +241,7 @@ describe('UpgradeableProxyADFS', function () {
           historicalContractGenericWrappers,
           historicalContractWrappers,
           [proxy],
-          [],
+          [genericProxy],
           i,
           {
             skip: 16,
@@ -239,7 +254,7 @@ describe('UpgradeableProxyADFS', function () {
           historicalContractGenericWrappers,
           historicalContractWrappers,
           [proxy],
-          [],
+          [genericProxy],
           i,
           {
             skip: 16,
