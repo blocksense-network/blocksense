@@ -36,8 +36,11 @@ async function getOrCreateArtifact<A, I = A>(
     throw new Error('Skipping cache');
   } catch {
     console.log(`Creating new artifact: '${path}'`);
+    const startTime = performance.now();
     json = await create();
+    const delta = performance.now() - startTime;
     await writeJSON({ name, content: json });
+    console.log(`Artifact '${path}' created in ${delta.toFixed(2)}ms`);
   }
   return schema ? decodeUnknownSync(schema)(json) : (json as A);
 }
