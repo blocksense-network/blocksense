@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { Feed } from './utils/wrappers/types';
-import { ADFSWrapper } from './utils/wrappers';
+import { ADFSGenericWrapper, ADFSWrapper } from './utils/wrappers';
 import {
   HistoricalDataFeedStoreBaseWrapper,
   HistoricalDataFeedStoreGenericBaseWrapper,
@@ -46,7 +46,7 @@ const feeds: Feed[] = [
   },
 ];
 
-describe('AggregatedDataFeedStore', () => {
+describe.only('AggregatedDataFeedStore', () => {
   let contract: ADFSWrapper;
   let signers: HardhatEthersSigner[];
   let accessControlOwner: HardhatEthersSigner;
@@ -166,6 +166,8 @@ describe('AggregatedDataFeedStore', () => {
     let genericContractWrappers: HistoricalDataFeedStoreGenericBaseWrapper[] =
       [];
 
+    let genericContract: ADFSGenericWrapper;
+
     beforeEach(async function () {
       contractWrappers = [];
       genericContractWrappers = [];
@@ -179,6 +181,14 @@ describe('AggregatedDataFeedStore', () => {
         HistoricalDataFeedStoreGenericV1Wrapper,
       ]);
 
+      genericContract = new ADFSGenericWrapper();
+      await genericContract.init(accessControlOwner);
+      await genericContract.accessControl.set(
+        accessControlOwner,
+        [sequencer.address],
+        [true],
+      );
+
       contract = new ADFSWrapper();
       await contract.init(accessControlOwner);
       await contract.accessControl.set(
@@ -189,8 +199,7 @@ describe('AggregatedDataFeedStore', () => {
 
       // store no data first time in ADFS to avoid first sstore of blocknumber
       await contract.setFeeds(sequencer, []);
-
-      // TODO make a generic ADFS contract and a test wrapper for it
+      await genericContract.setFeeds(sequencer, []);
     });
 
     for (let i = 1; i <= 100; i *= 10) {
@@ -200,7 +209,7 @@ describe('AggregatedDataFeedStore', () => {
           genericContractWrappers,
           contractWrappers,
           [contract],
-          [],
+          [genericContract],
           i,
           {
             round: 1n,
@@ -212,7 +221,7 @@ describe('AggregatedDataFeedStore', () => {
           genericContractWrappers,
           contractWrappers,
           [contract],
-          [],
+          [genericContract],
           i,
           {
             round: 2n,
@@ -226,7 +235,7 @@ describe('AggregatedDataFeedStore', () => {
           genericContractWrappers,
           contractWrappers,
           [contract],
-          [],
+          [genericContract],
           i,
           {
             skip: 16,
@@ -239,7 +248,7 @@ describe('AggregatedDataFeedStore', () => {
           genericContractWrappers,
           contractWrappers,
           [contract],
-          [],
+          [genericContract],
           i,
           {
             skip: 16,
