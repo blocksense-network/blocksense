@@ -245,7 +245,7 @@ export async function generateFeedConfig(
     isFeedSupported(feed, supportedCMCCurrencies),
   );
 
-  checkOnChainData(rawDataFeedsOnMainnets, feeds);
+  await checkOnChainData(rawDataFeedsOnMainnets, feeds);
 
   const feedsSortedByDescription = feeds.sort((a, b) => {
     // We hash the descriptions here, to avoid an obvious ordering.
