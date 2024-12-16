@@ -22,27 +22,27 @@
     "@blocksense/base-utils": "workspace:*",
     "@blocksense/contracts": "workspace:*",
     "@effect/data": "^0.18.7",
-    "@effect/schema": "^0.71.1",
-    "@rollup/plugin-commonjs": "^28.0.0",
+    "@effect/schema": "^0.75.5",
+    "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.1",
     "@types/keccak": "^3",
-    "@types/node": "^22.7.4",
+    "@types/node": "^22.10.2",
     "@types/rollup-plugin-peer-deps-external": "^2",
-    "effect": "^3.7.0",
+    "effect": "^3.11.7",
     "glob": "^11.0.0",
     "keccak": "^3.0.4",
     "keccak256": "^1.0.6",
-    "rollup": "^4.20.0",
-    "rollup-plugin-delete": "^2.0.0",
+    "rollup": "^4.28.1",
+    "rollup-plugin-delete": "^2.1.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-typescript2": "^0.36.0",
-    "tsx": "^4.17.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.5.4",
-    "yahoo-finance2": "^2.11.3"
+    "yahoo-finance2": "^2.13.2"
   },
   "dependencies": {
     "@blocksense/config-types": "workspace:*",
-    "web3": "^4.12.1"
+    "web3": "^4.16.0"
   }
 }
