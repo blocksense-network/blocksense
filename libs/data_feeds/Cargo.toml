@@ -15,7 +15,7 @@ crypto = { path = "../crypto" }
 feed_registry = { path = "../feed_registry"}
 config = { path = "../config"}
 
-alloy = { version = "0.7", features = [
+alloy = { version = "0.8", features = [
     "sol-types",
     "contract",
     "network",
@@ -44,7 +44,7 @@ thiserror = "1.0.64"
 tracing = { version = "0.1.41", features = ["async-await", "log"] }
 tracing-subscriber = { version = "0.3.19", features = ["json"] }
 serde_json = "1.0.128"
-serde = { version = "1.0.210", features = ["derive"] }
+serde = { version = "1.0.216", features = ["derive"] }
 erased-serde = "0.4.4"
 ringbuf = "0.4.7"
 reqwest = { version = "0.12.8", features = ["blocking", "json"] }
