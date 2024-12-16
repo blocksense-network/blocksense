@@ -1,3 +1,7 @@
+export function keysOf<K extends string>(obj: Record<K, unknown>): K[] {
+  return Object.keys(obj) as K[];
+}
+
 export function entries<K extends string, V>(obj: Record<K, V>): [K, V][] {
   return Object.entries(obj) as [K, V][];
 }
