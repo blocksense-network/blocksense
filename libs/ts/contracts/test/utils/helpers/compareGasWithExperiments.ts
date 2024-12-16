@@ -63,6 +63,6 @@ export const compareGasUsed = async <
     ] as IBaseWrapper<G>[],
     [...contractWrappers, ...adfsContractWrappers] as IBaseWrapper<B>[],
     experimentsData.receipts.concat(data.receipts),
-    experimentsData.receiptsGeneric.concat(data.receiptsGeneric),
+    data.receiptsGeneric.concat(experimentsData.receiptsGeneric),
   );
 };
