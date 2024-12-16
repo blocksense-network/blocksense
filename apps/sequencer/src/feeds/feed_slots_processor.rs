@@ -97,6 +97,7 @@ impl FeedSlotsProcessor {
         is_oneshot: bool,
         aggregator: FeedAggregate,
         history: &Arc<RwLock<FeedAggregateHistory>>,
+        feed_id: u32,
     ) -> ConsumedReports {
         let values = self.collect_repoted_values(feed_type, reports, slot);
 
@@ -157,7 +158,7 @@ impl FeedSlotsProcessor {
                 ad_score: ad_score_opt,
                 result_post_to_contract: Some(result_post_to_contract),
             };
-            info!("result_post_to_contract = {:?}", res);
+            info!("[feed {feed_id}] result_post_to_contract = {:?}", res);
             res
         }
     }
@@ -244,6 +245,7 @@ impl FeedSlotsProcessor {
                         is_oneshot,
                         aggregator,
                         history,
+                        feed_id,
                     )
                     .await;
 
