@@ -51,7 +51,9 @@ pub struct RpcProvider {
     pub contract_address: Option<Address>,
     pub event_contract_address: Option<Address>,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
-    pub transaction_timeout_secs: u32,
+    pub transaction_drop_timeout_secs: u32,
+    pub transaction_retry_timeout_secs: u32,
+    pub retry_fee_increment_fraction: f64,
     pub transaction_gas_limit: u32,
     pub data_feed_store_byte_code: Option<Vec<u8>>,
     pub data_feed_sports_byte_code: Option<Vec<u8>>,
@@ -201,7 +203,9 @@ async fn get_rpc_providers(
             provider,
             signer,
             provider_metrics: provider_metrics.clone(),
-            transaction_timeout_secs: p.transaction_timeout_secs,
+            transaction_drop_timeout_secs: p.transaction_drop_timeout_secs,
+            transaction_retry_timeout_secs: p.transaction_retry_timeout_secs,
+            retry_fee_increment_fraction: p.retry_fee_increment_fraction,
             transaction_gas_limit: p.transaction_gas_limit,
             data_feed_store_byte_code: p.data_feed_store_byte_code.clone().map(|byte_code| {
                 hex::decode(byte_code.clone())

@@ -163,6 +163,8 @@ pub async fn eth_batch_send_to_contract(
     feed_type: Repeatability,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    transaction_retry_timeout_secs: u64,
+    retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<u32>)> {
     let updates = {
         let provider = provider.lock().await;
@@ -269,24 +271,24 @@ pub async fn eth_batch_send_to_contract(
         }
     };
 
-    let mut timed_out = 0;
+    let mut timed_out_count = 0;
 
     loop {
         let tx;
-        if timed_out == 0 {
+        if timed_out_count == 0 {
             tx = TransactionRequest::default()
                 .to(contract_address)
                 .from(sender_address)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
         } else {
-            let nonce = provider
+            let nonce = prov
                 .get_transaction_count(contract_address.clone())
                 .latest()
                 .await?;
-            let price_increment = 1.0 + timed_out as f64 / 10 as f64;
-            let gas_price = provider.get_gas_price().await?;
-            let mut priority_fee = provider.get_max_priority_fee_per_gas().await?;
+            let price_increment = 1.0 + (timed_out_count as f64 * retry_fee_increment_fraction);
+            let gas_price = prov.get_gas_price().await?;
+            let mut priority_fee = prov.get_max_priority_fee_per_gas().await?;
             priority_fee = (priority_fee as f64 * price_increment) as u128;
             let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
             max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
@@ -315,9 +317,11 @@ pub async fn eth_batch_send_to_contract(
         let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
 
         let receipt_result = spawn(async move {
-            let result =
-                actix_web::rt::time::timeout(Duration::from_secs(50), receipt_future.get_receipt())
-                    .await;
+            let result = actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                receipt_future.get_receipt(),
+            )
+            .await;
             result
         })
         .await;
@@ -332,12 +336,12 @@ pub async fn eth_batch_send_to_contract(
                         }
                         Err(e) => {
                             warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}: {e}");
-                            timed_out += 1;
+                            timed_out_count += 1;
                         }
                     },
                     Err(e) => {
                         warn!("Timed out  tx={tx_str}, tx_result={tx_result_str}: {e}");
-                        timed_out += 1;
+                        timed_out_count += 1;
                     }
                 }
             }
@@ -402,6 +406,20 @@ pub async fn eth_batch_send_to_all_contracts(
         let feeds_config = sequencer_state.active_feeds.clone();
 
         for (net, p) in providers.iter() {
+            let updates = updates.clone();
+            let (
+                transaction_drop_timeout_secs,
+                transaction_retry_timeout_secs,
+                retry_fee_increment_fraction,
+            ) = {
+                let p = p.lock().await;
+                (
+                    p.transaction_drop_timeout_secs as u64,
+                    p.transaction_retry_timeout_secs as u64,
+                    p.retry_fee_increment_fraction,
+                )
+            };
+
             let net = net.clone();
 
             if let Some(provider_settings) = providers_config.get(&net) {
@@ -413,7 +431,6 @@ pub async fn eth_batch_send_to_all_contracts(
                 }
 
                 let updates = updates.clone();
-                let timeout = p.lock().await.transaction_timeout_secs as u64;
                 let provider = p.clone();
 
                 let feeds_config = feeds_config.clone();
@@ -421,7 +438,7 @@ pub async fn eth_batch_send_to_all_contracts(
                 let provider_settings = provider_settings.clone();
                 collected_futures.push(spawn(async move {
                     let result = actix_web::rt::time::timeout(
-                        Duration::from_secs(timeout),
+                        Duration::from_secs(transaction_drop_timeout_secs),
                         eth_batch_send_to_contract(
                             net.clone(),
                             provider.clone(),
@@ -430,6 +447,8 @@ pub async fn eth_batch_send_to_all_contracts(
                             feed_type,
                             Some(feeds_metrics),
                             feeds_config,
+                            transaction_retry_timeout_secs,
+                            retry_fee_increment_fraction,
                         ),
                     )
                     .await;
@@ -574,7 +593,7 @@ mod tests {
         }
     }
 
-    #[tokio::test]
+    #[actix_web::test]
     async fn test_eth_batch_send_to_oneshot_contract() {
         /////////////////////////////////////////////////////////////////////
         // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
@@ -671,6 +690,8 @@ mod tests {
             Oneshot,
             None,
             feeds_config,
+            50,
+            0.1,
         )
         .await;
         assert!(result.is_ok());

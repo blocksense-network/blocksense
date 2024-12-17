@@ -31,14 +31,26 @@ with lib; let
 
       publishing_criteria = mkOption {
         type = types.listOf (types.submodule publishingCriteriaOpts);
-        default = [ ];
+        default = [];
         description = mdDoc "List of publishing criteria for feed per provider customizationo";
       };
 
-      transaction_timeout_secs = mkOption {
+      transaction_drop_timeout_secs = mkOption {
         type = types.int;
         default = 420;
-        description = mdDoc "The timeout for transactions.";
+        description = mdDoc "The timeout for transactions to be dropped.";
+      };
+
+      transaction_retry_timeout_secs = mkOption {
+        type = types.int;
+        default = 50;
+        description = mdDoc "The timeout for transactions to be retried with higher fee.";
+      };
+
+      retry_fee_increment_fraction = mkOption {
+        type = types.int;
+        default = 0.1;
+        description = mdDoc "The increments to the gas price to apply when retry timeouts are reached.";
       };
 
       transaction_gas_limit = mkOption {
