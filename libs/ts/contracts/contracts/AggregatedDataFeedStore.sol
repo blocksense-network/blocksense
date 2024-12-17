@@ -24,7 +24,7 @@ contract AggregatedDataFeedStore {
       // Load selector from memory
       let selector := calldataload(0x00)
 
-      /* <selector 1b> <stride 1b> <X feedId length in bytes 1b> <feedId Xb> (<round 2b> <slots 4b> | <slots 4b>) */
+      /* <selector 1b> <stride 1b> <X feedId length in bytes 1b> <feedId Xb> (<round 2b> <startSlot 4b> <slots 4b> | <startSlot 4b> <slots 4b>) */
       if and(
         selector,
         0x8000000000000000000000000000000000000000000000000000000000000000
@@ -34,7 +34,7 @@ contract AggregatedDataFeedStore {
         let feedId := shr(sub(256, shl(3, feedIdLength)), shl(24, selector))
         let data := calldataload(add(feedIdLength, 3))
 
-        // getFeedAtRound(uint8 stride, uintX feedId, uint16 round, uint32 slots) returns (bytes)
+        // getFeedAtRound(uint8 stride, uintX feedId, uint16 round, uint32 startSlot, uint32 slots) returns (bytes)
         if and(
           selector,
           0x0400000000000000000000000000000000000000000000000000000000000000
@@ -44,12 +44,16 @@ contract AggregatedDataFeedStore {
           let len := 0
           let ptr := mload(0x40)
 
-          let slots := shr(224, shl(16, data))
+          let startSlot := shr(224, shl(16, data))
+          let slots := shr(224, shl(48, data))
           stride := add(stride, 1)
           // (feedId * 2**13 + round) * (stride + 1)
           let initialPos := add(
-            shl(sub(stride, 1), DATA_FEED_ADDRESS),
-            mul(add(mul(feedId, shl(13, 1)), round), stride)
+            add(
+              shl(sub(stride, 1), DATA_FEED_ADDRESS),
+              mul(add(mul(feedId, shl(13, 1)), round), stride)
+            ),
+            startSlot
           )
 
           for {
@@ -94,17 +98,21 @@ contract AggregatedDataFeedStore {
           mstore(ptr, round)
         }
 
-        // getLatestData(uint8 stride, uintX feedId, uint32 slots) returns (bytes)
+        // getLatestData(uint8 stride, uintX feedId, uint32 startSlot, uint32 slots) returns (bytes)
         if and(
           selector,
           0x0200000000000000000000000000000000000000000000000000000000000000
         ) {
-          let slots := shr(224, data)
-          stride := add(stride, 1)
-          // (feedId * 2**13 + round) * (stride + 1)
+          let startSlot := shr(224, data)
+          let slots := shr(224, shl(32, data))
+
+          // (feedId * 2**13 + round) * 2**stride
           let initialPos := add(
-            shl(sub(stride, 1), DATA_FEED_ADDRESS),
-            mul(add(mul(feedId, shl(13, 1)), round), stride)
+            add(
+              shl(stride, DATA_FEED_ADDRESS),
+              mul(add(mul(feedId, shl(13, 1)), round), shl(stride, 1))
+            ),
+            startSlot
           )
 
           for {

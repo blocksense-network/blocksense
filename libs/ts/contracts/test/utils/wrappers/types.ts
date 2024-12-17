@@ -12,6 +12,8 @@ export interface Feed {
   round: bigint;
   stride: bigint;
   data: string;
+  startSlotToReadFrom?: number;
+  slotsToRead?: number;
 }
 
 export type UpgradeableProxyCallMethods = Omit<

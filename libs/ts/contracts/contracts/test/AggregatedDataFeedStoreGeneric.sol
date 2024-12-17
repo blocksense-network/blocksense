@@ -38,42 +38,53 @@ contract AggregatedDataFeedStoreGeneric {
   function getLatestData(
     uint256 stride,
     uint256 feedId,
+    uint256 startSlot,
     uint256 slots
   ) public view returns (bytes memory) {
-    return _getData(getLatestRound(stride, feedId), stride, feedId, slots);
+    return
+      _getData(
+        getLatestRound(stride, feedId),
+        stride,
+        feedId,
+        startSlot,
+        slots
+      );
   }
 
   function getFeedAtRound(
     uint256 stride,
     uint256 feedId,
     uint256 round,
+    uint256 startSlot,
     uint256 slots
   ) public view returns (bytes memory) {
-    return _getData(round, stride, feedId, slots);
+    return _getData(round, stride, feedId, startSlot, slots);
   }
 
   function getLatestDataAndRound(
     uint256 stride,
     uint256 feedId,
+    uint256 startSlot,
     uint256 slots
   ) external view returns (uint256, bytes memory) {
     uint256 round = getLatestRound(stride, feedId);
-    return (round, getFeedAtRound(stride, feedId, round, slots));
+    return (round, getFeedAtRound(stride, feedId, round, startSlot, slots));
   }
 
   function _getData(
     uint256 round,
     uint256 stride,
     uint256 feedId,
+    uint256 startSlot,
     uint256 slots
   ) internal view returns (bytes memory data) {
-    uint256 pos = (uint256(uint160(DATA_FEED_ADDRESS)) << stride) +
-      (feedId * 2 ** 13 + round) *
-      (stride + 1);
+    uint256 pos = startSlot +
+      (uint256(uint160(DATA_FEED_ADDRESS)) << stride) +
+      (feedId * (2 ** 13) + round) *
+      (2 ** stride);
 
     assembly {
-      let ptr := mload(0x40)
-      data := mload(ptr)
+      data := mload(0x40)
       let j := 32
       for {
         let i := 0
@@ -86,7 +97,7 @@ contract AggregatedDataFeedStoreGeneric {
       }
 
       mstore(data, mul(slots, 32))
-      mstore(0x40, add(ptr, j))
+      mstore(0x40, add(data, j))
     }
   }
 
@@ -117,10 +128,8 @@ contract AggregatedDataFeedStoreGeneric {
       uint256 length = data_.length;
       for (uint256 j = 0; j < length; j++) {
         bytes32 dataSlice = data_[j];
-        bytes32 test;
         assembly {
           sstore(add(shl(stride, DATA_FEED_ADDRESS), add(index, j)), dataSlice)
-          test := add(shl(stride, DATA_FEED_ADDRESS), add(index, j))
         }
       }
     }
@@ -128,7 +137,7 @@ contract AggregatedDataFeedStoreGeneric {
     for (uint256 i = 0; i < roundTableIndices.length; i++) {
       uint256 index = roundTableIndices[i];
 
-      require(index < 2 ** 115);
+      require(index <= 2 ** 116);
 
       bytes32 dataSlice = roundTableData[i];
       assembly {

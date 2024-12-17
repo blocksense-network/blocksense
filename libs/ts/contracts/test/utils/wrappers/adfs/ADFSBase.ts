@@ -39,7 +39,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
         ...opts.txData,
       });
 
-      expect(storedValue).to.equal(this.formatData(feed.data));
+      expect(storedValue).to.equal(this.formatData(feed));
     }
   }
 
@@ -75,7 +75,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
         ...opts.txData,
       });
 
-      expect(storedValue).to.equal(this.formatData(feed.data));
+      expect(storedValue).to.equal(this.formatData(feed));
     }
   }
 
@@ -94,9 +94,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       });
 
       expect(storedValue).to.be.equal(
-        ethers
-          .toBeHex(feed.round, 32)
-          .concat(this.formatData(feed.data).slice(2)),
+        ethers.toBeHex(feed.round, 32).concat(this.formatData(feed).slice(2)),
       );
     }
   }
@@ -161,8 +159,6 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
         .slice(2);
     });
 
-    feeds.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-
     const batchFeeds: { [key: string]: string } = {};
 
     feeds.forEach(feed => {
@@ -220,12 +216,15 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
         feed.id,
       ],
     );
-    const slots = Math.ceil((feed.data.length - 2) / 64);
+    const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
 
     if (operation === ReadOp.GetFeedAtRound) {
       return prefix.concat(
         ethers
-          .solidityPacked(['uint16', 'uint32'], [feed.round, slots])
+          .solidityPacked(
+            ['uint16', 'uint32', 'uint32'],
+            [feed.round, feed.startSlotToReadFrom ?? 0n, slots],
+          )
           .slice(2),
       );
     }
@@ -234,15 +233,28 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       operation === ReadOp.GetLatestFeed ||
       operation === ReadOp.GetLatestFeedAndRound
     ) {
-      return prefix.concat(ethers.solidityPacked(['uint32'], [slots]).slice(2));
+      return prefix.concat(
+        ethers
+          .solidityPacked(
+            ['uint32', 'uint32'],
+            [feed.startSlotToReadFrom ?? 0n, slots],
+          )
+          .slice(2),
+      );
     }
 
     return prefix;
   };
 
-  public formatData = (data: string) => {
-    const slots = Math.ceil((data.length - 2) / 64);
-    return '0x' + data.slice(2).padStart(slots * 64, '0');
+  public formatData = (feed: Feed) => {
+    const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
+    const startIndex = 2 + (feed.startSlotToReadFrom ?? 0) * 64;
+    return (
+      '0x' +
+      feed.data
+        .slice(startIndex, startIndex + slots * 64)
+        .padStart(slots * 64, '0')
+    );
   };
 
   public abstract init(
