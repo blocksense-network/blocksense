@@ -61,3 +61,34 @@ export const isUpgradeableProxy = (
     (contract as IUpgradeableProxyADFSWrapper).implementation !== undefined
   );
 };
+
+export const generateRandomFeeds = (count: number): Feed[] => {
+  const feeds: Feed[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const stride = BigInt(Math.floor(Math.random() * 32));
+    const data = ethers.hexlify(ethers.randomBytes(Number(stride + 1n) * 32));
+    const maxSlots = Math.floor(
+      Math.random() * Math.ceil((data.length - 2) / 64) + 1,
+    );
+    const startSlotToReadFrom = Math.floor(Math.random() * maxSlots);
+
+    feeds.push({
+      // random number between 0 and 2**115
+      id: BigInt(Math.floor(Math.random() * (2 ** 115 + 1))),
+      // random number between 0 and 2**13
+      round: BigInt(Math.floor(Math.random() * 2 ** 13 + 1)),
+      // random number between 0 and 31
+      stride,
+      // random bytes depending on the stride (here we won't use max numbers to avoid overflow)
+      data,
+      // random number between 0 and maxSlots - 1
+      startSlotToReadFrom,
+      // random number between 1 and maxSlots - startSlotToReadFrom
+      slotsToRead:
+        Math.floor(Math.random() * (maxSlots - startSlotToReadFrom)) + 1,
+    });
+  }
+
+  return feeds;
+};

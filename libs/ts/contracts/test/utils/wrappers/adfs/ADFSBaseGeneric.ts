@@ -40,7 +40,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
       });
 
       expect(new ethers.AbiCoder().decode(['bytes'], storedValue)[0]).to.equal(
-        this.formatData(feed.data),
+        this.formatData(feed),
       );
     }
   }
@@ -78,7 +78,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
       });
 
       expect(new ethers.AbiCoder().decode(['bytes'], storedValue)[0]).to.equal(
-        this.formatData(feed.data),
+        this.formatData(feed),
       );
     }
   }
@@ -102,8 +102,10 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
         storedValue,
       );
 
+      // console.log('feed', feed);
+
       expect(parsed[0]).to.be.equal(feed.round);
-      expect(parsed[1]).to.be.equal(this.formatData(feed.data));
+      expect(parsed[1]).to.be.equal(this.formatData(feed));
     }
   }
 
@@ -137,8 +139,6 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     const indices = feeds.map(
       feed => (feed.id * 2n ** 13n + feed.round) * 2n ** feed.stride,
     );
-
-    feeds.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 
     const batchFeeds: { [key: string]: string } = {};
 
@@ -181,13 +181,14 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
   };
 
   public encodeDataRead = (operation: ReadOp, feed: Feed) => {
-    const slots = Math.ceil((feed.data.length - 2) / 64);
+    const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
 
     switch (operation) {
       case ReadOp.GetLatestFeed:
         return this.contract.interface.encodeFunctionData('getLatestData', [
           feed.stride,
           feed.id,
+          feed.startSlotToReadFrom ?? 0,
           slots,
         ]);
       case ReadOp.GetLatestRound:
@@ -200,21 +201,29 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
           feed.stride,
           feed.id,
           feed.round,
+          feed.startSlotToReadFrom ?? 0,
+
           slots,
         ]);
       case ReadOp.GetLatestFeedAndRound:
         return this.contract.interface.encodeFunctionData(
           'getLatestDataAndRound',
-          [feed.stride, feed.id, slots],
+          [feed.stride, feed.id, feed.startSlotToReadFrom ?? 0, slots],
         );
       default:
         throw new Error('Invalid operation');
     }
   };
 
-  public formatData = (data: string) => {
-    const slots = Math.ceil((data.length - 2) / 64);
-    return '0x' + data.slice(2).padEnd(slots * 64, '0');
+  public formatData = (feed: Feed) => {
+    const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
+    const startIndex = 2 + (feed.startSlotToReadFrom ?? 0) * 64;
+    return (
+      '0x' +
+      feed.data
+        .slice(startIndex, startIndex + slots * 64)
+        .padEnd(slots * 64, '0')
+    );
   };
 
   public abstract init(

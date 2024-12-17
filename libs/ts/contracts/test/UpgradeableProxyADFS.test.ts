@@ -88,7 +88,7 @@ describe('UpgradeableProxyADFS', function () {
 
     const valueV2 = (await proxy.proxyCall('getValues', sequencer, [feed]))[0];
 
-    expect(valueV1).to.be.equal(proxy.implementation.formatData(feed.data));
+    expect(valueV1).to.be.equal(proxy.implementation.formatData(feed));
     expect(valueV1).to.be.equal(valueV2);
   });
 

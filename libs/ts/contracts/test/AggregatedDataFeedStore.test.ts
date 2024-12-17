@@ -12,6 +12,7 @@ import {
 } from './experiments/utils/wrappers';
 import { initWrappers } from './experiments/utils/helpers/common';
 import { compareGasUsed } from './utils/helpers/compareGasWithExperiments';
+import { generateRandomFeeds } from './utils/helpers/common';
 
 const feeds: Feed[] = [
   {
@@ -46,7 +47,7 @@ const feeds: Feed[] = [
   },
 ];
 
-describe.only('AggregatedDataFeedStore', () => {
+describe('AggregatedDataFeedStore', () => {
   let contract: ADFSWrapper;
   let signers: HardhatEthersSigner[];
   let accessControlOwner: HardhatEthersSigner;
@@ -159,6 +160,13 @@ describe.only('AggregatedDataFeedStore', () => {
         data,
       }),
     ).to.be.reverted;
+  });
+
+  it('Should read from contract multiple slots', async () => {
+    const feeds = generateRandomFeeds(15);
+
+    await contract.setFeeds(sequencer, feeds);
+    await contract.checkLatestFeedAndRound(sequencer, feeds);
   });
 
   describe('Compare gas usage', function () {
