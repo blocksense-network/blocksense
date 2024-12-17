@@ -1,6 +1,9 @@
 import * as S from '@effect/schema/Schema';
 
-import { FeedCategorySchema } from '@blocksense/config-types/data-feeds-config';
+import {
+  FeedCategorySchema,
+  MarketHoursSchema,
+} from '@blocksense/config-types/data-feeds-config';
 
 /**
  * Schema for the ChainLink feed information.
@@ -30,6 +33,7 @@ const ChainLinkFeedInfoSchema = S.Struct({
     assetName: S.NullishOr(S.String),
     baseAsset: S.NullishOr(S.String),
     quoteAsset: S.NullishOr(S.String),
+    marketHours: S.NullishOr(MarketHoursSchema),
   }),
 }).annotations({ identifier: 'ChainLinkFeedInfo' });
 
