@@ -3,17 +3,18 @@ pragma solidity ^0.8.24;
 
 import {IUpgradeableProxy} from './interfaces/IUpgradeableProxy.sol';
 
-/// @title UpgradeableProxy
+/// @title UpgradeableProxyADFS
 /// @notice Transaprent proxy contract that allows the implementation to be upgraded
 /// @dev This contract is based on the OpenZeppelin UpgradeableProxy contract
 contract UpgradeableProxyADFS {
   /// @notice Slot for the implementation address
-  /// @dev The slot is high enough to prevent storage collisions
-  /// This is the keccak-256 hash of "eip1967.proxy.implementation" subtracted by 1.
+  /// @dev The first 4096 addresses are reserved for management values
+  /// The first address (0x0000) is reserved for the blocknumber
+  /// For more information, see libs/ts/contracts/contracts/AggregatedDataFeedStore.sol
   bytes32 internal constant IMPLEMENTATION_SLOT =
     0x0000000000000000000000000000000000000000000000000000000000000001;
 
-  /// @notice Admin of the contract
+  /// @notice Slot for the admin of the uprgadeable proxy
   bytes32 internal constant ADMIN_SLOT =
     0x0000000000000000000000000000000000000000000000000000000000000002;
 
@@ -33,8 +34,10 @@ contract UpgradeableProxyADFS {
 
   /// @notice Fallback function
   /// @dev The fallback function is used to delegate calls to the implementation contract
-  /// If the sender is the admin, the function will dispatch the upgrade to a new implementation
-  /// The admin can only call this contract to upgrade the implementation
+  /// If the sender is the admin, the function will either upgrade to a new
+  /// implementation or change the admin, depending on the message signature.
+  /// The admin can only call this contract to modify the proxy, not call the
+  /// proxied contract.
   fallback() external payable {
     bool isAdmin;
 
@@ -94,6 +97,8 @@ contract UpgradeableProxyADFS {
     emit Upgraded(newImplementation);
   }
 
+  /// @notice Change the owner of the upgradable proxy
+  /// @param newAdmin The address of the new admin
   function _setAdmin(address newAdmin) internal {
     if (newAdmin == address(0)) {
       revert InvalidUpgrade(newAdmin);
