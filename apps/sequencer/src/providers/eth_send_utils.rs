@@ -293,7 +293,7 @@ pub async fn eth_batch_send_to_all_contracts<
     sequencer_state: Data<SequencerState>,
     updates: HashMap<K, V>,
     feed_type: Repeatability,
-) -> Result<String> {
+) -> String {
     let span = info_span!("eth_batch_send_to_all_contracts");
     let _guard = span.enter();
     debug!("updates: {:?}", updates);
@@ -378,7 +378,7 @@ pub async fn eth_batch_send_to_all_contracts<
         }
         all_results += "\n"
     }
-    Ok(all_results)
+    all_results
 }
 
 #[cfg(test)]
@@ -649,10 +649,7 @@ mod tests {
 
         let result =
             eth_batch_send_to_all_contracts(sequencer_state, updates_oneshot, Oneshot).await;
-        // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
-        // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
-        // followups
-        assert!(result.is_ok());
+        assert_eq!("result from network ETH375: Ok -> \"true\"\nresult from network ETH374: Ok -> \"true\"\n", result);
     }
 
     #[test]
