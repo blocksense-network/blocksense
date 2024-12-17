@@ -1,3 +1,4 @@
+use alloy::primitives::utils::format_ether;
 use alloy::providers::Provider;
 use alloy::transports::http::Http;
 use alloy::{
@@ -43,6 +44,8 @@ pub fn parse_eth_address(addr: &str) -> Option<Address> {
     contract_address
 }
 
+const RPC_INITIAL_CHECK_TIMEOUT: Duration = Duration::from_secs(5);
+
 #[derive(Debug)]
 pub struct RpcProvider {
     pub provider: ProviderType,
@@ -63,7 +66,7 @@ pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr:
     let bytecode = match provider.lock().await.provider.get_code_at(*addr).await {
         Ok(result) => result,
         Err(e) => {
-            error!("Could not get bytecode of contract: {}", e);
+            error!("Could not get bytecode of contract: {e}");
             return false;
         }
     };
@@ -79,6 +82,7 @@ pub async fn init_shared_rpc_providers(
 }
 
 async fn verify_contract_exists(
+    contract_type: &str,
     key: &str,
     address: &Option<String>,
     rpc_provider: Arc<Mutex<RpcProvider>>,
@@ -86,12 +90,11 @@ async fn verify_contract_exists(
     if let Some(addr_str) = address {
         if let Some(addr) = parse_eth_address(addr_str.as_str()) {
             info!(
-                "Contract address for network {} set to {}. Checking if contract exists ...",
-                key, addr
+                "{contract_type} contract address for network {key} set to {addr}. Checking if contract exists ..."
             );
             match spawn(async move {
                 actix_web::rt::time::timeout(
-                    Duration::from_secs(5),
+                    RPC_INITIAL_CHECK_TIMEOUT,
                     can_read_contract_bytecode(rpc_provider, &addr),
                 )
                 .await
@@ -101,30 +104,45 @@ async fn verify_contract_exists(
                 Ok(result) => match result {
                     Ok(exists) => {
                         if exists {
-                            info!("Contract for network {} exists on address {}", key, addr);
+                            info!(
+                                "{contract_type} contract for network {key} exists on address {addr}"
+                            );
                         } else {
-                            warn!("No contract for network {} exists on address {}", key, addr);
+                            warn!(
+                                "No {contract_type} contract for network {key} exists on address {addr}"
+                            );
                         }
                     }
                     Err(e) => {
-                        warn!(
-                            "JSON rpc request to verify contract existence timed out: {}",
-                            e
-                        );
+                        warn!("JSON rpc request to verify contract existence timed out: {e}");
                     }
                 },
                 Err(e) => {
-                    error!("Task join error: {}", e)
+                    error!("Task join error: {e}")
                 }
             };
         } else {
             error!(
-                "Set contract address for network {} is not a valid Ethereum contract address!",
-                key
+                "Set contract address for network {key} is not a valid Ethereum contract address!"
             );
         }
     } else {
-        warn!("No contract address set for network {}", key);
+        warn!("No {contract_type} contract address set for network {key}");
+    }
+}
+
+async fn get_balance_of_signer(rpc_provider: Arc<Mutex<RpcProvider>>) -> eyre::Result<String> {
+    // Fetch balance in wei (smallest Ether unit)
+    let address = rpc_provider.lock().await.signer.address();
+
+    let result = actix_web::rt::time::timeout(
+        RPC_INITIAL_CHECK_TIMEOUT,
+        rpc_provider.lock().await.provider.get_balance(address),
+    )
+    .await?;
+    match result {
+        Ok(balance) => Ok(format_ether(balance)),
+        Err(e) => eyre::bail!("{e}"),
     }
 }
 
@@ -145,15 +163,13 @@ async fn get_rpc_providers(
             .unwrap_or_else(|_| panic!("Not a valid url provided for {key}!"));
         let priv_key_path = &p.private_key_path;
         let priv_key = fs::read_to_string(priv_key_path.clone()).unwrap_or_else(|_| {
-            panic!(
-                "Failed to read private key for {} from {}",
-                key, priv_key_path
-            )
+            panic!("Failed to read private key for {key} from {priv_key_path}")
         });
         let signer: PrivateKeySigner = priv_key
             .trim()
             .parse()
-            .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
+            .unwrap_or_else(|_| panic!("Incorrect private key specified {priv_key}."));
+        let signer_address = signer.address();
         let provider = ProviderBuilder::new()
             .with_recommended_fillers()
             .wallet(EthereumWallet::from(signer.clone()))
@@ -194,16 +210,36 @@ async fn get_rpc_providers(
 
         // Verify contract_address
         // If contract does not exist statements are logged and the process continues
-        verify_contract_exists(key, &p.contract_address, rpc_provider.clone()).await;
+        verify_contract_exists("Asset", key, &p.contract_address, rpc_provider.clone()).await;
 
         // Verify event_contract_address
         // If contract does not exist statements are logged and the process continues
-        verify_contract_exists(key, &p.event_contract_address, rpc_provider.clone()).await;
+        verify_contract_exists(
+            "Event",
+            key,
+            &p.event_contract_address,
+            rpc_provider.clone(),
+        )
+        .await;
+
+        info!(
+            "Transaction timeout for network {key} set to {0} seconds",
+            p.transaction_timeout_secs
+        );
+
+        match get_balance_of_signer(rpc_provider).await {
+            Ok(ether_balance) => {
+                info!("Balance of {signer_address} in network {key}: {ether_balance} tokens")
+            }
+            Err(e) => {
+                warn!("Could not get balance of {signer_address} in network {key} due to: {e}")
+            }
+        }
     }
 
     debug!("List of providers:");
     for (key, value) in &providers {
-        debug!("{}: {:?}", key, value);
+        debug!("{key}: {value:?}");
     }
 
     providers
