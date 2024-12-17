@@ -112,3 +112,19 @@ export type FeedsConfig = S.Schema.Type<typeof FeedsConfigSchema>;
  * Function to decode Data Feeds configuration.
  */
 export const decodeFeedsConfig = S.decodeUnknownSync(FeedsConfigSchema);
+
+/**
+ * Schema for the data feed market hours ( Chainlink compatible ).
+ */
+export const MarketHoursSchema = S.Union(
+  S.Literal('Crypto'),
+  S.Literal('Forex'),
+  S.Literal('FX'),
+  S.Literal('MI_ETF'),
+  S.Literal('NYMEX'),
+  S.Literal('Precious_Metals'),
+  S.Literal('UK_ETF'),
+  S.Literal('US_Equities'),
+).annotations({ identifier: 'MarketHours' });
+
+export type MarketHours = S.Schema.Type<typeof MarketHoursSchema>;
