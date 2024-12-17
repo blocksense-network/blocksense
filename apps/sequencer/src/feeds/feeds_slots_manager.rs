@@ -274,6 +274,7 @@ pub async fn register_feed_with_config(
             new_feed_config.report_interval_ms,
             new_feed_config.quorum_percentage,
             new_feed_config.skip_publish_if_less_then_percentage,
+            new_feed_config.always_publish_heartbeat_ms,
             new_feed_config.first_report_start_time,
             new_feed_config.value_type.clone(),
             new_feed_config.aggregate_type.clone(),

@@ -890,10 +890,10 @@ mod tests {
     async fn new_test_sequencer_state(
         sequencer_config: &SequencerConfig,
         feeds_config: &AllFeedsConfig,
-        metrix_prefix: &str,
+        metics_prefix: &str,
     ) -> SequencerState {
         let log_handle = init_shared_logging_handle("INFO", false);
-        let metrics_prefix = Some(metrix_prefix);
+        let metrics_prefix = Some(metics_prefix);
         let (vote_send, _vote_recv) = mpsc::unbounded_channel();
         let (feeds_management_cmd_send, _feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
         let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
@@ -1079,6 +1079,7 @@ mod tests {
             resources: HashMap::from([]),
             quorum_percentage: 1.0f32,
             skip_publish_if_less_then_percentage: 0.0f32,
+            always_publish_heartbeat_ms: None,
             script: "script".to_string(),
             value_type: "Numerical".to_string(),
             aggregate_type: "Average".to_string(),

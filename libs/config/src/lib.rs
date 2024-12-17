@@ -76,6 +76,8 @@ pub struct FeedConfig {
     pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
     #[serde(default = "skip_publish_if_less_then_percentage_default")]
     pub skip_publish_if_less_then_percentage: f32,
+    #[serde(default)]
+    pub always_publish_heartbeat_ms: Option<u128>,
     pub script: String,
     pub value_type: String,
     pub aggregate_type: String,
@@ -128,6 +130,18 @@ impl Validated for FeedConfig {
                 context, self.name, self.id, self.skip_publish_if_less_then_percentage,
             );
         }
+        if let Some(value) = self.always_publish_heartbeat_ms {
+            let max_always_publis_heartbeat_ms = 24 * 60 * 60 * 1000;
+            if value > max_always_publis_heartbeat_ms {
+                anyhow::bail!(
+                    "{}: always_publish_heartbeat_ms for feed {} with id {} must be less then {} ms",
+                    context,
+                    self.name,
+                    self.id,
+                    max_always_publis_heartbeat_ms,
+                );
+            }
+        };
         Ok(())
     }
 }

@@ -50,11 +50,13 @@ impl FeedMetaDataRegistry {
 pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let start = SystemTime::now();
     let skip_publish_if_less_then_percentage = 0.0f32; // 0%
+    let always_publish_heartbeat_ms = None;
     let fmd1 = FeedMetaData::new(
         "DOGE/USD",
         60000,
         60.0f32, // 60%
         skip_publish_if_less_then_percentage,
+        always_publish_heartbeat_ms,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -65,6 +67,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         30000,
         60.0f32, // 60%
         skip_publish_if_less_then_percentage,
+        always_publish_heartbeat_ms,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -75,6 +78,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         60000,
         60.0f32, // 60%
         skip_publish_if_less_then_percentage,
+        always_publish_heartbeat_ms,
         start,
         "Numerical".to_string(),
         "Average".to_string(),
@@ -101,6 +105,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
                 feed.report_interval_ms,
                 feed.quorum_percentage,
                 feed.skip_publish_if_less_then_percentage,
+                feed.always_publish_heartbeat_ms,
                 feed.first_report_start_time,
                 feed.value_type.clone(),
                 feed.aggregate_type.clone(),
@@ -572,6 +577,7 @@ mod tests {
 
         // voting will be 30 seconds long
         let voting_wait_duration_ms = 30000;
+        let always_publish_heartbeat_ms = None;
 
         let oneshot_feed = FeedMetaData::new_oneshot(
             "TestFeed".to_string(),
@@ -584,6 +590,7 @@ mod tests {
             voting_wait_duration_ms,
             10.0f32, // 10%
             1.0f32,  // 1%
+            always_publish_heartbeat_ms,
             current_system_time,
             "Numeric".to_string(),
             "Average".to_string(),

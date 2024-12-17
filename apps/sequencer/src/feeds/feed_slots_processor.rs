@@ -92,6 +92,8 @@ impl FeedSlotsProcessor {
         slot: u64,
         quorum_percentage: f32,
         skip_publish_if_less_then_percentage: f64,
+        always_publish_heartbeat_ms: Option<u128>,
+        end_slot_timestamp: Timestamp,
         num_valid_reporters: usize,
         is_oneshot: bool,
         aggregator: FeedAggregate,
@@ -142,10 +144,12 @@ impl FeedSlotsProcessor {
                     }
                     if skip_publish_if_less_then_percentage > 0.0f64 {
                         skip_publishing = self
-                            .check_skip_publish_if_less_then_percentage(
+                            .check_skip_publish(
                                 history,
                                 candidate_value,
                                 skip_publish_if_less_then_percentage,
+                                end_slot_timestamp,
+                                always_publish_heartbeat_ms,
                             )
                             .await;
                     }
@@ -200,6 +204,8 @@ impl FeedSlotsProcessor {
         report_interval_ms: u64,
         quorum_percentage: f32,
         skip_publish_if_less_then_percentage: f64,
+        always_publish_heartbeat_ms: Option<u128>,
+        end_slot_timestamp: Timestamp,
         aggregator: FeedAggregate,
         slot: u64,
         feed_type: &FeedType,
@@ -240,6 +246,8 @@ impl FeedSlotsProcessor {
                         slot,
                         quorum_percentage,
                         skip_publish_if_less_then_percentage,
+                        always_publish_heartbeat_ms,
+                        end_slot_timestamp,
                         num_valid_reporters,
                         is_oneshot,
                         aggregator,
@@ -322,24 +330,35 @@ impl FeedSlotsProcessor {
             .map_err(|e| eyre!("[post_to_contract]: {e}"))
     }
 
-    async fn check_skip_publish_if_less_then_percentage(
+    async fn check_skip_publish(
         &self,
         history: &Arc<RwLock<FeedAggregateHistory>>,
         candidate_value: f64,
         skip_publish_if_less_then_percentage: f64,
+        end_slot_timestamp: Timestamp,
+        always_publish_heartbeat_ms: Option<u128>,
     ) -> bool {
         let feed_id = self.key;
         debug!("Get a read lock on history [feed {feed_id}]");
         let history_guard = history.read().await;
-        let res = match history_guard.last_value(feed_id) {
-            Some(FeedType::Numerical(last)) => {
-                let a = f64::abs(*last);
-                let b = f64::abs(candidate_value);
-                let diff = f64::abs(last - candidate_value);
-                diff * 100.0f64 < skip_publish_if_less_then_percentage * f64::max(a, b)
-            }
-            _ => false,
-        };
+        let res =
+            history_guard
+                .last(feed_id)
+                .is_some_and(|last_published| match last_published.value {
+                    FeedType::Numerical(last) => {
+                        let a = f64::abs(last);
+                        let b = f64::abs(candidate_value);
+                        let diff = f64::abs(last - candidate_value);
+                        let skip_time_check =
+                            always_publish_heartbeat_ms.map_or(true, |heartbeat| {
+                                end_slot_timestamp < heartbeat + last_published.end_slot_timestamp
+                            });
+                        let skip_diff_check =
+                            diff * 100.0f64 < skip_publish_if_less_then_percentage * f64::max(a, b);
+                        skip_diff_check && skip_time_check
+                    }
+                    _ => false,
+                });
         debug!("Release the read lock on history [feed {feed_id}]");
         res
     }
@@ -435,6 +454,7 @@ impl FeedSlotsProcessor {
             first_report_start_time,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
+            always_publish_heartbeat_ms,
             aggregator,
             feed_type,
         ) = {
@@ -446,6 +466,7 @@ impl FeedSlotsProcessor {
                 datafeed.get_first_report_start_time_ms(),
                 datafeed.get_quorum_percentage(),
                 datafeed.get_skip_publish_if_less_then_percentage() as f64,
+                datafeed.get_always_publish_heartbeat_ms(),
                 datafeed.get_feed_aggregator(),
                 datafeed.value_type.clone(),
             )
@@ -509,11 +530,15 @@ impl FeedSlotsProcessor {
                 _ = feed_slots_time_tracker
                 .await_end_of_current_slot(&repeatability) => {
                     is_processed = true;
+                    let end_slot_timestamp = first_report_start_time + (report_interval_ms as u128) * (slot as u128 + 1);
+
                     match self.process_end_of_slot(
                         is_oneshot,
                         report_interval_ms,
                         quorum_percentage,
                         skip_publish_if_less_then_percentage,
+                        always_publish_heartbeat_ms,
+                        end_slot_timestamp,
                         aggregator,
                         slot,
                         &feed_type,
@@ -521,7 +546,6 @@ impl FeedSlotsProcessor {
                         history,
                         ).await {
                             Ok(consumed_reports) => {
-                                let end_slot_timestamp = first_report_start_time + (report_interval_ms as u128) * (slot as u128 + 1);
                                 if let Err(e) = self.post_consumed_reports(consumed_reports,
                                     end_slot_timestamp,
                                      feed_metrics.clone(),
@@ -545,6 +569,7 @@ mod tests {
 
     use super::*;
     use config::get_test_config_with_single_provider;
+    use config::AllFeedsConfig;
     use config::Reporter;
     use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::AllFeedsReports;
@@ -554,19 +579,71 @@ mod tests {
     use tokio::sync::RwLock;
     use utils::test_env::get_test_private_key_path;
 
+    use crate::providers::provider::init_shared_rpc_providers;
+    use crate::reporters::reporter::init_shared_reporters;
+    use blockchain_data_model::in_mem_db::InMemDb;
+    use config::SequencerConfig;
+    use feed_registry::registry::new_feeds_meta_data_reg_from_config;
+    use tokio::sync::mpsc::UnboundedReceiver;
+    use utils::logging::init_shared_logging_handle;
+
+    async fn new_test_sequencer_state(
+        sequencer_config: &SequencerConfig,
+        feeds_config: &AllFeedsConfig,
+        metics_prefix: &str,
+    ) -> (SequencerState, UnboundedReceiver<(String, String)>) {
+        let log_handle = init_shared_logging_handle("INFO", false);
+        let metrics_prefix = Some(metics_prefix);
+        let (vote_send, vote_recv) = mpsc::unbounded_channel();
+        let (feeds_management_cmd_send, _feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
+        let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
+
+        let sequencer_state = SequencerState {
+            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
+                &feeds_config,
+            ))),
+            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+            providers: providers.clone(),
+            log_handle,
+            reporters: init_shared_reporters(sequencer_config, metrics_prefix),
+            feed_id_allocator: Arc::new(RwLock::new(None)),
+            voting_send_channel: vote_send,
+            feeds_metrics: Arc::new(RwLock::new(
+                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
+                    .expect("Failed to allocate feed_metrics"),
+            )),
+            active_feeds: Arc::new(RwLock::new(
+                feeds_config
+                    .feeds
+                    .clone()
+                    .into_iter()
+                    .map(|feed| (feed.id, feed))
+                    .collect(),
+            )),
+            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            feeds_management_cmd_send,
+            blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+        };
+        (sequencer_state, vote_recv)
+    }
+
     #[tokio::test]
     async fn test_feed_slots_processor_loop() {
         // setup
-        let name = "test_feed";
+        let name = "test_feed_slots_processor_loop";
+        let metrics_prefix = name;
         let report_interval_ms = 1000; // 1 second interval
         let quorum_percentage = 100.0; // 100%
         let skip_publish_if_less_then_percentage = 10.0; // 10%
         let first_report_start_time = SystemTime::now();
+        let always_publish_heartbeat_ms = None;
         let feed_metadata = FeedMetaData::new(
             name,
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
+            always_publish_heartbeat_ms,
             first_report_start_time,
             "Numerical".to_string(),
             "Average".to_string(),
@@ -587,8 +664,7 @@ mod tests {
         );
 
         let (sequencer_state, mut rx) =
-            create_sequencer_state_from_sequencer_config(cfg, "test_feed_slots_processor_loop")
-                .await;
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -663,7 +739,8 @@ mod tests {
         // voting will be 3 seconds long
         let voting_wait_duration_ms = 3000;
 
-        let name = "test_feed";
+        let name = "test_process_oneshot_feed";
+        let metics_prefix = name;
         let feed_metadata = FeedMetaData::new_oneshot(
             name.to_string(),
             voting_wait_duration_ms,
@@ -686,7 +763,7 @@ mod tests {
         );
 
         let (sequencer_state, mut rx) =
-            create_sequencer_state_from_sequencer_config(cfg, "test_process_oneshot_feed").await;
+            create_sequencer_state_from_sequencer_config(cfg, metics_prefix).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -776,16 +853,19 @@ mod tests {
     async fn test_feed_slots_processor_loop_with_quorum() {
         // A test that with quorum 0.6 and one of two reporters only reported then nothing should be written.
         // setup
-        let name = "test_feed_with_quorum";
+        let name = "test_feed_slots_processor_loop_with_quorum";
+        let metrics_prefix = name;
         let report_interval_ms = 100; // 0.1 second interval
         let quorum_percentage = 60.0f32;
         let skip_publish_if_less_then_percentage = 10.0f32; // 10%
         let first_report_start_time = SystemTime::now();
+        let always_publish_heartbeat_ms = None;
         let feed_metadata = FeedMetaData::new(
             name,
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
+            always_publish_heartbeat_ms,
             first_report_start_time,
             "Numerical".to_string(),
             "Average".to_string(),
@@ -810,11 +890,8 @@ mod tests {
             id: 14,
             pub_key: "ea30813e2f8cf968e27bad29167b41bce038a3ce9b7b368de05e5cf1af3de919eeba267b8706f55c356d5f71891eff116b98".to_string(),
         });
-        let (sequencer_state, mut rx) = create_sequencer_state_from_sequencer_config(
-            cfg,
-            "test_feed_slots_processor_loop_with_quorum",
-        )
-        .await;
+        let (sequencer_state, mut rx) =
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix).await;
         //info!()
         let num_reporteds = sequencer_state.reporters.read().await.len();
         assert_eq!(num_reporteds, 2);
@@ -877,16 +954,20 @@ mod tests {
     #[tokio::test]
     async fn test_feed_slots_processor_loop_skip_publish_based_on_low_diviation() {
         // setup
-        let name = "test_feed_low_diviation";
+        let name = "test_feed_slots_processor_loop_skip_publish_based_on_low_diviation";
+        let metrics_prefix = name;
         let report_interval_ms = 100; // 0.1 second interval
         let quorum_percentage = 100.0f32; //100%
         let skip_publish_if_less_then_percentage = 10.0f32; // 10%
-        let first_report_start_time = SystemTime::now();
+        let first_report_start_time =
+            SystemTime::now() - Duration::from_millis(report_interval_ms * 3);
+        let always_publish_heartbeat_ms = None;
         let feed_metadata = FeedMetaData::new(
             name,
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
+            always_publish_heartbeat_ms,
             first_report_start_time,
             "Numerical".to_string(),
             "Average".to_string(),
@@ -904,11 +985,8 @@ mod tests {
             "http://localhost:8545",
         );
 
-        let (sequencer_state, mut rx) = create_sequencer_state_from_sequencer_config(
-            cfg,
-            "test_feed_slots_processor_loop_skip_publish_based_on_low_diviation",
-        )
-        .await;
+        let (sequencer_state, mut rx) =
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -988,16 +1066,21 @@ mod tests {
     #[tokio::test]
     async fn test_feed_slots_processor_loop_skip_publish_based_on_low_diviation_2() {
         // setup
-        let name = "test_feed_low_diviation_2";
+        let name = "test_feed_slots_processor_loop_skip_publish_based_on_low_diviation_2";
+        let metrics_prefix = name;
+
         let report_interval_ms = 100; // 0.1 second interval
         let quorum_percentage = 100.0f32; // 100%
         let skip_publish_if_less_then_percentage = 10.0f32; // 10%
-        let first_report_start_time = SystemTime::now();
+        let first_report_start_time =
+            SystemTime::now() - Duration::from_millis(report_interval_ms * 3);
+        let always_publish_heartbeat_ms = None;
         let feed_metadata = FeedMetaData::new(
             name,
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
+            always_publish_heartbeat_ms,
             first_report_start_time,
             "Numerical".to_string(),
             "Average".to_string(),
@@ -1015,11 +1098,8 @@ mod tests {
             "http://localhost:8545",
         );
 
-        let (sequencer_state, mut rx) = create_sequencer_state_from_sequencer_config(
-            cfg,
-            "test_feed_slots_processor_loop_skip_publish_based_on_low_diviation_2",
-        )
-        .await;
+        let (sequencer_state, mut rx) =
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -1097,6 +1177,147 @@ mod tests {
             }
             Err(_) => {
                 panic!("The channel did not receive any data within the timeout period");
+            }
+        }
+    }
+
+    async fn run_feed_slots_processor_loop_always_publish_heartbeat(
+        name: &str,
+        always_publish_heartbeat_ms: Option<u128>,
+    ) -> std::result::Result<Option<(String, String)>, tokio::time::error::Elapsed> {
+        let metrics_prefix = name;
+        let report_interval_ms = 100; // 0.1 second interval
+        let quorum_percentage = 60.0f32; // 60 %
+        let skip_publish_if_less_then_percentage = 50.0f32; // 50%
+        let first_report_start_time =
+            SystemTime::now() - Duration::from_millis(report_interval_ms * 3);
+        let feed_metadata = FeedMetaData::new(
+            name,
+            report_interval_ms,
+            quorum_percentage,
+            skip_publish_if_less_then_percentage,
+            always_publish_heartbeat_ms,
+            first_report_start_time,
+            "Numerical".to_string(),
+            "Average".to_string(),
+            None,
+        );
+        let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
+        let history = Arc::new(RwLock::new(FeedAggregateHistory::new()));
+
+        let network = "ETH2";
+        let key_path = get_test_private_key_path();
+
+        let cfg = get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            "http://localhost:8545",
+        );
+        let all_feed_config = AllFeedsConfig { feeds: vec![] };
+        let (sequencer_state, mut rx) =
+            new_test_sequencer_state(&cfg, &all_feed_config, metrics_prefix).await;
+
+        // we are specifically sending only one report message as we don't want to test the average processor
+        {
+            let feed_id = 1;
+            let reporter_id = 42;
+            let original_report_data = FeedType::Numerical(102.0);
+
+            sequencer_state
+                .reports
+                .write()
+                .await
+                .push(feed_id, reporter_id, Ok(original_report_data.clone()))
+                .await;
+        }
+
+        // run
+        let feed_id = 1;
+        let name = name.to_string();
+        let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
+        {
+            let mut history_guard = history.write().await;
+            history_guard.register_feed(feed_id, 10_000);
+            let since_the_epoch = first_report_start_time
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards");
+            let slot_start_in_ms = since_the_epoch.as_millis();
+            history_guard.push(
+                feed_id,
+                FeedType::Numerical(102.1),
+                slot_start_in_ms + 1 * report_interval_ms as u128,
+            );
+        }
+
+        tokio::spawn(async move {
+            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
+            let sequencer_state = Data::new(sequencer_state);
+            feed_slots_processor
+                .start_loop(
+                    &sequencer_state,
+                    &feed_metadata_arc_clone,
+                    &history,
+                    None,
+                    cmd_recv,
+                    Some(cmd_send),
+                )
+                .await
+                .unwrap();
+        });
+
+        // Attempt to receive with a timeout of 0.2 seconds
+        tokio::time::timeout(Duration::from_millis(200), rx.recv()).await
+    }
+
+    #[tokio::test]
+    async fn test_feed_slots_processor_loop_always_publish_heartbeat() {
+        // setup
+        let name = "test_feed_slots_processor_loop_always_publish_heartbeat";
+        let always_publish_heartbeat_ms = Some(300_u128);
+        let received = run_feed_slots_processor_loop_always_publish_heartbeat(
+            name,
+            always_publish_heartbeat_ms,
+        )
+        .await;
+        match received {
+            Ok(Some((key, result))) => {
+                let feed_id = 1_u32;
+                assert_eq!(
+                    key,
+                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
+                    "The key does not match the expected value"
+                );
+                assert_eq!(result, naive_packing(FeedType::Numerical(102.0)));
+            }
+            Ok(None) => {
+                panic!("The channel was closed before receiving any data");
+            }
+            Err(_) => {
+                panic!("The channel did not receive any data within the timeout period");
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_feed_slots_processor_loop_always_publish_heartbeat_2() {
+        // setup
+        let name = "test_feed_slots_processor_loop_always_publish_heartbeat_2";
+        let always_publish_heartbeat_ms = Some(600_u128);
+        let received = run_feed_slots_processor_loop_always_publish_heartbeat(
+            name,
+            always_publish_heartbeat_ms,
+        )
+        .await;
+        match received {
+            Ok(Some((_key, _result))) => {
+                panic!("This update should be skipped based on diviation criteria");
+            }
+            Ok(None) => {
+                panic!("The channel was closed before receiving any data");
+            }
+            Err(_) => {
+                info!("This looks fine");
             }
         }
     }

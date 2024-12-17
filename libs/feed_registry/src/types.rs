@@ -37,6 +37,7 @@ pub struct FeedMetaData {
     pub report_interval_ms: u64, // Consider oneshot feeds.
     pub quorum_percentage: f32,
     pub skip_publish_if_less_then_percentage: f32,
+    pub always_publish_heartbeat_ms: Option<u128>,
     first_report_start_time: SystemTime,
     feed_aggregator: FeedAggregate,
     pub value_type: String,
@@ -52,12 +53,14 @@ impl FeedMetaData {
         first_report_start_time: SystemTime,
     ) -> FeedMetaData {
         let skip_publish_if_less_then_percentage = 0.0f32;
+        let always_publish_heartbeat_ms = None;
         FeedMetaData {
             name,
             voting_repeatability: Repeatability::Oneshot,
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
+            always_publish_heartbeat_ms,
             first_report_start_time,
             feed_aggregator: FeedAggregate::MajorityVoteAggregator,
             value_type: "Text".to_string(),
@@ -72,6 +75,7 @@ impl FeedMetaData {
         report_interval_ms: u64, // Consider oneshot feeds.
         quorum_percentage: f32,
         skip_publish_if_less_then_percentage: f32,
+        always_publish_heartbeat_ms: Option<u128>,
         first_report_start_time: SystemTime,
         value_type: String,
         aggregate_type: String,
@@ -83,6 +87,7 @@ impl FeedMetaData {
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
+            always_publish_heartbeat_ms,
             first_report_start_time,
             feed_aggregator: get_aggregator(aggregate_type.as_str()), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
             value_type,
@@ -107,6 +112,10 @@ impl FeedMetaData {
     pub fn get_skip_publish_if_less_then_percentage(&self) -> f32 {
         self.skip_publish_if_less_then_percentage
     }
+    pub fn get_always_publish_heartbeat_ms(&self) -> Option<u128> {
+        self.always_publish_heartbeat_ms
+    }
+
     pub fn get_first_report_start_time_ms(&self) -> u128 {
         let since_the_epoch = self
             .first_report_start_time
