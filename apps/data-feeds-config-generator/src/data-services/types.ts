@@ -1,6 +1,6 @@
 import * as S from '@effect/schema/Schema';
 
-import { FeedTypeSchema } from '@blocksense/config-types/data-feeds-config';
+import { FeedCategorySchema } from '@blocksense/config-types/data-feeds-config';
 
 /**
  * Schema for the ChainLink feed information.
@@ -24,7 +24,7 @@ const ChainLinkFeedInfoSchema = S.Struct({
   threshold: S.Number,
   valuePrefix: S.String,
   assetName: S.String,
-  feedType: FeedTypeSchema,
+  feedType: FeedCategorySchema,
   decimals: S.Number,
   docs: S.Struct({
     assetName: S.NullishOr(S.String),

@@ -1,9 +1,9 @@
 import * as S from '@effect/schema/Schema';
 
 /**
- * Schema for the data feed types ( Chainlink compatible ).
+ * Schema for the data feed category ( Chainlink compatible ).
  */
-export const FeedTypeSchema = S.Union(
+export const FeedCategorySchema = S.Union(
   S.Literal(''),
   S.Literal('crypto'),
   S.Literal('Crypto'),
@@ -18,12 +18,12 @@ export const FeedTypeSchema = S.Union(
   S.Literal('Economic index'),
   S.Literal('US Treasuries'),
   S.Literal('Tokenized Asset'),
-).annotations({ identifier: 'FeedType' });
+).annotations({ identifier: 'FeedCategory' });
 
 /**
- * Type for the data feed types.
+ * Type for the data feed categories.
  */
-export type FeedType = S.Schema.Type<typeof FeedTypeSchema>;
+export type FeedCategory = S.Schema.Type<typeof FeedCategorySchema>;
 
 /**
  * Schema for the scripts that can be used to fetch data.
@@ -72,7 +72,7 @@ export const FeedSchema = S.mutable(
     id: S.Number,
     name: S.String,
     fullName: S.String,
-    type: FeedTypeSchema,
+    type: FeedCategorySchema,
     description: S.String,
     decimals: S.Number,
     script: ScriptSchema,

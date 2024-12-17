@@ -12,6 +12,7 @@ import {
   FeedType,
   Pair,
   decodeScript,
+  FeedCategory,
 } from '@blocksense/config-types/data-feeds-config';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
@@ -57,7 +58,7 @@ function feedFromChainLinkFeedInfo(
 }
 async function isFeedSupported(
   feed: {
-    type: FeedType;
+    type: FeedCategory;
     pair: Pair;
     description: string;
     fullName: string;
