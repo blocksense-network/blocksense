@@ -114,6 +114,18 @@ export type FeedsConfig = S.Schema.Type<typeof FeedsConfigSchema>;
 export const decodeFeedsConfig = S.decodeUnknownSync(FeedsConfigSchema);
 
 /**
+ * Schema for the data feed type.
+ */
+export const FeedTypeSchema = S.Union(S.Literal('price-feed')).annotations({
+  identifier: 'FeedType',
+});
+
+/**
+ * Type for the data feed type.
+ */
+export type FeedType = S.Schema.Type<typeof FeedTypeSchema>;
+
+/**
  * Schema for the data feed market hours ( Chainlink compatible ).
  */
 export const MarketHoursSchema = S.Union(
