@@ -5,7 +5,7 @@ import { BybitAssetsFetcher } from './bybit';
 import { CMCAssetFetcher } from './cmc';
 import { KrakenAssetsFetcher } from './kraken';
 import { UpbitAssetsFetcher } from './upbit';
-import { artifactsDir } from '../../paths';
+import { dataProvidersDir } from '../../paths';
 
 export async function fetchSymbols() {
   const [
@@ -23,7 +23,7 @@ export async function fetchSymbols() {
   ]);
 
   {
-    const { writeJSON } = selectDirectory(artifactsDir);
+    const { writeJSON } = selectDirectory(dataProvidersDir);
     const symbolFiles = [
       { content: { supportedBinanceSymbols }, name: 'binance_symbols' },
       { content: { supportedBybitSymbols }, name: 'bybit_symbols' },
@@ -42,7 +42,7 @@ console.log(
 fetchSymbols()
   .then(() => {
     console.log(
-      `Symbols fetched successfully.\nData saved to ${artifactsDir}.`,
+      `Symbols fetched successfully.\nData saved to ${dataProvidersDir}.`,
     );
   })
   .catch(e => {
