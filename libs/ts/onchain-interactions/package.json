@@ -1,0 +1,24 @@
+{
+  "name": "@blocksense/onchain-interactions",
+  "packageManager": "yarn@4.3.1",
+  "scripts": {
+    "ts": "yarn node --import tsx",
+    "get-wallets-balances": "yarn ts src/balance-script.ts",
+    "calculate-cost": "yarn ts src/cost-calculations.ts",
+    "unstuck-transaction": "yarn ts src/unstuck-transaction.ts"
+  },
+  "dependencies": {
+    "@types/node": "^22.10.1",
+    "axios": "^1.7.9",
+    "chalk": "^5.3.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.4",
+    "web3": "^4.15.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@types/yargs": "^17.0.33",
+    "tsx": "^4.19.2"
+  }
+}

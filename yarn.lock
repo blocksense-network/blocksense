@@ -969,6 +969,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/onchain-interactions@workspace:libs/ts/onchain-interactions":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/onchain-interactions@workspace:libs/ts/onchain-interactions"
+  dependencies:
+    "@blocksense/base-utils": "workspace:*"
+    "@types/node": "npm:^22.10.1"
+    "@types/yargs": "npm:^17.0.33"
+    axios: "npm:^1.7.9"
+    chalk: "npm:^5.3.0"
+    dotenv: "npm:^16.4.7"
+    ethers: "npm:^6.13.4"
+    tsx: "npm:^4.19.2"
+    web3: "npm:^4.15.0"
+    yargs: "npm:^17.7.2"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/sol-reflector@workspace:*, @blocksense/sol-reflector@workspace:libs/ts/sol-reflector":
   version: 0.0.0-use.local
   resolution: "@blocksense/sol-reflector@workspace:libs/ts/sol-reflector"
@@ -5651,7 +5668,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.10.2":
+"@types/node@npm:^22.10.1, @types/node@npm:^22.10.2":
   version: 22.10.2
   resolution: "@types/node@npm:22.10.2"
   dependencies:
@@ -5761,6 +5778,22 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/af36857b804e6df615b401bacf34e9312f073ed9dbeda35be16ee3352d18a4449f27066169893166a6ec17ae51557c3adf8d232ac4a4a0226aafb3267e1f1b39
+  languageName: node
+  linkType: hard
+
+"@types/yargs-parser@npm:*":
+  version: 21.0.3
+  resolution: "@types/yargs-parser@npm:21.0.3"
+  checksum: 10c0/e71c3bd9d0b73ca82e10bee2064c384ab70f61034bbfb78e74f5206283fc16a6d85267b606b5c22cb2a3338373586786fed595b2009825d6a9115afba36560a0
+  languageName: node
+  linkType: hard
+
+"@types/yargs@npm:^17.0.33":
+  version: 17.0.33
+  resolution: "@types/yargs@npm:17.0.33"
+  dependencies:
+    "@types/yargs-parser": "npm:*"
+  checksum: 10c0/d16937d7ac30dff697801c3d6f235be2166df42e4a88bf730fa6dc09201de3727c0a9500c59a672122313341de5f24e45ee0ff579c08ce91928e519090b7906b
   languageName: node
   linkType: hard
 
@@ -7095,6 +7128,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.7.9":
+  version: 1.7.9
+  resolution: "axios@npm:1.7.9"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10c0/b7a41e24b59fee5f0f26c1fc844b45b17442832eb3a0fb42dd4f1430eb4abc571fe168e67913e8a1d91c993232bd1d1ab03e20e4d1fee8c6147649b576fc1b0b
+  languageName: node
+  linkType: hard
+
 "axobject-query@npm:^4.1.0":
   version: 4.1.0
   resolution: "axobject-query@npm:4.1.0"
@@ -7613,6 +7657,13 @@ __metadata:
     escape-string-regexp: "npm:^1.0.5"
     supports-color: "npm:^5.3.0"
   checksum: 10c0/e6543f02ec877732e3a2d1c3c3323ddb4d39fbab687c23f526e25bd4c6a9bf3b83a696e8c769d078e04e5754921648f7821b2a2acfd16c550435fd630026e073
+  languageName: node
+  linkType: hard
+
+"chalk@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "chalk@npm:5.3.0"
+  checksum: 10c0/8297d436b2c0f95801103ff2ef67268d362021b8210daf8ddbe349695333eb3610a71122172ff3b0272f1ef2cf7cc2c41fdaa4715f52e49ffe04c56340feed09
   languageName: node
   linkType: hard
 
@@ -21205,7 +21256,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web3@npm:^4.16.0":
+"web3@npm:^4.15.0, web3@npm:^4.16.0":
   version: 4.16.0
   resolution: "web3@npm:4.16.0"
   dependencies:
