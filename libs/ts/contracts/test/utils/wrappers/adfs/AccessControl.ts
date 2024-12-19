@@ -22,35 +22,53 @@ export class AccessControlWrapper {
     return 'AccessControl';
   }
 
-  public async set(
-    signer: HardhatEthersSigner,
-    addresses: string[],
+  /**
+   * @param owner - Owner of the contract.
+   * @param adminAddresses - Addresses of the admins.
+   * @param states - States of the admins.
+   * @dev Sets the states of the admins.
+   * The owner can set the states of the admins.
+   * If the `owner` is not the owner of the contract, the function will not do anything.
+   **/
+  public async setAdminStates(
+    owner: HardhatEthersSigner,
+    adminAddresses: string[],
     states: boolean[],
   ) {
     const encodedData = ethers.solidityPacked(
-      [...addresses.map(() => ['address', 'bool']).flat()],
-      [...addresses.map((addr, i) => [addr, states[i]]).flat()],
+      [...adminAddresses.map(() => ['address', 'bool']).flat()],
+      [...adminAddresses.map((addr, i) => [addr, states[i]]).flat()],
     );
 
-    await signer.sendTransaction({
+    await owner.sendTransaction({
       to: this.contract.target,
       data: encodedData,
     });
   }
 
+  /**
+   * @param caller - Caller of the function.
+   * @param addresses - Addresses of the admins.
+   * @param expected - Expected states of the admins.
+   **/
   public async checkAdmin(
-    signer: HardhatEthersSigner,
+    caller: HardhatEthersSigner,
     addresses: string[],
     expected: bigint[],
   ) {
     for (const [index, address] of addresses.entries()) {
-      const res = await this.isAdmin(signer, address);
+      const res = await this.isAdmin(caller, address);
       expect(res).to.be.equal(expected[index]);
     }
   }
 
-  public async isAdmin(signer: HardhatEthersSigner, address: string) {
-    return signer.call({
+  /**
+   * @param caller - Caller of the function.
+   * @param address - Address of the admin.
+   * @returns - State of the admin.
+   **/
+  public async isAdmin(caller: HardhatEthersSigner, address: string) {
+    return caller.call({
       to: this.contract.target,
       data: address,
     });

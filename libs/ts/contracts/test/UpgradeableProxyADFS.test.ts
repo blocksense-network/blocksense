@@ -42,7 +42,7 @@ describe('UpgradeableProxyADFS', function () {
     proxy = new UpgradeableProxyADFSWrapper();
     await proxy.init(await admin.getAddress(), accessControlAdmin);
 
-    await proxy.implementation.accessControl.set(
+    await proxy.implementation.accessControl.setAdminStates(
       accessControlAdmin,
       [sequencer.address],
       [true],
@@ -187,7 +187,7 @@ describe('UpgradeableProxyADFS', function () {
       proxy = new UpgradeableProxyADFSWrapper();
       await proxy.init(await admin.getAddress(), accessControlAdmin);
 
-      await proxy.implementation.accessControl.set(
+      await proxy.implementation.accessControl.setAdminStates(
         accessControlAdmin,
         [sequencer.address],
         [true],
@@ -196,7 +196,7 @@ describe('UpgradeableProxyADFS', function () {
       genericProxy = new UpgradeableProxyADFSGenericWrapper();
       await genericProxy.init(await admin.getAddress(), accessControlAdmin);
 
-      await genericProxy.implementation.accessControl.set(
+      await genericProxy.implementation.accessControl.setAdminStates(
         accessControlAdmin,
         [sequencer.address],
         [true],
