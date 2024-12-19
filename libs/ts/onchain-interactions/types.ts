@@ -23,18 +23,8 @@ export const deployedNetworks = [
 ] as const;
 
 export const API_KEYS: Record<string, string> = {
-  arbitrumSepolia: getEnvStringNotAssert('ARBITRUM_ETHERSCAN_API_KEY'),
-  avalancheFuji: getEnvStringNotAssert('AVALANCHE_FUJI_ETHERSCAN_API_KEY'),
-  baseSepolia: getEnvStringNotAssert('BASE_ETHERSCAN_API_KEY'),
-  bscTestnet: getEnvStringNotAssert('BSC_ETHERSCAN_API_KEY'),
-  celoAlfajores: getEnvStringNotAssert('CELO_ETHERSCAN_API_KEY'),
   ethereumHolesky: getEnvStringNotAssert('ETHERSCAN_API_KEY'),
   ethereumSepolia: getEnvStringNotAssert('ETHERSCAN_API_KEY'),
-  fantomTestnet: getEnvStringNotAssert('FTM_ETHERSCAN_API_KEY'),
-  lineaSepolia: getEnvStringNotAssert('LINEASCAN_API_KEY'),
-  optimismSepolia: getEnvStringNotAssert('OPTIMISM_ETHERSCAN_API_KEY'),
-  polygonAmoy: getEnvStringNotAssert('POLYGONSCAN_API_KEY'),
-  polygonZkevmCardona: getEnvStringNotAssert('POLYGONSCAN_API_KEY'),
 };
 
 export const API_ENDPOINTS = {
