@@ -12,7 +12,11 @@
   } // (import ./lib lib);
 
   perSystem =
-    { inputs', pkgs, ... }:
+    {
+      inputs',
+      pkgs,
+      ...
+    }:
     let
       rustToolchain =
         with inputs'.fenix.packages;
@@ -30,6 +34,7 @@
       ldLibraryPath = lib.makeLibraryPath [
         pkgs.openssl
         pkgs.curl
+        pkgs.rdkafka
       ];
 
       cargoWrapped = pkgs.writeShellScriptBin "cargo" ''
