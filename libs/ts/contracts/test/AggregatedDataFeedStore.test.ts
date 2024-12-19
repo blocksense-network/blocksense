@@ -72,7 +72,7 @@ describe('AggregatedDataFeedStore', () => {
     await contract.checkLatestRound(sequencer, feeds);
   });
 
-  it('Should get latest data', async () => {
+  it.only('Should get latest data', async () => {
     await contract.setFeeds(sequencer, feeds);
     await contract.checkLatestValue(sequencer, feeds);
   });

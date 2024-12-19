@@ -125,7 +125,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   }
 
   public encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
-    blockNumber ??= Date.now() + 100;
+    blockNumber ??= 1234567890;
     const prefix = ethers.solidityPacked(
       ['bytes1', 'uint64', 'uint32'],
       ['0x00', blockNumber, feeds.length],
@@ -135,6 +135,10 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       const index = (feed.id * 2n ** 13n + feed.round) * 2n ** feed.stride;
       const indexInBytesLength = Math.ceil(index.toString(2).length / 8);
       const bytes = (feed.data.length - 2) / 2;
+      console.log(`DEBUG: feed.data =`, feed.data);
+
+      console.log(`DEBUG: the len of bytes = `, bytes);
+
       const bytesLength = Math.ceil(bytes.toString(2).length / 8);
 
       return ethers
@@ -159,6 +163,8 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
         .slice(2);
     });
 
+    console.log(`DEBUG: data =`, data);
+
     const batchFeeds: { [key: string]: string } = {};
 
     feeds.forEach(feed => {
@@ -172,6 +178,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
 
       // Convert round to 2b hex and pad if needed
       const roundHex = feed.round.toString(16).padStart(4, '0');
+      console.log(`roundHes = `, roundHex);
 
       // Calculate position in the 32b row (64 hex chars)
       const position = slotPosition * 4;
@@ -197,6 +204,14 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
           .slice(2);
       })
       .join('');
+
+    console.log(`batchFeeds = `);
+    console.log(batchFeeds);
+
+    console.log(
+      "prefix.concat(data.join('')).concat(roundData) = ",
+      prefix.concat(data.join('')).concat(roundData),
+    );
 
     return prefix.concat(data.join('')).concat(roundData);
   };

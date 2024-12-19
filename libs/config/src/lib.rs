@@ -81,6 +81,7 @@ pub struct FeedConfig {
     pub script: String,
     pub value_type: String,
     pub aggregate_type: String,
+    pub stride: u16,
 }
 
 fn skip_publish_if_less_then_percentage_default() -> f32 {
@@ -211,6 +212,9 @@ pub struct Provider {
 
     #[serde(default)]
     pub publishing_criteria: Vec<PublishCriteria>,
+
+    #[serde(default = "default_is_enabled")]
+    pub is_legacy_contract: bool, // TODO: remove when migration ot ADFS contracts is complete
 }
 
 fn default_is_enabled() -> bool {
@@ -367,6 +371,7 @@ pub fn get_test_config_with_single_provider(
                 allow_feeds: None,
                 publishing_criteria: vec![],
                 impersonated_anvil_account: None,
+                is_legacy_contract: true,
             },
         )]),
         reporters: Vec::new(),
@@ -398,6 +403,7 @@ pub fn get_test_config_with_multiple_providers(
                 allow_feeds: None,
                 publishing_criteria: vec![],
                 impersonated_anvil_account: None,
+                is_legacy_contract: true,
             },
         );
     }

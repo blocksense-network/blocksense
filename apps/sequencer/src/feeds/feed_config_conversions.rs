@@ -30,6 +30,7 @@ pub fn feed_config_to_block(feed_config: &config::FeedConfig) -> BlockFeedConfig
         script: string_to_data_chunk(&feed_config.script),
         value_type: string_to_data_chunk(&feed_config.value_type),
         aggregate_type: string_to_data_chunk(&feed_config.aggregate_type),
+        stride: feed_config.stride,
     }
 }
 
@@ -97,6 +98,7 @@ pub fn block_feed_to_feed_config(block_feed: &BlockFeedConfig) -> config::FeedCo
         script: data_chunk_to_string(&block_feed.script),
         value_type: data_chunk_to_string(&block_feed.value_type),
         aggregate_type: data_chunk_to_string(&block_feed.aggregate_type),
+        stride: block_feed.stride,
     }
 }
 

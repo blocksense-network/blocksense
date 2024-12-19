@@ -58,6 +58,7 @@ pub struct RpcProvider {
     pub impersonated_anvil_account: Option<Address>,
     pub history: FeedAggregateHistory,
     pub publishing_criteria: HashMap<u32, PublishCriteria>,
+    pub is_legacy_contract: bool,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -213,6 +214,7 @@ async fn get_rpc_providers(
             impersonated_anvil_account,
             history,
             publishing_criteria,
+            is_legacy_contract: p.is_legacy_contract,
         }));
 
         providers.insert(key.clone(), rpc_provider.clone());
@@ -236,6 +238,8 @@ async fn get_rpc_providers(
 }
 
 use data_feeds::feeds_processing::VotedFeedUpdate;
+
+use crate::UpdateToSend;
 impl RpcProvider {
     pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {
         for update in updates.iter() {
@@ -245,16 +249,20 @@ impl RpcProvider {
         }
     }
 
-    pub fn apply_publish_criteria(&self, updates: &[VotedFeedUpdate]) -> Vec<VotedFeedUpdate> {
-        updates
-            .iter()
-            .filter(|update| {
-                self.publishing_criteria
-                    .get(&update.feed_id)
-                    .is_none_or(|criteria| !update.should_skip(criteria, &self.history))
-            })
-            .cloned()
-            .collect::<Vec<VotedFeedUpdate>>()
+    pub fn apply_publish_criteria(&self, updates: UpdateToSend) -> UpdateToSend {
+        UpdateToSend {
+            block_height: updates.block_height,
+            updates: updates
+                .updates
+                .iter()
+                .filter(|update| {
+                    self.publishing_criteria
+                        .get(&update.feed_id)
+                        .is_none_or(|criteria| !update.should_skip(criteria, &self.history))
+                })
+                .cloned()
+                .collect::<Vec<VotedFeedUpdate>>(),
+        }
     }
 }
 // pub fn print_type<T>(_: &T) {
