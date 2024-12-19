@@ -2,6 +2,7 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { BinanceAssetsFetcher } from './binance';
 import { BybitAssetsFetcher } from './bybit';
+import { CoinbaseExchangeAssetsFetcher } from './coinbase-exchange';
 import { CMCAssetFetcher } from './cmc';
 import { KrakenAssetsFetcher } from './kraken';
 import { UpbitAssetsFetcher } from './upbit';
@@ -11,12 +12,14 @@ export async function fetchSymbols() {
   const [
     supportedBinanceSymbols,
     supportedBybitSymbols,
+    supportedCoinbaseExchangeSymbols,
     supportedUpbitSymbols,
     supportedKrakenSymbols,
     supportedCMCCurrencies,
   ] = await Promise.all([
     new BinanceAssetsFetcher().fetchAssets(),
     new BybitAssetsFetcher().fetchAssets(),
+    new CoinbaseExchangeAssetsFetcher().fetchAssets(),
     new UpbitAssetsFetcher().fetchAssets(),
     new KrakenAssetsFetcher().fetchAssets(),
     new CMCAssetFetcher().fetchAssets(),
@@ -27,6 +30,10 @@ export async function fetchSymbols() {
     const symbolFiles = [
       { content: { supportedBinanceSymbols }, name: 'binance_symbols' },
       { content: { supportedBybitSymbols }, name: 'bybit_symbols' },
+      {
+        content: { supportedCoinbaseExchangeSymbols },
+        name: 'coinbase_exchange_symbols',
+      },
       { content: { supportedUpbitSymbols }, name: 'upbit_symbols' },
       { content: { supportedKrakenSymbols }, name: 'kraken_symbols' },
       { content: { supportedCMCCurrencies }, name: 'cmc_currencies' },
