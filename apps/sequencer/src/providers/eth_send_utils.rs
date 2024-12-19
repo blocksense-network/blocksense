@@ -282,6 +282,7 @@ pub async fn eth_batch_send_to_contract(
                 .from(sender_address)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
+            debug!("Sending initial tx: {tx:?}");
         } else {
             let nonce = prov
                 .get_transaction_count(contract_address.clone())
@@ -301,6 +302,7 @@ pub async fn eth_batch_send_to_contract(
                 .max_priority_fee_per_gas(priority_fee)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
+            debug!("Retrying for {timed_out_count}-th time tx: {tx:?}");
         }
 
         let tx_str = format!("{tx:?}");
