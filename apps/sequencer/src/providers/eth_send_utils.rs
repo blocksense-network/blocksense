@@ -1,11 +1,3 @@
-use crate::{
-    providers::{
-        adfs_gen_calldata::adfs_serialize_updates,
-        provider::{parse_eth_address, ProviderStatus},
-    },
-    sequencer_state::SequencerState,
-    UpdateToSend,
-};
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
     dyn_abi::DynSolValue,
@@ -22,13 +14,17 @@ use std::{collections::HashMap, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 use utils::to_hex_string;
 
-use crate::providers::provider::{RpcProvider, SharedRpcProviders};
-use prometheus::{metrics::FeedsMetrics, process_provider_getter};
-
+use crate::{
+    providers::adfs_gen_calldata::adfs_serialize_updates,
+    providers::provider::{parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders},
+    sequencer_state::SequencerState,
+    UpdateToSend,
+};
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_metric_by};
+use prometheus::{metrics::FeedsMetrics, process_provider_getter};
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
 
@@ -282,7 +278,7 @@ pub async fn eth_batch_send_to_contract(
                 .from(sender_address)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
-            debug!("Sending initial tx: {tx:?}");
+            debug!("[retry test] Sending initial tx: {tx:?}");
         } else {
             let nonce = prov
                 .get_transaction_count(contract_address.clone())
@@ -302,7 +298,7 @@ pub async fn eth_batch_send_to_contract(
                 .max_priority_fee_per_gas(priority_fee)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
-            debug!("Retrying for {timed_out_count}-th time tx: {tx:?}");
+            debug!("[retry test] Retrying for {timed_out_count}-th time tx: {tx:?}");
         }
 
         let tx_str = format!("{tx:?}");
