@@ -4,7 +4,11 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import { API_ENDPOINTS, API_KEYS, Transaction } from '../types';
-import { networkMetadata, NetworkName } from '@blocksense/base-utils/evm';
+import {
+  getOptionalRpcUrl,
+  networkMetadata,
+  NetworkName,
+} from '@blocksense/base-utils/evm';
 import { deployedNetworks } from '../types';
 import { kebabToCamelCase } from '@blocksense/base-utils/string';
 import { logToFile } from '@blocksense/base-utils/logging';
@@ -12,8 +16,6 @@ import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
-
-import * as fs from 'fs/promises';
 
 const calculateGasCosts = (
   transactions: Transaction[],
@@ -57,9 +59,9 @@ const logGasCosts = async (
     projectedCost1h: number;
     projectedCost24h: number;
   },
+  balance: string,
 ): Promise<void> => {
-  const metadata = networkMetadata[network];
-  const currency = metadata.currency || 'ETH';
+  const { currency } = networkMetadata[network];
   const logFile = 'cost-calculations.log';
 
   try {
@@ -101,6 +103,26 @@ const logGasCosts = async (
       logFile,
       `  Projected Cost (24h): ${gasCosts.projectedCost24h} ${currency}`,
     );
+
+    if (balance == null) {
+      console.error(chalk.red(`Can't calculate balance for ${network}`));
+    } else {
+      const daysBalanceWillLast = Number(balance) / gasCosts.projectedCost24h;
+      const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour projected costs.`;
+      if (daysBalanceWillLast < 10) {
+        console.log(chalk.red(balanceMsg));
+      } else if (daysBalanceWillLast >= 10 && daysBalanceWillLast <= 30) {
+        console.log(chalk.yellow(balanceMsg));
+      } else {
+        console.log(chalk.green(balanceMsg));
+      }
+
+      await logToFile(
+        logFile,
+        `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour projected costs.`,
+      );
+    }
+
     await logToFile(logFile, `\n`);
   } catch (error) {
     if (error instanceof Error) {
@@ -191,8 +213,29 @@ const main = async (): Promise<void> => {
     const transactions = await fetchTransactionsForNetwork(network, address);
     if (transactions.length > 0) {
       const gasCosts = calculateGasCosts(transactions);
+      const rpcUrl = getOptionalRpcUrl(network);
+      var balance: string;
+
+      if (rpcUrl === '') {
+        console.log(
+          chalk.red(
+            `No rpc url for network ${network}. Cant get balance - will use 0.`,
+          ),
+        );
+        balance = '0';
+      } else {
+        const web3 = new Web3(rpcUrl);
+        const balanceWei = await web3.eth.getBalance(address);
+        balance = web3.utils.fromWei(balanceWei, 'ether');
+      }
       if (gasCosts) {
-        await logGasCosts(network, address, transactions.length, gasCosts);
+        await logGasCosts(
+          network,
+          address,
+          transactions.length,
+          gasCosts,
+          balance,
+        );
       }
     } else {
       console.log(
