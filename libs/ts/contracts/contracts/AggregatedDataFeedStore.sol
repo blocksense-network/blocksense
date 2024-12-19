@@ -106,7 +106,8 @@ contract AggregatedDataFeedStore {
           let startSlot := shr(224, data)
           let slots := shr(224, shl(32, data))
 
-          // (feedId * 2**13 + round) * 2**stride
+          // (feedId * 2**13 + round) * 2**stride - find start of feed
+          // `startSlot` and `slots` are used to read a slice from the feed
           let initialPos := add(
             add(
               shl(stride, DATA_FEED_ADDRESS),
@@ -276,7 +277,7 @@ contract AggregatedDataFeedStore {
             sub(256, shl(3, indexLength)),
             shl(8, roundTableData)
           )
-          if gt(index, shl(115, 2)) {
+          if gt(index, shl(116, 1)) {
             revert(0, 0)
           }
 

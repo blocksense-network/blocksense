@@ -60,7 +60,7 @@ describe('AggregatedDataFeedStore', () => {
 
     contract = new ADFSWrapper();
     await contract.init(accessControlOwner);
-    await contract.accessControl.set(
+    await contract.accessControl.setAdminStates(
       accessControlOwner,
       [sequencer.address],
       [true],
@@ -81,8 +81,11 @@ describe('AggregatedDataFeedStore', () => {
     await contract.setFeeds(sequencer, feeds);
 
     const updatedFeeds = feeds.map(feed => {
-      feed.round++;
-      return feed;
+      return {
+        ...feed,
+        round: feed.round + 1n,
+        data: ethers.hexlify(ethers.randomBytes(feed.data.length)),
+      };
     });
 
     await contract.setFeeds(sequencer, updatedFeeds);
@@ -95,12 +98,15 @@ describe('AggregatedDataFeedStore', () => {
     await contract.setFeeds(sequencer, feeds);
 
     const updatedFeeds = feeds.map(feed => {
-      feed.round++;
-      return feed;
+      return {
+        ...feed,
+        round: feed.round + 1n,
+        data: ethers.hexlify(ethers.randomBytes(feed.data.length)),
+      };
     });
 
     await contract.setFeeds(sequencer, updatedFeeds);
-    await contract.checkLatestFeedAndRound(sequencer, feeds);
+    await contract.checkLatestFeedAndRound(sequencer, updatedFeeds);
   });
 
   it('Should revert on write when not in access control', async () => {
@@ -154,6 +160,10 @@ describe('AggregatedDataFeedStore', () => {
       overflowRoundTableIndex.slice(2),
     );
 
+    // change blocknumber
+    const newPrefix = contract.encodeDataWrite([]);
+    data = data.replace(data.slice(2, 20), newPrefix.slice(2, 20));
+
     await expect(
       sequencer.sendTransaction({
         to: contract.contract.target,
@@ -191,7 +201,7 @@ describe('AggregatedDataFeedStore', () => {
 
       genericContract = new ADFSGenericWrapper();
       await genericContract.init(accessControlOwner);
-      await genericContract.accessControl.set(
+      await genericContract.accessControl.setAdminStates(
         accessControlOwner,
         [sequencer.address],
         [true],
@@ -199,7 +209,7 @@ describe('AggregatedDataFeedStore', () => {
 
       contract = new ADFSWrapper();
       await contract.init(accessControlOwner);
-      await contract.accessControl.set(
+      await contract.accessControl.setAdminStates(
         accessControlOwner,
         [sequencer.address],
         [true],
