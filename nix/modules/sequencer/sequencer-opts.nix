@@ -48,7 +48,7 @@ with lib; let
       };
 
       retry_fee_increment_fraction = mkOption {
-        type = types.int;
+        type = types.anything;
         default = 0.1;
         description = mdDoc "The increments to the gas price to apply when retry timeouts are reached.";
       };
