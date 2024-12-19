@@ -203,17 +203,17 @@ pub async fn eth_batch_send_to_contract(
     let mut provider = provider.lock().await;
     let signer = &provider.signer;
     let contract_address = if feed_type == Periodic {
-        provider
-            .contract_address
-            .ok_or(eyre!("Contract address not set for network {net}."))
+        provider.contract_address.ok_or(eyre!(
+            "[retry test] Contract address not set for network {net}."
+        ))
     } else {
-        provider
-            .event_contract_address
-            .ok_or(eyre!("Event contract address not set for network {net}."))
+        provider.event_contract_address.ok_or(eyre!(
+            "[retry test] Event contract address not set for network {net}."
+        ))
     }?;
 
     info!(
-        "sending data to address `{}` in network `{}`",
+        "[retry test] sending data to address `{}` in network `{}`",
         contract_address, net
     );
 
@@ -222,8 +222,8 @@ pub async fn eth_batch_send_to_contract(
 
     let calldata_str = serialized_updates;
 
-    let input =
-        Bytes::from_hex(calldata_str).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
+    let input = Bytes::from_hex(calldata_str)
+        .map_err(|e| eyre!("[retry test] Key is not valid hex string: {}", e))?;
 
     let base_fee = process_provider_getter!(
         prov.get_gas_price().await,
@@ -232,7 +232,7 @@ pub async fn eth_batch_send_to_contract(
         get_gas_price
     );
 
-    debug!("Observed gas price (base_fee) for network {net} = {base_fee}");
+    debug!("[retry test] Observed gas price (base_fee) for network {net} = {base_fee}");
     provider_metrics
         .read()
         .await
@@ -260,13 +260,13 @@ pub async fn eth_batch_send_to_contract(
     let (sender_address, is_impersonated) = match &provider_settings.impersonated_anvil_account {
         Some(impersonated_anvil_account) => {
             debug!(
-                "Using impersonated anvil account with address: {}",
+                "[retry test] Using impersonated anvil account with address: {}",
                 impersonated_anvil_account
             );
             (parse_eth_address(impersonated_anvil_account).unwrap(), true)
         }
         None => {
-            debug!("Using signer address: {}", signer.address());
+            debug!("[retry test] Using signer address: {}", signer.address());
             (signer.address(), false)
         }
     };
@@ -274,6 +274,7 @@ pub async fn eth_batch_send_to_contract(
     let mut timed_out_count = 0;
 
     loop {
+        info!("[retry test] loop begin; timed_out_count={timed_out_count}");
         let tx;
         if timed_out_count == 0 {
             tx = TransactionRequest::default()
@@ -303,6 +304,7 @@ pub async fn eth_batch_send_to_contract(
         }
 
         let tx_str = format!("{tx:?}");
+        info!("[retry test] tx_str={tx_str}");
 
         let tx_result = if is_impersonated {
             let rpc_url = prov.client().transport().url().parse()?;
@@ -313,6 +315,7 @@ pub async fn eth_batch_send_to_contract(
         };
 
         let tx_result_str = format!("{tx_result:?}");
+        info!("[retry test] tx_result_str={tx_result_str}");
 
         let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
 
@@ -326,34 +329,36 @@ pub async fn eth_batch_send_to_contract(
         })
         .await;
 
+        info!("[retry test] matching receipt_result...");
+
         match receipt_result {
-            Ok(outer_result) => {
-                match outer_result {
-                    Ok(inner_result) => match inner_result {
-                        Ok(r) => {
-                            receipt = r;
-                            break;
-                        }
-                        Err(e) => {
-                            warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}: {e}");
-                            timed_out_count += 1;
-                        }
-                    },
+            Ok(outer_result) => match outer_result {
+                Ok(inner_result) => match inner_result {
+                    Ok(r) => {
+                        receipt = r;
+                        break;
+                    }
                     Err(e) => {
-                        warn!("Timed out  tx={tx_str}, tx_result={tx_result_str}: {e}");
+                        warn!("[retry test] PendingTransactionError tx={tx_str}, tx_result={tx_result_str}: {e}");
                         timed_out_count += 1;
                     }
+                },
+                Err(e) => {
+                    warn!("[retry test] Timed out  tx={tx_str}, tx_result={tx_result_str}: {e}");
+                    timed_out_count += 1;
                 }
-            }
+            },
             Err(e) => {
-                panic!("Join error tx={tx_str}, tx_result={tx_result_str}: {e}");
+                panic!("[retry test] Join error tx={tx_str}, tx_result={tx_result_str}: {e}");
             }
         }
+
+        info!("[retry test] matched receipt_result");
     }
 
     let transaction_time = tx_time.elapsed().as_millis();
     info!(
-        "Recvd transaction receipt that took {}ms from `{}`: {:?}",
+        "[retry test] Recvd transaction receipt that took {}ms from `{}`: {:?}",
         transaction_time, net, receipt
     );
     inc_metric!(provider_metrics, net, total_tx_sent);
@@ -370,7 +375,7 @@ pub async fn eth_batch_send_to_contract(
     let tx_hash = receipt.transaction_hash;
     let tx_fee = receipt.gas_used * receipt.effective_gas_price;
     let tx_fee = (tx_fee as f64) / 1e18;
-    info!("Transaction with hash {tx_hash} on `{net}` cost {tx_fee} ETH");
+    info!("[retry test] Transaction with hash {tx_hash} on `{net}` cost {tx_fee} ETH");
 
     provider_metrics
         .read()
