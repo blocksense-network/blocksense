@@ -359,7 +359,6 @@ mod tests {
     use config::get_sequencer_and_feed_configs;
     use config::init_config;
     use config::SequencerConfig;
-    use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::FeedAggregateHistory;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::FeedType;
@@ -369,9 +368,9 @@ mod tests {
     use std::sync::Arc;
     use std::time::Duration;
 
+    use crate::feeds::feed_slots_processor::tests::check_recieved;
     use tokio::sync::RwLock;
     use utils::logging::init_shared_logging_handle;
-    use utils::to_hex_string;
 
     #[actix_web::test]
     async fn test_feed_slots_manager_loop() {
@@ -444,23 +443,6 @@ mod tests {
             vote_recv.recv(),
         )
         .await;
-
-        match received {
-            Ok(Some((key, result))) => {
-                // assert the received data
-                assert_eq!(
-                    key,
-                    to_hex_string((1 as u32).to_be_bytes().to_vec(), None),
-                    "The key does not match the expected value"
-                );
-                assert_eq!(result, naive_packing(original_report_data));
-            }
-            Ok(None) => {
-                panic!("The channel was closed before receiving any data");
-            }
-            Err(_) => {
-                panic!("The channel did not receive any data within the timeout period");
-            }
-        }
+        check_recieved(received, (1_u32, original_report_data));
     }
 }

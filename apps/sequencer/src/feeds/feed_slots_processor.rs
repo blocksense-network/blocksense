@@ -564,19 +564,19 @@ impl FeedSlotsProcessor {
 }
 
 #[cfg(test)]
-mod tests {
-    use crate::testing::sequencer_state::create_sequencer_state_from_sequencer_config;
+pub mod tests {
 
     use super::*;
-    use config::get_test_config_with_single_provider;
     use config::AllFeedsConfig;
     use config::Reporter;
+    use config::{get_sequencer_and_feed_configs, get_test_config_with_single_provider};
     use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::AllFeedsReports;
     use feed_registry::types::FeedMetaData;
     use std::sync::Arc;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::RwLock;
+    use tokio::time::error::Elapsed;
     use utils::test_env::get_test_private_key_path;
 
     use crate::providers::provider::init_shared_rpc_providers;
@@ -586,6 +586,50 @@ mod tests {
     use feed_registry::registry::new_feeds_meta_data_reg_from_config;
     use tokio::sync::mpsc::UnboundedReceiver;
     use utils::logging::init_shared_logging_handle;
+
+    // Exclusively take config structure to init sequencer_state
+    pub async fn create_sequencer_state_from_sequencer_config(
+        sequencer_config: SequencerConfig,
+        metrics_prefix: &str,
+    ) -> (Data<SequencerState>, UnboundedReceiver<(String, String)>) {
+        let providers = init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix)).await;
+
+        let log_handle = init_shared_logging_handle("INFO", false);
+
+        let (vote_send, vote_recv) = mpsc::unbounded_channel();
+        let (feeds_management_cmd_send, _feeds_management_cmd_recv) = mpsc::unbounded_channel();
+
+        let (_, feeds_config) = get_sequencer_and_feed_configs();
+
+        (
+            Data::new(SequencerState {
+                registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
+                    &feeds_config,
+                ))),
+                reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+                providers,
+                log_handle,
+                reporters: init_shared_reporters(&sequencer_config, Some(metrics_prefix)),
+                feed_id_allocator: Arc::new(RwLock::new(None)),
+                voting_send_channel: vote_send,
+                feeds_metrics: Arc::new(RwLock::new(
+                    FeedsMetrics::new(metrics_prefix).expect("Failed to allocate feed_metrics"),
+                )),
+                active_feeds: Arc::new(RwLock::new(
+                    feeds_config
+                        .feeds
+                        .into_iter()
+                        .map(|feed| (feed.id, feed))
+                        .collect(),
+                )),
+                sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
+                feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+                feeds_management_cmd_send,
+                blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
+            }),
+            vote_recv,
+        )
+    }
 
     async fn new_test_sequencer_state(
         sequencer_config: &SequencerConfig,
@@ -626,6 +670,61 @@ mod tests {
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
         };
         (sequencer_state, vote_recv)
+    }
+
+    pub fn check_recieved(
+        received: Result<Option<(String, String)>, Elapsed>,
+        expected: (u32, FeedType),
+    ) {
+        let feed_id = expected.0;
+        let original_report_data = expected.1;
+        match received {
+            Ok(Some((key, result))) => {
+                // assert the received data
+                assert_eq!(
+                    key,
+                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
+                    "The key does not match the expected value"
+                );
+                assert_eq!(result, naive_packing(original_report_data));
+            }
+            Ok(None) => {
+                panic!("The channel was closed before receiving any data");
+            }
+            Err(_) => {
+                panic!("The channel did not receive any data within the timeout period");
+            }
+        }
+    }
+
+    pub fn check_timeout_expected(received: Result<Option<(String, String)>, Elapsed>) {
+        // Assert that the result is an error of type Elapsed
+        match received {
+            Ok(Some(_)) => {
+                panic!("Received unexpected data");
+            }
+            Ok(None) => {
+                panic!("The channel was closed before receiving any data");
+            }
+            Err(_) => {
+                println!("Timeout as expected");
+            }
+        }
+    }
+
+    pub fn check_channel_is_closed(received: Result<Option<(String, String)>, Elapsed>) {
+        // Assert that the result is an error of type Elapsed
+        match received {
+            Ok(Some(_)) => {
+                panic!("Received unexpected data");
+            }
+            Ok(None) => {
+                println!("Channel closed as expected");
+            }
+            Err(_) => {
+                panic!("The channel recieved timeout when it should be closed");
+            }
+        }
     }
 
     #[tokio::test]
@@ -705,25 +804,9 @@ mod tests {
         });
 
         // Attempt to receive with a timeout of 2 seconds
-        let received = tokio::time::timeout(Duration::from_secs(2), rx.recv()).await;
-
-        match received {
-            Ok(Some((key, result))) => {
-                // assert the received data
-                assert_eq!(
-                    key,
-                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
-                    "The key does not match the expected value"
-                );
-                assert_eq!(result, naive_packing(original_report_data));
-            }
-            Ok(None) => {
-                panic!("The channel was closed before receiving any data");
-            }
-            Err(_) => {
-                panic!("The channel did not receive any data within the timeout period");
-            }
-        }
+        let received: std::result::Result<Option<(String, String)>, tokio::time::error::Elapsed> =
+            tokio::time::timeout(Duration::from_secs(2), rx.recv()).await;
+        check_recieved(received, (feed_id, original_report_data));
     }
 
     #[tokio::test]
@@ -801,24 +884,7 @@ mod tests {
 
         // Attempt to receive with a timeout of 10 seconds
         let received = tokio::time::timeout(Duration::from_secs(10), rx.recv()).await;
-
-        match received {
-            Ok(Some((key, result))) => {
-                // assert the received data
-                assert_eq!(
-                    key,
-                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
-                    "The key does not match the expected value"
-                );
-                assert_eq!(result, naive_packing(original_report_data.clone()));
-            }
-            Ok(None) => {
-                panic!("The channel was closed before receiving any data");
-            }
-            Err(_) => {
-                panic!("The channel did not receive any data within the timeout period");
-            }
-        }
+        check_recieved(received, (feed_id, original_report_data.clone()));
 
         tokio::time::sleep(Duration::from_millis(2000)).await;
 
@@ -834,19 +900,7 @@ mod tests {
 
         // Attempt to receive with a timeout of 2 seconds
         let received = tokio::time::timeout(Duration::from_secs(20), rx.recv()).await;
-
-        // Assert that the result is an error of type Elapsed
-        match received {
-            Ok(Some(_)) => {
-                panic!("Received unexpected data");
-            }
-            Ok(None) => {
-                println!("Channel closed as expected");
-            }
-            Err(_) => {
-                println!("Timeout as expected");
-            }
-        }
+        check_channel_is_closed(received);
     }
 
     #[tokio::test]
@@ -937,18 +991,8 @@ mod tests {
 
         // Attempt to receive with a timeout of 0.2 seconds
         let received = tokio::time::timeout(Duration::from_millis(200), rx.recv()).await;
-
-        match received {
-            Ok(Some((_key, _result))) => {
-                panic!("This update should be skipped based on diviation criteria");
-            }
-            Ok(None) => {
-                panic!("The channel was closed before receiving any data");
-            }
-            Err(_) => {
-                info!("This looks fine");
-            }
-        }
+        // This update should be skipped based on diviation criteria
+        check_timeout_expected(received);
     }
 
     #[tokio::test]
@@ -1049,18 +1093,7 @@ mod tests {
 
         // Attempt to receive with a timeout of 0.2 seconds
         let received = tokio::time::timeout(Duration::from_millis(200), rx.recv()).await;
-
-        match received {
-            Ok(Some((_key, _result))) => {
-                panic!("This update should be skipped based on diviation criteria");
-            }
-            Ok(None) => {
-                panic!("The channel was closed before receiving any data");
-            }
-            Err(_) => {
-                info!("This looks fine");
-            }
-        }
+        check_timeout_expected(received);
     }
 
     #[tokio::test]
@@ -1162,23 +1195,7 @@ mod tests {
 
         // Attempt to receive with a timeout of 0.2 seconds
         let received = tokio::time::timeout(Duration::from_millis(200), rx.recv()).await;
-
-        match received {
-            Ok(Some((key, result))) => {
-                assert_eq!(
-                    key,
-                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
-                    "The key does not match the expected value"
-                );
-                assert_eq!(result, naive_packing(FeedType::Numerical(115.0)));
-            }
-            Ok(None) => {
-                panic!("The channel was closed before receiving any data");
-            }
-            Err(_) => {
-                panic!("The channel did not receive any data within the timeout period");
-            }
-        }
+        check_recieved(received, (feed_id, FeedType::Numerical(115.0)));
     }
 
     async fn run_feed_slots_processor_loop_always_publish_heartbeat(
@@ -1280,23 +1297,7 @@ mod tests {
             always_publish_heartbeat_ms,
         )
         .await;
-        match received {
-            Ok(Some((key, result))) => {
-                let feed_id = 1_u32;
-                assert_eq!(
-                    key,
-                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
-                    "The key does not match the expected value"
-                );
-                assert_eq!(result, naive_packing(FeedType::Numerical(102.0)));
-            }
-            Ok(None) => {
-                panic!("The channel was closed before receiving any data");
-            }
-            Err(_) => {
-                panic!("The channel did not receive any data within the timeout period");
-            }
-        }
+        check_recieved(received, (1_u32, FeedType::Numerical(102.0)));
     }
 
     #[tokio::test]
@@ -1309,16 +1310,6 @@ mod tests {
             always_publish_heartbeat_ms,
         )
         .await;
-        match received {
-            Ok(Some((_key, _result))) => {
-                panic!("This update should be skipped based on diviation criteria");
-            }
-            Ok(None) => {
-                panic!("The channel was closed before receiving any data");
-            }
-            Err(_) => {
-                info!("This looks fine");
-            }
-        }
+        check_timeout_expected(received);
     }
 }
