@@ -3,35 +3,11 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import {
+  getOptionalRpcUrl,
   networkMetadata,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { deployedNetworks } from '../types';
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
-
-const getBalance = async (
-  address: string,
-  networkName: string,
-  rpcUrl: string | undefined,
-  currency: string,
-) => {
-  if (!rpcUrl) {
-    console.error(chalk.red(`No RPC URL provided for ${networkName}`));
-    return;
-  }
-
-  try {
-    const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
-    const balanceWei = await web3.eth.getBalance(address);
-    const balance = web3.utils.fromWei(balanceWei, 'ether');
-    console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
-  } catch (error: unknown) {
-    console.error(
-      chalk.red(`Error fetching balance for ${networkName}:`),
-      error instanceof Error ? error.message : String(error),
-    );
-  }
-};
 
 const main = async (): Promise<void> => {
   const currentSequencerAddress = '0xd756119012CcabBC59910dE0ecEbE406B5b952bE';
@@ -57,22 +33,18 @@ const main = async (): Promise<void> => {
   );
 
   for (const networkName of deployedNetworks) {
-    const metadata = networkMetadata[networkName];
-    if (!metadata) {
-      console.error(chalk.red(`Metadata not found for ${networkName}`));
-      console.error(chalk.red(`Try rebuilding @blocksense/base-utils`));
+    const rpcUrl = getOptionalRpcUrl(networkName);
+    if (rpcUrl === '') {
+      console.log(
+        chalk.red(`No rpc url for network ${networkName}. Skipping.`),
+      );
       continue;
     }
-    const { currency } = metadata;
-
-    const rpcUrl = getEnvStringNotAssert(
-      `RPC_URL_${networkName.toUpperCase().replace(/-/g, '_')}`,
-    );
-    if (rpcUrl) {
-      await getBalance(address, networkName, rpcUrl, currency || 'UNKNOWN');
-    } else {
-      console.error(chalk.yellow(`RPC URL not set for ${networkName}`));
-    }
+    const web3 = new Web3(rpcUrl);
+    const balanceWei = await web3.eth.getBalance(address);
+    const balance = web3.utils.fromWei(balanceWei, 'ether');
+    const { currency } = networkMetadata[networkName];
+    console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
   }
 };
 
