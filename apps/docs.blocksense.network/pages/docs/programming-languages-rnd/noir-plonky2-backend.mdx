@@ -2,7 +2,7 @@ import { Callout } from '@blocksense/docs-theme';
 
 # Noir PLONKY2 backend
 
-An essential component of blocksense are ZK proofs, the primary technology which eliminates bad actors from manipulating truth. In order to make it easier for our ZK engineers to develop this component, we have built a PLONKY2 backend for the Noir programming language. While this backend is not yet completely stable, it already serves as a good proof-of-concept. Since our work is public and open-source, anyone can download it, try it out, and submit feedback.
+An essential component of Blocksense are ZK proofs, the primary technology which eliminates bad actors from manipulating truth. In order to make it easier for our ZK engineers to develop this component, we built a PLONKY2 backend for the Noir programming language. While this backend is not completely stable, it already serves as a good proof-of-concept. Since our work is public and open-source, anyone can download it, try it out, and submit feedback.
 
 ## What is zero-knowledge?
 
@@ -18,7 +18,7 @@ The only system which has been adapted for ACIR is barratenberg, also built by A
 
 ### What is PLONKY2?
 
-PLONKY2 is a zkSNARK built by [Polygon Labs](https://polygon.technology/), with efficiency, decomposition and size in mind. A proof can be generated 100x faster than other systems, proofs can be split into subproofs and distributed across hundreds or thousands of machines, and it provides the ability to shrink proofs down to \<50kb in seconds.
+PLONKY2 is a zkSNARK built by [Polygon Labs](https://polygon.technology/), with efficiency, decomposition and size in mind. Recursive proofs can be generated faster than other systems. This enables proofs to be split into subproofs and distributed across hundreds or thousands of machines, and it provides the ability to shrink proofs down dramatically in seconds.
 
 A simple programming language to write ZK programs, with fast-to-generate, distributed and small in size proofs gives us the best of both worlds. The consensus mechanism can be developed and maintained without much difficulty, while it's execution can be distributed on the blockchain with vast assuredness of the result's correctness, all for a small cost.
 
