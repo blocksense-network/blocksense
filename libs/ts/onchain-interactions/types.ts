@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@blocksense/base-utils/evm';
+import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
 export const deployedNetworks = [
@@ -20,7 +20,7 @@ export const deployedNetworks = [
   'polygon-zkevm-cardona',
   'scroll-sepolia',
   'taiko-hekla',
-] as const;
+] satisfies NetworkName[];
 
 export const API_KEYS: Record<string, string> = {
   ethereumHolesky: getEnvStringNotAssert('ETHERSCAN_API_KEY'),
