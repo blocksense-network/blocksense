@@ -1,5 +1,3 @@
-//use std::collections::HashMap;
-
 use data_feeds::feeds_processing::VotedFeedUpdate;
 
 pub mod block_creator;

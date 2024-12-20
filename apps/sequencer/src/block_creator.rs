@@ -2,7 +2,7 @@ use actix_web::web::Data;
 use alloy::hex;
 use blockchain_data_model::in_mem_db::InMemDb;
 use blockchain_data_model::{
-    MAX_ASSET_FEED_UPDATES_IN_BLOCK, MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
+    MAX_ASSET_FEED_UPDATES_IN_BLOCK, MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK
 };
 use config::BlockConfig;
 use data_feeds::feeds_processing::VotedFeedUpdate;

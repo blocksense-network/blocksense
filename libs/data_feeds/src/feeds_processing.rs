@@ -89,6 +89,8 @@ pub fn naive_packing(feed_result: &FeedType) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::time::SystemTime;
+
     use feed_registry::types::FeedType;
 
     use super::*;
@@ -242,5 +244,33 @@ mod tests {
             end_slot_timestamp,
         };
         assert_eq!(update.should_skip(&one_percent_threshold, &history), false);
+    }
+
+    #[test]
+    fn test_voted_feed_update() {
+        let end_slot_timestamp = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+        let update = VotedFeedUpdate {
+            feed_id: 42_u32,
+            value: FeedType::Numerical(142.0),
+            end_slot_timestamp,
+        };
+        let (encoded_key, encoded_value) = update.encode();
+        assert_eq!("0000002a", encoded_key);
+        assert_eq!(
+            "00000000000000000000000000000007b2a557a6d97800000000000000000000",
+            encoded_value
+        );
+
+        // Send test votes
+        let k1 = "ab000001";
+        let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
+        let vote_1 =
+            VotedFeedUpdate::new_decode(k1, v1, end_slot_timestamp, FeedType::Numerical(0.0))
+                .unwrap();
+        assert_eq!(vote_1.feed_id, 2868903937_u32);
+        assert_eq!(vote_1.value, FeedType::Numerical(80000.8f64));
     }
 }
