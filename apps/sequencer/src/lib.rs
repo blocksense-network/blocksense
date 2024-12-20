@@ -1,5 +1,6 @@
-use std::collections::HashMap;
-use std::fmt::Debug;
+//use std::collections::HashMap;
+
+use data_feeds::feeds_processing::VotedFeedUpdate;
 
 pub mod block_creator;
 pub mod blocks_reader;
@@ -11,10 +12,8 @@ pub mod reporters;
 pub mod sequencer_state;
 pub mod testing;
 
-pub struct UpdateToSend<
-    K: Debug + Clone + std::string::ToString + 'static,
-    V: Debug + Clone + std::string::ToString + 'static,
-> {
+pub struct UpdateToSend {
     pub block_height: u64,
-    pub kv_updates: HashMap<K, V>,
+    //pub kv_updates: HashMap<String, String>,
+    pub updates: Vec<VotedFeedUpdate>,
 }

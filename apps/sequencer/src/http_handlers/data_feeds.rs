@@ -526,6 +526,7 @@ mod tests {
     };
     use crypto::JsonSerializableSignature;
     use data_feeds::connector::post::generate_signature;
+    use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::feed_registration_cmds::FeedsManagementCmds;
     use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
@@ -631,7 +632,7 @@ mod tests {
         key_path: &Path,
         anvil_endpoint: &str,
     ) -> (
-        UnboundedReceiver<(String, String)>, // aggregated_votes_to_block_creator_recv
+        UnboundedReceiver<VotedFeedUpdate>, // aggregated_votes_to_block_creator_recv
         UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
         UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
         Data<SequencerState>,

@@ -8,6 +8,7 @@ use config::{
     get_sequencer_and_feed_configs, get_test_config_with_single_provider, init_config,
     SequencerConfig,
 };
+use data_feeds::feeds_processing::VotedFeedUpdate;
 use tokio::sync::mpsc;
 use utils::logging::init_shared_logging_handle;
 
@@ -19,7 +20,7 @@ pub async fn create_sequencer_state_from_sequencer_config_file(
     network: &str,
     key_path: &Path,
     anvil_endpoint: &str,
-    vote_send: Option<mpsc::UnboundedSender<(String, String)>>,
+    vote_send: Option<mpsc::UnboundedSender<VotedFeedUpdate>>,
     overwrite_config: Option<SequencerConfig>,
 ) -> web::Data<SequencerState> {
     let cfg = match &overwrite_config {

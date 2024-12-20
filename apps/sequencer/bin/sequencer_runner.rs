@@ -26,9 +26,11 @@ use utils::build_info::{
     VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
 };
 
+use data_feeds::feeds_processing::VotedFeedUpdate;
+
 type VoteChannel = (
-    UnboundedSender<(String, String)>,
-    UnboundedReceiver<(String, String)>,
+    UnboundedSender<VotedFeedUpdate>,
+    UnboundedReceiver<VotedFeedUpdate>,
 );
 
 /// Given a Sequencer config is returns the app state need to start the Actix Sequencer server.
@@ -37,7 +39,7 @@ pub async fn prepare_sequencer_state(
     feeds_config: AllFeedsConfig,
     metrics_prefix: Option<&str>,
 ) -> (
-    UnboundedReceiver<(String, String)>, // aggregated_votes_to_block_creator_recv
+    UnboundedReceiver<VotedFeedUpdate>, // aggregated_votes_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
     Data<SequencerState>,

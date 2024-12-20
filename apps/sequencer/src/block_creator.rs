@@ -5,6 +5,7 @@ use blockchain_data_model::{
     MAX_ASSET_FEED_UPDATES_IN_BLOCK, MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
 };
 use config::BlockConfig;
+use data_feeds::feeds_processing::VotedFeedUpdate;
 use feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
@@ -13,8 +14,7 @@ use feed_registry::types::Repeatability;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use serde_json::json;
-use std::collections::{HashMap, VecDeque};
-use std::fmt::Debug;
+use std::collections::VecDeque;
 use std::io::Error;
 use std::mem;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
@@ -26,14 +26,11 @@ use crate::feeds::feed_config_conversions::feed_config_to_block;
 use crate::sequencer_state::SequencerState;
 use crate::UpdateToSend;
 
-pub async fn block_creator_loop<
-    K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
-    V: Debug + Clone + std::string::ToString + 'static,
->(
+pub async fn block_creator_loop(
     sequencer_state: Data<SequencerState>,
-    mut vote_recv: UnboundedReceiver<(K, V)>,
+    mut vote_recv: UnboundedReceiver<VotedFeedUpdate>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
-    batched_votes_send: UnboundedSender<UpdateToSend<K, V>>,
+    batched_votes_send: UnboundedSender<UpdateToSend>,
     block_config: BlockConfig,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -66,8 +63,8 @@ pub async fn block_creator_loop<
             );
 
             // Updates that overflowed the capacity of a block
-            let mut backlog_updates = VecDeque::new();
-            let mut updates: HashMap<K, V> = Default::default();
+            let mut backlog_updates: VecDeque<VotedFeedUpdate> = Default::default();
+            let mut updates: Vec<VotedFeedUpdate> = Default::default();
 
             let mut new_feeds_to_register = Vec::new();
             let mut feeds_ids_to_delete = Vec::new();
@@ -102,11 +99,11 @@ pub async fn block_creator_loop<
                             feeds_ids_to_delete.clear();
 
                             // Fill the updates that overflowed the capacity of the last block
-                            while let Some((k, v)) = backlog_updates.pop_front() {
+                            while let Some(v) = backlog_updates.pop_front() {
                                 if updates.len() == max_feed_updates_to_batch {
                                     break;
                                 }
-                                updates.insert(k, v);
+                                updates.push(v);
                             }
                         }
                     }
@@ -125,31 +122,29 @@ pub async fn block_creator_loop<
 }
 
 // When we recv feed updates that have passed aggregation, we prepare them to be placed in the next generated block
-fn recvd_feed_update_to_block<
-    K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
-    V: Debug + Clone + std::string::ToString + 'static,
->(
-    recvd_feed_update: Option<(K, V)>,
-    updates_to_block: &mut HashMap<K, V>,
-    backlog_updates: &mut VecDeque<(K, V)>,
+fn recvd_feed_update_to_block(
+    recvd_feed_update: Option<VotedFeedUpdate>,
+    updates_to_block: &mut Vec<VotedFeedUpdate>,
+    backlog_updates: &mut VecDeque<VotedFeedUpdate>,
     max_feed_updates_to_batch: usize,
 ) {
     match recvd_feed_update {
-        Some((key, val)) => {
+        Some(voted_uptate) => {
+            let (key, val) = voted_uptate.encode();
             info!(
                 "adding {} => {} to updates",
                 key.to_string(),
                 val.to_string()
             );
-            if updates_to_block.keys().len() < max_feed_updates_to_batch {
-                updates_to_block.insert(key, val);
+            if updates_to_block.len() < max_feed_updates_to_batch {
+                updates_to_block.push(voted_uptate);
             } else {
                 warn!(
                     "updates.keys().len() >= max_feed_updates_to_batch ({} >= {})",
-                    updates_to_block.keys().len(),
+                    updates_to_block.len(),
                     max_feed_updates_to_batch
                 );
-                backlog_updates.push_back((key, val));
+                backlog_updates.push_back(voted_uptate);
             }
         }
         None => {
@@ -193,14 +188,11 @@ fn recvd_feed_management_cmd_to_block(
     }
 }
 
-async fn generate_block<
-    K: Debug + Clone + std::string::ToString + 'static + std::cmp::Eq + PartialEq + std::hash::Hash,
-    V: Debug + Clone + std::string::ToString + 'static,
->(
-    updates: &mut HashMap<K, V>,
+async fn generate_block(
+    updates: &mut Vec<VotedFeedUpdate>,
     new_feeds_to_register: &mut Vec<RegisterNewAssetFeed>,
     feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
-    batched_votes_send: &UnboundedSender<UpdateToSend<K, V>>,
+    batched_votes_send: &UnboundedSender<UpdateToSend>,
     sequencer_state: &Data<SequencerState>,
     block_height: u64,
 ) -> eyre::Result<()> {
@@ -259,10 +251,10 @@ async fn generate_block<
     }
 
     // Process feed updates:
-    if updates.keys().len() > 0 {
+    if !updates.is_empty() {
         if let Err(e) = batched_votes_send.send(UpdateToSend {
             block_height,
-            kv_updates: updates,
+            updates,
         }) {
             error!(
                 "Channel for propagating batched updates to sender failed: {}",
@@ -321,6 +313,8 @@ async fn generate_block<
 #[cfg(test)]
 mod tests {
     use config::BlockConfig;
+    use data_feeds::feeds_processing::VotedFeedUpdate;
+    use feed_registry::types::{FeedType, Timestamp};
     use std::time::Duration;
     use tokio::sync::mpsc;
     use tokio::time;
@@ -362,20 +356,29 @@ mod tests {
             block_config,
         )
         .await;
+        let end_of_timeslot: Timestamp = 0;
 
         // Send test votes
         let k1 = "ab000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
-        vote_send.send((k1, v1)).unwrap();
+        let vote_1 =
+            VotedFeedUpdate::new_decode(k1, v1, end_of_timeslot, FeedType::Numerical(0.0)).unwrap();
         let k2 = "ac000002";
         let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000";
-        vote_send.send((k2, v2)).unwrap();
+        let vote_2 =
+            VotedFeedUpdate::new_decode(k2, v2, end_of_timeslot, FeedType::Numerical(0.0)).unwrap();
         let k3 = "ad000003";
         let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000";
-        vote_send.send((k3, v3)).unwrap();
+        let vote_3 =
+            VotedFeedUpdate::new_decode(k3, v3, end_of_timeslot, FeedType::Numerical(0.0)).unwrap();
         let k4 = "af000004";
         let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000";
-        vote_send.send((k4, v4)).unwrap();
+        let vote_4 =
+            VotedFeedUpdate::new_decode(k4, v4, end_of_timeslot, FeedType::Numerical(0.0)).unwrap();
+        vote_send.send(vote_1).unwrap();
+        vote_send.send(vote_2).unwrap();
+        vote_send.send(vote_3).unwrap();
+        vote_send.send(vote_4).unwrap();
 
         // Wait for a while to let the loop process the message
         time::sleep(Duration::from_millis(1000)).await;
@@ -383,7 +386,7 @@ mod tests {
 
         // Validate
         if let Some(batched) = batched_votes_recv.recv().await {
-            assert_eq!(batched.kv_updates.len(), 3);
+            assert_eq!(batched.updates.len(), 3);
         } else {
             panic!("Batched votes were not received");
         }

@@ -3,7 +3,7 @@ use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use alloy::primitives::map::HashMap;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
-use data_feeds::feeds_processing::naive_packing;
+use data_feeds::feeds_processing::VotedFeedUpdate;
 use eyre::{eyre, Result};
 use eyre::{Context, ContextCompat};
 use feed_registry::aggregate::FeedAggregate;
@@ -25,7 +25,6 @@ use tracing::error;
 use tracing::warn;
 use tracing::{debug, info};
 use utils::time::current_unix_time;
-use utils::to_hex_string;
 
 const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
@@ -40,6 +39,7 @@ pub struct ConsumedReports {
     pub skip_publishing: bool,
     pub ad_score: Option<f64>,
     pub result_post_to_contract: Option<FeedType>,
+    pub end_slot_timestamp: Timestamp,
 }
 
 impl FeedSlotsProcessor {
@@ -109,6 +109,7 @@ impl FeedSlotsProcessor {
                 skip_publishing: true,
                 ad_score: None,
                 result_post_to_contract: None,
+                end_slot_timestamp,
             }
         } else {
             let total_votes_count = values.len() as f32;
@@ -160,6 +161,7 @@ impl FeedSlotsProcessor {
                 skip_publishing,
                 ad_score: ad_score_opt,
                 result_post_to_contract: Some(result_post_to_contract),
+                end_slot_timestamp,
             };
             info!("[feed {feed_id}] result_post_to_contract = {:?}", res);
             res
@@ -223,6 +225,7 @@ impl FeedSlotsProcessor {
             skip_publishing: true,
             ad_score: None,
             result_post_to_contract: None,
+            end_slot_timestamp,
         };
 
         info!(
@@ -270,7 +273,6 @@ impl FeedSlotsProcessor {
     async fn post_consumed_reports(
         &self,
         consumed_reports: ConsumedReports,
-        end_slot_timestamp: Timestamp,
         feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
         skip_publish_if_less_then_percentage: f64,
         history: &Arc<RwLock<FeedAggregateHistory>>,
@@ -289,23 +291,24 @@ impl FeedSlotsProcessor {
             );
             return Ok(());
         }
+
         let result_post_to_contract = consumed_reports.result_post_to_contract.context(
             "[post_consumed_reports]: Impossible, quorum reached but no value is reported",
         )?;
-        self.post_to_contract(
-            history,
-            result_post_to_contract,
-            end_slot_timestamp,
-            sequencer_state,
-        )
-        .await
+        let feed_id = self.key;
+        let message = VotedFeedUpdate {
+            feed_id,
+            value: result_post_to_contract,
+            end_slot_timestamp: consumed_reports.end_slot_timestamp,
+        };
+        self.post_to_contract(history, message, sequencer_state)
+            .await
     }
 
     async fn post_to_contract(
         &self,
         history: &Arc<RwLock<FeedAggregateHistory>>,
-        result_post_to_contract: FeedType,
-        end_slot_timestamp: Timestamp,
+        message: VotedFeedUpdate,
         sequencer_state: &Data<SequencerState>,
     ) -> Result<()> {
         {
@@ -313,22 +316,14 @@ impl FeedSlotsProcessor {
             debug!("Get a write lock on history [feed {feed_id}]");
             let mut history_guard = history.write().await;
             debug!("Push result that will be posted to contract to history [feed {feed_id}]");
-            history_guard.push(
-                self.key,
-                result_post_to_contract.clone(),
-                end_slot_timestamp,
-            );
+            history_guard.push(self.key, message.value.clone(), message.end_slot_timestamp);
             debug!("Release the write lock on history [feed {feed_id}]");
         }
-        let key_post = self.key;
         let result_send = sequencer_state
             .aggregated_votes_to_block_creator_send
             .clone();
         result_send
-            .send((
-                to_hex_string(key_post.to_be_bytes().to_vec(), None),
-                naive_packing(result_post_to_contract),
-            ))
+            .send(message)
             .map_err(|e| eyre!("[post_to_contract]: {e}"))
     }
 
@@ -548,10 +543,7 @@ impl FeedSlotsProcessor {
                         history,
                         ).await {
                             Ok(consumed_reports) => {
-                                if let Err(e) = self.post_consumed_reports(consumed_reports,
-                                    end_slot_timestamp,
-                                     feed_metrics.clone(),
-                                skip_publish_if_less_then_percentage, history, sequencer_state).await {
+                                if let Err(e) = self.post_consumed_reports(consumed_reports, feed_metrics.clone(), skip_publish_if_less_then_percentage, history, sequencer_state).await {
                                     error!("{e}")
                                 }
                             }
@@ -572,7 +564,6 @@ pub mod tests {
     use config::AllFeedsConfig;
     use config::Reporter;
     use config::{get_sequencer_and_feed_configs, get_test_config_with_single_provider};
-    use data_feeds::feeds_processing::naive_packing;
     use feed_registry::registry::AllFeedsReports;
     use feed_registry::types::FeedMetaData;
     use std::sync::Arc;
@@ -590,7 +581,7 @@ pub mod tests {
     pub async fn create_sequencer_state_from_sequencer_config(
         sequencer_config: SequencerConfig,
         metrics_prefix: &str,
-    ) -> (Data<SequencerState>, UnboundedReceiver<(String, String)>) {
+    ) -> (Data<SequencerState>, UnboundedReceiver<VotedFeedUpdate>) {
         let providers = init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix)).await;
 
         let log_handle = init_shared_logging_handle("INFO", false);
@@ -625,7 +616,7 @@ pub mod tests {
         sequencer_config: &SequencerConfig,
         feeds_config: AllFeedsConfig,
         metics_prefix: &str,
-    ) -> (SequencerState, UnboundedReceiver<(String, String)>) {
+    ) -> (SequencerState, UnboundedReceiver<VotedFeedUpdate>) {
         let log_handle = init_shared_logging_handle("INFO", false);
         let metrics_prefix = Some(metics_prefix);
         let (vote_send, vote_recv) = mpsc::unbounded_channel();
@@ -652,20 +643,18 @@ pub mod tests {
     }
 
     pub fn check_recieved(
-        received: Result<Option<(String, String)>, Elapsed>,
+        received: Result<Option<VotedFeedUpdate>, Elapsed>,
         expected: (u32, FeedType),
     ) {
         let feed_id = expected.0;
         let original_report_data = expected.1;
         match received {
-            Ok(Some((key, result))) => {
-                // assert the received data
+            Ok(Some(vote)) => {
                 assert_eq!(
-                    key,
-                    to_hex_string(feed_id.to_be_bytes().to_vec(), None),
+                    feed_id, vote.feed_id,
                     "The key does not match the expected value"
                 );
-                assert_eq!(result, naive_packing(original_report_data));
+                assert_eq!(vote.value, original_report_data);
             }
             Ok(None) => {
                 panic!("The channel was closed before receiving any data");
@@ -676,7 +665,7 @@ pub mod tests {
         }
     }
 
-    pub fn check_timeout_expected(received: Result<Option<(String, String)>, Elapsed>) {
+    pub fn check_timeout_expected(received: Result<Option<VotedFeedUpdate>, Elapsed>) {
         // Assert that the result is an error of type Elapsed
         match received {
             Ok(Some(_)) => {
@@ -691,7 +680,7 @@ pub mod tests {
         }
     }
 
-    pub fn check_channel_is_closed(received: Result<Option<(String, String)>, Elapsed>) {
+    pub fn check_channel_is_closed(received: Result<Option<VotedFeedUpdate>, Elapsed>) {
         // Assert that the result is an error of type Elapsed
         match received {
             Ok(Some(_)) => {
@@ -783,7 +772,7 @@ pub mod tests {
         });
 
         // Attempt to receive with a timeout of 2 seconds
-        let received: std::result::Result<Option<(String, String)>, tokio::time::error::Elapsed> =
+        let received: std::result::Result<Option<VotedFeedUpdate>, tokio::time::error::Elapsed> =
             tokio::time::timeout(Duration::from_secs(2), rx.recv()).await;
         check_recieved(received, (feed_id, original_report_data));
     }
@@ -1180,7 +1169,7 @@ pub mod tests {
     async fn run_feed_slots_processor_loop_always_publish_heartbeat(
         name: &str,
         always_publish_heartbeat_ms: Option<u128>,
-    ) -> std::result::Result<Option<(String, String)>, tokio::time::error::Elapsed> {
+    ) -> std::result::Result<Option<VotedFeedUpdate>, tokio::time::error::Elapsed> {
         let metrics_prefix = name;
         let report_interval_ms = 100; // 0.1 second interval
         let quorum_percentage = 60.0f32; // 60 %

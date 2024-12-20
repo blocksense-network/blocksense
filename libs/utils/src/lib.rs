@@ -14,7 +14,7 @@ use std::{
     str::FromStr,
 };
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 
 pub fn get_env_var<T>(key: &str) -> Result<T>
 where
@@ -45,6 +45,10 @@ pub fn to_hex_string(mut bytes: Vec<u8>, padding_to: Option<usize>) -> String {
         .map(|b| format!("{:02x}", b))
         .collect::<Vec<_>>()
         .join("")
+}
+
+pub fn from_hex_string(input: &str) -> Result<Vec<u8>> {
+    hex::decode(input).context("Decoding of hex failed")
 }
 
 pub fn read_file(path: &str) -> String {

@@ -2,16 +2,12 @@ use crate::providers::eth_send_utils::eth_batch_send_to_all_contracts;
 use crate::{sequencer_state::SequencerState, UpdateToSend};
 use actix_web::web::Data;
 use feed_registry::types::Repeatability::Periodic;
-use std::fmt::Debug;
 use std::io::Error;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{error, info};
 
-pub async fn votes_result_sender_loop<
-    K: Debug + Clone + std::string::ToString + 'static,
-    V: Debug + Clone + std::string::ToString + 'static,
->(
-    mut batched_votes_recv: UnboundedReceiver<UpdateToSend<K, V>>,
+pub async fn votes_result_sender_loop(
+    mut batched_votes_recv: UnboundedReceiver<UpdateToSend>,
     sequencer_state: Data<SequencerState>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -39,19 +35,15 @@ pub async fn votes_result_sender_loop<
         .expect("Failed to spawn votes result sender!")
 }
 
-fn async_send_to_contracts<
-    K: Debug + Clone + std::string::ToString + 'static,
-    V: Debug + Clone + std::string::ToString + 'static,
->(
+fn async_send_to_contracts(
     sequencer_state: Data<SequencerState>,
-    updates: UpdateToSend<K, V>,
+    updates: UpdateToSend,
     batch_count: usize,
 ) {
     let sender = tokio::task::Builder::new()
         .name(format!("batch_sender_{batch_count}").as_str())
         .spawn_local(async move {
-            match eth_batch_send_to_all_contracts(sequencer_state, updates.kv_updates, Periodic)
-                .await
+            match eth_batch_send_to_all_contracts(sequencer_state, updates.updates, Periodic).await
             {
                 Ok(res) => info!("Sending updates complete {}.", res),
                 Err(err) => error!("ERROR Sending updates {}", err),

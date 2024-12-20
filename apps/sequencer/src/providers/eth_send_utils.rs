@@ -8,8 +8,8 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::eth::TransactionRequest,
 };
+use data_feeds::feeds_processing::VotedFeedUpdate;
 use eyre::{eyre, Result};
-use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::{sync::Mutex, time::Duration};
 
@@ -20,7 +20,6 @@ use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_metric_by};
-use std::fmt::Debug;
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
 
@@ -105,19 +104,16 @@ pub async fn deploy_contract(
 ///
 /// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
 /// will be added to the result. Otherwise, all feeds in `updates` will be added.
-fn serialize_updates<
-    K: Debug + Clone + std::string::ToString + 'static,
-    V: Debug + Clone + std::string::ToString + 'static,
->(
+fn serialize_updates(
     net: &str,
-    updates: HashMap<K, V>,
+    updates: Vec<VotedFeedUpdate>,
     allowed_feed_ids: &Option<Vec<u32>>,
 ) -> Result<String> {
     let mut result: String = Default::default();
 
     info!("Preparing a batch of feeds to network `{net}`");
     let mut num_reported_feeds = 0;
-    for (key, val) in updates.into_iter() {
+    for (key, val) in updates.into_iter().map(|update| update.encode()) {
         match allowed_feed_ids {
             Some(allowed_feed_ids) => {
                 // if special net: add only special feeds
@@ -145,13 +141,10 @@ fn serialize_updates<
     Ok(result)
 }
 
-pub async fn eth_batch_send_to_contract<
-    K: Debug + Clone + std::string::ToString + 'static,
-    V: Debug + Clone + std::string::ToString + 'static,
->(
+pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
-    updates: HashMap<K, V>,
+    updates: Vec<VotedFeedUpdate>,
     feed_type: Repeatability,
     allow_list: Option<Vec<u32>>,
     impersonated_anvil_account: Option<String>,
@@ -286,12 +279,9 @@ pub async fn eth_batch_send_to_contract<
     Ok(receipt.status().to_string())
 }
 
-pub async fn eth_batch_send_to_all_contracts<
-    K: Debug + Clone + std::string::ToString + 'static,
-    V: Debug + Clone + std::string::ToString + 'static,
->(
+pub async fn eth_batch_send_to_all_contracts(
     sequencer_state: Data<SequencerState>,
-    updates: HashMap<K, V>,
+    updates: Vec<VotedFeedUpdate>,
     feed_type: Repeatability,
 ) -> Result<String> {
     let span = info_span!("eth_batch_send_to_all_contracts");
@@ -393,7 +383,6 @@ mod tests {
     use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
     use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
-    use std::collections::HashMap;
     use std::str::FromStr;
     use tokio::sync::mpsc;
     use utils::test_env::get_test_private_key_path;
@@ -514,8 +503,17 @@ mod tests {
         let description =
             String::from("0000000000000000000000000000000000000000000000000000000000000000");
         let result_value = format!("{}{}{}", number_of_slots, payload, description);
-        let mut updates_oneshot: HashMap<String, String> = HashMap::new();
-        updates_oneshot.insert(result_key, result_value);
+
+        let end_slot_timestamp = 0_u128;
+        let voted_update = VotedFeedUpdate::new_decode(
+            &result_key,
+            &result_value,
+            end_slot_timestamp,
+            feed_registry::types::FeedType::Numerical(0.0f64),
+        )
+        .unwrap();
+        let updates_oneshot: Vec<VotedFeedUpdate> = vec![voted_update];
+
         let result = eth_batch_send_to_contract(
             net.clone(),
             provider.clone(),
@@ -644,8 +642,14 @@ mod tests {
         let slot2 =
             String::from("0505050505050505050505050505050505050505050505050505050505050505");
         let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
-        let mut updates_oneshot: HashMap<String, String> = HashMap::new();
-        updates_oneshot.insert(String::from("00000003"), value1);
+        let end_of_timeslot = 0_u128;
+        let updates_oneshot: Vec<VotedFeedUpdate> = vec![VotedFeedUpdate::new_decode(
+            &"00000003",
+            &value1,
+            end_of_timeslot,
+            FeedType::Text("".to_string()),
+        )
+        .unwrap()];
 
         let result =
             eth_batch_send_to_all_contracts(sequencer_state, updates_oneshot, Oneshot).await;
@@ -658,27 +662,44 @@ mod tests {
     #[test]
     fn compute_keys_vals_ignores_networks_not_on_the_list() {
         let network = "dont_filter_me";
-        let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
-
-        let serialized_updates = serialize_updates(network, updates, &None);
-
+        let updates = get_updates_test_data();
+        let serialized_updates =
+            serialize_updates(network, updates, &None).expect("Serialize updates failed!");
+        let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
+        let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
+        let ab = format!("{a}{b}");
+        let ba = format!("{b}{a}");
         // It is undeterministic what the order will be, so checking both possibilities.
-        assert!(["0fffbye001fhi", "001fhi0fffbye"].contains(
-            &serialized_updates
-                .expect("Serialize updates failed!")
-                .as_str()
-        ));
+        assert!(ab == serialized_updates || ba == serialized_updates);
     }
+    use feed_registry::types::FeedType;
 
+    fn get_updates_test_data() -> Vec<VotedFeedUpdate> {
+        //let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
+        let end_slot_timestamp = 0_u128;
+        let v1 = VotedFeedUpdate {
+            feed_id: 0x1F_u32,
+            value: FeedType::Text("hi".to_string()),
+            end_slot_timestamp,
+        };
+        let v2 = VotedFeedUpdate {
+            feed_id: 0x0FFF,
+            value: FeedType::Text("bye".to_string()),
+            end_slot_timestamp,
+        };
+        let updates: Vec<VotedFeedUpdate> = vec![v1, v2];
+        updates
+    }
     #[test]
     fn compute_keys_vals_filters_updates_for_networks_on_the_list() {
         // Citrea
         let network = "citrea-testnet";
-        let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
+
+        let updates = get_updates_test_data();
 
         let serialized_updates = serialize_updates(
             network,
-            updates,
+            updates.clone(),
             &Some(vec![
                 31,  // BTC/USD
                 47,  // ETH/USD
@@ -694,15 +715,17 @@ mod tests {
         .expect("Serialize updates failed!");
 
         // Note: bye is filtered out:
-        assert_eq!(serialized_updates, "001fhi");
+        assert_eq!(
+            serialized_updates,
+            "0000001f6869000000000000000000000000000000000000000000000000000000000000"
+        );
 
         // Berachain
         let network = "berachain-bartio";
-        let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
         let serialized_updates = serialize_updates(
             network,
-            updates,
+            updates.clone(),
             &Some(vec![
                 31,  // BTC/USD
                 47,  // ETH/USD
@@ -714,15 +737,17 @@ mod tests {
         )
         .expect("Serialize updates failed!");
 
-        assert_eq!(serialized_updates, "001fhi");
+        assert_eq!(
+            serialized_updates,
+            "0000001f6869000000000000000000000000000000000000000000000000000000000000"
+        );
 
         // Manta
         let network = "manta-sepolia";
-        let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
 
         let serialized_updates = serialize_updates(
             network,
-            updates,
+            updates.clone(),
             &Some(vec![
                 31,  // BTC/USD
                 47,  // ETH/USD
@@ -733,6 +758,9 @@ mod tests {
         )
         .expect("Serialize updates failed!");
 
-        assert_eq!(serialized_updates, "001fhi");
+        assert_eq!(
+            serialized_updates,
+            "0000001f6869000000000000000000000000000000000000000000000000000000000000"
+        );
     }
 }

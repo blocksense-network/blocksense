@@ -6,6 +6,7 @@ use blockchain_data_model::in_mem_db::InMemDb;
 use config::AllFeedsConfig;
 use config::FeedConfig;
 use config::SequencerConfig;
+use data_feeds::feeds_processing::VotedFeedUpdate;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::new_feeds_meta_data_reg_from_config;
 use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
@@ -25,7 +26,7 @@ pub struct SequencerState {
     pub log_handle: SharedLoggingHandle,
     pub reporters: SharedReporters,
     pub feed_id_allocator: Arc<RwLock<Option<ConcurrentAllocator>>>,
-    pub aggregated_votes_to_block_creator_send: UnboundedSender<(String, String)>,
+    pub aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdate>,
     pub feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     pub active_feeds: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     pub sequencer_config: Arc<RwLock<SequencerConfig>>,
@@ -46,7 +47,7 @@ impl SequencerState {
         sequencer_config: &SequencerConfig,
         metrics_prefix: Option<&str>,
         feed_id_allocator: Option<ConcurrentAllocator>,
-        aggregated_votes_to_block_creator_send: UnboundedSender<(String, String)>,
+        aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdate>,
         feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
     ) -> SequencerState {
