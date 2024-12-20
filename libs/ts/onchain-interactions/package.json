@@ -5,7 +5,8 @@
     "ts": "yarn node --import tsx",
     "get-wallets-balances": "yarn ts src/scripts/balance-script.ts",
     "calculate-cost": "yarn ts src/scripts/cost-calculations.ts",
-    "unstuck-transaction": "yarn ts src/scripts/unstuck-transaction.ts"
+    "unstuck-transaction": "yarn ts src/scripts/unstuck-transaction.ts",
+    "check-pending-tx": "yarn ts src/scripts/check-pending-tx.ts"
   },
   "dependencies": {
     "@types/node": "^22.10.1",

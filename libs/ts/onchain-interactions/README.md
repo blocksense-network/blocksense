@@ -17,6 +17,12 @@ Print the balance of an address on the current deployedNetworks
 `yarn get-wallets-balances --address <ethereum address>`
 or just `yarn get-wallets-balances` if you want to check the funds on the sequencer(0xd756119012CcabBC59910dE0ecEbE406B5b952bE)
 
+### check-pending-tx
+
+Check all networks in deployedNetworks for pending transactions
+`yarn check-pending-tx --address <ethereum address>`
+or just `yarn check-pending-tx` if you want to check for pending on the sequencer(0xd756119012CcabBC59910dE0ecEbE406B5b952bE)
+
 ### cost-calculations
 
 Print and log the cost of avg transaction, cost for 24h on all deployedNetworks and runway using current balance(if we assume 5 min between transactions)
