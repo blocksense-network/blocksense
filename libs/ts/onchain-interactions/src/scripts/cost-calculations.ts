@@ -16,6 +16,7 @@ import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
+import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
 const calculateGasCosts = (
   transactions: Transaction[],
@@ -188,14 +189,14 @@ const fetchTransactionsForNetwork = async (
 };
 
 const main = async (): Promise<void> => {
-  const currentSequencerAddress = '0xd756119012CcabBC59910dE0ecEbE406B5b952bE';
+  const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage('Usage: $0 [--address <ethereum address>]')
     .option('address', {
       alias: 'a',
       describe: 'Ethereum address to fetch transactions for',
       type: 'string',
-      default: currentSequencerAddress,
+      default: sequencerAddress,
     })
     .help()
     .alias('help', 'h')
@@ -206,7 +207,7 @@ const main = async (): Promise<void> => {
   console.log(
     chalk.cyan(
       `Using Ethereum address: ${address} (sequencer: ${
-        address === currentSequencerAddress
+        address === sequencerAddress
       })\n`,
     ),
   );
