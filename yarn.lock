@@ -979,7 +979,6 @@ __metadata:
     axios: "npm:^1.7.9"
     chalk: "npm:^5.3.0"
     dotenv: "npm:^16.4.7"
-    ethers: "npm:^6.13.4"
     tsx: "npm:^4.19.2"
     web3: "npm:^4.15.0"
     yargs: "npm:^17.7.2"
