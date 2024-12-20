@@ -17,11 +17,11 @@ const networks = [
   'ethereum-mainnet',
   'ethereum-sepolia',
   'ethereum-holesky',
-  'avalanche-mainnet',
-  'avalanche-fuji',
   'andromeda-mainnet',
   'arbitrum-mainnet',
   'arbitrum-sepolia',
+  'avalanche-mainnet',
+  'avalanche-fuji',
   'base-mainnet',
   'base-sepolia',
   'berachain-bartio',
@@ -29,17 +29,17 @@ const networks = [
   'bsc-testnet',
   'celo-mainnet',
   'celo-alfajores',
+  'citrea-testnet',
   'fantom-mainnet',
   'fantom-testnet',
   'gnosis-mainnet',
   'gnosis-chiado',
-  'taiko-mainnet',
-  'taiko-hekla',
+  'kusama-moonriver',
   'linea-mainnet',
   'linea-sepolia',
   'manta-mainnet',
   'manta-sepolia',
-  'kusama-moonriver',
+  'morph-holesky',
   'optimism-mainnet',
   'optimism-sepolia',
   'polygon-mainnet',
@@ -48,17 +48,17 @@ const networks = [
   'polygon-zkevm-cardona',
   'scroll-mainnet',
   'scroll-sepolia',
+  'taiko-mainnet',
+  'taiko-hekla',
   'zksync-mainnet',
   'zksync-sepolia',
-  'morph-holesky',
-  'citrea-testnet',
 ] as const;
 
 const chainIds = [
-  99999999999, 1, 11155111, 17000, 43114, 43113, 1088, 42161, 421614, 8453,
-  84532, 80084, 56, 97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009,
-  59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
-  534352, 534351, 324, 300, 2810, 5115,
+  99999999999, 1, 11155111, 17000, 1088, 42161, 421614, 43114, 43113, 8453,
+  84532, 80084, 56, 97, 42220, 44787, 5115, 250, 4002, 100, 10200, 1285, 59144,
+  59141, 169, 3441006, 2810, 10, 11155420, 137, 80002, 1101, 2442, 534352,
+  534351, 167000, 167009, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -82,18 +82,18 @@ export type Network = S.Schema.Type<typeof network>;
 export enum Currency {
   ETH = 'ETH',
   AVAX = 'AVAX',
-  METIS = 'METIS',
+  BERA = 'BERA',
   BNB = 'BNB',
-  tBNB = 'tBNB',
   CELO = 'CELO',
+  cBTC = 'cBTC',
   FTM = 'FTM',
+  METIS = 'METIS',
+  MATIC = 'MATIC',
+  MOVR = 'MOVR',
+  POL = 'POL',
+  tBNB = 'tBNB',
   tFTM = 'tFTM',
   xDAI = 'xDAI',
-  MOVR = 'MOVR',
-  MATIC = 'MATIC',
-  POL = 'POL',
-  cBTC = 'cBTC',
-  BERA = 'BERA',
 }
 
 /**
@@ -125,18 +125,6 @@ export const networkMetadata = {
     explorerUrl: 'https://holesky.etherscan.io',
     currency: Currency.ETH,
   },
-  'avalanche-mainnet': {
-    chainId: 43114,
-    isTestnet: false,
-    explorerUrl: 'https://snowtrace.io',
-    currency: Currency.AVAX,
-  },
-  'avalanche-fuji': {
-    chainId: 43113,
-    isTestnet: true,
-    explorerUrl: 'https://testnet.snowtrace.io',
-    currency: Currency.AVAX,
-  },
   'andromeda-mainnet': {
     chainId: 1088,
     isTestnet: false,
@@ -154,6 +142,18 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://sepolia.arbiscan.io',
     currency: Currency.ETH,
+  },
+  'avalanche-mainnet': {
+    chainId: 43114,
+    isTestnet: false,
+    explorerUrl: 'https://snowtrace.io',
+    currency: Currency.AVAX,
+  },
+  'avalanche-fuji': {
+    chainId: 43113,
+    isTestnet: true,
+    explorerUrl: 'https://testnet.snowtrace.io',
+    currency: Currency.AVAX,
   },
   'base-mainnet': {
     chainId: 8453,
@@ -197,6 +197,12 @@ export const networkMetadata = {
     explorerUrl: 'https://alfajores.celoscan.com',
     currency: Currency.CELO,
   },
+  'citrea-testnet': {
+    chainId: 5115,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.citrea.xyz',
+    currency: Currency.cBTC,
+  },
   'fantom-mainnet': {
     chainId: 250,
     isTestnet: false,
@@ -221,17 +227,11 @@ export const networkMetadata = {
     explorerUrl: 'https://gnosis-chiado.blockscout.com',
     currency: Currency.xDAI,
   },
-  'taiko-mainnet': {
-    chainId: 167000,
+  'kusama-moonriver': {
+    chainId: 1285,
     isTestnet: false,
-    explorerUrl: 'https://taikoscan.io',
-    currency: Currency.ETH,
-  },
-  'taiko-hekla': {
-    chainId: 167009,
-    isTestnet: true,
-    explorerUrl: 'https://hekla.taikoscan.io',
-    currency: Currency.ETH,
+    explorerUrl: 'https://moonriver.moonscan.io',
+    currency: Currency.MOVR,
   },
   'linea-mainnet': {
     chainId: 59144,
@@ -257,11 +257,11 @@ export const networkMetadata = {
     explorerUrl: 'https://pacific-explorer.sepolia-testnet.manta.network',
     currency: Currency.ETH,
   },
-  'kusama-moonriver': {
-    chainId: 1285,
-    isTestnet: false,
-    explorerUrl: 'https://moonriver.moonscan.io',
-    currency: Currency.MOVR,
+  'morph-holesky': {
+    chainId: 2810,
+    isTestnet: true,
+    explorerUrl: 'https://explorer-holesky.morphl2.io',
+    currency: Currency.ETH,
   },
   'optimism-mainnet': {
     chainId: 10,
@@ -311,6 +311,18 @@ export const networkMetadata = {
     explorerUrl: 'https://sepolia.scrollscan.com',
     currency: Currency.ETH,
   },
+  'taiko-mainnet': {
+    chainId: 167000,
+    isTestnet: false,
+    explorerUrl: 'https://taikoscan.io',
+    currency: Currency.ETH,
+  },
+  'taiko-hekla': {
+    chainId: 167009,
+    isTestnet: true,
+    explorerUrl: 'https://hekla.taikoscan.io',
+    currency: Currency.ETH,
+  },
   'zksync-mainnet': {
     chainId: 324,
     isTestnet: false,
@@ -322,18 +334,6 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://zksync-sepolia.blockscout.com',
     currency: Currency.ETH,
-  },
-  'morph-holesky': {
-    chainId: 2810,
-    isTestnet: true,
-    explorerUrl: 'https://explorer-holesky.morphl2.io',
-    currency: Currency.ETH,
-  },
-  'citrea-testnet': {
-    chainId: 5115,
-    isTestnet: true,
-    explorerUrl: 'https://explorer.testnet.citrea.xyz',
-    currency: Currency.cBTC,
   },
 } satisfies {
   [Net in NetworkName]: {
