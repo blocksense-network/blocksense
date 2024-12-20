@@ -3,9 +3,9 @@
   "packageManager": "yarn@4.3.1",
   "scripts": {
     "ts": "yarn node --import tsx",
-    "get-wallets-balances": "yarn ts src/balance-script.ts",
-    "calculate-cost": "yarn ts src/cost-calculations.ts",
-    "unstuck-transaction": "yarn ts src/unstuck-transaction.ts"
+    "get-wallets-balances": "yarn ts src/scripts/balance-script.ts",
+    "calculate-cost": "yarn ts src/scripts/cost-calculations.ts",
+    "unstuck-transaction": "yarn ts src/scripts/unstuck-transaction.ts"
   },
   "dependencies": {
     "@types/node": "^22.10.1",
