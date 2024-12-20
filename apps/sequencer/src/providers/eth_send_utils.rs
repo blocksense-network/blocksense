@@ -281,7 +281,7 @@ pub async fn eth_batch_send_to_contract(
             debug!("[retry test] Sending initial tx: {tx:?}");
         } else {
             let nonce = prov
-                .get_transaction_count(contract_address.clone())
+                .get_transaction_count(contract_address)
                 .latest()
                 .await?;
             let price_increment = 1.0 + (timed_out_count as f64 * retry_fee_increment_fraction);
@@ -318,12 +318,11 @@ pub async fn eth_batch_send_to_contract(
         let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
 
         let receipt_result = spawn(async move {
-            let result = actix_web::rt::time::timeout(
+            actix_web::rt::time::timeout(
                 Duration::from_secs(transaction_retry_timeout_secs),
                 receipt_future.get_receipt(),
             )
-            .await;
-            result
+            .await
         })
         .await;
 
