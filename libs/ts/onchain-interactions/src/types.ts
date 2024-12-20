@@ -53,4 +53,5 @@ export type Transaction = {
   gasUsed: string;
   gasPrice: string;
   from: EthereumAddress;
+  to: EthereumAddress;
 };

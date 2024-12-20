@@ -168,12 +168,14 @@ const fetchTransactionsForNetwork = async (
 
     const transactions: Transaction[] = response.data.result
       .filter(
-        (tx: Transaction) => tx.from.toLowerCase() === address.toLowerCase(),
+        (tx: Transaction) =>
+          tx.from.toLowerCase() === address.toLowerCase() &&
+          tx.to.toLowerCase() !== address.toLowerCase(), // Filter out self-sent transactions
       )
-      .slice(0, 576); //2 days if we update every 5 min
+      .slice(0, 576); // 2 days if we update every 5 min
     console.log(
       chalk.green(
-        `${network}: Found ${transactions.length} transactions sent by the account`,
+        `${network}: Found ${transactions.length} transactions sent by the account to other addresses`,
       ),
     );
     return transactions;
