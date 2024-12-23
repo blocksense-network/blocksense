@@ -212,7 +212,7 @@ async fn handle_feeds_slots_manager_cmd(
                             }
                             Err(e) => {
                                 error!(
-                                    "Error sending to processot for feed id {}: {:?}",
+                                    "Error sending to processor for feed id {}: {:?}",
                                     delete_asset_feed.id, e
                                 );
                             }

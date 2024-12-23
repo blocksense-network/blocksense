@@ -1,4 +1,3 @@
-use actix_web::rt::spawn;
 use actix_web::web::Data;
 use alloy::hex;
 use blockchain_data_model::{BlockFeedConfig, BlockHeader, FeedActions, Resources};
@@ -12,59 +11,62 @@ use std::collections::HashMap;
 use std::io::Error;
 use std::time::SystemTime;
 use tokio_stream::StreamExt;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
 use crate::sequencer_state::SequencerState;
 
 pub async fn blocks_reader_loop(
     sequencer_state: Data<SequencerState>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
-    spawn(async move {
-        let Some(kafka_report_endpoint) = sequencer_state
-            .sequencer_config
-            .read()
-            .await
-            .kafka_report_endpoint
-            .url
-            .clone()
-        else {
-            warn!("No kafka endpoint specified for reading blocks!");
-            return Ok(()); // Exit the function early
-        };
+    tokio::task::Builder::new()
+        .name("blocks_reader_loop")
+        .spawn_local(async move {
+            let Some(kafka_report_endpoint) = sequencer_state
+                .sequencer_config
+                .read()
+                .await
+                .kafka_report_endpoint
+                .url
+                .clone()
+            else {
+                warn!("No kafka endpoint specified for reading blocks!");
+                return Ok(()); // Exit the function early
+            };
 
-        // Configure the Kafka consumer
-        let consumer: StreamConsumer = ClientConfig::new()
-            .set("bootstrap.servers", kafka_report_endpoint)
-            .set("group.id", "no_commit_group") // Consumer group ID
-            .set("enable.auto.commit", "false") // Disable auto-commit
-            .set("auto.offset.reset", "earliest") // Start from the beginning if no offset is stored
-            .create()
-            .expect("Failed to create Kafka consumer");
+            // Configure the Kafka consumer
+            let consumer: StreamConsumer = ClientConfig::new()
+                .set("bootstrap.servers", kafka_report_endpoint)
+                .set("group.id", "no_commit_group") // Consumer group ID
+                .set("enable.auto.commit", "false") // Disable auto-commit
+                .set("auto.offset.reset", "earliest") // Start from the beginning if no offset is stored
+                .create()
+                .expect("Failed to create Kafka consumer");
 
-        // Subscribe to the desired topic(s)
-        consumer
-            .subscribe(&["blockchain"])
-            .expect("Failed to subscribe to topic");
+            // Subscribe to the desired topic(s)
+            consumer
+                .subscribe(&["blockchain"])
+                .expect("Failed to subscribe to topic");
 
-        // Asynchronously process messages using a stream
-        let mut message_stream = consumer.stream();
+            // Asynchronously process messages using a stream
+            let mut message_stream = consumer.stream();
 
-        let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
+            let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
 
-        loop {
-            if let Some(message_result) = message_stream.next().await {
-                match message_result {
-                    Ok(message) => {
-                        process_msg_from_stream(sequencer_id, &sequencer_state, message).await;
-                    }
-                    Err(err) => {
-                        // Handle message errors
-                        error!("Error while consuming: {:?}", err);
+            loop {
+                if let Some(message_result) = message_stream.next().await {
+                    match message_result {
+                        Ok(message) => {
+                            process_msg_from_stream(sequencer_id, &sequencer_state, message).await;
+                        }
+                        Err(err) => {
+                            // Handle message errors
+                            error!("Error while consuming: {:?}", err);
+                        }
                     }
                 }
             }
-        }
-    })
+        })
+        .expect("Failed to spawn blocks_reader_loop!")
 }
 
 async fn process_msg_from_stream(
@@ -74,8 +76,8 @@ async fn process_msg_from_stream(
 ) {
     // Process the message
     if let Some(payload) = message.payload() {
-        info!(
-            "Key: {:?}, Payload: {}, Offset: {}, Partition: {}",
+        debug!(
+            "Processing Kafka message: Key: {:?}, Payload: {}, Offset: {}, Partition: {}",
             message.key(),
             String::from_utf8_lossy(payload),
             message.offset(),
@@ -97,51 +99,72 @@ async fn process_block(
     sequencer_state: &Data<SequencerState>,
     block: serde_json::Value,
 ) {
-    if let Some(header) = block["BlockHeader"].as_str() {
-        if let Ok(bytes) = hex::decode(header) {
-            let header = BlockHeader::deserialize(&bytes);
-            let process_block = header.issuer_id != sequencer_id
-                || sequencer_state
-                    .blockchain_db
-                    .read()
-                    .await
-                    .get_latest_block_height()
-                    < header.block_height;
-            if process_block {
-                if let Some(add_remove_feeds) = block["FeedActions"].as_str() {
-                    if let Ok(bytes) = hex::decode(add_remove_feeds) {
-                        let add_remove_feeds = FeedActions::deserialize(&bytes);
-                        for new_block_feed in add_remove_feeds.new_feeds.into_iter().flatten() {
-                            let new_feed_config = block_feed_to_feed_config(&new_block_feed);
-                            info!("new_feed_config = {:?}", new_feed_config);
-                            let cmd =
-                                FeedsManagementCmds::RegisterNewAssetFeed(RegisterNewAssetFeed {
-                                    config: new_feed_config.clone(),
-                                });
-                            match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
-                                Ok(_) => info!("forward register cmd"),
-                                Err(e) => {
-                                    info!("Could not forward register cmd: {e}")
+    match block["BlockHeader"].as_str() {
+        Some(header) => {
+            match hex::decode(header) {
+                Ok(bytes) => {
+                    let header = BlockHeader::deserialize(&bytes);
+                    // A sequencer needs to process blocks that come from peer sequencers
+                    // and all the blocks that it has emitted with block height
+                    // higher than what it has in storage. A scenario of a sequencer
+                    // having in storage a lower block height compared to the messages
+                    // it has posted to the message queue are on restart, since we don't
+                    // yet have persistent storage.
+                    let process_block = header.issuer_id != sequencer_id
+                        || sequencer_state
+                            .blockchain_db
+                            .read()
+                            .await
+                            .get_latest_block_height()
+                            < header.block_height;
+                    if process_block {
+                        if let Some(add_remove_feeds) = block["FeedActions"].as_str() {
+                            if let Ok(bytes) = hex::decode(add_remove_feeds) {
+                                let add_remove_feeds = FeedActions::deserialize(&bytes);
+                                for new_block_feed in
+                                    add_remove_feeds.new_feeds.into_iter().flatten()
+                                {
+                                    let new_feed_config =
+                                        block_feed_to_feed_config(&new_block_feed);
+                                    info!("new_feed_config = {:?}", new_feed_config);
+                                    let cmd = FeedsManagementCmds::RegisterNewAssetFeed(
+                                        RegisterNewAssetFeed {
+                                            config: new_feed_config.clone(),
+                                        },
+                                    );
+                                    match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
+                                        Ok(_) => info!("forward register cmd"),
+                                        Err(e) => {
+                                            error!("Could not forward register cmd: {e}")
+                                        }
+                                    };
                                 }
-                            };
-                        }
-                        for rm_feed_id in add_remove_feeds.feed_ids_to_rm.into_iter().flatten() {
-                            info!("rm_feed_id = {:?}", rm_feed_id);
-                            let cmd = FeedsManagementCmds::DeleteAssetFeed(DeleteAssetFeed {
-                                id: rm_feed_id,
-                            });
-                            match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
-                                Ok(_) => info!("forward register cmd"),
-                                Err(e) => {
-                                    info!("Could not forward register cmd: {e}")
+                                for rm_feed_id in
+                                    add_remove_feeds.feed_ids_to_rm.into_iter().flatten()
+                                {
+                                    info!("rm_feed_id = {:?}", rm_feed_id);
+                                    let cmd =
+                                        FeedsManagementCmds::DeleteAssetFeed(DeleteAssetFeed {
+                                            id: rm_feed_id,
+                                        });
+                                    match sequencer_state.feeds_slots_manager_cmd_send.send(cmd) {
+                                        Ok(_) => info!("forward remove cmd"),
+                                        Err(e) => {
+                                            error!("Could not forward remove cmd: {e}")
+                                        }
+                                    };
                                 }
-                            };
+                            }
                         }
                     }
                 }
+                Err(e) => {
+                    error!("Decoding header: {header} failed! {e}");
+                }
             }
-        } else {
-            info!("Decoding failed!");
+        }
+        None => {
+            warn!("Recvd msg with missing BlockHeader! {block}");
         }
     }
 }
@@ -196,7 +219,7 @@ fn convert_resources(resources: &Resources) -> HashMap<String, String> {
 }
 
 fn u64_to_system_time(timestamp: u64) -> SystemTime {
-    SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(timestamp)
+    SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(timestamp as u64)
 }
 
 fn u8_array_to_f32(bytes: [u8; 4]) -> f32 {

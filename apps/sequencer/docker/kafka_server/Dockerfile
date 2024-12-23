@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Download Kafka 3.6.2 from the official Apache mirror
-RUN curl -O https://downloads.apache.org/kafka/3.6.2/kafka_2.12-3.6.2.tgz
+RUN curl -O https://archive.apache.org/dist/kafka/3.6.2/kafka_2.12-3.6.2.tgz
 
 # Extract the downloaded Kafka tarball
 RUN tar xvfz kafka_2.12-3.6.2.tgz

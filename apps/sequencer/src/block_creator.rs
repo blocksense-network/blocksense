@@ -198,7 +198,7 @@ fn recvd_feed_management_cmd_to_block(
 fn system_time_to_u64(time: SystemTime) -> u64 {
     time.duration_since(UNIX_EPOCH)
         .expect("SystemTime should be after UNIX_EPOCH")
-        .as_secs()
+        .as_millis() as u64
 }
 
 // Helper function to convert f32 to [u8; 4]

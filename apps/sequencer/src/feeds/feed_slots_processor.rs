@@ -479,7 +479,7 @@ impl FeedSlotsProcessor {
             "Text" => FeedType::Text("".to_string()),
             _ => {
                 return Err(eyre!(
-                    "Insupported feed type {feed_type} for feed: {}",
+                    "Unsupported feed type {feed_type} for feed: {}",
                     self.name
                 ));
             }
@@ -656,7 +656,7 @@ pub mod tests {
             mpsc::unbounded_channel();
         let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
 
-        let sequencer_state: SequencerState = SequencerState {
+        let sequencer_state = SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
             ))),
