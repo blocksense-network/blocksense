@@ -1,5 +1,6 @@
 pub mod in_mem_db;
 
+use anyhow::Result;
 use ssz_rs::prelude::*;
 
 type HashType = [u8; 32];
@@ -57,12 +58,14 @@ pub struct BlockHeader {
 }
 
 impl BlockHeader {
-    pub fn serialize(&mut self) -> Vec<u8> {
-        ssz_rs::serialize(self).expect("Serialization of BlockHeader failed")
+    pub fn serialize(&mut self) -> Result<Vec<u8>> {
+        let result = ssz_rs::serialize(self)?;
+        Ok(result)
     }
 
-    pub fn deserialize(serialized: &[u8]) -> BlockHeader {
-        ssz_rs::deserialize(serialized).expect("Serialization of BlockHeader failed")
+    pub fn deserialize(serialized: &[u8]) -> Result<BlockHeader> {
+        let result = ssz_rs::deserialize(serialized)?;
+        Ok(result)
     }
 }
 
@@ -74,12 +77,14 @@ pub struct FeedActions {
 }
 
 impl FeedActions {
-    pub fn serialize(&mut self) -> Vec<u8> {
-        ssz_rs::serialize(self).expect("Serialization of FeedActions failed")
+    pub fn serialize(&mut self) -> Result<Vec<u8>> {
+        let result = ssz_rs::serialize(self)?;
+        Ok(result)
     }
 
-    pub fn deserialize(serialized: &[u8]) -> FeedActions {
-        ssz_rs::deserialize(serialized).expect("Serialization of FeedActions failed")
+    pub fn deserialize(serialized: &[u8]) -> Result<FeedActions> {
+        let result = ssz_rs::deserialize(serialized)?;
+        Ok(result)
     }
 }
 

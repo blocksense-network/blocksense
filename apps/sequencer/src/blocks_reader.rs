@@ -1,6 +1,7 @@
 use actix_web::web::Data;
 use alloy::hex;
 use blockchain_data_model::{BlockHeader, FeedActions};
+use eyre::Result;
 use feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
@@ -9,7 +10,7 @@ use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::{BorrowedMessage, Message};
 use std::io::Error;
 use tokio_stream::StreamExt;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info, trace, warn};
 
 use crate::feeds::feed_config_conversions::block_feed_to_feed_config;
 use crate::sequencer_state::SequencerState;
@@ -84,7 +85,10 @@ async fn process_msg_from_stream(
         );
         match serde_json::from_str::<serde_json::Value>(&String::from_utf8_lossy(payload)) {
             Ok(block) => {
-                process_block(sequencer_id, sequencer_state, block).await;
+                match process_block(sequencer_id, sequencer_state, &block).await {
+                    Ok(_) => trace!("Successfully processed block: {block}"),
+                    Err(e) => error!("Error processing block: {block} error: {e}"),
+                };
             }
             Err(e) => {
                 warn!("Error parsing block: {e}");
@@ -96,13 +100,16 @@ async fn process_msg_from_stream(
 async fn process_block(
     sequencer_id: u64,
     sequencer_state: &Data<SequencerState>,
-    block: serde_json::Value,
-) {
+    block: &serde_json::Value,
+) -> Result<()> {
     match block["BlockHeader"].as_str() {
         Some(header) => {
             match hex::decode(header) {
                 Ok(bytes) => {
-                    let header = BlockHeader::deserialize(&bytes);
+                    let header = match BlockHeader::deserialize(&bytes) {
+                        Ok(h) => h,
+                        Err(e) => eyre::bail!("BlockHeader::deserialize error: {e}"),
+                    };
                     // A sequencer needs to process blocks that come from peer sequencers
                     // and all the blocks that it has emitted with block height
                     // higher than what it has in storage. A scenario of a sequencer
@@ -117,12 +124,13 @@ async fn process_block(
                             .get_latest_block_height()
                             < header.block_height;
                     if process_block {
-                        if let Some(add_remove_feeds) = block["FeedActions"].as_str() {
-                            if let Ok(bytes) = hex::decode(add_remove_feeds) {
-                                let add_remove_feeds = FeedActions::deserialize(&bytes);
-                                for new_block_feed in
-                                    add_remove_feeds.new_feeds.into_iter().flatten()
-                                {
+                        if let Some(feed_actions) = block["FeedActions"].as_str() {
+                            if let Ok(bytes) = hex::decode(feed_actions) {
+                                let feed_actions = match FeedActions::deserialize(&bytes) {
+                                    Ok(fa) => fa,
+                                    Err(e) => eyre::bail!("FeedActions::deserialize error: {e}"),
+                                };
+                                for new_block_feed in feed_actions.new_feeds.into_iter().flatten() {
                                     let new_feed_config =
                                         block_feed_to_feed_config(&new_block_feed);
                                     info!("new_feed_config = {:?}", new_feed_config);
@@ -138,8 +146,7 @@ async fn process_block(
                                         }
                                     };
                                 }
-                                for rm_feed_id in
-                                    add_remove_feeds.feed_ids_to_rm.into_iter().flatten()
+                                for rm_feed_id in feed_actions.feed_ids_to_rm.into_iter().flatten()
                                 {
                                     info!("rm_feed_id = {:?}", rm_feed_id);
                                     let cmd =
@@ -166,4 +173,5 @@ async fn process_block(
             warn!("Recvd msg with missing BlockHeader! {block}");
         }
     }
+    Ok(())
 }

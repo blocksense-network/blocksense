@@ -221,12 +221,12 @@ async fn generate_block<
 
     let block_is_empty = new_feeds_to_register.is_empty() && feeds_ids_to_delete.is_empty();
     let mut serialized_header = Vec::new();
-    let mut serialized_add_remove_feeds = Vec::new();
+    let mut serialized_feed_actions = Vec::new();
     // Block holding the db write mutex:
     if !block_is_empty {
         // Create the block that will contain the new feeds, deleted feeds and updates of feed values
         let mut blockchain_db = sequencer_state.blockchain_db.write().await;
-        let (header, add_remove_feeds) = blockchain_db
+        let (header, feed_actions) = blockchain_db
             .create_new_block(
                 sequencer_id,
                 block_height,
@@ -234,8 +234,18 @@ async fn generate_block<
                 feeds_ids_to_delete_in_block,
             )
             .map_err(|e| eyre::eyre!(e.to_string()))?;
-        serialized_header = header.clone().serialize();
-        serialized_add_remove_feeds = add_remove_feeds.clone().serialize();
+        serialized_header = match header.clone().serialize() {
+            Ok(res) => res,
+            Err(e) => {
+                panic!("could not serialize block header: {e}")
+            }
+        };
+        serialized_feed_actions = match feed_actions.clone().serialize() {
+            Ok(res) => res,
+            Err(e) => {
+                panic!("could not serialize block feed_actions: {e}")
+            }
+        };
         let header_merkle_root = InMemDb::calc_merkle_root(&mut header.clone())
             .map_err(|e| eyre::eyre!(e.to_string()))?;
         info!(
@@ -243,7 +253,7 @@ async fn generate_block<
             header,
             InMemDb::node_to_hash(header_merkle_root).map_err(|e| eyre::eyre!(e.to_string()))?
         );
-        if let Err(e) = blockchain_db.add_next_block(header, add_remove_feeds) {
+        if let Err(e) = blockchain_db.add_next_block(header, feed_actions) {
             eyre::bail!(e.to_string());
         }
     }
@@ -286,7 +296,7 @@ async fn generate_block<
     if !block_is_empty {
         let block_to_kafka = json!({
             "BlockHeader": hex::encode(serialized_header),
-            "FeedActions": hex::encode(serialized_add_remove_feeds),
+            "FeedActions": hex::encode(serialized_feed_actions),
         });
 
         if let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint {
