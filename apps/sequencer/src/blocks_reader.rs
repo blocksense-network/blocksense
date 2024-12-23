@@ -1,18 +1,17 @@
 use actix_web::web::Data;
 use alloy::hex;
-use blockchain_data_model::{BlockFeedConfig, BlockHeader, FeedActions, Resources};
+use blockchain_data_model::{BlockHeader, FeedActions};
 use feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
 use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::{BorrowedMessage, Message};
-use std::collections::HashMap;
 use std::io::Error;
-use std::time::SystemTime;
 use tokio_stream::StreamExt;
 use tracing::{debug, error, info, warn};
 
+use crate::feeds::feed_config_conversions::block_feed_to_feed_config;
 use crate::sequencer_state::SequencerState;
 
 pub async fn blocks_reader_loop(
@@ -167,61 +166,4 @@ async fn process_block(
             warn!("Recvd msg with missing BlockHeader! {block}");
         }
     }
-}
-
-// Functions for conversion of BlockFeedConfig to FeedConfig:
-fn block_feed_to_feed_config(block_feed: &BlockFeedConfig) -> config::FeedConfig {
-    config::FeedConfig {
-        id: block_feed.id,
-        name: data_chunk_to_string(&block_feed.name),
-        full_name: data_chunk_to_string(&block_feed.full_name),
-        description: data_chunk_to_string(&block_feed.description),
-        _type: data_chunk_to_string(&block_feed._type),
-        decimals: block_feed.decimals,
-        pair: config::AssetPair {
-            base: data_chunk_to_string(&block_feed.pair.base),
-            quote: data_chunk_to_string(&block_feed.pair.quote),
-        },
-        report_interval_ms: block_feed.report_interval_ms,
-        first_report_start_time: u64_to_system_time(block_feed.first_report_start_time),
-        resources: convert_resources(&block_feed.resources),
-        quorum_percentage: u8_array_to_f32(block_feed.quorum_percentage),
-        skip_publish_if_less_then_percentage: u8_array_to_f32(
-            block_feed.skip_publish_if_less_then_percentage,
-        ),
-        always_publish_heartbeat_ms: block_feed.always_publish_heartbeat_ms,
-        script: data_chunk_to_string(&block_feed.script),
-        value_type: data_chunk_to_string(&block_feed.value_type),
-        aggregate_type: data_chunk_to_string(&block_feed.aggregate_type),
-    }
-}
-
-fn data_chunk_to_string(bytes: &[u8; 32]) -> String {
-    let null_terminated = bytes.split(|&b| b == 0).next().unwrap_or(&[]);
-    String::from_utf8(null_terminated.to_vec()).unwrap_or_default()
-}
-
-fn convert_resources(resources: &Resources) -> HashMap<String, String> {
-    // Convert `Resources` back to `HashMap<String, String>` based on its internal representation
-    let mut map = HashMap::new();
-
-    for (key_opt, value_opt) in resources
-        .resource_keys
-        .iter()
-        .zip(&resources.resource_values)
-    {
-        if let (Some(key), Some(value)) = (key_opt, value_opt) {
-            // Convert DataChunk back to String and insert into HashMap
-            map.insert(data_chunk_to_string(key), data_chunk_to_string(value));
-        }
-    }
-    map
-}
-
-fn u64_to_system_time(timestamp: u64) -> SystemTime {
-    SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(timestamp as u64)
-}
-
-fn u8_array_to_f32(bytes: [u8; 4]) -> f32 {
-    f32::from_be_bytes(bytes)
 }

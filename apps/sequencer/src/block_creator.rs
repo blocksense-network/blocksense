@@ -2,8 +2,7 @@ use actix_web::web::Data;
 use alloy::hex;
 use blockchain_data_model::in_mem_db::InMemDb;
 use blockchain_data_model::{
-    BlockFeedConfig, DataChunk, Resources, MAX_ASSET_FEED_UPDATES_IN_BLOCK,
-    MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
+    MAX_ASSET_FEED_UPDATES_IN_BLOCK, MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
 };
 use config::BlockConfig;
 use feed_registry::feed_registration_cmds::{
@@ -18,12 +17,12 @@ use std::collections::{HashMap, VecDeque};
 use std::fmt::Debug;
 use std::io::Error;
 use std::mem;
-use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::Duration;
 use tracing::{debug, error, info, info_span, warn};
 use utils::time::{current_unix_time, system_time_to_millis};
 
+use crate::feeds::feed_config_conversions::feed_config_to_block;
 use crate::sequencer_state::SequencerState;
 use crate::UpdateToSend;
 
@@ -191,71 +190,6 @@ fn recvd_feed_management_cmd_to_block(
             }
         },
         None => info!("Woke up on empty channel - feed_management_cmds_recv"),
-    }
-}
-
-// Helper function to convert SystemTime to u64 (seconds since UNIX_EPOCH)
-fn system_time_to_u64(time: SystemTime) -> u64 {
-    time.duration_since(UNIX_EPOCH)
-        .expect("SystemTime should be after UNIX_EPOCH")
-        .as_millis() as u64
-}
-
-// Helper function to convert f32 to [u8; 4]
-fn f32_to_u8_array(value: f32) -> [u8; 4] {
-    value.to_be_bytes()
-}
-
-// Helper function to convert String to DataChunk ([u8; 32])
-fn string_to_data_chunk(input: &str) -> DataChunk {
-    let mut chunk = [0u8; 32];
-    let bytes = input.as_bytes();
-    let len = bytes.len().min(32); // Truncate if longer than 32 bytes
-    chunk[..len].copy_from_slice(&bytes[..len]);
-    chunk
-}
-
-// Function to convert HashMap<String, String> to Resources struct
-fn convert_resources(map: &HashMap<String, String>) -> Resources {
-    // Initialize arrays with None
-    let mut resource_keys: [Option<DataChunk>; 32] = Default::default();
-    let mut resource_values: [Option<DataChunk>; 32] = Default::default();
-
-    // Iterate over the HashMap, up to 32 entries
-    for (i, (key, value)) in map.iter().take(32).enumerate() {
-        resource_keys[i] = Some(string_to_data_chunk(key));
-        resource_values[i] = Some(string_to_data_chunk(value));
-    }
-
-    Resources {
-        resource_keys,
-        resource_values,
-    }
-}
-
-fn feed_config_to_block(feed_config: &config::FeedConfig) -> BlockFeedConfig {
-    BlockFeedConfig {
-        id: feed_config.id,
-        name: string_to_data_chunk(&feed_config.name),
-        full_name: string_to_data_chunk(&feed_config.full_name),
-        description: string_to_data_chunk(&feed_config.description),
-        _type: string_to_data_chunk(&feed_config._type),
-        decimals: feed_config.decimals,
-        pair: blockchain_data_model::AssetPair {
-            base: string_to_data_chunk(feed_config.pair.base.as_str()),
-            quote: string_to_data_chunk(feed_config.pair.quote.as_str()),
-        },
-        report_interval_ms: feed_config.report_interval_ms,
-        first_report_start_time: system_time_to_u64(feed_config.first_report_start_time),
-        resources: convert_resources(&feed_config.resources),
-        quorum_percentage: f32_to_u8_array(feed_config.quorum_percentage),
-        skip_publish_if_less_then_percentage: f32_to_u8_array(
-            feed_config.skip_publish_if_less_then_percentage,
-        ),
-        always_publish_heartbeat_ms: feed_config.always_publish_heartbeat_ms,
-        script: string_to_data_chunk(&feed_config.script),
-        value_type: string_to_data_chunk(&feed_config.value_type),
-        aggregate_type: string_to_data_chunk(&feed_config.aggregate_type),
     }
 }
 
