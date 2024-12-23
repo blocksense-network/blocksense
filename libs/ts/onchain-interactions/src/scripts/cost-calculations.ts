@@ -222,7 +222,7 @@ const main = async (): Promise<void> => {
       if (rpcUrl === '') {
         console.log(
           chalk.red(
-            `No rpc url for network ${network}. Cant get balance - will use 0.`,
+            `No rpc url for network ${network}. Can't get balance - will use 0.`,
           ),
         );
         balance = '0';
