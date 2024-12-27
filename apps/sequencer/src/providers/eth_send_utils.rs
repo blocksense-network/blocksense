@@ -103,7 +103,14 @@ pub async fn deploy_contract(
     Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
 }
 
-fn serialize_updates(net: &str, updates: &[VotedFeedUpdate]) -> Result<String> {
+/// Serializes the `updates` hash map into a string.
+///
+/// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
+/// will be added to the result. Otherwise, all feeds in `updates` will be added.
+fn serialize_updates(
+    net: &str,
+    updates: &[VotedFeedUpdate],
+) -> Result<String> {
     let mut result: String = Default::default();
     info!("Preparing a batch of feeds to network `{net}`");
     let mut num_reported_feeds = 0;
