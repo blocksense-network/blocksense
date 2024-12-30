@@ -45,7 +45,7 @@ impl SequencerState {
         log_handle: SharedLoggingHandle,
         sequencer_config: &SequencerConfig,
         metrics_prefix: Option<&str>,
-        feed_id_allocator: ConcurrentAllocator,
+        feed_id_allocator: Option<ConcurrentAllocator>,
         aggregated_votes_to_block_creator_send: UnboundedSender<(String, String)>,
         feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
@@ -58,7 +58,7 @@ impl SequencerState {
             providers,
             log_handle,
             reporters: init_shared_reporters(sequencer_config, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(Some(feed_id_allocator))),
+            feed_id_allocator: Arc::new(RwLock::new(feed_id_allocator)),
             aggregated_votes_to_block_creator_send,
             feeds_metrics: Arc::new(RwLock::new(
                 FeedsMetrics::new(metrics_prefix.unwrap_or(""))

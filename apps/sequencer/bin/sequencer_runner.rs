@@ -67,7 +67,7 @@ pub async fn prepare_sequencer_state(
         log_handle,
         sequencer_config,
         metrics_prefix,
-        feed_id_allocator,
+        Some(feed_id_allocator),
         aggregated_votes_to_block_creator_send,
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,

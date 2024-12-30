@@ -609,33 +609,17 @@ pub mod tests {
         let (_, feeds_config) = get_sequencer_and_feed_configs();
 
         (
-            Data::new(SequencerState {
-                registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                    &feeds_config,
-                ))),
-                reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+            Data::new(SequencerState::new(
+                feeds_config,
                 providers,
                 log_handle,
-                reporters: init_shared_reporters(&sequencer_config, Some(metrics_prefix)),
-                feed_id_allocator: Arc::new(RwLock::new(None)),
-                aggregated_votes_to_block_creator_send: vote_send,
-                feeds_metrics: Arc::new(RwLock::new(
-                    FeedsMetrics::new(metrics_prefix).expect("Failed to allocate feed_metrics"),
-                )),
-                active_feeds: Arc::new(RwLock::new(
-                    feeds_config
-                        .feeds
-                        .into_iter()
-                        .map(|feed| (feed.id, feed))
-                        .collect(),
-                )),
-                sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-                feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+                &sequencer_config,
+                Some(metrics_prefix),
+                None,
+                vote_send,
                 feeds_management_cmd_to_block_creator_send,
                 feeds_slots_manager_cmd_send,
-                blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
-                kafka_endpoint: None,
-            }),
+            )),
             vote_recv,
         )
     }
