@@ -3,6 +3,7 @@ use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use alloy::primitives::map::HashMap;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
+use config::PublishCriteria;
 use data_feeds::feeds_processing::VotedFeedUpdate;
 use eyre::{eyre, Result};
 use eyre::{Context, ContextCompat};
@@ -143,16 +144,21 @@ impl FeedSlotsProcessor {
                             warn!("Anomaly Detection failed with error - {}", e);
                         }
                     }
-                    if skip_publish_if_less_then_percentage > 0.0f64 {
-                        skip_publishing = self
-                            .check_skip_publish(
-                                history,
-                                candidate_value,
-                                skip_publish_if_less_then_percentage,
-                                end_slot_timestamp,
-                                always_publish_heartbeat_ms,
-                            )
-                            .await;
+                    {
+                        let criteria = PublishCriteria {
+                            feed_id,
+                            skip_publish_if_less_then_percentage,
+                            always_publish_heartbeat_ms,
+                        };
+                        let update = VotedFeedUpdate {
+                            feed_id,
+                            value: result_post_to_contract.clone(),
+                            end_slot_timestamp,
+                        };
+                        debug!("Get a read lock on history [feed {feed_id}]");
+                        let history_guard = history.read().await;
+                        skip_publishing = update.should_skip(&criteria, &history_guard);
+                        debug!("Release the read lock on history [feed {feed_id}]");
                     }
                 }
             }
@@ -325,39 +331,6 @@ impl FeedSlotsProcessor {
         result_send
             .send(message)
             .map_err(|e| eyre!("[post_to_contract]: {e}"))
-    }
-
-    async fn check_skip_publish(
-        &self,
-        history: &Arc<RwLock<FeedAggregateHistory>>,
-        candidate_value: f64,
-        skip_publish_if_less_then_percentage: f64,
-        end_slot_timestamp: Timestamp,
-        always_publish_heartbeat_ms: Option<u128>,
-    ) -> bool {
-        let feed_id = self.key;
-        debug!("Get a read lock on history [feed {feed_id}]");
-        let history_guard = history.read().await;
-        let res =
-            history_guard
-                .last(feed_id)
-                .is_some_and(|last_published| match last_published.value {
-                    FeedType::Numerical(last) => {
-                        let a = f64::abs(last);
-                        let b = f64::abs(candidate_value);
-                        let diff = f64::abs(last - candidate_value);
-                        let skip_time_check =
-                            always_publish_heartbeat_ms.map_or(true, |heartbeat| {
-                                end_slot_timestamp < heartbeat + last_published.end_slot_timestamp
-                            });
-                        let skip_diff_check =
-                            diff * 100.0f64 < skip_publish_if_less_then_percentage * f64::max(a, b);
-                        skip_diff_check && skip_time_check
-                    }
-                    _ => false,
-                });
-        debug!("Release the read lock on history [feed {feed_id}]");
-        res
     }
 
     async fn perform_anomaly_detection(

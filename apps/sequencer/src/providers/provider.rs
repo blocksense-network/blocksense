@@ -15,7 +15,8 @@ use alloy::{
 };
 use reqwest::{Client, Url};
 
-use config::SequencerConfig;
+use config::{PublishCriteria, SequencerConfig};
+use feed_registry::registry::FeedAggregateHistory;
 use prometheus::metrics::ProviderMetrics;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -44,7 +45,6 @@ pub fn parse_eth_address(addr: &str) -> Option<Address> {
     contract_address
 }
 
-#[derive(Debug)]
 pub struct RpcProvider {
     pub provider: ProviderType,
     pub signer: PrivateKeySigner,
@@ -56,6 +56,8 @@ pub struct RpcProvider {
     pub data_feed_store_byte_code: Option<Vec<u8>>,
     pub data_feed_sports_byte_code: Option<Vec<u8>>,
     pub impersonated_anvil_account: Option<Address>,
+    pub history: FeedAggregateHistory,
+    pub publishing_criteria: HashMap<u32, PublishCriteria>,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -179,7 +181,19 @@ async fn get_rpc_providers(
             .impersonated_anvil_account
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
+        let mut history = FeedAggregateHistory::new();
+        let mut publishing_criteria: HashMap<u32, PublishCriteria> = HashMap::new();
 
+        for crit in p.publishing_criteria.iter() {
+            let feed_id = crit.feed_id;
+            let buf_size = 256;
+            if publishing_criteria
+                .insert(crit.feed_id, crit.clone())
+                .is_none()
+            {
+                history.register_feed(feed_id, buf_size);
+            }
+        }
         let rpc_provider = Arc::new(Mutex::new(RpcProvider {
             contract_address: address,
             event_contract_address: event_address,
@@ -197,6 +211,8 @@ async fn get_rpc_providers(
                     .expect("data_feed_sports_byte_code for provider is not valid hex string!")
             }),
             impersonated_anvil_account,
+            history,
+            publishing_criteria,
         }));
 
         providers.insert(key.clone(), rpc_provider.clone());
@@ -212,12 +228,35 @@ async fn get_rpc_providers(
 
     debug!("List of providers:");
     for (key, value) in &providers {
-        debug!("{}: {:?}", key, value);
+        let provider = &value.lock().await.provider;
+        debug!("{}: {:?}", key, provider);
     }
 
     providers
 }
 
+use data_feeds::feeds_processing::VotedFeedUpdate;
+impl RpcProvider {
+    pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {
+        for update in updates.iter() {
+            let feed_id = update.feed_id;
+            self.history
+                .push(feed_id, update.value.clone(), update.end_slot_timestamp);
+        }
+    }
+
+    pub fn apply_publish_criteria(&self, updates: &[VotedFeedUpdate]) -> Vec<VotedFeedUpdate> {
+        updates
+            .iter()
+            .filter(|update| {
+                self.publishing_criteria
+                    .get(&update.feed_id)
+                    .is_none_or(|criteria| !update.should_skip(criteria, &self.history))
+            })
+            .cloned()
+            .collect::<Vec<VotedFeedUpdate>>()
+    }
+}
 // pub fn print_type<T>(_: &T) {
 //     println!("{:?}", std::any::type_name::<T>());
 // }

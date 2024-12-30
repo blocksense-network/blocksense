@@ -822,6 +822,7 @@ mod tests {
                     is_enabled: true,
                     allow_feeds: None,
                     impersonated_anvil_account: None,
+                    publishing_criteria: vec![],
                 }
             });
 
@@ -883,6 +884,7 @@ mod tests {
                     is_enabled: false,
                     allow_feeds: None,
                     impersonated_anvil_account: None,
+                    publishing_criteria: vec![],
                 }
             });
 
@@ -944,6 +946,7 @@ mod tests {
                     is_enabled: true,
                     allow_feeds: None,
                     impersonated_anvil_account: None,
+                    publishing_criteria: vec![],
                 }
             });
 
@@ -1015,6 +1018,7 @@ mod tests {
                     is_enabled: false,
                     allow_feeds: None,
                     impersonated_anvil_account: None,
+                    publishing_criteria: vec![],
                 }
             });
 
