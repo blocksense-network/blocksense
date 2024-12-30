@@ -1,18 +1,8 @@
-use std::sync::Arc;
-
 use actix_web::{web, App, HttpServer};
-use blockchain_data_model::in_mem_db::InMemDb;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
-use feed_registry::registry::{
-    new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
-};
-use rdkafka::producer::FutureProducer;
-use rdkafka::ClientConfig;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
-use tokio::sync::{mpsc, RwLock};
-
-use sequencer::reporters::reporter::init_shared_reporters;
+use tokio::sync::mpsc;
 
 use sequencer::http_handlers::admin::add_admin_services;
 use sequencer::http_handlers::data_feeds::add_main_services;
@@ -23,7 +13,6 @@ use utils::logging::{
 
 use actix_web::web::Data;
 use config::{get_sequencer_and_feed_configs, AllFeedsConfig, SequencerConfig};
-use prometheus::metrics::FeedsMetrics;
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
@@ -41,15 +30,6 @@ type VoteChannel = (
     UnboundedSender<(String, String)>,
     UnboundedReceiver<(String, String)>,
 );
-
-fn create_kafka_producer(
-    bootstrap_server: &str,
-) -> Result<FutureProducer, Box<dyn std::error::Error>> {
-    Ok(ClientConfig::new()
-        .set("bootstrap.servers", bootstrap_server)
-        .set("queue.buffering.max.ms", "0")
-        .create()?)
-}
 
 /// Given a Sequencer config is returns the app state need to start the Actix Sequencer server.
 pub async fn prepare_sequencer_state(
@@ -81,42 +61,17 @@ pub async fn prepare_sequencer_state(
         mpsc::unbounded_channel();
     let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
 
-    let db = RwLock::new(InMemDb::new());
-
-    let sequencer_state: Data<SequencerState> = web::Data::new(SequencerState {
-        registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-            &feeds_config,
-        ))),
-        reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+    let sequencer_state: Data<SequencerState> = web::Data::new(SequencerState::new(
+        feeds_config,
         providers,
         log_handle,
-        reporters: init_shared_reporters(sequencer_config, metrics_prefix),
-        feed_id_allocator: Arc::new(RwLock::new(Some(feed_id_allocator))),
+        sequencer_config,
+        metrics_prefix,
+        feed_id_allocator,
         aggregated_votes_to_block_creator_send,
-        feeds_metrics: Arc::new(RwLock::new(
-            FeedsMetrics::new(metrics_prefix.unwrap_or(""))
-                .expect("Failed to allocate feed_metrics"),
-        )),
-        active_feeds: Arc::new(RwLock::new(
-            feeds_config
-                .feeds
-                .into_iter()
-                .map(|feed| (feed.id, feed))
-                .collect(),
-        )),
-        sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-        feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
-        blockchain_db: Arc::new(db),
-        kafka_endpoint: sequencer_config
-            .kafka_report_endpoint
-            .url
-            .as_ref()
-            .map(|url| {
-                create_kafka_producer(url).expect("Could not create kafka communication channel.")
-            }),
-    });
+    ));
 
     (
         aggregated_votes_to_block_creator_recv,
