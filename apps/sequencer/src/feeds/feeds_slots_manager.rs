@@ -354,22 +354,15 @@ async fn read_next_feed_slots_manager_cmd(
 mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
-    use crate::reporters::reporter::init_shared_reporters;
-    use blockchain_data_model::in_mem_db::InMemDb;
     use config::get_sequencer_and_feed_configs;
     use config::init_config;
     use config::SequencerConfig;
-    use feed_registry::registry::FeedAggregateHistory;
-    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::FeedType;
-    use prometheus::metrics::FeedsMetrics;
     use std::env;
     use std::path::PathBuf;
-    use std::sync::Arc;
     use std::time::Duration;
 
     use crate::feeds::feed_slots_processor::tests::check_recieved;
-    use tokio::sync::RwLock;
     use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
@@ -386,8 +379,6 @@ mod tests {
 
         let (_, mut feeds_config) = get_sequencer_and_feed_configs();
 
-        let all_feeds_reports = AllFeedsReports::new();
-        let all_feeds_reports_arc = Arc::new(RwLock::new(all_feeds_reports));
         let metrics_prefix = Some("test_feed_slots_manager_loop_");
 
         let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
@@ -400,11 +391,6 @@ mod tests {
         feeds_config.feeds[1].report_interval_ms = TIME_INTERVAL; // lower the report time interval.
 
         let reporter_id = 42;
-        all_feeds_reports_arc
-            .write()
-            .await
-            .push(1, reporter_id, Ok(original_report_data.clone()))
-            .await;
         let (vote_send, mut vote_recv) = mpsc::unbounded_channel();
         let (
             feeds_management_cmd_to_block_creator_send,
@@ -413,34 +399,24 @@ mod tests {
         let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
             mpsc::unbounded_channel();
 
-        let sequencer_state = web::Data::new(SequencerState {
-            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &feeds_config,
-            ))),
-            reports: all_feeds_reports_arc,
+        let sequencer_state = web::Data::new(SequencerState::new(
+            feeds_config,
             providers,
             log_handle,
-            reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(None)),
-            aggregated_votes_to_block_creator_send: vote_send.clone(),
-            feeds_metrics: Arc::new(RwLock::new(
-                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
-                    .expect("Failed to allocate feed_metrics"),
-            )),
-            active_feeds: Arc::new(RwLock::new(
-                feeds_config
-                    .feeds
-                    .into_iter()
-                    .map(|feed| (feed.id, feed))
-                    .collect(),
-            )),
-            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            &sequencer_config,
+            metrics_prefix,
+            None,
+            vote_send,
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
-            blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
-            kafka_endpoint: None,
-        });
+        ));
+
+        sequencer_state
+            .reports
+            .write()
+            .await
+            .push(1, reporter_id, Ok(original_report_data.clone()))
+            .await;
 
         let _future =
             feeds_slots_manager_loop(sequencer_state, feeds_management_cmd_to_block_creator_recv)

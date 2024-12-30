@@ -582,10 +582,7 @@ pub mod tests {
     use utils::test_env::get_test_private_key_path;
 
     use crate::providers::provider::init_shared_rpc_providers;
-    use crate::reporters::reporter::init_shared_reporters;
-    use blockchain_data_model::in_mem_db::InMemDb;
     use config::SequencerConfig;
-    use feed_registry::registry::new_feeds_meta_data_reg_from_config;
     use tokio::sync::mpsc::UnboundedReceiver;
     use utils::logging::init_shared_logging_handle;
 
@@ -626,7 +623,7 @@ pub mod tests {
 
     async fn new_test_sequencer_state(
         sequencer_config: &SequencerConfig,
-        feeds_config: &AllFeedsConfig,
+        feeds_config: AllFeedsConfig,
         metics_prefix: &str,
     ) -> (SequencerState, UnboundedReceiver<(String, String)>) {
         let log_handle = init_shared_logging_handle("INFO", false);
@@ -640,35 +637,17 @@ pub mod tests {
             mpsc::unbounded_channel();
         let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
 
-        let sequencer_state = SequencerState {
-            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &feeds_config,
-            ))),
-            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            providers: providers.clone(),
+        let sequencer_state = SequencerState::new(
+            feeds_config,
+            providers,
             log_handle,
-            reporters: init_shared_reporters(sequencer_config, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(None)),
-            aggregated_votes_to_block_creator_send: vote_send,
-            feeds_metrics: Arc::new(RwLock::new(
-                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
-                    .expect("Failed to allocate feed_metrics"),
-            )),
-            active_feeds: Arc::new(RwLock::new(
-                feeds_config
-                    .feeds
-                    .clone()
-                    .into_iter()
-                    .map(|feed| (feed.id, feed))
-                    .collect(),
-            )),
-            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            &sequencer_config,
+            metrics_prefix,
+            None,
+            vote_send,
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
-            blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
-            kafka_endpoint: None,
-        };
+        );
         (sequencer_state, vote_recv)
     }
 
@@ -1232,7 +1211,7 @@ pub mod tests {
         );
         let all_feed_config = AllFeedsConfig { feeds: vec![] };
         let (sequencer_state, mut rx) =
-            new_test_sequencer_state(&cfg, &all_feed_config, metrics_prefix).await;
+            new_test_sequencer_state(&cfg, all_feed_config, metrics_prefix).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
