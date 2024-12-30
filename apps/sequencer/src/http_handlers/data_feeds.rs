@@ -682,6 +682,7 @@ mod tests {
             feeds_slots_manager_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
             kafka_endpoint: None,
+            provider_status: Arc::new(RwLock::new(HashMap::new())),
         };
 
         (

@@ -1,4 +1,7 @@
-use crate::{providers::provider::parse_eth_address, sequencer_state::SequencerState};
+use crate::{
+    providers::provider::{parse_eth_address, ProviderStatus},
+    sequencer_state::SequencerState,
+};
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
     dyn_abi::DynSolValue,
@@ -344,11 +347,15 @@ pub async fn eth_batch_send_to_all_contracts(
                 (Ok(x), net, _provider) => match x {
                     Ok(y) => {
                         all_results += &format!("result from network {}: Ok -> {:?}", net, y);
+                        let mut status_map = sequencer_state.provider_status.write().await;
+                        status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
                     }
                     Err(error_message) => {
                         warn!("Network {net} responded with error: {error_message}");
                         all_results +=
                             &format!("result from network {}: Err -> {:?}", net, error_message);
+                        let mut status_map = sequencer_state.provider_status.write().await;
+                        status_map.insert(net, ProviderStatus::LastUpdateFailed);
                     }
                 },
                 (Err(e), net, provider) => {
@@ -358,6 +365,8 @@ pub async fn eth_batch_send_to_all_contracts(
                     let provider = provider.lock().await;
                     let provider_metrics = provider.provider_metrics.clone();
                     inc_metric!(provider_metrics, net, total_timed_out_tx);
+                    let mut status_map = sequencer_state.provider_status.write().await;
+                    status_map.insert(net, ProviderStatus::LastUpdateFailed);
                 }
             },
             Err(e) => {

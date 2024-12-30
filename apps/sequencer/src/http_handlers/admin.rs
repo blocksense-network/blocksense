@@ -1,4 +1,5 @@
 use crate::http_handlers::MAX_SIZE;
+use crate::providers::provider::ProviderStatus;
 use crate::sequencer_state::SequencerState;
 use actix_web::http::header::ContentType;
 use actix_web::web::ServiceConfig;
@@ -371,6 +372,19 @@ async fn set_provider_is_enabled(
         }
     };
     provider.is_enabled = is_enabled;
+    // Dropping write lock, just out of good hygiene.
+    drop(sequencer_config);
+
+    // Modify provider_status, depending on the new value of is_enabled.
+    let mut provider_status = sequencer_state.provider_status.write().await;
+    provider_status.entry(network_name.clone()).and_modify(|e| {
+        *e = if is_enabled {
+            ProviderStatus::AwaitingFirstUpdate
+        } else {
+            ProviderStatus::Disabled
+        }
+    });
+    drop(provider_status);
 
     let message = if is_enabled {
         format!("posting to {network_name} successfully enabled")
@@ -518,7 +532,9 @@ mod tests {
     use actix_test::to_bytes;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
-    use config::{get_sequencer_and_feed_configs, init_config};
+    use config::{
+        get_sequencer_and_feed_configs, get_test_config_with_single_provider, init_config,
+    };
     use config::{AllFeedsConfig, SequencerConfig};
     use regex::Regex;
     use std::env;
@@ -771,33 +787,37 @@ mod tests {
         let key_path = get_test_private_key_path();
         let network = "ETH_disable_provider_changes_state";
 
+        // Constructing config early, because value of `is_enabled` is used in SequencerState::new
+        // to set the initial value of provider_status for the network.
+        let mut sequencer_config =
+            get_test_config_with_single_provider(network, PathBuf::new().as_path(), "");
+        sequencer_config
+            .providers
+            .entry(network.to_string())
+            .and_modify(|provider| {
+                *provider = config::Provider {
+                    private_key_path: key_path.to_str().unwrap().to_owned(),
+                    url: "http://example.com".to_string(),
+                    contract_address: None,
+                    event_contract_address: None,
+                    transaction_timeout_secs: 42,
+                    transaction_gas_limit: 1337,
+                    data_feed_store_byte_code: None,
+                    data_feed_sports_byte_code: None,
+                    is_enabled: true,
+                    allow_feeds: None,
+                    impersonated_anvil_account: None,
+                }
+            });
+
         let sequencer_state = create_sequencer_state_from_sequencer_config_file(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
             None,
-            None,
+            Some(sequencer_config),
         )
         .await;
-
-        let mut sequencer_config = sequencer_state.sequencer_config.write().await;
-        sequencer_config.providers.insert(
-            network.to_string(),
-            config::Provider {
-                private_key_path: "".to_string(),
-                url: "".to_string(),
-                contract_address: None,
-                event_contract_address: None,
-                transaction_timeout_secs: 42,
-                transaction_gas_limit: 1337,
-                data_feed_store_byte_code: None,
-                data_feed_sports_byte_code: None,
-                is_enabled: true,
-                allow_feeds: None,
-                impersonated_anvil_account: None,
-            },
-        );
-        drop(sequencer_config);
 
         let app = test::init_service(
             App::new()
@@ -828,33 +848,37 @@ mod tests {
         let key_path = get_test_private_key_path();
         let network = "ETH_enable_provider_changes_state";
 
+        // Constructing config early, because value of `is_enabled` is used in SequencerState::new
+        // to set the initial value of provider_status for the network.
+        let mut sequencer_config =
+            get_test_config_with_single_provider(network, PathBuf::new().as_path(), "");
+        sequencer_config
+            .providers
+            .entry(network.to_string())
+            .and_modify(|provider| {
+                *provider = config::Provider {
+                    private_key_path: key_path.to_str().unwrap().to_owned(),
+                    url: "http://example.com".to_string(),
+                    contract_address: None,
+                    event_contract_address: None,
+                    transaction_timeout_secs: 42,
+                    transaction_gas_limit: 1337,
+                    data_feed_store_byte_code: None,
+                    data_feed_sports_byte_code: None,
+                    is_enabled: false,
+                    allow_feeds: None,
+                    impersonated_anvil_account: None,
+                }
+            });
+
         let sequencer_state = create_sequencer_state_from_sequencer_config_file(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
             None,
-            None,
+            Some(sequencer_config),
         )
         .await;
-
-        let mut sequencer_config = sequencer_state.sequencer_config.write().await;
-        sequencer_config.providers.insert(
-            network.to_string(),
-            config::Provider {
-                private_key_path: "".to_string(),
-                url: "".to_string(),
-                contract_address: None,
-                event_contract_address: None,
-                transaction_timeout_secs: 42,
-                transaction_gas_limit: 1337,
-                data_feed_store_byte_code: None,
-                data_feed_sports_byte_code: None,
-                is_enabled: false,
-                allow_feeds: None,
-                impersonated_anvil_account: None,
-            },
-        );
-        drop(sequencer_config);
 
         let app = test::init_service(
             App::new()
@@ -877,5 +901,147 @@ mod tests {
             true,
             sequencer_config.providers.get(network).unwrap().is_enabled
         );
+    }
+
+    #[actix_web::test]
+    async fn disable_provider_changes_provider_status() {
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = get_test_private_key_path();
+        let network = "ETH_disable_provider_changes_provider_status";
+
+        // Constructing config early, because value of `is_enabled` is used in SequencerState::new
+        // to set the initial value of provider_status for the network.
+        let mut sequencer_config =
+            get_test_config_with_single_provider(network, PathBuf::new().as_path(), "");
+        sequencer_config
+            .providers
+            .entry(network.to_string())
+            .and_modify(|provider| {
+                *provider = config::Provider {
+                    private_key_path: key_path.to_str().unwrap().to_owned(),
+                    url: "http://example.com".to_string(),
+                    contract_address: None,
+                    event_contract_address: None,
+                    transaction_timeout_secs: 42,
+                    transaction_gas_limit: 1337,
+                    data_feed_store_byte_code: None,
+                    data_feed_sports_byte_code: None,
+                    is_enabled: true,
+                    allow_feeds: None,
+                    impersonated_anvil_account: None,
+                }
+            });
+
+        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+            None,
+            Some(sequencer_config),
+        )
+        .await;
+
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .configure(add_admin_services),
+        )
+        .await;
+
+        let req = test::TestRequest::post()
+            .uri(format!("/disable_provider/{network}").as_str())
+            .to_request();
+
+        // Check state before request
+        let provider_status = sequencer_state.provider_status.read().await;
+        assert_eq!(
+            &ProviderStatus::AwaitingFirstUpdate,
+            provider_status.get(network).unwrap()
+        );
+        drop(provider_status);
+
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        info!("{resp:?}");
+        assert_eq!(200, resp.status());
+
+        // Check state after request
+        let provider_status = sequencer_state.provider_status.read().await;
+        assert_eq!(
+            &ProviderStatus::Disabled,
+            provider_status.get(network).unwrap()
+        );
+        drop(provider_status);
+    }
+
+    #[actix_web::test]
+    async fn enable_provider_changes_provider_status() {
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = get_test_private_key_path();
+        let network = "ETH_enable_provider_changes_provider_status";
+
+        // Constructing config early, because value of `is_enabled` is used in SequencerState::new
+        // to set the initial value of provider_status for the network.
+        let mut sequencer_config =
+            get_test_config_with_single_provider(network, PathBuf::new().as_path(), "");
+        sequencer_config
+            .providers
+            .entry(network.to_string())
+            .and_modify(|provider| {
+                *provider = config::Provider {
+                    private_key_path: key_path.to_str().unwrap().to_owned(),
+                    url: "http://example.com".to_string(),
+                    contract_address: None,
+                    event_contract_address: None,
+                    transaction_timeout_secs: 42,
+                    transaction_gas_limit: 1337,
+                    data_feed_store_byte_code: None,
+                    data_feed_sports_byte_code: None,
+                    is_enabled: false,
+                    allow_feeds: None,
+                    impersonated_anvil_account: None,
+                }
+            });
+
+        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
+            network,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+            None,
+            Some(sequencer_config),
+        )
+        .await;
+
+        let app = test::init_service(
+            App::new()
+                .app_data(sequencer_state.clone())
+                .configure(add_admin_services),
+        )
+        .await;
+
+        let req = test::TestRequest::post()
+            .uri(format!("/enable_provider/{network}").as_str())
+            .to_request();
+
+        // Check status before request
+        let provider_status = sequencer_state.provider_status.read().await;
+        assert_eq!(
+            &ProviderStatus::Disabled,
+            provider_status.get(network).unwrap()
+        );
+        drop(provider_status);
+
+        // Execute the request and read the response
+        let resp = test::call_service(&app, req).await;
+        info!("{resp:?}");
+        assert_eq!(200, resp.status());
+
+        // Check status before request
+        let provider_status = sequencer_state.provider_status.read().await;
+        assert_eq!(
+            &ProviderStatus::AwaitingFirstUpdate,
+            provider_status.get(network).unwrap()
+        );
+        drop(provider_status);
     }
 }

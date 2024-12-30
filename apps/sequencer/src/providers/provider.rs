@@ -57,6 +57,14 @@ pub struct RpcProvider {
     pub impersonated_anvil_account: Option<Address>,
 }
 
+#[derive(PartialEq, Debug)]
+pub enum ProviderStatus {
+    AwaitingFirstUpdate,
+    Disabled,
+    LastUpdateFailed,
+    LastUpdateSucceeded,
+}
+
 pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
 pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {

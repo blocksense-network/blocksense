@@ -1,4 +1,5 @@
 use crate::feeds::feed_allocator::ConcurrentAllocator;
+use crate::providers::provider::ProviderStatus;
 use crate::providers::provider::SharedRpcProviders;
 use crate::reporters::reporter::init_shared_reporters;
 use crate::reporters::reporter::SharedReporters;
@@ -35,6 +36,7 @@ pub struct SequencerState {
     pub feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
     pub blockchain_db: Arc<RwLock<InMemDb>>,
     pub kafka_endpoint: Option<FutureProducer>,
+    pub provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }
 
@@ -51,6 +53,20 @@ impl SequencerState {
         feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
     ) -> SequencerState {
+        let provider_status: HashMap<String, ProviderStatus> = sequencer_config
+            .providers
+            .iter()
+            .map(|(provider_name, provider)| {
+                let initial_state = if provider.is_enabled {
+                    ProviderStatus::AwaitingFirstUpdate
+                } else {
+                    ProviderStatus::Disabled
+                };
+                (provider_name.clone(), initial_state)
+            })
+            .collect();
+        let provider_status = Arc::new(RwLock::new(provider_status));
+
         SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
@@ -85,6 +101,7 @@ impl SequencerState {
                     create_kafka_producer(url)
                         .expect("Could not create kafka communication channel.")
                 }),
+            provider_status,
         }
     }
 }
