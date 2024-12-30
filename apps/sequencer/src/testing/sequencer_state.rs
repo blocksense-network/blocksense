@@ -1,26 +1,17 @@
 use std::{
     env,
     path::{Path, PathBuf},
-    sync::Arc,
 };
 
 use actix_web::web;
-use blockchain_data_model::in_mem_db::InMemDb;
 use config::{
     get_sequencer_and_feed_configs, get_test_config_with_single_provider, init_config,
     SequencerConfig,
 };
-use feed_registry::registry::{
-    new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
-};
-use prometheus::metrics::FeedsMetrics;
-use tokio::sync::{mpsc, RwLock};
+use tokio::sync::mpsc;
 use utils::logging::init_shared_logging_handle;
 
-use crate::{
-    providers::provider::init_shared_rpc_providers, reporters::reporter::init_shared_reporters,
-    sequencer_state::SequencerState,
-};
+use crate::{providers::provider::init_shared_rpc_providers, sequencer_state::SequencerState};
 
 // Creates sequencer state using the default config file and uses overwrite_config
 // or a config with a single provider if no overwrite_config is specified.
@@ -67,31 +58,15 @@ pub async fn create_sequencer_state_from_sequencer_config_file(
 
     let (_, feeds_config) = get_sequencer_and_feed_configs();
 
-    web::Data::new(SequencerState {
-        registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-            &feeds_config,
-        ))),
-        reports: Arc::new(RwLock::new(AllFeedsReports::new())),
+    web::Data::new(SequencerState::new(
+        feeds_config,
         providers,
         log_handle,
-        reporters: init_shared_reporters(&cfg, Some(metrics_prefix.as_str())),
-        feed_id_allocator: Arc::new(RwLock::new(None)),
-        aggregated_votes_to_block_creator_send: vote_send,
-        feeds_metrics: Arc::new(RwLock::new(
-            FeedsMetrics::new(metrics_prefix.as_str()).expect("Failed to allocate feed_metrics"),
-        )),
-        active_feeds: Arc::new(RwLock::new(
-            feeds_config
-                .feeds
-                .into_iter()
-                .map(|feed| (feed.id, feed))
-                .collect(),
-        )),
-        sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-        feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+        &sequencer_config,
+        Some(metrics_prefix.as_str()),
+        None,
+        vote_send,
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
-        blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
-        kafka_endpoint: None,
-    })
+    ))
 }

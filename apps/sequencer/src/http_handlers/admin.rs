@@ -514,23 +514,16 @@ pub fn add_admin_services(cfg: &mut ServiceConfig) {
 mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
-    use crate::reporters::reporter::init_shared_reporters;
     use crate::testing::sequencer_state::create_sequencer_state_from_sequencer_config_file;
     use actix_test::to_bytes;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
-    use blockchain_data_model::in_mem_db::InMemDb;
     use config::{get_sequencer_and_feed_configs, init_config};
     use config::{AllFeedsConfig, SequencerConfig};
-    use feed_registry::registry::{
-        new_feeds_meta_data_reg_from_config, AllFeedsReports, FeedAggregateHistory,
-    };
-    use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use std::env;
     use std::path::PathBuf;
-    use std::sync::Arc;
-    use tokio::sync::{mpsc, RwLock};
+    use tokio::sync::mpsc;
     use utils::constants::{FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE};
     use utils::get_config_file_path;
     use utils::logging::init_shared_logging_handle;
@@ -562,34 +555,17 @@ mod tests {
         let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
             mpsc::unbounded_channel();
 
-        let sequencer_state = web::Data::new(SequencerState {
-            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &feeds_config,
-            ))),
-            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            providers: providers.clone(),
+        let sequencer_state = web::Data::new(SequencerState::new(
+            feeds_config,
+            providers,
             log_handle,
-            reporters: init_shared_reporters(&sequencer_config, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(None)),
-            aggregated_votes_to_block_creator_send: vote_send,
-            feeds_metrics: Arc::new(RwLock::new(
-                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
-                    .expect("Failed to allocate feed_metrics"),
-            )),
-            active_feeds: Arc::new(RwLock::new(
-                feeds_config
-                    .feeds
-                    .into_iter()
-                    .map(|feed| (feed.id, feed))
-                    .collect(),
-            )),
-            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            &sequencer_config,
+            metrics_prefix,
+            None,
+            vote_send,
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
-            blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
-            kafka_endpoint: None,
-        });
+        ));
 
         let app = test::init_service(
             App::new()
