@@ -153,6 +153,14 @@ fn send_get_request(request: &str) -> String {
     format!("{}", String::from_utf8_lossy(&easy.get_ref().0))
 }
 
+fn send_post_request(request: &str) -> String {
+    let mut easy = Easy2::new(Collector(Vec::new()));
+    easy.post(true).unwrap();
+    easy.url(request).unwrap();
+    easy.perform().unwrap();
+    format!("{}", String::from_utf8_lossy(&easy.get_ref().0))
+}
+
 fn send_report(endpoint: &str, payload_json: serde_json::Value) -> String {
     let mut result = Vec::new();
     let mut easy = Easy::new();
@@ -264,6 +272,18 @@ async fn main() -> Result<()> {
 
     deploy_contract_to_networks(vec!["ETH1", "ETH2"]);
 
+    println!("\n * Assert provider status is 'AwaitingFirstUpdate' at the start:\n");
+    {
+        let expected_response = r#"{
+  "ETH1": "AwaitingFirstUpdate",
+  "ETH2": "AwaitingFirstUpdate"
+}"#;
+        let actual_response = send_get_request(
+            format!("127.0.0.1:{}/list_provider_status", SEQUENCER_ADMIN_PORT).as_str(),
+        );
+        assert_eq!(expected_response, actual_response);
+    }
+
     println!("\n * Send single update and verify value posted to contract:\n");
     {
         let timestamp = SystemTime::now()
@@ -299,6 +319,18 @@ async fn main() -> Result<()> {
             .expect("Error while waiting for value to be updated to contracts.");
 
         verify_expected_data_in_contracts(REPORT_VAL);
+    }
+
+    println!("\n * Assert provider status is 'LastUpdateSucceeded' after first update:\n");
+    {
+        let expected_response = r#"{
+  "ETH1": "LastUpdateSucceeded",
+  "ETH2": "LastUpdateSucceeded"
+}"#;
+        let actual_response = send_get_request(
+            format!("127.0.0.1:{}/list_provider_status", SEQUENCER_ADMIN_PORT).as_str(),
+        );
+        assert_eq!(expected_response, actual_response);
     }
 
     println!("\n * Send batched update and verify value posted to contract:\n");
@@ -388,6 +420,24 @@ async fn main() -> Result<()> {
             .expect("Error while waiting for value to be updated to contracts.");
 
         verify_expected_data_in_contracts(CORRECT_AND_WRONG_VALS[0]);
+    }
+
+    println!("\n * Assert provider status is 'Disabled' after disabling provider:\n");
+    {
+        let response_from_disable = send_post_request(
+            format!("127.0.0.1:{}/disable_provider/ETH1", SEQUENCER_ADMIN_PORT).as_str(),
+        );
+
+        assert_eq!("", response_from_disable);
+
+        let expected_response = r#"{
+  "ETH1": "Disabled",
+  "ETH2": "LastUpdateSucceeded"
+}"#;
+        let actual_response = send_get_request(
+            format!("127.0.0.1:{}/list_provider_status", SEQUENCER_ADMIN_PORT).as_str(),
+        );
+        assert_eq!(expected_response, actual_response);
     }
 
     cleanup_spawned_processes();

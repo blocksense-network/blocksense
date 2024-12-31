@@ -17,6 +17,7 @@ use reqwest::{Client, Url};
 
 use config::SequencerConfig;
 use prometheus::metrics::ProviderMetrics;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::sync::Arc;
@@ -57,7 +58,7 @@ pub struct RpcProvider {
     pub impersonated_anvil_account: Option<Address>,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
 pub enum ProviderStatus {
     AwaitingFirstUpdate,
     Disabled,
