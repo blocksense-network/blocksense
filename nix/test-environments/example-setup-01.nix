@@ -37,6 +37,7 @@ in
     };
 
     sequencer = {
+      sequencer-id = 1;
       main-port = 9856;
       admin-port = 5553;
       metrics-port = 5551;
@@ -73,6 +74,10 @@ in
           ];
           impersonated_anvil_account = impersonationAddress;
         };
+      };
+
+      kafka-report-endpoint = {
+        url = null;
       };
 
       reporters = [
@@ -119,7 +124,7 @@ in
       a = {
         reporter-info = {
           reporter_id = 0;
-          interval_time_in_seconds = 100;
+          interval_time_in_seconds = 6;
           secret_key = "${testKeysDir}/reporter_secret_key";
         };
         api-keys = {

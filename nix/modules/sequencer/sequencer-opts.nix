@@ -85,8 +85,23 @@ let
       };
     };
   };
+
+  kafkaReportEndpointOpts = {
+    options = {
+      url = mkOption {
+        type = types.nullOr types.str;
+        description = mdDoc "The URL of the Apache Kafka server.";
+      };
+    };
+  };
 in
 {
+  sequencer-id = mkOption {
+    type = types.int;
+    default = 1;
+    description = mdDoc "An identifier for the sequencer, useful when we have more than one.";
+  };
+
   main-port = mkOption {
     type = types.port;
     default = 8877;
@@ -140,6 +155,15 @@ in
       "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e"
       "ea30a8bd97d4f78213320c38215e95b239f8889df885552d85a50665b8b802de85fb40ae9b72d3f67628fa301e81252cd87e"
     ];
+  };
+
+  kafka-report-endpoint = mkOption {
+    type = types.submodule kafkaReportEndpointOpts;
+    default = { };
+    description = mdDoc "URL to Apache Kafka server that facilitates decentralized communication.";
+    example = {
+      "url" = "localhost:9092";
+    };
   };
 
   log-level = mkOption {
