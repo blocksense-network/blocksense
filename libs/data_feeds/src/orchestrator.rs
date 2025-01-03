@@ -67,8 +67,9 @@ pub async fn orchestrator() {
 
     let config_file_path: std::path::PathBuf =
         get_config_file_path(REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE);
-    let reporter_config = get_validated_config::<ReporterConfig>(&config_file_path)
-        .expect("Config file is not valid JSON!");
+    let reporter_config =
+        get_validated_config::<ReporterConfig>(&config_file_path, "ReporterConfig")
+            .expect("Config file is not valid JSON!");
 
     let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
     let feeds_registry =

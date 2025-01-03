@@ -36,8 +36,9 @@ async fn main() -> std::io::Result<()> {
                     get_config_file_path(REPORTER_CONFIG_DIR, REPORTER_CONFIG_FILE);
                 let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
                 let _reporter_config =
-                    get_validated_config::<ReporterConfig>(&reporter_config_file);
-                let _feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file);
+                    get_validated_config::<ReporterConfig>(&reporter_config_file, "ReporterConfig");
+                let _feeds_config =
+                    get_validated_config::<AllFeedsConfig>(&feeds_config_file, "AllFeedsConfig");
 
                 return std::io::Result::Ok(());
             }

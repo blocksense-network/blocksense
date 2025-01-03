@@ -299,24 +299,26 @@ pub fn init_config<T: for<'a> Deserialize<'a>>(config_file: &Path) -> anyhow::Re
 
 pub fn get_validated_config<T: for<'a> Deserialize<'a> + Validated>(
     config_file: &Path,
+    context: &str,
 ) -> anyhow::Result<T> {
-    let sequencer_config = match init_config::<T>(config_file) {
+    let config = match init_config::<T>(config_file) {
         Ok(v) => v,
         Err(e) => anyhow::bail!("Failed to get config {e} "),
     };
 
-    match sequencer_config.validate("SequencerConfig") {
-        Ok(_) => Ok(sequencer_config),
+    match config.validate(context) {
+        Ok(_) => Ok(config),
         Err(e) => anyhow::bail!("Validation error {e} "),
     }
 }
 
 pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
     let sequencer_config_file = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
-    let sequencer_config = get_validated_config::<SequencerConfig>(&sequencer_config_file)
-        .expect("Could not get validated sequencer config");
+    let sequencer_config =
+        get_validated_config::<SequencerConfig>(&sequencer_config_file, "SequencerConfig")
+            .expect("Could not get validated sequencer config");
     let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-    let feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file)
+    let feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file, "FeedsConfig")
         .expect("Could not get validated feeds config");
     (sequencer_config, feeds_config)
 }
@@ -434,7 +436,7 @@ mod tests {
         file.flush().expect("Could flush sequencer config file");
 
         let path = PathBuf::new().join("/tmp").join("sequencer_config.json");
-        match get_validated_config::<SequencerConfig>(&path) {
+        match get_validated_config::<SequencerConfig>(&path, "SequencerConfig") {
             Ok(_) => panic!("Did not detect error in config file!"),
             Err(_) => {}
         }
