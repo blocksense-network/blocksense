@@ -14,6 +14,5 @@ pub mod testing;
 
 pub struct UpdateToSend {
     pub block_height: u64,
-    //pub kv_updates: HashMap<String, String>,
     pub updates: Vec<VotedFeedUpdate>,
 }

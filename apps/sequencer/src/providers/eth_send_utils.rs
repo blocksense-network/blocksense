@@ -103,56 +103,54 @@ pub async fn deploy_contract(
     Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
 }
 
-/// Serializes the `updates` hash map into a string.
-///
-/// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
-/// will be added to the result. Otherwise, all feeds in `updates` will be added.
-fn serialize_updates(
-    net: &str,
-    updates: Vec<VotedFeedUpdate>,
-    allowed_feed_ids: &Option<Vec<u32>>,
-) -> Result<String> {
+fn serialize_updates(net: &str, updates: &[VotedFeedUpdate]) -> Result<String> {
     let mut result: String = Default::default();
-
     info!("Preparing a batch of feeds to network `{net}`");
     let mut num_reported_feeds = 0;
-    for (key, val) in updates.into_iter().map(|update| update.encode()) {
-        match allowed_feed_ids {
-            Some(allowed_feed_ids) => {
-                // if special net: add only special feeds
-                let feed_id = i64::from_str_radix(&key.to_string(), 16)
-                    .map(|x| x as u32)
-                    .map_err(|err| eyre!("Parsing error {err}"))?;
-                if allowed_feed_ids.is_empty() || allowed_feed_ids.contains(&feed_id) {
-                    num_reported_feeds += 1;
-                    result += key.to_string().as_str();
-                    result += val.to_string().as_str();
-                } else {
-                    debug!("Skipping feed id {feed_id} for special network `{net}`");
-                }
-            }
-            None => {
-                // if not special: always add
-                num_reported_feeds += 1;
-                result += key.to_string().as_str();
-                result += val.to_string().as_str();
-            }
-        }
+    for (key, val) in updates.iter().map(|update| update.encode()) {
+        num_reported_feeds += 1;
+        result += key.to_string().as_str();
+        result += val.to_string().as_str();
     }
     info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
-
     Ok(result)
+}
+
+/// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
+/// will be added to the result. Otherwise, all feeds in `updates` will be added.
+pub fn filter_allowed_feeds(
+    net: &str,
+    updates: Vec<VotedFeedUpdate>,
+    allow_feeds: &Option<Vec<u32>>,
+) -> Vec<VotedFeedUpdate> {
+    if let Some(allowed_feed_ids) = allow_feeds {
+        let mut res: Vec<VotedFeedUpdate> = vec![];
+        for u in &updates {
+            let feed_id = u.feed_id;
+            if allowed_feed_ids.is_empty() || allowed_feed_ids.contains(&feed_id) {
+                res.push(u.clone());
+            } else {
+                debug!("Skipping feed id {feed_id} for special network `{net}`");
+            }
+        }
+        res
+    } else {
+        updates
+    }
 }
 
 pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
+    provider_settings: config::Provider,
     updates: Vec<VotedFeedUpdate>,
     feed_type: Repeatability,
-    allow_list: Option<Vec<u32>>,
-    impersonated_anvil_account: Option<String>,
 ) -> Result<String> {
-    let provider = provider.lock().await;
+    let mut provider = provider.lock().await;
+
+    let updates = filter_allowed_feeds(&net, updates, &provider_settings.allow_feeds);
+    let updates = provider.apply_publish_criteria(&updates);
+
     let signer = &provider.signer;
     let contract_address = if feed_type == Periodic {
         provider
@@ -170,11 +168,11 @@ pub async fn eth_batch_send_to_contract(
     );
 
     let provider_metrics = &provider.provider_metrics;
-    let provider = &provider.provider;
+    let prov = &provider.provider;
 
     let selector = "0x1a2d80ac";
 
-    let serialized_updates = serialize_updates(&net, updates, &allow_list);
+    let serialized_updates = serialize_updates(&net, &updates);
 
     let calldata_str = (selector.to_owned() + serialized_updates?.as_str()).to_string();
 
@@ -182,7 +180,7 @@ pub async fn eth_batch_send_to_contract(
         Bytes::from_hex(calldata_str).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
 
     let base_fee = process_provider_getter!(
-        provider.get_gas_price().await,
+        prov.get_gas_price().await,
         net,
         provider_metrics,
         get_gas_price
@@ -197,29 +195,26 @@ pub async fn eth_batch_send_to_contract(
         .observe((base_fee as f64) / 1000000000.0);
 
     let _max_priority_fee_per_gas = process_provider_getter!(
-        provider.get_max_priority_fee_per_gas().await,
+        prov.get_max_priority_fee_per_gas().await,
         net,
         provider_metrics,
         get_max_priority_fee_per_gas
     );
 
     let chain_id = process_provider_getter!(
-        provider.get_chain_id().await,
+        prov.get_chain_id().await,
         net,
         provider_metrics,
         get_chain_id
     );
 
-    let (sender_address, is_impersonated) = match impersonated_anvil_account {
+    let (sender_address, is_impersonated) = match &provider_settings.impersonated_anvil_account {
         Some(impersonated_anvil_account) => {
             debug!(
                 "Using impersonated anvil account with address: {}",
                 impersonated_anvil_account
             );
-            (
-                parse_eth_address(&impersonated_anvil_account).unwrap(),
-                true,
-            )
+            (parse_eth_address(impersonated_anvil_account).unwrap(), true)
         }
         None => {
             debug!("Using signer address: {}", signer.address());
@@ -236,11 +231,11 @@ pub async fn eth_batch_send_to_contract(
     let tx_time = Instant::now();
 
     let tx_result = if is_impersonated {
-        let rpc_url = provider.client().transport().url().parse()?;
+        let rpc_url = prov.client().transport().url().parse()?;
         let provider = ProviderBuilder::new().on_http(rpc_url);
         provider.send_transaction(tx).await
     } else {
-        provider.send_transaction(tx).await
+        prov.send_transaction(tx).await
     };
 
     let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
@@ -279,6 +274,8 @@ pub async fn eth_batch_send_to_contract(
         .transaction_confirmation_times
         .with_label_values(&[net.as_str()])
         .observe(transaction_time as f64);
+
+    provider.update_history(&updates);
     Ok(receipt.status().to_string())
 }
 
@@ -294,7 +291,12 @@ pub async fn eth_batch_send_to_all_contracts(
     let collected_futures = FuturesUnordered::new();
 
     let providers = sequencer_state.providers.read().await;
-    let providers_config = &sequencer_state.sequencer_config.read().await.providers;
+    let providers_config = sequencer_state
+        .sequencer_config
+        .read()
+        .await
+        .providers
+        .clone();
 
     for (net, p) in providers.iter() {
         let updates = updates.clone();
@@ -303,25 +305,22 @@ pub async fn eth_batch_send_to_all_contracts(
         let net = net.clone();
         let provider = p.clone();
 
-        if let Some(provider_settings) = providers_config.get(&net) {
+        if let Some(provider_settings) = providers_config.get(&net).cloned() {
             if !provider_settings.is_enabled {
                 warn!("Network `{net}` is not enabled; skipping it during reporting");
                 continue;
             } else {
                 info!("Network `{net}` is enabled; reporting...");
             }
-            let allow_feeds = provider_settings.allow_feeds.clone();
-            let impersonated_anvil_account = provider_settings.impersonated_anvil_account.clone();
             collected_futures.push(spawn(async move {
                 let result = actix_web::rt::time::timeout(
                     Duration::from_secs(timeout),
                     eth_batch_send_to_contract(
                         net.clone(),
                         provider.clone(),
+                        provider_settings,
                         updates,
                         feed_type,
-                        allow_feeds,
-                        impersonated_anvil_account,
                     ),
                 )
                 .await;
@@ -522,14 +521,17 @@ mod tests {
         )
         .unwrap();
         let updates_oneshot: Vec<VotedFeedUpdate> = vec![voted_update];
-
+        let provider_settings = cfg
+            .providers
+            .get(&net)
+            .expect(format!("Config for network {net} not found!").as_str())
+            .clone();
         let result = eth_batch_send_to_contract(
             net.clone(),
             provider.clone(),
+            provider_settings,
             updates_oneshot,
             Oneshot,
-            None,
-            None,
         )
         .await;
         assert!(result.is_ok());
@@ -671,9 +673,11 @@ mod tests {
     #[test]
     fn compute_keys_vals_ignores_networks_not_on_the_list() {
         let network = "dont_filter_me";
-        let updates = get_updates_test_data();
-        let serialized_updates =
-            serialize_updates(network, updates, &None).expect("Serialize updates failed!");
+        let serialized_updates = serialize_updates(
+            network,
+            &filter_allowed_feeds(network, get_updates_test_data(), &None),
+        )
+        .expect("Serialize updates failed!");
         let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
         let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
         let ab = format!("{a}{b}");
@@ -684,7 +688,6 @@ mod tests {
     use feed_registry::types::FeedType;
 
     fn get_updates_test_data() -> Vec<VotedFeedUpdate> {
-        //let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
             feed_id: 0x1F_u32,
@@ -703,23 +706,23 @@ mod tests {
     fn compute_keys_vals_filters_updates_for_networks_on_the_list() {
         // Citrea
         let network = "citrea-testnet";
-
-        let updates = get_updates_test_data();
-
         let serialized_updates = serialize_updates(
             network,
-            updates.clone(),
-            &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                65,  // EURC/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                21,  // PAXG/USD
-                206, // TBTC/USD
-                43,  // WBTC/USD
-                4,   // WSTETH/USD
-            ]),
+            &filter_allowed_feeds(
+                network,
+                get_updates_test_data(),
+                &Some(vec![
+                    31,  // BTC/USD
+                    47,  // ETH/USD
+                    65,  // EURC/USD
+                    236, // USDT/USD
+                    131, // USDC/USD
+                    21,  // PAXG/USD
+                    206, // TBTC/USD
+                    43,  // WBTC/USD
+                    4,   // WSTETH/USD
+                ]),
+            ),
         )
         .expect("Serialize updates failed!");
 
@@ -734,15 +737,18 @@ mod tests {
 
         let serialized_updates = serialize_updates(
             network,
-            updates.clone(),
-            &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                65,  // EURC/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                21,  // PAXG/USD
-            ]),
+            &filter_allowed_feeds(
+                network,
+                get_updates_test_data(),
+                &Some(vec![
+                    31,  // BTC/USD
+                    47,  // ETH/USD
+                    65,  // EURC/USD
+                    236, // USDT/USD
+                    131, // USDC/USD
+                    21,  // PAXG/USD
+                ]),
+            ),
         )
         .expect("Serialize updates failed!");
 
@@ -756,14 +762,17 @@ mod tests {
 
         let serialized_updates = serialize_updates(
             network,
-            updates.clone(),
-            &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                43,  // WBTC/USD
-            ]),
+            &filter_allowed_feeds(
+                network,
+                get_updates_test_data(),
+                &Some(vec![
+                    31,  // BTC/USD
+                    47,  // ETH/USD
+                    236, // USDT/USD
+                    131, // USDC/USD
+                    43,  // WBTC/USD
+                ]),
+            ),
         )
         .expect("Serialize updates failed!");
 
