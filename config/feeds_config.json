@@ -8,6 +8,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -33,6 +35,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -58,6 +62,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -83,6 +89,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -109,6 +117,7 @@
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
       "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -134,6 +143,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -159,6 +170,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -184,6 +197,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -208,6 +223,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -233,6 +250,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -258,6 +277,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -283,6 +304,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -308,6 +331,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -333,6 +358,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -358,6 +385,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -383,6 +412,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -408,6 +439,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -432,6 +465,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -457,6 +492,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -482,6 +519,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -507,6 +546,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -532,7 +573,7 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
-      "skip_publish_if_less_then_percentage": 1,
+      "skip_publish_if_less_then_percentage": 0.1,
       "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
@@ -559,6 +600,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -584,6 +627,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -609,6 +654,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -634,6 +681,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -659,6 +708,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -684,6 +735,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -709,6 +762,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -734,6 +789,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -759,6 +816,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -784,6 +843,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -809,6 +870,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -834,6 +897,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -859,6 +924,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -884,6 +951,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -909,6 +978,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -934,6 +1005,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -959,6 +1032,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -984,6 +1059,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1009,6 +1086,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -1033,6 +1112,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1058,6 +1139,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1083,6 +1166,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1108,6 +1193,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1133,6 +1220,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1158,6 +1247,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "YahooFinance",
       "pair": {
@@ -1182,6 +1273,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1207,6 +1300,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1232,6 +1327,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -1256,6 +1353,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -1280,6 +1379,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1305,6 +1406,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1330,6 +1433,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Commodities",
       "script": "YahooFinance",
       "pair": {
@@ -1354,6 +1459,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -1378,6 +1485,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1403,6 +1512,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1428,6 +1539,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1453,6 +1566,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1478,6 +1593,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1503,6 +1620,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1528,6 +1647,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1553,6 +1674,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -1577,6 +1700,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1602,6 +1727,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1627,6 +1754,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1652,6 +1781,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Commodities",
       "script": "YahooFinance",
       "pair": {
@@ -1676,6 +1807,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1701,6 +1834,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1726,6 +1861,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1751,6 +1888,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1776,6 +1915,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1801,6 +1942,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1826,6 +1969,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1851,6 +1996,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1876,6 +2023,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1901,6 +2050,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1926,6 +2077,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -1950,6 +2103,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -1975,6 +2130,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2000,6 +2157,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2025,6 +2184,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2050,6 +2211,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2075,6 +2238,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2099,6 +2264,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2124,6 +2291,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2149,6 +2318,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2174,6 +2345,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2199,6 +2372,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2223,6 +2398,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2248,6 +2425,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2273,6 +2452,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2298,6 +2479,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2323,6 +2506,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2348,6 +2533,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -2372,6 +2559,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2397,6 +2586,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2422,6 +2613,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2446,6 +2639,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -2470,6 +2665,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2495,6 +2692,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2519,6 +2718,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -2543,6 +2744,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2568,6 +2771,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2593,6 +2798,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2618,6 +2825,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2643,6 +2852,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -2667,6 +2878,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -2691,6 +2904,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2716,6 +2931,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2741,6 +2958,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2766,6 +2985,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -2790,6 +3011,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2815,6 +3038,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2840,6 +3065,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -2864,6 +3091,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2889,6 +3118,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2914,6 +3145,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2939,6 +3172,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2964,6 +3199,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -2989,6 +3226,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3014,6 +3253,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -3038,6 +3279,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -3062,6 +3305,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3087,6 +3332,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3112,6 +3359,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3137,6 +3386,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3162,6 +3413,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3187,6 +3440,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3212,6 +3467,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3237,6 +3494,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3262,6 +3521,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3287,6 +3548,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3312,6 +3575,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3337,6 +3602,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3362,6 +3629,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3387,6 +3656,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3412,6 +3683,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3437,6 +3710,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3462,6 +3737,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3487,6 +3764,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3512,6 +3791,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3537,6 +3818,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3562,6 +3845,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3587,6 +3872,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3612,6 +3899,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3637,6 +3926,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -3661,6 +3952,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3686,6 +3979,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3711,6 +4006,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3736,6 +4033,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -3760,6 +4059,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3785,6 +4086,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3810,6 +4113,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -3834,6 +4139,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3859,6 +4166,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3884,6 +4193,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3909,6 +4220,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3934,6 +4247,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3959,6 +4274,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -3984,6 +4301,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4009,6 +4328,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4034,6 +4355,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -4058,6 +4381,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4083,6 +4408,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -4107,6 +4434,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4132,6 +4461,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4157,6 +4488,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4182,6 +4515,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -4206,6 +4541,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4231,6 +4568,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4256,6 +4595,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4281,6 +4622,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4306,6 +4649,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4331,6 +4676,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4356,6 +4703,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4381,6 +4730,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -4405,6 +4756,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Commodities",
       "script": "YahooFinance",
       "pair": {
@@ -4429,6 +4782,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Commodities",
       "script": "YahooFinance",
       "pair": {
@@ -4453,6 +4808,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4478,6 +4835,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Fiat",
       "script": "YahooFinance",
       "pair": {
@@ -4502,6 +4861,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -4526,6 +4887,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4551,6 +4914,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4576,6 +4941,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "YahooFinance",
       "pair": {
@@ -4600,6 +4967,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4625,6 +4994,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -4649,6 +5020,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4674,6 +5047,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -4698,6 +5073,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4723,6 +5100,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4748,6 +5127,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4773,6 +5154,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4798,6 +5181,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4823,6 +5208,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4848,6 +5235,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4873,6 +5262,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4898,6 +5289,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4923,6 +5316,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4948,6 +5343,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -4973,6 +5370,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -4997,6 +5396,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5022,6 +5423,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5047,6 +5450,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5072,6 +5477,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5097,6 +5504,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5122,6 +5531,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5147,6 +5558,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5172,6 +5585,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5197,6 +5612,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5222,6 +5639,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5247,6 +5666,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5272,6 +5693,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5297,6 +5720,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -5321,6 +5746,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5346,6 +5773,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5371,6 +5800,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5396,6 +5827,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5421,6 +5854,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5446,6 +5881,8 @@
       "decimals": 18,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5471,6 +5908,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5496,6 +5935,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -5520,6 +5961,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -5544,6 +5987,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5569,6 +6014,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -5593,6 +6040,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5618,6 +6067,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5643,6 +6094,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5668,6 +6121,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5693,6 +6148,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5718,6 +6175,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "",
       "script": "YahooFinance",
       "pair": {
@@ -5742,6 +6201,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -5766,6 +6227,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5791,6 +6254,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5816,6 +6281,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5841,6 +6308,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5866,6 +6335,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5891,6 +6362,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5916,6 +6389,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5941,6 +6416,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5966,6 +6443,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -5991,6 +6470,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6016,6 +6497,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6041,6 +6524,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Equities",
       "script": "YahooFinance",
       "pair": {
@@ -6065,6 +6550,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6090,6 +6577,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6115,6 +6604,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -6139,6 +6630,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -6163,6 +6656,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6188,6 +6683,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6213,6 +6710,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6238,6 +6737,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6263,6 +6764,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6288,6 +6791,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Forex",
       "script": "YahooFinance",
       "pair": {
@@ -6312,6 +6817,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6337,6 +6844,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
@@ -6362,6 +6871,8 @@
       "decimals": 8,
       "report_interval_ms": 300000,
       "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {
