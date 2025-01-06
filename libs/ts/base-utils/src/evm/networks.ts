@@ -17,6 +17,7 @@ const networks = [
   'ethereum-mainnet',
   'ethereum-sepolia',
   'ethereum-holesky',
+  'abstract-testnet',
   'andromeda-mainnet',
   'arbitrum-mainnet',
   'arbitrum-sepolia',
@@ -55,10 +56,10 @@ const networks = [
 ] as const;
 
 const chainIds = [
-  99999999999, 1, 11155111, 17000, 1088, 42161, 421614, 43114, 43113, 8453,
-  84532, 80084, 56, 97, 42220, 44787, 5115, 250, 4002, 100, 10200, 1285, 59144,
-  59141, 169, 3441006, 2810, 10, 11155420, 137, 80002, 1101, 2442, 534352,
-  534351, 167000, 167009, 324, 300,
+  99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 43114, 43113,
+  8453, 84532, 80084, 56, 97, 42220, 44787, 5115, 250, 4002, 100, 10200, 1285,
+  59144, 59141, 169, 3441006, 2810, 10, 11155420, 137, 80002, 1101, 2442,
+  534352, 534351, 167000, 167009, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -123,6 +124,12 @@ export const networkMetadata = {
     chainId: 17000,
     isTestnet: true,
     explorerUrl: 'https://holesky.etherscan.io',
+    currency: Currency.ETH,
+  },
+  'abstract-testnet': {
+    chainId: 11124,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.abs.xyz',
     currency: Currency.ETH,
   },
   'andromeda-mainnet': {
