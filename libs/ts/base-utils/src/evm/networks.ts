@@ -52,13 +52,17 @@ const networks = [
   'zksync-sepolia',
   'morph-holesky',
   'citrea-testnet',
+  'abstract-testnet',
+  'ink-sepolia',
+  'monad-devnet',
+  'mantle-sepolia',
 ] as const;
 
 const chainIds = [
   99999999999, 1, 11155111, 17000, 43114, 43113, 1088, 42161, 421614, 8453,
   84532, 80084, 56, 97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009,
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
-  534352, 534351, 324, 300, 2810, 5115,
+  534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -278,6 +282,26 @@ export const networkMetadata = {
     chainId: 5115,
     isTestnet: true,
     explorerUrl: 'https://explorer.testnet.citrea.xyz',
+  },
+  'abstract-testnet': {
+    chainId: 11124,
+    isTestnet: true,
+    explorerUrl: '	https://explorer.testnet.abs.xyz',
+  },
+  'ink-sepolia': {
+    chainId: 763373,
+    isTestnet: true,
+    explorerUrl: 'https://explorer-sepolia.inkonchain.com/',
+  },
+  'monad-devnet': {
+    chainId: 41454,
+    isTestnet: true,
+    explorerUrl: 'https://brightstar-884.devnet1.monad.xyz/',
+  },
+  'mantle-sepolia': {
+    chainId: 5003,
+    isTestnet: true,
+    explorerUrl: 'https://sepolia.mantlescan.xyz/',
   },
 } satisfies {
   [Net in NetworkName]: {
