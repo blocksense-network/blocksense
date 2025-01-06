@@ -3,6 +3,7 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 import { BinanceAssetsFetcher } from './binance';
 import { BybitAssetsFetcher } from './bybit';
 import { CoinbaseExchangeAssetsFetcher } from './coinbase-exchange';
+import { OKXExchangeAssetInfo, OKXExchangeAssetsFetcher } from './okx';
 import { CMCAssetFetcher } from './cmc';
 import { KrakenAssetsFetcher } from './kraken';
 import { UpbitAssetsFetcher } from './upbit';
@@ -13,6 +14,7 @@ export async function fetchSymbols() {
     supportedBinanceSymbols,
     supportedBybitSymbols,
     supportedCoinbaseExchangeSymbols,
+    supportedOKXExchangeSymbols,
     supportedUpbitSymbols,
     supportedKrakenSymbols,
     supportedCMCCurrencies,
@@ -20,6 +22,7 @@ export async function fetchSymbols() {
     new BinanceAssetsFetcher().fetchAssets(),
     new BybitAssetsFetcher().fetchAssets(),
     new CoinbaseExchangeAssetsFetcher().fetchAssets(),
+    new OKXExchangeAssetsFetcher().fetchAssets(),
     new UpbitAssetsFetcher().fetchAssets(),
     new KrakenAssetsFetcher().fetchAssets(),
     new CMCAssetFetcher().fetchAssets(),
@@ -33,6 +36,10 @@ export async function fetchSymbols() {
       {
         content: { supportedCoinbaseExchangeSymbols },
         name: 'coinbase_exchange_symbols',
+      },
+      {
+        content: { supportedOKXExchangeSymbols },
+        name: 'okx_exchange_symbols',
       },
       { content: { supportedUpbitSymbols }, name: 'upbit_symbols' },
       { content: { supportedKrakenSymbols }, name: 'kraken_symbols' },
