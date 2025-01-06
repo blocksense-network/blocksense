@@ -189,10 +189,6 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
           BigInt(index).toString(2).length / 8,
         );
 
-        if (batchFeeds[index] === ethers.toBeHex(0, 32)) {
-          return ''; // skip empty updates
-        }
-
         return ethers
           .solidityPacked(
             ['uint8', `uint${8n * BigInt(indexInBytesLength)}`, 'bytes32'],
