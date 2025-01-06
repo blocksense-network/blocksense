@@ -41,6 +41,7 @@ const networks = [
   'linea-sepolia',
   'manta-mainnet',
   'manta-sepolia',
+  'monad-devnet',
   'morph-holesky',
   'optimism-mainnet',
   'optimism-sepolia',
@@ -59,8 +60,8 @@ const networks = [
 const chainIds = [
   99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 43114, 43113,
   8453, 84532, 80084, 56, 97, 42220, 44787, 5115, 250, 4002, 100, 10200, 763373,
-  1285, 59144, 59141, 169, 3441006, 2810, 10, 11155420, 137, 80002, 1101, 2442,
-  534352, 534351, 167000, 167009, 324, 300,
+  1285, 59144, 59141, 169, 3441006, 41454, 2810, 10, 11155420, 137, 80002, 1101,
+  2442, 534352, 534351, 167000, 167009, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -88,6 +89,7 @@ export enum Currency {
   BNB = 'BNB',
   CELO = 'CELO',
   cBTC = 'cBTC',
+  DMON = 'DMON',
   FTM = 'FTM',
   METIS = 'METIS',
   MATIC = 'MATIC',
@@ -270,6 +272,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://pacific-explorer.sepolia-testnet.manta.network',
     currency: Currency.ETH,
+  },
+  'monad-devnet': {
+    chainId: 41454,
+    isTestnet: true,
+    explorerUrl: 'https://brightstar-884.devnet1.monad.xyz/',
+    currency: Currency.DMON,
   },
   'morph-holesky': {
     chainId: 2810,
