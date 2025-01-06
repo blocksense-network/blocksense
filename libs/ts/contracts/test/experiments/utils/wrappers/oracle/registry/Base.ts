@@ -1,38 +1,38 @@
 import { ethers } from 'hardhat';
 import {
-  CLAggregatorAdapter,
-  CLFeedRegistryAdapter,
+  CLAggregatorAdapterExp,
+  CLFeedRegistryAdapterExp,
   IChainlinkAggregator,
+  RegistryExp,
 } from '../../../../../../typechain';
-import { Registry } from '../../../../../../typechain';
 import { OracleBaseWrapper } from '../Base';
 import { deployContract } from '../../../helpers/common';
 
-export class RegistryWrapper extends OracleBaseWrapper<Registry> {
-  public registry!: CLFeedRegistryAdapter;
+export class RegistryWrapper extends OracleBaseWrapper<RegistryExp> {
+  public registry!: CLFeedRegistryAdapterExp;
 
   constructor(
     name: string,
-    underliers: (CLAggregatorAdapter | IChainlinkAggregator)[],
+    underliers: (CLAggregatorAdapterExp | IChainlinkAggregator)[],
   ) {
     super(name, underliers);
   }
 
   public async init(address: string, registryAddress?: string) {
     if (!registryAddress) {
-      this.registry = await deployContract<CLFeedRegistryAdapter>(
-        'CLFeedRegistryAdapter',
+      this.registry = await deployContract<CLFeedRegistryAdapterExp>(
+        'CLFeedRegistryAdapterExp',
         address,
       );
     } else {
       this.registry = await ethers.getContractAt(
-        'CLFeedRegistryAdapter',
+        'CLFeedRegistryAdapterExp',
         registryAddress,
       );
     }
 
-    this.contract = await deployContract<Registry>(
-      'Registry',
+    this.contract = await deployContract<RegistryExp>(
+      'RegistryExp',
       this.registry.target,
     );
   }

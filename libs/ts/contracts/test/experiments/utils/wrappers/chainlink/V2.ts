@@ -1,5 +1,5 @@
 import {
-  CLAggregatorAdapter,
+  CLAggregatorAdapterExp,
   HistoricalDataFeedStoreV2,
 } from '../../../../../typechain';
 import { deployContract } from '../../helpers/common';
@@ -25,8 +25,8 @@ export class CLV2Wrapper extends CLBaseWrapper<HistoricalDataFeedStoreV2> {
       proxy = proxyData;
     }
 
-    this.contract = await deployContract<CLAggregatorAdapter>(
-      'CLAggregatorAdapter',
+    this.contract = await deployContract<CLAggregatorAdapterExp>(
+      'CLAggregatorAdapterExp',
       description,
       decimals,
       key,
@@ -38,6 +38,6 @@ export class CLV2Wrapper extends CLBaseWrapper<HistoricalDataFeedStoreV2> {
   }
 
   public override getName(): string {
-    return 'CLAggregatorAdapterHistoricalDataFeedStoreV2';
+    return 'CLAggregatorAdapterExpHistoricalDataFeedStoreV2';
   }
 }

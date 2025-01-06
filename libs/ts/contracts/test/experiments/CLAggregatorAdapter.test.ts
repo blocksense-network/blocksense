@@ -26,7 +26,7 @@ const aggregatorData = [
   },
 ];
 
-describe('CLAggregatorAdapter', function () {
+describe('CLAggregatorAdapterExp', function () {
   let admin: Signer;
 
   beforeEach(async function () {

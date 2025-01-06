@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Blocksense} from '../../libraries/Blocksense.sol';
+import {BlocksenseExp} from '../../experiments/libraries/BlocksenseExp.sol';
 
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
@@ -17,7 +17,7 @@ contract BlocksenseFeedStoreConsumer {
   function getLatestAnswer(
     uint32 key
   ) external view returns (uint256 value, uint64 timestamp) {
-    bytes32 data = Blocksense._callDataFeed(
+    bytes32 data = BlocksenseExp._callDataFeed(
       feed,
       abi.encodePacked(0x80000000 | key)
     );
@@ -29,7 +29,7 @@ contract BlocksenseFeedStoreConsumer {
     uint32 key,
     uint32 roundId
   ) external view returns (uint256 value, uint64 timestamp) {
-    bytes32 data = Blocksense._callDataFeed(
+    bytes32 data = BlocksenseExp._callDataFeed(
       feed,
       abi.encodeWithSelector(bytes4(0x20000000 | key), roundId)
     );
@@ -38,12 +38,12 @@ contract BlocksenseFeedStoreConsumer {
   }
 
   function getLatestRound(uint32 key) external view returns (uint32 roundId) {
-    return uint32(Blocksense._latestRound(key, feed));
+    return uint32(BlocksenseExp._latestRound(key, feed));
   }
 
   function getLatestRoundData(
     uint32 key
   ) external view returns (int256 value, uint256 timestamp, uint80 roundId) {
-    (roundId, value, timestamp, , ) = Blocksense._latestRoundData(key, feed);
+    (roundId, value, timestamp, , ) = BlocksenseExp._latestRoundData(key, feed);
   }
 }

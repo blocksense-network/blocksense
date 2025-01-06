@@ -1,10 +1,10 @@
-import { CLAggregatorAdapter } from '../../../../../typechain';
+import { CLAggregatorAdapterExp } from '../../../../../typechain';
 import { BaseContract } from 'ethers';
 import { expect } from 'chai';
 import { UpgradeableProxyHistoricalBaseWrapper } from '../upgradeable/historical/Base';
 
 export abstract class CLBaseWrapper<T extends BaseContract> {
-  public contract!: CLAggregatorAdapter;
+  public contract!: CLAggregatorAdapterExp;
   public proxy!: UpgradeableProxyHistoricalBaseWrapper<T>;
   public key!: number;
 

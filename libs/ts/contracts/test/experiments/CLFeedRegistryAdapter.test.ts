@@ -32,7 +32,7 @@ const data = [
   },
 ];
 
-describe('CLFeedRegistryAdapter', async () => {
+describe('CLFeedRegistryAdapterExp', async () => {
   beforeEach(async () => {
     contractWrappersV1 = [];
     contractWrappersV2 = [];

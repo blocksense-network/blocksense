@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import './HistoricalConsumer.sol';
-import {Blocksense} from '../../../../libraries/Blocksense.sol';
+import {BlocksenseExp} from '../../../../experiments/libraries/BlocksenseExp.sol';
 
 contract HistoricalDataFeedConsumer is HistoricalConsumer {
   constructor(address _dataFeedStore) HistoricalConsumer(_dataFeedStore) {}
@@ -12,7 +12,7 @@ contract HistoricalDataFeedConsumer is HistoricalConsumer {
   ) internal view override returns (Transmission memory) {
     return
       _decodeTransmission(
-        Blocksense._callDataFeed(
+        BlocksenseExp._callDataFeed(
           dataFeedStore,
           abi.encodePacked(0x80000000 | key)
         )
@@ -25,7 +25,7 @@ contract HistoricalDataFeedConsumer is HistoricalConsumer {
   ) internal view override returns (Transmission memory) {
     return
       _decodeTransmission(
-        Blocksense._callDataFeed(
+        BlocksenseExp._callDataFeed(
           dataFeedStore,
           abi.encodeWithSelector(bytes4(0x20000000 | key), counter)
         )
@@ -42,6 +42,6 @@ contract HistoricalDataFeedConsumer is HistoricalConsumer {
   function _getLatestCounter(
     uint32 key
   ) internal view override returns (uint32 counter) {
-    return uint32(Blocksense._latestRound(key, dataFeedStore));
+    return uint32(BlocksenseExp._latestRound(key, dataFeedStore));
   }
 }

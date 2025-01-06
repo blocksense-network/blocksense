@@ -1,5 +1,5 @@
 import {
-  CLFeedRegistryAdapter,
+  CLFeedRegistryAdapterExp,
   UpgradeableProxy,
 } from '../../../../../../typechain';
 import { CLBaseWrapper } from '../Base';
@@ -12,7 +12,7 @@ import {
 
 export class CLRegistryBaseWrapper {
   public name!: string;
-  public contract!: CLFeedRegistryAdapter;
+  public contract!: CLFeedRegistryAdapterExp;
   public owner!: HardhatEthersSigner;
   public map: Record<
     string,
@@ -116,11 +116,11 @@ export class CLRegistryBaseWrapper {
 
   public async init(owner: HardhatEthersSigner) {
     this.owner = owner;
-    this.contract = (await deployContract<CLFeedRegistryAdapter>(
-      'CLFeedRegistryAdapter',
+    this.contract = (await deployContract<CLFeedRegistryAdapterExp>(
+      'CLFeedRegistryAdapterExp',
       owner.address,
       this.dataFeedStore.target,
-    )) as CLFeedRegistryAdapter;
+    )) as CLFeedRegistryAdapterExp;
   }
 
   public getName(): string {

@@ -381,7 +381,6 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
       expect(roundData[2].roundId).to.be.equal(chainlinkRoundData[0]);
       expect(roundData[2].answer).to.be.equal(chainlinkRoundData[1]);
       expect(roundData[2].startedAt).to.be.equal(chainlinkRoundData[2]);
-      expect(roundData[2].startedAt).to.be.equal(chainlinkRoundData[3]);
       expect(roundData[2].roundId).to.be.equal(chainlinkRoundData[4]);
     });
 
