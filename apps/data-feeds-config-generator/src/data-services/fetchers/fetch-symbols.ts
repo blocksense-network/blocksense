@@ -6,6 +6,7 @@ import { CoinbaseExchangeAssetsFetcher } from './coinbase-exchange';
 import { OKXExchangeAssetsFetcher } from './okx';
 import { BitgetExchangeAssetsFetcher } from './bitget';
 import { KuCoinExchangeAssetsFetcher } from './kucoin';
+import { MEXCExchangeAssetsFetcher } from './mexc';
 import { CMCAssetFetcher } from './cmc';
 import { KrakenAssetsFetcher } from './kraken';
 import { UpbitAssetsFetcher } from './upbit';
@@ -19,6 +20,7 @@ export async function fetchSymbols() {
     supportedOKXExchangeSymbols,
     supportedBitgetExchangeSymbols,
     supportedKuCoinExchangeSymbols,
+    supportedMEXCExchangeSymbols,
     supportedUpbitSymbols,
     supportedKrakenSymbols,
     supportedCMCCurrencies,
@@ -29,6 +31,7 @@ export async function fetchSymbols() {
     new OKXExchangeAssetsFetcher().fetchAssets(),
     new BitgetExchangeAssetsFetcher().fetchAssets(),
     new KuCoinExchangeAssetsFetcher().fetchAssets(),
+    new MEXCExchangeAssetsFetcher().fetchAssets(),
     new UpbitAssetsFetcher().fetchAssets(),
     new KrakenAssetsFetcher().fetchAssets(),
     new CMCAssetFetcher().fetchAssets(),
@@ -49,6 +52,7 @@ export async function fetchSymbols() {
       },
       { content: { supportedBitgetExchangeSymbols }, name: 'bitget_symbols' },
       { content: { supportedKuCoinExchangeSymbols }, name: 'kucoin_symbols' },
+      { content: { supportedMEXCExchangeSymbols }, name: 'mexc_symbols' },
       { content: { supportedUpbitSymbols }, name: 'upbit_symbols' },
       { content: { supportedKrakenSymbols }, name: 'kraken_symbols' },
       { content: { supportedCMCCurrencies }, name: 'cmc_currencies' },
