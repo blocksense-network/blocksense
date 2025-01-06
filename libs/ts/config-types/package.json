@@ -33,10 +33,10 @@
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.1",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.5",
     "@types/rollup-plugin-peer-deps-external": "^2",
     "glob": "^11.0.0",
-    "rollup": "^4.28.1",
+    "rollup": "^4.29.2",
     "rollup-plugin-delete": "^2.1.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-typescript2": "^0.36.0",
@@ -47,6 +47,6 @@
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
     "@effect/schema": "^0.75.5",
-    "effect": "^3.11.7"
+    "effect": "^3.12.1"
   }
 }
