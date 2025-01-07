@@ -6,7 +6,7 @@ import {
   Feed,
 } from '@blocksense/config-types/data-feeds-config';
 import {
-  ChainlinkProxyData,
+  CLAggregatorAdapterData,
   decodeDeploymentConfig,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
@@ -30,7 +30,7 @@ export default async function DataFeedPage({ params }) {
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
   const feedsDeploymentInfo = decodeDeploymentConfig(
     CONTRACTS_DEPLOYMENT_CONFIG,
-  )['ethereum-sepolia']?.contracts?.ChainlinkProxy;
+  )['ethereum-sepolia']?.contracts?.CLAggregatorAdapter;
   const feed = feedsConfig.feeds.find(feed => feed.id === Number(feedId));
 
   if (!feed) {
@@ -38,7 +38,7 @@ export default async function DataFeedPage({ params }) {
   }
 
   const feedDeploymentInfo = feedsDeploymentInfo?.find(
-    (info: ChainlinkProxyData) => info.description === feed.description,
+    (info: CLAggregatorAdapterData) => info.description === feed.description,
   );
 
   if (!feedDeploymentInfo) {

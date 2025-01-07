@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Feed } from '@blocksense/config-types/data-feeds-config';
-import { ChainlinkProxyData } from '@blocksense/config-types/evm-contracts-deployment';
+import { CLAggregatorAdapterData } from '@blocksense/config-types/evm-contracts-deployment';
 
 import { DataFeedCardSection } from '@/components/DataFeeds/DataFeedCardSection';
 import { DataFeedCardContentItem } from '@/components/DataFeeds/DataFeedCardContentItem';
@@ -12,7 +12,7 @@ import { QuestionsCardContent } from '@/components/DataFeeds/QuestionsCardConten
 
 type FeedDataProps = {
   feed: Feed;
-  feedDeploymentInfo: ChainlinkProxyData;
+  feedDeploymentInfo: CLAggregatorAdapterData;
 };
 
 export const DataFeedPageClient = ({
