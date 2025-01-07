@@ -1,4 +1,5 @@
-use crate::feeds::feed_allocator::ConcurrentAllocator;
+use crate::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
+use crate::providers::provider::init_shared_rpc_providers;
 use crate::providers::provider::ProviderStatus;
 use crate::providers::provider::SharedRpcProviders;
 use crate::reporters::reporter::init_shared_reporters;
@@ -16,9 +17,10 @@ use rdkafka::producer::FutureProducer;
 use rdkafka::ClientConfig;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::mpsc;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::sync::RwLock;
-use utils::logging::SharedLoggingHandle;
+use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 
 pub struct SequencerState {
     pub registry: Arc<RwLock<FeedMetaDataRegistry>>,
@@ -104,6 +106,46 @@ impl SequencerState {
             provider_status,
         }
     }
+}
+
+// Exclusively take config structure to init sequencer_state
+pub async fn create_sequencer_state_from_sequencer_config(
+    sequencer_config: SequencerConfig,
+    metrics_prefix: &str,
+    feeds_config: AllFeedsConfig,
+) -> (
+    actix_web::web::Data<SequencerState>,
+    UnboundedReceiver<VotedFeedUpdate>, // aggregated_votes_to_block_creator_recv
+    UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
+    UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
+) {
+    let log_handle = init_shared_logging_handle("INFO", false);
+    let providers = init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix)).await;
+
+    let (vote_send, vote_recv) = mpsc::unbounded_channel();
+    let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
+        mpsc::unbounded_channel();
+    let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
+    let aggregated_votes_to_block_creator_send = vote_send;
+    let feed_id_allocator = Some(init_concurrent_allocator());
+    let sequencer_state = SequencerState::new(
+        feeds_config,
+        providers,
+        log_handle,
+        &sequencer_config,
+        Some(metrics_prefix),
+        feed_id_allocator,
+        aggregated_votes_to_block_creator_send,
+        feeds_management_cmd_to_block_creator_send,
+        feeds_slots_manager_cmd_send,
+    );
+
+    (
+        actix_web::web::Data::new(sequencer_state),
+        vote_recv,
+        feeds_management_cmd_to_block_creator_recv,
+        feeds_slots_manager_cmd_recv,
+    )
 }
 
 fn create_kafka_producer(

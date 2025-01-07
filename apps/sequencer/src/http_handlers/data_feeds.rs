@@ -503,63 +503,45 @@ pub fn add_main_services(cfg: &mut ServiceConfig) {
 }
 
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use super::*;
-    use crate::feeds::feed_allocator::init_concurrent_allocator;
     use crate::feeds::feed_workers::prepare_app_workers;
     use crate::http_handlers::admin::deploy;
     use crate::providers::provider::can_read_contract_bytecode;
     use crate::providers::provider::init_shared_rpc_providers;
-    use crate::reporters::reporter::init_shared_reporters;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
     use alloy::primitives::Address;
-    use blockchain_data_model::in_mem_db::InMemDb;
-    use config::get_test_config_with_multiple_providers;
+    use config::get_test_config_with_no_providers;
     use config::AllFeedsConfig;
     use config::AssetPair;
     use config::FeedConfig;
 
-    use config::{
-        get_sequencer_and_feed_configs, get_test_config_with_single_provider, init_config,
-        SequencerConfig,
-    };
+    use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
+    use config::{get_test_config_with_single_provider, SequencerConfig};
     use crypto::JsonSerializableSignature;
     use data_feeds::connector::post::generate_signature;
-    use data_feeds::feeds_processing::VotedFeedUpdate;
-    use feed_registry::feed_registration_cmds::FeedsManagementCmds;
-    use feed_registry::registry::{new_feeds_meta_data_reg_from_config, AllFeedsReports};
     use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
-    use prometheus::metrics::FeedsMetrics;
     use regex::Regex;
     use std::collections::HashMap;
-    use std::env;
-    use std::path::Path;
     use std::path::PathBuf;
     use std::str::FromStr;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
-    use tokio::sync::mpsc::UnboundedReceiver;
-    use tokio::sync::{mpsc, RwLock};
+    use tokio::sync::mpsc;
     use utils::logging::init_shared_logging_handle;
-    use web::Data;
 
     #[actix_web::test]
     async fn post_report_from_unknown_reporter_fails_with_401() {
-        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let sequencer_config_file = PathBuf::new()
-            .join(manifest_dir)
-            .join("tests")
-            .join("sequencer_config.json");
-
         let log_handle = init_shared_logging_handle("INFO", false);
-        let sequencer_config =
-            init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
         let metrics_prefix = Some("post_report_from_unknown_reporter_fails_with_401_");
 
+        let sequencer_config: SequencerConfig = get_test_config_with_no_providers();
         let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
 
-        let (_, feeds_config) = get_sequencer_and_feed_configs();
-
+        let feed_1_config = some_feed_config_with_id_1();
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![feed_1_config],
+        };
         let (vote_send, mut _vote_recv) = mpsc::unbounded_channel();
         let (
             feeds_management_cmd_to_block_creator_send,
@@ -627,72 +609,6 @@ mod tests {
         assert_eq!(resp.status(), 401);
     }
 
-    async fn create_sequencer_state_from_sequencer_config(
-        network: &str,
-        key_path: &Path,
-        anvil_endpoint: &str,
-    ) -> (
-        UnboundedReceiver<VotedFeedUpdate>, // aggregated_votes_to_block_creator_recv
-        UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
-        UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
-        Data<SequencerState>,
-    ) {
-        let cfg = get_test_config_with_single_provider(network, key_path, anvil_endpoint);
-
-        let metrics_prefix = Some("create_sequencer_state_from_sequencer_config");
-
-        let providers = init_shared_rpc_providers(&cfg, metrics_prefix).await;
-
-        let log_handle = init_shared_logging_handle("INFO", false);
-
-        let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
-
-        let (vote_send, vote_recv) = mpsc::unbounded_channel();
-        let (
-            feeds_management_cmd_to_block_creator_send,
-            feeds_management_cmd_to_block_creator_recv,
-        ) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
-
-        let sequencer_state = SequencerState {
-            registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
-                &feeds_config,
-            ))),
-            reports: Arc::new(RwLock::new(AllFeedsReports::new())),
-            providers: providers.clone(),
-            log_handle,
-            reporters: init_shared_reporters(&cfg, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(Some(init_concurrent_allocator()))),
-            aggregated_votes_to_block_creator_send: vote_send,
-            feeds_metrics: Arc::new(RwLock::new(
-                FeedsMetrics::new(metrics_prefix.expect("Need to set metrics prefix in tests!"))
-                    .expect("Failed to allocate feed_metrics"),
-            )),
-            active_feeds: Arc::new(RwLock::new(
-                feeds_config
-                    .feeds
-                    .into_iter()
-                    .map(|feed| (feed.id, feed))
-                    .collect(),
-            )),
-            sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
-            feeds_management_cmd_to_block_creator_send,
-            feeds_slots_manager_cmd_send,
-            blockchain_db: Arc::new(RwLock::new(InMemDb::new())),
-            kafka_endpoint: None,
-            provider_status: Arc::new(RwLock::new(HashMap::new())),
-        };
-
-        (
-            vote_recv,
-            feeds_management_cmd_to_block_creator_recv,
-            feeds_slots_manager_cmd_recv,
-            web::Data::new(sequencer_state),
-        )
-    }
-
     #[actix_web::test]
     async fn test_register_feed_success() {
         // Test that registering a oneshot feed and reporting a vote will lead
@@ -709,17 +625,18 @@ mod tests {
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
 
         // Create app state
         let (
+            sequencer_state,
             aggregated_votes_to_block_creator_recv,
             feeds_management_cmd_to_block_creator_recv,
             feeds_slots_manager_cmd_recv,
-            sequencer_state,
         ) = create_sequencer_state_from_sequencer_config(
-            network,
-            key_path.as_path(),
-            anvil.endpoint().as_str(),
+            cfg.clone(),
+            "test_register_feed_success",
+            feeds_config,
         )
         .await;
 
@@ -894,46 +811,17 @@ mod tests {
         // Assert feed is no longer in registry (was removed after vote)
     }
 
-    async fn new_test_sequencer_state(
-        sequencer_config: &SequencerConfig,
-        feeds_config: AllFeedsConfig,
-        metics_prefix: &str,
-    ) -> SequencerState {
-        let log_handle = init_shared_logging_handle("INFO", false);
-        let metrics_prefix = Some(metics_prefix);
-        let (vote_send, _vote_recv) = mpsc::unbounded_channel();
-        let (
-            feeds_management_cmd_to_block_creator_send,
-            _feeds_management_cmd_to_block_creator_recv,
-        ) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
-        let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
-
-        SequencerState::new(
-            feeds_config,
-            providers,
-            log_handle,
-            &sequencer_config,
-            metrics_prefix,
-            None,
-            vote_send,
-            feeds_management_cmd_to_block_creator_send,
-            feeds_slots_manager_cmd_send,
-        )
-    }
-
     #[actix_web::test]
     async fn test_get_last_published_value_and_timestamp_empty_success() {
-        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let sequencer_state = new_test_sequencer_state(
-            &sequencer_config,
-            feed_config,
+
+        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
             "test_get_last_published_value_and_timestamp_empty_success",
+            feed_config,
         )
         .await;
-        let sequencer_state = web::Data::new(sequencer_state);
 
         // Initialize the service
         let app = test::init_service(
@@ -959,15 +847,14 @@ mod tests {
 
     #[actix_web::test]
     async fn test_get_last_published_value_and_timestamp_wrong_feed_id() {
-        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let sequencer_state = new_test_sequencer_state(
-            &sequencer_config,
-            feed_config,
+        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
             "test_get_last_published_value_and_timestamp_wrong_feed_id",
+            feed_config,
         )
         .await;
-        let sequencer_state = web::Data::new(sequencer_state);
 
         // Initialize the service
         let app = test::init_service(
@@ -1007,15 +894,14 @@ mod tests {
 
     #[actix_web::test]
     async fn test_get_last_published_value_and_timestamp_unregistered_feed_id() {
-        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let sequencer_state = new_test_sequencer_state(
-            &sequencer_config,
-            feed_config,
+        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
             "test_get_last_published_value_and_timestamp_unregistered_feed_id",
+            feed_config,
         )
         .await;
-        let sequencer_state = web::Data::new(sequencer_state);
 
         // Initialize the service
         let app = test::init_service(
@@ -1058,7 +944,7 @@ mod tests {
         );
     }
 
-    fn some_feed_config_with_id_1() -> FeedConfig {
+    pub fn some_feed_config_with_id_1() -> FeedConfig {
         FeedConfig {
             id: 1,
             name: "name".to_string(),
@@ -1085,22 +971,21 @@ mod tests {
 
     #[actix_web::test]
     async fn test_get_last_published_value_and_timestamp_registered_feed_id_no_data() {
-        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let sequencer_config = get_test_config_with_no_providers();
         let all_feeds_config = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
 
-        let sequencer_state = new_test_sequencer_state(
-            &sequencer_config,
-            all_feeds_config,
+        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_no_data",
+            all_feeds_config,
         )
         .await;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
             history.register_feed(1, 100);
         }
-        let sequencer_state = web::Data::new(sequencer_state);
 
         // Initialize the service
         let app = test::init_service(
@@ -1140,17 +1025,17 @@ mod tests {
 
     #[actix_web::test]
     async fn test_get_last_published_value_and_timestamp_registered_feed_id_with_data() {
-        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let sequencer_config = get_test_config_with_no_providers();
 
         let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
         let all_feeds_config = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
 
-        let sequencer_state = new_test_sequencer_state(
-            &sequencer_config,
-            all_feeds_config,
+        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_with_data",
+            all_feeds_config,
         )
         .await;
         {
@@ -1165,7 +1050,6 @@ mod tests {
                 + 300_u128 * 10_u128;
             history.push(feed_id, feed_value, end_slot_timestamp);
         }
-        let sequencer_state = web::Data::new(sequencer_state);
 
         // Initialize the service
         let app = test::init_service(
@@ -1206,17 +1090,17 @@ mod tests {
 
     #[actix_web::test]
     async fn test_get_last_published_value_and_timestamp_registered_feed_id_with_more_data() {
-        let sequencer_config = get_test_config_with_multiple_providers(vec![]);
+        let sequencer_config = get_test_config_with_no_providers();
 
         let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
         let all_feeds_config = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
 
-        let sequencer_state = new_test_sequencer_state(
-            &sequencer_config,
-            all_feeds_config,
+        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_with_more_data",
+            all_feeds_config,
         )
         .await;
         let end_slot_timestamp = first_report_start_time
@@ -1255,7 +1139,6 @@ mod tests {
                 end_slot_timestamp + 300_u128 * 4,
             );
         }
-        let sequencer_state = web::Data::new(sequencer_state);
 
         // Initialize the service
         let app = test::init_service(

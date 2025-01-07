@@ -147,7 +147,7 @@ impl Validated for FeedConfig {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Clone)]
 pub struct AllFeedsConfig {
     pub feeds: Vec<FeedConfig>,
 }
@@ -343,90 +343,41 @@ pub fn get_validated_config<T: for<'a> Deserialize<'a> + Validated>(
     }
 }
 
-pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
+pub fn get_sequencer_config() -> SequencerConfig {
     let sequencer_config_file = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
-    let sequencer_config =
-        get_validated_config::<SequencerConfig>(&sequencer_config_file, "SequencerConfig")
-            .expect("Could not get validated sequencer config");
+    get_validated_config::<SequencerConfig>(&sequencer_config_file, "SequencerConfig")
+        .expect("Could not get validated sequencer config")
+}
+
+pub fn get_feeds_config() -> AllFeedsConfig {
     let feeds_config_file = get_config_file_path(FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE);
-    let feeds_config = get_validated_config::<AllFeedsConfig>(&feeds_config_file, "FeedsConfig")
-        .expect("Could not get validated feeds config");
-    (sequencer_config, feeds_config)
+    get_validated_config::<AllFeedsConfig>(&feeds_config_file, "FeedsConfig")
+        .expect("Could not get validated feeds config")
+}
+
+pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
+    (get_sequencer_config(), get_feeds_config())
 }
 
 // Utility functions for tests follow:
+
+pub fn test_data_feed_store_byte_code() -> String {
+    "0x60a060405234801561001057600080fd5b506040516101cf3803806101cf83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014561008a6000396000609001526101456000f3fe608060405234801561001057600080fd5b50600060405160046000601c83013751905063e000000081161561008e5763e0000000198116632000000082161561005957806020526004356004603c20015460005260206000f35b805463800000008316156100775781600052806004601c2001546000525b634000000083161561008857806020525b60406000f35b7f00000000000000000000000000000000000000000000000000000000000000003381146100bb57600080fd5b631a2d80ac820361010a57423660045b8181101561010857600481601c376000516004601c2061ffff6001835408806100f2575060015b91829055600483013585179101556024016100cb565b005b600080fdfea26469706673582212204a7c38e6d9b723ea65e6d451d6a8436444c333499ad610af033e7360a2558aea64736f6c63430008180033".to_string()
+}
+
+pub fn test_data_feed_sports_byte_code() -> String {
+    "0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033".to_string()
+}
 
 pub fn get_test_config_with_single_provider(
     network: &str,
     private_key_path: &Path,
     url: &str,
 ) -> SequencerConfig {
-    SequencerConfig {
-        sequencer_id: 1,
-        main_port: 8877,
-        admin_port: 5556,
-        prometheus_port: 5555,
-        block_config: BlockConfig{
-            max_feed_updates_to_batch: 1,
-            block_generation_period: 500,
-            genesis_block_timestamp: None,
-        },
-        providers: HashMap::from([(
-            network.to_string(),
-            Provider {
-                private_key_path: private_key_path.to_str().expect("Error in private key path").to_string(),
-                url: url.to_string(),
-                contract_address: None,
-                event_contract_address: None,
-                transaction_drop_timeout_secs: 50,
-                transaction_retry_timeout_secs: 24,
-                retry_fee_increment_fraction: 0.1,
-                transaction_gas_limit: 7500000,
-                data_feed_store_byte_code: Some("0x60a060405234801561001057600080fd5b503360805260805160e761002d60003960006045015260e76000f3fe6080604052348015600f57600080fd5b506000366060600060046000601c37506000516201ffff811015604357600f60fc1b6020526005601c205460005260206000f35b7f0000000000000000000000000000000000000000000000000000000000000000338114606f57600080fd5b631a2d80ac8281109083101760ac57600f60fc1b6004523660045b8181101560aa57600481600037600560002060048201359055602401608a565b005b600080fdfea264697066735822122015800ed562cf954d8d71346ded5d44d9d6c459e49b37d67049ba43a5524b430764736f6c63430008180033".to_string()),
-                data_feed_sports_byte_code: Some("0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033".to_string()),
-                is_enabled: true,
-                allow_feeds: None,
-                publishing_criteria: vec![],
-                impersonated_anvil_account: None,
-                contract_version: 1,
-            },
-        )]),
-        reporters: Vec::new(),
-        kafka_report_endpoint: KafkaReportEndpoint{url: None},
-    }
+    get_test_config_with_multiple_providers(vec![(network, private_key_path, url)])
 }
 
-pub fn get_test_config_with_multiple_providers(
-    provider_details: Vec<(&str, &Path, &str)>,
-) -> SequencerConfig {
-    let mut providers = HashMap::new();
-
-    for (network, private_key_path, url) in provider_details {
-        providers.insert(
-            network.to_string(),
-            Provider {
-                private_key_path: private_key_path
-                    .to_str()
-                    .expect("Error in private_key_path: ")
-                    .to_string(),
-                url: url.to_string(),
-                contract_address: None,
-                event_contract_address: None,
-                transaction_drop_timeout_secs: 50,
-                transaction_retry_timeout_secs: 24,
-                retry_fee_increment_fraction: 0.1,
-                transaction_gas_limit: 7500000,
-                data_feed_store_byte_code: Some("".to_string()),
-                data_feed_sports_byte_code: Some("".to_string()),
-                is_enabled: true,
-                allow_feeds: None,
-                publishing_criteria: vec![],
-                impersonated_anvil_account: None,
-                contract_version: 1,
-            },
-        );
-    }
-
+pub fn get_test_config_with_no_providers() -> SequencerConfig {
     SequencerConfig {
         sequencer_id: 1,
         main_port: 8877,
@@ -437,48 +388,65 @@ pub fn get_test_config_with_multiple_providers(
             block_generation_period: 500,
             genesis_block_timestamp: None,
         },
-        providers,
+        providers: HashMap::new(),
         reporters: Vec::new(),
         kafka_report_endpoint: KafkaReportEndpoint { url: None },
     }
 }
 
+pub fn get_test_config_with_multiple_providers(
+    provider_details: Vec<(&str, &Path, &str)>,
+) -> SequencerConfig {
+    let mut sequencer_config = get_test_config_with_no_providers();
+    for (network, private_key_path, url) in provider_details {
+        sequencer_config.providers.insert(
+            network.to_string(),
+            Provider {
+                private_key_path: private_key_path
+                    .to_str()
+                    .expect("Error in private_key_path: ")
+                    .to_string(),
+                url: url.to_string(),
+                contract_address: Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string()),
+                event_contract_address: None,
+                transaction_drop_timeout_secs: 50,
+                transaction_retry_timeout_secs: 24,
+                retry_fee_increment_fraction: 0.1,
+                transaction_gas_limit: 7500000,
+                data_feed_store_byte_code: Some(test_data_feed_store_byte_code()),
+                data_feed_sports_byte_code: Some(test_data_feed_sports_byte_code()),
+                is_enabled: true,
+                allow_feeds: None,
+                publishing_criteria: vec![],
+                impersonated_anvil_account: None,
+                contract_version: 1,
+            },
+        );
+    }
+    sequencer_config
+}
+
 #[cfg(test)]
 mod tests {
-    use utils::constants::{SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE};
-    use utils::get_config_file_path;
-    use utils::read_file;
-
     use super::*;
-    use std::fs::File;
-    use std::io::prelude::*;
-    use std::path::PathBuf;
 
     #[test]
     fn sequencer_config_with_conflicting_ports_fails_validation() {
-        let config_file_path = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
-        let config_file_path = config_file_path
-            .to_str()
-            .expect("Error converting path to str, needed to read file.");
+        let sequencer_config = get_test_config_with_no_providers();
 
-        let data = read_file(config_file_path);
-        let mut config_json = match serde_json::from_str::<SequencerConfig>(data.as_str()) {
-            Ok(c) => c,
-            Err(e) => panic!("Config file ({config_file_path}) is not valid JSON! {e}"),
-        };
-        config_json.main_port = config_json.admin_port; // Set an error in the config - endpoints cannot have same ports.
+        let mut invalid_config_1 = sequencer_config.clone();
+        invalid_config_1.admin_port = invalid_config_1.main_port;
 
-        let mut file = File::create("/tmp/sequencer_config.json")
-            .expect("Could not create sequencer config file!");
-        file.write(serde_json::to_string(&config_json).unwrap().as_bytes())
-            .expect("Could not write to sequencer config file");
-        file.flush().expect("Could flush sequencer config file");
+        let mut invalid_config_2 = sequencer_config.clone();
+        invalid_config_2.prometheus_port = invalid_config_2.main_port;
 
-        let path = PathBuf::new().join("/tmp").join("sequencer_config.json");
-        match get_validated_config::<SequencerConfig>(&path, "SequencerConfig") {
-            Ok(_) => panic!("Did not detect error in config file!"),
-            Err(_) => {}
-        }
+        let mut invalid_config_3 = sequencer_config.clone();
+        invalid_config_3.prometheus_port = invalid_config_3.admin_port;
+
+        assert!(sequencer_config.validate("").is_ok());
+        assert!(invalid_config_1.validate("").is_err());
+        assert!(invalid_config_2.validate("").is_err());
+        assert!(invalid_config_3.validate("").is_err());
     }
 
     #[test]
@@ -507,8 +475,14 @@ mod tests {
             provider_a.contract_address,
             Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string())
         );
-        assert_eq!(provider_a.data_feed_store_byte_code, Some("0x60a060405234801561001057600080fd5b506040516101cf3803806101cf83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014561008a6000396000609001526101456000f3fe608060405234801561001057600080fd5b50600060405160046000601c83013751905063e000000081161561008e5763e0000000198116632000000082161561005957806020526004356004603c20015460005260206000f35b805463800000008316156100775781600052806004601c2001546000525b634000000083161561008857806020525b60406000f35b7f00000000000000000000000000000000000000000000000000000000000000003381146100bb57600080fd5b631a2d80ac820361010a57423660045b8181101561010857600481601c376000516004601c2061ffff6001835408806100f2575060015b91829055600483013585179101556024016100cb565b005b600080fdfea26469706673582212204a7c38e6d9b723ea65e6d451d6a8436444c333499ad610af033e7360a2558aea64736f6c63430008180033".to_string()));
-        assert_eq!(provider_a.data_feed_sports_byte_code, Some("0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033".to_string()));
+        assert_eq!(
+            provider_a.data_feed_store_byte_code,
+            Some(test_data_feed_store_byte_code())
+        );
+        assert_eq!(
+            provider_a.data_feed_sports_byte_code,
+            Some(test_data_feed_sports_byte_code())
+        );
         assert_eq!(provider_a.allow_feeds, None);
         assert_eq!(provider_a.publishing_criteria.len(), 0);
         assert_eq!(provider_a.impersonated_anvil_account, None);
@@ -558,8 +532,14 @@ mod tests {
             provider_a.contract_address,
             Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string())
         );
-        assert_eq!(provider_a.data_feed_store_byte_code, Some("0x60a060405234801561001057600080fd5b506040516101cf3803806101cf83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014561008a6000396000609001526101456000f3fe608060405234801561001057600080fd5b50600060405160046000601c83013751905063e000000081161561008e5763e0000000198116632000000082161561005957806020526004356004603c20015460005260206000f35b805463800000008316156100775781600052806004601c2001546000525b634000000083161561008857806020525b60406000f35b7f00000000000000000000000000000000000000000000000000000000000000003381146100bb57600080fd5b631a2d80ac820361010a57423660045b8181101561010857600481601c376000516004601c2061ffff6001835408806100f2575060015b91829055600483013585179101556024016100cb565b005b600080fdfea26469706673582212204a7c38e6d9b723ea65e6d451d6a8436444c333499ad610af033e7360a2558aea64736f6c63430008180033".to_string()));
-        assert_eq!(provider_a.data_feed_sports_byte_code, Some("0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033".to_string()));
+        assert_eq!(
+            provider_a.data_feed_store_byte_code,
+            Some(test_data_feed_store_byte_code())
+        );
+        assert_eq!(
+            provider_a.data_feed_sports_byte_code,
+            Some(test_data_feed_sports_byte_code())
+        );
         assert_eq!(provider_a.allow_feeds, None);
         assert_eq!(provider_a.publishing_criteria.len(), 4);
         assert_eq!(provider_a.impersonated_anvil_account, None);

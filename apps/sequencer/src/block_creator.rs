@@ -308,15 +308,15 @@ async fn generate_block(
 
 #[cfg(test)]
 mod tests {
+    use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
+    use config::get_test_config_with_no_providers;
+    use config::AllFeedsConfig;
     use config::BlockConfig;
     use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::{FeedType, Timestamp};
     use std::time::Duration;
     use tokio::sync::mpsc;
     use tokio::time;
-    use utils::test_env::get_test_private_key_path;
-
-    use crate::testing::sequencer_state::create_sequencer_state_from_sequencer_config_file;
 
     #[actix_web::test]
     async fn test_block_creator_loop() {
@@ -327,27 +327,29 @@ mod tests {
             genesis_block_timestamp: None,
         };
 
-        let (vote_send, vote_recv) = mpsc::unbounded_channel();
-        let (_feeds_management_cmd_send, feeds_management_cmd_recv) = mpsc::unbounded_channel();
-        let (batched_votes_send, mut batched_votes_recv) = mpsc::unbounded_channel();
-
-        let key_path = get_test_private_key_path();
-        let network = "ETH_test_block_creator_loop";
-
-        let sequencer_state = create_sequencer_state_from_sequencer_config_file(
-            network,
-            key_path.as_path(),
-            "https://127.0.0.1:1234",
-            None,
-            None,
+        let sequencer_config = get_test_config_with_no_providers();
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
+        let metrics_prefix = "test_block_creator_loop";
+        let (
+            sequencer_state,
+            vote_recv,
+            feeds_management_cmd_to_block_creator_recv,
+            _feeds_slots_manager_cmd_recv,
+        ) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
+            metrics_prefix,
+            feeds_config,
         )
         .await;
 
+        let (batched_votes_send, mut batched_votes_recv) = mpsc::unbounded_channel();
+        let vote_send = sequencer_state
+            .aggregated_votes_to_block_creator_send
+            .clone();
         super::block_creator_loop(
-            //Arc::new(RwLock::new(vote_recv)),
             sequencer_state,
             vote_recv,
-            feeds_management_cmd_recv,
+            feeds_management_cmd_to_block_creator_recv,
             batched_votes_send,
             block_config,
         )

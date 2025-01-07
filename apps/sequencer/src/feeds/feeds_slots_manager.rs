@@ -354,31 +354,27 @@ async fn read_next_feed_slots_manager_cmd(
 mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
-    use config::get_sequencer_and_feed_configs;
-    use config::init_config;
-    use config::SequencerConfig;
+    use config::{AllFeedsConfig, SequencerConfig};
     use feed_registry::types::FeedType;
-    use std::env;
-    use std::path::PathBuf;
     use std::time::Duration;
+
+    use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
+    use config::get_test_config_with_no_providers;
 
     use crate::feeds::feed_slots_processor::tests::check_recieved;
     use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
     async fn test_feed_slots_manager_loop() {
-        let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-        let sequencer_config_file = PathBuf::new()
-            .join(manifest_dir)
-            .join("tests")
-            .join("sequencer_config.json");
-
         let log_handle = init_shared_logging_handle("INFO", false);
-        let sequencer_config =
-            init_config::<SequencerConfig>(&sequencer_config_file).expect("Failed to load config:");
+        let sequencer_config: SequencerConfig = get_test_config_with_no_providers();
+        let mut feed_1_config = some_feed_config_with_id_1();
+        const TIME_INTERVAL: u64 = 2_000_u64;
 
-        let (_, mut feeds_config) = get_sequencer_and_feed_configs();
-
+        feed_1_config.report_interval_ms = TIME_INTERVAL; // lower the report time interval.
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![feed_1_config],
+        };
         let metrics_prefix = Some("test_feed_slots_manager_loop_");
 
         let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
@@ -386,10 +382,6 @@ mod tests {
         let original_report_data = FeedType::Numerical(13.0);
 
         // we are specifically sending only one report message as we don't want to test the average processor
-        const TIME_INTERVAL: u64 = 2000;
-
-        feeds_config.feeds[1].report_interval_ms = TIME_INTERVAL; // lower the report time interval.
-
         let reporter_id = 42;
         let (vote_send, mut vote_recv) = mpsc::unbounded_channel();
         let (

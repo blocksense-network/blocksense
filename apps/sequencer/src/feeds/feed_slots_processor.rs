@@ -534,9 +534,11 @@ impl FeedSlotsProcessor {
 pub mod tests {
 
     use super::*;
+    use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
+    use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
+    use config::get_test_config_with_single_provider;
     use config::AllFeedsConfig;
     use config::Reporter;
-    use config::{get_sequencer_and_feed_configs, get_test_config_with_single_provider};
     use feed_registry::registry::AllFeedsReports;
     use feed_registry::types::FeedMetaData;
     use std::sync::Arc;
@@ -544,76 +546,6 @@ pub mod tests {
     use tokio::sync::RwLock;
     use tokio::time::error::Elapsed;
     use utils::test_env::get_test_private_key_path;
-
-    use crate::providers::provider::init_shared_rpc_providers;
-    use config::SequencerConfig;
-    use tokio::sync::mpsc::UnboundedReceiver;
-    use utils::logging::init_shared_logging_handle;
-
-    // Exclusively take config structure to init sequencer_state
-    pub async fn create_sequencer_state_from_sequencer_config(
-        sequencer_config: SequencerConfig,
-        metrics_prefix: &str,
-    ) -> (Data<SequencerState>, UnboundedReceiver<VotedFeedUpdate>) {
-        let providers = init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix)).await;
-
-        let log_handle = init_shared_logging_handle("INFO", false);
-
-        let (vote_send, vote_recv) = mpsc::unbounded_channel();
-        let (
-            feeds_management_cmd_to_block_creator_send,
-            _feeds_management_cmd_to_block_creator_recv,
-        ) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
-
-        let (_, feeds_config) = get_sequencer_and_feed_configs();
-
-        (
-            Data::new(SequencerState::new(
-                feeds_config,
-                providers,
-                log_handle,
-                &sequencer_config,
-                Some(metrics_prefix),
-                None,
-                vote_send,
-                feeds_management_cmd_to_block_creator_send,
-                feeds_slots_manager_cmd_send,
-            )),
-            vote_recv,
-        )
-    }
-
-    async fn new_test_sequencer_state(
-        sequencer_config: &SequencerConfig,
-        feeds_config: AllFeedsConfig,
-        metics_prefix: &str,
-    ) -> (SequencerState, UnboundedReceiver<VotedFeedUpdate>) {
-        let log_handle = init_shared_logging_handle("INFO", false);
-        let metrics_prefix = Some(metics_prefix);
-        let (vote_send, vote_recv) = mpsc::unbounded_channel();
-        let (
-            feeds_management_cmd_to_block_creator_send,
-            _feeds_management_cmd_to_block_creator_recv,
-        ) = mpsc::unbounded_channel();
-        let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
-            mpsc::unbounded_channel();
-        let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
-
-        let sequencer_state = SequencerState::new(
-            feeds_config,
-            providers,
-            log_handle,
-            &sequencer_config,
-            metrics_prefix,
-            None,
-            vote_send,
-            feeds_management_cmd_to_block_creator_send,
-            feeds_slots_manager_cmd_send,
-        );
-        (sequencer_state, vote_recv)
-    }
 
     pub fn check_recieved(
         received: Result<Option<VotedFeedUpdate>, Elapsed>,
@@ -703,8 +635,9 @@ pub mod tests {
             "http://localhost:8545",
         );
 
-        let (sequencer_state, mut rx) =
-            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix).await;
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
+        let (sequencer_state, mut rx, _, _) =
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -785,9 +718,9 @@ pub mod tests {
             key_path.as_path(),
             "http://localhost:8545",
         );
-
-        let (sequencer_state, mut rx) =
-            create_sequencer_state_from_sequencer_config(cfg, metics_prefix).await;
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
+        let (sequencer_state, mut rx, _, _) =
+            create_sequencer_state_from_sequencer_config(cfg, metics_prefix, feeds_config).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -885,8 +818,13 @@ pub mod tests {
             id: 14,
             pub_key: "ea30813e2f8cf968e27bad29167b41bce038a3ce9b7b368de05e5cf1af3de919eeba267b8706f55c356d5f71891eff116b98".to_string(),
         });
-        let (sequencer_state, mut rx) =
-            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix).await;
+
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![some_feed_config_with_id_1()],
+        };
+
+        let (sequencer_state, mut rx, _, _) =
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
         //info!()
         let num_reporteds = sequencer_state.reporters.read().await.len();
         assert_eq!(num_reporteds, 2);
@@ -969,9 +907,11 @@ pub mod tests {
             key_path.as_path(),
             "http://localhost:8545",
         );
-
-        let (sequencer_state, mut rx) =
-            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix).await;
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![some_feed_config_with_id_1()],
+        };
+        let (sequencer_state, mut rx, _, _) =
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -1071,9 +1011,11 @@ pub mod tests {
             key_path.as_path(),
             "http://localhost:8545",
         );
-
-        let (sequencer_state, mut rx) =
-            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix).await;
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![some_feed_config_with_id_1()],
+        };
+        let (sequencer_state, mut rx, _, _) =
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -1171,9 +1113,12 @@ pub mod tests {
             key_path.as_path(),
             "http://localhost:8545",
         );
-        let all_feed_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, mut rx) =
-            new_test_sequencer_state(&cfg, all_feed_config, metrics_prefix).await;
+        let all_feed_config = AllFeedsConfig {
+            feeds: vec![some_feed_config_with_id_1()],
+        };
+        let (sequencer_state, mut rx, _, _) =
+            create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, all_feed_config)
+                .await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
         {
@@ -1210,7 +1155,6 @@ pub mod tests {
         tokio::spawn(async move {
             let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
-            let sequencer_state = Data::new(sequencer_state);
             feed_slots_processor
                 .start_loop(
                     &sequencer_state,
@@ -1245,7 +1189,7 @@ pub mod tests {
     async fn test_feed_slots_processor_loop_always_publish_heartbeat_2() {
         // setup
         let name = "test_feed_slots_processor_loop_always_publish_heartbeat_2";
-        let always_publish_heartbeat_ms = Some(600_u128);
+        let always_publish_heartbeat_ms = Some(900_u128);
         let received = run_feed_slots_processor_loop_always_publish_heartbeat(
             name,
             always_publish_heartbeat_ms,
