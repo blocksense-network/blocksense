@@ -10,6 +10,7 @@ import { MEXCExchangeAssetsFetcher } from './mexc';
 import { GateIoExchangeAssetsFetcher } from './gate-io';
 import { CryptoComExchangeAssetsFetcher } from './crypto-com-exchange';
 import { BinanceTRExchangeAssetsFetcher } from './binance-tr';
+import { BinanceUSExchangeAssetsFetcher } from './binance-us';
 import { CMCAssetFetcher } from './cmc';
 import { KrakenAssetsFetcher } from './kraken';
 import { UpbitAssetsFetcher } from './upbit';
@@ -27,6 +28,7 @@ export async function fetchSymbols() {
     supportedGateIoExchangeSymbols,
     supportedCryptoComExchangeSymbols,
     supportedBinanceTRExchangeSymbols,
+    supportedBinanceUSExchangeSymbols,
     supportedUpbitSymbols,
     supportedKrakenSymbols,
     supportedCMCCurrencies,
@@ -41,6 +43,7 @@ export async function fetchSymbols() {
     new GateIoExchangeAssetsFetcher().fetchAssets(),
     new CryptoComExchangeAssetsFetcher().fetchAssets(),
     new BinanceTRExchangeAssetsFetcher().fetchAssets(),
+    new BinanceUSExchangeAssetsFetcher().fetchAssets(),
     new UpbitAssetsFetcher().fetchAssets(),
     new KrakenAssetsFetcher().fetchAssets(),
     new CMCAssetFetcher().fetchAssets(),
@@ -70,6 +73,10 @@ export async function fetchSymbols() {
       {
         content: { supportedBinanceTRExchangeSymbols },
         name: 'binance-tr_symbols',
+      },
+      {
+        content: { supportedBinanceUSExchangeSymbols },
+        name: 'binance-us_symbols',
       },
       { content: { supportedUpbitSymbols }, name: 'upbit_symbols' },
       { content: { supportedKrakenSymbols }, name: 'kraken_symbols' },
