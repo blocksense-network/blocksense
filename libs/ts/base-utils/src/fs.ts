@@ -1,8 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-import type { Schema } from '@effect/schema/Schema';
-import { decodeUnknownSync } from '@effect/schema/ParseResult';
+import { Schema, ParseResult } from 'effect';
 
 /**  An object whose properties represent significant elements of the path. */
 // ┌─────────────────────┬────────────┐
@@ -141,8 +140,8 @@ class SelectedDirectory {
   readJSON = (args: FileArgs) =>
     this.read({ ext: '.json', ...args }).then(JSON.parse);
 
-  decodeJSON = <A, I>(args: FileArgs, schema: Schema<A, I, never>) =>
-    this.readJSON(args).then(x => decodeUnknownSync(schema)(x));
+  decodeJSON = <A, I>(args: FileArgs, schema: Schema.Schema<A, I, never>) =>
+    this.readJSON(args).then(x => ParseResult.decodeUnknownSync(schema)(x));
 
   /**
    * Reads all JSON files in a directory and returns their data.

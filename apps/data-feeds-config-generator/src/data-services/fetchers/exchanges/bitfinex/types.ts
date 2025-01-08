@@ -1,4 +1,4 @@
-import * as S from '@effect/schema/Schema';
+import { Schema as S } from 'effect';
 
 /**
  * Schema for the relevant information about products received from Bitfinex Exchange.

@@ -46,7 +46,6 @@
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
-    "@effect/schema": "^0.75.5",
-    "effect": "^3.11.7"
+    "effect": "^3.12.1"
   }
 }

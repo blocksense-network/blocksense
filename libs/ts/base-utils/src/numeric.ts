@@ -1,6 +1,4 @@
-import * as bigInt_ from 'effect/BigInt';
-import * as ParseResult from '@effect/schema/ParseResult';
-import * as S from '@effect/schema/Schema';
+import { Schema as S, ParseResult, BigInt as EFBigInt } from 'effect';
 
 export class NumberFromSelfBigIntOrString extends S.transformOrFail(
   S.Union(S.BigIntFromSelf, S.Number, S.NumberFromString),
@@ -9,12 +7,12 @@ export class NumberFromSelfBigIntOrString extends S.transformOrFail(
     strict: true,
     encode: (n, _, ast) =>
       ParseResult.fromOption(
-        bigInt_.fromNumber(n),
+        EFBigInt.fromNumber(n),
         () => new ParseResult.Type(ast, n),
       ),
     decode: (b, _, ast) =>
       ParseResult.fromOption(
-        bigInt_.toNumber(BigInt(b)),
+        EFBigInt.toNumber(BigInt(b)),
         () => new ParseResult.Type(ast, b),
       ),
   },
