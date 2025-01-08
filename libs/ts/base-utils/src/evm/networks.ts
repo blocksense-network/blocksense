@@ -35,6 +35,7 @@ const networks = [
   'fantom-testnet',
   'gnosis-mainnet',
   'gnosis-chiado',
+  'horizen-gobi',
   'inevm-testnet',
   'ink-sepolia',
   'kusama-moonriver',
@@ -62,9 +63,10 @@ const networks = [
 
 const chainIds = [
   99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 43114, 43113,
-  8453, 84532, 80084, 56, 97, 42220, 44787, 5115, 250, 4002, 100, 10200, 2424,
-  763373, 1285, 59144, 59141, 169, 3441006, 5003, 41454, 2810, 10, 11155420,
-  137, 80002, 1101, 2442, 534352, 534351, 57054, 167000, 167009, 324, 300,
+  8453, 84532, 80084, 56, 97, 42220, 44787, 5115, 250, 4002, 100, 10200, 1663,
+  2424, 763373, 1285, 59144, 59141, 169, 3441006, 5003, 41454, 2810, 10,
+  11155420, 137, 80002, 1101, 2442, 534352, 534351, 57054, 167000, 167009, 324,
+  300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -102,6 +104,7 @@ export enum Currency {
   POL = 'POL',
   tBNB = 'tBNB',
   tFTM = 'tFTM',
+  tZEN = 'tZEN',
   xDAI = 'xDAI',
   S = 'S',
 }
@@ -242,6 +245,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://gnosis-chiado.blockscout.com',
     currency: Currency.xDAI,
+  },
+  'horizen-gobi': {
+    chainId: 1663,
+    isTestnet: true,
+    explorerUrl: 'https://gobi-explorer.horizenlabs.io/',
+    currency: Currency.tZEN,
   },
   'inevm-testnet': {
     chainId: 2424,
