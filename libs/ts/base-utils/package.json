@@ -94,8 +94,7 @@
     "vitest": "^2.0.4"
   },
   "dependencies": {
-    "@effect/schema": "^0.75.5",
-    "effect": "^3.11.7",
+    "effect": "^3.12.1",
     "shiki": "^1.12.1"
   }
 }

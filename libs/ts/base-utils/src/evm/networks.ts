@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as S from '@effect/schema/Schema';
+import { Schema as S } from 'effect';
 
 import { getEnvString, getOptionalEnvString } from '../env/functions';
 import { EthereumAddress, TxHash } from './hex-types';

@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import * as S from '@effect/schema/Schema';
+import { Schema as S } from 'effect';
 
 import { hexDataString } from '../buffer-and-hex';
 
