@@ -111,7 +111,8 @@
 
             oracle-scripts = {
               base-dir = mkOption {
-                type = types.path;
+                type = types.nullOr types.path;
+                default = null;
                 description = mdDoc "Base dir for oracles.";
               };
               oracles = mkOption {

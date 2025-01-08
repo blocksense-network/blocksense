@@ -14,6 +14,13 @@
         inherit (self.lib) filesets;
       };
 
+      mkOracleScript =
+        oracle-name:
+        pkgs.callPackage ./oracle-script {
+          inherit craneLib version oracle-name;
+          inherit (self.lib) filesets;
+        };
+
       mkApp = package: exeName: {
         type = "app";
         program = "${package}/bin/${exeName}";
@@ -27,6 +34,12 @@
       };
       packages = {
         inherit blocksense-rs;
+      };
+      legacyPackages = {
+        oracle-scripts = {
+          cmc-wasm = mkOracleScript "cmc";
+          yahoo-wasm = mkOracleScript "yahoo";
+        };
       };
     };
 }
