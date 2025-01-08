@@ -27,6 +27,16 @@ export const deployedNetworks = [
 export const API_KEYS: Record<string, string> = {
   ethereumHolesky: getEnvStringNotAssert('ETHERSCAN_API_KEY'),
   ethereumSepolia: getEnvStringNotAssert('ETHERSCAN_API_KEY'),
+  arbitrumSepolia: getEnvStringNotAssert('ARBRITRUM_SEPOLIA_API_KEY'),
+  baseSepolia: getEnvStringNotAssert('BASE_SEPOLIA_API_KEY'),
+  bscTestnet: getEnvStringNotAssert('BSC_TESTNET_API_KEY'),
+  celoAlfajores: getEnvStringNotAssert('CELO_ALFAJORES_API_KEY'),
+  fantomTestnet: getEnvStringNotAssert('FANTOM_TESTNET_API_KEY'),
+  lineaSepolia: getEnvStringNotAssert('LINEA_SEPOLIA_API_KEY'),
+  mantleSepolia: getEnvStringNotAssert('MANTLE_SEPOLIA_API_KEY'),
+  optimismSepolia: getEnvStringNotAssert('OPTIMISM_SEPOLIA_API_KEY'),
+  polygonZkevmCardona: getEnvStringNotAssert('POLYGON_ZKEVM_CARDONA_API_KEY'),
+  scrollSepolia: getEnvStringNotAssert('SCROLL_SEPOLIA_API_KEY'),
 };
 
 export const API_ENDPOINTS = {
@@ -58,4 +68,5 @@ export type Transaction = {
   gasPrice: string;
   from: EthereumAddress;
   to: EthereumAddress;
+  timeStamp?: string;
 };
