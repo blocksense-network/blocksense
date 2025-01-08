@@ -7,7 +7,7 @@
     "libs/aztec_contracts/"
   ],
   "scripts": {
-    "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -e .pre-commit-config.yaml -- $(git rev-parse --show-toplevel)",
+    "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -e .pre-commit-config.yaml -e node_modules -- $(git rev-parse --show-toplevel)",
     "format:check": "pre-commit run --all",
     "format:write": "pre-commit run --all || pre-commit run --all",
     "generate-data-feeds-config": "yarn workspace '@blocksense/data-feeds-config-generator' generate",
