@@ -62,9 +62,9 @@ export function getContractsData() {
         if (!networkData) return [];
         if (_networkName === 'local') return [];
         const networkName = parseNetworkName(_networkName);
-        const { ChainlinkProxy } = networkData.contracts;
+        const { CLAggregatorAdapter } = networkData.contracts;
 
-        return ChainlinkProxy.map(proxy => {
+        return CLAggregatorAdapter.map(proxy => {
           const compatibilityData = Object.entries(
             blocksenseFeedsCompatibility,
           ).find(([_id, data]) => data.description === proxy.description)?.[1];
@@ -75,7 +75,7 @@ export function getContractsData() {
             );
           }
 
-          const chainLinkProxyData: ChainLinkProxyData =
+          const chainLinkProxyData =
             Object.entries(
               compatibilityData.chainlink_compatibility.chainlink_aggregators,
             ).find(([network, _data]) => network === networkName)?.[1] ?? null;
