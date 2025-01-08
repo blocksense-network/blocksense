@@ -7,6 +7,13 @@ export enum ReadOp {
   GetLatestFeedAndRound = 0x03,
 }
 
+export type ReadFeed = Omit<Feed, 'data' | 'slotsToRead'> &
+  (
+    | { data: string; slotsToRead: number } // Both are present
+    | { data: string; slotsToRead?: never } // Only data is present
+    | { slotsToRead: number; data?: never } // Only slotsToRead is present
+  );
+
 export interface Feed {
   id: bigint;
   round: bigint;
