@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { IADFSWrapper } from '../interfaces/IADFSWrapper';
 import { AggregatedDataFeedStore } from '../../../../typechain';
 import { AccessControlWrapper } from './AccessControl';
-import { Feed, ReadOp } from '../types';
+import { Feed, ReadFeed, ReadOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 
 export abstract class ADFSBaseWrapper implements IADFSWrapper {
@@ -101,7 +101,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
 
   public async getValues(
     caller: HardhatEthersSigner,
-    feeds: Feed[],
+    feeds: ReadFeed[],
     opts: {
       operations?: ReadOp[];
       txData?: any;
@@ -201,16 +201,10 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     return prefix.concat(data.join('')).concat(roundData);
   };
 
-  public encodeDataRead = (operation: ReadOp, feed: Feed) => {
-    const feedIdInBytesLength = Math.ceil(feed.id.toString(2).length / 4);
+  public encodeDataRead = (operation: ReadOp, feed: ReadFeed) => {
     const prefix = ethers.solidityPacked(
-      ['bytes1', 'uint8', 'uint8', `uint${8n * BigInt(feedIdInBytesLength)}`],
-      [
-        ethers.toBeHex(operation | 0x80),
-        feed.stride,
-        feedIdInBytesLength,
-        feed.id,
-      ],
+      ['bytes1', 'uint8', 'uint120'],
+      [ethers.toBeHex(operation | 0x80), feed.stride, feed.id],
     );
     const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
 
@@ -243,8 +237,19 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   };
 
   public formatData = (feed: Feed) => {
-    const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
+    const dataSlots = Math.ceil((feed.data.length - 2) / 64);
     const startIndex = 2 + (feed.startSlotToReadFrom ?? 0) * 64;
+
+    if (feed.slotsToRead && feed.slotsToRead > dataSlots) {
+      return (
+        '0x' +
+        feed.data
+          .slice(startIndex, startIndex + feed.slotsToRead * 64)
+          .padEnd(feed.slotsToRead * 64, '0')
+      );
+    }
+
+    const slots = feed.slotsToRead ?? dataSlots;
     return (
       '0x' +
       feed.data
