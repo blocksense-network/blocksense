@@ -147,9 +147,14 @@ pub async fn eth_batch_send_to_contract(
     feed_type: Repeatability,
 ) -> Result<String> {
     let mut provider = provider.lock().await;
-
     let updates = filter_allowed_feeds(&net, updates, &provider_settings.allow_feeds);
     let updates = provider.apply_publish_criteria(&updates);
+
+    // Don’t post to Smart Contract if we have 0 updates
+    if updates.is_empty() {
+        info!("Network `{net}` posting to smart contract skipped because it received 0 updates");
+        return Ok("skipped due to 0 feeds that need update".to_string());
+    }
 
     let signer = &provider.signer;
     let contract_address = if feed_type == Periodic {
