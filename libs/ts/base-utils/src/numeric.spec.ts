@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import * as S from '@effect/schema/Schema';
+import { Schema as S } from 'effect';
 
 import { NumberFromSelfBigIntOrString } from './numeric';
 

@@ -1,4 +1,4 @@
-import * as S from '@effect/schema/Schema';
+import { Schema as S } from 'effect';
 
 import { ethereumAddress, networkName } from '@blocksense/base-utils/evm';
 

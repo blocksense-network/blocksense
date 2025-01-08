@@ -1,6 +1,4 @@
-import * as S from '@effect/schema/Schema';
-import * as ParseResult from '@effect/schema/ParseResult';
-import * as bigInt_ from 'effect/BigInt';
+import { Schema as S, ParseResult, BigInt as EFBigInt } from 'effect';
 
 import { NetworkName, ethereumAddress } from '@blocksense/base-utils/evm';
 
@@ -126,12 +124,12 @@ export class NumberFromBigInt extends S.transformOrFail(
     strict: true,
     encode: (n, _, ast) =>
       ParseResult.fromOption(
-        bigInt_.fromNumber(n),
+        EFBigInt.fromNumber(n),
         () => new ParseResult.Type(ast, n),
       ),
     decode: (b, _, ast) =>
       ParseResult.fromOption(
-        bigInt_.toNumber(BigInt(b)),
+        EFBigInt.toNumber(BigInt(b)),
         () => new ParseResult.Type(ast, b),
       ),
   },

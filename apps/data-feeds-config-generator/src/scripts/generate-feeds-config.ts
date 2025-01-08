@@ -1,7 +1,7 @@
 import { format } from 'node:path';
 
-import type { Schema } from '@effect/schema/Schema';
-import { decodeUnknownSync } from '@effect/schema/ParseResult';
+import { Schema, ParseResult } from 'effect';
+const { decodeUnknownSync } = ParseResult;
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
@@ -21,7 +21,7 @@ import { FeedRegistryEventsPerAggregatorSchema } from '../chainlink-compatibilit
 
 async function getOrCreateArtifact<A, I = A>(
   name: string,
-  schema: Schema<A, I, never> | null,
+  schema: Schema.Schema<A, I, never> | null,
   create: () => Promise<A>,
 ) {
   const { readJSON, writeJSON } = selectDirectory(artifactsDir);

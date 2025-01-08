@@ -1,3 +1,5 @@
+import { Schema as S } from 'effect';
+
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
 import {
