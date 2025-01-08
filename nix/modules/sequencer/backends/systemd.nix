@@ -43,6 +43,36 @@ let
     };
   }) cfg.reporters;
 
+  reporterV2Instances = lib.mapAttrs' (
+    name:
+    { log-level, ... }:
+    {
+      name = "reporter-v2-${name}";
+      value = {
+        description = "Reporter v2 ${name}";
+        wantedBy = [ "multi-user.target" ];
+        requires = [ "blocksense-sequencer.service" ];
+        environment = {
+          RUST_LOG = "${conf.log-level}";
+        };
+
+        # depends_on =
+        #   let
+        #     oracle-scripts = lib.mapAttrs' (
+        #       key: _value:
+        #       lib.nameValuePair "oracle-script-builder-${key}" { condition = "process_completed_successfully"; }
+        #     ) cfg.oracle-scripts.oracles;
+        #   in
+        #   oracle-scripts // { blocksense-sequencer.condition = "process_healthy"; };
+
+        serviceConfig = {
+          ExecStart = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
+          Restart = "on-failure";
+        };
+      };
+    }
+  ) cfg.reporters-v2;
+
   etcEnv = lib.mapAttrs' (name: _conf: {
     name = "blocksense/reporter-${name}/reporter_config.json";
     value.text = cfg._reporters-config-txt.${name};
@@ -74,6 +104,6 @@ in
           Restart = "on-failure";
         };
       };
-    } // anvilInstances // reporterInstances;
+    } // anvilInstances // reporterInstances // reporterV2Instances;
   };
 }
