@@ -820,6 +820,7 @@ __metadata:
     rollup-plugin-typescript2: "npm:^0.36.0"
     tsx: "npm:^4.19.2"
     typescript: "npm:^5.5.4"
+    vitest: "npm:^2.0.4"
     web3: "npm:^4.16.0"
     yahoo-finance2: "npm:^2.13.2"
   languageName: unknown
