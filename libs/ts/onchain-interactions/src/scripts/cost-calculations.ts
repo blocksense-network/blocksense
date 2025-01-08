@@ -22,6 +22,7 @@ const calculateGasCosts = (
   transactions: Transaction[],
 ): {
   avgGasCostEth: string;
+  avgGasPriceGwei: string;
   projectedCost1h: number;
   projectedCost24h: number;
 } | null => {
@@ -30,15 +31,23 @@ const calculateGasCosts = (
   }
 
   let totalGasCost = BigInt(0);
+  let totalGasPrice = BigInt(0);
+
   for (const tx of transactions) {
     const gasUsed = BigInt(tx.gasUsed);
     const gasPrice = BigInt(tx.gasPrice);
     const txGasCost = gasUsed * gasPrice;
+
     totalGasCost += txGasCost;
+    totalGasPrice += gasPrice;
   }
 
   const avgGasCost = totalGasCost / BigInt(transactions.length);
+  const avgGasPrice = totalGasPrice / BigInt(transactions.length);
+
   const avgGasCostEth = Web3.utils.fromWei(avgGasCost.toString(), 'ether');
+  const avgGasPriceGwei = Web3.utils.fromWei(avgGasPrice.toString(), 'gwei');
+
   const minBetweenUpdate = 5;
   const updatePerHour = 60 / minBetweenUpdate;
   const projectedCost1h = parseFloat(avgGasCostEth) * updatePerHour;
@@ -46,6 +55,7 @@ const calculateGasCosts = (
 
   return {
     avgGasCostEth,
+    avgGasPriceGwei,
     projectedCost1h,
     projectedCost24h,
   };
@@ -57,10 +67,13 @@ const logGasCosts = async (
   transactionsCount: number,
   gasCosts: {
     avgGasCostEth: string;
+    avgGasPriceGwei: string;
     projectedCost1h: number;
     projectedCost24h: number;
   },
   balance: string,
+  firstTransactionTime: string,
+  lastTransactionTime: string,
 ): Promise<void> => {
   const { currency } = networkMetadata[network];
   const logFile = 'cost-calculations.log';
@@ -72,9 +85,18 @@ const logGasCosts = async (
       ),
     );
     console.log(
+      chalk.blue(`  First transaction timestamp: ${firstTransactionTime}`),
+    );
+    console.log(
+      chalk.blue(`  Last transaction timestamp: ${lastTransactionTime}`),
+    );
+    console.log(
       chalk.yellow(
         `  Average Gas Cost per Transaction: ${gasCosts.avgGasCostEth} ${currency}`,
       ),
+    );
+    console.log(
+      chalk.yellow(`  Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei`),
     );
     console.log(
       chalk.magenta(
@@ -94,7 +116,19 @@ const logGasCosts = async (
     );
     await logToFile(
       logFile,
+      `  First transaction timestamp: ${firstTransactionTime}`,
+    );
+    await logToFile(
+      logFile,
+      `  Last transaction timestamp: ${lastTransactionTime}`,
+    );
+    await logToFile(
+      logFile,
       `  Average Gas Cost per Transaction: ${gasCosts.avgGasCostEth} ${currency}`,
+    );
+    await logToFile(
+      logFile,
+      `  Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei`,
     );
     await logToFile(
       logFile,
@@ -137,7 +171,12 @@ const logGasCosts = async (
 const fetchTransactionsForNetwork = async (
   network: NetworkName,
   address: EthereumAddress,
-): Promise<Transaction[]> => {
+  numberOfTransactions: number,
+): Promise<{
+  transactions: Transaction[];
+  firstTxTime: string;
+  lastTxTime: string;
+}> => {
   const snakeCaseNetwork = kebabToCamelCase(
     network,
   ) as keyof typeof API_ENDPOINTS;
@@ -145,10 +184,12 @@ const fetchTransactionsForNetwork = async (
   const apikey = API_KEYS[snakeCaseNetwork];
   if (!apiUrl) {
     console.log(chalk.red(`Skipping ${network}: Missing API configuration`));
-    return [];
+    return { transactions: [], firstTxTime: '', lastTxTime: '' };
   }
 
   try {
+    console.log('------------------------------------------------------------');
+    console.log(chalk.green(network.toUpperCase()));
     console.log(chalk.blue(`Fetching transactions for ${network}...`));
     const response: AxiosResponse<any> = await axios.get(apiUrl, {
       params: {
@@ -164,39 +205,67 @@ const fetchTransactionsForNetwork = async (
 
     if (response.data.status !== '1') {
       console.error(chalk.red(`${network} Error: ${response.data.message}`));
-      return [];
+      return { transactions: [], firstTxTime: '', lastTxTime: '' };
     }
 
-    const transactions: Transaction[] = response.data.result
+    const rawTransactions = response.data.result;
+    const transactions: Transaction[] = rawTransactions
       .filter(
-        (tx: Transaction) =>
+        (tx: any) =>
           tx.from.toLowerCase() === address.toLowerCase() &&
           tx.to.toLowerCase() !== address.toLowerCase(), // Filter out self-sent transactions
       )
-      .slice(0, 576); // 2 days if we update every 5 min
+      .slice(0, numberOfTransactions)
+      .map((tx: any) => ({
+        gasUsed: tx.gasUsed,
+        gasPrice: tx.gasPrice,
+        from: tx.from,
+        to: tx.to,
+        timeStamp: tx.timeStamp,
+      }));
+
+    let firstTxTime = '';
+    let lastTxTime = '';
+    if (transactions.length > 0) {
+      firstTxTime = new Date(
+        parseInt(transactions[transactions.length - 1].timeStamp || '0') * 1000,
+      ).toISOString();
+      lastTxTime = new Date(
+        parseInt(transactions[0].timeStamp || '0') * 1000,
+      ).toISOString();
+    }
+
     console.log(
       chalk.green(
         `${network}: Found ${transactions.length} transactions sent by the account to other addresses`,
       ),
     );
-    return transactions;
+    return { transactions, firstTxTime, lastTxTime };
   } catch (error: any) {
     console.error(
       chalk.red(`Error fetching transactions for ${network}: ${error.message}`),
     );
-    return [];
+    return { transactions: [], firstTxTime: '', lastTxTime: '' };
   }
 };
 
 const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
-    .usage('Usage: $0 [--address <ethereum address>]')
+    .usage(
+      'Usage: $0 --numberOfTransactions <number> [--address <ethereum address>]',
+    )
     .option('address', {
       alias: 'a',
       describe: 'Ethereum address to fetch transactions for',
       type: 'string',
       default: sequencerAddress,
+    })
+    .option('numberOfTransactions', {
+      alias: 'num',
+      describe: 'Number of transactions to calculated the cost on',
+      type: 'number',
+      default: 288,
     })
     .help()
     .alias('help', 'h')
@@ -213,7 +282,12 @@ const main = async (): Promise<void> => {
   );
 
   for (const network of deployedNetworks) {
-    const transactions = await fetchTransactionsForNetwork(network, address);
+    const { transactions, firstTxTime, lastTxTime } =
+      await fetchTransactionsForNetwork(
+        network,
+        address,
+        argv.numberOfTransactions,
+      );
     if (transactions.length > 0) {
       const gasCosts = calculateGasCosts(transactions);
       const rpcUrl = getOptionalRpcUrl(network);
@@ -238,6 +312,8 @@ const main = async (): Promise<void> => {
           transactions.length,
           gasCosts,
           balance,
+          firstTxTime,
+          lastTxTime,
         );
       }
     } else {
