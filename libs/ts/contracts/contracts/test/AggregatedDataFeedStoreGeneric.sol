@@ -137,7 +137,7 @@ contract AggregatedDataFeedStoreGeneric {
     for (uint256 i = 0; i < roundTableIndices.length; i++) {
       uint256 index = roundTableIndices[i];
 
-      require(index <= 2 ** 116);
+      require(index < 2 ** 116);
 
       bytes32 dataSlice = roundTableData[i];
       assembly {

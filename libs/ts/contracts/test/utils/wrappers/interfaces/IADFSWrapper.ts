@@ -1,4 +1,4 @@
-import { Feed, ReadOp } from '../types';
+import { Feed, ReadFeed, ReadOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { AggregatedDataFeedStore } from '../../../../typechain';
 import { AccessControlWrapper } from '../adfs/AccessControl';
@@ -52,7 +52,7 @@ export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
 
   getValues(
     caller: HardhatEthersSigner,
-    feeds: Feed[],
+    feeds: ReadFeed[],
     opts?: {
       txData?: any;
       operations?: ReadOp[];

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { Feed } from './utils/wrappers/types';
+import { Feed, ReadOp } from './utils/wrappers/types';
 import { ADFSGenericWrapper, ADFSWrapper } from './utils/wrappers';
 import {
   HistoricalDataFeedStoreBaseWrapper,
@@ -121,7 +121,18 @@ describe('AggregatedDataFeedStore', () => {
       .reverted;
   });
 
-  it('Should revert when stride is bigger than 31', async () => {
+  it('[W] Should revert when stride is bigger than max stride (31)', async () => {
+    await expect(
+      contract.setFeeds(sequencer, [
+        {
+          id: 1n,
+          round: 1n,
+          stride: 31n,
+          data: '0x12343267643573',
+        },
+      ]),
+    ).to.not.be.reverted;
+
     await expect(
       contract.setFeeds(sequencer, [
         {
@@ -134,7 +145,194 @@ describe('AggregatedDataFeedStore', () => {
     ).to.be.reverted;
   });
 
-  it('Should revert when round table index is bigger than 2**116', async () => {
+  it('[R] Should revert when id is bigger than max id (2**115 - 1)', async () => {
+    const feed: Feed = {
+      id: 2n ** 115n - 1n,
+      round: 1n,
+      stride: 31n,
+      data: '0x12343267643573',
+      slotsToRead: 1,
+    };
+    await contract.setFeeds(sequencer, [feed]);
+    await contract.checkLatestValue(sequencer, [feed]);
+    await contract.checkValueAtRound(sequencer, [feed]);
+
+    await expect(
+      contract.getValues(sequencer, [
+        {
+          ...feed,
+          id: feed.id + 1n,
+        },
+      ]),
+    ).to.be.reverted;
+    await expect(
+      contract.getValues(
+        sequencer,
+        [
+          {
+            ...feed,
+            id: feed.id + 1n,
+          },
+        ],
+        { operations: [ReadOp.GetFeedAtRound] },
+      ),
+    ).to.be.reverted;
+  });
+
+  it('[R] Should revert when stride is bigger than max stride (31)', async () => {
+    const feed: Feed = {
+      id: 2n,
+      round: 1n,
+      stride: 31n,
+      data: '0x12343267643573',
+    };
+    await contract.setFeeds(sequencer, [feed]);
+    await contract.checkLatestValue(sequencer, [feed]);
+    await contract.checkValueAtRound(sequencer, [feed]);
+
+    await expect(
+      contract.getValues(sequencer, [
+        {
+          ...feed,
+          stride: 32n,
+        },
+      ]),
+    ).to.be.reverted;
+    await expect(
+      contract.getValues(
+        sequencer,
+        [
+          {
+            ...feed,
+            stride: 32n,
+          },
+        ],
+        { operations: [ReadOp.GetFeedAtRound] },
+      ),
+    ).to.be.reverted;
+  });
+
+  it('[R] Should revert when round is bigger than max round (2**13 - 1)', async () => {
+    const feed: Feed = {
+      id: 1n,
+      round: 2n ** 13n - 1n,
+      stride: 31n,
+      data: '0x12343267643573',
+      slotsToRead: 1,
+    };
+    await contract.setFeeds(sequencer, [feed]);
+    await contract.checkValueAtRound(sequencer, [feed]);
+
+    await expect(
+      contract.getValues(
+        sequencer,
+        [
+          {
+            id: 1n,
+            round: 2n ** 13n,
+            stride: 31n,
+            slotsToRead: 1,
+          },
+        ],
+        {
+          operations: [ReadOp.GetFeedAtRound],
+        },
+      ),
+    ).to.be.reverted;
+  });
+
+  it('[R] Should revert when slots to read exceed feed space', async () => {
+    const feed = {
+      id: 5000000000000n,
+      round: 2n ** 13n - 1n,
+      stride: 3n,
+      data: ethers.hexlify(ethers.randomBytes(32)),
+      slotsToRead: 8,
+    };
+    await contract.setFeeds(sequencer, [feed]);
+    await contract.checkLatestValue(sequencer, [feed]);
+    await contract.checkValueAtRound(sequencer, [feed]);
+
+    await expect(
+      contract.getValues(
+        sequencer,
+        [
+          {
+            ...feed,
+            slotsToRead: feed.slotsToRead + 1,
+          },
+        ],
+        {
+          operations: [ReadOp.GetFeedAtRound],
+        },
+      ),
+    ).to.be.reverted;
+    await expect(
+      contract.getValues(
+        sequencer,
+        [
+          {
+            ...feed,
+            slotsToRead: feed.slotsToRead + 1,
+          },
+        ],
+        {
+          operations: [ReadOp.GetLatestFeed],
+        },
+      ),
+    ).to.be.reverted;
+  });
+
+  it('[W] Should revert when index is outside of stride space', async () => {
+    // round is exceeded
+    await expect(
+      contract.setFeeds(sequencer, [
+        {
+          id: 2n ** 115n - 1n,
+          round: 2n ** 13n,
+          stride: 0n,
+          data: '0x12343267643573',
+        },
+      ]),
+    ).to.be.reverted;
+
+    // id is exceeded
+    await expect(
+      contract.setFeeds(sequencer, [
+        {
+          id: 2n ** 115n,
+          round: 2n,
+          stride: 0n,
+          data: '0x12343267643573',
+        },
+      ]),
+    ).to.be.reverted;
+
+    await expect(
+      contract.setFeeds(sequencer, [
+        {
+          id: 2n ** 115n - 1n,
+          round: 2n ** 13n - 1n,
+          stride: 0n,
+          data: ethers.hexlify(ethers.randomBytes(32)),
+        },
+      ]),
+    ).to.not.be.reverted;
+
+    // bytes to write exceeds stride space
+    await expect(
+      contract.setFeeds(sequencer, [
+        {
+          id: 2n ** 115n - 1n,
+          round: 2n ** 13n - 1n,
+          stride: 0n,
+          data: ethers.hexlify(ethers.randomBytes(33)),
+        },
+      ]),
+    ).to.be.reverted;
+  });
+
+  it('[W] Should revert when round table index is bigger than 2**116', async () => {
     const feed = {
       id: 1n,
       round: 1n,
@@ -147,14 +345,14 @@ describe('AggregatedDataFeedStore', () => {
     const roundTableIndex = ethers.toBeHex(
       (2n ** 115n * feed.stride + feed.id) / 16n,
     );
-    const maxRoundTableIndex = ethers.toBeHex(2n ** 116n);
+    const maxRoundTableIndex = ethers.toBeHex(2n ** 116n - 1n);
     data = data.replace(roundTableIndex.slice(2), maxRoundTableIndex.slice(2));
     await sequencer.sendTransaction({
       to: contract.contract.target,
       data,
     });
 
-    const overflowRoundTableIndex = ethers.toBeHex(2n ** 116n + 1n);
+    const overflowRoundTableIndex = ethers.toBeHex(2n ** 116n);
     data = data.replace(
       maxRoundTableIndex.slice(2),
       overflowRoundTableIndex.slice(2),
