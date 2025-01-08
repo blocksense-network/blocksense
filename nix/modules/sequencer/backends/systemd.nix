@@ -2,12 +2,17 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
   cfg = config.services.blocksense;
 
-  inherit (self'.apps) sequencer reporter;
+  reportersV2ConfigJSON = builtins.mapAttrs (
+    name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
+  ) cfg.reporters;
+
+  inherit (self'.apps) sequencer reporter blocksense;
 
   anvilInstances = lib.mapAttrs' (
     name:
@@ -47,25 +52,21 @@ let
     name:
     { log-level, ... }:
     {
-      name = "reporter-v2-${name}";
+      name = "blocksense-reporter-v2-${name}";
       value = {
         description = "Reporter v2 ${name}";
         wantedBy = [ "multi-user.target" ];
         requires = [ "blocksense-sequencer.service" ];
         environment = {
-          RUST_LOG = "${conf.log-level}";
+          RUST_LOG = "${log-level}";
         };
-
-        # depends_on =
-        #   let
-        #     oracle-scripts = lib.mapAttrs' (
-        #       key: _value:
-        #       lib.nameValuePair "oracle-script-builder-${key}" { condition = "process_completed_successfully"; }
-        #     ) cfg.oracle-scripts.oracles;
-        #   in
-        #   oracle-scripts // { blocksense-sequencer.condition = "process_healthy"; };
-
         serviceConfig = {
+          ExecStartPre = "cp ${
+            lib.pipe self'.legacyPackages.oracle-scripts [
+              builtins.attrValues
+              (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
+            ]
+          } %S";
           ExecStart = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
           Restart = "on-failure";
         };

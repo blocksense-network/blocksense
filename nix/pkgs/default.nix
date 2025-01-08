@@ -7,11 +7,22 @@
 
       craneLib = (inputs.mcl-blockchain.inputs.crane.mkLib pkgs).overrideToolchain rust;
 
+      version = "dev-${
+        pkgs.lib.removeSuffix "-dirty" (self.shortRev or self.dirtyShortRev or self.lastModifiedDate)
+      }";
+
       blocksense-rs = pkgs.callPackage ./blocksense-rs {
-        version = "dev-${pkgs.lib.removeSuffix "-dirty" (self.shortRev or self.dirtyShortRev)}";
         inherit (self.lib) filesets;
-        inherit craneLib;
+        inherit craneLib version;
       };
+
+      oracle-script-wasm =
+        oracleName:
+        pkgs.callPackage ./oracle-script {
+          inherit (self.lib) filesets;
+          inherit craneLib version;
+          oracle-name = oracleName;
+        };
 
       mkApp = package: exeName: {
         type = "app";
@@ -26,6 +37,12 @@
       };
       packages = {
         inherit blocksense-rs;
+      };
+      legacyPackages = {
+        oracle-scripts = {
+          cmc-wasm = oracle-script-wasm "cmc";
+          yahoo-wasm = oracle-script-wasm "yahoo";
+        };
       };
     };
 }
