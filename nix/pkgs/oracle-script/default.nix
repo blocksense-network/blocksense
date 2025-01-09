@@ -7,7 +7,7 @@
 }:
 let
   sharedAttrs = rec {
-    pname = "blocksense";
+    pname = "oracle-script-${oracle-name}";
     inherit (filesets.rustSrc) src;
 
     postUnpack = ''

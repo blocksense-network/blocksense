@@ -60,13 +60,14 @@ let
         environment = {
           RUST_LOG = "${log-level}";
         };
+        path = [ pkgs.coreutils ];
         serviceConfig = {
-          ExecStartPre = "cp ${
+          ExecStartPre = "${lib.getExe pkgs.bash} -c 'set -x; cp ${
             lib.pipe self'.legacyPackages.oracle-scripts [
               builtins.attrValues
               (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
             ]
-          } %S";
+          } %S'";
           ExecStart = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
           Restart = "on-failure";
         };
