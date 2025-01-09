@@ -18,8 +18,11 @@ import {
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
 
 import { ChainLinkFeedInfo, RawDataFeeds } from '../data-services/types';
-import { CMCInfo, getCMCCryptoList } from '../data-services/fetchers/cmc';
-import { isFeedSupportedByYF } from '../data-services/fetchers/yf';
+import {
+  CMCInfo,
+  getCMCCryptoList,
+} from '../data-services/fetchers/aggregators/cmc';
+import { isFeedSupportedByYF } from '../data-services/fetchers/markets/yf';
 import { artifactsDir } from '../paths';
 import {
   chainlinkNetworkNameToChainId,

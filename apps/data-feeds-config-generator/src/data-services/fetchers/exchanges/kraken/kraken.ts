@@ -1,7 +1,11 @@
-import * as S from '@effect/schema/Schema';
-
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
+import { ExchangeAssetsFetcher, AssetInfo } from '../../../exchange-assets';
+import {
+  KrakenAssetInfo,
+  KrakenAssetPairsResp,
+  KrakenAssetPairsRespSchema,
+  KrakenAssetRespSchema,
+} from './types';
 
 /**
  * Class to fetch assets information from Kraken.
@@ -31,54 +35,6 @@ export class KrakenAssetsFetcher
     }));
   }
 }
-
-/**
- * Schema for the relevant information about assets received from Kraken.
- */
-const KrakenAssetPairsRespSchema = S.Struct({
-  error: S.Array(S.Any),
-  result: S.Record({
-    key: S.String,
-    value: S.mutable(
-      S.Struct({
-        altname: S.String,
-        wsname: S.String,
-        base: S.String,
-        quote: S.String,
-      }),
-    ),
-  }),
-});
-
-type KrakenAssetPairsResp = S.Schema.Type<typeof KrakenAssetPairsRespSchema>;
-
-const KrakenAssetRespSchema = S.Struct({
-  error: S.Array(S.Any),
-  result: S.Record({
-    key: S.String,
-    value: S.Struct({
-      altname: S.String,
-    }),
-  }),
-});
-
-/**
- * Schema for the data relevant to a Kraken oracle.
- *
- * Ref: https://docs.kraken.com/api/docs/rest-api/get-ticker-information/
- * Ref: https://docs.kraken.com/api/docs/websocket-v2/ticker ( note that wsname match with symbol in their doc
- */
-const KrakenAssetInfoSchema = S.mutable(
-  S.Struct({
-    pair: S.String,
-    wsname: S.String,
-  }),
-);
-
-/**
- * Type for the information about symbols received from Kraken.
- */
-export type KrakenAssetInfo = S.Schema.Type<typeof KrakenAssetInfoSchema>;
 
 /**
  * Function to fetch detailed information about symbols from Kraken.

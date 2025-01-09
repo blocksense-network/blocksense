@@ -1,7 +1,12 @@
-import * as S from '@effect/schema/Schema';
-
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
+import {
+  GeminiExchangeAssetInfo,
+  GeminiExchangeSymbolDetailsInfoResp,
+  GeminiExchangeSymbolDetailsInfoRespSchema,
+  GeminiExchangeSymbolsInfoResp,
+  GeminiExchangeSymbolsInfoRespSchema,
+} from './types';
 
 /**
  * Class to fetch assets information from Gemini Exchange.
@@ -27,45 +32,6 @@ export class GeminiExchangeAssetsFetcher
     return result;
   }
 }
-
-/**
- * Schema for the relevant information about symbols received from Gemini Exchange.
- */
-const GeminiExchangeSymbolsInfoRespSchema = S.mutable(S.Array(S.String));
-
-export type GeminiExchangeSymbolsInfoResp = S.Schema.Type<
-  typeof GeminiExchangeSymbolsInfoRespSchema
->;
-
-/**
- * Schema for the relevant information about symbol details received from Gemini Exchange.
- */
-const GeminiExchangeSymbolDetailsInfoRespSchema = S.mutable(
-  S.Struct({
-    symbol: S.String,
-    base_currency: S.String,
-    quote_currency: S.String,
-  }),
-);
-
-export type GeminiExchangeSymbolDetailsInfoResp = S.Schema.Type<
-  typeof GeminiExchangeSymbolDetailsInfoRespSchema
->;
-
-/**
- * Schema for the data relevant to a Gemini Exchange oracle.
- *
- * Ref: https://docs.gemini.com/rest-api/#ticker
- */
-const GeminiExchangeAssetInfoSchema = S.mutable(
-  S.Struct({
-    symbol: S.String,
-  }),
-);
-
-export type GeminiExchangeAssetInfo = S.Schema.Type<
-  typeof GeminiExchangeAssetInfoSchema
->;
 
 /**
  * Function to fetch symbols information from Gemini Exchange.

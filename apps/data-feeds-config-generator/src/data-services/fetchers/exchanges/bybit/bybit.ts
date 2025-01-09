@@ -1,7 +1,10 @@
-import * as S from '@effect/schema/Schema';
-
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
+import { ExchangeAssetsFetcher, AssetInfo } from '../../../exchange-assets';
+import {
+  BybitAssetInfo,
+  BybitInstrumentsInfoResp,
+  BybitInstrumentsInfoRespSchema,
+} from './types';
 
 /**
  * Class to fetch assets information from Bybit.
@@ -22,47 +25,6 @@ export class BybitAssetsFetcher
     }));
   }
 }
-
-/**
- * Schema for the relevant information about symbols received from Bybit.
- */
-const BybitInstrumentsInfoRespSchema = S.Struct({
-  retCode: S.Number,
-  retMsg: S.String,
-  result: S.Struct({
-    list: S.Array(
-      S.Struct({
-        symbol: S.String,
-        baseCoin: S.String,
-        quoteCoin: S.String,
-      }),
-    ),
-  }),
-});
-
-export type BybitInstrumentsInfoResp = S.Schema.Type<
-  typeof BybitInstrumentsInfoRespSchema
->;
-
-/**
- * Schema for the data relevant to a Bybit oracle.
- *
- * Ref: https://bybit-exchange.github.io/docs/v5/market/tickers#request-parameters
- */
-const BybitAssetInfoSchema = S.mutable(
-  S.Struct({
-    symbol: S.String,
-  }),
-);
-
-export type BybitAssetInfo = S.Schema.Type<typeof BybitAssetInfoSchema>;
-
-/**
- * Function to decode Bybit symbol information.
- */
-export const decodeBybitSymbolInfo = S.decodeUnknownSync(
-  S.mutable(S.Array(BybitAssetInfoSchema)),
-);
 
 /**
  * Function to fetch information about symbols from Bybit.

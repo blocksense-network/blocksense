@@ -1,22 +1,22 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import { BinanceAssetsFetcher } from './binance';
-import { BybitAssetsFetcher } from './bybit';
-import { CoinbaseExchangeAssetsFetcher } from './coinbase-exchange';
-import { OKXExchangeAssetsFetcher } from './okx';
-import { BitgetExchangeAssetsFetcher } from './bitget';
-import { KuCoinExchangeAssetsFetcher } from './kucoin';
-import { MEXCExchangeAssetsFetcher } from './mexc';
-import { GateIoExchangeAssetsFetcher } from './gate-io';
-import { CryptoComExchangeAssetsFetcher } from './crypto-com-exchange';
-import { BinanceTRExchangeAssetsFetcher } from './binance-tr';
-import { BinanceUSExchangeAssetsFetcher } from './binance-us';
-import { GeminiExchangeAssetsFetcher } from './gemini';
-import { BitfinexExchangeAssetsFetcher } from './bitfinex';
-import { CMCAssetFetcher } from './cmc';
-import { KrakenAssetsFetcher } from './kraken';
-import { UpbitAssetsFetcher } from './upbit';
-import { dataProvidersDir } from '../../paths';
+import { BinanceAssetsFetcher } from '../exchanges/binance/binance';
+import { BybitAssetsFetcher } from '../exchanges/bybit/bybit';
+import { CoinbaseExchangeAssetsFetcher } from '../exchanges/coinbase-exchange/coinbase-exchange';
+import { OKXExchangeAssetsFetcher } from '../exchanges/okx/okx';
+import { BitgetExchangeAssetsFetcher } from '../exchanges/bitget/bitget';
+import { KuCoinExchangeAssetsFetcher } from '../exchanges/kucoin/kucoin';
+import { MEXCExchangeAssetsFetcher } from '../exchanges/mexc/mexc';
+import { GateIoExchangeAssetsFetcher } from '../exchanges/gate-io/gate-io';
+import { CryptoComExchangeAssetsFetcher } from '../exchanges/crypto-com-exchange/crypto-com-exchange';
+import { BinanceTRExchangeAssetsFetcher } from '../exchanges/binance-tr/binance-tr';
+import { BinanceUSExchangeAssetsFetcher } from '../exchanges/binance-us/binance-us';
+import { GeminiExchangeAssetsFetcher } from '../exchanges/gemini/gemini';
+import { BitfinexExchangeAssetsFetcher } from '../exchanges/bitfinex/bitfinex';
+import { CMCAssetFetcher } from '../aggregators/cmc';
+import { KrakenAssetsFetcher } from '../exchanges/kraken/kraken';
+import { UpbitAssetsFetcher } from '../exchanges/upbit/upbit';
+import { dataProvidersDir } from '../../../paths';
 
 export async function fetchSymbols() {
   const [

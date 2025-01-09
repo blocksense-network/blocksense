@@ -1,7 +1,10 @@
-import * as S from '@effect/schema/Schema';
-
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
+import {
+  BitfinexExchangeAssetInfo,
+  BitfinexExchangeInfoResp,
+  BitfinexExchangeInfoRespSchema,
+} from './types';
 
 /**
  * Class to fetch assets information from Bitfinex Exchange.
@@ -22,30 +25,6 @@ export class BitfinexExchangeAssetsFetcher
     });
   }
 }
-
-/**
- * Schema for the relevant information about products received from Bitfinex Exchange.
- */
-const BitfinexExchangeInfoRespSchema = S.mutable(S.Array(S.Array(S.String)));
-
-export type BitfinexExchangeInfoResp = S.Schema.Type<
-  typeof BitfinexExchangeInfoRespSchema
->;
-
-/**
- * Schema for the data relevant to a Bitfinex Exchange oracle.
- *
- * Ref: https://docs.bitfinex.com/reference/rest-public-tickers
- */
-const BitfinexExchangeAssetInfoSchema = S.mutable(
-  S.Struct({
-    symbol: S.String,
-  }),
-);
-
-export type BitfinexExchangeAssetInfo = S.Schema.Type<
-  typeof BitfinexExchangeAssetInfoSchema
->;
 
 /**
  * Function to fetch products information from Bitfinex Exchange.
