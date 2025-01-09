@@ -66,6 +66,11 @@
       "require": "./dist/cjs/string.cjs",
       "import": "./dist/esm/string.mjs",
       "types": "./src/string.ts"
+    },
+    "./type-level": {
+      "require": "./dist/cjs/type-level.cjs",
+      "import": "./dist/esm/type-level.mjs",
+      "types": "./src/type-level.ts"
     }
   },
   "scripts": {
