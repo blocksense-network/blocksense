@@ -51,6 +51,17 @@ export default {
           'creating-data-feeds': '',
         },
       },
+      'node-operations': {
+        items: {
+          'reporter-node': '',
+        },
+      },
+      'programming-languages-rnd': {
+        title: 'Programming Languages R&D',
+        items: {
+          'noir-plonky2-backend': '',
+        },
+      },
     },
   },
 };
