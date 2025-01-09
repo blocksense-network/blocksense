@@ -28,7 +28,7 @@ or just `yarn check-pending-tx` if you want to check for pending on the sequence
 
 Print and log the cost of avg transaction, avg gas price, cost for 24h and runway on all deployedNetworks using the last N transactions (default is 288) and current balance with M seconds between transactions (default 300).
 
-`yarn calculate-cost --address <ethereum address> --numberOfTransactions<number> --secondsBetweenTransactions<number>`
+`yarn calculate-cost --address <ethereum address> --numberOfTransactions <number> --secondsBetweenTransactions <number>`
 or just `yarn calculate-cost` if you want to check the cost on the sequencer (0xd756119012CcabBC59910dE0ecEbE406B5b952bE).
 
 ### unstuck-transaction

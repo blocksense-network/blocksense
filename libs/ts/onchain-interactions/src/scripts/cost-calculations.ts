@@ -24,6 +24,7 @@ const calculateGasCosts = (
 ): {
   avgGasCostEth: string;
   avgGasPriceGwei: string;
+  avgGasUsed: string;
   projectedCost1h: number;
   projectedCost24h: number;
 } | null => {
@@ -33,6 +34,7 @@ const calculateGasCosts = (
 
   let totalGasCost = BigInt(0);
   let totalGasPrice = BigInt(0);
+  let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
     const gasUsed = BigInt(tx.gasUsed);
@@ -41,23 +43,24 @@ const calculateGasCosts = (
 
     totalGasCost += txGasCost;
     totalGasPrice += gasPrice;
+    totalGasUsed += gasUsed;
   }
 
   const avgGasCost = totalGasCost / BigInt(transactions.length);
   const avgGasPrice = totalGasPrice / BigInt(transactions.length);
+  const avgGasUsed = totalGasUsed / BigInt(transactions.length);
 
   const avgGasCostEth = Web3.utils.fromWei(avgGasCost.toString(), 'ether');
   const avgGasPriceGwei = Web3.utils.fromWei(avgGasPrice.toString(), 'gwei');
 
-  const transactionsPerHour = 3600 / secondsBetweenTransactions;
-  const projectedCost1h = parseFloat(avgGasCostEth) * transactionsPerHour;
-  const projectedCost24h = projectedCost1h * 24;
-
   return {
     avgGasCostEth,
     avgGasPriceGwei,
-    projectedCost1h,
-    projectedCost24h,
+    avgGasUsed: avgGasUsed.toString(),
+    projectedCost1h:
+      parseFloat(avgGasCostEth) * (3600 / secondsBetweenTransactions),
+    projectedCost24h:
+      parseFloat(avgGasCostEth) * ((24 * 3600) / secondsBetweenTransactions),
   };
 };
 
@@ -68,6 +71,7 @@ const logGasCosts = async (
   gasCosts: {
     avgGasCostEth: string;
     avgGasPriceGwei: string;
+    avgGasUsed: string;
     projectedCost1h: number;
     projectedCost24h: number;
   },
@@ -94,12 +98,13 @@ const logGasCosts = async (
     );
     console.log(
       chalk.yellow(
-        `  Average Gas Cost per Transaction: ${gasCosts.avgGasCostEth} ${currency}`,
+        `  Average Transaction Cost: ${gasCosts.avgGasCostEth} ${currency}`,
       ),
     );
     console.log(
       chalk.yellow(`  Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei`),
     );
+    console.log(chalk.yellow(`  Average Gas Used: ${gasCosts.avgGasUsed}`));
     console.log(
       chalk.magenta(
         `  Projected Cost for 1h (${transactionsPerHour} tx): ${gasCosts.projectedCost1h} ${currency}`,
@@ -126,12 +131,13 @@ const logGasCosts = async (
     );
     await logToFile(
       logFile,
-      `  Average Gas Cost per Transaction: ${gasCosts.avgGasCostEth} ${currency}`,
+      `  Average Transaction Cost: ${gasCosts.avgGasCostEth} ${currency}`,
     );
     await logToFile(
       logFile,
       `  Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei`,
     );
+    await logToFile(logFile, `  Average Gas Used: ${gasCosts.avgGasUsed}`);
     await logToFile(
       logFile,
       `  Projected Cost for 1h (${transactionsPerHour} tx): ${gasCosts.projectedCost1h} ${currency}`,
