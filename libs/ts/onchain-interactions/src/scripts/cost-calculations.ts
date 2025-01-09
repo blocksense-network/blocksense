@@ -19,6 +19,7 @@ import {
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
 const calculateGasCosts = (
+  secondsBetweenTransactions: number,
   transactions: Transaction[],
 ): {
   avgGasCostEth: string;
@@ -48,9 +49,8 @@ const calculateGasCosts = (
   const avgGasCostEth = Web3.utils.fromWei(avgGasCost.toString(), 'ether');
   const avgGasPriceGwei = Web3.utils.fromWei(avgGasPrice.toString(), 'gwei');
 
-  const minBetweenUpdate = 5;
-  const updatePerHour = 60 / minBetweenUpdate;
-  const projectedCost1h = parseFloat(avgGasCostEth) * updatePerHour;
+  const transactionsPerHour = 3600 / secondsBetweenTransactions;
+  const projectedCost1h = parseFloat(avgGasCostEth) * transactionsPerHour;
   const projectedCost24h = projectedCost1h * 24;
 
   return {
@@ -74,9 +74,11 @@ const logGasCosts = async (
   balance: string,
   firstTransactionTime: string,
   lastTransactionTime: string,
+  secondsBetweenTransactions: number,
 ): Promise<void> => {
   const { currency } = networkMetadata[network];
   const logFile = 'cost-calculations.log';
+  const transactionsPerHour = 3600 / secondsBetweenTransactions;
 
   try {
     console.log(
@@ -100,12 +102,12 @@ const logGasCosts = async (
     );
     console.log(
       chalk.magenta(
-        `  Projected Cost (1h): ${gasCosts.projectedCost1h} ${currency}`,
+        `  Projected Cost for 1h (${transactionsPerHour} tx): ${gasCosts.projectedCost1h} ${currency}`,
       ),
     );
     console.log(
       chalk.cyan(
-        `  Projected Cost (24h): ${gasCosts.projectedCost24h} ${currency}`,
+        `  Projected Cost for 24h (${transactionsPerHour * 24} tx): ${gasCosts.projectedCost24h} ${currency}`,
       ),
     );
 
@@ -132,11 +134,11 @@ const logGasCosts = async (
     );
     await logToFile(
       logFile,
-      `  Projected Cost (1h): ${gasCosts.projectedCost1h} ${currency}`,
+      `  Projected Cost for 1h (${transactionsPerHour} tx): ${gasCosts.projectedCost1h} ${currency}`,
     );
     await logToFile(
       logFile,
-      `  Projected Cost (24h): ${gasCosts.projectedCost24h} ${currency}`,
+      `  Projected Cost 24h (${transactionsPerHour * 24} tx): ${gasCosts.projectedCost24h} ${currency}`,
     );
 
     if (balance == null) {
@@ -253,7 +255,7 @@ const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage(
-      'Usage: $0 --numberOfTransactions <number> [--address <ethereum address>]',
+      'Usage: $0 --numberOfTransactions <number> --secondsBetweenTransactions <number> [--address <ethereum address>]',
     )
     .option('address', {
       alias: 'a',
@@ -266,6 +268,12 @@ const main = async (): Promise<void> => {
       describe: 'Number of transactions to calculated the cost on',
       type: 'number',
       default: 288,
+    })
+    .option('secondsBetweenTransactions', {
+      alias: 'time',
+      describe: 'Time between Transactions in seconds ',
+      type: 'number',
+      default: 300, //5min
     })
     .help()
     .alias('help', 'h')
@@ -280,6 +288,11 @@ const main = async (): Promise<void> => {
       })\n`,
     ),
   );
+  console.log(
+    chalk.cyan(
+      `Using ${argv.secondsBetweenTransactions} seconds between transactions`,
+    ),
+  );
 
   for (const network of deployedNetworks) {
     const { transactions, firstTxTime, lastTxTime } =
@@ -289,7 +302,10 @@ const main = async (): Promise<void> => {
         argv.numberOfTransactions,
       );
     if (transactions.length > 0) {
-      const gasCosts = calculateGasCosts(transactions);
+      const gasCosts = calculateGasCosts(
+        argv.secondsBetweenTransactions,
+        transactions,
+      );
       const rpcUrl = getOptionalRpcUrl(network);
       var balance: string;
 
@@ -314,6 +330,7 @@ const main = async (): Promise<void> => {
           balance,
           firstTxTime,
           lastTxTime,
+          argv.secondsBetweenTransactions,
         );
       }
     } else {
