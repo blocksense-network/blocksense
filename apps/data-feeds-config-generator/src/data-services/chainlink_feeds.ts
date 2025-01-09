@@ -2,7 +2,7 @@ import { Web3 } from 'web3';
 
 import { assertIsObject } from '@blocksense/base-utils/assert';
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import { getRpcUrl } from '@blocksense/base-utils/evm';
+import { getRpcUrl, isTestnet } from '@blocksense/base-utils/evm';
 
 import {
   NetworkName,
@@ -56,6 +56,7 @@ type CookedDataFeeds = {
 
 export function aggregateNetworkInfoPerField(
   rawDataFeeds: RawDataFeeds,
+  skipTestnetNetworks = false,
 ): CookedDataFeeds {
   const cookedDataFeeds: CookedDataFeeds = {};
 
@@ -74,7 +75,7 @@ export function aggregateNetworkInfoPerField(
         );
 
         const networkName = chainlinkNetworkNameToChainId[chainlinkNetworkName];
-        if (!networkName) {
+        if (!networkName || (skipTestnetNetworks && isTestnet(networkName))) {
           // `Skipping feed '${feedName}' on network '${chainlinkNetworkName}'`,
           continue;
         }
