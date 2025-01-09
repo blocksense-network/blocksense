@@ -71,6 +71,11 @@
       "require": "./dist/cjs/syntax-highlighting.cjs",
       "import": "./dist/esm/syntax-highlighting.mjs",
       "types": "./dist/types/syntax-highlighting.d.ts"
+    },
+    "./type-level": {
+      "require": "./dist/cjs/type-level.cjs",
+      "import": "./dist/esm/type-level.mjs",
+      "types": "./dist/types/type-level.d.ts"
     }
   },
   "scripts": {

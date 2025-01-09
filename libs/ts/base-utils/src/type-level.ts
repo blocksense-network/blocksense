@@ -42,3 +42,7 @@ export type ReplaceType<Where, Replace, WithWhat> = Where extends Replace
     : {
         [K in keyof Where]: ReplaceType<Where[K], Replace, WithWhat>;
       };
+
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
