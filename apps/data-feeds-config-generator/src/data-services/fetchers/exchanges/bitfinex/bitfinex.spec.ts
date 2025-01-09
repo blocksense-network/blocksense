@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest';
 import { splitPair } from './bitfinex';
-import { unsafeDivide } from 'effect/Duration';
 
 describe('Tests for `splitPair`', async () => {
   test('should split pairs with `:` correctly', () => {
