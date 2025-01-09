@@ -7,6 +7,12 @@ with lib;
 let
   providerOpts = {
     options = {
+      is_enabled = mkOption {
+        type = types.bool;
+        default = true;
+        description = mdDoc "Is the provider enabled or not.";
+      };
+
       private_key_path = mkOption {
         type = types.path;
         description = mdDoc "The path to the private key.";
