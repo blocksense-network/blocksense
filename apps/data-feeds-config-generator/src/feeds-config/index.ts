@@ -30,6 +30,7 @@ import {
 } from '../chainlink-compatibility/types';
 import {
   AggregatedFeedInfo,
+  aggregateNetworkInfoPerField,
   CookedDataFeeds,
   getFieldFromAggregatedData,
 } from '../data-services/chainlink_feeds';
@@ -207,6 +208,20 @@ async function checkOnChainData(
   ) {
     throw new Error("Feed data doesn't match on chain");
   }
+}
+
+export async function getAllPossibleCLFeeds(
+  cookedDataFeeds: CookedDataFeeds,
+): Promise<SimplifiedFeed[]> {
+  const allPossibleDataFeeds = Object.entries(cookedDataFeeds).map(
+    ([_feedName, feedData]) => {
+      return {
+        ...feedFromChainLinkFeedInfo(feedData),
+      };
+    },
+  );
+
+  return allPossibleDataFeeds;
 }
 
 export async function generateFeedConfig(
