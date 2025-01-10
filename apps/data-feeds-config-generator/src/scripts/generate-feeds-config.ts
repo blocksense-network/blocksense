@@ -6,7 +6,10 @@ import { decodeUnknownSync } from '@effect/schema/ParseResult';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
-import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
+import {
+  FeedsConfigSchema,
+  NewFeedsConfigSchema,
+} from '@blocksense/config-types/data-feeds-config';
 
 import { chainlinkFeedsDir, artifactsDir, configDir } from '../paths';
 import {
@@ -15,7 +18,11 @@ import {
   getAllProposedFeedsInRegistry,
 } from '../data-services/chainlink_feeds';
 import { RawDataFeedsSchema } from '../data-services/types';
-import { generateFeedConfig } from '../feeds-config/index';
+import {
+  generateFeedConfig,
+  getAllPossibleCLFeeds,
+  getCLFeedsOnMainnet,
+} from '../feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../chainlink-compatibility/index';
 import { FeedRegistryEventsPerAggregatorSchema } from '../chainlink-compatibility/types';
 
@@ -30,6 +37,7 @@ async function getOrCreateArtifact<A, I = A>(
   let json: unknown;
   try {
     if (process.env['ENABLE_CACHE'] ?? false) {
+      console.log(process.env['ENABLE_CACHE']);
       json = await readJSON({ name });
       console.log(`Loading existing artifact from: '${path}'`);
     }
@@ -74,11 +82,35 @@ async function main(chainlinkFeedsDir: string) {
     async () => aggregateNetworkInfoPerField(rawDataFeeds),
   );
 
+  // Representation of all the Chainlink data feeds in our feed config format.
+  const allPossibleCLDataFeeds = await getOrCreateArtifact(
+    'step_1_chainlink_all_possible_feeds',
+    null,
+    async () => getAllPossibleCLFeeds(aggregatedDataFeeds),
+  );
+
+  // Representation of all the Chainlink data feeds on mainnets in our feed config format.
+  const onMainnetCLDataFeeds = await getOrCreateArtifact(
+    'step_2_chainlink_on_mainnet_feeds',
+    null,
+    async () => getCLFeedsOnMainnet(rawDataFeeds),
+  );
+
   const feedConfig = await getOrCreateArtifact(
-    'feeds_config',
-    FeedsConfigSchema,
+    'feeds_config_new',
+    NewFeedsConfigSchema,
     () => generateFeedConfig(rawDataFeeds),
   );
+
+  // const x = feedConfig.feeds.map(f => {
+  //   const providers = Object.keys(f.priceFeedInfo.providers);
+  //   return {
+  //     name: `${f.priceFeedInfo.pair.base} / ${f.priceFeedInfo.pair.quote}`,
+  //     providers: providers,
+  //   };
+  // });
+
+  // await getOrCreateArtifact('x', null, async () => x);
 
   const feedRegistryEvents = await getOrCreateArtifact(
     'feed_registry_events',
@@ -87,7 +119,7 @@ async function main(chainlinkFeedsDir: string) {
   );
 
   const chainlinkCompatConfig = await getOrCreateArtifact(
-    'chainlink_compatibility',
+    'chainlink_compatibility_new',
     ChainlinkCompatibilityConfigSchema,
     () =>
       generateChainlinkCompatibilityConfig(
@@ -98,8 +130,8 @@ async function main(chainlinkFeedsDir: string) {
   );
 
   await saveConfigs(
-    { name: 'feeds_config', content: feedConfig },
-    { name: 'chainlink_compatibility', content: chainlinkCompatConfig },
+    { name: 'feeds_config_new', content: feedConfig },
+    { name: 'chainlink_compatibility_new', content: chainlinkCompatConfig },
   );
 }
 

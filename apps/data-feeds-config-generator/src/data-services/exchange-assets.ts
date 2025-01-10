@@ -1,4 +1,4 @@
-export type AssetInfo<ExtraData extends Record<string, unknown>> = {
+export type AssetInfo<ExtraData extends Record<string, unknown> = {}> = {
   pair: {
     base: string;
     quote: string;

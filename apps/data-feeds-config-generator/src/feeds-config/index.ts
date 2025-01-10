@@ -4,7 +4,14 @@ import Web3 from 'web3';
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { everyAsync, filterAsync } from '@blocksense/base-utils/async';
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import { getRpcUrl, isTestnet, NetworkName } from '@blocksense/base-utils/evm';
+import {
+  getRpcUrl,
+  isTestnet,
+  network,
+  networkName,
+  NetworkName,
+} from '@blocksense/base-utils/evm';
+import { isObject, KeysOf } from '@blocksense/base-utils/type-level';
 
 import {
   Feed,
@@ -13,101 +20,87 @@ import {
   Pair,
   decodeScript,
   FeedCategory,
+  NewFeed,
+  NewFeedsConfig,
 } from '@blocksense/config-types/data-feeds-config';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
 
-import { ChainLinkFeedInfo, RawDataFeeds } from '../data-services/types';
 import {
-  CMCInfo,
-  getCMCCryptoList,
-} from '../data-services/fetchers/aggregators/cmc';
-import { isFeedSupportedByYF } from '../data-services/fetchers/markets/yf';
+  ChainLinkFeedDocsInfo,
+  ChainLinkFeedInfo,
+  RawDataFeeds,
+} from '../data-services/types';
 import { artifactsDir } from '../paths';
 import {
   chainlinkNetworkNameToChainId,
   parseNetworkFilename,
 } from '../chainlink-compatibility/types';
+import {
+  AggregatedFeedInfo,
+  aggregateNetworkInfoPerField,
+  CookedDataFeeds,
+  getFieldFromAggregatedData,
+} from '../data-services/chainlink_feeds';
+import { keysOf } from '@blocksense/base-utils/array-iter';
+import { dataProvidersInjection } from './data-providers';
+import { SimplifiedFeed } from './types';
 
-function getBaseQuote(data: ChainLinkFeedInfo) {
-  if (data.docs && data.docs.baseAsset && data.docs.quoteAsset) {
-    return { base: data.docs.baseAsset, quote: data.docs.quoteAsset };
+function getBaseQuote(data: AggregatedFeedInfo) {
+  const docsBaseQuote = getFieldFromAggregatedData(data, 'docs', 'baseAsset');
+  const docsQuoteBase = getFieldFromAggregatedData(data, 'docs', 'quoteAsset');
+  const pair = getFieldFromAggregatedData(data, 'pair');
+  const name = getFieldFromAggregatedData(data, 'name');
+
+  if (docsBaseQuote && docsQuoteBase) {
+    return { base: docsBaseQuote, quote: docsQuoteBase };
   }
-  if (data.pair.length === 2 && data.pair[0] && data.pair[1]) {
-    return { base: data.pair[0], quote: data.pair[1] };
+  if (pair && pair.length === 2 && pair[0] && pair[1]) {
+    return { base: pair[0], quote: pair[1] };
   }
-  const [base, quote] = data.name.split(' / ');
-  return { base, quote };
+  if (name) {
+    const [base, quote] = name.split(' / ');
+    return { base, quote };
+  }
+  return { base: '', quote: '' };
 }
 
 function feedFromChainLinkFeedInfo(
-  data: ChainLinkFeedInfo,
-): Omit<Feed, 'id' | 'script'> {
+  additionalData: AggregatedFeedInfo,
+): SimplifiedFeed {
+  const description = getFieldFromAggregatedData(additionalData, 'assetName');
+  const fullName = getFieldFromAggregatedData(additionalData, 'name');
+  const category = getFieldFromAggregatedData(additionalData, 'feedType');
+  const marketHours = getFieldFromAggregatedData(
+    additionalData,
+    'docs',
+    'marketHours',
+  );
+  const decimals = !isObject(additionalData.decimals)
+    ? additionalData.decimals
+    : Object.values(additionalData.decimals).reduce(
+        (max, value) => (value > max ? value : max),
+        0,
+      );
+
   return {
-    name: data.name,
-    fullName: data.assetName,
-    description: data.name,
-    type: data.feedType,
-    decimals: data.decimals,
-    pair: getBaseQuote(data),
-    resources: {},
-    report_interval_ms: 300_000,
-    first_report_start_time: {
-      secs_since_epoch: 0,
-      nanos_since_epoch: 0,
+    description,
+    fullName,
+    priceFeedInfo: {
+      pair: getBaseQuote(additionalData),
+      decimals,
+      category,
+      marketHours,
+      aggregation: '',
+      providers: {},
     },
-    quorum_percentage: 1,
   };
 }
-async function isFeedSupported(
-  feed: {
-    type: FeedCategory;
-    pair: Pair;
-    description: string;
-    fullName: string;
-    resources: any;
-  },
-  supportedCMCCurrencies: readonly CMCInfo[],
-): Promise<boolean> {
-  const cmcSupported = supportedCMCCurrencies.find(
-    currency =>
-      currency.symbol === feed.pair.base &&
-      (feed.type === 'Crypto' || feed.type === ''),
-  );
-  if (cmcSupported != null) {
-    feed.resources.cmc_id = cmcSupported.id;
-    feed.resources.cmc_quote = feed.pair.base;
-    feed.type = 'Crypto';
-    return true;
-  }
 
-  const yfSupported = await isFeedSupportedByYF(feed.pair.base);
-  if (yfSupported) {
-    feed.resources.yf_symbol = feed.pair.base;
-    if (
-      feed.type === 'Currency' ||
-      feed.type === 'Forex' ||
-      feed.type === 'Fiat' ||
-      feed.type === ''
-    ) {
-      feed.resources.yf_symbol = `${feed.pair.base}${feed.pair.quote}=X`;
-    }
-
-    const specialCases: Record<string, any> = {
-      XAG: {
-        yf_symbol: 'GC=F',
-      },
-      XAU: {
-        yf_symbol: 'SI-F',
-      },
-    };
-
-    const special = specialCases[feed.pair.base];
-    if (special) feed.resources = { ...special };
-    return true;
-  }
-
-  return false;
+function isDataFeedOnMainnet(
+  networks: Record<string, ChainLinkFeedInfo>,
+): boolean {
+  return Object.keys(networks).some(chainLinkFileNameIsNotTestnet);
 }
 
 function chainLinkFileNameIsNotTestnet(fileName: string) {
@@ -151,7 +144,7 @@ async function isFeedDataSameOnChain(
 
 async function checkOnChainData(
   rawDataFeedsOnMainnets: any[],
-  feeds: Omit<Feed, 'id' | 'script'>[],
+  feeds: SimplifiedFeed[],
 ) {
   let flatedNonTestnetSupportedFeeds = rawDataFeedsOnMainnets
     .filter(([feedName, _feedData]) =>
@@ -182,10 +175,93 @@ async function checkOnChainData(
   }
 }
 
+export async function getAllPossibleCLFeeds(
+  cookedDataFeeds: CookedDataFeeds,
+): Promise<SimplifiedFeed[]> {
+  const allPossibleDataFeeds = Object.entries(cookedDataFeeds)
+    .map(([_feedName, feedData]) => {
+      return {
+        ...feedFromChainLinkFeedInfo(feedData),
+      };
+    })
+    .filter((feed): feed is SimplifiedFeed => feed !== null); // Filter out null entries
+  return allPossibleDataFeeds;
+}
+
+function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
+  const seenPairs = new Set<string>();
+
+  return dataFeeds.filter(feed => {
+    const { base, quote } = feed.priceFeedInfo.pair;
+    const pairKey = `${base}-${quote}`; // Create a unique key for the pair
+
+    if (seenPairs.has(pairKey)) {
+      return false; // Exclude if the pair is already in the set
+    }
+
+    seenPairs.add(pairKey); // Add the pair to the set
+    return true; // Include in the result
+  });
+}
+
+export async function getCLFeedsOnMainnet(
+  rawDataFeeds: RawDataFeeds,
+): Promise<SimplifiedFeed[]> {
+  const onMainnetCookedDataFeeds = aggregateNetworkInfoPerField(
+    rawDataFeeds,
+    true,
+  );
+  const onMainnetDataFeeds = Object.entries(rawDataFeeds)
+    .map(([feedName, feedData]) => {
+      if (isDataFeedOnMainnet(feedData.networks)) {
+        return {
+          ...feedFromChainLinkFeedInfo(onMainnetCookedDataFeeds[feedName]),
+        };
+      } else {
+        return null;
+      }
+    })
+    .filter((feed): feed is SimplifiedFeed => feed !== null); // Filter out null entries
+  console.log(onMainnetDataFeeds.length);
+  return onMainnetDataFeeds;
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
-): Promise<FeedsConfig> {
-  // Filter out the data feeds that are not present on any mainnet.
+): Promise<NewFeedsConfig> {
+  const mainnetDataFeeds: SimplifiedFeed[] =
+    await getCLFeedsOnMainnet(rawDataFeeds);
+
+  const uniqueDataFeeds = getUniqueDataFeeds(mainnetDataFeeds);
+
+  {
+    const { writeJSON } = selectDirectory(artifactsDir);
+    await writeJSON({
+      content: { feeds: uniqueDataFeeds },
+      name: 'uniqueDataFeeds',
+    });
+  }
+
+  function isEmpty(obj: object): boolean {
+    return Object.keys(obj).length === 0;
+  }
+
+  const dataFeedsWithCryptoResources = (
+    await dataProvidersInjection(uniqueDataFeeds)
+  ).filter(dataFeed => !isEmpty(dataFeed.priceFeedInfo.providers));
+
+  {
+    const { writeJSON } = selectDirectory(artifactsDir);
+    await writeJSON({
+      content: { feeds: dataFeedsWithCryptoResources },
+      name: 'dataFeedsWithCryptoResources',
+    });
+  }
+
+  console.log('dataFeedsOnMainnetWithMaxDecimals', mainnetDataFeeds.length);
+  console.log('uniqueDataFeeds', uniqueDataFeeds.length);
+  console.log('uniqueDataFeeds', dataFeedsWithCryptoResources.length);
+
   let rawDataFeedsOnMainnets = Object.entries(rawDataFeeds).filter(
     ([_feedName, feedData]) =>
       // If the data feed is not present on any mainnet, we don't include it.
@@ -193,85 +269,37 @@ export async function generateFeedConfig(
         chainLinkFileNameIsNotTestnet(chainlinkFileName),
       ),
   );
+  await checkOnChainData(rawDataFeedsOnMainnets, dataFeedsWithCryptoResources);
 
-  /**
-   * Filters out testnet entries from the list of network files.
-   */
-  function filterMainnetNetworks(
-    networks: Record<string, ChainLinkFeedInfo>,
-  ): [string, ChainLinkFeedInfo][] {
-    return Object.entries(networks).filter(([chainlinkFileName]) =>
-      chainLinkFileNameIsNotTestnet(chainlinkFileName),
-    );
-  }
-
-  /**
-   * Finds the network entry with the highest decimals value.
-   */
-  function findMaxDecimalsNetwork(
-    validNetworks: [string, ChainLinkFeedInfo][],
-  ): ChainLinkFeedInfo | undefined {
-    return validNetworks.reduce<ChainLinkFeedInfo | undefined>(
-      (max, [, data]) => (!max || data.decimals > max.decimals ? data : max),
-      undefined,
-    );
-  }
-
-  /**
-   * Processes a single raw data feed entry to extract and convert the
-   *  "best" feed data to Feed structure.
-   */
-  function convertRawDataFeed(feedData: {
-    networks: Record<string, ChainLinkFeedInfo>;
-  }): Omit<Feed, 'id' | 'script'> | null {
-    const validNetworks = filterMainnetNetworks(feedData.networks);
-    const maxEntry = findMaxDecimalsNetwork(validNetworks);
-
-    if (!maxEntry) {
-      return null;
-    }
-
-    return { ...feedFromChainLinkFeedInfo(maxEntry) };
-  }
-
-  const dataFeedsOnMainnetWithMaxDecimals: Omit<Feed, 'id' | 'script'>[] =
-    rawDataFeedsOnMainnets
-      .map(([_feedName, feedData]) => convertRawDataFeed(feedData))
-      .filter((feed): feed is Omit<Feed, 'id' | 'script'> => feed !== null); // Filter out null entries
-
-  const supportedCMCCurrencies = await getCMCCryptoList();
-
-  const usdPairFeeds = dataFeedsOnMainnetWithMaxDecimals.filter(
-    feed => feed.pair.quote === 'USD',
-  );
-
-  const feeds = await filterAsync(usdPairFeeds, feed =>
-    isFeedSupported(feed, supportedCMCCurrencies),
-  );
-
-  await checkOnChainData(rawDataFeedsOnMainnets, feeds);
-
-  const feedsSortedByDescription = feeds.sort((a, b) => {
+  const feedsSortedByDescription = dataFeedsWithCryptoResources.sort((a, b) => {
     // We hash the descriptions here, to avoid an obvious ordering.
     const a_ = keccak256(a.description).toString();
     const b_ = keccak256(b.description).toString();
     return a_.localeCompare(b_);
   });
-  const feedsWithIdAndScript = feedsSortedByDescription.map((feed, id) => ({
-    id,
-    ...feed,
-    script: decodeScript(
-      'cmc_id' in feed.resources ? 'CoinMarketCap' : 'YahooFinance',
-    ),
-  }));
+
+  const feeds = feedsSortedByDescription.map((simplifiedFeed, id) => {
+    const feed: NewFeed = {
+      ...simplifiedFeed,
+      id,
+      type: 'price-feed',
+      valueType: 'Numerical',
+      consensusAggregation: 'Median',
+      quorumPercentage: 100,
+      deviationPercentage: 0,
+      skipPublishIfLessThanPercentage: 0.1,
+      alwaysPublishHeartbeatMs: 3600000,
+    };
+    return feed;
+  });
 
   {
     const { writeJSON } = selectDirectory(artifactsDir);
     await writeJSON({
-      content: { feeds: feedsWithIdAndScript },
+      content: { feeds: feeds },
       name: 'feeds_config',
     });
   }
 
-  return { feeds: feedsWithIdAndScript };
+  return { feeds: feeds };
 }
