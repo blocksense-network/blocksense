@@ -44,13 +44,13 @@ export async function collectRawDataFeeds(directoryPath: string) {
 type FeedData = RawDataFeeds[string]['networks'][string];
 type FeedDataFieldName = keyof FeedData;
 
-type AggregatedFeedInfo = {
+export type AggregatedFeedInfo = {
   [F in FeedDataFieldName]: {
     [networkName in Exclude<NetworkName, 'local'>]: FeedData[F];
   };
 };
 
-type CookedDataFeeds = {
+export type CookedDataFeeds = {
   [feedName: string]: AggregatedFeedInfo;
 };
 
