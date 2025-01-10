@@ -2,7 +2,7 @@ import { Web3 } from 'web3';
 
 import { assertIsObject } from '@blocksense/base-utils/assert';
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import { getRpcUrl, isTestnet } from '@blocksense/base-utils/evm';
+import { getRpcUrl, isTestnet, networkName } from '@blocksense/base-utils/evm';
 
 import {
   NetworkName,
@@ -11,14 +11,20 @@ import {
   isZeroAddress,
 } from '@blocksense/base-utils/evm';
 
+import { keysOf } from '@blocksense/base-utils/array-iter';
+import { KeysOf, isObject } from '@blocksense/base-utils/type-level';
+
 import {
   chainlinkNetworkNameToChainId,
   decodeConfirmedFeedEvent,
   FeedRegistryEventsPerAggregator,
   parseNetworkFilename,
 } from '../chainlink-compatibility/types';
-import { RawDataFeeds, decodeChainLinkFeedsInfo } from './types';
-import { keysOf } from '@blocksense/base-utils/array-iter';
+import {
+  ChainLinkFeedDocsInfo,
+  RawDataFeeds,
+  decodeChainLinkFeedsInfo,
+} from './types';
 
 export async function collectRawDataFeeds(directoryPath: string) {
   const { readAllJSONFiles } = selectDirectory(directoryPath);
@@ -101,6 +107,32 @@ export function aggregateNetworkInfoPerField(
   }
 
   return cookedDataFeeds;
+}
+
+export function getFieldFromAggregatedData(
+  data: AggregatedFeedInfo,
+  field: KeysOf<AggregatedFeedInfo>,
+  inDocsField?: KeysOf<ChainLinkFeedDocsInfo>,
+) {
+  if (field === 'docs' && !inDocsField) {
+    throw new Error('inDocsField is required when field is "docs"');
+  }
+
+  if (field === 'docs' && data[field] && inDocsField) {
+    if (keysOf(data.docs).some(key => networkName.literals.includes(key))) {
+      const docsWithField = Object.values(data.docs).find(
+        value => value[inDocsField],
+      );
+      return docsWithField ? docsWithField[inDocsField] : '';
+    }
+    const docs = data.docs as unknown as ChainLinkFeedDocsInfo;
+    return docs[inDocsField] ?? null;
+  }
+
+  const value = isObject(data[field])
+    ? Object.values(data[field]).find(value => value)
+    : data[field];
+  return value;
 }
 
 export const feedRegistries: {
