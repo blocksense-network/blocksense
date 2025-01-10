@@ -8,23 +8,23 @@ edition.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.89"
+anyhow = { workspace = true }
 indexmap = { version = "2", features = ["serde"] }
 camino = "1.1.7"
 clap = { version = "4.5", features=["derive"] }
-is-terminal = "0.4.12"
+is-terminal = { workspace = true }
 lazy_static = "1.4.0"
-log = "0.4.21"
-reqwest = { version = "0.12", features=["json"] }
-serde = { version = "1.0", features=["derive"]}
-serde_json = "1.0"
+log = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
-tokio = { version = "1.11", features = ["full"] }
+tokio = { workspace = true }
 toml = "0.8.13"
 toml_edit = "0.22.22"
-tracing = { version = "0.1.41" , features=["log"] }
-tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
-url = "2.5.4"
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+url = { workspace = true }
 
 blocksense-registry = { path = "../../libs/registry" }
-utils = { path = "../../libs/utils"}
+utils = { workspace = true }

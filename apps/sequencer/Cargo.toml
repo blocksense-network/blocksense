@@ -11,7 +11,7 @@ anomaly_detection = { path = "../../libs/anomaly_detection" }
 config = { path = "../../libs/config" }
 blocksense-registry = { path = "../../libs/registry" }
 crypto = { path = "../../libs/crypto" }
-utils = { path = "../../libs/utils" }
+utils = { workspace = true }
 feed_registry = { path = "../../libs/feed_registry" }
 blockchain_data_model = { path = "../../libs/blockchain_data_model" }
 
@@ -42,9 +42,9 @@ alloy-primitives = "0.8.14"
 
 prometheus = { path = "../../libs/prometheus" }
 
-reqwest = { version = "0.12", features = ["multipart", "blocking"] }
+reqwest = { workspace = true }
 # async
-tokio = { version = "1.4.0", features = ["full", "tracing"] }
+tokio = { workspace = true }
 
 # misc
 eyre = "0.6.12"
@@ -52,14 +52,14 @@ openssl-sys = "0.9.102"
 actix-web = "4.6.0"
 actix-multipart = "0.7.2"
 actix-test = "0.1.5"
-serde_json = "1.0.128"
-serde = { version = "1.0.216", features = ["derive"]}
-futures = "0.3.31"
+serde_json = { workspace = true }
+serde = { workspace = true }
+futures = { workspace = true }
 envload = "0.1.1"
 once_cell = "1.20.2"
 async-channel = "2.3.0"
-tracing = { version = "0.1.41", features = ["async-await", "log"] }
-tracing-subscriber = { version = "0.3.19", features = ["json"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
 bytes = "1.9.0"
 futures-util = "0.3.30"
 rand = "0.8.5"
