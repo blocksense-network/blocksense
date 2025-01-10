@@ -1,5 +1,47 @@
-{ self, ... }:
 {
+  self,
+  lib,
+  inputs,
+  ...
+}:
+{
+  flake.nixosConfigurations =
+    let
+      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+    in
+    {
+      test-vm = pkgs.testers.runNixOSTest {
+        name = "systemd-test";
+        nodes.machine1 =
+          { ... }:
+          {
+            imports = [
+              # self.nixosModules.blocksense-systemd
+              # ./example-setup-01.nix
+            ];
+
+            options = {
+              devenv.root = lib.mkOption {
+                type = lib.types.path;
+                default = /home/petar/code/repos/metacraft-labs/blocksense;
+              };
+            };
+
+            config = {
+              users.users.toshko = {
+                isNormalUser = true;
+              };
+            };
+          };
+
+        testScript =
+          { nodes, ... }:
+          ''
+            machine.wait_for_unit("default.target")
+          '';
+      };
+    };
+
   perSystem =
     {
       pkgs,
