@@ -59,6 +59,8 @@ const networks = [
   'inevm-testnet',
   'sonic-blaze',
   'horizen-gobi',
+  'harmony-shard0',
+  'aurora-testnet',
 ] as const;
 
 const chainIds = [
@@ -66,7 +68,7 @@ const chainIds = [
   84532, 80084, 56, 97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009,
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
-  1663,
+  1663, 1666700000, 1313161555,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -321,6 +323,16 @@ export const networkMetadata = {
     chainId: 1663,
     isTestnet: true,
     explorerUrl: 'https://gobi-explorer.horizenlabs.io/',
+  },
+  'harmony-shard0': {
+    chainId: 1666700000,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.harmony.one/',
+  },
+  'aurora-testnet': {
+    chainId: 1313161555,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.aurora.dev/',
   },
 } satisfies {
   [Net in NetworkName]: {
