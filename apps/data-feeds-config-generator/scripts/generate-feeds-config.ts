@@ -15,7 +15,11 @@ import {
   getAllProposedFeedsInRegistry,
 } from '../src/data-services/chainlink_feeds';
 import { RawDataFeedsSchema } from '../src/data-services/types';
-import { generateFeedConfig, getAllPossibleCLFeeds } from '../src/feeds-config/index';
+import {
+  generateFeedConfig,
+  getAllPossibleCLFeeds,
+  getCLFeedsOnMainnet,
+} from '../src/feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
 import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';
 
@@ -79,6 +83,13 @@ async function main(chainlinkFeedsDir: string) {
     'step_1_chainlink_all_possible_feeds',
     null,
     async () => getAllPossibleCLFeeds(aggregatedDataFeeds),
+  );
+
+  // Representation of all the Chainlink data feeds on mainnets in our feed config format.
+  const onMainnetCLDataFeeds = await getOrCreateArtifact(
+    'step_2_chainlink_on_mainnet_feeds',
+    null,
+    async () => getCLFeedsOnMainnet(rawDataFeeds),
   );
 
   const feedConfig = await getOrCreateArtifact(

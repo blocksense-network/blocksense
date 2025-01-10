@@ -224,6 +224,30 @@ export async function getAllPossibleCLFeeds(
   return allPossibleDataFeeds;
 }
 
+export async function getCLFeedsOnMainnet(
+  rawDataFeeds: RawDataFeeds,
+): Promise<SimplifiedFeed[]> {
+  const onMainnetCookedDataFeeds = aggregateNetworkInfoPerField(
+    rawDataFeeds,
+    true,
+  );
+  const onMainnetDataFeeds = Object.entries(rawDataFeeds)
+    .filter(([_feedName, feedData]) => isDataFeedOnMainnet(feedData.networks))
+    .map(([feedName, _feedData]) => {
+      return {
+        ...feedFromChainLinkFeedInfo(onMainnetCookedDataFeeds[feedName]),
+      };
+    });
+
+  return onMainnetDataFeeds;
+}
+
+function isDataFeedOnMainnet(
+  networks: Record<string, ChainLinkFeedInfo>,
+): boolean {
+  return Object.keys(networks).some(chainLinkFileNameIsNotTestnet);
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
 ): Promise<FeedsConfig> {
