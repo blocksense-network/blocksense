@@ -105,7 +105,7 @@ async function main(chainlinkFeedsDir: string) {
   );
 
   const chainlinkCompatConfig = await getOrCreateArtifact(
-    'chainlink_compatibility',
+    'chainlink_compatibility_new',
     ChainlinkCompatibilityConfigSchema,
     () =>
       generateChainlinkCompatibilityConfig(
@@ -117,7 +117,7 @@ async function main(chainlinkFeedsDir: string) {
 
   await saveConfigs(
     { name: 'feeds_config_new', content: feedConfig },
-    { name: 'chainlink_compatibility', content: chainlinkCompatConfig },
+    { name: 'chainlink_compatibility_new', content: chainlinkCompatConfig },
   );
 }
 

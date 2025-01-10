@@ -15,7 +15,7 @@ export type ChainlinkAggregators = S.Schema.Type<
 
 export const ChainlinkCompatibilityDataSchema = S.Struct({
   base: S.NullOr(ethereumAddress),
-  quote: ethereumAddress,
+  quote: S.NullOr(ethereumAddress),
   chainlink_aggregators: ChainlinkAggregatorsSchema,
 }).annotations({ identifier: 'ChainlinkCompatibilityData' });
 
