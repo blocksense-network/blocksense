@@ -140,3 +140,73 @@ export const MarketHoursSchema = S.Union(
 ).annotations({ identifier: 'MarketHours' });
 
 export type MarketHours = S.Schema.Type<typeof MarketHoursSchema>;
+
+export const providersResourcesSchema = S.mutable(
+  S.Record({
+    // provider name
+    key: S.String,
+    // map of api parameters
+    value: S.Record({
+      key: S.String,
+      value: S.String,
+    }),
+  }),
+);
+
+export type ProvidersResources = S.Schema.Type<typeof providersResourcesSchema>;
+
+export const PriceFeedInfoSchema = S.mutable(
+  S.Struct({
+    pair: PairSchema,
+    decimals: S.Number,
+    category: FeedCategorySchema,
+    marketHours: S.NullishOr(MarketHoursSchema),
+    aggregation: S.Union(
+      // Indicates that the value will be replaced with
+      // the correct value later in the pipeline:
+      S.Literal('fixme'),
+      S.Literal('fallback'),
+      S.Literal('volume-weighted-average'),
+    ),
+    providers: providersResourcesSchema,
+  }),
+);
+
+export type PriceFeedInfo = S.Schema.Type<typeof PriceFeedInfoSchema>;
+
+export const NewFeedSchema = S.mutable(
+  S.Struct({
+    id: S.Number,
+    type: FeedTypeSchema,
+    valueType: S.Literal('Numerical'),
+    consensusAggregation: S.Literal('Median'),
+    description: S.String,
+    fullName: S.String,
+    quorumPercentage: S.Number,
+    deviationPercentage: S.Number,
+    skipPublishIfLessThanPercentage: S.Number,
+    alwaysPublishHeartbeatMs: S.Number,
+    priceFeedInfo: PriceFeedInfoSchema,
+  }),
+);
+
+export type NewFeed = S.Schema.Type<typeof NewFeedSchema>;
+
+/**
+ * Schema for the Data Feeds configuration.
+ */
+export const NewFeedsConfigSchema = S.mutable(
+  S.Struct({
+    feeds: S.mutable(S.Array(NewFeedSchema)),
+  }),
+);
+
+/**
+ * Type for the Data Feeds configuration.
+ */
+export type NewFeedsConfig = S.Schema.Type<typeof NewFeedsConfigSchema>;
+
+/**
+ * Function to decode Data Feeds configuration.
+ */
+export const decodeNewFeedsConfig = S.decodeUnknownSync(NewFeedsConfigSchema);
