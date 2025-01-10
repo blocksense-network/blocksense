@@ -2,26 +2,22 @@ import keccak256 from 'keccak256';
 import Web3 from 'web3';
 
 import { assertNotNull } from '@blocksense/base-utils/assert';
-import { everyAsync, filterAsync } from '@blocksense/base-utils/async';
+import { everyAsync } from '@blocksense/base-utils/async';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { getRpcUrl, isTestnet, NetworkName } from '@blocksense/base-utils/evm';
 import { isObject } from '@blocksense/base-utils/type-level';
 
 import {
-  Feed,
-  FeedsConfig,
   Pair,
-  decodeScript,
   FeedCategory,
+  NewFeed,
+  NewFeedsConfig,
 } from '@blocksense/config-types/data-feeds-config';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
 
 import { ChainLinkFeedInfo, RawDataFeeds } from '../data-services/types';
-import {
-  CMCInfo,
-  getCMCCryptoList,
-} from '../data-services/fetchers/aggregators/cmc';
+import { CMCInfo } from '../data-services/fetchers/aggregators/cmc';
 import { isFeedSupportedByYF } from '../data-services/fetchers/markets/yf';
 import { artifactsDir } from '../paths';
 import {
@@ -35,6 +31,7 @@ import {
   getFieldFromAggregatedData,
 } from '../data-services/chainlink_feeds';
 import { SimplifiedFeed } from './types';
+import { dataProvidersInjection } from './data-providers';
 
 function getBaseQuote(data: AggregatedFeedInfo) {
   const docsBase = getFieldFromAggregatedData(data, 'docs', 'baseAsset');
@@ -179,7 +176,7 @@ async function isFeedDataSameOnChain(
 
 async function checkOnChainData(
   rawDataFeedsOnMainnets: any[],
-  feeds: Omit<Feed, 'id' | 'script'>[],
+  feeds: SimplifiedFeed[],
 ) {
   let flatedNonTestnetSupportedFeeds = rawDataFeedsOnMainnets
     .filter(([feedName, _feedData]) =>
@@ -248,10 +245,39 @@ function isDataFeedOnMainnet(
   return Object.keys(networks).some(chainLinkFileNameIsNotTestnet);
 }
 
+function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
+  const seenPairs = new Set<string>();
+
+  return dataFeeds.filter(feed => {
+    const { base, quote } = feed.priceFeedInfo.pair;
+    const pairKey = `${base}-${quote}`;
+
+    if (seenPairs.has(pairKey)) {
+      return false;
+    }
+
+    seenPairs.add(pairKey);
+    return true;
+  });
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
-): Promise<FeedsConfig> {
-  // Filter out the data feeds that are not present on any mainnet.
+): Promise<NewFeedsConfig> {
+  // Get the CL feeds on mainnet
+  const mainnetDataFeeds: SimplifiedFeed[] =
+    await getCLFeedsOnMainnet(rawDataFeeds);
+
+  // Get the unique data feeds
+  const uniqueDataFeeds = getUniqueDataFeeds(mainnetDataFeeds);
+
+  // Add providers data to the feeds and filter out feeds without providers
+  const dataFeedsWithCryptoResources = (
+    await dataProvidersInjection(uniqueDataFeeds)
+  ).filter(
+    dataFeed => Object.keys(dataFeed.priceFeedInfo.providers).length !== 0,
+  );
+
   let rawDataFeedsOnMainnets = Object.entries(rawDataFeeds).filter(
     ([_feedName, feedData]) =>
       // If the data feed is not present on any mainnet, we don't include it.
@@ -260,84 +286,31 @@ export async function generateFeedConfig(
       ),
   );
 
-  /**
-   * Filters out testnet entries from the list of network files.
-   */
-  function filterMainnetNetworks(
-    networks: Record<string, ChainLinkFeedInfo>,
-  ): [string, ChainLinkFeedInfo][] {
-    return Object.entries(networks).filter(([chainlinkFileName]) =>
-      chainLinkFileNameIsNotTestnet(chainlinkFileName),
-    );
-  }
+  await checkOnChainData(rawDataFeedsOnMainnets, dataFeedsWithCryptoResources);
 
-  /**
-   * Finds the network entry with the highest decimals value.
-   */
-  function findMaxDecimalsNetwork(
-    validNetworks: [string, ChainLinkFeedInfo][],
-  ): ChainLinkFeedInfo | undefined {
-    return validNetworks.reduce<ChainLinkFeedInfo | undefined>(
-      (max, [, data]) => (!max || data.decimals > max.decimals ? data : max),
-      undefined,
-    );
-  }
-
-  /**
-   * Processes a single raw data feed entry to extract and convert the
-   *  "best" feed data to Feed structure.
-   */
-  function convertRawDataFeed(feedData: {
-    networks: Record<string, ChainLinkFeedInfo>;
-  }): Omit<Feed, 'id' | 'script'> | null {
-    const validNetworks = filterMainnetNetworks(feedData.networks);
-    const maxEntry = findMaxDecimalsNetwork(validNetworks);
-
-    if (!maxEntry) {
-      return null;
-    }
-
-    return { ...feedFromChainLinkFeedInfo(maxEntry) };
-  }
-
-  const dataFeedsOnMainnetWithMaxDecimals: Omit<Feed, 'id' | 'script'>[] =
-    rawDataFeedsOnMainnets
-      .map(([_feedName, feedData]) => convertRawDataFeed(feedData))
-      .filter((feed): feed is Omit<Feed, 'id' | 'script'> => feed !== null); // Filter out null entries
-
-  const supportedCMCCurrencies = await getCMCCryptoList();
-
-  const usdPairFeeds = dataFeedsOnMainnetWithMaxDecimals.filter(
-    feed => feed.pair.quote === 'USD',
-  );
-
-  const feeds = await filterAsync(usdPairFeeds, feed =>
-    isFeedSupported(feed, supportedCMCCurrencies),
-  );
-
-  await checkOnChainData(rawDataFeedsOnMainnets, feeds);
-
-  const feedsSortedByDescription = feeds.sort((a, b) => {
+  // Sort the feeds by description
+  const feedsSortedByDescription = dataFeedsWithCryptoResources.sort((a, b) => {
     // We hash the descriptions here, to avoid an obvious ordering.
     const a_ = keccak256(a.description).toString();
     const b_ = keccak256(b.description).toString();
     return a_.localeCompare(b_);
   });
-  const feedsWithIdAndScript = feedsSortedByDescription.map((feed, id) => ({
-    id,
-    ...feed,
-    script: decodeScript(
-      'cmc_id' in feed.resources ? 'CoinMarketCap' : 'YahooFinance',
-    ),
-  }));
 
-  {
-    const { writeJSON } = selectDirectory(artifactsDir);
-    await writeJSON({
-      content: { feeds: feedsWithIdAndScript },
-      name: 'feeds_config',
-    });
-  }
+  // Construct the final feeds config
+  const feeds = feedsSortedByDescription.map((simplifiedFeed, id) => {
+    const feed: NewFeed = {
+      ...simplifiedFeed,
+      id,
+      type: 'price-feed',
+      valueType: 'Numerical',
+      consensusAggregation: 'Median',
+      quorumPercentage: 100,
+      deviationPercentage: 0,
+      skipPublishIfLessThanPercentage: 0.1,
+      alwaysPublishHeartbeatMs: 3600000,
+    };
+    return feed;
+  });
 
-  return { feeds: feedsWithIdAndScript };
+  return { feeds: feeds };
 }

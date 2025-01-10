@@ -6,7 +6,7 @@ const { decodeUnknownSync } = ParseResult;
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
-import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
+import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 
 import { chainlinkFeedsDir, artifactsDir, configDir } from '../src/paths';
 import {
@@ -93,8 +93,8 @@ async function main(chainlinkFeedsDir: string) {
   );
 
   const feedConfig = await getOrCreateArtifact(
-    'feeds_config',
-    FeedsConfigSchema,
+    'feeds_config_new',
+    NewFeedsConfigSchema,
     () => generateFeedConfig(rawDataFeeds),
   );
 
@@ -116,7 +116,7 @@ async function main(chainlinkFeedsDir: string) {
   );
 
   await saveConfigs(
-    { name: 'feeds_config', content: feedConfig },
+    { name: 'feeds_config_new', content: feedConfig },
     { name: 'chainlink_compatibility', content: chainlinkCompatConfig },
   );
 }
