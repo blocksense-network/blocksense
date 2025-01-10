@@ -4,9 +4,9 @@
 
 `deployedNetworks` type needs to be updated after we deploy to a new network.
 
-For balance you need to set up the RPCs of the networks - check `.env.example` for reference.
+For balance you need to set up RPCs for the networks - check `.env.example` for reference.
 
-For cost calculation on `ethereum-sepolia` and `ethereum-holesky` you need `ETHERSCAN_API_KEY` set in `.env`.
+For cost-calculations you need to set up Api Keys for the networks - check `.env.example` for reference.
 
 ## How to use scripts
 
@@ -14,25 +14,61 @@ For cost calculation on `ethereum-sepolia` and `ethereum-holesky` you need `ETHE
 
 Print the balance of an address on the current deployedNetworks.
 
-`yarn get-wallets-balances --address <ethereum address>`
-or just `yarn get-wallets-balances` if you want to check the funds on the sequencer (0xd756119012CcabBC59910dE0ecEbE406B5b952bE).
+To run this script, do the following, from the root of the repo:
+
+```
+yarn build @blocksense/base-utils
+cd libs/ts/onchain-interactions
+yarn balance-script
+```
+
+You can use `yarn balance-script --help` to get the full list of options.
 
 ### check-pending-tx
 
 Check all networks in deployedNetworks for pending transactions.
 
-`yarn check-pending-tx --address <ethereum address>`
-or just `yarn check-pending-tx` if you want to check for pending on the sequencer (0xd756119012CcabBC59910dE0ecEbE406B5b952bE).
+To run this script, do the following, from the root of the repo:
+
+```
+yarn build @blocksense/base-utils
+cd libs/ts/onchain-interactions
+yarn check-pending-tx
+```
+
+You can use `yarn check-pending-tx --help` to get the full list of options.
 
 ### cost-calculations
 
-Print and log the cost of avg transaction, avg gas price, cost for 24h and runway on all deployedNetworks using the last N transactions (default is 288) and current balance with M seconds between transactions (default 300).
+Print and log the following:
 
-`yarn calculate-cost --address <ethereum address> --numberOfTransactions <number> --secondsBetweenTransactions <number>`
-or just `yarn calculate-cost` if you want to check the cost on the sequencer (0xd756119012CcabBC59910dE0ecEbE406B5b952bE).
+1. cost of avg transaction,
+2. avg gas price,
+3. cost for 24h and runway, and
+4. current balance.
+
+This is done for all deployedNetworks using the last N transactions (default is 288) with M seconds between transactions (default 300).
+
+To run this script, do the following, from the root of the repo:
+
+```
+yarn build @blocksense/base-utils
+cd libs/ts/onchain-interactions
+yarn calculate-cost
+```
+
+You can use `yarn calculate-cost --help` to get the full list of options.
 
 ### unstuck-transaction
 
 Send empty transactions with the purpose of removing all pending transactions for this account on this network.
 
-`yarn unstuck-transaction --address <ethereum address> --providerUrl <url> --privateKey <key>`
+To run this script, do the following, from the root of the repo:
+
+```
+yarn build @blocksense/base-utils
+cd libs/ts/onchain-interactions
+yarn unstuck-transaction
+```
+
+You can use `yarn unstuck-transaction --help` to get the full list of options.
