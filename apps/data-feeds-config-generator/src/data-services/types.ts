@@ -5,6 +5,19 @@ import {
   MarketHoursSchema,
 } from '@blocksense/config-types/data-feeds-config';
 
+const ChainLinkFeedDocsInfoSchema = S.Struct({
+  assetName: S.NullishOr(S.String),
+  baseAsset: S.NullishOr(S.String),
+  quoteAsset: S.NullishOr(S.String),
+  marketHours: S.NullishOr(MarketHoursSchema),
+  productType: S.NullishOr(S.String),
+  feedType: S.NullishOr(S.String),
+}).annotations({ identifier: 'ChainLinkFeedDocsInfo' });
+
+export type ChainLinkFeedDocsInfo = S.Schema.Type<
+  typeof ChainLinkFeedDocsInfoSchema
+>;
+
 /**
  * Schema for the ChainLink feed information.
  */
@@ -29,12 +42,7 @@ const ChainLinkFeedInfoSchema = S.Struct({
   assetName: S.String,
   feedType: FeedCategorySchema,
   decimals: S.Number,
-  docs: S.Struct({
-    assetName: S.NullishOr(S.String),
-    baseAsset: S.NullishOr(S.String),
-    quoteAsset: S.NullishOr(S.String),
-    marketHours: S.NullishOr(MarketHoursSchema),
-  }),
+  docs: ChainLinkFeedDocsInfoSchema,
 }).annotations({ identifier: 'ChainLinkFeedInfo' });
 
 /**
