@@ -5,11 +5,11 @@ import { assertNotNull } from '@blocksense/base-utils/assert';
 import { everyAsync, filterAsync } from '@blocksense/base-utils/async';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { getRpcUrl, isTestnet, NetworkName } from '@blocksense/base-utils/evm';
+import { isObject } from '@blocksense/base-utils/type-level';
 
 import {
   Feed,
   FeedsConfig,
-  FeedType,
   Pair,
   decodeScript,
   FeedCategory,
@@ -28,37 +28,64 @@ import {
   chainlinkNetworkNameToChainId,
   parseNetworkFilename,
 } from '../chainlink-compatibility/types';
+import {
+  AggregatedFeedInfo,
+  CookedDataFeeds,
+  getFieldFromAggregatedData,
+} from '../data-services/chainlink_feeds';
+import { SimplifiedFeed } from './types';
 
-function getBaseQuote(data: ChainLinkFeedInfo) {
-  if (data.docs && data.docs.baseAsset && data.docs.quoteAsset) {
-    return { base: data.docs.baseAsset, quote: data.docs.quoteAsset };
+function getBaseQuote(data: AggregatedFeedInfo) {
+  const docsBase = getFieldFromAggregatedData(data, 'docs', 'baseAsset');
+  const docsQuote = getFieldFromAggregatedData(data, 'docs', 'quoteAsset');
+  const pair = getFieldFromAggregatedData(data, 'pair');
+  const name = getFieldFromAggregatedData(data, 'name');
+
+  if (docsBase && docsQuote) {
+    return { base: docsBase, quote: docsQuote };
   }
-  if (data.pair.length === 2 && data.pair[0] && data.pair[1]) {
-    return { base: data.pair[0], quote: data.pair[1] };
+  if (pair && pair.length === 2 && pair[0] && pair[1]) {
+    return { base: pair[0], quote: pair[1] };
   }
-  const [base, quote] = data.name.split(' / ');
-  return { base, quote };
+  if (name) {
+    const [base, quote] = name.split(' / ');
+    return { base, quote };
+  }
+  return { base: '', quote: '' };
 }
 
 function feedFromChainLinkFeedInfo(
-  data: ChainLinkFeedInfo,
-): Omit<Feed, 'id' | 'script'> {
+  additionalData: AggregatedFeedInfo,
+): SimplifiedFeed {
+  const description = getFieldFromAggregatedData(additionalData, 'assetName');
+  const fullName = getFieldFromAggregatedData(additionalData, 'name');
+  const category = getFieldFromAggregatedData(additionalData, 'feedType');
+  const marketHours = getFieldFromAggregatedData(
+    additionalData,
+    'docs',
+    'marketHours',
+  );
+  const decimals = !isObject(additionalData.decimals)
+    ? additionalData.decimals
+    : Object.values(additionalData.decimals).reduce(
+        (max, value) => (value > max ? value : max),
+        0,
+      );
+
   return {
-    name: data.name,
-    fullName: data.assetName,
-    description: data.name,
-    type: data.feedType,
-    decimals: data.decimals,
-    pair: getBaseQuote(data),
-    resources: {},
-    report_interval_ms: 300_000,
-    first_report_start_time: {
-      secs_since_epoch: 0,
-      nanos_since_epoch: 0,
+    description,
+    fullName,
+    priceFeedInfo: {
+      pair: getBaseQuote(additionalData),
+      decimals,
+      category,
+      marketHours,
+      aggregation: 'fixme',
+      providers: {},
     },
-    quorum_percentage: 1,
   };
 }
+
 async function isFeedSupported(
   feed: {
     type: FeedCategory;
