@@ -15,6 +15,7 @@ use url::Url;
 #[serde(rename_all = "camelCase")]
 pub struct Root {
     pub status: Status,
+    #[serde(default)]
     pub data: HashMap<u64, CmcData>,
 }
 
@@ -120,7 +121,12 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
                 }
             }
             None => {
-                let error = format!("CMC data feed with id {} is not found", data.cmc_id);
+                let error = if value.status.error_code == 0 {
+                        format!("CMC data feed with id {} is not found", data.cmc_id)
+                    } else {
+                        println!("CMC returned error with code = {} message = {}", value.status.error_code, value.status.error_message);
+                        value.status.error_message.to_string()
+                    };
                 DataFeedResult {
                     id: feed_id.clone(),
                     value: DataFeedResultValue::Error(error),
