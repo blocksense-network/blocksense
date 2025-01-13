@@ -1,0 +1,15 @@
+export { BinanceAssetsFetcher } from '../exchanges/binance/binance';
+export { BybitAssetsFetcher } from '../exchanges/bybit/bybit';
+export { CoinbaseExchangeAssetsFetcher } from '../exchanges/coinbase-exchange/coinbase-exchange';
+export { OKXExchangeAssetsFetcher } from '../exchanges/okx/okx';
+export { BitgetExchangeAssetsFetcher } from '../exchanges/bitget/bitget';
+export { KuCoinExchangeAssetsFetcher } from '../exchanges/kucoin/kucoin';
+export { MEXCExchangeAssetsFetcher } from '../exchanges/mexc/mexc';
+export { GateIoExchangeAssetsFetcher } from '../exchanges/gate-io/gate-io';
+export { CryptoComExchangeAssetsFetcher } from '../exchanges/crypto-com-exchange/crypto-com-exchange';
+export { BinanceTRExchangeAssetsFetcher } from '../exchanges/binance-tr/binance-tr';
+export { BinanceUSExchangeAssetsFetcher } from '../exchanges/binance-us/binance-us';
+export { GeminiExchangeAssetsFetcher } from '../exchanges/gemini/gemini';
+export { BitfinexExchangeAssetsFetcher } from '../exchanges/bitfinex/bitfinex';
+export { KrakenAssetsFetcher } from '../exchanges/kraken/kraken';
+export { UpbitAssetsFetcher } from '../exchanges/upbit/upbit';
