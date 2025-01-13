@@ -277,9 +277,16 @@ const main = async (): Promise<void> => {
     })
     .option('secondsBetweenTransactions', {
       alias: 'time',
-      describe: 'Time between Transactions in seconds ',
+      describe: 'Time between Transactions in seconds',
       type: 'number',
       default: 300, //5min
+    })
+    .option('network', {
+      alias: 'n',
+      describe:
+        'Calculate cost only for this network, not all deployed networks',
+      type: 'string',
+      default: '',
     })
     .help()
     .alias('help', 'h')
@@ -300,7 +307,9 @@ const main = async (): Promise<void> => {
     ),
   );
 
-  for (const network of deployedNetworks) {
+  const networks = argv.network == '' ? deployedNetworks : [argv.network];
+
+  for (const network of networks) {
     const { transactions, firstTxTime, lastTxTime } =
       await fetchTransactionsForNetwork(
         network,
