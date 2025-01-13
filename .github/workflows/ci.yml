@@ -208,10 +208,13 @@ jobs:
         include:
           - project: docs
             vercel_project: docs.blocksense.network
+          - project: docs.v2
+            vercel_project: blocksense-docs-blocksense-network-v2
           - project: explorer
             vercel_project: explorer.blocksense.network
     outputs:
       docsDeploymentMessage: ${{ steps.collect-docs.outputs.message }}
+      docsV2DeploymentMessage: ${{ steps.collect-docs-v2.outputs.message }}
       explorerDeploymentMessage: ${{ steps.collect-explorer.outputs.message }}
     steps:
       - uses: actions/checkout@v4
@@ -265,6 +268,13 @@ jobs:
           DOCS_DEPLOY_URL=$(cat _vercel-deployment-url)
           echo "::set-output name=message::$DOCS_DEPLOY_URL"
 
+      - name: Collect Docs V2 Deployment URL
+        id: collect-docs-v2
+        if: matrix.project == 'docs.v2'
+        run: |
+          DOCSV2_DEPLOY_URL=$(cat _vercel-deployment-url)
+          echo "::set-output name=message::$DOCSV2_DEPLOY_URL"
+
       - name: Collect Explorer Deployment URL
         id: collect-explorer
         if: matrix.project == 'explorer'
@@ -285,4 +295,5 @@ jobs:
           message: |
             🚀 Deployment Links of Blocksense Network websites:
              * 🌱 Documentation: ${{ needs.deploy_websites.outputs.docsDeploymentMessage }}
+             * ⚙️ Documentation V2: ${{ needs.deploy_websites.outputs.docsV2DeploymentMessage }}
              * 🧭 Explorer: ${{ needs.deploy_websites.outputs.explorerDeploymentMessage }}
