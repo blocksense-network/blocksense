@@ -21,11 +21,13 @@ const networks = [
   'andromeda-mainnet',
   'arbitrum-mainnet',
   'arbitrum-sepolia',
+  'aurora-testnet',
   'avalanche-mainnet',
   'avalanche-fuji',
   'base-mainnet',
   'base-sepolia',
   'berachain-bartio',
+  'blast-sepolia',
   'bsc-mainnet',
   'bsc-testnet',
   'celo-mainnet',
@@ -63,11 +65,11 @@ const networks = [
 ] as const;
 
 const chainIds = [
-  99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 43114, 43113,
-  8453, 84532, 80084, 56, 97, 42220, 44787, 5115, 250, 4002, 100, 10200,
-  1666700000, 1663, 2424, 763373, 1285, 59144, 59141, 169, 3441006, 5003, 41454,
-  2810, 10, 11155420, 137, 80002, 1101, 2442, 534352, 534351, 57054, 167000,
-  167009, 324, 300,
+  99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 1313161555,
+  43114, 43113, 8453, 84532, 80084, 168587773, 56, 97, 42220, 44787, 5115, 250,
+  4002, 100, 10200, 1666700000, 1663, 2424, 763373, 1285, 59144, 59141, 169,
+  3441006, 5003, 41454, 2810, 10, 11155420, 137, 80002, 1101, 2442, 534352,
+  534351, 57054, 167000, 167009, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -164,6 +166,12 @@ export const networkMetadata = {
     explorerUrl: 'https://sepolia.arbiscan.io',
     currency: Currency.ETH,
   },
+  'aurora-testnet': {
+    chainId: 1313161555,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.aurora.dev',
+    currency: Currency.ETH,
+  },
   'avalanche-mainnet': {
     chainId: 43114,
     isTestnet: false,
@@ -193,6 +201,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://bartio.beratrail.io',
     currency: Currency.BERA,
+  },
+  'blast-sepolia': {
+    chainId: 168587773,
+    isTestnet: true,
+    explorerUrl: 'https://sepolia.blastscan.io',
+    currency: Currency.ETH,
   },
   'bsc-mainnet': {
     chainId: 56,
