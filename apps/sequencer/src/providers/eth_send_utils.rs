@@ -1,6 +1,10 @@
 use crate::{
-    providers::provider::{parse_eth_address, ProviderStatus},
+    providers::{
+        adfs_gen_calldata::adfs_serialize_updates,
+        provider::{parse_eth_address, ProviderStatus},
+    },
     sequencer_state::SequencerState,
+    UpdateToSend,
 };
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
@@ -11,13 +15,15 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::eth::TransactionRequest,
 };
+use config::FeedConfig;
 use data_feeds::feeds_processing::VotedFeedUpdate;
 use eyre::{eyre, Result};
-use std::sync::Arc;
-use tokio::{sync::Mutex, time::Duration};
+use std::{collections::HashMap, sync::Arc};
+use tokio::{sync::Mutex, sync::RwLock, time::Duration};
+use utils::to_hex_string;
 
 use crate::providers::provider::{RpcProvider, SharedRpcProviders};
-use prometheus::process_provider_getter;
+use prometheus::{metrics::FeedsMetrics, process_provider_getter};
 
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use futures::stream::FuturesUnordered;
@@ -103,16 +109,26 @@ pub async fn deploy_contract(
     Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
 }
 
-fn serialize_updates(net: &str, updates: &[VotedFeedUpdate]) -> Result<String> {
+/// Serializes the `updates` hash map into a string.
+///
+/// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
+/// will be added to the result. Otherwise, all feeds in `updates` will be added.
+fn legacy_serialize_updates(net: &str, updates: &UpdateToSend) -> Result<String> {
     let mut result: String = Default::default();
-    info!("Preparing a batch of feeds to network `{net}`");
+
+    let selector = "0x1a2d80ac";
+    result.push_str(selector);
+
+    info!("Preparing a legacy batch of feeds to network `{net}`");
+
     let mut num_reported_feeds = 0;
-    for (key, val) in updates.iter().map(|update| update.encode()) {
+    for (key, val) in updates.updates.iter().map(|update| update.encode()) {
         num_reported_feeds += 1;
-        result += key.to_string().as_str();
-        result += val.to_string().as_str();
+        result += to_hex_string(key, None).as_str();
+        result += to_hex_string(val, Some(32)).as_str(); // TODO: Get size to pad to based on strinde in feed_config. Also check!
     }
     info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
+
     Ok(result)
 }
 
@@ -120,12 +136,12 @@ fn serialize_updates(net: &str, updates: &[VotedFeedUpdate]) -> Result<String> {
 /// will be added to the result. Otherwise, all feeds in `updates` will be added.
 pub fn filter_allowed_feeds(
     net: &str,
-    updates: Vec<VotedFeedUpdate>,
+    updates: UpdateToSend,
     allow_feeds: &Option<Vec<u32>>,
-) -> Vec<VotedFeedUpdate> {
+) -> UpdateToSend {
     if let Some(allowed_feed_ids) = allow_feeds {
         let mut res: Vec<VotedFeedUpdate> = vec![];
-        for u in &updates {
+        for u in &updates.updates {
             let feed_id = u.feed_id;
             if allowed_feed_ids.is_empty() || allowed_feed_ids.contains(&feed_id) {
                 res.push(u.clone());
@@ -133,7 +149,10 @@ pub fn filter_allowed_feeds(
                 debug!("Skipping feed id {feed_id} for special network `{net}`");
             }
         }
-        res
+        UpdateToSend {
+            block_height: updates.block_height,
+            updates: res,
+        }
     } else {
         updates
     }
@@ -143,19 +162,49 @@ pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
     provider_settings: config::Provider,
-    updates: Vec<VotedFeedUpdate>,
+    updates: UpdateToSend,
     feed_type: Repeatability,
-) -> Result<String> {
-    let mut provider = provider.lock().await;
-    let updates = filter_allowed_feeds(&net, updates, &provider_settings.allow_feeds);
-    let updates = provider.apply_publish_criteria(&updates);
+    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+) -> Result<(String, Vec<u32>)> {
+    let updates = {
+        let provider = provider.lock().await;
+        let updates = filter_allowed_feeds(&net, updates, &provider_settings.allow_feeds);
+        let updates = provider.apply_publish_criteria(updates);
 
-    // Don’t post to Smart Contract if we have 0 updates
-    if updates.is_empty() {
-        info!("Network `{net}` posting to smart contract skipped because it received 0 updates");
-        return Ok("skipped due to 0 feeds that need update".to_string());
+        // Don’t post to Smart Contract if we have 0 updates
+        if updates.updates.is_empty() {
+            info!(
+                "Network `{net}` posting to smart contract skipped because it received 0 updates"
+            );
+            return Ok((
+                "skipped due to 0 feeds that need update".to_string(),
+                vec![],
+            ));
+        }
+
+        updates
+    };
+
+    let feeds_to_update_ids = updates
+        .updates
+        .iter()
+        .map(|update| update.feed_id)
+        .collect();
+
+    let serialized_updates;
+
+    if provider.lock().await.is_legacy_contract {
+        serialized_updates = legacy_serialize_updates(&net, &updates)?;
+    } else {
+        serialized_updates =
+            match adfs_serialize_updates(&net, &updates, feeds_metrics, feeds_config).await {
+                Ok(result) => result,
+                Err(e) => eyre::bail!("ADFS serialization failed: {}!", e),
+            }
     }
 
+    let mut provider = provider.lock().await;
     let signer = &provider.signer;
     let contract_address = if feed_type == Periodic {
         provider
@@ -175,11 +224,7 @@ pub async fn eth_batch_send_to_contract(
     let provider_metrics = &provider.provider_metrics;
     let prov = &provider.provider;
 
-    let selector = "0x1a2d80ac";
-
-    let serialized_updates = serialize_updates(&net, &updates);
-
-    let calldata_str = (selector.to_owned() + serialized_updates?.as_str()).to_string();
+    let calldata_str = serialized_updates;
 
     let input =
         Bytes::from_hex(calldata_str).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
@@ -280,64 +325,73 @@ pub async fn eth_batch_send_to_contract(
         .with_label_values(&[net.as_str()])
         .observe(transaction_time as f64);
 
-    provider.update_history(&updates);
-    Ok(receipt.status().to_string())
+    provider.update_history(&updates.updates);
+    Ok((receipt.status().to_string(), feeds_to_update_ids))
 }
 
 pub async fn eth_batch_send_to_all_contracts(
     sequencer_state: Data<SequencerState>,
-    updates: Vec<VotedFeedUpdate>,
+    updates: UpdateToSend,
     feed_type: Repeatability,
 ) -> Result<String> {
     let span = info_span!("eth_batch_send_to_all_contracts");
     let _guard = span.enter();
-    debug!("updates: {:?}", updates);
+    debug!("updates: {:?}", updates.updates);
 
     let collected_futures = FuturesUnordered::new();
 
-    let providers = sequencer_state.providers.read().await;
-    let providers_config = sequencer_state
-        .sequencer_config
-        .read()
-        .await
-        .providers
-        .clone();
+    // drop all the locks as soon as we are done using the data
+    {
+        // Locks acquired here
+        let providers = sequencer_state.providers.read().await;
+        let providers_config = sequencer_state.sequencer_config.read().await;
+        let providers_config = &providers_config.providers;
 
-    for (net, p) in providers.iter() {
-        let updates = updates.clone();
-        let timeout = p.lock().await.transaction_timeout_secs as u64;
+        // No lock, we propagete the shared objects to the created futures
+        let feeds_metrics = sequencer_state.feeds_metrics.clone();
+        let feeds_config = sequencer_state.active_feeds.clone();
 
-        let net = net.clone();
-        let provider = p.clone();
+        for (net, p) in providers.iter() {
+            let updates = updates.clone();
+            let timeout = p.lock().await.transaction_timeout_secs as u64;
 
-        if let Some(provider_settings) = providers_config.get(&net).cloned() {
-            if !provider_settings.is_enabled {
-                warn!("Network `{net}` is not enabled; skipping it during reporting");
-                continue;
+            let net = net.clone();
+            let provider = p.clone();
+
+            if let Some(provider_settings) = providers_config.get(&net) {
+                if !provider_settings.is_enabled {
+                    warn!("Network `{net}` is not enabled; skipping it during reporting");
+                    continue;
+                } else {
+                    info!("Network `{net}` is enabled; reporting...");
+                }
+                let feeds_config = feeds_config.clone();
+                let feeds_metrics = feeds_metrics.clone();
+                let provider_settings = provider_settings.clone();
+                collected_futures.push(spawn(async move {
+                    let result = actix_web::rt::time::timeout(
+                        Duration::from_secs(timeout),
+                        eth_batch_send_to_contract(
+                            net.clone(),
+                            provider.clone(),
+                            provider_settings,
+                            updates,
+                            feed_type,
+                            Some(feeds_metrics),
+                            feeds_config,
+                        ),
+                    )
+                    .await;
+                    (result, net, provider)
+                }));
             } else {
-                info!("Network `{net}` is enabled; reporting...");
+                warn!(
+                    "Network `{net}` is not configured in sequencer; skipping it during reporting"
+                );
+                continue;
             }
-            collected_futures.push(spawn(async move {
-                let result = actix_web::rt::time::timeout(
-                    Duration::from_secs(timeout),
-                    eth_batch_send_to_contract(
-                        net.clone(),
-                        provider.clone(),
-                        provider_settings,
-                        updates,
-                        feed_type,
-                    ),
-                )
-                .await;
-                (result, net, provider)
-            }));
-        } else {
-            warn!("Network `{net}` is not configured in sequencer; skipping it during reporting");
-            continue;
         }
     }
-
-    drop(providers);
 
     if collected_futures.is_empty() {
         warn!("There are no enabled networks; not reporting to anybody");
@@ -349,8 +403,22 @@ pub async fn eth_batch_send_to_all_contracts(
         match v {
             Ok(res) => match res {
                 (Ok(x), net, _provider) => match x {
-                    Ok(y) => {
-                        all_results += &format!("result from network {}: Ok -> {:?}", net, y);
+                    Ok((status, updated_feeds)) => {
+                        all_results +=
+                            &format!("result from network {net}: Ok -> status: {status}");
+                        if status == "true" {
+                            all_results += &format!(", updated_feeds: {updated_feeds:?}");
+                            for feed in updated_feeds {
+                                // update the round counters accordingly
+                                sequencer_state
+                                    .feeds_metrics
+                                    .read()
+                                    .await
+                                    .updates_to_networks
+                                    .with_label_values(&[&feed.to_string(), &net])
+                                    .inc();
+                            }
+                        }
                         let mut status_map = sequencer_state.provider_status.write().await;
                         status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
                     }
@@ -394,6 +462,7 @@ mod tests {
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
     use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
+    use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
     use std::str::FromStr;
@@ -525,18 +594,25 @@ mod tests {
             feed_registry::types::FeedType::Numerical(0.0f64),
         )
         .unwrap();
-        let updates_oneshot: Vec<VotedFeedUpdate> = vec![voted_update];
+        let updates_oneshot = UpdateToSend {
+            block_height: 0,
+            updates: vec![voted_update],
+        };
         let provider_settings = cfg
             .providers
             .get(&net)
             .expect(format!("Config for network {net} not found!").as_str())
             .clone();
+        let feeds_config = Arc::new(RwLock::new(HashMap::<u32, FeedConfig>::new()));
+
         let result = eth_batch_send_to_contract(
             net.clone(),
             provider.clone(),
             provider_settings,
             updates_oneshot,
             Oneshot,
+            None,
+            feeds_config,
         )
         .await;
         assert!(result.is_ok());
@@ -659,13 +735,16 @@ mod tests {
             String::from("0505050505050505050505050505050505050505050505050505050505050505");
         let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
         let end_of_timeslot = 0_u128;
-        let updates_oneshot: Vec<VotedFeedUpdate> = vec![VotedFeedUpdate::new_decode(
-            &"00000003",
-            &value1,
-            end_of_timeslot,
-            FeedType::Text("".to_string()),
-        )
-        .unwrap()];
+        let updates_oneshot = UpdateToSend {
+            block_height: 0,
+            updates: vec![VotedFeedUpdate::new_decode(
+                &"00000003",
+                &value1,
+                end_of_timeslot,
+                FeedType::Text("".to_string()),
+            )
+            .unwrap()],
+        };
 
         let result =
             eth_batch_send_to_all_contracts(sequencer_state, updates_oneshot, Oneshot).await;
@@ -677,22 +756,31 @@ mod tests {
 
     #[test]
     fn compute_keys_vals_ignores_networks_not_on_the_list() {
+        let selector = "0x1a2d80ac";
         let network = "dont_filter_me";
+        let updates = UpdateToSend {
+            block_height: 0,
+            updates: get_updates_test_data(),
+        };
         let serialized_updates = serialize_updates(
             network,
             &filter_allowed_feeds(network, get_updates_test_data(), &None),
         )
         .expect("Serialize updates failed!");
+
+        let serialized_updates =
+            serialize_updates(network, updates, &None).expect("Serialize updates failed!");
         let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
         let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
-        let ab = format!("{a}{b}");
-        let ba = format!("{b}{a}");
+        let ab = format!("{selector}{a}{b}");
+        let ba = format!("{selector}{b}{a}");
         // It is undeterministic what the order will be, so checking both possibilities.
         assert!(ab == serialized_updates || ba == serialized_updates);
     }
     use feed_registry::types::FeedType;
 
     fn get_updates_test_data() -> Vec<VotedFeedUpdate> {
+        //let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
             feed_id: 0x1F_u32,
@@ -709,25 +797,29 @@ mod tests {
     }
     #[test]
     fn compute_keys_vals_filters_updates_for_networks_on_the_list() {
+        let selector = "0x1a2d80ac";
         // Citrea
         let network = "citrea-testnet";
+
+        let updates = UpdateToSend {
+            block_height: 0,
+            updates: get_updates_test_data(),
+        };
+
         let serialized_updates = serialize_updates(
             network,
-            &filter_allowed_feeds(
-                network,
-                get_updates_test_data(),
-                &Some(vec![
-                    31,  // BTC/USD
-                    47,  // ETH/USD
-                    65,  // EURC/USD
-                    236, // USDT/USD
-                    131, // USDC/USD
-                    21,  // PAXG/USD
-                    206, // TBTC/USD
-                    43,  // WBTC/USD
-                    4,   // WSTETH/USD
-                ]),
-            ),
+            updates.clone(),
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                65,  // EURC/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                21,  // PAXG/USD
+                206, // TBTC/USD
+                43,  // WBTC/USD
+                4,   // WSTETH/USD
+            ]),
         )
         .expect("Serialize updates failed!");
 
@@ -742,18 +834,15 @@ mod tests {
 
         let serialized_updates = serialize_updates(
             network,
-            &filter_allowed_feeds(
-                network,
-                get_updates_test_data(),
-                &Some(vec![
-                    31,  // BTC/USD
-                    47,  // ETH/USD
-                    65,  // EURC/USD
-                    236, // USDT/USD
-                    131, // USDC/USD
-                    21,  // PAXG/USD
-                ]),
-            ),
+            updates.clone(),
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                65,  // EURC/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                21,  // PAXG/USD
+            ]),
         )
         .expect("Serialize updates failed!");
 
@@ -767,17 +856,14 @@ mod tests {
 
         let serialized_updates = serialize_updates(
             network,
-            &filter_allowed_feeds(
-                network,
-                get_updates_test_data(),
-                &Some(vec![
-                    31,  // BTC/USD
-                    47,  // ETH/USD
-                    236, // USDT/USD
-                    131, // USDC/USD
-                    43,  // WBTC/USD
-                ]),
-            ),
+            updates.clone(),
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                43,  // WBTC/USD
+            ]),
         )
         .expect("Serialize updates failed!");
 

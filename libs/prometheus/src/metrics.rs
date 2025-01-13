@@ -303,6 +303,7 @@ impl ReporterMetrics {
 pub struct FeedsMetrics {
     pub quorums_reached: IntCounterVec,
     pub failures_to_reach_quorum: IntCounterVec,
+    pub updates_to_networks: IntCounterVec,
 }
 
 impl FeedsMetrics {
@@ -317,6 +318,11 @@ impl FeedsMetrics {
                 format!("{}failures_to_reach_quorum", prefix),
                 "Number of slots for whcih quorum was not reached for a given feed id",
                 &["FeedId"]
+            )?,
+            updates_to_networks: register_int_counter_vec!(
+                format!("{}updates_to_networks", prefix),
+                "Number of updates for a given feed id per Network",
+                &["FeedId", "Network"]
             )?,
         })
     }

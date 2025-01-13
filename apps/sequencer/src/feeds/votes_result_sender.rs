@@ -43,8 +43,7 @@ fn async_send_to_contracts(
     let sender = tokio::task::Builder::new()
         .name(format!("batch_sender_{batch_count}").as_str())
         .spawn_local(async move {
-            match eth_batch_send_to_all_contracts(sequencer_state, updates.updates, Periodic).await
-            {
+            match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
                 Ok(res) => info!("Sending updates complete {}.", res),
                 Err(err) => error!("ERROR Sending updates {}", err),
             };

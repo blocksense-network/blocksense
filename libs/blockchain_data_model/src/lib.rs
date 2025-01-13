@@ -37,6 +37,7 @@ pub struct BlockFeedConfig {
     pub script: DataChunk,
     pub value_type: DataChunk,
     pub aggregate_type: DataChunk,
+    pub stride: u16,
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]

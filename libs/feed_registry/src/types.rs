@@ -175,6 +175,7 @@ impl FeedMetaData {
 pub enum FeedType {
     Numerical(f64),
     Text(String),
+    Bytes(Vec<u8>),
 }
 
 //TODO: In the future, consider support for variable precision
@@ -184,6 +185,7 @@ impl FeedType {
     pub fn sizeof(&self) -> usize {
         match self {
             FeedType::Numerical(_) => std::mem::size_of::<f64>(),
+            FeedType::Bytes(v) => v.len(),
             FeedType::Text(s) => s.len(),
         }
     }
@@ -229,6 +231,7 @@ impl FeedType {
                 bytes_vec
             }
             FeedType::Text(s) => s.as_bytes().to_vec(),
+            FeedType::Bytes(bytes) => bytes.clone(),
         }
     }
 
@@ -236,6 +239,7 @@ impl FeedType {
         match self {
             FeedType::Numerical(val) => format!("{}", val),
             FeedType::Text(s) => s.clone(),
+            FeedType::Bytes(bytes) => format!("{:?}", bytes),
         }
     }
 
@@ -271,6 +275,7 @@ impl FeedType {
                     String::from_utf8(bytes).map_err(|_| "Invalid UTF-8 sequence".to_string())?;
                 Ok(FeedType::Text(s))
             }
+            FeedType::Bytes(_) => Ok(FeedType::Bytes(bytes)),
         }
     }
 
@@ -278,6 +283,7 @@ impl FeedType {
         match self {
             FeedType::Numerical(_) => "FeedType::Numerical",
             FeedType::Text(_) => "FeedType::Text",
+            FeedType::Bytes(_) => "FeedType::Bytes",
         }
     }
 
