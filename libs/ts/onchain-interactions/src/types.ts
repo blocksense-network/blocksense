@@ -31,6 +31,7 @@ export const API_KEYS: Record<string, string> = {
   ethereumSepolia: getEnvStringNotAssert('ETHERSCAN_API_KEY'),
   arbitrumSepolia: getEnvStringNotAssert('ARBRITRUM_SEPOLIA_API_KEY'),
   baseSepolia: getEnvStringNotAssert('BASE_SEPOLIA_API_KEY'),
+  blastSepolia: getEnvStringNotAssert('BLAST_SEPOLIA_API_KEY'),
   bscTestnet: getEnvStringNotAssert('BSC_TESTNET_API_KEY'),
   celoAlfajores: getEnvStringNotAssert('CELO_ALFAJORES_API_KEY'),
   fantomTestnet: getEnvStringNotAssert('FANTOM_TESTNET_API_KEY'),
@@ -48,6 +49,7 @@ export const API_ENDPOINTS = {
   baseSepolia: 'https://api-sepolia.basescan.org/api',
   berachainBartio:
     'https://api.routescan.io/v2/network/testnet/evm/80084/etherscan',
+  blastSepolia: 'https://api-sepolia.blastscan.io/api',
   bscTestnet: 'https://api-testnet.bscscan.com/api',
   celoAlfajores: 'https://api-alfajores.celoscan.io/api',
   citreaTestnet: 'https://explorer.testnet.citrea.xyz/api',
