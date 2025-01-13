@@ -823,7 +823,7 @@ mod tests {
                     allow_feeds: None,
                     impersonated_anvil_account: None,
                     publishing_criteria: vec![],
-                    is_legacy_contract: true,
+                    contract_version: 1,
                 }
             });
 
@@ -886,7 +886,7 @@ mod tests {
                     allow_feeds: None,
                     impersonated_anvil_account: None,
                     publishing_criteria: vec![],
-                    is_legacy_contract: true,
+                    contract_version: 1,
                 }
             });
 
@@ -949,7 +949,7 @@ mod tests {
                     allow_feeds: None,
                     impersonated_anvil_account: None,
                     publishing_criteria: vec![],
-                    is_legacy_contract: true,
+                    contract_version: 1,
                 }
             });
 
@@ -1022,7 +1022,7 @@ mod tests {
                     allow_feeds: None,
                     impersonated_anvil_account: None,
                     publishing_criteria: vec![],
-                    is_legacy_contract: true,
+                    contract_version: 1,
                 }
             });
 

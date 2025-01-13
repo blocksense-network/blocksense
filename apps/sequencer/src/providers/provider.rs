@@ -58,7 +58,7 @@ pub struct RpcProvider {
     pub impersonated_anvil_account: Option<Address>,
     pub history: FeedAggregateHistory,
     pub publishing_criteria: HashMap<u32, PublishCriteria>,
-    pub is_legacy_contract: bool,
+    pub contract_version: u16,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -214,7 +214,7 @@ async fn get_rpc_providers(
             impersonated_anvil_account,
             history,
             publishing_criteria,
-            is_legacy_contract: p.is_legacy_contract,
+            contract_version: p.contract_version,
         }));
 
         providers.insert(key.clone(), rpc_provider.clone());

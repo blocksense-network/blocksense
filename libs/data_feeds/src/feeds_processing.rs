@@ -80,9 +80,7 @@ pub const REPORT_HEX_SIZE: usize = 64;
 
 pub fn naive_packing(feed_result: &FeedType) -> Vec<u8> {
     //TODO: Return Bytes32 type
-    let result_bytes = feed_result.as_bytes();
-
-    result_bytes
+    feed_result.as_bytes()
 }
 
 #[cfg(test)]

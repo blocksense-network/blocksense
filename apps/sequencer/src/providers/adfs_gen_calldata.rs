@@ -42,9 +42,6 @@ fn truncate_leading_zero_bytes(bytes: Vec<u8>) -> Vec<u8> {
 }
 
 /// Serializes the `updates` hash map into a string.
-///
-/// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
-/// will be added to the result. Otherwise, all feeds in `updates` will be added.
 pub async fn adfs_serialize_updates(
     net: &str,
     feed_updates: &UpdateToSend,
@@ -75,15 +72,17 @@ pub async fn adfs_serialize_updates(
 
         drop(feed_config);
 
-        let round = match &feeds_metrics {
+        let mut round = match &feeds_metrics {
             Some(fm) => fm
                 .read()
                 .await
                 .updates_to_networks
-                .with_label_values(&[&update.feed_id.to_string(), &net])
+                .with_label_values(&[&update.feed_id.to_string(), net])
                 .get(),
             None => 0,
         };
+
+        round %= 4096; // Max history elements per feed.
 
         let (_key, val) = update.encode(); // Key is not needed. It is the bytes of the feed_id
 
@@ -138,12 +137,12 @@ pub async fn adfs_serialize_updates(
             / U256::from(16);
         let slot_position = update.feed_id % 16;
 
-        if !batch_feeds.contains_key(&row_index) {
+        batch_feeds.entry(row_index).or_insert_with(|| {
             // Initialize new row with zeros
             let mut val = "0x".to_string();
             val.push_str("0".repeat(64).as_str());
-            batch_feeds.insert(row_index, val);
-        }
+            val
+        });
 
         // Convert round to 2b hex and pad if needed
         let round_bytes = round.to_be_bytes_vec();
@@ -154,9 +153,9 @@ pub async fn adfs_serialize_updates(
         let v = batch_feeds.get_mut(&row_index).unwrap();
         let temp = format!(
             "{}{}{}",
-            v[0..position + 2].to_string(),
+            &v[0..position + 2].to_string(),
             round_hex,
-            v[position + 6..].to_string()
+            &v[position + 6..].to_string()
         );
         v.clear();
         v.push_str(temp.as_str());

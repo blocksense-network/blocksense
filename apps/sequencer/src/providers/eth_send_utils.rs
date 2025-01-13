@@ -110,9 +110,6 @@ pub async fn deploy_contract(
 }
 
 /// Serializes the `updates` hash map into a string.
-///
-/// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
-/// will be added to the result. Otherwise, all feeds in `updates` will be added.
 fn legacy_serialize_updates(net: &str, updates: &UpdateToSend) -> Result<String> {
     let mut result: String = Default::default();
 
@@ -192,17 +189,14 @@ pub async fn eth_batch_send_to_contract(
         .map(|update| update.feed_id)
         .collect();
 
-    let serialized_updates;
-
-    if provider.lock().await.is_legacy_contract {
-        serialized_updates = legacy_serialize_updates(&net, &updates)?;
-    } else {
-        serialized_updates =
-            match adfs_serialize_updates(&net, &updates, feeds_metrics, feeds_config).await {
-                Ok(result) => result,
-                Err(e) => eyre::bail!("ADFS serialization failed: {}!", e),
-            }
-    }
+    let serialized_updates = match provider.lock().await.contract_version {
+        1 => legacy_serialize_updates(&net, &updates)?,
+        2 => match adfs_serialize_updates(&net, &updates, feeds_metrics, feeds_config).await {
+            Ok(result) => result,
+            Err(e) => eyre::bail!("ADFS serialization failed: {}!", e),
+        },
+        _ => eyre::bail!("Unsupported contract version set for network {net}!"),
+    };
 
     let mut provider = provider.lock().await;
     let signer = &provider.signer;

@@ -213,12 +213,16 @@ pub struct Provider {
     #[serde(default)]
     pub publishing_criteria: Vec<PublishCriteria>,
 
-    #[serde(default = "default_is_enabled")]
-    pub is_legacy_contract: bool, // TODO: remove when migration ot ADFS contracts is complete
+    #[serde(default = "contract_initial_version")]
+    pub contract_version: u16, // TODO: remove when migration ot ADFS contracts is complete
 }
 
 fn default_is_enabled() -> bool {
     true
+}
+
+fn contract_initial_version() -> u16 {
+    1
 }
 
 impl Validated for Provider {
@@ -371,7 +375,7 @@ pub fn get_test_config_with_single_provider(
                 allow_feeds: None,
                 publishing_criteria: vec![],
                 impersonated_anvil_account: None,
-                is_legacy_contract: true,
+                contract_version: 1,
             },
         )]),
         reporters: Vec::new(),
@@ -403,7 +407,7 @@ pub fn get_test_config_with_multiple_providers(
                 allow_feeds: None,
                 publishing_criteria: vec![],
                 impersonated_anvil_account: None,
-                is_legacy_contract: true,
+                contract_version: 1,
             },
         );
     }
