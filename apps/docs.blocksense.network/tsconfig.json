@@ -1,32 +1,30 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "target": "es2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "allowJs": true,
     "incremental": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "moduleResolution": "bundler",
-    "jsx": "preserve",
     "module": "esnext",
-    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
       "@/sol-contracts-components/*": ["components/sol-contracts/*"],
-    },
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "strictNullChecks": true,
-    "downlevelIteration": true
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", ".next"]
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
 }

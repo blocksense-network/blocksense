@@ -1,4 +1,3 @@
-'use client';
 import { useEffect, useState, RefObject } from 'react';
 
 type AccordionStates = {

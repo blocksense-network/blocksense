@@ -1,7 +1,6 @@
-'use client';
 import * as React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 import { Tooltip } from '@/components/common/Tooltip';
 import { CopyButton } from '@/components/common/CopyButton';

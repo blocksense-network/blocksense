@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import { previewHexString } from '@blocksense/base-utils/buffer-and-hex';
 import { VariableDocItem } from '@blocksense/sol-reflector';

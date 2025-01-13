@@ -1,4 +1,3 @@
-'use client';
 import * as React from 'react';
 import {
   ColumnDef,
@@ -13,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 import {
   Table,

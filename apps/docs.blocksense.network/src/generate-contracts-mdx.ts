@@ -39,7 +39,7 @@ function generateLinkContent(name: string): string {
 function generateOverviewContent(contractsMetaJSON: {
   [key: string]: string;
 }): string {
-  let overviewContent = `import { ContractAnchorLink } from '@blocksense/docs.blocksense.network.v2/components/sol-contracts/ContractAnchorLink';\n
+  let overviewContent = `import { ContractAnchorLink } from '@blocksense/docs.blocksense.network/components/sol-contracts/ContractAnchorLink';\n
   # Introduction\n
   Explore the range of smart contracts available within the Blocksense protocol. This overview covers contracts for interacting with data feeds, historical data feed storage, proxy contracts, and interfaces for integrating with data aggregation services.\n
   <br/>`;
