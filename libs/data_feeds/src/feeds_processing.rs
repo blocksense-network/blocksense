@@ -126,10 +126,10 @@ mod tests {
             end_slot_timestamp,
         };
         let (encoded_key, encoded_value) = update.encode();
-        assert_eq!("0000002a", encoded_key);
+        assert_eq!("0000002a", to_hex_string(encoded_key, None));
         assert_eq!(
             "00000000000000000000000000000007b2a557a6d97800000000000000000000",
-            encoded_value
+            to_hex_string(encoded_value, None)
         );
     }
 

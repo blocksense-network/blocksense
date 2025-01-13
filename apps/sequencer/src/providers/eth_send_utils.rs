@@ -762,14 +762,10 @@ mod tests {
             block_height: 0,
             updates: get_updates_test_data(),
         };
-        let serialized_updates = serialize_updates(
-            network,
-            &filter_allowed_feeds(network, get_updates_test_data(), &None),
-        )
-        .expect("Serialize updates failed!");
-
         let serialized_updates =
-            serialize_updates(network, updates, &None).expect("Serialize updates failed!");
+            legacy_serialize_updates(network, &filter_allowed_feeds(network, updates, &None))
+                .expect("Serialize updates failed!");
+
         let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
         let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
         let ab = format!("{selector}{a}{b}");
@@ -806,70 +802,79 @@ mod tests {
             updates: get_updates_test_data(),
         };
 
-        let serialized_updates = serialize_updates(
+        let serialized_updates = legacy_serialize_updates(
             network,
-            updates.clone(),
-            &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                65,  // EURC/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                21,  // PAXG/USD
-                206, // TBTC/USD
-                43,  // WBTC/USD
-                4,   // WSTETH/USD
-            ]),
+            &filter_allowed_feeds(
+                network,
+                updates.clone(),
+                &Some(vec![
+                    31,  // BTC/USD
+                    47,  // ETH/USD
+                    65,  // EURC/USD
+                    236, // USDT/USD
+                    131, // USDC/USD
+                    21,  // PAXG/USD
+                    206, // TBTC/USD
+                    43,  // WBTC/USD
+                    4,   // WSTETH/USD
+                ]),
+            ),
         )
         .expect("Serialize updates failed!");
 
         // Note: bye is filtered out:
         assert_eq!(
             serialized_updates,
-            "0000001f6869000000000000000000000000000000000000000000000000000000000000"
+            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
         );
 
         // Berachain
         let network = "berachain-bartio";
 
-        let serialized_updates = serialize_updates(
+        let serialized_updates = legacy_serialize_updates(
             network,
-            updates.clone(),
-            &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                65,  // EURC/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                21,  // PAXG/USD
-            ]),
+            &filter_allowed_feeds(
+                network,
+                updates.clone(),
+                &Some(vec![
+                    31,  // BTC/USD
+                    47,  // ETH/USD
+                    65,  // EURC/USD
+                    236, // USDT/USD
+                    131, // USDC/USD
+                    21,  // PAXG/USD
+                ]),
+            ),
         )
         .expect("Serialize updates failed!");
 
         assert_eq!(
             serialized_updates,
-            "0000001f6869000000000000000000000000000000000000000000000000000000000000"
+            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
         );
 
         // Manta
         let network = "manta-sepolia";
 
-        let serialized_updates = serialize_updates(
+        let serialized_updates = legacy_serialize_updates(
             network,
-            updates.clone(),
-            &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                43,  // WBTC/USD
-            ]),
+            &filter_allowed_feeds(
+                network,
+                updates.clone(),
+                &Some(vec![
+                    31,  // BTC/USD
+                    47,  // ETH/USD
+                    236, // USDT/USD
+                    131, // USDC/USD
+                    43,  // WBTC/USD
+                ]),
+            ),
         )
         .expect("Serialize updates failed!");
 
         assert_eq!(
             serialized_updates,
-            "0000001f6869000000000000000000000000000000000000000000000000000000000000"
+            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
         );
     }
 }
