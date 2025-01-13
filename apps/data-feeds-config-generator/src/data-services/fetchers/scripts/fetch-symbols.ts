@@ -95,12 +95,12 @@ export async function fetchSymbols() {
     ];
 
     await Promise.all(symbolFiles.map(providerData => writeJSON(providerData)));
+    console.log(
+      `Fetching supported asset lists from ${symbolFiles.length} providers`,
+    );
   }
 }
 
-console.log(
-  'Fetching symbols from Binace, Bybit, Upbit, Kraken and CoinMarketCap...',
-);
 fetchSymbols()
   .then(() => {
     console.log(
