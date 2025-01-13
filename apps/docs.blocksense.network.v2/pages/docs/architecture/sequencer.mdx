@@ -1,0 +1,45 @@
+import { DiagramImageWrapper } from '@/components/common/DiagramImageWrapper'
+
+# What is Blocksense Sequencer?
+
+The Blocksense sequencer is a pivotal component within the Blocksense protocol responsible for aggregating, validating, and publishing data collected by reporters. It ensures the data integrity before it is published on the target blockchains.
+
+<DiagramImageWrapper src="/diagrams/BlocksenseSequencer.png" alt="Blocksense Sequencer"/>
+
+## How Does Blocksense Sequencer Work?
+
+The Blocksense sequencer processes data feeds by executing several key functions that ensure the reliability and trustworthiness of the data:
+
+## Registry (Oracle Scripts)
+
+- **Role:** Maintains a registry of all active oracle scripts.
+- **Function:** Stores critical metadata for each oracle script, including:
+
+- **Name:** The identifier of the oracle script.
+- **Registration Time:** The timestamp when the oracle script was registered.
+- **Slot Duration:** The time interval assigned for the oracle script to collect and report data.
+- **Type of Processing:** The method used for data processing to aggregate the reports from the submitted reports.
+
+## Periodic Reports Processing per Slot
+
+- **Role:** Processes reports periodically based on the assigned slot duration.
+- **Function:** Collects data from the reporters and compiles it into a structured data feed. This periodic processing ensures that the data is up-to-date and reflects the most recent information collected by the reporters.
+
+## Data Feed to Publish
+
+- **Role:** Prepares the validated data feed for publication.
+- **Function:** The compiled and validated data feed is formatted and readied for transmission to the blockchain. This step ensures that only accurate and verified data is forwarded.
+
+## Sender to Ethereum Networks
+
+- **Role:** Transmits the validated data feed to target Ethereum networks.
+- **Function:** Sends the data feed to multiple Ethereum-based blockchains (such as Ethereum, Gnosis, and Polygon). This step finalizes the data publication process, making the data available for consumption by decentralized applications and smart contracts on these blockchains.
+
+## Diagram Description
+
+- **Registry (Oracle Scripts):** Contains metadata about each oracle script, ensuring proper management and tracking.
+- **Periodic Reports Processing per Slot:** Aggregates and validates reports from reporters in a timely manner.
+- **Data Feed to Publish:** Prepares the structured and validated data for publication.
+- **Sender to Ethereum Networks:** Transmits the data feed to the designated EVM networks for consumption.
+
+The Blocksense sequencer integrates these components to maintain the integrity and accuracy of data feeds, leveraging cryptographic methods and game-theoretic incentives to ensure that the data published on the blockchain is reliable and trustworthy. This structured approach enhances the overall functionality and security of the Blocksense protocol.
