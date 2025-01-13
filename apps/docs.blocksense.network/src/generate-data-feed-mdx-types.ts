@@ -1,4 +1,4 @@
-import * as S from '@effect/schema/Schema';
+import { Schema as S } from 'effect';
 
 import { FeedSchema } from '@blocksense/config-types/data-feeds-config';
 import { CLAggregatorAdapterDataSchema } from '@blocksense/config-types/evm-contracts-deployment';
