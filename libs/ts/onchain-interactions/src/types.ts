@@ -3,6 +3,7 @@ import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
 export const deployedNetworks = [
   'arbitrum-sepolia',
+  'aurora-testnet',
   'avalanche-fuji',
   'base-sepolia',
   'berachain-bartio',
@@ -43,6 +44,7 @@ export const API_KEYS: Record<string, string> = {
 export const API_ENDPOINTS = {
   arbitrumSepolia: 'https://api-sepolia.arbiscan.io/api',
   avalancheFuji: 'https://api-testnet.snowtrace.io/api',
+  auroraTestnet: 'https://explorer.testnet.aurora.dev/api',
   baseSepolia: 'https://api-sepolia.basescan.org/api',
   berachainBartio:
     'https://api.routescan.io/v2/network/testnet/evm/80084/etherscan',
