@@ -17,6 +17,8 @@ use crate::UpdateToSend;
 
 use once_cell::sync::Lazy;
 
+const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 4096;
+
 static STRIDES_SIZES: Lazy<HashMap<u16, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
     map.insert(0, 32);
@@ -82,7 +84,7 @@ pub async fn adfs_serialize_updates(
             None => 0,
         };
 
-        round %= 4096; // Max history elements per feed.
+        round %= MAX_HISTORY_ELEMENTS_PER_FEED;
 
         let (_key, val) = update.encode(); // Key is not needed. It is the bytes of the feed_id
 
@@ -100,8 +102,8 @@ pub async fn adfs_serialize_updates(
             error!("Error trying to forward data of {bytes} bytes, larger than the stride size of {stride_size} for feed: {id}");
             continue;
         }
-        let bytes_length = truncate_leading_zero_bytes(bytes.to_be_bytes().to_vec()).len();
         let bytes_vec = truncate_leading_zero_bytes(bytes.to_be_bytes().to_vec());
+        let bytes_length = bytes_vec.len();
 
         let stride_as_byte = [stride as u8; 1];
         let index_in_bytes_length = [index_in_bytes_length as u8; 1];

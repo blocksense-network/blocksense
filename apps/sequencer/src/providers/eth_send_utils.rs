@@ -346,11 +346,7 @@ pub async fn eth_batch_send_to_all_contracts(
         let feeds_config = sequencer_state.active_feeds.clone();
 
         for (net, p) in providers.iter() {
-            let updates = updates.clone();
-            let timeout = p.lock().await.transaction_timeout_secs as u64;
-
             let net = net.clone();
-            let provider = p.clone();
 
             if let Some(provider_settings) = providers_config.get(&net) {
                 if !provider_settings.is_enabled {
@@ -359,6 +355,11 @@ pub async fn eth_batch_send_to_all_contracts(
                 } else {
                     info!("Network `{net}` is enabled; reporting...");
                 }
+
+                let updates = updates.clone();
+                let timeout = p.lock().await.transaction_timeout_secs as u64;
+                let provider = p.clone();
+
                 let feeds_config = feeds_config.clone();
                 let feeds_metrics = feeds_metrics.clone();
                 let provider_settings = provider_settings.clone();
@@ -394,53 +395,60 @@ pub async fn eth_batch_send_to_all_contracts(
     let result = futures::future::join_all(collected_futures).await;
     let mut all_results = String::new();
     for v in result {
-        match v {
-            Ok(res) => match res {
-                (Ok(x), net, _provider) => match x {
-                    Ok((status, updated_feeds)) => {
-                        all_results +=
-                            &format!("result from network {net}: Ok -> status: {status}");
-                        if status == "true" {
-                            all_results += &format!(", updated_feeds: {updated_feeds:?}");
-                            for feed in updated_feeds {
-                                // update the round counters accordingly
-                                sequencer_state
-                                    .feeds_metrics
-                                    .read()
-                                    .await
-                                    .updates_to_networks
-                                    .with_label_values(&[&feed.to_string(), &net])
-                                    .inc();
-                            }
-                        }
-                        let mut status_map = sequencer_state.provider_status.write().await;
-                        status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
-                    }
-                    Err(error_message) => {
-                        warn!("Network {net} responded with error: {error_message}");
-                        all_results +=
-                            &format!("result from network {}: Err -> {:?}", net, error_message);
-                        let mut status_map = sequencer_state.provider_status.write().await;
-                        status_map.insert(net, ProviderStatus::LastUpdateFailed);
-                    }
-                },
-                (Err(e), net, provider) => {
-                    let err = format!("Timed out transaction for network {} -> {}", net, e);
-                    error!(err);
-                    all_results += &err;
-                    let provider = provider.lock().await;
-                    let provider_metrics = provider.provider_metrics.clone();
-                    inc_metric!(provider_metrics, net, total_timed_out_tx);
-                    let mut status_map = sequencer_state.provider_status.write().await;
-                    status_map.insert(net, ProviderStatus::LastUpdateFailed);
-                }
-            },
+        let res = match v {
+            Ok(res) => res,
             Err(e) => {
                 all_results += "JoinError:";
                 error!("JoinError: {}", e.to_string());
-                all_results += &e.to_string()
+                all_results += &e.to_string();
+                continue;
+            }
+        };
+
+        let (x, net) = match res {
+            (Ok(x), net, _provider) => (x, net),
+            (Err(e), net, provider) => {
+                let err = format!("Timed out transaction for network {} -> {}", net, e);
+                error!(err);
+                all_results += &err;
+                let provider = provider.lock().await;
+                let provider_metrics = provider.provider_metrics.clone();
+                inc_metric!(provider_metrics, net, total_timed_out_tx);
+                let mut status_map = sequencer_state.provider_status.write().await;
+                status_map.insert(net, ProviderStatus::LastUpdateFailed);
+                continue;
+            }
+        };
+
+        let (status, updated_feeds) = match x {
+            Ok((status, updated_feeds)) => (status, updated_feeds),
+            Err(error_message) => {
+                warn!("Network {net} responded with error: {error_message}");
+                all_results += &format!("result from network {}: Err -> {:?}", net, error_message);
+                let mut status_map = sequencer_state.provider_status.write().await;
+                status_map.insert(net, ProviderStatus::LastUpdateFailed);
+                continue;
+            }
+        };
+
+        // Transaction confirmed, process the status:
+        all_results += &format!("result from network {net}: Ok -> status: {status}");
+        if status == "true" {
+            all_results += &format!(", updated_feeds: {updated_feeds:?}");
+            for feed in updated_feeds {
+                // update the round counters accordingly
+                sequencer_state
+                    .feeds_metrics
+                    .read()
+                    .await
+                    .updates_to_networks
+                    .with_label_values(&[&feed.to_string(), &net])
+                    .inc();
             }
         }
+        let mut status_map = sequencer_state.provider_status.write().await;
+        status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
+
         all_results += "\n"
     }
     Ok(all_results)
