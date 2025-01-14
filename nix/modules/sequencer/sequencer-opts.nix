@@ -30,6 +30,12 @@ let
         description = mdDoc "List of allowed feed ids to be published";
       };
 
+      publishing_criteria = mkOption {
+        type = types.listOf (types.submodule publishingCriteriaOpts);
+        default = [ ];
+        description = mdDoc "List of publishing criteria for feed per provider customizationo";
+      };
+
       transaction_timeout_secs = mkOption {
         type = types.int;
         default = 50;
@@ -51,6 +57,25 @@ let
         type = types.nullOr types.str;
         default = null;
         description = mdDoc "The account to impersonate for the provider.";
+      };
+    };
+  };
+
+  publishingCriteriaOpts = {
+    options = {
+      feed_id = mkOption {
+        type = types.int;
+        description = mdDoc "Feed id";
+      };
+      skip_publish_if_less_then_percentage = mkOption {
+        type = types.float;
+        default = 0.0;
+        description = mdDoc "Publish updates only if they are greater then given threshould as percentage";
+      };
+      always_publish_heartbeat_ms = mkOption {
+        type = types.int;
+        default = 3600000;
+        description = mdDoc "Interval to always publuish updates if there is not enough change";
       };
     };
   };

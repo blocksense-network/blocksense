@@ -72,6 +72,18 @@ in
             131 # USDC/USD
             43 # WBTC/USD
           ];
+          publishing_criteria = [
+            {
+              feed_id = 31;
+              skip_publish_if_less_then_percentage = 0.1;
+              always_publish_heartbeat_ms = 50000;
+            }
+            {
+              feed_id = 47;
+              skip_publish_if_less_then_percentage = 0.01;
+              always_publish_heartbeat_ms = 360000;
+            }
+          ];
           impersonated_anvil_account = impersonationAddress;
         };
       };
