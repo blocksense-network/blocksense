@@ -5,6 +5,7 @@ import { AggregatedDataFeedStoreGeneric } from '../../../../typechain';
 import { AccessControlWrapper } from './AccessControl';
 import { Feed, ReadOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { EventFragment } from 'ethers';
 
 export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
   public contract!: AggregatedDataFeedStoreGeneric;
@@ -23,6 +24,20 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
       data: this.encodeDataWrite(feeds, opts.blockNumber),
       ...opts.txData,
     });
+  }
+
+  public checkEvent(receipt: any, newBlockNumber: number): void {
+    const fragment = this.getEventFragment();
+    const parsedEvent = this.contract.interface.decodeEventLog(
+      fragment,
+      receipt.logs[0].data,
+    );
+
+    expect(parsedEvent[0]).to.be.eq(newBlockNumber);
+  }
+
+  public getEventFragment(): EventFragment {
+    return this.contract.interface.getEvent('DataFeedsUpdated')!;
   }
 
   public async checkLatestValue(

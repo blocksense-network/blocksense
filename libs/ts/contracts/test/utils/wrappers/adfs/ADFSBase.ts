@@ -5,6 +5,7 @@ import { AggregatedDataFeedStore } from '../../../../typechain';
 import { AccessControlWrapper } from './AccessControl';
 import { Feed, ReadFeed, ReadOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { EventFragment, TransactionReceipt } from 'ethers';
 
 export abstract class ADFSBaseWrapper implements IADFSWrapper {
   public contract!: AggregatedDataFeedStore;
@@ -22,6 +23,28 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       to: this.contract.target,
       data: this.encodeDataWrite(feeds, opts.blockNumber),
       ...opts.txData,
+    });
+  }
+
+  public checkEvent(receipt: TransactionReceipt, newBlockNumber: number): void {
+    const fragment = this.getEventFragment();
+    const parsedEvent = this.contract.interface.decodeEventLog(
+      fragment,
+      receipt.logs[0].data,
+    );
+
+    expect(parsedEvent[0]).to.be.eq(newBlockNumber);
+  }
+
+  public getEventFragment(): EventFragment {
+    return ethers.EventFragment.from({
+      name: 'DataFeedsUpdated',
+      inputs: [
+        {
+          type: 'uint256',
+          name: 'newBlockNumber',
+        },
+      ],
     });
   }
 

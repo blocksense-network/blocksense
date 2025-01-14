@@ -67,6 +67,15 @@ describe('AggregatedDataFeedStore', () => {
     );
   });
 
+  it('Should emit event when data feeds updated', async () => {
+    const blockNumber = 1234;
+    const tx = await contract.setFeeds(sequencer, feeds, {
+      blockNumber,
+    });
+    const receipt = await tx.wait();
+    contract.checkEvent(receipt!, blockNumber);
+  });
+
   it('Should get latest round', async () => {
     await contract.setFeeds(sequencer, feeds);
     await contract.checkLatestRound(sequencer, feeds);

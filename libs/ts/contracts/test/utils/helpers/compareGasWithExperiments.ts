@@ -8,6 +8,7 @@ import { isUpgradeableProxy, setFeeds } from './common';
 import { IADFSWrapper } from '../wrappers';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { IUpgradeableProxyADFSWrapper } from '../wrappers/interfaces/IUpgradeableProxyADFSWarpper';
+import { ethers } from 'hardhat';
 
 export const compareGasUsed = async <
   G extends BaseContract,
@@ -53,6 +54,16 @@ export const compareGasUsed = async <
       await wrapper.proxyCall('checkLatestValue', sequencer, data.feeds);
     } else {
       await wrapper.checkLatestValue(sequencer, data.feeds);
+    }
+  }
+
+  for (const receipt of data.receipts) {
+    for (const wrapper of adfsContractWrappers) {
+      const tx = await ethers.provider.getTransaction(receipt?.hash!);
+      const blockNumberInReceipt = parseInt('0x' + tx!.data.slice(4, 20), 16);
+      if (!isUpgradeableProxy(wrapper)) {
+        wrapper.checkEvent(receipt!, blockNumberInReceipt);
+      }
     }
   }
 
