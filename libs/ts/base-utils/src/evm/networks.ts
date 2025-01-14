@@ -61,6 +61,9 @@ const networks = [
   'horizen-gobi',
   'harmony-shard0',
   'aurora-testnet',
+  'exSat-testnet',
+  'songbird-coston',
+  'flair-coston2',
 ] as const;
 
 const chainIds = [
@@ -68,7 +71,7 @@ const chainIds = [
   84532, 80084, 56, 97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009,
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
-  1663, 1666700000, 1313161555,
+  1663, 1666700000, 1313161555, 839999, 16, 114,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -333,6 +336,21 @@ export const networkMetadata = {
     chainId: 1313161555,
     isTestnet: true,
     explorerUrl: 'https://explorer.testnet.aurora.dev/',
+  },
+  'exSat-testnet': {
+    chainId: 839999,
+    isTestnet: true,
+    explorerUrl: 'https://scan-testnet.exsat.network/',
+  },
+  'songbird-coston': {
+    chainId: 16,
+    isTestnet: true,
+    explorerUrl: 'https://coston-explorer.flare.network/',
+  },
+  'flair-coston2': {
+    chainId: 114,
+    isTestnet: true,
+    explorerUrl: 'https://coston2.testnet.flarescan.com/',
   },
 } satisfies {
   [Net in NetworkName]: {
