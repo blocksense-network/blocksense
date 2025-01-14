@@ -3,7 +3,7 @@ import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { AggregatedDataFeedStore } from '../../../../typechain';
 import { AccessControlWrapper } from '../adfs/AccessControl';
 import { IBaseWrapper } from '../../../experiments/utils/wrappers';
-import { TransactionResponse } from 'ethers';
+import { EventFragment, TransactionReceipt, TransactionResponse } from 'ethers';
 
 export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
   contract: AggregatedDataFeedStore;
@@ -17,6 +17,10 @@ export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
       txData?: any;
     },
   ): Promise<TransactionResponse>;
+
+  checkEvent(receipt: TransactionReceipt, newBlockNumber: number): void;
+
+  getEventFragment(): EventFragment;
 
   checkLatestValue(
     sequencer: HardhatEthersSigner,
