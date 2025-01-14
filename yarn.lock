@@ -17948,7 +17948,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nextra-theme-docs@npm:^4.0.0":
+"nextra-theme-docs@npm:4.0.0, nextra-theme-docs@npm:^4.0.0":
   version: 4.0.0
   resolution: "nextra-theme-docs@npm:4.0.0"
   dependencies:
@@ -17969,45 +17969,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nextra@npm:^2.13.4":
-  version: 2.13.4
-  resolution: "nextra@npm:2.13.4"
-  dependencies:
-    "@headlessui/react": "npm:^1.7.17"
-    "@mdx-js/mdx": "npm:^2.3.0"
-    "@mdx-js/react": "npm:^2.3.0"
-    "@napi-rs/simple-git": "npm:^0.1.9"
-    "@theguild/remark-mermaid": "npm:^0.0.5"
-    "@theguild/remark-npm2yarn": "npm:^0.2.0"
-    clsx: "npm:^2.0.0"
-    github-slugger: "npm:^2.0.0"
-    graceful-fs: "npm:^4.2.11"
-    gray-matter: "npm:^4.0.3"
-    katex: "npm:^0.16.9"
-    lodash.get: "npm:^4.4.2"
-    next-mdx-remote: "npm:^4.2.1"
-    p-limit: "npm:^3.1.0"
-    rehype-katex: "npm:^7.0.0"
-    rehype-pretty-code: "npm:0.9.11"
-    rehype-raw: "npm:^7.0.0"
-    remark-gfm: "npm:^3.0.1"
-    remark-math: "npm:^5.1.1"
-    remark-reading-time: "npm:^2.0.1"
-    shiki: "npm:^0.14.3"
-    slash: "npm:^3.0.0"
-    title: "npm:^3.5.3"
-    unist-util-remove: "npm:^4.0.0"
-    unist-util-visit: "npm:^5.0.0"
-    zod: "npm:^3.22.3"
-  peerDependencies:
-    next: ">=9.5.3"
-    react: ">=16.13.1"
-    react-dom: ">=16.13.1"
-  checksum: 10c0/68941552f83639ae818e27b1cfbfef4031362c95bb5c80188cabe29ccd700e0889e20d90cde621d79e151fdf02713b096cfaa42b9304946133b82c223d2e01e3
-  languageName: node
-  linkType: hard
-
-"nextra@npm:^4.0.0":
+"nextra@npm:4.0.0, nextra@npm:^4.0.0":
   version: 4.0.0
   resolution: "nextra@npm:4.0.0"
   dependencies:
@@ -18053,6 +18015,44 @@ __metadata:
     react: ">=18"
     react-dom: ">=18"
   checksum: 10c0/278583aab7d296384ed4cac416d825534440f1e0241088169e668b5b9550c4b33b31247afdc6b737f8bfaa37a9192363e90944a6f647a4f2bb9475fe843c6977
+  languageName: node
+  linkType: hard
+
+"nextra@npm:^2.13.4":
+  version: 2.13.4
+  resolution: "nextra@npm:2.13.4"
+  dependencies:
+    "@headlessui/react": "npm:^1.7.17"
+    "@mdx-js/mdx": "npm:^2.3.0"
+    "@mdx-js/react": "npm:^2.3.0"
+    "@napi-rs/simple-git": "npm:^0.1.9"
+    "@theguild/remark-mermaid": "npm:^0.0.5"
+    "@theguild/remark-npm2yarn": "npm:^0.2.0"
+    clsx: "npm:^2.0.0"
+    github-slugger: "npm:^2.0.0"
+    graceful-fs: "npm:^4.2.11"
+    gray-matter: "npm:^4.0.3"
+    katex: "npm:^0.16.9"
+    lodash.get: "npm:^4.4.2"
+    next-mdx-remote: "npm:^4.2.1"
+    p-limit: "npm:^3.1.0"
+    rehype-katex: "npm:^7.0.0"
+    rehype-pretty-code: "npm:0.9.11"
+    rehype-raw: "npm:^7.0.0"
+    remark-gfm: "npm:^3.0.1"
+    remark-math: "npm:^5.1.1"
+    remark-reading-time: "npm:^2.0.1"
+    shiki: "npm:^0.14.3"
+    slash: "npm:^3.0.0"
+    title: "npm:^3.5.3"
+    unist-util-remove: "npm:^4.0.0"
+    unist-util-visit: "npm:^5.0.0"
+    zod: "npm:^3.22.3"
+  peerDependencies:
+    next: ">=9.5.3"
+    react: ">=16.13.1"
+    react-dom: ">=16.13.1"
+  checksum: 10c0/68941552f83639ae818e27b1cfbfef4031362c95bb5c80188cabe29ccd700e0889e20d90cde621d79e151fdf02713b096cfaa42b9304946133b82c223d2e01e3
   languageName: node
   linkType: hard
 
