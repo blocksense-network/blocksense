@@ -974,6 +974,7 @@ __metadata:
     clsx: "npm:^2.1.1"
     cmdk: "npm:1.0.4"
     effect: "npm:^3.12.1"
+    fast-glob: "npm:^3.3.2"
     lucide-react: "npm:^0.468.0"
     next: "npm:^15.1.4"
     nextra: "npm:^4.0.0"
