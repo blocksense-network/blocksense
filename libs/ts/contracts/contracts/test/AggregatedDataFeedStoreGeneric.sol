@@ -8,6 +8,8 @@ contract AggregatedDataFeedStoreGeneric {
     0x0000000000000000000000000000000000001000;
   address internal immutable ACCESS_CONTROL;
 
+  event DataFeedsUpdated(uint256 blocknumber);
+
   uint256 internal blocknumber;
 
   constructor(address accessControl) {
@@ -144,6 +146,8 @@ contract AggregatedDataFeedStoreGeneric {
         sstore(add(ROUND_ADDRESS, index), dataSlice)
       }
     }
+
+    emit DataFeedsUpdated(blocknumber_);
   }
 
   function _bytesToBytes32Array(

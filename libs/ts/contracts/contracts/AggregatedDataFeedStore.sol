@@ -8,6 +8,11 @@ contract AggregatedDataFeedStore {
     0x0000000000000000000000000000000000001000;
   address internal immutable ACCESS_CONTROL;
 
+  /// @notice Topic to be emitted on update
+  /// @dev keccak256("DataFeedsUpdated(uint256)")
+  bytes32 internal constant DATA_FEEDS_UPDATE_EVENT_TOPIC =
+    0xe64378c8d8a289137204264780c7669f3860a703795c6f0574d925d473a4a2a7;
+
   /*
     0x0000 - latest blocknumber
     0x0001 - implementation slot (UpgradeableProxy)
@@ -323,6 +328,14 @@ contract AggregatedDataFeedStore {
           pointer := add(pointer, add(indexLength, 33))
           sstore(add(ROUND_ADDRESS, index), calldataload(sub(pointer, 32)))
         }
+
+        /* Emit update event */
+
+        // store blocknumber at slot 0 in memory
+        mstore(0x00, newBlockNumber)
+
+        // Emit event with new block number
+        log1(0x00, 0x20, DATA_FEEDS_UPDATE_EVENT_TOPIC)
 
         return(0x00, 0x00)
       }
