@@ -13,12 +13,23 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/sol-contracts-components/*": ["components/sol-contracts/*"],
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@/sol-contracts-components/*": [
+        "components/sol-contracts/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "files": [],
-  "include": [],
+  "include": [
+    ".next/types/**/*.ts"
+  ],
   "references": [
     {
       "path": "./tsconfig.lib.json"

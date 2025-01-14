@@ -1,0 +1,48 @@
+---
+title: Introduction
+---
+
+# What is Blocksense?
+
+Blocksense is the rollup for verifiable data and compute, built with the vision that everyone should be able to securely access any data on-chain securely.
+
+To achieve this, builders can permissionlessly deploy oracle scripts on the network, which is secured by a Schelling Coin-based consensus protocol. With the help of Blocksense’s Oracle Script SDK, developers can focus on solving their users’ problems, while the network guarantees decentralization, security and scalability.
+
+The initial offering focuses on creating and reading price feeds to serve the needs of the growing DeFi ecosystem, and is available on EVM chains. Long term, Blocksense aims to help usher in a new generation of dApps unconstrained by access to real world information and computation.
+
+## What problems is Blocksense solving?
+
+- **Flexibility:** The model for creating new data feeds is broken. Closed-door negotiations, rejections and excessive monthly fees are commonplace. With Blocksense, data feed creation is permissionless. You provide the instructions; we do the rest.
+- **Cost:** The standard push oracle is prohibitively expensive. The Blocksense protocol tightly packs blocks with data feed updates, upgrading throughput and offering up to 50x improvement in gas costs for new and existing chains.
+- **Centralization:** Blocksense uses the Schelling Point consensus protocol and generates a ZK proof of the secret voting process, thereby removing unnecessary trust assumptions and improving decentralization.
+- **Speed:** The pace of innovation in crypto may be fast, but connecting your protocol to real-world data is not. From our modular and permissionless architecture, to our zippy onboarding and integration support, Blocksense gets you faster to market so you can focus on delighting customers.
+
+## Who is Blocksense for?
+
+**L1 and L2 chains** that want to rapidly onboard new and existing DeFi protocols, bring new classes of real-world information on-chain, and enable next-wave innovation on their chain. Blocksense offers drop-in compatibility with some of the largest oracle providers, enabling smooth migration for existing ecosystem protocols.
+
+**Builders** who need access to the most cost-effective and comprehensive data feeds, and those who need to be able to spin up new asset markets with short lead times, while providing strong guarantees of reliability and decentralization for their customers. Blocksense is working with lending protocols, CDPs, prediction markets, RWAs, stablecoins, and others. Furthermore, we’re #stillearly in Blocksense’s journey and are open to collaborating with builders at the cutting edge of the industry. So, if you are unsure whether Blocksense is right for you, don’t hesitate to get in touch and our helpful team will happily learn about your use case.
+
+## How does Blocksense work today?
+
+We are thrilled to be launching v1 of the Blocksense network. While the gigabrains are cooking up a ZK special in the Blocksense kitchen, we are already releasing our SDK for permissionless data feed creation on a Proof of Authority (PoA) network, secured by a hand-picked set of reputable node operators.
+
+We believe v1 already delivers some big improvements in the oracle space and are excited to share them with you. We designed the interfaces to be drop-in compatible with some of the largest oracle providers, enabling seamless migration.
+
+## How is data accuracy ensured?
+
+In the initial phase, Blocksense is secured by a Proof of Authority (PoA) network of reputable node operators. In phase two (H1’2025), consensus on the Blocksense network will be achieved through the SchellingCoin game first proposed by Vitalik in his 2014 [blogpost](https://blog.ethereum.org/2014/03/28/schellingcoin-a-minimal-trust-universal-data-feed). This consensus mechanism is enabled for the first time through ZK proofs, which facilitate the vote secrecy vital to ensuring collusion and bribery resistance in the network.
+
+## How does the SchellingCoin game work?
+
+Every round, a random subset of the reporters in the network are chosen to vote on a random subset of data feeds. This stochastic process prevents malicious actors from targeting node operators as they can’t know which node operators will vote for which data feeds at a given time. When the protocol chooses a particular reporter to report on a data feed, the node software will execute the specified oracle script and ‘vote’ on the result. The most common vote is taken as the correct answer, such that all reporters voting the most common answer are rewarded, while anyone voting a differing answer is slashed. No reporter can know who any of the other reporters are, and votes cannot be shared without exposing one’s private key. The integrity of the voting process is attested to by ZK proofs. Because in any voting round there will be many incorrect answers and only one correct answer, the Naish Equilibrium in the SchellingCoin game is honesty. This is for a simple but elegant reason: without the opportunity for collusion or bribery, the chances of the most commonly reported answer being false are slim.
+
+### What is an oracle script?
+
+Oracle scripts are how Blocksense developers create new data feeds. Builders can choose any of the growing set of languages that compile to WebAssembly. Our SDK allows anyone to permissionlessly develop and deploy new oracle scripts on the Blocksense network.
+
+An oracle script consists of a set of instructions on:
+
+- Where to pull the data from, including endpoints and required environment variables
+- How to aggregate the data in case of multiple data sources
+- How to transform the collected data into the most efficient form for the blockchain

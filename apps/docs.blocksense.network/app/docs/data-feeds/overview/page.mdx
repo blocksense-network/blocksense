@@ -1,0 +1,11 @@
+---
+title: Overview
+---
+import React from 'react';
+
+import { DataFeeds, getFeedsConfig } from '@/components/DataFeeds/DataFeeds';
+
+export default function FeedsPage() {
+  const feedsConfig = getFeedsConfig();
+  return <DataFeeds feedsConfig={feedsConfig} />;
+}
