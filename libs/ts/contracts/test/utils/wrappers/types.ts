@@ -23,7 +23,12 @@ export interface Feed {
   slotsToRead?: number;
 }
 
-export type UpgradeableProxyCallMethods = Omit<
+export type UpgradeableProxyCallMethods = Pick<
   IADFSWrapper,
-  'init' | 'getName' | 'contract' | 'accessControl'
+  | 'setFeeds'
+  | 'checkLatestValue'
+  | 'checkLatestRound'
+  | 'checkValueAtRound'
+  | 'checkLatestFeedAndRound'
+  | 'getValues'
 >;
