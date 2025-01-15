@@ -23,6 +23,7 @@ export const deployedNetworks = [
   'polygon-amoy',
   'polygon-zkevm-cardona',
   'scroll-sepolia',
+  'songbird-coston',
   'taiko-hekla',
 ] satisfies NetworkName[];
 
@@ -66,6 +67,7 @@ export const API_ENDPOINTS = {
   polygonAmoy: 'https://api-amoy.polygonscan.com/api',
   polygonZkevmCardona: 'https://api-cardona-zkevm.polygonscan.com/api',
   scrollSepolia: 'https://api-sepolia.scrollscan.com/api',
+  songbirdCoston: 'https://coston-explorer.flare.network/api',
   taikoHekla: 'https://blockscoutapi.hekla.taiko.xyz/api',
 };
 
