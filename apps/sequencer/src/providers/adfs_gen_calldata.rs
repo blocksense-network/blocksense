@@ -17,7 +17,7 @@ use crate::UpdateToSend;
 
 use once_cell::sync::Lazy;
 
-const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 4096;
+const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
 
 static STRIDES_SIZES: Lazy<HashMap<u16, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
