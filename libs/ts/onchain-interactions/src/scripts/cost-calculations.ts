@@ -176,10 +176,15 @@ const logGasCosts = async (
   }
 };
 
+const getTxTimestampAsDate = (tx: Transaction): Date =>
+  new Date(parseInt(tx.timeStamp || '0') * 1000);
+
 const fetchTransactionsForNetwork = async (
   network: NetworkName,
   address: EthereumAddress,
   numberOfTransactions: number,
+  firstTxTime: string,
+  lastTxTime: string,
 ): Promise<{
   transactions: Transaction[];
   firstTxTime: string;
@@ -217,12 +222,31 @@ const fetchTransactionsForNetwork = async (
     }
 
     const rawTransactions = response.data.result;
-    const transactions: Transaction[] = rawTransactions
-      .filter(
-        (tx: any) =>
-          tx.from.toLowerCase() === address.toLowerCase() &&
-          tx.to.toLowerCase() !== address.toLowerCase(), // Filter out self-sent transactions
-      )
+    const notSelfSent: any[] = rawTransactions.filter(
+      (tx: any) =>
+        tx.from.toLowerCase() === address.toLowerCase() &&
+        tx.to.toLowerCase() !== address.toLowerCase(), // Filter out self-sent transactions
+    );
+
+    let limitedInTime = notSelfSent;
+
+    if (firstTxTime != DEFAULT_FIRST_TX_TIME) {
+      const firstTxTimeAsDate = new Date(firstTxTime);
+      limitedInTime = limitedInTime.filter((tx: Transaction) => {
+        const txTime = getTxTimestampAsDate(tx);
+        return txTime >= firstTxTimeAsDate;
+      });
+    }
+
+    if (lastTxTime != DEFAULT_LAST_TX_TIME) {
+      const lastTxTimeAsDate = new Date(lastTxTime);
+      limitedInTime = limitedInTime.filter((tx: any) => {
+        const txTime = getTxTimestampAsDate(tx);
+        return txTime <= lastTxTimeAsDate;
+      });
+    }
+
+    const transactions: Transaction[] = limitedInTime
       .slice(0, numberOfTransactions)
       .map((tx: any) => ({
         gasUsed: tx.gasUsed,
@@ -232,15 +256,13 @@ const fetchTransactionsForNetwork = async (
         timeStamp: tx.timeStamp,
       }));
 
-    let firstTxTime = '';
-    let lastTxTime = '';
+    let firstTxTimeRet = '';
+    let lastTxTimeRet = '';
     if (transactions.length > 0) {
-      firstTxTime = new Date(
-        parseInt(transactions[transactions.length - 1].timeStamp || '0') * 1000,
+      firstTxTimeRet = getTxTimestampAsDate(
+        transactions[transactions.length - 1],
       ).toISOString();
-      lastTxTime = new Date(
-        parseInt(transactions[0].timeStamp || '0') * 1000,
-      ).toISOString();
+      lastTxTimeRet = getTxTimestampAsDate(transactions[0]).toISOString();
     }
 
     console.log(
@@ -248,7 +270,11 @@ const fetchTransactionsForNetwork = async (
         `${network}: Found ${transactions.length} transactions sent by the account to other addresses`,
       ),
     );
-    return { transactions, firstTxTime, lastTxTime };
+    return {
+      transactions,
+      firstTxTime: firstTxTimeRet,
+      lastTxTime: lastTxTimeRet,
+    };
   } catch (error: any) {
     console.error(
       chalk.red(`Error fetching transactions for ${network}: ${error.message}`),
@@ -256,6 +282,9 @@ const fetchTransactionsForNetwork = async (
     return { transactions: [], firstTxTime: '', lastTxTime: '' };
   }
 };
+
+const DEFAULT_FIRST_TX_TIME = '';
+const DEFAULT_LAST_TX_TIME = '';
 
 const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
@@ -288,6 +317,18 @@ const main = async (): Promise<void> => {
       type: 'string',
       default: '',
     })
+    .option('firstTxTime', {
+      describe:
+        'Filter out transactions that are timestamped before this time. Format is ISO, e.g. 2025-01-14T03:35:14.000Z.',
+      type: 'string',
+      default: DEFAULT_FIRST_TX_TIME,
+    })
+    .option('lastTxTime', {
+      describe:
+        'Filter out transactions that are timestamped after this time. Format is ISO, e.g. 2025-01-14T03:35:14.000Z.',
+      type: 'string',
+      default: DEFAULT_LAST_TX_TIME,
+    })
     .help()
     .alias('help', 'h')
     .parse();
@@ -315,6 +356,8 @@ const main = async (): Promise<void> => {
         network,
         address,
         argv.numberOfTransactions,
+        argv.firstTxTime,
+        argv.lastTxTime,
       );
     if (transactions.length > 0) {
       const gasCosts = calculateGasCosts(
