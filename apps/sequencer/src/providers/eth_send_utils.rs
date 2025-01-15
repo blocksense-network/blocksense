@@ -151,21 +151,17 @@ pub fn filter_allowed_feeds(
     }
 }
 
-#[allow(clippy::too_many_arguments)]
-pub async fn eth_batch_send_to_contract(
-    net: String,
-    provider: Arc<Mutex<RpcProvider>>,
-    provider_settings: config::Provider,
+pub async fn get_serialized_updates_for_network(
+    net: &str,
+    provider: &Arc<Mutex<RpcProvider>>,
     updates: UpdateToSend,
-    feed_type: Repeatability,
+    provider_settings: &config::Provider,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
-    transaction_retry_timeout_secs: u64,
-    retry_fee_increment_fraction: f64,
-) -> Result<(String, Vec<u32>)> {
+) -> Result<(String, Vec<u32>, UpdateToSend)> {
     let updates = {
         let provider = provider.lock().await;
-        let updates = filter_allowed_feeds(&net, updates, &provider_settings.allow_feeds);
+        let updates = filter_allowed_feeds(net, updates, &provider_settings.allow_feeds);
         let updates = provider.apply_publish_criteria(updates);
 
         // Don’t post to Smart Contract if we have 0 updates
@@ -173,10 +169,7 @@ pub async fn eth_batch_send_to_contract(
             info!(
                 "Network `{net}` posting to smart contract skipped because it received 0 updates"
             );
-            return Ok((
-                "skipped due to 0 feeds that need update".to_string(),
-                vec![],
-            ));
+            eyre::bail!("skipped due to 0 feeds that need update".to_string());
         }
 
         updates
@@ -189,13 +182,38 @@ pub async fn eth_batch_send_to_contract(
         .collect();
 
     let serialized_updates = match provider.lock().await.contract_version {
-        1 => legacy_serialize_updates(&net, &updates)?,
-        2 => match adfs_serialize_updates(&net, &updates, feeds_metrics, feeds_config).await {
+        1 => legacy_serialize_updates(net, &updates)?,
+        2 => match adfs_serialize_updates(net, &updates, feeds_metrics, feeds_config).await {
             Ok(result) => result,
             Err(e) => eyre::bail!("ADFS serialization failed: {}!", e),
         },
         _ => eyre::bail!("Unsupported contract version set for network {net}!"),
     };
+
+    Ok((serialized_updates, feeds_to_update_ids, updates))
+}
+
+#[allow(clippy::too_many_arguments)]
+pub async fn eth_batch_send_to_contract(
+    net: String,
+    provider: Arc<Mutex<RpcProvider>>,
+    provider_settings: config::Provider,
+    updates: UpdateToSend,
+    feed_type: Repeatability,
+    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    transaction_retry_timeout_secs: u64,
+    retry_fee_increment_fraction: f64,
+) -> Result<(String, Vec<u32>)> {
+    let (serialized_updates, feeds_to_update_ids, updates) = get_serialized_updates_for_network(
+        net.as_str(),
+        &provider,
+        updates,
+        &provider_settings,
+        feeds_metrics,
+        feeds_config,
+    )
+    .await?;
 
     let mut provider = provider.lock().await;
     let signer = &provider.signer;
