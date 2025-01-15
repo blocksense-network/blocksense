@@ -45,7 +45,7 @@ jobs:
 
   smart-contracts-tests:
     timeout-minutes: 360
-    runs-on: self-hosted
+    runs-on: [self-hosted, nixos, x86-64-v3]
 
     steps:
       - uses: actions/checkout@v4
