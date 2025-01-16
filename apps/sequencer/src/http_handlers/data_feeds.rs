@@ -235,7 +235,7 @@ pub async fn get_last_published_value_and_time(
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let span = info_span!("get_last_published_value_and_time");
-    let _guard: tracing::span::Entered<'_> = span.enter();
+    let _guard = span.enter();
 
     let requested_data_feeds: Vec<GetLastPublishedRequestData> =
         deserialize_payload_to_vec::<GetLastPublishedRequestData>(payload).await?;
@@ -312,7 +312,7 @@ pub async fn post_reports_batch(
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let span = info_span!("post_reports_batch");
-    let _guard: tracing::span::Entered<'_> = span.enter();
+    let _guard = span.enter();
 
     let data_feeds: Vec<DataFeedPayload> =
         deserialize_payload_to_vec::<DataFeedPayload>(payload).await?;
@@ -331,6 +331,29 @@ pub async fn post_reports_batch(
     } else {
         Ok(HttpResponse::BadRequest().body(format!("{errors_in_batch:?}")))
     }
+}
+
+#[post("/post_aggregated_consensus_vote")]
+pub async fn post_aggregated_consensus_vote(
+    mut payload: web::Payload,
+    _sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    let span = info_span!("post_aggregated_consensus_vote");
+    let _guard = span.enter();
+
+    let mut body = web::BytesMut::new();
+    while let Some(chunk) = payload.next().await {
+        let chunk = chunk?;
+        // limit max size of in-memory payload
+        if (body.len() + chunk.len()) > MAX_SIZE {
+            return Err(ErrorBadRequest("overflow"));
+        }
+        body.extend_from_slice(&chunk);
+    }
+
+    info!("Recvd aggregated_consensus_vote = {body:?}!");
+
+    Ok(HttpResponse::Ok().into())
 }
 
 #[derive(Serialize, Deserialize)]
@@ -499,7 +522,8 @@ pub async fn register_feed(
 pub fn add_main_services(cfg: &mut ServiceConfig) {
     cfg.service(post_report)
         .service(post_reports_batch)
-        .service(get_last_published_value_and_time);
+        .service(get_last_published_value_and_time)
+        .service(post_aggregated_consensus_vote);
 }
 
 #[cfg(test)]
