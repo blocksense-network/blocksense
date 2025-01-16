@@ -71,89 +71,85 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
     sequencer_state: &Data<SequencerState>,
     updates: &UpdateToSend,
 ) {
-    if let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint {
-        let block_height = updates.block_height;
-        let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
+    let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint else {
+        warn!("No Kafka endpoint set to stream consensus second round data.");
+        return;
+    };
+    let block_height = updates.block_height;
+    let sequencer_id = sequencer_state.sequencer_config.read().await.sequencer_id;
 
-        let providers = sequencer_state.providers.read().await;
+    let providers = sequencer_state.providers.read().await;
 
-        // iterate for all supported networks and generate a calldata for the contract accordingly
-        for (net, p) in providers.iter() {
-            // Do not hold the provider_settings lock for more than necessary
-            let provider_settings = {
-                debug!("Acquiring a read lock on sequencer_config for `{net}`");
-                let providers_config = sequencer_state.sequencer_config.read().await;
-                debug!("Acquired a read lock on sequencer_config for `{net}`");
-                let providers_config = &providers_config.providers;
+    // iterate for all supported networks and generate a calldata for the contract accordingly
+    for (net, p) in providers.iter() {
+        // Do not hold the provider_settings lock for more than necessary
+        let provider_settings = {
+            debug!("Acquiring a read lock on sequencer_config for `{net}`");
+            let providers_config = sequencer_state.sequencer_config.read().await;
+            debug!("Acquired a read lock on sequencer_config for `{net}`");
+            let providers_config = &providers_config.providers;
 
-                let Some(provider_settings) = providers_config.get(net).cloned() else {
-                    warn!(
+            let Some(provider_settings) = providers_config.get(net).cloned() else {
+                warn!(
                         "Network `{net}` is not configured in sequencer; skipping it during second round consensus"
                     );
-                    debug!(
-                        "About to release a read lock on sequencer_config for `{net}` [continue 1]"
-                    );
-                    continue;
-                };
-
-                if !provider_settings.is_enabled {
-                    warn!("Network `{net}` is not enabled; skipping it for second round consensus");
-                    debug!(
-                        "About to release a read lock on sequencer_config for `{net}` [continue 2]"
-                    );
-                    continue;
-                } else {
-                    info!("Network `{net}` is enabled; initiating second round consensus");
-                }
-                debug!("About to release a read lock on sequencer_config for `{net}` [default]");
-                provider_settings
+                debug!("About to release a read lock on sequencer_config for `{net}` [continue 1]");
+                continue;
             };
 
-            let feeds_metrics = sequencer_state.feeds_metrics.clone();
-            let feeds_config = sequencer_state.active_feeds.clone();
+            if !provider_settings.is_enabled {
+                warn!("Network `{net}` is not enabled; skipping it for second round consensus");
+                debug!("About to release a read lock on sequencer_config for `{net}` [continue 2]");
+                continue;
+            } else {
+                info!("Network `{net}` is enabled; initiating second round consensus");
+            }
+            debug!("About to release a read lock on sequencer_config for `{net}` [default]");
+            provider_settings
+        };
 
-            let serialized_updates = match get_serialized_updates_for_network(
-                net,
-                p,
-                updates.clone(),
-                &provider_settings,
-                Some(feeds_metrics),
-                feeds_config,
+        let feeds_metrics = sequencer_state.feeds_metrics.clone();
+        let feeds_config = sequencer_state.active_feeds.clone();
+
+        let serialized_updates = match get_serialized_updates_for_network(
+            net,
+            p,
+            updates.clone(),
+            &provider_settings,
+            Some(feeds_metrics),
+            feeds_config,
+        )
+        .await
+        {
+            Ok((res, _, _)) => res,
+            Err(e) => {
+                warn!("Could not get serialized updates for network {net} due to: {e}");
+                continue;
+            }
+        };
+
+        let updates_to_kafka = json!({
+            "SequencerId": sequencer_id,
+            "BlockHeight": block_height,
+            "Network": net,
+            "calldata": hex::encode(serialized_updates),
+        });
+
+        debug!("About to send feed values to kafka");
+        match kafka_endpoint
+            .send(
+                FutureRecord::<(), _>::to("aggregation_consensus")
+                    .payload(&updates_to_kafka.to_string()),
+                Timeout::After(Duration::from_secs(3 * 60)),
             )
             .await
-            {
-                Ok((res, _, _)) => res,
-                Err(e) => {
-                    warn!("Could not get serialized updates for network {net} due to: {e}");
-                    continue;
-                }
-            };
-
-            let updates_to_kafka = json!({
-                "SequencerId": sequencer_id,
-                "BlockHeight": block_height,
-                "Network": net,
-                "calldata": hex::encode(serialized_updates),
-            });
-
-            debug!("About to send feed values to kafka");
-            match kafka_endpoint
-                .send(
-                    FutureRecord::<(), _>::to("aggregation_consensus")
-                        .payload(&updates_to_kafka.to_string()),
-                    Timeout::After(Duration::from_secs(3 * 60)),
-                )
-                .await
-            {
-                Ok(res) => debug!(
-                    "Successfully sent batch of aggregated feed values to kafka endpoint: {res:?}"
-                ),
-                Err(e) => error!(
-                    "Failed to send batch of aggregated feed values to kafka endpoint! {e:?}"
-                ),
+        {
+            Ok(res) => debug!(
+                "Successfully sent batch of aggregated feed values to kafka endpoint: {res:?}"
+            ),
+            Err(e) => {
+                error!("Failed to send batch of aggregated feed values to kafka endpoint! {e:?}")
             }
         }
-    } else {
-        warn!("No Kafka endpoint set to stream consensus second round data.");
     }
 }
