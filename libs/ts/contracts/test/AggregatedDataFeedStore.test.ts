@@ -343,7 +343,7 @@ describe('AggregatedDataFeedStore', () => {
 
   it('[W] Should revert when round table index is bigger than 2**116', async () => {
     const feed = {
-      id: 1n,
+      id: 2n ** 115n - 1n,
       round: 1n,
       stride: 31n,
       data: '0x12343267643573',
@@ -356,10 +356,12 @@ describe('AggregatedDataFeedStore', () => {
     );
     const maxRoundTableIndex = ethers.toBeHex(2n ** 116n - 1n);
     data = data.replace(roundTableIndex.slice(2), maxRoundTableIndex.slice(2));
-    await sequencer.sendTransaction({
-      to: contract.contract.target,
-      data,
-    });
+    await expect(
+      sequencer.sendTransaction({
+        to: contract.contract.target,
+        data,
+      }),
+    ).to.not.be.reverted;
 
     const overflowRoundTableIndex = ethers.toBeHex(2n ** 116n);
     data = data.replace(

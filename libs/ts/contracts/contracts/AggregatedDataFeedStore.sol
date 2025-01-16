@@ -5,7 +5,7 @@ contract AggregatedDataFeedStore {
   address internal constant DATA_FEED_ADDRESS =
     0x0000000100000000000000000000000000000000;
   address internal constant ROUND_ADDRESS =
-    0x0000000000000000000000000000000000001000;
+    0x00000000FFf00000000000000000000000000000;
   address internal immutable ACCESS_CONTROL;
 
   /// @notice Topic to be emitted on update
@@ -14,9 +14,13 @@ contract AggregatedDataFeedStore {
     0xe64378c8d8a289137204264780c7669f3860a703795c6f0574d925d473a4a2a7;
 
   /*
-    0x0000 - latest blocknumber
-    0x0001 - implementation slot (UpgradeableProxy)
-    0x0002 - admin slot (UpgradeableProxy)
+    Storage layout:
+      Management space: [0 to 2**128-2**116)
+        0x0000 - latest blocknumber
+        0x0001 - implementation slot (UpgradeableProxy)
+        0x0002 - admin slot (UpgradeableProxy)
+      Round table: [2**128-2**116 to 2**128)
+      Data feed space: [2**128 to 2**160)
   */
 
   constructor(address accessControl) {
