@@ -888,60 +888,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/docs.blocksense.network.v2@workspace:apps/docs.blocksense.network.v2":
-  version: 0.0.0-use.local
-  resolution: "@blocksense/docs.blocksense.network.v2@workspace:apps/docs.blocksense.network.v2"
-  dependencies:
-    "@blocksense/base-utils": "workspace:*"
-    "@blocksense/config-types": "workspace:*"
-    "@blocksense/contracts": "workspace:*"
-    "@blocksense/docs-theme": "workspace:*"
-    "@blocksense/monorepo": "workspace:*"
-    "@blocksense/sol-reflector": "workspace:*"
-    "@effect/data": "npm:^0.18.7"
-    "@effect/schema": "npm:^0.75.5"
-    "@emotion/react": "npm:^11.14.0"
-    "@emotion/styled": "npm:^11.14.0"
-    "@radix-ui/react-accordion": "npm:^1.2.2"
-    "@radix-ui/react-dialog": "npm:^1.1.3"
-    "@radix-ui/react-dropdown-menu": "npm:^2.1.3"
-    "@radix-ui/react-label": "npm:^2.1.1"
-    "@radix-ui/react-popover": "npm:^1.1.3"
-    "@radix-ui/react-scroll-area": "npm:^1.2.2"
-    "@radix-ui/react-select": "npm:^2.1.3"
-    "@radix-ui/react-separator": "npm:^1.1.1"
-    "@radix-ui/react-slot": "npm:^1.1.1"
-    "@radix-ui/react-switch": "npm:^1.1.2"
-    "@radix-ui/react-tabs": "npm:^1.1.2"
-    "@tanstack/react-table": "npm:^8.20.6"
-    "@types/node": "npm:^22.10.2"
-    "@types/react": "npm:^18.3.3"
-    autoprefixer: "npm:^10.4.20"
-    class-variance-authority: "npm:^0.7.1"
-    clsx: "npm:^2.1.1"
-    cmdk: "npm:1.0.4"
-    effect: "npm:^3.11.7"
-    lucide-react: "npm:^0.468.0"
-    next: "npm:^14.2.5"
-    nextra: "npm:^2.13.4"
-    nodemon: "npm:^3.1.9"
-    postcss: "npm:^8.4.49"
-    prettier: "npm:^3.4.2"
-    react: "npm:^18.3.1"
-    react-dom: "npm:^18.3.1"
-    react-vertical-timeline-component: "npm:^3.6.0"
-    shiki: "npm:^1.12.1"
-    tailwind-merge: "npm:^2.5.5"
-    tailwindcss: "npm:^3.4.16"
-    tailwindcss-animate: "npm:^1.0.7"
-    tslib: "npm:^2.8.1"
-    tsx: "npm:^4.19.2"
-    typescript: "npm:^5.5.4"
-    vaul: "npm:^1.1.2"
-    vitest: "npm:^2.1.8"
-  languageName: unknown
-  linkType: soft
-
 "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network":
   version: 0.0.0-use.local
   resolution: "@blocksense/docs.blocksense.network@workspace:apps/docs.blocksense.network"
@@ -1182,24 +1128,6 @@ __metadata:
   dependencies:
     "@edge-runtime/primitives": "npm:4.1.0"
   checksum: 10c0/ee9f23abfe3f661f9bf5bcc3b1b779157d8e2c42ff160827ca345ec5b4043e98939cec5a917a3c3a3169908bc095d1d180d9261353886d83a4a083aa6e9feae0
-  languageName: node
-  linkType: hard
-
-"@effect/data@npm:^0.18.7":
-  version: 0.18.7
-  resolution: "@effect/data@npm:0.18.7"
-  checksum: 10c0/5c6f26fab197df3fb669839a242c3caeacac2b01ceb7b7873ccf10473d95674981bd2495176e59217172604157dda8a18651dacaa4e949b4027de0eb0106dc71
-  languageName: node
-  linkType: hard
-
-"@effect/schema@npm:^0.75.5":
-  version: 0.75.5
-  resolution: "@effect/schema@npm:0.75.5"
-  dependencies:
-    fast-check: "npm:^3.21.0"
-  peerDependencies:
-    effect: ^3.9.2
-  checksum: 10c0/287a860f67eb41d54d0b46f2303eba273b35a9db41f1c2c352fc94023e88574969e03c6284d5dcefdda953f56eabdd98d2cdd268fa872f5966108f540c9e3f44
   languageName: node
   linkType: hard
 
@@ -10360,15 +10288,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"effect@npm:^3.11.7":
-  version: 3.11.7
-  resolution: "effect@npm:3.11.7"
-  dependencies:
-    fast-check: "npm:^3.21.0"
-  checksum: 10c0/e7d7d5ba96b34a0403177ef99102f98788be9a6da6459e54f4dc3cf84915e5f7a1e19373fbf8a5b5f98c9b55e902ef9799b9dbbaf36378e4197e1d9d7a0c859f
-  languageName: node
-  linkType: hard
-
 "effect@npm:^3.12.1":
   version: 3.12.1
   resolution: "effect@npm:3.12.1"
@@ -12150,15 +12069,6 @@ __metadata:
   version: 3.0.2
   resolution: "extend@npm:3.0.2"
   checksum: 10c0/73bf6e27406e80aa3e85b0d1c4fd987261e628064e170ca781125c0b635a3dabad5e05adbf07595ea0cf1e6c5396cacb214af933da7cbaf24fe75ff14818e8f9
-  languageName: node
-  linkType: hard
-
-"fast-check@npm:^3.21.0":
-  version: 3.21.0
-  resolution: "fast-check@npm:3.21.0"
-  dependencies:
-    pure-rand: "npm:^6.1.0"
-  checksum: 10c0/69c31cf27503f19e383fb72e03bdc22c9bc669b55e8e243b3f7ec328ff956787ee49d06239b7ba75250c964c815ff33ff03dfe441bbbf67d97e0f65761efb046
   languageName: node
   linkType: hard
 
