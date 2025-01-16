@@ -229,15 +229,25 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       ['bytes1', 'uint8', 'uint120'],
       [ethers.toBeHex(operation | 0x80), feed.stride, feed.id],
     );
-    const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
+
+    const values: any[] = [
+      feed.startSlotToReadFrom ?? 0,
+      feed.slotsToRead ?? 0,
+    ];
+
+    for (let i = values.length - 1; i >= 0; i--) {
+      if (values[i] === 0) {
+        values.splice(i, 1);
+      } else {
+        break;
+      }
+    }
+    const types = Array(values.length).fill('uint32');
 
     if (operation === ReadOp.GetFeedAtRound) {
       return prefix.concat(
         ethers
-          .solidityPacked(
-            ['uint16', 'uint32', 'uint32'],
-            [feed.round, feed.startSlotToReadFrom ?? 0n, slots],
-          )
+          .solidityPacked(['uint16', ...types], [feed.round, ...values])
           .slice(2),
       );
     }
@@ -246,14 +256,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       operation === ReadOp.GetLatestFeed ||
       operation === ReadOp.GetLatestFeedAndRound
     ) {
-      return prefix.concat(
-        ethers
-          .solidityPacked(
-            ['uint32', 'uint32'],
-            [feed.startSlotToReadFrom ?? 0n, slots],
-          )
-          .slice(2),
-      );
+      return prefix.concat(ethers.solidityPacked(types, values).slice(2));
     }
 
     return prefix;
