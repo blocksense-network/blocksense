@@ -20,6 +20,7 @@ const feeds: Feed[] = [
     round: 6n,
     stride: 1n,
     data: '0x12343267643573',
+    slotsToRead: 1,
   },
   {
     id: 2n,
@@ -194,6 +195,7 @@ describe('AggregatedDataFeedStore', () => {
       round: 1n,
       stride: 31n,
       data: '0x12343267643573',
+      slotsToRead: 1,
     };
     await contract.setFeeds(sequencer, [feed]);
     await contract.checkLatestValue(sequencer, [feed]);
