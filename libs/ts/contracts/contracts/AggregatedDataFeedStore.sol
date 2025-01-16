@@ -241,11 +241,6 @@ contract AggregatedDataFeedStore {
           let indexLength := byte(1, metadata)
           let indexLengthBits := shl(3, indexLength)
           let index := shr(sub(256, indexLengthBits), shl(16, metadata))
-          // next stride address - current stride address - 1
-          let maxWriteIndex := sub(
-            sub(shl(add(stride, 1), DATA_FEED_ADDRESS), strideAddress),
-            1
-          )
 
           // 5b
           let bytesLength := byte(add(2, indexLength), metadata)
@@ -264,7 +259,8 @@ contract AggregatedDataFeedStore {
           // cannot write outside stride space
           if gt(
             add(index, sub(add(slots, gt(remainderSlot, 0)), 1)),
-            maxWriteIndex
+            // maxWriteAddress: next stride address - current stride address - 1
+            sub(sub(shl(add(stride, 1), DATA_FEED_ADDRESS), strideAddress), 1)
           ) {
             revert(0, 0)
           }
@@ -282,7 +278,7 @@ contract AggregatedDataFeedStore {
             let remainderSlotData := calldataload(pointer)
             sstore(
               add(strideAddress, add(index, slots)),
-              shr(sub(256, shl(3, remainderSlot)), remainderSlotData)
+              shr(sub(256, shl(3, remainderSlot)), calldataload(pointer))
             )
             pointer := add(pointer, remainderSlot)
           }
