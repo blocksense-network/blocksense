@@ -34,7 +34,7 @@ contract AggregatedDataFeedStore {
       // Load selector from memory
       let selector := calldataload(0x00)
 
-      /* <selector 1b> <stride 1b> <feedId 15b> (<round 2b> <startSlot 4b> <slots 4b> | <startSlot 4b> <slots 4b>) */
+      /* <selector 1b> <stride 1b> <feedId 15b> (<round 2b> <startSlot? 4b> <slots? 4b> | <startSlot? 4b> <slots? 4b>) */
       if and(
         selector,
         0x8000000000000000000000000000000000000000000000000000000000000000
@@ -58,7 +58,7 @@ contract AggregatedDataFeedStore {
 
         let data := calldataload(17)
 
-        // getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot, uint32 slots) returns (bytes)
+        // getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
         if and(
           selector,
           0x0400000000000000000000000000000000000000000000000000000000000000
@@ -74,6 +74,10 @@ contract AggregatedDataFeedStore {
 
           let startSlot := shr(224, shl(16, data))
           let slots := shr(224, shl(48, data))
+          if iszero(slots) {
+            slots := shl(stride, 1)
+          }
+
           // find start index for round: baseFeedIndex + round * 2**stride + startSlot
           let startIndex := add(
             add(baseFeedIndex, mul(round, shl(stride, 1))),
@@ -128,13 +132,16 @@ contract AggregatedDataFeedStore {
           mstore(ptr, round)
         }
 
-        // getLatestData(uint8 stride, uint120 feedId, uint32 startSlot, uint32 slots) returns (bytes)
+        // getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
         if and(
           selector,
           0x0200000000000000000000000000000000000000000000000000000000000000
         ) {
           let startSlot := shr(224, data)
           let slots := shr(224, shl(32, data))
+          if iszero(slots) {
+            slots := shl(stride, 1)
+          }
 
           // `startSlot` and `slots` are used to read a slice from the feed
           // find start index for round: baseFeedIndex + round * 2**stride + startSlot
