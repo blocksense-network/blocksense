@@ -19,4 +19,4 @@ anyhow = "1.0.89"
 
 [build-dependencies]
 # All features enabled
-vergen = { version = "9.0.2", features = ["build", "cargo", "rustc", "si"] }
+vergen = { version = "9.0.4", features = ["build", "cargo", "rustc", "si"] }

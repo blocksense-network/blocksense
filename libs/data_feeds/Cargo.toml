@@ -38,9 +38,9 @@ alloy = { version = "0.8", features = [
     "pubsub",
 ] }
 
-log = "0.4.21"
+log = "0.4.25"
 anyhow = "1.0.89"
-thiserror = "2.0.4"
+thiserror = "2.0.11"
 tracing = { version = "0.1.41", features = ["async-await", "log"] }
 tracing-subscriber = { version = "0.3.19", features = ["json"] }
 serde_json = "1.0.128"
