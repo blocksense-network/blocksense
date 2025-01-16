@@ -25,6 +25,7 @@ pub async fn votes_result_sender_loop(
                 let recvd = batched_votes_recv.recv().await;
                 match recvd {
                     Some(updates) => {
+                        debug!("sending aggregation consensus trigger");
                         try_send_aggregation_consensus_trigger_to_reporters(
                             &sequencer_state,
                             &updates,
@@ -80,22 +81,31 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         for (net, p) in providers.iter() {
             // Do not hold the provider_settings lock for more than necessary
             let provider_settings = {
+                debug!("Acquiring a read lock on sequencer_config for `{net}`");
                 let providers_config = sequencer_state.sequencer_config.read().await;
+                debug!("Acquired a read lock on sequencer_config for `{net}`");
                 let providers_config = &providers_config.providers;
 
                 let Some(provider_settings) = providers_config.get(net).cloned() else {
                     warn!(
                         "Network `{net}` is not configured in sequencer; skipping it during second round consensus"
                     );
+                    debug!(
+                        "About to release a read lock on sequencer_config for `{net}` [continue 1]"
+                    );
                     continue;
                 };
 
                 if !provider_settings.is_enabled {
                     warn!("Network `{net}` is not enabled; skipping it for second round consensus");
+                    debug!(
+                        "About to release a read lock on sequencer_config for `{net}` [continue 2]"
+                    );
                     continue;
                 } else {
                     info!("Network `{net}` is enabled; initiating second round consensus");
                 }
+                debug!("About to release a read lock on sequencer_config for `{net}` [default]");
                 provider_settings
             };
 
@@ -126,6 +136,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 "calldata": hex::encode(serialized_updates),
             });
 
+            debug!("About to send feed values to kafka");
             match kafka_endpoint
                 .send(
                     FutureRecord::<(), _>::to("aggregation_consensus")
