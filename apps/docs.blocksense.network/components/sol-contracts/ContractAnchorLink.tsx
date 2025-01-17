@@ -13,7 +13,7 @@ export const ContractAnchorLink = ({ label }: AnchorLinkProps) => {
       {/* <ListIcon /> */}
       <span className="flex-grow">
         <strong>
-          <Link href={`${contractsUrl}${label}`}>{label}</Link>
+          <Link href={`${contractsUrl}/contract/${label}`}>{label}</Link>
         </strong>
       </span>
     </li>
