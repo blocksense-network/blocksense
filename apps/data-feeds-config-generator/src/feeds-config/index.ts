@@ -24,29 +24,11 @@ import {
   AggregatedFeedInfo,
   aggregateNetworkInfoPerField,
   CookedDataFeeds,
+  getBaseQuote,
   getFieldFromAggregatedData,
 } from '../data-services/chainlink_feeds';
 import { SimplifiedFeed } from './types';
 import { dataProvidersInjection } from './data-providers';
-
-function getBaseQuote(data: AggregatedFeedInfo): Pair {
-  const docsBase = getFieldFromAggregatedData(data, 'docs', 'baseAsset');
-  const docsQuote = getFieldFromAggregatedData(data, 'docs', 'quoteAsset');
-  const pair = getFieldFromAggregatedData(data, 'pair');
-  const name = getFieldFromAggregatedData(data, 'name');
-
-  if (docsBase && docsQuote) {
-    return createPair(docsBase, docsQuote);
-  }
-  if (pair && pair.length === 2 && pair[0] && pair[1]) {
-    return createPair(pair[0], pair[1]);
-  }
-  if (name) {
-    const [base, quote] = name.split(' / ');
-    return createPair(base, quote);
-  }
-  return createPair('', '');
-}
 
 function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,

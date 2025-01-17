@@ -25,6 +25,7 @@ import {
   RawDataFeeds,
   decodeChainLinkFeedsInfo,
 } from './types';
+import { Pair, createPair } from '@blocksense/config-types/data-feeds-config';
 
 export async function collectRawDataFeeds(directoryPath: string) {
   const { readAllJSONFiles } = selectDirectory(directoryPath);
@@ -133,6 +134,25 @@ export function getFieldFromAggregatedData(
     ? Object.values(data[field]).find(value => value)
     : data[field];
   return value;
+}
+
+export function getBaseQuote(data: AggregatedFeedInfo): Pair {
+  const docsBase = getFieldFromAggregatedData(data, 'docs', 'baseAsset');
+  const docsQuote = getFieldFromAggregatedData(data, 'docs', 'quoteAsset');
+  const pair = getFieldFromAggregatedData(data, 'pair');
+  const name = getFieldFromAggregatedData(data, 'name');
+
+  if (docsBase && docsQuote) {
+    return createPair(docsBase, docsQuote);
+  }
+  if (pair && pair.length === 2 && pair[0] && pair[1]) {
+    return createPair(pair[0], pair[1]);
+  }
+  if (name) {
+    const [base, quote] = name.split(' / ');
+    return createPair(base, quote);
+  }
+  return createPair('', '');
 }
 
 export const feedRegistries: {
