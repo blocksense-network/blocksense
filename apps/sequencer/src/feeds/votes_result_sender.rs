@@ -108,25 +108,35 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             provider_settings
         };
 
+        // Those are all the updates produced by the blocksense system. We clone here, because
+        // each supported network can be configured to have a subset of the feeds and below we
+        // perform this filtering
+        let mut updates = updates.clone();
+
         let feeds_metrics = sequencer_state.feeds_metrics.clone();
         let feeds_config = sequencer_state.active_feeds.clone();
 
         let serialized_updates = match get_serialized_updates_for_network(
             net,
             p,
-            updates.clone(),
+            &mut updates,
             &provider_settings,
             Some(feeds_metrics),
             feeds_config,
         )
         .await
         {
-            Ok((res, _, _)) => res,
+            Ok(res) => res,
             Err(e) => {
                 warn!("Could not get serialized updates for network {net} due to: {e}");
                 continue;
             }
         };
+
+        if updates.updates.is_empty() {
+            debug!("No aggregated batch update for network {net}");
+            continue;
+        }
 
         let updates_to_kafka = json!({
             "SequencerId": sequencer_id,
@@ -148,7 +158,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 "Successfully sent batch of aggregated feed values to kafka endpoint: {res:?}"
             ),
             Err(e) => {
-                error!("Failed to send batch of aggregated feed values to kafka endpoint! {e:?}")
+                error!("Failed to send batch of aggregated feed values for network: {net}, block height: {block_height} to kafka endpoint! {e:?}")
             }
         }
     }

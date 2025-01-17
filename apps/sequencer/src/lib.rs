@@ -11,7 +11,7 @@ pub mod providers;
 pub mod reporters;
 pub mod sequencer_state;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct UpdateToSend {
     pub block_height: u64,
     pub updates: Vec<VotedFeedUpdate>,

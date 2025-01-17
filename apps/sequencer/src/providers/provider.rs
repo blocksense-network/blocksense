@@ -20,8 +20,8 @@ use feed_registry::registry::FeedAggregateHistory;
 use prometheus::metrics::ProviderMetrics;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::fs;
 use std::sync::Arc;
+use std::{fs, mem};
 use tokio::spawn;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::Duration;
@@ -253,20 +253,18 @@ impl RpcProvider {
         }
     }
 
-    pub fn apply_publish_criteria(&self, updates: UpdateToSend) -> UpdateToSend {
-        UpdateToSend {
-            block_height: updates.block_height,
-            updates: updates
-                .updates
-                .iter()
-                .filter(|update| {
-                    self.publishing_criteria
-                        .get(&update.feed_id)
-                        .is_none_or(|criteria| !update.should_skip(criteria, &self.history))
-                })
-                .cloned()
-                .collect::<Vec<VotedFeedUpdate>>(),
-        }
+    pub fn apply_publish_criteria(&self, updates: &mut UpdateToSend) {
+        let mut res = updates
+            .updates
+            .iter()
+            .filter(|update| {
+                self.publishing_criteria
+                    .get(&update.feed_id)
+                    .is_none_or(|criteria| !update.should_skip(criteria, &self.history))
+            })
+            .cloned()
+            .collect::<Vec<VotedFeedUpdate>>();
+        updates.updates = mem::take(&mut res);
     }
 }
 // pub fn print_type<T>(_: &T) {

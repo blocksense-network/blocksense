@@ -10,7 +10,7 @@ use alloy::{
 use config::FeedConfig;
 use data_feeds::feeds_processing::VotedFeedUpdate;
 use eyre::{eyre, Result};
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, mem, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 use utils::to_hex_string;
 
@@ -127,11 +127,7 @@ fn legacy_serialize_updates(net: &str, updates: &UpdateToSend) -> Result<String>
 
 /// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
 /// will be added to the result. Otherwise, all feeds in `updates` will be added.
-pub fn filter_allowed_feeds(
-    net: &str,
-    updates: UpdateToSend,
-    allow_feeds: &Option<Vec<u32>>,
-) -> UpdateToSend {
+pub fn filter_allowed_feeds(net: &str, updates: &mut UpdateToSend, allow_feeds: &Option<Vec<u32>>) {
     if let Some(allowed_feed_ids) = allow_feeds {
         let mut res: Vec<VotedFeedUpdate> = vec![];
         for u in &updates.updates {
@@ -142,55 +138,41 @@ pub fn filter_allowed_feeds(
                 debug!("Skipping feed id {feed_id} for special network `{net}`");
             }
         }
-        UpdateToSend {
-            block_height: updates.block_height,
-            updates: res,
-        }
-    } else {
-        updates
+        updates.updates = mem::take(&mut res);
     }
 }
 
+// Will reduce the updates to only the relevant for the network
 pub async fn get_serialized_updates_for_network(
     net: &str,
     provider: &Arc<Mutex<RpcProvider>>,
-    updates: UpdateToSend,
+    updates: &mut UpdateToSend,
     provider_settings: &config::Provider,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
-) -> Result<(String, Vec<u32>, UpdateToSend)> {
-    let updates = {
-        let provider = provider.lock().await;
-        let updates = filter_allowed_feeds(net, updates, &provider_settings.allow_feeds);
-        let updates = provider.apply_publish_criteria(updates);
+) -> Result<String> {
+    let provider = provider.lock().await;
+    filter_allowed_feeds(net, updates, &provider_settings.allow_feeds);
+    provider.apply_publish_criteria(updates);
 
-        // Don’t post to Smart Contract if we have 0 updates
-        if updates.updates.is_empty() {
-            info!(
-                "Network `{net}` posting to smart contract skipped because it received 0 updates"
-            );
-            eyre::bail!("skipped due to 0 feeds that need update".to_string());
-        }
+    // Don’t post to Smart Contract if we have 0 updates
+    if updates.updates.is_empty() {
+        return Ok("".to_string());
+    }
 
-        updates
-    };
+    let contract_version = provider.contract_version;
+    drop(provider);
 
-    let feeds_to_update_ids = updates
-        .updates
-        .iter()
-        .map(|update| update.feed_id)
-        .collect();
-
-    let serialized_updates = match provider.lock().await.contract_version {
-        1 => legacy_serialize_updates(net, &updates)?,
-        2 => match adfs_serialize_updates(net, &updates, feeds_metrics, feeds_config).await {
+    let serialized_updates = match contract_version {
+        1 => legacy_serialize_updates(net, updates)?,
+        2 => match adfs_serialize_updates(net, updates, feeds_metrics, feeds_config).await {
             Ok(result) => result,
             Err(e) => eyre::bail!("ADFS serialization failed: {}!", e),
         },
         _ => eyre::bail!("Unsupported contract version set for network {net}!"),
     };
 
-    Ok((serialized_updates, feeds_to_update_ids, updates))
+    Ok(serialized_updates)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -198,22 +180,27 @@ pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
     provider_settings: config::Provider,
-    updates: UpdateToSend,
+    mut updates: UpdateToSend,
     feed_type: Repeatability,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<u32>)> {
-    let (serialized_updates, feeds_to_update_ids, updates) = get_serialized_updates_for_network(
+    let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
         &provider,
-        updates,
+        &mut updates,
         &provider_settings,
         feeds_metrics,
         feeds_config,
     )
     .await?;
+
+    if updates.updates.is_empty() {
+        info!("Network `{net}` posting to smart contract skipped because it received 0 updates");
+        return Ok((format!("No updates to send for network {net}"), Vec::new()));
+    }
 
     let mut provider = provider.lock().await;
     let signer = &provider.signer;
@@ -401,6 +388,13 @@ pub async fn eth_batch_send_to_contract(
         .observe(transaction_time as f64);
 
     provider.update_history(&updates.updates);
+
+    let feeds_to_update_ids = updates
+        .updates
+        .iter()
+        .map(|update| update.feed_id)
+        .collect();
+
     Ok((receipt.status().to_string(), feeds_to_update_ids))
 }
 
@@ -851,13 +845,13 @@ mod tests {
     fn compute_keys_vals_ignores_networks_not_on_the_list() {
         let selector = "0x1a2d80ac";
         let network = "dont_filter_me";
-        let updates = UpdateToSend {
+        let mut updates = UpdateToSend {
             block_height: 0,
             updates: get_updates_test_data(),
         };
+        filter_allowed_feeds(network, &mut updates, &None);
         let serialized_updates =
-            legacy_serialize_updates(network, &filter_allowed_feeds(network, updates, &None))
-                .expect("Serialize updates failed!");
+            legacy_serialize_updates(network, &updates).expect("Serialize updates failed!");
 
         let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
         let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
@@ -890,30 +884,29 @@ mod tests {
         // Citrea
         let network = "citrea-testnet";
 
-        let updates = UpdateToSend {
+        let mut updates = UpdateToSend {
             block_height: 0,
             updates: get_updates_test_data(),
         };
 
-        let serialized_updates = legacy_serialize_updates(
+        filter_allowed_feeds(
             network,
-            &filter_allowed_feeds(
-                network,
-                updates.clone(),
-                &Some(vec![
-                    31,  // BTC/USD
-                    47,  // ETH/USD
-                    65,  // EURC/USD
-                    236, // USDT/USD
-                    131, // USDC/USD
-                    21,  // PAXG/USD
-                    206, // TBTC/USD
-                    43,  // WBTC/USD
-                    4,   // WSTETH/USD
-                ]),
-            ),
-        )
-        .expect("Serialize updates failed!");
+            &mut updates,
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                65,  // EURC/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                21,  // PAXG/USD
+                206, // TBTC/USD
+                43,  // WBTC/USD
+                4,   // WSTETH/USD
+            ]),
+        );
+
+        let serialized_updates =
+            legacy_serialize_updates(network, &updates).expect("Serialize updates failed!");
 
         // Note: bye is filtered out:
         assert_eq!(
@@ -924,22 +917,21 @@ mod tests {
         // Berachain
         let network = "berachain-bartio";
 
-        let serialized_updates = legacy_serialize_updates(
+        filter_allowed_feeds(
             network,
-            &filter_allowed_feeds(
-                network,
-                updates.clone(),
-                &Some(vec![
-                    31,  // BTC/USD
-                    47,  // ETH/USD
-                    65,  // EURC/USD
-                    236, // USDT/USD
-                    131, // USDC/USD
-                    21,  // PAXG/USD
-                ]),
-            ),
-        )
-        .expect("Serialize updates failed!");
+            &mut updates,
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                65,  // EURC/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                21,  // PAXG/USD
+            ]),
+        );
+
+        let serialized_updates =
+            legacy_serialize_updates(network, &updates).expect("Serialize updates failed!");
 
         assert_eq!(
             serialized_updates,
@@ -949,21 +941,20 @@ mod tests {
         // Manta
         let network = "manta-sepolia";
 
-        let serialized_updates = legacy_serialize_updates(
+        filter_allowed_feeds(
             network,
-            &filter_allowed_feeds(
-                network,
-                updates.clone(),
-                &Some(vec![
-                    31,  // BTC/USD
-                    47,  // ETH/USD
-                    236, // USDT/USD
-                    131, // USDC/USD
-                    43,  // WBTC/USD
-                ]),
-            ),
-        )
-        .expect("Serialize updates failed!");
+            &mut updates,
+            &Some(vec![
+                31,  // BTC/USD
+                47,  // ETH/USD
+                236, // USDT/USD
+                131, // USDC/USD
+                43,  // WBTC/USD
+            ]),
+        );
+
+        let serialized_updates =
+            legacy_serialize_updates(network, &updates).expect("Serialize updates failed!");
 
         assert_eq!(
             serialized_updates,
