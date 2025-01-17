@@ -3,7 +3,8 @@ lib:
 # let
 #   cfg = config.services.blocksense;
 # in
-with lib; let
+with lib;
+let
   providerOpts = {
     options = {
       is_enabled = mkOption {
@@ -25,13 +26,13 @@ with lib; let
 
       allow_feeds = mkOption {
         type = types.listOf types.int;
-        default = [];
+        default = [ ];
         description = mdDoc "List of allowed feed ids to be published";
       };
 
       publishing_criteria = mkOption {
         type = types.listOf (types.submodule publishingCriteriaOpts);
-        default = [];
+        default = [ ];
         description = mdDoc "List of publishing criteria for feed per provider customizationo";
       };
 
@@ -136,7 +137,8 @@ with lib; let
       };
     };
   };
-in {
+in
+{
   sequencer-id = mkOption {
     type = types.int;
     default = 1;
@@ -168,7 +170,7 @@ in {
 
   providers = mkOption {
     type = types.attrsOf (types.submodule providerOpts);
-    default = {};
+    default = { };
     description = mdDoc "The Ethereum JSON-RPC provider to use for sending tx.";
     example = {
       "ETH1" = {
@@ -190,7 +192,7 @@ in {
 
   reporters = mkOption {
     type = types.listOf types.str;
-    default = [];
+    default = [ ];
     description = mdDoc "The list of whitelisted reporter public keys.";
     example = [
       "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e"
@@ -200,7 +202,7 @@ in {
 
   kafka-report-endpoint = mkOption {
     type = types.submodule kafkaReportEndpointOpts;
-    default = {};
+    default = { };
     description = mdDoc "URL to Apache Kafka server that facilitates decentralized communication.";
     example = {
       "url" = "localhost:9092";
