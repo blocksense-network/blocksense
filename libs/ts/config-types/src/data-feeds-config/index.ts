@@ -129,6 +129,7 @@ export type FeedType = S.Schema.Type<typeof FeedTypeSchema>;
  * Schema for the data feed market hours ( Chainlink compatible ).
  */
 export const MarketHoursSchema = S.Union(
+  S.Literal(''),
   S.Literal('Crypto'),
   S.Literal('Forex'),
   S.Literal('FX'),
