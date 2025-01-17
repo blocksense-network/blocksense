@@ -1,20 +1,20 @@
-import {
-  DataFeedStoreContractArtifact,
-  DataFeedStoreContract,
-} from '../contracts/data_feed_store/src/artifacts/DataFeedStore';
+import { getInitialTestAccountsWallets } from '@aztec/accounts/testing';
 import {
   AccountWallet,
   CompleteAddress,
   ContractDeployer,
-  Fr,
-  PXE,
-  waitForPXE,
-  TxStatus,
   createPXEClient,
+  Fr,
   getContractInstanceFromDeployParams,
+  PXE,
+  TxStatus,
+  waitForPXE,
 } from '@aztec/aztec.js';
-import { getInitialTestAccountsWallets } from '@aztec/accounts/testing';
-import { describe, beforeAll, expect, test } from 'vitest';
+import { beforeAll, describe, expect, test } from 'vitest';
+import {
+  AggregatedDataFeedStoreContract,
+  AggregatedDataFeedStoreContractArtifact,
+} from '../contracts/aggregated_data_feed_store/src/artifacts/AggregatedDataFeedStore.js';
 
 const setupSandbox = async () => {
   const { PXE_URL = 'http://localhost:8080' } = process.env;
@@ -37,7 +37,8 @@ describe('Data feed store contract', () => {
 
   test('Deploying the contract', async () => {
     const salt = Fr.random();
-    const dataFeedStoreContractArtifact = DataFeedStoreContractArtifact;
+    const dataFeedStoreContractArtifact =
+      AggregatedDataFeedStoreContractArtifact;
     const deployArgs = wallets[0].getCompleteAddress().address;
 
     const deploymentData = getContractInstanceFromDeployParams(
@@ -79,46 +80,4 @@ describe('Data feed store contract', () => {
       deploymentData.address,
     );
   }, 30000);
-
-  test('Calling the contract when not owner', async () => {
-    const index_zero = new Fr(0);
-    const data = Array.from(
-      { length: 32 },
-      () => new Fr(Math.floor(Math.random() * 256)),
-    );
-
-    const contract = await DataFeedStoreContract.deploy(wallets[0])
-      .send()
-      .deployed();
-
-    await expect(
-      contract
-        .withWallet(wallets[1])
-        .methods.setFeed(data, index_zero)
-        .send()
-        .wait(),
-    ).rejects.toThrow('Caller is not the owner!');
-  }, 30000);
-
-  test('Setting and getting 10 feeds', async () => {
-    const data = Array.from(
-      { length: 32 },
-      () => new Fr(Math.floor(Math.random() * 256)),
-    );
-
-    const contract = await DataFeedStoreContract.deploy(wallets[0])
-      .send()
-      .deployed();
-
-    for (let i = 0; i < 10; i++) {
-      const index_i = new Fr(i);
-      await contract.methods.setFeed(data, index_i).send().wait();
-      const get_feed_tx = await contract.methods.getFeed(index_i).simulate();
-      for (let j = 0; j < 32; j++) {
-        expect(Number(get_feed_tx[j])).toEqual(
-          parseInt(data[j].value.toString(16), 16),
-        );
-      }
-    }
-  }, 100000);
 });

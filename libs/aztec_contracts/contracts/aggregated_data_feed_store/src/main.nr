@@ -1,5 +1,5 @@
 use dep::aztec::macros::aztec;
-// mod utils
+mod test;
 
 #[aztec]
 contract AggregatedDataFeedStore {
