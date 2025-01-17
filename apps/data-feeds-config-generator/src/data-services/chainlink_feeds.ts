@@ -131,7 +131,20 @@ export function getFieldFromAggregatedData(
   }
 
   const value = isObject(data[field])
-    ? Object.values(data[field]).find(value => value)
+    ? // if value is an object, return the first non-falsy value
+      Object.values(data[field]).find(value => {
+        // if value is an array, return the first non-falsy value
+        // example:
+        // {
+        //   A: ['', ''],
+        //   B: ['B1', 'B2'],
+        // }
+        // should return 'B'
+        if (Array.isArray(value)) {
+          return value.find(arrayValue => arrayValue);
+        }
+        return value;
+      })
     : data[field];
   return value;
 }

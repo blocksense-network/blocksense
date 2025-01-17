@@ -30,7 +30,7 @@ describe('Tests for `getFieldFromAggregatedData`', async () => {
     name: 'LINK / AVAX',
     pair: {
       'avalanche-fuji': ['', ''],
-      'avalanche-mainnet': ['', ''],
+      'avalanche-mainnet': ['LINK', 'AVAX'],
     },
     path: 'link-avax',
     proxyAddress: {
@@ -98,6 +98,31 @@ describe('Tests for `getFieldFromAggregatedData`', async () => {
           'threshold',
         ),
       ).toBe(expectedResult);
+    }
+  });
+
+  test('should work getting aggregated fields when they are arrays', () => {
+    {
+      const expectedResult = testData.pair['avalanche-mainnet'];
+      expect(
+        getFieldFromAggregatedData(
+          testData as unknown as AggregatedFeedInfo,
+          'pair',
+        ),
+      ).toBe(expectedResult);
+    }
+    {
+      testData.pair = {
+        'avalanche-fuji': ['', ''],
+        'avalanche-mainnet': ['', ''],
+      };
+
+      expect(
+        getFieldFromAggregatedData(
+          testData as unknown as AggregatedFeedInfo,
+          'pair',
+        ),
+      ).toBeUndefined();
     }
   });
 
