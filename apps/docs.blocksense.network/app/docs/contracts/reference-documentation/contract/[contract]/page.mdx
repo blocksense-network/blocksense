@@ -1,0 +1,12 @@
+---
+title: 'Contract'
+---
+
+import React from 'react';
+import  ContractPageWrapper, { generateStaticParams }  from '@/components/ReferenceDocumentation/[contract]';
+
+export { generateStaticParams };
+
+export default function ContractPage({ params }) {
+  return <ContractPageWrapper params={params} />;
+}
