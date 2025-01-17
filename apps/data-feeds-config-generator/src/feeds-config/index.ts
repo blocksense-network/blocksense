@@ -26,6 +26,7 @@ import {
   CookedDataFeeds,
   getBaseQuote,
   getFieldFromAggregatedData,
+  getHighestDecimals,
 } from '../data-services/chainlink_feeds';
 import { SimplifiedFeed } from './types';
 import { dataProvidersInjection } from './data-providers';
@@ -41,19 +42,13 @@ function feedFromChainLinkFeedInfo(
     'docs',
     'marketHours',
   );
-  const decimals = !isObject(additionalData.decimals)
-    ? additionalData.decimals
-    : Object.values(additionalData.decimals).reduce(
-        (max, value) => (value > max ? value : max),
-        0,
-      );
 
   return {
     description,
     fullName,
     priceFeedInfo: {
       pair: getBaseQuote(additionalData),
-      decimals,
+      decimals: getHighestDecimals(additionalData),
       category,
       marketHours,
       aggregation: 'fixme',

@@ -168,6 +168,15 @@ export function getBaseQuote(data: AggregatedFeedInfo): Pair {
   return createPair('', '');
 }
 
+export function getHighestDecimals(data: AggregatedFeedInfo): number {
+  return !isObject(data.decimals)
+    ? data.decimals
+    : Object.values(data.decimals).reduce(
+        (max, value) => (value > max ? value : max),
+        0,
+      );
+}
+
 export const feedRegistries: {
   [key in NetworkName]?: EthereumAddress;
 } = {

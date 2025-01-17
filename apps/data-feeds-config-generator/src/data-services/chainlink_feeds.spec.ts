@@ -3,6 +3,7 @@ import {
   AggregatedFeedInfo,
   getBaseQuote,
   getFieldFromAggregatedData,
+  getHighestDecimals,
 } from './chainlink_feeds';
 
 describe('Tests for functions over Aggregated Data', async () => {
@@ -63,6 +64,7 @@ describe('Tests for functions over Aggregated Data', async () => {
       },
     },
   } as unknown as AggregatedFeedInfo;
+
   describe('Tests for `getFieldFromAggregatedData`', async () => {
     test('should work getting unique fields', () => {
       expect(getFieldFromAggregatedData(testData, 'decimals')).toBe(
@@ -172,6 +174,7 @@ describe('Tests for functions over Aggregated Data', async () => {
         });
       }
     });
+
     test('should work getting pair from name field', () => {
       const testPair = ['LINK', 'AVAX'];
       testData.docs = {} as any;
@@ -191,6 +194,23 @@ describe('Tests for functions over Aggregated Data', async () => {
       testData.name = '' as any;
       const { base, quote } = getBaseQuote(testData);
       expect({ base, quote }).toEqual({ base: '', quote: '' });
+    });
+  });
+
+  describe('Tests for `getHighestDecimals`', async () => {
+    test('should work getting decimals when they are not an object', () => {
+      const decimals = getHighestDecimals(testData);
+      expect(decimals).toBe(testData.decimals);
+    });
+
+    test('should work getting decimals when they are an object', () => {
+      testData.decimals = {
+        'avalanche-fuji': 2,
+        'avalanche-mainnet': 4,
+      } as any;
+
+      const decimals = getHighestDecimals(testData);
+      expect(decimals).toBe(4);
     });
   });
 });
