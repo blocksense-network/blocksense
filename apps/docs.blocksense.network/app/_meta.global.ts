@@ -31,15 +31,6 @@ export default {
           'reference-documentation': {
             items: {
               Overview: '',
-              Blocksense: '',
-              IChainlinkFeedRegistry: '',
-              IChainlinkAggregator: '',
-              ICLFeedRegistryAdapter: '',
-              ICLAggregatorAdapter: '',
-              CLFeedRegistryAdapter: '',
-              CLAggregatorAdapter: '',
-              AggregatedDataFeedStore: '',
-              AccessControl: '',
             },
           },
           'deployed-contracts': 'Deployed Contracts',
