@@ -2428,6 +2428,8 @@ dependencies = [
 name = "blocksense-sdk"
 version = "0.1.1"
 dependencies = [
+ "anyhow",
+ "async-trait",
  "blocksense-macro",
  "reqwest 0.12.12",
  "serde 1.0.217",

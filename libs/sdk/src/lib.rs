@@ -15,6 +15,7 @@ pub mod wit {
 }
 
 pub mod oracle;
+pub mod price_pair;
 
 pub use spin_sdk as spin;
 
