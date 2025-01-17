@@ -12,6 +12,7 @@ import {
   FeedCategory,
   NewFeed,
   NewFeedsConfig,
+  createPair,
 } from '@blocksense/config-types/data-feeds-config';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
@@ -33,23 +34,23 @@ import {
 import { SimplifiedFeed } from './types';
 import { dataProvidersInjection } from './data-providers';
 
-function getBaseQuote(data: AggregatedFeedInfo) {
+function getBaseQuote(data: AggregatedFeedInfo): Pair {
   const docsBase = getFieldFromAggregatedData(data, 'docs', 'baseAsset');
   const docsQuote = getFieldFromAggregatedData(data, 'docs', 'quoteAsset');
   const pair = getFieldFromAggregatedData(data, 'pair');
   const name = getFieldFromAggregatedData(data, 'name');
 
   if (docsBase && docsQuote) {
-    return { base: docsBase, quote: docsQuote };
+    return createPair(docsBase, docsQuote);
   }
   if (pair && pair.length === 2 && pair[0] && pair[1]) {
-    return { base: pair[0], quote: pair[1] };
+    return createPair(pair[0], pair[1]);
   }
   if (name) {
     const [base, quote] = name.split(' / ');
-    return { base, quote };
+    return createPair(base, quote);
   }
-  return { base: '', quote: '' };
+  return createPair('', '');
 }
 
 function feedFromChainLinkFeedInfo(
@@ -249,8 +250,7 @@ function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
   const seenPairs = new Set<string>();
 
   return dataFeeds.filter(feed => {
-    const { base, quote } = feed.priceFeedInfo.pair;
-    const pairKey = `${base}-${quote}`;
+    const pairKey = feed.priceFeedInfo.pair.toString();
 
     if (seenPairs.has(pairKey)) {
       return false;
