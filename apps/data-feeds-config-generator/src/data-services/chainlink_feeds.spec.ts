@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vitest';
 import {
   AggregatedFeedInfo,
+  getBaseQuote,
   getFieldFromAggregatedData,
 } from './chainlink_feeds';
-import { get } from 'http';
 
-describe('Tests for `getFieldFromAggregatedData`', async () => {
+describe('Tests for functions over Aggregated Data', async () => {
   const testData = {
     compareOffchain: '',
     contractAddress: {
@@ -62,88 +62,135 @@ describe('Tests for `getFieldFromAggregatedData`', async () => {
         feedType: 'Crypto',
       },
     },
-  };
+  } as unknown as AggregatedFeedInfo;
+  describe('Tests for `getFieldFromAggregatedData`', async () => {
+    test('should work getting unique fields', () => {
+      expect(getFieldFromAggregatedData(testData, 'decimals')).toBe(
+        testData.decimals,
+      );
 
-  test('should work getting unique fields', () => {
-    expect(
-      getFieldFromAggregatedData(
-        testData as unknown as AggregatedFeedInfo,
-        'decimals',
-      ),
-    ).toBe(testData.decimals);
+      expect(getFieldFromAggregatedData(testData, 'name')).toBe(testData.name);
+    });
 
-    expect(
-      getFieldFromAggregatedData(
-        testData as unknown as AggregatedFeedInfo,
-        'name',
-      ),
-    ).toBe(testData.name);
+    test('should work getting aggregated fields', () => {
+      {
+        const expectedResult = testData.feedType['avalanche-mainnet'];
+        expect(getFieldFromAggregatedData(testData, 'feedType')).toBe(
+          expectedResult,
+        );
+      }
+      {
+        const expectedResult = testData.threshold['avalanche-fuji'];
+        expect(getFieldFromAggregatedData(testData, 'threshold')).toBe(
+          expectedResult,
+        );
+      }
+    });
+
+    test('should work getting aggregated fields when they are arrays', () => {
+      {
+        const expectedResult = testData.pair['avalanche-mainnet'];
+        expect(getFieldFromAggregatedData(testData, 'pair')).toBe(
+          expectedResult,
+        );
+      }
+      {
+        testData.pair = {
+          'avalanche-fuji': ['', ''],
+          'avalanche-mainnet': ['', ''],
+        } as any;
+
+        expect(getFieldFromAggregatedData(testData, 'pair')).toBeUndefined();
+      }
+    });
+
+    test('should work getting fields from docs', () => {
+      {
+        expect(getFieldFromAggregatedData(testData, 'docs', 'assetName')).toBe(
+          testData.docs['avalanche-mainnet'].assetName,
+        );
+      }
+    });
+
+    test('should throw an error when inDocsField is not provided', () => {
+      expect(() => getFieldFromAggregatedData(testData, 'docs')).toThrowError(
+        'inDocsField is required when field is "docs"',
+      );
+    });
   });
 
-  test('should work getting aggregated fields', () => {
-    {
-      const expectedResult = testData.feedType['avalanche-mainnet'];
-      expect(
-        getFieldFromAggregatedData(
-          testData as unknown as AggregatedFeedInfo,
-          'feedType',
-        ),
-      ).toBe(expectedResult);
-    }
-    {
-      const expectedResult = testData.threshold['avalanche-fuji'];
-      expect(
-        getFieldFromAggregatedData(
-          testData as unknown as AggregatedFeedInfo,
-          'threshold',
-        ),
-      ).toBe(expectedResult);
-    }
-  });
+  describe('Tests for `getBaseQuote`', async () => {
+    test('should work getting pair from docs field', () => {
+      const { base, quote } = getBaseQuote(testData);
+      expect({ base, quote }).toEqual({
+        base: testData.docs['avalanche-mainnet'].baseAsset,
+        quote: testData.docs['avalanche-mainnet'].quoteAsset,
+      });
+    });
 
-  test('should work getting aggregated fields when they are arrays', () => {
-    {
-      const expectedResult = testData.pair['avalanche-mainnet'];
-      expect(
-        getFieldFromAggregatedData(
-          testData as unknown as AggregatedFeedInfo,
-          'pair',
-        ),
-      ).toBe(expectedResult);
-    }
-    {
-      testData.pair = {
-        'avalanche-fuji': ['', ''],
-        'avalanche-mainnet': ['', ''],
-      };
+    test('should work getting pair if in docs any of the base / quote fields are present', () => {
+      const testPair = ['tLINK', 'tAVAX'];
+      testData.docs = {
+        'avalanche-fuji': {
+          assetName: 'Chainlink',
+          baseAsset: 'tLINK',
+        },
+        'avalanche-mainnet': {
+          assetName: 'Chainlink',
+          quoteAsset: 'tAVAX',
+        },
+      } as any;
 
-      expect(
-        getFieldFromAggregatedData(
-          testData as unknown as AggregatedFeedInfo,
-          'pair',
-        ),
-      ).toBeUndefined();
-    }
-  });
+      const { base, quote } = getBaseQuote(testData);
+      expect({ base, quote }).toEqual({
+        base: testPair[0],
+        quote: testPair[1],
+      });
+    });
 
-  test('should work getting fields from docs', () => {
-    {
-      expect(
-        getFieldFromAggregatedData(
-          testData as unknown as AggregatedFeedInfo,
-          'docs',
-          'assetName',
-        ),
-      ).toBe(testData.docs['avalanche-mainnet'].assetName);
-    }
-  });
+    test('should work getting pair from pair field', () => {
+      const testPair = ['tLINK', 'tAVAX'];
+      testData.docs = {} as any;
+      {
+        testData.pair = testPair as any;
+        const { base, quote } = getBaseQuote(testData);
+        expect({ base, quote }).toEqual({
+          base: testPair[0],
+          quote: testPair[1],
+        });
+      }
+      {
+        testData.pair = {
+          'avalanche-fuji': ['', ''],
+          'avalanche-mainnet': testPair,
+        } as any;
 
-  test('should throw an error when inDocsField is not provided', () => {
-    expect(() =>
-      getFieldFromAggregatedData(
-        testData as unknown as AggregatedFeedInfo,
-        'docs',
-      ),
-    ).toThrowError('inDocsField is required when field is "docs"');
+        const { base, quote } = getBaseQuote(testData);
+        expect({ base, quote }).toEqual({
+          base: testPair[0],
+          quote: testPair[1],
+        });
+      }
+    });
+    test('should work getting pair from name field', () => {
+      const testPair = ['LINK', 'AVAX'];
+      testData.docs = {} as any;
+      testData.pair = {} as any;
+      {
+        const { base, quote } = getBaseQuote(testData);
+        expect({ base, quote }).toEqual({
+          base: testPair[0],
+          quote: testPair[1],
+        });
+      }
+    });
+
+    test("should return empty base and quote if don't fined fields", () => {
+      testData.docs = {} as any;
+      testData.pair = {} as any;
+      testData.name = '' as any;
+      const { base, quote } = getBaseQuote(testData);
+      expect({ base, quote }).toEqual({ base: '', quote: '' });
+    });
   });
 });
