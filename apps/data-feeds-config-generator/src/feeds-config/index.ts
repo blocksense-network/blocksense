@@ -3,13 +3,11 @@ import Web3 from 'web3';
 
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { everyAsync } from '@blocksense/base-utils/async';
-import { selectDirectory } from '@blocksense/base-utils/fs';
 import { getRpcUrl, isTestnet, NetworkName } from '@blocksense/base-utils/evm';
 import { isObject } from '@blocksense/base-utils/type-level';
 
 import {
   Pair,
-  FeedCategory,
   NewFeed,
   NewFeedsConfig,
   createPair,
@@ -18,9 +16,6 @@ import {
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
 
 import { ChainLinkFeedInfo, RawDataFeeds } from '../data-services/types';
-import { CMCInfo } from '../data-services/fetchers/aggregators/cmc';
-import { isFeedSupportedByYF } from '../data-services/fetchers/markets/yf';
-import { artifactsDir } from '../paths';
 import {
   chainlinkNetworkNameToChainId,
   parseNetworkFilename,
@@ -83,57 +78,6 @@ function feedFromChainLinkFeedInfo(
       providers: {},
     },
   };
-}
-
-async function isFeedSupported(
-  feed: {
-    type: FeedCategory;
-    pair: Pair;
-    description: string;
-    fullName: string;
-    resources: any;
-  },
-  supportedCMCCurrencies: readonly CMCInfo[],
-): Promise<boolean> {
-  const cmcSupported = supportedCMCCurrencies.find(
-    currency =>
-      currency.symbol === feed.pair.base &&
-      (feed.type === 'Crypto' || feed.type === ''),
-  );
-  if (cmcSupported != null) {
-    feed.resources.cmc_id = cmcSupported.id;
-    feed.resources.cmc_quote = feed.pair.base;
-    feed.type = 'Crypto';
-    return true;
-  }
-
-  const yfSupported = await isFeedSupportedByYF(feed.pair.base);
-  if (yfSupported) {
-    feed.resources.yf_symbol = feed.pair.base;
-    if (
-      feed.type === 'Currency' ||
-      feed.type === 'Forex' ||
-      feed.type === 'Fiat' ||
-      feed.type === ''
-    ) {
-      feed.resources.yf_symbol = `${feed.pair.base}${feed.pair.quote}=X`;
-    }
-
-    const specialCases: Record<string, any> = {
-      XAG: {
-        yf_symbol: 'GC=F',
-      },
-      XAU: {
-        yf_symbol: 'SI-F',
-      },
-    };
-
-    const special = specialCases[feed.pair.base];
-    if (special) feed.resources = { ...special };
-    return true;
-  }
-
-  return false;
 }
 
 function chainLinkFileNameIsNotTestnet(fileName: string) {
