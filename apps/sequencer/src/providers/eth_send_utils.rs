@@ -151,6 +151,7 @@ pub fn filter_allowed_feeds(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
