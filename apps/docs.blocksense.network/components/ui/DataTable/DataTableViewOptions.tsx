@@ -31,13 +31,16 @@ export function DataTableViewOptions<TData>({
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto h-8 flex border-solid border-slate-200"
+          className="ml-auto bg-white h-8 flex border-solid border-slate-200 dark:bg-neutral-900"
         >
           <Settings2 className="mr-2 h-4 w-4" />
           View
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[150px]">
+      <DropdownMenuContent
+        align="end"
+        className="w-[150px] bg-white dark:bg-neutral-900"
+      >
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table

@@ -20,7 +20,7 @@ export const Footer = () => {
           <ImageWrapper
             src="/icons/blocksense-rocket-icon.svg"
             alt={config.adoptersAltLink}
-            className="footer__social-icon-img relative w-6 h-6"
+            className="footer__social-icon-img relative w-6 h-6 invert"
           />
           <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
             Early Adopters
@@ -39,7 +39,7 @@ export const Footer = () => {
               <ImageWrapper
                 src="/icons/blocksense-telegram.svg"
                 alt={config.social_media.telegram._alt}
-                className="footer__social-icon-img relative w-6 h-6"
+                className="footer__social-icon-img relative w-6 h-6 invert"
               />
               <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
                 Telegram
@@ -56,7 +56,7 @@ export const Footer = () => {
               <ImageWrapper
                 src="/icons/blocksense-x.svg"
                 alt={config.social_media.x._alt}
-                className="footer__social-icon-img relative w-6 h-6"
+                className="footer__social-icon-img relative w-6 h-6 invert"
               />
               <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
                 Follow us
@@ -73,7 +73,7 @@ export const Footer = () => {
               <ImageWrapper
                 src="/icons/blocksense-discord.svg"
                 alt={config.social_media.discord._alt}
-                className="footer__social-icon-img relative w-6 h-6"
+                className="footer__social-icon-img relative w-6 h-6 invert"
               />
               <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
                 Join our community

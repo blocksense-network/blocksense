@@ -90,7 +90,7 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
           type="image/png"
         />
       </NextHead>
-      <body>
+      <body className="md:px-4 lg:px-10 dark:bg-neutral-900 dark:text-neutral-300">
         <Layout
           navbar={navbar}
           pageMap={pageMap}

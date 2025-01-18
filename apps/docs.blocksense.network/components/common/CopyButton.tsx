@@ -42,13 +42,13 @@ export const CopyButton = ({
           <ImageWrapper
             src="/icons/check.svg"
             alt="Copied"
-            className="relative w-5 h-5"
+            className="relative w-5 h-5 invert"
           />
         ) : (
           <ImageWrapper
             src="/icons/clipboard.svg"
             alt="Clipboard"
-            className="relative w-5 h-5 cursor-pointer"
+            className="relative w-5 h-5 cursor-pointer invert"
             onClick={onCopy}
           />
         )}

@@ -10,9 +10,9 @@ type AnchorLinkTitleProps = {
 const titleStyles = {
   1: 'text-4xl',
   2: 'text-3xl',
-  3: 'text-2xl',
+  3: 'text-2xl font-bold h3__separator',
   4: 'text-xl',
-  5: 'text-md max-w-[280px] px-4 truncate lg:max-w-none lg:whitespace-normal lg:overflow-visible lg:truncate-none',
+  5: 'text-md max-w-[280px] font-bold px-4 truncate lg:max-w-none lg:whitespace-normal lg:overflow-visible lg:truncate-none dark:text-white',
   6: 'text-sm px-4',
 };
 

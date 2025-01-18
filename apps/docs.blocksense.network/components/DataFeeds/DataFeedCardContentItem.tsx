@@ -13,7 +13,7 @@ export const DataFeedCardContentItem = ({
     <span className="data-feed-card-content__label text-sm text-gray-500">
       {label}
     </span>
-    <div className="data-feed-card-content__value text-sm font-noto-sans-bold text-gray-900 leading-snug">
+    <div className="data-feed-card-content__value text-sm font-bold text-gray-900 leading-snug dark:text-white">
       {value}
     </div>
   </div>

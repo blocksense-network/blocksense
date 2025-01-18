@@ -8,7 +8,7 @@ const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
 
 export const Overview = () => {
   return (
-    <ul className="overview__list nx-mt-6 nx-list-none first:nx-mt-0 ltr:nx-ml-0 rtl:nx-mr-6">
+    <ul className="overview__list mt-6 nx-list-none first:nx-mt-0 ltr:nx-ml-0 rtl:nx-mr-6">
       {solReflection.map((sourceUnit: SourceUnitDocItem) => (
         <ContractAnchorLink
           key={sourceUnit.absolutePath}

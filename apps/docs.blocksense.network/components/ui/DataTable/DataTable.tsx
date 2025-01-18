@@ -135,7 +135,7 @@ export function DataTable<TData, TValue>({
           invisibleColumns={invisibleColumns}
         />
       )}
-      <div className="rounded-md border">
+      <div className="rounded-md border border-solid border-neutral-200 dark:border-neutral-600">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (

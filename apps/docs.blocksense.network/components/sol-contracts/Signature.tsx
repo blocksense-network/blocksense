@@ -13,7 +13,7 @@ export const Signature = ({
 }: SignatureProps) => {
   return (
     signature && (
-      <section className="signature border border-gray-800 rounded-md">
+      <section className="signature rounded-md">
         <section className="signature__content justify-between items-start w-full p-0">
           <CodeBlock code={signature.codeSnippet} lang="solidity" />
         </section>

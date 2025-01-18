@@ -94,10 +94,10 @@ export const Errors = ({ errors, isFromSourceUnit }: ErrorsProps) => {
                 )}
 
                 <footer className="error-details__footer flex justify-between items-center mt-2">
-                  <aside className="error-details__abi-modal flex-shrink-0">
+                  <aside className="error-details__abi-modal shrink-0">
                     <ABIModal abi={error.abi} name={error.name} />
                   </aside>
-                  <aside className="error-details__selector flex-shrink-0">
+                  <aside className="error-details__selector shrink-0">
                     <Selector selector={error.errorSelector} />
                   </aside>
                 </footer>

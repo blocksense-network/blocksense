@@ -7,7 +7,7 @@ const ArrowPathIcon = () => {
     <ImageWrapper
       src="/icons/blocksense-arrow-path.svg"
       alt="Blocksense roadmap arrow"
-      className="relative w-8 h-8"
+      className="relative w-8 h-8 invert"
     />
   );
 };

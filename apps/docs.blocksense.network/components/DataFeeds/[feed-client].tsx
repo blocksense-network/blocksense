@@ -115,7 +115,7 @@ export const DataFeedPageClient = ({
 
   return (
     <div className="data-feed-details">
-      <h1 className="text-2xl font-bold text-gray-900 mt-10">
+      <h1 className="text-2xl font-bold text-gray-900 mt-10 dark:text-white">
         {description} | ID: {id}
       </h1>
 

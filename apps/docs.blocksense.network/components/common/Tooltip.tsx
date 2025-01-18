@@ -53,7 +53,7 @@ export const Tooltip = ({
       {content && (
         <div
           className={cn(
-            `absolute ${positionClasses[position]} hidden group-hover:block group-focus:block px-4 py-1.5 text-sm font-semibold border border-neutral-300 rounded-md shadow-md z-50 whitespace-nowrap text-gray-800 bg-white ${contentClassName}`,
+            `absolute ${positionClasses[position]} hidden group-hover:block group-focus:block px-4 py-1.5 text-sm font-semibold border border-neutral-300 rounded-md shadow-md z-50 whitespace-nowrap text-gray-800 bg-white text-md max-w-[280px] dark:bg-neutral-900 dark:border-neutral-600 dark:text-white ${contentClassName}`,
           )}
         >
           {content?.props.children}

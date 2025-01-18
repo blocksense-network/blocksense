@@ -21,7 +21,9 @@ export const ContractOverview = ({ contract }: ContractOverviewProps) => {
       transformers={[
         transformerOverviewLineLink({
           routeLink: pathName,
-          classes: ['p-1 hover:bg-stone-100 cursor-pointer'],
+          classes: [
+            'p-1 hover:bg-stone-100 dark:hover:bg-neutral-800 cursor-pointer',
+          ],
         }),
       ]}
     />

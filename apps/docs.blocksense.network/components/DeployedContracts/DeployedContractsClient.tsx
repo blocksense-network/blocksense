@@ -47,10 +47,8 @@ export const DeployedContractsClient = ({
         itemsLength={1}
       >
         <Callout type="info" emoji="💡">
-          <span className="text-gray-500 text-md">
-            We have deployed our contracts on the following networks. Select a
-            network to view detailed information about the deployed contracts.
-          </span>
+          We have deployed our contracts on the following networks. Select a
+          network to view detailed information about the deployed contracts.
         </Callout>
 
         <div className="flex flex-wrap justify-center gap-4 pt-4">
@@ -74,7 +72,7 @@ export const DeployedContractsClient = ({
             itemsLength={deployedCoreContracts.length}
           >
             <Callout type="info" emoji="💡">
-              <span className="text-gray-500 text-md">
+              <span>
                 These contracts are key components of the Blocksense platform
                 and provide essential functionalities that support the
                 ecosystem.
@@ -111,13 +109,10 @@ export const DeployedContractsClient = ({
               itemsLength={deployedProxyContracts.length}
             >
               <Callout type="info" emoji="💡">
-                <span className="text-gray-500 text-md">
-                  Blocksense aggregator proxy contracts table allows users to
-                  explore contracts that serve as an alternative to the
-                  Chainlink proxy contracts. Additionally, the table provides
-                  information about data feed names, IDs, and relevant
-                  addresses.
-                </span>
+                Blocksense aggregator proxy contracts table allows users to
+                explore contracts that serve as an alternative to the Chainlink
+                proxy contracts. Additionally, the table provides information
+                about data feed names, IDs, and relevant addresses.
               </Callout>
               <DataTable
                 columns={proxyContractsColumns}

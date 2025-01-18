@@ -88,7 +88,7 @@ export const Variables = ({
                 </section>
 
                 <footer className="variable-details__footer flex justify-between items-center mt-2">
-                  <aside className="variable-details__abi-modal flex-shrink-0">
+                  <aside className="variable-details__abi-modal shrink-0">
                     <ABIModal abi={variable.abi!} name={variable.name} />
                   </aside>
                 </footer>

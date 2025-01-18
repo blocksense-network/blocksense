@@ -97,7 +97,7 @@ export const Events = ({ events }: EventsProps) => {
                 </section>
 
                 <footer className="event-details__footer flex justify-between items-center mt-2">
-                  <aside className="event-details__abi-modal flex-shrink-0">
+                  <aside className="event-details__abi-modal shrink-0">
                     <ABIModal abi={event.abi} name={event.name} />
                   </aside>
                 </footer>

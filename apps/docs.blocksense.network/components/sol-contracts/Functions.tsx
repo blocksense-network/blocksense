@@ -114,10 +114,10 @@ export const Functions = ({ functions, isFromSourceUnit }: FunctionsProps) => {
                   <FunctionModifiers functionModifiers={_function._modifiers} />
                 </section>
                 <footer className="function-details__footer flex justify-between items-center mt-2">
-                  <aside className="function-details__abi-modal flex-shrink-0">
+                  <aside className="function-details__abi-modal shrink-0">
                     <ABIModal abi={_function.abi} name={functionId} />
                   </aside>
-                  <aside className="function-details__selector flex-shrink-0">
+                  <aside className="function-details__selector shrink-0">
                     <Selector selector={_function.functionSelector} />
                   </aside>
                 </footer>

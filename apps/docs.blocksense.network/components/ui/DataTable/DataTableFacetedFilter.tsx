@@ -43,13 +43,16 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          className="h-8 border-solid border-slate-200"
+          className="h-8 border border-solid border-neutral-200/70 bg-white dark:bg-neutral-900"
         >
           {firstSelectedValue || title}
           <ChevronDown className="ml-1 h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
+      <PopoverContent
+        className="w-[200px] p-0 bg-white dark:bg-neutral-900"
+        align="start"
+      >
         <Command className="py-2">
           <CommandInput className="my-1 h-1 px-2" placeholder={title} />
           <CommandList>
@@ -74,7 +77,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                   >
                     <div
                       className={cn(
-                        'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                        'mr-2 flex h-4 w-4 items-center justify-center rounded-xs border border-primary',
                         isSelected
                           ? 'bg-primary text-primary-foreground'
                           : 'opacity-50 [&_svg]:invisible border-solid border-slate-500',

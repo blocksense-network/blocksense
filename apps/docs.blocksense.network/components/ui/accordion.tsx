@@ -13,7 +13,7 @@ const AccordionItem = React.forwardRef<
   <AccordionPrimitive.Item
     ref={ref}
     className={cn(
-      'border-b border-solid border border-slate-200 bg-slate-100 px-1 py-0 mb-4',
+      'border-b border-solid border border-slate-200 bg-slate-100 dark:bg-neutral-900 dark:border-neutral-600 px-1 py-0 mb-4',
       className,
     )}
     {...props}
@@ -29,7 +29,7 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        'accordion-item__trigger flex flex-1 items-center h-[36px] pb-[0.5rem] justify-between font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180 focus:ring-0 focus:outline-none focus:border-transparent focus:text-blue-700',
+        'accordion-item__trigger flex flex-1 items-center h-[36px] pb-[0.5rem] justify-between font-bold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 focus:ring-0 focus:outline-none focus:border-transparent focus:text-blue-700',
         className,
       )}
       {...props}
