@@ -80,4 +80,41 @@ describe('Data feed store contract', () => {
       deploymentData.address,
     );
   }, 30000);
+
+  // feed_input_data: [Field; MAX_INPUT_ARRAY_SIZE],
+  // block_number: Field,
+  // feeds_len: Field,
+  // rounds_len: Field
+  test('Sets new feeds', async () => {
+    const contract = await AggregatedDataFeedStoreContract.deploy(wallets[0])
+      .send()
+      .deployed();
+
+    const feedInputData = Array.from(
+      { length: 1000 },
+      () => new Fr(Math.floor(Math.random() * 256)),
+    );
+
+    const blockNumber = new Fr(100);
+    const feedLength = 1055;
+    const roundsLength = 1055;
+
+    await contract
+      .withWallet(wallets[0])
+      .methods.set_feeds(feedInputData, blockNumber, feedLength, roundsLength)
+      .send()
+      .wait();
+    // const get_first_feed_tx = await contract.methods
+    //     .get_data_feed(keys[0])
+    //     .simulate();
+    // const get_second_feed_tx = await contract.methods
+    //     .get_data_feed(keys[1])
+    //     .simulate();
+    // for (let i = 0; i < 24; i++) {
+    //     expect(Number(get_first_feed_tx.value[i])).toEqual(values[i]);
+    // }
+    // for (let i = 0; i < 24; i++) {
+    //     expect(Number(get_second_feed_tx.value[i])).toEqual(values[i + 24]);
+    // }
+  }, 30000);
 });
