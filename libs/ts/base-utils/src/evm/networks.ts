@@ -71,6 +71,7 @@ const networks = [
   'conflux-eSpace-testnet',
   'cronos-testnet',
   'world-chain-sepolia',
+  'kroma-sepolia',
 ] as const;
 
 const chainIds = [
@@ -79,7 +80,7 @@ const chainIds = [
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
   1663, 1666700000, 1313161555, 839999, 16, 114, 28882, 9728, 31, 41, 71, 338,
-  4801,
+  4801, 2358,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -394,6 +395,11 @@ export const networkMetadata = {
     chainId: 4801,
     isTestnet: true,
     explorerUrl: 'https://worldchain-sepolia.explorer.alchemy.com/',
+  },
+  'kroma-sepolia': {
+    chainId: 2358,
+    isTestnet: true,
+    explorerUrl: 'https://blockscout.sepolia.kroma.network',
   },
 } satisfies {
   [Net in NetworkName]: {
