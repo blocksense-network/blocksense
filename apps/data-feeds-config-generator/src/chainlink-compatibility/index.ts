@@ -28,17 +28,18 @@ async function getBlocksenseFeedsCompatibility(
     .reduce((acc, [feedName, feedData]) => {
       const chainlinkAggregators = fromEntries(
         Object.entries(feedData.networks)
+          .filter(
+            ([networkFile, _perNetworkFeedData]) =>
+              chainlinkNetworkNameToChainId[parseNetworkFilename(networkFile)],
+          )
           .map(([networkFile, perNetworkFeedData]) => {
             const networkName =
               chainlinkNetworkNameToChainId[parseNetworkFilename(networkFile)];
-            return networkName == null
-              ? null
-              : tuple(
-                  networkName,
-                  parseEthereumAddress(perNetworkFeedData.contractAddress),
-                );
-          })
-          .filter(pair => pair != null),
+            return tuple(
+              networkName!,
+              parseEthereumAddress(perNetworkFeedData.contractAddress),
+            );
+          }),
       );
 
       const dataFeed = feedConfig.feeds.find(
