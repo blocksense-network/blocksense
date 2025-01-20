@@ -3,15 +3,8 @@
   "type": "module",
   "version": "0.0.0",
   "types": "src/index.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/cjs/index.cjs",
-      "import": "./dist/esm/index.mjs",
-      "types": "./dist/types/src/index.d.ts"
-    }
-  },
   "scripts": {
-    "build": "rollup --silent --config ./rollup.config.mjs",
+    "build": "yarn run rollup:build-workspace",
     "ts": "yarn node --import tsx",
     "get-chainlink-feeds": "yarn ts scripts/get_chainlink_feeds.ts",
     "generate-data-feeds-config": "yarn ts scripts/generate-feeds-config.ts",
