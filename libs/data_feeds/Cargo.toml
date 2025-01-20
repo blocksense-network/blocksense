@@ -52,7 +52,7 @@ rand = "0.8.5"
 curl = "0.4.47"
 async-trait = "0.1.83"
 assert_cmd = "2.0.14"
-dirs = "5.0.1"
+dirs = "6.0.0"
 strum = { version = "0.26.3", features = ["derive"] }
 http = "1.2.0"
 
