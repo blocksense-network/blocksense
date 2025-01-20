@@ -11,7 +11,8 @@
     "format:check": "pre-commit run --all",
     "format:write": "pre-commit run --all || pre-commit run --all",
     "generate-data-feeds-config": "yarn workspace '@blocksense/data-feeds-config-generator' generate",
-    "build": "yarn workspaces foreach --from $0 -Rp --topological-dev run build",
+    "build": "yarn build:recursive",
+    "build:recursive": "yarn workspaces foreach --from $0 -Rp --topological-dev run build",
     "build:all": "yarn workspaces foreach --all -p --topological-dev run build",
     "test": "yarn workspaces foreach --from $0 -Rp --topological-dev run test",
     "test:all": "yarn workspaces foreach --all -p --topological-dev run test"
