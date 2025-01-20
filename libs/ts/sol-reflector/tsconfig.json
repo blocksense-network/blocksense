@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "esModuleInterop": true,
@@ -8,7 +8,7 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "rootDir": "src",
+    "rootDir": "./src",
     "outDir": "dist",
     "noUncheckedIndexedAccess": true,
     "noImplicitAny": true,
