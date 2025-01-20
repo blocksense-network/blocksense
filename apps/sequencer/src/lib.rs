@@ -1,6 +1,7 @@
 //use std::collections::HashMap;
 
 use data_feeds::feeds_processing::VotedFeedUpdate;
+use serde::{Deserialize, Serialize};
 
 pub mod block_creator;
 pub mod blocks_reader;
@@ -15,4 +16,12 @@ pub mod sequencer_state;
 pub struct UpdateToSend {
     pub block_height: u64,
     pub updates: Vec<VotedFeedUpdate>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ConsensusSecondRoundBatch {
+    sequencer_id: u64,
+    block_height: u64,
+    network: String,
+    calldata: String,
 }

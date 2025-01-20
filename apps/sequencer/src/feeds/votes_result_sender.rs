@@ -1,13 +1,13 @@
 use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
+use crate::ConsensusSecondRoundBatch;
 use crate::{sequencer_state::SequencerState, UpdateToSend};
 use actix_web::web::Data;
 use alloy::hex;
 use feed_registry::types::Repeatability::Periodic;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
-use serde_json::json;
 use std::io::Error;
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedReceiver;
@@ -138,18 +138,25 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             continue;
         }
 
-        let updates_to_kafka = json!({
-            "SequencerId": sequencer_id,
-            "BlockHeight": block_height,
-            "Network": net,
-            "calldata": hex::encode(serialized_updates),
-        });
+        let updates_to_kafka = ConsensusSecondRoundBatch {
+            sequencer_id,
+            block_height,
+            network: net.to_string(),
+            calldata: hex::encode(serialized_updates),
+        };
+
+        let serialized_updates = match serde_json::to_string(&updates_to_kafka) {
+            Ok(res) => res,
+            Err(e) => {
+                error!("Failed to serialize data for second round conseneus trigger! {e}");
+                continue;
+            }
+        };
 
         debug!("About to send feed values to kafka");
         match kafka_endpoint
             .send(
-                FutureRecord::<(), _>::to("aggregation_consensus")
-                    .payload(&updates_to_kafka.to_string()),
+                FutureRecord::<(), _>::to("aggregation_consensus").payload(&serialized_updates),
                 Timeout::After(Duration::from_secs(3 * 60)),
             )
             .await
