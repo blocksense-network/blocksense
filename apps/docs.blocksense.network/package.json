@@ -2,8 +2,8 @@
   "name": "@blocksense/docs.blocksense.network",
   "version": "0.0.0",
   "scripts": {
-    "build:deps": "yarn run -T build @blocksense/data-feeds-config-generator && yarn workspace @blocksense/contracts sol-reflect",
-    "build": "yarn build:deps && yarn build:tsc && yarn build:nextra && yarn build:pagefind",
+    "build": "yarn build:collect-artifacts && yarn build:tsc && yarn build:nextra && yarn build:pagefind",
+    "build:collect-artifacts": "yarn workspace @blocksense/contracts sol-reflect",
     "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
     "build:nextra": "next build",
     "build:pagefind": "pagefind --site .next/server/app --output-path public/_pagefind",
