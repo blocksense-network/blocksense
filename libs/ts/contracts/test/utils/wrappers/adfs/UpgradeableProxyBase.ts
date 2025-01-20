@@ -44,16 +44,22 @@ export abstract class UpgradeableProxyADFSBaseWrapper
 
   public async proxyCall<T extends keyof UpgradeableProxyCallMethods>(
     method: T,
-    sequencer: HardhatEthersSigner,
+    caller: HardhatEthersSigner,
     feeds: Feed[],
     ...args: any[]
   ): Promise<ReturnType<UpgradeableProxyCallMethods[T]>> {
-    return this.implementation[method](sequencer, feeds, {
-      txData: {
-        to: this.contract.target,
-      },
-      ...args,
-    }) as ReturnType<UpgradeableProxyCallMethods[T]>;
+    return this.implementation[method](
+      caller,
+      feeds,
+      Object.assign(
+        {
+          txData: {
+            to: this.contract.target,
+          },
+        },
+        ...args,
+      ),
+    ) as ReturnType<UpgradeableProxyCallMethods[T]>;
   }
 
   public abstract init(

@@ -49,14 +49,14 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   }
 
   public async checkLatestValue(
-    sequencer: HardhatEthersSigner,
+    caller: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
       txData?: any;
     } = {},
   ) {
     for (const feed of feeds) {
-      const storedValue = await sequencer.call({
+      const storedValue = await caller.call({
         to: this.contract.target,
         data: this.encodeDataRead(ReadOp.GetLatestFeed, feed),
         ...opts.txData,
@@ -67,14 +67,14 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   }
 
   public async checkLatestRound(
-    sequencer: HardhatEthersSigner,
+    caller: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
       txData?: any;
     } = {},
   ) {
     for (const feed of feeds) {
-      const round = await sequencer.call({
+      const round = await caller.call({
         to: this.contract.target,
         data: this.encodeDataRead(ReadOp.GetLatestRound, feed),
         ...opts.txData,
@@ -85,14 +85,14 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   }
 
   public async checkValueAtRound(
-    sequencer: HardhatEthersSigner,
+    caller: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
       txData?: any;
     } = {},
   ) {
     for (const feed of feeds) {
-      const storedValue = await sequencer.call({
+      const storedValue = await caller.call({
         to: this.contract.target,
         data: this.encodeDataRead(ReadOp.GetFeedAtRound, feed),
         ...opts.txData,
@@ -103,14 +103,14 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
   }
 
   public async checkLatestFeedAndRound(
-    sequencer: HardhatEthersSigner,
+    caller: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
       txData?: any;
     } = {},
   ) {
     for (const feed of feeds) {
-      const storedValue = await sequencer.call({
+      const storedValue = await caller.call({
         to: this.contract.target,
         data: this.encodeDataRead(ReadOp.GetLatestFeedAndRound, feed),
         ...opts.txData,
