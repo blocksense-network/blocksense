@@ -64,6 +64,12 @@ const networks = [
   'exSat-testnet',
   'songbird-coston',
   'flair-coston2',
+  'boba-sepolia',
+  'boba-bnb-testnet',
+  'rootstock-testnet',
+  'telos-testnet',
+  'conflux-eSpace-testnet',
+  'cronos-testnet',
 ] as const;
 
 const chainIds = [
@@ -71,7 +77,7 @@ const chainIds = [
   84532, 80084, 56, 97, 42220, 44787, 250, 4002, 100, 10200, 167000, 167009,
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
-  1663, 1666700000, 1313161555, 839999, 16, 114,
+  1663, 1666700000, 1313161555, 839999, 16, 114, 28882, 9728, 31, 41, 71, 338,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -351,6 +357,36 @@ export const networkMetadata = {
     chainId: 114,
     isTestnet: true,
     explorerUrl: 'https://coston2.testnet.flarescan.com/',
+  },
+  'boba-sepolia': {
+    chainId: 28882,
+    isTestnet: true,
+    explorerUrl: 'https://testnet.bobascan.com/',
+  },
+  'boba-bnb-testnet': {
+    chainId: 9728,
+    isTestnet: true,
+    explorerUrl: 'https://bnb.testnet.bobascan.com/',
+  },
+  'rootstock-testnet': {
+    chainId: 31,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.rootstock.io/',
+  },
+  'telos-testnet': {
+    chainId: 41,
+    isTestnet: true,
+    explorerUrl: 'testnet.teloscan.io',
+  },
+  'conflux-eSpace-testnet': {
+    chainId: 71,
+    isTestnet: true,
+    explorerUrl: 'https://evmtestnet.confluxscan.io/',
+  },
+  'cronos-testnet': {
+    chainId: 338,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.cronos.org/testnet',
   },
 } satisfies {
   [Net in NetworkName]: {
