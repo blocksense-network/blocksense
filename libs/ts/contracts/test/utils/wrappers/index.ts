@@ -9,6 +9,7 @@ import { UpgradeableProxyADFSWrapper } from './adfs/UpgradeableProxy';
 import { UpgradeableProxyADFSGenericWrapper } from './adfs/UpgradeableProxyGeneric';
 import { CLBaseWrapper } from './chainlink/Base';
 import { CLAdapterWrapper } from './chainlink/CLAdapter';
+import { CLRegistryBaseWrapper } from './chainlink/registry/Base';
 
 export {
   IADFSWrapper,
@@ -22,4 +23,5 @@ export {
   UpgradeableProxyADFSGenericWrapper,
   CLBaseWrapper,
   CLAdapterWrapper,
+  CLRegistryBaseWrapper,
 };

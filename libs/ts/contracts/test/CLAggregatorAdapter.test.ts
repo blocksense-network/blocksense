@@ -4,6 +4,7 @@ import {
   UpgradeableProxyADFSWrapper,
 } from './utils/wrappers';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { encodeDataAndTimestamp } from './utils/helpers/common';
 
 const aggregatorData = [
   {
@@ -157,14 +158,4 @@ describe('CLAggregatorAdapter', function () {
       });
     }
   });
-
-  const encodeDataAndTimestamp = (data: number): string => {
-    const value = '0x' + data.toString(16).padStart(48, '0');
-    const timestamp =
-      '0x' +
-      BigInt(Math.floor(Date.now() / 1000))
-        .toString(16)
-        .padStart(16, '0');
-    return ethers.concat([value, timestamp]);
-  };
 });
