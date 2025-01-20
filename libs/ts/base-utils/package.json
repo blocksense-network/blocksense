@@ -10,67 +10,67 @@
     ".": {
       "require": "./dist/cjs/index.cjs",
       "import": "./dist/esm/index.mjs",
-      "types": "./dist/types/index.d.ts"
+      "types": "./src/index.ts"
     },
     "./array-iter": {
       "require": "./dist/cjs/array-iter.cjs",
       "import": "./dist/esm/array-iter.mjs",
-      "types": "./dist/types/array-iter.d.ts"
+      "types": "./src/array-iter.ts"
     },
     "./assert": {
       "require": "./dist/cjs/assert.cjs",
       "import": "./dist/esm/assert.mjs",
-      "types": "./dist/types/assert.d.ts"
+      "types": "./src/assert.ts"
     },
     "./async": {
       "require": "./dist/cjs/async.cjs",
       "import": "./dist/esm/async.mjs",
-      "types": "./dist/types/async.d.ts"
+      "types": "./src/async.ts"
     },
     "./buffer-and-hex": {
       "require": "./dist/cjs/buffer-and-hex/index.cjs",
       "import": "./dist/esm/buffer-and-hex/index.mjs",
-      "types": "./dist/types/buffer-and-hex/index.d.ts"
+      "types": "./src/buffer-and-hex/index.ts"
     },
     "./fs": {
       "require": "./dist/cjs/fs.cjs",
       "import": "./dist/esm/fs.mjs",
-      "types": "./dist/types/fs.d.ts"
+      "types": "./src/fs.ts"
     },
     "./evm": {
       "require": "./dist/cjs/evm/index.cjs",
       "import": "./dist/esm/evm/index.mjs",
-      "types": "./dist/types/evm/index.d.ts"
+      "types": "./src/evm/index.ts"
     },
     "./env": {
       "require": "./dist/cjs/env/index.cjs",
       "import": "./dist/esm/env/index.mjs",
-      "types": "./dist/types/env/index.d.ts"
+      "types": "./src/env/index.ts"
     },
     "./http": {
       "require": "./dist/cjs/http.cjs",
       "import": "./dist/esm/http.mjs",
-      "types": "./dist/types/http.d.ts"
+      "types": "./src/http.ts"
     },
     "./logging": {
       "require": "./dist/cjs/logging.cjs",
       "import": "./dist/esm/logging.mjs",
-      "types": "./dist/types/logging.d.ts"
+      "types": "./src/logging.ts"
     },
     "./numeric": {
       "require": "./dist/cjs/numeric.cjs",
       "import": "./dist/esm/numeric.mjs",
-      "types": "./dist/types/numeric.d.ts"
+      "types": "./src/numeric.ts"
     },
     "./string": {
       "require": "./dist/cjs/string.cjs",
       "import": "./dist/esm/string.mjs",
-      "types": "./dist/types/string.d.ts"
+      "types": "./src/string.ts"
     },
     "./syntax-highlighting": {
       "require": "./dist/cjs/syntax-highlighting.cjs",
       "import": "./dist/esm/syntax-highlighting.mjs",
-      "types": "./dist/types/syntax-highlighting.d.ts"
+      "types": "./src/syntax-highlighting.ts"
     }
   },
   "scripts": {
