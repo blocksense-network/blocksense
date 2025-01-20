@@ -27,6 +27,7 @@ export const deployedNetworks = [
   'scroll-sepolia',
   'songbird-coston',
   'taiko-hekla',
+  'world-chain-sepolia',
 ] satisfies NetworkName[];
 
 export const API_KEYS: Record<string, string> = {
@@ -74,6 +75,7 @@ export const API_ENDPOINTS = {
   scrollSepolia: 'https://api-sepolia.scrollscan.com/api',
   songbirdCoston: 'https://coston-explorer.flare.network/api',
   taikoHekla: 'https://blockscoutapi.hekla.taiko.xyz/api',
+  worldChainSepolia: 'https://worldchain-sepolia.explorer.alchemy.com/api',
 };
 
 export type Transaction = {
