@@ -6,11 +6,11 @@ pragma solidity ^0.8.24;
 /// @dev Contains utility functions for calling gas efficiently dataFeedStore functions and decoding return data
 library Blocksense {
   /// @notice Gets the latest answer from the dataFeedStore
-  /// @param key The key ID for the feed
+  /// @param id The key ID for the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @return answer The latest stored value after being decoded
   function _latestAnswer(
-    uint32 key,
+    uint256 id,
     address dataFeedStore
   ) internal view returns (int256) {
     return
@@ -18,7 +18,10 @@ library Blocksense {
         uint256(
           uint192(
             bytes24(
-              _callDataFeed(dataFeedStore, abi.encodePacked(0x80000000 | key))
+              _callDataFeed(
+                dataFeedStore,
+                abi.encodePacked(bytes2(0x8200), uint120(id))
+              )
             )
           )
         )
@@ -27,7 +30,7 @@ library Blocksense {
 
   /// @notice Gets the round data from the dataFeedStore
   /// @param _roundId The round ID to retrieve data for
-  /// @param key The key ID for the feed
+  /// @param id The key ID for the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @return roundId The round ID
   /// @return answer The value stored for the feed at the given round ID
@@ -36,7 +39,7 @@ library Blocksense {
   /// @return answeredInRound Same as roundId
   function _getRoundData(
     uint80 _roundId,
-    uint32 key,
+    uint256 id,
     address dataFeedStore
   )
     internal
@@ -46,7 +49,7 @@ library Blocksense {
     (answer, startedAt) = _decodeData(
       _callDataFeed(
         dataFeedStore,
-        abi.encodeWithSelector(bytes4(0x20000000 | key), _roundId)
+        abi.encodePacked(bytes2(0x8400), uint120(id), uint16(_roundId))
       )
     );
 
@@ -55,38 +58,25 @@ library Blocksense {
 
   /// @notice Gets the latest round ID for a given feed from the dataFeedStore
   /// @dev Using assembly achieves lower gas costs
-  /// @param key The key ID for the feed
+  /// @param id The key ID for the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @return roundId The latest round ID
   function _latestRound(
-    uint32 key,
+    uint256 id,
     address dataFeedStore
-  ) internal view returns (uint256 roundId) {
-    // using assembly staticcall costs less gas than using a view function
-    assembly {
-      // get free memory pointer
-      let ptr := mload(0x40)
-
-      // store selector in memory at location 0
-      mstore(0, shl(224, or(0x40000000, key)))
-
-      // call dataFeedStore with selector 0xc0000000 | key (4 bytes) and store return value (64 bytes) at memory location ptr
-      let success := staticcall(gas(), dataFeedStore, 0, 4, ptr, 64)
-
-      // revert if call failed
-      if iszero(success) {
-        revert(0, 0)
-      }
-
-      // load return value from memory at location ptr
-      // roundId is stored in the second 32 bytes of the return 64 bytes
-      roundId := mload(add(ptr, 32))
-    }
+  ) internal view returns (uint256) {
+    return
+      uint256(
+        _callDataFeed(
+          dataFeedStore,
+          abi.encodePacked(bytes2(0x8100), uint120(id))
+        )
+      );
   }
 
   /// @notice Gets the latest round data for a given feed from the dataFeedStore
   /// @dev Using assembly achieves lower gas costs
-  /// @param key The key ID for the feed
+  /// @param id The key ID for the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @return roundId The latest round ID
   /// @return answer The latest stored value after being decoded
@@ -94,7 +84,7 @@ library Blocksense {
   /// @return updatedAt Same as startedAt
   /// @return answeredInRound Same as roundId
   function _latestRoundData(
-    uint32 key,
+    uint256 id,
     address dataFeedStore
   )
     internal
@@ -109,22 +99,28 @@ library Blocksense {
       let ptr := mload(0x40)
 
       // store selector in memory at location 0
-      mstore(0x00, shl(224, or(0xc0000000, key)))
+      mstore(
+        0x00,
+        or(
+          0x8300000000000000000000000000000000000000000000000000000000000000,
+          shl(120, id)
+        )
+      )
 
       // call dataFeedStore with selector 0xc0000000 | key (4 bytes) and store return value (64 bytes) at memory location ptr
-      let success := staticcall(gas(), dataFeedStore, 0x00, 4, ptr, 64)
+      let success := staticcall(gas(), dataFeedStore, 0x00, 19, ptr, 64)
 
       // revert if call failed
       if iszero(success) {
         revert(0, 0)
       }
 
-      // assign return value to returnData
-      returnData := mload(ptr)
-
       // load return value from memory at location ptr
-      // roundId is stored in the second 32 bytes of the return 64 bytes
-      roundId := mload(add(ptr, 32))
+      // roundId is stored in the first 32 bytes of the returned 64 bytes
+      roundId := mload(ptr)
+
+      // value is stored in the second 32 bytes of the returned 64 bytes
+      returnData := mload(add(ptr, 32))
     }
 
     (answer, startedAt) = _decodeData(returnData);

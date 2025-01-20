@@ -7,7 +7,7 @@ interface ICLAggregatorAdapter is IChainlinkAggregator {
   /// @notice The feed data this contract is responsible for
   /// @dev This is the key ID for the mapping in the dataFeedStore
   /// @return key The key ID for the feed
-  function key() external view returns (uint32);
+  function id() external view returns (uint256);
 
   /// @notice The dataFeedStore this contract is responsible for
   /// @dev The address of the underlying contract that stores the data

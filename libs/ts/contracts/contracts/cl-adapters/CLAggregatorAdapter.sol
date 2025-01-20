@@ -11,7 +11,7 @@ contract CLAggregatorAdapter is ICLAggregatorAdapter {
   /// @inheritdoc IChainlinkAggregator
   uint8 public immutable override decimals;
   /// @inheritdoc ICLAggregatorAdapter
-  uint32 public immutable override key;
+  uint256 public immutable override id;
   /// @inheritdoc ICLAggregatorAdapter
   address public immutable override dataFeedStore;
 
@@ -21,28 +21,28 @@ contract CLAggregatorAdapter is ICLAggregatorAdapter {
   /// @notice Constructor
   /// @param _description The description of the feed
   /// @param _decimals The decimals of the feed
-  /// @param _key The key ID of the feed
+  /// @param _id The key ID of the feed
   /// @param _dataFeedStore The address of the data feed store
   constructor(
     string memory _description,
     uint8 _decimals,
-    uint32 _key,
+    uint256 _id,
     address _dataFeedStore
   ) {
     description = _description;
     decimals = _decimals;
-    key = _key;
+    id = _id;
     dataFeedStore = _dataFeedStore;
   }
 
   /// @inheritdoc IChainlinkAggregator
   function latestAnswer() external view override returns (int256) {
-    return Blocksense._latestAnswer(key, dataFeedStore);
+    return Blocksense._latestAnswer(id, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
   function latestRound() external view override returns (uint256) {
-    return Blocksense._latestRound(key, dataFeedStore);
+    return Blocksense._latestRound(id, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
@@ -52,13 +52,13 @@ contract CLAggregatorAdapter is ICLAggregatorAdapter {
     override
     returns (uint80, int256, uint256, uint256, uint80)
   {
-    return Blocksense._latestRoundData(key, dataFeedStore);
+    return Blocksense._latestRoundData(id, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
   function getRoundData(
     uint80 _roundId
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
-    return Blocksense._getRoundData(_roundId, key, dataFeedStore);
+    return Blocksense._getRoundData(_roundId, id, dataFeedStore);
   }
 }
