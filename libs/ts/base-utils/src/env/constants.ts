@@ -1,5 +1,5 @@
 import { join } from 'path';
-import { getEnvString } from '.';
+import { getEnvString } from './functions';
 
 /**
  * The root directory of the Git repository.
