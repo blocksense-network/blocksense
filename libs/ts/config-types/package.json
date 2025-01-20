@@ -6,22 +6,22 @@
     ".": {
       "require": "./dist/cjs/index.cjs",
       "import": "./dist/esm/index.mjs",
-      "types": "./dist/types/index.d.ts"
+      "types": "./src/index.ts"
     },
     "./data-feeds-config": {
       "require": "./dist/cjs/data-feeds-config/index.cjs",
       "import": "./dist/esm/data-feeds-config/index.mjs",
-      "types": "./dist/types/data-feeds-config/index.d.ts"
+      "types": "./src/data-feeds-config/index.ts"
     },
     "./chainlink-compatibility": {
       "require": "./dist/cjs/chainlink-compatibility/index.cjs",
       "import": "./dist/esm/chainlink-compatibility/index.mjs",
-      "types": "./dist/types/chainlink-compatibility/index.d.ts"
+      "types": "./src/chainlink-compatibility/index.ts"
     },
     "./evm-contracts-deployment": {
       "require": "./dist/cjs/evm-contracts-deployment/index.cjs",
       "import": "./dist/esm/evm-contracts-deployment/index.mjs",
-      "types": "./dist/types/evm-contracts-deployment/index.d.ts"
+      "types": "./src/evm-contracts-deployment/index.ts"
     }
   },
   "scripts": {
