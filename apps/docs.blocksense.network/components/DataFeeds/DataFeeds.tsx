@@ -3,7 +3,7 @@ import {
   decodeFeedsConfig,
   FeedsConfig,
 } from '@blocksense/config-types/data-feeds-config';
-import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
+import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { DataFeedsTable } from '@/components/DataFeeds/DataFeedsTable';
 

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Brand } from 'effect/Brand';
 import { parseNetworkName } from '@blocksense/base-utils/evm';
-import CHAINLINK_COMPATIBILITY from '@blocksense/monorepo/chainlink_compatibility';
-import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/monorepo/evm_contracts_deployment_v1';
+import CHAINLINK_COMPATIBILITY from '@blocksense/data-feeds-config-generator/chainlink_compatibility';
+import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/data-feeds-config-generator/evm_contracts_deployment_v1';
 import {
   decodeChainlinkCompatibilityConfig,
   decodeDeploymentConfig,

@@ -1,6 +1,6 @@
 import React from 'react';
-import DATA_FEEDS from '@blocksense/monorepo/feeds_config';
-import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/monorepo/evm_contracts_deployment_v1';
+import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
+import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/data-feeds-config-generator/evm_contracts_deployment_v1';
 import {
   decodeFeedsConfig,
   Feed,

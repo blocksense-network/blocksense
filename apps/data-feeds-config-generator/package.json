@@ -3,6 +3,20 @@
   "type": "module",
   "version": "0.0.0",
   "types": "src/index.ts",
+  "exports": {
+    "./feeds_config": {
+      "require": "./config/feeds_config.json",
+      "import": "./config/feeds_config.json"
+    },
+    "./chainlink_compatibility": {
+      "require": "./config/chainlink_compatibility.json",
+      "import": "./config/chainlink_compatibility.json"
+    },
+    "./evm_contracts_deployment_v1": {
+      "require": "./config/evm_contracts_deployment_v1.json",
+      "import": "./config/evm_contracts_deployment_v1.json"
+    }
+  },
   "scripts": {
     "build": "yarn run rollup:build-workspace",
     "ts": "yarn node --import tsx",

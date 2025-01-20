@@ -31,7 +31,7 @@
     "@blocksense/base-utils": "workspace:*",
     "@blocksense/config-types": "workspace:*",
     "@blocksense/contracts": "workspace:*",
-    "@blocksense/monorepo": "workspace:*",
+    "@blocksense/data-feeds-config-generator": "workspace:*",
     "@blocksense/sol-reflector": "workspace:*",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
