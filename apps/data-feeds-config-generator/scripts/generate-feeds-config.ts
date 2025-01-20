@@ -8,16 +8,16 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
 import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 
-import { chainlinkFeedsDir, artifactsDir, configDir } from '../paths';
+import { chainlinkFeedsDir, artifactsDir, configDir } from '../src/paths';
 import {
   collectRawDataFeeds,
   aggregateNetworkInfoPerField,
   getAllProposedFeedsInRegistry,
-} from '../data-services/chainlink_feeds';
-import { RawDataFeedsSchema } from '../data-services/types';
-import { generateFeedConfig } from '../feeds-config/index';
-import { generateChainlinkCompatibilityConfig } from '../chainlink-compatibility/index';
-import { FeedRegistryEventsPerAggregatorSchema } from '../chainlink-compatibility/types';
+} from '../src/data-services/chainlink_feeds';
+import { RawDataFeedsSchema } from '../src/data-services/types';
+import { generateFeedConfig } from '../src/feeds-config/index';
+import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
+import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';
 
 async function getOrCreateArtifact<A, I = A>(
   name: string,
