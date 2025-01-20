@@ -7,6 +7,7 @@ import { API_ENDPOINTS, API_KEYS, Transaction } from '../types';
 import {
   getOptionalRpcUrl,
   networkMetadata,
+  networkName,
   NetworkName,
 } from '@blocksense/base-utils/evm';
 import { deployedNetworks } from '../types';
@@ -37,7 +38,7 @@ const calculateGasCosts = (
   let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
-    const gasUsed = BigInt(tx.gasUsed);
+    const gasUsed = BigInt(tx.gasUsed ?? tx.gas);
     const gasPrice = BigInt(tx.gasPrice);
     const txGasCost = gasUsed * gasPrice;
 
@@ -177,7 +178,7 @@ const logGasCosts = async (
 };
 
 const getTxTimestampAsDate = (tx: Transaction): Date =>
-  new Date(parseInt(tx.timeStamp || '0') * 1000);
+  new Date(parseInt((tx.timestamp ?? tx.timeStamp) || '0') * 1000);
 
 const fetchTransactionsForNetwork = async (
   network: NetworkName,
@@ -222,11 +223,20 @@ const fetchTransactionsForNetwork = async (
     }
 
     const rawTransactions = response.data.result;
-    const notSelfSent: any[] = rawTransactions.filter(
-      (tx: any) =>
-        tx.from.toLowerCase() === address.toLowerCase() &&
-        tx.to.toLowerCase() !== address.toLowerCase(), // Filter out self-sent transactions
-    );
+    let notSelfSent: any[];
+    if (network == 'cronos-testnet') {
+      notSelfSent = rawTransactions.filter(
+        (tx: any) =>
+          tx.from.address.toLowerCase() === address.toLowerCase() &&
+          tx.to.address.toLowerCase() !== address.toLowerCase(),
+      ); //cronos has a different call
+    } else {
+      notSelfSent = rawTransactions.filter(
+        (tx: any) =>
+          tx.from.toLowerCase() === address.toLowerCase() &&
+          tx.to.toLowerCase() !== address.toLowerCase(), // Filter out self-sent transactions
+      );
+    }
 
     let limitedInTime = notSelfSent;
 
@@ -246,15 +256,10 @@ const fetchTransactionsForNetwork = async (
       });
     }
 
-    const transactions: Transaction[] = limitedInTime
-      .slice(0, numberOfTransactions)
-      .map((tx: any) => ({
-        gasUsed: tx.gasUsed,
-        gasPrice: tx.gasPrice,
-        from: tx.from,
-        to: tx.to,
-        timeStamp: tx.timeStamp,
-      }));
+    const transactions: Transaction[] = limitedInTime.slice(
+      0,
+      numberOfTransactions,
+    );
 
     let firstTxTimeRet = '';
     let lastTxTimeRet = '';

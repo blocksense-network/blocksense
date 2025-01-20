@@ -59,7 +59,8 @@ export const API_ENDPOINTS = {
   bscTestnet: 'https://api-testnet.bscscan.com/api',
   celoAlfajores: 'https://api-alfajores.celoscan.io/api',
   citreaTestnet: 'https://explorer.testnet.citrea.xyz/api',
-  cronosTestnet: 'https://explorer-api.cronos.org/testnet',
+  cronosTestnet:
+    'https://explorer-api.cronos.org/testnet/api/v1/account/getTxsByAddress',
   ethereumHolesky: 'https://api-holesky.etherscan.io/api',
   ethereumSepolia: 'https://api-sepolia.etherscan.io/api',
   fantomTestnet: 'https://api-testnet.ftmscan.com/api',
@@ -81,9 +82,12 @@ export const API_ENDPOINTS = {
 };
 
 export type Transaction = {
-  gasUsed: string;
+  gasUsed?: string;
+  gas: string;
   gasPrice: string;
   from: EthereumAddress;
   to: EthereumAddress;
-  timeStamp?: string;
-};
+} & (
+  | { timestamp: string; timeStamp: never }
+  | { timeStamp: string; timestamp: never }
+);
