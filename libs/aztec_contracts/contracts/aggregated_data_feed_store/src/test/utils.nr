@@ -6,8 +6,10 @@ use dep::aztec::{
 
 use crate::AggregatedDataFeedStore;
 
-pub fn setup() -> (&mut TestEnvironment, AztecAddress) {
+pub unconstrained fn setup() -> (&mut TestEnvironment, AztecAddress) {
     let mut env = TestEnvironment::new();
+
+    let _admin = env.create_account();
 
     let initializer_call_interface = AggregatedDataFeedStore::interface().constructor();
     let adfs_contract = env.deploy_self("AggregatedDataFeedStore").with_public_void_initializer(
