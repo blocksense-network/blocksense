@@ -19,10 +19,9 @@
     }
   },
   "scripts": {
-    "build:deps": "yarn workspace @blocksense/base-utils build && yarn workspace @blocksense/sol-reflector build",
     "clean": "git clean -fdx -e .env",
     "build": "hardhat compile",
-    "sol-reflect": "yarn build:deps && yarn hardhat reflect",
+    "sol-reflect": "yarn build:with-deps && yarn hardhat reflect",
     "test": "hardhat test",
     "test:fork": "FORKING=true hardhat test --grep '@fork'",
     "coverage": "hardhat coverage",
