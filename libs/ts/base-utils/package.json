@@ -74,7 +74,7 @@
     }
   },
   "scripts": {
-    "build": "rollup --silent --config ./rollup.config.mjs",
+    "build": "yarn run rollup:build-workspace",
     "ts": "yarn node --import tsx",
     "test": "yarn vitest --typecheck -w false"
   },
