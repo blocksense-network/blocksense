@@ -46,7 +46,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address base,
     address quote
   ) external view override returns (int256) {
-    return Blocksense._latestAnswer(feedData[base][quote].key, DATA_FEED_STORE);
+    return Blocksense._latestAnswer(feedData[base][quote].id, DATA_FEED_STORE);
   }
 
   /// @inheritdoc IChainlinkFeedRegistry
@@ -58,7 +58,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     return
       Blocksense._getRoundData(
         _roundId,
-        feedData[base][quote].key,
+        feedData[base][quote].id,
         DATA_FEED_STORE
       );
   }
@@ -80,8 +80,8 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     for (uint256 i = 0; i < feeds.length; i++) {
       feedData[feeds[i].base][feeds[i].quote] = FeedData(
         IChainlinkAggregator(feeds[i].feed),
-        ICLAggregatorAdapter(feeds[i].feed).key(),
         ICLAggregatorAdapter(feeds[i].feed).decimals(),
+        ICLAggregatorAdapter(feeds[i].feed).id(),
         ICLAggregatorAdapter(feeds[i].feed).description()
       );
     }
@@ -92,7 +92,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address base,
     address quote
   ) external view override returns (uint256) {
-    return Blocksense._latestRound(feedData[base][quote].key, DATA_FEED_STORE);
+    return Blocksense._latestRound(feedData[base][quote].id, DATA_FEED_STORE);
   }
 
   /// @inheritdoc IChainlinkFeedRegistry
@@ -101,6 +101,6 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address quote
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
     return
-      Blocksense._latestRoundData(feedData[base][quote].key, DATA_FEED_STORE);
+      Blocksense._latestRoundData(feedData[base][quote].id, DATA_FEED_STORE);
   }
 }

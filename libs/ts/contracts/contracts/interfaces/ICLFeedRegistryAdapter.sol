@@ -6,8 +6,8 @@ import {IChainlinkFeedRegistry, IChainlinkAggregator} from './chainlink/IChainli
 interface ICLFeedRegistryAdapter is IChainlinkFeedRegistry {
   struct FeedData {
     IChainlinkAggregator aggregator;
-    uint32 key;
     uint8 decimals;
+    uint256 id;
     string description;
   }
 
