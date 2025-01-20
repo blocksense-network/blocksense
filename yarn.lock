@@ -734,17 +734,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/base-utils@workspace:libs/ts/base-utils"
   dependencies:
-    "@rollup/plugin-commonjs": "npm:^28.0.2"
-    "@rollup/plugin-json": "npm:^6.1.0"
-    "@rollup/plugin-node-resolve": "npm:^15.2.1"
     "@types/node": "npm:^22.10.2"
-    "@types/rollup-plugin-peer-deps-external": "npm:^2"
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
-    rollup: "npm:^4.28.1"
-    rollup-plugin-delete: "npm:^2.1.0"
-    rollup-plugin-peer-deps-external: "npm:^2.2.4"
-    rollup-plugin-typescript2: "npm:^0.36.0"
     shiki: "npm:^1.12.1"
     tsx: "npm:^4.19.2"
     typescript: "npm:^5.5.4"
@@ -757,17 +749,9 @@ __metadata:
   resolution: "@blocksense/config-types@workspace:libs/ts/config-types"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
-    "@rollup/plugin-commonjs": "npm:^28.0.2"
-    "@rollup/plugin-json": "npm:^6.1.0"
-    "@rollup/plugin-node-resolve": "npm:^15.2.1"
     "@types/node": "npm:^22.10.2"
-    "@types/rollup-plugin-peer-deps-external": "npm:^2"
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
-    rollup: "npm:^4.28.1"
-    rollup-plugin-delete: "npm:^2.1.0"
-    rollup-plugin-peer-deps-external: "npm:^2.2.4"
-    rollup-plugin-typescript2: "npm:^0.36.0"
     tsx: "npm:^4.19.2"
     typescript: "npm:^5.5.4"
     vitest: "npm:^2.1.8"
@@ -819,20 +803,12 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
-    "@rollup/plugin-commonjs": "npm:^28.0.2"
-    "@rollup/plugin-json": "npm:^6.1.0"
-    "@rollup/plugin-node-resolve": "npm:^15.2.1"
     "@types/keccak": "npm:^3"
     "@types/node": "npm:^22.10.2"
-    "@types/rollup-plugin-peer-deps-external": "npm:^2"
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
     keccak: "npm:^3.0.4"
     keccak256: "npm:^1.0.6"
-    rollup: "npm:^4.28.1"
-    rollup-plugin-delete: "npm:^2.1.0"
-    rollup-plugin-peer-deps-external: "npm:^2.2.4"
-    rollup-plugin-typescript2: "npm:^0.36.0"
     tsx: "npm:^4.19.2"
     typescript: "npm:^5.5.4"
     vitest: "npm:^2.1.8"
@@ -4817,7 +4793,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-commonjs@npm:^28.0.0, @rollup/plugin-commonjs@npm:^28.0.2":
+"@rollup/plugin-commonjs@npm:^28.0.0":
   version: 28.0.2
   resolution: "@rollup/plugin-commonjs@npm:28.0.2"
   dependencies:
@@ -20829,7 +20805,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup-plugin-delete@npm:^2.0.0, rollup-plugin-delete@npm:^2.1.0":
+"rollup-plugin-delete@npm:^2.0.0":
   version: 2.1.0
   resolution: "rollup-plugin-delete@npm:2.1.0"
   dependencies:
@@ -21095,7 +21071,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup@npm:^4.24.0, rollup@npm:^4.28.1":
+"rollup@npm:^4.24.0":
   version: 4.28.1
   resolution: "rollup@npm:4.28.1"
   dependencies:

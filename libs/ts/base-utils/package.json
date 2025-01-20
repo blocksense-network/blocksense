@@ -79,16 +79,8 @@
     "test": "yarn vitest --typecheck -w false"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.2",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.2.1",
     "@types/node": "^22.10.2",
-    "@types/rollup-plugin-peer-deps-external": "^2",
     "glob": "^11.0.0",
-    "rollup": "^4.28.1",
-    "rollup-plugin-delete": "^2.1.0",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rollup-plugin-typescript2": "^0.36.0",
     "tsx": "^4.19.2",
     "typescript": "^5.5.4",
     "vitest": "^2.1.8"
