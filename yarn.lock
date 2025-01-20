@@ -841,7 +841,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/docs-theme@workspace:*, @blocksense/docs-theme@workspace:libs/ts/docs-theme":
+"@blocksense/docs-theme@workspace:libs/ts/docs-theme":
   version: 0.0.0-use.local
   resolution: "@blocksense/docs-theme@workspace:libs/ts/docs-theme"
   dependencies:
@@ -895,7 +895,6 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
-    "@blocksense/docs-theme": "workspace:*"
     "@blocksense/monorepo": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"
     "@emotion/react": "npm:^11.14.0"

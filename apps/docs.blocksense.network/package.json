@@ -31,7 +31,6 @@
     "@blocksense/base-utils": "workspace:*",
     "@blocksense/config-types": "workspace:*",
     "@blocksense/contracts": "workspace:*",
-    "@blocksense/docs-theme": "workspace:*",
     "@blocksense/monorepo": "workspace:*",
     "@blocksense/sol-reflector": "workspace:*",
     "@emotion/react": "^11.14.0",
