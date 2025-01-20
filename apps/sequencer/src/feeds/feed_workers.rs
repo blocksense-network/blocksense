@@ -1,3 +1,4 @@
+use crate::aggregate_batch_consensus_processor::aggregation_batch_consensus_loop;
 use crate::block_creator::block_creator_loop;
 use crate::blocks_reader::blocks_reader_loop;
 use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
@@ -45,7 +46,9 @@ pub async fn prepare_app_workers(
 
     let metrics_collector = metrics_collector_loop().await;
 
-    let blocks_reader = blocks_reader_loop(sequencer_state).await;
+    let blocks_reader = blocks_reader_loop(sequencer_state.clone()).await;
+
+    let aggregation_batch_consensus = aggregation_batch_consensus_loop(sequencer_state).await;
 
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();
@@ -54,6 +57,7 @@ pub async fn prepare_app_workers(
     collected_futures.push(votes_sender);
     collected_futures.push(metrics_collector);
     collected_futures.push(blocks_reader);
+    collected_futures.push(aggregation_batch_consensus);
 
     collected_futures
 }

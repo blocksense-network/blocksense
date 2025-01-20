@@ -1,3 +1,4 @@
+use crate::feeds::consensus_second_round_manager::AggregationBatchConsensus;
 use crate::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use crate::providers::provider::init_shared_rpc_providers;
 use crate::providers::provider::ProviderStatus;
@@ -19,6 +20,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::sync::Mutex;
 use tokio::sync::RwLock;
 use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 
@@ -39,6 +41,7 @@ pub struct SequencerState {
     pub blockchain_db: Arc<RwLock<InMemDb>>,
     pub kafka_endpoint: Option<FutureProducer>,
     pub provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
+    pub batches_awaiting_consensus: Arc<Mutex<AggregationBatchConsensus>>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }
 
@@ -104,6 +107,7 @@ impl SequencerState {
                         .expect("Could not create kafka communication channel.")
                 }),
             provider_status,
+            batches_awaiting_consensus: Arc::new(Mutex::new(AggregationBatchConsensus::new())),
         }
     }
 }

@@ -3,6 +3,7 @@
 use data_feeds::feeds_processing::VotedFeedUpdate;
 use serde::{Deserialize, Serialize};
 
+pub mod aggregate_batch_consensus_processor;
 pub mod block_creator;
 pub mod blocks_reader;
 pub mod feeds;
