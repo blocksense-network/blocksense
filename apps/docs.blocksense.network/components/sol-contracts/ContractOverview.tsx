@@ -1,14 +1,29 @@
-import React from 'react';
+'use client';
 
 import { ContractDocItem } from '@blocksense/sol-reflector';
+import { usePathname } from 'next/navigation';
 
+import { transformerOverviewLineLink } from '@/src/contract-overview';
 import { getOverviewCodeContent } from '@/src/contract-overview';
-import { OverviewCodeBlock } from '../common/CodeBlock';
+import { CodeBlock } from '@/components/common/CodeBlock';
 
 type ContractOverviewProps = {
   contract: ContractDocItem;
 };
 
 export const ContractOverview = ({ contract }: ContractOverviewProps) => {
-  return <OverviewCodeBlock code={getOverviewCodeContent(contract)} />;
+  const pathName = usePathname();
+
+  return (
+    <CodeBlock
+      code={getOverviewCodeContent(contract)}
+      lang="solidity"
+      transformers={[
+        transformerOverviewLineLink({
+          routeLink: pathName,
+          classes: ['p-1 hover:bg-stone-100 cursor-pointer'],
+        }),
+      ]}
+    />
+  );
 };
