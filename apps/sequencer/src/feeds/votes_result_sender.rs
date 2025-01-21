@@ -175,7 +175,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 );
                 let mut batches_awaiting_consensus =
                     sequencer_state.batches_awaiting_consensus.lock().await;
-                batches_awaiting_consensus.insert(&updates_to_kafka);
+                batches_awaiting_consensus.insert_new_in_process_batch(&updates_to_kafka);
             }
             Err(e) => {
                 error!("Failed to send batch of aggregated feed values for network: {net}, block height: {block_height} to kafka endpoint! {e:?}")

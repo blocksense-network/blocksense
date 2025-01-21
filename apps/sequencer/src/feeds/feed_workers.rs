@@ -48,7 +48,9 @@ pub async fn prepare_app_workers(
 
     let blocks_reader = blocks_reader_loop(sequencer_state.clone()).await;
 
-    let aggregation_batch_consensus = aggregation_batch_consensus_loop(sequencer_state).await;
+    let aggregation_batch_consensus =
+        aggregation_batch_consensus_loop(sequencer_state, sequencer_config.block_config.clone())
+            .await;
 
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();
