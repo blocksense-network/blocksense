@@ -82,6 +82,18 @@ describe('AggregatedDataFeedStore', () => {
     await contract.checkLatestRound(sequencer, feeds);
   });
 
+  it('Should get latest single feed data', async () => {
+    const stride0Feeds = feeds.filter(feed => feed.stride === 0n);
+    await contract.setFeeds(sequencer, stride0Feeds);
+    const res = await contract.getValues(sequencer, stride0Feeds, {
+      operations: stride0Feeds.map(() => ReadOp.GetLatestSingleFeed),
+    });
+
+    for (const [i, feed] of stride0Feeds.entries()) {
+      expect(res[i]).to.equal(contract.formatData(feed));
+    }
+  });
+
   it('Should get latest data', async () => {
     await contract.setFeeds(sequencer, feeds);
     await contract.checkLatestValue(sequencer, feeds);
@@ -102,6 +114,32 @@ describe('AggregatedDataFeedStore', () => {
 
     await contract.checkValueAtRound(sequencer, feeds);
     await contract.checkValueAtRound(sequencer, updatedFeeds);
+  });
+
+  it('Should get latest single feed and round after update', async () => {
+    const stride0Feeds = feeds.filter(feed => feed.stride === 0n);
+    await contract.setFeeds(sequencer, stride0Feeds);
+
+    const updatedFeeds = stride0Feeds.map(feed => {
+      return {
+        ...feed,
+        round: feed.round + 1n,
+        data: ethers.hexlify(ethers.randomBytes(feed.data.length)),
+      };
+    });
+
+    await contract.setFeeds(sequencer, updatedFeeds);
+    const res = await contract.getValues(sequencer, stride0Feeds, {
+      operations: stride0Feeds.map(() => ReadOp.GetLatestSingleFeedAndRound),
+    });
+
+    for (const [i, feed] of updatedFeeds.entries()) {
+      expect(res[i]).to.equal(
+        ethers
+          .toBeHex(feed.round, 32)
+          .concat(contract.formatData(feed).slice(2)),
+      );
+    }
   });
 
   it('Should get latest feed and round after update', async () => {

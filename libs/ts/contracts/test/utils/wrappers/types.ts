@@ -6,10 +6,12 @@ import {
 import { IADFSWrapper } from './interfaces/IADFSWrapper';
 
 export enum ReadOp {
-  GetFeedAtRound = 0x04,
-  GetLatestFeed = 0x02,
+  GetFeedAtRound = 0x06,
+  GetLatestFeed = 0x04,
   GetLatestRound = 0x01,
-  GetLatestFeedAndRound = 0x03,
+  GetLatestFeedAndRound = 0x05,
+  GetLatestSingleFeed = 0x02,
+  GetLatestSingleFeedAndRound = 0x03,
 }
 
 export type ReadFeed = Omit<Feed, 'data' | 'slotsToRead'> &

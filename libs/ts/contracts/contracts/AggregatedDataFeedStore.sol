@@ -28,7 +28,7 @@ contract AggregatedDataFeedStore {
   }
 
   fallback() external payable {
-    /* READ - 1st bit of selector is 1 */
+    /* READ - 1st bit of selector is 1; selector is 1 byte */
     /* @dev cannot read more than a feed's space -> reading all of feed's historical data is possible */
     assembly {
       // Load selector from memory
@@ -40,82 +40,98 @@ contract AggregatedDataFeedStore {
         0x8000000000000000000000000000000000000000000000000000000000000000
       ) {
         let stride := byte(1, selector)
-        let strideAddress := shl(stride, DATA_FEED_ADDRESS)
 
         let feedId := shr(136, shl(16, selector))
+        // ensure feedId is in range [0-2**115) and stride is in range [0-32)
         if or(gt(feedId, 0x7ffffffffffffffffffffffffffff), gt(stride, 31)) {
           revert(0, 0)
         }
 
-        // find start of feed: (feedId * 2**13) * 2**stride
-        let baseFeedIndex := mul(mul(feedId, 0x2000), shl(stride, 1))
-
-        // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
-        let maxReadIndex := sub(
-          mul(mul(add(feedId, 1), 0x2000), shl(stride, 1)),
-          1
-        )
-
         let data := calldataload(17)
 
+        selector := shr(248, selector)
+
         // getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
-        if and(
-          selector,
-          0x0400000000000000000000000000000000000000000000000000000000000000
-        ) {
+        if eq(selector, 0x86) {
+          // how many slots in this stride: 2**stride
+          let strideSlots := shl(stride, 1)
           let round := shr(240, data)
 
+          // ensure round is in range [0-8192)
           if gt(round, 0x1fff) {
             revert(0, 0)
           }
 
+          // base feed index: (feedId * 2**13) * 2**stride
+          // find start index for round: baseFeedIndex + round * 2**stride
+          let startIndex := add(
+            mul(mul(feedId, 0x2000), strideSlots),
+            mul(round, strideSlots)
+          )
+
+          // `startSlot` and `slots` are used to read a slice from the feed
+          if gt(calldatasize(), 21) {
+            // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
+            let lastFeedIndex := sub(
+              mul(mul(add(feedId, 1), 0x2000), strideSlots),
+              1
+            )
+
+            // startIndex + startSlot
+            startIndex := add(startIndex, shr(224, shl(16, data)))
+            // strideSlots = slots
+            strideSlots := shr(224, shl(48, data))
+            if iszero(strideSlots) {
+              strideSlots := shl(stride, 1)
+            }
+
+            // ensure the caller is not trying to read past the end of the feed
+            if gt(add(startIndex, sub(strideSlots, 1)), lastFeedIndex) {
+              revert(0, 0)
+            }
+          }
+
+          let initialPos := add(shl(stride, DATA_FEED_ADDRESS), startIndex)
+
           let len := 0
           let ptr := mload(0x40)
 
-          let startSlot := shr(224, shl(16, data))
-          let slots := shr(224, shl(48, data))
-          if iszero(slots) {
-            slots := shl(stride, 1)
+          switch strideSlots
+          // if stride is 0, read 1 slot (no need for a loop - saves gas)
+          case 1 {
+            mstore(add(ptr, len), sload(initialPos))
+            len := 32
           }
-
-          // find start index for round: baseFeedIndex + round * 2**stride + startSlot
-          let startIndex := add(
-            add(baseFeedIndex, mul(round, shl(stride, 1))),
-            startSlot
-          )
-
-          if gt(add(startIndex, sub(slots, 1)), maxReadIndex) {
-            revert(0, 0)
-          }
-
-          let initialPos := add(strideAddress, startIndex)
-
-          for {
-            let i := 0
-          } lt(i, slots) {
-            i := add(i, 1)
-            len := add(len, 32)
-          } {
-            let feedData := sload(add(initialPos, i))
-            mstore(add(ptr, len), feedData)
+          default {
+            for {
+              let i := 0
+            } lt(i, strideSlots) {
+              i := add(i, 1)
+              len := add(len, 32)
+            } {
+              let feedData := sload(add(initialPos, i))
+              mstore(add(ptr, len), feedData)
+            }
           }
 
           return(ptr, len)
         }
 
-        // 0x030000000...000 will call both getLatestData and getLatestRound
-        // getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
-        // find round table slot: (2**115 * stride + feedId)/16
-        let roundAddress := add(
-          ROUND_ADDRESS,
-          shr(4, add(mul(0x80000000000000000000000000000, stride), feedId))
-        )
         // feedId%16 * 16
         let pos := shl(4, mod(feedId, 16))
         let round := shr(
           sub(240, pos),
           and(
-            sload(roundAddress),
+            sload(
+              add(
+                ROUND_ADDRESS,
+                // find round table slot: (2**115 * stride + feedId)/16
+                shr(
+                  4,
+                  add(mul(0x80000000000000000000000000000, stride), feedId)
+                )
+              )
+            ),
             shr(
               pos,
               0xFFFF000000000000000000000000000000000000000000000000000000000000
@@ -124,46 +140,72 @@ contract AggregatedDataFeedStore {
         )
         let len := 0
         let ptr := mload(0x40)
-        if and(
-          selector,
-          0x0100000000000000000000000000000000000000000000000000000000000000
-        ) {
+
+        // 0x83 will call both getLatestData and getLatestSingleData
+        // 0x85 will call both getLatestRound and getLatestData
+        // getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
+        if and(selector, 0x01) {
           len := 32
           mstore(ptr, round)
         }
 
-        // getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
-        if and(
-          selector,
-          0x0200000000000000000000000000000000000000000000000000000000000000
-        ) {
-          let startSlot := shr(224, data)
-          let slots := shr(224, shl(32, data))
-          if iszero(slots) {
-            slots := shl(stride, 1)
-          }
+        // getLatestSingleData(uint8 stride, uint120 feedId) returns (bytes)
+        if and(selector, 0x02) {
+          // find start index for round: feedId * 2**13 + round
+          let startIndex := add(mul(feedId, 0x2000), round)
 
-          // `startSlot` and `slots` are used to read a slice from the feed
-          // find start index for round: baseFeedIndex + round * 2**stride + startSlot
-          let startIndex := add(
-            add(baseFeedIndex, mul(round, shl(stride, 1))),
-            startSlot
+          // load feed data from storage and store it in memory
+          mstore(
+            add(ptr, len),
+            sload(add(shl(stride, DATA_FEED_ADDRESS), startIndex))
           )
 
-          if gt(add(startIndex, sub(slots, 1)), maxReadIndex) {
-            revert(0, 0)
+          return(ptr, add(len, 32))
+        }
+
+        // getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
+        if and(selector, 0x04) {
+          // how many slots in this stride: 2**stride
+          let strideSlots := shl(stride, 1)
+
+          // base feed index: (feedId * 2**13) * 2**stride
+          // find start index for round: baseFeedIndex + round * 2**stride
+          let startIndex := add(
+            mul(mul(feedId, 0x2000), strideSlots),
+            mul(round, strideSlots)
+          )
+
+          // `startSlot` and `slots` are used to read a slice from the feed
+          if gt(calldatasize(), 21) {
+            // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
+            let lastFeedIndex := sub(
+              mul(mul(add(feedId, 1), 0x2000), strideSlots),
+              1
+            )
+
+            // startIndex + startSlot
+            startIndex := add(startIndex, shr(224, data))
+            // strideSlots = slots
+            strideSlots := shr(224, shl(32, data))
+            if iszero(strideSlots) {
+              strideSlots := shl(stride, 1)
+            }
+
+            // ensure the caller is not trying to read past the end of the feed
+            if gt(add(startIndex, sub(strideSlots, 1)), lastFeedIndex) {
+              revert(0, 0)
+            }
           }
 
-          let initialPos := add(strideAddress, startIndex)
+          let initialPos := add(shl(stride, DATA_FEED_ADDRESS), startIndex)
 
           for {
             let i := 0
-          } lt(i, slots) {
+          } lt(i, strideSlots) {
             i := add(i, 1)
             len := add(len, 32)
           } {
-            let feedData := sload(add(initialPos, i))
-            mstore(add(ptr, len), feedData)
+            mstore(add(ptr, len), sload(add(initialPos, i)))
           }
         }
 
