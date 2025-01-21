@@ -9,8 +9,14 @@ struct InProcessBatchKey {
     network: String,
 }
 
+#[derive(Clone, Debug)]
+struct CallDataWithSignatures {
+    calldata: String,
+    signatures: HashMap<u64, String>,
+}
+
 pub struct AggregationBatchConsensus {
-    in_progress_batches: HashMap<InProcessBatchKey, String>, // TODO: Add collected signatures
+    in_progress_batches: HashMap<InProcessBatchKey, CallDataWithSignatures>,
     backlog_batches: VecDeque<InProcessBatchKey>,
 }
 
@@ -29,7 +35,13 @@ impl AggregationBatchConsensus {
         };
 
         self.backlog_batches.push_back(key.clone());
-        self.in_progress_batches.insert(key, batch.calldata.clone());
+        self.in_progress_batches.insert(
+            key,
+            CallDataWithSignatures {
+                calldata: batch.calldata.clone(),
+                signatures: HashMap::new(),
+            },
+        );
     }
 
     pub fn clear_batches_older_than(
@@ -41,8 +53,8 @@ impl AggregationBatchConsensus {
         while let Some(key) = self.backlog_batches.front() {
             debug!("Cleanup call for: {key:?}");
             if key.block_height + retention_time_blocks >= current_block_height {
-                if let Some(calldata) = self.in_progress_batches.remove(&key) {
-                    warn!("Removing timed out (did not collect quorum of signatures) entry for network: {}, block_height: {} with calldata: {}", key.network, key.block_height, calldata);
+                if let Some(calldata_with_signatures) = self.in_progress_batches.remove(&key) {
+                    warn!("Removing timed out (did not collect quorum of signatures) entry for network: {}, block_height: {} with calldata: {:?}", key.network, key.block_height, calldata_with_signatures);
                 }
                 self.backlog_batches.pop_front();
             } else {
