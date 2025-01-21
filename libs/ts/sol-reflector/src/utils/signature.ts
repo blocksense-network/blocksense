@@ -1,8 +1,6 @@
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
-import { generateCodeSnippetHTML } from '@blocksense/base-utils/syntax-highlighting';
-
 import { ASTNode, Signature, SolReflection } from '../types';
 import { formatVariable, iterateContractElements } from './common';
 
@@ -12,7 +10,6 @@ export function getSignature(node: ASTNode): Signature | undefined {
     case 'ContractDefinition':
       return {
         codeSnippet: `${node.contractKind} ${node.name}`,
-        signatureCodeSnippetHTML: '',
       };
 
     case 'FunctionDefinition': {
@@ -46,7 +43,6 @@ export function getSignature(node: ASTNode): Signature | undefined {
 
       return {
         codeSnippet,
-        signatureCodeSnippetHTML: '',
         overviewCodeSnippet,
       };
     }
@@ -56,7 +52,6 @@ export function getSignature(node: ASTNode): Signature | undefined {
       codeSnippet = `event ${node.name}(${params.map(formatVariable).join(', ')});`;
       return {
         codeSnippet,
-        signatureCodeSnippetHTML: '',
         overviewCodeSnippet: codeSnippet,
         type: node.nodeType,
       };
@@ -67,7 +62,6 @@ export function getSignature(node: ASTNode): Signature | undefined {
       codeSnippet = `error ${node.name}(${params.map(formatVariable).join(', ')});`;
       return {
         codeSnippet,
-        signatureCodeSnippetHTML: '',
         overviewCodeSnippet: codeSnippet,
         type: node.nodeType,
       };
@@ -78,7 +72,6 @@ export function getSignature(node: ASTNode): Signature | undefined {
       codeSnippet = `modifier ${node.name}(${params.map(formatVariable).join(', ')});`;
       return {
         codeSnippet,
-        signatureCodeSnippetHTML: '',
         overviewCodeSnippet: codeSnippet,
         type: node.nodeType,
       };
@@ -97,7 +90,6 @@ export function getSignature(node: ASTNode): Signature | undefined {
 
       return {
         codeSnippet: `${variableSignature};`,
-        signatureCodeSnippetHTML: '',
         overviewCodeSnippet: variableSignature,
         type: node.nodeType,
       };
@@ -106,7 +98,6 @@ export function getSignature(node: ASTNode): Signature | undefined {
       codeSnippet = `enum ${node.name} { ... };`;
       return {
         codeSnippet,
-        signatureCodeSnippetHTML: '',
         overviewCodeSnippet: codeSnippet,
         type: node.nodeType,
       };
@@ -115,7 +106,6 @@ export function getSignature(node: ASTNode): Signature | undefined {
       codeSnippet = `struct ${node.name} { ... };`;
       return {
         codeSnippet,
-        signatureCodeSnippetHTML: '',
         overviewCodeSnippet: codeSnippet,
         type: node.nodeType,
       };
@@ -134,12 +124,12 @@ export function getSignature(node: ASTNode): Signature | undefined {
  * @returns {Promise<void>} This function returns a Promise that resolves
  *   when all signatures have been formatted and highlighted.
  */
-export async function formatAndHighlightSignatures(docItem: SolReflection) {
+export async function formatSignatures(docItem: SolReflection) {
   for (const { element } of iterateContractElements(docItem)) {
     if (!element.signature) {
       continue;
     }
-    await formatAndHighlightSignature(element.signature);
+    await formatSignature(element.signature);
   }
 }
 
@@ -151,19 +141,14 @@ export async function formatAndHighlightSignatures(docItem: SolReflection) {
  * @returns {Promise<void>} This function returns a Promise that resolves when
  *  the signature has been formatted and highlighted.
  */
-async function formatAndHighlightSignature(signature: Signature) {
+async function formatSignature(signature: Signature) {
   if (signature?.codeSnippet) {
     const formattedCodeSnippet =
       signature.type != 'VariableDeclaration'
         ? await formatCodeSnippet(signature.codeSnippet)
         : signature.codeSnippet;
-    const highlightedSignatureHTML = await generateCodeSnippetHTML(
-      formattedCodeSnippet,
-      'solidity',
-    );
 
     signature.codeSnippet = formattedCodeSnippet;
-    signature.signatureCodeSnippetHTML = highlightedSignatureHTML;
   }
 }
 

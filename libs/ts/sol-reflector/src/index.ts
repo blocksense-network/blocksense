@@ -8,7 +8,7 @@ import {
   appendNatspecDetailsToParams,
 } from './utils/natspec';
 import { appendAbiToSolReflection, collectAbi } from './abiCollector';
-import { formatAndHighlightSignatures } from './utils/signature';
+import { formatSignatures } from './utils/signature';
 import { enableFileTree } from './contractsFileStructure';
 
 if ('extendConfig' in global && 'task' in global) {
@@ -59,7 +59,7 @@ export async function main(
   appendNatspecDetailsToParams(solReflection);
   appendAbiToSolReflection(solReflection, abiArtifacts);
 
-  await formatAndHighlightSignatures(solReflection);
+  await formatSignatures(solReflection);
 
   await writeDocFiles(solReflection, userConfig);
 

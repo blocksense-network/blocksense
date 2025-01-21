@@ -9,16 +9,13 @@ type SignatureProps = {
 };
 
 export const Signature = ({
-  signature = { codeSnippet: '', signatureCodeSnippetHTML: '' },
+  signature = { codeSnippet: '' },
 }: SignatureProps) => {
   return (
     signature && (
       <section className="signature border border-gray-800 rounded-md">
         <section className="signature__content justify-between items-start w-full p-0">
-          <CodeBlock
-            code={signature.codeSnippet}
-            precompiledHtml={signature.signatureCodeSnippetHTML}
-          />
+          <CodeBlock code={signature.codeSnippet} lang="solidity" />
         </section>
       </section>
     )
