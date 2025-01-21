@@ -947,7 +947,7 @@ __metadata:
   resolution: "@blocksense/monorepo@workspace:."
   dependencies:
     "@blocksense/base-utils": "workspace:*"
-    "@vercel/build-utils": "npm:^8.8.0"
+    "@vercel/build-utils": "npm:^9.0.1"
     "@vercel/next": "npm:^4.4.0"
     "@vercel/nft": "npm:^0.27.9"
     prettier: "npm:^3.4.2"
@@ -7042,10 +7042,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vercel/build-utils@npm:^8.8.0":
-  version: 8.8.0
-  resolution: "@vercel/build-utils@npm:8.8.0"
-  checksum: 10c0/2e69e114a31f6b1a4bc8ca05671be715281b7635c967c84a3c62f7412ad4388e73a553444fedfed09498ed301ad698d3c81575e82f516dd6f0c4db3c7792b031
+"@vercel/build-utils@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "@vercel/build-utils@npm:9.0.1"
+  checksum: 10c0/de8b128357f18f81d856c3acb80b2b218be10355034e0e8ceeae4e39f65b48664bbd906fc1c56a676777954a33b38579e3346012286f0f38b4d40f3c258f0d6c
   languageName: node
   linkType: hard
 
