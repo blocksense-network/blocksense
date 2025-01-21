@@ -328,6 +328,7 @@ mod tests {
             max_feed_updates_to_batch: 3,
             block_generation_period: 100,
             genesis_block_timestamp: None,
+            aggregation_consensus_discard_period_blocks: 100,
         };
 
         let sequencer_config = get_test_config_with_no_providers();

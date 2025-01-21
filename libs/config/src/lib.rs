@@ -286,6 +286,7 @@ pub struct BlockConfig {
     pub max_feed_updates_to_batch: usize,
     pub block_generation_period: u64,
     pub genesis_block_timestamp: Option<SystemTime>,
+    pub aggregation_consensus_discard_period_blocks: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -401,6 +402,7 @@ pub fn get_test_config_with_no_providers() -> SequencerConfig {
             max_feed_updates_to_batch: 1,
             block_generation_period: 500,
             genesis_block_timestamp: None,
+            aggregation_consensus_discard_period_blocks: 100,
         },
         providers: HashMap::new(),
         reporters: Vec::new(),

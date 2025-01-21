@@ -9,7 +9,8 @@
     "genesis_block_timestamp": {
       "secs_since_epoch": 0,
       "nanos_since_epoch": 0
-    }
+    },
+    "aggregation_consensus_discard_period_blocks": 1000
   },
   "providers": {
       "ETH1": {"private_key_path": "/tmp/priv_key_test", "url": "http://127.0.0.1:8545", "transaction_drop_timeout_secs": 420, "transaction_retry_timeout_secs": 420, "retry_fee_increment_fraction": 0.1, "transaction_gas_limit": 7500000, "contract_address": "0x663F3ad617193148711d28f5334eE4Ed07016602",

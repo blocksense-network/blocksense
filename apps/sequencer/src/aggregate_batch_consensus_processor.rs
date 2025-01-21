@@ -25,7 +25,7 @@ pub async fn aggregation_batch_consensus_loop(
                 block_genesis_time,
             );
 
-            let timeout_period_blocks = 500; // TODO: take this timeout from config
+            let timeout_period_blocks = block_config.aggregation_consensus_discard_period_blocks;
 
             let aggregation_batch_consensus_process_period = SlotTimeTracker::new(
                 "aggregation_batch_consensus_loop".to_string(),
