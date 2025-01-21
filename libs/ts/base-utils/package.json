@@ -66,11 +66,6 @@
       "require": "./dist/cjs/string.cjs",
       "import": "./dist/esm/string.mjs",
       "types": "./src/string.ts"
-    },
-    "./syntax-highlighting": {
-      "require": "./dist/cjs/syntax-highlighting.cjs",
-      "import": "./dist/esm/syntax-highlighting.mjs",
-      "types": "./src/syntax-highlighting.ts"
     }
   },
   "scripts": {
