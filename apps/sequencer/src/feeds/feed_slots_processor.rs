@@ -646,7 +646,7 @@ pub mod tests {
         );
 
         let feeds_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, mut rx, _, _) =
+        let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
@@ -729,7 +729,7 @@ pub mod tests {
             "http://localhost:8545",
         );
         let feeds_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, mut rx, _, _) =
+        let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metics_prefix, feeds_config).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
@@ -833,7 +833,7 @@ pub mod tests {
             feeds: vec![some_feed_config_with_id_1()],
         };
 
-        let (sequencer_state, mut rx, _, _) =
+        let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
         //info!()
         let num_reporteds = sequencer_state.reporters.read().await.len();
@@ -920,7 +920,7 @@ pub mod tests {
         let feeds_config = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
-        let (sequencer_state, mut rx, _, _) =
+        let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
@@ -1024,7 +1024,7 @@ pub mod tests {
         let feeds_config = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
-        let (sequencer_state, mut rx, _, _) =
+        let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
 
         // we are specifically sending only one report message as we don't want to test the average processor
@@ -1126,7 +1126,7 @@ pub mod tests {
         let all_feed_config = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
-        let (sequencer_state, mut rx, _, _) =
+        let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, all_feed_config)
                 .await;
 

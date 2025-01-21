@@ -2,6 +2,7 @@ use actix_web::{web, App, HttpServer};
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
+use sequencer::ReporterResponse;
 use tokio::sync::mpsc;
 
 use sequencer::http_handlers::admin::add_admin_services;
@@ -42,6 +43,7 @@ pub async fn prepare_sequencer_state(
     UnboundedReceiver<VotedFeedUpdate>, // aggregated_votes_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
+    UnboundedReceiver<ReporterResponse>, // aggregate_batch_sig_recv
     Data<SequencerState>,
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();
@@ -62,6 +64,7 @@ pub async fn prepare_sequencer_state(
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
         mpsc::unbounded_channel();
     let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
+    let (aggregate_batch_sig_send, aggregate_batch_sig_recv) = mpsc::unbounded_channel();
 
     let sequencer_state: Data<SequencerState> = web::Data::new(SequencerState::new(
         feeds_config,
@@ -73,12 +76,14 @@ pub async fn prepare_sequencer_state(
         aggregated_votes_to_block_creator_send,
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
+        aggregate_batch_sig_send,
     ));
 
     (
         aggregated_votes_to_block_creator_recv,
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
+        aggregate_batch_sig_recv,
         sequencer_state,
     )
 }
@@ -199,6 +204,7 @@ async fn main() -> std::io::Result<()> {
         aggregated_votes_to_block_creator_recv,
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
+        aggregate_batch_sig_recv,
         sequencer_state,
     ) = prepare_sequencer_state(&sequencer_config, feeds_config, None).await;
 
@@ -208,6 +214,7 @@ async fn main() -> std::io::Result<()> {
         aggregated_votes_to_block_creator_recv,
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
+        aggregate_batch_sig_recv,
     )
     .await;
 

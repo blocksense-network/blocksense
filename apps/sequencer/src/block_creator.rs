@@ -339,6 +339,7 @@ mod tests {
             aggregated_votes_to_block_creator_recv,
             feeds_management_cmd_to_block_creator_recv,
             _feeds_slots_manager_cmd_recv,
+            _aggregate_batch_sig_recv,
         ) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             metrics_prefix,

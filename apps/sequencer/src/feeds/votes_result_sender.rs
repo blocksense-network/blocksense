@@ -174,7 +174,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                     "Successfully sent batch of aggregated feed values to kafka endpoint: {res:?}; network={net}"
                 );
                 let mut batches_awaiting_consensus =
-                    sequencer_state.batches_awaiting_consensus.lock().await;
+                    sequencer_state.batches_awaiting_consensus.write().await;
                 batches_awaiting_consensus.insert_new_in_process_batch(&updates_to_kafka);
             }
             Err(e) => {

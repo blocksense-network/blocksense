@@ -5,6 +5,7 @@ use crate::providers::provider::ProviderStatus;
 use crate::providers::provider::SharedRpcProviders;
 use crate::reporters::reporter::init_shared_reporters;
 use crate::reporters::reporter::SharedReporters;
+use crate::ReporterResponse;
 use blockchain_data_model::in_mem_db::InMemDb;
 use config::AllFeedsConfig;
 use config::FeedConfig;
@@ -20,7 +21,6 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
-use tokio::sync::Mutex;
 use tokio::sync::RwLock;
 use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 
@@ -41,7 +41,8 @@ pub struct SequencerState {
     pub blockchain_db: Arc<RwLock<InMemDb>>,
     pub kafka_endpoint: Option<FutureProducer>,
     pub provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
-    pub batches_awaiting_consensus: Arc<Mutex<AggregationBatchConsensus>>,
+    pub batches_awaiting_consensus: Arc<RwLock<AggregationBatchConsensus>>,
+    pub aggregate_batch_sig_send: UnboundedSender<ReporterResponse>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }
 
@@ -57,6 +58,7 @@ impl SequencerState {
         aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdate>,
         feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
+        aggregate_batch_sig_send: UnboundedSender<ReporterResponse>,
     ) -> SequencerState {
         let provider_status: HashMap<String, ProviderStatus> = sequencer_config
             .providers
@@ -107,7 +109,8 @@ impl SequencerState {
                         .expect("Could not create kafka communication channel.")
                 }),
             provider_status,
-            batches_awaiting_consensus: Arc::new(Mutex::new(AggregationBatchConsensus::new())),
+            batches_awaiting_consensus: Arc::new(RwLock::new(AggregationBatchConsensus::new())),
+            aggregate_batch_sig_send,
         }
     }
 }
@@ -122,6 +125,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
     UnboundedReceiver<VotedFeedUpdate>, // aggregated_votes_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
+    UnboundedReceiver<ReporterResponse>, // aggregate_batch_sig_recv
 ) {
     let log_handle = init_shared_logging_handle("INFO", false);
     let providers = init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix)).await;
@@ -130,6 +134,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
         mpsc::unbounded_channel();
     let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
+    let (aggregate_batch_sig_send, aggregate_batch_sig_recv) = mpsc::unbounded_channel();
     let aggregated_votes_to_block_creator_send = vote_send;
     let feed_id_allocator = Some(init_concurrent_allocator());
     let sequencer_state = SequencerState::new(
@@ -142,6 +147,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
         aggregated_votes_to_block_creator_send,
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
+        aggregate_batch_sig_send,
     );
 
     (
@@ -149,6 +155,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
         vote_recv,
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
+        aggregate_batch_sig_recv,
     )
 }
 

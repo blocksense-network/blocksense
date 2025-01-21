@@ -843,7 +843,7 @@ mod tests {
         let feeds_config = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
-        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             metrics_prefix,
             feeds_config,

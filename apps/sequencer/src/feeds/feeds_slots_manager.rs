@@ -390,6 +390,7 @@ mod tests {
         ) = mpsc::unbounded_channel();
         let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
             mpsc::unbounded_channel();
+        let (aggregate_batch_sig_send, _aggregate_batch_sig_recv) = mpsc::unbounded_channel();
 
         let sequencer_state = web::Data::new(SequencerState::new(
             feeds_config,
@@ -401,6 +402,7 @@ mod tests {
             vote_send,
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
+            aggregate_batch_sig_send,
         ));
 
         sequencer_state

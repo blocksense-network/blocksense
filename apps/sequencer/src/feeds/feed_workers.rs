@@ -5,6 +5,7 @@ use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
 use crate::sequencer_state::SequencerState;
+use crate::ReporterResponse;
 use actix_web::web::Data;
 use config::SequencerConfig;
 use data_feeds::feeds_processing::VotedFeedUpdate;
@@ -20,12 +21,14 @@ use tokio::task::JoinHandle;
 /// - Block creator loop
 /// - Votes result sender loop
 /// - Metrics collector loop
+/// - Aggregation batch consensus loop
 pub async fn prepare_app_workers(
     sequencer_state: Data<SequencerState>,
     sequencer_config: &SequencerConfig,
     aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdate>,
     feeds_management_cmd_to_block_creator_recv: UnboundedReceiver<FeedsManagementCmds>,
     feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
+    aggregate_batch_sig_recv: UnboundedReceiver<ReporterResponse>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
 
@@ -48,9 +51,12 @@ pub async fn prepare_app_workers(
 
     let blocks_reader = blocks_reader_loop(sequencer_state.clone()).await;
 
-    let aggregation_batch_consensus =
-        aggregation_batch_consensus_loop(sequencer_state, sequencer_config.block_config.clone())
-            .await;
+    let aggregation_batch_consensus = aggregation_batch_consensus_loop(
+        sequencer_state,
+        sequencer_config.block_config.clone(),
+        aggregate_batch_sig_recv,
+    )
+    .await;
 
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();

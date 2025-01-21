@@ -26,3 +26,11 @@ pub struct ConsensusSecondRoundBatch {
     network: String,
     calldata: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ReporterResponse {
+    block_height: u64,
+    reporter_id: u64,
+    network: String,
+    signature: String,
+}

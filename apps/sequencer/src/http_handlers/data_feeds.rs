@@ -19,6 +19,7 @@ use uuid::Uuid;
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
+use crate::ReporterResponse;
 use crypto::verify_signature;
 use crypto::Signature;
 use feed_registry::registry::FeedAggregateHistory;
@@ -336,7 +337,7 @@ pub async fn post_reports_batch(
 #[post("/post_aggregated_consensus_vote")]
 pub async fn post_aggregated_consensus_vote(
     mut payload: web::Payload,
-    _sequencer_state: web::Data<SequencerState>,
+    sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let span = info_span!("post_aggregated_consensus_vote");
     let _guard = span.enter();
@@ -353,7 +354,43 @@ pub async fn post_aggregated_consensus_vote(
 
     info!("Recvd aggregated_consensus_vote = {body:?}!");
 
-    Ok(HttpResponse::Ok().into())
+    let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
+    let reporter_response: ReporterResponse = serde_json::from_value(v)?;
+
+    {
+        let reporters = sequencer_state.reporters.read().await;
+        let reporter = reporters.get_key_value(&reporter_response.reporter_id);
+        if reporter.is_none() {
+            warn!("Unknown Reporter sending aggregation batch signature {body:?}!");
+            return Ok(HttpResponse::BadRequest().body(format!("Unknown Reporter")));
+        }
+    }
+
+    if sequencer_state
+        .batches_awaiting_consensus
+        .read()
+        .await
+        .batch_is_waiting_signatures(
+            reporter_response.block_height,
+            reporter_response.network.as_str(),
+        )
+    {
+        match sequencer_state
+            .aggregate_batch_sig_send
+            .send(reporter_response)
+        {
+            Ok(_) => Ok(HttpResponse::Ok().into()),
+            Err(e) => Ok(HttpResponse::BadRequest().body(format!(
+                "Error forwarding reporter aggregated consensus vote {e}"
+            ))),
+        }
+    } else {
+        return Ok(HttpResponse::BadRequest().body(format!(
+            "No calldata waiting for signatires for block height {} and network {}",
+            reporter_response.block_height,
+            reporter_response.network.as_str(),
+        )));
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -573,6 +610,7 @@ pub mod tests {
         ) = mpsc::unbounded_channel();
         let (feeds_slots_manager_cmd_send, _feeds_slots_manager_cmd_recv) =
             mpsc::unbounded_channel();
+        let (aggregate_batch_sig_send, _aggregate_batch_sig_recv) = mpsc::unbounded_channel();
 
         let sequencer_state = web::Data::new(SequencerState::new(
             feeds_config,
@@ -584,6 +622,7 @@ pub mod tests {
             vote_send,
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
+            aggregate_batch_sig_send,
         ));
 
         let app = test::init_service(
@@ -657,6 +696,7 @@ pub mod tests {
             aggregated_votes_to_block_creator_recv,
             feeds_management_cmd_to_block_creator_recv,
             feeds_slots_manager_cmd_recv,
+            aggregate_batch_sig_recv,
         ) = create_sequencer_state_from_sequencer_config(
             cfg.clone(),
             "test_register_feed_success",
@@ -671,6 +711,7 @@ pub mod tests {
             aggregated_votes_to_block_creator_recv,
             feeds_management_cmd_to_block_creator_recv,
             feeds_slots_manager_cmd_recv,
+            aggregate_batch_sig_recv,
         )
         .await;
 
@@ -840,7 +881,7 @@ pub mod tests {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
 
-        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_empty_success",
             feed_config,
@@ -873,7 +914,7 @@ pub mod tests {
     async fn test_get_last_published_value_and_timestamp_wrong_feed_id() {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_wrong_feed_id",
             feed_config,
@@ -920,7 +961,7 @@ pub mod tests {
     async fn test_get_last_published_value_and_timestamp_unregistered_feed_id() {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_unregistered_feed_id",
             feed_config,
@@ -1000,7 +1041,7 @@ pub mod tests {
             feeds: vec![some_feed_config_with_id_1()],
         };
 
-        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_no_data",
             all_feeds_config,
@@ -1056,7 +1097,7 @@ pub mod tests {
             feeds: vec![some_feed_config_with_id_1()],
         };
 
-        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_with_data",
             all_feeds_config,
@@ -1121,7 +1162,7 @@ pub mod tests {
             feeds: vec![some_feed_config_with_id_1()],
         };
 
-        let (sequencer_state, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_with_more_data",
             all_feeds_config,
