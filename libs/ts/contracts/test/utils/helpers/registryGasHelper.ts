@@ -1,5 +1,5 @@
-import { RegistryWrapper } from '../../utils/wrappers';
-import { logTable } from './common';
+import { RegistryWrapper } from '../wrappers';
+import { logTable } from '../../experiments/utils/helpers/common';
 
 export const callAndCompareRegistries = async (
   registryWrappers: RegistryWrapper[],
@@ -19,7 +19,7 @@ export const callAndCompareRegistries = async (
   let chainlinkTxs = [];
   for (const wrapper of chainlinkRegistryWrappers) {
     if (functionName === 'setRoundData') {
-      const roundId = await wrapper.registry.latestRound(...args.slice(0, 2));
+      const roundId = await wrapper.registry.latestRound(args[0], args[1]);
       chainlinkTxs.push(
         wrapper.call(functionName, ...args.slice(0, 2), roundId - 4n),
       );

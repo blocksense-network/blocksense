@@ -8,7 +8,7 @@ import {
   UpgradeableProxyADFSWrapper,
 } from './utils/wrappers';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { encodeDataAndTimestamp } from './utils/helpers/common';
+import { encodeData, encodeDataAndTimestamp } from './utils/helpers/common';
 
 let oracles: OracleWrapper[];
 let chainlinkOracle: OracleWrapper;
@@ -29,7 +29,6 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
   let accessControlAdmin: HardhatEthersSigner;
   let proxy: UpgradeableProxyADFSWrapper;
   let caller: HardhatEthersSigner;
-  let clAdapterFeedValue: string;
 
   before(async function () {
     if (process.env.FORKING !== 'true') {
@@ -52,8 +51,8 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
 
     clAdapter = new CLAdapterWrapper();
     await clAdapter.init(data.description, data.decimals, data.key, proxy);
-    clAdapterFeedValue = encodeDataAndTimestamp(312343354);
-    await clAdapter.setFeed(sequencer, clAdapterFeedValue, 1n);
+    const value = encodeDataAndTimestamp(312343354);
+    await clAdapter.setFeed(sequencer, value, 1n);
 
     const signer = (await ethers.getSigners())[5];
 
@@ -63,7 +62,6 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
     proxyV2 = new CLV2Wrapper();
     await proxyV2.init(data.description, data.decimals, data.key, signer);
 
-    const value = encodeValue(312343354);
     await proxyV1.setFeed(value);
     await proxyV2.setFeed(value);
 
@@ -137,7 +135,7 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
 
       await proxyV1.checkLatestAnswer(answer);
       await proxyV2.checkLatestAnswer(answer);
-      await clAdapter.checkLatestAnswer(caller, clAdapterFeedValue);
+      await clAdapter.checkLatestAnswer(caller, encodeData(answer));
     });
 
     it('Should compare setLatestRoundId', async () => {
@@ -187,32 +185,36 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
 
       await proxyV1.checkLatestRoundData(roundData[0]);
       await proxyV2.checkLatestRoundData(roundData[1]);
-      await clAdapter.checkLatestRoundData(caller, clAdapterFeedValue, roundId);
+      await clAdapter.checkLatestRoundData(
+        caller,
+        encodeDataAndTimestamp(roundData[2].answer, roundData[2].startedAt),
+        roundId,
+      );
     });
 
     it('Should compare setRoundData', async () => {
-      const value1 = encodeValue(312343);
+      const value1 = encodeData(312343);
       await proxyV1.setFeed(value1);
       await proxyV2.setFeed(value1);
 
       const clAdapterValue1 = encodeDataAndTimestamp(312343);
       await clAdapter.setFeed(sequencer, clAdapterValue1, 2n);
 
-      const value2 = encodeValue(1312343);
+      const value2 = encodeData(1312343);
       await proxyV1.setFeed(value2);
       await proxyV2.setFeed(value2);
 
       const clAdapterValue2 = encodeDataAndTimestamp(1312343);
       await clAdapter.setFeed(sequencer, clAdapterValue2, 3n);
 
-      const value3 = encodeValue(13123433);
+      const value3 = encodeData(13123433);
       await proxyV1.setFeed(value3);
       await proxyV2.setFeed(value3);
 
       const clAdapterValue3 = encodeDataAndTimestamp(13123433);
       await clAdapter.setFeed(sequencer, clAdapterValue3, 4n);
 
-      const value4 = encodeValue(13142343);
+      const value4 = encodeData(13142343);
       await proxyV1.setFeed(value4);
       await proxyV2.setFeed(value4);
 
@@ -244,8 +246,4 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
       await clAdapter.checkRoundData(caller, clAdapterValue2, 3n);
     });
   });
-
-  const encodeValue = (value: number) => {
-    return '0x' + value.toString(16).padStart(48, '0').padEnd(64, '0');
-  };
 });

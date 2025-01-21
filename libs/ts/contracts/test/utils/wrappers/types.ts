@@ -42,3 +42,8 @@ export type OracleUnderlier =
   | CLAggregatorAdapterExp
   | CLAggregatorAdapter
   | IChainlinkAggregator;
+
+export type RegistryUnderlier =
+  | CLAggregatorAdapterExp
+  | CLAggregatorAdapter
+  | IChainlinkAggregator;

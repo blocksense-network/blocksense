@@ -53,7 +53,7 @@ describe('CLFeedRegistryAdapter', async () => {
       [true],
     );
 
-    clRegistry = new CLRegistryBaseWrapper('CLRegistryV1', proxy.contract);
+    clRegistry = new CLRegistryBaseWrapper('CLRegistry', proxy.contract);
     await clRegistry.init(registryOwner);
 
     for (const d of data) {
