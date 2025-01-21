@@ -10,6 +10,9 @@ import { UpgradeableProxyADFSGenericWrapper } from './adfs/UpgradeableProxyGener
 import { CLBaseWrapper } from './chainlink/Base';
 import { CLAdapterWrapper } from './chainlink/CLAdapter';
 import { CLRegistryBaseWrapper } from './chainlink/registry/Base';
+import { OracleBaseWrapper } from './oracle/Base';
+import { OracleWrapper } from './oracle/Oracle';
+import { RegistryWrapper } from './oracle/registry/Base';
 
 export {
   IADFSWrapper,
@@ -18,10 +21,21 @@ export {
   ADFSBaseGenericWrapper,
   ADFSGenericWrapper,
   AccessControlWrapper,
+
+  // upgradeable
   UpgradeableProxyADFSBaseWrapper,
   UpgradeableProxyADFSWrapper,
   UpgradeableProxyADFSGenericWrapper,
+
+  // chainlink adapters
   CLBaseWrapper,
   CLAdapterWrapper,
   CLRegistryBaseWrapper,
+
+  // oracle
+  OracleBaseWrapper,
+  OracleWrapper,
+
+  // registry
+  RegistryWrapper,
 };

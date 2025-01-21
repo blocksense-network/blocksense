@@ -3,14 +3,17 @@ import {
   CLRegistryBaseWrapper,
   CLV1Wrapper,
   CLV2Wrapper,
-  RegistryWrapper,
   UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
-} from './utils/wrappers';
-import { callAndCompareRegistries } from './utils/helpers/registryGasHelper';
-import { HistoricalDataFeedStore, TOKENS } from './utils/helpers/common';
+} from './experiments/utils/wrappers';
+import { callAndCompareRegistries } from './experiments/utils/helpers/registryGasHelper';
+import {
+  HistoricalDataFeedStore,
+  TOKENS,
+} from './experiments/utils/helpers/common';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
+import { RegistryWrapper } from './utils/wrappers';
 
 let registryWrapperV1: CLRegistryBaseWrapper;
 let registryWrapperV2: CLRegistryBaseWrapper;

@@ -4,9 +4,9 @@ import {
   CLFeedRegistryAdapterExp,
   IChainlinkAggregator,
   RegistryExp,
-} from '../../../../../../typechain';
+} from '../../../../../typechain';
 import { OracleBaseWrapper } from '../Base';
-import { deployContract } from '../../../helpers/common';
+import { deployContract } from '../../../../experiments/utils/helpers/common';
 
 export class RegistryWrapper extends OracleBaseWrapper<RegistryExp> {
   public registry!: CLFeedRegistryAdapterExp;

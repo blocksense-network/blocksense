@@ -1,5 +1,5 @@
-import { OracleWrapper } from '../../utils/wrappers';
-import { logTable } from './common';
+import { OracleWrapper } from '../wrappers';
+import { logTable } from '../../experiments/utils/helpers/common';
 
 export const callAndCompareOracles = async (
   oracleWrappers: OracleWrapper[],
@@ -21,7 +21,7 @@ export const callAndCompareOracles = async (
   for (const wrapper of chainlinkOracleWrappers) {
     if (functionName === 'setRoundData') {
       const res = await wrapper.underliers[0].latestRoundData();
-      chainlinkTxs.push(wrapper.call(functionName, res.roundId - 4n));
+      chainlinkTxs.push(wrapper.call(functionName, res[0] - 4n));
     } else {
       chainlinkTxs.push(wrapper.call(functionName));
     }

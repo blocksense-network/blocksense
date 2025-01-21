@@ -1,16 +1,10 @@
-import {
-  CLAggregatorAdapterExp,
-  IChainlinkAggregator,
-  Oracle,
-} from '../../../../../typechain';
-import { deployContract } from '../../helpers/common';
+import { Oracle } from '../../../../typechain';
+import { deployContract } from '../../../experiments/utils/helpers/common';
+import { OracleUnderlier } from '../types';
 import { OracleBaseWrapper } from './Base';
 
 export class OracleWrapper extends OracleBaseWrapper<Oracle> {
-  constructor(
-    name: string,
-    underliers: (CLAggregatorAdapterExp | IChainlinkAggregator)[],
-  ) {
+  constructor(name: string, underliers: OracleUnderlier[]) {
     if (underliers.length !== 1) {
       throw new Error('OracleWrapper only supports one underlier');
     }

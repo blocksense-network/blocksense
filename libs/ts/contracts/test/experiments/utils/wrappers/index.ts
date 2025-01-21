@@ -55,10 +55,6 @@ import { CLV2Wrapper } from './chainlink/V2';
 
 import { CLRegistryBaseWrapper } from './chainlink/registry/Base';
 
-import { OracleBaseWrapper } from './oracle/Base';
-import { OracleWrapper } from './oracle/Oracle';
-import { RegistryWrapper } from './oracle/registry/Base';
-
 import { IBaseWrapper } from './interfaces/IBaseWrapper';
 import { ISetWrapper } from './interfaces/ISetWrapper';
 import { IConsumerWrapper } from './interfaces/IConsumerWrapper';
@@ -132,13 +128,6 @@ export {
 
   // chainlink registry
   CLRegistryBaseWrapper,
-
-  // oracle
-  OracleBaseWrapper,
-  OracleWrapper,
-
-  // registry
-  RegistryWrapper,
 
   // interfaces
   IBaseWrapper,

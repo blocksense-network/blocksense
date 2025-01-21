@@ -18,10 +18,9 @@ library Blocksense {
         uint256(
           uint192(
             bytes24(
-              _callDataFeed(
-                dataFeedStore,
-                abi.encodePacked(bytes2(0x8200), uint120(id))
-              )
+              // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
+              // after that are 15 bytes of the feed id
+              _callDataFeed(dataFeedStore, (uint256(0x82) << 248) | (id << 120))
             )
           )
         )
@@ -49,10 +48,12 @@ library Blocksense {
     (answer, startedAt) = _decodeData(
       _callDataFeed(
         dataFeedStore,
-        abi.encodePacked(bytes2(0x8400), uint120(id), uint16(_roundId))
+        // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
+        // after that are 15 bytes of the feed id
+        // after the feed id are 2 bytes of the round id
+        (uint256(0x84) << 248) | (id << 120) | (uint256(_roundId) << 104)
       )
     );
-
     return (_roundId, answer, startedAt, startedAt, _roundId);
   }
 
@@ -67,10 +68,9 @@ library Blocksense {
   ) internal view returns (uint256) {
     return
       uint256(
-        _callDataFeed(
-          dataFeedStore,
-          abi.encodePacked(bytes2(0x8100), uint120(id))
-        )
+        // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
+        // after that are 15 bytes of the feed id
+        _callDataFeed(dataFeedStore, (uint256(0x81) << 248) | (id << 120))
       );
   }
 
@@ -99,6 +99,8 @@ library Blocksense {
       let ptr := mload(0x40)
 
       // store selector in memory at location 0
+      // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
+      // after that are 15 bytes of the feed id
       mstore(
         0x00,
         or(
@@ -107,7 +109,7 @@ library Blocksense {
         )
       )
 
-      // call dataFeedStore with selector 0xc0000000 | key (4 bytes) and store return value (64 bytes) at memory location ptr
+      // call dataFeedStore with selector and store return value (64 bytes) at memory location ptr
       let success := staticcall(gas(), dataFeedStore, 0x00, 19, ptr, 64)
 
       // revert if call failed
@@ -132,23 +134,26 @@ library Blocksense {
   /// @dev Using assembly achieves lower gas costs
   /// Used as a call() function to dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @param data The data to call the dataFeedStore with
+  /// @param selector The data to call the dataFeedStore with
   /// @return returnData The return value from the dataFeedStore
   function _callDataFeed(
     address dataFeedStore,
-    bytes memory data
+    uint256 selector
   ) internal view returns (bytes32 returnData) {
     // using assembly staticcall costs less gas than using a view function
     assembly {
       // get free memory pointer
       let ptr := mload(0x40)
 
+      // store selector in memory at location 0
+      mstore(0x00, selector)
+
       // call dataFeedStore with data and store return value (32 bytes) at memory location ptr
       let success := staticcall(
         gas(), // gas remaining
         dataFeedStore, // address to call
-        add(data, 32), // location of data to call (skip first 32 bytes of data which is the length of data)
-        mload(data), // size of data to call
+        0x00, // location of data to call
+        21, // size of data to call - usually it is 19b but for _getRoundData it is 21b because of the 2 bytes of the roundId
         ptr, // where to store the return data
         32 // how much data to store
       )

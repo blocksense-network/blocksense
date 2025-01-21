@@ -1,3 +1,8 @@
+import {
+  CLAggregatorAdapterExp,
+  CLAggregatorAdapter,
+  IChainlinkAggregator,
+} from '../../../typechain';
 import { IADFSWrapper } from './interfaces/IADFSWrapper';
 
 export enum ReadOp {
@@ -32,3 +37,8 @@ export type UpgradeableProxyCallMethods = Pick<
   | 'checkLatestFeedAndRound'
   | 'getValues'
 >;
+
+export type OracleUnderlier =
+  | CLAggregatorAdapterExp
+  | CLAggregatorAdapter
+  | IChainlinkAggregator;
