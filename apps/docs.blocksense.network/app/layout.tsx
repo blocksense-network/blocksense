@@ -1,9 +1,10 @@
 import NextHead from 'next/head';
 import type { Metadata } from 'next';
-import { Footer, Layout, Link, Navbar } from 'nextra-theme-docs';
+import { Footer, Layout, Navbar } from 'nextra-theme-docs';
 import { getPageMap } from 'nextra/page-map';
 import type { FC, ReactNode } from 'react';
 import './globals.css';
+import { updatePageMapWithContractsRefDoc } from '@/src/pageMap';
 
 export const metadata: Metadata = {
   description:
@@ -63,6 +64,7 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
     </Footer>
   );
   const pageMap = await getPageMap();
+  updatePageMapWithContractsRefDoc(pageMap);
 
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
