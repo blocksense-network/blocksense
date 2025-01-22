@@ -68,7 +68,7 @@ regex = "1.11.0"
 tempfile = "3.13.0"
 time = "0.3.36"
 conv = "0.3.3"
-uuid = { version = "1.12.0", features = ["v4"] }
+uuid = { version = "1.12.1", features = ["v4"] }
 chrono = "0.4.39"
 ringbuf = "0.4.7"
 console-subscriber = "0.4.0"
