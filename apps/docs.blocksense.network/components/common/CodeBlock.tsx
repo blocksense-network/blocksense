@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { codeToHtml, ShikiTransformer } from 'shiki';
+import { useTheme } from 'nextra-theme-docs';
 
 import { CopyButton } from '@/components/common/CopyButton';
 
 type CodeBlockProps = {
   code: string;
   lang?: string;
-  theme?: string;
+  themes?: {
+    light: string;
+    dark: string;
+  };
   copy?: {
     hasCopyButton: boolean;
     disabled: boolean;
@@ -19,19 +23,30 @@ type CodeBlockProps = {
 export const CodeBlock = ({
   code = '',
   lang = 'text',
-  theme = 'material-theme-lighter',
+  themes = {
+    light: 'material-theme-lighter',
+    dark: 'vitesse-dark',
+  },
   copy = { hasCopyButton: true, disabled: false },
   transformers = [],
 }: CodeBlockProps) => {
   const [html, setHtml] = useState('');
+  const { theme, systemTheme } = useTheme();
+
+  const currentTheme = useMemo(() => {
+    if (theme === 'system') {
+      return systemTheme === 'light' ? themes.light : themes.dark;
+    }
+    return theme === 'light' ? themes.light : themes.dark;
+  }, [theme, systemTheme, themes]);
 
   useEffect(() => {
     codeToHtml(code, {
       lang,
-      theme,
+      theme: currentTheme,
       transformers,
-    }).then((htmlString: string) => setHtml(htmlString));
-  }, [code, theme, html]);
+    }).then(setHtml);
+  }, [code, lang, currentTheme, transformers]);
 
   return (
     <div className="relative">

@@ -64,7 +64,11 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
           </DialogHeader>
           <ScrollArea>
             <aside className="scroll-area">
-              <CodeBlock code={getABI()} lang="json" theme="github-light" />
+              <CodeBlock
+                code={getABI()}
+                lang="json"
+                themes={{ light: 'github-light', dark: 'vitesse-dark' }}
+              />
             </aside>
           </ScrollArea>
         </DialogContent>
@@ -91,7 +95,11 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
           <DialogDescription />
         </DialogHeader>
         <div className="max-h-96 overflow-y-scroll pb-6">
-          <CodeBlock code={getABI()} lang="json" theme="github-light" />
+          <CodeBlock
+            code={getABI()}
+            lang="json"
+            themes={{ light: 'github-light', dark: 'vitesse-dark' }}
+          />
         </div>
       </DrawerContent>
     </Drawer>
