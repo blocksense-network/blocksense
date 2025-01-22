@@ -28,11 +28,7 @@ export default {
               },
             },
           },
-          'reference-documentation': {
-            items: {
-              Overview: '',
-            },
-          },
+          'reference-documentation': 'Reference Documentation',
           'deployed-contracts': 'Deployed Contracts',
         },
       },
