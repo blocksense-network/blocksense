@@ -4,7 +4,11 @@ use crate::providers::eth_send_utils::{
 use crate::ConsensusSecondRoundBatch;
 use crate::{sequencer_state::SequencerState, UpdateToSend};
 use actix_web::web::Data;
-use alloy::hex;
+use alloy::hex::{self, FromHex, ToHexExt};
+use alloy::providers::Provider;
+use alloy::sol;
+use alloy::sol_types::SolStruct;
+use alloy_primitives::{address, keccak256, Address, Bytes, B256, U256};
 use feed_registry::types::Repeatability::Periodic;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
@@ -12,6 +16,34 @@ use std::io::Error;
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
+
+sol! {
+    #[derive(Debug)]
+    struct SafeTx {
+        address to;
+        uint256 value;
+        bytes data;
+        uint8 operation;
+        uint256 safeTxGas;
+        uint256 baseGas;
+        uint256 gasPrice;
+        address gasToken;
+        address refundReceiver;
+        uint256 nonce;
+    }
+
+    struct EIP712Domain {
+        uint256 chainId;
+        address verifyingContract;
+    }
+}
+
+sol! {
+    #[allow(clippy::too_many_arguments)]
+    #[sol(rpc)]
+    SafeMultisig,
+    "safe_abi.json"
+}
 
 pub async fn votes_result_sender_loop(
     mut batched_votes_recv: UnboundedReceiver<UpdateToSend>,
@@ -146,9 +178,67 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             continue;
         }
 
+        let (contract_address, safe_address, nonce, chain_id, tx_hash) = {
+            let provider = p.lock().await;
+
+            let contract_address = provider.contract_address.unwrap_or(Address::default());
+            let safe_address = provider.safe_address.unwrap_or(Address::default());
+            let contract = SafeMultisig::new(safe_address, &provider.provider);
+
+            let nonce = match contract.nonce().call().await {
+                Ok(n) => n,
+                Err(e) => {
+                    error!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}!");
+                    return;
+                }
+            };
+
+            let calldata = match Bytes::from_hex(serialized_updates.clone()) {
+                Ok(b) => b,
+                Err(e) => {
+                    error!("[serialized_updates] is not valid hex string: {}", e);
+                    return;
+                }
+            };
+
+            let safe_transaction = SafeTx {
+                to: contract_address,
+                value: U256::from(0),
+                data: calldata,
+                operation: 0,
+                safeTxGas: U256::from(0),
+                gasPrice: U256::from(0),
+                baseGas: U256::from(0),
+                gasToken: address!("0000000000000000000000000000000000000000"),
+                refundReceiver: address!("0000000000000000000000000000000000000000"),
+                nonce: nonce._0,
+            };
+
+            let chain_id = match provider.provider.get_chain_id().await {
+                Ok(c) => c,
+                Err(e) => {
+                    error!("Failed to get chain_id in network {net}: {e}!");
+                    return;
+                }
+            };
+
+            let tx_hash = generate_transaction_hash(
+                safe_address,
+                U256::from(chain_id),
+                safe_transaction.clone(),
+            );
+
+            (contract_address, safe_address, nonce, chain_id, tx_hash)
+        };
+
         let updates_to_kafka = ConsensusSecondRoundBatch {
             sequencer_id,
             block_height,
+            contract_address: contract_address.encode_hex(),
+            safe_address: safe_address.encode_hex(),
+            nonce: nonce._0.to_string(),
+            chain_id: chain_id.to_string(),
+            tx_hash: tx_hash.to_string(),
             network: net.to_string(),
             calldata: hex::encode(serialized_updates),
         };
@@ -182,4 +272,27 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             }
         }
     }
+}
+
+fn generate_transaction_hash(safe_address: Address, chain_id: U256, data: SafeTx) -> B256 {
+    let mut parts = Vec::new();
+
+    parts.extend(hex::decode("1901").unwrap());
+
+    let domain = EIP712Domain {
+        chainId: chain_id,
+        verifyingContract: safe_address,
+    };
+
+    parts.extend(domain.eip712_hash_struct());
+
+    let type_hash = data.eip712_type_hash().0.to_vec();
+    let struct_data = data.eip712_encode_data();
+    let encoded_data = [type_hash, struct_data].concat();
+
+    let safe_tx_data_hash = keccak256(encoded_data);
+
+    parts.extend(safe_tx_data_hash);
+
+    keccak256(parts)
 }

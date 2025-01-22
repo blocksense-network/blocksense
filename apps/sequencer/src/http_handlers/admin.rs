@@ -805,6 +805,7 @@ mod tests {
                     private_key_path: key_path.to_str().unwrap().to_owned(),
                     url,
                     contract_address: None,
+                    safe_address: None,
                     event_contract_address: None,
                     transaction_drop_timeout_secs: 42,
                     transaction_retry_timeout_secs: 20,

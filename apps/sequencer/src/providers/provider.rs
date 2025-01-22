@@ -50,6 +50,7 @@ pub struct RpcProvider {
     pub provider: ProviderType,
     pub signer: PrivateKeySigner,
     pub contract_address: Option<Address>,
+    pub safe_address: Option<Address>,
     pub event_contract_address: Option<Address>,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
     pub transaction_drop_timeout_secs: u32,
@@ -177,6 +178,10 @@ async fn get_rpc_providers(
             .contract_address
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
+        let safe_address = p
+            .safe_address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
         let event_address = p
             .event_contract_address
             .as_ref()
@@ -200,6 +205,7 @@ async fn get_rpc_providers(
         }
         let rpc_provider = Arc::new(Mutex::new(RpcProvider {
             contract_address: address,
+            safe_address,
             event_contract_address: event_address,
             provider,
             signer,

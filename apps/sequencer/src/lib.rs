@@ -24,6 +24,11 @@ pub struct ConsensusSecondRoundBatch {
     sequencer_id: u64,
     block_height: u64,
     network: String,
+    contract_address: String,
+    safe_address: String,
+    nonce: String,
+    chain_id: String,
+    tx_hash: String,
     calldata: String,
 }
 

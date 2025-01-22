@@ -16,6 +16,7 @@ with lib.fileset;
           "rs"
           "toml"
           "wit"
+          "json"
         ]
       ) root)
     ];
