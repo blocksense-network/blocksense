@@ -63,7 +63,7 @@ const networks = [
   'aurora-testnet',
   'exSat-testnet',
   'songbird-coston',
-  'flair-coston2',
+  'flare-coston',
   'boba-sepolia',
   'boba-bnb-testnet',
   'rootstock-testnet',
@@ -73,6 +73,8 @@ const networks = [
   'world-chain-sepolia',
   'kroma-sepolia',
   'blast-sepolia',
+  'metal-l2-testnet',
+  'creator-testnet',
 ] as const;
 
 const chainIds = [
@@ -81,7 +83,7 @@ const chainIds = [
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
   1663, 1666700000, 1313161555, 839999, 16, 114, 28882, 9728, 31, 41, 71, 338,
-  4801, 2358, 168587773,
+  4801, 2358, 168587773, 1740, 66665,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -357,7 +359,7 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://coston-explorer.flare.network/',
   },
-  'flair-coston2': {
+  'flare-coston': {
     chainId: 114,
     isTestnet: true,
     explorerUrl: 'https://coston2.testnet.flarescan.com/',
@@ -406,6 +408,16 @@ export const networkMetadata = {
     chainId: 168587773,
     isTestnet: true,
     explorerUrl: 'https://sepolia.blastscan.io',
+  },
+  'metal-l2-testnet': {
+    chainId: 1740,
+    isTestnet: true,
+    explorerUrl: 'https://testnet.explorer.metall2.com/',
+  },
+  'creator-testnet': {
+    chainId: 66665,
+    isTestnet: true,
+    explorerUrl: 'https://testnet.explorer.metall2.com/',
   },
 } satisfies {
   [Net in NetworkName]: {
