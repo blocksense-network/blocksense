@@ -23,17 +23,11 @@ This diagram illustrates the role of smart contracts in ensuring data integrity 
 ---
 config:
     rightAngles: true
-    theme: neutral
-    primaryColor: "#d0d0d0"
-    signalColor: "FF0000"
-    signalTextColor: "#808080"
 ---
 graph TD
-    classDef clientNode fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
-    classDef feedNode,proxyNode,dataNode fill:#fafafa,color:#0c0a09,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
+    classDef clientNode display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
+    classDef feedNode,proxyNode,dataNode display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
     classDef feedNode:hover,proxyNode:hover,dataNode:hover fill:#fafafa,color:#0000EE,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace, text-decoration: underline, text-underline-offset: 4px;
-
-    linkStyle default fill:none,stroke-width:1px,stroke:#1c1917
 
     A[Client] -->|invoke| E
     A -->|invoke| B
