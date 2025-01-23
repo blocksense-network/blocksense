@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import '../../interfaces/ICLFeedRegistryAdapter.sol';
 import {ICLAggregatorAdapter} from '../../interfaces/ICLAggregatorAdapter.sol';
-import {Blocksense} from '../../libraries/Blocksense.sol';
+import {CLAdapterLib} from '../../libraries/CLAdapterLib.sol';
 
 /// @title Registry aggregating information from CLAggregatorAdapters and the feed itself
 /// @notice This contract is used to store and retrieve information about feeds
@@ -46,7 +46,8 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address base,
     address quote
   ) external view override returns (int256) {
-    return Blocksense._latestAnswer(feedData[base][quote].id, DATA_FEED_STORE);
+    return
+      CLAdapterLib._latestAnswer(feedData[base][quote].id, DATA_FEED_STORE);
   }
 
   /// @inheritdoc IChainlinkFeedRegistry
@@ -56,7 +57,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     uint80 _roundId
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
     return
-      Blocksense._getRoundData(
+      CLAdapterLib._getRoundData(
         _roundId,
         feedData[base][quote].id,
         DATA_FEED_STORE
@@ -92,7 +93,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address base,
     address quote
   ) external view override returns (uint256) {
-    return Blocksense._latestRound(feedData[base][quote].id, DATA_FEED_STORE);
+    return CLAdapterLib._latestRound(feedData[base][quote].id, DATA_FEED_STORE);
   }
 
   /// @inheritdoc IChainlinkFeedRegistry
@@ -101,6 +102,6 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address quote
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
     return
-      Blocksense._latestRoundData(feedData[base][quote].id, DATA_FEED_STORE);
+      CLAdapterLib._latestRoundData(feedData[base][quote].id, DATA_FEED_STORE);
   }
 }

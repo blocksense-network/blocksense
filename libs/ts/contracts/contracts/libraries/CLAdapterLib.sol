@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title Blocksense
-/// @notice Library for calling dataFeedStore functions
+/// @title CLAdapterLib
+/// @notice Library for calling dataFeedStore functions for Chainlink adapters
 /// @dev Contains utility functions for calling gas efficiently dataFeedStore functions and decoding return data
-library Blocksense {
+library CLAdapterLib {
   /// @notice Gets the latest answer from the dataFeedStore
   /// @param id The key ID for the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
@@ -20,7 +20,7 @@ library Blocksense {
             bytes24(
               // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
               // after that are 15 bytes of the feed id
-              _callDataFeed(dataFeedStore, (uint256(0x82) << 248) | (id << 120))
+              _callDataFeed(dataFeedStore, (uint256(0x82) << 248) | id)
             )
           )
         )
@@ -51,7 +51,7 @@ library Blocksense {
         // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
         // after that are 15 bytes of the feed id
         // after the feed id are 2 bytes of the round id
-        (uint256(0x84) << 248) | (id << 120) | (uint256(_roundId) << 104)
+        (uint256(0x84) << 248) | id | (uint256(_roundId) << 104)
       )
     );
     return (_roundId, answer, startedAt, startedAt, _roundId);
@@ -70,7 +70,7 @@ library Blocksense {
       uint256(
         // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
         // after that are 15 bytes of the feed id
-        _callDataFeed(dataFeedStore, (uint256(0x81) << 248) | (id << 120))
+        _callDataFeed(dataFeedStore, (uint256(0x81) << 248) | id)
       );
   }
 
@@ -105,7 +105,7 @@ library Blocksense {
         0x00,
         or(
           0x8300000000000000000000000000000000000000000000000000000000000000,
-          shl(120, id)
+          id
         )
       )
 
@@ -174,5 +174,9 @@ library Blocksense {
   /// @return timestamp The timestamp when the value was stored
   function _decodeData(bytes32 data) internal pure returns (int256, uint256) {
     return (int256(uint256(uint192(bytes24(data)))), uint64(uint256(data)));
+  }
+
+  function _shiftId(uint256 id) internal pure returns (uint256) {
+    return id << 120;
   }
 }

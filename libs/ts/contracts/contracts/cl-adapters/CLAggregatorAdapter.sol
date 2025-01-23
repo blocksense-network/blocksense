@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import '../interfaces/ICLAggregatorAdapter.sol';
-import {Blocksense} from '../libraries/Blocksense.sol';
+import {CLAdapterLib} from '../libraries/CLAdapterLib.sol';
 
 /// @title CLAggregatorAdapter
 /// @notice Contract that proxies calls to the dataFeedStore
@@ -31,18 +31,18 @@ contract CLAggregatorAdapter is ICLAggregatorAdapter {
   ) {
     description = _description;
     decimals = _decimals;
-    id = _id;
+    id = CLAdapterLib._shiftId(_id);
     dataFeedStore = _dataFeedStore;
   }
 
   /// @inheritdoc IChainlinkAggregator
   function latestAnswer() external view override returns (int256) {
-    return Blocksense._latestAnswer(id, dataFeedStore);
+    return CLAdapterLib._latestAnswer(id, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
   function latestRound() external view override returns (uint256) {
-    return Blocksense._latestRound(id, dataFeedStore);
+    return CLAdapterLib._latestRound(id, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
@@ -52,13 +52,13 @@ contract CLAggregatorAdapter is ICLAggregatorAdapter {
     override
     returns (uint80, int256, uint256, uint256, uint80)
   {
-    return Blocksense._latestRoundData(id, dataFeedStore);
+    return CLAdapterLib._latestRoundData(id, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
   function getRoundData(
     uint80 _roundId
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
-    return Blocksense._getRoundData(_roundId, id, dataFeedStore);
+    return CLAdapterLib._getRoundData(_roundId, id, dataFeedStore);
   }
 }
