@@ -6,44 +6,15 @@ use crate::{sequencer_state::SequencerState, UpdateToSend};
 use actix_web::web::Data;
 use alloy::hex::{self, FromHex, ToHexExt};
 use alloy::providers::Provider;
-use alloy::sol;
-use alloy::sol_types::SolStruct;
-use alloy_primitives::{address, keccak256, Address, Bytes, B256, U256};
+use alloy_primitives::{address, Address, Bytes, U256};
 use feed_registry::types::Repeatability::Periodic;
+use gnosis_safe::utils::{generate_transaction_hash, SafeMultisig, SafeTx};
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use std::io::Error;
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
-
-sol! {
-    #[derive(Debug)]
-    struct SafeTx {
-        address to;
-        uint256 value;
-        bytes data;
-        uint8 operation;
-        uint256 safeTxGas;
-        uint256 baseGas;
-        uint256 gasPrice;
-        address gasToken;
-        address refundReceiver;
-        uint256 nonce;
-    }
-
-    struct EIP712Domain {
-        uint256 chainId;
-        address verifyingContract;
-    }
-}
-
-sol! {
-    #[allow(clippy::too_many_arguments)]
-    #[sol(rpc)]
-    SafeMultisig,
-    "safe_abi.json"
-}
 
 pub async fn votes_result_sender_loop(
     mut batched_votes_recv: UnboundedReceiver<UpdateToSend>,
@@ -272,27 +243,4 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             }
         }
     }
-}
-
-fn generate_transaction_hash(safe_address: Address, chain_id: U256, data: SafeTx) -> B256 {
-    let mut parts = Vec::new();
-
-    parts.extend(hex::decode("1901").unwrap());
-
-    let domain = EIP712Domain {
-        chainId: chain_id,
-        verifyingContract: safe_address,
-    };
-
-    parts.extend(domain.eip712_hash_struct());
-
-    let type_hash = data.eip712_type_hash().0.to_vec();
-    let struct_data = data.eip712_encode_data();
-    let encoded_data = [type_hash, struct_data].concat();
-
-    let safe_tx_data_hash = keccak256(encoded_data);
-
-    parts.extend(safe_tx_data_hash);
-
-    keccak256(parts)
 }

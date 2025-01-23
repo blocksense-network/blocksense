@@ -41,6 +41,7 @@ alloy = { version = "0.8", features = [
 alloy-primitives = "0.8.19"
 
 prometheus = { path = "../../libs/prometheus" }
+gnosis_safe = { path = "../../libs/gnosis_safe" }
 
 reqwest = { workspace = true }
 # async
