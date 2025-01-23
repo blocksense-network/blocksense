@@ -31,7 +31,7 @@ export const NetworkIcon = ({
       <ImageWrapper
         src={iconPath}
         alt={network}
-        className="relative w-14 h-14 invert"
+        className="relative w-14 h-14"
       />
       <div className="pt-4 font-bold text-xs dark:text-white">
         {capitalizeWords(network)}
