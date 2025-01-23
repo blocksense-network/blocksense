@@ -51,7 +51,7 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
 
     clAdapter = new CLAdapterWrapper();
     await clAdapter.init(data.description, data.decimals, data.key, proxy);
-    const value = encodeDataAndTimestamp(312343354);
+    const value = encodeDataAndTimestamp(312343354, Date.now() - 1234);
     await clAdapter.setFeed(sequencer, value, 1n);
 
     const signer = (await ethers.getSigners())[5];
