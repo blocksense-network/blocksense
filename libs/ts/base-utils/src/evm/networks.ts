@@ -75,6 +75,7 @@ const networks = [
   'blast-sepolia',
   'metal-l2-testnet',
   'creator-testnet',
+  'lumia-testnet',
 ] as const;
 
 const chainIds = [
@@ -83,7 +84,7 @@ const chainIds = [
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
   1663, 1666700000, 1313161555, 839999, 16, 114, 28882, 9728, 31, 41, 71, 338,
-  4801, 2358, 168587773, 1740, 66665,
+  4801, 2358, 168587773, 1740, 66665, 1952959480,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -418,6 +419,11 @@ export const networkMetadata = {
     chainId: 66665,
     isTestnet: true,
     explorerUrl: 'https://testnet.explorer.metall2.com/',
+  },
+  'lumia-testnet': {
+    chainId: 1952959480,
+    isTestnet: true,
+    explorerUrl: 'https://testnet-explorer.lumia.org/',
   },
 } satisfies {
   [Net in NetworkName]: {
