@@ -85,6 +85,29 @@ const config: HardhatUserConfig = {
   etherscan: {
     enabled: true,
     apiKey: process.env.ETHERSCAN_API_KEY || '',
+    // apiKey: 'qeeYh3D9jQD8hHKbsv8jvGhtURw0WE0M',
+    // customChains: [
+    //   {
+    //     network: 'cronos-testnet',
+    //     chainId: 338,
+    //     urls: {
+    //       apiURL:
+    //         'https://explorer-api.cronos.org/testnet/api/v1/hardhat/contract?apikey=qeeYh3D9jQD8hHKbsv8jvGhtURw0WE0M',
+    //       browserURL: 'https://explorer.cronos.org/testnet',
+    //     },
+    //   },
+    // ],
+    // apiKey: 'qeeYh3D9jQD8hHKbsv8jvGhtURw0WE0M',
+    // customChains: [
+    //   {
+    //     network: 'kroma-sepolia',
+    //     chainId: 2358,
+    //     urls: {
+    //       apiURL: 'https://blockscout.sepolia.kroma.network/api',
+    //       browserURL: 'https://blockscout.sepolia.kroma.network/',
+    //     },
+    //   },
+    // ],
   },
 };
 
