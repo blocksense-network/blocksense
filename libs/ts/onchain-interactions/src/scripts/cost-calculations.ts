@@ -12,12 +12,12 @@ import {
 } from '@blocksense/base-utils/evm';
 import { deployedNetworks } from '../types';
 import { kebabToCamelCase } from '@blocksense/base-utils/string';
-import { logToFile } from '@blocksense/base-utils/logging';
 import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import chalkTemplate from 'chalk-template';
 
 const calculateGasCosts = (
   secondsBetweenTransactions: number,
@@ -82,71 +82,19 @@ const logGasCosts = async (
   secondsBetweenTransactions: number,
 ): Promise<void> => {
   const { currency } = networkMetadata[network];
-  const logFile = 'cost-calculations.log';
   const transactionsPerHour = 3600 / secondsBetweenTransactions;
 
   try {
-    console.log(
-      chalk.green(
-        `${network}: Processed ${transactionsCount} transactions sent by ${address}`,
-      ),
-    );
-    console.log(
-      chalk.blue(`  First transaction timestamp: ${firstTransactionTime}`),
-    );
-    console.log(
-      chalk.blue(`  Last transaction timestamp: ${lastTransactionTime}`),
-    );
-    console.log(
-      chalk.yellow(
-        `  Average Transaction Cost: ${gasCosts.avgGasCostEth} ${currency}`,
-      ),
-    );
-    console.log(
-      chalk.yellow(`  Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei`),
-    );
-    console.log(chalk.yellow(`  Average Gas Used: ${gasCosts.avgGasUsed}`));
-    console.log(
-      chalk.magenta(
-        `  Projected Cost for 1h (${transactionsPerHour} tx): ${gasCosts.projectedCost1h} ${currency}`,
-      ),
-    );
-    console.log(
-      chalk.cyan(
-        `  Projected Cost for 24h (${transactionsPerHour * 24} tx): ${gasCosts.projectedCost24h} ${currency}`,
-      ),
-    );
-
-    await logToFile(logFile, `${network}:`);
-    await logToFile(
-      logFile,
-      `  Processed ${transactionsCount} transactions sent by the account`,
-    );
-    await logToFile(
-      logFile,
-      `  First transaction timestamp: ${firstTransactionTime}`,
-    );
-    await logToFile(
-      logFile,
-      `  Last transaction timestamp: ${lastTransactionTime}`,
-    );
-    await logToFile(
-      logFile,
-      `  Average Transaction Cost: ${gasCosts.avgGasCostEth} ${currency}`,
-    );
-    await logToFile(
-      logFile,
-      `  Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei`,
-    );
-    await logToFile(logFile, `  Average Gas Used: ${gasCosts.avgGasUsed}`);
-    await logToFile(
-      logFile,
-      `  Projected Cost for 1h (${transactionsPerHour} tx): ${gasCosts.projectedCost1h} ${currency}`,
-    );
-    await logToFile(
-      logFile,
-      `  Projected Cost 24h (${transactionsPerHour * 24} tx): ${gasCosts.projectedCost24h} ${currency}`,
-    );
+    await console.log(chalkTemplate`
+    {green ${network}: Processed ${transactionsCount} transactions sent by ${address}}
+    {blue First transaction timestamp: ${firstTransactionTime}}
+    {blue Last transaction timestamp: ${lastTransactionTime}}
+    {yellow Average Transaction Cost: ${gasCosts.avgGasCostEth} ${currency}}
+    {yellow Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei}
+    {yellow Average Gas Used: ${gasCosts.avgGasUsed}}
+    {magenta Projected Cost for 1h (${transactionsPerHour} tx): ${gasCosts.projectedCost1h} ${currency}}
+    {cyan Projected Cost for 24h (${transactionsPerHour * 24} tx): ${gasCosts.projectedCost24h} ${currency}}
+    `);
 
     if (balance == null) {
       console.error(chalk.red(`Can't calculate balance for ${network}`));
@@ -160,14 +108,7 @@ const logGasCosts = async (
       } else {
         console.log(chalk.green(balanceMsg));
       }
-
-      await logToFile(
-        logFile,
-        `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour projected costs.`,
-      );
     }
-
-    await logToFile(logFile, `\n`);
   } catch (error) {
     if (error instanceof Error) {
       console.error(chalk.red(`Error logging gas costs: ${error.message}`));
