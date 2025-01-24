@@ -3422,6 +3422,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "crypto-price-feeds"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "blocksense-sdk",
+ "serde 1.0.217",
+ "serde_derive",
+ "serde_json",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "csv"
 version = "1.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
