@@ -1,5 +1,7 @@
 'use client';
+
 import React from 'react';
+
 import {
   Dialog,
   DialogContent,
@@ -11,7 +13,14 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CodeBlock } from '@/components/common/CodeBlock';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
 
@@ -84,16 +93,16 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
         </section>
       </DrawerTrigger>
       <DrawerContent>
-        <DialogHeader>
+        <DrawerHeader>
           <section className="flex items-center justify-between px-4 py-2">
-            <DialogTitle>{title}</DialogTitle>
+            <DrawerTitle>{title}</DrawerTitle>
             <FormatButton
               isFormatted={isFormatted}
               formatHandler={formatHandler}
             />
           </section>
-          <DialogDescription />
-        </DialogHeader>
+          <DrawerDescription />
+        </DrawerHeader>
         <div className="max-h-96 overflow-y-scroll pb-6">
           <CodeBlock
             code={getABI()}
