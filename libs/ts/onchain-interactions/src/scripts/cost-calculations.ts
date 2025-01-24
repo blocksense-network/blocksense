@@ -38,8 +38,8 @@ const calculateGasCosts = (
   let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
-    const gasUsed = BigInt(tx.gasUsed ?? tx.gas);
-    const gasPrice = BigInt(tx.gasPrice);
+    const gasUsed = BigInt(tx.gasUsed ?? tx.gas_used ?? tx.gas);
+    const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price);
     const txGasCost = gasUsed * gasPrice;
 
     totalGasCost += txGasCost;
@@ -178,7 +178,7 @@ const logGasCosts = async (
 };
 
 const getTxTimestampAsDate = (tx: Transaction): Date =>
-  new Date(parseInt((tx.timestamp ?? tx.timeStamp) || '0') * 1000);
+  new Date(tx.timestamp ?? parseInt(tx.timeStamp || '0') * 1000);
 
 const fetchTransactionsForNetwork = async (
   network: NetworkName,
@@ -205,24 +205,30 @@ const fetchTransactionsForNetwork = async (
     console.log('------------------------------------------------------------');
     console.log(chalk.green(network.toUpperCase()));
     console.log(chalk.blue(`Fetching transactions for ${network}...`));
-    const response: AxiosResponse<any> = await axios.get(apiUrl, {
-      params: {
-        module: 'account',
-        action: 'txlist',
-        address,
-        startblock: 0,
-        endblock: 99999999,
-        sort: 'desc',
-        apikey,
-      },
-    });
+    let response: AxiosResponse<any>;
+    let rawTransactions;
+    if (network === 'morph-holesky') {
+      response = await axios.get(`${apiUrl}/addresses/${address}/transactions`);
+      rawTransactions = response.data.items || [];
+    } else {
+      response = await axios.get(apiUrl, {
+        params: {
+          module: 'account',
+          action: 'txlist',
+          address,
+          startblock: 0,
+          endblock: 99999999,
+          sort: 'desc',
+          apikey,
+        },
+      });
 
-    if (response.data.status !== '1') {
-      console.error(chalk.red(`${network} Error: ${response.data.message}`));
-      return { transactions: [], firstTxTime: '', lastTxTime: '' };
+      if (response.data.status !== '1') {
+        console.error(chalk.red(`${network} Error: ${response.data.message}`));
+        return { transactions: [], firstTxTime: '', lastTxTime: '' };
+      }
+      rawTransactions = response.data.result;
     }
-
-    const rawTransactions = response.data.result;
     let notSelfSent: any[];
     if (network == 'cronos-testnet') {
       notSelfSent = rawTransactions.filter(
@@ -230,6 +236,12 @@ const fetchTransactionsForNetwork = async (
           tx.from.address.toLowerCase() === address.toLowerCase() &&
           tx.to.address.toLowerCase() !== address.toLowerCase(),
       ); //cronos has a different call
+    } else if (network == 'morph-holesky') {
+      notSelfSent = rawTransactions.filter(
+        (tx: any) =>
+          tx.from.hash.toLowerCase() === address.toLowerCase() &&
+          tx.to.hash.toLowerCase() !== address.toLowerCase(),
+      ); //morph has a different call
     } else {
       notSelfSent = rawTransactions.filter(
         (tx: any) =>

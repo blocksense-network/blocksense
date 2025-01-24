@@ -71,7 +71,7 @@ export const API_ENDPOINTS = {
   lineaSepolia: 'https://api-sepolia.lineascan.build/api',
   mantaSepolia: 'https://pacific-explorer.sepolia-testnet.manta.network/api',
   mantleSepolia: 'https://api-sepolia.mantlescan.xyz/api?',
-  morphHolesky: 'https://explorer-api-holesky.morphl2.io/api? ',
+  morphHolesky: 'https://explorer-api-holesky.morphl2.io/api/v2',
   optimismSepolia: 'https://api-sepolia-optimistic.etherscan.io/api',
   polygonAmoy: 'https://api-amoy.polygonscan.com/api',
   polygonZkevmCardona: 'https://api-cardona-zkevm.polygonscan.com/api',
@@ -83,8 +83,10 @@ export const API_ENDPOINTS = {
 
 export type Transaction = {
   gasUsed?: string;
+  gas_used?: string;
   gas: string;
-  gasPrice: string;
+  gasPrice?: string;
+  gas_price?: string;
   from: EthereumAddress;
   to: EthereumAddress;
 } & (
