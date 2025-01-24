@@ -6,9 +6,9 @@ use crate::{sequencer_state::SequencerState, UpdateToSend};
 use actix_web::web::Data;
 use alloy::hex::{self, FromHex, ToHexExt};
 use alloy::providers::Provider;
-use alloy_primitives::{address, Address, Bytes, U256};
+use alloy_primitives::{Address, Bytes, U256};
 use feed_registry::types::Repeatability::Periodic;
-use gnosis_safe::utils::{generate_transaction_hash, SafeMultisig, SafeTx};
+use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use std::io::Error;
@@ -172,18 +172,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 }
             };
 
-            let safe_transaction = SafeTx {
-                to: contract_address,
-                value: U256::from(0),
-                data: calldata,
-                operation: 0,
-                safeTxGas: U256::from(0),
-                gasPrice: U256::from(0),
-                baseGas: U256::from(0),
-                gasToken: address!("0000000000000000000000000000000000000000"),
-                refundReceiver: address!("0000000000000000000000000000000000000000"),
-                nonce: nonce._0,
-            };
+            let safe_transaction = create_safe_tx(contract_address, calldata, nonce._0);
 
             let chain_id = match provider.provider.get_chain_id().await {
                 Ok(c) => c,
@@ -193,11 +182,8 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 }
             };
 
-            let tx_hash = generate_transaction_hash(
-                safe_address,
-                U256::from(chain_id),
-                safe_transaction.clone(),
-            );
+            let tx_hash =
+                generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction);
 
             (contract_address, safe_address, nonce, chain_id, tx_hash)
         };
