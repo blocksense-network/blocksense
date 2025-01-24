@@ -1,4 +1,4 @@
-use anyhow::{Result, Context, bail};
+use anyhow::{bail, Context, Result};
 // use async_trait::async_trait;
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
@@ -17,8 +17,7 @@ use url::Url;
 //2. Move URLS to constants
 //3. Try to minimize object cloning.
 
-const USD_SYMBOLS: [&'static str; 3] = ["USD", "USDC", "USDT"];
-
+const USD_SYMBOLS: [&str; 3] = ["USD", "USDC", "USDT"];
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct BinancePrice {
@@ -26,10 +25,11 @@ pub struct BinancePrice {
     pub price: String,
 }
 
-async fn get_binance_prices(resources: &Vec<ResourceData>, results: &mut HashMap<String, Vec<ResourceResult>>) -> Result<()> {
-    let url = Url::parse(
-        "https://api.binance.com/api/v3/ticker/price",
-    )?;
+async fn get_binance_prices(
+    resources: &Vec<ResourceData>,
+    results: &mut HashMap<String, Vec<ResourceResult>>,
+) -> Result<()> {
+    let url = Url::parse("https://api.binance.com/api/v3/ticker/price")?;
 
     let mut req = Request::builder();
     req.method(Method::Get);
@@ -42,7 +42,10 @@ async fn get_binance_prices(resources: &Vec<ResourceData>, results: &mut HashMap
     let body = resp.into_body();
     let string = String::from_utf8(body)?;
     let values: Vec<BinancePrice> = serde_json::from_str(&string)?;
-    let response: HashMap<String, String> = values.into_iter().map(|value| (value.symbol, value.price)).collect();
+    let response: HashMap<String, String> = values
+        .into_iter()
+        .map(|value| (value.symbol, value.price))
+        .collect();
 
     fill_results(resources, results, response)?;
     Ok(())
@@ -59,10 +62,11 @@ pub struct KrakenResponse {
     pub result: HashMap<String, KrakenPrice>,
 }
 
-async fn get_kraken_prices(resources: &Vec<ResourceData>, results: &mut HashMap<String, Vec<ResourceResult>>) -> Result<()> {
-    let url = Url::parse(
-        "https://api.kraken.com/0/public/Ticker",
-    )?;
+async fn get_kraken_prices(
+    resources: &Vec<ResourceData>,
+    results: &mut HashMap<String, Vec<ResourceResult>>,
+) -> Result<()> {
+    let url = Url::parse("https://api.kraken.com/0/public/Ticker")?;
 
     let mut req = Request::builder();
     req.method(Method::Get);
@@ -77,7 +81,17 @@ async fn get_kraken_prices(resources: &Vec<ResourceData>, results: &mut HashMap<
     let value: KrakenResponse = serde_json::from_str(&string)?;
     let mut response: HashMap<String, String> = HashMap::new();
     for (symbol, price) in value.result {
-        response.insert(symbol.clone(), price.a.first().context(format!("Kraken has no price in response for symbol: {}", symbol))?.clone());
+        response.insert(
+            symbol.clone(),
+            price
+                .a
+                .first()
+                .context(format!(
+                    "Kraken has no price in response for symbol: {}",
+                    symbol
+                ))?
+                .clone(),
+        );
     }
 
     fill_results(resources, results, response)?;
@@ -107,7 +121,10 @@ pub struct BybitResponse {
     pub result: BybitResult,
 }
 
-async fn get_bybit_prices(resources: &Vec<ResourceData>, results: &mut HashMap<String, Vec<ResourceResult>>) -> Result<()> {
+async fn get_bybit_prices(
+    resources: &Vec<ResourceData>,
+    results: &mut HashMap<String, Vec<ResourceResult>>,
+) -> Result<()> {
     let url = Url::parse_with_params(
         "https://api.bybit.com/v5/market/tickers",
         &[("category", "spot"), ("symbols", "")],
@@ -124,7 +141,12 @@ async fn get_bybit_prices(resources: &Vec<ResourceData>, results: &mut HashMap<S
     let body = resp.into_body();
     let string = String::from_utf8(body)?;
     let value: BybitResponse = serde_json::from_str(&string)?;
-    let response: HashMap<String, String> = value.result.list.into_iter().map(|value| (value.symbol, value.last_price)).collect();
+    let response: HashMap<String, String> = value
+        .result
+        .list
+        .into_iter()
+        .map(|value| (value.symbol, value.last_price))
+        .collect();
 
     fill_results(resources, results, response)?;
 
@@ -189,6 +211,7 @@ struct ResourceData {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)] // We are not using this struct yet.
 struct ResourceResult {
     pub id: String,
     pub symbol: String,
@@ -197,7 +220,11 @@ struct ResourceResult {
     //TODO(adikov): Add balance information when we start getting it.
 }
 
-fn fill_results(resources: &Vec<ResourceData>, results: &mut HashMap<String, Vec<ResourceResult>>, response: HashMap<String, String>) -> Result<()> {
+fn fill_results(
+    resources: &Vec<ResourceData>,
+    results: &mut HashMap<String, Vec<ResourceResult>>,
+    response: HashMap<String, String>,
+) -> Result<()> {
     //TODO(adikov): We need a proper way to get trade volume from Binance API.
     for resource in resources {
         // First USD pair found.
@@ -205,7 +232,7 @@ fn fill_results(resources: &Vec<ResourceData>, results: &mut HashMap<String, Vec
             let quote = format!("{}{}", resource.symbol, symbol);
             if response.contains_key(&quote) {
                 //TODO(adikov): remove unwrap
-                let res = results.entry(resource.id.clone()).or_insert(vec![]);
+                let res = results.entry(resource.id.clone()).or_default();
                 res.push(ResourceResult {
                     id: resource.id.clone(),
                     symbol: resource.symbol.clone(),
@@ -221,7 +248,6 @@ fn fill_results(resources: &Vec<ResourceData>, results: &mut HashMap<String, Vec
 }
 
 fn vwap(results: &Vec<ResourceResult>) -> Result<f64> {
-
     if results.is_empty() {
         bail!("Missing results");
     }
@@ -238,7 +264,7 @@ fn vwap(results: &Vec<ResourceResult>) -> Result<f64> {
     //   THIS IS NOT THE PROPER IMPLEMENTATION IT IS FOR TEST PURPOSES
     let mut sum: f64 = 0.0f64;
     for res in results {
-       sum = sum + res.result.parse::<f64>()?;
+        sum += res.result.parse::<f64>()?;
     }
 
     Ok(sum / results.len() as f64)
@@ -247,20 +273,15 @@ fn vwap(results: &Vec<ResourceResult>) -> Result<f64> {
 fn process_results(results: HashMap<String, Vec<ResourceResult>>) -> Result<Payload> {
     let mut payload: Payload = Payload::new();
     for (feed_id, results) in results.iter() {
-
         payload.values.push(match vwap(results) {
-            Ok(price) => {
-                DataFeedResult {
-                    id: feed_id.clone(),
-                    value: DataFeedResultValue::Numerical(price),
-                }
-            }
-            Err(err) => {
-                DataFeedResult {
-                    id: feed_id.clone(),
-                    value: DataFeedResultValue::Error(err.to_string()),
-                }
-            }
+            Ok(price) => DataFeedResult {
+                id: feed_id.clone(),
+                value: DataFeedResultValue::Numerical(price),
+            },
+            Err(err) => DataFeedResult {
+                id: feed_id.clone(),
+                value: DataFeedResultValue::Error(err.to_string()),
+            },
         });
     }
 
@@ -277,7 +298,7 @@ fn print_results(resources: &Vec<ResourceData>, results: &HashMap<String, Vec<Re
     println!("missing ids(id-symbol): {}]", missing);
 
     let mut print = "[".to_string();
-    for (id,  results) in results {
+    for (id, results) in results {
         print.push_str(&format!("({}-{}),", id, results.len()).to_string());
     }
     println!("(id-echange_count): {}]", print);
@@ -286,13 +307,18 @@ fn print_results(resources: &Vec<ResourceData>, results: &HashMap<String, Vec<Re
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     let mut resources: Vec<ResourceData> = vec![];
-    let mut results: HashMap<String, Vec<ResourceResult>> = HashMap::<String, Vec<ResourceResult>>::new();
+    let mut results: HashMap<String, Vec<ResourceResult>> =
+        HashMap::<String, Vec<ResourceResult>>::new();
     // let mut ids: Vec<String> = vec![];
     //TODO(adikov): Make sure citrea feeds exist so that we can properly test.
     // let citrea_feeds = vec!["BTCUSD", "ETHUSD", "EURCUSD", "USDTUSD", "USDCUSD", "PAXGUSD", "TBTCUSD", "WBTCUSD", "WSTETHUSD"];
     for feed in settings.data_feeds.iter() {
-        let data: CmcResource = serde_json::from_str(&feed.data).context("Couldn't parse Data Feed resource properly")?;
-        resources.push(ResourceData { symbol: data.cmc_quote.clone(), id: feed.id.clone()});
+        let data: CmcResource = serde_json::from_str(&feed.data)
+            .context("Couldn't parse Data Feed resource properly")?;
+        resources.push(ResourceData {
+            symbol: data.cmc_quote.clone(),
+            id: feed.id.clone(),
+        });
         //TODO(adikov): We need to get all the proper symbols from the new data feed configuration.
     }
 
@@ -315,7 +341,6 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let payload = process_results(results)?;
     println!("Final Payload - {:?}", payload);
-
 
     Ok(payload)
 }
