@@ -111,15 +111,17 @@ async function saveToFile(data: any, fileName: string) {
   await writeJSON({ content: { data }, name: fileName });
 }
 
+// Placeholder for now; to be extended later
+export const stableCoins = {
+  USD: ['USDT', 'USDC'],
+  EUR: ['EURC', 'EURS', 'EURt'],
+};
+
 // Pair validation logic
 function isPairSupportedByCryptoProvider(
   oracleFeedPair: Pair,
   dataProviderPair: Pair,
 ): boolean {
-  const stableCoins = {
-    USD: ['USDT', 'USDC'],
-  };
-
   const isBaseCompatible = oracleFeedPair.base === dataProviderPair.base;
   const isCompatibleQuote =
     oracleFeedPair.quote === dataProviderPair.quote ||

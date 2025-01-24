@@ -8,6 +8,7 @@ import { getRpcUrl, isTestnet, NetworkName } from '@blocksense/base-utils/evm';
 import {
   NewFeed,
   NewFeedsConfig,
+  createPair,
 } from '@blocksense/config-types/data-feeds-config';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
@@ -26,7 +27,7 @@ import {
   getHighestDecimals,
 } from '../data-services/chainlink_feeds';
 import { SimplifiedFeed } from './types';
-import { addDataProviders } from './data-providers';
+import { addDataProviders, stableCoins } from './data-providers';
 
 function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,
@@ -179,6 +180,30 @@ function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
   });
 }
 
+function addStableCoinVariants(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
+  const stableCoinVariants = feeds.flatMap(feed => {
+    const { base, quote } = feed.priceFeedInfo.pair;
+    if (quote in stableCoins) {
+      return stableCoins[quote as keyof typeof stableCoins]
+        .map(altStableCoin => createPair(base, altStableCoin))
+        .map(pair => {
+          const fullName = pair.toString();
+          return {
+            ...feed,
+            fullName,
+            priceFeedInfo: {
+              ...feed.priceFeedInfo,
+              pair,
+            },
+          };
+        });
+    }
+    return [feed];
+  });
+
+  return [...feeds, ...stableCoinVariants];
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
 ): Promise<NewFeedsConfig> {
@@ -189,9 +214,13 @@ export async function generateFeedConfig(
   // Get the unique data feeds
   const uniqueDataFeeds = getUniqueDataFeeds(mainnetDataFeeds);
 
+  // Add stablecoin variants
+  const dataFeedsWithStableCoinVariants =
+    addStableCoinVariants(uniqueDataFeeds);
+
   // Add providers data to the feeds and filter out feeds without providers
   const dataFeedsWithCryptoResources = (
-    await addDataProviders(uniqueDataFeeds)
+    await addDataProviders(dataFeedsWithStableCoinVariants)
   ).filter(
     dataFeed => Object.keys(dataFeed.priceFeedInfo.providers).length !== 0,
   );
