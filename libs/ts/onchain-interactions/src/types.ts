@@ -27,6 +27,7 @@ export const deployedNetworks = [
   'polygon-zkevm-cardona',
   'scroll-sepolia',
   'songbird-coston',
+  'sonic-blaze',
   'taiko-hekla',
   'world-chain-sepolia',
 ] satisfies NetworkName[];
@@ -46,6 +47,7 @@ export const API_KEYS: Record<string, string> = {
   optimismSepolia: getEnvStringNotAssert('OPTIMISM_SEPOLIA_API_KEY'),
   polygonZkevmCardona: getEnvStringNotAssert('POLYGON_ZKEVM_CARDONA_API_KEY'),
   scrollSepolia: getEnvStringNotAssert('SCROLL_SEPOLIA_API_KEY'),
+  sonicBlaze: getEnvStringNotAssert('SONIC_BLAZE_API_KEY'),
 };
 
 export const API_ENDPOINTS = {
@@ -77,6 +79,7 @@ export const API_ENDPOINTS = {
   polygonZkevmCardona: 'https://api-cardona-zkevm.polygonscan.com/api',
   scrollSepolia: 'https://api-sepolia.scrollscan.com/api',
   songbirdCoston: 'https://coston-explorer.flare.network/api',
+  sonicBlaze: 'https://api-testnet.sonicscan.org/api',
   taikoHekla: 'https://blockscoutapi.hekla.taiko.xyz/api',
   worldChainSepolia: 'https://worldchain-sepolia.explorer.alchemy.com/api',
 };
