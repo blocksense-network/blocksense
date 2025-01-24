@@ -4,13 +4,10 @@ import Web3 from 'web3';
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { everyAsync } from '@blocksense/base-utils/async';
 import { getRpcUrl, isTestnet, NetworkName } from '@blocksense/base-utils/evm';
-import { isObject } from '@blocksense/base-utils/type-level';
 
 import {
-  Pair,
   NewFeed,
   NewFeedsConfig,
-  createPair,
 } from '@blocksense/config-types/data-feeds-config';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';

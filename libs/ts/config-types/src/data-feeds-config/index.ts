@@ -171,7 +171,7 @@ export const providersResourcesSchema = S.mutable(
     // map of api parameters
     value: S.Record({
       key: S.String,
-      value: S.String,
+      value: S.Array(S.String),
     }),
   }),
 );
