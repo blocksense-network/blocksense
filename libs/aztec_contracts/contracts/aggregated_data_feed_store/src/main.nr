@@ -16,10 +16,9 @@ contract AggregatedDataFeedStore {
     /// for a fixed size array you can pass to public function with only array as a parameter.
     /// Since `set_feeds` function has several parameters, each being its own type, MAX_INPUT_ARRAY_SIZE is 32698
     global MAX_INPUT_ARRAY_SIZE: u32 = 1000;
-    /// TODO: Check gates
     global MAX_DATA_FEED_LEN_AS_FIELDS: u32 = (MAX_INPUT_ARRAY_SIZE / 31) + 1;
 
-
+    /// TODO: When aztec-nr's storage macro start handling field types with generics implement `FeedData` with generic param
     struct FeedData {
         // TODO: Check gas difference between one len array and N len array
         data: BoundedVec<Field, MAX_DATA_FEED_LEN_AS_FIELDS>
@@ -39,6 +38,8 @@ contract AggregatedDataFeedStore {
         }
     }
 
+    /// As aztec-nr smart contract's storage still doesn't handle field types with generics
+    /// the FeedData struct comes with the max size of fields that can be written for certain data feed.
     #[storage]
     struct Storage<Context> {
         owner: PublicImmutable<AztecAddress, Context>,
