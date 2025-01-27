@@ -30,6 +30,10 @@ spin-outbound-networking = { git = "https://github.com/blocksense-network/spin",
 terminal = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 outbound-http = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 
+rdkafka = { version = "0.37.0", features = ["dynamic-linking"] }
+futures-util = "0.3.30"
+tokio-stream = "0.1.16"
+
 url = { workspace = true }
 tokio = { workspace = true }
 tokio-scoped = "0.2.0"
