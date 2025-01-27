@@ -11,7 +11,7 @@ import { AssetInfo } from '../data-services/exchange-assets';
 import * as exchangeFetchers from '../data-services/fetchers/exchanges/index';
 import { SimplifiedFeed } from './types';
 
-export async function dataProvidersInjection(dataFeeds: SimplifiedFeed[]) {
+export async function addDataProviders(dataFeeds: SimplifiedFeed[]) {
   const exchangeAssetsMap: ExchangeData[] = await Promise.all(
     Object.entries(exchangeFetchers).map(async ([name, fetcher]) => {
       const fetcherData = await new fetcher().fetchAssets();
@@ -57,14 +57,17 @@ function getAllProvidersForFeed(
   };
 
   exchangeAssets.forEach(exchangeData => {
-    addProvider(exchangeData.name, getAssetMetadata(feed, exchangeData.data));
+    addProvider(
+      exchangeData.name,
+      getPriceFeedDataProvidersInfo(feed, exchangeData.data),
+    );
   });
 
   return providers;
 }
 
 /**
- * Generalized resource finder
+ * Get provider resources for a given feed.
  *
  * This code takes an array of supported assets by an exchange and reduces it into a single object (`providerInfo`).
  * Each key in the `providerInfo` object corresponds to a key found in the `data` property of the assets.
@@ -72,7 +75,7 @@ function getAllProvidersForFeed(
  * If no data is aggregated (i.e., `providerInfo` has no keys), the function returns `null`.
  * Otherwise, it returns the `providerInfo` object.
  */
-function getAssetMetadata<T>(
+function getPriceFeedDataProvidersInfo<T>(
   feed: SimplifiedFeed,
   exchangeAssets: AssetInfo[],
 ): Record<string, string[]> | null {

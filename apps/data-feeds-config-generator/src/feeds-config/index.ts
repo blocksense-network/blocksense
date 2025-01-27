@@ -26,7 +26,7 @@ import {
   getHighestDecimals,
 } from '../data-services/chainlink_feeds';
 import { SimplifiedFeed } from './types';
-import { dataProvidersInjection } from './data-providers';
+import { addDataProviders } from './data-providers';
 
 function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,
@@ -191,7 +191,7 @@ export async function generateFeedConfig(
 
   // Add providers data to the feeds and filter out feeds without providers
   const dataFeedsWithCryptoResources = (
-    await dataProvidersInjection(uniqueDataFeeds)
+    await addDataProviders(uniqueDataFeeds)
   ).filter(
     dataFeed => Object.keys(dataFeed.priceFeedInfo.providers).length !== 0,
   );
