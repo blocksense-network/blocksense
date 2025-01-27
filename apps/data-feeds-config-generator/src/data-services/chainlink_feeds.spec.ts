@@ -97,12 +97,15 @@ describe('Tests for functions over Aggregated Data', async () => {
         );
       }
       {
-        testData.pair = {
+        const testDataClone = structuredClone(testData);
+        testDataClone.pair = {
           'avalanche-fuji': ['', ''],
           'avalanche-mainnet': ['', ''],
         } as any;
 
-        expect(getFieldFromAggregatedData(testData, 'pair')).toBeUndefined();
+        expect(
+          getFieldFromAggregatedData(testDataClone, 'pair'),
+        ).toBeUndefined();
       }
     });
 
@@ -132,7 +135,9 @@ describe('Tests for functions over Aggregated Data', async () => {
 
     test('should work getting pair if in docs any of the base / quote fields are present', () => {
       const testPair = ['tLINK', 'tAVAX'];
-      testData.docs = {
+      const testDataClone = structuredClone(testData);
+
+      testDataClone.docs = {
         'avalanche-fuji': {
           assetName: 'Chainlink',
           baseAsset: 'tLINK',
@@ -143,7 +148,7 @@ describe('Tests for functions over Aggregated Data', async () => {
         },
       } as any;
 
-      const { base, quote } = getBaseQuote(testData);
+      const { base, quote } = getBaseQuote(testDataClone);
       expect({ base, quote }).toEqual({
         base: testPair[0],
         quote: testPair[1],
@@ -152,22 +157,24 @@ describe('Tests for functions over Aggregated Data', async () => {
 
     test('should work getting pair from pair field', () => {
       const testPair = ['tLINK', 'tAVAX'];
-      testData.docs = {} as any;
+      const testDataClone = structuredClone(testData);
+
+      testDataClone.docs = {} as any;
       {
-        testData.pair = testPair as any;
-        const { base, quote } = getBaseQuote(testData);
+        testDataClone.pair = testPair as any;
+        const { base, quote } = getBaseQuote(testDataClone);
         expect({ base, quote }).toEqual({
           base: testPair[0],
           quote: testPair[1],
         });
       }
       {
-        testData.pair = {
+        testDataClone.pair = {
           'avalanche-fuji': ['', ''],
           'avalanche-mainnet': testPair,
         } as any;
 
-        const { base, quote } = getBaseQuote(testData);
+        const { base, quote } = getBaseQuote(testDataClone);
         expect({ base, quote }).toEqual({
           base: testPair[0],
           quote: testPair[1],
@@ -177,10 +184,12 @@ describe('Tests for functions over Aggregated Data', async () => {
 
     test('should work getting pair from name field', () => {
       const testPair = ['LINK', 'AVAX'];
-      testData.docs = {} as any;
-      testData.pair = {} as any;
+      const testDataClone = structuredClone(testData);
+
+      testDataClone.docs = {} as any;
+      testDataClone.pair = {} as any;
       {
-        const { base, quote } = getBaseQuote(testData);
+        const { base, quote } = getBaseQuote(testDataClone);
         expect({ base, quote }).toEqual({
           base: testPair[0],
           quote: testPair[1],
@@ -189,10 +198,12 @@ describe('Tests for functions over Aggregated Data', async () => {
     });
 
     test("should return empty base and quote if don't fined fields", () => {
-      testData.docs = {} as any;
-      testData.pair = {} as any;
-      testData.name = '' as any;
-      const { base, quote } = getBaseQuote(testData);
+      const testDataClone = structuredClone(testData);
+
+      testDataClone.docs = {} as any;
+      testDataClone.pair = {} as any;
+      testDataClone.name = '' as any;
+      const { base, quote } = getBaseQuote(testDataClone);
       expect({ base, quote }).toEqual({ base: '', quote: '' });
     });
   });
@@ -204,12 +215,14 @@ describe('Tests for functions over Aggregated Data', async () => {
     });
 
     test('should work getting decimals when they are an object', () => {
-      testData.decimals = {
+      const testDataClone = structuredClone(testData);
+
+      testDataClone.decimals = {
         'avalanche-fuji': 2,
         'avalanche-mainnet': 4,
       } as any;
 
-      const decimals = getHighestDecimals(testData);
+      const decimals = getHighestDecimals(testDataClone);
       expect(decimals).toBe(4);
     });
   });
