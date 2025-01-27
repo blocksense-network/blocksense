@@ -7,10 +7,10 @@ contract AggregatedDataFeedStore {
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
     use dep::aztec::protocol_types::traits::{Serialize, Deserialize};
 
-    comptime global TWO_POW_128: Field = 340282366920938463463374607431768211456; // 2^128
-    comptime global TWO_POW_13: Field = 8192; // 2^13
-    comptime global TWO_POW_115: Field = 41538374868278621028243970633760768; // 2^115
-    comptime global TWO: Field = 2;
+    global TWO_POW_128: Field = 340282366920938463463374607431768211456; // 2^128
+    global TWO_POW_115: Field = 41538374868278621028243970633760768; // 2^115
+    global TWO_POW_13: Field = 8192; // 2^13
+    global TWO: Field = 2;
 
     /// As of aztec version `0.67.0` and compiler version `0.35.0`, 32701 is the maximal value
     /// for a fixed size array you can pass to public function with only array as a parameter.
@@ -100,14 +100,36 @@ contract AggregatedDataFeedStore {
         }
     }
 
-    unconstrained fn get_data(stride: Field, feed_id: Field, start_slot: Field, slots: Field, round: Field) -> pub FeedData {
-        storage.data_feeds.at(TWO_POW_128.pow_32(stride) + ((feed_id * TWO_POW_13) * TWO.pow_32(stride)) + (round * TWO.pow_32(stride))).read()
-    }
-
     unconstrained fn get_latest_round(stride: Field, feed_id: Field) -> pub Field {
         let latest_rounds_record = ((TWO_POW_115 * stride + feed_id) / 15);
         let quotient = latest_rounds_record / 15;
         let quot_times_15 = quotient * 15;
         latest_rounds_record - quot_times_15
+    }
+
+    unconstrained fn get_feed_at_round(stride: Field, feed_id: Field, round: Field, start_slot: u32, slots: u32) -> FeedData {
+        let feed_at_round = storage.data_feeds.at((TWO_POW_128 + (feed_id * TWO_POW_13) + round) * TWO.pow_32(stride)).read();
+        let mut feed_within_slots: BoundedVec<Field, MAX_DATA_FEED_LEN_AS_FIELDS> = BoundedVec::new();
+        for i in start_slot..slots {
+            feed_within_slots.push(feed_at_round.data.storage[i]);
+        }
+
+        FeedData {
+            data: feed_within_slots
+        }
+    }
+
+    unconstrained fn get_latest_data(stride: Field, feed_id: Field, start_slot: u32, slots: u32) -> FeedData {
+        let latest_round = get_latest_round(stride, feed_id);
+        get_feed_at_round(stride, feed_id, latest_round, start_slot, slots)
+    }
+
+    unconstrained fn get_latest_data_and_round(stride: Field, feed_id: Field, start_slot: u32, slots: u32) -> (FeedData, Field) {
+        let latest_round = get_latest_round(stride, feed_id);
+
+        (
+            get_feed_at_round(stride, feed_id, latest_round, start_slot, slots),
+            latest_round
+        )
     }
 }
