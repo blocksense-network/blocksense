@@ -75,6 +75,10 @@ impl From<BlocksenseConfig> for AppManifest {
             toml::Value::String(config.reporter_info.sequencer),
         );
         table.insert(
+            "kafka_endpoint".to_string(),
+            toml::Value::String(config.reporter_info.kafka_endpoint),
+        );
+        table.insert(
             "secret_key".to_string(),
             toml::Value::String(config.reporter_info.secret_key),
         );
