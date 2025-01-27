@@ -1,5 +1,6 @@
 mod binance;
 mod common;
+mod kraken;
 
 use anyhow::{bail, Context, Result};
 // use async_trait::async_trait;
@@ -17,59 +18,12 @@ use url::Url;
 
 use crate::common::{fill_results, ResourceData, ResourceResult};
 use binance::get_binance_prices;
+use kraken::get_kraken_prices;
 
 //TODO(adikov): Refacotr:
 //1. Move all specific exchange logic to separate files.
 //2. Move URLS to constants
 //3. Try to minimize object cloning.
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct KrakenPrice {
-    pub a: Vec<String>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct KrakenResponse {
-    pub error: Vec<Value>,
-    pub result: HashMap<String, KrakenPrice>,
-}
-
-async fn get_kraken_prices(
-    resources: &Vec<ResourceData>,
-    results: &mut HashMap<String, Vec<ResourceResult>>,
-) -> Result<()> {
-    let url = Url::parse("https://api.kraken.com/0/public/Ticker")?;
-
-    let mut req = Request::builder();
-    req.method(Method::Get);
-    req.uri(url);
-    req.header("Accepts", "application/json");
-
-    let req = req.build();
-    let resp: Response = send(req).await?;
-
-    let body = resp.into_body();
-    let string = String::from_utf8(body)?;
-    let value: KrakenResponse = serde_json::from_str(&string)?;
-    let mut response: HashMap<String, String> = HashMap::new();
-    for (symbol, price) in value.result {
-        response.insert(
-            symbol.clone(),
-            price
-                .a
-                .first()
-                .context(format!(
-                    "Kraken has no price in response for symbol: {}",
-                    symbol
-                ))?
-                .clone(),
-        );
-    }
-
-    fill_results(resources, results, response)?;
-
-    Ok(())
-}
 
 //TODO(adikov): Include all the needed fields form the response like volume.
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
