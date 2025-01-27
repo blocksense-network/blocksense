@@ -737,7 +737,6 @@ __metadata:
     "@types/node": "npm:^22.10.2"
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
-    shiki: "npm:^1.12.1"
     tsx: "npm:^4.19.2"
     typescript: "npm:^5.5.4"
     vitest: "npm:^3.0.2"

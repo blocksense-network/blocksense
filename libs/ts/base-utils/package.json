@@ -86,7 +86,6 @@
     "vitest": "^3.0.2"
   },
   "dependencies": {
-    "effect": "^3.12.1",
-    "shiki": "^1.12.1"
+    "effect": "^3.12.1"
   }
 }
