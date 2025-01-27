@@ -23,10 +23,6 @@ main > h1 {
   @apply mt-8;
 }
 
-footer {
-  display: none;
-}
-
 .x\:bg-gray-100.x\:pb-\[env\(safe-area-inset-bottom\)\].x\:dark\:bg-neutral-900.x\:print\:bg-transparent {
   @apply bg-white;
 }

@@ -1,6 +1,7 @@
 import NextHead from 'next/head';
 import type { Metadata } from 'next';
-import { Footer, Layout, Navbar } from 'nextra-theme-docs';
+import { Layout, Navbar } from 'nextra-theme-docs';
+import { Footer } from '@/components/common/Footer';
 import { getPageMap } from 'nextra/page-map';
 import type { FC, ReactNode } from 'react';
 import './globals.css';
@@ -58,11 +59,7 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
       projectLink="https://github.com/blocksense-network/blocksense"
     />
   );
-  const footer = (
-    <Footer className="flex-col items-center md:items-start">
-      <p className="mt-6 text-xs">© {new Date().getFullYear()} Blocksense</p>
-    </Footer>
-  );
+  const footer = <Footer />;
   const pageMap = await getPageMap();
   updatePageMapWithContractsRefDoc(pageMap);
 

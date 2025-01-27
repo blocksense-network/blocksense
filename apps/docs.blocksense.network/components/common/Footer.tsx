@@ -5,12 +5,8 @@ import { ImageWrapper } from '@/components/common/ImageWrapper';
 
 export const Footer = () => {
   return (
-    <footer
-      className="footer nx-mx-auto nx-flex nx-h-[var(--nextra-navbar-height)] nx-max-w-[90rem]
-  nx-items-center nx-justify-end nx-gap-2 nx-pl-[max(env(safe-area-inset-left),1.5rem)]
-  nx-pr-[max(env(safe-area-inset-right),1.5rem)] h-20"
-    >
-      <aside className="footer__link ltr:nx-mr-auto rtl:nx-ml-auto space-x-4 p-2">
+    <footer className="footer mx-auto flex items-center justify-between mt-10 md:mt-12 h-20 nx-h-[var(--nextra-navbar-height)] nx-max-w-[90rem] p-4 nx-gap-2 nx-pl-[max(env(safe-area-inset-left),1.5rem)] nx-pr-[max(env(safe-area-inset-right),1.5rem)]">
+      <aside className="footer__link flex items-center space-x-2">
         <a
           className="footer__social-icon flex items-center space-x-2"
           href={config.adoptersTextLink}
@@ -22,14 +18,14 @@ export const Footer = () => {
             alt={config.adoptersAltLink}
             className="footer__social-icon-img relative w-6 h-6 invert"
           />
-          <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
+          <span className="footer__social-label font-semibold text-gray-900 hidden lg:block dark:text-neutral-200">
             Early Adopters
           </span>
         </a>
       </aside>
-      <nav className="footer__social-nav flex items-center nx-justify-end">
-        <ul className="footer__social-list flex gap-2">
-          <li className="footer__social-item flex items-center space-x-4 p-2">
+      <nav className="footer__social-nav flex items-center">
+        <ul className="footer__social-list flex gap-4">
+          <li className="footer__social-item flex items-center space-x-2">
             <a
               className="footer__social-icon footer__social-icon--telegram flex items-center space-x-2"
               href={config.social_media.telegram._href}
@@ -41,12 +37,12 @@ export const Footer = () => {
                 alt={config.social_media.telegram._alt}
                 className="footer__social-icon-img relative w-6 h-6 invert"
               />
-              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
+              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block dark:text-neutral-200">
                 Telegram
               </span>
             </a>
           </li>
-          <li className="footer__social-item flex items-center space-x-4 p-2">
+          <li className="footer__social-item flex items-center space-x-2">
             <a
               className="footer__social-icon footer__social-icon--x flex items-center space-x-2"
               href={config.social_media.x._href}
@@ -58,12 +54,12 @@ export const Footer = () => {
                 alt={config.social_media.x._alt}
                 className="footer__social-icon-img relative w-6 h-6 invert"
               />
-              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
+              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block dark:text-neutral-200">
                 Follow us
               </span>
             </a>
           </li>
-          <li className="footer__social-item flex items-center space-x-4 p-2">
+          <li className="footer__social-item flex items-center space-x-2">
             <a
               className="footer__social-icon footer__social-icon--discord flex items-center space-x-2"
               href={config.social_media.discord._href}
@@ -75,7 +71,7 @@ export const Footer = () => {
                 alt={config.social_media.discord._alt}
                 className="footer__social-icon-img relative w-6 h-6 invert"
               />
-              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block">
+              <span className="footer__social-label font-semibold text-gray-900 hidden lg:block dark:text-neutral-200">
                 Join our community
               </span>
             </a>
