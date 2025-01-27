@@ -252,7 +252,13 @@ async fn main() -> Result<()> {
     let mut providers = Vec::new();
 
     for port in PROVIDERS_PORTS {
-        providers.push(Anvil::new().port(port as u16).try_spawn()?);
+        providers.push(
+            Anvil::new()
+                .port(port as u16)
+                .fork("https://eth-sepolia.public.blastapi.io")
+                .fork_block_number(7582688)
+                .try_spawn()?,
+        );
     }
 
     for provider in providers.iter() {
