@@ -10,15 +10,12 @@ use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     // price_pair::{DataProvider, OraclePriceHelper},
     oracle_component,
-    spin::http::{send, Method, Request, Response},
 };
 use std::collections::HashMap;
 
 use serde::Deserialize;
-use serde_json::Value;
-use url::Url;
 
-use crate::common::{fill_results, ResourceData, ResourceResult};
+use crate::common::{ResourceData, ResourceResult};
 use binance::get_binance_prices;
 use bybit::get_bybit_prices;
 use kraken::get_kraken_prices;
