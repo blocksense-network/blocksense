@@ -4,14 +4,17 @@ on:
   # Enable option to manually run the action:
   workflow_dispatch:
 
-  # Run every Monday at 00:00:
+  # Run every Sunday at 00:00:
   schedule:
-    - cron: 0 0 * * 1
+    - cron: 0 0 * * 0
 
 jobs:
   update-flake-lock:
-    uses: metacraft-labs/nixos-modules/.github/workflows/update-flake-lock.yml@main
+    uses: blocksense-network/nixos-modules/.github/workflows/reusable-update-flake-lock.yml@main
     secrets:
-      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      CREATE_PR_APP_ID: ${{ secrets.APP_ID }}
-      CREATE_PR_APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+      NIX_GITHUB_TOKEN: ${{ secrets.BLOCKSENSE_GITHUB_ACCESS_TOKEN }}
+      CACHIX_AUTH_TOKEN: ${{ secrets.BLOCKSENSE_INFRA_CACHIX_AUTH_TOKEN }}
+      CREATE_PR_APP_ID: ${{ secrets.NIX_FLAKE_UPDATE_PR_BOT_APP_ID }}
+      CREATE_PR_APP_PRIVATE_KEY: ${{ secrets.NIX_FLAKE_UPDATE_PR_BOT_APP_PRIVATE_KEY }}
+    with:
+      runner: '["self-hosted", "Linux", "x86-64-v2"]'
