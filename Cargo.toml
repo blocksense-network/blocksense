@@ -5,6 +5,7 @@ members = [
   "apps/sequencer",
   "apps/sequencer_tests",
   "apps/trigger-oracle",
+  "apps/oracles/crypto-price-feeds",
   "libs/anomaly_detection",
   "libs/data_feeds",
   "libs/derive",
@@ -15,8 +16,7 @@ members = [
   "libs/config",
   "libs/crypto",
   "libs/feed_registry",
-  "libs/blockchain_data_model",
-  "libs/sdk/examples/crypto-price-feeds"]
+  "libs/blockchain_data_model"]
 
 resolver = "2"
 
