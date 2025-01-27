@@ -29,6 +29,7 @@ export const deployedNetworks = [
   'songbird-coston',
   'sonic-blaze',
   'taiko-hekla',
+  'telos-testnet',
   'world-chain-sepolia',
 ] satisfies NetworkName[];
 
@@ -81,6 +82,7 @@ export const API_ENDPOINTS = {
   songbirdCoston: 'https://coston-explorer.flare.network/api',
   sonicBlaze: 'https://api-testnet.sonicscan.org/api',
   taikoHekla: 'https://blockscoutapi.hekla.taiko.xyz/api',
+  telosTestnet: 'https://api.teloscan.io/v1',
   worldChainSepolia: 'https://worldchain-sepolia.explorer.alchemy.com/api',
 };
 

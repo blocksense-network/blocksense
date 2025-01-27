@@ -151,6 +151,9 @@ const fetchTransactionsForNetwork = async (
     if (network === 'morph-holesky') {
       response = await axios.get(`${apiUrl}/addresses/${address}/transactions`);
       rawTransactions = response.data.items || [];
+    } else if (network === 'telos-testnet') {
+      response = await axios.get(`${apiUrl}/address/${address}/transactions`);
+      rawTransactions = response.data.results || [];
     } else {
       response = await axios.get(apiUrl, {
         params: {
