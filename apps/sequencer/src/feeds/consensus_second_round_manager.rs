@@ -12,7 +12,7 @@ struct InProcessBatchKey {
 #[derive(Clone, Debug)]
 struct CallDataWithSignatures {
     calldata: String,
-    signatures: HashMap<u64, String>,
+    signatures: HashMap<u64, String>, //TODO: convert String to SignatureWithAddress!
 }
 
 pub struct AggregationBatchConsensus {

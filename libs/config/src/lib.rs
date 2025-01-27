@@ -267,6 +267,7 @@ impl Validated for Provider {
 pub struct Reporter {
     pub id: u32,
     pub pub_key: String,
+    pub address: String,
 }
 
 impl Validated for Reporter {

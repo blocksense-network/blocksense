@@ -1,13 +1,16 @@
+use alloy::primitives::Address;
 use config::SequencerConfig;
 use crypto::{deserialize_public_key, PublicKey, MULTIFORMATS_BLS_PUBKYE_PREFIX};
 use prometheus::metrics::ReporterMetrics;
 use std::collections::HashMap;
+use std::str::FromStr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
 #[derive(Debug)]
 pub struct Reporter {
     pub pub_key: PublicKey,
+    pub address: Address,
     pub reporter_metrics: Arc<RwLock<ReporterMetrics>>,
 }
 
@@ -37,6 +40,7 @@ fn init_reporters(conf: &SequencerConfig, prefix: &str) -> HashMap<u64, Arc<RwLo
                         .expect("Multiformats key prefix error. Only BLS is currently supported."),
                 )
                 .expect("Pub key format error: "),
+                address: Address::from_str(&r.address).expect("Could not deserialize address!"),
                 reporter_metrics: reporter_metrics.clone(),
             })),
         );

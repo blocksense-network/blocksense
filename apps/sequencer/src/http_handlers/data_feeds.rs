@@ -1,7 +1,9 @@
 use actix_web::http::StatusCode;
+use alloy_primitives::PrimitiveSignature;
 use chrono::{TimeZone, Utc};
 use crypto::PublicKey;
 use eyre::Result;
+use std::str::FromStr;
 use std::sync::Arc;
 use utils::time::current_unix_time;
 
@@ -358,12 +360,28 @@ pub async fn post_aggregated_consensus_vote(
     let reporter_response: ReporterResponse = serde_json::from_value(v)?;
 
     {
+        let reporter_id = reporter_response.reporter_id;
         let reporters = sequencer_state.reporters.read().await;
-        let reporter = reporters.get_key_value(&reporter_response.reporter_id);
-        if reporter.is_none() {
+        let reporter = reporters.get(&reporter_id).cloned();
+        drop(reporters);
+
+        let Some(reporter) = reporter else {
             warn!("Unknown Reporter sending aggregation batch signature {body:?}!");
             return Ok(HttpResponse::BadRequest().body(format!("Unknown Reporter")));
-        }
+        };
+        let signature = match PrimitiveSignature::from_str(reporter_response.signature.as_str()) {
+            Ok(r) => r,
+            Err(e) => {
+                return Ok(HttpResponse::BadRequest()
+                    .body(format!("Could not deserialize signature: {e}")))
+            }
+        };
+
+        let reporter_address = reporter.read().await.address;
+        // let recovered_address = signature.recover_address_from_prehash(&tx_hash).unwrap();
+        // if reporter_address != recovered_address {
+        //     return Ok(HttpResponse::BadRequest().body(format!("Signature check failure!")));
+        // }
     }
 
     if sequencer_state
