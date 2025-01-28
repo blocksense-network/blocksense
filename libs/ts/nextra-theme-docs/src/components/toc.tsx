@@ -83,7 +83,7 @@ export const TOC: FC<TOCProps> = ({ toc, filePath, pageTitle }) => {
                       4: 'x:ms-6',
                       5: 'x:ms-9',
                       6: 'x:ms-12',
-                    }[depth],
+                    }[depth as 2 | 3 | 4 | 5 | 6],
                     'x:block x:transition-colors x:subpixel-antialiased',
                     id === activeSlug
                       ? 'x:text-primary-600 x:contrast-more:text-primary-600!'
