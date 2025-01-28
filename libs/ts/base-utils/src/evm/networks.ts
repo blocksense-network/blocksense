@@ -76,6 +76,10 @@ const networks = [
   'metal-l2-testnet',
   'creator-testnet',
   'lumia-testnet',
+  'superseed-sepolia',
+  'ozean-poseidon',
+  'opbnb-testnet',
+  'rollux-testnet',
 ] as const;
 
 const chainIds = [
@@ -84,7 +88,7 @@ const chainIds = [
   59144, 59141, 169, 3441006, 1285, 10, 11155420, 137, 80002, 1101, 2442,
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
   1663, 1666700000, 1313161555, 839999, 16, 114, 28882, 9728, 31, 41, 71, 338,
-  4801, 2358, 168587773, 1740, 66665, 1952959480,
+  4801, 2358, 168587773, 1740, 66665, 1952959480, 53302, 7849306, 5611, 57000,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -424,6 +428,26 @@ export const networkMetadata = {
     chainId: 1952959480,
     isTestnet: true,
     explorerUrl: 'https://testnet-explorer.lumia.org/',
+  },
+  'superseed-sepolia': {
+    chainId: 53302,
+    isTestnet: true,
+    explorerUrl: 'https://sepolia-explorer.superseed.xyz',
+  },
+  'ozean-poseidon': {
+    chainId: 7849306,
+    isTestnet: true,
+    explorerUrl: 'https://ozean-testnet.explorer.caldera.xyz',
+  },
+  'opbnb-testnet': {
+    chainId: 5611,
+    isTestnet: true,
+    explorerUrl: 'https://opbnb-testnet.bscscan.com',
+  },
+  'rollux-testnet': {
+    chainId: 57000,
+    isTestnet: true,
+    explorerUrl: 'https://rollux.tanenbaum.io',
   },
 } satisfies {
   [Net in NetworkName]: {
