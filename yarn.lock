@@ -939,6 +939,7 @@ __metadata:
     "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
     "@blocksense/data-feeds-config-generator": "workspace:*"
+    "@blocksense/nextra-theme-docs": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
@@ -967,7 +968,6 @@ __metadata:
     lucide-react: "npm:^0.468.0"
     next: "npm:^15.1.4"
     nextra: "npm:^4.1.1"
-    nextra-theme-docs: "npm:^4.0.0"
     nodemon: "npm:^3.1.9"
     pagefind: "npm:^1.1.1"
     postcss: "npm:^8.4.49"
@@ -1030,7 +1030,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/nextra-theme-docs@workspace:libs/ts/nextra-theme-docs":
+"@blocksense/nextra-theme-docs@workspace:*, @blocksense/nextra-theme-docs@workspace:libs/ts/nextra-theme-docs":
   version: 0.0.0-use.local
   resolution: "@blocksense/nextra-theme-docs@workspace:libs/ts/nextra-theme-docs"
   dependencies:
@@ -17318,7 +17318,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nextra-theme-docs@npm:4.0.0, nextra-theme-docs@npm:^4.0.0":
+"nextra-theme-docs@npm:4.0.0":
   version: 4.0.0
   resolution: "nextra-theme-docs@npm:4.0.0"
   dependencies:

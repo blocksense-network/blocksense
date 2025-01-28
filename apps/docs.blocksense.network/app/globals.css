@@ -1,4 +1,4 @@
 @import 'tailwindcss';
-@import 'nextra-theme-docs/style.css';
+@import '@blocksense/nextra-theme-docs/style.css';
 @import '../blocksense-theme/base.css';
 @plugin "tailwindcss-animate";

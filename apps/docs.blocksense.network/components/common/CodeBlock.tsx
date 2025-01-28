@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { codeToHtml, ShikiTransformer } from 'shiki';
-import { useTheme } from 'nextra-theme-docs';
+import { useTheme } from '@blocksense/nextra-theme-docs';
 
 import { CopyButton } from '@/components/common/CopyButton';
 import { shikiDefaultThemes } from '@/config';
