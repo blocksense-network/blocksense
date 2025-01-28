@@ -1046,6 +1046,7 @@ __metadata:
     next: "npm:^15.0.2"
     next-themes: "npm:^0.4.0"
     nextra: "npm:^4.1.1"
+    nextra-theme-docs: "npm:^4.1.1"
     postcss: "npm:^8.4.49"
     react: "npm:19.0.0"
     react-compiler-runtime: "npm:0.0.0-experimental-22c6e49-20241219"
@@ -17335,6 +17336,27 @@ __metadata:
     react: ">=18"
     react-dom: ">=18"
   checksum: 10c0/21e356faf35f24f75aa5cec35b01bb3e4fc241e0b3480ff42a0677cce2c22d72521698a4867ffa8b34ee09dbb45d8509cd76e35774b7d425689cc77dc3c356a8
+  languageName: node
+  linkType: hard
+
+"nextra-theme-docs@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "nextra-theme-docs@npm:4.1.1"
+  dependencies:
+    "@headlessui/react": "npm:^2.1.2"
+    clsx: "npm:^2.1.0"
+    next-themes: "npm:^0.4.0"
+    react-compiler-runtime: "npm:0.0.0-experimental-22c6e49-20241219"
+    scroll-into-view-if-needed: "npm:^3.1.0"
+    zod: "npm:^3.22.3"
+    zod-validation-error: "npm:^3.0.0"
+    zustand: "npm:^5.0.1"
+  peerDependencies:
+    next: ">=14"
+    nextra: 4.1.1
+    react: ">=18"
+    react-dom: ">=18"
+  checksum: 10c0/12f50fdcb56540b9a69aad3c1e71d2bf6c1d7ef120a234da79c9920b3e051d86fb1b9b59a715904535b3c6d641adae22ce4f8e0f9485a0496d8c17b572b83ab3
   languageName: node
   linkType: hard
 
