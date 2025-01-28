@@ -1,5 +1,16 @@
+use alloy::hex;
+use alloy::hex::FromHex;
 use alloy::hex::ToHexExt;
+use alloy::network::EthereumWallet;
 use alloy::node_bindings::Anvil;
+use alloy::primitives::Address;
+use alloy::primitives::Bytes;
+use alloy::primitives::Uint;
+use alloy::providers::Provider;
+use alloy::providers::ProviderBuilder;
+use alloy::signers::local::PrivateKeySigner;
+use alloy::sol;
+use alloy::sol_types::SolCall;
 use config::get_sequencer_and_feed_configs;
 use config::SequencerConfig;
 use crypto::JsonSerializableSignature;
@@ -15,6 +26,7 @@ use port_scanner::scan_port;
 use serde_json::json;
 use std::io::stdout;
 use std::process::Command;
+use std::str::FromStr;
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -42,6 +54,20 @@ const REPORTERS_INFO: [(u64, &str); 2] = [
 const SEQUENCER_MAIN_PORT: u16 = 8787;
 const SEQUENCER_ADMIN_PORT: u16 = 5557;
 
+sol! {
+    #[allow(clippy::too_many_arguments)]
+    #[sol(rpc)]
+    SafeABI,
+    "Safe.json"
+}
+
+sol! {
+    #[allow(clippy::too_many_arguments)]
+    #[sol(rpc)]
+    SafeFactoryABI,
+    "SafeProxyFactory.json"
+}
+
 struct Collector(Vec<u8>);
 
 impl Handler for Collector {
@@ -57,14 +83,17 @@ async fn write_file(key_path: &str, content: &[u8]) {
     f.flush().await.expect("Could not flush file");
 }
 
-async fn spawn_sequencer(eth_networks_ports: [i32; 2]) -> thread::JoinHandle<()> {
+async fn spawn_sequencer(
+    eth_networks_ports: &Vec<i32>,
+    safe_contracts_per_net: &Vec<String>,
+) -> thread::JoinHandle<()> {
     let config_patch = json!(
     {
         "main_port": SEQUENCER_MAIN_PORT,
         "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
-            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0])},
-            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1])}
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "safe_address": safe_contracts_per_net[0]},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "safe_address": safe_contracts_per_net[1]}
         },
     });
 
@@ -249,30 +278,104 @@ fn cleanup_spawned_processes() {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    let mut anvils = Vec::new();
     let mut providers = Vec::new();
+    let mut safe_contracts_per_net = Vec::new();
 
+    // Setup anvil instances, providers connected to them and deploy gnosis safe contracts:
     for port in PROVIDERS_PORTS {
-        providers.push(
-            Anvil::new()
-                .port(port as u16)
-                .fork("https://eth-sepolia.public.blastapi.io")
-                .fork_block_number(7582688)
-                .try_spawn()?,
+        let anvil = Anvil::new()
+            .port(port as u16)
+            .fork("https://eth-sepolia.public.blastapi.io")
+            .try_spawn()?;
+
+        let owner = anvil.addresses()[0];
+
+        let signer: PrivateKeySigner = anvil.keys()[0].clone().into();
+
+        let provider = ProviderBuilder::new()
+            // Adds the `ChainIdFiller`, `GasFiller` and the `NonceFiller` layers.
+            // This is the recommended way to set up the provider.
+            .with_recommended_fillers()
+            .wallet(EthereumWallet::from(signer.clone()))
+            .on_http(format!("http:127.0.0.1:{port}").as_str().parse().unwrap());
+
+        let safe_iface = SafeABI::new(
+            Address::from_str("0x41675C099F32341bf84BFc5382aF534df5C7461a")
+                .ok()
+                .unwrap(),
+            provider.clone(),
         );
+
+        let safe_factory_iface = Box::leak(Box::new(SafeFactoryABI::new(
+            Address::from_str("0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67")
+                .ok()
+                .unwrap(),
+            provider.clone(),
+        )));
+
+        let encoded = hex::encode(
+            SafeABI::setupCall {
+                _owners: vec![owner],
+                _threshold: Uint::from(1),
+                to: Address::default(),
+                data: Bytes::from_hex("0x").unwrap(),
+                fallbackHandler: Address::from_str("0xfd0732dc9e303f09fcef3a7388ad10a83459ec99")
+                    .ok()
+                    .unwrap(),
+                paymentToken: Address::default(),
+                payment: Uint::from(0),
+                paymentReceiver: Address::default(),
+            }
+            .abi_encode(),
+        );
+
+        // First perform a call only (no tx sent) to get the contract address (it is easier than parsing the logs of the receipt)
+        let res = safe_factory_iface
+            .createProxyWithNonce(
+                safe_iface.address().clone(),
+                Bytes::from_hex(encoded.clone()).unwrap(),
+                Uint::from(1500),
+            )
+            .await
+            .unwrap();
+
+        // Then actually send a transaction with the same parameters as above to deploy the contract
+        let receipt = safe_factory_iface
+            .createProxyWithNonce(
+                safe_iface.address().clone(),
+                Bytes::from_hex(encoded).unwrap(),
+                Uint::from(1500),
+            )
+            .send()
+            .await
+            .unwrap()
+            .get_receipt()
+            .await;
+
+        println!("deploy gnosis safe receipt = {receipt:?}");
+
+        let multisig_addr = res.proxy;
+
+        safe_contracts_per_net.push(multisig_addr.to_string());
+        println!("multisig_addr = {multisig_addr}");
+
+        anvils.push(anvil);
+        providers.push(provider);
     }
 
-    for provider in providers.iter() {
-        let signer = provider.keys()[0].clone();
+    for anvil in anvils.iter() {
+        let signer = anvil.keys()[0].clone();
         let signer = signer.to_bytes().encode_hex();
 
         write_file(
-            format!("/tmp/key_{}", provider.port()).as_str(),
+            format!("/tmp/key_{}", anvil.port()).as_str(),
             signer.as_bytes(),
         )
         .await;
     }
 
-    let seq = spawn_sequencer(PROVIDERS_PORTS).await;
+    let seq = spawn_sequencer(&PROVIDERS_PORTS.to_vec(), &safe_contracts_per_net).await;
 
     wait_for_sequencer_to_accept_votes(5 * 60).await;
 
