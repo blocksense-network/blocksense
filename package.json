@@ -50,5 +50,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
     "vercel": "^37.1.1"
+  },
+  "resolutions": {
+    "babel-plugin-react-compiler": "patch:babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch"
   }
 }

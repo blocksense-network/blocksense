@@ -8418,6 +8418,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-plugin-react-compiler@patch:babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch::locator=%40blocksense%2Fmonorepo%40workspace%3A.":
+  version: 0.0.0-experimental-22c6e49-20241219
+  resolution: "babel-plugin-react-compiler@patch:babel-plugin-react-compiler@npm%3A0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch::version=0.0.0-experimental-22c6e49-20241219&hash=8a3a80&locator=%40blocksense%2Fmonorepo%40workspace%3A."
+  dependencies:
+    "@babel/types": "npm:^7.19.0"
+  checksum: 10c0/6f90ee1b94ec0549b309050eae56042698322f5aaa7333ca5a996b3f89afa9df6c6b3ba74685979a21373f4d1bd2e853d6ccac7c4e8867e21117d3150b5521f1
+  languageName: node
+  linkType: hard
+
 "bail@npm:^2.0.0":
   version: 2.0.2
   resolution: "bail@npm:2.0.2"
