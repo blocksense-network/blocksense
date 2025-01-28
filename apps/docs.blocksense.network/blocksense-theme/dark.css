@@ -19,7 +19,9 @@
 }
 
 .dark pre {
-  @apply bg-neutral-900 border-neutral-600;
+  @apply border-neutral-600;
+  /* matching bg color for our styles */
+  background-color: #1c1c1c !important;
 }
 
 .dark code {

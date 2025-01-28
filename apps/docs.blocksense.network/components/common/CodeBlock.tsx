@@ -43,7 +43,14 @@ export const CodeBlock = ({
       lang,
       theme: currentTheme,
       transformers,
-    }).then(setHtml);
+    })
+      .then((htmlString = '') => {
+        if (currentTheme === themes.dark) {
+          return htmlString.replace(/class="shiki/, 'class="shiki dark');
+        }
+        return htmlString;
+      })
+      .then(setHtml);
   }, [code, lang, currentTheme, transformers]);
 
   return (
