@@ -847,7 +847,7 @@ id = "256"
 data = '{"cmc_id":"7501","cmc_quote":"WOO"}'
 
 [component.crypto-price-feeds]
-source = "target/wasm32-wasip1/release/crypto_price_feeds.wasm"
+source = "../../../target/wasm32-wasip1/release/crypto_price_feeds.wasm"
 allowed_outbound_hosts = [
   "https://api.kraken.com",
   "https://api.bybit.com",
