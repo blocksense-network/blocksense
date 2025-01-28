@@ -11018,6 +11018,8 @@ __metadata:
     "@types/node": "npm:^22.10.2"
     babel-plugin-react-compiler: "npm:0.0.0-experimental-22c6e49-20241219"
     react-compiler-webpack: "npm:0.1.2"
+    tsup: "npm:8.3.5"
+    typescript: "npm:^5.5.4"
   languageName: unknown
   linkType: soft
 
