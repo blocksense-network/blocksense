@@ -54,6 +54,7 @@
     "react": "19.0.0",
     "tailwindcss": "^4.0.0-beta.8",
     "tsup": "8.3.5",
+    "typescript": "^5.5.4",
     "vitest": "^3.0.0",
     "zx": "^8.2.4"
   },
