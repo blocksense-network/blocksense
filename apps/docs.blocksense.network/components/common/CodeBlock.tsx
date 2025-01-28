@@ -5,6 +5,7 @@ import { codeToHtml, ShikiTransformer } from 'shiki';
 import { useTheme } from 'nextra-theme-docs';
 
 import { CopyButton } from '@/components/common/CopyButton';
+import { shikiDefaultThemes } from '@/config';
 
 type CodeBlockProps = {
   code: string;
@@ -23,10 +24,7 @@ type CodeBlockProps = {
 export const CodeBlock = ({
   code = '',
   lang = 'text',
-  themes = {
-    light: 'material-theme-lighter',
-    dark: 'vitesse-dark',
-  },
+  themes = shikiDefaultThemes.themes,
   copy = { hasCopyButton: true, disabled: false },
   transformers = [],
 }: CodeBlockProps) => {

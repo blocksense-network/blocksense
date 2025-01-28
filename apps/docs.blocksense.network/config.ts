@@ -25,3 +25,14 @@ export const gettingStartedConfig = {
   description:
     'A fully decentralized protocol with groundbreaking cost efficiency. Everyone will finally be able to create secure oracles in minutes.',
 };
+
+export const shikiDefaultThemes = {
+  themes: {
+    light: 'material-theme-lighter',
+    dark: 'github-dark',
+  },
+  jsonThemes: {
+    light: 'github-light',
+    dark: 'vitesse-dark',
+  },
+};

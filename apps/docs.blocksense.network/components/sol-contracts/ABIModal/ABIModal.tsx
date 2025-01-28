@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/drawer';
 import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
+import { shikiDefaultThemes } from '@/config';
 
 export interface AbiStruct {
   [key: string]: unknown;
@@ -76,7 +77,7 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
               <CodeBlock
                 code={getABI()}
                 lang="json"
-                themes={{ light: 'github-light', dark: 'vitesse-dark' }}
+                themes={shikiDefaultThemes.jsonThemes}
               />
             </aside>
           </ScrollArea>
