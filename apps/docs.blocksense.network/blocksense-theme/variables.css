@@ -26,4 +26,8 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
   --breakpoint-3xl: 1920px;
+
+  --focus-border-color: #2fa6ff;
+  --transparent-color: transparent;
+  --focus-outline-offset: 0;
 }

@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './variables.css';
+@import './states/focus.css';
 @import './font/font-face.css';
 @import './font/typography.css';
 @import './nextra.css';
@@ -9,10 +10,6 @@
 ::before,
 ::after {
   box-sizing: border-box;
-}
-
-*:focus {
-  outline: none;
 }
 
 .invert {

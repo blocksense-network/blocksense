@@ -13,7 +13,7 @@ const AccordionItem = React.forwardRef<
   <AccordionPrimitive.Item
     ref={ref}
     className={cn(
-      'border-b border-solid border border-slate-200 bg-slate-100 dark:bg-neutral-900 dark:border-neutral-600 px-1 py-0 mb-4',
+      'border-b border-solid border border-neutral-200 bg-slate-100 dark:bg-neutral-900 dark:border-neutral-600 px-1 py-0 mb-4',
       className,
     )}
     {...props}
@@ -29,7 +29,7 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        'accordion-item__trigger flex flex-1 items-center h-[36px] pb-[0.5rem] justify-between font-bold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 focus:ring-0 focus:outline-none focus:border-transparent focus:text-blue-700',
+        'accordion-item__trigger flex flex-1 items-center h-[36px] pb-[0.5rem] justify-between font-bold transition-all hover:underline [&[data-state=open]>svg]:rotate-180 focus:ring-0 focus:outline-none focus:border-none focus:text-blue-700',
         className,
       )}
       {...props}
@@ -48,7 +48,7 @@ const AccordionContent = React.forwardRef<
   <AccordionPrimitive.Content
     ref={ref}
     className={cn(
-      'overflow-hidden text-sm transition-[max-height,opacity,padding] duration-500 ease-in-out',
+      'overflow-hidden text-sm transition-[max-height,opacity,padding] duration-500 ease-in-out border-none bg-transparent',
       'data-[state=closed]:max-h-0 data-[state=closed]:opacity-0 data-[state=closed]:p-0 data-[state=closed]:overflow-hidden',
       'data-[state=open]:max-h-[1540px] data-[state=open]:opacity-100',
       className,
