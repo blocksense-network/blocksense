@@ -898,7 +898,7 @@ __metadata:
     fast-glob: "npm:^3.3.2"
     lucide-react: "npm:^0.468.0"
     next: "npm:^15.1.4"
-    nextra: "npm:^4.0.0"
+    nextra: "npm:^4.1.1"
     nextra-theme-docs: "npm:^4.0.0"
     nodemon: "npm:^3.1.9"
     pagefind: "npm:^1.1.1"
@@ -5600,6 +5600,17 @@ __metadata:
     "@shikijs/types": "npm:1.27.2"
     twoslash: "npm:^0.2.12"
   checksum: 10c0/fcb1b62069d650f6e964d6d50bc7698677eb3ec639caf820cbd21c285d4d844cfd18214a65fe02b53835d5345c6e48f12f775ad7d1b67dcb7840cfaab4b719ee
+  languageName: node
+  linkType: hard
+
+"@shikijs/twoslash@npm:^2.0.0":
+  version: 2.1.0
+  resolution: "@shikijs/twoslash@npm:2.1.0"
+  dependencies:
+    "@shikijs/core": "npm:2.1.0"
+    "@shikijs/types": "npm:2.1.0"
+    twoslash: "npm:^0.2.12"
+  checksum: 10c0/1def9c7154e593d2fd1caf1c6b0811966eab595b22c6759a995efffffe1798a7566216b6057c1493d113348e11b54e31c95e6b61481648573dd30d80ddc411d8
   languageName: node
   linkType: hard
 
@@ -14963,6 +14974,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"katex@npm:^0.16.21":
+  version: 0.16.21
+  resolution: "katex@npm:0.16.21"
+  dependencies:
+    commander: "npm:^8.3.0"
+  bin:
+    katex: cli.js
+  checksum: 10c0/e2e4139ba72a13f2393308fbb2b4c5511611a19a40a6e39d956cf775e553af3517dbfd0a54477faaf401c923e4654e32296347846b8ff15dfa579f88ff8579bb
+  languageName: node
+  linkType: hard
+
 "keccak256@npm:^1.0.6":
   version: 1.0.6
   resolution: "keccak256@npm:1.0.6"
@@ -18113,7 +18135,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nextra@npm:4.0.0, nextra@npm:^4.0.0":
+"nextra@npm:4.0.0":
   version: 4.0.0
   resolution: "nextra@npm:4.0.0"
   dependencies:
@@ -18197,6 +18219,56 @@ __metadata:
     react: ">=16.13.1"
     react-dom: ">=16.13.1"
   checksum: 10c0/68941552f83639ae818e27b1cfbfef4031362c95bb5c80188cabe29ccd700e0889e20d90cde621d79e151fdf02713b096cfaa42b9304946133b82c223d2e01e3
+  languageName: node
+  linkType: hard
+
+"nextra@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "nextra@npm:4.1.1"
+  dependencies:
+    "@formatjs/intl-localematcher": "npm:^0.5.4"
+    "@headlessui/react": "npm:^2.1.2"
+    "@mdx-js/mdx": "npm:^3.0.0"
+    "@napi-rs/simple-git": "npm:^0.1.9"
+    "@shikijs/twoslash": "npm:^2.0.0"
+    "@theguild/remark-mermaid": "npm:^0.2.0"
+    "@theguild/remark-npm2yarn": "npm:^0.3.2"
+    better-react-mathjax: "npm:^2.0.3"
+    clsx: "npm:^2.1.0"
+    estree-util-to-js: "npm:^2.0.0"
+    estree-util-value-to-estree: "npm:^3.0.1"
+    fast-glob: "npm:^3.3.2"
+    github-slugger: "npm:^2.0.0"
+    hast-util-to-estree: "npm:^3.1.0"
+    katex: "npm:^0.16.21"
+    mdast-util-from-markdown: "npm:^2.0.1"
+    mdast-util-gfm: "npm:^3.0.0"
+    mdast-util-to-hast: "npm:^13.2.0"
+    negotiator: "npm:^1.0.0"
+    react-compiler-runtime: "npm:0.0.0-experimental-22c6e49-20241219"
+    react-medium-image-zoom: "npm:^5.2.12"
+    rehype-katex: "npm:^7.0.0"
+    rehype-pretty-code: "npm:0.14.0"
+    rehype-raw: "npm:^7.0.0"
+    remark-frontmatter: "npm:^5.0.0"
+    remark-gfm: "npm:^4.0.0"
+    remark-math: "npm:^6.0.0"
+    remark-reading-time: "npm:^2.0.1"
+    remark-smartypants: "npm:^3.0.0"
+    shiki: "npm:^2.0.0"
+    slash: "npm:^5.1.0"
+    title: "npm:^4.0.1"
+    unist-util-remove: "npm:^4.0.0"
+    unist-util-visit: "npm:^5.0.0"
+    unist-util-visit-children: "npm:^3.0.0"
+    yaml: "npm:^2.3.2"
+    zod: "npm:^3.22.3"
+    zod-validation-error: "npm:^3.0.0"
+  peerDependencies:
+    next: ">=14"
+    react: ">=18"
+    react-dom: ">=18"
+  checksum: 10c0/a42b4f6ca9877f5da125c9479a271911d4bb5c9795c7fcfc2f45e853b6d00f71af79aa238bca20b3aff5664f5347e49681094e74754e0d84789386520b933d40
   languageName: node
   linkType: hard
 
@@ -21472,7 +21544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shiki@npm:^2.1.0":
+"shiki@npm:^2.0.0, shiki@npm:^2.1.0":
   version: 2.1.0
   resolution: "shiki@npm:2.1.0"
   dependencies:
