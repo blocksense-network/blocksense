@@ -211,8 +211,6 @@ jobs:
             vercel_project: docs.blocksense.network
           # - project: explorer
           #   vercel_project: explorer.blocksense.network
-    outputs:
-      docsDeploymentMessage: ${{ steps.collect-docs.outputs.message }}
       # explorerDeploymentMessage: ${{ steps.collect-explorer.outputs.message }}
     steps:
       - uses: actions/checkout@v4
@@ -240,49 +238,13 @@ jobs:
       - name: Install JS deps
         run: yarn install
 
-      - name: Pull Vercel configuration
-        run: yarn vercel link --scope blocksense --project ${{ matrix.vercel_project }} --yes --token ${{ secrets.vercel_token }}
+      - name: Build the website
+        run: yarn build @blocksense/docs.blocksense.network
 
-      # - name: Vercel Build - Prod
-      #   if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-      #   run: yarn vercel build --prod --yes --token ${{ secrets.vercel_token }}
-
-      - name: Vercel Build - Preview
-        if: github.ref != format('refs/heads/{0}', github.event.repository.default_branch)
-        run: yarn vercel build --yes --token ${{ secrets.vercel_token }}
-
-      # - name: Deploy to Vercel - Prod
-      #   if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-      #   run: yarn vercel deploy --prod --prebuilt --scope blocksense --token ${{ secrets.vercel_token }} > _vercel-deployment-url
-
-      - name: Deploy to Vercel - Preview
-        if: github.ref != format('refs/heads/{0}', github.event.repository.default_branch)
-        run: yarn vercel deploy --prebuilt --scope blocksense --token ${{ secrets.vercel_token }} > _vercel-deployment-url
-
-      - name: Collect Docs Deployment URL
-        id: collect-docs
-        if: matrix.project == 'docs'
-        run: |
-          DOCS_DEPLOY_URL=$(cat _vercel-deployment-url)
-          echo "::set-output name=message::$DOCS_DEPLOY_URL"
-
-      # - name: Collect Explorer Deployment URL
-      #   id: collect-explorer
-      #   if: matrix.project == 'explorer'
-      #   run: |
-      #     EXPLORER_DEPLOY_URL=$(cat _vercel-deployment-url)
-      #     echo "::set-output name=message::$EXPLORER_DEPLOY_URL"
-
-  comment_on_pr:
-    needs: [deploy_websites]
-    runs-on: self-hosted
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Comment Deployment Links on the PR
-        uses: marocchino/sticky-pull-request-comment@v2.9.1
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
         with:
-          recreate: true
-          message: |
-            🚀 Deployment Links of Blocksense Network websites:
-             * 🌱 Documentation: ${{ needs.deploy_websites.outputs.docsDeploymentMessage }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy apps/docs.blocksense.network/dist --project-name=blocksense
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}``
