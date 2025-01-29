@@ -51,8 +51,16 @@ let
   reporterV2Instances = lib.mapAttrs' (
     name:
     { log-level, ... }:
+    let
+      serviceName = "blocksense-reporter-v2-${name}";
+      wasmCopyCmd = lib.pipe self'.legacyPackages.oracle-scripts [
+        builtins.attrValues
+        (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
+        (files: "${lib.getExe pkgs.bash} -c 'set -x; cp ${files} %S/${serviceName}'")
+      ];
+    in
     {
-      name = "blocksense-reporter-v2-${name}";
+      name = serviceName;
       value = {
         description = "Reporter v2 ${name}";
         wantedBy = [ "multi-user.target" ];
@@ -62,13 +70,9 @@ let
         };
         path = [ pkgs.coreutils ];
         serviceConfig = {
-          StateDirectory = "blocksense-reporter-v2-${name}";
-          ExecStartPre = "${lib.getExe pkgs.bash} -c 'set -x; cp ${
-            lib.pipe self'.legacyPackages.oracle-scripts [
-              builtins.attrValues
-              (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
-            ]
-          } %S/blocksense-reporter-v2-${name}'";
+          StateDirectory = serviceName;
+          WorkingDirectory = "/var/lib/${serviceName}";
+          ExecStartPre = wasmCopyCmd;
           ExecStart = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
           Restart = "on-failure";
         };
