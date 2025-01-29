@@ -10,7 +10,7 @@ let
 
   reportersV2ConfigJSON = builtins.mapAttrs (
     name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
-  ) cfg.reporters;
+  ) cfg.reporters-v2;
 
   inherit (self'.apps) sequencer reporter blocksense;
 
@@ -62,12 +62,13 @@ let
         };
         path = [ pkgs.coreutils ];
         serviceConfig = {
+          StateDirectory = "blocksense-reporter-v2-${name}";
           ExecStartPre = "${lib.getExe pkgs.bash} -c 'set -x; cp ${
             lib.pipe self'.legacyPackages.oracle-scripts [
               builtins.attrValues
               (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
             ]
-          } %S'";
+          } %S/blocksense-reporter-v2-${name}'";
           ExecStart = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
           Restart = "on-failure";
         };
@@ -81,12 +82,15 @@ let
   }) cfg.reporters;
 in
 {
+  options.debugme = lib.mkOption { type = lib.types.raw; };
   config = lib.mkIf cfg.enable {
     environment.etc = {
       "blocksense/sequencer_config.json" = {
         text = cfg._sequencer-config-txt;
       };
     } // etcEnv;
+
+    debugme = reportersV2ConfigJSON;
 
     systemd.services = {
       blocksense-sequencer = {
