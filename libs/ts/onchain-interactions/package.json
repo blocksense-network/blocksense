@@ -2,7 +2,7 @@
   "name": "@blocksense/onchain-interactions",
   "packageManager": "yarn@4.3.1",
   "scripts": {
-    "ts": "yarn node --import tsx",
+    "ts": "yarn node --import tsx --no-deprecation",
     "get-wallets-balances": "yarn ts src/scripts/balance-script.ts",
     "calculate-cost": "FORCE_COLOR=1 yarn ts src/scripts/cost-calculations.ts \"$@\" | tee cost-calculations.log",
     "unstuck-transaction": "yarn ts src/scripts/unstuck-transaction.ts",
