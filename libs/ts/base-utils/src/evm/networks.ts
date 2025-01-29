@@ -80,6 +80,7 @@ const networks = [
   'ozean-poseidon',
   'opbnb-testnet',
   'rollux-testnet',
+  'camp-network-testnet-v2',
 ] as const;
 
 const chainIds = [
@@ -89,6 +90,7 @@ const chainIds = [
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
   1663, 1666700000, 1313161555, 839999, 16, 114, 28882, 9728, 31, 41, 71, 338,
   4801, 2358, 168587773, 1740, 66665, 1952959480, 53302, 7849306, 5611, 57000,
+  325000,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -448,6 +450,11 @@ export const networkMetadata = {
     chainId: 57000,
     isTestnet: true,
     explorerUrl: 'https://rollux.tanenbaum.io',
+  },
+  'camp-network-testnet-v2': {
+    chainId: 325000,
+    isTestnet: true,
+    explorerUrl: 'https://camp-network-testnet.blockscout.com/',
   },
 } satisfies {
   [Net in NetworkName]: {
