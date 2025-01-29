@@ -68,7 +68,10 @@ let
         environment = {
           RUST_LOG = "${log-level}";
         };
-        path = [ pkgs.coreutils ];
+        path = [
+          pkgs.coreutils
+          self'.legacyPackages.spinWrapped
+        ];
         serviceConfig = {
           StateDirectory = serviceName;
           WorkingDirectory = "/var/lib/${serviceName}";
