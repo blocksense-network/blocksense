@@ -118,8 +118,18 @@ const logGasCosts = async (
   }
 };
 
-const getTxTimestampAsDate = (tx: Transaction): Date =>
-  new Date(tx.timestamp ?? parseInt(tx.timeStamp || '0') * 1000);
+const getTxTimestampAsDate = (tx: Transaction): Date => {
+  if (typeof tx.timestamp === 'string' && tx.timestamp.includes('T')) {
+    // Morph-style ISO string timestamp
+    return new Date(tx.timestamp);
+  }
+
+  // Unix timestamp (either string or number)
+  const unixTimestamp = parseInt(
+    tx.timestamp?.toString() ?? (tx.timeStamp?.toString() || '0'),
+  );
+  return new Date(unixTimestamp * 1000);
+};
 
 const fetchTransactionsForNetwork = async (
   network: NetworkName,
