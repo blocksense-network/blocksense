@@ -7,14 +7,14 @@ import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
 const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
 
 export function generateStaticParams() {
-  return solReflection.map((sourceUnit: SourceUnitDocItem) => ({
-    sourceUnitName: path.parse(sourceUnit.absolutePath).name,
+  return solReflection.map((contract: SourceUnitDocItem) => ({
+    contract: path.parse(contract.absolutePath).name,
   }));
 }
 
-type Params = {
+interface Params {
   contract: string;
-};
+}
 
 export default async function ContractPageWrapper({
   params,
