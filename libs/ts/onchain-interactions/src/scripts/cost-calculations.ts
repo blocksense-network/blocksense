@@ -19,15 +19,29 @@ import {
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import chalkTemplate from 'chalk-template';
 
+function getHourDifference(transactions: Transaction[]): number {
+  if (transactions.length < 2) {
+    console.log(chalk.red('Not enough transactions'));
+    return 0;
+  }
+  const firstTransactionTime = getTxTimestampAsDate(transactions[0]);
+  const lastTransactionTime = getTxTimestampAsDate(
+    transactions[transactions.length - 1],
+  );
+
+  const diffMs = firstTransactionTime.getTime() - lastTransactionTime.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+
+  return diffHours;
+}
+
 const calculateGasCosts = (
-  secondsBetweenTransactions: number,
+  periodOfTransactions: number,
   transactions: Transaction[],
 ): {
-  avgGasCostEth: string;
   avgGasPriceGwei: string;
-  avgGasUsed: string;
-  projectedCost1h: number;
-  projectedCost24h: number;
+  Cost1h: number;
+  GasUsed1h: number;
 } | null => {
   if (transactions.length === 0) {
     return null;
@@ -47,21 +61,16 @@ const calculateGasCosts = (
     totalGasUsed += gasUsed;
   }
 
-  const avgGasCost = totalGasCost / BigInt(transactions.length);
   const avgGasPrice = totalGasPrice / BigInt(transactions.length);
-  const avgGasUsed = totalGasUsed / BigInt(transactions.length);
-
-  const avgGasCostEth = Web3.utils.fromWei(avgGasCost.toString(), 'ether');
   const avgGasPriceGwei = Web3.utils.fromWei(avgGasPrice.toString(), 'gwei');
+  const totalCostInETH = Web3.utils.fromWei(totalGasCost.toString(), 'ether');
+  const Cost1h = Number(totalCostInETH) / periodOfTransactions;
+  const GasUsed1h = Number(totalGasUsed) / periodOfTransactions;
 
   return {
-    avgGasCostEth,
     avgGasPriceGwei,
-    avgGasUsed: avgGasUsed.toString(),
-    projectedCost1h:
-      parseFloat(avgGasCostEth) * (3600 / secondsBetweenTransactions),
-    projectedCost24h:
-      parseFloat(avgGasCostEth) * ((24 * 3600) / secondsBetweenTransactions),
+    Cost1h,
+    GasUsed1h,
   };
 };
 
@@ -70,43 +79,40 @@ const logGasCosts = async (
   address: EthereumAddress,
   transactionsCount: number,
   gasCosts: {
-    avgGasCostEth: string;
     avgGasPriceGwei: string;
-    avgGasUsed: string;
-    projectedCost1h: number;
-    projectedCost24h: number;
+    Cost1h: number;
+    GasUsed1h: number;
   },
   balance: string,
   firstTransactionTime: string,
   lastTransactionTime: string,
-  secondsBetweenTransactions: number,
+  hoursBetweenFirstLast: string,
 ): Promise<void> => {
   const { currency } = networkMetadata[network];
-  const transactionsPerHour = 3600 / secondsBetweenTransactions;
 
   try {
     await console.log(chalkTemplate`
-    {green ${network}: Processed ${transactionsCount} transactions sent by ${address}}
+    {white ${network}: Processed ${transactionsCount} transactions sent by ${address} over ${hoursBetweenFirstLast} hours}
     {blue First transaction timestamp: ${firstTransactionTime}}
     {blue Last transaction timestamp: ${lastTransactionTime}}
-    {yellow Average Transaction Cost: ${gasCosts.avgGasCostEth} ${currency}}
     {yellow Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei}
-    {yellow Average Gas Used: ${gasCosts.avgGasUsed}}
-    {magenta Projected Cost for 1h (${transactionsPerHour} tx): ${gasCosts.projectedCost1h} ${currency}}
-    {cyan Projected Cost for 24h (${transactionsPerHour * 24} tx): ${gasCosts.projectedCost24h} ${currency}}
+    {magenta Gas for 1h: ${gasCosts.GasUsed1h}}
+    {magenta Gas for 24h: ${gasCosts.GasUsed1h * 24}}
+    {cyan Cost for 1h: ${gasCosts.Cost1h} ${currency}}
+    {cyan Cost for 24h: ${gasCosts.Cost1h * 24} ${currency}}
     `);
 
     if (balance == null) {
       console.error(chalk.red(`Can't calculate balance for ${network}`));
     } else {
-      const daysBalanceWillLast = Number(balance) / gasCosts.projectedCost24h;
-      const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour projected costs.`;
+      const daysBalanceWillLast = Number(balance) / (gasCosts.Cost1h * 24);
+      const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour costs.`;
       if (daysBalanceWillLast < 10) {
-        console.log(chalk.red(balanceMsg));
+        console.log(chalk.bold.red(balanceMsg));
       } else if (daysBalanceWillLast >= 10 && daysBalanceWillLast <= 30) {
-        console.log(chalk.yellow(balanceMsg));
+        console.log(chalk.bold.yellow(balanceMsg));
       } else {
-        console.log(chalk.green(balanceMsg));
+        console.log(chalk.bold.green(balanceMsg));
       }
     }
   } catch (error) {
@@ -232,8 +238,8 @@ const fetchTransactionsForNetwork = async (
     if (transactions.length > 0) {
       firstTxTimeRet = getTxTimestampAsDate(
         transactions[transactions.length - 1],
-      ).toISOString();
-      lastTxTimeRet = getTxTimestampAsDate(transactions[0]).toISOString();
+      ).toString();
+      lastTxTimeRet = getTxTimestampAsDate(transactions[0]).toString();
     }
 
     console.log(
@@ -261,7 +267,7 @@ const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage(
-      'Usage: $0 --numberOfTransactions <number> --secondsBetweenTransactions <number> [--address <ethereum address>]',
+      'Usage: $0 --numberOfTransactions <number> [--address <ethereum address>]',
     )
     .option('address', {
       alias: 'a',
@@ -274,12 +280,6 @@ const main = async (): Promise<void> => {
       describe: 'Number of transactions to calculated the cost on',
       type: 'number',
       default: 288,
-    })
-    .option('secondsBetweenTransactions', {
-      alias: 'time',
-      describe: 'Time between Transactions in seconds',
-      type: 'number',
-      default: 300, //5min
     })
     .option('network', {
       alias: 'n',
@@ -313,11 +313,6 @@ const main = async (): Promise<void> => {
       })\n`,
     ),
   );
-  console.log(
-    chalk.cyan(
-      `Using ${argv.secondsBetweenTransactions} seconds between transactions`,
-    ),
-  );
 
   const networks = argv.network == '' ? deployedNetworks : [argv.network];
 
@@ -330,11 +325,9 @@ const main = async (): Promise<void> => {
         argv.firstTxTime,
         argv.lastTxTime,
       );
+    const hoursBetweenFirstLast = getHourDifference(transactions);
     if (transactions.length > 0) {
-      const gasCosts = calculateGasCosts(
-        argv.secondsBetweenTransactions,
-        transactions,
-      );
+      const gasCosts = calculateGasCosts(hoursBetweenFirstLast, transactions);
       const rpcUrl = getOptionalRpcUrl(network);
       var balance: string;
 
@@ -359,7 +352,7 @@ const main = async (): Promise<void> => {
           balance,
           firstTxTime,
           lastTxTime,
-          argv.secondsBetweenTransactions,
+          hoursBetweenFirstLast,
         );
       }
     } else {
