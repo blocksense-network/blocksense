@@ -18,6 +18,7 @@ use serde::Deserialize;
 use crate::common::{ResourceData, ResourceResult};
 use binance::get_binance_prices;
 use bybit::get_bybit_prices;
+use coinbase::get_coinbase_prices;
 use kraken::get_kraken_prices;
 
 //TODO(adikov): Refacotr:
@@ -115,9 +116,8 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     get_bybit_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
 
-    //TODO(adikov): Transform coinbase price to match the others - 1 / coinbase price
-    // get_coinbase_prices(&resources, &mut results).await?;
-    // print_results(&resources, &results);
+    get_coinbase_prices(&resources, &mut results).await?;
+    print_results(&resources, &results);
 
     //TODO(adikov): Write the logic for transforming the data to DataFeedResult
     // We need proper way to match binance, kraken, bybit and coinbase response to

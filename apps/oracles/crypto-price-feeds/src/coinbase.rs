@@ -18,12 +18,13 @@ pub struct CoinbaseResponse {
     pub data: CoinbaseData,
 }
 
-#[allow(dead_code)] // We are not using this func yet.
-async fn get_coinbase_prices(
+pub async fn get_coinbase_prices(
     resources: &Vec<ResourceData>,
     results: &mut HashMap<String, Vec<ResourceResult>>,
 ) -> Result<()> {
     let url = Url::parse_with_params(
+        // In the future we must use other endpoints to get the price of a
+        // given currency in another currency, not just USD.
         "https://api.coinbase.com/v2/exchange-rates",
         &[("currency", "USD")],
     )?;
@@ -42,13 +43,22 @@ async fn get_coinbase_prices(
 
     for resource in resources {
         if value.data.rates.contains_key(&resource.symbol) {
-            //TODO(adikov): remove unwrap
             let res = results.entry(resource.id.clone()).or_default();
+
+            // Since the endpoint we currently use give us the price of 1 USD in the given currency
+            // we need to invert the price to get the price of 1 unit of the given currency in USD.
+            let rate = match value.data.rates.get(&resource.symbol) {
+                Some(rate) => rate,
+                None => continue,
+            };
+            let price_as_number: f64 = rate.parse()?;
+            let price: String = (1.0 / price_as_number).to_string();
+
             res.push(ResourceResult {
                 id: resource.id.clone(),
                 symbol: resource.symbol.clone(),
                 usd_symbol: resource.symbol.to_string(),
-                result: value.data.rates.get(&resource.symbol).unwrap().clone(),
+                result: price,
             });
         }
     }
