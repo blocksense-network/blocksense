@@ -16,6 +16,8 @@ is-terminal = { workspace = true }
 lazy_static = "1.4.0"
 log = { workspace = true }
 reqwest = { workspace = true }
+reqwest-middleware = "0.4"
+reqwest-retry = "0.7"
 serde = { workspace = true }
 serde_json = { workspace = true }
 

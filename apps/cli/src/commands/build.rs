@@ -1,10 +1,13 @@
 use std::{convert::From, env, path::PathBuf, process::Stdio};
 
-use tokio::{fs, io::AsyncWriteExt, process::Command};
+use tokio::{fs, io::AsyncWriteExt, process::Command, time::Duration};
 
 use anyhow::{Context, Result};
 use clap::Parser;
 use url::Url;
+
+use reqwest_middleware::ClientBuilder;
+use reqwest_retry::{policies::ExponentialBackoff, RetryTransientMiddleware};
 
 use blocksense_registry::config::{BlocksenseConfig, FeedsResponse, OraclesResponse};
 
@@ -119,7 +122,15 @@ impl BuildConfig {
         let url = base.join("/get_feeds_config")?;
         tracing::info!("Getting data feed config from {:?}", url);
 
-        let body = reqwest::get(url.clone()).await?.text().await?;
+        let retry_policy = ExponentialBackoff::builder()
+            .retry_bounds(Duration::from_secs(1), Duration::from_secs(6))
+            .build_with_total_retry_duration_and_max_retries(Duration::from_secs(24));
+        let client = ClientBuilder::new(reqwest::Client::new())
+            // Retry failed requests.
+            .with(RetryTransientMiddleware::new_with_policy(retry_policy))
+            .build();
+
+        let body = client.get(url.clone()).send().await?.text().await?;
 
         //TODO(melatron): Remove this when data feeds are properly generated.
         let response_json: FeedsResponse = serde_json::from_str(&body)?;
