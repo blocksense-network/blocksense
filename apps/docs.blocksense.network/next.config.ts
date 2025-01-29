@@ -6,7 +6,12 @@ const withNextra = nextra({
 });
 
 const nextConfig = withNextra({
+  output: 'export',
+  distDir: 'dist',
   reactStrictMode: true,
+  images: {
+    unoptimized: true, // mandatory, otherwise won't export
+  },
   eslint: {
     // ESLint behaves weirdly in this monorepo.
     ignoreDuringBuilds: true,
