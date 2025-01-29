@@ -116,7 +116,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     get_bybit_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
 
-    get_coinbase_prices(&resources, &mut results).await?;
+    get_coinbase_prices(&resources, &mut results, "USD".to_string()).await?;
     print_results(&resources, &results);
 
     //TODO(adikov): Write the logic for transforming the data to DataFeedResult

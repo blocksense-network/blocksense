@@ -21,12 +21,11 @@ pub struct CoinbaseResponse {
 pub async fn get_coinbase_prices(
     resources: &Vec<ResourceData>,
     results: &mut HashMap<String, Vec<ResourceResult>>,
+    currency: String,
 ) -> Result<()> {
     let url = Url::parse_with_params(
-        // In the future we must use other endpoints to get the price of a
-        // given currency in another currency, not just USD.
         "https://api.coinbase.com/v2/exchange-rates",
-        &[("currency", "USD")],
+        &[("currency", currency)],
     )?;
 
     let mut req = Request::builder();
