@@ -7,9 +7,7 @@
 
       craneLib = (inputs.mcl-blockchain.inputs.crane.mkLib pkgs).overrideToolchain rust;
 
-      version = "dev-${
-        pkgs.lib.removeSuffix "-dirty" (self.shortRev or self.dirtyShortRev or self.lastModifiedDate)
-      }";
+      version = "dev";
 
       blocksense-rs = pkgs.callPackage ./blocksense-rs {
         inherit (self.lib) filesets;
