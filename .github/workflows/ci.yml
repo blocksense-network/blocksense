@@ -228,18 +228,18 @@ jobs:
 
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
           env >> "$GITHUB_ENV"
-
-      - name: Set node linker
-        run: |
-          echo "nodeLinker: node-modules" >> .yarnrc.yml
 
       - name: Install JS deps
         run: yarn install
 
       - name: Build the website
-        run: yarn build @blocksense/docs.blocksense.network
+        run: |
+          (
+            cd apps/docs.blocksense.network
+            yarn build
+          )
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
