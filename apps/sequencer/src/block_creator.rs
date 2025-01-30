@@ -28,7 +28,7 @@ use crate::UpdateToSend;
 
 pub async fn block_creator_loop(
     sequencer_state: Data<SequencerState>,
-    mut vote_recv: UnboundedReceiver<VotedFeedUpdate>,
+    mut aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdate>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
     batched_votes_send: UnboundedSender<UpdateToSend>,
     block_config: BlockConfig,
@@ -83,6 +83,7 @@ pub async fn block_creator_loop(
                     .await_end_of_current_slot(&Repeatability::Periodic) => {
                          // Only emit a block if data is present
                         if !updates.is_empty() || !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() {
+                            debug!("Emitting block, since there is data present...");
                             if let Err(e) = generate_block(
                                 updates,
                                 new_feeds_to_register,
@@ -108,7 +109,8 @@ pub async fn block_creator_loop(
                         }
                     }
 
-                    feed_update = vote_recv.recv() => {
+                    feed_update = aggregated_votes_to_block_creator_recv.recv() => {
+                        debug!("Received votes over `aggregated_votes_to_block_creator_recv`");
                         recvd_feed_update_to_block(feed_update, updates, backlog_updates, max_feed_updates_to_batch);
                     }
 
@@ -248,6 +250,7 @@ async fn generate_block(
 
     // Process feed updates:
     if !updates.is_empty() {
+        debug!("Sending batched votes over `batched_votes_send`...");
         if let Err(e) = batched_votes_send.send(UpdateToSend {
             block_height,
             updates,
@@ -332,7 +335,7 @@ mod tests {
         let metrics_prefix = "test_block_creator_loop";
         let (
             sequencer_state,
-            vote_recv,
+            aggregated_votes_to_block_creator_recv,
             feeds_management_cmd_to_block_creator_recv,
             _feeds_slots_manager_cmd_recv,
         ) = create_sequencer_state_from_sequencer_config(
@@ -348,7 +351,7 @@ mod tests {
             .clone();
         super::block_creator_loop(
             sequencer_state,
-            vote_recv,
+            aggregated_votes_to_block_creator_recv,
             feeds_management_cmd_to_block_creator_recv,
             batched_votes_send,
             block_config,

@@ -284,13 +284,16 @@ impl FeedSlotsProcessor {
         history: &Arc<RwLock<FeedAggregateHistory>>,
         sequencer_state: &Data<SequencerState>,
     ) -> Result<()> {
+        let feed_id = self.key;
         self.increase_quorum_metric(feed_metrics, consumed_reports.is_quorum_reached)
             .await;
+
         if !consumed_reports.is_quorum_reached {
+            debug!("Quorum not reached for feed_id = {feed_id}");
             return Ok(());
         }
+
         if consumed_reports.skip_publishing {
-            let feed_id = self.key;
             info!(
                 "Skipping publishing for feed_id = {} change is lower then threshold of {} %",
                 feed_id, skip_publish_if_less_then_percentage
@@ -301,14 +304,17 @@ impl FeedSlotsProcessor {
         let result_post_to_contract = consumed_reports.result_post_to_contract.context(
             "[post_consumed_reports]: Impossible, quorum reached but no value is reported",
         )?;
-        let feed_id = self.key;
         let message = VotedFeedUpdate {
             feed_id,
             value: result_post_to_contract,
             end_slot_timestamp: consumed_reports.end_slot_timestamp,
         };
-        self.post_to_contract(history, message, sequencer_state)
-            .await
+        debug!("Awaiting post_to_contract... [feed {feed_id}]");
+        let result = self
+            .post_to_contract(history, message, sequencer_state)
+            .await;
+        debug!("Continued after post_to_contract [feed {feed_id}]");
+        result
     }
 
     async fn post_to_contract(
@@ -502,6 +508,7 @@ impl FeedSlotsProcessor {
                     is_processed = true;
                     let end_slot_timestamp = first_report_start_time + (report_interval_ms as u128) * (slot as u128 + 1);
 
+                    debug!("Awaiting process_end_of_slot [feed {}]", self.key);
                     match self.process_end_of_slot(
                         is_oneshot,
                         report_interval_ms,
@@ -516,12 +523,13 @@ impl FeedSlotsProcessor {
                         history,
                         ).await {
                             Ok(consumed_reports) => {
+                                debug!("Continued after process_end_of_slot [feed {}]", self.key);
                                 if let Err(e) = self.post_consumed_reports(consumed_reports, feed_metrics.clone(), skip_publish_if_less_then_percentage, history, sequencer_state).await {
-                                    error!("{e}")
+                                    error!("post_consumed_reports failed with {e}")
                                 }
                             }
                             Err(e) => {
-                                error!("{e}");
+                                error!("process_end_of_slot failed with {e}");
                             }
                         };
                 }

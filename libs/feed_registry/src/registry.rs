@@ -269,9 +269,9 @@ impl SlotTimeTracker {
         // These log lines indicate the successful completion of a slot, as well as the successful
         // start of the next slot. At the time of writing, there is one tracker per feed, as well
         // as a single tracker for block generation.
-        info!("Awaiting end of slot... [{}]", self.name);
+        debug!("Awaiting end of slot... [{}]", self.name);
         await_time(time_to_await_ms).await;
-        info!("New slot begins [{}]", self.name);
+        debug!("New slot begins [{}]", self.name);
     }
 
     // Return the number of milliseconds until the end of the voting slot.

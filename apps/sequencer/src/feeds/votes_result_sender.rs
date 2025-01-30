@@ -22,7 +22,11 @@ pub async fn votes_result_sender_loop(
         .spawn_local(async move {
             let mut batch_count = 0;
             loop {
+                debug!("Awaiting batched votes over `batched_votes_recv`...");
                 let recvd = batched_votes_recv.recv().await;
+                debug!(
+                    "Received batched votes over `batched_votes_recv`; batch_count={batch_count}"
+                );
                 match recvd {
                     Some(updates) => {
                         debug!("sending aggregation consensus trigger");
