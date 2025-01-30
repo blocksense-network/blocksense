@@ -61,7 +61,7 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
             <TriggerButton tooltipContent={title} />
           </section>
         </DialogTrigger>
-        <DialogContent className="h-4/6 max-w-screen-md">
+        <DialogContent className="max-w-screen-md">
           <DialogHeader>
             <section className="flex items-center justify-between px-2 pt-2 pb-0">
               <DialogTitle>{title}</DialogTitle>
@@ -72,14 +72,12 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
             </section>
             <DialogDescription />
           </DialogHeader>
-          <ScrollArea>
-            <aside className="scroll-area">
-              <CodeBlock
-                code={getABI()}
-                lang="json"
-                themes={shikiDefaultThemes.jsonThemes}
-              />
-            </aside>
+          <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg">
+            <CodeBlock
+              code={getABI()}
+              lang="json"
+              themes={shikiDefaultThemes.jsonThemes}
+            />
           </ScrollArea>
         </DialogContent>
       </Dialog>

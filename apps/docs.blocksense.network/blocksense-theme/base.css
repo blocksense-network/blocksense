@@ -100,10 +100,6 @@ main > h1 {
 }
 
 @layer components {
-  .scroll-area .signature__code {
-    @apply p-1;
-  }
-
   .announcement__icon,
   .error-404__icon,
   .error-500__icon {
