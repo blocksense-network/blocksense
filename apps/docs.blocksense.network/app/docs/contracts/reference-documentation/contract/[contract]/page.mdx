@@ -1,12 +1,13 @@
----
-title: 'Contract'
----
-
-import React from 'react';
 import  ContractPageWrapper, { generateStaticParams }  from '@/components/ReferenceDocumentation/[contract]';
 
 export { generateStaticParams };
 
-export default function ContractPage({ params }) {
+export async function generateMetadata({ params }) {
+  const { contract: contractName } = await params;
+  return { title: contractName };
+}
+
+export default async function ContractPage({ params }) {
+
   return <ContractPageWrapper params={params} />;
 }
