@@ -7,7 +7,6 @@ import { API_ENDPOINTS, API_KEYS, Transaction } from '../types';
 import {
   getOptionalRpcUrl,
   networkMetadata,
-  networkName,
   NetworkName,
 } from '@blocksense/base-utils/evm';
 import { deployedNetworks } from '../types';
@@ -18,16 +17,15 @@ import {
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import chalkTemplate from 'chalk-template';
+import { throwError } from 'libs/ts/base-utils/src/errors';
 
 function getHourDifference(transactions: Transaction[]): number {
-  if (transactions.length < 2) {
-    console.log(chalk.red('Not enough transactions'));
-    return 0;
+  const txsLen = transactions.length;
+  if (txsLen < 2) {
+    throwError('Less then 2 transactions in getHourDifference');
   }
   const firstTransactionTime = getTxTimestampAsDate(transactions[0]);
-  const lastTransactionTime = getTxTimestampAsDate(
-    transactions[transactions.length - 1],
-  );
+  const lastTransactionTime = getTxTimestampAsDate(transactions[txsLen - 1]);
 
   const diffMs = firstTransactionTime.getTime() - lastTransactionTime.getTime();
   const diffHours = diffMs / (1000 * 60 * 60);
@@ -36,17 +34,16 @@ function getHourDifference(transactions: Transaction[]): number {
 }
 
 const calculateGasCosts = (
-  periodOfTransactions: number,
+  hoursBetweenFirstLastTx: number,
   transactions: Transaction[],
 ): {
   avgGasPriceGwei: string;
-  Cost1h: number;
-  GasUsed1h: number;
-} | null => {
-  if (transactions.length === 0) {
-    return null;
+  cost1h: number;
+  gasUsed1h: number;
+} => {
+  if (transactions.length < 2) {
+    throwError('Less then 2 transactions in calculateGasCosts');
   }
-
   let totalGasCost = BigInt(0);
   let totalGasPrice = BigInt(0);
   let totalGasUsed = BigInt(0);
@@ -64,13 +61,13 @@ const calculateGasCosts = (
   const avgGasPrice = totalGasPrice / BigInt(transactions.length);
   const avgGasPriceGwei = Web3.utils.fromWei(avgGasPrice.toString(), 'gwei');
   const totalCostInETH = Web3.utils.fromWei(totalGasCost.toString(), 'ether');
-  const Cost1h = Number(totalCostInETH) / periodOfTransactions;
-  const GasUsed1h = Number(totalGasUsed) / periodOfTransactions;
+  const cost1h = Number(totalCostInETH) / hoursBetweenFirstLastTx;
+  const gasUsed1h = Number(totalGasUsed) / hoursBetweenFirstLastTx;
 
   return {
     avgGasPriceGwei,
-    Cost1h,
-    GasUsed1h,
+    cost1h,
+    gasUsed1h,
   };
 };
 
@@ -80,8 +77,8 @@ const logGasCosts = async (
   transactionsCount: number,
   gasCosts: {
     avgGasPriceGwei: string;
-    Cost1h: number;
-    GasUsed1h: number;
+    cost1h: number;
+    gasUsed1h: number;
   },
   balance: string,
   firstTransactionTime: string,
@@ -96,16 +93,16 @@ const logGasCosts = async (
     {blue First transaction timestamp: ${firstTransactionTime}}
     {blue Last transaction timestamp: ${lastTransactionTime}}
     {yellow Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei}
-    {magenta Gas for 1h: ${gasCosts.GasUsed1h}}
-    {magenta Gas for 24h: ${gasCosts.GasUsed1h * 24}}
-    {cyan Cost for 1h: ${gasCosts.Cost1h} ${currency}}
-    {cyan Cost for 24h: ${gasCosts.Cost1h * 24} ${currency}}
+    {magenta Gas for 1h: ${gasCosts.gasUsed1h}}
+    {magenta Gas for 24h: ${gasCosts.gasUsed1h * 24}}
+    {cyan Cost for 1h: ${gasCosts.cost1h} ${currency}}
+    {cyan Cost for 24h: ${gasCosts.cost1h * 24} ${currency}}
     `);
 
     if (balance == null) {
       console.error(chalk.red(`Can't calculate balance for ${network}`));
     } else {
-      const daysBalanceWillLast = Number(balance) / (gasCosts.Cost1h * 24);
+      const daysBalanceWillLast = Number(balance) / (gasCosts.cost1h * 24);
       const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour costs.`;
       if (daysBalanceWillLast < 10) {
         console.log(chalk.bold.red(balanceMsg));
@@ -325,9 +322,9 @@ const main = async (): Promise<void> => {
         argv.firstTxTime,
         argv.lastTxTime,
       );
-    const hoursBetweenFirstLast = getHourDifference(transactions);
-    if (transactions.length > 0) {
-      const gasCosts = calculateGasCosts(hoursBetweenFirstLast, transactions);
+    if (transactions.length > 1) {
+      const hoursBetweenFirstLastTx = getHourDifference(transactions);
+      const gasCosts = calculateGasCosts(hoursBetweenFirstLastTx, transactions);
       const rpcUrl = getOptionalRpcUrl(network);
       var balance: string;
 
@@ -352,12 +349,14 @@ const main = async (): Promise<void> => {
           balance,
           firstTxTime,
           lastTxTime,
-          hoursBetweenFirstLast,
+          hoursBetweenFirstLastTx,
         );
       }
     } else {
       console.log(
-        chalk.yellow(`${network}: No transactions found for the account.`),
+        chalk.yellow(
+          `${network}: Less than 2 transactions found for the account.`,
+        ),
       );
     }
   }
