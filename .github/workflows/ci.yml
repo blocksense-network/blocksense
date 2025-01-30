@@ -108,7 +108,7 @@ jobs:
         run: yarn install
 
       - name: Build
-        run: yarn workspace @blocksense/docs.blocksense.network build
+        run: yarn workspace @blocksense/docs.blocksense.network build:with-deps
 
       - name: Test `@blocksense/base-utils`
         run: yarn workspace @blocksense/base-utils test
@@ -238,7 +238,7 @@ jobs:
         run: |
           (
             cd apps/docs.blocksense.network
-            yarn build
+            yarn build:with-deps
           )
 
       - name: Deploy
