@@ -35,6 +35,7 @@ sol! {
     "safe_abi.json"
 }
 
+#[derive(Clone, Debug)]
 pub struct SignatureWithAddress {
     pub signature: PrimitiveSignature,
     pub signer_address: Address,

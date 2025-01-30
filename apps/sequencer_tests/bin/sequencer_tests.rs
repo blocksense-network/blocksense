@@ -6,7 +6,6 @@ use alloy::node_bindings::Anvil;
 use alloy::primitives::Address;
 use alloy::primitives::Bytes;
 use alloy::primitives::Uint;
-use alloy::providers::Provider;
 use alloy::providers::ProviderBuilder;
 use alloy::signers::local::PrivateKeySigner;
 use alloy::sol;

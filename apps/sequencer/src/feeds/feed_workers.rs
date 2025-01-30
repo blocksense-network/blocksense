@@ -11,6 +11,7 @@ use config::SequencerConfig;
 use data_feeds::feeds_processing::VotedFeedUpdate;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use futures_util::stream::FuturesUnordered;
+use gnosis_safe::utils::SignatureWithAddress;
 use std::io::Error;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::UnboundedReceiver;
@@ -28,7 +29,7 @@ pub async fn prepare_app_workers(
     aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdate>,
     feeds_management_cmd_to_block_creator_recv: UnboundedReceiver<FeedsManagementCmds>,
     feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
-    aggregate_batch_sig_recv: UnboundedReceiver<ReporterResponse>,
+    aggregate_batch_sig_recv: UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
 

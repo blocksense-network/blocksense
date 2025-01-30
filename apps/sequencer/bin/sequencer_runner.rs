@@ -1,5 +1,6 @@
 use actix_web::{web, App, HttpServer};
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
+use gnosis_safe::utils::SignatureWithAddress;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
 use sequencer::ReporterResponse;
@@ -43,7 +44,7 @@ pub async fn prepare_sequencer_state(
     UnboundedReceiver<VotedFeedUpdate>, // aggregated_votes_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
-    UnboundedReceiver<ReporterResponse>, // aggregate_batch_sig_recv
+    UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
     Data<SequencerState>,
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();

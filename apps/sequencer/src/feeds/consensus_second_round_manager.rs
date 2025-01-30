@@ -1,3 +1,4 @@
+use gnosis_safe::utils::SignatureWithAddress;
 use std::collections::{HashMap, VecDeque};
 use tracing::{debug, error, warn};
 
@@ -12,7 +13,7 @@ struct InProcessBatchKey {
 #[derive(Clone, Debug)]
 struct CallDataWithSignatures {
     calldata: String,
-    signatures: HashMap<u64, String>, //TODO: convert String to SignatureWithAddress!
+    signatures: HashMap<u64, SignatureWithAddress>,
 }
 
 pub struct AggregationBatchConsensus {
@@ -59,14 +60,13 @@ impl AggregationBatchConsensus {
         );
     }
 
-    pub fn insert_reporter_sig(&mut self, response: &ReporterResponse) {
+    pub fn insert_reporter_sig(&mut self, response: &ReporterResponse, sig: SignatureWithAddress) {
         let batch = self.in_progress_batches.get_mut(&InProcessBatchKey {
             block_height: response.block_height,
             network: response.network.clone(),
         });
         if let Some(val) = batch {
-            val.signatures
-                .insert(response.reporter_id, response.signature.clone());
+            val.signatures.insert(response.reporter_id, sig);
         } else {
             error!("Aggregated batch associated to key: {response:?} does not exist!");
         }

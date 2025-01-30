@@ -14,6 +14,7 @@ use data_feeds::feeds_processing::VotedFeedUpdate;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::new_feeds_meta_data_reg_from_config;
 use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
+use gnosis_safe::utils::SignatureWithAddress;
 use prometheus::metrics::FeedsMetrics;
 use rdkafka::producer::FutureProducer;
 use rdkafka::ClientConfig;
@@ -42,7 +43,7 @@ pub struct SequencerState {
     pub kafka_endpoint: Option<FutureProducer>,
     pub provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
     pub batches_awaiting_consensus: Arc<RwLock<AggregationBatchConsensus>>,
-    pub aggregate_batch_sig_send: UnboundedSender<ReporterResponse>,
+    pub aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }
 
@@ -58,7 +59,7 @@ impl SequencerState {
         aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdate>,
         feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
-        aggregate_batch_sig_send: UnboundedSender<ReporterResponse>,
+        aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
     ) -> SequencerState {
         let provider_status: HashMap<String, ProviderStatus> = sequencer_config
             .providers

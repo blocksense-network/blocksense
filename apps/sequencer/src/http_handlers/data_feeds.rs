@@ -3,6 +3,7 @@ use alloy_primitives::PrimitiveSignature;
 use chrono::{TimeZone, Utc};
 use crypto::PublicKey;
 use eyre::Result;
+use gnosis_safe::utils::SignatureWithAddress;
 use std::str::FromStr;
 use std::sync::Arc;
 use utils::time::current_unix_time;
@@ -359,7 +360,7 @@ pub async fn post_aggregated_consensus_vote(
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
     let reporter_response: ReporterResponse = serde_json::from_value(v)?;
 
-    {
+    let (signature, signer_address) = {
         let reporter_id = reporter_response.reporter_id;
         let reporters = sequencer_state.reporters.read().await;
         let reporter = reporters.get(&reporter_id).cloned();
@@ -377,12 +378,14 @@ pub async fn post_aggregated_consensus_vote(
             }
         };
 
-        let reporter_address = reporter.read().await.address;
+        let signer_address = reporter.read().await.address;
         // let recovered_address = signature.recover_address_from_prehash(&tx_hash).unwrap();
         // if reporter_address != recovered_address {
         //     return Ok(HttpResponse::BadRequest().body(format!("Signature check failure!")));
         // }
-    }
+
+        (signature, signer_address)
+    };
 
     if sequencer_state
         .batches_awaiting_consensus
@@ -393,10 +396,13 @@ pub async fn post_aggregated_consensus_vote(
             reporter_response.network.as_str(),
         )
     {
-        match sequencer_state
-            .aggregate_batch_sig_send
-            .send(reporter_response)
-        {
+        match sequencer_state.aggregate_batch_sig_send.send((
+            reporter_response,
+            SignatureWithAddress {
+                signature,
+                signer_address,
+            },
+        )) {
             Ok(_) => Ok(HttpResponse::Ok().into()),
             Err(e) => Ok(HttpResponse::BadRequest().body(format!(
                 "Error forwarding reporter aggregated consensus vote {e}"

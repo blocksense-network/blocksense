@@ -1,6 +1,7 @@
 use actix_web::web::Data;
 use config::BlockConfig;
 use feed_registry::{registry::SlotTimeTracker, types::Repeatability};
+use gnosis_safe::utils::SignatureWithAddress;
 use tokio::select;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::trace;
@@ -12,7 +13,7 @@ use std::{io::Error, time::Duration};
 pub async fn aggregation_batch_consensus_loop(
     sequencer_state: Data<SequencerState>,
     block_config: BlockConfig,
-    mut aggregate_batch_sig_recv: UnboundedReceiver<ReporterResponse>,
+    mut aggregate_batch_sig_recv: UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("aggregation_batch_consensus_loop")
@@ -43,13 +44,13 @@ pub async fn aggregation_batch_consensus_loop(
                         batches_awaiting_consensus
                             .clear_batches_older_than(latest_block_height as u64, timeout_period_blocks);
                     }
-                    Some(signed_aggregate) = aggregate_batch_sig_recv.recv() => {
+                    Some((signed_aggregate, signature_with_address)) = aggregate_batch_sig_recv.recv() => {
 
                         let mut batches_awaiting_consensus = sequencer_state
                             .batches_awaiting_consensus
                             .write()
                             .await;
-                        batches_awaiting_consensus.insert_reporter_sig(&signed_aggregate);
+                        batches_awaiting_consensus.insert_reporter_sig(&signed_aggregate, signature_with_address);
 
                         //TODO: check if a quorum is reached, process the signatures and trigger send to contract
                     }
