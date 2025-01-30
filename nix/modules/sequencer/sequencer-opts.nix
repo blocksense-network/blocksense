@@ -205,7 +205,7 @@ in
     default = { };
     description = mdDoc "URL to Apache Kafka server that facilitates decentralized communication.";
     example = {
-      "url" = "localhost:9092";
+      "url" = "127.0.0.1:9092";
     };
   };
 

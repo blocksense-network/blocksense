@@ -1,9 +1,14 @@
-{ self, config, ... }:
+{
+  self,
+  config,
+  ...
+}:
 {
   imports = [
     ./js.nix
     ./rust.nix
     ./anvil.nix
+    ./kafka.nix
 
     self.nixosModules.blocksense-process-compose
     ../../test-environments/example-setup-01.nix
