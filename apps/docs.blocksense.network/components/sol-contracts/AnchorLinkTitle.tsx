@@ -1,10 +1,11 @@
-import React, { createElement } from 'react';
+import { createElement, HTMLAttributes } from 'react';
 
 type AnchorLinkTitleProps = {
   title?: string;
   parentTitle?: string;
   titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   accordion?: boolean;
+  pagefindIgnore?: boolean;
 };
 
 const titleStyles = {
@@ -26,23 +27,28 @@ export const AnchorLinkTitle = ({
   parentTitle,
   titleLevel,
   accordion,
+  pagefindIgnore = false,
 }: AnchorLinkTitleProps) => {
-  return (
-    titleLevel &&
-    createElement(
-      `h${titleLevel}`,
-      {
-        className: `${titleStyles[titleLevel]} ${accordion ? accordionStyles : ''} nx-font-semibold nx-text-slate-900 dark:nx-text-slate-100 ${accordion ? '' : borderStyles}`,
-      },
-      <>
-        {title}
-        <a
-          href={`#${parentTitle ? `${parentTitle}-` : ''}${title}`}
-          id={`${parentTitle ? `${parentTitle}-` : ''}${title}`}
-          className="subheading-anchor"
-          aria-label="Permalink for this section"
-        ></a>
-      </>,
-    )
+  if (!titleLevel) {
+    return null;
+  }
+
+  const elementAttributes: HTMLAttributes<HTMLHeadingElement> = {
+    className: `${titleStyles[titleLevel]} ${accordion ? accordionStyles : ''} nx-font-semibold nx-text-slate-900 dark:nx-text-slate-100 ${accordion ? '' : borderStyles}`,
+    ...(pagefindIgnore && { 'data-pagefind-ignore': true }),
+  };
+
+  return createElement(
+    `h${titleLevel}`,
+    elementAttributes,
+    <>
+      {title}
+      <a
+        href={`#${parentTitle ? `${parentTitle}-` : ''}${title}`}
+        id={`${parentTitle ? `${parentTitle}-` : ''}${title}`}
+        className="subheading-anchor"
+        aria-label="Permalink for this section"
+      ></a>
+    </>,
   );
 };

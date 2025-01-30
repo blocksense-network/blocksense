@@ -24,6 +24,7 @@ export const ContractItemWrapper = ({
           title={title}
           parentTitle={parentTitle}
           titleLevel={titleLevel}
+          pagefindIgnore
         />
         <div className="contract-item-wrapper__content">{children}</div>
       </div>
