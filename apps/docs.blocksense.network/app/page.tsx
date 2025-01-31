@@ -5,7 +5,7 @@ import { gettingStartedConfig } from '@/config';
 import { LinkButton } from '@/components/common/LinkButton';
 
 export const metadata: Metadata = {
-  title: 'Blocksense | Home',
+  title: 'Home',
 };
 
 const IndexPage: FC = () => {

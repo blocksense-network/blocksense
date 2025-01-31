@@ -21,7 +21,7 @@ export default {
   },
   useNextSeoProps() {
     return {
-      titleTemplate: 'Blocksense | %s',
+      titleTemplate: '%s',
     };
   },
   head: (

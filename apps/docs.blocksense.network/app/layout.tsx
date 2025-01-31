@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
   title: {
     absolute: '',
-    template: 'Blocksense | %s ',
+    template: '%s',
   },
   icons: {
     icon: [
