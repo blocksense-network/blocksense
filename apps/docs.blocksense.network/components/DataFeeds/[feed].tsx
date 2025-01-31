@@ -1,10 +1,7 @@
 import React from 'react';
 import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
 import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/data-feeds-config-generator/evm_contracts_deployment_v1';
-import {
-  decodeFeedsConfig,
-  Feed,
-} from '@blocksense/config-types/data-feeds-config';
+import { decodeFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import {
   CLAggregatorAdapterData,
   decodeDeploymentConfig,
