@@ -4,6 +4,7 @@ mod coinbase;
 mod common;
 mod kraken;
 mod kucoin;
+mod mexc;
 
 use anyhow::{bail, Context, Result};
 // use async_trait::async_trait;
@@ -22,6 +23,7 @@ use bybit::get_bybit_prices;
 use coinbase::get_coinbase_prices;
 use kraken::get_kraken_prices;
 use kucoin::get_kucoin_prices;
+use mexc::get_mexc_prices;
 
 //TODO(adikov): Refacotr:
 //1. Move all specific exchange logic to separate files.
@@ -122,6 +124,9 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     print_results(&resources, &results);
 
     get_kucoin_prices(&resources, &mut results).await?;
+    print_results(&resources, &results);
+
+    get_mexc_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
 
     //TODO(adikov): Write the logic for transforming the data to DataFeedResult
