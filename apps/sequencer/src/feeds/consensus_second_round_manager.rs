@@ -1,4 +1,4 @@
-use gnosis_safe::utils::SignatureWithAddress;
+use gnosis_safe::utils::{SafeTx, SignatureWithAddress};
 use std::collections::{HashMap, VecDeque};
 use tracing::{debug, error, warn};
 
@@ -13,7 +13,7 @@ pub struct InProcessBatchKey {
 #[derive(Clone, Debug)]
 pub struct CallDataWithSignatures {
     pub tx_hash: String,
-    pub calldata: String,
+    pub safe_tx: SafeTx,
     pub signatures: HashMap<u64, SignatureWithAddress>,
 }
 
@@ -43,7 +43,11 @@ impl AggregationBatchConsensus {
             .cloned()
     }
 
-    pub fn insert_new_in_process_batch(&mut self, batch: &ConsensusSecondRoundBatch) {
+    pub fn insert_new_in_process_batch(
+        &mut self,
+        batch: &ConsensusSecondRoundBatch,
+        safe_transaction: SafeTx,
+    ) {
         let key = InProcessBatchKey {
             block_height: batch.block_height,
             network: batch.network.clone(),
@@ -62,7 +66,7 @@ impl AggregationBatchConsensus {
             key,
             CallDataWithSignatures {
                 tx_hash: batch.tx_hash.clone(),
-                calldata: batch.calldata.clone(),
+                safe_tx: safe_transaction,
                 signatures: HashMap::new(),
             },
         );

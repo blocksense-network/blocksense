@@ -112,6 +112,11 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             } else {
                 info!("Network `{net}` is enabled; initiating second round consensus");
             }
+            // TODO: uncomment when we start using ADFS contracts
+            // if provider_settings.contract_version < 2 {
+            //     info!("Network `{net}` uses legacy contracts; skipping second round consensus");
+            //     continue;
+            // }
             debug!("About to release a read lock on sequencer_config for `{net}` [default]");
             provider_settings
         };
@@ -149,7 +154,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             continue;
         }
 
-        let (contract_address, safe_address, nonce, chain_id, tx_hash) = {
+        let (contract_address, safe_address, nonce, chain_id, tx_hash, safe_transaction) = {
             let provider = p.lock().await;
 
             let contract_address = provider.contract_address.unwrap_or(Address::default());
@@ -182,10 +187,20 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 }
             };
 
-            let tx_hash =
-                generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction);
+            let tx_hash = generate_transaction_hash(
+                safe_address,
+                U256::from(chain_id),
+                safe_transaction.clone(),
+            );
 
-            (contract_address, safe_address, nonce, chain_id, tx_hash)
+            (
+                contract_address,
+                safe_address,
+                nonce,
+                chain_id,
+                tx_hash,
+                safe_transaction,
+            )
         };
 
         let updates_to_kafka = ConsensusSecondRoundBatch {
@@ -222,7 +237,8 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 );
                 let mut batches_awaiting_consensus =
                     sequencer_state.batches_awaiting_consensus.write().await;
-                batches_awaiting_consensus.insert_new_in_process_batch(&updates_to_kafka);
+                batches_awaiting_consensus
+                    .insert_new_in_process_batch(&updates_to_kafka, safe_transaction);
             }
             Err(e) => {
                 error!("Failed to send batch of aggregated feed values for network: {net}, block height: {block_height} to kafka endpoint! {e:?}")
