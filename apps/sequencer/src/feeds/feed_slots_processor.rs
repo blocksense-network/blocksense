@@ -149,6 +149,8 @@ impl FeedSlotsProcessor {
                             feed_id,
                             skip_publish_if_less_then_percentage,
                             always_publish_heartbeat_ms,
+                            peg_to_value: None,
+                            peg_tolerance_percentage: 0.0f64,
                         };
                         let update = VotedFeedUpdate {
                             feed_id,

@@ -17,6 +17,7 @@ use reqwest::{Client, Url};
 
 use config::{PublishCriteria, SequencerConfig};
 use feed_registry::registry::FeedAggregateHistory;
+use feed_registry::types::FeedType;
 use prometheus::metrics::ProviderMetrics;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -265,6 +266,26 @@ impl RpcProvider {
             .cloned()
             .collect::<Vec<VotedFeedUpdate>>();
         updates.updates = mem::take(&mut res);
+    }
+
+    pub fn peg_stable_coins_to_value(&self, updates: &mut UpdateToSend) {
+        for u in updates.updates.iter_mut() {
+            if let FeedType::Numerical(value) = u.value {
+                if let Some(criteria) = self
+                    .publishing_criteria
+                    .get(&u.feed_id)
+                    .filter(|criteria| criteria.should_peg(value))
+                {
+                    Self::peg_value(criteria, &mut u.value);
+                }
+            }
+        }
+    }
+
+    pub fn peg_value(criteria: &PublishCriteria, value: &mut FeedType) {
+        if let Some(peg_value) = criteria.peg_to_value {
+            *value = FeedType::Numerical(peg_value);
+        }
     }
 }
 // pub fn print_type<T>(_: &T) {

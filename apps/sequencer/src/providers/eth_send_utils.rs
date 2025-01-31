@@ -153,6 +153,7 @@ pub async fn get_serialized_updates_for_network(
 ) -> Result<String> {
     let provider = provider.lock().await;
     filter_allowed_feeds(net, updates, &provider_settings.allow_feeds);
+    provider.peg_stable_coins_to_value(updates);
     provider.apply_publish_criteria(updates);
 
     // Don’t post to Smart Contract if we have 0 updates
@@ -554,8 +555,8 @@ mod tests {
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
-    use config::AllFeedsConfig;
     use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
+    use config::{AllFeedsConfig, PublishCriteria};
     use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
@@ -878,6 +879,7 @@ mod tests {
         let updates: Vec<VotedFeedUpdate> = vec![v1, v2];
         updates
     }
+
     #[test]
     fn compute_keys_vals_filters_updates_for_networks_on_the_list() {
         let selector = "0x1a2d80ac";
@@ -960,5 +962,135 @@ mod tests {
             serialized_updates,
             format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
         );
+    }
+
+    fn peg_stable_coin_updates_data() -> UpdateToSend {
+        let end_slot_timestamp = 0_u128;
+        let v1 = VotedFeedUpdate {
+            feed_id: 0x1F_u32,
+            value: FeedType::Text("hi".to_string()),
+            end_slot_timestamp,
+        };
+        let v2 = VotedFeedUpdate {
+            feed_id: 0x0FFF,
+            value: FeedType::Text("bye".to_string()),
+            end_slot_timestamp,
+        };
+        let v3 = VotedFeedUpdate {
+            feed_id: 0x001_u32,
+            value: FeedType::Numerical(1.001f64),
+            end_slot_timestamp,
+        };
+
+        let v4 = VotedFeedUpdate {
+            feed_id: 0x001_u32,
+            value: FeedType::Numerical(1.101f64),
+            end_slot_timestamp,
+        };
+        let v5 = VotedFeedUpdate {
+            feed_id: 0x001_u32,
+            value: FeedType::Numerical(0.991f64),
+            end_slot_timestamp,
+        };
+
+        UpdateToSend {
+            block_height: 1,
+            updates: vec![v1, v2, v3, v4, v5],
+        }
+    }
+
+    #[actix_web::test]
+    async fn peg_stable_coin_updates() {
+        let network = "ETH";
+        let url = "http://localhost:8545";
+        let key_path = get_test_private_key_path();
+
+        let mut sequencer_config =
+            get_test_config_with_single_provider(network, key_path.as_path(), &url);
+
+        sequencer_config
+            .providers
+            .entry(network.to_string())
+            .and_modify(|p| {
+                let c = PublishCriteria {
+                    feed_id: 1_u32,
+                    skip_publish_if_less_then_percentage: 0.3f64,
+                    always_publish_heartbeat_ms: None,
+                    peg_to_value: Some(1f64),
+                    peg_tolerance_percentage: 1.0f64,
+                };
+                p.publishing_criteria.push(c);
+            });
+
+        let providers =
+            init_shared_rpc_providers(&sequencer_config, Some(&"peg_stable_coin_updates_")).await;
+        let mut prov2 = providers.write().await;
+        let mut provider = prov2.get_mut(network).unwrap().lock().await;
+
+        provider.update_history(&vec![VotedFeedUpdate {
+            feed_id: 0x001_u32,
+            value: FeedType::Numerical(1.0f64),
+            end_slot_timestamp: 0_u128,
+        }]);
+
+        let mut updates = peg_stable_coin_updates_data();
+        assert_eq!(updates.updates[2].value, FeedType::Numerical(1.001f64));
+        provider.peg_stable_coins_to_value(&mut updates);
+        assert_eq!(updates.updates.len(), 5);
+        assert_eq!(updates.updates[2].value, FeedType::Numerical(1.0f64));
+        assert_eq!(updates.updates[3].value, FeedType::Numerical(1.101f64));
+        assert_eq!(updates.updates[4].value, FeedType::Numerical(1.0f64));
+
+        provider.apply_publish_criteria(&mut updates);
+        assert_eq!(updates.updates.len(), 3);
+        assert_eq!(updates.updates[2].value, FeedType::Numerical(1.101f64));
+    }
+
+    #[actix_web::test]
+    async fn peg_stable_coin_updates_disabled() {
+        let network = "ETH";
+        let url = "http://localhost:8545";
+        let key_path = get_test_private_key_path();
+
+        let mut sequencer_config =
+            get_test_config_with_single_provider(network, key_path.as_path(), &url);
+
+        sequencer_config
+            .providers
+            .entry(network.to_string())
+            .and_modify(|p| {
+                let c = PublishCriteria {
+                    feed_id: 1_u32,
+                    skip_publish_if_less_then_percentage: 0.0f64,
+                    always_publish_heartbeat_ms: None,
+                    peg_to_value: None,
+                    peg_tolerance_percentage: 100.0f64,
+                };
+                p.publishing_criteria.push(c);
+            });
+
+        let providers =
+            init_shared_rpc_providers(&sequencer_config, Some(&"peg_stable_coin_updates_disabled"))
+                .await;
+        let mut prov2 = providers.write().await;
+        let mut provider = prov2.get_mut(network).unwrap().lock().await;
+
+        provider.update_history(&vec![VotedFeedUpdate {
+            feed_id: 0x001_u32,
+            value: FeedType::Numerical(1.0f64),
+            end_slot_timestamp: 0_u128,
+        }]);
+
+        let mut updates = peg_stable_coin_updates_data();
+        assert_eq!(updates.updates[2].value, FeedType::Numerical(1.001f64));
+        provider.peg_stable_coins_to_value(&mut updates);
+        assert_eq!(updates.updates.len(), 5);
+        assert_eq!(updates.updates[2].value, FeedType::Numerical(1.001f64));
+        assert_eq!(updates.updates[3].value, FeedType::Numerical(1.101f64));
+        assert_eq!(updates.updates[4].value, FeedType::Numerical(0.991f64));
+
+        provider.apply_publish_criteria(&mut updates);
+        assert_eq!(updates.updates.len(), 5);
+        assert_eq!(updates.updates[3].value, FeedType::Numerical(1.101f64));
     }
 }

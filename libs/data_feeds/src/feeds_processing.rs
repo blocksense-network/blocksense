@@ -159,18 +159,24 @@ mod tests {
             feed_id,
             skip_publish_if_less_then_percentage: 0.0f64,
             always_publish_heartbeat_ms: None,
+            peg_to_value: None,
+            peg_tolerance_percentage: 0.0f64,
         };
 
         let one_percent_threshold = PublishCriteria {
             feed_id,
             skip_publish_if_less_then_percentage: 1.0f64,
             always_publish_heartbeat_ms: None,
+            peg_to_value: None,
+            peg_tolerance_percentage: 0.0f64,
         };
 
         let always_publish_every_second = PublishCriteria {
             feed_id,
             skip_publish_if_less_then_percentage: 1000.0f64,
             always_publish_heartbeat_ms: Some(1000_u128),
+            peg_to_value: None,
+            peg_tolerance_percentage: 0.0f64,
         };
 
         // No history

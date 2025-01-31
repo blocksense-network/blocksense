@@ -187,6 +187,20 @@ pub struct PublishCriteria {
     pub skip_publish_if_less_then_percentage: f64,
 
     pub always_publish_heartbeat_ms: Option<u128>,
+    #[serde(default)]
+    pub peg_to_value: Option<f64>,
+    #[serde(default)]
+    pub peg_tolerance_percentage: f64,
+}
+
+impl PublishCriteria {
+    pub fn should_peg(&self, value: f64) -> bool {
+        self.peg_to_value.is_some_and(|peg_value| {
+            let tolerance = peg_value * self.peg_tolerance_percentage * 0.01f64;
+            let peg_range = (peg_value - tolerance)..(peg_value + tolerance);
+            peg_range.contains(&value)
+        })
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -490,7 +504,7 @@ mod tests {
 
     #[test]
     fn parsing_provider_config_with_publish_criteria() {
-        let provider_a: Provider = serde_json::from_str(r#"
+        let p: Provider = serde_json::from_str(r#"
             {
             "private_key_path": "/tmp/priv_key_test",
             "url": "http://127.0.0.1:8546",
@@ -517,71 +531,118 @@ mod tests {
                 },
                 {
                     "feed_id": 2
+                },
+                {
+                    "feed_id": 22,
+                    "peg_to_value": 1.995
+                },
+                {
+                    "feed_id": 23,
+                    "peg_to_value": 1.00,
+                    "peg_tolerance_percentage": 1.3
+                },
+                {
+                    "feed_id": 24,
+                    "peg_tolerance_percentage": 4.3
+                },
+                {
+                    "feed_id": 25,
+                    "skip_publish_if_less_then_percentage": 1.32,
+                    "always_publish_heartbeat_ms": 45000,
+                    "peg_to_value": 5.00,
+                    "peg_tolerance_percentage": 1.3
                 }
             ]
             }"#).unwrap();
-        assert_eq!(provider_a.is_enabled, true);
-        assert_eq!(provider_a.event_contract_address, None);
-        assert_eq!(&provider_a.private_key_path, "/tmp/priv_key_test");
-        assert_eq!(&provider_a.url, "http://127.0.0.1:8546");
-        assert_eq!(provider_a.transaction_drop_timeout_secs, 42_u32);
-        assert_eq!(provider_a.transaction_retry_timeout_secs, 20_u32);
-        assert_eq!(provider_a.retry_fee_increment_fraction, 0.1f64);
-        assert_eq!(provider_a.transaction_gas_limit, 7500000_u32);
+        assert_eq!(p.is_enabled, true);
+        assert_eq!(p.event_contract_address, None);
+        assert_eq!(&p.private_key_path, "/tmp/priv_key_test");
+        assert_eq!(&p.url, "http://127.0.0.1:8546");
+        assert_eq!(p.transaction_drop_timeout_secs, 42_u32);
+        assert_eq!(p.transaction_retry_timeout_secs, 20_u32);
+        assert_eq!(p.retry_fee_increment_fraction, 0.1f64);
+        assert_eq!(p.transaction_gas_limit, 7500000_u32);
         assert_eq!(
-            provider_a.contract_address,
+            p.contract_address,
             Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string())
         );
         assert_eq!(
-            provider_a.data_feed_store_byte_code,
+            p.data_feed_store_byte_code,
             Some(test_data_feed_store_byte_code())
         );
         assert_eq!(
-            provider_a.data_feed_sports_byte_code,
+            p.data_feed_sports_byte_code,
             Some(test_data_feed_sports_byte_code())
         );
-        assert_eq!(provider_a.allow_feeds, None);
-        assert_eq!(provider_a.publishing_criteria.len(), 4);
-        assert_eq!(provider_a.impersonated_anvil_account, None);
+        assert_eq!(p.allow_feeds, None);
+        assert_eq!(p.publishing_criteria.len(), 8);
+        assert_eq!(p.impersonated_anvil_account, None);
 
-        assert_eq!(provider_a.publishing_criteria[0].feed_id, 13);
-        assert_eq!(
-            provider_a.publishing_criteria[0].skip_publish_if_less_then_percentage,
-            13.2f64
-        );
-        assert_eq!(
-            provider_a.publishing_criteria[0].always_publish_heartbeat_ms,
-            Some(50_000)
-        );
+        {
+            let c = &p.publishing_criteria[0];
+            assert_eq!(c.feed_id, 13);
+            assert_eq!(c.skip_publish_if_less_then_percentage, 13.2f64);
+            assert_eq!(c.always_publish_heartbeat_ms, Some(50_000));
+            assert_eq!(p.publishing_criteria[0].peg_to_value, None);
+            assert_eq!(p.publishing_criteria[0].peg_tolerance_percentage, 0.0f64);
+        }
 
-        assert_eq!(provider_a.publishing_criteria[1].feed_id, 15);
-        assert_eq!(
-            provider_a.publishing_criteria[1].skip_publish_if_less_then_percentage,
-            2.2f64
-        );
-        assert_eq!(
-            provider_a.publishing_criteria[1].always_publish_heartbeat_ms,
-            None
-        );
+        {
+            let c = &p.publishing_criteria[1];
+            assert_eq!(c.feed_id, 15);
+            assert_eq!(c.skip_publish_if_less_then_percentage, 2.2f64);
+            assert_eq!(c.always_publish_heartbeat_ms, None);
+            assert_eq!(c.peg_to_value, None);
+            assert_eq!(c.peg_tolerance_percentage, 0.0f64);
+        }
+        {
+            let c = &p.publishing_criteria[2];
+            assert_eq!(c.feed_id, 8);
+            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.always_publish_heartbeat_ms, Some(12_345));
+            assert_eq!(c.peg_to_value, None);
+            assert_eq!(c.peg_tolerance_percentage, 0.0f64);
+        }
+        {
+            let c = &p.publishing_criteria[3];
+            assert_eq!(c.feed_id, 2);
+            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.always_publish_heartbeat_ms, None);
+            assert_eq!(c.peg_to_value, None);
+            assert_eq!(c.peg_tolerance_percentage, 0.0f64);
+        }
+        {
+            let c = &p.publishing_criteria[4];
+            assert_eq!(c.feed_id, 22);
+            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.always_publish_heartbeat_ms, None);
+            assert_eq!(c.peg_to_value, Some(1.995f64));
+            assert_eq!(c.peg_tolerance_percentage, 0.0f64);
+        }
+        {
+            let c = &p.publishing_criteria[5];
+            assert_eq!(c.feed_id, 23);
+            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.always_publish_heartbeat_ms, None);
+            assert_eq!(c.peg_to_value, Some(1.0f64));
+            assert_eq!(c.peg_tolerance_percentage, 1.3f64);
+        }
+        {
+            let c = &p.publishing_criteria[6];
+            assert_eq!(c.feed_id, 24);
+            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.always_publish_heartbeat_ms, None);
+            assert_eq!(c.peg_to_value, None);
+            assert_eq!(c.peg_tolerance_percentage, 4.3f64);
+        }
 
-        assert_eq!(provider_a.publishing_criteria[2].feed_id, 8);
-        assert_eq!(
-            provider_a.publishing_criteria[2].skip_publish_if_less_then_percentage,
-            0.0f64
-        );
-        assert_eq!(
-            provider_a.publishing_criteria[2].always_publish_heartbeat_ms,
-            Some(12_345)
-        );
-
-        assert_eq!(provider_a.publishing_criteria[3].feed_id, 2);
-        assert_eq!(
-            provider_a.publishing_criteria[3].skip_publish_if_less_then_percentage,
-            0.0f64
-        );
-        assert_eq!(
-            provider_a.publishing_criteria[3].always_publish_heartbeat_ms,
-            None
-        );
+        {
+            let c = &p.publishing_criteria[7];
+            assert_eq!(c.feed_id, 25);
+            assert_eq!(c.skip_publish_if_less_then_percentage, 1.32f64);
+            assert_eq!(c.always_publish_heartbeat_ms, Some(45_000));
+            assert_eq!(c.peg_to_value, Some(5.0f64));
+            assert_eq!(c.peg_tolerance_percentage, 1.3f64);
+        }
     }
 }

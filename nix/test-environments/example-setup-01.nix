@@ -83,8 +83,22 @@ in
             }
             {
               feed_id = 47;
-              skip_publish_if_less_then_percentage = 0.01;
+              skip_publish_if_less_then_percentage = 0.1;
               always_publish_heartbeat_ms = 360000;
+            }
+            {
+              feed_id = 131;
+              skip_publish_if_less_then_percentage = 0.1;
+              always_publish_heartbeat_ms = 360000;
+              peg_to_value = 1.00;
+              peg_tolerance_percentage = 0.2;
+            }
+            {
+              feed_id = 236;
+              skip_publish_if_less_then_percentage = 0.5;
+              always_publish_heartbeat_ms = 360000;
+              peg_to_value = 1.00;
+              peg_tolerance_percentage = 0.1;
             }
           ];
           impersonated_anvil_account = impersonationAddress;
