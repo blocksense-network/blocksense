@@ -1,5 +1,5 @@
 use actix_web::http::StatusCode;
-use alloy_primitives::PrimitiveSignature;
+use alloy_primitives::{FixedBytes, PrimitiveSignature};
 use chrono::{TimeZone, Utc};
 use crypto::PublicKey;
 use eyre::Result;
@@ -379,41 +379,58 @@ pub async fn post_aggregated_consensus_vote(
         };
 
         let signer_address = reporter.read().await.address;
-        // let recovered_address = signature.recover_address_from_prehash(&tx_hash).unwrap();
-        // if reporter_address != recovered_address {
-        //     return Ok(HttpResponse::BadRequest().body(format!("Signature check failure!")));
-        // }
+        let call_data_with_signatures = sequencer_state
+            .batches_awaiting_consensus
+            .read()
+            .await
+            .get_batch_waiting_signatures(
+                reporter_response.block_height,
+                reporter_response.network.as_str(),
+            );
+
+        let tx_hash_str = match call_data_with_signatures {
+            Some(v) => v.tx_hash,
+            None => {
+                return Ok(HttpResponse::BadRequest().body(format!(
+                    "No calldata waiting for signatires for block height {} and network {}",
+                    reporter_response.block_height,
+                    reporter_response.network.as_str(),
+                )));
+            }
+        };
+        let tx_hash = match FixedBytes::<32>::from_str(tx_hash_str.as_str()) {
+            Ok(v) => v,
+            Err(e) => {
+                return Ok(HttpResponse::BadRequest().body(format!(
+                    "failed to deserialize tx_data for block height {} and network {}: {}",
+                    reporter_response.block_height,
+                    reporter_response.network.as_str(),
+                    e,
+                )));
+            }
+        };
+
+        let recovered_address = signature.recover_address_from_prehash(&tx_hash).unwrap();
+        if signer_address != recovered_address {
+            return Ok(HttpResponse::BadRequest().body(format!(
+                "Signature check failure! Expected signer_address != recovered_address"
+            )));
+        }
 
         (signature, signer_address)
     };
 
-    if sequencer_state
-        .batches_awaiting_consensus
-        .read()
-        .await
-        .batch_is_waiting_signatures(
-            reporter_response.block_height,
-            reporter_response.network.as_str(),
-        )
-    {
-        match sequencer_state.aggregate_batch_sig_send.send((
-            reporter_response,
-            SignatureWithAddress {
-                signature,
-                signer_address,
-            },
-        )) {
-            Ok(_) => Ok(HttpResponse::Ok().into()),
-            Err(e) => Ok(HttpResponse::BadRequest().body(format!(
-                "Error forwarding reporter aggregated consensus vote {e}"
-            ))),
-        }
-    } else {
-        return Ok(HttpResponse::BadRequest().body(format!(
-            "No calldata waiting for signatires for block height {} and network {}",
-            reporter_response.block_height,
-            reporter_response.network.as_str(),
-        )));
+    match sequencer_state.aggregate_batch_sig_send.send((
+        reporter_response,
+        SignatureWithAddress {
+            signature,
+            signer_address,
+        },
+    )) {
+        Ok(_) => Ok(HttpResponse::Ok().into()),
+        Err(e) => Ok(HttpResponse::BadRequest().body(format!(
+            "Error forwarding reporter aggregated consensus vote {e}"
+        ))),
     }
 }
 

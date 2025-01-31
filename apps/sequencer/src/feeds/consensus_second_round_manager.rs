@@ -5,19 +5,20 @@ use tracing::{debug, error, warn};
 use crate::{ConsensusSecondRoundBatch, ReporterResponse};
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
-struct InProcessBatchKey {
+pub struct InProcessBatchKey {
     block_height: u64,
     network: String,
 }
 
 #[derive(Clone, Debug)]
-struct CallDataWithSignatures {
-    calldata: String,
-    signatures: HashMap<u64, SignatureWithAddress>,
+pub struct CallDataWithSignatures {
+    pub tx_hash: String,
+    pub calldata: String,
+    pub signatures: HashMap<u64, SignatureWithAddress>,
 }
 
 pub struct AggregationBatchConsensus {
-    in_progress_batches: HashMap<InProcessBatchKey, CallDataWithSignatures>,
+    pub in_progress_batches: HashMap<InProcessBatchKey, CallDataWithSignatures>,
     backlog_batches: VecDeque<InProcessBatchKey>,
 }
 
@@ -29,11 +30,17 @@ impl AggregationBatchConsensus {
         }
     }
 
-    pub fn batch_is_waiting_signatures(&self, block_height: u64, network: &str) -> bool {
-        self.in_progress_batches.contains_key(&InProcessBatchKey {
-            block_height,
-            network: network.to_string(),
-        })
+    pub fn get_batch_waiting_signatures(
+        &self,
+        block_height: u64,
+        network: &str,
+    ) -> Option<CallDataWithSignatures> {
+        self.in_progress_batches
+            .get(&InProcessBatchKey {
+                block_height,
+                network: network.to_string(),
+            })
+            .cloned()
     }
 
     pub fn insert_new_in_process_batch(&mut self, batch: &ConsensusSecondRoundBatch) {
@@ -54,6 +61,7 @@ impl AggregationBatchConsensus {
         self.in_progress_batches.insert(
             key,
             CallDataWithSignatures {
+                tx_hash: batch.tx_hash.clone(),
                 calldata: batch.calldata.clone(),
                 signatures: HashMap::new(),
             },
