@@ -2,6 +2,7 @@ mod binance;
 mod bybit;
 mod coinbase;
 mod common;
+mod crypto_com_exchange;
 mod kraken;
 mod kucoin;
 mod mexc;
@@ -21,6 +22,7 @@ use crate::common::{ResourceData, ResourceResult};
 use binance::get_binance_prices;
 use bybit::get_bybit_prices;
 use coinbase::get_coinbase_prices;
+use crypto_com_exchange::get_crypto_com_exchange_prices;
 use kraken::get_kraken_prices;
 use kucoin::get_kucoin_prices;
 use mexc::get_mexc_prices;
@@ -127,6 +129,9 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     print_results(&resources, &results);
 
     get_mexc_prices(&resources, &mut results).await?;
+    print_results(&resources, &results);
+
+    get_crypto_com_exchange_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
 
     //TODO(adikov): Write the logic for transforming the data to DataFeedResult
