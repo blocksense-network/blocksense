@@ -823,10 +823,12 @@ pub mod tests {
         cfg.reporters.push(Reporter {
             id: 42,
             pub_key: "ea30b1533ef5638af7b70a036275642fc453ace97ed2c6b9d220fe1f59a24d61f481a777aa8a579f20e95a74cd4567ed36a3".to_string(),
+            address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266".to_string(),
         });
         cfg.reporters.push(Reporter {
             id: 14,
             pub_key: "ea30813e2f8cf968e27bad29167b41bce038a3ce9b7b368de05e5cf1af3de919eeba267b8706f55c356d5f71891eff116b98".to_string(),
+            address: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8".to_string(),
         });
 
         let feeds_config = AllFeedsConfig {

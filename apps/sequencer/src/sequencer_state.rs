@@ -126,7 +126,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
     UnboundedReceiver<VotedFeedUpdate>, // aggregated_votes_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>, // feeds_slots_manager_cmd_recv
-    UnboundedReceiver<ReporterResponse>, // aggregate_batch_sig_recv
+    UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
 ) {
     let log_handle = init_shared_logging_handle("INFO", false);
     let providers = init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix)).await;

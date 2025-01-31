@@ -51,6 +51,7 @@ pub struct RpcProvider {
     pub signer: PrivateKeySigner,
     pub contract_address: Option<Address>,
     pub safe_address: Option<Address>,
+    pub safe_min_quorum: u32,
     pub event_contract_address: Option<Address>,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
     pub transaction_drop_timeout_secs: u32,
@@ -206,6 +207,7 @@ async fn get_rpc_providers(
         let rpc_provider = Arc::new(Mutex::new(RpcProvider {
             contract_address: address,
             safe_address,
+            safe_min_quorum: p.safe_min_quorum,
             event_contract_address: event_address,
             provider,
             signer,

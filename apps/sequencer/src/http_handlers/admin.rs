@@ -806,6 +806,7 @@ mod tests {
                     url,
                     contract_address: None,
                     safe_address: None,
+                    safe_min_quorum: 1,
                     event_contract_address: None,
                     transaction_drop_timeout_secs: 42,
                     transaction_retry_timeout_secs: 20,

@@ -68,16 +68,33 @@ impl AggregationBatchConsensus {
         );
     }
 
-    pub fn insert_reporter_sig(&mut self, response: &ReporterResponse, sig: SignatureWithAddress) {
+    pub fn insert_reporter_signature(
+        &mut self,
+        response: &ReporterResponse,
+        sig: SignatureWithAddress,
+    ) -> usize {
         let batch = self.in_progress_batches.get_mut(&InProcessBatchKey {
             block_height: response.block_height,
             network: response.network.clone(),
         });
         if let Some(val) = batch {
             val.signatures.insert(response.reporter_id, sig);
+            val.signatures.len()
         } else {
             error!("Aggregated batch associated to key: {response:?} does not exist!");
+            0
         }
+    }
+
+    pub fn take_reporters_signatures(
+        &mut self,
+        block_height: u64,
+        network: String,
+    ) -> Option<CallDataWithSignatures> {
+        self.in_progress_batches.remove(&InProcessBatchKey {
+            block_height,
+            network,
+        })
     }
 
     pub fn clear_batches_older_than(
