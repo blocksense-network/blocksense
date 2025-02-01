@@ -19,3 +19,11 @@
 .nextra-filetree {
   @apply shadow-md;
 }
+
+.x\:text-base {
+  @apply text-black;
+}
+
+mark {
+  @apply text-blue-700 font-bold;
+}

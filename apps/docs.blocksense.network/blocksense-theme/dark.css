@@ -67,3 +67,11 @@
 .dark .nextra-sidebar button:hover {
   @apply text-white transition duration-300 ease-in-out;
 }
+
+.dark .x\:text-base {
+  @apply text-white;
+}
+
+.dark mark {
+  @apply text-blue-500 font-bold;
+}
