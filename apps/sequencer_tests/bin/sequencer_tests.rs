@@ -83,8 +83,8 @@ async fn write_file(key_path: &str, content: &[u8]) {
 }
 
 async fn spawn_sequencer(
-    eth_networks_ports: &Vec<i32>,
-    safe_contracts_per_net: &Vec<String>,
+    eth_networks_ports: &[i32],
+    safe_contracts_per_net: &[String],
 ) -> thread::JoinHandle<()> {
     let config_patch = json!(
     {
@@ -332,7 +332,7 @@ async fn main() -> Result<()> {
         // First perform a call only (no tx sent) to get the contract address (it is easier than parsing the logs of the receipt)
         let res = safe_factory_iface
             .createProxyWithNonce(
-                safe_iface.address().clone(),
+                *safe_iface.address(),
                 Bytes::from_hex(encoded.clone()).unwrap(),
                 Uint::from(1500),
             )
@@ -342,7 +342,7 @@ async fn main() -> Result<()> {
         // Then actually send a transaction with the same parameters as above to deploy the contract
         let receipt = safe_factory_iface
             .createProxyWithNonce(
-                safe_iface.address().clone(),
+                *safe_iface.address(),
                 Bytes::from_hex(encoded).unwrap(),
                 Uint::from(1500),
             )
@@ -374,7 +374,7 @@ async fn main() -> Result<()> {
         .await;
     }
 
-    let seq = spawn_sequencer(&PROVIDERS_PORTS.to_vec(), &safe_contracts_per_net).await;
+    let seq = spawn_sequencer(PROVIDERS_PORTS.as_ref(), &safe_contracts_per_net).await;
 
     wait_for_sequencer_to_accept_votes(5 * 60).await;
 

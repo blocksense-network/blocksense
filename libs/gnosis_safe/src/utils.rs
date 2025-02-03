@@ -75,7 +75,7 @@ pub async fn sign_hash(
     owner: &PrivateKeySigner,
     tx_hash: &FixedBytes<32>,
 ) -> anyhow::Result<SignatureWithAddress> {
-    let signature = owner.sign_hash(&tx_hash).await?;
+    let signature = owner.sign_hash(tx_hash).await?;
     let signer_address = owner.address();
     Ok(SignatureWithAddress {
         signature,
@@ -89,7 +89,7 @@ pub fn verify_message_recovery(
     tx_hash: &FixedBytes<32>,
     signer_address: Address,
 ) {
-    let recovered_address = signature.recover_address_from_prehash(&tx_hash).unwrap();
+    let recovered_address = signature.recover_address_from_prehash(tx_hash).unwrap();
     assert_eq!(signer_address, recovered_address);
 }
 
@@ -104,7 +104,7 @@ pub fn create_safe_tx(contract_address: Address, calldata: Bytes, nonce: Uint<25
         baseGas: U256::from(0),
         gasToken: address!("0000000000000000000000000000000000000000"),
         refundReceiver: address!("0000000000000000000000000000000000000000"),
-        nonce: nonce,
+        nonce,
     }
 }
 
@@ -121,13 +121,13 @@ pub fn signature_to_bytes(signature: PrimitiveSignature) -> Vec<u8> {
 }
 
 pub async fn get_signature_bytes(
-    signatures_with_addresses: &mut Vec<SignatureWithAddress>,
+    signatures_with_addresses: &mut [SignatureWithAddress],
 ) -> Vec<u8> {
     // Gnosis safe requires signatures to be sorted by signer address
     signatures_with_addresses.sort_by(|a, b| a.signer_address.cmp(&b.signer_address));
 
     let signature_bytes: Vec<u8> = signatures_with_addresses
-        .into_iter()
+        .iter_mut()
         .flat_map(|entry| signature_to_bytes(entry.signature))
         .collect();
     signature_bytes

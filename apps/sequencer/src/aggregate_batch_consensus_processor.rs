@@ -77,7 +77,7 @@ pub async fn aggregation_batch_consensus_loop(
                         };
                         let mut signatures_with_addresses: Vec<&_> = quorum.signatures.values().collect();
                         signatures_with_addresses.sort_by(|a, b| a.signer_address.cmp(&b.signer_address));
-                        let signature_bytes: Vec<u8> = signatures_with_addresses
+                        let _signature_bytes: Vec<u8> = signatures_with_addresses
                             .into_iter()
                             .flat_map(|entry| signature_to_bytes(entry.signature))
                             .collect();

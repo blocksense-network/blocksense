@@ -368,7 +368,7 @@ pub async fn post_aggregated_consensus_vote(
 
         let Some(reporter) = reporter else {
             warn!("Unknown Reporter sending aggregation batch signature {body:?}!");
-            return Ok(HttpResponse::BadRequest().body(format!("Unknown Reporter")));
+            return Ok(HttpResponse::BadRequest().body("Unknown Reporter".to_string()));
         };
         let signature = match PrimitiveSignature::from_str(reporter_response.signature.as_str()) {
             Ok(r) => r,
@@ -413,7 +413,7 @@ pub async fn post_aggregated_consensus_vote(
         let recovered_address = signature.recover_address_from_prehash(&tx_hash).unwrap();
         if signer_address != recovered_address {
             return Ok(HttpResponse::BadRequest().body(format!(
-                "Signature check failure! Expected signer_address != recovered_address"
+                "Signature check failure! Expected signer_address: {signer_address} != recovered_address: {recovered_address}"
             )));
         }
 
