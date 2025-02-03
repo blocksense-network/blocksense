@@ -41,10 +41,8 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
 
                   {contract.contractKind === 'contract' && (
                     <>
-                      {/* Separator between Kind and Abstract */}
-                      <div className="contract-base-info__separator hidden lg:block w-[1px] bg-gray-900 h-4 mx-4"></div>
+                      <div className="contract-base-info__separator hidden lg:block w-[1px] bg-gray-900 dark:bg-neutral-600 h-4 mx-4"></div>
 
-                      {/* Abstract section */}
                       <div className="contract-base-info__item flex items-center">
                         <ImageWrapper
                           src="/icons/blocksense-abstract.svg"

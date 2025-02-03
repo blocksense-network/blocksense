@@ -1,7 +1,17 @@
 @import 'tailwindcss';
 
-*:focus,
-:focus-visible {
+input:focus,
+textarea:focus,
+select:focus,
+details:focus,
+[tabindex]:focus,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+details:focus-visible,
+[tabindex]:focus-visible {
   border: 1px solid var(--focus-border-color);
   border-radius: 0.5rem;
   outline: none;
@@ -116,4 +126,12 @@ summary:focus-visible {
 .nextra-filetree ul > li button:focus-visible {
   border: 1px solid var(--transparent-color);
   outline: none;
+}
+
+.nextra-sidebar button:focus,
+.nextra-sidebar button:focus-visible {
+  border: 1px solid var(--focus-border-color);
+  border-radius: 0.5rem;
+  outline: none;
+  outline-offset: 0;
 }

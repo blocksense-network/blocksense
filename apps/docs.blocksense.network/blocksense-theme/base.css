@@ -71,6 +71,7 @@ main > h1 {
 
   header span {
     font-family: var(--font-mono-space-bold);
+    font-size: 22px;
   }
 
   @media (max-width: 600px) {

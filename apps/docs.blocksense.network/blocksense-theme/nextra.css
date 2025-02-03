@@ -28,12 +28,20 @@ mark {
   @apply text-blue-700 font-bold;
 }
 
+.nextra-navbar {
+  z-index: 40;
+}
+
 .nextra-navbar-blur {
   border-color: var(--transparent-color);
 }
 
 .nextra-search input {
   @apply bg-white border border-solid border-neutral-200 dark:bg-neutral-900 dark:border-neutral-600;
+}
+
+.nextra-search-results {
+  z-index: 999;
 }
 
 .nextra-search input:focus,

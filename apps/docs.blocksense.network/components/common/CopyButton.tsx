@@ -33,7 +33,7 @@ export const CopyButton = ({
     : null;
 
   return (
-    <aside className={`signature__copy-button ${copyButtonClasses}`}>
+    <aside className={`signature__copy-button z-5 ${copyButtonClasses}`}>
       <Tooltip position={tooltipPosition}>
         <Tooltip.Content>
           <span>{isCopied ? 'Copied' : 'Copy'}</span>
