@@ -10,6 +10,8 @@ use tracing::{error, info, trace};
 use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::sequencer_state::SequencerState;
+use alloy_primitives::{Address, Bytes};
+use gnosis_safe::utils::SafeMultisig;
 use std::{io::Error, time::Duration};
 
 pub async fn aggregation_batch_consensus_loop(
@@ -74,6 +76,9 @@ pub async fn aggregation_batch_consensus_loop(
                             error!("Error getting signatures of a full quorum! net {}, Blocksense block height {}", signed_aggregate.network, signed_aggregate.block_height);
                             continue;
                         };
+
+                        drop(batches_awaiting_consensus);
+
                         let mut signatures_with_addresses: Vec<&_> = quorum.signatures.values().collect();
                         signatures_with_addresses.sort_by(|a, b| a.signer_address.cmp(&b.signer_address));
                         let signature_bytes: Vec<u8> = signatures_with_addresses
@@ -81,6 +86,48 @@ pub async fn aggregation_batch_consensus_loop(
                             .flat_map(|entry| signature_to_bytes(entry.signature))
                             .collect();
                         info!("Generated aggregated signature: {} for network: {} block_height: {}", signature_bytes.encode_hex(), signed_aggregate.network, signed_aggregate.block_height);
+
+                        let net = &signed_aggregate.network;
+                        let providers = sequencer_state.providers.read().await;
+                        let provider = providers.get(net).unwrap().lock().await;
+
+                        let safe_address = provider.safe_address.unwrap_or(Address::default());
+                        let contract = SafeMultisig::new(safe_address, &provider.provider);
+
+                        let nonce = match contract.nonce().call().await {
+                            Ok(n) => n,
+                            Err(e) => {
+                                error!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}!");
+                                continue;
+                            }
+                        };
+
+                        let safe_tx = quorum.safe_tx;
+
+                        if nonce._0 != safe_tx.nonce {
+                            error!("Mismatch nonces!");
+                        } else {
+                            let transaction = contract
+                            .execTransaction(
+                                safe_tx.to,
+                                safe_tx.value,
+                                safe_tx.data,
+                                safe_tx.operation,
+                                safe_tx.safeTxGas,
+                                safe_tx.baseGas,
+                                safe_tx.gasPrice,
+                                safe_tx.gasToken,
+                                safe_tx.refundReceiver,
+                                Bytes::copy_from_slice(&signature_bytes),
+                            )
+                            .send()
+                            .await.unwrap()
+                            .get_receipt()
+                            .await.unwrap();
+
+                            info!("Transaction receipt: {:?}", transaction);
+                        }
+
                     }
                 }
             }
