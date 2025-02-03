@@ -6,10 +6,18 @@ contract AggregatedDataFeedStore {
     use dep::aztec::{macros::{functions::{initializer, public}, storage::storage}};
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
 
-    global MAX_FEEDS_TO_BE_STORED: u32 = 63;
-    global TWO_POW_128: Field = 340282366920938463463374607431768211456; // 2^128
-    global TWO_POW_115: Field = 41538374868278621028243970633760768; // 2^115
-    global TWO_POW_13: Field = 8192; // 2^13
+    /// Max Fields that can be written in storage per Tx are 63.
+    /// Thus we have 59 feeds that are distributed in 4 rounds.
+    /// Each feed metadata has id, length of the data and the actual data => 59 * 3.
+    /// Each round metadata has id and its data => 4 * 2.
+    /// Thus (59 * 3) + (4 * 2) = 185.
+    global MAX_FEEDS_AND_ROUNDS_DATA: u32 = 185;
+    /// 2^128
+    global TWO_POW_128: Field = 340282366920938463463374607431768211456;
+    /// 2^115
+    global TWO_POW_115: Field = 41538374868278621028243970633760768;
+    /// 2^13
+    global TWO_POW_13: Field = 8192;
     global TWO: Field = 2;
 
     #[storage]
@@ -25,21 +33,21 @@ contract AggregatedDataFeedStore {
         storage.owner.initialize(context.msg_sender());
     }
 
-    ///                  [                                    .                                   ]
-    ///                  [  [---------]  [-----------------]  .  [-------------]  [------------]  ]
-    /// feed_input_data: [  | Feed id |  | the feed's data |  .  | Round index |  | Round data |  ]
-    ///                  [  [---------]  [-----------------]  .  [-------------]  [------------]  ]
-    ///                  [                                    .                                   ]
-    ///                                 ^                                        ^
-    ///                                 |                                        |
-    ///                       Repeats for every feed                        Round Table
+    ///                  [                                                         .                                   ]
+    ///                  [  [---------]  [-----------------]  [-----------------]  .  [-------------]  [------------]  ]
+    /// feed_input_data: [  | Feed id |  | the feed's data |  | the feed's data |  .  | Round index |  | Round data |  ]
+    ///                  [  [---------]  [-----------------]  [-----------------]  .  [-------------]  [------------]  ]
+    ///                  [                                                         .                                   ]
+    ///                                      ^                  ^                                     ^
+    ///                                      |                  |                                     |
+    ///                                     Repeats for every feed                               Round Table
     ///
     #[public]
     fn set_feeds(
-        feed_input_data: [Field; MAX_FEEDS_TO_BE_STORED],
-        block_number: Field,
+        feed_input_data: [Field; MAX_FEEDS_AND_ROUNDS_DATA],
         feeds_len: Field,
-        rounds_len: Field
+        rounds_len: Field,
+        block_number: Field,
     ) {
         // TODO: Implement access control
 
