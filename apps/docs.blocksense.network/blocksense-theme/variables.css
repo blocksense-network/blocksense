@@ -19,6 +19,7 @@
   --font-extra-bold: 'Noto Sans Extra Bold', sans-serif;
   --font-black: 'Noto Sans Black', sans-serif;
   --font-mono: 'Fira Code', monospace;
+  --font-mono-space-bold: 'Space Mono Bold', monospace;
 
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;

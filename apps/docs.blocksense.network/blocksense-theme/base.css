@@ -65,9 +65,12 @@ main > h1 {
     @apply mt-2;
   }
 
-  header span,
   footer span {
     @apply font-bold;
+  }
+
+  header span {
+    font-family: var(--font-mono-space-bold);
   }
 
   @media (max-width: 600px) {

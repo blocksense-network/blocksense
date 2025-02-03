@@ -27,3 +27,19 @@
 mark {
   @apply text-blue-700 font-bold;
 }
+
+.nextra-navbar-blur {
+  border-color: var(--transparent-color);
+}
+
+.nextra-search input {
+  @apply bg-white border border-solid border-neutral-200 dark:bg-neutral-900 dark:border-neutral-600;
+}
+
+.nextra-search input:focus,
+.nextra-search input:focus-visible {
+  border-color: var(--focus-border-color);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
