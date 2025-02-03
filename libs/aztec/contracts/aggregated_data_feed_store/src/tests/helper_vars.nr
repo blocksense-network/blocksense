@@ -21,7 +21,7 @@ unconstrained fn calculate_round_index(stride: Field, feed_id: Field) -> Field {
 global zero_feed_index: Field = calculate_feed_index(ZERO, ZERO, ZERO);
 global fifteen_feed_index: Field = calculate_feed_index(15, ONE, ZERO);
 global thirty_feed_index: Field = calculate_feed_index(30, TWO, ZERO);
-global fortyfive_feed_index: Field = calculate_feed_index(30, THREE, ZERO);
+global fortyfive_feed_index: Field = calculate_feed_index(45, THREE, ZERO);
 global zero_round_index: Field = calculate_round_index(ZERO, zero_feed_index);
 global one_round_index: Field = calculate_round_index(ZERO, fifteen_feed_index);
 global two_round_index: Field = calculate_round_index(ZERO, thirty_feed_index);
