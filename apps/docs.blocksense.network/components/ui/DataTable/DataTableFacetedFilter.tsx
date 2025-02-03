@@ -50,7 +50,7 @@ export function DataTableFacetedFilter<TData, TValue>({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[200px] p-0 bg-white dark:bg-neutral-900"
+        className="w-[200px] p-0 border border-solid border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-600"
         align="start"
       >
         <Command className="py-2">
