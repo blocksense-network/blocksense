@@ -109,9 +109,13 @@ impl AggregationBatchConsensus {
         // Pop elements older than time_point and check if they also need to be removed from in_progress_batches
         while let Some(key) = self.backlog_batches.front() {
             debug!("Cleanup call for: {key:?}");
-            if key.block_height + retention_time_blocks >= current_block_height {
+            if key.block_height + retention_time_blocks < current_block_height {
                 if let Some(calldata_with_signatures) = self.in_progress_batches.remove(key) {
-                    warn!("Removing timed out (did not collect quorum of signatures) entry for network: {}, block_height: {} with calldata: {:?}", key.network, key.block_height, calldata_with_signatures);
+                    warn!("Removing timed out (did not collect quorum of signatures as of block {}) entry for network: {}, block_height: {} with calldata: {:?}",
+                        current_block_height,
+                        key.network,
+                        key.block_height,
+                        calldata_with_signatures);
                 }
                 self.backlog_batches.pop_front();
             } else {

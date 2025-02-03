@@ -1,10 +1,11 @@
 use actix_web::web::Data;
+use alloy::hex::ToHexExt;
 use config::BlockConfig;
 use feed_registry::{registry::SlotTimeTracker, types::Repeatability};
 use gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
 use tokio::select;
 use tokio::sync::mpsc::UnboundedReceiver;
-use tracing::{error, trace};
+use tracing::{error, info, trace};
 use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::{sequencer_state::SequencerState, ReporterResponse};
@@ -68,7 +69,7 @@ pub async fn aggregation_batch_consensus_loop(
                             continue
                         }
 
-                        let quorum = match batches_awaiting_consensus.take_reporters_signatures(signed_aggregate.block_height, signed_aggregate.network){
+                        let quorum = match batches_awaiting_consensus.take_reporters_signatures(signed_aggregate.block_height, signed_aggregate.network.clone()){
                             Some(v) => v,
                             None => {
                                 error!("Error getting signatures of a full quorum!");
@@ -77,11 +78,11 @@ pub async fn aggregation_batch_consensus_loop(
                         };
                         let mut signatures_with_addresses: Vec<&_> = quorum.signatures.values().collect();
                         signatures_with_addresses.sort_by(|a, b| a.signer_address.cmp(&b.signer_address));
-                        let _signature_bytes: Vec<u8> = signatures_with_addresses
+                        let signature_bytes: Vec<u8> = signatures_with_addresses
                             .into_iter()
                             .flat_map(|entry| signature_to_bytes(entry.signature))
                             .collect();
-
+                        info!("Generated aggregated signature: {} for network: {} block_height: {}", signature_bytes.encode_hex(), signed_aggregate.network, signed_aggregate.block_height);
                     }
                 }
             }
