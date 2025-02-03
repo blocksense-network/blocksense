@@ -1,11 +1,37 @@
+use crate::utils::SafeMultisig::SafeMultisigInstance;
+use alloy::providers::{
+    fillers::{
+        BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller, WalletFiller,
+    },
+    Identity, RootProvider,
+};
 use alloy::{
+    network::{Ethereum, EthereumWallet},
     signers::{local::PrivateKeySigner, Signer},
     sol,
     sol_types::SolStruct,
+    transports::http::{Client, Http},
 };
+
 use alloy_primitives::{
     address, keccak256, Address, Bytes, FixedBytes, PrimitiveSignature, Uint, B256, U256,
 };
+
+pub type SafeMultisigInst = SafeMultisigInstance<
+    Http<Client>,
+    FillProvider<
+        JoinFill<
+            JoinFill<
+                Identity,
+                JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
+            >,
+            WalletFiller<EthereumWallet>,
+        >,
+        RootProvider<Http<Client>>,
+        Http<Client>,
+        Ethereum,
+    >,
+>;
 
 sol! {
     #[derive(Debug)]
