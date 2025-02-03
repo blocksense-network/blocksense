@@ -2,7 +2,8 @@ use anyhow::Result;
 use blocksense_sdk::spin::http::{send, Method, Request, Response};
 use std::collections::HashMap;
 
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
+use serde_json::{from_value, Value};
 
 use url::Url;
 
@@ -65,4 +66,29 @@ pub struct FundingCurrencyTicker {
 pub enum BitfinexPrice {
     Trading(TradingPairTicker),
     Funding(FundingCurrencyTicker),
+}
+
+impl<'de> Deserialize<'de> for BitfinexPrice {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value: Value = Deserialize::deserialize(deserializer)?;
+
+        // Ensure the value is an array
+        let array = value
+            .as_array()
+            .ok_or_else(|| serde::de::Error::custom("Expected an array"))?;
+
+        // Match the array size to determine the struct
+        match array.len() {
+            11 => from_value::<TradingPairTicker>(value)
+                .map(BitfinexPrice::Trading)
+                .map_err(serde::de::Error::custom),
+            17 => from_value::<FundingCurrencyTicker>(value)
+                .map(BitfinexPrice::Funding)
+                .map_err(serde::de::Error::custom),
+            _ => Err(serde::de::Error::custom("Unknown ticker format")),
+        }
+    }
 }
