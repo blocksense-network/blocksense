@@ -1,9 +1,0 @@
-[package]
-name = "aggregated_data_feed_store"
-type = "contract"
-authors = [""]
-compiler_version = ">=0.35.0"
-
-[dependencies]
-aztec = { git = "https://github.com/AztecProtocol/aztec-packages", tag = "aztec-packages-v0.71.0", directory = "noir-projects/aztec-nr/aztec" }
-bignum = { tag = "v0.5.0", git = "https://github.com/noir-lang/noir-bignum" }

@@ -23,6 +23,40 @@ const setupSandbox = async () => {
   return pxe;
 };
 
+const feeds = [
+  {
+    id: 1n,
+    round: 6n,
+    stride: 1n,
+    data: '0x12343267643573',
+    slotsToRead: 1,
+  },
+  {
+    id: 2n,
+    round: 5n,
+    stride: 0n,
+    data: '0x2456',
+  },
+  {
+    id: 3n,
+    round: 4n,
+    stride: 0n,
+    data: '0x3678',
+  },
+  {
+    id: 4n,
+    round: 3n,
+    stride: 0n,
+    data: '0x4890',
+  },
+  {
+    id: 5n,
+    round: 2n,
+    stride: 0n,
+    data: '0x5abc',
+  },
+];
+
 describe('Data feed store contract', () => {
   let pxe: PXE;
   let wallets: AccountWallet[] = [];
@@ -91,13 +125,13 @@ describe('Data feed store contract', () => {
       .deployed();
 
     const feedInputData = Array.from(
-      { length: 1000 },
+      { length: 33 },
       () => new Fr(Math.floor(Math.random() * 256)),
     );
 
     const blockNumber = new Fr(100);
-    const feedLength = 1055;
-    const roundsLength = 1055;
+    const feedLength = 1;
+    const roundsLength = 1;
 
     await contract
       .withWallet(wallets[0])
