@@ -84,7 +84,18 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     enabled: true,
-    apiKey: process.env.ETHERSCAN_API_KEY || '',
+    // apiKey: '93943646c0994105a2cb6b40f690fdf8',
+    // customChains: [
+    //   {
+    //     network: 'opbnb-testnet',
+    //     chainId: 5611,
+    //     urls: {
+    //       apiURL:
+    //         'https://open-platform.nodereal.io/93943646c0994105a2cb6b40f690fdf8/op-bnb-testnet/contract/',
+    //       browserURL: 'https://testnet.opbnbscan.com/',
+    //     },
+    //   },
+    // ],
     // apiKey: 'qeeYh3D9jQD8hHKbsv8jvGhtURw0WE0M',
     // customChains: [
     //   {
