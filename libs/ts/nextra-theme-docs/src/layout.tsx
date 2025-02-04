@@ -19,7 +19,7 @@ const theme = z.strictObject({
   docsRepositoryBase: z
     .string()
     .startsWith('https://')
-    .default('https://github.com/shuding/nextra'),
+    .default('https://github.com/blocksense-network/blocksense'),
   editLink: stringOrElement.or(z.null()).default('Edit this page'),
   feedback: z
     .strictObject({
