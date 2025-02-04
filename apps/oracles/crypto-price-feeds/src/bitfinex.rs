@@ -92,3 +92,42 @@ impl<'de> Deserialize<'de> for BitfinexPrice {
         }
     }
 }
+
+pub async fn get_bitfinex_prices(
+    resources: &Vec<ResourceData>,
+    results: &mut HashMap<String, Vec<ResourceResult>>,
+) -> Result<()> {
+    let url = Url::parse("https://api-pub.bitfinex.com/v2/tickers?symbols=ALL")?;
+
+    let mut req = Request::builder();
+    req.method(Method::Get);
+    req.uri(url);
+    req.header("Accepts", "application/json");
+
+    let req = req.build();
+    let resp: Response = send(req).await?;
+
+    let body = resp.into_body();
+    let string = String::from_utf8(body)?;
+    let values: Vec<BitfinexPrice> = serde_json::from_str(&string)?;
+
+    let trading_tickers: Vec<TradingPairTicker> = values
+        .into_iter()
+        .filter_map(|ticker| {
+            if let BitfinexPrice::Trading(trading) = ticker {
+                Some(trading)
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    let response: HashMap<String, String> = trading_tickers
+        .into_iter()
+        .map(|value| (value.symbol().to_string(), value.price().to_string()))
+        .collect();
+
+    fill_results(resources, results, response)?;
+
+    Ok(())
+}

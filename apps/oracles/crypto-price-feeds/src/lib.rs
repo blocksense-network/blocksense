@@ -1,5 +1,6 @@
 mod binance;
 mod binance_us;
+mod bitfinex;
 mod bybit;
 mod coinbase;
 mod common;
@@ -23,6 +24,7 @@ use serde::Deserialize;
 use crate::common::{ResourceData, ResourceResult};
 use binance::get_binance_prices;
 use binance_us::get_binance_us_prices;
+use bitfinex::get_bitfinex_prices;
 use bybit::get_bybit_prices;
 use coinbase::get_coinbase_prices;
 use crypto_com_exchange::get_crypto_com_exchange_prices;
@@ -132,6 +134,9 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     get_kucoin_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
 
+    get_bitfinex_prices(&resources, &mut results).await?;
+    print_results(&resources, &results);
+
     get_mexc_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
 
@@ -149,7 +154,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     // data feed ID.
 
     let payload = process_results(results)?;
-    println!("Final Payload - {:?}", payload);
+    println!("Final Payload - {:?}", payload.values);
 
     Ok(payload)
 }
