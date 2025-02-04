@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import { MouseEvent, useState } from 'react';
 
 import { Tooltip } from '@/components/common/Tooltip';
 import { ImageWrapper } from '@/components/common/ImageWrapper';
@@ -16,9 +18,9 @@ export const CopyButton = ({
   copyButtonClasses = '',
   disabled = false,
 }: CopyButtonProps) => {
-  const [isCopied, setIsCopied] = React.useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
-  const onCopy = (e: React.MouseEvent) => {
+  const onCopy = (e: MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(textToCopy);
     setIsCopied(true);
