@@ -7,6 +7,7 @@ export const deployedNetworks = [
   'avalanche-fuji',
   'base-sepolia',
   'berachain-bartio',
+  'blast-sepolia',
   'bsc-testnet',
   'celo-alfajores',
   'citrea-testnet',
