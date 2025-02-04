@@ -393,7 +393,7 @@ export const Sidebar: FC<{ toc: Heading[] }> = ({ toc }) => {
   return (
     <>
       {includePlaceholder && hideSidebar && (
-        <div className="x:max-xl:hidden x:h-0 x:w-64 x:shrink-0" />
+        <div className="x:max-xl:hidden x:h-0 x:w-68 x:shrink-0" />
       )}
       <aside
         id={sidebarControlsId}
@@ -403,7 +403,7 @@ export const Sidebar: FC<{ toc: Heading[] }> = ({ toc }) => {
           'x:max-md:hidden x:flex x:flex-col',
           'x:h-[calc(100dvh-var(--nextra-menu-height))]',
           'x:top-(--nextra-navbar-height) x:shrink-0',
-          isExpanded ? 'x:w-64' : 'x:w-20',
+          isExpanded ? 'x:w-68' : 'x:w-20',
           hideSidebar ? 'x:hidden' : 'x:sticky',
         )}
       >
