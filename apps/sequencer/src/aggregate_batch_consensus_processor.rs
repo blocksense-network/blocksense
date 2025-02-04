@@ -11,6 +11,7 @@ use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
+use futures::stream::{FuturesUnordered, StreamExt};
 use gnosis_safe::utils::SafeMultisig;
 use std::{io::Error, time::Duration};
 
@@ -35,8 +36,37 @@ pub async fn aggregation_batch_consensus_loop(
 
             let timeout_period_blocks = block_config.aggregation_consensus_discard_period_blocks;
 
+            let mut collected_futures = FuturesUnordered::new();
+
             loop {
                 select! {
+                    future_result = collected_futures.select_next_some() => {
+                        let res = match future_result {
+                            Ok(res) => res,
+                            Err(e) => {
+                                // We panic here, because this is a serious error.
+                                panic!("JoinError: {e}");
+                            },
+                        };
+
+                        let result_val = match res {
+                            Ok(v) => v,
+                            Err(e) => {
+                                // We error here, to support the task returning errors.
+                                error!("Task terminated with error: {:?}", e);
+                                continue;
+                            }
+                        };
+
+                        match result_val {
+                            Ok(v) => {
+                                info!("tx receipt: {v:?}");
+                            },
+                            Err(e) => {
+                                error!("Failed to get tx receipt: {e}");
+                            },
+                        };
+                    }
                     _ = block_height_tracker.await_end_of_current_slot(&Repeatability::Periodic) => {
 
                         trace!("processing aggregation_batch_consensus_loop");
@@ -50,10 +80,13 @@ pub async fn aggregation_batch_consensus_loop(
                     }
                     Some((signed_aggregate, signature_with_address)) = aggregate_batch_sig_recv.recv() => {
 
+                        let block_height = signed_aggregate.block_height;
+                        let net = &signed_aggregate.network;
+
                         // Get quorum size from config bedore locking batches_awaiting_consensus!
                         let safe_min_quorum = {
                             let sequencer_config = sequencer_state.sequencer_config.read().await;
-                            match sequencer_config.providers.get(&signed_aggregate.network) {
+                            match sequencer_config.providers.get(net) {
                                 Some(v) => v.safe_min_quorum,
                                 None => {
                                     error!("Trying to get the quorum size of a non existent network!");
@@ -72,8 +105,8 @@ pub async fn aggregation_batch_consensus_loop(
                             continue
                         }
 
-                        let Some(quorum) = batches_awaiting_consensus.take_reporters_signatures(signed_aggregate.block_height, signed_aggregate.network.clone()) else {
-                            error!("Error getting signatures of a full quorum! net {}, Blocksense block height {}", signed_aggregate.network, signed_aggregate.block_height);
+                        let Some(quorum) = batches_awaiting_consensus.take_reporters_signatures(block_height, net.clone()) else {
+                            error!("Error getting signatures of a full quorum! net {net}, Blocksense block height {block_height}");
                             continue;
                         };
 
@@ -85,49 +118,60 @@ pub async fn aggregation_batch_consensus_loop(
                             .into_iter()
                             .flat_map(|entry| signature_to_bytes(entry.signature))
                             .collect();
-                        info!("Generated aggregated signature: {} for network: {} block_height: {}", signature_bytes.encode_hex(), signed_aggregate.network, signed_aggregate.block_height);
+                        info!("Generated aggregated signature: {} for network: {} Blocksense block_height: {}", signature_bytes.encode_hex(), net, block_height);
 
-                        let net = &signed_aggregate.network;
-                        let providers = sequencer_state.providers.read().await;
-                        let provider = providers.get(net).unwrap().lock().await;
+                        let sequencer_state_clone = sequencer_state.clone();
+                        collected_futures.push(
+                            tokio::task::Builder::new()
+                                .name(format!("safe_tx_sender network={net} block={block_height}").as_str())
+                                .spawn_local(async move {
+                                    let block_height = signed_aggregate.block_height;
+                                    let net = &signed_aggregate.network;
+                                    let providers = sequencer_state_clone.providers.read().await;
+                                    let provider = providers.get(net).unwrap().lock().await;
 
-                        let safe_address = provider.safe_address.unwrap_or(Address::default());
-                        let contract = SafeMultisig::new(safe_address, &provider.provider);
+                                    let safe_address = provider.safe_address.unwrap_or(Address::default());
+                                    let contract = SafeMultisig::new(safe_address, &provider.provider);
 
-                        let nonce = match contract.nonce().call().await {
-                            Ok(n) => n,
-                            Err(e) => {
-                                error!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}!");
-                                continue;
-                            }
-                        };
+                                    let latest_nonce = match contract.nonce().call().await {
+                                        Ok(n) => n,
+                                        Err(e) => {
+                                            eyre::bail!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}! Blocksense block height: {block_height}");
+                                        }
+                                    };
 
-                        let safe_tx = quorum.safe_tx;
+                                    let safe_tx = quorum.safe_tx;
 
-                        if nonce._0 != safe_tx.nonce {
-                            error!("Mismatch nonces!");
-                        } else {
-                            let transaction = contract
-                            .execTransaction(
-                                safe_tx.to,
-                                safe_tx.value,
-                                safe_tx.data,
-                                safe_tx.operation,
-                                safe_tx.safeTxGas,
-                                safe_tx.baseGas,
-                                safe_tx.gasPrice,
-                                safe_tx.gasToken,
-                                safe_tx.refundReceiver,
-                                Bytes::copy_from_slice(&signature_bytes),
-                            )
-                            .send()
-                            .await.unwrap()
-                            .get_receipt()
-                            .await.unwrap();
+                                    if latest_nonce._0 != safe_tx.nonce {
+                                        eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_nonce._0, safe_tx.nonce);
+                                    }
 
-                            info!("Transaction receipt: {:?}", transaction);
-                        }
-
+                                    Ok(match contract
+                                    .execTransaction(
+                                        safe_tx.to,
+                                        safe_tx.value,
+                                        safe_tx.data,
+                                        safe_tx.operation,
+                                        safe_tx.safeTxGas,
+                                        safe_tx.baseGas,
+                                        safe_tx.gasPrice,
+                                        safe_tx.gasToken,
+                                        safe_tx.refundReceiver,
+                                        Bytes::copy_from_slice(&signature_bytes),
+                                    )
+                                    .send()
+                                    .await {
+                                        Ok(v) => {
+                                            info!("Posted tx for network {net}, Blocksense block height: {block_height}! Waiting for receipt ...");
+                                            v.get_receipt()
+                                            .await
+                                        }
+                                        Err(e) => {
+                                            eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
+                                        }
+                                    })
+                                }).expect("Failed to spawn tx sender for network {net} Blocksense block height: {block_height}!")
+                        );
                     }
                 }
             }

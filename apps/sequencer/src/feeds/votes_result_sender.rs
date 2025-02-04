@@ -169,8 +169,6 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 }
             };
 
-            drop(contract);
-
             let calldata = match Bytes::from_hex(serialized_updates.clone()) {
                 Ok(b) => b,
                 Err(e) => {
