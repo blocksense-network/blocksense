@@ -34,7 +34,7 @@ export const Breadcrumb: FC<{ activePath: Item[] }> = ({ activePath }) => {
             )}
             <ComponentToUse
               className={cn(
-                'nextra-breadcrumb__item x:transition-colors x:min-w-0 x:max-w-[150px] sm:x:max-w-[200px] md:x:max-w-[250px] x:overflow-hidden x:break-words',
+                'nextra-breadcrumb__item x:py-1 x:transition-colors x:min-w-0 x:max-w-[150px] sm:x:max-w-[200px] md:x:max-w-[250px] x:overflow-hidden x:break-words',
                 isLastItem
                   ? 'nextra-breadcrumb__item--active x:font-bold x:text-gray-700 x:dark:text-gray-100'
                   : 'x:min-w-6 x:overflow-hidden x:font-medium x:dark:text-gray-600/75',

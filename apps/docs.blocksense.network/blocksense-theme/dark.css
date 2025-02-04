@@ -75,3 +75,27 @@
 .dark mark {
   @apply text-blue-500 font-bold;
 }
+
+.dark .nextra-breadcrumb__item:hover {
+  @apply text-neutral-300;
+}
+
+.dark .nextra-breadcrumb__item--active {
+  @apply text-blue-500;
+}
+
+.dark .nextra-breadcrumb__item--inactive {
+  @apply text-gray-300;
+}
+
+.dark .nextra-breadcrumb__item--active:hover {
+  @apply text-neutral-100;
+}
+
+.dark .nextra-breadcrumb__link {
+  @apply text-white;
+}
+
+.dark .nextra-breadcrumb__link--active {
+  @apply text-neutral-300 underline underline-offset-4;
+}

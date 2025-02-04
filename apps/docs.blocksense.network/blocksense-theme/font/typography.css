@@ -35,7 +35,7 @@
   }
 
   a {
-    @apply text-blue-700;
+    @apply text-blue-500;
     font-family: var(--font-sans);
   }
 

@@ -25,7 +25,7 @@
 }
 
 mark {
-  @apply text-blue-700 font-bold;
+  @apply text-blue-500 font-bold;
 }
 
 .nextra-navbar {
@@ -50,4 +50,28 @@ mark {
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.nextra-breadcrumb__item:hover {
+  @apply text-gray-900;
+}
+
+.nextra-breadcrumb__item--active {
+  @apply text-blue-500;
+}
+
+.nextra-breadcrumb__item--inactive {
+  @apply text-gray-300;
+}
+
+.nextra-breadcrumb__item--active:hover {
+  @apply text-gray-950;
+}
+
+.nextra-breadcrumb__link {
+  @apply text-gray-800 underline underline-offset-4;
+}
+
+.nextra-breadcrumb__link--active {
+  @apply underline underline-offset-4;
 }
