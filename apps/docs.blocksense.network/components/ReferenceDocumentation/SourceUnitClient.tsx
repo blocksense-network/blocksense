@@ -1,5 +1,16 @@
 import React from 'react';
-import { SourceUnitDocItem } from '@blocksense/sol-reflector';
+
+import {
+  EnumDocItem,
+  ErrorDocItem,
+  EventDocItem,
+  FunctionDocItem,
+  ModifierDocItem,
+  SourceUnitDocItem,
+  StructDocItem,
+  VariableDocItem,
+} from '@blocksense/sol-reflector';
+
 import { AbsolutePath } from '@/sol-contracts-components/AbsolutePath';
 import { License } from '@/sol-contracts-components/License';
 import { Contracts } from '@/sol-contracts-components/Contracts';
@@ -13,6 +24,24 @@ import { filterConstants, filterVariables } from '@/src/utils';
 type SourceUnitProps = {
   sourceUnit: SourceUnitDocItem;
 };
+
+type ContractElements =
+  | FunctionDocItem[]
+  | VariableDocItem[]
+  | ModifierDocItem[]
+  | EnumDocItem[]
+  | StructDocItem[]
+  | EventDocItem[]
+  | ErrorDocItem[];
+
+export function getContractElementsNames(elements: ContractElements) {
+  return elements.map(element => {
+    if ('kind' in element) {
+      return element.name || element.kind;
+    }
+    return element.name;
+  });
+}
 
 export const SourceUnitClient = ({ sourceUnit }: SourceUnitProps) => {
   return (

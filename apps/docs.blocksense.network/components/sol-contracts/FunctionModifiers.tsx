@@ -41,16 +41,20 @@ export const FunctionModifiers = ({
           </TableRow>
         </TableHeader>
         <TableBody className="contract-item-wrapper__table-body">
-          {functionModifiers?.map((functionModifier, index) => (
-            <TableRow className="contract-item-wrapper__table-row" key={index}>
-              <TableCell className="contract-item-wrapper__table-cell">
-                <code>{functionModifier._modifierName}</code>
-              </TableCell>
-              <TableCell className="contract-item-wrapper__table-cell">
-                <code>{functionModifier.kind}</code>
-              </TableCell>
-            </TableRow>
-          ))}
+          {functionModifiers?.length &&
+            functionModifiers?.map((functionModifier, index) => (
+              <TableRow
+                className="contract-item-wrapper__table-row"
+                key={index}
+              >
+                <TableCell className="contract-item-wrapper__table-cell">
+                  <code>{functionModifier._modifierName}</code>
+                </TableCell>
+                <TableCell className="contract-item-wrapper__table-cell">
+                  <code>{functionModifier.kind}</code>
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </ContractItemWrapper>
