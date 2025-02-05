@@ -4,7 +4,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use crate::types::{FeedMetaData, FeedResult, FeedType, Repeatability, Timestamp};
+use crate::types::{DataFeedPayload, FeedMetaData, FeedType, Repeatability, Timestamp};
 use config::AllFeedsConfig;
 use ringbuf::{
     storage::Heap,
@@ -120,7 +120,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
 // For a given Feed this struct represents the received votes from different reporters.
 #[derive(Debug)]
 pub struct FeedReports {
-    pub report: HashMap<u64, FeedResult>,
+    pub report: HashMap<u64, DataFeedPayload>,
 }
 
 impl FeedReports {
@@ -224,7 +224,7 @@ impl AllFeedsReports {
             reports: HashMap::new(),
         }
     }
-    pub async fn push(&mut self, feed_id: u32, reporter_id: u64, data: FeedResult) -> bool {
+    pub async fn push(&mut self, feed_id: u32, reporter_id: u64, data: DataFeedPayload) -> bool {
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
@@ -345,6 +345,7 @@ mod tests {
     use crate::registry::new_feeds_meta_data_reg_with_test_data;
     use crate::registry::AllFeedsReports;
     use crate::registry::SlotTimeTracker;
+    use crate::types::test_payload_from_result;
     use crate::types::FeedMetaData;
     use crate::types::FeedResult;
     use crate::types::FeedType;
@@ -679,7 +680,11 @@ mod tests {
                 reports
                     .write()
                     .await
-                    .push(DATA_FEED_ID, i.into(), Ok(FeedType::Numerical(0.1)))
+                    .push(
+                        DATA_FEED_ID,
+                        i.into(),
+                        test_payload_from_result(Ok(FeedType::Numerical(0.1))),
+                    )
                     .await;
 
                 println!("this is thread number {}", i);
@@ -696,7 +701,7 @@ mod tests {
         // Process the reports:
         let mut values: Vec<&FeedResult> = vec![];
         for kv in &reports.report {
-            values.push(kv.1);
+            values.push(&kv.1.result);
         }
         assert!(values.len() as u32 == NTHREADS);
     }
