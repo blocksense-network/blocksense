@@ -12,9 +12,9 @@ use feed_registry::feed_registration_cmds::ProcessorResultValue;
 use feed_registry::registry::AllFeedsReports;
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::registry::SlotTimeTracker;
-use feed_registry::types::FeedType;
+use feed_registry::types::FeedsSlotProcessorCmds;
+use feed_registry::types::{DataFeedPayload, FeedType};
 use feed_registry::types::{FeedMetaData, Repeatability, Timestamp};
-use feed_registry::types::{FeedResult, FeedsSlotProcessorCmds};
 use prometheus::{inc_metric, metrics::FeedsMetrics};
 use ringbuf::traits::consumer::Consumer;
 use std::hash::RandomState;
@@ -88,7 +88,7 @@ impl FeedSlotsProcessor {
     #[allow(clippy::too_many_arguments)]
     async fn consume_reports(
         &self,
-        reports: &HashMap<u64, FeedResult, RandomState>,
+        reports: &HashMap<u64, DataFeedPayload, RandomState>,
         feed_type: &FeedType,
         slot: u64,
         quorum_percentage: f32,
@@ -179,16 +179,13 @@ impl FeedSlotsProcessor {
     fn collect_repoted_values(
         &self,
         expected_feed_type: &FeedType,
-        reports: &std::collections::HashMap<
-            u64,
-            std::result::Result<FeedType, feed_registry::types::FeedError>,
-        >,
+        reports: &std::collections::HashMap<u64, DataFeedPayload>,
         slot: u64,
     ) -> Vec<FeedType> {
         let feed_id = self.key;
         let mut values: Vec<FeedType> = vec![];
         for kv in reports {
-            match kv.1 {
+            match &kv.1.result {
                 Ok(value) => {
                     if value.same_enum_type_as(expected_feed_type) {
                         values.push(value.clone());
@@ -550,6 +547,7 @@ pub mod tests {
     use config::AllFeedsConfig;
     use config::Reporter;
     use feed_registry::registry::AllFeedsReports;
+    use feed_registry::types::test_payload_from_result;
     use feed_registry::types::FeedMetaData;
     use std::sync::Arc;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -657,7 +655,11 @@ pub mod tests {
                 .reports
                 .write()
                 .await
-                .push(feed_id, reporter_id, Ok(original_report_data.clone()))
+                .push(
+                    feed_id,
+                    reporter_id,
+                    test_payload_from_result(Ok(original_report_data.clone())),
+                )
                 .await;
         }
 
@@ -740,7 +742,11 @@ pub mod tests {
                 .reports
                 .write()
                 .await
-                .push(feed_id, reporter_id, Ok(original_report_data.clone()))
+                .push(
+                    feed_id,
+                    reporter_id,
+                    test_payload_from_result(Ok(original_report_data.clone())),
+                )
                 .await;
         }
 
@@ -778,7 +784,11 @@ pub mod tests {
             all_feeds_reports_arc
                 .write()
                 .await
-                .push(feed_id, reporter_id, Ok(original_report_data.clone()))
+                .push(
+                    feed_id,
+                    reporter_id,
+                    test_payload_from_result(Ok(original_report_data.clone())),
+                )
                 .await;
         }
 
@@ -850,7 +860,11 @@ pub mod tests {
                 .reports
                 .write()
                 .await
-                .push(feed_id, reporter_id, Ok(original_report_data.clone()))
+                .push(
+                    feed_id,
+                    reporter_id,
+                    test_payload_from_result(Ok(original_report_data.clone())),
+                )
                 .await;
         }
 
@@ -935,7 +949,11 @@ pub mod tests {
                 .reports
                 .write()
                 .await
-                .push(feed_id, reporter_id, Ok(original_report_data.clone()))
+                .push(
+                    feed_id,
+                    reporter_id,
+                    test_payload_from_result(Ok(original_report_data.clone())),
+                )
                 .await;
         }
 
@@ -1039,7 +1057,11 @@ pub mod tests {
                 .reports
                 .write()
                 .await
-                .push(feed_id, reporter_id, Ok(original_report_data.clone()))
+                .push(
+                    feed_id,
+                    reporter_id,
+                    test_payload_from_result(Ok(original_report_data.clone())),
+                )
                 .await;
         }
 
@@ -1142,7 +1164,11 @@ pub mod tests {
                 .reports
                 .write()
                 .await
-                .push(feed_id, reporter_id, Ok(original_report_data.clone()))
+                .push(
+                    feed_id,
+                    reporter_id,
+                    test_payload_from_result(Ok(original_report_data.clone())),
+                )
                 .await;
         }
 

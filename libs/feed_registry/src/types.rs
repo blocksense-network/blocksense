@@ -8,7 +8,7 @@ use thiserror::Error;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::debug;
 
-use crypto::JsonSerializableSignature;
+use crypto::{JsonSerializableSignature, Signature};
 use num::BigUint;
 
 use crate::aggregate::{get_aggregator, FeedAggregate};
@@ -318,6 +318,33 @@ pub struct DataFeedPayload {
 
     /// Data feed result
     pub result: FeedResult,
+}
+
+pub fn test_payload_from_result(result: FeedResult) -> DataFeedPayload {
+    DataFeedPayload {
+        payload_metadata: PayloadMetaData {
+            reporter_id: 0,
+            feed_id: 0.to_string(),
+            timestamp: 0,
+            signature: JsonSerializableSignature {
+                sig: Signature::deserialize(&[
+                    0, 75, 165, 94, 34, 91, 193, 86, 52, 0, 106, 177, 27, 82, 185, 18, 70, 254,
+                    112, 46, 89, 145, 219, 189, 112, 201, 83, 200, 117, 8, 151, 81, 111, 118, 67,
+                    40, 96, 97, 112, 146, 70, 82, 119, 13, 137, 75, 166, 90, 20, 139, 229, 212,
+                    109, 59, 233, 200, 57, 36, 128, 239, 247, 108, 175, 240, 26, 36, 203, 72, 61,
+                    5, 156, 77, 203, 185, 61, 203, 174, 34, 226, 165, 225, 192, 231, 186, 37, 167,
+                    159, 49, 183, 201, 111, 11, 121, 134, 149, 18, 2, 187, 19, 32, 9, 0, 200, 146,
+                    216, 237, 154, 150, 149, 81, 230, 98, 142, 93, 85, 239, 65, 92, 6, 110, 174,
+                    139, 226, 57, 50, 165, 15, 108, 37, 16, 196, 29, 25, 9, 193, 162, 201, 62, 99,
+                    173, 148, 2, 50, 158, 2, 100, 76, 25, 218, 70, 166, 215, 155, 160, 162, 46,
+                    101, 233, 175, 104, 0, 7, 20, 235, 100, 163, 35, 76, 63, 34, 32, 32, 154, 81,
+                    174, 5, 110, 5, 195, 12, 128, 68, 244, 46, 214, 92, 85, 53, 71, 50, 12, 117,
+                ])
+                .expect("Signature::deserialize failed!"),
+            },
+        },
+        result,
+    }
 }
 
 pub type FeedResult = Result<FeedType, FeedError>;
