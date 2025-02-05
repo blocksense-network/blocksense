@@ -155,7 +155,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         }
 
         let (contract_address, safe_address, nonce, chain_id, tx_hash, safe_transaction) = {
-            let provider = p.lock().await;
+            let provider = provider.lock().await;
 
             let contract_address = provider.contract_address.unwrap_or(Address::default());
             let safe_address = provider.safe_address.unwrap_or(Address::default());

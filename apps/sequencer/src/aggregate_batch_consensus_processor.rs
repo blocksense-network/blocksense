@@ -70,12 +70,9 @@ pub async fn aggregation_batch_consensus_loop(
                             continue
                         }
 
-                        let quorum = match batches_awaiting_consensus.take_reporters_signatures(signed_aggregate.block_height, signed_aggregate.network.clone()){
-                            Some(v) => v,
-                            None => {
-                                error!("Error getting signatures of a full quorum!");
-                                continue
-                            },
+                        let Some(quorum) = batches_awaiting_consensus.take_reporters_signatures(signed_aggregate.block_height, signed_aggregate.network.clone()) else {
+                            error!("Error getting signatures of a full quorum! net {}, Blocksense block height {}", signed_aggregate.network, signed_aggregate.block_height);
+                            continue;
                         };
                         let mut signatures_with_addresses: Vec<&_> = quorum.signatures.values().collect();
                         signatures_with_addresses.sort_by(|a, b| a.signer_address.cmp(&b.signer_address));
