@@ -40,6 +40,7 @@
     "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@openzeppelin/contracts": "^5.1.0",
     "@safe-global/protocol-kit": "^4.0.2",
+    "@safe-global/safe-contracts": "1.4.1-2",
     "@safe-global/safe-core-sdk-types": "^5.0.3",
     "@safe-global/safe-deployments": "^1.37.22",
     "@typechain/ethers-v6": "^0.5.1",

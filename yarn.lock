@@ -1934,6 +1934,7 @@ __metadata:
     "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.1.0"
     "@safe-global/protocol-kit": "npm:^4.0.2"
+    "@safe-global/safe-contracts": "npm:1.4.1-2"
     "@safe-global/safe-core-sdk-types": "npm:^5.0.3"
     "@safe-global/safe-deployments": "npm:^1.37.22"
     "@typechain/ethers-v6": "npm:^0.5.1"
@@ -6752,6 +6753,15 @@ __metadata:
     ethers: "npm:^6.13.1"
     semver: "npm:^7.6.2"
   checksum: 10c0/a112ababfa43cd9b6ed753913857d530e2805f39e1ead1f70c1e5770719f466c312c81a932f6f5348aa514c064aec74fd05f98a8a3fd07fc614dae7494e110d0
+  languageName: node
+  linkType: hard
+
+"@safe-global/safe-contracts@npm:1.4.1-2":
+  version: 1.4.1-2
+  resolution: "@safe-global/safe-contracts@npm:1.4.1-2"
+  peerDependencies:
+    ethers: 5.4.0
+  checksum: 10c0/ba2d701aeb5bd98219fc276f51dd1421ba0b2e8d22eadffe819f58e9a7b77078ac3533862418b5c48fc9e952cee24c5601a287da65306e514c4c1c251ea73704
   languageName: node
   linkType: hard
 

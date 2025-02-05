@@ -25,7 +25,11 @@ import {
   parseTxHash,
 } from '@blocksense/base-utils/evm';
 
-import { getEnvString, configDir } from '@blocksense/base-utils/env';
+import {
+  getEnvString,
+  configDir,
+  getOptionalEnvString,
+} from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { kebabToSnakeCase } from '@blocksense/base-utils/string';
 
@@ -81,89 +85,137 @@ task('deploy', 'Deploy contracts')
     for (const config of configs) {
       const chainId = parseChainId(config.network.chainId);
       console.log(`\n\n// ChainId: ${config.network.chainId}`);
-      console.log(`// Signer: ${config.signer.address}`);
-      const signerBalance = await config.provider.getBalance(config.signer);
+      console.log(`// Signer: ${config.adminMultisig.signer.address}`);
+      const signerBalance = await config.provider.getBalance(
+        config.adminMultisig.signer,
+      );
       console.log(`// balance: ${signerBalance} //`);
 
-      const multisig = await deployMultisig(config);
-      const multisigAddress = await multisig.getAddress();
+      const adminMultisig = await deployMultisig(config, 'adminMultisig');
+      const adminMultisigAddress = parseEthereumAddress(
+        await adminMultisig.getAddress(),
+      );
 
-      const dataFeedStoreAddress = await predictAddress(
+      const sequencerMultisig = await deployMultisig(
+        config,
+        'sequencerMultisig',
+      );
+      const sequencerMultisigAddress = parseEthereumAddress(
+        await sequencerMultisig.getAddress(),
+      );
+
+      const accessControlAddress = await predictAddress(
         artifacts,
         config,
-        ContractNames.HistoricalDataFeedStoreV2,
-        ethers.id('dataFeedStore'),
-        abiCoder.encode(['address'], [process.env.SEQUENCER_ADDRESS]),
+        ContractNames.AccessControl,
+        ethers.id('accessControl'),
+        abiCoder.encode(['address'], [adminMultisigAddress]),
+      );
+      const adfsAddress = await predictAddress(
+        artifacts,
+        config,
+        ContractNames.ADFS,
+        ethers.id('aggregatedDataFeedStore'),
+        abiCoder.encode(['address'], [accessControlAddress]),
       );
       const upgradeableProxyAddress = await predictAddress(
         artifacts,
         config,
-        ContractNames.UpgradeableProxy,
+        ContractNames.UpgradeableProxyADFS,
         ethers.id('proxy'),
         abiCoder.encode(
           ['address', 'address'],
-          [dataFeedStoreAddress, multisigAddress],
+          [adfsAddress, adminMultisigAddress],
         ),
       );
 
-      const deployData = await deployContracts(config, multisig, artifacts, [
-        {
-          name: ContractNames.HistoricalDataFeedStoreV2,
-          argsTypes: ['address'],
-          argsValues: [process.env.SEQUENCER_ADDRESS],
-          salt: ethers.id('dataFeedStore'),
-          value: 0n,
-        },
-        {
-          name: ContractNames.UpgradeableProxy,
-          argsTypes: ['address', 'address'],
-          argsValues: [dataFeedStoreAddress, multisigAddress],
-          salt: ethers.id('proxy'),
-          value: 0n,
-        },
-        {
-          name: ContractNames.CLFeedRegistryAdapter,
-          argsTypes: ['address', 'address'],
-          argsValues: [multisigAddress, upgradeableProxyAddress],
-          salt: ethers.id('registry'),
-          value: 0n,
-        },
-        ...dataFeedConfig.map(data => {
-          return {
-            name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
-            argsValues: [
-              data.description,
-              data.decimals,
-              data.id,
-              upgradeableProxyAddress,
-            ],
-            salt: ethers.id('aggregator'),
+      const deployData = await deployContracts(
+        config,
+        adminMultisig,
+        artifacts,
+        [
+          {
+            name: ContractNames.OnlySequencerGuard,
+            argsTypes: ['address', 'address'],
+            argsValues: [sequencerMultisigAddress, adminMultisigAddress],
+            salt: ethers.id('onlySequencerGuard'),
             value: 0n,
-            feedRegistryInfo: {
-              description: data.description,
-              base: data.base,
-              quote: data.quote,
-            },
-          };
-        }),
-      ]);
+          },
+          {
+            name: ContractNames.AccessControl,
+            argsTypes: ['address'],
+            argsValues: [adminMultisigAddress],
+            salt: ethers.id('accessControl'),
+            value: 0n,
+          },
+          {
+            name: ContractNames.ADFS,
+            argsTypes: ['address'],
+            argsValues: [accessControlAddress],
+            salt: ethers.id('aggregatedDataFeedStore'),
+            value: 0n,
+          },
+          {
+            name: ContractNames.UpgradeableProxyADFS,
+            argsTypes: ['address', 'address'],
+            argsValues: [adfsAddress, adminMultisigAddress],
+            salt: ethers.id('proxy'),
+            value: 0n,
+          },
+          {
+            name: ContractNames.CLFeedRegistryAdapter,
+            argsTypes: ['address', 'address'],
+            argsValues: [adminMultisigAddress, upgradeableProxyAddress],
+            salt: ethers.id('registry'),
+            value: 0n,
+          },
+          ...dataFeedConfig.slice(0, 10).map(data => {
+            return {
+              name: ContractNames.CLAggregatorAdapter as const,
+              argsTypes: ['string', 'uint8', 'uint32', 'address'],
+              argsValues: [
+                data.description,
+                data.decimals,
+                data.id,
+                upgradeableProxyAddress,
+              ],
+              salt: ethers.id('aggregator'),
+              value: 0n,
+              feedRegistryInfo: {
+                description: data.description,
+                base: data.base,
+                quote: data.quote,
+              },
+            };
+          }),
+        ],
+      );
 
       const networkName = getNetworkNameByChainId(chainId);
       chainsDeployment[networkName] = {
         chainId,
         contracts: {
           ...deployData,
-          SafeMultisig: parseEthereumAddress(multisigAddress),
+          SafeMultisig: adminMultisigAddress,
         },
       };
-      const signerBalancePost = await config.provider.getBalance(config.signer);
+      const signerBalancePost = await config.provider.getBalance(
+        config.adminMultisig.signer,
+      );
       console.log(`// balance: ${signerBalancePost} //`);
       console.log(`// balance diff: ${signerBalance - signerBalancePost} //`);
 
       await registerCLAggregatorAdapters(
         config,
-        multisig,
+        adminMultisig,
+        deployData,
+        artifacts,
+      );
+
+      await setupAccessControl(
+        config,
+        adminMultisig,
+        sequencerMultisig,
         deployData,
         artifacts,
       );
@@ -172,13 +224,16 @@ task('deploy', 'Deploy contracts')
     await saveDeployment(configs, chainsDeployment);
   });
 
-const deployMultisig = async (config: NetworkConfig) => {
+const deployMultisig = async (
+  config: NetworkConfig,
+  type: keyof Pick<NetworkConfig, 'adminMultisig' | 'sequencerMultisig'>,
+) => {
   const safeVersion = '1.4.1';
 
   // Create SafeFactory instance
   const safeFactory = await SafeFactory.init({
     provider: config.rpc,
-    signer: config.signer.privateKey,
+    signer: config[type].signer.privateKey,
     safeVersion,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
@@ -188,8 +243,8 @@ const deployMultisig = async (config: NetworkConfig) => {
   console.log('\nSafeFactory address:', await safeFactory.getAddress());
 
   const safeAccountConfig: SafeAccountConfig = {
-    owners: config.owners,
-    threshold: config.threshold,
+    owners: config[type].owners,
+    threshold: config[type].threshold,
   };
   const saltNonce = '150000';
 
@@ -206,7 +261,7 @@ const deployMultisig = async (config: NetworkConfig) => {
     return Safe.init({
       provider: config.rpc,
       safeAddress: predictedDeploySafeAddress,
-      signer: config.signer.privateKey,
+      signer: config[type].signer.privateKey,
       contractNetworks: {
         [config.network.chainId.toString()]: config.safeAddresses,
       },
@@ -220,7 +275,9 @@ const deployMultisig = async (config: NetworkConfig) => {
     safeAccountConfig,
     saltNonce,
     options: {
-      nonce: await config.provider.getTransactionCount(config.signer.address),
+      nonce: await config.provider.getTransactionCount(
+        config[type].signer.address,
+      ),
     },
     callback: (txHash: string) => {
       console.log('-> Safe deployment tx hash:', txHash);
@@ -231,18 +288,40 @@ const deployMultisig = async (config: NetworkConfig) => {
 const initChain = async (networkName: NetworkName): Promise<NetworkConfig> => {
   const rpc = getRpcUrl(networkName);
   const provider = new ethers.JsonRpcProvider(rpc);
-  const wallet = new Wallet(getEnvString('SIGNER_PRIVATE_KEY'), provider);
-  const envOwners =
-    process.env['OWNER_ADDRESSES_' + kebabToSnakeCase(networkName)];
-  const owners = envOwners
-    ? envOwners.split(',').map(address => parseEthereumAddress(address))
+
+  const sequencer = new Wallet(
+    getEnvString('SEQUENCER_SIGNER_PRIVATE_KEY'),
+    provider,
+  );
+  const envSequencerOwners =
+    process.env['SEQUENCER_OWNER_ADDRESSES_' + kebabToSnakeCase(networkName)];
+  const sequencerOwners = envSequencerOwners
+    ? envSequencerOwners
+        .split(',')
+        .map(address => parseEthereumAddress(address))
     : [];
+
+  const admin = new Wallet(getEnvString('ADMIN_SIGNER_PRIVATE_KEY'), provider);
+  const envAdminOwners =
+    process.env['ADMIN_OWNER_ADDRESSES_' + kebabToSnakeCase(networkName)];
+  const adminOwners = envAdminOwners
+    ? envAdminOwners.split(',').map(address => parseEthereumAddress(address))
+    : [];
+
   return {
     rpc,
     provider,
     network: await provider.getNetwork(),
-    signer: wallet,
-    owners: [...owners, parseEthereumAddress(wallet.address)],
+    sequencerMultisig: {
+      signer: sequencer,
+      owners: sequencerOwners,
+      threshold: +getOptionalEnvString('SEQUENCER_THRESHOLD', '1'),
+    },
+    adminMultisig: {
+      signer: admin,
+      owners: [...adminOwners, parseEthereumAddress(admin.address)],
+      threshold: +getOptionalEnvString('ADMIN_THRESHOLD', '1'),
+    },
     safeAddresses: {
       multiSendAddress: parseEthereumAddress(
         '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
@@ -277,7 +356,6 @@ const initChain = async (networkName: NetworkName): Promise<NetworkConfig> => {
         '0x1d31F259eE307358a26dFb23EB365939E8641195',
       ),
     },
-    threshold: 1,
   };
 };
 
@@ -313,7 +391,7 @@ const multisigTxExec = async (
   transactions: SafeTransactionDataPartial[],
   safe: Safe,
   config: NetworkConfig,
-  gasLimit: bigint,
+  gasLimit?: bigint,
 ) => {
   if (transactions.length === 0) {
     console.log('No transactions to execute');
@@ -329,8 +407,10 @@ const multisigTxExec = async (
   console.log('\nProposing transaction...');
 
   const txResponse = await safe.executeTransaction(safeTransaction, {
-    gasLimit: (gasLimit + 100_000n).toString(),
-    nonce: await config.provider.getTransactionCount(config.signer.address),
+    gasLimit: gasLimit ? (gasLimit + 100_000n).toString() : undefined,
+    nonce: await config.provider.getTransactionCount(
+      config.adminMultisig.signer.address,
+    ),
   });
 
   // transactionResponse is of unknown type and there is no type def in the specs
@@ -341,7 +421,7 @@ const multisigTxExec = async (
 
 const deployContracts = async (
   config: NetworkConfig,
-  multisig: Safe,
+  adminMultisig: Safe,
   artifacts: Artifacts,
   contracts: {
     name: Exclude<ContractNames, ContractNames.SafeMultisig>;
@@ -361,7 +441,7 @@ const deployContracts = async (
   const createCall = new ethers.Contract(
     createCallAddress,
     getCreateCallDeployment()?.abi!,
-    config.signer,
+    config.adminMultisig.signer,
   );
 
   const contractsConfig = {} as ContractsConfig;
@@ -436,7 +516,7 @@ const deployContracts = async (
     const batch = transactions.slice(i * BATCH_LENGTH, (i + 1) * BATCH_LENGTH);
     await multisigTxExec(
       batch,
-      multisig,
+      adminMultisig,
       config,
       500_000n * BigInt(batch.length),
     );
@@ -447,7 +527,7 @@ const deployContracts = async (
 
 const registerCLAggregatorAdapters = async (
   config: NetworkConfig,
-  multisig: Safe,
+  adminMultisig: Safe,
   deployData: ContractsConfig,
   artifacts: Artifacts,
 ) => {
@@ -457,7 +537,7 @@ const registerCLAggregatorAdapters = async (
   const registry = new ethers.Contract(
     deployData.coreContracts.CLFeedRegistryAdapter.address,
     artifacts.readArtifactSync(ContractNames.CLFeedRegistryAdapter).abi,
-    config.signer,
+    config.adminMultisig.signer,
   );
 
   // Split into batches of 100
@@ -466,10 +546,9 @@ const registerCLAggregatorAdapters = async (
   const aggregatorData = deployData.CLAggregatorAdapter.filter(d => d.base);
   const filteredData = [];
   for (const data of aggregatorData) {
-    const feed = await registry.connect(config.signer).getFunction('getFeed')(
-      data.base,
-      data.quote,
-    );
+    const feed = await registry
+      .connect(config.adminMultisig.signer)
+      .getFunction('getFeed')(data.base, data.quote);
 
     if (feed === ethers.ZeroAddress) {
       filteredData.push(data);
@@ -500,11 +579,59 @@ const registerCLAggregatorAdapters = async (
 
     await multisigTxExec(
       [safeTransactionData],
-      multisig,
+      adminMultisig,
       config,
       60_000n * BigInt(batch.length),
     );
   }
+};
+
+const setupAccessControl = async (
+  config: NetworkConfig,
+  adminMultisig: Safe,
+  sequencerMultisig: Safe,
+  deployData: ContractsConfig,
+  artifacts: Artifacts,
+) => {
+  console.log('\nSetting up sequencer guard...');
+
+  const guard = new ethers.Contract(
+    deployData.coreContracts.OnlySequencerGuard.address,
+    artifacts.readArtifactSync(ContractNames.OnlySequencerGuard).abi,
+    config.adminMultisig.signer,
+  );
+
+  const safeTxSetGuard: SafeTransactionDataPartial = {
+    to: guard.target.toString(),
+    value: '0',
+    data: guard.interface.encodeFunctionData('setSequencer', [
+      config.sequencerMultisig.signer.address, // sequencer address
+      true,
+    ]),
+    operation: OperationType.Call,
+  };
+
+  await multisigTxExec([safeTxSetGuard], adminMultisig, config);
+
+  console.log('\nSetting up access control...');
+
+  const accessControl = new ethers.Contract(
+    deployData.coreContracts.AccessControl.address,
+    artifacts.readArtifactSync(ContractNames.AccessControl).abi,
+    config.adminMultisig.signer,
+  );
+
+  const safeTxSetAccessControl: SafeTransactionDataPartial = {
+    to: accessControl.target.toString(),
+    value: '0',
+    data: ethers.solidityPacked(
+      ['address', 'bool'],
+      [await sequencerMultisig.getAddress(), true],
+    ),
+    operation: OperationType.Call,
+  };
+
+  await multisigTxExec([safeTxSetAccessControl], adminMultisig, config);
 };
 
 const saveDeployment = async (

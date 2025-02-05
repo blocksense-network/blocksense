@@ -5,8 +5,16 @@ export interface NetworkConfig {
   rpc: string;
   provider: JsonRpcProvider;
   network: Network;
-  signer: Wallet;
-  owners: EthereumAddress[];
+  sequencerMultisig: {
+    signer: Wallet;
+    owners: EthereumAddress[];
+    threshold: number;
+  };
+  adminMultisig: {
+    signer: Wallet;
+    owners: EthereumAddress[];
+    threshold: number;
+  };
   safeAddresses: {
     multiSendAddress: EthereumAddress;
     multiSendCallOnlyAddress: EthereumAddress;
@@ -19,13 +27,14 @@ export interface NetworkConfig {
     safeWebAuthnSharedSignerAddress: EthereumAddress;
     safeWebAuthnSignerFactoryAddress: EthereumAddress;
   };
-  threshold: number;
 }
 
 export enum ContractNames {
   SafeMultisig = 'SafeMultisig',
   CLFeedRegistryAdapter = 'CLFeedRegistryAdapter',
   CLAggregatorAdapter = 'CLAggregatorAdapter',
-  HistoricalDataFeedStoreV2 = 'HistoricalDataFeedStoreV2',
-  UpgradeableProxy = 'UpgradeableProxy',
+  ADFS = 'AggregatedDataFeedStore',
+  UpgradeableProxyADFS = 'UpgradeableProxyADFS',
+  AccessControl = 'AccessControl',
+  OnlySequencerGuard = 'OnlySequencerGuard',
 }
