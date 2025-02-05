@@ -1,8 +1,8 @@
+use gnosis_safe::data_types::ConsensusSecondRoundBatch;
+use gnosis_safe::data_types::ReporterResponse;
 use gnosis_safe::utils::{SafeTx, SignatureWithAddress};
 use std::collections::{HashMap, VecDeque};
 use tracing::{debug, error, warn};
-
-use crate::{ConsensusSecondRoundBatch, ReporterResponse};
 
 #[derive(Clone, Debug, Hash, Eq, PartialEq)]
 pub struct InProcessBatchKey {

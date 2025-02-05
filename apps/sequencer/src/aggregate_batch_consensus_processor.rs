@@ -2,13 +2,14 @@ use actix_web::web::Data;
 use alloy::hex::ToHexExt;
 use config::BlockConfig;
 use feed_registry::{registry::SlotTimeTracker, types::Repeatability};
+use gnosis_safe::data_types::ReporterResponse;
 use gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
 use tokio::select;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{error, info, trace};
 use utils::time::{current_unix_time, system_time_to_millis};
 
-use crate::{sequencer_state::SequencerState, ReporterResponse};
+use crate::sequencer_state::SequencerState;
 use std::{io::Error, time::Duration};
 
 pub async fn aggregation_batch_consensus_loop(

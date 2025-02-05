@@ -1,9 +1,9 @@
 use actix_web::{web, App, HttpServer};
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
+use gnosis_safe::data_types::ReporterResponse;
 use gnosis_safe::utils::SignatureWithAddress;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
-use sequencer::ReporterResponse;
 use tokio::sync::mpsc;
 
 use sequencer::http_handlers::admin::add_admin_services;
