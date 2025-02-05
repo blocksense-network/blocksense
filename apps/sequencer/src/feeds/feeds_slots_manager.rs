@@ -355,7 +355,7 @@ mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
     use config::{AllFeedsConfig, SequencerConfig};
-    use feed_registry::types::FeedType;
+    use feed_registry::types::{test_payload_from_result, FeedType};
     use std::time::Duration;
 
     use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
@@ -409,7 +409,11 @@ mod tests {
             .reports
             .write()
             .await
-            .push(1, reporter_id, Ok(original_report_data.clone()))
+            .push(
+                1,
+                reporter_id,
+                test_payload_from_result(Ok(original_report_data.clone())),
+            )
             .await;
 
         let _future =

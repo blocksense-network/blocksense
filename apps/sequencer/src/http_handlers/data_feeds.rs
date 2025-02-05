@@ -63,7 +63,7 @@ async fn process_report(
     data_feed: DataFeedPayload,
 ) -> HttpResponse {
     let reporter_id = data_feed.payload_metadata.reporter_id;
-    let signature = data_feed.payload_metadata.signature;
+    let signature = data_feed.payload_metadata.signature.clone();
     let msg_timestamp = data_feed.payload_metadata.timestamp;
 
     let feed_id: u32;
@@ -122,7 +122,7 @@ async fn process_report(
             inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
         }
     };
-    let result = data_feed.result;
+    let result = data_feed;
 
     trace!(
         "result = {:?}; feed_id = {:?}; reporter_id = {:?}",
