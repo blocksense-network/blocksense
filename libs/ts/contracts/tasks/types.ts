@@ -30,7 +30,8 @@ export interface NetworkConfig {
 }
 
 export enum ContractNames {
-  SafeMultisig = 'SafeMultisig',
+  SequencerMultisig = 'SequencerMultisig',
+  AdminMultisig = 'AdminMultisig',
   CLFeedRegistryAdapter = 'CLFeedRegistryAdapter',
   CLAggregatorAdapter = 'CLAggregatorAdapter',
   ADFS = 'AggregatedDataFeedStore',

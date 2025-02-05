@@ -169,7 +169,7 @@ task('deploy', 'Deploy contracts')
             salt: ethers.id('registry'),
             value: 0n,
           },
-          ...dataFeedConfig.slice(0, 10).map(data => {
+          ...dataFeedConfig.map(data => {
             return {
               name: ContractNames.CLAggregatorAdapter as const,
               argsTypes: ['string', 'uint8', 'uint32', 'address'],
@@ -196,7 +196,8 @@ task('deploy', 'Deploy contracts')
         chainId,
         contracts: {
           ...deployData,
-          SafeMultisig: adminMultisigAddress,
+          AdminMultisig: adminMultisigAddress,
+          SequencerMultisig: sequencerMultisigAddress,
         },
       };
       const signerBalancePost = await config.provider.getBalance(
@@ -285,9 +286,26 @@ const deployMultisig = async (
   });
 };
 
-const initChain = async (networkName: NetworkName): Promise<NetworkConfig> => {
+export const initChain = async (
+  networkName: NetworkName,
+): Promise<NetworkConfig> => {
   const rpc = getRpcUrl(networkName);
   const provider = new ethers.JsonRpcProvider(rpc);
+
+  let network: ethers.Network | undefined;
+  try {
+    network = await Promise.race([
+      provider.getNetwork(),
+      awaitTimeout(5000, 'provider.getNetwork() timed out after 5 seconds'),
+    ]);
+
+    if (!network) {
+      throw new Error(`Network not initialized`);
+    }
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
 
   const sequencer = new Wallet(
     getEnvString('SEQUENCER_SIGNER_PRIVATE_KEY'),
@@ -311,7 +329,7 @@ const initChain = async (networkName: NetworkName): Promise<NetworkConfig> => {
   return {
     rpc,
     provider,
-    network: await provider.getNetwork(),
+    network,
     sequencerMultisig: {
       signer: sequencer,
       owners: sequencerOwners,
@@ -391,7 +409,6 @@ const multisigTxExec = async (
   transactions: SafeTransactionDataPartial[],
   safe: Safe,
   config: NetworkConfig,
-  gasLimit?: bigint,
 ) => {
   if (transactions.length === 0) {
     console.log('No transactions to execute');
@@ -407,7 +424,6 @@ const multisigTxExec = async (
   console.log('\nProposing transaction...');
 
   const txResponse = await safe.executeTransaction(safeTransaction, {
-    gasLimit: gasLimit ? (gasLimit + 100_000n).toString() : undefined,
     nonce: await config.provider.getTransactionCount(
       config.adminMultisig.signer.address,
     ),
@@ -424,7 +440,10 @@ const deployContracts = async (
   adminMultisig: Safe,
   artifacts: Artifacts,
   contracts: {
-    name: Exclude<ContractNames, ContractNames.SafeMultisig>;
+    name: Exclude<
+      ContractNames,
+      ContractNames.AdminMultisig | ContractNames.SequencerMultisig
+    >;
     argsTypes: string[];
     argsValues: any[];
     salt: string;
@@ -449,8 +468,9 @@ const deployContracts = async (
 
   const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
+  const BATCH_LENGTH = 30;
   const transactions: SafeTransactionDataPartial[] = [];
-  for (const contract of contracts) {
+  for (const [index, contract] of contracts.entries()) {
     const encodedArgs = abiCoder.encode(
       contract.argsTypes,
       contract.argsValues,
@@ -507,19 +527,14 @@ const deployContracts = async (
         constructorArgs: contract.argsValues,
       };
     }
-  }
 
-  // deploying 30 contracts in a single transaction costs about 12.6m gas
-  const BATCH_LENGTH = 30;
-  const batches = Math.ceil(transactions.length / BATCH_LENGTH);
-  for (let i = 0; i < batches; i++) {
-    const batch = transactions.slice(i * BATCH_LENGTH, (i + 1) * BATCH_LENGTH);
-    await multisigTxExec(
-      batch,
-      adminMultisig,
-      config,
-      500_000n * BigInt(batch.length),
-    );
+    if (
+      transactions.length === BATCH_LENGTH ||
+      (index === contracts.length - 1 && transactions.length > 0)
+    ) {
+      await multisigTxExec(transactions, adminMultisig, config);
+      transactions.length = 0;
+    }
   }
 
   return contractsConfig;
@@ -570,19 +585,16 @@ const registerCLAggregatorAdapters = async (
       to: registry.target.toString(),
       value: '0',
       data: registry.interface.encodeFunctionData('setFeeds', [
-        batch.map(({ base, quote, address }) => {
-          return { base, quote, feed: address };
-        }),
+        batch.map(({ base, quote, address }) => ({
+          base,
+          quote,
+          feed: address,
+        })),
       ]),
       operation: OperationType.Call,
     };
 
-    await multisigTxExec(
-      [safeTransactionData],
-      adminMultisig,
-      config,
-      60_000n * BigInt(batch.length),
-    );
+    await multisigTxExec([safeTransactionData], adminMultisig, config);
   }
 };
 
@@ -601,17 +613,25 @@ const setupAccessControl = async (
     config.adminMultisig.signer,
   );
 
-  const safeTxSetGuard: SafeTransactionDataPartial = {
-    to: guard.target.toString(),
-    value: '0',
-    data: guard.interface.encodeFunctionData('setSequencer', [
-      config.sequencerMultisig.signer.address, // sequencer address
-      true,
-    ]),
-    operation: OperationType.Call,
-  };
+  const isSequencerSet = await guard.getSequencerRole(
+    config.sequencerMultisig.signer.address,
+  );
 
-  await multisigTxExec([safeTxSetGuard], adminMultisig, config);
+  if (!isSequencerSet) {
+    const safeTxSetGuard: SafeTransactionDataPartial = {
+      to: guard.target.toString(),
+      value: '0',
+      data: guard.interface.encodeFunctionData('setSequencer', [
+        config.sequencerMultisig.signer.address, // sequencer address
+        true,
+      ]),
+      operation: OperationType.Call,
+    };
+
+    await multisigTxExec([safeTxSetGuard], adminMultisig, config);
+  } else {
+    console.log('Sequencer guard already set up');
+  }
 
   console.log('\nSetting up access control...');
 
@@ -621,17 +641,30 @@ const setupAccessControl = async (
     config.adminMultisig.signer,
   );
 
-  const safeTxSetAccessControl: SafeTransactionDataPartial = {
-    to: accessControl.target.toString(),
-    value: '0',
-    data: ethers.solidityPacked(
-      ['address', 'bool'],
-      [await sequencerMultisig.getAddress(), true],
+  const isAllowed = Boolean(
+    Number(
+      await config.sequencerMultisig.signer.call({
+        to: accessControl.target.toString(),
+        data: await sequencerMultisig.getAddress(),
+      }),
     ),
-    operation: OperationType.Call,
-  };
+  );
 
-  await multisigTxExec([safeTxSetAccessControl], adminMultisig, config);
+  if (!isAllowed) {
+    const safeTxSetAccessControl: SafeTransactionDataPartial = {
+      to: accessControl.target.toString(),
+      value: '0',
+      data: ethers.solidityPacked(
+        ['address', 'bool'],
+        [await sequencerMultisig.getAddress(), true],
+      ),
+      operation: OperationType.Call,
+    };
+
+    await multisigTxExec([safeTxSetAccessControl], adminMultisig, config);
+  } else {
+    console.log('Access control already set up');
+  }
 };
 
 const saveDeployment = async (
@@ -654,3 +687,11 @@ const saveDeployment = async (
   }
   await writeJSON({ name: fileName, content: deploymentContent });
 };
+
+const awaitTimeout = (delayMs: number, reason: string) =>
+  new Promise<undefined>((resolve, reject) =>
+    setTimeout(
+      () => (reason === undefined ? resolve(undefined) : reject(reason)),
+      delayMs,
+    ),
+  );

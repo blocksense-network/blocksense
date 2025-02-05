@@ -11,7 +11,6 @@ contract OnlySequencerGuard is BaseGuard {
 
   error OnlyAdminMultisig();
   error ExecutorNotSequencer();
-  error ToNotADFS();
 
   constructor(address multisig, address adminMultisig) {
     MULTISIG = multisig;
@@ -29,6 +28,10 @@ contract OnlySequencerGuard is BaseGuard {
       revert OnlyAdminMultisig();
     }
     sequencers[sequencer] = status;
+  }
+
+  function getSequencerRole(address sequencer) external view returns (bool) {
+    return sequencers[sequencer];
   }
 
   /**
