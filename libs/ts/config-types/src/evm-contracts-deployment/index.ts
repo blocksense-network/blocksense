@@ -31,9 +31,11 @@ export type CLAggregatorAdapterData = S.Schema.Type<
 
 const CoreContractsSchema = S.mutable(
   S.Struct({
-    HistoricalDataFeedStoreV2: ContractDataSchema,
-    UpgradeableProxy: ContractDataSchema,
+    AggregatedDataFeedStore: ContractDataSchema,
+    UpgradeableProxyADFS: ContractDataSchema,
     CLFeedRegistryAdapter: ContractDataSchema,
+    AccessControl: ContractDataSchema,
+    OnlySequencerGuard: ContractDataSchema,
   }),
 );
 
@@ -43,7 +45,8 @@ const ContractsConfigSchema = S.mutable(
   S.Struct({
     coreContracts: CoreContractsSchema,
     CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
-    SafeMultisig: ethereumAddress,
+    SequencerMultisig: ethereumAddress,
+    AdminMultisig: ethereumAddress,
   }),
 );
 
