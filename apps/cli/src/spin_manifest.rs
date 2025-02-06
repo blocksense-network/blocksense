@@ -82,6 +82,10 @@ impl From<BlocksenseConfig> for AppManifest {
             "secret_key".to_string(),
             toml::Value::String(config.reporter_info.secret_key),
         );
+        table.insert(
+            "second_consensus_secret_key".to_string(),
+            toml::Value::String(config.reporter_info.second_consensus_secret_key),
+        );
         trigger_global_configs.insert("settings".to_string(), table);
 
         let mut oracles: Vec<Trigger> = vec![];

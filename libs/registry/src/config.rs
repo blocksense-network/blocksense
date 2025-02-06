@@ -95,6 +95,9 @@ pub struct ReporterInfo {
     /// Reporter secret key for signing transactions
     #[serde(default)]
     pub secret_key: String,
+    /// Reporter secret key for second consensus
+    #[serde(default)]
+    pub second_consensus_secret_key: String,
     /// Reporter id
     #[serde(default)]
     pub reporter_id: u64,

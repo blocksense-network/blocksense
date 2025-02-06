@@ -95,6 +95,10 @@ pub fn create_private_key_signer(private_key: &str) -> PrivateKeySigner {
     .unwrap()
 }
 
+pub fn create_fixed_bytes(tx_hash: &str) -> FixedBytes<32> {
+    FixedBytes::<32>::from_slice(tx_hash.as_bytes())
+}
+
 pub async fn sign_hash(
     owner: &PrivateKeySigner,
     tx_hash: &FixedBytes<32>,
