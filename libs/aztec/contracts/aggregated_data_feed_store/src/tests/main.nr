@@ -56,7 +56,7 @@ unconstrained fn test_store_59_data_fields_with_length_1() {
 }
 
 #[test]
-unconstrained fn test_get_latest_round() {
+unconstrained fn test_get_feed_at_round() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
 
@@ -74,4 +74,22 @@ unconstrained fn test_get_latest_round() {
         env,
         adfs_contract_address
     );
+}
+
+#[test]
+unconstrained fn test_get_latest_round() {
+    let (env, adfs_contract_address) = setup();
+    let block_number = get_block_number();
+
+    let feeds_len = 59;
+    let rounds_len = 4;
+
+    AggregatedDataFeedStore::at(adfs_contract_address).set_feeds(
+        _59_DATA_FEEDS_STRIDE_0,
+        feeds_len,
+        rounds_len,
+        block_number as Field
+    ).call(&mut env.public());
+
+
 }

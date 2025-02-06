@@ -24,22 +24,14 @@ unconstrained fn assert_feeds_are_stored_in_correct_slots<let END_OF_ROUND_DATA:
     block_number: u32,
     adfs_contract_address: AztecAddress,
 ) {
-    let mut new_index = 2;
-    let mut temp = 0;
+    let mut values_iterator = 2;
+    let mut round_index = 0;
     for i in 0..END_OF_ROUND_DATA {
-        if (i == zero_round_index as u32) {
-            temp = zero_round_index;
-        } else if (i == one_round_index as u32) {
-            temp = one_round_index;
-        } else if (i == two_round_index as u32) {
-            temp = two_round_index;
-        } else if (i == three_round_index as u32) {
-            temp = three_round_index;
-        }
-        let data_feed_slot = derive_storage_slot_in_map(storage_slot, calculate_feed_index(i as Field, temp ,0));
+        round_index = __determine_round_index(round_index, i);
+        let data_feed_slot = derive_storage_slot_in_map(storage_slot, calculate_feed_index(i as Field, round_index ,0));
         let data_feed_slot_value: u32 = storage_read(adfs_contract_address, data_feed_slot, block_number);
-        assert(_59_DATA_FEEDS_STRIDE_0[new_index] as u32 == data_feed_slot_value);
-        new_index = new_index + 3;
+        assert(_59_DATA_FEEDS_STRIDE_0[values_iterator] as u32 == data_feed_slot_value);
+        values_iterator = values_iterator + 3;
     }
 }
 
@@ -47,20 +39,26 @@ unconstrained fn assert_get_feed_at_round_produces_correct_result<let END_OF_ROU
     env: &mut TestEnvironment,
     adfs_contract_address: AztecAddress
 ) {
-    let mut new_index = 2;
-    let mut temp = 0;
+    let mut values_iterator = 2;
+    let mut round_index = 0;
     for i in 0..END_OF_ROUND_DATA {
-        if (i == zero_round_index as u32) {
-            temp = zero_round_index;
-        } else if (i == one_round_index as u32) {
-            temp = one_round_index;
-        } else if (i == two_round_index as u32) {
-            temp = two_round_index;
-        } else if (i == three_round_index as u32) {
-            temp = three_round_index;
-        }
-        let feed_at_round = AggregatedDataFeedStore::at(adfs_contract_address).get_feed_at_round(i as Field, temp, 0).view(&mut env.public());
-        assert(_59_DATA_FEEDS_STRIDE_0[new_index] == feed_at_round);
-        new_index = new_index + 3;
+        round_index = __determine_round_index(round_index, i);
+        let feed_at_round = AggregatedDataFeedStore::at(adfs_contract_address).get_feed_at_round(i as Field, round_index, 0).view(&mut env.public());
+        assert(_59_DATA_FEEDS_STRIDE_0[values_iterator] == feed_at_round);
+        values_iterator = values_iterator + 3;
     }
+}
+
+unconstrained fn __determine_round_index(mut temp: Field, iterator: u32) -> Field {
+    if (iterator == zero_round_index as u32) {
+        temp = zero_round_index;
+    } else if (iterator == one_round_index as u32) {
+        temp = one_round_index;
+    } else if (iterator == two_round_index as u32) {
+        temp = two_round_index;
+    } else if (iterator == three_round_index as u32) {
+        temp = three_round_index;
+    }
+
+    temp
 }
