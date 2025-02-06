@@ -5,7 +5,7 @@ use blockchain_data_model::{
     MAX_ASSET_FEED_UPDATES_IN_BLOCK, MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
 };
 use config::BlockConfig;
-use data_feeds::feeds_processing::VotedFeedUpdate;
+use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
 use feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
@@ -14,7 +14,7 @@ use feed_registry::types::Repeatability;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use serde_json::json;
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use std::io::Error;
 use std::mem;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
@@ -28,7 +28,7 @@ use crate::UpdateToSend;
 
 pub async fn block_creator_loop(
     sequencer_state: Data<SequencerState>,
-    mut aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdate>,
+    mut aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdateWithProof>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
     batched_votes_send: UnboundedSender<UpdateToSend>,
     block_config: BlockConfig,
@@ -63,8 +63,8 @@ pub async fn block_creator_loop(
             );
 
             // Updates that overflowed the capacity of a block
-            let mut backlog_updates: VecDeque<VotedFeedUpdate> = Default::default();
-            let mut updates: Vec<VotedFeedUpdate> = Default::default();
+            let mut backlog_updates: VecDeque<VotedFeedUpdateWithProof> = Default::default();
+            let mut updates: Vec<VotedFeedUpdateWithProof> = Default::default();
 
             let mut new_feeds_to_register = Vec::new();
             let mut feeds_ids_to_delete = Vec::new();
@@ -125,14 +125,14 @@ pub async fn block_creator_loop(
 
 // When we recv feed updates that have passed aggregation, we prepare them to be placed in the next generated block
 fn recvd_feed_update_to_block(
-    recvd_feed_update: Option<VotedFeedUpdate>,
-    updates_to_block: &mut Vec<VotedFeedUpdate>,
-    backlog_updates: &mut VecDeque<VotedFeedUpdate>,
+    recvd_feed_update: Option<VotedFeedUpdateWithProof>,
+    updates_to_block: &mut Vec<VotedFeedUpdateWithProof>,
+    backlog_updates: &mut VecDeque<VotedFeedUpdateWithProof>,
     max_feed_updates_to_batch: usize,
 ) {
     match recvd_feed_update {
         Some(voted_uptate) => {
-            let (key, val) = voted_uptate.encode(18);
+            let (key, val) = voted_uptate.update.encode(18);
             info!("adding {:?} => {:?} to updates", key, val);
             if updates_to_block.len() < max_feed_updates_to_batch {
                 updates_to_block.push(voted_uptate);
@@ -187,7 +187,7 @@ fn recvd_feed_management_cmd_to_block(
 }
 
 async fn generate_block(
-    updates: &mut Vec<VotedFeedUpdate>,
+    updates: &mut Vec<VotedFeedUpdateWithProof>,
     new_feeds_to_register: &mut Vec<RegisterNewAssetFeed>,
     feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
     batched_votes_send: &UnboundedSender<UpdateToSend>,
@@ -251,9 +251,19 @@ async fn generate_block(
     // Process feed updates:
     if !updates.is_empty() {
         debug!("Sending batched votes over `batched_votes_send`...");
+
+        let mut value_updates = Vec::new();
+        let mut proofs = HashMap::new();
+        for v in updates {
+            let feed_id = v.update.feed_id;
+            value_updates.push(v.update);
+            proofs.insert(feed_id, v.proof);
+        }
+
         if let Err(e) = batched_votes_send.send(UpdateToSend {
             block_height,
-            updates,
+            updates: value_updates,
+            proofs,
         }) {
             error!(
                 "Channel for propagating batched updates to sender failed: {}",
