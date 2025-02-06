@@ -22,6 +22,7 @@ use tracing::Instrument;
 
 use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
+use rdkafka::Message;
 // use rdkafka::message::{BorrowedMessage, Message};
 use tokio_stream::StreamExt;
 
@@ -47,6 +48,11 @@ use blocksense_metrics::{
     TextEncoder,
 };
 use blocksense_utils::time::current_unix_time;
+
+use blocksense_gnosis_safe::{
+    data_types::{ConsensusSecondRoundBatch, ReporterResponse},
+    utils::{create_fixed_bytes, create_private_key_signer, get_signature_bytes, sign_hash},
+};
 
 wasmtime::component::bindgen!({
     path: "../../libs/sdk/wit",
@@ -76,6 +82,7 @@ pub struct OracleTrigger {
     prometheus_url: Option<String>,
     kafka_endpoint: String,
     secret_key: String,
+    second_consensus_secret_key: String,
     reporter_id: u64,
     queue_components: HashMap<String, Component>,
 }
@@ -95,6 +102,7 @@ struct TriggerMetadata {
     prometheus_url: Option<String>,
     kafka_endpoint: Option<String>,
     secret_key: Option<String>,
+    second_consensus_secret_key: Option<String>,
     reporter_id: Option<u64>,
 }
 
@@ -190,6 +198,9 @@ impl TriggerExecutor for OracleTrigger {
             .kafka_endpoint
             .expect("Kafka Endpoint is not provided");
         let secret_key = metadata.secret_key.expect("Secret key is not provided");
+        let second_consensus_secret_key = metadata
+            .second_consensus_secret_key
+            .expect("Second consensus secret key is not provided");
         let reporter_id = metadata.reporter_id.expect("Reporter ID is not provided");
         // TODO(adikov) There is a specific case in which one reporter receives task to report multiple
         // data feeds which are gathered from one wasm component. For example -
@@ -226,6 +237,7 @@ impl TriggerExecutor for OracleTrigger {
             prometheus_url,
             kafka_endpoint,
             secret_key,
+            second_consensus_secret_key,
             reporter_id,
             queue_components,
         })
@@ -309,6 +321,7 @@ impl TriggerExecutor for OracleTrigger {
             &sequencer_post_batch_url,
             &sequencer_aggregated_consensus_url,
             &self.secret_key,
+            &self.second_consensus_secret_key,
             self.reporter_id,
         );
         loops.append(&mut manager);
@@ -515,7 +528,7 @@ impl OracleTrigger {
 
     fn start_secondary_signature_listener(
         kafka_report_endpoint: String,
-        signal_sender: UnboundedSender<String>,
+        signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
         kafka_info: Option<String>,
     ) -> tokio::task::JoinHandle<TerminationReason> {
         let future =
@@ -529,7 +542,7 @@ impl OracleTrigger {
 
     async fn signal_secondary_signature(
         kafka_report_endpoint: String,
-        signal_sender: UnboundedSender<String>,
+        signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
         _kafka_info: Option<String>,
     ) -> TerminationReason {
         // TODO(adikov): remove unwrap/expect
@@ -556,8 +569,22 @@ impl OracleTrigger {
             if let Some(message_result) = message_stream.next().await {
                 match message_result {
                     Ok(message) => {
-                        tracing::debug!("kafka message received - {:?}", message);
-                        match signal_sender.send("test".to_string()) {
+                        let payload = match message.payload() {
+                            None => {
+                                tracing::warn!("kafka None message received ");
+                                continue;
+                            }
+                            Some(bytes) => match serde_json::from_slice(bytes) {
+                                Ok(r) => r,
+                                Err(err) => {
+                                    tracing::error!("Error while parsing the message: {:?}", err);
+                                    continue;
+                                }
+                            },
+                        };
+                        tracing::debug!("kafka message received - {:?}", payload);
+
+                        match signal_sender.send(payload) {
                             Ok(_) => {
                                 continue;
                             }
@@ -579,10 +606,11 @@ impl OracleTrigger {
 
     fn start_manager(
         rx: UnboundedReceiver<(String, Payload)>,
-        ss_rx: UnboundedReceiver<String>,
+        ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
         sequencer_post_batch: &url::Url,
         sequencer_aggregated_consensus: &url::Url,
         secret_key: &str,
+        second_consensus_secret_key: &str,
         reporter_id: u64,
     ) -> Vec<tokio::task::JoinHandle<TerminationReason>> {
         let process_payload_future = Self::process_payload(
@@ -595,7 +623,7 @@ impl OracleTrigger {
         let process_aggregated_consensus_future = Self::process_aggregated_consensus(
             ss_rx,
             sequencer_aggregated_consensus.to_owned(),
-            secret_key.to_owned(),
+            second_consensus_secret_key.to_owned(),
             reporter_id,
         );
 
@@ -684,17 +712,39 @@ impl OracleTrigger {
     }
 
     async fn process_aggregated_consensus(
-        mut ss_rx: UnboundedReceiver<String>,
+        mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
         sequencer: url::Url,
-        _secret_key: String,
-        _reporter_id: u64,
+        second_consensus_secret_key: String,
+        reporter_id: u64,
     ) -> TerminationReason {
-        while let Some(hash) = ss_rx.recv().await {
-            let _timestamp = current_unix_time();
-            tracing::trace!("Sending to url - {}; {:?} hash", sequencer.clone(), hash);
+        while let Some(aggregated_consensus) = ss_rx.recv().await {
+            let signer = create_private_key_signer(second_consensus_secret_key.as_str());
+            let tx = create_fixed_bytes(aggregated_consensus.tx_hash.as_str());
+            let signed = match sign_hash(&signer, &tx).await {
+                Ok(s) => s,
+                Err(e) => {
+                    tracing::error!("Failed to sign hash on second consensus: {}", &e);
+                    continue;
+                }
+            };
+            let signature = match String::from_utf8(get_signature_bytes(&mut [signed]).await) {
+                Ok(s) => s,
+                Err(e) => {
+                    tracing::error!("Failed to parse signature to string: {}", &e);
+                    continue;
+                }
+            };
+            let report = ReporterResponse {
+                block_height: aggregated_consensus.block_height,
+                reporter_id,
+                network: aggregated_consensus.network,
+                signature,
+            };
+
+            tracing::trace!("Sending to url - {}; {:?} hash", sequencer.clone(), &report);
 
             let client = reqwest::Client::new();
-            match client.post(sequencer.clone()).json(&hash).send().await {
+            match client.post(sequencer.clone()).json(&report).send().await {
                 Ok(res) => {
                     let contents = res.text().await.unwrap();
                     tracing::trace!("Sequencer responded with: {}", &contents);
