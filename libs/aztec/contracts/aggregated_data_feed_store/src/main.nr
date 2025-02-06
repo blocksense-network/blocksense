@@ -3,7 +3,7 @@ mod tests;
 
 #[aztec]
 contract AggregatedDataFeedStore {
-    use dep::aztec::{macros::{functions::{initializer, public}, storage::storage}};
+    use dep::aztec::{macros::{functions::{initializer, public, view}, storage::storage}};
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
 
     /// Max Fields that can be written in storage per Tx are 63.
@@ -64,35 +64,33 @@ contract AggregatedDataFeedStore {
             new_index = new_index + curr_feed_len;
         }
 
-        new_index = feeds_len_u64;
-        for i in new_index..rounds_len as u64 {
+        for i in 0..rounds_len as u64 {
             storage.rounds.at(feed_input_data[new_index]).write(feed_input_data[new_index + 1]);
             new_index = new_index + 2;
         }
     }
 
     unconstrained fn get_latest_round(stride: Field, feed_id: Field) -> pub Field {
-        let latest_rounds_record = ((TWO_POW_115 * stride + feed_id) / 15);
-        let quotient = latest_rounds_record / 15;
-        let quot_times_15 = quotient * 15;
-        latest_rounds_record - quot_times_15
+        storage.rounds.at(TWO_POW_115 * stride + feed_id).read()
     }
 
-    unconstrained fn get_feed_at_round(stride: Field, feed_id: Field, round: Field) -> Field {
-        storage.data_feeds.at((TWO_POW_128 + (feed_id * TWO_POW_13) + round) * TWO.pow_32(stride)).read()
+    #[public]
+    #[view]
+    fn get_feed_at_round(feed_id: Field, round: Field, stride: Field) -> Field {
+        storage.data_feeds.at((TWO_POW_128 * TWO.pow_32(stride)) + ((feed_id * TWO_POW_13) * TWO.pow_32(stride)) + (round * TWO.pow_32(stride))).read()
     }
 
     unconstrained fn get_latest_data(stride: Field, feed_id: Field) -> Field {
         let latest_round = get_latest_round(stride, feed_id);
-        get_feed_at_round(stride, feed_id, latest_round)
+        storage.data_feeds.at(get_feed_at_round(stride, feed_id, latest_round)).read()
     }
 
     unconstrained fn get_latest_data_and_round(stride: Field, feed_id: Field) -> (Field, Field) {
         let latest_round = get_latest_round(stride, feed_id);
 
         (
-            get_feed_at_round(stride, feed_id, latest_round),
-            latest_round
+            storage.data_feeds.at(get_feed_at_round(stride, feed_id, latest_round)).read(),
+            storage.rounds.at(latest_round).read()
         )
     }
 }
