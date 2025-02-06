@@ -12,8 +12,13 @@ pub mod providers;
 pub mod reporters;
 pub mod sequencer_state;
 
+use feed_registry::types::DataFeedPayload;
+use std::collections::HashMap;
+
 #[derive(Debug, Clone, Default)]
 pub struct UpdateToSend {
     pub block_height: u64,
     pub updates: Vec<VotedFeedUpdate>,
+    // The key in this map is the feed id for which we provide a proof for the aggregated value.
+    pub proofs: HashMap<u32, Vec<DataFeedPayload>>,
 }

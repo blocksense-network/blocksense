@@ -4,7 +4,7 @@ use actix_web::web::Data;
 use alloy::primitives::map::HashMap;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use config::PublishCriteria;
-use data_feeds::feeds_processing::VotedFeedUpdate;
+use data_feeds::feeds_processing::{VotedFeedUpdate, VotedFeedUpdateWithProof};
 use eyre::{eyre, Result};
 use eyre::{Context, ContextCompat};
 use feed_registry::aggregate::FeedAggregate;
@@ -39,7 +39,7 @@ pub struct ConsumedReports {
     pub is_quorum_reached: bool,
     pub skip_publishing: bool,
     pub ad_score: Option<f64>,
-    pub result_post_to_contract: Option<FeedType>,
+    pub result_post_to_contract: Option<VotedFeedUpdateWithProof>,
     pub end_slot_timestamp: Timestamp,
 }
 
@@ -125,19 +125,31 @@ impl FeedSlotsProcessor {
             }
 
             // Dispatch to concrete FeedAggregate implementation.
-            let result_post_to_contract = aggregator.aggregate(&values[..]);
+            let result_post_to_contract = VotedFeedUpdate {
+                feed_id,
+                value: aggregator.aggregate(&values[..]), // Perform the concrete aggregation
+                end_slot_timestamp: end_slot_timestamp,
+            };
+
+            let mut proof: Vec<DataFeedPayload> = Vec::new();
+            for (_, v) in reports.iter() {
+                proof.push(v.clone());
+            }
 
             let mut ad_score_opt: Option<f64> = None;
 
             // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
             if !is_oneshot {
-                if let FeedType::Numerical(candidate_value) = result_post_to_contract {
+                if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
                     let ad_score = self
                         .perform_anomaly_detection(history, candidate_value)
                         .await;
                     match ad_score {
                         Ok(ad_score) => {
-                            info!("AD_score for {:?} is {}", result_post_to_contract, ad_score);
+                            info!(
+                                "AD_score for {:?} is {}",
+                                result_post_to_contract.value, ad_score
+                            );
                             ad_score_opt = Some(ad_score)
                         }
                         Err(e) => {
@@ -152,14 +164,10 @@ impl FeedSlotsProcessor {
                             peg_to_value: None,
                             peg_tolerance_percentage: 0.0f64,
                         };
-                        let update = VotedFeedUpdate {
-                            feed_id,
-                            value: result_post_to_contract.clone(),
-                            end_slot_timestamp,
-                        };
                         debug!("Get a read lock on history [feed {feed_id}]");
                         let history_guard = history.read().await;
-                        skip_publishing = update.should_skip(&criteria, &history_guard);
+                        skip_publishing =
+                            result_post_to_contract.should_skip(&criteria, &history_guard);
                         debug!("Release the read lock on history [feed {feed_id}]");
                     }
                 }
@@ -168,7 +176,10 @@ impl FeedSlotsProcessor {
                 is_quorum_reached,
                 skip_publishing,
                 ad_score: ad_score_opt,
-                result_post_to_contract: Some(result_post_to_contract),
+                result_post_to_contract: Some(VotedFeedUpdateWithProof {
+                    update: result_post_to_contract,
+                    proof,
+                }),
                 end_slot_timestamp,
             };
             info!("[feed {feed_id}] result_post_to_contract = {:?}", res);
@@ -303,14 +314,10 @@ impl FeedSlotsProcessor {
         let result_post_to_contract = consumed_reports.result_post_to_contract.context(
             "[post_consumed_reports]: Impossible, quorum reached but no value is reported",
         )?;
-        let message = VotedFeedUpdate {
-            feed_id,
-            value: result_post_to_contract,
-            end_slot_timestamp: consumed_reports.end_slot_timestamp,
-        };
+
         debug!("Awaiting post_to_contract... [feed {feed_id}]");
         let result = self
-            .post_to_contract(history, message, sequencer_state)
+            .post_to_contract(history, result_post_to_contract, sequencer_state)
             .await;
         debug!("Continued after post_to_contract [feed {feed_id}]");
         result
@@ -319,7 +326,7 @@ impl FeedSlotsProcessor {
     async fn post_to_contract(
         &self,
         history: &Arc<RwLock<FeedAggregateHistory>>,
-        message: VotedFeedUpdate,
+        message: VotedFeedUpdateWithProof,
         sequencer_state: &Data<SequencerState>,
     ) -> Result<()> {
         {
@@ -327,7 +334,11 @@ impl FeedSlotsProcessor {
             debug!("Get a write lock on history [feed {feed_id}]");
             let mut history_guard = history.write().await;
             debug!("Push result that will be posted to contract to history [feed {feed_id}]");
-            history_guard.push(self.key, message.value.clone(), message.end_slot_timestamp);
+            history_guard.push(
+                self.key,
+                message.update.value.clone(),
+                message.update.end_slot_timestamp,
+            );
             debug!("Release the write lock on history [feed {feed_id}]");
         }
         let result_send = sequencer_state
