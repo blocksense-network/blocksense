@@ -7,7 +7,7 @@ use crate::metrics_collector::metrics_collector_loop;
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use config::SequencerConfig;
-use data_feeds::feeds_processing::VotedFeedUpdate;
+use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use futures_util::stream::FuturesUnordered;
 use gnosis_safe::data_types::ReporterResponse;
@@ -26,7 +26,7 @@ use tokio::task::JoinHandle;
 pub async fn prepare_app_workers(
     sequencer_state: Data<SequencerState>,
     sequencer_config: &SequencerConfig,
-    aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdate>,
+    aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdateWithProof>,
     feeds_management_cmd_to_block_creator_recv: UnboundedReceiver<FeedsManagementCmds>,
     feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
     aggregate_batch_sig_recv: UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>,

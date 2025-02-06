@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use config::PublishCriteria;
 use feed_registry::registry::FeedAggregateHistory;
+use feed_registry::types::DataFeedPayload;
 use feed_registry::types::FeedType;
 use feed_registry::types::Timestamp;
 use log::error;
@@ -11,6 +12,12 @@ pub struct VotedFeedUpdate {
     pub feed_id: u32,
     pub value: FeedType,
     pub end_slot_timestamp: Timestamp,
+}
+
+#[derive(Debug, Clone)]
+pub struct VotedFeedUpdateWithProof {
+    pub update: VotedFeedUpdate,
+    pub proof: Vec<DataFeedPayload>,
 }
 
 impl VotedFeedUpdate {
