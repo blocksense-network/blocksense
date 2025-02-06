@@ -47,7 +47,7 @@ contract AggregatedDataFeedStore {
         feed_input_data: [Field; MAX_FEEDS_AND_ROUNDS_DATA],
         feeds_len: Field,
         rounds_len: Field,
-        block_number: Field,
+        block_number: Field, // TODO
     ) {
         // TODO: Implement access control
 
@@ -70,7 +70,9 @@ contract AggregatedDataFeedStore {
         }
     }
 
-    unconstrained fn get_latest_round(stride: Field, feed_id: Field) -> pub Field {
+    #[public]
+    #[view]
+    fn get_latest_round(stride: Field, feed_id: Field) -> pub Field {
         storage.rounds.at(TWO_POW_115 * stride + feed_id).read()
     }
 
