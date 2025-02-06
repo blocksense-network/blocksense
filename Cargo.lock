@@ -11288,6 +11288,7 @@ dependencies = [
  "feed_registry",
  "futures",
  "futures-util",
+ "gnosis_safe",
  "http 1.2.0",
  "hyper 1.6.0",
  "is-terminal",
