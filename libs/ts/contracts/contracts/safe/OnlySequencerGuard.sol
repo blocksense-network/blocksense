@@ -8,13 +8,15 @@ contract OnlySequencerGuard is BaseGuard {
   mapping(address => bool) public sequencers;
   address internal immutable MULTISIG;
   address internal immutable ADMIN_MULTISIG;
+  address internal immutable ADFS;
 
   error OnlyAdminMultisig();
   error ExecutorNotSequencer();
 
-  constructor(address multisig, address adminMultisig) {
+  constructor(address multisig, address adminMultisig, address adfs) {
     MULTISIG = multisig;
     ADMIN_MULTISIG = adminMultisig;
+    ADFS = adfs;
   }
 
   // solhint-disable-next-line payable-fallback
@@ -40,7 +42,7 @@ contract OnlySequencerGuard is BaseGuard {
    * @param msgSender Executor of the transaction.
    */
   function checkTransaction(
-    address,
+    address to,
     uint256,
     bytes memory,
     Enum.Operation,
@@ -52,7 +54,7 @@ contract OnlySequencerGuard is BaseGuard {
     bytes memory,
     address msgSender
   ) external view override {
-    if (!sequencers[msgSender]) {
+    if (to == ADFS && !sequencers[msgSender]) {
       revert ExecutorNotSequencer();
     }
   }

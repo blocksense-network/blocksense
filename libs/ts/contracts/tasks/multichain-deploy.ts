@@ -13,7 +13,7 @@ import {
 } from '@safe-global/safe-core-sdk-types';
 import { getCreateCallDeployment } from '@safe-global/safe-deployments';
 
-import { NetworkConfig, ContractNames } from './types';
+import { NetworkConfig, ContractNames, MultisigConfig } from './types';
 import {
   EthereumAddress,
   getNetworkNameByChainId,
@@ -104,25 +104,30 @@ task('deploy', 'Deploy contracts')
         await sequencerMultisig.getAddress(),
       );
 
+      const accessControlSalt = ethers.id('accessControl');
+      const adfsSalt = ethers.id('aggregatedDataFeedStore');
+      const proxySalt = ethers.id('proxy');
+      const safeGuardSalt = ethers.id('onlySafeGuard');
+
       const accessControlAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.AccessControl,
-        ethers.id('accessControl'),
+        accessControlSalt,
         abiCoder.encode(['address'], [adminMultisigAddress]),
       );
       const adfsAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.ADFS,
-        ethers.id('aggregatedDataFeedStore'),
+        adfsSalt,
         abiCoder.encode(['address'], [accessControlAddress]),
       );
       const upgradeableProxyAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.UpgradeableProxyADFS,
-        ethers.id('proxy'),
+        proxySalt,
         abiCoder.encode(
           ['address', 'address'],
           [adfsAddress, adminMultisigAddress],
@@ -136,30 +141,34 @@ task('deploy', 'Deploy contracts')
         [
           {
             name: ContractNames.OnlySequencerGuard,
-            argsTypes: ['address', 'address'],
-            argsValues: [sequencerMultisigAddress, adminMultisigAddress],
-            salt: ethers.id('onlySequencerGuard'),
+            argsTypes: ['address', 'address', 'address'],
+            argsValues: [
+              sequencerMultisigAddress,
+              adminMultisigAddress,
+              upgradeableProxyAddress,
+            ],
+            salt: safeGuardSalt,
             value: 0n,
           },
           {
             name: ContractNames.AccessControl,
             argsTypes: ['address'],
             argsValues: [adminMultisigAddress],
-            salt: ethers.id('accessControl'),
+            salt: accessControlSalt,
             value: 0n,
           },
           {
             name: ContractNames.ADFS,
             argsTypes: ['address'],
             argsValues: [accessControlAddress],
-            salt: ethers.id('aggregatedDataFeedStore'),
+            salt: adfsSalt,
             value: 0n,
           },
           {
             name: ContractNames.UpgradeableProxyADFS,
             argsTypes: ['address', 'address'],
             argsValues: [adfsAddress, adminMultisigAddress],
-            salt: ethers.id('proxy'),
+            salt: proxySalt,
             value: 0n,
           },
           {
@@ -169,7 +178,7 @@ task('deploy', 'Deploy contracts')
             salt: ethers.id('registry'),
             value: 0n,
           },
-          ...dataFeedConfig.map(data => {
+          ...dataFeedConfig.slice(0, 10).map(data => {
             return {
               name: ContractNames.CLAggregatorAdapter as const,
               argsTypes: ['string', 'uint8', 'uint32', 'address'],
@@ -247,6 +256,11 @@ const deployMultisig = async (
     owners: config[type].owners,
     threshold: config[type].threshold,
   };
+  if (type === 'sequencerMultisig') {
+    safeAccountConfig.owners = [config[type].signer.address];
+    safeAccountConfig.threshold = 1;
+  }
+
   const saltNonce = '150000';
 
   // Predict deployed address
@@ -312,7 +326,7 @@ export const initChain = async (
     provider,
   );
   const envSequencerOwners =
-    process.env['SEQUENCER_OWNER_ADDRESSES_' + kebabToSnakeCase(networkName)];
+    process.env['SEQUENCER_EXTRA_SIGNERS_' + kebabToSnakeCase(networkName)];
   const sequencerOwners = envSequencerOwners
     ? envSequencerOwners
         .split(',')
@@ -321,7 +335,7 @@ export const initChain = async (
 
   const admin = new Wallet(getEnvString('ADMIN_SIGNER_PRIVATE_KEY'), provider);
   const envAdminOwners =
-    process.env['ADMIN_OWNER_ADDRESSES_' + kebabToSnakeCase(networkName)];
+    process.env['ADMIN_EXTRA_SIGNERS_' + kebabToSnakeCase(networkName)];
   const adminOwners = envAdminOwners
     ? envAdminOwners.split(',').map(address => parseEthereumAddress(address))
     : [];
@@ -405,35 +419,37 @@ async function checkAddressExists(
   return result !== '0x';
 }
 
-const multisigTxExec = async (
-  transactions: SafeTransactionDataPartial[],
+async function multisigTxExec(
+  transactions: SafeTransactionDataPartial[] | SafeTransaction,
   safe: Safe,
-  config: NetworkConfig,
-) => {
-  if (transactions.length === 0) {
-    console.log('No transactions to execute');
-    return;
+  multisigConfig: MultisigConfig,
+  provider: NetworkConfig['provider'],
+) {
+  let tx: SafeTransaction;
+
+  if (Array.isArray(transactions)) {
+    if (transactions.length === 0) {
+      console.log('No transactions to execute');
+      return;
+    }
+    tx = await safe.createTransaction({
+      transactions,
+    });
+  } else {
+    tx = transactions;
   }
-
-  const tx: SafeTransaction = await safe.createTransaction({
-    transactions,
-  });
-
-  const safeTransaction = await safe.signTransaction(tx);
 
   console.log('\nProposing transaction...');
 
-  const txResponse = await safe.executeTransaction(safeTransaction, {
-    nonce: await config.provider.getTransactionCount(
-      config.adminMultisig.signer.address,
-    ),
+  const txResponse = await safe.executeTransaction(tx, {
+    nonce: await provider.getTransactionCount(multisigConfig.signer.address),
   });
 
   // transactionResponse is of unknown type and there is no type def in the specs
   await (txResponse.transactionResponse as any).wait();
   console.log('-> tx hash', txResponse.hash);
   return parseTxHash(txResponse.hash);
-};
+}
 
 const deployContracts = async (
   config: NetworkConfig,
@@ -532,7 +548,12 @@ const deployContracts = async (
       transactions.length === BATCH_LENGTH ||
       (index === contracts.length - 1 && transactions.length > 0)
     ) {
-      await multisigTxExec(transactions, adminMultisig, config);
+      await multisigTxExec(
+        transactions,
+        adminMultisig,
+        config.adminMultisig,
+        config.provider,
+      );
       transactions.length = 0;
     }
   }
@@ -594,7 +615,12 @@ const registerCLAggregatorAdapters = async (
       operation: OperationType.Call,
     };
 
-    await multisigTxExec([safeTransactionData], adminMultisig, config);
+    await multisigTxExec(
+      [safeTransactionData],
+      adminMultisig,
+      config.adminMultisig,
+      config.provider,
+    );
   }
 };
 
@@ -605,7 +631,9 @@ const setupAccessControl = async (
   deployData: ContractsConfig,
   artifacts: Artifacts,
 ) => {
-  console.log('\nSetting up sequencer guard...');
+  console.log('\nSetting sequencer role in sequencer guard...');
+
+  const transactions: SafeTransactionDataPartial[] = [];
 
   const guard = new ethers.Contract(
     deployData.coreContracts.OnlySequencerGuard.address,
@@ -627,8 +655,7 @@ const setupAccessControl = async (
       ]),
       operation: OperationType.Call,
     };
-
-    await multisigTxExec([safeTxSetGuard], adminMultisig, config);
+    transactions.push(safeTxSetGuard);
   } else {
     console.log('Sequencer guard already set up');
   }
@@ -660,10 +687,90 @@ const setupAccessControl = async (
       ),
       operation: OperationType.Call,
     };
-
-    await multisigTxExec([safeTxSetAccessControl], adminMultisig, config);
+    transactions.push(safeTxSetAccessControl);
   } else {
     console.log('Access control already set up');
+  }
+
+  if (transactions.length > 0) {
+    await multisigTxExec(
+      transactions,
+      adminMultisig,
+      config.adminMultisig,
+      config.provider,
+    );
+  }
+
+  console.log(
+    '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
+  );
+
+  const enabledGuard = await sequencerMultisig.getGuard();
+  if (enabledGuard !== guard.target.toString()) {
+    const abiCoder = new ethers.AbiCoder();
+    const sequencerMultisigAddress = await sequencerMultisig.getAddress();
+    const sequencerTransactions: SafeTransactionDataPartial[] = [];
+
+    // setGuard(address guard)
+    const safeTxSetGuard: SafeTransactionDataPartial = {
+      to: sequencerMultisigAddress,
+      value: '0',
+      data:
+        '0xe19a9dd9' + abiCoder.encode(['address'], [guard.target]).slice(2),
+      operation: OperationType.Call,
+    };
+    sequencerTransactions.push(safeTxSetGuard);
+
+    for (const owner of config.sequencerMultisig.owners) {
+      // addOwnerWithThreshold(address newOwner, uint256 threshold);
+      const safeTxAddOwner: SafeTransactionDataPartial = {
+        to: sequencerMultisigAddress,
+        value: '0',
+        data:
+          '0x0d582f13' +
+          abiCoder.encode(['address', 'uint256'], [owner, 1]).slice(2),
+        operation: OperationType.Call,
+      };
+      sequencerTransactions.push(safeTxAddOwner);
+    }
+
+    const prevOwnerAddress = config.sequencerMultisig.owners[0];
+    // removeOwner(address prevOwner, address owner, uint256 threshold);
+    const safeTxRemoveOwner: SafeTransactionDataPartial = {
+      to: sequencerMultisigAddress,
+      value: '0',
+      data:
+        '0xf8dc5dd9' +
+        abiCoder
+          .encode(
+            ['address', 'address', 'uint256'],
+            [
+              prevOwnerAddress,
+              config.sequencerMultisig.signer.address,
+              config.sequencerMultisig.threshold,
+            ],
+          )
+          .slice(2),
+      operation: OperationType.Call,
+    };
+    sequencerTransactions.push(safeTxRemoveOwner);
+
+    await multisigTxExec(
+      sequencerTransactions,
+      sequencerMultisig,
+      config.sequencerMultisig,
+      config.provider,
+    );
+
+    console.log('Only sequencer guard set');
+    console.log(
+      'Sequencer multisig owners changed to reporters',
+      await sequencerMultisig.getOwners(),
+    );
+    console.log('Removed sequencer from multisig owners');
+    console.log('Current threshold', await sequencerMultisig.getThreshold());
+  } else {
+    console.log('Sequencer guard already set up');
   }
 };
 

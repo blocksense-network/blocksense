@@ -1,20 +1,18 @@
 import { EthereumAddress } from '@blocksense/base-utils/evm';
 import { JsonRpcProvider, Network, Wallet } from 'ethers';
 
+export interface MultisigConfig {
+  signer: Wallet;
+  owners: EthereumAddress[];
+  threshold: number;
+}
+
 export interface NetworkConfig {
   rpc: string;
   provider: JsonRpcProvider;
   network: Network;
-  sequencerMultisig: {
-    signer: Wallet;
-    owners: EthereumAddress[];
-    threshold: number;
-  };
-  adminMultisig: {
-    signer: Wallet;
-    owners: EthereumAddress[];
-    threshold: number;
-  };
+  sequencerMultisig: MultisigConfig;
+  adminMultisig: MultisigConfig;
   safeAddresses: {
     multiSendAddress: EthereumAddress;
     multiSendCallOnlyAddress: EthereumAddress;
