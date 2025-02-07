@@ -9,6 +9,7 @@ mod gemini;
 mod kraken;
 mod kucoin;
 mod mexc;
+mod upbit;
 
 use anyhow::{bail, Context, Result};
 // use async_trait::async_trait;
@@ -32,6 +33,7 @@ use gemini::get_gemini_prices;
 use kraken::get_kraken_prices;
 use kucoin::get_kucoin_prices;
 use mexc::get_mexc_prices;
+use upbit::get_upbit_prices;
 
 //TODO(adikov): Refacotr:
 //1. Move all specific exchange logic to separate files.
@@ -144,6 +146,9 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     print_results(&resources, &results);
 
     get_binance_us_prices(&resources, &mut results).await?;
+    print_results(&resources, &results);
+
+    get_upbit_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
 
     get_gemini_prices(&resources, &mut results).await?;
