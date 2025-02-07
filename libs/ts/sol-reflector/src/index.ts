@@ -59,7 +59,7 @@ export async function main(
   appendNatspecDetailsToParams(solReflection);
   appendAbiToSolReflection(solReflection, abiArtifacts);
 
-  await formatSignatures(solReflection);
+  //await formatSignatures(solReflection);
 
   await writeDocFiles(solReflection, userConfig);
 
