@@ -1,7 +1,13 @@
 { inputs, self, ... }:
 {
   perSystem =
-    { pkgs, self', ... }:
+    {
+      lib,
+      pkgs,
+      inputs',
+      self',
+      ...
+    }:
     let
       rust = self'.legacyPackages.rustToolchain;
 
@@ -25,12 +31,17 @@
         type = "app";
         program = "${package}/bin/${exeName}";
       };
+
+      mkSpinStateDir = pkgs.callPackage ./spin-plugin {
+        spin = lib.getExe' inputs'.nixpkgs-unstable.legacyPackages.fermyon-spin "spin";
+      };
     in
     {
       apps = {
         sequencer = mkApp blocksense-rs "sequencer";
         reporter = mkApp blocksense-rs "launch_reporter";
         blocksense = mkApp blocksense-rs "blocksense";
+        trigger-oracle = mkApp blocksense-rs "trigger-oracle";
       };
       packages = {
         inherit blocksense-rs;
@@ -39,6 +50,18 @@
         oracle-scripts = {
           cmc-wasm = mkOracleScript "cmc";
           yahoo-wasm = mkOracleScript "yahoo";
+        };
+
+        spinPlugins = {
+          triggerOracle = mkSpinStateDir {
+            name = "trigger-oracle";
+            description = "Run Blocksense oracle components at timed intervals";
+            homepage = "https://github.com/blocksense-network/blocksense/tree/main/apps/trigger-oracle";
+            license = "Apache-2.0";
+            spinCompatibility = ">=2.2";
+            version = "0.1.0";
+            packages = [ self'.apps.trigger-oracle.program ];
+          };
         };
       };
     };
