@@ -10,8 +10,6 @@
     let
       inherit (self.lib) dashToUnderscore;
 
-      mkReporters = keys: lib.imap0 (id: pub_key: { inherit id pub_key; }) keys;
-
       mkModule =
         backend:
         { config, pkgs, ... }:
@@ -54,7 +52,7 @@
             ];
 
           sequencerConfigJSON = configJSON cfg.sequencer {
-            reporters = mkReporters cfg.sequencer.reporters;
+            reporters = cfg.sequencer.reporters;
             prometheus_port = cfg.sequencer.metrics-port;
           };
 

@@ -65,6 +65,18 @@ let
         description = mdDoc "The Historical Data Feed contract address.";
       };
 
+      safe_address = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = mdDoc "Address of Gnosis Safe contract.";
+      };
+
+      safe_min_quorum = mkOption {
+        type = types.int;
+        default = 5;
+        description = mdDoc "Minimum number of reporters to sign the update before it can be posted.";
+      };
+
       impersonated_anvil_account = mkOption {
         type = types.nullOr types.str;
         default = null;
@@ -153,6 +165,25 @@ let
       };
     };
   };
+
+  reporterOpts = {
+    options = {
+      id = mkOption {
+        type = types.int;
+        description = mdDoc "Consecutive ids of the reporters.";
+      };
+
+      pub_key = mkOption {
+        type = types.str;
+        description = mdDoc "BLS public key of the reporter.";
+      };
+
+      address = mkOption {
+        type = types.str;
+        description = mdDoc "Gnosis Safe address of the reporter.";
+      };
+    };
+  };
 in
 {
   sequencer-id = mkOption {
@@ -207,12 +238,20 @@ in
   };
 
   reporters = mkOption {
-    type = types.listOf types.str;
+    type = types.listOf (types.submodule reporterOpts);
     default = [ ];
     description = mdDoc "The list of whitelisted reporter public keys.";
     example = [
-      "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e"
-      "ea30a8bd97d4f78213320c38215e95b239f8889df885552d85a50665b8b802de85fb40ae9b72d3f67628fa301e81252cd87e"
+      {
+        id = 0;
+        pub_key = "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e";
+        address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+      }
+      {
+        id = 1;
+        pub_key = "ea30a8bd97d4f78213320c38215e95b239f8889df885552d85a50665b8b802de85fb40ae9b72d3f67628fa301e81252cd87e";
+        address = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+      }
     ];
   };
 

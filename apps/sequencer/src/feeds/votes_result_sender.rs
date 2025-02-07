@@ -112,11 +112,11 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             } else {
                 info!("Network `{net}` is enabled; initiating second round consensus");
             }
-            // TODO: uncomment when we start using ADFS contracts
-            // if provider_settings.contract_version < 2 {
-            //     info!("Network `{net}` uses legacy contracts; skipping second round consensus");
-            //     continue;
-            // }
+            // TODO: remove when we start using ADFS contracts
+            if provider_settings.contract_version < 2 {
+                info!("Network `{net}` uses legacy contracts; skipping second round consensus");
+                continue;
+            }
             debug!("About to release a read lock on sequencer_config for `{net}` [default]");
             provider_settings
         };
