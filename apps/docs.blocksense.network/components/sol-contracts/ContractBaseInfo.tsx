@@ -92,7 +92,7 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
             </section>
           )}
           <aside className="contract-base-info__base-contracts-description mx-2 pb-6">
-            <ContractOverview contract={contract} />
+            <ContractOverview contractString={JSON.stringify(contract)} />
           </aside>
           <footer className="contract-base-info__header mt-6 mx-2 mb-6">
             <NatSpec natspec={contract.natspec} />

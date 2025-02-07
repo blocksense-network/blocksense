@@ -1,6 +1,5 @@
 'use client';
 
-import { ContractDocItem } from '@blocksense/sol-reflector';
 import { usePathname } from 'next/navigation';
 
 import { transformerOverviewLineLink } from '@/src/contract-overview';
@@ -8,15 +7,15 @@ import { getOverviewCodeContent } from '@/src/contract-overview';
 import { CodeBlock } from '@/components/common/CodeBlock';
 
 type ContractOverviewProps = {
-  contract: ContractDocItem;
+  contractString: string;
 };
 
-export const ContractOverview = ({ contract }: ContractOverviewProps) => {
+export const ContractOverview = ({ contractString }: ContractOverviewProps) => {
   const pathName = usePathname();
 
   return (
     <CodeBlock
-      code={getOverviewCodeContent(contract)}
+      code={getOverviewCodeContent(JSON.parse(contractString))}
       lang="solidity"
       transformers={[
         transformerOverviewLineLink({
