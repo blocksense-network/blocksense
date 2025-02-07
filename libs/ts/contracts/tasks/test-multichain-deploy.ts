@@ -1,5 +1,4 @@
 import { task } from 'hardhat/config';
-import { Artifacts } from 'hardhat/types';
 import { Wallet, ethers } from 'ethers';
 
 import Safe from '@safe-global/protocol-kit';
@@ -17,19 +16,17 @@ import {
 import { configDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import {
-  ContractsConfig,
-  DeploymentConfig,
-} from '@blocksense/config-types/evm-contracts-deployment';
+import { DeploymentConfig } from '@blocksense/config-types/evm-contracts-deployment';
 import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
 import { Feed } from '../test/utils/wrappers/types';
 
 import { initChain } from './multichain-deploy';
+import { expect } from 'chai';
 
 task(
   'test-deploy',
   'Test deployed contracts (only for localhost: THIS SCRIPT MAKES CHANGES TO THE DEPLOYED CONTRACTS)',
-).setAction(async (_, { artifacts }) => {
+).setAction(async (_, hre) => {
   const network = 'local';
   const config: NetworkConfig = await initChain(network);
 
@@ -62,30 +59,36 @@ task(
     },
   });
 
-  await checkDeployedContracts(
-    config,
-    deployment,
-    artifacts,
-    adminMultisig,
-    sequencerMultisig,
+  const reporter = new Wallet(
+    '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
   );
-});
 
-const checkDeployedContracts = async (
-  config: NetworkConfig,
-  deployedData: ContractsConfig,
-  artifacts: Artifacts,
-  adminMultisig: Safe,
-  sequencerMultisig: Safe,
-) => {
+  // change threshold to 1 for easier testing
+  let safeTxChangeThreshold =
+    await sequencerMultisig.createChangeThresholdTx(1);
+
+  for (const owner of config.sequencerMultisig.owners) {
+    const apiKit = await Safe.init({
+      provider: config.rpc,
+      safeAddress: await sequencerMultisig.getAddress(),
+      signer: owner,
+      contractNetworks: {
+        [config.network.chainId.toString()]: config.safeAddresses,
+      },
+    });
+    safeTxChangeThreshold = await apiKit.signTransaction(safeTxChangeThreshold);
+  }
+
+  await sequencerMultisig.executeTransaction(safeTxChangeThreshold);
+
   ////////////////////////
   // Write data in ADFS //
   ////////////////////////
+  console.log('Writing data in ADFS...');
 
-  const UP = new ethers.Contract(
-    deployedData.coreContracts.UpgradeableProxyADFS.address,
-    artifacts.readArtifactSync(ContractNames.UpgradeableProxyADFS).abi,
-    config.sequencerMultisig.signer,
+  const UP = await hre.ethers.getContractAt(
+    ContractNames.UpgradeableProxyADFS,
+    deployment.coreContracts.UpgradeableProxyADFS.address,
   );
 
   const feed: Feed = {
@@ -105,60 +108,53 @@ const checkDeployedContracts = async (
     transactions: [writeTxData],
   });
 
-  for (const owner of config.sequencerMultisig.owners) {
-    const apiKit = await Safe.init({
-      provider: config.rpc,
-      safeAddress: await sequencerMultisig.getAddress(),
-      signer: owner,
-      contractNetworks: {
-        [config.network.chainId.toString()]: config.safeAddresses,
-      },
-    });
-    writeTx = await apiKit.signTransaction(writeTx);
-  }
+  const apiKit = await Safe.init({
+    provider: config.rpc,
+    safeAddress: await sequencerMultisig.getAddress(),
+    signer: reporter.address,
+    contractNetworks: {
+      [config.network.chainId.toString()]: config.safeAddresses,
+    },
+  });
+  writeTx = await apiKit.signTransaction(writeTx);
 
-  try {
-    const reporter = new Wallet(config.sequencerMultisig.owners[0]);
-    const apiKit = await Safe.init({
-      provider: config.rpc,
-      safeAddress: await sequencerMultisig.getAddress(),
-      signer: reporter.address,
-      contractNetworks: {
-        [config.network.chainId.toString()]: config.safeAddresses,
-      },
-    });
+  const safeGuard = await hre.ethers.getContractAt(
+    ContractNames.OnlySequencerGuard,
+    deployment.coreContracts.OnlySequencerGuard.address,
+  );
 
-    await apiKit.executeTransaction(writeTx);
-  } catch (err) {
-    console.log('[WRONG MULTISIG SENDER] REVERTED AS EXPECTED');
-  }
+  // reporters cannot send signed transactions to upgradeable proxy
+  // only sequencer can
+  await expect(
+    apiKit.executeTransaction(writeTx),
+  ).to.be.revertedWithCustomError(safeGuard, 'ExecutorNotSequencer');
 
-  try {
-    await config.sequencerMultisig.signer.sendTransaction(writeTxData);
-  } catch (err) {
-    console.log('[NOT MULTISIG] REVERTED AS EXPECTED');
-  }
+  // sequencer cannot send direct transaction to upgradeable proxy
+  // AccessControl will reject this transaction
+  await expect(config.sequencerMultisig.signer.sendTransaction(writeTxData)).to
+    .be.reverted;
 
   await sequencerMultisig.executeTransaction(writeTx);
 
   ////////////////////////////////////////////
   // Check Aggregator and Registry adapters //
   ////////////////////////////////////////////
+  console.log('Checking Aggregator and Registry adapters...');
 
-  const PERPAggregator = new ethers.Contract(
-    deployedData.CLAggregatorAdapter[1].address,
-    artifacts.readArtifactSync(ContractNames.CLAggregatorAdapter).abi,
+  const PERPAggregator = await hre.ethers.getContractAt(
+    ContractNames.CLAggregatorAdapter,
+    deployment.CLAggregatorAdapter[1].address,
     config.sequencerMultisig.signer,
   );
 
   const description = await PERPAggregator.description();
-  console.log('description: ' + description + ', expected: PERP / USD');
+  expect(description).to.equal('PERP / USD');
   const latestAnswer = await PERPAggregator.latestAnswer();
-  console.log('latestAnswer: ' + latestAnswer.toString() + ', expected: 1234');
+  expect(latestAnswer).to.equal(1234);
 
-  const feedRegistry = new ethers.Contract(
-    deployedData.coreContracts.CLFeedRegistryAdapter.address,
-    artifacts.readArtifactSync(ContractNames.CLFeedRegistryAdapter).abi,
+  const feedRegistry = await hre.ethers.getContractAt(
+    ContractNames.CLFeedRegistryAdapter,
+    deployment.coreContracts.CLFeedRegistryAdapter.address,
     config.sequencerMultisig.signer,
   );
 
@@ -166,26 +162,14 @@ const checkDeployedContracts = async (
     '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
     '0x0000000000000000000000000000000000000348',
   );
-  console.log(
-    'feed from registry: ' +
-      feedFromRegistry.toString() +
-      ', expected: ' +
-      deployedData.CLAggregatorAdapter[6].address,
-  );
+
+  expect(feedFromRegistry).to.equal(deployment.CLAggregatorAdapter[6].address);
 
   ///////////////////////////////////////////
   // Change sequencer rights in Safe Guard //
   ///////////////////////////////////////////
+  console.log('Changing sequencer rights in Safe Guard...');
 
-  const safeGuard = new ethers.Contract(
-    deployedData.coreContracts.OnlySequencerGuard.address,
-    artifacts.readArtifactSync(ContractNames.OnlySequencerGuard).abi,
-    config.sequencerMultisig.signer,
-  );
-
-  const reporter = new Wallet(
-    '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
-  );
   const changeSequencerTxData: SafeTransactionDataPartial = {
     to: safeGuard.target.toString(),
     value: '0',
@@ -195,13 +179,11 @@ const checkDeployedContracts = async (
     ]),
     operation: OperationType.Call,
   };
-  let setSequencerTx = await adminMultisig.createTransaction({
+  const setSequencerTx = await adminMultisig.createTransaction({
     transactions: [changeSequencerTxData],
   });
 
   await adminMultisig.executeTransaction(setSequencerTx);
-
-  console.log('Sequencer rights changed');
 
   const newFeed: Feed = {
     id: 1n,
@@ -216,41 +198,37 @@ const checkDeployedContracts = async (
     data: encodeDataWrite([newFeed]),
   };
 
-  setSequencerTx = await sequencerMultisig.createTransaction({
+  const writeDataTx = await sequencerMultisig.createTransaction({
     transactions: [writeTxData2].map(tx => ({
       ...tx,
       operation: OperationType.Call,
     })),
   });
 
-  const apiKit = await Safe.init({
-    provider: config.rpc,
-    safeAddress: await sequencerMultisig.getAddress(),
-    signer: reporter.address,
-    contractNetworks: {
-      [config.network.chainId.toString()]: config.safeAddresses,
-    },
-  });
-  await apiKit.executeTransaction(setSequencerTx);
+  await apiKit.executeTransaction(writeDataTx);
 
   const latestAnswer2 = await PERPAggregator.latestAnswer();
-  console.log('latestAnswer: ' + latestAnswer2.toString() + ', expected: 5678');
+  expect(latestAnswer2).to.equal(5678);
 
   //////////////////////////////////////
   // Change Access Control admin role //
   //////////////////////////////////////
+  console.log('Changing Access Control admin role...');
 
-  const accessControl = new ethers.Contract(
-    deployedData.coreContracts.AccessControl.address,
-    artifacts.readArtifactSync(ContractNames.AccessControl).abi,
-    config.sequencerMultisig.signer,
+  const accessControl = await hre.ethers.getContractAt(
+    ContractNames.AccessControl,
+    deployment.coreContracts.AccessControl.address,
   );
 
-  const isAllowed = await config.sequencerMultisig.signer.call({
-    to: accessControl.target.toString(),
-    data: await sequencerMultisig.getAddress(),
-  });
-  console.log('isAllowed: ' + Boolean(Number(isAllowed)) + ', expected: true');
+  const isAllowed = Boolean(
+    Number(
+      await config.sequencerMultisig.signer.call({
+        to: accessControl.target.toString(),
+        data: await sequencerMultisig.getAddress(),
+      }),
+    ),
+  );
+  expect(isAllowed).to.equal(true);
 
   const changeAccessControlTxData: SafeTransactionDataPartial = {
     to: accessControl.target.toString(),
@@ -268,14 +246,16 @@ const checkDeployedContracts = async (
 
   await adminMultisig.executeTransaction(changeAccessControlTx);
 
-  const isAllowedAfter = await config.sequencerMultisig.signer.call({
-    to: accessControl.target.toString(),
-    data: await sequencerMultisig.getAddress(),
-  });
-  console.log(
-    'isAllowedAfter: ' + Boolean(Number(isAllowedAfter)) + ', expected: false',
+  const isAllowedAfter = Boolean(
+    Number(
+      await config.sequencerMultisig.signer.call({
+        to: accessControl.target.toString(),
+        data: await sequencerMultisig.getAddress(),
+      }),
+    ),
   );
-};
+  expect(isAllowedAfter).to.equal(false);
+});
 
 const encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
   blockNumber ??= Date.now() + 100;
