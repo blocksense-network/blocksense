@@ -5,7 +5,7 @@ import { Signature } from '@/sol-contracts-components/Signature';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
-import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnitClient';
+import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
 
 type VariablesProps = {
   variables?: VariableDocItem[];

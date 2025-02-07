@@ -1,4 +1,4 @@
-import  ContractPageWrapper, { generateStaticParams }  from '@/components/ReferenceDocumentation/[contract]';
+import  Contract, { generateStaticParams }  from '@/components/ReferenceDocumentation/[contract]';
 
 export { generateStaticParams };
 
@@ -8,6 +8,5 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ContractPage({ params }) {
-
-  return <ContractPageWrapper params={params} />;
+  return <Contract params={params} />;
 }

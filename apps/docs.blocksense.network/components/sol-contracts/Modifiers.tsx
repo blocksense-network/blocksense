@@ -5,7 +5,7 @@ import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { Parameters } from '@/sol-contracts-components/Parameters';
 import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
-import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnitClient';
+import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
 
 type ModifiersProps = {
   modifiers?: ModifierDocItem[];

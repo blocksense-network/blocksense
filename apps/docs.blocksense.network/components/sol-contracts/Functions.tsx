@@ -8,7 +8,7 @@ import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers'
 import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 import { Selector } from '@/sol-contracts-components/Selector';
 import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
-import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnitClient';
+import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];

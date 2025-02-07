@@ -6,7 +6,7 @@ import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrap
 import { Parameters } from '@/sol-contracts-components/Parameters';
 import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
-import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnitClient';
+import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
 
 type EventsProps = {
   events?: EventDocItem[];
