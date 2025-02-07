@@ -94,7 +94,7 @@ pub async fn aggregation_batch_consensus_loop(
                         let block_height = signed_aggregate.block_height;
                         let net = &signed_aggregate.network;
 
-                        // Get quorum size from config bedore locking batches_awaiting_consensus!
+                        // Get quorum size from config before locking batches_awaiting_consensus!
                         let safe_min_quorum = {
                             let sequencer_config = sequencer_state.sequencer_config.read().await;
                             match sequencer_config.providers.get(net) {
