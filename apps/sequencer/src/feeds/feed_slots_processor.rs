@@ -128,7 +128,7 @@ impl FeedSlotsProcessor {
             let result_post_to_contract = VotedFeedUpdate {
                 feed_id,
                 value: aggregator.aggregate(&values[..]), // Perform the concrete aggregation
-                end_slot_timestamp: end_slot_timestamp,
+                end_slot_timestamp,
             };
 
             let mut proof: Vec<DataFeedPayload> = Vec::new();
