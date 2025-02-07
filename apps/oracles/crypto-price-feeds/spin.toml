@@ -860,6 +860,7 @@ allowed_outbound_hosts = [
   "https://api.gemini.com",
   "https://api-pub.bitfinex.com",
   "https://api.upbit.com",
+  "https://api.bitget.com",
 ]
 
 [component.crypto-price-feeds.build]
