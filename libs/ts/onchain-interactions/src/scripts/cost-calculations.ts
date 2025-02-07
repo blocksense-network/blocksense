@@ -160,13 +160,35 @@ const fetchTransactionsForNetwork = async (
     console.log(chalk.green(network.toUpperCase()));
     console.log(chalk.blue(`Fetching transactions for ${network}...`));
     let response: AxiosResponse<any>;
-    let rawTransactions;
+    let rawTransactions: any[] = [];
     if (network === 'morph-holesky') {
       response = await axios.get(`${apiUrl}/addresses/${address}/transactions`);
       rawTransactions = response.data.items || [];
     } else if (network === 'telos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.results || [];
+    } else if (network === 'cronos-testnet') {
+      let currentPage = 1;
+      let totalPages = 1;
+      do {
+        const page = await axios.get(apiUrl, {
+          params: {
+            module: 'account',
+            action: 'txlist',
+            address,
+            startblock: 0,
+            endblock: 99999999,
+            sort: 'desc',
+            apikey,
+            limit: 100,
+            currentPage,
+          },
+        });
+        const txFromPage = page.data.result;
+        rawTransactions = rawTransactions.concat(txFromPage);
+        totalPages = page.data.pagination.totalPage;
+        currentPage += 1;
+      } while (currentPage <= totalPages);
     } else {
       response = await axios.get(apiUrl, {
         params: {
