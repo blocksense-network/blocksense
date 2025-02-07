@@ -5,9 +5,11 @@ use feed_registry::types::DataFeedPayload;
 use feed_registry::types::FeedType;
 use feed_registry::types::Timestamp;
 use log::error;
+use serde::Deserialize;
+use serde::Serialize;
 use utils::from_hex_string;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotedFeedUpdate {
     pub feed_id: u32,
     pub value: FeedType,

@@ -4727,6 +4727,8 @@ dependencies = [
  "alloy-encode-packed",
  "alloy-primitives",
  "anyhow",
+ "data_feeds",
+ "feed_registry",
  "hex",
  "serde 1.0.217",
  "serde_json",

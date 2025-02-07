@@ -6,6 +6,8 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
+feed_registry = { path = "../feed_registry" }
+data_feeds = {path = "../data_feeds"}
 hex = "0.4.3"
 alloy = { version = "0.8", features = [
     "sol-types",
