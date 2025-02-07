@@ -120,6 +120,12 @@ let
         type = types.nullOr (types.submodule systemTimeOpts);
         description = mdDoc "Time of genesis of blockchain.";
       };
+
+      aggregation_consensus_discard_period_blocks = mkOption {
+        type = types.int;
+        default = 1000;
+        description = mdDoc "Maximum number of blocks to consider for consensus. If there are blocks (batches) that are older and still await consensus, they will be dropped.";
+      };
     };
   };
 
