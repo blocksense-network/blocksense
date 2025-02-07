@@ -2,11 +2,16 @@
 title: Deployed Contracts
 ---
 
-import React from 'react';
-
-import { DeployedContracts, getContractsData } from '@/components/DeployedContracts/DeployedContracts';
+import { DeployedContracts } from '@/components/DeployedContracts/DeployedContracts';
+import { getContractsData } from '@/components/DeployedContracts/getContractsData';
 
 export default function DeployedContractsPage() {
   const { parsedCoreContracts, parsedProxyContracts } = getContractsData();
-  return <DeployedContracts parsedCoreContracts={parsedCoreContracts} parsedProxyContracts={parsedProxyContracts} />;
+
+  return (
+    <DeployedContracts
+      parsedCoreContracts={parsedCoreContracts}
+      parsedProxyContracts={parsedProxyContracts}
+    />
+  );
 }
