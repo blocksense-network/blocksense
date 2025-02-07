@@ -26,8 +26,6 @@ main > h1 {
 @layer base {
   pre {
     contain: paint;
-    word-break: break-word;
-    white-space: pre-wrap;
     border: 1px solid #ececec;
     border-radius: 0.375rem;
     padding: 1.25rem 0.75rem;
@@ -114,7 +112,6 @@ main > h1 {
 
   .contract-base-info__base-contracts-description pre code,
   .signature__content pre code {
-    white-space: pre;
     overflow-y: scroll;
     scrollbar-width: none;
     padding: 0;

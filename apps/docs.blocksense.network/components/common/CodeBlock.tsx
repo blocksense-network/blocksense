@@ -64,7 +64,7 @@ export const CodeBlock = ({
         />
       )}
       <div
-        className="signature__code grow"
+        className="signature__code"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
