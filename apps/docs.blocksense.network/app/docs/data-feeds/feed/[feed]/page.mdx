@@ -1,7 +1,7 @@
 import { decodeFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
 
-import DataFeedPage, { generateStaticParams } from '@/components/DataFeeds/[feed]';
+import DataFeed, { generateStaticParams } from '@/components/DataFeeds/[feed]';
 
 export { generateStaticParams };
 
@@ -21,6 +21,6 @@ export async function generateMetadata({ params }) {
   return metadata;
 }
 
-export default function FeedPage({ params }) {
-  return <DataFeedPage params={params} />;
+export default function DataFeedPage({ params }) {
+  return <DataFeed params={params} />;
 }
