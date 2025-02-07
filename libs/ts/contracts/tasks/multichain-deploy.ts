@@ -106,7 +106,9 @@ task('deploy', 'Deploy contracts')
 
       const accessControlSalt = ethers.id('accessControl');
       const adfsSalt = ethers.id('aggregatedDataFeedStore');
-      const proxySalt = ethers.id('proxy');
+      // this address starts with '0xadf5...'
+      const proxySalt =
+        '0x0065ba4ae95eae67c94ed75da1c129f9047f7195542167968b28794cb9611643';
       const safeGuardSalt = ethers.id('onlySafeGuard');
 
       const accessControlAddress = await predictAddress(
