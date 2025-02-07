@@ -1,6 +1,7 @@
 mod binance;
 mod binance_us;
 mod bitfinex;
+mod bitget;
 mod bybit;
 mod coinbase;
 mod common;
@@ -26,6 +27,7 @@ use crate::common::{ResourceData, ResourceResult};
 use binance::get_binance_prices;
 use binance_us::get_binance_us_prices;
 use bitfinex::get_bitfinex_prices;
+use bitget::get_bitget_prices;
 use bybit::get_bybit_prices;
 use coinbase::get_coinbase_prices;
 use crypto_com_exchange::get_crypto_com_exchange_prices;
@@ -152,6 +154,9 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     print_results(&resources, &results);
 
     get_gemini_prices(&resources, &mut results).await?;
+    print_results(&resources, &results);
+
+    get_bitget_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
 
     //TODO(adikov): Write the logic for transforming the data to DataFeedResult
