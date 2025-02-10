@@ -32,7 +32,7 @@ pub async fn votes_result_sender_loop(
                 );
                 match recvd {
                     Some(updates) => {
-                        debug!("sending aggregation consensus trigger");
+                        info!("sending aggregation consensus trigger");
                         try_send_aggregation_consensus_trigger_to_reporters(
                             &sequencer_state,
                             &updates,
@@ -150,7 +150,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         };
 
         if updates.updates.is_empty() {
-            println!("--------------------updates empty---------------------------");
+            info!("--------------------updates empty---------------------------");
             debug!("No aggregated batch update for network {net}");
             continue;
         }
@@ -223,7 +223,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
         let serialized_updates = match serde_json::to_string(&updates_to_kafka) {
             Ok(res) => {
-                println!("--------------------{:?}---------------------------", res);
+                info!("--------------------{:?}---------------------------", res);
                 res
             }
             Err(e) => {
