@@ -4208,10 +4208,10 @@
       "fullName": "IoTeX",
       "description": "IOTX / USD",
       "decimals": 8,
-      "report_interval_ms": 90000,
+      "report_interval_ms": 9000,
       "quorum_percentage": 100,
-      "skip_publish_if_less_then_percentage": 0.1,
-      "always_publish_heartbeat_ms": 3600000,
+      "skip_publish_if_less_then_percentage": 0.0001,
+      "always_publish_heartbeat_ms": 9000,
       "type": "Crypto",
       "script": "CoinMarketCap",
       "pair": {

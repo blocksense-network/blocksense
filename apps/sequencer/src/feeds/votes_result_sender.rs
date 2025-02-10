@@ -113,10 +113,10 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 info!("Network `{net}` is enabled; initiating second round consensus");
             }
             // TODO: remove when we start using ADFS contracts
-            if provider_settings.contract_version < 2 {
-                info!("Network `{net}` uses legacy contracts; skipping second round consensus");
-                continue;
-            }
+            // if provider_settings.contract_version < 2 {
+            // info!("Network `{net}` uses legacy contracts; skipping second round consensus");
+            // continue;
+            // }
             debug!("About to release a read lock on sequencer_config for `{net}` [default]");
             provider_settings
         };
@@ -150,6 +150,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         };
 
         if updates.updates.is_empty() {
+            println!("--------------------updates empty---------------------------");
             debug!("No aggregated batch update for network {net}");
             continue;
         }
@@ -221,7 +222,10 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         };
 
         let serialized_updates = match serde_json::to_string(&updates_to_kafka) {
-            Ok(res) => res,
+            Ok(res) => {
+                println!("--------------------{:?}---------------------------", res);
+                res
+            }
             Err(e) => {
                 error!("Failed to serialize data for second round conseneus trigger! {e}");
                 continue;
