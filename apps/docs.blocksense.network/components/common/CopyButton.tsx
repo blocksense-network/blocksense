@@ -35,7 +35,9 @@ export const CopyButton = ({
     : null;
 
   return (
-    <aside className={`signature__copy-button z-5 ${copyButtonClasses}`}>
+    <aside
+      className={`signature__copy-button z-5 border ms-auto rounded-sm border-neutral-200 bg-slate-50 dark:bg-neutral-900 dark:border-neutral-600 flex items-center justify-center w-8 h-8 ${copyButtonClasses}`}
+    >
       <Tooltip position={tooltipPosition}>
         <Tooltip.Content>
           <span>{isCopied ? 'Copied' : 'Copy'}</span>
@@ -44,13 +46,13 @@ export const CopyButton = ({
           <ImageWrapper
             src="/icons/check.svg"
             alt="Copied"
-            className="relative w-5 h-5 invert"
+            className="w-4 h-4 invert"
           />
         ) : (
           <ImageWrapper
             src="/icons/clipboard.svg"
             alt="Clipboard"
-            className="relative w-5 h-5 cursor-pointer invert"
+            className="w-4 h-4 cursor-pointer invert"
             onClick={onCopy}
           />
         )}

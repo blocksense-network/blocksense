@@ -57,7 +57,9 @@ export const Tooltip = ({
           )}
         >
           {content?.props.children}
-          <div className={`absolute ${arrowClasses[position]} border-solid`} />
+          <div
+            className={`absolute ${arrowClasses[position]} invert border-solid`}
+          />
         </div>
       )}
     </div>

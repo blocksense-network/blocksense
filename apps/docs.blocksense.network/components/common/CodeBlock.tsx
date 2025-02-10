@@ -59,7 +59,7 @@ export const CodeBlock = ({
         <CopyButton
           textToCopy={code}
           tooltipPosition="left"
-          copyButtonClasses="absolute top-4 right-2 m-2"
+          copyButtonClasses="absolute top-2 right-2 m-2"
           disabled={copy.disabled}
         />
       )}
