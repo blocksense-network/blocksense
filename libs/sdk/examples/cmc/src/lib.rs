@@ -55,7 +55,7 @@ pub struct Tag {
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CmcValue {
-    pub price: f64,
+    pub price: Option<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -106,7 +106,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     for (feed_id, data) in resources.iter() {
         payload.values.push(match value.data.get(&data.cmc_id.parse::<u64>()?) {
             Some(cmc) => {
-                let value = if let Some(&CmcValue { price }) = cmc.quote.get("USD") {
+                let value = if let Some(&CmcValue { price: Some(price) }) = cmc.quote.get("USD") {
                     DataFeedResultValue::Numerical(price)
                 } else {
                     DataFeedResultValue::Error(format!(
