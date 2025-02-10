@@ -4209,7 +4209,7 @@
       "description": "IOTX / USD",
       "decimals": 8,
       "report_interval_ms": 9000,
-      "quorum_percentage": 100,
+      "quorum_percentage": 1,
       "skip_publish_if_less_then_percentage": 0.0001,
       "always_publish_heartbeat_ms": 9000,
       "type": "Crypto",
