@@ -51,7 +51,7 @@ use blocksense_utils::time::current_unix_time;
 
 use blocksense_gnosis_safe::{
     data_types::{ConsensusSecondRoundBatch, ReporterResponse},
-    utils::{create_fixed_bytes, create_private_key_signer, get_signature_bytes, sign_hash},
+    utils::{bytes_to_hex_string, create_fixed_bytes, create_private_key_signer, sign_hash},
 };
 
 wasmtime::component::bindgen!({
@@ -80,7 +80,7 @@ pub struct OracleTrigger {
     engine: TriggerAppEngine<Self>,
     sequencer: String,
     prometheus_url: Option<String>,
-    kafka_endpoint: String,
+    kafka_endpoint: Option<String>,
     secret_key: String,
     second_consensus_secret_key: String,
     reporter_id: u64,
@@ -194,9 +194,7 @@ impl TriggerExecutor for OracleTrigger {
             .expect("Report time interval not provided");
         let sequencer = metadata.sequencer.expect("Sequencer URL is not provided");
         let prometheus_url = metadata.prometheus_url;
-        let kafka_endpoint = metadata
-            .kafka_endpoint
-            .expect("Kafka Endpoint is not provided");
+        let kafka_endpoint = metadata.kafka_endpoint;
         let secret_key = metadata.secret_key.expect("Secret key is not provided");
         let second_consensus_secret_key = metadata
             .second_consensus_secret_key
@@ -527,7 +525,7 @@ impl OracleTrigger {
     }
 
     fn start_secondary_signature_listener(
-        kafka_report_endpoint: String,
+        kafka_report_endpoint: Option<String>,
         signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
         kafka_info: Option<String>,
     ) -> tokio::task::JoinHandle<TerminationReason> {
@@ -541,21 +539,37 @@ impl OracleTrigger {
     }
 
     async fn signal_secondary_signature(
-        kafka_report_endpoint: String,
+        kafka_report_endpoint: Option<String>,
         signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
         _kafka_info: Option<String>,
     ) -> TerminationReason {
         // TODO(adikov): remove unwrap/expect
         // TODO(adikov): get all kafka configuration from `kafka_info` parameter
 
+        let Some(kafka_report_endpoint) = kafka_report_endpoint else {
+            return TerminationReason::Other("No kafka report provided".to_string());
+        };
+
         // Configure the Kafka consumer
-        let consumer: StreamConsumer = ClientConfig::new()
+        let consumer: StreamConsumer = match ClientConfig::new()
             .set("bootstrap.servers", kafka_report_endpoint)
             .set("group.id", "no_commit_group") // Consumer group ID
             .set("enable.auto.commit", "false") // Disable auto-commit
             .set("auto.offset.reset", "latest") // Start from latest always
+            .set("socket.timeout.ms", "300000")
+            .set("session.timeout.ms", "400000")
+            .set("max.poll.interval.ms", "500000")
             .create()
-            .expect("Failed to create Kafka consumer");
+        {
+            Ok(consumer) => consumer,
+            Err(err) => {
+                tracing::error!("Error while creating kafka consumer: {:?}", err);
+                return TerminationReason::Other(format!(
+                    "Error while creating kafka consumer: {:?}",
+                    err
+                ));
+            }
+        };
 
         // Subscribe to the desired topic(s)
         consumer
@@ -727,13 +741,9 @@ impl OracleTrigger {
                     continue;
                 }
             };
-            let signature = match String::from_utf8(get_signature_bytes(&mut [signed]).await) {
-                Ok(s) => s,
-                Err(e) => {
-                    tracing::error!("Failed to parse signature to string: {}", &e);
-                    continue;
-                }
-            };
+
+            let signature = bytes_to_hex_string(signed.signature.as_bytes().to_vec());
+
             let report = ReporterResponse {
                 block_height: aggregated_consensus.block_height,
                 reporter_id,
