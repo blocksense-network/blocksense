@@ -4,7 +4,7 @@ import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Settings2 } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/Button';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,

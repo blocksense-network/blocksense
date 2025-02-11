@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import type { FC } from 'react';
 
 import { gettingStartedConfig } from '@/config';
-import { LinkButton } from '@/components/common/LinkButton';
+import { Button } from '@/components/common/Button';
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -19,14 +19,15 @@ const IndexPage: FC = () => {
           {gettingStartedConfig.description}
         </p>
         <div className="flex flex-wrap mt-2">
-          <LinkButton
+          <Button
+            variant="link"
             href="/docs"
             className="bg-neutral-100 hover:bg-neutral-900 hover:text-white"
-            label="Get Started"
+            content="Get Started"
           />
-          <LinkButton
+          <Button
             href="/docs/overview/roadmap"
-            label="Roadmap"
+            content="Roadmap"
             className="hidden"
           />
         </div>

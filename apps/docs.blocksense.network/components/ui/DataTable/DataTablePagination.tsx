@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/Button';
 import {
   Select,
   SelectContent,

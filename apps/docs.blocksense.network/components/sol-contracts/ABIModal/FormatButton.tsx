@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ImageWrapper } from '@/components/common/ImageWrapper';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/Button';
 
 type FormatButtonProps = {
   formatHandler: () => void;

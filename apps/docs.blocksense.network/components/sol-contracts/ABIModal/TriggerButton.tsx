@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/Button';
 import { Tooltip } from '@/components/common/Tooltip';
 
 type TriggerButtonProps = {
@@ -12,7 +12,7 @@ export const TriggerButton = ({ tooltipContent }: TriggerButtonProps) => {
     <Tooltip position="right">
       <Tooltip.Content>{tooltipContent}</Tooltip.Content>
       <Button
-        variant="secondary"
+        variant="highlight"
         className="mt-2 mb-2 font-bold w-full min-w-16 border-solid border border-slate-200 bg-slate-50 rounded-md dark:bg-neutral-900 dark:border-neutral-600 dark:text-white dark:hover:bg-black"
       >
         ABI

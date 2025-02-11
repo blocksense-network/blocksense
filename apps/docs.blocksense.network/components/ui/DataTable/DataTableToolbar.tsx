@@ -3,7 +3,7 @@ import * as React from 'react';
 import { X } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/Button';
 import { Input } from '@/components/ui/input';
 import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions';
 import { DataTableFacetedFilter } from '@/components/ui/DataTable/DataTableFacetedFilter';
@@ -63,7 +63,7 @@ export function DataTableToolbar<TData>({
         )}
         {isFiltered && (
           <Button
-            variant="ghost"
+            variant="highlight"
             onClick={() => table.resetColumnFilters()}
             className="h-8 p-1"
           >

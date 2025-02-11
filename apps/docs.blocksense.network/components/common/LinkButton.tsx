@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from '@blocksense/nextra-theme-docs';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/common/Button';
 
 interface ButtonProps {
   href?: string;
