@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+/// @title AccessControl
+/// @notice Contract that manages access control when writing to the dataFeedStore storage
 contract AccessControl {
   address internal immutable OWNER;
 

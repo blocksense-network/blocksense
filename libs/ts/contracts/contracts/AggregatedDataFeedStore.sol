@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+/// @title AggregatedDataFeedStore
+/// @notice Contract that stores data feeds of different strides
 contract AggregatedDataFeedStore {
   address internal constant DATA_FEED_ADDRESS =
     0x0000000100000000000000000000000000000000;

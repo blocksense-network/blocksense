@@ -6,8 +6,8 @@ pragma solidity ^0.8.24;
 /// @dev Contains utility functions for calling gas efficiently dataFeedStore functions and decoding return data
 library CLAdapterLib {
   /// @notice Gets the latest answer from the dataFeedStore
-  /// @param id The key ID for the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
+  /// @param id The ID of the feed
   /// @return answer The latest stored value after being decoded
   function _latestAnswer(
     uint256 id,
@@ -29,7 +29,7 @@ library CLAdapterLib {
 
   /// @notice Gets the round data from the dataFeedStore
   /// @param _roundId The round ID to retrieve data for
-  /// @param id The key ID for the feed
+  /// @param id The ID of the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @return roundId The round ID
   /// @return answer The value stored for the feed at the given round ID
@@ -58,8 +58,7 @@ library CLAdapterLib {
   }
 
   /// @notice Gets the latest round ID for a given feed from the dataFeedStore
-  /// @dev Using assembly achieves lower gas costs
-  /// @param id The key ID for the feed
+  /// @param id The ID of the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @return roundId The latest round ID
   function _latestRound(
@@ -76,7 +75,7 @@ library CLAdapterLib {
 
   /// @notice Gets the latest round data for a given feed from the dataFeedStore
   /// @dev Using assembly achieves lower gas costs
-  /// @param id The key ID for the feed
+  /// @param id The ID of the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @return roundId The latest round ID
   /// @return answer The latest stored value after being decoded
@@ -176,6 +175,10 @@ library CLAdapterLib {
     return (int256(uint256(uint192(bytes24(data)))), uint64(uint256(data)));
   }
 
+  /// @notice Shifts the feed id to the left by 120 bits
+  /// @dev This is used in the constructor to save gas when calling the dataFeedStore
+  /// The dataFeedStore expects the feed id to be positioned in the calldata in a 15 bytes value starting from the 3rd byte
+  /// @param id The feed id to shift
   function _shiftId(uint256 id) internal pure returns (uint256) {
     return id << 120;
   }
