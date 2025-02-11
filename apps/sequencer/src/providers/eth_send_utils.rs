@@ -111,6 +111,7 @@ pub async fn get_serialized_updates_for_network(
     provider_settings: &config::Provider,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    feeds_rounds: &mut HashMap<u32, u64>,
 ) -> Result<String> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider.lock().await;
@@ -133,12 +134,20 @@ pub async fn get_serialized_updates_for_network(
 
     let serialized_updates = match contract_version {
         1 => match legacy_serialize_updates(net, updates, feeds_config).await {
-            Ok(result) => result,
-            Err(e) => eyre::bail!("Legacy serialization failed: {}!", e),
+            Ok(result) => {
+                debug!("legacy_serialize_updates result = {result}");
+                result
+            }
+            Err(e) => eyre::bail!("Legacy serialization failed: {e}!"),
         },
-        2 => match adfs_serialize_updates(net, updates, feeds_metrics, feeds_config).await {
-            Ok(result) => result,
-            Err(e) => eyre::bail!("ADFS serialization failed: {}!", e),
+        2 => match adfs_serialize_updates(net, updates, feeds_metrics, feeds_config, feeds_rounds)
+            .await
+        {
+            Ok(result) => {
+                debug!("adfs_serialize_updates result = {result}");
+                result
+            }
+            Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
         },
         _ => eyre::bail!("Unsupported contract version set for network {net}!"),
     };
@@ -158,6 +167,7 @@ pub async fn eth_batch_send_to_contract(
     transaction_retry_timeout_secs: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<u32>)> {
+    let mut feeds_rounds = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
         &provider,
@@ -165,6 +175,7 @@ pub async fn eth_batch_send_to_contract(
         &provider_settings,
         feeds_metrics,
         feeds_config,
+        &mut feeds_rounds,
     )
     .await?;
 

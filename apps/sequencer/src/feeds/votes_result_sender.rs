@@ -6,6 +6,7 @@ use crate::{sequencer_state::SequencerState, BatchedAggegratesToSend};
 use actix_web::web::Data;
 use alloy::hex::{self, FromHex, ToHexExt};
 use alloy::providers::Provider;
+use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, U256};
 use feed_registry::types::Repeatability::Periodic;
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
@@ -130,6 +131,8 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         let feeds_metrics = sequencer_state.feeds_metrics.clone();
         let feeds_config = sequencer_state.active_feeds.clone();
 
+        let mut feeds_rounds = HashMap::new();
+
         let serialized_updates = match get_serialized_updates_for_network(
             net,
             provider,
@@ -137,6 +140,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             &provider_settings,
             Some(feeds_metrics),
             feeds_config,
+            &mut feeds_rounds,
         )
         .await
         {
@@ -222,6 +226,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             network: net.to_string(),
             calldata: hex::encode(serialized_updates),
             updates: updates.updates,
+            feeds_rounds,
             proofs: updates.proofs,
         };
 
