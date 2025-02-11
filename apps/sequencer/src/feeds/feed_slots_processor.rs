@@ -567,7 +567,7 @@ pub mod tests {
     use utils::test_env::get_test_private_key_path;
 
     pub fn check_recieved(
-        received: Result<Option<VotedFeedUpdate>, Elapsed>,
+        received: Result<Option<VotedFeedUpdateWithProof>, Elapsed>,
         expected: (u32, FeedType),
     ) {
         let feed_id = expected.0;
@@ -575,10 +575,10 @@ pub mod tests {
         match received {
             Ok(Some(vote)) => {
                 assert_eq!(
-                    feed_id, vote.feed_id,
+                    feed_id, vote.update.feed_id,
                     "The key does not match the expected value"
                 );
-                assert_eq!(vote.value, original_report_data);
+                assert_eq!(vote.update.value, original_report_data);
             }
             Ok(None) => {
                 panic!("The channel was closed before receiving any data");
@@ -589,7 +589,7 @@ pub mod tests {
         }
     }
 
-    pub fn check_timeout_expected(received: Result<Option<VotedFeedUpdate>, Elapsed>) {
+    pub fn check_timeout_expected(received: Result<Option<VotedFeedUpdateWithProof>, Elapsed>) {
         // Assert that the result is an error of type Elapsed
         match received {
             Ok(Some(_)) => {
@@ -604,7 +604,7 @@ pub mod tests {
         }
     }
 
-    pub fn check_channel_is_closed(received: Result<Option<VotedFeedUpdate>, Elapsed>) {
+    pub fn check_channel_is_closed(received: Result<Option<VotedFeedUpdateWithProof>, Elapsed>) {
         // Assert that the result is an error of type Elapsed
         match received {
             Ok(Some(_)) => {
@@ -701,8 +701,10 @@ pub mod tests {
         });
 
         // Attempt to receive with a timeout of 2 seconds
-        let received: std::result::Result<Option<VotedFeedUpdate>, tokio::time::error::Elapsed> =
-            tokio::time::timeout(Duration::from_secs(2), rx.recv()).await;
+        let received: std::result::Result<
+            Option<VotedFeedUpdateWithProof>,
+            tokio::time::error::Elapsed,
+        > = tokio::time::timeout(Duration::from_secs(2), rx.recv()).await;
         check_recieved(received, (feed_id, original_report_data));
     }
 
@@ -1129,7 +1131,7 @@ pub mod tests {
     async fn run_feed_slots_processor_loop_always_publish_heartbeat(
         name: &str,
         always_publish_heartbeat_ms: Option<u128>,
-    ) -> std::result::Result<Option<VotedFeedUpdate>, tokio::time::error::Elapsed> {
+    ) -> std::result::Result<Option<VotedFeedUpdateWithProof>, tokio::time::error::Elapsed> {
         let metrics_prefix = name;
         let report_interval_ms = 100; // 0.1 second interval
         let quorum_percentage = 60.0f32; // 60 %
