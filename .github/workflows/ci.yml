@@ -177,9 +177,6 @@ jobs:
       - name: Run Cargo Clippy
         run: cargo clippy -- --deny warnings
 
-      - name: Build and install oracle trigger plugin
-        run: ./scripts/sdk/build-and-install-plugin.sh
-
   rust-nix-build:
     timeout-minutes: 360
     runs-on: self-hosted
