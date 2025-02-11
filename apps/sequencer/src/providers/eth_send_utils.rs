@@ -758,6 +758,7 @@ mod tests {
         let updates_oneshot = UpdateToSend {
             block_height: 0,
             updates: vec![voted_update],
+            proofs: HashMap::new(),
         };
         let provider_settings = cfg
             .providers
@@ -899,6 +900,7 @@ mod tests {
                 FeedType::Text("".to_string()),
             )
             .unwrap()],
+            proofs: HashMap::new(),
         };
 
         let result =
@@ -916,6 +918,7 @@ mod tests {
         let mut updates = UpdateToSend {
             block_height: 0,
             updates: get_updates_test_data(),
+            proofs: HashMap::new(),
         };
         filter_allowed_feeds(network, &mut updates, &None);
         let serialized_updates =
@@ -956,6 +959,7 @@ mod tests {
         let mut updates = UpdateToSend {
             block_height: 0,
             updates: get_updates_test_data(),
+            proofs: HashMap::new(),
         };
 
         filter_allowed_feeds(
@@ -1063,6 +1067,7 @@ mod tests {
         UpdateToSend {
             block_height: 1,
             updates: vec![v1, v2, v3, v4, v5],
+            proofs: HashMap::new(),
         }
     }
 
