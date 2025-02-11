@@ -49,6 +49,10 @@ pub async fn adfs_serialize_updates(
     feed_updates: &BatchedAggegratesToSend,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    feeds_rounds: &mut HashMap<u32, u64>, /* The rounds table for the relevant feeds. If the feeds_metrics are provided,
+                                          this map will be filled with the update count for each feed from it. If the
+                                          feeds_metrics is None, feeds_rounds will be used as the source of the updates
+                                          count. */
 ) -> Result<String> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
@@ -97,9 +101,13 @@ pub async fn adfs_serialize_updates(
                     .with_label_values(&[&update.feed_id.to_string(), net])
                     .get();
                 debug!("Acquired and released a read lock on feeds_metrics; network={net}; feed_id={feed_id}");
+                feeds_rounds.insert(feed_id, round);
                 round
             }
-            None => 0,
+            None => *feeds_rounds.get(&feed_id).unwrap_or({
+                error!("feeds_rounds does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
+                &0
+            }),
         };
 
         round %= MAX_HISTORY_ELEMENTS_PER_FEED;
@@ -310,6 +318,7 @@ pub mod tests {
                 &updates,
                 Some(feeds_metrics.clone()),
                 Arc::new(RwLock::new(config)),
+                &mut HashMap::new(),
             )
             .await
             .unwrap()
