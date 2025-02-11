@@ -4347,6 +4347,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "feeds_processing"
+version = "0.1.1"
+dependencies = [
+ "alloy 0.8.3",
+ "alloy-encode-packed",
+ "alloy-primitives",
+ "anomaly_detection",
+ "anyhow",
+ "config 0.1.1",
+ "data_feeds",
+ "feed_registry",
+ "hex",
+ "ringbuf",
+ "serde 1.0.217",
+ "serde_json",
+ "tokio 1.43.0",
+ "tracing",
+]
+
+[[package]]
 name = "ff"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9342,6 +9362,7 @@ dependencies = [
  "envload",
  "eyre",
  "feed_registry",
+ "feeds_processing",
  "futures",
  "futures-util",
  "gnosis_safe",

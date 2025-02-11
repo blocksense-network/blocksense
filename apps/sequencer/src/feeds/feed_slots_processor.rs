@@ -1,45 +1,27 @@
 use crate::reporters::reporter::SharedReporters;
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
-use anomaly_detection::ingest::anomaly_detector_aggregate;
-use config::PublishCriteria;
-use data_feeds::feeds_processing::{VotedFeedUpdate, VotedFeedUpdateWithProof};
-use eyre::{eyre, Result};
-use eyre::{Context, ContextCompat};
+use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
+use eyre::{eyre, ContextCompat, Result};
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::feed_registration_cmds::ProcessorResultValue;
-use feed_registry::registry::AllFeedsReports;
-use feed_registry::registry::FeedAggregateHistory;
-use feed_registry::registry::SlotTimeTracker;
-use feed_registry::types::FeedsSlotProcessorCmds;
-use feed_registry::types::{DataFeedPayload, FeedType};
-use feed_registry::types::{FeedMetaData, Repeatability, Timestamp};
+use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, SlotTimeTracker};
+use feed_registry::types::{
+    FeedMetaData, FeedType, FeedsSlotProcessorCmds, Repeatability, Timestamp,
+};
+use feeds_processing::utils::{consume_reports, ConsumedReports};
 use prometheus::{inc_metric, metrics::FeedsMetrics};
-use ringbuf::traits::consumer::Consumer;
-use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc;
 use tokio::sync::RwLock;
 use tracing::error;
-use tracing::warn;
 use tracing::{debug, info};
 use utils::time::current_unix_time;
-
-const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
 pub struct FeedSlotsProcessor {
     name: String,
     key: u32,
-}
-
-#[derive(Debug)]
-pub struct ConsumedReports {
-    pub is_quorum_reached: bool,
-    pub skip_publishing: bool,
-    pub ad_score: Option<f64>,
-    pub result_post_to_contract: Option<VotedFeedUpdateWithProof>,
-    pub end_slot_timestamp: Timestamp,
 }
 
 impl FeedSlotsProcessor {
@@ -85,136 +67,6 @@ impl FeedSlotsProcessor {
     }
 
     #[allow(clippy::too_many_arguments)]
-    async fn consume_reports(
-        &self,
-        reports: &HashMap<u64, DataFeedPayload>,
-        feed_type: &FeedType,
-        slot: u64,
-        quorum_percentage: f32,
-        skip_publish_if_less_then_percentage: f64,
-        always_publish_heartbeat_ms: Option<u128>,
-        end_slot_timestamp: Timestamp,
-        num_valid_reporters: usize,
-        is_oneshot: bool,
-        aggregator: FeedAggregate,
-        history: &Arc<RwLock<FeedAggregateHistory>>,
-        feed_id: u32,
-    ) -> ConsumedReports {
-        let values = self.collect_reported_values(feed_type, reports, slot);
-
-        if values.is_empty() {
-            info!("No reports found for feed: {} slot: {}!", self.name, &slot);
-            ConsumedReports {
-                is_quorum_reached: false,
-                skip_publishing: true,
-                ad_score: None,
-                result_post_to_contract: None,
-                end_slot_timestamp,
-            }
-        } else {
-            let total_votes_count = values.len() as f32;
-            let required_votes_count = quorum_percentage * 0.01f32 * (num_valid_reporters as f32);
-            let is_quorum_reached = required_votes_count <= total_votes_count;
-            let mut skip_publishing = false;
-            if !is_quorum_reached {
-                warn!(
-                    "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
-                    self.name, &slot, quorum_percentage, total_votes_count, num_valid_reporters
-                );
-            }
-
-            // Dispatch to concrete FeedAggregate implementation.
-            let result_post_to_contract = VotedFeedUpdate {
-                feed_id,
-                value: aggregator.aggregate(&values[..]), // Perform the concrete aggregation
-                end_slot_timestamp,
-            };
-
-            let mut proof: Vec<DataFeedPayload> = Vec::new();
-            for (_, v) in reports.iter() {
-                proof.push(v.clone());
-            }
-
-            let mut ad_score_opt: Option<f64> = None;
-
-            // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
-            if !is_oneshot {
-                if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
-                    let ad_score = self
-                        .perform_anomaly_detection(history, candidate_value)
-                        .await;
-                    match ad_score {
-                        Ok(ad_score) => {
-                            info!(
-                                "AD_score for {:?} is {}",
-                                result_post_to_contract.value, ad_score
-                            );
-                            ad_score_opt = Some(ad_score)
-                        }
-                        Err(e) => {
-                            warn!("Anomaly Detection failed with error - {}", e);
-                        }
-                    }
-                    {
-                        let criteria = PublishCriteria {
-                            feed_id,
-                            skip_publish_if_less_then_percentage,
-                            always_publish_heartbeat_ms,
-                            peg_to_value: None,
-                            peg_tolerance_percentage: 0.0f64,
-                        };
-                        debug!("Get a read lock on history [feed {feed_id}]");
-                        let history_guard = history.read().await;
-                        skip_publishing =
-                            result_post_to_contract.should_skip(&criteria, &history_guard);
-                        debug!("Release the read lock on history [feed {feed_id}]");
-                    }
-                }
-            }
-            let res = ConsumedReports {
-                is_quorum_reached,
-                skip_publishing,
-                ad_score: ad_score_opt,
-                result_post_to_contract: Some(VotedFeedUpdateWithProof {
-                    update: result_post_to_contract,
-                    proof,
-                }),
-                end_slot_timestamp,
-            };
-            info!("[feed {feed_id}] result_post_to_contract = {:?}", res);
-            res
-        }
-    }
-
-    fn collect_reported_values(
-        &self,
-        expected_feed_type: &FeedType,
-        reports: &HashMap<u64, DataFeedPayload>,
-        slot: u64,
-    ) -> Vec<FeedType> {
-        let feed_id = self.key;
-        let mut values: Vec<FeedType> = vec![];
-        for kv in reports {
-            match &kv.1.result {
-                Ok(value) => {
-                    if value.same_enum_type_as(expected_feed_type) {
-                        values.push(value.clone());
-                    } else {
-                        warn!("Wrong value type reported by reporter {} for feed id {} slot {}! {} expected", kv.0, feed_id, slot, expected_feed_type.enum_type_to_string());
-                    }
-                }
-                Err(_) => {
-                    warn!(
-                        "Got error from reporter {} for feed id {} slot {}",
-                        kv.0, feed_id, slot
-                    );
-                }
-            }
-        }
-        values
-    }
-
-    #[allow(clippy::too_many_arguments)]
     async fn process_end_of_slot(
         &self,
         is_oneshot: bool,
@@ -257,22 +109,22 @@ impl FeedSlotsProcessor {
                 debug!("Get a write lock on reports [feed {feed_id}]");
                 let mut reports = reports.write().await;
                 debug!("Acquired a write lock on reports [feed {feed_id}]");
-                consumed_reports = self
-                    .consume_reports(
-                        &reports.report,
-                        feed_type,
-                        slot,
-                        quorum_percentage,
-                        skip_publish_if_less_then_percentage,
-                        always_publish_heartbeat_ms,
-                        end_slot_timestamp,
-                        num_valid_reporters,
-                        is_oneshot,
-                        aggregator,
-                        history,
-                        feed_id,
-                    )
-                    .await;
+                consumed_reports = consume_reports(
+                    self.name.as_str(),
+                    &reports.report,
+                    feed_type,
+                    slot,
+                    quorum_percentage,
+                    skip_publish_if_less_then_percentage,
+                    always_publish_heartbeat_ms,
+                    end_slot_timestamp,
+                    num_valid_reporters,
+                    is_oneshot,
+                    aggregator,
+                    history,
+                    feed_id,
+                )
+                .await;
 
                 reports.clear();
                 drop(reports);
@@ -346,66 +198,6 @@ impl FeedSlotsProcessor {
         result_send
             .send(message)
             .map_err(|e| eyre!("[post_to_contract]: {e}"))
-    }
-
-    async fn perform_anomaly_detection(
-        &self,
-        history: &Arc<RwLock<FeedAggregateHistory>>,
-        candidate_value: f64,
-    ) -> Result<f64, eyre::Error> {
-        let feed_id = self.key;
-        let history = history.clone();
-        let anomaly_detection_future = async move {
-            debug!("Get a read lock on history [feed {feed_id}]");
-            let history_lock = history.read().await;
-
-            // The first slice is from the current read position to the end of the array
-            // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
-            let heap = history_lock
-                .get(feed_id)
-                .context("Missing key from History!")?;
-            let (first, last) = heap.as_slices();
-            let history_vec: Vec<&FeedType> =
-                first.iter().chain(last.iter()).map(|h| &h.value).collect();
-            let mut numerical_vec: Vec<f64> = history_vec
-                .iter()
-                .filter_map(|feed| {
-                    if let FeedType::Numerical(value) = feed {
-                        Some(*value)
-                    } else if let FeedType::Text(_) = feed {
-                        warn!("Anomaly Detection not implemented for FeedType::Text, skipping...");
-                        None
-                    } else {
-                        warn!("Anomaly Detection does not recognize FeedType, skipping...");
-                        None
-                    }
-                })
-                .collect();
-
-            drop(history_lock);
-            debug!("Release the read lock on history [feed {feed_id}]");
-
-            numerical_vec.push(candidate_value);
-
-            // Get AD prediction only if enough data is present
-            if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
-                debug!("Starting anomaly detection for [feed {feed_id}]");
-                anomaly_detector_aggregate(numerical_vec).map_err(|e| eyre!("{e}"))
-            } else {
-                Err(eyre!(
-                    "Skipping anomaly detection; numerical_vec.len() = {} threshold: {}",
-                    numerical_vec.len(),
-                    AD_MIN_DATA_POINTS_THRESHOLD
-                ))
-            }
-        };
-
-        tokio::task::Builder::new()
-            .name("anomaly_detection")
-            .spawn(anomaly_detection_future)
-            .context("Failed to spawn feed slots manager anomaly detection!")?
-            .await
-            .context("Failed to join feed slots manager anomaly detection!")?
     }
 
     async fn increase_quorum_metric(
