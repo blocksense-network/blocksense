@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/common/Card';
 
 type DataFeedCardContentProps = {
   children: ReactNode;

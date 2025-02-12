@@ -1,6 +1,11 @@
 import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/common/Card';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 
 type CoreContractProps = {

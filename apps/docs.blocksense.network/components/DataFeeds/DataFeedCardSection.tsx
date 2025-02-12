@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from '@/components/ui/card';
+} from '@/components/common/Card';
 import { DataFeedCardContent } from '@/components/DataFeeds/DataFeedCardContent';
 
 type DataFeedCardSectionProps = {
