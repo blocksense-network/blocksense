@@ -56,10 +56,8 @@ impl VotedFeedUpdate {
                             let diff = f64::abs(last - candidate_value);
                             let skip_time_check =
                                 criteria
-                                    .always_publish_heartbeat_ms
-                                    .map_or(true, |heartbeat| {
-                                        self.end_slot_timestamp
-                                            < heartbeat + last_published.end_slot_timestamp
+                                    .always_publish_heartbeat_ms.is_none_or(|heartbeat| {
+                                        self.end_slot_timestamp < heartbeat + last_published.end_slot_timestamp
                                     });
                             let skip_diff_check = diff * 100.0f64 < criteria.skip_publish_if_less_then_percentage * a;
                             skip_diff_check && skip_time_check
