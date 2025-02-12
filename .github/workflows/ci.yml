@@ -76,70 +76,6 @@ jobs:
       - name: Measure contract size
         run: yarn workspace @blocksense/contracts size
 
-  docs_website:
-    timeout-minutes: 360
-    runs-on: [self-hosted, nixos, x86-64-v3]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build & activate the Nix Dev Shell
-        run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
-
-      - name: Install JS deps
-        run: yarn install
-
-      - name: Build
-        run: yarn workspace @blocksense/docs.blocksense.network build:with-deps
-
-      - name: Test `@blocksense/base-utils`
-        run: yarn workspace @blocksense/base-utils test
-
-      - name: Test
-        run: yarn workspace @blocksense/docs.blocksense.network test
-
-  explorer_website:
-    timeout-minutes: 360
-    runs-on: [self-hosted, nixos, x86-64-v3]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build & activate the Nix Dev Shell
-        run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
-
-      - name: Install JS deps
-        run: yarn install
-
-      - name: Build
-        run: yarn workspace @blocksense/explorer.blocksense.network build
-
   rust:
     timeout-minutes: 360
     strategy:
@@ -243,12 +179,14 @@ jobs:
       - name: Install JS deps
         run: yarn install
 
-      - name: Build the website
-        run: |
-          (
-            cd apps/docs.blocksense.network
-            yarn build:with-deps
-          )
+      - name: Build
+        run: yarn workspace @blocksense/docs.blocksense.network build:with-deps
+
+      - name: Test `@blocksense/base-utils`
+        run: yarn workspace @blocksense/base-utils test
+
+      - name: Test
+        run: yarn workspace @blocksense/docs.blocksense.network test
 
       - name: Deploy
         id: Deploy
