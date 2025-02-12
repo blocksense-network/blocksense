@@ -106,9 +106,10 @@ task('deploy', 'Deploy contracts')
 
       const accessControlSalt = ethers.id('accessControl');
       const adfsSalt = ethers.id('aggregatedDataFeedStore');
-      // this address starts with '0xadf5...'
+      // this address starts with '0xADF5...' for local deployment
+      // should be recalculated when admin address and/or owners (therefore adminMultisig address) changes
       const proxySalt =
-        '0x0065ba4ae95eae67c94ed75da1c129f9047f7195542167968b28794cb9611643';
+        '0x209fdf6800d7d02ac1cc47ea0409e3064b940123694168d0c33238324bb086e1';
       const safeGuardSalt = ethers.id('onlySafeGuard');
 
       const accessControlAddress = await predictAddress(
@@ -180,7 +181,7 @@ task('deploy', 'Deploy contracts')
             salt: ethers.id('registry'),
             value: 0n,
           },
-          ...dataFeedConfig.slice(0, 10).map(data => {
+          ...dataFeedConfig.map(data => {
             return {
               name: ContractNames.CLAggregatorAdapter as const,
               argsTypes: ['string', 'uint8', 'uint32', 'address'],
@@ -263,7 +264,7 @@ const deployMultisig = async (
     safeAccountConfig.threshold = 1;
   }
 
-  const saltNonce = '150000';
+  const saltNonce = ethers.hexlify(ethers.toUtf8Bytes(type));
 
   // Predict deployed address
   const predictedDeploySafeAddress = await safeFactory.predictSafeAddress(
@@ -323,12 +324,8 @@ export const initChain = async (
     process.exit(1);
   }
 
-  const sequencer = new Wallet(
-    getEnvString('SEQUENCER_SIGNER_PRIVATE_KEY'),
-    provider,
-  );
   const envSequencerOwners =
-    process.env['SEQUENCER_EXTRA_SIGNERS_' + kebabToSnakeCase(networkName)];
+    process.env['REPORTER_ADDRESSES_' + kebabToSnakeCase(networkName)];
   const sequencerOwners = envSequencerOwners
     ? envSequencerOwners
         .split(',')
@@ -347,9 +344,9 @@ export const initChain = async (
     provider,
     network,
     sequencerMultisig: {
-      signer: sequencer,
+      signer: admin,
       owners: sequencerOwners,
-      threshold: +getOptionalEnvString('SEQUENCER_THRESHOLD', '1'),
+      threshold: +getOptionalEnvString('REPORTER_THRESHOLD', '1'),
     },
     adminMultisig: {
       signer: admin,
@@ -652,7 +649,7 @@ const setupAccessControl = async (
       to: guard.target.toString(),
       value: '0',
       data: guard.interface.encodeFunctionData('setSequencer', [
-        config.sequencerMultisig.signer.address, // sequencer address
+        getEnvString('SEQUENCER_ADDRESS'), // sequencer address
         true,
       ]),
       operation: OperationType.Call,
@@ -780,7 +777,7 @@ const saveDeployment = async (
   configs: NetworkConfig[],
   chainsDeployment: DeploymentConfigV2,
 ) => {
-  const fileName = 'evm_contracts_deployment_v1';
+  const fileName = 'evm_contracts_deployment_v2';
   const { decodeJSON, writeJSON } = selectDirectory(configDir);
 
   const deploymentContent = await decodeJSON(
