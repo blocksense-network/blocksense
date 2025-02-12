@@ -54,12 +54,18 @@ pub struct ReporterInfo {
     /// Sequencer URL
     #[serde(default)]
     pub sequencer: String,
+    /// Kafka endpoint
+    #[serde(default)]
+    pub kafka_endpoint: String,
     /// Registry URL
     #[serde(default)]
     pub registry: String,
     /// Reporter secret key for signing transactions
     #[serde(default)]
     pub secret_key: String,
+    /// Reporter secret key for second consensus
+    #[serde(default)]
+    pub second_consensus_secret_key: String,
     /// Reporter id
     #[serde(default)]
     pub reporter_id: u64,
