@@ -96,9 +96,6 @@ jobs:
         with:
           extra-conf: accept-flake-config = true
 
-      - uses: DeterminateSystems/magic-nix-cache-action@main
-        if: runner.os == 'macOS'
-
       - uses: cachix/cachix-action@v15
         with:
           name: ${{ vars.CACHIX_CACHE }}
@@ -202,7 +199,7 @@ jobs:
         env:
           DOCS_DEPLOY_URL: ${{ steps.Deploy.outputs.deployment-url }}
         run: |
-          echo "::set-output name=url::$DOCS_DEPLOY_URL"
+          echo "url=$DOCS_DEPLOY_URL" >> $GITHUB_STATE
 
   comment_on_pr:
     needs: [deploy_websites]
@@ -213,7 +210,7 @@ jobs:
       - name: Get current date and time
         id: datetime
         run: |
-          echo "::set-output name=latest_update::$(date +'%d.%m.%Y %H:%M:%S')"
+          echo "latest_update=$(date +'%d.%m.%Y %H:%M:%S')" >> $GITHUB_STATE
 
       - name: Comment Deployment Links on the PR
         uses: marocchino/sticky-pull-request-comment@v2.9.1
