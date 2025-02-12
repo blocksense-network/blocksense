@@ -15,84 +15,71 @@ contracts
 │   │   ├── IChainlinkAggregator.sol
 │   │   └── IChainlinkFeedRegistry.sol
 │   ├── ICLAggregatorAdapter.sol
-│   └── ICLFeedRegistryAdapter.sol
+│   ├── ICLFeedRegistryAdapter.sol
+│   └── IUpgradeableProxy.sol
 ├── libraries
-│   └── Blocksense.sol
+│   ├── Blocksense.sol
+│   └── CLAdapterLib.sol
+├── safe
+│   └── OnlySequencerGuard.sol
 ├── test
-│   ├── consumers
-│   │   ├── historical
-│   │   │   └── ...
+│   ├── chainlink-oracles
+│   │   ├── Oracle.sol
+│   │   └── Registry.sol
+│   ├── examples
 │   │   └── ...
-│   ├── interfaces
-│   │   └── ...
-│   ├── DataFeedStoreGeneric.sol
-│   ├── DataFeedStoreGenericV1.sol
-│   ├── DataFeedStoreGenericV2.sol
-│   └── HistoricalDataFeedStoreGenericV1.sol
-├── DataFeedStoreV1.sol
-├── DataFeedStoreV2.sol
-├── DataFeedStoreV3.sol
-├── HistoricalDataFeedStoreV1.sol
-├── HistoricalDataFeedStoreV2.sol
-└── UpgradeableProxy.sol
+│   └── AggregatedDataFeedStoreGeneric.sol
+├── AccessControl.sol
+├── AggregatedDataFeedStore.sol (ADFS)
+└── UpgradeableProxyADFS.sol
 ```
 
-The `cl-adapters` folder contains the Chainlink aggregator contract - CLAggregatorAdapter.sol. The Chainlink aggregator contract implements the Chainlink aggregator interface. It interacts with the UpgradeableProxy contract to make calls to the data feed store contracts. The `registries` folder contains the CLFeedRegistryAdapter contract which is used to register new data feeds. It stores the immutable data from Chainlink aggregator contracts (key, description and decimals) and directly calls the upgradeable historical data feed contract to retrieve data.
+The `cl-adapters` folder contains the Chainlink aggregator contract - CLAggregatorAdapter.sol. The Chainlink aggregator contract implements the Chainlink aggregator interface. It interacts with the UpgradeableProxyADFS contract to make calls to the data feed store contracts. The `registries` folder contains the CLFeedRegistryAdapter contract which is used to register new data feeds. It stores the immutable data from CL aggregator adapter contracts (id, description and decimals) and directly calls the upgradeable ADFS contract to retrieve data.
 
-The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - ICLFeedRegistryAdapter.sol and the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - ICLAggregatorAdapter.sol.
+The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - ICLFeedRegistryAdapter.sol, the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - ICLAggregatorAdapter.sol and the interface for the upgradeable proxy contract - IUpgradeableProxy.sol.
 
-The `libraries` folder contains the Blocksense library which is used to make calls to either the data feed store contracts or the UpgradeableProxy before them. The Blocksense library is used by the Chainlink aggregator contracts and the CLFeedRegistryAdapter contracts.
+The `libraries` folder contains the Blocksense library which is used to make calls to the upgradeable ADFS proxy. The CLAdapterLib is used by the Chainlink aggregator contracts and the CLFeedRegistryAdapter contract.
 
-The `test` folder contains example consumer contracts (under `consumers`) and reference implementations of data feed store - DataFeedStoreGenericV1.sol, DataFeedStoreGenericV2.sol and HistoricalDataFeedStoreGenericV1.sol.
+The `safe` folder contains the OnlySequencerGuard contract which is used to restrict access when writing data to the ADFS contract.
 
-Each of the data feed store implementations (DataFeedStoreV1.sol, DataFeedStoreV2.sol, DataFeedStoreV3.sol) is a contract that stores data feed values for a specific data feed key. The data feed key is a maximum of 31 bit integer that uniquely identifies a data feed. The data feed value is stored as `bytes32`. The data feed value is updated by the data feed store contract owner.
+The `test` folder contains example consumer contracts (under `consumers`) and a reference implementation of ADFS - AggregatedDataFeedStoreGeneric.sol. It also contains the `chainlink-oracle` contracts which are used for gas comparison tests against Chainlink.
 
-The historical data feed contracts (HistoricalDataFeedStoreV1.sol, HistoricalDataFeedStoreV2.sol) store historical data feed values for a specific data feed key. The data feed key is a maximum of 29 bit integer that uniquely identifies a data feed. The data feed value is stored as packed `bytes32` which consists of `bytes24 value` and `uint64 timestamp`. When a new value is set, a counter representing the contiguous history of the stored values is incremented. The data feed value is updated by the data feed store contract owner.
+The `AccessControl.sol` contract is used to manage access control when writing data to the ADFS contract.
+
+The `AggregatedDataFeedStore.sol` contract (ADFS) is where data is stored and read from. The `UpgradeableProxyADFS.sol` contract is used as a transparent proxy for the ADFS contract.
 
 ```mermaid
 graph TD
     A[Client] -->|invoke| E
     A -->|invoke| B
-    B[CLFeedRegistryAdapter] -->|staticcall| C[UpgradeableProxy]
-    C -->|delegatecall| D[HistoricalDataFeedStore]
+    B[CLFeedRegistryAdapter] -->|staticcall| C[UpgradeableProxyADFS]
+    C -->|delegatecall| D[AggregatedDataFeedStore]
     E[CLAggregatorAdapter] -->|staticcall| C
 ```
 
 ### Calls
 
-All calls are handled by a fallback function based on the selector:
+All read calls must start with the first bit set to 1, where the whole selector is 1 byte (0x80 in binary is 0b10000000, i.e. first bit set to 1):
 
 - Setter:
-  - All contracts have the same selector `0x1a2d80ac` which is the keccak256 hash of the string `setFeeds(bytes)`.
-
-#### DataFeedStore
-
-- Getter:
-  - For `DataFeedStoreV1.sol` the selector is `0x00000000` + a key which should not be greater than a predefined constant `CONTRACT_MANAGEMENT_SELECTOR` (e.g. `0x00...0001ffff`);
-  - For `DataFeedStoreV2.sol` and `DataFeedStoreV3.sol` the selector is `0x80000000` + key which enables the key to be a 31 bit integer. The most significant bit of the selector defines the type of the call (getter or setter).
-
-#### HistoricalDataFeedStore
-
-- Getter:
-  - There are 3 types of selectors:
-    - `0x80000000` + key which returns the most recent value based on the latest counter from the feed with id `key`;
-    - `0x40000000` + key which returns the latest counter for the feed with id `key`;
-    - `0x20000000` + key followed by counter which returns the value at `counter` for the feed with id `key`;
-    - `0xc0000000` + key to call both `0x40000000` and `0x80000000` selectors in a single call.
-
-> This way the gas cost of calls is reduced as the Solidity compiler will not generate `Linear If-Else Dispatcher` statements for the different selectors.
+  - `0x00`
+- Getters:
+  - `0x86`: getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
+  - `0x81`: getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
+  - `0x82`: getLatestSingleData(uint8 stride, uint120 feedId) returns (bytes)
+  - `0x84`: getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
+  - `0x83` will call both **getLatestRound** and **getLatestSingleData**.
+  - `0x85` will call both **getLatestRound** and **getLatestData**.
 
 ### Storage layout representation
 
-- `DataFeedStoreV1.sol` and `DataFeedStoreV2.sol`:
-  - `mapping(uint32 key => bytes32 value) dataFeed`
-- `DataFeedStoreV3.sol`:
-  - `bytes32[] dataFeed`
-- `HistoricalDataFeedStoreV1.sol`:
-  - array[key] -> array[counter] -> Transmission { value, timestamp }
-- `HistoricalDataFeedStoreV2.sol`:
-  - `mapping(uint32 key => mapping(uint256 counter => Transmission { value, timestamp })) dataFeed`
-  - `uint256[] latestCounters`
+The slots between 0 and 2\*\*128-2\*\*116 - 1 are considered management slots. These values are used for admin functionality.
+The slots between 2\*\*128-2\*\*116 and 2\*\*128 - 1 are considered Round table slots. These values are used to store the latest round of a feed. Each slot consists of 16 packed rounds (2 bytes each).
+The slots between 2\*\*128 and 2\*\*160 - 1 are considered Data feed slots. Here all data feeds are stored along with their historical data. Data feeds are of different slot sizes based on the stride (powers of 2). For example, stride 0 is 32b (1 slot) data, stride 1 is 64b, stride 2 is 128b and so on. Data feeds have historical data stored up to 8192 rounds. CL-compatible contracts make use of only stride 0 data feeds. There are 32 strides in total (stride 0 to stride 31) which leaves us with 2\*\*115 feed IDs in each stride (2\*\*115 \* 32 feed IDs combined).
+
+### Events
+
+When an update is posted to the contract, an event is emitted - “DataFeedsUpdated(uint256 blockNumber)” (topic: 0xe64378c8d8a289137204264780c7669f3860a703795c6f0574d925d473a4a2a7). Block number is an internal counter for the Blocksense system. Through this event off-chain programs can subscribe to is and trigger on-chain actions when needed.
 
 ## Development
 
