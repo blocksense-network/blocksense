@@ -3,15 +3,15 @@ import CHAINLINK_COMPATIBILITY from '@blocksense/data-feeds-config-generator/cha
 import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/data-feeds-config-generator/evm_contracts_deployment_v1';
 import {
   decodeChainlinkCompatibilityConfig,
-  decodeDeploymentConfig,
-  DeploymentConfig,
+  decodeDeploymentConfigV1,
+  DeploymentConfigV1,
 } from '@blocksense/config-types';
 import {
   CoreContract,
   ProxyContractData,
 } from '@/src/deployed-contracts/types';
 
-const getCoreContractsData = (networksData: DeploymentConfig) => {
+const getCoreContractsData = (networksData: DeploymentConfigV1) => {
   const parsedCoreContracts: CoreContract[] = [];
 
   Object.entries(networksData).forEach(([_networkName, networkData]) => {
@@ -39,7 +39,7 @@ const getCoreContractsData = (networksData: DeploymentConfig) => {
   return parsedCoreContracts;
 };
 
-const getProxyContractsContent = (networksData: DeploymentConfig) => {
+const getProxyContractsContent = (networksData: DeploymentConfigV1) => {
   const { blocksenseFeedsCompatibility } = decodeChainlinkCompatibilityConfig(
     CHAINLINK_COMPATIBILITY,
   );
@@ -79,7 +79,7 @@ const getProxyContractsContent = (networksData: DeploymentConfig) => {
 };
 
 export function getContractsData() {
-  const networksData = decodeDeploymentConfig(CONTRACTS_DEPLOYMENT_CONFIG);
+  const networksData = decodeDeploymentConfigV1(CONTRACTS_DEPLOYMENT_CONFIG);
   const parsedCoreContracts = getCoreContractsData(networksData);
   const parsedProxyContracts = getProxyContractsContent(networksData);
 

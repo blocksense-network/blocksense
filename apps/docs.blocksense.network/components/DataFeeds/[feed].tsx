@@ -3,7 +3,7 @@ import CONTRACTS_DEPLOYMENT_CONFIG from '@blocksense/data-feeds-config-generator
 import { decodeFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import {
   CLAggregatorAdapterData,
-  decodeDeploymentConfig,
+  decodeDeploymentConfigV1,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
 import { Error404 } from '@/components/common/Error404';
@@ -34,7 +34,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
   }
 
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
-  const feedsDeploymentInfo = decodeDeploymentConfig(
+  const feedsDeploymentInfo = decodeDeploymentConfigV1(
     CONTRACTS_DEPLOYMENT_CONFIG,
   )['ethereum-sepolia']?.contracts?.CLAggregatorAdapter;
   const feed = feedsConfig.feeds.find(feed => feed.id === Number(feedId));
