@@ -30,7 +30,7 @@ task(
   const network = 'local';
   const config: NetworkConfig = await initChain(network);
 
-  const fileName = 'evm_contracts_deployment_v1';
+  const fileName = 'evm_contracts_deployment_v2';
   const { readJSON } = selectDirectory(configDir);
 
   const deployedData: DeploymentConfigV2 = await readJSON({ name: fileName });
@@ -50,15 +50,22 @@ task(
     },
   });
 
+  // Public key: 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
+  const sequencerWallet = new Wallet(
+    '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e',
+    config.provider,
+  );
+
   const sequencerMultisig = await Safe.init({
     provider: config.rpc,
     safeAddress: deployment.SequencerMultisig,
-    signer: config.sequencerMultisig.signer.privateKey,
+    signer: sequencerWallet.privateKey,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
     },
   });
 
+  // Public key: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
   const reporter = new Wallet(
     '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
   );
@@ -131,8 +138,7 @@ task(
 
   // sequencer cannot send direct transaction to upgradeable proxy
   // AccessControl will reject this transaction
-  await expect(config.sequencerMultisig.signer.sendTransaction(writeTxData)).to
-    .be.reverted;
+  await expect(sequencerWallet.sendTransaction(writeTxData)).to.be.reverted;
 
   await sequencerMultisig.executeTransaction(writeTx);
 
@@ -144,7 +150,7 @@ task(
   const PERPAggregator = await hre.ethers.getContractAt(
     ContractNames.CLAggregatorAdapter,
     deployment.CLAggregatorAdapter[1].address,
-    config.sequencerMultisig.signer,
+    sequencerWallet,
   );
 
   const description = await PERPAggregator.description();
@@ -155,7 +161,7 @@ task(
   const feedRegistry = await hre.ethers.getContractAt(
     ContractNames.CLFeedRegistryAdapter,
     deployment.coreContracts.CLFeedRegistryAdapter.address,
-    config.sequencerMultisig.signer,
+    sequencerWallet,
   );
 
   const feedFromRegistry = await feedRegistry.getFeed(
@@ -222,7 +228,7 @@ task(
 
   const isAllowed = Boolean(
     Number(
-      await config.sequencerMultisig.signer.call({
+      await sequencerWallet.call({
         to: accessControl.target.toString(),
         data: await sequencerMultisig.getAddress(),
       }),
@@ -248,7 +254,7 @@ task(
 
   const isAllowedAfter = Boolean(
     Number(
-      await config.sequencerMultisig.signer.call({
+      await sequencerWallet.call({
         to: accessControl.target.toString(),
         data: await sequencerMultisig.getAddress(),
       }),
