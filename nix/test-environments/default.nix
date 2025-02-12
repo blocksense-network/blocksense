@@ -37,9 +37,9 @@
         mkdir $out
         (
           set -x
-          ${
-            lib.concatMapStringsSep "\n" (x: "cp ${x.file} $out/${x.name}-process-compose.yaml") allEnvironments
-          }
+          ${lib.concatMapStringsSep "\n" (
+            x: "cp ${x.file} $out/${x.name}-process-compose.yaml"
+          ) allEnvironments}
         )
       '';
     in

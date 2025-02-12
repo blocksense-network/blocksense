@@ -96,24 +96,28 @@ in
       };
     } // etcEnv;
 
-    systemd.services = {
-      blocksense-sequencer = {
-        description = "Blocksense Sequencer";
-        wantedBy = [ "multi-user.target" ];
-        requires = lib.pipe cfg.anvil [
-          builtins.attrNames
-          (map (x: "blocksense-anvil-${x}.service"))
-        ];
-        environment = {
-          FEEDS_CONFIG_DIR = "${../../../../config}";
-          SEQUENCER_CONFIG_DIR = "/etc/blocksense";
-          SEQUENCER_LOG_LEVEL = "${lib.toUpper cfg.sequencer.log-level}";
+    systemd.services =
+      {
+        blocksense-sequencer = {
+          description = "Blocksense Sequencer";
+          wantedBy = [ "multi-user.target" ];
+          requires = lib.pipe cfg.anvil [
+            builtins.attrNames
+            (map (x: "blocksense-anvil-${x}.service"))
+          ];
+          environment = {
+            FEEDS_CONFIG_DIR = "${../../../../config}";
+            SEQUENCER_CONFIG_DIR = "/etc/blocksense";
+            SEQUENCER_LOG_LEVEL = "${lib.toUpper cfg.sequencer.log-level}";
+          };
+          serviceConfig = {
+            ExecStart = sequencer.program;
+            Restart = "on-failure";
+          };
         };
-        serviceConfig = {
-          ExecStart = sequencer.program;
-          Restart = "on-failure";
-        };
-      };
-    } // anvilInstances // reporterInstances // reporterV2Instances;
+      }
+      // anvilInstances
+      // reporterInstances
+      // reporterV2Instances;
   };
 }
