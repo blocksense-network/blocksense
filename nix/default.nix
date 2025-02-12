@@ -47,7 +47,7 @@
 
       spinWrapped = pkgs.writeShellScriptBin "spin" ''
         export LD_LIBRARY_PATH="${ldLibraryPath}:$LD_LIBRARY_PATH"
-        export XDG_DATA_HOME="${self'.legacyPackages.spinPlugins.triggerOracle}"
+        export SPIN_DATA_DIR="${self'.legacyPackages.spinPlugins.triggerOracle}"
         ${lib.getExe' inputs'.nixpkgs-unstable.legacyPackages.fermyon-spin "spin"} "$@"
       '';
     in

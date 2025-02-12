@@ -62,7 +62,7 @@ let
     let
       stateDir = runCommand "" { } ''
         mkdir -p $out
-        XDG_DATA_HOME=$out ${spin} plugin install --yes --file ${spinManifestJson}
+        SPIN_DATA_DIR=$out ${spin} plugin install --yes --file ${spinManifestJson}
       '';
     in
     stateDir;
