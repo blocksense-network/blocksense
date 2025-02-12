@@ -18,7 +18,7 @@ let
   os =
     {
       linux = "linux";
-      darwin = "osx";
+      darwin = "macos";
     }
     .${hostPlatform.parsed.kernel.name};
 
