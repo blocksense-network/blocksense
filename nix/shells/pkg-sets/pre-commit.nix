@@ -1,5 +1,8 @@
 { self', ... }:
 {
+  # Libraries used when cargo-check builds libraries
+  packages = self'.legacyPackages.commonLibDeps;
+
   pre-commit.hooks = {
     nixfmt-rfc-style.enable = true;
     editorconfig-checker = {
@@ -10,7 +13,13 @@
       enable = true;
       package = self'.legacyPackages.cargoWrapped;
     };
-    rustfmt.enable = true;
+    rustfmt = {
+      enable = true;
+      packageOverrides = {
+        cargo = self'.legacyPackages.rustToolchain;
+        rustfmt = self'.legacyPackages.rustToolchain;
+      };
+    };
     prettier = {
       enable = true;
       args = [

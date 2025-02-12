@@ -32,11 +32,13 @@
           targets.wasm32-wasip1.latest.rust-std
         ];
 
-      ldLibraryPath = lib.makeLibraryPath [
+      commonLibDeps = [
         pkgs.openssl
         pkgs.curl
         pkgs.rdkafka
       ];
+
+      ldLibraryPath = lib.makeLibraryPath commonLibDeps;
 
       cargoWrapped = pkgs.writeShellScriptBin "cargo" ''
         export LD_LIBRARY_PATH="${ldLibraryPath}:$LD_LIBRARY_PATH"
@@ -51,7 +53,12 @@
     in
     {
       legacyPackages = {
-        inherit rustToolchain cargoWrapped spinWrapped;
+        inherit
+          rustToolchain
+          commonLibDeps
+          cargoWrapped
+          spinWrapped
+          ;
         inherit (inputs'.mcl-nixos-modules.checks) foundry;
       };
     };
