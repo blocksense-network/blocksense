@@ -1,38 +1,41 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Method, Request, Response};
+use blocksense_sdk::spin::http::{send, Response};
 
 use serde::Deserialize;
-use url::Url;
 
-use crate::common::PairPriceData;
+use crate::common::{Fetcher, PairPriceData};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct BinanceUsPrice {
+pub struct BinanceUsPriceData {
     pub symbol: String,
     pub price: String,
 }
 
-// Binance US provides wrong price for pair BTC/USD. For the USDT stable coin the price is correct.
-// It might mean other pairs with fiat quote might be incorrect
+type BinanceUsPriceResponse = Vec<BinanceUsPriceData>;
+
+struct BinanceUsPriceFetcher;
+
+impl Fetcher for BinanceUsPriceFetcher {
+    type ParsedResponse = PairPriceData;
+    type ApiResponse = BinanceUsPriceResponse;
+
+    fn parse_response(&self, value: BinanceUsPriceResponse) -> Result<Self::ParsedResponse> {
+        let response: Self::ParsedResponse = value
+            .into_iter()
+            .filter(|value| !value.symbol.ends_with("USD"))
+            .map(|value| (value.symbol, value.price))
+            .collect();
+
+        Ok(response)
+    }
+}
+
 pub async fn get_binance_us_prices() -> Result<PairPriceData> {
-    let url = Url::parse("https://api.binance.us/api/v3/ticker/price")?;
+    let fetcher = BinanceUsPriceFetcher {};
+    let req = fetcher.prepare_get_request("https://api.binance.us/api/v3/ticker/price", None);
+    let resp: Response = send(req?).await?;
+    let deserialized = fetcher.deserialize_response(resp)?;
+    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
 
-    let mut req = Request::builder();
-    req.method(Method::Get);
-    req.uri(url);
-    req.header("Accepts", "application/json");
-
-    let req = req.build();
-    let resp: Response = send(req).await?;
-
-    let body = resp.into_body();
-    let string = String::from_utf8(body)?;
-    let values: Vec<BinanceUsPrice> = serde_json::from_str(&string)?;
-    let response: PairPriceData = values
-        .into_iter()
-        .filter(|value| !value.symbol.ends_with("USD"))
-        .map(|value| (value.symbol, value.price))
-        .collect();
-
-    Ok(response)
+    Ok(pair_prices)
 }
