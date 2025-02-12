@@ -1,12 +1,10 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Method, Request, Response};
+use blocksense_sdk::spin::http::{send, Response};
 
 use serde::{Deserialize, Deserializer};
 use serde_json::{from_value, Value};
 
-use url::Url;
-
-use crate::common::PairPriceData;
+use crate::common::{Fetcher, PairPriceData};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct TradingPairTicker {
@@ -62,12 +60,12 @@ pub struct FundingCurrencyTicker {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum BitfinexPrice {
+pub enum BitfinexPriceResponseData {
     Trading(TradingPairTicker),
     Funding(FundingCurrencyTicker),
 }
 
-impl<'de> Deserialize<'de> for BitfinexPrice {
+impl<'de> Deserialize<'de> for BitfinexPriceResponseData {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -82,46 +80,51 @@ impl<'de> Deserialize<'de> for BitfinexPrice {
         // Match the array size to determine the struct
         match array.len() {
             11 => from_value::<TradingPairTicker>(value)
-                .map(BitfinexPrice::Trading)
+                .map(BitfinexPriceResponseData::Trading)
                 .map_err(serde::de::Error::custom),
             17 => from_value::<FundingCurrencyTicker>(value)
-                .map(BitfinexPrice::Funding)
+                .map(BitfinexPriceResponseData::Funding)
                 .map_err(serde::de::Error::custom),
             _ => Err(serde::de::Error::custom("Unknown ticker format")),
         }
     }
 }
 
+type BitfinexPricesResponse = Vec<BitfinexPriceResponseData>;
+
+struct BitfinexPriceFetcher;
+impl Fetcher for BitfinexPriceFetcher {
+    type ParsedResponse = PairPriceData;
+    type ApiResponse = BitfinexPricesResponse;
+
+    fn parse_response(&self, value: BitfinexPricesResponse) -> Result<Self::ParsedResponse> {
+        let trading_tickers: Vec<TradingPairTicker> = value
+            .into_iter()
+            .filter_map(|ticker| {
+                if let BitfinexPriceResponseData::Trading(trading) = ticker {
+                    Some(trading)
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        let response: Self::ParsedResponse = trading_tickers
+            .into_iter()
+            .map(|value| (value.symbol().to_string(), value.price().to_string()))
+            .collect();
+
+        Ok(response)
+    }
+}
+
 pub async fn get_bitfinex_prices() -> Result<PairPriceData> {
-    let url = Url::parse("https://api-pub.bitfinex.com/v2/tickers?symbols=ALL")?;
-
-    let mut req = Request::builder();
-    req.method(Method::Get);
-    req.uri(url);
-    req.header("Accepts", "application/json");
-
-    let req = req.build();
+    let fetcher = BitfinexPriceFetcher {};
+    let req =
+        fetcher.prepare_get_request("https://api-pub.bitfinex.com/v2/tickers?symbols=ALL", None)?;
     let resp: Response = send(req).await?;
+    let deserialized = fetcher.deserialize_response(resp)?;
+    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
 
-    let body = resp.into_body();
-    let string = String::from_utf8(body)?;
-    let values: Vec<BitfinexPrice> = serde_json::from_str(&string)?;
-
-    let trading_tickers: Vec<TradingPairTicker> = values
-        .into_iter()
-        .filter_map(|ticker| {
-            if let BitfinexPrice::Trading(trading) = ticker {
-                Some(trading)
-            } else {
-                None
-            }
-        })
-        .collect();
-
-    let response: PairPriceData = trading_tickers
-        .into_iter()
-        .map(|value| (value.symbol().to_string(), value.price().to_string()))
-        .collect();
-
-    Ok(response)
+    Ok(pair_prices)
 }
