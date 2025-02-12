@@ -1,15 +1,14 @@
-use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Method, Request, Response};
+use anyhow::{Ok, Result};
+use blocksense_sdk::spin::http::{send, Response};
 
 use serde::Deserialize;
-use url::Url;
 
-use crate::common::PairPriceData;
+use crate::common::{Fetcher, PairPriceData};
 
 //TODO(adikov): Include all the needed fields form the response like volume.
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct BybitPrice {
+pub struct BybitPriceData {
     pub symbol: String,
     pub last_price: String,
 }
@@ -17,40 +16,44 @@ pub struct BybitPrice {
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct BybitResult {
     pub category: String,
-    pub list: Vec<BybitPrice>,
+    pub list: Vec<BybitPriceData>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct BybitResponse {
+pub struct BybitPriceResponse {
     pub ret_code: u32,
     pub ret_msg: String,
     pub result: BybitResult,
 }
 
+struct BybitFetcher;
+
+impl Fetcher for BybitFetcher {
+    type ParsedResponse = PairPriceData;
+    type ApiResponse = BybitPriceResponse;
+
+    fn parse_response(&self, value: BybitPriceResponse) -> Result<Self::ParsedResponse> {
+        let response: PairPriceData = value
+            .result
+            .list
+            .into_iter()
+            .map(|value| (value.symbol, value.last_price))
+            .collect();
+
+        Ok(response)
+    }
+}
+
 pub async fn get_bybit_prices() -> Result<PairPriceData> {
-    let url = Url::parse_with_params(
+    let fetcher = BybitFetcher {};
+    let req = fetcher.prepare_get_request(
         "https://api.bybit.com/v5/market/tickers",
-        &[("category", "spot"), ("symbols", "")],
-    )?;
+        Some(&[("category", "spot"), ("symbols", "")]),
+    );
+    let resp: Response = send(req?).await?;
+    let deserialized = fetcher.deserialize_response(resp)?;
+    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
 
-    let mut req = Request::builder();
-    req.method(Method::Get);
-    req.uri(url);
-    req.header("Accepts", "application/json");
-
-    let req = req.build();
-    let resp: Response = send(req).await?;
-
-    let body = resp.into_body();
-    let string = String::from_utf8(body)?;
-    let value: BybitResponse = serde_json::from_str(&string)?;
-    let response: PairPriceData = value
-        .result
-        .list
-        .into_iter()
-        .map(|value| (value.symbol, value.last_price))
-        .collect();
-
-    Ok(response)
+    Ok(pair_prices)
 }
