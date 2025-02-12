@@ -29,7 +29,17 @@ export type CLAggregatorAdapterData = S.Schema.Type<
   typeof CLAggregatorAdapterDataSchema
 >;
 
-const CoreContractsSchema = S.mutable(
+const CoreContractsSchemaV1 = S.mutable(
+  S.Struct({
+    HistoricalDataFeedStoreV2: ContractDataSchema,
+    UpgradeableProxy: ContractDataSchema,
+    CLFeedRegistryAdapter: ContractDataSchema,
+  }),
+);
+
+export type CoreContractsV1 = S.Schema.Type<typeof CoreContractsSchemaV1>;
+
+const CoreContractsSchemaV2 = S.mutable(
   S.Struct({
     AggregatedDataFeedStore: ContractDataSchema,
     UpgradeableProxyADFS: ContractDataSchema,
@@ -39,33 +49,60 @@ const CoreContractsSchema = S.mutable(
   }),
 );
 
-export type CoreContracts = S.Schema.Type<typeof CoreContractsSchema>;
+export type CoreContractsV2 = S.Schema.Type<typeof CoreContractsSchemaV2>;
 
-const ContractsConfigSchema = S.mutable(
+const ContractsConfigSchemaV1 = S.mutable(
   S.Struct({
-    coreContracts: CoreContractsSchema,
+    coreContracts: CoreContractsSchemaV1,
+    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
+    SafeMultisig: ethereumAddress,
+  }),
+);
+
+export type ContractsConfigV1 = S.Schema.Type<typeof ContractsConfigSchemaV1>;
+
+const ContractsConfigSchemaV2 = S.mutable(
+  S.Struct({
+    coreContracts: CoreContractsSchemaV2,
     CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
     SequencerMultisig: ethereumAddress,
     AdminMultisig: ethereumAddress,
   }),
 );
 
-export type ContractsConfig = S.Schema.Type<typeof ContractsConfigSchema>;
+export type ContractsConfigV2 = S.Schema.Type<typeof ContractsConfigSchemaV2>;
 
-export const DeploymentConfigSchema = S.mutable(
+export const DeploymentConfigSchemaV1 = S.mutable(
   S.Record({
     key: networkName,
     value: S.UndefinedOr(
       S.Struct({
         chainId: chainId,
-        contracts: ContractsConfigSchema,
+        contracts: ContractsConfigSchemaV1,
       }),
     ),
   }),
 );
 
-export type DeploymentConfig = S.Schema.Type<typeof DeploymentConfigSchema>;
+export type DeploymentConfigV1 = S.Schema.Type<typeof DeploymentConfigSchemaV1>;
 
-export const decodeDeploymentConfig = S.decodeUnknownSync(
-  DeploymentConfigSchema,
+export const DeploymentConfigSchemaV2 = S.mutable(
+  S.Record({
+    key: networkName,
+    value: S.UndefinedOr(
+      S.Struct({
+        chainId: chainId,
+        contracts: ContractsConfigSchemaV2,
+      }),
+    ),
+  }),
+);
+export type DeploymentConfigV2 = S.Schema.Type<typeof DeploymentConfigSchemaV2>;
+
+export const decodeDeploymentConfigV1 = S.decodeUnknownSync(
+  DeploymentConfigSchemaV1,
+);
+
+export const decodeDeploymentConfigV2 = S.decodeUnknownSync(
+  DeploymentConfigSchemaV2,
 );

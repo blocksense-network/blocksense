@@ -16,7 +16,7 @@ import {
 import { configDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import { DeploymentConfig } from '@blocksense/config-types/evm-contracts-deployment';
+import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
 import { Feed } from '../test/utils/wrappers/types';
 
@@ -33,7 +33,7 @@ task(
   const fileName = 'evm_contracts_deployment_v1';
   const { readJSON } = selectDirectory(configDir);
 
-  const deployedData: DeploymentConfig = await readJSON({ name: fileName });
+  const deployedData: DeploymentConfigV2 = await readJSON({ name: fileName });
 
   const networkName = getNetworkNameByChainId(
     parseChainId(config.network.chainId),

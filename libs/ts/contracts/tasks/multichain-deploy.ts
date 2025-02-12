@@ -37,10 +37,10 @@ import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/cha
 import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 import {
   CLAggregatorAdapterData,
-  ContractsConfig,
-  CoreContracts,
-  DeploymentConfig,
-  DeploymentConfigSchema,
+  ContractsConfigV2,
+  CoreContractsV2,
+  DeploymentConfigV2,
+  DeploymentConfigSchemaV2,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
 task('deploy', 'Deploy contracts')
@@ -78,7 +78,7 @@ task('deploy', 'Deploy contracts')
       };
     });
 
-    const chainsDeployment: DeploymentConfig = {} as DeploymentConfig;
+    const chainsDeployment: DeploymentConfigV2 = {} as DeploymentConfigV2;
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
@@ -481,8 +481,8 @@ const deployContracts = async (
     config.adminMultisig.signer,
   );
 
-  const contractsConfig = {} as ContractsConfig;
-  contractsConfig.coreContracts = {} as CoreContracts;
+  const ContractsConfigV2 = {} as ContractsConfigV2;
+  ContractsConfigV2.coreContracts = {} as CoreContractsV2;
 
   const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
@@ -532,7 +532,7 @@ const deployContracts = async (
     }
 
     if (contract.name === ContractNames.CLAggregatorAdapter) {
-      (contractsConfig[contract.name] ??= []).push({
+      (ContractsConfigV2[contract.name] ??= []).push({
         description: contract.feedRegistryInfo?.description ?? '',
         base: contract.feedRegistryInfo?.base ?? null,
         quote: contract.feedRegistryInfo?.quote ?? null,
@@ -540,7 +540,7 @@ const deployContracts = async (
         constructorArgs: contract.argsValues,
       });
     } else {
-      contractsConfig.coreContracts[contract.name] = {
+      ContractsConfigV2.coreContracts[contract.name] = {
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
       };
@@ -560,13 +560,13 @@ const deployContracts = async (
     }
   }
 
-  return contractsConfig;
+  return ContractsConfigV2;
 };
 
 const registerCLAggregatorAdapters = async (
   config: NetworkConfig,
   adminMultisig: Safe,
-  deployData: ContractsConfig,
+  deployData: ContractsConfigV2,
   artifacts: Artifacts,
 ) => {
   // The difference between setting n and n+1 feeds via CLFeedRegistryAdapter::setFeeds is slightly above 55k gas.
@@ -630,7 +630,7 @@ const setupAccessControl = async (
   config: NetworkConfig,
   adminMultisig: Safe,
   sequencerMultisig: Safe,
-  deployData: ContractsConfig,
+  deployData: ContractsConfigV2,
   artifacts: Artifacts,
 ) => {
   console.log('\nSetting sequencer role in sequencer guard...');
@@ -778,15 +778,15 @@ const setupAccessControl = async (
 
 const saveDeployment = async (
   configs: NetworkConfig[],
-  chainsDeployment: DeploymentConfig,
+  chainsDeployment: DeploymentConfigV2,
 ) => {
   const fileName = 'evm_contracts_deployment_v1';
   const { decodeJSON, writeJSON } = selectDirectory(configDir);
 
   const deploymentContent = await decodeJSON(
     { name: fileName },
-    DeploymentConfigSchema,
-  ).catch(() => ({}) as DeploymentConfig);
+    DeploymentConfigSchemaV2,
+  ).catch(() => ({}) as DeploymentConfigV2);
 
   for (const config of configs) {
     const networkName = getNetworkNameByChainId(
