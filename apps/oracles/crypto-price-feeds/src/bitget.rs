@@ -1,43 +1,45 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Method, Request, Response};
+use blocksense_sdk::spin::http::{send, Response};
 
 use serde::Deserialize;
-use url::Url;
 
-use crate::common::PairPriceData;
+use crate::common::{Fetcher, PairPriceData};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct BitgetPrice {
+pub struct BitgetPriceData {
     pub symbol: String,
     pub close: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct BitgetResponse {
+pub struct BitgetPriceResponse {
     pub code: String,
-    pub data: Vec<BitgetPrice>,
+    pub data: Vec<BitgetPriceData>,
+}
+struct BitgetFetcher;
+
+impl Fetcher for BitgetFetcher {
+    type ParsedResponse = PairPriceData;
+    type ApiResponse = BitgetPriceResponse;
+
+    fn parse_response(&self, value: BitgetPriceResponse) -> Result<Self::ParsedResponse> {
+        let response: Self::ParsedResponse = value
+            .data
+            .into_iter()
+            .map(|value| (value.symbol, value.close))
+            .collect();
+
+        Ok(response)
+    }
 }
 
 pub async fn get_bitget_prices() -> Result<PairPriceData> {
-    let url = Url::parse("https://api.bitget.com/api/spot/v1/market/tickers")?;
+    let fetcher = BitgetFetcher {};
+    let req =
+        fetcher.prepare_get_request("https://api.bitget.com/api/spot/v1/market/tickers", None);
+    let resp: Response = send(req?).await?;
+    let deserialized = fetcher.deserialize_response(resp)?;
+    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
 
-    let mut req = Request::builder();
-    req.method(Method::Get);
-    req.uri(url);
-    req.header("Accepts", "application/json");
-
-    let req = req.build();
-    let resp: Response = send(req).await?;
-
-    let body = resp.into_body();
-    let body_as_string = String::from_utf8(body)?;
-    let value: BitgetResponse = serde_json::from_str(&body_as_string)?;
-
-    let response: PairPriceData = value
-        .data
-        .into_iter()
-        .map(|value| (value.symbol, value.close))
-        .collect();
-
-    Ok(response)
+    Ok(pair_prices)
 }
