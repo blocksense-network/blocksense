@@ -50,10 +50,7 @@ pub async fn fetch_all_prices(
     futures.push(exchange_future("Bitfinex", get_bitfinex_prices()));
     futures.push(exchange_future("Bitget", get_bitget_prices()));
     futures.push(exchange_future("Bybit", get_bybit_prices()));
-    futures.push(exchange_future(
-        "Coinbase",
-        get_coinbase_prices("USD".to_string()),
-    ));
+    futures.push(exchange_future("Coinbase", get_coinbase_prices()));
     futures.push(exchange_future(
         "Crypto.com",
         get_crypto_com_exchange_prices(),
