@@ -122,27 +122,6 @@ jobs:
         if: ${{ runner.environment == 'self-hosted' }}
         run: cargo clippy -- --deny warnings
 
-  rust-nix-build:
-    timeout-minutes: 360
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
-        if: ${{ runner.environment == 'github-hosted' }}
-        with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Nix build Rust workspace
-        run: nix build --impure --json -L --accept-flake-config .#blocksense-rs
-
   deploy_websites:
     timeout-minutes: 360
     runs-on: [self-hosted, nixos, x86-64-v3]
