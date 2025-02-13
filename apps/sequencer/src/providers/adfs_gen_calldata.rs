@@ -23,12 +23,12 @@ static STRIDES_SIZES: Lazy<HashMap<u16, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
     map.insert(0, 32);
     map.insert(1, 64);
-    map.insert(2, 96);
-    map.insert(3, 128);
-    map.insert(4, 160);
-    map.insert(5, 192);
-    map.insert(6, 224);
-    map.insert(7, 256);
+    map.insert(2, 128);
+    map.insert(3, 256);
+    map.insert(4, 512);
+    map.insert(5, 1024);
+    map.insert(6, 2048);
+    map.insert(7, 4096);
     map
 });
 

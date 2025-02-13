@@ -1071,7 +1071,7 @@ pub mod tests {
             script: "script".to_string(),
             value_type: "Numerical".to_string(),
             aggregate_type: "Average".to_string(),
-            stride: 1,
+            stride: 0,
         }
     }
 
