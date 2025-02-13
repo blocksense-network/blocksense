@@ -13,6 +13,12 @@ let
         description = mdDoc "Is the provider enabled or not.";
       };
 
+      contract_version = mkOption {
+        type = types.int;
+        default = 1;
+        description = mdDoc "The version of the ETH contract deployed on the network and associated with the parameter contract_address";
+      };
+
       private_key_path = mkOption {
         type = types.path;
         description = mdDoc "The path to the private key.";
