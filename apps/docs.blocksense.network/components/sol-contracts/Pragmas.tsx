@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/common/Badge';
 
 import { PragmaDocItem } from '@blocksense/sol-reflector';
 
@@ -9,7 +9,7 @@ type PragmasProps = {
 
 export const Pragmas = ({ pragmas }: PragmasProps) => {
   return (
-    <Badge className="pragmas" variant="secondary">
+    <Badge className="pragmas" variant="highlight">
       {pragmas.map(
         pragma => `pragma ${pragma.literals.map(literal => literal).join('')}`,
       )}
