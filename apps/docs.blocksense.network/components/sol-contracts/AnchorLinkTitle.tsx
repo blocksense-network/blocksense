@@ -33,7 +33,10 @@ export const AnchorLinkTitle = ({
     return null;
   }
 
+  const id = `${parentTitle ? `${parentTitle}-` : ''}${title}`;
+
   const elementAttributes: HTMLAttributes<HTMLHeadingElement> = {
+    id,
     className: `${titleStyles[titleLevel]} ${accordion ? accordionStyles : ''} nx-font-semibold nx-text-slate-900 dark:nx-text-slate-100 ${accordion ? '' : borderStyles}`,
     ...(pagefindIgnore && { 'data-pagefind-ignore': true }),
   };
@@ -44,8 +47,8 @@ export const AnchorLinkTitle = ({
     <>
       {title}
       <a
-        href={`#${parentTitle ? `${parentTitle}-` : ''}${title}`}
-        id={`${parentTitle ? `${parentTitle}-` : ''}${title}`}
+        href={`#${id}`}
+        id={id}
         className="subheading-anchor"
         aria-label="Permalink for this section"
       ></a>
