@@ -62,7 +62,7 @@ export const ContractAddress = ({
         {network ? (
           <code className="hover:underline">
             <Link
-              className=""
+              className="font-mono"
               href={getAddressExplorerUrl(network, address)}
               onClick={e =>
                 onLinkClick(
@@ -85,7 +85,7 @@ export const ContractAddress = ({
             </Link>
           </code>
         ) : (
-          <code className="">{addressToDisplay}</code>
+          <code>{addressToDisplay}</code>
         )}
       </Tooltip>
       <div className={'w-4 h-4'}>
