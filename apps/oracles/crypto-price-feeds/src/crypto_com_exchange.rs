@@ -1,51 +1,56 @@
-use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Method, Request, Response};
+use anyhow::{Ok, Result};
+use blocksense_sdk::spin::http::{send, Response};
 
 use serde::Deserialize;
-use url::Url;
 
-use crate::common::PairPriceData;
+use crate::common::{Fetcher, PairPriceData};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct CryptoComExchangePrice {
+pub struct CryptoComPriceData {
     pub i: String,
     pub a: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct CryptoComExchangeResult {
-    pub data: Vec<CryptoComExchangePrice>,
+pub struct CryptoComResult {
+    pub data: Vec<CryptoComPriceData>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct CryptoComExchangeResponse {
+pub struct CryptoComPriceResponse {
     pub code: i8,
-    pub result: CryptoComExchangeResult,
+    pub result: CryptoComResult,
+}
+
+struct CryptoComPriceFetcher;
+
+impl Fetcher for CryptoComPriceFetcher {
+    type ParsedResponse = PairPriceData;
+    type ApiResponse = CryptoComPriceResponse;
+
+    fn parse_response(&self, value: CryptoComPriceResponse) -> Result<Self::ParsedResponse> {
+        let response: PairPriceData = value
+            .result
+            .data
+            .into_iter()
+            //  we should consider what to do with perp
+            .filter(|value| !value.i.contains("-PERP"))
+            .map(|value| (value.i.replace("_", ""), value.a))
+            .collect();
+
+        Ok(response)
+    }
 }
 
 pub async fn get_crypto_com_exchange_prices() -> Result<PairPriceData> {
-    let url = Url::parse("https://api.crypto.com/exchange/v1/public/get-tickers")?;
+    let fetcher = CryptoComPriceFetcher {};
+    let req = fetcher.prepare_get_request(
+        "https://api.crypto.com/exchange/v1/public/get-tickers",
+        None,
+    );
+    let resp: Response = send(req?).await?;
+    let deserialized = fetcher.deserialize_response(resp)?;
+    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
 
-    let mut req = Request::builder();
-    req.method(Method::Get);
-    req.uri(url);
-    req.header("Accepts", "application/json");
-
-    let req = req.build();
-    let resp: Response = send(req).await?;
-
-    let body = resp.into_body();
-    let body_as_string = String::from_utf8(body)?;
-    let value: CryptoComExchangeResponse = serde_json::from_str(&body_as_string)?;
-
-    let response: PairPriceData = value
-        .result
-        .data
-        .into_iter()
-        //  we should consider what to do with perp
-        .filter(|value| !value.i.contains('-'))
-        .map(|value| (value.i.replace("_", ""), value.a))
-        .collect();
-
-    Ok(response)
+    Ok(pair_prices)
 }
