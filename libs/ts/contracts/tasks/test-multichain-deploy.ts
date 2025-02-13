@@ -30,6 +30,11 @@ task(
   const network = 'local';
   const config: NetworkConfig = await initChain(network);
 
+  if (!config.deployWithSequencerMultisig) {
+    console.log('Test needs sequencer multisig set!');
+    return;
+  }
+
   const fileName = 'evm_contracts_deployment_v2';
   const { readJSON } = selectDirectory(configDir);
 

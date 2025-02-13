@@ -12,6 +12,7 @@ export interface NetworkConfig {
   provider: JsonRpcProvider;
   network: Network;
   sequencerMultisig: MultisigConfig;
+  deployWithSequencerMultisig: boolean;
   adminMultisig: MultisigConfig;
   safeAddresses: {
     multiSendAddress: EthereumAddress;
@@ -37,3 +38,19 @@ export enum ContractNames {
   AccessControl = 'AccessControl',
   OnlySequencerGuard = 'OnlySequencerGuard',
 }
+
+export type DeployContract = {
+  name: Exclude<
+    ContractNames,
+    ContractNames.AdminMultisig | ContractNames.SequencerMultisig
+  >;
+  argsTypes: string[];
+  argsValues: any[];
+  salt: string;
+  value: bigint;
+  feedRegistryInfo?: {
+    description: string;
+    base: EthereumAddress | null;
+    quote: EthereumAddress | null;
+  };
+};
