@@ -4,14 +4,13 @@ use config::BlockConfig;
 use feed_registry::{registry::SlotTimeTracker, types::Repeatability};
 use gnosis_safe::data_types::ReporterResponse;
 use gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
-use tokio::select;
 use tokio::sync::mpsc::UnboundedReceiver;
-use tracing::{error, info, trace};
+use tracing::{debug, error, info, trace};
 use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
-use futures::stream::{FuturesUnordered, StreamExt};
+use futures_util::stream::{FuturesUnordered, StreamExt};
 use gnosis_safe::utils::SafeMultisig;
 use std::{io::Error, time::Duration};
 
@@ -39,34 +38,7 @@ pub async fn aggregation_batch_consensus_loop(
             let mut collected_futures = FuturesUnordered::new();
 
             loop {
-                select! {
-                    future_result = collected_futures.select_next_some() => {
-                        let res = match future_result {
-                            Ok(res) => res,
-                            Err(e) => {
-                                // We panic here, because this is a serious error.
-                                panic!("JoinError: {e}");
-                            },
-                        };
-
-                        let result_val = match res {
-                            Ok(v) => v,
-                            Err(e) => {
-                                // We error here, to support the task returning errors.
-                                error!("Task terminated with error: {:?}", e);
-                                continue;
-                            }
-                        };
-
-                        match result_val {
-                            Ok(v) => {
-                                info!("tx receipt: {v:?}");
-                            },
-                            Err(e) => {
-                                error!("Failed to get tx receipt: {e}");
-                            },
-                        };
-                    }
+                tokio::select! {
                     _ = block_height_tracker.await_end_of_current_slot(&Repeatability::Periodic) => {
 
                         trace!("processing aggregation_batch_consensus_loop");
@@ -77,6 +49,45 @@ pub async fn aggregation_batch_consensus_loop(
                             sequencer_state.batches_awaiting_consensus.write().await;
                         batches_awaiting_consensus
                             .clear_batches_older_than(latest_block_height as u64, timeout_period_blocks);
+
+                        // Loop to process all completed futures for sending TX-s.
+                        // Once all available completed futures are processed, control
+                        // is returned. collected_futures.next() is an unblocking call
+                        loop {
+                            futures::select! {
+                                future_result = collected_futures.next() => {
+                                    match future_result {
+                                        Some(res) => {
+                                            let result_val = match res {
+                                                Ok(v) => v,
+                                                Err(e) => {
+                                                    // We error here, to support the task returning errors.
+                                                    error!("Task terminated with error: {:?}", e);
+                                                    continue;
+                                                }
+                                            };
+
+                                            match result_val {
+                                                Ok(v) => {
+                                                    info!("tx receipt: {v:?}");
+                                                },
+                                                Err(e) => {
+                                                    error!("Failed to get tx receipt: {e}");
+                                                },
+                                            };
+                                        },
+                                        None => {
+                                            debug!("aggregation_batch_consensus_loop got none from collected_futures");
+                                            break;
+                                        },
+                                    }
+                                },
+                                complete => {
+                                    debug!("aggregation_batch_consensus_loop collected_futures empty");
+                                    break;
+                                },
+                            }
+                        }
                     }
                     Some((signed_aggregate, signature_with_address)) = aggregate_batch_sig_recv.recv() => {
 
