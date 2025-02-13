@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+
+.nextra-sidebar button {
+  @apply font-bold text-black;
+}
+
+.nextra-sidebar ul > li a {
+  @apply text-neutral-800;
+}
+
+.nextra-mobile-nav {
+  @apply bg-white;
+}
+
+.nextra-callout {
+  @apply text-sm;
+}
+
+.nextra-filetree {
+  @apply shadow-md;
+}
+
+.x\:text-base {
+  @apply text-black;
+}
+
+mark {
+  @apply text-blue-500 font-bold;
+}
+
+.nextra-navbar {
+  z-index: 40;
+}
+
+.nextra-navbar-blur {
+  border-color: var(--transparent-color);
+}
+
+.nextra-search input {
+  @apply bg-white border border-solid border-neutral-200 dark:bg-neutral-900 dark:border-neutral-600;
+}
+
+.nextra-search-results {
+  z-index: 999;
+}
+
+.nextra-search input:focus,
+.nextra-search input:focus-visible {
+  border-color: var(--focus-border-color);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.nextra-breadcrumb__item:hover {
+  @apply text-gray-900;
+}
+
+.nextra-breadcrumb__item--active {
+  @apply text-blue-500;
+}
+
+.nextra-breadcrumb__item--inactive {
+  @apply text-gray-300;
+}
+
+.nextra-breadcrumb__item--active:hover {
+  @apply text-gray-950;
+}
+
+.nextra-breadcrumb__link {
+  @apply text-gray-800 underline underline-offset-4;
+}
+
+.nextra-breadcrumb__link--active {
+  @apply underline underline-offset-4;
+}
+
+.pagination__link {
+  @apply text-gray-900;
+}
+
+.pagination__link:hover {
+  @apply text-gray-800;
+}
+
+.pagination__link--prev {
+  @apply text-gray-500;
+}
+
+.pagination__link--next {
+  @apply text-blue-500;
+}

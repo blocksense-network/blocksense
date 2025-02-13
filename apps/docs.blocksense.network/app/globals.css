@@ -1,4 +1,7 @@
-@import 'tailwindcss';
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
 @import '@blocksense/nextra-theme-docs/style.css';
 @import '../blocksense-theme/base.css';
 @plugin "tailwindcss-animate";
