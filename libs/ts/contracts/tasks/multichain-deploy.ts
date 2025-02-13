@@ -256,13 +256,9 @@ const deployMultisig = async (
   console.log('\nSafeFactory address:', await safeFactory.getAddress());
 
   const safeAccountConfig: SafeAccountConfig = {
-    owners: config[type].owners,
-    threshold: config[type].threshold,
+    owners: [config[type].signer.address],
+    threshold: 1,
   };
-  if (type === 'sequencerMultisig') {
-    safeAccountConfig.owners = [config[type].signer.address];
-    safeAccountConfig.threshold = 1;
-  }
 
   const saltNonce = ethers.hexlify(ethers.toUtf8Bytes(type));
 
@@ -350,7 +346,7 @@ export const initChain = async (
     },
     adminMultisig: {
       signer: admin,
-      owners: [...adminOwners, parseEthereumAddress(admin.address)],
+      owners: adminOwners,
       threshold: +getOptionalEnvString('ADMIN_THRESHOLD', '1'),
     },
     safeAddresses: {
@@ -632,6 +628,7 @@ const setupAccessControl = async (
 ) => {
   console.log('\nSetting sequencer role in sequencer guard...');
 
+  const abiCoder = new ethers.AbiCoder();
   const transactions: SafeTransactionDataPartial[] = [];
 
   const guard = new ethers.Contract(
@@ -659,7 +656,9 @@ const setupAccessControl = async (
     console.log('Sequencer guard already set up');
   }
 
-  console.log('\nSetting up access control...');
+  console.log(
+    '\nSetting up access control and adding owners to admin multisig...',
+  );
 
   const accessControl = new ethers.Contract(
     deployData.coreContracts.AccessControl.address,
@@ -691,6 +690,44 @@ const setupAccessControl = async (
     console.log('Access control already set up');
   }
 
+  const owners = await adminMultisig.getOwners();
+  if (owners.length === 1 && config.adminMultisig.owners.length > 0) {
+    const adminMultisigAddress = await adminMultisig.getAddress();
+    for (const owner of config.adminMultisig.owners) {
+      // addOwnerWithThreshold(address newOwner, uint256 threshold);
+      const safeTxAddOwner: SafeTransactionDataPartial = {
+        to: adminMultisigAddress,
+        value: '0',
+        data:
+          '0x0d582f13' +
+          abiCoder.encode(['address', 'uint256'], [owner, 1]).slice(2),
+        operation: OperationType.Call,
+      };
+      transactions.push(safeTxAddOwner);
+    }
+
+    const prevOwnerAddress = config.adminMultisig.owners[0];
+    // removeOwner(address prevOwner, address owner, uint256 threshold);
+    const safeTxRemoveOwner: SafeTransactionDataPartial = {
+      to: adminMultisigAddress,
+      value: '0',
+      data:
+        '0xf8dc5dd9' +
+        abiCoder
+          .encode(
+            ['address', 'address', 'uint256'],
+            [
+              prevOwnerAddress,
+              config.adminMultisig.signer.address,
+              config.adminMultisig.threshold,
+            ],
+          )
+          .slice(2),
+      operation: OperationType.Call,
+    };
+    transactions.push(safeTxRemoveOwner);
+  }
+
   if (transactions.length > 0) {
     await multisigTxExec(
       transactions,
@@ -698,6 +735,15 @@ const setupAccessControl = async (
       config.adminMultisig,
       config.provider,
     );
+
+    if (owners.length === 1 && config.adminMultisig.owners.length > 0) {
+      console.log(
+        'Admin multisig owners changed to',
+        await adminMultisig.getOwners(),
+      );
+      console.log('Removed signer from multisig owners');
+      console.log('Current threshold', await adminMultisig.getThreshold());
+    }
   }
 
   console.log(
@@ -706,7 +752,6 @@ const setupAccessControl = async (
 
   const enabledGuard = await sequencerMultisig.getGuard();
   if (enabledGuard !== guard.target.toString()) {
-    const abiCoder = new ethers.AbiCoder();
     const sequencerMultisigAddress = await sequencerMultisig.getAddress();
     const sequencerTransactions: SafeTransactionDataPartial[] = [];
 
