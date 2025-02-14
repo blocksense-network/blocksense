@@ -132,7 +132,9 @@ fn recvd_feed_update_to_block(
 ) {
     match recvd_feed_update {
         Some(voted_update) => {
-            let (key, val) = voted_update.update.encode(18);
+            let (key, val) = voted_update
+                .update
+                .encode(18, voted_update.update.end_slot_timestamp as u64);
             info!("adding {:?} => {:?} to updates", key, val);
             if updates_to_block.len() < max_feed_updates_to_batch {
                 updates_to_block.push(voted_update);

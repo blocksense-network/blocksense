@@ -40,7 +40,7 @@ pub fn check_signature(
         .collect();
 
     if let Ok(result) = feed_result {
-        byte_buffer.extend(result.as_bytes(18));
+        byte_buffer.extend(result.as_bytes(18, timestamp as u64));
     }
     verify_signature(pub_key, signature, &byte_buffer)
 }
