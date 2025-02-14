@@ -92,12 +92,17 @@ impl<'de> Deserialize<'de> for BitfinexPriceResponseData {
 
 type BitfinexPricesResponse = Vec<BitfinexPriceResponseData>;
 
-struct BitfinexPriceFetcher;
+pub struct BitfinexPriceFetcher;
 impl Fetcher for BitfinexPriceFetcher {
     type ParsedResponse = PairPriceData;
     type ApiResponse = BitfinexPricesResponse;
+    const NAME: &str = "Bitfinex";
 
-    fn parse_response(&self, value: BitfinexPricesResponse) -> Result<Self::ParsedResponse> {
+    fn get_request() -> Result<blocksense_sdk::spin::http::Request> {
+        Self::prepare_get_request("https://api-pub.bitfinex.com/v2/tickers?symbols=ALL", None)
+    }
+
+    fn parse_response(value: BitfinexPricesResponse) -> Result<Self::ParsedResponse> {
         let trading_tickers: Vec<TradingPairTicker> = value
             .into_iter()
             .filter_map(|ticker| {
@@ -116,15 +121,4 @@ impl Fetcher for BitfinexPriceFetcher {
 
         Ok(response)
     }
-}
-
-pub async fn get_bitfinex_prices() -> Result<PairPriceData> {
-    let fetcher = BitfinexPriceFetcher {};
-    let req =
-        fetcher.prepare_get_request("https://api-pub.bitfinex.com/v2/tickers?symbols=ALL", None)?;
-    let resp: Response = send(req).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
 }
