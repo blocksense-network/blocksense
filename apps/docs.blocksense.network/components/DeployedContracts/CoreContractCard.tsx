@@ -34,7 +34,6 @@ export const CoreContractCard = ({
               <ContractAddress
                 address={contract.address}
                 network={contract.networks[0]}
-                enableCopy
               />
             </div>
           </div>

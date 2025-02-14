@@ -72,7 +72,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <ContractAddress
         network={row.original.network}
         address={row.getValue('address')}
-        enableCopy
+        copyButton={{ enableCopy: true, background: false }}
         abbreviation={{ hasAbbreviation: true }}
       />
     ),
@@ -89,7 +89,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <ContractAddress
         network={row.original.network}
         address={row.getValue('base')}
-        enableCopy
+        copyButton={{ enableCopy: true, background: false }}
         abbreviation={{ hasAbbreviation: true }}
       />
     ),
@@ -106,7 +106,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <ContractAddress
         network={row.original.network}
         address={row.getValue('quote')}
-        enableCopy
+        copyButton={{ enableCopy: true, background: false }}
         abbreviation={{ hasAbbreviation: true }}
       />
     ),
@@ -123,7 +123,7 @@ export const columns: ColumnDef<ProxyContractData>[] = [
       <ContractAddress
         network={row.original.network}
         address={row.getValue('chainlink_proxy')}
-        enableCopy
+        copyButton={{ enableCopy: true, background: false }}
         abbreviation={{ hasAbbreviation: true }}
       />
     ),

@@ -12,13 +12,15 @@ import {
   isEthereumAddress,
   NetworkName,
 } from '@blocksense/base-utils/evm';
-import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 type ContractAddressProps = {
   network?: NetworkName;
   address: string;
-  enableCopy?: boolean;
+  copyButton?: {
+    enableCopy?: boolean;
+    background?: boolean;
+  };
   abbreviation?: {
     hasAbbreviation?: boolean;
     bytesToShow?: number;
@@ -28,14 +30,14 @@ type ContractAddressProps = {
 export const ContractAddress = ({
   network,
   address,
-  enableCopy,
+  copyButton = { enableCopy: true, background: true },
   abbreviation = { hasAbbreviation: false, bytesToShow: 6 },
 }: ContractAddressProps) => {
   const router = useRouter();
   const isDesktop = useMediaQuery('(min-width: 890px)');
 
   if (!address) {
-    return '-';
+    return <span className="flex justify-center items-center">-</span>;
   }
 
   if (!isEthereumAddress(address)) {
@@ -49,12 +51,7 @@ export const ContractAddress = ({
     : previewHexStringOrDefault(address, '-', 6);
 
   return (
-    <div
-      className={cn(
-        enableCopy && 'flex items-start gap-2',
-        'sm:text-base text-sm',
-      )}
-    >
+    <section className="flex gap-1.5 justify-between items-center">
       <Tooltip contentClassName="bg-gray-900 text-white">
         {abbreviation?.hasAbbreviation && (
           <Tooltip.Content>{address}</Tooltip.Content>
@@ -88,11 +85,13 @@ export const ContractAddress = ({
           <code>{addressToDisplay}</code>
         )}
       </Tooltip>
-      <div className={'w-4 h-4'}>
-        {enableCopy && (
-          <CopyButton textToCopy={address} tooltipPosition="top" />
-        )}
-      </div>
-    </div>
+      {copyButton.enableCopy && (
+        <CopyButton
+          textToCopy={address}
+          tooltipPosition="top"
+          background={copyButton.background}
+        />
+      )}
+    </section>
   );
 };

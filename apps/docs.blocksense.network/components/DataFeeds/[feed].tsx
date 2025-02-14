@@ -91,7 +91,6 @@ export default async function DataFeed({ params }: DataFeedProps) {
             base:{' '}
             <ContractAddress
               address={base}
-              enableCopy
               abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
             />
           </div>
@@ -99,7 +98,6 @@ export default async function DataFeed({ params }: DataFeedProps) {
             quote:{''}
             <ContractAddress
               address={quote}
-              enableCopy
               abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
             />
           </div>
@@ -110,7 +108,6 @@ export default async function DataFeed({ params }: DataFeedProps) {
         address:{' '}
         <ContractAddress
           address={address}
-          enableCopy
           abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
         />
       </div>
