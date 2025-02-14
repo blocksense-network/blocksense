@@ -77,6 +77,14 @@ pub async fn adfs_serialize_updates(
             }
         };
 
+        let digits_in_fraction = match &feed_config {
+            Some(f) => f.decimals,
+            None => {
+                warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
+                18
+            }
+        };
+
         drop(feed_config);
 
         let mut round = match &feeds_metrics {
@@ -96,7 +104,7 @@ pub async fn adfs_serialize_updates(
 
         round %= MAX_HISTORY_ELEMENTS_PER_FEED;
 
-        let (_key, val) = update.encode(); // Key is not needed. It is the bytes of the feed_id
+        let (_key, val) = update.encode(digits_in_fraction as usize); // Key is not needed. It is the bytes of the feed_id
 
         let id = U256::from(update.feed_id);
         let round = U256::from(round);

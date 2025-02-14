@@ -72,7 +72,7 @@ async fn get_key_from_contract(
     info!("Call result: {:?}", result);
     // TODO: get from metadata the type of the value.
     // TODO: Refector to not use dummy argument
-    let return_val = match FeedType::from_bytes(result.to_vec(), FeedType::Numerical(0.0)) {
+    let return_val = match FeedType::from_bytes(result.to_vec(), FeedType::Numerical(0.0), 18) {
         Ok(val) => val,
         Err(e) => {
             return Err(eyre!("Could not deserialize feed from bytes {}", e));

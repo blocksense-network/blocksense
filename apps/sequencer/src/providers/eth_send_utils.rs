@@ -106,7 +106,11 @@ pub async fn deploy_contract(
 }
 
 /// Serializes the `updates` hash map into a string.
-fn legacy_serialize_updates(net: &str, updates: &UpdateToSend) -> Result<String> {
+async fn legacy_serialize_updates(
+    net: &str,
+    updates: &UpdateToSend,
+    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+) -> Result<String> {
     let mut result: String = Default::default();
 
     let selector = "0x1a2d80ac";
@@ -115,7 +119,20 @@ fn legacy_serialize_updates(net: &str, updates: &UpdateToSend) -> Result<String>
     info!("Preparing a legacy batch of feeds to network `{net}`");
 
     let mut num_reported_feeds = 0;
-    for (key, val) in updates.updates.iter().map(|update| update.encode()) {
+    for update in &updates.updates {
+        let feed_id = update.feed_id;
+        let feed_config = feeds_config.read().await.get(&feed_id).cloned();
+
+        let digits_in_fraction = match &feed_config {
+            Some(f) => f.decimals,
+            None => {
+                warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
+                18
+            }
+        };
+
+        let (key, val) = update.encode(digits_in_fraction as usize);
+
         num_reported_feeds += 1;
         result += to_hex_string(key, None).as_str();
         result += to_hex_string(val, Some(32)).as_str(); // TODO: Get size to pad to based on strinde in feed_config. Also check!
@@ -168,7 +185,10 @@ pub async fn get_serialized_updates_for_network(
     debug!("Released a read lock on provider config for `{net}`");
 
     let serialized_updates = match contract_version {
-        1 => legacy_serialize_updates(net, updates)?,
+        1 => match legacy_serialize_updates(net, updates, feeds_config).await {
+            Ok(result) => result,
+            Err(e) => eyre::bail!("Legacy serialization failed: {}!", e),
+        },
         2 => match adfs_serialize_updates(net, updates, feeds_metrics, feeds_config).await {
             Ok(result) => result,
             Err(e) => eyre::bail!("ADFS serialization failed: {}!", e),

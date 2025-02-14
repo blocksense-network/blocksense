@@ -178,9 +178,6 @@ pub enum FeedType {
     Bytes(Vec<u8>),
 }
 
-//TODO: In the future, consider support for variable precision
-const MAX_DIGITS_IN_FRACTION: usize = 18;
-
 impl FeedType {
     pub fn sizeof(&self) -> usize {
         match self {
@@ -190,7 +187,7 @@ impl FeedType {
         }
     }
 
-    pub fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self, digits_in_fraction: usize) -> Vec<u8> {
         match self {
             FeedType::Numerical(val) => {
                 let truncate =
@@ -206,9 +203,9 @@ impl FeedType {
 
                 if val_split.len() > 1 {
                     actual_digits_in_fraction =
-                        truncate(val_split[1].to_string(), MAX_DIGITS_IN_FRACTION).len();
+                        truncate(val_split[1].to_string(), digits_in_fraction).len();
 
-                    fraction = truncate(val_split[1].to_string(), MAX_DIGITS_IN_FRACTION)
+                    fraction = truncate(val_split[1].to_string(), digits_in_fraction)
                         .parse::<BigUint>()
                         .unwrap();
                 } else {
@@ -216,10 +213,10 @@ impl FeedType {
                     fraction = BigUint::from(0u32);
                 }
 
-                let result = (integer * BigUint::from(10u32).pow(MAX_DIGITS_IN_FRACTION as u32))
+                let result = (integer * BigUint::from(10u32).pow(digits_in_fraction as u32))
                     + (fraction
                         * BigUint::from(10u32)
-                            .pow(MAX_DIGITS_IN_FRACTION as u32 - actual_digits_in_fraction as u32));
+                            .pow(digits_in_fraction as u32 - actual_digits_in_fraction as u32));
 
                 let mut value_bytes = result.to_bytes_be();
                 let mut bytes_vec = vec![0; 32 - value_bytes.len()];
@@ -243,7 +240,11 @@ impl FeedType {
         }
     }
 
-    pub fn from_bytes(bytes: Vec<u8>, variant: FeedType) -> Result<FeedType, String> {
+    pub fn from_bytes(
+        bytes: Vec<u8>,
+        variant: FeedType,
+        digits_in_fraction: usize,
+    ) -> Result<FeedType, String> {
         match variant {
             FeedType::Numerical(_) => {
                 if bytes.len() < 32 {
@@ -258,10 +259,10 @@ impl FeedType {
 
                 let combined = BigUint::from_bytes_be(&result);
 
-                let fraction = &combined % BigUint::from(10u32).pow(MAX_DIGITS_IN_FRACTION as u32);
-                let integer = &combined / BigUint::from(10u32).pow(MAX_DIGITS_IN_FRACTION as u32);
+                let fraction = &combined % BigUint::from(10u32).pow(digits_in_fraction as u32);
+                let integer = &combined / BigUint::from(10u32).pow(digits_in_fraction as u32);
 
-                let str_val = format!("{}.{:0>18}", integer, fraction.to_string());
+                let str_val = format!("{}.{:0>digits_in_fraction$}", integer, fraction.to_string());
 
                 let val = match str_val.parse::<f64>() {
                     Ok(v) => v,

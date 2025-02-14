@@ -14,10 +14,10 @@ pub struct VotedFeedUpdate {
 }
 
 impl VotedFeedUpdate {
-    pub fn encode(&self) -> (Vec<u8>, Vec<u8>) {
+    pub fn encode(&self, digits_in_fraction: usize) -> (Vec<u8>, Vec<u8>) {
         (
             self.feed_id.to_be_bytes().to_vec(),
-            naive_packing(&self.value),
+            naive_packing(&self.value, digits_in_fraction),
         )
     }
 
@@ -26,13 +26,15 @@ impl VotedFeedUpdate {
         value: &str,
         end_slot_timestamp: Timestamp,
         variant: FeedType, // variant is only a type placeholder.
+        digits_in_fraction: usize,
     ) -> Result<VotedFeedUpdate, anyhow::Error> {
         let key_bytes = from_hex_string(key)?;
         let mut dst = [0u8; 4];
         dst.clone_from_slice(&key_bytes[0..4]);
         let feed_id = u32::from_be_bytes(dst);
         let value_bytes = from_hex_string(value)?;
-        let value = FeedType::from_bytes(value_bytes, variant).map_err(|e| anyhow!("{e}"))?;
+        let value = FeedType::from_bytes(value_bytes, variant, digits_in_fraction)
+            .map_err(|e| anyhow!("{e}"))?;
 
         Ok(VotedFeedUpdate {
             feed_id,
@@ -76,9 +78,9 @@ impl VotedFeedUpdate {
 
 pub const REPORT_HEX_SIZE: usize = 64;
 
-pub fn naive_packing(feed_result: &FeedType) -> Vec<u8> {
+pub fn naive_packing(feed_result: &FeedType, digits_in_fraction: usize) -> Vec<u8> {
     //TODO: Return Bytes32 type
-    feed_result.as_bytes()
+    feed_result.as_bytes(digits_in_fraction)
 }
 
 #[cfg(test)]

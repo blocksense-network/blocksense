@@ -34,7 +34,7 @@ use tokio::io::AsyncWriteExt;
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 const PROVIDERS_KEY_PREFIX: &str = "/tmp/key_";
-const BATCHED_REPORT_VAL: f64 = 100000.1;
+const BATCHED_REPORT_VAL: f64 = 123456.7;
 const REPORT_VAL: f64 = 80000.8;
 const FEED_ID: &str = "1";
 // We use the second value to generate a wrong signature in a batch
