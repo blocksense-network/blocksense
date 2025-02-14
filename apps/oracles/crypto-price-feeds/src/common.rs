@@ -106,3 +106,44 @@ fn wvap(exchange_price_points: &ExchangePricePoints) -> Result<f64> {
 
     Ok(numerator / denominator)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_wvap() {
+        let mut exchange_price_points: ExchangePricePoints = HashMap::new();
+        exchange_price_points.insert(
+            "exchange1".to_string(),
+            PricePoint {
+                price: 100.0,
+                volume: 10.0,
+            },
+        );
+        exchange_price_points.insert(
+            "exchange2".to_string(),
+            PricePoint {
+                price: 200.0,
+                volume: 20.0,
+            },
+        );
+        exchange_price_points.insert(
+            "exchange3".to_string(),
+            PricePoint {
+                price: 300.0,
+                volume: 30.0,
+            },
+        );
+
+        let result = wvap(&exchange_price_points).unwrap();
+        assert_eq!(result, 233.33333333333334);
+    }
+
+    #[test]
+    fn test_wvap_empty() {
+        let exchange_price_points: ExchangePricePoints = HashMap::new();
+        let result = wvap(&exchange_price_points);
+        assert!(result.is_err());
+    }
+}
