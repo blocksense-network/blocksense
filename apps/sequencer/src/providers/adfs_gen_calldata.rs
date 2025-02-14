@@ -228,7 +228,7 @@ pub mod tests {
             let bytes = from_hex_string(value).unwrap();
             VotedFeedUpdate {
                 feed_id,
-                value: FeedType::from_bytes(bytes, FeedType::Bytes(Vec::new())).unwrap(),
+                value: FeedType::from_bytes(bytes, FeedType::Bytes(Vec::new()), 18).unwrap(),
                 end_slot_timestamp: 0,
             }
         }

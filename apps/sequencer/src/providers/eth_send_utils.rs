@@ -661,12 +661,15 @@ mod tests {
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
-    use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
+    use config::{
+        get_test_config_with_multiple_providers, get_test_config_with_single_provider, AssetPair,
+    };
     use config::{AllFeedsConfig, PublishCriteria};
     use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
     use std::str::FromStr;
+    use std::time::SystemTime;
     use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
@@ -675,6 +678,36 @@ mod tests {
             return Some(mat.as_str().to_string());
         }
         None
+    }
+
+    fn test_feeds_config() -> Arc<RwLock<HashMap<u32, FeedConfig>>> {
+        let mut feeds_config = HashMap::new();
+        feeds_config.insert(
+            0,
+            FeedConfig {
+                id: 0,
+                name: "FOXY".to_string(),
+                full_name: "Foxy".to_string(),
+                description: "FOXY / USD".to_string(),
+                decimals: 18,
+                report_interval_ms: 90000,
+                quorum_percentage: 100.0,
+                skip_publish_if_less_then_percentage: 0.1,
+                always_publish_heartbeat_ms: Some(3600000),
+                _type: "Crypto".to_string(),
+                script: "CoinMarketCap".to_string(),
+                pair: AssetPair {
+                    base: "FOXY".to_string(),
+                    quote: "USD".to_string(),
+                },
+                first_report_start_time: SystemTime::now(),
+                resources: HashMap::new(),
+                value_type: "Numerical".to_string(),
+                aggregate_type: "Median".to_string(),
+                stride: 0,
+            },
+        );
+        Arc::new(RwLock::new(feeds_config))
     }
 
     #[tokio::test]
@@ -792,6 +825,7 @@ mod tests {
             &result_value,
             end_slot_timestamp,
             feed_registry::types::FeedType::Numerical(0.0f64),
+            18,
         )
         .unwrap();
         let updates_oneshot = UpdateToSend {
@@ -936,6 +970,7 @@ mod tests {
                 &value1,
                 end_of_timeslot,
                 FeedType::Text("".to_string()),
+                18,
             )
             .unwrap()],
         };
@@ -948,8 +983,8 @@ mod tests {
         assert!(result.is_ok());
     }
 
-    #[test]
-    fn compute_keys_vals_ignores_networks_not_on_the_list() {
+    #[tokio::test]
+    async fn compute_keys_vals_ignores_networks_not_on_the_list() {
         let selector = "0x1a2d80ac";
         let network = "dont_filter_me";
         let mut updates = UpdateToSend {
@@ -957,8 +992,9 @@ mod tests {
             updates: get_updates_test_data(),
         };
         filter_allowed_feeds(network, &mut updates, &None);
-        let serialized_updates =
-            legacy_serialize_updates(network, &updates).expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
+            .await
+            .expect("Serialize updates failed!");
 
         let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
         let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
@@ -986,8 +1022,8 @@ mod tests {
         updates
     }
 
-    #[test]
-    fn compute_keys_vals_filters_updates_for_networks_on_the_list() {
+    #[tokio::test]
+    async fn compute_keys_vals_filters_updates_for_networks_on_the_list() {
         let selector = "0x1a2d80ac";
         // Citrea
         let network = "citrea-testnet";
@@ -1013,8 +1049,9 @@ mod tests {
             ]),
         );
 
-        let serialized_updates =
-            legacy_serialize_updates(network, &updates).expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
+            .await
+            .expect("Serialize updates failed!");
 
         // Note: bye is filtered out:
         assert_eq!(
@@ -1038,8 +1075,9 @@ mod tests {
             ]),
         );
 
-        let serialized_updates =
-            legacy_serialize_updates(network, &updates).expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
+            .await
+            .expect("Serialize updates failed!");
 
         assert_eq!(
             serialized_updates,
@@ -1061,8 +1099,9 @@ mod tests {
             ]),
         );
 
-        let serialized_updates =
-            legacy_serialize_updates(network, &updates).expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
+            .await
+            .expect("Serialize updates failed!");
 
         assert_eq!(
             serialized_updates,

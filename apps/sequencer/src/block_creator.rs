@@ -365,19 +365,23 @@ mod tests {
         let k1 = "ab000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         let vote_1 =
-            VotedFeedUpdate::new_decode(k1, v1, end_of_timeslot, FeedType::Numerical(0.0)).unwrap();
+            VotedFeedUpdate::new_decode(k1, v1, end_of_timeslot, FeedType::Numerical(0.0), 18)
+                .unwrap();
         let k2 = "ac000002";
         let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000";
         let vote_2 =
-            VotedFeedUpdate::new_decode(k2, v2, end_of_timeslot, FeedType::Numerical(0.0)).unwrap();
+            VotedFeedUpdate::new_decode(k2, v2, end_of_timeslot, FeedType::Numerical(0.0), 18)
+                .unwrap();
         let k3 = "ad000003";
         let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000";
         let vote_3 =
-            VotedFeedUpdate::new_decode(k3, v3, end_of_timeslot, FeedType::Numerical(0.0)).unwrap();
+            VotedFeedUpdate::new_decode(k3, v3, end_of_timeslot, FeedType::Numerical(0.0), 18)
+                .unwrap();
         let k4 = "af000004";
         let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000";
         let vote_4 =
-            VotedFeedUpdate::new_decode(k4, v4, end_of_timeslot, FeedType::Numerical(0.0)).unwrap();
+            VotedFeedUpdate::new_decode(k4, v4, end_of_timeslot, FeedType::Numerical(0.0), 18)
+                .unwrap();
         vote_send.send(vote_1).unwrap();
         vote_send.send(vote_2).unwrap();
         vote_send.send(vote_3).unwrap();
