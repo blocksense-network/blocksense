@@ -54,12 +54,11 @@ pub fn fill_results(
 pub trait Fetcher {
     type ParsedResponse;
     type ApiResponse: DeserializeOwned; // Ensure it's deserializable
+    const NAME: &str;
 
-    fn prepare_get_request(
-        &self,
-        base_url: &str,
-        params: Option<&[(&str, &str)]>,
-    ) -> Result<Request> {
+    fn get_request() -> Result<Request>;
+
+    fn prepare_get_request(base_url: &str, params: Option<&[(&str, &str)]>) -> Result<Request> {
         let url = match params {
             Some(p) => Url::parse_with_params(base_url, p)?,
             None => Url::parse(base_url)?,
@@ -73,12 +72,12 @@ pub trait Fetcher {
         Ok(req.build())
     }
 
-    fn deserialize_response(&self, resp: Response) -> Result<Self::ApiResponse> {
+    fn deserialize_response(resp: Response) -> Result<Self::ApiResponse> {
         let body = resp.into_body();
         serde_json::from_slice(&body).map_err(|e| e.into())
     }
 
-    fn parse_response(&self, response: Self::ApiResponse) -> Result<Self::ParsedResponse>;
+    fn parse_response(response: Self::ApiResponse) -> Result<Self::ParsedResponse>;
 }
 
 #[derive(Default, Debug, Clone, PartialEq)]

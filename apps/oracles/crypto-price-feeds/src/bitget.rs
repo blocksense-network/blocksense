@@ -16,13 +16,18 @@ pub struct BitgetPriceResponse {
     pub code: String,
     pub data: Vec<BitgetPriceData>,
 }
-struct BitgetFetcher;
+pub struct BitgetFetcher;
 
 impl Fetcher for BitgetFetcher {
     type ParsedResponse = PairPriceData;
     type ApiResponse = BitgetPriceResponse;
+    const NAME: &str = "Bitget";
 
-    fn parse_response(&self, value: BitgetPriceResponse) -> Result<Self::ParsedResponse> {
+    fn get_request() -> Result<blocksense_sdk::spin::http::Request> {
+        Self::prepare_get_request("https://api.bitget.com/api/spot/v1/market/tickers", None)
+    }
+
+    fn parse_response(value: BitgetPriceResponse) -> Result<Self::ParsedResponse> {
         let response: Self::ParsedResponse = value
             .data
             .into_iter()
@@ -31,15 +36,4 @@ impl Fetcher for BitgetFetcher {
 
         Ok(response)
     }
-}
-
-pub async fn get_bitget_prices() -> Result<PairPriceData> {
-    let fetcher = BitgetFetcher {};
-    let req =
-        fetcher.prepare_get_request("https://api.bitget.com/api/spot/v1/market/tickers", None);
-    let resp: Response = send(req?).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
 }

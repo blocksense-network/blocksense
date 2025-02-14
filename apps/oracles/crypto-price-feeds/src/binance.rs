@@ -13,13 +13,21 @@ pub struct BinancePriceData {
 
 type BinancePriceResponse = Vec<BinancePriceData>;
 
-struct BinancePriceFetcher;
+pub struct BinancePriceFetcher {
+    // base_url: str,
+    // params: Option<[(str, str)]>
+}
 
 impl Fetcher for BinancePriceFetcher {
     type ParsedResponse = PairPriceData;
     type ApiResponse = BinancePriceResponse;
+    const NAME: &str = "Binance";
 
-    fn parse_response(&self, value: BinancePriceResponse) -> Result<Self::ParsedResponse> {
+    fn get_request() -> Result<blocksense_sdk::spin::http::Request> {
+        Self::prepare_get_request("https://api.binance.com/api/v3/ticker/price", None)
+    }
+
+    fn parse_response(value: BinancePriceResponse) -> Result<Self::ParsedResponse> {
         let response: Self::ParsedResponse = value
             .into_iter()
             .map(|value| (value.symbol, value.price))
@@ -27,14 +35,4 @@ impl Fetcher for BinancePriceFetcher {
 
         Ok(response)
     }
-}
-
-pub async fn get_binance_prices() -> Result<PairPriceData> {
-    let fetcher = BinancePriceFetcher {};
-    let req = fetcher.prepare_get_request("https://api.binance.com/api/v3/ticker/price", None);
-    let resp: Response = send(req?).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
 }
