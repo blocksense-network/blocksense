@@ -23,10 +23,10 @@ pub struct VotedFeedUpdateWithProof {
 }
 
 impl VotedFeedUpdate {
-    pub fn encode(&self, digits_in_fraction: usize) -> (Vec<u8>, Vec<u8>) {
+    pub fn encode(&self, digits_in_fraction: usize, time_stamp: u64) -> (Vec<u8>, Vec<u8>) {
         (
             self.feed_id.to_be_bytes().to_vec(),
-            naive_packing(&self.value, digits_in_fraction),
+            naive_packing(&self.value, digits_in_fraction, time_stamp),
         )
     }
 
@@ -85,9 +85,13 @@ impl VotedFeedUpdate {
     }
 }
 
-pub fn naive_packing(feed_result: &FeedType, digits_in_fraction: usize) -> Vec<u8> {
+pub fn naive_packing(
+    feed_result: &FeedType,
+    digits_in_fraction: usize,
+    time_stamp: u64,
+) -> Vec<u8> {
     //TODO: Return Bytes32 type
-    feed_result.as_bytes(digits_in_fraction)
+    feed_result.as_bytes(digits_in_fraction, time_stamp)
 }
 
 use std::collections::HashMap;
@@ -135,7 +139,7 @@ mod tests {
     #[test]
     fn naive_packing_numerical_value() {
         let value = 42.42;
-        let bytes = naive_packing(&FeedType::Numerical(value), 18);
+        let bytes = naive_packing(&FeedType::Numerical(value), 18, 0);
 
         let reversed = FeedType::from_bytes(bytes, FeedType::Numerical(0.0), 18).unwrap();
 
@@ -146,7 +150,7 @@ mod tests {
     fn naive_packing_string_value() {
         let value = "blocksense"; // size is 10
         let feed_value = FeedType::Text(value.to_string());
-        let bytes = naive_packing(&feed_value, 18);
+        let bytes = naive_packing(&feed_value, 18, 0);
 
         let mut buf = [0; 10];
         buf.copy_from_slice(&bytes[..10]);
@@ -163,7 +167,7 @@ mod tests {
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
-        let (encoded_key, encoded_value) = update.encode(18);
+        let (encoded_key, encoded_value) = update.encode(18, 0);
         assert_eq!("0000002a", to_hex_string(encoded_key, None));
         assert_eq!(
             "00000000000000000000000000000007b2a557a6d97800000000000000000000",
@@ -279,7 +283,7 @@ mod tests {
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
-        let (encoded_key, encoded_value) = update.encode(18);
+        let (encoded_key, encoded_value) = update.encode(18, 0);
         assert_eq!("0000002a", to_hex_string(encoded_key, None));
         assert_eq!(
             "00000000000000000000000000000007b2a557a6d97800000000000000000000",

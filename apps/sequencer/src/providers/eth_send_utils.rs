@@ -71,7 +71,10 @@ async fn legacy_serialize_updates(
             }
         };
 
-        let (key, val) = update.encode(digits_in_fraction as usize);
+        let (key, val) = update.encode(
+            digits_in_fraction as usize,
+            update.end_slot_timestamp as u64,
+        );
 
         num_reported_feeds += 1;
         result += to_hex_string(key, None).as_str();
