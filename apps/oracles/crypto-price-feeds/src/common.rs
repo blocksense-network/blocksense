@@ -80,3 +80,29 @@ pub trait Fetcher {
 
     fn parse_response(&self, response: Self::ApiResponse) -> Result<Self::ParsedResponse>;
 }
+
+#[derive(Default, Debug, Clone, PartialEq)]
+pub struct PricePoint {
+    price: f64,
+    volume: f64,
+}
+
+#[allow(dead_code)]
+type ExchangePricePoints = HashMap<String, PricePoint>;
+
+#[allow(dead_code)]
+fn wvap(exchange_price_points: &ExchangePricePoints) -> Result<f64> {
+    if exchange_price_points.is_empty() {
+        return Err(anyhow::anyhow!("No price points found"));
+    }
+    let numerator: f64 = exchange_price_points
+        .iter()
+        .fold(0.0, |acc, (_, price_point)| {
+            acc + price_point.volume * price_point.price
+        });
+    let denominator: f64 = exchange_price_points
+        .iter()
+        .fold(0.0, |acc, (_, price_point)| acc + price_point.volume);
+
+    Ok(numerator / denominator)
+}
