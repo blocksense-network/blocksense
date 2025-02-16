@@ -14,6 +14,10 @@
   @apply bg-neutral-900 border-neutral-600;
 }
 
+.dark .tabs__trigger-selected {
+  @apply border-blue-700 rounded-none;
+}
+
 .dark button:hover {
   @apply bg-neutral-800;
 }
