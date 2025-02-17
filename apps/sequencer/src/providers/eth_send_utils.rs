@@ -23,6 +23,7 @@ use crate::{
     BatchedAggegratesToSend,
 };
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
+use feeds_processing::adfs_gen_calldata::adfs_serialize_updates;
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_metric_by};
