@@ -1049,7 +1049,7 @@ __metadata:
     nextra-theme-docs: "npm:^4.1.1"
     postcss: "npm:^8.4.49"
     react: "npm:19.0.0"
-    react-compiler-runtime: "npm:0.0.0-experimental-22c6e49-20241219"
+    react-compiler-runtime: "npm:0.0.0-experimental-2689395-20241226"
     scroll-into-view-if-needed: "npm:^3.1.0"
     tailwindcss: "npm:^4.0.0-beta.8"
     tsup: "npm:8.3.5"
@@ -18923,6 +18923,15 @@ __metadata:
   peerDependencies:
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
   checksum: 10c0/ebe13dd77fd5252772b54326817eac3f3369056e6d8893929fa27a135c918013ec52119aad747762bbea61162a861eb55d2ce02217bd2f07328e7b0884d703b6
+  languageName: node
+  linkType: hard
+
+"react-compiler-runtime@npm:0.0.0-experimental-2689395-20241226":
+  version: 0.0.0-experimental-2689395-20241226
+  resolution: "react-compiler-runtime@npm:0.0.0-experimental-2689395-20241226"
+  peerDependencies:
+    react: ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/cb3860fef40c3f9d9bb2bcf298223abf85f78d4fa35172ccf196c100189269e90481784c9a55eee87f91171aec4bc362bf8d7c5a693b518cd15ae9152e3410d5
   languageName: node
   linkType: hard
 
