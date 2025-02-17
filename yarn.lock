@@ -1988,6 +1988,7 @@ __metadata:
     "@blocksense/data-feeds-config-generator": "workspace:*"
     "@blocksense/nextra-theme-docs": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"
+    "@blocksense/ui": "workspace:*"
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.0"
     "@radix-ui/react-accordion": "npm:^1.2.2"
@@ -2172,7 +2173,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/ui@workspace:libs/ts/ui":
+"@blocksense/ui@workspace:*, @blocksense/ui@workspace:libs/ts/ui":
   version: 0.0.0-use.local
   resolution: "@blocksense/ui@workspace:libs/ts/ui"
   dependencies:
