@@ -109,3 +109,18 @@ unconstrained fn test_block_number_greater_than_previous() {
         block_number
     ).call(&mut env.public());
 }
+
+#[test(should_fail)]
+unconstrained fn test_write_when_not_in_access_control() {
+    let (env, adfs_contract_address) = setup();
+    let block_number = get_block_number();
+    let alice = env.create_account(2);
+    env.impersonate(alice);
+
+    AggregatedDataFeedStore::at(adfs_contract_address).set_feeds(
+        _58_DATA_FEEDS_STRIDE_0,
+        FIFTY_EIGHT,
+        FOUR,
+        block_number
+    ).call(&mut env.public());
+}

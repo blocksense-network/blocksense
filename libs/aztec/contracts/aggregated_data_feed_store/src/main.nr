@@ -59,7 +59,7 @@ contract AggregatedDataFeedStore {
         rounds_len: Field,
         block_number: u32,
     ) {
-        // TODO: Implement access control
+        assert(context.msg_sender() == storage.owner.read());
         assert(storage.block_number.read() < block_number);
         storage.block_number.write(block_number);
 
