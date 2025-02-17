@@ -79,3 +79,19 @@ unconstrained fn test_get_latest_round() {
         .get_latest_round(0, 45 as Field).view(&mut env.public()) == _59_DATA_FEEDS_STRIDE_0[_59_DATA_FEEDS_STRIDE_0.len() - 1]
     );
 }
+
+#[test]
+unconstrained fn test_get_latest_data() {
+    let (env, adfs_contract_address) = setup();
+    let block_number = get_block_number();
+
+    AggregatedDataFeedStore::at(adfs_contract_address).set_feeds(
+        _59_DATA_FEEDS_STRIDE_0,
+        FIFTY_NINE,
+        FOUR,
+        block_number as Field
+    ).call(&mut env.public());
+
+    let latest_data = AggregatedDataFeedStore::at(adfs_contract_address).get_latest_data(0, 45 as Field).view(&mut env.public());
+    assert(latest_data == 83296120);
+}

@@ -44,6 +44,8 @@ unconstrained fn assert_get_feed_at_round_produces_correct_result<let END_OF_ROU
     for i in 0..END_OF_ROUND_DATA {
         round_index = __determine_round_index(round_index, i);
         let feed_at_round = AggregatedDataFeedStore::at(adfs_contract_address).get_feed_at_round(i as Field, round_index, ZERO).view(&mut env.public());
+        println("feed_at_round");
+        println(feed_at_round);
         assert(_59_DATA_FEEDS_STRIDE_0[values_iterator] == feed_at_round);
         values_iterator = values_iterator + THREE;
     }
