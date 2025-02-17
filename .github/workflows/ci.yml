@@ -178,7 +178,7 @@ jobs:
         env:
           DOCS_DEPLOY_URL: ${{ steps.Deploy.outputs.deployment-url }}
         run: |
-          echo "url=$DOCS_DEPLOY_URL" >> $GITHUB_STATE
+          echo "url=$DOCS_DEPLOY_URL" >> $GITHUB_OUTPUT
 
   comment_on_pr:
     needs: [deploy_websites]
@@ -189,7 +189,7 @@ jobs:
       - name: Get current date and time
         id: datetime
         run: |
-          echo "latest_update=$(date +'%d.%m.%Y %H:%M:%S')" >> $GITHUB_STATE
+          echo "latest_update=$(date +'%d.%m.%Y %H:%M:%S')" >> $GITHUB_OUTPUT
 
       - name: Comment Deployment Links on the PR
         uses: marocchino/sticky-pull-request-comment@v2.9.1
