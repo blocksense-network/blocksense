@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Tooltip } from '@blocksense/ui/Tooltip';
-import { CopyButton } from '@/components/common/CopyButton';
+import { CopyButton } from '@blocksense/ui/CopyButton';
 import { onLinkClick, previewHexStringOrDefault } from '@/src/utils';
 import {
   getAddressExplorerUrl,

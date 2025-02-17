@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { codeToHtml, ShikiTransformer } from 'shiki';
 import { useTheme } from '@blocksense/nextra-theme-docs';
 
-import { CopyButton } from '@/components/common/CopyButton';
+import { CopyButton } from '@blocksense/ui/CopyButton';
 import { shikiDefaultThemes } from '@/config';
 
 type CodeBlockProps = {

@@ -10,7 +10,7 @@ import { Error404 } from '@/components/common/Error404';
 import { DataFeedCardSection } from '@/components/DataFeeds/DataFeedCardSection';
 import { DataFeedCardContentItem } from '@/components/DataFeeds/DataFeedCardContentItem';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
-import { CopyButton } from '@/components/common/CopyButton';
+import { CopyButton } from '@blocksense/ui/CopyButton';
 import { QuestionsCardContent } from '@/components/DataFeeds/QuestionsCardContent';
 
 export function generateStaticParams() {

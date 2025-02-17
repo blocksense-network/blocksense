@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent, useState } from 'react';
+import React, { MouseEvent, useState } from 'react';
 
 import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 import { Tooltip } from '@blocksense/ui/Tooltip';
