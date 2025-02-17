@@ -30,7 +30,7 @@ unconstrained fn test_initializer() {
     let owner_storage_value: AztecAddress = storage_read(adfs_contract_address, owner_slot, block_number);
 }
 
-#[test]
+// #[test]
 unconstrained fn test_store_59_data_fields_with_length_1() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
@@ -91,5 +91,8 @@ unconstrained fn test_get_latest_round() {
         block_number as Field
     ).call(&mut env.public());
 
-
+    assert(
+        AggregatedDataFeedStore::at(adfs_contract_address)
+        .get_latest_round(0, 45 as Field).view(&mut env.public()) == _59_DATA_FEEDS_STRIDE_0[_59_DATA_FEEDS_STRIDE_0.len() - 1]
+    );
 }

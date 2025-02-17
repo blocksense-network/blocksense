@@ -25,6 +25,7 @@ contract AggregatedDataFeedStore {
         owner: PublicImmutable<AztecAddress, Context>,
         data_feeds: Map<Field, PublicMutable<Field, Context>, Context>,
         rounds: Map<Field, PublicMutable<Field, Context>, Context>,
+        block_number: PublicMutable<Field, Context>,
     }
 
     #[public]
@@ -72,8 +73,8 @@ contract AggregatedDataFeedStore {
 
     #[public]
     #[view]
-    fn get_latest_round(stride: Field, feed_id: Field) -> pub Field {
-        storage.rounds.at(TWO_POW_115 * stride + feed_id).read()
+    fn get_latest_round(stride: Field, feed_id: Field) -> Field {
+        storage.rounds.at((TWO_POW_115 * stride) + feed_id).read()
     }
 
     #[public]
