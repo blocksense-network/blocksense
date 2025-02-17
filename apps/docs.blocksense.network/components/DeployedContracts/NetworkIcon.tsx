@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button } from 'nextra/components';
 
-import { ImageWrapper } from '../common/ImageWrapper';
+import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 
 type NetworkIconProps = {
   network: string;

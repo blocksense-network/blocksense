@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ImageWrapper } from '@/components/common/ImageWrapper';
+import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 
 const ArrowRoundedIcon = () => {
   return (

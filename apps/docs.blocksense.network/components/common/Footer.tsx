@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { config } from '@/config';
-import { ImageWrapper } from '@/components/common/ImageWrapper';
+import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 
 export const Footer = () => {
   return (
