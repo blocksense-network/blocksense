@@ -25,6 +25,10 @@ const config = {
       from: '../assets/fonts',
       to: 'assets/fonts',
     },
+    {
+      from: '../assets/icons',
+      to: 'assets/icons',
+    },
   ],
 };
 export default config;
