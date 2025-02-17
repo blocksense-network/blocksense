@@ -3,7 +3,7 @@ global ONE: Field = 1;
 global TWO: Field = 2;
 global THREE: Field = 3;
 global FOUR: Field = 4;
-global FIFTY_NINE: Field = 59;
+global FIFTY_EIGHT: Field = 58;
 global TWO_POW_13: Field = 8192; // 2^13
 global TWO_POW_115: Field = 41538374868278621028243970633760768; // 2^115
 global TWO_POW_128: Field = 340282366920938463463374607431768211456; // 2^128
@@ -26,7 +26,7 @@ global fifteen_feed_index: Field = calculate_feed_index(15, one_round_index, ZER
 global thirty_feed_index: Field = calculate_feed_index(30, two_round_index, ZERO);
 global fortyfive_feed_index: Field = calculate_feed_index(45, three_round_index, ZERO);
 
-global _59_DATA_FEEDS_STRIDE_0: [Field; 185] = [
+global _58_DATA_FEEDS_STRIDE_0: [Field; 182] = [
     // Feeds
     calculate_feed_index(0, zero_round_index, ZERO), ONE, 48147686,
     calculate_feed_index(1, zero_round_index, ZERO), ONE, 65136033,
@@ -86,7 +86,6 @@ global _59_DATA_FEEDS_STRIDE_0: [Field; 185] = [
     calculate_feed_index(55, three_round_index, ZERO), ONE, 119340840,
     calculate_feed_index(56, three_round_index, ZERO), ONE, 24073850,
     calculate_feed_index(57, three_round_index, ZERO), ONE, 103273774,
-    calculate_feed_index(58, three_round_index, ZERO), ONE, 72975937,
     // Rounds
     zero_round_index, ZERO,
     one_round_index, ONE,

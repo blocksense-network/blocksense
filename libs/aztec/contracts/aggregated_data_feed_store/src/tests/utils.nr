@@ -6,7 +6,7 @@ use dep::aztec::{
 };
 
 use crate::AggregatedDataFeedStore;
-use crate::tests::helper_vars::{_59_DATA_FEEDS_STRIDE_0, calculate_feed_index, zero_round_index, one_round_index, two_round_index, three_round_index, ZERO, TWO, THREE};
+use crate::tests::helper_vars::{_58_DATA_FEEDS_STRIDE_0, calculate_feed_index, zero_round_index, one_round_index, two_round_index, three_round_index, ZERO, TWO, THREE};
 
 unconstrained pub fn setup() -> (&mut TestEnvironment, AztecAddress) {
     let mut env = TestEnvironment::new();
@@ -30,7 +30,7 @@ unconstrained fn assert_feeds_are_stored_in_correct_slots<let END_OF_ROUND_DATA:
         round_index = __determine_round_index(round_index, i);
         let data_feed_slot = derive_storage_slot_in_map(storage_slot, calculate_feed_index(i as Field, round_index, ZERO));
         let data_feed_slot_value: u32 = storage_read(adfs_contract_address, data_feed_slot, block_number);
-        assert(_59_DATA_FEEDS_STRIDE_0[values_iterator] as u32 == data_feed_slot_value);
+        assert(_58_DATA_FEEDS_STRIDE_0[values_iterator] as u32 == data_feed_slot_value);
         values_iterator = values_iterator + THREE;
     }
 }
@@ -46,7 +46,7 @@ unconstrained fn assert_get_feed_at_round_produces_correct_result<let END_OF_ROU
         let feed_at_round = AggregatedDataFeedStore::at(adfs_contract_address).get_feed_at_round(i as Field, round_index, ZERO).view(&mut env.public());
         println("feed_at_round");
         println(feed_at_round);
-        assert(_59_DATA_FEEDS_STRIDE_0[values_iterator] == feed_at_round);
+        assert(_58_DATA_FEEDS_STRIDE_0[values_iterator] == feed_at_round);
         values_iterator = values_iterator + THREE;
     }
 }

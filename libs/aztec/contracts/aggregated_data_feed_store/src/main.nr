@@ -9,11 +9,11 @@ contract AggregatedDataFeedStore {
     use std::meta::derive;
 
     /// Max Fields that can be written in storage per Tx are 63.
-    /// Thus we have 59 feeds that are distributed in 4 rounds.
-    /// Each feed metadata has id, length of the data and the actual data => 59 * 3.
+    /// Thus we have blocknumber and 58 feeds that are distributed in 4 rounds.
+    /// Each feed metadata has id, length of the data and the actual data => 58 * 3.
     /// Each round metadata has id and its data => 4 * 2.
-    /// Thus (59 * 3) + (4 * 2) = 185.
-    global MAX_FEEDS_AND_ROUNDS_DATA: u32 = 185;
+    /// Thus (58 * 3) + (4 * 2) = 182.
+    global MAX_FEEDS_AND_ROUNDS_DATA: u32 = 182;
     /// 2^128
     global TWO_POW_128: Field = 340282366920938463463374607431768211456;
     /// 2^115
@@ -33,13 +33,14 @@ contract AggregatedDataFeedStore {
         owner: PublicImmutable<AztecAddress, Context>,
         data_feeds: Map<Field, PublicMutable<Field, Context>, Context>,
         rounds: Map<Field, PublicMutable<Field, Context>, Context>,
-        block_number: PublicMutable<Field, Context>,
+        block_number: PublicMutable<u32, Context>,
     }
 
     #[public]
     #[initializer]
     fn constructor() {
         storage.owner.initialize(context.msg_sender());
+        storage.block_number.write(3); // 4 is the default block number when fetched from the Sandbox
     }
 
     ///                  [                                                         .                                   ]
@@ -56,9 +57,11 @@ contract AggregatedDataFeedStore {
         feed_input_data: [Field; MAX_FEEDS_AND_ROUNDS_DATA],
         feeds_len: Field,
         rounds_len: Field,
-        block_number: Field, // TODO
+        block_number: u32,
     ) {
         // TODO: Implement access control
+        assert(storage.block_number.read() < block_number);
+        storage.block_number.write(block_number);
 
         // Doing a cast here to avoid casting one more time
         let feeds_len_u64 = feeds_len as u64;
@@ -110,7 +113,7 @@ contract AggregatedDataFeedStore {
     }
 
     fn calculate_feed_index(feed_id: Field, round: Field, stride: Field) -> pub Field {
-        (TWO_POW_128 * TWO.pow_32(stride)) + ((feed_id * TWO_POW_13) * TWO.pow_32(stride)) + (round * TWO.pow_32(stride))
+        (TWO_POW_128 + (feed_id * TWO_POW_13) + round) * TWO.pow_32(stride)
     }
 
     fn calculate_round_index(stride: Field, feed_id: Field) -> pub Field {
