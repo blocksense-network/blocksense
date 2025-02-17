@@ -1,6 +1,10 @@
 {
   "name": "@blocksense/ui",
   "type": "module",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./Button": "./src/components/Button/index.tsx"
+  },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.0-beta.9",
     "clsx": "^2.1.1",
