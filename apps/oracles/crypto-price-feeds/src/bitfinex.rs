@@ -1,10 +1,9 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Response};
 
 use serde::{Deserialize, Deserializer};
 use serde_json::{from_value, Value};
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::common::{Fetcher, PairPriceData, PriceFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct TradingPairTicker {
@@ -90,19 +89,19 @@ impl<'de> Deserialize<'de> for BitfinexPriceResponseData {
     }
 }
 
-type BitfinexPricesResponse = Vec<BitfinexPriceResponseData>;
-
 pub struct BitfinexPriceFetcher;
+
+impl PriceFetcher for BitfinexPriceFetcher {}
+
 impl Fetcher for BitfinexPriceFetcher {
-    type ParsedResponse = PairPriceData;
-    type ApiResponse = BitfinexPricesResponse;
+    type ApiResponse = Vec<BitfinexPriceResponseData>;
     const NAME: &str = "Bitfinex";
 
-    fn get_request() -> Result<blocksense_sdk::spin::http::Request> {
+    fn get_request(&self) -> Result<blocksense_sdk::spin::http::Request> {
         Self::prepare_get_request("https://api-pub.bitfinex.com/v2/tickers?symbols=ALL", None)
     }
 
-    fn parse_response(value: BitfinexPricesResponse) -> Result<Self::ParsedResponse> {
+    fn parse_response(value: Self::ApiResponse) -> Result<Self::ParsedResponse> {
         let trading_tickers: Vec<TradingPairTicker> = value
             .into_iter()
             .filter_map(|ticker| {
@@ -114,7 +113,7 @@ impl Fetcher for BitfinexPriceFetcher {
             })
             .collect();
 
-        let response: Self::ParsedResponse = trading_tickers
+        let response = trading_tickers
             .into_iter()
             .map(|value| (value.symbol().to_string(), value.price().to_string()))
             .collect();

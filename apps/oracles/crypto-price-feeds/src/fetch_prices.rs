@@ -3,44 +3,49 @@ use anyhow::Result;
 use std::collections::HashMap;
 use std::time::Instant;
 
-use futures::stream::{FuturesUnordered, StreamExt};
-use std::future::Future;
-use std::pin::Pin;
+use futures::{
+    future::LocalBoxFuture,
+    stream::{FuturesUnordered, StreamExt},
+    FutureExt,
+};
 
 use blocksense_sdk::spin::http::{send, Response};
 
-use crate::binance::BinancePriceFetcher;
+use crate::binance::{BinancePriceFetcher, BinancePriceFetcher2};
 use crate::bitfinex::BitfinexPriceFetcher;
 use crate::bitget::BitgetFetcher;
-use crate::common::{fill_results, PairPriceData, ResourceData, ResourceResult, Fetcher};
+use crate::common::{fill_results, Fetcher, ResourceData, ResourceResult};
 
-// Define boxed future type that includes the exchange name
-type BoxedFuture = Pin<Box<dyn Future<Output = Result<(String, PairPriceData)>>>>;
-
-fn run_fetcher<EF>() -> Pin<Box<dyn Future<Output = Result<(String, EF::ParsedResponse)>>>>
-where
-    EF: Fetcher + 'static
-{
-    Box::pin(async move {
-        let req = EF::get_request();
+fn run_fetcher<FetcherT: Fetcher>(
+    fetcher: &FetcherT,
+) -> LocalBoxFuture<Result<(String, FetcherT::ParsedResponse)>> {
+    async {
+        let req = fetcher.get_request();
         let resp: Response = send(req?).await?;
-        let deserialized = EF::deserialize_response(resp)?;
-        let prices: EF::ParsedResponse = EF::parse_response(deserialized)?;
-        Ok((EF::NAME.into(), prices))
-    })
+        let deserialized = FetcherT::deserialize_response(resp)?;
+        let prices: FetcherT::ParsedResponse = FetcherT::parse_response(deserialized)?;
+        Ok((FetcherT::NAME.into(), prices))
+    }
+    .boxed_local()
 }
 
 pub async fn fetch_all_prices(
-    resources: &Vec<ResourceData>,
+    resources: &[ResourceData],
     results: &mut HashMap<String, Vec<ResourceResult>>,
 ) -> Result<()> {
-    let mut futures = FuturesUnordered::<BoxedFuture>::new();
+    let mut futures = FuturesUnordered::new();
     let start = Instant::now();
 
     // Push exchange futures into FuturesUnordered
-    futures.push(run_fetcher::<BinancePriceFetcher>());
-    futures.push(run_fetcher::<BitfinexPriceFetcher>());
-    futures.push(run_fetcher::<BitgetFetcher>());
+    // futures.push(run_fetcher::<BinancePriceFetcher>());
+    // futures.push(run_fetcher::<BitfinexPriceFetcher>());
+    // futures.push(run_fetcher::<BitgetFetcher>());
+
+    // let fetcher = BitfinexPriceFetcher {};
+    // fetcher.get_request()
+    futures.push(run_fetcher(&BinancePriceFetcher2::new(&["BTCUSD"])));
+    // futures.push(run_fetcher(&BitfinexPriceFetcher {}));
+    // futures.push(run_fetcher(&BitgetFetcher {}));
 
     // Process results as they complete
     while let Some(result) = futures.next().await {

@@ -1,9 +1,8 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Response};
 
 use serde::Deserialize;
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::common::{prepare_get_request, Fetcher, PairPriceData};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct BitgetPriceData {
@@ -23,12 +22,12 @@ impl Fetcher for BitgetFetcher {
     type ApiResponse = BitgetPriceResponse;
     const NAME: &str = "Bitget";
 
-    fn get_request() -> Result<blocksense_sdk::spin::http::Request> {
-        Self::prepare_get_request("https://api.bitget.com/api/spot/v1/market/tickers", None)
+    fn get_request(&self) -> Result<blocksense_sdk::spin::http::Request> {
+        prepare_get_request("https://api.bitget.com/api/spot/v1/market/tickers", None)
     }
 
-    fn parse_response(value: BitgetPriceResponse) -> Result<Self::ParsedResponse> {
-        let response: Self::ParsedResponse = value
+    fn parse_response(value: Self::ApiResponse) -> Result<Self::ParsedResponse> {
+        let response = value
             .data
             .into_iter()
             .map(|value| (value.symbol, value.close))

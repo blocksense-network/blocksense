@@ -87,6 +87,7 @@ fn print_results(resources: &Vec<ResourceData>, results: &HashMap<String, Vec<Re
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
+    println!("starting oracle component");
     let mut resources: Vec<ResourceData> = vec![];
     let mut results: HashMap<String, Vec<ResourceResult>> =
         HashMap::<String, Vec<ResourceResult>>::new();
@@ -103,10 +104,10 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     }
 
     fetch_all_prices(&resources, &mut results).await?;
-    print_results(&resources, &results);
+    // print_results(&resources, &results);
 
-    let payload = process_results(results)?;
-    println!("Final Payload - {:?}", payload.values);
+    // let payload = process_results(results)?;
+    // println!("Final Payload - {:?}", payload.values);
 
-    Ok(payload)
+    Ok(Payload::default())
 }

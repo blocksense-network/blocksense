@@ -6,6 +6,7 @@ use url::Url;
 
 pub const USD_SYMBOLS: [&str; 3] = ["USD", "USDC", "USDT"];
 
+// TODO: Anotate what key and value means
 pub type PairPriceData = HashMap<String, String>;
 
 #[derive(Debug)]
@@ -25,7 +26,7 @@ pub struct ResourceResult {
 }
 
 pub fn fill_results(
-    resources: &Vec<ResourceData>,
+    resources: &[ResourceData],
     results: &mut HashMap<String, Vec<ResourceResult>>,
     response: HashMap<String, String>,
 ) -> Result<()> {
@@ -51,27 +52,26 @@ pub fn fill_results(
     Ok(())
 }
 
-pub trait Fetcher {
+pub trait FetcherOutputProvider {
     type ParsedResponse;
+}
+
+pub trait PriceFetcher {}
+
+impl<Context: PriceFetcher> FetcherOutputProvider for Context {
+    type ParsedResponse = PairPriceData;
+}
+
+// pub trait PriceFetcher: Fetcher<ParsedResponse = PairPriceData> {}
+
+pub trait Fetcher: FetcherOutputProvider {
     type ApiResponse: DeserializeOwned; // Ensure it's deserializable
     const NAME: &str;
 
-    fn get_request() -> Result<Request>;
+    // Forge the url and params to pass to `prepare_get_request` based on the state
+    fn get_request(&self) -> Result<Request>;
 
-    fn prepare_get_request(base_url: &str, params: Option<&[(&str, &str)]>) -> Result<Request> {
-        let url = match params {
-            Some(p) => Url::parse_with_params(base_url, p)?,
-            None => Url::parse(base_url)?,
-        };
-
-        let mut req = Request::builder();
-        req.method(Method::Get);
-        req.uri(url.as_str());
-        req.header("Accepts", "application/json");
-
-        Ok(req.build())
-    }
-
+    // TODO: maybe pass in the body to deserialize_response instead of the whole response
     fn deserialize_response(resp: Response) -> Result<Self::ApiResponse> {
         let body = resp.into_body();
         serde_json::from_slice(&body).map_err(|e| e.into())
@@ -146,3 +146,29 @@ mod tests {
         assert!(result.is_err());
     }
 }
+pub fn prepare_get_request(base_url: &str, params: Option<&[(&str, &str)]>) -> Result<Request> {
+    let url = match params {
+        Some(p) => Url::parse_with_params(base_url, p)?,
+        None => Url::parse(base_url)?,
+    };
+
+    let mut req = Request::builder();
+    req.method(Method::Get);
+    req.uri(url.as_str());
+    req.header("Accepts", "application/json");
+
+    Ok(req.build())
+}
+
+// pub trait PriceFetcher: FetcherOutputProvider {}
+//
+// pub trait FetcherOutputProvider {
+//     type ParsedResponse;
+// }
+//
+// impl<Context> FetcherOutputProvider for Context
+// where
+//     Context: PriceFetcher,
+// {
+//     type ParsedResponse = PairPriceData;
+// }
