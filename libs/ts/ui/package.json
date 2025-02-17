@@ -1,6 +1,12 @@
 {
   "name": "@blocksense/ui",
   "type": "module",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.0.0-beta.9",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss": "^4.0.0-beta.9",
+    "tailwindcss-animate": "^1.0.7"
+  },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.4",
     "@storybook/addon-essentials": "^8.5.6",
