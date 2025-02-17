@@ -5,7 +5,7 @@ mod tests;
 contract AggregatedDataFeedStore {
     use dep::aztec::{macros::{functions::{initializer, public, view}, storage::storage}};
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
-    use dep::aztec::protocol_types::traits::Serialize;
+    use dep::aztec::protocol_types::traits::{Serialize, Deserialize};
     use std::meta::derive;
 
     /// Max Fields that can be written in storage per Tx are 63.
@@ -22,7 +22,7 @@ contract AggregatedDataFeedStore {
     global TWO_POW_13: Field = 8192;
     global TWO: Field = 2;
 
-    #[derive(Serialize)]
+    #[derive(Serialize, Deserialize)]
     pub struct LatestRoundAndData {
         latest_round: Field,
         latest_data: Field,

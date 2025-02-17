@@ -8,6 +8,7 @@ use crate::tests::utils::{
     assert_get_feed_at_round_produces_correct_result
 };
 use crate::tests::helper_vars::{
+    calculate_round_index,
     _58_DATA_FEEDS_STRIDE_0,
     FIFTY_EIGHT,
     FOUR
@@ -123,4 +124,22 @@ unconstrained fn test_write_when_not_in_access_control() {
         FOUR,
         block_number
     ).call(&mut env.public());
+}
+
+#[test]
+unconstrained fn test_get_latest_data_and_round() {
+    let (env, adfs_contract_address) = setup();
+    let block_number = get_block_number();
+
+    AggregatedDataFeedStore::at(adfs_contract_address).set_feeds(
+        _58_DATA_FEEDS_STRIDE_0,
+        FIFTY_EIGHT,
+        FOUR,
+        block_number
+    ).call(&mut env.public());
+
+    let input_data_feed_index: Field = 45;
+    let latest_round_and_data = AggregatedDataFeedStore::at(adfs_contract_address).get_latest_data_and_round(0, input_data_feed_index).view(&mut env.public());
+    assert(latest_round_and_data.latest_round == 3);
+    assert(latest_round_and_data.latest_data == 83296120);
 }
