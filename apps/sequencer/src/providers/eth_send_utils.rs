@@ -15,12 +15,12 @@ use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 use utils::to_hex_string;
 
 use crate::{
-    providers::adfs_gen_calldata::adfs_serialize_updates,
     providers::provider::{parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders},
     sequencer_state::SequencerState,
     BatchedAggegratesToSend,
 };
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
+use feeds_processing::adfs_gen_calldata::adfs_serialize_updates;
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_metric_by};

@@ -85,8 +85,6 @@ impl VotedFeedUpdate {
     }
 }
 
-pub const REPORT_HEX_SIZE: usize = 64;
-
 pub fn naive_packing(feed_result: &FeedType, digits_in_fraction: usize) -> Vec<u8> {
     //TODO: Return Bytes32 type
     feed_result.as_bytes(digits_in_fraction)
