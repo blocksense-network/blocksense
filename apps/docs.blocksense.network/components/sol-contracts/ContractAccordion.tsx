@@ -2,7 +2,7 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@/components/common/Switch';
 import { Label } from '@/components/common/Label';
 import {
   Accordion,
