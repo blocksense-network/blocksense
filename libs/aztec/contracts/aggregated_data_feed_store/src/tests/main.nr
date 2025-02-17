@@ -9,16 +9,8 @@ use crate::tests::utils::{
 };
 use crate::tests::helper_vars::{
     _59_DATA_FEEDS_STRIDE_0,
-    zero_feed_index,
-    fifteen_feed_index,
-    thirty_feed_index,
-    fortyfive_feed_index,
-    zero_round_index,
-    one_round_index,
-    two_round_index,
-    three_round_index,
-    calculate_feed_index,
-    calculate_round_index,
+    FIFTY_NINE,
+    FOUR
 };
 use crate::AggregatedDataFeedStore;
 
@@ -30,18 +22,15 @@ unconstrained fn test_initializer() {
     let owner_storage_value: AztecAddress = storage_read(adfs_contract_address, owner_slot, block_number);
 }
 
-// #[test]
+#[test]
 unconstrained fn test_store_59_data_fields_with_length_1() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
 
-    let feeds_len = 59;
-    let rounds_len = 4;
-
     AggregatedDataFeedStore::at(adfs_contract_address).set_feeds(
         _59_DATA_FEEDS_STRIDE_0,
-        feeds_len,
-        rounds_len,
+        FIFTY_NINE,
+        FOUR,
         block_number as Field
     ).call(&mut env.public());
 
@@ -60,13 +49,10 @@ unconstrained fn test_get_feed_at_round() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
 
-    let feeds_len = 59;
-    let rounds_len = 4;
-
     AggregatedDataFeedStore::at(adfs_contract_address).set_feeds(
         _59_DATA_FEEDS_STRIDE_0,
-        feeds_len,
-        rounds_len,
+        FIFTY_NINE,
+        FOUR,
         block_number as Field
     ).call(&mut env.public());
 
@@ -81,13 +67,10 @@ unconstrained fn test_get_latest_round() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
 
-    let feeds_len = 59;
-    let rounds_len = 4;
-
     AggregatedDataFeedStore::at(adfs_contract_address).set_feeds(
         _59_DATA_FEEDS_STRIDE_0,
-        feeds_len,
-        rounds_len,
+        FIFTY_NINE,
+        FOUR,
         block_number as Field
     ).call(&mut env.public());
 

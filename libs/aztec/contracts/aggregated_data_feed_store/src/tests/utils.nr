@@ -6,7 +6,7 @@ use dep::aztec::{
 };
 
 use crate::AggregatedDataFeedStore;
-use crate::tests::helper_vars::{_59_DATA_FEEDS_STRIDE_0, calculate_feed_index, zero_round_index, one_round_index, two_round_index, three_round_index, ZERO, ONE, TWO, THREE};
+use crate::tests::helper_vars::{_59_DATA_FEEDS_STRIDE_0, calculate_feed_index, zero_round_index, one_round_index, two_round_index, three_round_index, ZERO, TWO, THREE};
 
 unconstrained pub fn setup() -> (&mut TestEnvironment, AztecAddress) {
     let mut env = TestEnvironment::new();
