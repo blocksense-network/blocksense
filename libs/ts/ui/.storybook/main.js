@@ -20,5 +20,11 @@ const config = {
     name: getAbsolutePath('@storybook/nextjs'),
     options: {},
   },
+  staticDirs: [
+    {
+      from: '../assets/fonts',
+      to: 'assets/fonts',
+    },
+  ],
 };
 export default config;
