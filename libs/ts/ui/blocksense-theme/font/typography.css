@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+@import './font-face.css';
+@import './mdx-styles.css';
+
+@layer base {
+  h1 {
+    @apply font-bold;
+    font-family: var(--font-display);
+  }
+
+  h2 {
+    font-family: var(--font-semi-bold);
+  }
+
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  h4 {
+    font-family: var(--font-display);
+  }
+
+  h5 {
+    font-family: var(--font-regular);
+  }
+
+  h6 {
+    font-family: var(--font-display);
+  }
+
+  p {
+    font-family: var(--font-sans);
+  }
+
+  span {
+    font-family: var(--font-sans);
+  }
+
+  a {
+    @apply text-blue-500;
+    font-family: var(--font-sans);
+  }
+
+  strong {
+    font-family: var(--font-sans);
+  }
+
+  ul,
+  ol {
+    font-family: var(--font-sans);
+  }
+}
