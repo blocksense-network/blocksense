@@ -5,8 +5,8 @@
     "./style.css": "./dist/style.css",
     ".": "./src/index.tsx",
     "./Button": "./src/components/Button/index.tsx",
-    "./ImageWrapper": "./src/components/ImageWrapper/index.tsx"
-
+    "./ImageWrapper": "./src/components/ImageWrapper/index.tsx",
+    "./Tooltip": "./src/components/Tooltip/index.tsx"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.0-beta.9",

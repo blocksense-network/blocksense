@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactElement } from 'react';
 
-import { Tooltip } from '@/components/common/Tooltip';
+import { Tooltip } from '@blocksense/ui/Tooltip';
 
 export const GitHubIcon = (props: ComponentProps<'svg'>): ReactElement => (
   <Tooltip position="bottom">

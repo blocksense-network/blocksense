@@ -1,5 +1,11 @@
-import { cn } from '@/lib/utils';
-import { ReactNode, ReactElement, Children, isValidElement } from 'react';
+import React, {
+  ReactNode,
+  ReactElement,
+  Children,
+  isValidElement,
+} from 'react';
+
+import { cn } from '../../utils';
 
 type TooltipProps = {
   position?: 'top' | 'right' | 'bottom' | 'left';

@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
-import { Tooltip } from '@/components/common/Tooltip';
+import { Tooltip } from '@blocksense/ui/Tooltip';
 
 type DataFeed = {
   id: number;

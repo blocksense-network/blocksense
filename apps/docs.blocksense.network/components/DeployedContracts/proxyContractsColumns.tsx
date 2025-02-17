@@ -7,7 +7,7 @@ import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumn
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
 import { NetworkAddressExplorerLink } from '@/components/DeployedContracts/NetworkAddressExplorerLink';
-import { Tooltip } from '@/components/common/Tooltip';
+import { Tooltip } from '@blocksense/ui/Tooltip';
 
 export const proxyColumnsTitles: { [key: string]: string } = {
   description: 'Data Feed Name',
