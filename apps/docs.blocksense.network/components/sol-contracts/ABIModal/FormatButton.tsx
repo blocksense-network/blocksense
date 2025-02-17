@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ImageWrapper } from '@/components/common/ImageWrapper';
 
-import { Button } from '@/components/common/Button';
+import { Button } from '@blocksense/ui/Button';
 
 type FormatButtonProps = {
   formatHandler: () => void;

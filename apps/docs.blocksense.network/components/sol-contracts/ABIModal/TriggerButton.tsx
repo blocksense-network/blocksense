@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button } from '@/components/common/Button';
+import { Button } from '@blocksense/ui/Button';
 import { Tooltip } from '@/components/common/Tooltip';
 
 type TriggerButtonProps = {
