@@ -1,7 +1,7 @@
 use alloy::hex;
 use alloy_primitives::U256;
+use anyhow::Result;
 use config::FeedConfig;
-use eyre::Result;
 use prometheus::metrics::FeedsMetrics;
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap};
