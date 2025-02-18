@@ -13,7 +13,7 @@
     "@tailwindcss/postcss": "^4.0.0-beta.9",
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss": "^4.0.0-beta.9",
+    "tailwindcss": "^4.0.6",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
