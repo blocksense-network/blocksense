@@ -2,6 +2,7 @@
   "name": "@blocksense/ui",
   "type": "module",
   "exports": {
+    "./style.css": "./dist/style.css",
     ".": "./src/index.tsx",
     "./Button": "./src/components/Button/index.tsx"
   },
