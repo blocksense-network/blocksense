@@ -9,3 +9,4 @@ export { Sidebar, MobileNav } from './sidebar';
 export { ThemeSwitch } from './theme-switch';
 export { TOC } from './toc';
 export { Tooltip } from './Tooltip';
+export { E } from './e';

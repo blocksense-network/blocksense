@@ -1,3 +1,5 @@
+'use client';
+
 import type { ComponentProps, ReactElement } from 'react';
 
 import { Tooltip } from '@blocksense/nextra-theme-docs';

@@ -11,4 +11,5 @@ export {
   LastUpdated,
   Footer,
   Tooltip,
+  E,
 } from './components';
