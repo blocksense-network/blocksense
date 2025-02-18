@@ -1,5 +1,10 @@
-import { cn } from '@/lib/utils';
 import { ReactNode, ReactElement, Children, isValidElement } from 'react';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 type TooltipProps = {
   position?: 'top' | 'right' | 'bottom' | 'left';
@@ -38,16 +43,19 @@ export const Tooltip = ({
     child => isValidElement(child) && child.type !== TooltipContent,
   ) as ReactElement;
 
+  console.log(content);
+
   return (
     <div className="tooltip relative inline-flex items-center group">
       {trigger}
-      {content && (
+      {(content as ReactElement) && (
         <div
           className={cn(
             `tooltip__content absolute ${positionClasses[position]} hidden group-hover:block group-focus:block px-4 py-1.5 text-sm font-semibold border rounded-md shadow-md z-50 whitespace-nowrap border-neutral-200 text-gray-800 bg-white dark:bg-neutral-900 dark:border-neutral-600 dark:text-white ${contentClassName}`,
           )}
         >
-          {content?.props.children}
+          {(content?.props as any).children}
+
           <div
             className={`tooltip__arrow absolute ${arrowClasses[position]} w-0 h-0 border-transparent invert border-solid border-4`}
           />

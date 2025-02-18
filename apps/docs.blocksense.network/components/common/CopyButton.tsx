@@ -3,7 +3,7 @@
 import { MouseEvent, useState } from 'react';
 
 import { ImageWrapper } from '@/components/common/ImageWrapper';
-import { Tooltip } from '@/components/common/Tooltip';
+import { Tooltip } from '@blocksense/nextra-theme-docs';
 
 type CopyButtonProps = {
   textToCopy: string;

@@ -10,4 +10,5 @@ export {
   LocaleSwitch,
   LastUpdated,
   Footer,
+  Tooltip,
 } from './components';
