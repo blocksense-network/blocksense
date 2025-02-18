@@ -4358,6 +4358,7 @@ dependencies = [
  "config 0.1.1",
  "data_feeds",
  "feed_registry",
+ "gnosis_safe",
  "hex",
  "once_cell",
  "prometheus 0.1.1",
