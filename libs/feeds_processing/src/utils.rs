@@ -1,12 +1,13 @@
 use anomaly_detection::ingest::anomaly_detector_aggregate;
-use anyhow::{anyhow, Context};
-use config::PublishCriteria;
+use anyhow::{anyhow, Context, Result};
+use config::{FeedConfig, PublishCriteria};
 use data_feeds::feeds_processing::{VotedFeedUpdate, VotedFeedUpdateWithProof};
-use feed_registry::aggregate::FeedAggregate;
+use feed_registry::aggregate::{get_aggregator, FeedAggregate};
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::{DataFeedPayload, FeedType, Timestamp};
+use gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use ringbuf::traits::consumer::Consumer;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::hash::RandomState;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -207,4 +208,80 @@ pub async fn perform_anomaly_detection(
         .context("Failed to spawn feed slots manager anomaly detection!")?
         .await
         .context("Failed to join feed slots manager anomaly detection!")?
+}
+
+pub async fn validate(
+    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    batch: ConsensusSecondRoundBatch,
+    num_valid_reporters: usize,
+    history: &Arc<RwLock<FeedAggregateHistory>>,
+) -> Result<()> {
+    // Check that all the aggregated values have a corresponding set of votes
+    let feed_ids_in_updates: Vec<u32> = batch.updates.iter().map(|u| u.feed_id).collect();
+    let feed_ids_in_proof: Vec<u32> = batch.proofs.keys().cloned().collect();
+
+    if feed_ids_in_updates.len() != feed_ids_in_proof.len() {
+        anyhow::bail!("Proofs / Updates size mismatch");
+    }
+
+    let feed_ids_in_updates: HashSet<_> = feed_ids_in_updates.into_iter().collect();
+    let feed_ids_in_proof: HashSet<_> = feed_ids_in_proof.into_iter().collect();
+
+    if feed_ids_in_updates != feed_ids_in_proof {
+        anyhow::bail!("Proofs / Updates mismatch");
+    }
+
+    for update in batch.updates {
+        let Some(proof_for_update) = batch.proofs.get(&update.feed_id) else {
+            anyhow::bail!(
+                "Proofs / Updates mismatch: no proof for {}",
+                &update.feed_id
+            );
+        };
+
+        let proof_for_update: HashMap<u64, DataFeedPayload> = proof_for_update
+            .iter()
+            .cloned()
+            .map(|payload| (payload.payload_metadata.reporter_id, payload))
+            .collect();
+
+        let feeds_config = feeds_config.read().await;
+
+        let Some(feed_config) = feeds_config.get(&update.feed_id) else {
+            anyhow::bail!("Feed ID {} has no configuration.", &update.feed_id);
+        };
+
+        let consumed_reports_result = consume_reports(
+            format!("Feed ID: {}", update.feed_id).as_str(),
+            &proof_for_update,
+            &FeedType::Numerical(0.0),
+            0,
+            feed_config.quorum_percentage,
+            feed_config.skip_publish_if_less_then_percentage as f64,
+            feed_config.always_publish_heartbeat_ms,
+            update.end_slot_timestamp,
+            num_valid_reporters,
+            false,
+            get_aggregator(feed_config.aggregate_type.as_str()),
+            history,
+            update.feed_id,
+        )
+        .await;
+
+        let Some(result_post_to_contract) = consumed_reports_result.result_post_to_contract else {
+            anyhow::bail!(
+                "Feed ID {} did not produce a result for sending to contract.",
+                &update.feed_id
+            );
+        };
+
+        if update.value != result_post_to_contract.update.value {
+            anyhow::bail!(
+                "Feed ID {}'s proof did not produce the expected result.",
+                &update.feed_id
+            );
+        }
+    }
+
+    Ok(())
 }
