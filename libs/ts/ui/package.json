@@ -34,6 +34,7 @@
     "react-dom": "*"
   },
   "scripts": {
+    "build": "yarn build-tailwind",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "build-tailwind": "yarn dlx @tailwindcss/cli -i globals.css -o dist/style.css"
