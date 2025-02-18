@@ -330,7 +330,7 @@ impl FeedSlotsProcessor {
             debug!("Get a write lock on history [feed {feed_id}]");
             let mut history_guard = history.write().await;
             debug!("Push result that will be posted to contract to history [feed {feed_id}]");
-            history_guard.push(self.key, message.value.clone(), message.end_slot_timestamp);
+            history_guard.push_next(self.key, message.value.clone(), message.end_slot_timestamp);
             debug!("Release the write lock on history [feed {feed_id}]");
         }
         let result_send = sequencer_state
@@ -355,7 +355,7 @@ impl FeedSlotsProcessor {
             // The first slice is from the current read position to the end of the array
             // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
             let heap = history_lock
-                .collect(feed_id)
+                .get(feed_id)
                 .context("Missing key from History!")?;
             let (first, last) = heap.as_slices();
             let history_vec: Vec<&FeedType> =
@@ -950,17 +950,17 @@ pub mod tests {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards");
             let slot_start_in_ms = since_the_epoch.as_millis();
-            history_guard.push(
+            history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(130.0),
                 slot_start_in_ms + 1 * report_interval_ms as u128,
             );
-            history_guard.push(
+            history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(120.0),
                 slot_start_in_ms + 2 * report_interval_ms as u128,
             );
-            history_guard.push(
+            history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(102.0),
                 slot_start_in_ms + 3 * report_interval_ms as u128,
@@ -1054,17 +1054,17 @@ pub mod tests {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards");
             let slot_start_in_ms = since_the_epoch.as_millis();
-            history_guard.push(
+            history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(130.0),
                 slot_start_in_ms + 1 * report_interval_ms as u128,
             );
-            history_guard.push(
+            history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(120.0),
                 slot_start_in_ms + 2 * report_interval_ms as u128,
             );
-            history_guard.push(
+            history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(102.0),
                 slot_start_in_ms + 3 * report_interval_ms as u128,
@@ -1157,7 +1157,7 @@ pub mod tests {
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards");
             let slot_start_in_ms = since_the_epoch.as_millis();
-            history_guard.push(
+            history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(102.1),
                 slot_start_in_ms + 1 * report_interval_ms as u128,

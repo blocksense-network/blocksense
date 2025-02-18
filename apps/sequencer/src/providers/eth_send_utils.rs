@@ -1,6 +1,5 @@
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
-    dyn_abi::DynSolValue,
     hex::FromHex,
     network::TransactionBuilder,
     primitives::Bytes,
@@ -16,7 +15,10 @@ use utils::to_hex_string;
 
 use crate::{
     providers::adfs_gen_calldata::adfs_serialize_updates,
-    providers::provider::{parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders},
+    providers::provider::{
+        parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders,
+        EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
+    },
     sequencer_state::SequencerState,
     UpdateToSend,
 };
@@ -31,78 +33,16 @@ use tracing::{debug, error, info, info_span, warn};
 pub async fn deploy_contract(
     network: &String,
     providers: &SharedRpcProviders,
-    feed_type: Repeatability,
+    contract_name: &str,
 ) -> Result<String> {
     let providers = providers.read().await;
-
     let provider = providers.get(network);
     let Some(p) = provider.cloned() else {
         return Err(eyre!("No provider for network {}", network));
     };
     drop(providers);
     let mut p = p.lock().await;
-    let signer = &p.signer;
-    let provider = &p.provider;
-    let provider_metrics = &p.provider_metrics;
-
-    // Deploy the contract.
-    let bytecode = if feed_type == Periodic {
-        p.data_feed_store_byte_code.clone()
-    } else {
-        p.data_feed_sports_byte_code.clone()
-    };
-
-    let Some(mut bytecode) = bytecode else {
-        return Err(eyre!("Byte code unavailable"));
-    };
-
-    let _max_priority_fee_per_gas = process_provider_getter!(
-        provider.get_max_priority_fee_per_gas().await,
-        network,
-        provider_metrics,
-        get_max_priority_fee_per_gas
-    );
-
-    let chain_id = process_provider_getter!(
-        provider.get_chain_id().await,
-        network,
-        provider_metrics,
-        get_chain_id
-    );
-
-    let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
-
-    let mut encoded_arg = message_value.abi_encode();
-    bytecode.append(&mut encoded_arg);
-
-    let tx = TransactionRequest::default()
-        .from(signer.address())
-        .with_chain_id(chain_id)
-        .with_deploy_code(bytecode);
-
-    let deploy_time = Instant::now();
-    let contract_address = provider
-        .send_transaction(tx)
-        .await?
-        .get_receipt()
-        .await?
-        .contract_address
-        .expect("Failed to get contract address");
-
-    info!(
-        "Deployed {:?} contract at address: {:?} took {}ms\n",
-        feed_type,
-        contract_address.to_string(),
-        deploy_time.elapsed().as_millis()
-    );
-
-    if feed_type == Periodic {
-        p.contract_address = Some(contract_address);
-    } else {
-        p.event_contract_address = Some(contract_address);
-    }
-
-    Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
+    p.deploy_contract(contract_name).await
 }
 
 /// Serializes the `updates` hash map into a string.
@@ -180,7 +120,10 @@ pub async fn get_serialized_updates_for_network(
         return Ok("".to_string());
     }
 
-    let contract_version = provider.contract_version;
+    let contract_version = provider
+        .get_contract(PRICE_FEED_CONTRACT_NAME)
+        .ok_or(eyre!("{PRICE_FEED_CONTRACT_NAME} contract is not set!"))?
+        .contract_version;
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
@@ -236,16 +179,12 @@ pub async fn eth_batch_send_to_contract(
     debug!("Acquired a read/write lock on provider state for network `{net}`");
 
     let signer = &provider.signer;
-    let contract_address = if feed_type == Periodic {
-        provider
-            .contract_address
-            .ok_or(eyre!("Contract address not set for network {net}."))
+    let contract_name = if feed_type == Periodic {
+        PRICE_FEED_CONTRACT_NAME
     } else {
-        provider
-            .event_contract_address
-            .ok_or(eyre!("Event contract address not set for network {net}."))
-    }?;
-
+        EVENT_FEED_CONTRACT_NAME
+    };
+    let contract_address = provider.get_contract_address(contract_name)?;
     info!(
         "sending data to address `{}` in network `{}`",
         contract_address, net
@@ -656,7 +595,7 @@ mod tests {
     use super::*;
 
     use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
-    use crate::providers::provider::{can_read_contract_bytecode, init_shared_rpc_providers};
+    use crate::providers::provider::{init_shared_rpc_providers, MULTICALL_CONTRACT_NAME};
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
@@ -666,10 +605,13 @@ mod tests {
     };
     use config::{AllFeedsConfig, PublishCriteria};
     use data_feeds::feeds_processing::VotedFeedUpdate;
+    use feed_registry::registry::HistoryEntry;
     use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
+    use ringbuf::traits::Consumer;
     use std::str::FromStr;
     use std::time::SystemTime;
+    use std::time::UNIX_EPOCH;
     use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
@@ -722,14 +664,18 @@ mod tests {
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
-
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
         // give some time for cleanup env variables
-        let providers =
-            init_shared_rpc_providers(&cfg, Some("test_deploy_contract_returns_valid_address_"))
-                .await;
+        let providers = init_shared_rpc_providers(
+            &cfg,
+            Some("test_deploy_contract_returns_valid_address_"),
+            &feeds_config,
+        )
+        .await;
 
         // run
-        let result = deploy_contract(&String::from(network), &providers, Periodic).await;
+        let result =
+            deploy_contract(&String::from(network), &providers, PRICE_FEED_CONTRACT_NAME).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -742,7 +688,12 @@ mod tests {
             // Assert we can read bytecode from that address
             let extracted_address = Address::from_str(&extracted_address.unwrap()).ok().unwrap();
             let provider = providers.read().await.get(network).unwrap().clone();
-            let can_get_bytecode = can_read_contract_bytecode(provider, &extracted_address).await;
+            let can_get_bytecode = provider
+                .lock()
+                .await
+                .can_read_contract_bytecode(&extracted_address, Duration::from_secs(1))
+                .await
+                .expect("Timeout when trying to read from address");
             assert!(can_get_bytecode);
         } else {
             panic!("contract deployment failed")
@@ -765,12 +716,20 @@ mod tests {
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
-
-        let providers =
-            init_shared_rpc_providers(&cfg, Some("test_eth_batch_send_to_oneshot_contract_")).await;
+        let feed_1_config = some_feed_config_with_id_1();
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![feed_1_config],
+        };
+        let providers = init_shared_rpc_providers(
+            &cfg,
+            Some("test_eth_batch_send_to_oneshot_contract_"),
+            &feeds_config,
+        )
+        .await;
 
         // run
-        let result = deploy_contract(&String::from(network), &providers, Oneshot).await;
+        let result =
+            deploy_contract(&String::from(network), &providers, EVENT_FEED_CONTRACT_NAME).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -858,7 +817,11 @@ mod tests {
             "0x800000030000000000000000000000000000000000000000000000000000000000000002",
         );
         let calldata_bytes = Bytes::from_hex(calldata).expect("Invalid calldata");
-        let address_to_send = provider.lock().await.event_contract_address.unwrap();
+        let address_to_send = provider
+            .lock()
+            .await
+            .get_contract_address(EVENT_FEED_CONTRACT_NAME)
+            .unwrap();
         let result = provider
             .lock()
             .await
@@ -913,7 +876,7 @@ mod tests {
                 anvil_network3.endpoint().as_str(),
             ),
         ]);
-        let feeds_config = AllFeedsConfig {
+        let feeds_config: AllFeedsConfig = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
         let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
@@ -923,34 +886,29 @@ mod tests {
         )
         .await;
 
-        // run
-        let result =
-            deploy_contract(&String::from(network1), &sequencer_state.providers, Oneshot).await;
-        // assert
-        // validate contract was deployed at expected address
-        if let Ok(msg) = result {
-            let extracted_address = extract_address(&msg);
-            assert!(
-                extracted_address.is_some(),
-                "Did not return valid eth address"
-            );
-        } else {
-            panic!("contract deployment failed")
-        }
+        let msg = sequencer_state
+            .deploy_contract(network1, EVENT_FEED_CONTRACT_NAME)
+            .await
+            .expect("contract deployment failed");
 
-        let result =
-            deploy_contract(&String::from(network2), &sequencer_state.providers, Oneshot).await;
         // assert
         // validate contract was deployed at expected address
-        if let Ok(msg) = result {
-            let extracted_address = extract_address(&msg);
-            assert!(
-                extracted_address.is_some(),
-                "Did not return valid eth address"
-            );
-        } else {
-            panic!("contract deployment failed")
-        }
+        let extracted_address = extract_address(&msg);
+        assert!(
+            extracted_address.is_some(),
+            "Did not return valid eth address"
+        );
+        let msg2 = sequencer_state
+            .deploy_contract(network2, EVENT_FEED_CONTRACT_NAME)
+            .await
+            .expect("contract deployment failed");
+
+        // validate contract was deployed at expected address
+        let extracted_address = extract_address(&msg2);
+        assert!(
+            extracted_address.is_some(),
+            "Did not return valid eth address"
+        );
 
         /////////////////////////////////////////////////////////////////////
         // BIG STEP TWO - Prepare sample updates and write to the contract
@@ -981,6 +939,233 @@ mod tests {
         // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
         // followups
         assert!(result.is_ok());
+    }
+
+    #[actix_web::test]
+    async fn test_eth_batch_send_to_multidata_contracts_and_read_value() {
+        let metrics_prefix = "test_eth_batch_send_to_multidata_contracts_and_read_value";
+
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
+        /////////////////////////////////////////////////////////////////////
+
+        // setup
+        let key_path = get_test_private_key_path();
+        let anvil_network1 = Anvil::new().try_spawn().unwrap();
+        let network1 = "ETH17787";
+        let sequencer_config = get_test_config_with_multiple_providers(vec![(
+            network1,
+            key_path.as_path(),
+            anvil_network1.endpoint().as_str(),
+        )]);
+
+        let mut feed = some_feed_config_with_id_1();
+        feed.report_interval_ms = 1000; // 1 secound
+        let feeds_config: AllFeedsConfig = AllFeedsConfig {
+            feeds: vec![feed.clone()],
+        };
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
+            metrics_prefix,
+            feeds_config,
+        )
+        .await;
+
+        // run
+        let msg = sequencer_state
+            .deploy_contract(network1, PRICE_FEED_CONTRACT_NAME)
+            .await
+            .expect("Data feed publishing contract deployment failed!");
+        // assert
+        // validate contract was deployed at expected address
+        let extracted_address = extract_address(&msg).expect("Did not return valid eth address");
+        let contract_address =
+            Address::parse_checksummed(&extracted_address, None).expect("valid checksum");
+
+        {
+            let providers = sequencer_state.providers.read().await;
+            let p = providers.get(network1).unwrap().lock().await;
+            let nonce = p.provider.get_transaction_count(contract_address).await;
+            assert!(nonce.is_ok());
+            assert_eq!(nonce.unwrap(), 1);
+        }
+        {
+            let providers = sequencer_state.providers.read().await;
+            let mut p = providers.get(network1).unwrap().lock().await;
+            p.history.register_feed(feed.id, 100);
+        }
+        {
+            // Some arbitrart point in time in the past, nothing special about this value
+            let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
+            let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
+            let v1 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(103082.01f64),
+                end_slot_timestamp: end_slot_timestamp + (feed.report_interval_ms as u128) * 1,
+            };
+            let v2 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(103012.21f64),
+                end_slot_timestamp: end_slot_timestamp + (feed.report_interval_ms as u128) * 2,
+            };
+
+            let v3 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(104011.78f64),
+                end_slot_timestamp: end_slot_timestamp + (feed.report_interval_ms as u128) * 3,
+            };
+
+            let updates1 = UpdateToSend {
+                block_height: 0,
+                updates: vec![v1],
+            };
+            let updates2 = UpdateToSend {
+                block_height: 1,
+                updates: vec![v2],
+            };
+            let updates3 = UpdateToSend {
+                block_height: 2,
+                updates: vec![v3],
+            };
+
+            let p1 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates1, Periodic).await;
+            assert!(p1.is_ok());
+
+            let p2 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates2, Periodic).await;
+            assert!(p2.is_ok());
+
+            let p3 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates3, Periodic).await;
+            assert!(p3.is_ok());
+        }
+
+        let msg = sequencer_state
+            .deploy_contract(network1, MULTICALL_CONTRACT_NAME)
+            .await
+            .expect("Mutlicall contract deployment failed!");
+        let _extracted_address = extract_address(&msg).expect("Did not return valid eth address");
+        {
+            let p = sequencer_state.get_provider(network1).await.unwrap();
+            let p_lock = p.lock().await;
+
+            let latest = p_lock
+                .get_latest_values(&[feed.id])
+                .await
+                .expect("Can't get latest values from contract");
+            assert_eq!(latest.len(), 1);
+            assert_eq!(latest[0].feed_id, 1_u32);
+            assert_eq!(latest[0].num_updates, 3_u128);
+            assert_eq!(latest[0].value, Some(FeedType::Numerical(104011.78f64)));
+
+            let history = p_lock
+                .get_historical_values_for_feed(
+                    feed.id,
+                    &[0_u128, 1_u128, 2_u128, 3_u128, 4_u128],
+                    FeedType::Numerical(0.0f64),
+                )
+                .await
+                .expect("Error when reading historical values from contract!");
+
+            assert_eq!(history.len(), 5);
+
+            assert_eq!(history[0].feed_id, 1_u32);
+            assert_eq!(history[1].feed_id, 1_u32);
+            assert_eq!(history[2].feed_id, 1_u32);
+            assert_eq!(history[3].feed_id, 1_u32);
+            assert_eq!(history[4].feed_id, 1_u32);
+
+            assert_eq!(history[0].value, None);
+            assert_eq!(history[1].value, Some(FeedType::Numerical(103082.01f64)));
+            assert_eq!(history[2].value, Some(FeedType::Numerical(103012.21f64)));
+            assert_eq!(history[3].value, Some(FeedType::Numerical(104011.78f64)));
+            assert_eq!(history[4].value, None);
+
+            assert_eq!(history[0].num_updates, 0_u128);
+            assert_eq!(history[1].num_updates, 1_u128);
+            assert_eq!(history[2].num_updates, 2_u128);
+            assert_eq!(history[3].num_updates, 3_u128);
+            assert_eq!(history[4].num_updates, 4_u128);
+
+            assert_eq!(history[0].published, 0_u128);
+            assert_ne!(history[1].published, 0_u128);
+            assert_ne!(history[2].published, 0_u128);
+            assert_ne!(history[3].published, 0_u128);
+            assert_eq!(history[4].published, 0_u128);
+        }
+
+        {
+            let provider = sequencer_state
+                .get_provider(network1)
+                .await
+                .expect("Provider should be available");
+            let mut p_lock = provider.lock().await;
+            let num_cleared = p_lock.history.clear(feed.id);
+            assert_eq!(num_cleared, 3);
+            let limit = 2_u32;
+            let variant = FeedType::Numerical(0.0f64);
+            let num_loaded = p_lock
+                .load_history_from_chain(feed.id, limit, variant)
+                .await
+                .unwrap();
+            assert_eq!(num_loaded, 2);
+
+            let v = p_lock
+                .history
+                .get(feed.id)
+                .expect("Give me history")
+                .iter()
+                .cloned()
+                .collect::<Vec<HistoryEntry>>();
+            assert_eq!(v.len(), 2);
+            assert_eq!(v[0].update_number, 2_u128);
+            assert_eq!(v[0].value, FeedType::Numerical(103012.21f64));
+            assert_eq!(v[1].update_number, 3_u128);
+            assert_eq!(v[1].value, FeedType::Numerical(104011.78f64));
+        }
+
+        {
+            let provider = sequencer_state
+                .get_provider(network1)
+                .await
+                .expect("Provider should be available");
+            let mut p_lock = provider.lock().await;
+
+            let variant = FeedType::Numerical(0.0f64);
+            let limit = 200_u32;
+
+            // Make sure the values are not loaded more then once in history
+            let num_loaded = p_lock
+                .load_history_from_chain(feed.id, limit, variant)
+                .await
+                .unwrap();
+            assert_eq!(num_loaded, 0);
+
+            let v = p_lock
+                .history
+                .get(feed.id)
+                .expect("Give me history")
+                .iter()
+                .cloned()
+                .collect::<Vec<HistoryEntry>>();
+            assert_eq!(v.len(), 2);
+            assert_eq!(v[0].update_number, 2_u128);
+            assert_eq!(v[0].value, FeedType::Numerical(103012.21f64));
+            assert_eq!(v[1].update_number, 3_u128);
+            assert_eq!(v[1].value, FeedType::Numerical(104011.78f64));
+            // The date and time  of publishing is determined by the smart contarct, so we don't have control of this value
+            info!(
+                "Historical update {} publish date {:?}",
+                v[0].update_number,
+                v[0].get_date_time_published()
+            );
+            info!(
+                "Historical update {} publish date {:?}",
+                v[1].update_number,
+                v[1].get_date_time_published()
+            );
+        }
     }
 
     #[tokio::test]
@@ -1167,8 +1352,16 @@ mod tests {
                 p.publishing_criteria.push(c);
             });
 
-        let providers =
-            init_shared_rpc_providers(&sequencer_config, Some(&"peg_stable_coin_updates_")).await;
+        let feed = some_feed_config_with_id_1();
+        let feeds_config: AllFeedsConfig = AllFeedsConfig {
+            feeds: vec![feed.clone()],
+        };
+        let providers = init_shared_rpc_providers(
+            &sequencer_config,
+            Some(&"peg_stable_coin_updates_"),
+            &feeds_config,
+        )
+        .await;
         let mut prov2 = providers.write().await;
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
@@ -1213,10 +1406,16 @@ mod tests {
                 };
                 p.publishing_criteria.push(c);
             });
-
-        let providers =
-            init_shared_rpc_providers(&sequencer_config, Some(&"peg_stable_coin_updates_disabled"))
-                .await;
+        let feed = some_feed_config_with_id_1();
+        let feeds_config: AllFeedsConfig = AllFeedsConfig {
+            feeds: vec![feed.clone()],
+        };
+        let providers = init_shared_rpc_providers(
+            &sequencer_config,
+            Some(&"peg_stable_coin_updates_disabled"),
+            &feeds_config,
+        )
+        .await;
         let mut prov2 = providers.write().await;
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 

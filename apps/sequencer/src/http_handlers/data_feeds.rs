@@ -609,7 +609,6 @@ pub mod tests {
     use super::*;
     use crate::feeds::feed_workers::prepare_app_workers;
     use crate::http_handlers::admin::deploy;
-    use crate::providers::provider::can_read_contract_bytecode;
     use crate::providers::provider::init_shared_rpc_providers;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
@@ -638,12 +637,12 @@ pub mod tests {
         let metrics_prefix = Some("post_report_from_unknown_reporter_fails_with_401_");
 
         let sequencer_config: SequencerConfig = get_test_config_with_no_providers();
-        let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
-
         let feed_1_config = some_feed_config_with_id_1();
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };
+        let providers =
+            init_shared_rpc_providers(&sequencer_config, metrics_prefix, &feeds_config).await;
         let (vote_send, mut _vote_recv) = mpsc::unbounded_channel();
         let (
             feeds_management_cmd_to_block_creator_send,
@@ -816,7 +815,12 @@ pub mod tests {
                 .get(network)
                 .unwrap()
                 .clone();
-            let can_get_bytecode = can_read_contract_bytecode(provider, &extracted_address).await;
+            let can_get_bytecode = provider
+                .lock()
+                .await
+                .can_read_contract_bytecode(&extracted_address, Duration::from_secs(1))
+                .await
+                .expect("Timeout when trying to read from address");
             assert!(can_get_bytecode);
         }
 
@@ -1053,14 +1057,14 @@ pub mod tests {
     pub fn some_feed_config_with_id_1() -> FeedConfig {
         FeedConfig {
             id: 1,
-            name: "name".to_string(),
-            full_name: "full_name".to_string(),
-            description: "description".to_string(),
+            name: "BTC".to_string(),
+            full_name: "Bitcoin".to_string(),
+            description: "A Peer-to-Peer Electronic Cash System".to_string(),
             decimals: 10,
             _type: "Crypto".to_string(),
             pair: AssetPair {
-                base: "".to_string(),
-                quote: "".to_string(),
+                base: "BTC".to_string(),
+                quote: "USD".to_string(),
             },
             report_interval_ms: 300,
             first_report_start_time: SystemTime::now(),
@@ -1154,7 +1158,7 @@ pub mod tests {
                 .expect("Unknown error")
                 .as_millis()
                 + 300_u128 * 10_u128;
-            history.push(feed_id, feed_value, end_slot_timestamp);
+            history.push_next(feed_id, feed_value, end_slot_timestamp);
         }
 
         // Initialize the service
@@ -1219,27 +1223,27 @@ pub mod tests {
             let feed_id = 1_u32;
             history.register_feed(feed_id, 3);
 
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(102754.2f64),
                 end_slot_timestamp + 300_u128 * 0,
             );
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(122756.7f64),
                 end_slot_timestamp + 300_u128 * 1,
             );
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(102753.0f64),
                 end_slot_timestamp + 300_u128 * 2,
             );
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(102244.3f64),
                 end_slot_timestamp + 300_u128 * 3,
             );
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(112754.2f64),
                 end_slot_timestamp + 300_u128 * 4,

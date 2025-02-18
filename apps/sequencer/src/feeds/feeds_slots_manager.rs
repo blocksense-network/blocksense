@@ -377,7 +377,8 @@ mod tests {
         };
         let metrics_prefix = Some("test_feed_slots_manager_loop_");
 
-        let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
+        let providers =
+            init_shared_rpc_providers(&sequencer_config, metrics_prefix, &feeds_config).await;
 
         let original_report_data = FeedType::Numerical(13.0);
 

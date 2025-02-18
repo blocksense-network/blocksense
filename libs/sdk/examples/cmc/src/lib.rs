@@ -100,7 +100,12 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let body = resp.into_body();
     let string = String::from_utf8(body)?;
-    let value: Root = serde_json::from_str(&string).context("Couldn't parse CMC response properly")?;
+    let parsed: Result<Root> = serde_json::from_str(&string).context("Couldn't parse CMC response properly");
+    if parsed.is_err() {
+        println!("body = {string}");
+    }
+    let value: Root = parsed?;
+
     let mut payload: Payload = Payload::new();
 
     for (feed_id, data) in resources.iter() {
