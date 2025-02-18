@@ -23,11 +23,11 @@ const config = {
   staticDirs: [
     {
       from: '../assets/fonts',
-      to: 'assets/fonts',
+      to: 'fonts',
     },
     {
       from: '../assets/icons',
-      to: 'assets/icons',
+      to: 'icons',
     },
   ],
 };

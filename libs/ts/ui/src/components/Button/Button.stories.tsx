@@ -53,9 +53,7 @@ export const WithIcon: Story = {
     variant: 'highlight',
     size: 'md',
     content: 'Warning',
-    icon: (
-      <img className="w-4 h-4" src="assets/icons/test-icon.png" alt="icon" />
-    ),
+    icon: <img className="w-4 h-4" src="icons/test-icon.png" alt="icon" />,
   },
 };
 
