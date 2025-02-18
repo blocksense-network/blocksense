@@ -215,8 +215,11 @@ impl TriggerExecutor for OracleTrigger {
     }
 
     async fn run(self, config: Self::RunConfig) -> anyhow::Result<()> {
+        tracing::trace!("Starting Blocksense Reporter");
+
         let engine = Arc::new(self.engine);
         if config.test {
+            tracing::trace!("Running in test mode");
             for component in self.queue_components.values() {
                 let settings: Vec<DataFeedSetting> =
                     component.oracle_settings.clone().into_iter().collect();
@@ -224,13 +227,20 @@ impl TriggerExecutor for OracleTrigger {
             }
             return Ok(());
         }
+        tracing::trace!("Running in production mode");
+
         // This trigger spawns threads, which Ctrl+C does not kill.  So
         // for this case we need to detect Ctrl+C and shut those threads
-        // down.  For simplicity, we do this by terminating the process.
-        tokio::spawn(async move {
-            tokio::signal::ctrl_c().await.unwrap();
-            std::process::exit(0);
-        });
+        // down. For simplicity, we do this by terminating the process.
+        tokio::task::Builder::new()
+            .name("ctrl-c watcher")
+            .spawn(async move {
+                tracing::trace!("Task ctrl-c watcher started");
+                tokio::signal::ctrl_c().await.unwrap();
+                tracing::trace!("ctrl-c detected; terminating process");
+                std::process::exit(0);
+            })
+            .expect("ctrl-c watcher failed to start");
 
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
@@ -241,6 +251,7 @@ impl TriggerExecutor for OracleTrigger {
 
         let components = self.queue_components.clone();
         tracing::info!("Components: {:?}", &components);
+        tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
             .queue_components
             .into_values()
@@ -254,6 +265,7 @@ impl TriggerExecutor for OracleTrigger {
             })
             .collect();
 
+        tracing::trace!("Starting orchestrator");
         let orchestrator = Self::start_orchestrator(
             tokio::time::Duration::from_secs(self.interval_time_in_seconds),
             components,
@@ -262,6 +274,7 @@ impl TriggerExecutor for OracleTrigger {
         );
         loops.push(orchestrator);
 
+        tracing::trace!("Starting sender to sequencer");
         let url = url::Url::parse(&self.sequencer.clone())?;
         let sequencer_url = url.join("/post_reports_batch")?;
         let manager = Self::start_manager(
@@ -281,7 +294,7 @@ impl TriggerExecutor for OracleTrigger {
                 Ok(())
             }
             _ => {
-                tracing::trace!("Fatal: {:?}", tr);
+                tracing::error!("Fatal: {:?}", tr);
                 Err(anyhow::anyhow!("{tr:?}"))
             }
         }
@@ -296,7 +309,11 @@ impl OracleTrigger {
         component: &Component,
     ) -> tokio::task::JoinHandle<TerminationReason> {
         let future = Self::execute(engine, signal_receiver, payload_sender, component.clone());
-        tokio::task::spawn(future)
+        let task_name = format!("processor for {}", component.id);
+        tokio::task::Builder::new()
+            .name(&task_name)
+            .spawn(future)
+            .unwrap_or_else(|_| panic!("{task_name} failed to start"))
     }
 
     async fn execute(
@@ -305,7 +322,15 @@ impl OracleTrigger {
         payload_sender: UnboundedSender<(String, Payload)>,
         component: Component,
     ) -> TerminationReason {
+        let component_id = component.id.clone();
+        tracing::trace!("Starting processing loop `{component_id}`");
         while let Ok(feeds) = signal_receiver.recv().await {
+            tracing::trace!(
+                "Oracle script `{}` received a set of {} active feeds",
+                component.id,
+                feeds.len()
+            );
+
             let intersection: Vec<_> = component
                 .oracle_settings
                 .intersection(&feeds)
@@ -313,16 +338,23 @@ impl OracleTrigger {
                 .collect();
 
             if intersection.is_empty() {
-                tracing::trace!("Empty intersection between component {}", &component.id);
+                tracing::trace!("Empty intersection between component {component_id}");
                 continue;
             }
+            tracing::trace!(
+                "Intersection for {} has size {}",
+                &component.id,
+                intersection.len()
+            );
 
             let payload = match Self::execute_wasm(engine.clone(), &component, intersection).await {
-                Ok(payload) => payload,
+                Ok(payload) => {
+                    tracing::trace!("Component `{component_id}` executed successfully");
+                    payload
+                }
                 Err(error) => {
                     tracing::error!(
-                        "Component - ({}) execution ended with error {}",
-                        &component.id,
+                        "Component - ({component_id}) execution ended with error {}",
                         error
                     );
                     //TODO(adikov): We need to come up with proper way of handling errors in wasm
@@ -330,16 +362,21 @@ impl OracleTrigger {
                     continue;
                 }
             };
+            tracing::trace!("Sending update to sequencer for `{component_id}`...");
             match payload_sender.send((component.id.clone(), payload)) {
                 Ok(_) => {
+                    tracing::trace!("Sent update to sequencer for `{component_id}`");
                     continue;
                 }
-                Err(_) => {
+                Err(err) => {
+                    tracing::error!(
+                        "Failed to send update to sequencer for `{component_id}` due to {err}"
+                    );
                     break;
                 }
             };
         }
-
+        tracing::info!("End of execution for `{component_id}`");
         TerminationReason::Other("Oracle execution loop terminated".to_string())
     }
 
@@ -352,7 +389,10 @@ impl OracleTrigger {
         let future =
             Self::signal_data_feeds(time_interval, components, signal_sender, prometheus_url);
 
-        tokio::task::spawn(future)
+        tokio::task::Builder::new()
+            .name("orchestrator")
+            .spawn(future)
+            .expect("orchestrator failed to start")
     }
 
     async fn signal_data_feeds(
@@ -361,35 +401,55 @@ impl OracleTrigger {
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
         prometheus_url: Option<String>,
     ) -> TerminationReason {
+        tracing::trace!("Task orchestrator started");
         //TODO(adikov): Implement proper logic and remove dummy values
         loop {
             REPORTER_BATCH_COUNTER.inc();
+            let batch_count = REPORTER_BATCH_COUNTER.get();
+            tracing::trace!("Orchestrator entering sleep [batch_count={batch_count}]");
             let _ = tokio::time::sleep(time_interval).await;
+            tracing::trace!("Orchestrator woke up [batch_count={batch_count}]");
 
-            let data_feed_signal = components
+            let data_feed_signal: HashSet<DataFeedSetting> = components
                 .values()
                 .flat_map(|comp| comp.oracle_settings.clone())
                 .collect();
-            // tracing::info!("Signal data feeds: {:?}", &data_feed_signal);
+            tracing::trace!(
+                "Signal {} data feeds [batch_count={batch_count}]",
+                data_feed_signal.len()
+            );
             let _ = signal_sender.send(data_feed_signal);
 
             if prometheus_url.is_none() {
+                tracing::trace!("Prometheus URL not set; looping back [batch_count={batch_count}]");
                 continue;
             }
 
+            let prometheus_url = prometheus_url
+                .clone()
+                .expect("Prometheus URL should be provided.");
+            tracing::trace!(
+                "Sending metrics to prometheus at {prometheus_url} [batch_count={batch_count}]"
+            );
             let metrics_result = handle_prometheus_metrics(
                 &reqwest::Client::new(),
-                prometheus_url
-                    .clone()
-                    .expect("Prometheus URL should be provided.")
-                    .as_str(),
+                &prometheus_url,
                 &TextEncoder::new(),
             )
             .await;
-            if let Err(e) = metrics_result {
-                tracing::debug!("Error handling Prometheus metrics: {:?}", e);
+
+            match metrics_result {
+                Ok(_) => {
+                    tracing::trace!("Sent metrics to prometheus [batch_count={batch_count}]");
+                }
+                Err(e) => {
+                    tracing::error!(
+                        "Error handling Prometheus metrics: {e:?} [batch_count={batch_count}]"
+                    );
+                }
             }
         }
+        // unreachable!("No breaks in orchestrator loop");
 
         //TerminationReason::Other("Signal data feed loop terminated".to_string())
     }
@@ -403,7 +463,10 @@ impl OracleTrigger {
         let future =
             Self::process_payload(rx, sequencer.to_owned(), secret_key.to_owned(), reporter_id);
 
-        tokio::task::spawn(future)
+        tokio::task::Builder::new()
+            .name("sender to sequencer")
+            .spawn(future)
+            .expect("sender to sequencer failed to start")
     }
 
     async fn process_payload(
@@ -412,7 +475,12 @@ impl OracleTrigger {
         secret_key: String,
         reporter_id: u64,
     ) -> TerminationReason {
+        tracing::trace!("Task sender to sequencer started");
         while let Some((_component_id, payload)) = rx.recv().await {
+            tracing::trace!(
+                "Sender to sequencer received payload of size {}",
+                payload.values.len()
+            );
             let timestamp = current_unix_time();
             let mut batch_payload = vec![];
             for oracle::DataFeedResult { id, value } in payload.values {
@@ -423,6 +491,7 @@ impl OracleTrigger {
                         Err(FeedError::APIError(error_string))
                     }
                     oracle::DataFeedResultValue::None => {
+                        tracing::warn!("Encountered None result for feed id {id}");
                         //TODO(adikov): Handle properly None result
                         continue;
                     }
@@ -457,8 +526,9 @@ impl OracleTrigger {
                 .await
             {
                 Ok(res) => {
+                    let status = res.status();
                     let contents = res.text().await.unwrap();
-                    tracing::trace!("Sequencer responded with: {}", &contents);
+                    tracing::trace!("Sequencer responded with status={status} and text={contents}",);
                 }
                 Err(e) => {
                     //TODO(adikov): Add code from the error - e.status()
@@ -466,10 +536,13 @@ impl OracleTrigger {
                         .with_label_values(&["404"])
                         .inc();
 
-                    tracing::error!("Sequencer failed to respond with: {}", &e);
+                    tracing::error!("Sequencer failed to respond with; err={e}");
                 }
             };
+            tracing::trace!("Sender to sequencer waiting for new payload...");
         }
+
+        tracing::trace!("Task sender to sequencer ending");
 
         TerminationReason::SequencerExitRequested
     }
@@ -479,10 +552,14 @@ impl OracleTrigger {
         component: &Component,
         feeds: Vec<DataFeedSetting>,
     ) -> anyhow::Result<Payload> {
-        // Load the guest...
         let component_id = component.id.clone();
+        tracing::trace!("Loading guest for `{component_id }`");
+
+        // Load the guest...
         let (instance, mut store) = engine.prepare_instance(&component_id).await?;
         let instance = BlocksenseOracle::new(&mut store, &instance)?;
+
+        tracing::trace!("Successfully loaded guest for `{component_id}`");
 
         // We are getting the spin configuration from the Outbound HTTP host component similar to
         // `set_http_origin_from_request` in spin http trigger.
@@ -499,10 +576,8 @@ impl OracleTrigger {
 
         // ...and call the entry point
         tracing::trace!(
-            "Triggering application: {}; component_id: {}; data_feed: {}",
-            &engine.app_name,
-            component_id,
-            &component.id
+            "Triggering application: {}; component_id: {component_id}",
+            &engine.app_name
         );
 
         let wit_settings = oracle::Settings {
@@ -526,10 +601,12 @@ impl OracleTrigger {
         };
 
         let start_time = Instant::now();
+        tracing::trace!("Calling handle oracle request for `{component_id}`");
         let result = instance
             .call_handle_oracle_request(&mut store, &wit_settings)
             .await;
         let elapsed_time_ms = start_time.elapsed().as_millis();
+        tracing::trace!("Oracle request for `{component_id}` completed in {elapsed_time_ms}ms");
         REPORTER_WASM_EXECUTION_TIME_GAUGE
             .with_label_values(&[&component_id.clone()])
             .set(elapsed_time_ms as i64);
@@ -537,6 +614,7 @@ impl OracleTrigger {
         match result {
             Ok(Ok(payload)) => {
                 tracing::info!("Component {component_id} completed okay");
+                // TODO(stanm): increment metric for successful executions
 
                 Ok(payload)
             }
