@@ -82,6 +82,7 @@ const networks = [
   'rollux-testnet',
   'camp-network-testnet-v2',
   'metis-sepolia',
+  'shape-sepolia',
 ] as const;
 
 const chainIds = [
@@ -91,7 +92,7 @@ const chainIds = [
   534352, 534351, 324, 300, 2810, 5115, 11124, 763373, 41454, 5003, 2424, 57054,
   1663, 1666700000, 1313161555, 839999, 16, 114, 28882, 9728, 31, 41, 71, 338,
   4801, 2358, 168587773, 1740, 66665, 1952959480, 53302, 7849306, 5611, 57000,
-  325000, 59902,
+  325000, 59902, 11011,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -461,6 +462,11 @@ export const networkMetadata = {
     chainId: 59902,
     isTestnet: true,
     explorerUrl: 'https://sepolia-explorer.metisdevops.link',
+  },
+  'shape-sepolia': {
+    chainId: 11011,
+    isTestnet: true,
+    explorerUrl: 'https://explorer-sepolia.shape.network',
   },
 } satisfies {
   [Net in NetworkName]: {
