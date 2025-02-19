@@ -50,6 +50,7 @@ const networks = [
   'manta-mainnet',
   'manta-sepolia',
   'mantle-sepolia',
+  'mezo-matsnet-testnet',
   'monad-devnet',
   'morph-mainnet',
   'morph-holesky',
@@ -78,9 +79,9 @@ const chainIds = [
   99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 1313161555,
   43114, 43113, 8453, 84532, 80084, 168587773, 56, 97, 42220, 44787, 5115, 338,
   250, 4002, 114, 100, 10200, 1666700000, 1663, 2424, 763373, 2358, 1285, 59144,
-  59141, 169, 3441006, 5003, 41454, 2818, 2810, 10, 11155420, 5611, 137, 80002,
-  1101, 2442, 57000, 534352, 534351, 11011, 16, 57054, 167000, 167009, 41, 324,
-  300, 4801,
+  59141, 169, 3441006, 5003, 31611, 41454, 2818, 2810, 10, 11155420, 5611, 137,
+  80002, 1101, 2442, 57000, 534352, 534351, 11011, 16, 57054, 167000, 167009,
+  41, 324, 300, 4801,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -106,6 +107,7 @@ export enum Currency {
   AVAX = 'AVAX',
   BERA = 'BERA',
   BNB = 'BNB',
+  BTC = 'BTC',
   C2FLR = 'C2FLR',
   cBTC = 'cBTC',
   CELO = 'CELO',
@@ -355,6 +357,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://sepolia.mantlescan.xyz/',
     currency: Currency.MNT,
+  },
+  'mezo-matsnet-testnet': {
+    chainId: 31611,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.test.mezo.org',
+    currency: Currency.BTC,
   },
   'monad-devnet': {
     chainId: 41454,
