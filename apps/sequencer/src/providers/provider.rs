@@ -1,5 +1,5 @@
 use alloy::providers::Provider;
-use alloy::rpc::types::{TransactionInput, TransactionRequest};
+use alloy::rpc::types::TransactionRequest;
 use alloy::transports::http::Http;
 use alloy::{
     dyn_abi::DynSolValue,
@@ -16,7 +16,7 @@ use alloy::{
     signers::local::PrivateKeySigner,
 };
 
-use alloy_primitives::{Bytes, U256};
+use alloy_primitives::Bytes;
 use config::AllFeedsConfig;
 use reqwest::{Client, Url};
 
@@ -472,58 +472,6 @@ impl RpcProvider {
         self.history
             .get(feed_id)
             .map_or(default, |x| x.last().map_or(default, |x| x.update_number))
-    }
-
-    pub async fn get_value_from_contract(
-        &self,
-        multicall: &Address,
-        target: &Address,
-    ) -> Vec<Bytes> {
-        let latest_feed_id_1 = Multicall::Call {
-            target: *target,
-            callData: Bytes::from_static(&[0xc0, 0x00, 0x00, 0x01]),
-        };
-        let historical_feed_id_1 = Multicall::Call {
-            target: *target,
-            callData: "0x200000010000000000000000000000000000000000000000000000000000000000000002"
-                .parse::<Bytes>()
-                .unwrap(),
-        };
-        info!(
-            "p = target = {:?}, calldata = {:?}",
-            latest_feed_id_1.target, latest_feed_id_1.callData
-        );
-        let contract = MulticallInstance::new(*multicall, self.provider.clone());
-        info!("{:?}", contract);
-        let input = TransactionInput {
-            data: Some(Bytes::from_static(&[0xc0, 0x00, 0x00, 0x01])),
-            ..Default::default()
-        };
-
-        let tx = TransactionRequest::default().to(*target).input(input);
-        info!("Tx = {tx:?}");
-        let res = self.provider.call(&tx).await.expect("SOME ERRORS");
-
-        info!("{} bytes in Result = {res:?}", res.0.len());
-        let k = res.0;
-        let j1: [u8; 32] = k[0..32].try_into().unwrap();
-        let j2: [u8; 32] = k[32..64].try_into().unwrap();
-        let first = U256::from_be_bytes(j1);
-        let second = U256::from_be_bytes(j2);
-
-        info!("first  = {first} ");
-        info!("second = {second}");
-        let v: Vec<u8> = j1.to_vec();
-        info!("v.len = {}", v.len());
-        let digits_in_fraction = 18_usize;
-        let x = FeedType::from_bytes(v, FeedType::Numerical(0.0), digits_in_fraction).unwrap();
-        info!("x = {x:?}");
-
-        let aggregate_input = vec![latest_feed_id_1, historical_feed_id_1];
-        info!("aggregate_input = {aggregate_input:?}");
-        let aggregate_return = contract.aggregate(aggregate_input).call().await.unwrap();
-        info!("return from call = {:?}", &aggregate_return.returnData);
-        aggregate_return.returnData
     }
 
     pub async fn deploy_contract(&mut self, contract_name: &str) -> Result<String> {
