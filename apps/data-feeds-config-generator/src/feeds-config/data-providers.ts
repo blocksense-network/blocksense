@@ -30,7 +30,10 @@ export async function addDataProviders(dataFeeds: SimplifiedFeed[]) {
   const dataFeedsWithCryptoResources = await Promise.all(
     filteredFeeds.map(async feed => {
       const providers = getAllProvidersForFeed(feed, exchangeAssetsMap);
-      return { ...feed, priceFeedInfo: { ...feed.priceFeedInfo, providers } };
+      return {
+        ...feed,
+        price_feed_info: { ...feed.price_feed_info, providers },
+      };
     }),
   );
 
@@ -48,7 +51,7 @@ function getAllProvidersForFeed(
   feed: SimplifiedFeed,
   exchangeAssets: ExchangeData[],
 ): ProvidersResources {
-  let providers = feed.priceFeedInfo.providers ?? {};
+  let providers = feed.price_feed_info.providers ?? {};
 
   const addProvider = (key: string, value: any) => {
     if (value) {
@@ -80,7 +83,7 @@ function getPriceFeedDataProvidersInfo<T>(
   exchangeAssets: AssetInfo[],
 ): Record<string, string[]> | null {
   const supportedAssets = exchangeAssets.filter(symbol =>
-    isPairSupportedByCryptoProvider(feed.priceFeedInfo.pair, symbol.pair),
+    isPairSupportedByCryptoProvider(feed.price_feed_info.pair, symbol.pair),
   );
   const providerInfo = supportedAssets.reduce(
     (acc, asset) => {
@@ -102,7 +105,7 @@ function getPriceFeedDataProvidersInfo<T>(
 
 // Filter feeds that have a quote
 function filterFeedsWithQuotes(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
-  return feeds.filter(feed => feed.priceFeedInfo.pair.quote);
+  return feeds.filter(feed => feed.price_feed_info.pair.quote);
 }
 
 // Save data to JSON file

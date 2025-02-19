@@ -33,24 +33,29 @@ function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,
 ): SimplifiedFeed {
   const description = getFieldFromAggregatedData(additionalData, 'assetName');
-  const fullName = getFieldFromAggregatedData(additionalData, 'name');
   const category = getFieldFromAggregatedData(additionalData, 'feedType');
-  const marketHours = getFieldFromAggregatedData(
+  const market_hours = getFieldFromAggregatedData(
     additionalData,
     'docs',
     'marketHours',
   );
+  const clName = getFieldFromAggregatedData(additionalData, 'name');
+
+  const pair = getBaseQuote(additionalData);
+  const full_name = pair.toString();
 
   return {
     description,
-    fullName,
-    priceFeedInfo: {
-      pair: getBaseQuote(additionalData),
+    full_name,
+    price_feed_info: {
+      pair: pair,
       decimals: getHighestDecimals(additionalData),
       category,
-      marketHours,
-      aggregation: 'fixme',
+      market_hours,
       providers: {},
+      compatibility_info: {
+        chainlink: clName,
+      },
     },
   };
 }
@@ -169,7 +174,7 @@ function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
   const seenPairs = new Set<string>();
 
   return dataFeeds.filter(feed => {
-    const pairKey = feed.priceFeedInfo.pair.toString();
+    const pairKey = feed.price_feed_info.pair.toString();
 
     if (seenPairs.has(pairKey)) {
       return false;
@@ -182,17 +187,17 @@ function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
 
 function addStableCoinVariants(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
   const stableCoinVariants = feeds.flatMap(feed => {
-    const { base, quote } = feed.priceFeedInfo.pair;
+    const { base, quote } = feed.price_feed_info.pair;
     if (quote in stableCoins) {
       return stableCoins[quote as keyof typeof stableCoins]
         .map(altStableCoin => createPair(base, altStableCoin))
         .map(pair => {
-          const fullName = pair.toString();
+          const full_name = pair.toString();
           return {
             ...feed,
-            fullName,
-            priceFeedInfo: {
-              ...feed.priceFeedInfo,
+            full_name,
+            price_feed_info: {
+              ...feed.price_feed_info,
               pair,
             },
           };
@@ -222,7 +227,7 @@ export async function generateFeedConfig(
   const dataFeedsWithCryptoResources = (
     await addDataProviders(dataFeedsWithStableCoinVariants)
   ).filter(
-    dataFeed => Object.keys(dataFeed.priceFeedInfo.providers).length !== 0,
+    dataFeed => Object.keys(dataFeed.price_feed_info.providers).length !== 0,
   );
 
   let rawDataFeedsOnMainnets = Object.entries(rawDataFeeds).filter(
@@ -249,12 +254,18 @@ export async function generateFeedConfig(
       ...simplifiedFeed,
       id,
       type: 'price-feed',
-      valueType: 'Numerical',
-      consensusAggregation: 'Median',
-      quorumPercentage: 100,
-      deviationPercentage: 0,
-      skipPublishIfLessThanPercentage: 0.1,
-      alwaysPublishHeartbeatMs: 3600000,
+      value_type: 'numerical',
+      stride: 0,
+      quorum: {
+        percentage: 100,
+        aggregation: 'median',
+      },
+      schedule: {
+        interval_ms: 90000,
+        heartbeat_ms: 3600000,
+        deviation_percentage: 0.1,
+        first_report_start_unix_time_ms: 0,
+      },
     };
     return feed;
   });

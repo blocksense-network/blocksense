@@ -178,38 +178,53 @@ export const providersResourcesSchema = S.mutable(
 
 export type ProvidersResources = S.Schema.Type<typeof providersResourcesSchema>;
 
-export const PriceFeedInfoSchema = S.mutable(
-  S.Struct({
-    pair: PairSchema,
-    decimals: S.Number,
-    category: FeedCategorySchema,
-    marketHours: S.NullishOr(MarketHoursSchema),
-    aggregation: S.Union(
-      // Indicates that the value will be replaced with
-      // the correct value later in the pipeline:
-      S.Literal('fixme'),
-      S.Literal('fallback'),
-      S.Literal('volume-weighted-average'),
-    ),
-    providers: providersResourcesSchema,
-  }),
-);
-
-export type PriceFeedInfo = S.Schema.Type<typeof PriceFeedInfoSchema>;
-
 export const NewFeedSchema = S.mutable(
   S.Struct({
     id: S.Number,
-    type: FeedTypeSchema,
-    valueType: S.Literal('Numerical'),
-    consensusAggregation: S.Literal('Median'),
+    full_name: S.String,
     description: S.String,
-    fullName: S.String,
-    quorumPercentage: S.Number,
-    deviationPercentage: S.Number,
-    skipPublishIfLessThanPercentage: S.Number,
-    alwaysPublishHeartbeatMs: S.Number,
-    priceFeedInfo: PriceFeedInfoSchema,
+
+    type: S.Union(S.Literal('price-feed')).annotations({
+      identifier: 'FeedType',
+    }),
+
+    value_type: S.Union(
+      S.Literal('numerical'),
+      S.Literal('text'),
+      S.Literal('bytes'),
+    ).annotations({
+      identifier: 'ValueType',
+    }),
+
+    stride: S.Int,
+
+    quorum: S.Struct({
+      percentage: S.Number,
+      aggregation: S.Union(S.Literal('median')).annotations({
+        identifier: 'QuorumAggregation',
+      }),
+    }),
+
+    schedule: S.Struct({
+      interval_ms: S.Number,
+      heartbeat_ms: S.Number,
+      deviation_percentage: S.Number,
+      first_report_start_unix_time_ms: S.Number,
+    }),
+
+    // TODO: This field should be optional depending on the `type`.
+    price_feed_info: S.mutable(
+      S.Struct({
+        pair: PairSchema,
+        decimals: S.Number,
+        category: FeedCategorySchema,
+        market_hours: S.NullishOr(MarketHoursSchema),
+        providers: providersResourcesSchema,
+        compatibility_info: S.Struct({
+          chainlink: S.String,
+        }),
+      }),
+    ),
   }),
 );
 

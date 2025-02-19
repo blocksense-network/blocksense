@@ -1,13 +1,6 @@
 import { NewFeed } from '@blocksense/config-types/data-feeds-config';
 
-export type SimplifiedFeed = Omit<
+export type SimplifiedFeed = Pick<
   NewFeed,
-  | 'id'
-  | 'type'
-  | 'valueType'
-  | 'consensusAggregation'
-  | 'quorumPercentage'
-  | 'deviationPercentage'
-  | 'skipPublishIfLessThanPercentage'
-  | 'alwaysPublishHeartbeatMs'
+  'description' | 'full_name' | 'price_feed_info'
 >;
