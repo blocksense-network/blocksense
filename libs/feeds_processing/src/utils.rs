@@ -1,17 +1,24 @@
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use anyhow::{anyhow, Context, Result};
 use config::{FeedConfig, PublishCriteria};
-use data_feeds::feeds_processing::{VotedFeedUpdate, VotedFeedUpdateWithProof};
+use data_feeds::feeds_processing::{UpdateToSend, VotedFeedUpdate, VotedFeedUpdateWithProof};
 use feed_registry::aggregate::{get_aggregator, FeedAggregate};
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::{DataFeedPayload, FeedType, Timestamp};
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
+use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash};
 use ringbuf::traits::consumer::Consumer;
+// use serde_json::from_str;
+use alloy::hex::FromHex;
+use alloy_primitives::{Address, Bytes, Uint, U256};
 use std::collections::{HashMap, HashSet};
 use std::hash::RandomState;
+use std::str::FromStr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
+
+use crate::adfs_gen_calldata::adfs_serialize_updates;
 
 pub const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
 
@@ -212,7 +219,7 @@ pub async fn perform_anomaly_detection(
 
 pub async fn validate(
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
-    batch: ConsensusSecondRoundBatch,
+    mut batch: ConsensusSecondRoundBatch,
     num_valid_reporters: usize,
     history: &Arc<RwLock<FeedAggregateHistory>>,
 ) -> Result<()> {
@@ -231,13 +238,15 @@ pub async fn validate(
         anyhow::bail!("Proofs / Updates mismatch");
     }
 
-    for update in batch.updates {
+    for update in &batch.updates {
         let Some(proof_for_update) = batch.proofs.get(&update.feed_id) else {
             anyhow::bail!(
                 "Proofs / Updates mismatch: no proof for {}",
                 &update.feed_id
             );
         };
+
+        // TODO: Check signatures
 
         let proof_for_update: HashMap<u64, DataFeedPayload> = proof_for_update
             .iter()
@@ -270,7 +279,7 @@ pub async fn validate(
 
         let Some(result_post_to_contract) = consumed_reports_result.result_post_to_contract else {
             anyhow::bail!(
-                "Feed ID {} did not produce a result for sending to contract.",
+                "Feed ID {}'s proof did not produce a result for sending to contract, but a value is present.",
                 &update.feed_id
             );
         };
@@ -281,6 +290,79 @@ pub async fn validate(
                 &update.feed_id
             );
         }
+    }
+
+    let updates_to_serialize = UpdateToSend {
+        block_height: batch.block_height,
+        updates: batch.updates,
+        proofs: batch.proofs,
+    };
+
+    let calldata = match adfs_serialize_updates(
+        &batch.network,
+        &updates_to_serialize,
+        None,
+        feeds_config,
+        &mut batch.feeds_rounds,
+    )
+    .await
+    {
+        Ok(val) => val,
+        Err(e) => anyhow::bail!("Failed to recreate calldata: {e}"),
+    };
+
+    let calldata = match Bytes::from_hex(calldata) {
+        Ok(b) => b,
+        Err(e) => {
+            anyhow::bail!("calldata is not valid hex string: {}", e);
+        }
+    };
+
+    let contract_address = match Address::from_str(batch.contract_address.as_str()) {
+        Ok(addr) => addr,
+        Err(e) => {
+            anyhow::bail!(
+                "Non valid contract address ({}) provided: {}",
+                batch.contract_address.as_str(),
+                e
+            );
+        }
+    };
+
+    let safe_address = match Address::from_str(batch.safe_address.as_str()) {
+        Ok(addr) => addr,
+        Err(e) => {
+            anyhow::bail!(
+                "Non valid safe address ({}) provided: {}",
+                batch.contract_address.as_str(),
+                e
+            );
+        }
+    };
+    let nonce = match Uint::<256, 4>::from_str(batch.nonce.as_str()) {
+        Ok(n) => n,
+        Err(e) => {
+            anyhow::bail!("Non valid nonce ({}) provided: {}", batch.nonce.as_str(), e);
+        }
+    };
+    let safe_transaction = create_safe_tx(contract_address, calldata, nonce);
+
+    let chain_id: u64 = match batch.chain_id.as_str().parse() {
+        Ok(v) => v,
+        Err(e) => {
+            anyhow::bail!("Non valid chain_id ({}) provided: {}", batch.chain_id, e);
+        }
+    };
+
+    let tx_hash =
+        generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction.clone());
+
+    if tx_hash.to_string() != batch.tx_hash {
+        anyhow::bail!(
+            "tx_hash mismatch, recvd: {} generated: {}",
+            batch.tx_hash,
+            tx_hash.to_string()
+        );
     }
 
     Ok(())
