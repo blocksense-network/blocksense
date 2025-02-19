@@ -9,8 +9,11 @@ use gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash};
 use ringbuf::traits::consumer::Consumer;
 // use serde_json::from_str;
+use crate::adfs_gen_calldata::adfs_serialize_updates;
 use alloy::hex::FromHex;
 use alloy_primitives::{Address, Bytes, Uint, U256};
+use crypto::{verify_signature, PublicKey, Signature};
+use feed_registry::types::FeedResult;
 use std::collections::{HashMap, HashSet};
 use std::hash::RandomState;
 use std::str::FromStr;
@@ -18,9 +21,32 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
 
-use crate::adfs_gen_calldata::adfs_serialize_updates;
-
 pub const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
+
+pub fn check_signature(
+    signature: &Signature,
+    pub_key: &PublicKey,
+    feed_id: &str,
+    timestamp: Timestamp,
+    feed_result: &FeedResult,
+) -> bool {
+    let mut byte_buffer: Vec<u8> = feed_id
+        .as_bytes()
+        .iter()
+        .copied()
+        .chain(timestamp.to_be_bytes().to_vec())
+        .collect();
+
+    match feed_result {
+        Ok(result) => {
+            byte_buffer.extend(result.as_bytes(18));
+        }
+        Err(error) => {
+            warn!("Reported error for feed_id {} : {}", feed_id, error);
+        }
+    };
+    verify_signature(pub_key, signature, &byte_buffer)
+}
 
 #[derive(Debug)]
 pub struct ConsumedReports {
@@ -220,8 +246,8 @@ pub async fn perform_anomaly_detection(
 pub async fn validate(
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     mut batch: ConsensusSecondRoundBatch,
-    num_valid_reporters: usize,
     history: &Arc<RwLock<FeedAggregateHistory>>,
+    reporters_keys: HashMap<u64, PublicKey>,
 ) -> Result<()> {
     // Check that all the aggregated values have a corresponding set of votes
     let feed_ids_in_updates: Vec<u32> = batch.updates.iter().map(|u| u.feed_id).collect();
@@ -246,7 +272,34 @@ pub async fn validate(
             );
         };
 
-        // TODO: Check signatures
+        let num_valid_reporters = reporters_keys.len();
+
+        // Check signatures
+        for signed_data in proof_for_update {
+            let Some(reporter_pub_key) =
+                reporters_keys.get(&signed_data.payload_metadata.reporter_id)
+            else {
+                anyhow::bail!(
+                    "No public key known for reporter with ID {}!",
+                    signed_data.payload_metadata.reporter_id
+                );
+            };
+
+            if !check_signature(
+                &signed_data.payload_metadata.signature.sig,
+                &reporter_pub_key,
+                signed_data.payload_metadata.feed_id.as_str(),
+                signed_data.payload_metadata.timestamp,
+                &signed_data.result,
+            ) {
+                anyhow::bail!(
+                    "Signature verification failed for vote {:?} from reporter id {} with pub key {:?}",
+                    signed_data,
+                    signed_data.payload_metadata.reporter_id,
+                    reporter_pub_key,
+                );
+            }
+        }
 
         let proof_for_update: HashMap<u64, DataFeedPayload> = proof_for_update
             .iter()
