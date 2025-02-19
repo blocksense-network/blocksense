@@ -450,16 +450,8 @@ impl FeedSlotsProcessor {
             )
         };
 
-        let feed_type = match feed_type.as_str() {
-            "Numerical" => FeedType::Numerical(0.0f64),
-            "Text" => FeedType::Text("".to_string()),
-            _ => {
-                return Err(eyre!(
-                    "Unsupported feed type {feed_type} for feed: {}",
-                    self.name
-                ));
-            }
-        };
+        let feed_type = FeedType::get_variant_from_string(feed_type.as_str())
+            .map_err(|msg| eyre!("{msg} for feed: {}", self.name))?;
 
         debug!("Release the read lock on feed meta [feed {feed_id}]");
         let feed_slots_time_tracker = SlotTimeTracker::new(

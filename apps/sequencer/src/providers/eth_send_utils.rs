@@ -1060,11 +1060,7 @@ mod tests {
             assert_eq!(latest[0].value, Some(FeedType::Numerical(104011.78f64)));
 
             let history = p_lock
-                .get_historical_values_for_feed(
-                    feed.id,
-                    &[0_u128, 1_u128, 2_u128, 3_u128, 4_u128],
-                    FeedType::Numerical(0.0f64),
-                )
+                .get_historical_values_for_feed(feed.id, &[0_u128, 1_u128, 2_u128, 3_u128, 4_u128])
                 .await
                 .expect("Error when reading historical values from contract!");
 
@@ -1104,9 +1100,8 @@ mod tests {
             let num_cleared = p_lock.history.clear(feed.id);
             assert_eq!(num_cleared, 3);
             let limit = 2_u32;
-            let variant = FeedType::Numerical(0.0f64);
             let num_loaded = p_lock
-                .load_history_from_chain(feed.id, limit, variant)
+                .load_history_from_chain(feed.id, limit)
                 .await
                 .unwrap();
             assert_eq!(num_loaded, 2);
@@ -1132,12 +1127,11 @@ mod tests {
                 .expect("Provider should be available");
             let mut p_lock = provider.lock().await;
 
-            let variant = FeedType::Numerical(0.0f64);
             let limit = 200_u32;
 
             // Make sure the values are not loaded more then once in history
             let num_loaded = p_lock
-                .load_history_from_chain(feed.id, limit, variant)
+                .load_history_from_chain(feed.id, limit)
                 .await
                 .unwrap();
             assert_eq!(num_loaded, 0);

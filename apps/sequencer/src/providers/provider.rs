@@ -35,7 +35,7 @@ use std::{fs, mem};
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::error::Elapsed;
 use tokio::time::Duration;
-use tracing::{debug, info, warn};
+use tracing::{debug, error, info, warn};
 
 use crate::providers::multicall::Multicall;
 use crate::providers::provider::Multicall::MulticallInstance;
@@ -86,6 +86,7 @@ pub struct RpcProvider {
     pub impersonated_anvil_account: Option<Address>,
     pub history: FeedAggregateHistory,
     pub publishing_criteria: HashMap<u32, PublishCriteria>,
+    pub feeds_variants: HashMap<u32, (FeedType, usize)>,
     pub contracts: Vec<Contract>,
 }
 
@@ -142,7 +143,14 @@ async fn get_rpc_providers(
             .wallet(EthereumWallet::from(signer.clone()))
             .on_http(rpc_url);
 
-        let rpc_provider = RpcProvider::new(net.as_str(), provider, &signer, p, &provider_metrics, feeds_config);
+        let rpc_provider = RpcProvider::new(
+            net.as_str(),
+            provider,
+            &signer,
+            p,
+            &provider_metrics,
+            feeds_config,
+        );
         rpc_provider
             .log_if_contract_exists(PRICE_FEED_CONTRACT_NAME)
             .await;
@@ -167,21 +175,7 @@ async fn get_rpc_providers(
 impl RpcProvider {
     pub fn new(
         network: &str,
-        provider: FillProvider<
-            JoinFill<
-                JoinFill<
-                    Identity,
-                    JoinFill<
-                        GasFiller,
-                        JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>,
-                    >,
-                >,
-                WalletFiller<EthereumWallet>,
-            >,
-            RootProvider<Http<Client>>,
-            Http<Client>,
-            Ethereum,
-        >,
+        provider: ProviderType,
         signer: &PrivateKeySigner,
         p: &config::Provider,
         provider_metrics: &Arc<tokio::sync::RwLock<ProviderMetrics>>,
@@ -191,8 +185,20 @@ impl RpcProvider {
             .impersonated_anvil_account
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
-        let (history, publishing_criteria ) = RpcProvider::prepare_history(p);
+        let (history, publishing_criteria) = RpcProvider::prepare_history(p);
         let contracts = RpcProvider::prepare_contracts(p);
+        let mut feeds_variants: HashMap<u32, (FeedType, usize)> = HashMap::new();
+        for f in feeds_config.feeds.iter() {
+            info!("{:?}", f);
+            match FeedType::get_variant_from_string(f.value_type.as_str()) {
+                Ok(variant) => {
+                    feeds_variants.insert(f.id, (variant, f.decimals as usize));
+                }
+                _ => {
+                    error!("Unknown feed value variant = {}", f.value_type);
+                }
+            }
+        }
         RpcProvider {
             network: network.to_string(),
             provider,
@@ -206,12 +212,14 @@ impl RpcProvider {
             impersonated_anvil_account,
             history,
             publishing_criteria,
+            feeds_variants,
             contracts,
         }
     }
 
-
-    pub fn prepare_history(p: &config::Provider) -> (FeedAggregateHistory, HashMap<u32, PublishCriteria>) {
+    pub fn prepare_history(
+        p: &config::Provider,
+    ) -> (FeedAggregateHistory, HashMap<u32, PublishCriteria>) {
         let mut history = FeedAggregateHistory::new();
         let mut publishing_criteria: HashMap<u32, PublishCriteria> = HashMap::new();
 
@@ -224,7 +232,7 @@ impl RpcProvider {
             {
                 history.register_feed(feed_id, buf_size);
             }
-        }        
+        }
         (history, publishing_criteria)
     }
 
@@ -352,11 +360,6 @@ impl RpcProvider {
         }
     }
 
-    fn get_digits_in_fraction(_feed_id: u32) -> usize {
-        let digits_in_fraction = 10_usize;
-        digits_in_fraction
-    }
-
     pub async fn get_latest_values(
         &self,
         feed_ids: &[u32],
@@ -379,11 +382,17 @@ impl RpcProvider {
                 }
             })
             .collect();
-
-        let digits: Vec<usize> = feed_ids
-            .iter()
-            .map(|feed_id| RpcProvider::get_digits_in_fraction(*feed_id))
-            .collect();
+        let mut digits: Vec<usize> = vec![];
+        let mut variants: Vec<FeedType> = vec![];
+        for feed_id in feed_ids.iter() {
+            let Some((variant, digits_in_fraction)) = self.feeds_variants.get(feed_id) else {
+                return Err(eyre!(
+                    "Unknown variant and number of digits for feed with id = {feed_id}"
+                ));
+            };
+            digits.push(*digits_in_fraction);
+            variants.push(variant.clone());
+        }
 
         let aggregate_return = contract.aggregate(calldata).call().await?;
         let res = aggregate_return
@@ -393,7 +402,7 @@ impl RpcProvider {
             .map(|(count, data)| {
                 PublishedFeedUpdate::latest(
                     feed_ids[count],
-                    FeedType::Numerical(0.0f64),
+                    variants[count].clone(),
                     digits[count],
                     &data.0,
                 )
@@ -406,7 +415,6 @@ impl RpcProvider {
         &self,
         feed_id: u32,
         updates: &[u128],
-        variant: FeedType,
     ) -> Result<Vec<PublishedFeedUpdate>> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
         let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
@@ -433,7 +441,11 @@ impl RpcProvider {
                 }
             })
             .collect();
-        let digits_in_fraction = RpcProvider::get_digits_in_fraction(feed_id);
+        let Some((variant, digits_in_fraction)) = self.feeds_variants.get(&feed_id) else {
+            return Err(eyre!(
+                "Unknown variant and number of digits for feed with id = {feed_id}"
+            ));
+        };
         let aggregate_return = contract.aggregate(calldata).call().await?;
         let res = aggregate_return
             .returnData
@@ -444,7 +456,7 @@ impl RpcProvider {
                     feed_id,
                     updates[count],
                     variant.clone(),
-                    digits_in_fraction,
+                    *digits_in_fraction,
                     &data.0,
                 )
             })
@@ -622,7 +634,6 @@ impl RpcProvider {
         &mut self,
         feed_id: u32,
         limit_entries: u32,
-        variant: FeedType,
     ) -> Result<u32> {
         let latest = self.get_latest_values(&[feed_id]).await?;
         if !latest.is_empty() {
@@ -653,7 +664,7 @@ impl RpcProvider {
 
             let updates = range.collect::<Vec<u128>>();
             let values = self
-                .get_historical_values_for_feed(feed_id, &updates, variant)
+                .get_historical_values_for_feed(feed_id, &updates)
                 .await?;
             let Some(history) = self.history.get_mut(feed_id) else {
                 return Err(eyre!("History is not registered for feed id = {feed_id}"));
