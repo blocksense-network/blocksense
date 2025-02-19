@@ -6,10 +6,11 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTrigger,
   DialogDescription,
   DialogTitle,
-} from '@/components/ui/dialog';
+  DialogClose,
+  DialogTrigger,
+} from '@/components/common/Dialog';
 import { ScrollArea } from '@/components/common/ScrollArea';
 import { CodeBlock } from '@/components/common/CodeBlock';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -55,8 +56,8 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
 
   if (isDesktop) {
     return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
+      <Dialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <DialogTrigger onClick={() => setIsOpen(true)}>
           <section className="w-min">
             <TriggerButton tooltipContent={title} />
           </section>
@@ -72,7 +73,7 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
             </section>
             <DialogDescription />
           </DialogHeader>
-          <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg">
+          <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg max-h-[50vh] overflow-auto">
             <CodeBlock
               code={getABI()}
               lang="json"
@@ -80,6 +81,7 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
               className="abi-modal--pre"
             />
           </ScrollArea>
+          <DialogClose>Close</DialogClose>
         </DialogContent>
       </Dialog>
     );
