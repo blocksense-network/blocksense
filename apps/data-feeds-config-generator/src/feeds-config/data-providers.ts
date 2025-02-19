@@ -86,7 +86,7 @@ function getPriceFeedDataProvidersInfo<T>(
     (acc, asset) => {
       keysOf(asset.data).forEach(key => {
         const curr = acc[key] ?? [];
-        acc[key] = [...curr, asset.data[key]];
+        acc[key] = [...curr, asset.data[key]].sort();
       });
       return acc;
     },
