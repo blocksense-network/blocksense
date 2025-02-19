@@ -71,6 +71,16 @@ main > h1 {
     font-size: 22px;
   }
 
+  section.dialog__content span {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+  }
+
+  section.dialog__content button > span {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+  }
+
   @media (max-width: 600px) {
     pre code .line,
     pre:not([data-theme]) {
