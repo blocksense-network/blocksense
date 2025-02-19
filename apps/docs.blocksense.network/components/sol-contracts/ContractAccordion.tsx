@@ -3,7 +3,7 @@
 import { ReactNode, useRef } from 'react';
 
 import { Switch } from '@/components/common/Switch';
-import { Label } from '@/components/common/Label';
+import { Label } from '@blocksense/ui/Label';
 import {
   Accordion,
   AccordionContent,
