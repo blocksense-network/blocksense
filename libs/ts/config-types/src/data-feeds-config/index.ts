@@ -164,15 +164,24 @@ export const MarketHoursSchema = S.Union(
 
 export type MarketHours = S.Schema.Type<typeof MarketHoursSchema>;
 
-export const providersResourcesSchema = S.mutable(
+export const providerInfo = S.mutable(
   S.Record({
     // provider name
     key: S.String,
     // map of api parameters
-    value: S.Record({
-      key: S.String,
-      value: S.Array(S.String),
-    }),
+    value: S.mutable(
+      S.Record({
+        key: S.String,
+        value: S.Array(S.Union(S.String, S.Number)),
+      }),
+    ),
+  }),
+);
+
+export const providersResourcesSchema = S.mutable(
+  S.Struct({
+    exchanges: S.optional(providerInfo),
+    aggregators: S.optional(providerInfo),
   }),
 );
 

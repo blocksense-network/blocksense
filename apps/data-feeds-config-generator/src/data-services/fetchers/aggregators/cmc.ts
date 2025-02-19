@@ -7,7 +7,9 @@ import { AssetInfo, ExchangeAssetsFetcher } from '../../exchange-assets';
 /**
  * Class to fetch assets information from CoinMarketCap.
  */
-export class CMCAssetFetcher implements ExchangeAssetsFetcher<CMCAssetInfo> {
+export class CoinMarketCapAssetsFetcher
+  implements ExchangeAssetsFetcher<CMCAssetInfo>
+{
   async fetchAssets(): Promise<AssetInfo<CMCAssetInfo>[]> {
     const assets = (await fetchCMCCryptoList()).data;
     return assets.map(asset => ({

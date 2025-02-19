@@ -1,0 +1,1 @@
+export { CoinMarketCapAssetsFetcher } from './cmc';

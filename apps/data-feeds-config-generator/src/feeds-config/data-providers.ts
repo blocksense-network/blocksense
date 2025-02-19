@@ -8,16 +8,28 @@ import { keysOf } from '@blocksense/base-utils/array-iter';
 
 import { artifactsDir } from '../paths';
 import { AssetInfo } from '../data-services/exchange-assets';
+import * as aggregatorFetchers from '../data-services/fetchers/aggregators/index';
 import * as exchangeFetchers from '../data-services/fetchers/exchanges/index';
 import { SimplifiedFeed } from './types';
+import { assertNotNull } from '@blocksense/base-utils/assert';
 
 export async function addDataProviders(dataFeeds: SimplifiedFeed[]) {
+  const fetcherCategories = {
+    exchanges: exchangeFetchers,
+    aggregators: aggregatorFetchers,
+  };
+  const allFetchers = { ...exchangeFetchers, ...aggregatorFetchers };
   const exchangeAssetsMap: ExchangeData[] = await Promise.all(
-    Object.entries(exchangeFetchers).map(async ([name, fetcher]) => {
+    Object.entries(allFetchers).map(async ([name, fetcher]) => {
       const fetcherData = await new fetcher().fetchAssets();
       const fetcherName = name.split('AssetsFetcher')[0];
       return {
         name: fetcherName,
+        type: assertNotNull(
+          keysOf(fetcherCategories).find(
+            category => name in fetcherCategories[category],
+          ),
+        ),
         data: fetcherData,
       };
     }),
@@ -53,15 +65,17 @@ function getAllProvidersForFeed(
 ): ProvidersResources {
   let providers = feed.price_feed_info.providers ?? {};
 
-  const addProvider = (key: string, value: any) => {
+  const addProvider = (key: string, type: ExchangeData['type'], value: any) => {
     if (value) {
-      providers = { ...providers, [key]: value };
+      providers[type] ??= {};
+      providers[type][key] = value;
     }
   };
 
   exchangeAssets.forEach(exchangeData => {
     addProvider(
       exchangeData.name,
+      exchangeData.type,
       getPriceFeedDataProvidersInfo(feed, exchangeData.data),
     );
   });
@@ -139,5 +153,6 @@ function isPairSupportedByCryptoProvider(
 
 type ExchangeData = {
   name: string;
+  type: 'exchanges' | 'aggregators';
   data: AssetInfo[];
 };
