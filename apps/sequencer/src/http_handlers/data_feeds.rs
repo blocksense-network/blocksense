@@ -1,7 +1,6 @@
 use actix_web::http::StatusCode;
 use alloy_primitives::{FixedBytes, PrimitiveSignature};
 use chrono::{TimeZone, Utc};
-use crypto::PublicKey;
 use eyre::Result;
 use gnosis_safe::utils::SignatureWithAddress;
 use std::str::FromStr;
@@ -22,41 +21,15 @@ use uuid::Uuid;
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
-use crypto::verify_signature;
-use crypto::Signature;
 use feed_registry::registry::FeedAggregateHistory;
+use feed_registry::types::DataFeedPayload;
 use feed_registry::types::FeedMetaData;
-use feed_registry::types::{DataFeedPayload, FeedResult, Timestamp};
+use feeds_processing::utils::check_signature;
 use gnosis_safe::data_types::ReporterResponse;
 use prometheus::{inc_metric, inc_vec_metric};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::{mpsc, RwLock};
 use tokio::time::Duration;
-
-pub fn check_signature(
-    signature: &Signature,
-    pub_key: &PublicKey,
-    feed_id: &str,
-    timestamp: Timestamp,
-    feed_result: &FeedResult,
-) -> bool {
-    let mut byte_buffer: Vec<u8> = feed_id
-        .as_bytes()
-        .iter()
-        .copied()
-        .chain(timestamp.to_be_bytes().to_vec())
-        .collect();
-
-    match feed_result {
-        Ok(result) => {
-            byte_buffer.extend(result.as_bytes(18));
-        }
-        Err(error) => {
-            warn!("Reported error for feed_id {} : {}", feed_id, error);
-        }
-    };
-    verify_signature(pub_key, signature, &byte_buffer)
-}
 
 async fn process_report(
     sequencer_state: &web::Data<SequencerState>,
