@@ -1,7 +1,7 @@
 use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
-use crate::{sequencer_state::SequencerState, UpdateToSend};
+use crate::{sequencer_state::SequencerState, BatchedAggegratesToSend};
 use actix_web::web::Data;
 use alloy::hex::{self, FromHex, ToHexExt};
 use alloy::providers::Provider;
@@ -17,7 +17,7 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 pub async fn votes_result_sender_loop(
-    mut batched_votes_recv: UnboundedReceiver<UpdateToSend>,
+    mut batched_votes_recv: UnboundedReceiver<BatchedAggegratesToSend>,
     sequencer_state: Data<SequencerState>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -58,7 +58,7 @@ pub async fn votes_result_sender_loop(
 
 fn async_send_to_contracts(
     sequencer_state: Data<SequencerState>,
-    updates: UpdateToSend,
+    updates: BatchedAggegratesToSend,
     batch_count: usize,
 ) {
     let sender = tokio::task::Builder::new()
@@ -77,7 +77,7 @@ fn async_send_to_contracts(
 
 async fn try_send_aggregation_consensus_trigger_to_reporters(
     sequencer_state: &Data<SequencerState>,
-    updates: &UpdateToSend,
+    updates: &BatchedAggegratesToSend,
 ) {
     let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint else {
         warn!("No Kafka endpoint set to stream consensus second round data.");

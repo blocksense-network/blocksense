@@ -252,7 +252,7 @@ async fn get_rpc_providers(
 
 use data_feeds::feeds_processing::VotedFeedUpdate;
 
-use crate::UpdateToSend;
+use crate::BatchedAggegratesToSend;
 impl RpcProvider {
     pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {
         for update in updates.iter() {
@@ -262,7 +262,7 @@ impl RpcProvider {
         }
     }
 
-    pub fn apply_publish_criteria(&self, updates: &mut UpdateToSend) {
+    pub fn apply_publish_criteria(&self, updates: &mut BatchedAggegratesToSend) {
         let mut res = updates
             .updates
             .iter()
@@ -276,7 +276,7 @@ impl RpcProvider {
         updates.updates = mem::take(&mut res);
     }
 
-    pub fn peg_stable_coins_to_value(&self, updates: &mut UpdateToSend) {
+    pub fn peg_stable_coins_to_value(&self, updates: &mut BatchedAggegratesToSend) {
         for u in updates.updates.iter_mut() {
             if let FeedType::Numerical(value) = u.value {
                 if let Some(criteria) = self

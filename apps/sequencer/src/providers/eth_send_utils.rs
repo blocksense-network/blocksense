@@ -18,7 +18,7 @@ use crate::{
     providers::adfs_gen_calldata::adfs_serialize_updates,
     providers::provider::{parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders},
     sequencer_state::SequencerState,
-    UpdateToSend,
+    BatchedAggegratesToSend,
 };
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use futures::stream::FuturesUnordered;
@@ -108,7 +108,7 @@ pub async fn deploy_contract(
 /// Serializes the `updates` hash map into a string.
 async fn legacy_serialize_updates(
     net: &str,
-    updates: &UpdateToSend,
+    updates: &BatchedAggegratesToSend,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
 ) -> Result<String> {
     let mut result: String = Default::default();
@@ -144,7 +144,11 @@ async fn legacy_serialize_updates(
 
 /// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
 /// will be added to the result. Otherwise, all feeds in `updates` will be added.
-pub fn filter_allowed_feeds(net: &str, updates: &mut UpdateToSend, allow_feeds: &Option<Vec<u32>>) {
+pub fn filter_allowed_feeds(
+    net: &str,
+    updates: &mut BatchedAggegratesToSend,
+    allow_feeds: &Option<Vec<u32>>,
+) {
     if let Some(allowed_feed_ids) = allow_feeds {
         let mut res: Vec<VotedFeedUpdate> = vec![];
         for u in &updates.updates {
@@ -163,7 +167,7 @@ pub fn filter_allowed_feeds(net: &str, updates: &mut UpdateToSend, allow_feeds: 
 pub async fn get_serialized_updates_for_network(
     net: &str,
     provider: &Arc<Mutex<RpcProvider>>,
-    updates: &mut UpdateToSend,
+    updates: &mut BatchedAggegratesToSend,
     provider_settings: &config::Provider,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
@@ -204,7 +208,7 @@ pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
     provider_settings: config::Provider,
-    mut updates: UpdateToSend,
+    mut updates: BatchedAggegratesToSend,
     feed_type: Repeatability,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
@@ -497,7 +501,7 @@ pub async fn eth_batch_send_to_contract(
 
 pub async fn eth_batch_send_to_all_contracts(
     sequencer_state: Data<SequencerState>,
-    updates: UpdateToSend,
+    updates: BatchedAggegratesToSend,
     feed_type: Repeatability,
 ) -> Result<String> {
     let span = info_span!("eth_batch_send_to_all_contracts");
@@ -828,7 +832,7 @@ mod tests {
             18,
         )
         .unwrap();
-        let updates_oneshot = UpdateToSend {
+        let updates_oneshot = BatchedAggegratesToSend {
             block_height: 0,
             updates: vec![voted_update],
             proofs: HashMap::new(),
@@ -964,7 +968,7 @@ mod tests {
             String::from("0505050505050505050505050505050505050505050505050505050505050505");
         let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
         let end_of_timeslot = 0_u128;
-        let updates_oneshot = UpdateToSend {
+        let updates_oneshot = BatchedAggegratesToSend {
             block_height: 0,
             updates: vec![VotedFeedUpdate::new_decode(
                 &"00000003",
@@ -989,7 +993,7 @@ mod tests {
     async fn compute_keys_vals_ignores_networks_not_on_the_list() {
         let selector = "0x1a2d80ac";
         let network = "dont_filter_me";
-        let mut updates = UpdateToSend {
+        let mut updates = BatchedAggegratesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
             proofs: HashMap::new(),
@@ -1031,7 +1035,7 @@ mod tests {
         // Citrea
         let network = "citrea-testnet";
 
-        let mut updates = UpdateToSend {
+        let mut updates = BatchedAggegratesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
             proofs: HashMap::new(),
@@ -1113,7 +1117,7 @@ mod tests {
         );
     }
 
-    fn peg_stable_coin_updates_data() -> UpdateToSend {
+    fn peg_stable_coin_updates_data() -> BatchedAggegratesToSend {
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
             feed_id: 0x1F_u32,
@@ -1142,7 +1146,7 @@ mod tests {
             end_slot_timestamp,
         };
 
-        UpdateToSend {
+        BatchedAggegratesToSend {
             block_height: 1,
             updates: vec![v1, v2, v3, v4, v5],
             proofs: HashMap::new(),

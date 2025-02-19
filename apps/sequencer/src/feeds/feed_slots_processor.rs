@@ -101,7 +101,7 @@ impl FeedSlotsProcessor {
         history: &Arc<RwLock<FeedAggregateHistory>>,
         feed_id: u32,
     ) -> ConsumedReports {
-        let values = self.collect_repoted_values(feed_type, reports, slot);
+        let values = self.collect_reported_values(feed_type, reports, slot);
 
         if values.is_empty() {
             info!("No reports found for feed: {} slot: {}!", self.name, &slot);
@@ -187,7 +187,7 @@ impl FeedSlotsProcessor {
         }
     }
 
-    fn collect_repoted_values(
+    fn collect_reported_values(
         &self,
         expected_feed_type: &FeedType,
         reports: &std::collections::HashMap<u64, DataFeedPayload>,
@@ -566,7 +566,7 @@ pub mod tests {
     use tokio::time::error::Elapsed;
     use utils::test_env::get_test_private_key_path;
 
-    pub fn check_recieved(
+    pub fn check_received(
         received: Result<Option<VotedFeedUpdateWithProof>, Elapsed>,
         expected: (u32, FeedType),
     ) {
@@ -614,7 +614,7 @@ pub mod tests {
                 println!("Channel closed as expected");
             }
             Err(_) => {
-                panic!("The channel recieved timeout when it should be closed");
+                panic!("The channel received timeout when it should be closed");
             }
         }
     }
@@ -705,7 +705,7 @@ pub mod tests {
             Option<VotedFeedUpdateWithProof>,
             tokio::time::error::Elapsed,
         > = tokio::time::timeout(Duration::from_secs(2), rx.recv()).await;
-        check_recieved(received, (feed_id, original_report_data));
+        check_received(received, (feed_id, original_report_data));
     }
 
     #[tokio::test]
@@ -787,7 +787,7 @@ pub mod tests {
 
         // Attempt to receive with a timeout of 10 seconds
         let received = tokio::time::timeout(Duration::from_secs(10), rx.recv()).await;
-        check_recieved(received, (feed_id, original_report_data.clone()));
+        check_received(received, (feed_id, original_report_data.clone()));
 
         tokio::time::sleep(Duration::from_millis(2000)).await;
 
@@ -1125,7 +1125,7 @@ pub mod tests {
 
         // Attempt to receive with a timeout of 0.2 seconds
         let received = tokio::time::timeout(Duration::from_millis(200), rx.recv()).await;
-        check_recieved(received, (feed_id, FeedType::Numerical(115.0)));
+        check_received(received, (feed_id, FeedType::Numerical(115.0)));
     }
 
     async fn run_feed_slots_processor_loop_always_publish_heartbeat(
@@ -1233,7 +1233,7 @@ pub mod tests {
             always_publish_heartbeat_ms,
         )
         .await;
-        check_recieved(received, (1_u32, FeedType::Numerical(102.0)));
+        check_received(received, (1_u32, FeedType::Numerical(102.0)));
     }
 
     #[tokio::test]

@@ -361,7 +361,7 @@ mod tests {
     use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
     use config::get_test_config_with_no_providers;
 
-    use crate::feeds::feed_slots_processor::tests::check_recieved;
+    use crate::feeds::feed_slots_processor::tests::check_received;
     use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
@@ -426,6 +426,6 @@ mod tests {
             vote_recv.recv(),
         )
         .await;
-        check_recieved(received, (1_u32, original_report_data));
+        check_received(received, (1_u32, original_report_data));
     }
 }

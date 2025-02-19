@@ -24,13 +24,13 @@ use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::feeds::feed_config_conversions::feed_config_to_block;
 use crate::sequencer_state::SequencerState;
-use crate::UpdateToSend;
+use crate::BatchedAggegratesToSend;
 
 pub async fn block_creator_loop(
     sequencer_state: Data<SequencerState>,
     mut aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdateWithProof>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
-    batched_votes_send: UnboundedSender<UpdateToSend>,
+    batched_votes_send: UnboundedSender<BatchedAggegratesToSend>,
     block_config: BlockConfig,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -131,18 +131,18 @@ fn recvd_feed_update_to_block(
     max_feed_updates_to_batch: usize,
 ) {
     match recvd_feed_update {
-        Some(voted_uptate) => {
-            let (key, val) = voted_uptate.update.encode(18);
+        Some(voted_update) => {
+            let (key, val) = voted_update.update.encode(18);
             info!("adding {:?} => {:?} to updates", key, val);
             if updates_to_block.len() < max_feed_updates_to_batch {
-                updates_to_block.push(voted_uptate);
+                updates_to_block.push(voted_update);
             } else {
                 warn!(
                     "updates.keys().len() >= max_feed_updates_to_batch ({} >= {})",
                     updates_to_block.len(),
                     max_feed_updates_to_batch
                 );
-                backlog_updates.push_back(voted_uptate);
+                backlog_updates.push_back(voted_update);
             }
         }
         None => {
@@ -190,7 +190,7 @@ async fn generate_block(
     updates: &mut Vec<VotedFeedUpdateWithProof>,
     new_feeds_to_register: &mut Vec<RegisterNewAssetFeed>,
     feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
-    batched_votes_send: &UnboundedSender<UpdateToSend>,
+    batched_votes_send: &UnboundedSender<BatchedAggegratesToSend>,
     sequencer_state: &Data<SequencerState>,
     block_height: u64,
 ) -> eyre::Result<()> {
@@ -260,7 +260,7 @@ async fn generate_block(
             proofs.insert(feed_id, v.proof);
         }
 
-        if let Err(e) = batched_votes_send.send(UpdateToSend {
+        if let Err(e) = batched_votes_send.send(BatchedAggegratesToSend {
             block_height,
             updates: value_updates,
             proofs,

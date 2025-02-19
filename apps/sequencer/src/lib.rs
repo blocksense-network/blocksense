@@ -17,14 +17,14 @@ use std::collections::HashMap;
 use tracing::error;
 
 #[derive(Debug, Clone, Default)]
-pub struct UpdateToSend {
+pub struct BatchedAggegratesToSend {
     pub block_height: u64,
     pub updates: Vec<VotedFeedUpdate>,
     // The key in this map is the feed id for which we provide a proof for the aggregated value.
     pub proofs: HashMap<u32, Vec<DataFeedPayload>>,
 }
 
-impl UpdateToSend {
+impl BatchedAggegratesToSend {
     // The updates to be sent to different networks go through multiple filters.
     // Eventually we might need to reduce the proof to only contain records for
     // the relevant updates. The following function does that and returns the

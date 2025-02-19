@@ -13,7 +13,7 @@ use tracing::{debug, error, info, warn};
 
 use alloy_encode_packed::{self, abi::encode_packed, SolidityDataType};
 
-use crate::UpdateToSend;
+use crate::BatchedAggegratesToSend;
 
 use once_cell::sync::Lazy;
 
@@ -46,7 +46,7 @@ fn truncate_leading_zero_bytes(bytes: Vec<u8>) -> Vec<u8> {
 /// Serializes the `updates` hash map into a string.
 pub async fn adfs_serialize_updates(
     net: &str,
-    feed_updates: &UpdateToSend,
+    feed_updates: &BatchedAggegratesToSend,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
 ) -> Result<String> {
@@ -233,7 +233,7 @@ pub mod tests {
             }
         }
 
-        let updates = UpdateToSend {
+        let updates = BatchedAggegratesToSend {
             block_height: 1234567890,
             updates: vec![
                 create_voted_feed_update(1, "12343267643573"),

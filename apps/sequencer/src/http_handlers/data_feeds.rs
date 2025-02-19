@@ -63,7 +63,7 @@ async fn process_report(
     data_feed: DataFeedPayload,
 ) -> HttpResponse {
     let reporter_id = data_feed.payload_metadata.reporter_id;
-    let signature = data_feed.payload_metadata.signature.clone();
+    let signature = &data_feed.payload_metadata.signature;
     let msg_timestamp = data_feed.payload_metadata.timestamp;
 
     let feed_id: u32;
@@ -122,11 +122,10 @@ async fn process_report(
             inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
         }
     };
-    let result = data_feed;
 
     trace!(
-        "result = {:?}; feed_id = {:?}; reporter_id = {:?}",
-        result,
+        "data_feed = {:?}; feed_id = {:?}; reporter_id = {:?}",
+        data_feed,
         feed_id,
         reporter_id
     );
@@ -155,7 +154,7 @@ async fn process_report(
     match report_relevance {
         ReportRelevance::Relevant => {
             let mut reports = sequencer_state.reports.write().await;
-            if reports.push(feed_id, reporter_id, result).await {
+            if reports.push(feed_id, reporter_id, data_feed).await {
                 debug!(
                     "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
                     reporter_id, feed_id
