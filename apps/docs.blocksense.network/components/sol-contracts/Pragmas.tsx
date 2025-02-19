@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@/components/common/Badge';
+import { Badge } from '@blocksense/ui/Badge';
 
 import { PragmaDocItem } from '@blocksense/sol-reflector';
 

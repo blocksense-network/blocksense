@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@/components/common/Badge';
+import { Badge } from '@blocksense/ui/Badge';
 
 type DataTableBadgeProps = {
   children: React.ReactNode;

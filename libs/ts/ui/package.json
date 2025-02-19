@@ -8,7 +8,8 @@
     "./ImageWrapper": "./src/components/ImageWrapper/index.tsx",
     "./Tooltip": "./src/components/Tooltip/index.tsx",
     "./CopyButton": "./src/components/CopyButton/index.tsx",
-    "./Tabs": "./src/components/Tabs/index.tsx"
+    "./Tabs": "./src/components/Tabs/index.tsx",
+    "./Badge": "./src/components/Badge/index.tsx"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.7",
