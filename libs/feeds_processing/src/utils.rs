@@ -4,7 +4,7 @@ use config::{FeedConfig, PublishCriteria};
 use data_feeds::feeds_processing::{UpdateToSend, VotedFeedUpdate, VotedFeedUpdateWithProof};
 use feed_registry::aggregate::{get_aggregator, FeedAggregate};
 use feed_registry::registry::FeedAggregateHistory;
-use feed_registry::types::{DataFeedPayload, FeedType, Timestamp};
+use feed_registry::types::{DataFeedPayload, FeedMetaData, FeedType, Timestamp};
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash};
 use ringbuf::traits::consumer::Consumer;
@@ -274,6 +274,31 @@ pub async fn validate(
 
         let num_valid_reporters = reporters_keys.len();
 
+        let feeds_config = feeds_config.read().await;
+
+        let Some(feed_config) = feeds_config.get(&update.feed_id) else {
+            anyhow::bail!("Feed ID {} has no configuration.", &update.feed_id);
+        };
+
+        let feed_metadata = FeedMetaData::new(
+            format!("Feed ID: {}", update.feed_id).as_str(),
+            feed_config.report_interval_ms,
+            feed_config.quorum_percentage,
+            feed_config.skip_publish_if_less_then_percentage,
+            feed_config.always_publish_heartbeat_ms,
+            feed_config.first_report_start_time,
+            feed_config.value_type.clone(),
+            feed_config.aggregate_type.clone(),
+            None,
+        );
+
+        // Validate that the update and all the signed votes are for the same slot based on the timestamps and feed_metadata + make sure that this update has not been previously introduced!
+
+        // Get the aggregated value's slot:
+        let aggregated_value_slot = feed_metadata.get_slot(update.end_slot_timestamp);
+
+        drop(feeds_config);
+
         // Check signatures
         for signed_data in proof_for_update {
             let Some(reporter_pub_key) =
@@ -285,9 +310,20 @@ pub async fn validate(
                 );
             };
 
+            // Make sure that all votes have the same slot as the aggregated value
+            let vote_slot = feed_metadata.get_slot(signed_data.payload_metadata.timestamp);
+            if vote_slot != aggregated_value_slot {
+                anyhow::bail!(
+                    "Received a vote not corresponding to the aggregated value's slot! vote: {:?} aggregated_value_slot: {} calculated vote slot: {}",
+                    signed_data,
+                    aggregated_value_slot,
+                    vote_slot,
+                );
+            }
+
             if !check_signature(
                 &signed_data.payload_metadata.signature.sig,
-                &reporter_pub_key,
+                reporter_pub_key,
                 signed_data.payload_metadata.feed_id.as_str(),
                 signed_data.payload_metadata.timestamp,
                 &signed_data.result,
@@ -307,24 +343,18 @@ pub async fn validate(
             .map(|payload| (payload.payload_metadata.reporter_id, payload))
             .collect();
 
-        let feeds_config = feeds_config.read().await;
-
-        let Some(feed_config) = feeds_config.get(&update.feed_id) else {
-            anyhow::bail!("Feed ID {} has no configuration.", &update.feed_id);
-        };
-
         let consumed_reports_result = consume_reports(
             format!("Feed ID: {}", update.feed_id).as_str(),
             &proof_for_update,
             &FeedType::Numerical(0.0),
             0,
-            feed_config.quorum_percentage,
-            feed_config.skip_publish_if_less_then_percentage as f64,
-            feed_config.always_publish_heartbeat_ms,
+            feed_metadata.quorum_percentage,
+            feed_metadata.skip_publish_if_less_then_percentage as f64,
+            feed_metadata.always_publish_heartbeat_ms,
             update.end_slot_timestamp,
             num_valid_reporters,
             false,
-            get_aggregator(feed_config.aggregate_type.as_str()),
+            get_aggregator(feed_metadata.aggregate_type.as_str()),
             history,
             update.feed_id,
         )
