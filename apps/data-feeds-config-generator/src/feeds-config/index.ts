@@ -209,6 +209,27 @@ function addStableCoinVariants(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
   return [...feeds, ...stableCoinVariants];
 }
 
+function removeUnsupportedRateDataFeeds(
+  dataFeeds: SimplifiedFeed[],
+): SimplifiedFeed[] {
+  const unsupported = [
+    'exchange rate',
+    'exchange-rate',
+    'calculated',
+    'refprice',
+    'marketcap',
+  ];
+
+  return dataFeeds.filter(
+    feed =>
+      !unsupported.some(x =>
+        feed.price_feed_info.compatibility_info.chainlink
+          .toLowerCase()
+          .includes(x),
+      ),
+  );
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
 ): Promise<NewFeedsConfig> {
@@ -219,9 +240,12 @@ export async function generateFeedConfig(
   // Get the unique data feeds
   const uniqueDataFeeds = getUniqueDataFeeds(mainnetDataFeeds);
 
+  // Remove unsupported feed types
+  const supportedCLFeeds = removeUnsupportedRateDataFeeds(uniqueDataFeeds);
+
   // Add stablecoin variants
   const dataFeedsWithStableCoinVariants =
-    addStableCoinVariants(uniqueDataFeeds);
+    addStableCoinVariants(supportedCLFeeds);
 
   // Add providers data to the feeds and filter out feeds without providers
   const dataFeedsWithCryptoResources = (
