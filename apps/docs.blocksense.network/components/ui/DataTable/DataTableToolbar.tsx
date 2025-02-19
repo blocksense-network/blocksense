@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 import { Table } from '@tanstack/react-table';
 
 import { Button } from '@blocksense/ui/Button';
-import { Input } from '@/components/common/Input';
+import { Input } from '@blocksense/ui/Input';
 import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions';
 import { DataTableFacetedFilter } from '@/components/ui/DataTable/DataTableFacetedFilter';
 import {
@@ -39,7 +39,7 @@ export function DataTableToolbar<TData>({
               value={
                 (table.getColumn(filterCell)?.getFilterValue() as string) ?? ''
               }
-              onChange={event =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 table.getColumn(filterCell)?.setFilterValue(event.target.value)
               }
               className={`h-8 w-full min-w-[250px] lg:w-[250px] mr-1 lg:mr-2 border-solid border-slate-200 transition-all duration-200`}

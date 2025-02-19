@@ -5,6 +5,7 @@
     "./style.css": "./dist/style.css",
     ".": "./src/index.tsx",
     "./Button": "./src/components/Button/index.tsx",
+    "./Input": "./src/components/Input/index.tsx",
     "./ImageWrapper": "./src/components/ImageWrapper/index.tsx",
     "./Tooltip": "./src/components/Tooltip/index.tsx",
     "./CopyButton": "./src/components/CopyButton/index.tsx",
