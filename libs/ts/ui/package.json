@@ -11,7 +11,8 @@
     "./CopyButton": "./src/components/CopyButton/index.tsx",
     "./Tabs": "./src/components/Tabs/index.tsx",
     "./Badge": "./src/components/Badge/index.tsx",
-    "./Label": "./src/components/Label/index.tsx"
+    "./Label": "./src/components/Label/index.tsx",
+    "./Switch": "./src/components/Switch/index.tsx"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.7",

@@ -2,8 +2,8 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { Switch } from '@/components/common/Switch';
 import { Label } from '@blocksense/ui/Label';
+import { Switch } from '@blocksense/ui/Switch';
 import {
   Accordion,
   AccordionContent,
