@@ -13,8 +13,8 @@ const titleStyles = {
   2: 'text-2xl md:text-3xl',
   3: 'text-xl md:text-2xl font-bold h3__separator',
   4: 'text-lg md:text-base',
-  5: 'text-base md:text-sm max-w-[280px] font-bold px-4 truncate lg:max-w-none lg:whitespace-normal lg:overflow-visible lg:truncate-none dark:text-white',
-  6: 'text-sm px-4',
+  5: 'text-base md:text-sm max-w-[280px] font-bold truncate lg:max-w-none lg:whitespace-normal lg:overflow-visible lg:truncate-none dark:text-white',
+  6: 'text-sm',
 };
 
 const accordionStyles = 'text-gray-900';

@@ -9,7 +9,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@/components/common/Accordion';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
 
@@ -42,7 +42,6 @@ export const ContractAccordion = ({
       <Accordion
         type="multiple"
         value={Object.keys(accordionStates).filter(e => accordionStates[e])}
-        className="contract-accordion w-full"
         ref={elementsRef}
       >
         {elementsNames.map((elementName, index) => {
@@ -52,7 +51,7 @@ export const ContractAccordion = ({
                 <AnchorLinkTitle accordion title={elementName} titleLevel={5} />
               </AccordionTrigger>
               <AccordionContent
-                className={`accordion-content ${accordionStates[elementName] ? 'expanded' : ''} p-2 sm:p-4 border-b border-gray-200`}
+                className={`accordion-content ${accordionStates[elementName] ? 'expanded' : ''}`}
               >
                 {children[index]}
               </AccordionContent>
