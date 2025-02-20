@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { CardContent } from '@/components/common/Card';
+import { CardContent } from '@blocksense/ui/Card';
 
 type DataFeedCardContentProps = {
   children: ReactNode;

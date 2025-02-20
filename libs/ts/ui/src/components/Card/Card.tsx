@@ -1,19 +1,19 @@
 'use client';
 
+import React from 'react';
 import { HTMLAttributes } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../utils';
 
 type Variant = 'default' | 'bordered' | 'shadow' | 'transparent';
 type Size = 'sm' | 'md' | 'lg';
 
 const variants = {
   default:
-    'card card--default bg-card text-card-foreground dark:bg-neutral-900 dark:text-white',
-  bordered:
-    'card card--bordered border border-neutral-200 dark:border-neutral-600',
-  shadow: 'card card--shadow shadow-md',
-  transparent: 'card card--transparent bg-transparent',
+    'card--default shadow-md bg-white text-black dark:bg-neutral-900 dark:text-white',
+  bordered: 'card--bordered border border-neutral-200 dark:border-neutral-600',
+  shadow: 'card--shadow shadow-md',
+  transparent: 'card--transparent bg-transparent',
 };
 
 const sizes = {
@@ -51,7 +51,10 @@ export const CardHeader = ({
   ...props
 }: HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn('card__header flex flex-col px-2 mb-4', className)}
+    className={cn(
+      'card__header flex flex-col px-4 py-3 mb-4 dark:bg-neutral-800 rounded-t-sm',
+      className,
+    )}
     {...props}
   />
 );
@@ -83,14 +86,20 @@ export const CardContent = ({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('card__content p-4', className)} {...props} />
+  <div className={cn('card__content p-4 border-none', className)} {...props} />
 );
 
 export const CardFooter = ({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('card__footer flex items-center', className)} {...props} />
+  <div
+    className={cn(
+      'card__footer flex items-center py-3 mt-4 bg-neutral-100 dark:bg-neutral-800 rounded-b-sm',
+      className,
+    )}
+    {...props}
+  />
 );
 
 Card.displayName = 'Card';
