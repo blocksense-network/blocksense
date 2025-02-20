@@ -78,6 +78,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
                 textToCopy={`${id}`}
                 tooltipPosition="top"
                 copyButtonClasses="translate-x-1"
+                background={false}
               />
             </span>
           </div>
@@ -92,6 +93,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
             <ContractAddress
               address={base}
               abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+              copyButton={{ enableCopy: true, background: false }}
             />
           </div>
           <div className="flex gap-2 justify-between">
@@ -99,6 +101,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
             <ContractAddress
               address={quote}
               abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+              copyButton={{ enableCopy: true, background: false }}
             />
           </div>
         </div>
@@ -109,6 +112,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
         <ContractAddress
           address={address}
           abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+          copyButton={{ enableCopy: true, background: false }}
         />
       </div>
     ),

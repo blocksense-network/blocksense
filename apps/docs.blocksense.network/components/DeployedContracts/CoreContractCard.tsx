@@ -34,6 +34,7 @@ export const CoreContractCard = ({
               <ContractAddress
                 address={contract.address}
                 network={contract.networks[0]}
+                copyButton={{ enableCopy: true, background: false }}
               />
             </div>
           </div>
