@@ -59,7 +59,8 @@ pub async fn prepare_sequencer_state(
         })
         .expect("Failed to spawn interrupt watcher!");
 
-    let providers = init_shared_rpc_providers(sequencer_config, metrics_prefix).await;
+    let providers =
+        init_shared_rpc_providers(sequencer_config, metrics_prefix, &feeds_config).await;
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (aggregated_votes_to_block_creator_send, aggregated_votes_to_block_creator_recv): VoteChannel = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =

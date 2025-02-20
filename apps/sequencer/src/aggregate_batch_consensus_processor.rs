@@ -8,6 +8,7 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, trace};
 use utils::time::{current_unix_time, system_time_to_millis};
 
+use crate::providers::provider::GNOSIS_SAFE_CONTRACT_NAME;
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
 use futures_util::stream::{FuturesUnordered, StreamExt};
@@ -140,8 +141,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     let net = &signed_aggregate.network;
                                     let providers = sequencer_state_clone.providers.read().await;
                                     let provider = providers.get(net).unwrap().lock().await;
-
-                                    let safe_address = provider.safe_address.unwrap_or(Address::default());
+                                    let safe_address = provider.get_contract_address(GNOSIS_SAFE_CONTRACT_NAME).unwrap_or(Address::default());
                                     let contract = SafeMultisig::new(safe_address, &provider.provider);
 
                                     let latest_nonce = match contract.nonce().call().await {

@@ -10,6 +10,7 @@ use alloy::{
     hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
     rpc::types::eth::TransactionRequest,
 };
+
 use blocksense_registry::config::{OracleScript, OraclesResponse};
 use config::{AllFeedsConfig, FeedConfig, SequencerConfig};
 use eyre::eyre;
@@ -21,16 +22,16 @@ use futures::StreamExt;
 use std::collections::{BTreeMap, HashSet};
 use utils::logging::tokio_console_active;
 
-use super::super::providers::{eth_send_utils::deploy_contract, provider::SharedRpcProviders};
 use crate::http_handlers::data_feeds::register_feed;
+use crate::providers::eth_send_utils::deploy_contract;
+use crate::providers::provider::{SharedRpcProviders, PRICE_FEED_CONTRACT_NAME};
 use feed_registry::types::FeedType;
-use feed_registry::types::Repeatability;
 use prometheus::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
 
-async fn get_key_from_contract(
+pub async fn get_key_from_contract(
     providers: &SharedRpcProviders,
     network: &String,
     key: String,
@@ -48,14 +49,8 @@ async fn get_key_from_contract(
 
     let signer = &p.signer;
     let provider = &p.provider;
-    let contract_address = &p.contract_address;
-    let Some(addr) = contract_address else {
-        return Err(eyre!("No contract found for network {}", network));
-    };
-    info!(
-        "sending data to contract_address `{}` in network `{}`",
-        addr, network
-    );
+    let contract_address = p.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
+    info!("sending data to contract_address `{contract_address}` in network `{network}`",);
 
     let mut selector = key;
     selector.replace_range(0..1, "8"); // 8 indicates we want to take the latest value.
@@ -63,7 +58,7 @@ async fn get_key_from_contract(
     let input =
         Bytes::from_hex(selector).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
     let tx = TransactionRequest::default()
-        .to(*addr)
+        .to(contract_address)
         .from(signer.address())
         .with_chain_id(provider.get_chain_id().await?)
         .input(Some(input).into());
@@ -94,17 +89,8 @@ pub async fn deploy(
         "Deploying contract for network `{}` and feed type `{}` ...",
         network, feed_type
     );
-
-    let repeatability = match feed_type.as_str() {
-        "price_feed" => Repeatability::Periodic,
-        "event_feed" => Repeatability::Oneshot,
-        _ => {
-            let error_msg = format!("Invalid feed type: {}", feed_type);
-            error!("{}", error_msg);
-            return Err(error::ErrorBadRequest(error_msg));
-        }
-    };
-    match deploy_contract(&network, &sequencer_state.providers, repeatability).await {
+    let contact_name = &feed_type;
+    match deploy_contract(&network, &sequencer_state.providers, contact_name).await {
         Ok(result) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
@@ -569,7 +555,8 @@ mod tests {
 
         let metrics_prefix = Some("test_get_feed_report_interval_");
 
-        let providers = init_shared_rpc_providers(&sequencer_config, metrics_prefix).await;
+        let providers =
+            init_shared_rpc_providers(&sequencer_config, metrics_prefix, &feeds_config).await;
 
         let (vote_send, _vote_recv) = mpsc::unbounded_channel();
         let (
@@ -808,6 +795,7 @@ mod tests {
                     safe_address: None,
                     safe_min_quorum: 1,
                     event_contract_address: None,
+                    multicall_contract_address: None,
                     transaction_drop_timeout_secs: 42,
                     transaction_retry_timeout_secs: 20,
                     retry_fee_increment_fraction: 0.1,
