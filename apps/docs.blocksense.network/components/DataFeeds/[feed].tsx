@@ -70,7 +70,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
     directAccess: (
       <div className="text-sm text-gray-500 ml-2">
         {
-          <div className="flex gap-2 justify-between items-center">
+          <div className="flex gap-2 justify-between items-center break-all">
             Feed id:
             <span className="flex gap-2 items-center">
               <code className="inline">{id}</code>
@@ -88,7 +88,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
     chainlinkStyleRegistry:
       base && quote ? (
         <div className="text-sm text-gray-500 ml-2">
-          <div className="flex gap-2 justify-between">
+          <div className="flex flex-col gap-2 justify-between break-all">
             base:{' '}
             <ContractAddress
               address={base}
@@ -96,7 +96,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
               copyButton={{ enableCopy: true, background: false }}
             />
           </div>
-          <div className="flex gap-2 justify-between">
+          <div className="flex flex-col gap-2 justify-between break-all">
             quote:{''}
             <ContractAddress
               address={quote}
@@ -107,7 +107,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
         </div>
       ) : undefined,
     aggregatorProxyAddress: (
-      <div className="text-sm text-gray-500 ml-2 flex gap-2 justify-between">
+      <div className="text-sm text-gray-500 ml-2 flex flex-col gap-2 justify-between break-all">
         address:{' '}
         <ContractAddress
           address={address}
