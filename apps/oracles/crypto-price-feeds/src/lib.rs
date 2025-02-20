@@ -3,12 +3,11 @@ mod bitfinex;
 mod bitget;
 mod common;
 mod fetch_prices;
+mod okx;
 
 use anyhow::{bail, Context, Result};
-// use async_trait::async_trait;
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
-    // price_pair::{DataProvider, OraclePriceHelper},
     oracle_component,
 };
 use serde::Deserialize;
@@ -53,14 +52,14 @@ fn vwap(results: &Vec<ResourceResult>) -> Result<f64> {
 
 fn process_results(results: HashMap<String, Vec<ResourceResult>>) -> Result<Payload> {
     let mut payload: Payload = Payload::new();
-    for (feed_id, results) in results.iter() {
-        payload.values.push(match vwap(results) {
+    for (feed_id, results) in results.into_iter() {
+        payload.values.push(match vwap(&results) {
             Ok(price) => DataFeedResult {
-                id: feed_id.clone(),
+                id: feed_id,
                 value: DataFeedResultValue::Numerical(price),
             },
             Err(err) => DataFeedResult {
-                id: feed_id.clone(),
+                id: feed_id,
                 value: DataFeedResultValue::Error(err.to_string()),
             },
         });
@@ -88,26 +87,30 @@ fn print_results(resources: &Vec<ResourceData>, results: &HashMap<String, Vec<Re
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("starting oracle component");
-    let mut resources: Vec<ResourceData> = vec![];
-    let mut results: HashMap<String, Vec<ResourceResult>> =
-        HashMap::<String, Vec<ResourceResult>>::new();
     // let mut ids: Vec<String> = vec![];
     //TODO(adikov): Make sure citrea feeds exist so that we can properly test.
     // let citrea_feeds = vec!["BTCUSD", "ETHUSD", "EURCUSD", "USDTUSD", "USDCUSD", "PAXGUSD", "TBTCUSD", "WBTCUSD", "WSTETHUSD"];
-    for feed in settings.data_feeds.iter() {
-        let data: CmcResource = serde_json::from_str(&feed.data)
-            .context("Couldn't parse Data Feed resource properly")?;
-        resources.push(ResourceData {
-            symbol: data.cmc_quote.clone(),
-            id: feed.id.clone(),
-        });
-    }
 
+    let resources: Vec<ResourceData> = settings
+        .data_feeds
+        .into_iter()
+        .map(|feed| -> Result<_> {
+            let cmc_resource = serde_json::from_str::<CmcResource>(&feed.data)
+                .context("Couldn't parse Data Feed resource properly")?;
+
+            Ok(ResourceData {
+                symbol: cmc_resource.cmc_quote,
+                id: feed.id,
+            })
+        })
+        .collect::<Result<_>>()?;
+
+    let mut results: HashMap<String, Vec<ResourceResult>> = HashMap::new();
     fetch_all_prices(&resources, &mut results).await?;
-    // print_results(&resources, &results);
+    print_results(&resources, &results);
 
-    // let payload = process_results(results)?;
-    // println!("Final Payload - {:?}", payload.values);
+    let payload = process_results(results)?;
+    println!("Final Payload - {:?}", payload.values);
 
-    Ok(Payload::default())
+    Ok(payload)
 }

@@ -1,9 +1,10 @@
 use anyhow::Result;
 
+use futures::{future::LocalBoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer};
 use serde_json::{from_value, Value};
 
-use crate::common::{Fetcher, PairPriceData, PriceFetcher};
+use crate::common::{http_get_json, PairPriceData, PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct TradingPairTicker {
@@ -23,6 +24,7 @@ pub struct TradingPairTicker {
 impl TradingPairTicker {
     fn symbol(&self) -> String {
         // For trading pairs the API uses the format "t[Symbol]"
+        // TODO: Use strip_prefix_of
         let no_t_prefix = self.symbol.replace("t", "").to_string();
         // When the symbol ( label ) is with more than 3 characters,
         // the API uses the format for the trading pair "t[Symbol1]:[Symbol2]"
@@ -91,33 +93,23 @@ impl<'de> Deserialize<'de> for BitfinexPriceResponseData {
 
 pub struct BitfinexPriceFetcher;
 
-impl PriceFetcher for BitfinexPriceFetcher {}
+impl PricesFetcher for BitfinexPriceFetcher {
+    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
+        async {
+            let response = http_get_json::<Vec<BitfinexPriceResponseData>>(
+                "https://api-pub.bitfinex.com/v2/tickers?symbols=ALL",
+                None,
+            )
+            .await?;
 
-impl Fetcher for BitfinexPriceFetcher {
-    type ApiResponse = Vec<BitfinexPriceResponseData>;
-    const NAME: &str = "Bitfinex";
-
-    fn get_request(&self) -> Result<blocksense_sdk::spin::http::Request> {
-        Self::prepare_get_request("https://api-pub.bitfinex.com/v2/tickers?symbols=ALL", None)
-    }
-
-    fn parse_response(value: Self::ApiResponse) -> Result<Self::ParsedResponse> {
-        let trading_tickers: Vec<TradingPairTicker> = value
-            .into_iter()
-            .filter_map(|ticker| {
-                if let BitfinexPriceResponseData::Trading(trading) = ticker {
-                    Some(trading)
-                } else {
-                    None
-                }
-            })
-            .collect();
-
-        let response = trading_tickers
-            .into_iter()
-            .map(|value| (value.symbol().to_string(), value.price().to_string()))
-            .collect();
-
-        Ok(response)
+            Ok(response
+                .into_iter()
+                .filter_map(|ticker| match ticker {
+                    BitfinexPriceResponseData::Trading(data) => Some((data.symbol(), data.price())),
+                    _ => None,
+                })
+                .collect())
+        }
+        .boxed_local()
     }
 }

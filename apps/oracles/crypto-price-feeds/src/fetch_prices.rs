@@ -1,66 +1,63 @@
 use anyhow::Result;
 
-use std::collections::HashMap;
 use std::time::Instant;
+use std::{collections::HashMap, future::Future};
 
-use futures::{
-    future::LocalBoxFuture,
-    stream::{FuturesUnordered, StreamExt},
-    FutureExt,
+use futures::stream::{FuturesUnordered, StreamExt};
+
+use crate::{
+    binance::BinancePriceFetcher,
+    bitfinex::BitfinexPriceFetcher,
+    bitget::BitgetFetcher,
+    common::{fill_results, load_exchange_symbols, PricesFetcher, ResourceData, ResourceResult},
+    okx::OKXPriceFetcher,
 };
 
-use blocksense_sdk::spin::http::{send, Response};
-
-use crate::binance::{BinancePriceFetcher, BinancePriceFetcher2};
-use crate::bitfinex::BitfinexPriceFetcher;
-use crate::bitget::BitgetFetcher;
-use crate::common::{fill_results, Fetcher, ResourceData, ResourceResult};
-
-fn run_fetcher<FetcherT: Fetcher>(
-    fetcher: &FetcherT,
-) -> LocalBoxFuture<Result<(String, FetcherT::ParsedResponse)>> {
-    async {
-        let req = fetcher.get_request();
-        let resp: Response = send(req?).await?;
-        let deserialized = FetcherT::deserialize_response(resp)?;
-        let prices: FetcherT::ParsedResponse = FetcherT::parse_response(deserialized)?;
-        Ok((FetcherT::NAME.into(), prices))
-    }
-    .boxed_local()
+async fn try_tag_future<T>(
+    tag: &str,
+    future: impl Future<Output = Result<T>>,
+) -> Result<(&str, T)> {
+    Ok((tag, future.await?))
 }
 
 pub async fn fetch_all_prices(
     resources: &[ResourceData],
     results: &mut HashMap<String, Vec<ResourceResult>>,
 ) -> Result<()> {
-    let mut futures = FuturesUnordered::new();
     let start = Instant::now();
 
-    // Push exchange futures into FuturesUnordered
-    // futures.push(run_fetcher::<BinancePriceFetcher>());
-    // futures.push(run_fetcher::<BitfinexPriceFetcher>());
-    // futures.push(run_fetcher::<BitgetFetcher>());
+    let symbols = load_exchange_symbols(resources).await?;
 
-    // let fetcher = BitfinexPriceFetcher {};
-    // fetcher.get_request()
-    futures.push(run_fetcher(&BinancePriceFetcher2::new(&["BTCUSD"])));
-    // futures.push(run_fetcher(&BitfinexPriceFetcher {}));
-    // futures.push(run_fetcher(&BitgetFetcher {}));
+    let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[
+        ("OKX", Box::new(OKXPriceFetcher::new(&symbols.okx))),
+        ("Binance", Box::new(BinancePriceFetcher {})),
+        ("Bitget", Box::new(BitgetFetcher {})),
+        ("Bitfinex", Box::new(BitfinexPriceFetcher)),
+    ];
 
-    // Process results as they complete
-    while let Some(result) = futures.next().await {
+    let mut futures_set = FuturesUnordered::from_iter(
+        tagged_fetchers
+            .iter()
+            .map(|(exchange_id, fetcher)| try_tag_future(exchange_id, fetcher.fetch())),
+    );
+
+    while let Some(result) = futures_set.next().await {
         match result {
-            Ok((exchange, value)) => {
-                println!("ℹ️  Successfully fetched prices from {}", exchange);
-                fill_results(resources, results, value).unwrap_or_else(|err| {
-                    println!("❌ Error filling results for {}: {:?}", exchange, err);
+            Ok((exchange_id, prices)) => {
+                println!(
+                    "ℹ️  Successfully fetched prices from {exchange_id} in {:?}",
+                    start.elapsed()
+                );
+                fill_results(resources, results, prices).unwrap_or_else(|err| {
+                    println!("❌ Error filling results for {exchange_id}: {err:?}");
                 });
             }
             Err(err) => {
-                println!("❌ Error processing future: {:?}", err);
+                println!("❌ Error processing future: {err:?}");
             }
         }
     }
+
     println!("🕛 All prices fetched in {:?}", start.elapsed());
 
     Ok(())
