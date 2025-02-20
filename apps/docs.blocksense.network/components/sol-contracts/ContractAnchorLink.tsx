@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-// import { ListIcon } from "@/components/common/ListIcon";
 import { contractsUrl } from '@/src/constants';
 
 interface AnchorLinkProps {
@@ -10,7 +9,6 @@ interface AnchorLinkProps {
 export const ContractAnchorLink = ({ label }: AnchorLinkProps) => {
   return (
     <li key={label} className="flex items-start nx-gap-4 nx-my-2">
-      {/* <ListIcon /> */}
       <span className="grow contract__anchor mb-1 underline text-black dark:text-white">
         <strong>
           <Link href={`${contractsUrl}/contract/${label}`}>{label}</Link>
