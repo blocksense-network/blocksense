@@ -44,7 +44,7 @@ export async function addDataProviders(dataFeeds: SimplifiedFeed[]) {
       const providers = getAllProvidersForFeed(feed, exchangeAssetsMap);
       return {
         ...feed,
-        price_feed_info: { ...feed.price_feed_info, providers },
+        price_feed_info: { ...feed.price_feed_info, arguments: providers },
       };
     }),
   );
@@ -63,7 +63,7 @@ function getAllProvidersForFeed(
   feed: SimplifiedFeed,
   exchangeAssets: ExchangeData[],
 ): ProvidersResources {
-  let providers = feed.price_feed_info.providers ?? {};
+  let providers = feed.price_feed_info.arguments ?? {};
 
   const addProvider = (key: string, type: ExchangeData['type'], value: any) => {
     if (value) {

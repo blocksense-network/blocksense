@@ -52,7 +52,7 @@ function feedFromChainLinkFeedInfo(
       decimals: getHighestDecimals(additionalData),
       category,
       market_hours,
-      providers: {},
+      arguments: {},
       compatibility_info: {
         chainlink: clName,
       },
@@ -251,7 +251,7 @@ export async function generateFeedConfig(
   const dataFeedsWithCryptoResources = (
     await addDataProviders(dataFeedsWithStableCoinVariants)
   ).filter(
-    dataFeed => Object.keys(dataFeed.price_feed_info.providers).length !== 0,
+    dataFeed => Object.keys(dataFeed.price_feed_info.arguments).length !== 0,
   );
 
   let rawDataFeedsOnMainnets = Object.entries(rawDataFeeds).filter(
@@ -278,6 +278,7 @@ export async function generateFeedConfig(
       ...simplifiedFeed,
       id,
       type: 'price-feed',
+      oracle_id: 'crypto-price-feeds',
       value_type: 'numerical',
       stride: 0,
       quorum: {

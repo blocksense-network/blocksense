@@ -196,6 +196,7 @@ export const NewFeedSchema = S.mutable(
     type: S.Union(S.Literal('price-feed')).annotations({
       identifier: 'FeedType',
     }),
+    oracle_id: S.String,
 
     value_type: S.Union(
       S.Literal('numerical'),
@@ -228,7 +229,7 @@ export const NewFeedSchema = S.mutable(
         decimals: S.Number,
         category: FeedCategorySchema,
         market_hours: S.NullishOr(MarketHoursSchema),
-        providers: providersResourcesSchema,
+        arguments: providersResourcesSchema,
         compatibility_info: S.Struct({
           chainlink: S.String,
         }),
