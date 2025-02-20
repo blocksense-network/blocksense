@@ -1,6 +1,5 @@
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
-    dyn_abi::DynSolValue,
     hex::FromHex,
     network::TransactionBuilder,
     primitives::Bytes,
@@ -16,7 +15,10 @@ use utils::to_hex_string;
 
 use crate::{
     providers::adfs_gen_calldata::adfs_serialize_updates,
-    providers::provider::{parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders},
+    providers::provider::{
+        parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders,
+        EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
+    },
     sequencer_state::SequencerState,
     BatchedAggegratesToSend,
 };
@@ -31,78 +33,16 @@ use tracing::{debug, error, info, info_span, warn};
 pub async fn deploy_contract(
     network: &String,
     providers: &SharedRpcProviders,
-    feed_type: Repeatability,
+    contract_name: &str,
 ) -> Result<String> {
     let providers = providers.read().await;
-
     let provider = providers.get(network);
     let Some(p) = provider.cloned() else {
         return Err(eyre!("No provider for network {}", network));
     };
     drop(providers);
     let mut p = p.lock().await;
-    let signer = &p.signer;
-    let provider = &p.provider;
-    let provider_metrics = &p.provider_metrics;
-
-    // Deploy the contract.
-    let bytecode = if feed_type == Periodic {
-        p.data_feed_store_byte_code.clone()
-    } else {
-        p.data_feed_sports_byte_code.clone()
-    };
-
-    let Some(mut bytecode) = bytecode else {
-        return Err(eyre!("Byte code unavailable"));
-    };
-
-    let _max_priority_fee_per_gas = process_provider_getter!(
-        provider.get_max_priority_fee_per_gas().await,
-        network,
-        provider_metrics,
-        get_max_priority_fee_per_gas
-    );
-
-    let chain_id = process_provider_getter!(
-        provider.get_chain_id().await,
-        network,
-        provider_metrics,
-        get_chain_id
-    );
-
-    let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
-
-    let mut encoded_arg = message_value.abi_encode();
-    bytecode.append(&mut encoded_arg);
-
-    let tx = TransactionRequest::default()
-        .from(signer.address())
-        .with_chain_id(chain_id)
-        .with_deploy_code(bytecode);
-
-    let deploy_time = Instant::now();
-    let contract_address = provider
-        .send_transaction(tx)
-        .await?
-        .get_receipt()
-        .await?
-        .contract_address
-        .expect("Failed to get contract address");
-
-    info!(
-        "Deployed {:?} contract at address: {:?} took {}ms\n",
-        feed_type,
-        contract_address.to_string(),
-        deploy_time.elapsed().as_millis()
-    );
-
-    if feed_type == Periodic {
-        p.contract_address = Some(contract_address);
-    } else {
-        p.event_contract_address = Some(contract_address);
-    }
-
-    Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
+    p.deploy_contract(contract_name).await
 }
 
 /// Serializes the `updates` hash map into a string.
@@ -184,7 +124,10 @@ pub async fn get_serialized_updates_for_network(
         return Ok("".to_string());
     }
 
-    let contract_version = provider.contract_version;
+    let contract_version = provider
+        .get_contract(PRICE_FEED_CONTRACT_NAME)
+        .ok_or(eyre!("{PRICE_FEED_CONTRACT_NAME} contract is not set!"))?
+        .contract_version;
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
@@ -240,16 +183,12 @@ pub async fn eth_batch_send_to_contract(
     debug!("Acquired a read/write lock on provider state for network `{net}`");
 
     let signer = &provider.signer;
-    let contract_address = if feed_type == Periodic {
-        provider
-            .contract_address
-            .ok_or(eyre!("Contract address not set for network {net}."))
+    let contract_name = if feed_type == Periodic {
+        PRICE_FEED_CONTRACT_NAME
     } else {
-        provider
-            .event_contract_address
-            .ok_or(eyre!("Event contract address not set for network {net}."))
-    }?;
-
+        EVENT_FEED_CONTRACT_NAME
+    };
+    let contract_address = provider.get_contract_address(contract_name)?;
     info!(
         "sending data to address `{}` in network `{}`",
         contract_address, net
@@ -660,7 +599,7 @@ mod tests {
     use super::*;
 
     use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
-    use crate::providers::provider::{can_read_contract_bytecode, init_shared_rpc_providers};
+    use crate::providers::provider::init_shared_rpc_providers;
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
@@ -726,14 +665,18 @@ mod tests {
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
-
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
         // give some time for cleanup env variables
-        let providers =
-            init_shared_rpc_providers(&cfg, Some("test_deploy_contract_returns_valid_address_"))
-                .await;
+        let providers = init_shared_rpc_providers(
+            &cfg,
+            Some("test_deploy_contract_returns_valid_address_"),
+            &feeds_config,
+        )
+        .await;
 
         // run
-        let result = deploy_contract(&String::from(network), &providers, Periodic).await;
+        let result =
+            deploy_contract(&String::from(network), &providers, PRICE_FEED_CONTRACT_NAME).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -746,7 +689,12 @@ mod tests {
             // Assert we can read bytecode from that address
             let extracted_address = Address::from_str(&extracted_address.unwrap()).ok().unwrap();
             let provider = providers.read().await.get(network).unwrap().clone();
-            let can_get_bytecode = can_read_contract_bytecode(provider, &extracted_address).await;
+            let can_get_bytecode = provider
+                .lock()
+                .await
+                .can_read_contract_bytecode(&extracted_address, Duration::from_secs(1))
+                .await
+                .expect("Timeout when trying to read from address");
             assert!(can_get_bytecode);
         } else {
             panic!("contract deployment failed")
@@ -769,12 +717,20 @@ mod tests {
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
-
-        let providers =
-            init_shared_rpc_providers(&cfg, Some("test_eth_batch_send_to_oneshot_contract_")).await;
+        let feed_1_config = some_feed_config_with_id_1();
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![feed_1_config],
+        };
+        let providers = init_shared_rpc_providers(
+            &cfg,
+            Some("test_eth_batch_send_to_oneshot_contract_"),
+            &feeds_config,
+        )
+        .await;
 
         // run
-        let result = deploy_contract(&String::from(network), &providers, Oneshot).await;
+        let result =
+            deploy_contract(&String::from(network), &providers, EVENT_FEED_CONTRACT_NAME).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -863,7 +819,11 @@ mod tests {
             "0x800000030000000000000000000000000000000000000000000000000000000000000002",
         );
         let calldata_bytes = Bytes::from_hex(calldata).expect("Invalid calldata");
-        let address_to_send = provider.lock().await.event_contract_address.unwrap();
+        let address_to_send = provider
+            .lock()
+            .await
+            .get_contract_address(EVENT_FEED_CONTRACT_NAME)
+            .unwrap();
         let result = provider
             .lock()
             .await
@@ -918,7 +878,7 @@ mod tests {
                 anvil_network3.endpoint().as_str(),
             ),
         ]);
-        let feeds_config = AllFeedsConfig {
+        let feeds_config: AllFeedsConfig = AllFeedsConfig {
             feeds: vec![some_feed_config_with_id_1()],
         };
         let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
@@ -928,34 +888,29 @@ mod tests {
         )
         .await;
 
-        // run
-        let result =
-            deploy_contract(&String::from(network1), &sequencer_state.providers, Oneshot).await;
-        // assert
-        // validate contract was deployed at expected address
-        if let Ok(msg) = result {
-            let extracted_address = extract_address(&msg);
-            assert!(
-                extracted_address.is_some(),
-                "Did not return valid eth address"
-            );
-        } else {
-            panic!("contract deployment failed")
-        }
+        let msg = sequencer_state
+            .deploy_contract(network1, EVENT_FEED_CONTRACT_NAME)
+            .await
+            .expect("contract deployment failed");
 
-        let result =
-            deploy_contract(&String::from(network2), &sequencer_state.providers, Oneshot).await;
         // assert
         // validate contract was deployed at expected address
-        if let Ok(msg) = result {
-            let extracted_address = extract_address(&msg);
-            assert!(
-                extracted_address.is_some(),
-                "Did not return valid eth address"
-            );
-        } else {
-            panic!("contract deployment failed")
-        }
+        let extracted_address = extract_address(&msg);
+        assert!(
+            extracted_address.is_some(),
+            "Did not return valid eth address"
+        );
+        let msg2 = sequencer_state
+            .deploy_contract(network2, EVENT_FEED_CONTRACT_NAME)
+            .await
+            .expect("contract deployment failed");
+
+        // validate contract was deployed at expected address
+        let extracted_address = extract_address(&msg2);
+        assert!(
+            extracted_address.is_some(),
+            "Did not return valid eth address"
+        );
 
         /////////////////////////////////////////////////////////////////////
         // BIG STEP TWO - Prepare sample updates and write to the contract
@@ -1176,8 +1131,16 @@ mod tests {
                 p.publishing_criteria.push(c);
             });
 
-        let providers =
-            init_shared_rpc_providers(&sequencer_config, Some(&"peg_stable_coin_updates_")).await;
+        let feed = some_feed_config_with_id_1();
+        let feeds_config: AllFeedsConfig = AllFeedsConfig {
+            feeds: vec![feed.clone()],
+        };
+        let providers = init_shared_rpc_providers(
+            &sequencer_config,
+            Some(&"peg_stable_coin_updates_"),
+            &feeds_config,
+        )
+        .await;
         let mut prov2 = providers.write().await;
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
@@ -1222,10 +1185,16 @@ mod tests {
                 };
                 p.publishing_criteria.push(c);
             });
-
-        let providers =
-            init_shared_rpc_providers(&sequencer_config, Some(&"peg_stable_coin_updates_disabled"))
-                .await;
+        let feed = some_feed_config_with_id_1();
+        let feeds_config: AllFeedsConfig = AllFeedsConfig {
+            feeds: vec![feed.clone()],
+        };
+        let providers = init_shared_rpc_providers(
+            &sequencer_config,
+            Some(&"peg_stable_coin_updates_disabled"),
+            &feeds_config,
+        )
+        .await;
         let mut prov2 = providers.write().await;
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 

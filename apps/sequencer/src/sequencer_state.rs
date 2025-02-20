@@ -1,8 +1,8 @@
 use crate::feeds::consensus_second_round_manager::AggregationBatchConsensus;
 use crate::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
-use crate::providers::provider::init_shared_rpc_providers;
 use crate::providers::provider::ProviderStatus;
 use crate::providers::provider::SharedRpcProviders;
+use crate::providers::provider::{init_shared_rpc_providers, RpcProvider};
 use crate::reporters::reporter::init_shared_reporters;
 use crate::reporters::reporter::SharedReporters;
 use blockchain_data_model::in_mem_db::InMemDb;
@@ -10,6 +10,7 @@ use config::AllFeedsConfig;
 use config::FeedConfig;
 use config::SequencerConfig;
 use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
+use eyre::eyre;
 use feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use feed_registry::registry::new_feeds_meta_data_reg_from_config;
 use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
@@ -22,6 +23,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::sync::Mutex;
 use tokio::sync::RwLock;
 use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 
@@ -117,6 +119,22 @@ impl SequencerState {
             aggregate_batch_sig_send,
         }
     }
+
+    pub async fn get_provider(&self, network: &str) -> Option<Arc<Mutex<RpcProvider>>> {
+        self.providers.read().await.get(network).cloned()
+    }
+
+    pub async fn deploy_contract(
+        &self,
+        network: &str,
+        contract_name: &str,
+    ) -> Result<String, eyre::Error> {
+        let Some(p) = self.get_provider(network).await else {
+            return Err(eyre!("No provider for network {}", network));
+        };
+        let mut p = p.lock().await;
+        p.deploy_contract(contract_name).await
+    }
 }
 
 // Exclusively take config structure to init sequencer_state
@@ -132,7 +150,8 @@ pub async fn create_sequencer_state_from_sequencer_config(
     UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
 ) {
     let log_handle = init_shared_logging_handle("INFO", false);
-    let providers = init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix)).await;
+    let providers =
+        init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix), &feeds_config).await;
 
     let (vote_send, vote_recv) = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
@@ -142,7 +161,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
     let aggregated_votes_to_block_creator_send = vote_send;
     let feed_id_allocator = Some(init_concurrent_allocator());
     let sequencer_state = SequencerState::new(
-        feeds_config,
+        feeds_config.clone(),
         providers,
         log_handle,
         &sequencer_config,

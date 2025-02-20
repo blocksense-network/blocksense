@@ -1,8 +1,10 @@
 use alloy::providers::Provider;
+use alloy::rpc::types::TransactionRequest;
 use alloy::transports::http::Http;
 use alloy::{
+    dyn_abi::DynSolValue,
     hex,
-    network::{Ethereum, EthereumWallet},
+    network::{Ethereum, EthereumWallet, TransactionBuilder},
     primitives::Address,
     providers::{
         fillers::{
@@ -13,20 +15,29 @@ use alloy::{
     },
     signers::local::PrivateKeySigner,
 };
+
+use config::AllFeedsConfig;
 use reqwest::{Client, Url};
 
 use config::{PublishCriteria, SequencerConfig};
+use data_feeds::feeds_processing::VotedFeedUpdate;
+use eyre::{eyre, Result};
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::FeedType;
-use prometheus::metrics::ProviderMetrics;
+use paste::paste;
+use prometheus::{metrics::ProviderMetrics, process_provider_getter};
+use ringbuf::traits::{Consumer, Observer};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::{fs, mem};
-use tokio::spawn;
 use tokio::sync::{Mutex, RwLock};
+use tokio::time::error::Elapsed;
 use tokio::time::Duration;
 use tracing::{debug, error, info, warn};
+
+use crate::BatchedAggegratesToSend;
+use std::time::Instant;
 
 pub type ProviderType = FillProvider<
     JoinFill<
@@ -46,24 +57,34 @@ pub fn parse_eth_address(addr: &str) -> Option<Address> {
     contract_address
 }
 
+#[derive(Clone)]
+pub struct Contract {
+    pub name: String,
+    pub address: Option<Address>,
+    pub byte_code: Option<Vec<u8>>,
+    pub contract_version: u16,
+}
+
+pub const PRICE_FEED_CONTRACT_NAME: &str = "price_feed";
+pub const EVENT_FEED_CONTRACT_NAME: &str = "event_feed";
+pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
+pub const GNOSIS_SAFE_CONTRACT_NAME: &str = "gnosis_safe";
+
 pub struct RpcProvider {
+    pub network: String,
     pub provider: ProviderType,
     pub signer: PrivateKeySigner,
-    pub contract_address: Option<Address>,
-    pub safe_address: Option<Address>,
     pub safe_min_quorum: u32,
-    pub event_contract_address: Option<Address>,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
     pub transaction_drop_timeout_secs: u32,
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
     pub transaction_gas_limit: u32,
-    pub data_feed_store_byte_code: Option<Vec<u8>>,
-    pub data_feed_sports_byte_code: Option<Vec<u8>>,
     pub impersonated_anvil_account: Option<Address>,
     pub history: FeedAggregateHistory,
     pub publishing_criteria: HashMap<u32, PublishCriteria>,
-    pub contract_version: u16,
+    pub feeds_variants: HashMap<u32, (FeedType, usize)>,
+    pub contracts: Vec<Contract>,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -76,78 +97,21 @@ pub enum ProviderStatus {
 
 pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
-pub async fn can_read_contract_bytecode(provider: Arc<Mutex<RpcProvider>>, addr: &Address) -> bool {
-    let bytecode = match provider.lock().await.provider.get_code_at(*addr).await {
-        Ok(result) => result,
-        Err(e) => {
-            error!("Could not get bytecode of contract: {}", e);
-            return false;
-        }
-    };
-    bytecode.to_string() != "0x"
-}
-
 pub async fn init_shared_rpc_providers(
     conf: &SequencerConfig,
     prefix: Option<&str>,
+    feeds_config: &AllFeedsConfig,
 ) -> SharedRpcProviders {
     let prefix = prefix.unwrap_or("");
-    Arc::new(RwLock::new(get_rpc_providers(conf, prefix).await))
-}
-
-async fn verify_contract_exists(
-    key: &str,
-    address: &Option<String>,
-    rpc_provider: Arc<Mutex<RpcProvider>>,
-) {
-    if let Some(addr_str) = address {
-        if let Some(addr) = parse_eth_address(addr_str.as_str()) {
-            info!(
-                "Contract address for network {} set to {}. Checking if contract exists ...",
-                key, addr
-            );
-            match spawn(async move {
-                actix_web::rt::time::timeout(
-                    Duration::from_secs(5),
-                    can_read_contract_bytecode(rpc_provider, &addr),
-                )
-                .await
-            })
-            .await
-            {
-                Ok(result) => match result {
-                    Ok(exists) => {
-                        if exists {
-                            info!("Contract for network {} exists on address {}", key, addr);
-                        } else {
-                            warn!("No contract for network {} exists on address {}", key, addr);
-                        }
-                    }
-                    Err(e) => {
-                        warn!(
-                            "JSON rpc request to verify contract existence timed out: {}",
-                            e
-                        );
-                    }
-                },
-                Err(e) => {
-                    error!("Task join error: {}", e)
-                }
-            };
-        } else {
-            error!(
-                "Set contract address for network {} is not a valid Ethereum contract address!",
-                key
-            );
-        }
-    } else {
-        warn!("No contract address set for network {}", key);
-    }
+    Arc::new(RwLock::new(
+        get_rpc_providers(conf, prefix, feeds_config).await,
+    ))
 }
 
 async fn get_rpc_providers(
     conf: &SequencerConfig,
     prefix: &str,
+    feeds_config: &AllFeedsConfig,
 ) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
     let mut providers: HashMap<String, Arc<Mutex<RpcProvider>>> = HashMap::new();
 
@@ -155,16 +119,16 @@ async fn get_rpc_providers(
         ProviderMetrics::new(prefix).expect("Failed to allocate ProviderMetrics"),
     ));
 
-    for (key, p) in &conf.providers {
+    for (net, p) in &conf.providers {
         let rpc_url: Url = p
             .url
             .parse()
-            .unwrap_or_else(|_| panic!("Not a valid url provided for {key}!"));
+            .unwrap_or_else(|_| panic!("Not a valid url provided for {net}!"));
         let priv_key_path = &p.private_key_path;
         let priv_key = fs::read_to_string(priv_key_path.clone()).unwrap_or_else(|_| {
             panic!(
                 "Failed to read private key for {} from {}",
-                key, priv_key_path
+                net, priv_key_path
             )
         });
         let signer: PrivateKeySigner = priv_key
@@ -175,22 +139,84 @@ async fn get_rpc_providers(
             .with_recommended_fillers()
             .wallet(EthereumWallet::from(signer.clone()))
             .on_http(rpc_url);
-        let address = p
-            .contract_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let safe_address = p
-            .safe_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let event_address = p
-            .event_contract_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
+
+        let rpc_provider = RpcProvider::new(
+            net.as_str(),
+            provider,
+            &signer,
+            p,
+            &provider_metrics,
+            feeds_config,
+        );
+        rpc_provider
+            .log_if_contract_exists(PRICE_FEED_CONTRACT_NAME)
+            .await;
+        rpc_provider
+            .log_if_contract_exists(EVENT_FEED_CONTRACT_NAME)
+            .await;
+
+        let rpc_provider = Arc::new(Mutex::new(rpc_provider));
+
+        providers.insert(net.clone(), rpc_provider.clone());
+    }
+
+    debug!("List of providers:");
+    for (key, value) in &providers {
+        let provider = &value.lock().await.provider;
+        debug!("{}: {:?}", key, provider);
+    }
+
+    providers
+}
+
+impl RpcProvider {
+    pub fn new(
+        network: &str,
+        provider: ProviderType,
+        signer: &PrivateKeySigner,
+        p: &config::Provider,
+        provider_metrics: &Arc<tokio::sync::RwLock<ProviderMetrics>>,
+        feeds_config: &AllFeedsConfig,
+    ) -> RpcProvider {
         let impersonated_anvil_account = p
             .impersonated_anvil_account
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
+        let (history, publishing_criteria) = RpcProvider::prepare_history(p);
+        let contracts = RpcProvider::prepare_contracts(p);
+        let mut feeds_variants: HashMap<u32, (FeedType, usize)> = HashMap::new();
+        for f in feeds_config.feeds.iter() {
+            info!("{:?}", f);
+            match FeedType::get_variant_from_string(f.value_type.as_str()) {
+                Ok(variant) => {
+                    feeds_variants.insert(f.id, (variant, f.decimals as usize));
+                }
+                _ => {
+                    error!("Unknown feed value variant = {}", f.value_type);
+                }
+            }
+        }
+        RpcProvider {
+            network: network.to_string(),
+            provider,
+            signer: signer.clone(),
+            safe_min_quorum: p.safe_min_quorum,
+            provider_metrics: provider_metrics.clone(),
+            transaction_drop_timeout_secs: p.transaction_drop_timeout_secs,
+            transaction_retry_timeout_secs: p.transaction_retry_timeout_secs,
+            retry_fee_increment_fraction: p.retry_fee_increment_fraction,
+            transaction_gas_limit: p.transaction_gas_limit,
+            impersonated_anvil_account,
+            history,
+            publishing_criteria,
+            feeds_variants,
+            contracts,
+        }
+    }
+
+    pub fn prepare_history(
+        p: &config::Provider,
+    ) -> (FeedAggregateHistory, HashMap<u32, PublishCriteria>) {
         let mut history = FeedAggregateHistory::new();
         let mut publishing_criteria: HashMap<u32, PublishCriteria> = HashMap::new();
 
@@ -204,56 +230,54 @@ async fn get_rpc_providers(
                 history.register_feed(feed_id, buf_size);
             }
         }
-        let rpc_provider = Arc::new(Mutex::new(RpcProvider {
-            contract_address: address,
-            safe_address,
-            safe_min_quorum: p.safe_min_quorum,
-            event_contract_address: event_address,
-            provider,
-            signer,
-            provider_metrics: provider_metrics.clone(),
-            transaction_drop_timeout_secs: p.transaction_drop_timeout_secs,
-            transaction_retry_timeout_secs: p.transaction_retry_timeout_secs,
-            retry_fee_increment_fraction: p.retry_fee_increment_fraction,
-            transaction_gas_limit: p.transaction_gas_limit,
-            data_feed_store_byte_code: p.data_feed_store_byte_code.clone().map(|byte_code| {
+        (history, publishing_criteria)
+    }
+
+    pub fn prepare_contracts(p: &config::Provider) -> Vec<Contract> {
+        let address = p
+            .contract_address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
+        let safe_address = p
+            .safe_address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
+        let event_address = p
+            .event_contract_address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
+
+        let mut contracts = vec![];
+        contracts.push(Contract {
+            name: PRICE_FEED_CONTRACT_NAME.to_string(),
+            address,
+            byte_code: p.data_feed_store_byte_code.clone().map(|byte_code| {
                 hex::decode(byte_code.clone())
                     .expect("data_feed_store_byte_code for provider is not valid hex string!")
             }),
-            data_feed_sports_byte_code: p.data_feed_sports_byte_code.clone().map(|byte_code| {
+            contract_version: p.contract_version,
+        });
+
+        contracts.push(Contract {
+            name: EVENT_FEED_CONTRACT_NAME.to_string(),
+            address: event_address,
+            byte_code: p.data_feed_sports_byte_code.clone().map(|byte_code| {
                 hex::decode(byte_code.clone())
                     .expect("data_feed_sports_byte_code for provider is not valid hex string!")
             }),
-            impersonated_anvil_account,
-            history,
-            publishing_criteria,
             contract_version: p.contract_version,
-        }));
+        });
 
-        providers.insert(key.clone(), rpc_provider.clone());
+        contracts.push(Contract {
+            name: GNOSIS_SAFE_CONTRACT_NAME.to_string(),
+            address: safe_address,
+            byte_code: None,
+            contract_version: 1,
+        });
 
-        // Verify contract_address
-        // If contract does not exist statements are logged and the process continues
-        verify_contract_exists(key, &p.contract_address, rpc_provider.clone()).await;
-
-        // Verify event_contract_address
-        // If contract does not exist statements are logged and the process continues
-        verify_contract_exists(key, &p.event_contract_address, rpc_provider.clone()).await;
+        contracts
     }
 
-    debug!("List of providers:");
-    for (key, value) in &providers {
-        let provider = &value.lock().await.provider;
-        debug!("{}: {:?}", key, provider);
-    }
-
-    providers
-}
-
-use data_feeds::feeds_processing::VotedFeedUpdate;
-
-use crate::BatchedAggegratesToSend;
-impl RpcProvider {
     pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {
         for update in updates.iter() {
             let feed_id = update.feed_id;
@@ -295,6 +319,146 @@ impl RpcProvider {
             *value = FeedType::Numerical(peg_value);
         }
     }
+
+    pub fn get_contract(&self, name: &str) -> Option<Contract> {
+        for c in self.contracts.iter() {
+            if c.name == name {
+                return Some(c.clone());
+            }
+        }
+        None
+    }
+
+    pub fn get_contract_address(&self, name: &str) -> Result<Address> {
+        let address = self
+            .get_contract(name)
+            .ok_or(eyre!("{name} contract is not set!"))?
+            .address
+            .ok_or(eyre!("{name} contract address is not set!"))?;
+        Ok(address)
+    }
+
+    pub fn set_contract_address(&mut self, name: &str, address: &Address) {
+        for c in self.contracts.iter_mut() {
+            if c.name == name {
+                c.address = Some(*address);
+            }
+        }
+    }
+
+    pub fn get_history_capacity(&self, feed_id: u32) -> Option<usize> {
+        self.history.get(feed_id).map(|x| x.capacity().get())
+    }
+    pub fn get_last_update_num_from_history(&self, feed_id: u32) -> u128 {
+        let default = 0;
+        self.history
+            .get(feed_id)
+            .map_or(default, |x| x.last().map_or(default, |x| x.update_number))
+    }
+
+    pub async fn deploy_contract(&mut self, contract_name: &str) -> Result<String> {
+        let signer = &self.signer;
+        let provider = &self.provider;
+        let provider_metrics = &self.provider_metrics;
+
+        let mut bytecode = self
+            .get_contract(contract_name)
+            .ok_or(eyre!("{contract_name} contract is not set!"))?
+            .byte_code
+            .ok_or(eyre!(
+                "Byte code unavailable for contract named {contract_name}"
+            ))?;
+
+        // Deploy the contract.
+        let network = self.network.clone();
+        let _max_priority_fee_per_gas = process_provider_getter!(
+            provider.get_max_priority_fee_per_gas().await,
+            network,
+            provider_metrics,
+            get_max_priority_fee_per_gas
+        );
+
+        let chain_id = process_provider_getter!(
+            provider.get_chain_id().await,
+            network,
+            provider_metrics,
+            get_chain_id
+        );
+
+        let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
+
+        let mut encoded_arg = message_value.abi_encode();
+        bytecode.append(&mut encoded_arg);
+
+        let tx = TransactionRequest::default()
+            .from(signer.address())
+            .with_chain_id(chain_id)
+            .with_deploy_code(bytecode);
+
+        let deploy_time = Instant::now();
+        let contract_address = provider
+            .send_transaction(tx)
+            .await?
+            .get_receipt()
+            .await?
+            .contract_address
+            .expect("Failed to get contract address");
+
+        info!(
+            "Deployed {:?} contract at address: {:?} took {} ms\n",
+            contract_name,
+            contract_address.to_string(),
+            deploy_time.elapsed().as_millis()
+        );
+        self.set_contract_address(contract_name, &contract_address);
+        Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
+    }
+
+    pub async fn can_read_contract_bytecode(
+        &self,
+        addr: &Address,
+        timeout_duration: Duration,
+    ) -> Result<bool, Elapsed> {
+        actix_web::rt::time::timeout(timeout_duration, self.provider.get_code_at(*addr))
+            .await
+            .map(|r| r.is_ok_and(|bytecode| bytecode.to_string() != "0x"))
+    }
+
+    pub async fn url(&self) -> &str {
+        self.provider.client().transport().url()
+    }
+
+    pub async fn log_if_contract_exists(&self, contract_name: &str) {
+        let address = self.get_contract_address(contract_name).ok();
+        let network = self.network.as_str();
+        if let Some(addr) = address {
+            info!("Contract {contract_name} for network {network} address set to {addr}. Checking if contract exists ...");
+
+            let result = self
+                .can_read_contract_bytecode(&addr, Duration::from_secs(5))
+                .await;
+            match result {
+                Ok(exists) => {
+                    if exists {
+                        info!(
+                            "Contract for network {} exists on address {}",
+                            network, addr
+                        );
+                    } else {
+                        warn!(
+                            "No contract for network {} exists on address {}",
+                            network, addr
+                        );
+                    }
+                }
+                Err(e) => {
+                    warn!("JSON rpc request to verify contract existence timed out: {e}");
+                }
+            };
+        } else {
+            warn!("No contract address set for network {}", network);
+        }
+    }
 }
 // pub fn print_type<T>(_: &T) {
 //     println!("{:?}", std::any::type_name::<T>());
@@ -308,7 +472,6 @@ mod tests {
         rpc::types::eth::request::TransactionRequest,
     };
     use alloy_primitives::address;
-    use eyre::Result;
     use utils::test_env::get_test_private_key_path;
 
     use crate::providers::provider::get_rpc_providers;
@@ -325,8 +488,8 @@ mod tests {
 
         let cfg =
             get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
-
-        let providers = get_rpc_providers(&cfg, "basic_test_provider_").await;
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
+        let providers = get_rpc_providers(&cfg, "basic_test_provider_", &feeds_config).await;
         let provider = &providers.get(network).unwrap().lock().await.provider;
 
         let alice = anvil.addresses()[7];
@@ -369,7 +532,8 @@ mod tests {
             key_path.as_path(),
             "http://localhost:8545",
         );
-        let providers = get_rpc_providers(&cfg, "test_get_wallet_success_").await;
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
+        let providers = get_rpc_providers(&cfg, "test_get_wallet_success_", &feeds_config).await;
 
         // Call the function
         let wallet = &providers[network].lock().await.signer;
@@ -412,11 +576,12 @@ mod tests {
             key_path.as_path(),
             "http://localhost:8545",
         );
-
+        let feeds_config = AllFeedsConfig { feeds: vec![] };
         // test
         let binding = init_shared_rpc_providers(
             &cfg,
             Some("test_get_rpc_providers_returns_single_provider_"),
+            &feeds_config,
         )
         .await;
         let result = binding.read().await;
