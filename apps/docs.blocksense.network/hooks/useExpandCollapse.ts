@@ -7,6 +7,7 @@ type AccordionStates = {
 export const useExpandCollapse = (
   names: string[],
   ref: RefObject<HTMLDivElement>,
+  type: 'single' | 'multiple' = 'multiple',
 ) => {
   const [accordionStates, setAccordionStates] = useState<AccordionStates>(
     getInitialAccordionStates(),
@@ -64,9 +65,20 @@ export const useExpandCollapse = (
   }
 
   function toggleAccordion(name: string) {
-    setAccordionStates({
-      ...accordionStates,
-      [name]: !accordionStates[name],
+    setAccordionStates(currentAccordionStates => {
+      if (type === 'single') {
+        return {
+          ...Object.fromEntries(
+            Object.entries(currentAccordionStates).map(([key]) => [key, false]),
+          ),
+          [name]: !currentAccordionStates[name],
+        };
+      } else {
+        return {
+          ...currentAccordionStates,
+          [name]: !currentAccordionStates[name],
+        };
+      }
     });
   }
 
