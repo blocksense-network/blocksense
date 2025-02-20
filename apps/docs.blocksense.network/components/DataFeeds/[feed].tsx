@@ -70,9 +70,9 @@ export default async function DataFeed({ params }: DataFeedProps) {
     directAccess: (
       <div className="text-sm text-gray-500 ml-2">
         {
-          <div className="flex gap-2 justify-between ">
+          <div className="flex gap-2 justify-between items-center">
             Feed id:
-            <span className="flex gap-2">
+            <span className="flex gap-2 items-center">
               <code className="inline">{id}</code>
               <CopyButton
                 textToCopy={`${id}`}
