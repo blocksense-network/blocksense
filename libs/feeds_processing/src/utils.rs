@@ -248,6 +248,7 @@ pub async fn validate(
     mut batch: ConsensusSecondRoundBatch,
     history: &Arc<RwLock<FeedAggregateHistory>>,
     reporters_keys: HashMap<u64, PublicKey>,
+    feeds_last_updated_slots: &mut HashMap<u32, u64>,
 ) -> Result<()> {
     // Check that all the aggregated values have a corresponding set of votes
     let feed_ids_in_updates: Vec<u32> = batch.updates.iter().map(|u| u.feed_id).collect();
@@ -263,6 +264,8 @@ pub async fn validate(
     if feed_ids_in_updates != feed_ids_in_proof {
         anyhow::bail!("Proofs / Updates mismatch");
     }
+
+    let mut feeds_newly_updated_slots = HashMap::<u32, u64>::new();
 
     for update in &batch.updates {
         let Some(proof_for_update) = batch.proofs.get(&update.feed_id) else {
@@ -296,6 +299,16 @@ pub async fn validate(
 
         // Get the aggregated value's slot:
         let aggregated_value_slot = feed_metadata.get_slot(update.end_slot_timestamp);
+
+        // Make sure this slot's value was not previously proposed:
+        if *feeds_last_updated_slots.get(&update.feed_id).unwrap_or(&0) > aggregated_value_slot {
+            anyhow::bail!(
+                "Reintroduction of old value: {:?}, {:?}",
+                update,
+                proof_for_update
+            );
+        }
+        feeds_newly_updated_slots.insert(update.feed_id, aggregated_value_slot);
 
         drop(feeds_config);
 
@@ -446,6 +459,11 @@ pub async fn validate(
             batch.tx_hash,
             tx_hash.to_string()
         );
+    }
+
+    // Store the last updated slots per feed
+    for (key, val) in feeds_newly_updated_slots {
+        feeds_last_updated_slots.insert(key, val);
     }
 
     Ok(())
