@@ -31,7 +31,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let mut results: HashMap<String, Vec<ResourceResult>> =
         HashMap::<String, Vec<ResourceResult>>::new();
 
-    let resources = get_resources_from_settings(&settings)?;
+    let resources = get_resources_from_settings(settings)?;
 
     fetch_all_prices(&resources, &mut results).await?;
     print_results(&resources, &results);
@@ -60,21 +60,21 @@ fn process_results(results: HashMap<String, Vec<ResourceResult>>) -> Result<Payl
     Ok(payload)
 }
 
-fn get_resources_from_settings(settings: &Settings) -> Result<Vec<ResourceData>> {
-    let mut resources = vec![];
-
+fn get_resources_from_settings(settings: Settings) -> Result<Vec<ResourceData>> {
     //TODO(adikov): Make sure citrea feeds exist so that we can properly test.
     // let citrea_feeds = vec!["BTCUSD", "ETHUSD", "EURCUSD", "USDTUSD", "USDCUSD", "PAXGUSD", "TBTCUSD", "WBTCUSD", "WSTETHUSD"];
-    for feed in settings.data_feeds.iter() {
-        let data: CmcResource = serde_json::from_str(&feed.data)
-            .context("Couldn't parse Data Feed resource properly")?;
-        resources.push(ResourceData {
-            symbol: data.cmc_quote.clone(),
-            id: feed.id.clone(),
-        });
-    }
-
-    Ok(resources)
+    settings
+        .data_feeds
+        .into_iter()
+        .map(|feed| {
+            serde_json::from_str::<CmcResource>(&feed.data)
+                .map(|cmc_resource| ResourceData {
+                    symbol: cmc_resource.cmc_quote,
+                    id: feed.id,
+                })
+                .context("Couldn't parse Data Feed resource properly")
+        })
+        .collect()
 }
 
 fn print_results(resources: &Vec<ResourceData>, results: &HashMap<String, Vec<ResourceResult>>) {
