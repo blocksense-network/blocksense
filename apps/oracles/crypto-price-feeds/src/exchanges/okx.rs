@@ -8,7 +8,10 @@ use std::ops::Deref;
 
 use serde::Deserialize;
 
-use crate::common::{http_get_json, PairPriceData, PricesFetcher};
+use crate::{
+    common::{http_get_json, PairPriceData},
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct OKXInstrument {

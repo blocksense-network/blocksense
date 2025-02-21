@@ -6,19 +6,14 @@ use std::{collections::HashMap, future::Future};
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
-    binance::BinancePriceFetcher,
-    bitfinex::BitfinexPriceFetcher,
-    bitget::BitgetFetcher,
-    common::{fill_results, load_exchange_symbols, PricesFetcher, ResourceData, ResourceResult},
-    okx::OKXPriceFetcher,
+    common::{ResourceData, ResourceResult, USD_SYMBOLS},
+    exchanges::{
+        binance::BinancePriceFetcher, bitfinex::BitfinexPriceFetcher, bitget::BitgetFetcher,
+        okx::OKXPriceFetcher,
+    },
+    symbols_cache::load_exchange_symbols,
+    traits::prices_fetcher::PricesFetcher,
 };
-
-async fn try_tag_future<T>(
-    tag: &str,
-    future: impl Future<Output = Result<T>>,
-) -> Result<(&str, T)> {
-    Ok((tag, future.await?))
-}
 
 pub async fn fetch_all_prices(
     resources: &[ResourceData],
@@ -61,4 +56,38 @@ pub async fn fetch_all_prices(
     println!("🕛 All prices fetched in {:?}", start.elapsed());
 
     Ok(())
+}
+
+fn fill_results(
+    resources: &[ResourceData],
+    results: &mut HashMap<String, Vec<ResourceResult>>,
+    response: HashMap<String, String>,
+) -> Result<()> {
+    //TODO(adikov): We need a proper way to get trade volume from Binance API.
+    for resource in resources {
+        // First USD pair found.
+        for quote in USD_SYMBOLS {
+            let trading_pair = format!("{}{}", resource.symbol, quote);
+            if response.contains_key(&trading_pair) {
+                //TODO(adikov): remove unwrap
+                let res = results.entry(resource.id.clone()).or_default();
+                res.push(ResourceResult {
+                    id: resource.id.clone(),
+                    symbol: resource.symbol.clone(),
+                    usd_symbol: quote.to_string(),
+                    result: response.get(&trading_pair).unwrap().clone(),
+                });
+                break;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+async fn try_tag_future<T>(
+    tag: &str,
+    future: impl Future<Output = Result<T>>,
+) -> Result<(&str, T)> {
+    Ok((tag, future.await?))
 }

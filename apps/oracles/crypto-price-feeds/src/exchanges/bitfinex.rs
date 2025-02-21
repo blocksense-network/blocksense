@@ -4,7 +4,10 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer};
 use serde_json::{from_value, Value};
 
-use crate::common::{http_get_json, PairPriceData, PricesFetcher};
+use crate::{
+    common::{http_get_json, PairPriceData},
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct TradingPairTicker {
@@ -24,7 +27,6 @@ pub struct TradingPairTicker {
 impl TradingPairTicker {
     fn symbol(&self) -> String {
         // For trading pairs the API uses the format "t[Symbol]"
-        // TODO: Use strip_prefix_of
         let no_t_prefix = self.symbol.replace("t", "").to_string();
         // When the symbol ( label ) is with more than 3 characters,
         // the API uses the format for the trading pair "t[Symbol1]:[Symbol2]"

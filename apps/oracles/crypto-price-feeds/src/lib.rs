@@ -1,9 +1,8 @@
-mod binance;
-mod bitfinex;
-mod bitget;
 mod common;
+mod exchanges;
 mod fetch_prices;
-mod okx;
+mod symbols_cache;
+mod traits;
 
 use anyhow::{bail, Context, Result};
 use blocksense_sdk::{
