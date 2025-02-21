@@ -43,7 +43,7 @@ where
 }
 
 pub async fn fetch_all_prices(
-    resources: &Vec<ResourceData>,
+    resources: &[ResourceData],
     results: &mut HashMap<String, Vec<ResourceResult>>,
 ) -> Result<()> {
     let mut futures = FuturesUnordered::<LocalBoxFuture<Result<(String, PairPriceData)>>>::new();
