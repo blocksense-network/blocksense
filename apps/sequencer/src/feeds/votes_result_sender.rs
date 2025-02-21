@@ -1,12 +1,13 @@
 use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
-use crate::{sequencer_state::SequencerState, BatchedAggegratesToSend};
+use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use alloy::hex::{self, FromHex, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, U256};
+use data_feeds::feeds_processing::BatchedAggegratesToSend;
 use feed_registry::types::Repeatability::Periodic;
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
