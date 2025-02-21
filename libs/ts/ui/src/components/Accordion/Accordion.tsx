@@ -1,6 +1,6 @@
 'use client';
 
-import {
+import React, {
   createContext,
   useContext,
   HTMLAttributes,
@@ -12,7 +12,7 @@ import {
 } from 'react';
 
 import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
-import { cn } from '@/lib/utils';
+import { cn } from '../../utils';
 
 type AccordionContextType = {
   openItems: string[];
