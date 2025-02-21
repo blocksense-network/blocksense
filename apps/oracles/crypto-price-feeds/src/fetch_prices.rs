@@ -12,18 +12,6 @@ use crate::common::{fill_results, PairPriceData, ResourceData, ResourceResult};
 // Define boxed future type that includes the exchange name
 type BoxedFuture = Pin<Box<dyn Future<Output = Result<(String, PairPriceData)>>>>;
 
-// Helper function to wrap each async call with its exchange name
-#[allow(unused)]
-fn exchange_future<F>(exchange_name: &'static str, fut: F) -> BoxedFuture
-where
-    F: Future<Output = Result<PairPriceData>> + 'static,
-{
-    Box::pin(async move {
-        let prices = fut.await?;
-        Ok((exchange_name.to_string(), prices))
-    })
-}
-
 pub async fn fetch_all_prices(
     resources: &Vec<ResourceData>,
     results: &mut HashMap<String, Vec<ResourceResult>>,
