@@ -1,7 +1,9 @@
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use anyhow::{anyhow, Context, Result};
 use config::{FeedConfig, PublishCriteria};
-use data_feeds::feeds_processing::{UpdateToSend, VotedFeedUpdate, VotedFeedUpdateWithProof};
+use data_feeds::feeds_processing::{
+    BatchedAggegratesToSend, VotedFeedUpdate, VotedFeedUpdateWithProof,
+};
 use feed_registry::aggregate::{get_aggregator, FeedAggregate};
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::{DataFeedPayload, FeedMetaData, FeedType, Timestamp};
@@ -388,7 +390,7 @@ pub async fn validate(
         }
     }
 
-    let updates_to_serialize = UpdateToSend {
+    let updates_to_serialize = BatchedAggegratesToSend {
         block_height: batch.block_height,
         updates: batch.updates,
         proofs: batch.proofs,

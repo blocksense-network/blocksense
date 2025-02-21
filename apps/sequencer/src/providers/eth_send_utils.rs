@@ -8,7 +8,7 @@ use alloy::{
     rpc::types::eth::TransactionRequest,
 };
 use config::FeedConfig;
-use data_feeds::feeds_processing::VotedFeedUpdate;
+use data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use eyre::{eyre, Result};
 use std::{collections::HashMap, mem, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
@@ -17,7 +17,6 @@ use utils::to_hex_string;
 use crate::{
     providers::provider::{parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders},
     sequencer_state::SequencerState,
-    BatchedAggegratesToSend,
 };
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use feeds_processing::adfs_gen_calldata::adfs_serialize_updates;

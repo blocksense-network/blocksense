@@ -252,7 +252,7 @@ async fn get_rpc_providers(
 
 use data_feeds::feeds_processing::VotedFeedUpdate;
 
-use crate::BatchedAggegratesToSend;
+use data_feeds::feeds_processing::BatchedAggegratesToSend;
 
 impl RpcProvider {
     pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {

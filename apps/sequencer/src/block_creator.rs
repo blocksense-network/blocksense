@@ -24,7 +24,7 @@ use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::feeds::feed_config_conversions::feed_config_to_block;
 use crate::sequencer_state::SequencerState;
-use crate::BatchedAggegratesToSend;
+use data_feeds::feeds_processing::BatchedAggegratesToSend;
 
 pub async fn block_creator_loop(
     sequencer_state: Data<SequencerState>,
