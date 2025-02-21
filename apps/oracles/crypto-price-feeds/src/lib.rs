@@ -28,6 +28,8 @@ struct CmcResource {
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
+    println!("Starting oracle component");
+
     let resources = get_resources_from_settings(settings)?;
 
     let mut results: HashMap<String, Vec<ResourceResult>> = HashMap::new();
