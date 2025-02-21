@@ -2,6 +2,7 @@ use alloy::hex;
 use alloy_primitives::U256;
 use anyhow::Result;
 use config::FeedConfig;
+use data_feeds::feeds_processing::BatchedAggegratesToSend;
 use prometheus::metrics::FeedsMetrics;
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap};
@@ -12,8 +13,6 @@ use utils::{from_hex_string, to_hex_string};
 use tracing::{debug, error, info, warn};
 
 use alloy_encode_packed::{self, abi::encode_packed, SolidityDataType};
-
-use crate::BatchedAggegratesToSend;
 
 use once_cell::sync::Lazy;
 

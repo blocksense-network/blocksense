@@ -20,7 +20,7 @@ use config::AllFeedsConfig;
 use reqwest::{Client, Url};
 
 use config::{PublishCriteria, SequencerConfig};
-use data_feeds::feeds_processing::VotedFeedUpdate;
+use data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use eyre::{eyre, Result};
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::FeedType;
@@ -36,7 +36,6 @@ use tokio::time::error::Elapsed;
 use tokio::time::Duration;
 use tracing::{debug, error, info, warn};
 
-use crate::BatchedAggegratesToSend;
 use std::time::Instant;
 
 pub type ProviderType = FillProvider<
