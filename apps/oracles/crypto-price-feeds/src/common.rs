@@ -264,25 +264,10 @@ where
     let status_code: u16 = *response.status();
     let request_successful = (200..=299).contains(&status_code);
 
-    if request_successful {
-        let body = response.body();
-        serde_json::from_slice(body).map_err(Into::into)
-    } else {
-        Err(anyhow!(
-            "HTTP get request error: returned status code {status_code}"
-        ))
+    if !request_successful {
+        bail!("HTTP get request error: returned status code {status_code}");
     }
-}
 
-// pub trait PriceFetcher: FetcherOutputProvider {}
-//
-// pub trait FetcherOutputProvider {
-//     type ParsedResponse;
-// }
-//
-// impl<Context> FetcherOutputProvider for Context
-// where
-//     Context: PriceFetcher,
-// {
-//     type ParsedResponse = PairPriceData;
-// }
+    let body = response.body();
+    serde_json::from_slice(body).map_err(Into::into)
+}
