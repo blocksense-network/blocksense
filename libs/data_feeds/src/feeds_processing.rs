@@ -123,6 +123,107 @@ impl BatchedAggegratesToSend {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct PublishedFeedUpdate {
+    pub feed_id: u32,
+    pub num_updates: u128,
+    pub value: FeedType,
+    pub published: Timestamp, // in seconds since UNIX_EPOCH
+}
+
+#[derive(Clone, Debug)]
+pub struct PublishedFeedUpdateError {
+    pub feed_id: u32,
+    pub num_updates: u128,
+    pub error: String,
+}
+
+impl PublishedFeedUpdate {
+    pub fn latest(
+        feed_id: u32,
+        variant: FeedType,
+        digits_in_fraction: usize,
+        data: &[u8],
+    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+        if data.len() != 64 {
+            return Err(PublishedFeedUpdate::error(
+                feed_id,
+                "Data size is not exactly 64 bytes",
+            ));
+        }
+        let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
+        let j2: [u8; 16] = data[48..64].try_into().expect("Impossible");
+        let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
+        let timestamp_u64 = u64::from_be_bytes(j3);
+        match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
+            Ok(latest) => Ok(PublishedFeedUpdate {
+                feed_id,
+                num_updates: u128::from_be_bytes(j2),
+                value: latest,
+                published: timestamp_u64 as u128,
+            }),
+            Err(msg) => Err(PublishedFeedUpdate::error(feed_id, &msg)),
+        }
+    }
+
+    pub fn error(feed_id: u32, message: &str) -> PublishedFeedUpdateError {
+        PublishedFeedUpdateError {
+            feed_id,
+            num_updates: 0,
+            error: message.to_owned(),
+        }
+    }
+
+    pub fn error_num_update(
+        feed_id: u32,
+        message: &str,
+        num_updates: u128,
+    ) -> PublishedFeedUpdateError {
+        let mut r = PublishedFeedUpdate::error(feed_id, message);
+        r.num_updates = num_updates;
+        r
+    }
+
+    pub fn nth(
+        feed_id: u32,
+        num_updates: u128,
+        variant: FeedType,
+        digits_in_fraction: usize,
+        data: &[u8],
+    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+        if data.len() != 32 {
+            return Err(PublishedFeedUpdate::error_num_update(
+                feed_id,
+                "Data size is not exactly 32 bytes",
+                num_updates,
+            ));
+        }
+        let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
+        let timestamp_u64 = u64::from_be_bytes(j3);
+        if timestamp_u64 == 0 {
+            return Err(PublishedFeedUpdate::error_num_update(
+                feed_id,
+                "Timestamp is zero",
+                num_updates,
+            ));
+        }
+        let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
+        match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
+            Ok(value) => Ok(PublishedFeedUpdate {
+                feed_id,
+                num_updates,
+                value,
+                published: timestamp_u64 as u128,
+            }),
+            Err(msg) => Err(PublishedFeedUpdate::error_num_update(
+                feed_id,
+                &msg,
+                num_updates,
+            )),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::time::SystemTime;
