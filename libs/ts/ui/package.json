@@ -15,7 +15,8 @@
     "./Label": "./src/components/Label/index.tsx",
     "./Switch": "./src/components/Switch/index.tsx",
     "./Card": "./src/components/Card/index.tsx",
-    "./Accordion": "./src/components/Accordion/index.tsx"
+    "./Accordion": "./src/components/Accordion/index.tsx",
+    "./Icon": "./src/components/Icon/index.tsx"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.7",
