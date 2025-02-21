@@ -21,7 +21,7 @@ use fetch_prices::fetch_all_prices;
 //3. Try to minimize object cloning.
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct CmcResource {
+struct CmcResource {
     pub cmc_id: String,
     pub cmc_quote: String,
 }
