@@ -9,13 +9,14 @@ import {
 import { Table } from '@tanstack/react-table';
 
 import { Button } from '@blocksense/ui/Button';
+
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/common/Select';
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
@@ -30,16 +31,16 @@ export function DataTablePagination<TData>({
         <p className="text-sm font-medium">Rows per page</p>
         <Select
           value={`${table.getState().pagination.pageSize}`}
-          onValueChange={(value: string) => {
+          onValueChangeAction={(value: string) => {
             table.setPageSize(Number(value));
           }}
         >
-          <SelectTrigger className="h-8 w-[70px] border-slate-200">
+          <SelectTrigger className="h-8 w-[70px] border-slate-200" side="top">
             <SelectValue placeholder={table.getState().pagination.pageSize} />
           </SelectTrigger>
-          <SelectContent side="top">
+          <SelectContent>
             {[10, 20, 30, 50, 100].map(pageSize => (
-              <SelectItem key={pageSize} value={`${pageSize}`}>
+              <SelectItem key={pageSize} value={`${pageSize}`} className="m-1">
                 {pageSize}
               </SelectItem>
             ))}
