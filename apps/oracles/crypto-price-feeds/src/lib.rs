@@ -28,12 +28,11 @@ struct CmcResource {
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    let mut results: HashMap<String, Vec<ResourceResult>> =
-        HashMap::<String, Vec<ResourceResult>>::new();
-
     let resources = get_resources_from_settings(settings)?;
 
+    let mut results: HashMap<String, Vec<ResourceResult>> = HashMap::new();
     fetch_all_prices(&resources, &mut results).await?;
+
     print_results(&resources, &results);
 
     let payload = process_results(results)?;
