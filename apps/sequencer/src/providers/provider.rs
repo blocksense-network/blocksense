@@ -258,7 +258,7 @@ impl RpcProvider {
         for update in updates.iter() {
             let feed_id = update.feed_id;
             self.history
-                .push(feed_id, update.value.clone(), update.end_slot_timestamp);
+                .push_next(feed_id, update.value.clone(), update.end_slot_timestamp);
         }
     }
 

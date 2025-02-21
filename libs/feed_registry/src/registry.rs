@@ -5,6 +5,7 @@ use std::{
 };
 
 use crate::types::{DataFeedPayload, FeedMetaData, FeedType, Repeatability, Timestamp};
+use chrono::{DateTime, TimeZone, Utc};
 use config::AllFeedsConfig;
 use ringbuf::{
     storage::Heap,
@@ -129,9 +130,18 @@ impl FeedReports {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct HistoryEntry {
     pub value: FeedType,
+    pub update_number: u128,
     pub end_slot_timestamp: Timestamp,
+}
+
+impl HistoryEntry {
+    pub fn get_date_time_published(&self) -> DateTime<Utc> {
+        Utc.timestamp_opt(self.end_slot_timestamp as i64, 0)
+            .unwrap()
+    }
 }
 
 pub struct FeedAggregateHistory {
@@ -165,11 +175,22 @@ impl FeedAggregateHistory {
         self.aggregate_history.contains_key(&feed_id)
     }
 
-    pub fn collect(&self, feed_id: u32) -> Option<&SharedRb<Heap<HistoryEntry>>> {
+    pub fn get(&self, feed_id: u32) -> Option<&SharedRb<Heap<HistoryEntry>>> {
         self.aggregate_history.get(&feed_id)
     }
 
-    pub fn push(
+    pub fn get_mut(&mut self, feed_id: u32) -> Option<&mut SharedRb<Heap<HistoryEntry>>> {
+        self.aggregate_history.get_mut(&feed_id)
+    }
+
+    pub fn clear(&mut self, feed_id: u32) -> usize {
+        match self.aggregate_history.get_mut(&feed_id) {
+            Some(feed) => feed.clear(),
+            _ => 0_usize,
+        }
+    }
+
+    pub fn push_next(
         &mut self,
         feed_id: u32,
         aggregate_result: FeedType,
@@ -177,8 +198,10 @@ impl FeedAggregateHistory {
     ) {
         if let Some(rb) = self.aggregate_history.get_mut(&feed_id) {
             // Push the aggregate_result into the ring buffer
+            let update_number = rb.last().map_or(0, |x| x.update_number + 1);
             rb.push_overwrite(HistoryEntry {
                 value: aggregate_result,
+                update_number,
                 end_slot_timestamp,
             });
         } else {

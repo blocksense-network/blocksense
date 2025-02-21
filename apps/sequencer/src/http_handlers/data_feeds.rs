@@ -1153,7 +1153,7 @@ pub mod tests {
                 .expect("Unknown error")
                 .as_millis()
                 + 300_u128 * 10_u128;
-            history.push(feed_id, feed_value, end_slot_timestamp);
+            history.push_next(feed_id, feed_value, end_slot_timestamp);
         }
 
         // Initialize the service
@@ -1218,27 +1218,27 @@ pub mod tests {
             let feed_id = 1_u32;
             history.register_feed(feed_id, 3);
 
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(102754.2f64),
                 end_slot_timestamp + 300_u128 * 0,
             );
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(122756.7f64),
                 end_slot_timestamp + 300_u128 * 1,
             );
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(102753.0f64),
                 end_slot_timestamp + 300_u128 * 2,
             );
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(102244.3f64),
                 end_slot_timestamp + 300_u128 * 3,
             );
-            history.push(
+            history.push_next(
                 feed_id,
                 FeedType::Numerical(112754.2f64),
                 end_slot_timestamp + 300_u128 * 4,

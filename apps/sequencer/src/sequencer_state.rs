@@ -74,7 +74,10 @@ impl SequencerState {
             })
             .collect();
         let provider_status = Arc::new(RwLock::new(provider_status));
-
+        let mut history = FeedAggregateHistory::new();
+        for feed in &feeds_config.feeds {
+            history.register_feed(feed.id, 100);
+        }
         SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
                 &feeds_config,
@@ -97,7 +100,7 @@ impl SequencerState {
                     .collect(),
             )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
-            feed_aggregate_history: Arc::new(RwLock::new(FeedAggregateHistory::new())),
+            feed_aggregate_history: Arc::new(RwLock::new(history)),
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
             blockchain_db: Arc::new(RwLock::new(InMemDb::new())),

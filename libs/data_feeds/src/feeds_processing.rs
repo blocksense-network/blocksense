@@ -194,7 +194,7 @@ mod tests {
             false
         );
 
-        history.push(
+        history.push_next(
             feed_id,
             FeedType::Numerical(1000.0f64),
             end_slot_timestamp - 1000_u128,
@@ -209,7 +209,7 @@ mod tests {
             false
         );
 
-        history.push(
+        history.push_next(
             feed_id,
             FeedType::Numerical(1000.0f64),
             end_slot_timestamp - 900_u128,
