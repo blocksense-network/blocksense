@@ -14,9 +14,5 @@ export const ImageWrapper = ({
   className = ' ',
   onClick,
 }: ImageProps) => {
-  return (
-    <div className={`${className}`} onClick={onClick}>
-      <Image src={src} alt={alt} fill quality={50} />
-    </div>
-  );
+  return <img src={src} alt={alt} className={className} onClick={onClick} />;
 };
