@@ -3,6 +3,7 @@
   "type": "module",
   "exports": {
     "./style.css": "./dist/style.css",
+    "./globals.css": "./globals.css",
     ".": "./src/index.tsx",
     "./Button": "./src/components/Button/index.tsx",
     "./Input": "./src/components/Input/index.tsx",
