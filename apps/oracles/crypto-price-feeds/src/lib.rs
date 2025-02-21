@@ -50,15 +50,15 @@ fn vwap(results: &Vec<ResourceResult>) -> Result<f64> {
 }
 
 fn process_results(results: HashMap<String, Vec<ResourceResult>>) -> Result<Payload> {
-    let mut payload: Payload = Payload::new();
-    for (feed_id, results) in results.iter() {
-        payload.values.push(match vwap(results) {
+    let mut payload = Payload::new();
+    for (feed_id, results) in results.into_iter() {
+        payload.values.push(match vwap(&results) {
             Ok(price) => DataFeedResult {
-                id: feed_id.clone(),
+                id: feed_id,
                 value: DataFeedResultValue::Numerical(price),
             },
             Err(err) => DataFeedResult {
-                id: feed_id.clone(),
+                id: feed_id,
                 value: DataFeedResultValue::Error(err.to_string()),
             },
         });
