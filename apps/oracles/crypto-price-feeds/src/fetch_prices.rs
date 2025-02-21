@@ -92,23 +92,22 @@ pub async fn fetch_all_prices(
 }
 
 fn fill_results(
-    resources: &Vec<ResourceData>,
+    resources: &[ResourceData],
     results: &mut HashMap<String, Vec<ResourceResult>>,
-    response: HashMap<String, String>,
+    prices: PairPriceData,
 ) -> Result<()> {
     //TODO(adikov): We need a proper way to get trade volume from Binance API.
     for resource in resources {
         // First USD pair found.
-        for symbol in USD_SYMBOLS {
-            let quote = format!("{}{}", resource.symbol, symbol);
-            if response.contains_key(&quote) {
-                //TODO(adikov): remove unwrap
+        for quote in USD_SYMBOLS {
+            let trading_pair = format!("{}{}", resource.symbol, quote);
+            if let Some(price) = prices.get(&trading_pair) {
                 let res = results.entry(resource.id.clone()).or_default();
                 res.push(ResourceResult {
                     id: resource.id.clone(),
                     symbol: resource.symbol.clone(),
-                    usd_symbol: symbol.to_string(),
-                    result: response.get(&quote).unwrap().clone(),
+                    usd_symbol: quote.to_owned(),
+                    result: price.clone(),
                 });
                 break;
             }
