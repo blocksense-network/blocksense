@@ -92,6 +92,100 @@ pub fn naive_packing(feed_result: &FeedType, digits_in_fraction: usize) -> Vec<u
     feed_result.as_bytes(digits_in_fraction)
 }
 
+#[derive(Debug)]
+pub struct PublishedFeedUpdate {
+    pub feed_id: u32,
+    pub num_updates: u128,
+    pub value: Option<FeedType>,
+    pub published: Timestamp, // in seconds since UNIX_EPOCH
+    pub error: Option<String>,
+}
+
+impl PublishedFeedUpdate {
+    pub fn latest(
+        feed_id: u32,
+        variant: FeedType,
+        digits_in_fraction: usize,
+        data: &[u8],
+    ) -> PublishedFeedUpdate {
+        if data.len() != 64 {
+            return PublishedFeedUpdate::error(
+                feed_id,
+                "Data published per feed update should be exactrly 64 bytes",
+            );
+        }
+        let j1: [u8; 32] = data[0..32].try_into().expect("Imposible");
+        let j2: [u8; 16] = data[48..64].try_into().expect("Imposible");
+        let j3: [u8; 8] = data[24..32].try_into().expect("Imposible");
+        let timestamp_u64 = u64::from_be_bytes(j3);
+        match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
+            Ok(latest) => PublishedFeedUpdate {
+                feed_id,
+                num_updates: u128::from_be_bytes(j2),
+                value: Some(latest),
+                published: timestamp_u64 as u128,
+                error: None,
+            },
+            Err(msg) => PublishedFeedUpdate::error(feed_id, &msg),
+        }
+    }
+
+    pub fn none(feed_id: u32) -> PublishedFeedUpdate {
+        PublishedFeedUpdate {
+            feed_id,
+            num_updates: 0,
+            value: None,
+            published: 0,
+            error: None,
+        }
+    }
+
+    pub fn error(feed_id: u32, message: &str) -> PublishedFeedUpdate {
+        PublishedFeedUpdate {
+            feed_id,
+            num_updates: 0,
+            value: None,
+            published: 0,
+            error: Some(message.to_string()),
+        }
+    }
+
+    pub fn error_num_update(feed_id: u32, message: &str, num_updates: u128) -> PublishedFeedUpdate {
+        let mut r = PublishedFeedUpdate::error(feed_id, message);
+        r.num_updates = num_updates;
+        r
+    }
+
+    pub fn nth(
+        feed_id: u32,
+        num_updates: u128,
+        variant: FeedType,
+        digits_in_fraction: usize,
+        data: &[u8],
+    ) -> PublishedFeedUpdate {
+        if data.len() != 32 {
+            return PublishedFeedUpdate::error_num_update(feed_id, "Not availble", num_updates);
+        }
+        let j3: [u8; 8] = data[24..32].try_into().expect("Imposible");
+        let timestamp_u64 = u64::from_be_bytes(j3);
+        if timestamp_u64 == 0 {
+            return PublishedFeedUpdate::error_num_update(feed_id, "Not availble", num_updates);
+        }
+        let j1: [u8; 32] = data[0..32].try_into().expect("Imposible");
+        //let digits_in_fraction = 18_usize;
+        match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
+            Ok(value) => PublishedFeedUpdate {
+                feed_id,
+                num_updates,
+                value: Some(value),
+                published: timestamp_u64 as u128,
+                error: None,
+            },
+            Err(msg) => PublishedFeedUpdate::error_num_update(feed_id, &msg, num_updates),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::time::SystemTime;

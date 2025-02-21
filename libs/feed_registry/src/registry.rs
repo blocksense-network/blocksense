@@ -196,10 +196,10 @@ impl FeedAggregateHistory {
         aggregate_result: FeedType,
         end_slot_timestamp: Timestamp,
     ) {
-        if let Some(rb) = self.aggregate_history.get_mut(&feed_id) {
+        if let Some(ring_buffer) = self.aggregate_history.get_mut(&feed_id) {
             // Push the aggregate_result into the ring buffer
-            let update_number = rb.last().map_or(0, |x| x.update_number + 1);
-            rb.push_overwrite(HistoryEntry {
+            let update_number = ring_buffer.last().map_or(0, |x| x.update_number + 1);
+            ring_buffer.push_overwrite(HistoryEntry {
                 value: aggregate_result,
                 update_number,
                 end_slot_timestamp,
@@ -213,8 +213,8 @@ impl FeedAggregateHistory {
     }
 
     pub fn last(&self, feed_id: u32) -> Option<&HistoryEntry> {
-        if let Some(rb) = self.aggregate_history.get(&feed_id) {
-            rb.last()
+        if let Some(ring_buffer) = self.aggregate_history.get(&feed_id) {
+            ring_buffer.last()
         } else {
             info!(
                 "Feed Id: {}, not registered in FeedAggregateHistory!",

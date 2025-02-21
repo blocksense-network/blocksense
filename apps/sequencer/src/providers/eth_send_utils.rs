@@ -599,7 +599,7 @@ mod tests {
     use super::*;
 
     use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
-    use crate::providers::provider::init_shared_rpc_providers;
+    use crate::providers::provider::{init_shared_rpc_providers, MULTICALL_CONTRACT_NAME};
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
@@ -609,10 +609,13 @@ mod tests {
     };
     use config::{AllFeedsConfig, PublishCriteria};
     use data_feeds::feeds_processing::VotedFeedUpdate;
+    use feed_registry::registry::HistoryEntry;
     use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
+    use ringbuf::traits::Consumer;
     use std::str::FromStr;
     use std::time::SystemTime;
+    use std::time::UNIX_EPOCH;
     use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
@@ -942,6 +945,230 @@ mod tests {
         // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
         // followups
         assert!(result.is_ok());
+    }
+
+    #[actix_web::test]
+    async fn test_eth_batch_send_to_multidata_contracts_and_read_value() {
+        let metrics_prefix = "test_eth_batch_send_to_multidata_contracts_and_read_value";
+
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
+        /////////////////////////////////////////////////////////////////////
+
+        // setup
+        let key_path = get_test_private_key_path();
+        let anvil_network1 = Anvil::new().try_spawn().unwrap();
+        let network1 = "ETH17787";
+        let sequencer_config = get_test_config_with_multiple_providers(vec![(
+            network1,
+            key_path.as_path(),
+            anvil_network1.endpoint().as_str(),
+        )]);
+
+        let mut feed = some_feed_config_with_id_1();
+        feed.report_interval_ms = 1000; // 1 secound
+        let feeds_config: AllFeedsConfig = AllFeedsConfig {
+            feeds: vec![feed.clone()],
+        };
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
+            metrics_prefix,
+            feeds_config,
+        )
+        .await;
+
+        // run
+        let msg = sequencer_state
+            .deploy_contract(network1, PRICE_FEED_CONTRACT_NAME)
+            .await
+            .expect("Data feed publishing contract deployment failed!");
+        // assert
+        // validate contract was deployed at expected address
+        let extracted_address = extract_address(&msg).expect("Did not return valid eth address");
+        let contract_address =
+            Address::parse_checksummed(&extracted_address, None).expect("valid checksum");
+
+        {
+            let providers = sequencer_state.providers.read().await;
+            let p = providers.get(network1).unwrap().lock().await;
+            let nonce = p.provider.get_transaction_count(contract_address).await;
+            assert!(nonce.is_ok());
+            assert_eq!(nonce.unwrap(), 1);
+        }
+        {
+            let providers = sequencer_state.providers.read().await;
+            let mut p = providers.get(network1).unwrap().lock().await;
+            p.history.register_feed(feed.id, 100);
+        }
+        {
+            // Some arbitrart point in time in the past, nothing special about this value
+            let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
+            let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
+            let v1 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(103082.01f64),
+                end_slot_timestamp: end_slot_timestamp + (feed.report_interval_ms as u128) * 1,
+            };
+            let v2 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(103012.21f64),
+                end_slot_timestamp: end_slot_timestamp + (feed.report_interval_ms as u128) * 2,
+            };
+
+            let v3 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(104011.78f64),
+                end_slot_timestamp: end_slot_timestamp + (feed.report_interval_ms as u128) * 3,
+            };
+
+            let updates1 = BatchedAggegratesToSend {
+                block_height: 0,
+                updates: vec![v1],
+                proofs: HashMap::new(),
+            };
+            let updates2 = BatchedAggegratesToSend {
+                block_height: 1,
+                updates: vec![v2],
+                proofs: HashMap::new(),
+            };
+            let updates3 = BatchedAggegratesToSend {
+                block_height: 2,
+                updates: vec![v3],
+                proofs: HashMap::new(),
+            };
+
+            let p1 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates1, Periodic).await;
+            assert!(p1.is_ok());
+
+            let p2 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates2, Periodic).await;
+            assert!(p2.is_ok());
+
+            let p3 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates3, Periodic).await;
+            assert!(p3.is_ok());
+        }
+
+        let msg = sequencer_state
+            .deploy_contract(network1, MULTICALL_CONTRACT_NAME)
+            .await
+            .expect("Mutlicall contract deployment failed!");
+        let _extracted_address = extract_address(&msg).expect("Did not return valid eth address");
+        {
+            let p = sequencer_state.get_provider(network1).await.unwrap();
+            let p_lock = p.lock().await;
+
+            let latest = p_lock
+                .get_latest_values(&[feed.id])
+                .await
+                .expect("Can't get latest values from contract");
+            assert_eq!(latest.len(), 1);
+            assert_eq!(latest[0].feed_id, 1_u32);
+            assert_eq!(latest[0].num_updates, 3_u128);
+            assert_eq!(latest[0].value, Some(FeedType::Numerical(104011.78f64)));
+
+            let history = p_lock
+                .get_historical_values_for_feed(feed.id, &[0_u128, 1_u128, 2_u128, 3_u128, 4_u128])
+                .await
+                .expect("Error when reading historical values from contract!");
+
+            assert_eq!(history.len(), 5);
+
+            assert_eq!(history[0].feed_id, 1_u32);
+            assert_eq!(history[1].feed_id, 1_u32);
+            assert_eq!(history[2].feed_id, 1_u32);
+            assert_eq!(history[3].feed_id, 1_u32);
+            assert_eq!(history[4].feed_id, 1_u32);
+
+            assert_eq!(history[0].value, None);
+            assert_eq!(history[1].value, Some(FeedType::Numerical(103082.01f64)));
+            assert_eq!(history[2].value, Some(FeedType::Numerical(103012.21f64)));
+            assert_eq!(history[3].value, Some(FeedType::Numerical(104011.78f64)));
+            assert_eq!(history[4].value, None);
+
+            assert_eq!(history[0].num_updates, 0_u128);
+            assert_eq!(history[1].num_updates, 1_u128);
+            assert_eq!(history[2].num_updates, 2_u128);
+            assert_eq!(history[3].num_updates, 3_u128);
+            assert_eq!(history[4].num_updates, 4_u128);
+
+            assert_eq!(history[0].published, 0_u128);
+            assert_ne!(history[1].published, 0_u128);
+            assert_ne!(history[2].published, 0_u128);
+            assert_ne!(history[3].published, 0_u128);
+            assert_eq!(history[4].published, 0_u128);
+        }
+
+        {
+            let provider = sequencer_state
+                .get_provider(network1)
+                .await
+                .expect("Provider should be available");
+            let mut p_lock = provider.lock().await;
+            let num_cleared = p_lock.history.clear(feed.id);
+            assert_eq!(num_cleared, 3);
+            let limit = 2_u32;
+            let num_loaded = p_lock
+                .load_history_from_chain(feed.id, limit)
+                .await
+                .unwrap();
+            assert_eq!(num_loaded, 2);
+
+            let v = p_lock
+                .history
+                .get(feed.id)
+                .expect("Give me history")
+                .iter()
+                .cloned()
+                .collect::<Vec<HistoryEntry>>();
+            assert_eq!(v.len(), 2);
+            assert_eq!(v[0].update_number, 2_u128);
+            assert_eq!(v[0].value, FeedType::Numerical(103012.21f64));
+            assert_eq!(v[1].update_number, 3_u128);
+            assert_eq!(v[1].value, FeedType::Numerical(104011.78f64));
+        }
+
+        {
+            let provider = sequencer_state
+                .get_provider(network1)
+                .await
+                .expect("Provider should be available");
+            let mut p_lock = provider.lock().await;
+
+            let limit = 200_u32;
+
+            // Make sure the values are not loaded more then once in history
+            let num_loaded = p_lock
+                .load_history_from_chain(feed.id, limit)
+                .await
+                .unwrap();
+            assert_eq!(num_loaded, 0);
+
+            let v = p_lock
+                .history
+                .get(feed.id)
+                .expect("Give me history")
+                .iter()
+                .cloned()
+                .collect::<Vec<HistoryEntry>>();
+            assert_eq!(v.len(), 2);
+            assert_eq!(v[0].update_number, 2_u128);
+            assert_eq!(v[0].value, FeedType::Numerical(103012.21f64));
+            assert_eq!(v[1].update_number, 3_u128);
+            assert_eq!(v[1].value, FeedType::Numerical(104011.78f64));
+            // The date and time  of publishing is determined by the smart contarct, so we don't have control of this value
+            info!(
+                "Historical update {} publish date {:?}",
+                v[0].update_number,
+                v[0].get_date_time_published()
+            );
+            info!(
+                "Historical update {} publish date {:?}",
+                v[1].update_number,
+                v[1].get_date_time_published()
+            );
+        }
     }
 
     #[tokio::test]
