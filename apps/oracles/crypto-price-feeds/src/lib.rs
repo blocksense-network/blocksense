@@ -26,27 +26,30 @@ pub struct CmcResource {
     pub cmc_quote: String,
 }
 
-fn vwap(results: &Vec<ResourceResult>) -> Result<f64> {
-    if results.is_empty() {
-        bail!("Missing results");
+#[oracle_component]
+async fn oracle_request(settings: Settings) -> Result<Payload> {
+    let mut resources: Vec<ResourceData> = vec![];
+    let mut results: HashMap<String, Vec<ResourceResult>> =
+        HashMap::<String, Vec<ResourceResult>>::new();
+    // let mut ids: Vec<String> = vec![];
+    //TODO(adikov): Make sure citrea feeds exist so that we can properly test.
+    // let citrea_feeds = vec!["BTCUSD", "ETHUSD", "EURCUSD", "USDTUSD", "USDCUSD", "PAXGUSD", "TBTCUSD", "WBTCUSD", "WSTETHUSD"];
+    for feed in settings.data_feeds.iter() {
+        let data: CmcResource = serde_json::from_str(&feed.data)
+            .context("Couldn't parse Data Feed resource properly")?;
+        resources.push(ResourceData {
+            symbol: data.cmc_quote.clone(),
+            id: feed.id.clone(),
+        });
     }
 
-    //TODO(adikov): Implement vwap logic here.
-    // Assume a five-minute chart. The calculation is the same regardless of what intraday time frame is used.
-    // 1. Find the average price the stock traded at over the first five-minute period of the day.
-    //    To do this, add the high, low, and close, then divide by three.
-    //    Multiply this by the volume for that period. Record the result in a spreadsheet, under column PV (price, volume).
-    // 2. Divide PV by the volume for that period. This will produce the VWAP.
-    // 3. To maintain the VWAP throughout the day, continue to add the PV value from each period to the prior values.
-    //    Divide this total by the total volume up to that point.
-    //
-    //   THIS IS NOT THE PROPER IMPLEMENTATION IT IS FOR TEST PURPOSES
-    let mut sum: f64 = 0.0f64;
-    for res in results {
-        sum += res.result.parse::<f64>()?;
-    }
+    fetch_all_prices(&resources, &mut results).await?;
+    print_results(&resources, &results);
 
-    Ok(sum / results.len() as f64)
+    let payload = process_results(results)?;
+    println!("Final Payload - {:?}", payload.values);
+
+    Ok(payload)
 }
 
 fn process_results(results: HashMap<String, Vec<ResourceResult>>) -> Result<Payload> {
@@ -83,28 +86,25 @@ fn print_results(resources: &Vec<ResourceData>, results: &HashMap<String, Vec<Re
     println!("(id-echange_count): {}]", print);
 }
 
-#[oracle_component]
-async fn oracle_request(settings: Settings) -> Result<Payload> {
-    let mut resources: Vec<ResourceData> = vec![];
-    let mut results: HashMap<String, Vec<ResourceResult>> =
-        HashMap::<String, Vec<ResourceResult>>::new();
-    // let mut ids: Vec<String> = vec![];
-    //TODO(adikov): Make sure citrea feeds exist so that we can properly test.
-    // let citrea_feeds = vec!["BTCUSD", "ETHUSD", "EURCUSD", "USDTUSD", "USDCUSD", "PAXGUSD", "TBTCUSD", "WBTCUSD", "WSTETHUSD"];
-    for feed in settings.data_feeds.iter() {
-        let data: CmcResource = serde_json::from_str(&feed.data)
-            .context("Couldn't parse Data Feed resource properly")?;
-        resources.push(ResourceData {
-            symbol: data.cmc_quote.clone(),
-            id: feed.id.clone(),
-        });
+fn vwap(results: &Vec<ResourceResult>) -> Result<f64> {
+    if results.is_empty() {
+        bail!("Missing results");
     }
 
-    fetch_all_prices(&resources, &mut results).await?;
-    print_results(&resources, &results);
+    //TODO(adikov): Implement vwap logic here.
+    // Assume a five-minute chart. The calculation is the same regardless of what intraday time frame is used.
+    // 1. Find the average price the stock traded at over the first five-minute period of the day.
+    //    To do this, add the high, low, and close, then divide by three.
+    //    Multiply this by the volume for that period. Record the result in a spreadsheet, under column PV (price, volume).
+    // 2. Divide PV by the volume for that period. This will produce the VWAP.
+    // 3. To maintain the VWAP throughout the day, continue to add the PV value from each period to the prior values.
+    //    Divide this total by the total volume up to that point.
+    //
+    //   THIS IS NOT THE PROPER IMPLEMENTATION IT IS FOR TEST PURPOSES
+    let mut sum: f64 = 0.0f64;
+    for res in results {
+        sum += res.result.parse::<f64>()?;
+    }
 
-    let payload = process_results(results)?;
-    println!("Final Payload - {:?}", payload.values);
-
-    Ok(payload)
+    Ok(sum / results.len() as f64)
 }
