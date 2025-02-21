@@ -68,15 +68,13 @@ fn fill_results(
         // First USD pair found.
         for quote in USD_SYMBOLS {
             let trading_pair = format!("{}{}", resource.symbol, quote);
-            // TODO: Use get
-            if prices.contains_key(&trading_pair) {
-                //TODO(adikov): remove unwrap
+            if let Some(price) = prices.get(&trading_pair) {
                 let res = results.entry(resource.id.clone()).or_default();
                 res.push(ResourceResult {
                     id: resource.id.clone(),
                     symbol: resource.symbol.clone(),
-                    usd_symbol: quote.to_string(),
-                    result: prices.get(&trading_pair).unwrap().clone(),
+                    usd_symbol: quote.to_owned(),
+                    result: price.clone(),
                 });
                 break;
             }

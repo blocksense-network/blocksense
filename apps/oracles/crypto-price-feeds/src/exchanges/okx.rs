@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{anyhow, Context, Result};
 use futures::{
     future::LocalBoxFuture,
     stream::{FuturesUnordered, StreamExt},
@@ -50,15 +50,14 @@ impl<'a> OKXPriceFetcher<'a> {
 }
 
 async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, String)> {
-    // TODO: Refactor this
     let url = format!("https://www.okx.com/api/v5/market/index-tickers?instId={symbol}");
-    let data = http_get_json::<OKXTickerResponse>(&url, None).await?;
+    let response = http_get_json::<OKXTickerResponse>(&url, None).await?;
 
-    let data = data.data.first().ok_or(anyhow::anyhow!("No data"))?;
-    // TODO: get rid of this clone by partially moving data
-    let data = (data.inst_id.clone(), data.idx_px.clone());
-
-    Ok(data)
+    response
+        .data
+        .first()
+        .context("No data")
+        .map(|data| (data.inst_id.clone(), data.idx_px.clone()))
 }
 
 impl PricesFetcher for OKXPriceFetcher<'_> {
