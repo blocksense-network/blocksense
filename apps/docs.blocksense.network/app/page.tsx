@@ -25,11 +25,6 @@ const IndexPage: FC = () => {
             className="bg-neutral-100 hover:bg-neutral-900 hover:text-white"
             content="Get Started"
           />
-          <Button
-            href="/docs/overview/roadmap"
-            content="Roadmap"
-            className="hidden"
-          />
         </div>
       </article>
     </section>
