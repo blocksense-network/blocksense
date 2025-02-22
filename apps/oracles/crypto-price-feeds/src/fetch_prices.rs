@@ -7,6 +7,7 @@ use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
     common::{PairPriceData, ResourceData, ResourceResult, USD_SYMBOLS},
+    exchanges::binance::BinancePriceFetcher,
     traits::prices_fetcher::PricesFetcher,
 };
 
@@ -14,7 +15,8 @@ pub async fn fetch_all_prices(
     resources: &[ResourceData],
     results: &mut HashMap<String, Vec<ResourceResult>>,
 ) -> Result<()> {
-    let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[];
+    let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] =
+        &[("Binance", Box::new(BinancePriceFetcher))];
 
     let mut futures_set = FuturesUnordered::from_iter(
         tagged_fetchers

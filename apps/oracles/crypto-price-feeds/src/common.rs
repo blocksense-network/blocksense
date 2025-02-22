@@ -57,7 +57,6 @@ pub trait Fetcher {
 
 pub type QueryParam<'a, 'b> = (&'a str, &'b str);
 
-#[allow(dead_code)]
 pub fn prepare_get_request(
     base_url: &str,
     params: Option<&[QueryParam<'_, '_>]>,
@@ -75,7 +74,6 @@ pub fn prepare_get_request(
     Ok(req.build())
 }
 
-#[allow(dead_code)]
 pub async fn http_get_json<T>(url: &str, params: Option<&[QueryParam<'_, '_>]>) -> Result<T>
 where
     T: DeserializeOwned,
