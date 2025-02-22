@@ -1,24 +1,31 @@
 use anyhow::Result;
 
-use std::collections::HashMap;
 use std::time::Instant;
+use std::{collections::HashMap, future::Future};
 
-use futures::{
-    future::LocalBoxFuture,
-    stream::{FuturesUnordered, StreamExt},
+use futures::stream::{FuturesUnordered, StreamExt};
+
+use crate::{
+    common::{PairPriceData, ResourceData, ResourceResult, USD_SYMBOLS},
+    traits::prices_fetcher::PricesFetcher,
 };
-
-use crate::common::{PairPriceData, ResourceData, ResourceResult, USD_SYMBOLS};
 
 pub async fn fetch_all_prices(
     resources: &[ResourceData],
     results: &mut HashMap<String, Vec<ResourceResult>>,
 ) -> Result<()> {
-    let mut futures = FuturesUnordered::<LocalBoxFuture<Result<(String, PairPriceData)>>>::new();
+    let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[];
+
+    let mut futures_set = FuturesUnordered::from_iter(
+        tagged_fetchers
+            .iter()
+            .map(|(exchange_id, fetcher)| try_tag_future(exchange_id, fetcher.fetch())),
+    );
+
     let start = Instant::now();
 
     // Process results as they complete
-    while let Some(result) = futures.next().await {
+    while let Some(result) = futures_set.next().await {
         match result {
             Ok((exchange_id, prices)) => {
                 println!(
@@ -64,4 +71,11 @@ fn fill_results(
     }
 
     Ok(())
+}
+
+async fn try_tag_future<T>(
+    tag: &str,
+    future: impl Future<Output = Result<T>>,
+) -> Result<(&str, T)> {
+    Ok((tag, future.await?))
 }
