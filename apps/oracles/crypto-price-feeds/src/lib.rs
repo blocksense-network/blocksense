@@ -5,10 +5,8 @@ mod traits;
 mod vwap;
 
 use anyhow::{Context, Result};
-// use async_trait::async_trait;
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
-    // price_pair::{DataProvider, OraclePriceHelper},
     oracle_component,
 };
 use serde::Deserialize;
