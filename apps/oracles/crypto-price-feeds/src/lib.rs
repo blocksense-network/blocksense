@@ -94,5 +94,5 @@ fn print_results(
     for (id, results) in results {
         print.push_str(&format!("({}-{}),", id, results.len()).to_string());
     }
-    println!("(id-echange_count): {}]", print);
+    println!("(id-exchange_count): {}]", print);
 }
