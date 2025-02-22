@@ -1,10 +1,13 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Response};
 
+use futures::{future::LocalBoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer};
 use serde_json::{from_value, Value};
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::{
+    common::{http_get_json, PairPriceData},
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct TradingPairTicker {
@@ -90,41 +93,25 @@ impl<'de> Deserialize<'de> for BitfinexPriceResponseData {
     }
 }
 
-type BitfinexPricesResponse = Vec<BitfinexPriceResponseData>;
+pub struct BitfinexPriceFetcher;
 
-struct BitfinexPriceFetcher;
-impl Fetcher for BitfinexPriceFetcher {
-    type ParsedResponse = PairPriceData;
-    type ApiResponse = BitfinexPricesResponse;
+impl PricesFetcher for BitfinexPriceFetcher {
+    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
+        async {
+            let response = http_get_json::<Vec<BitfinexPriceResponseData>>(
+                "https://api-pub.bitfinex.com/v2/tickers?symbols=ALL",
+                None,
+            )
+            .await?;
 
-    fn parse_response(&self, value: BitfinexPricesResponse) -> Result<Self::ParsedResponse> {
-        let trading_tickers: Vec<TradingPairTicker> = value
-            .into_iter()
-            .filter_map(|ticker| {
-                if let BitfinexPriceResponseData::Trading(trading) = ticker {
-                    Some(trading)
-                } else {
-                    None
-                }
-            })
-            .collect();
-
-        let response: Self::ParsedResponse = trading_tickers
-            .into_iter()
-            .map(|value| (value.symbol().to_string(), value.price().to_string()))
-            .collect();
-
-        Ok(response)
+            Ok(response
+                .into_iter()
+                .filter_map(|ticker| match ticker {
+                    BitfinexPriceResponseData::Trading(data) => Some((data.symbol(), data.price())),
+                    _ => None,
+                })
+                .collect())
+        }
+        .boxed_local()
     }
-}
-
-pub async fn get_bitfinex_prices() -> Result<PairPriceData> {
-    let fetcher = BitfinexPriceFetcher {};
-    let req =
-        fetcher.prepare_get_request("https://api-pub.bitfinex.com/v2/tickers?symbols=ALL", None)?;
-    let resp: Response = send(req).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
 }
