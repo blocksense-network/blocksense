@@ -17,8 +17,7 @@ use crate::{
 
 pub async fn fetch_all_prices(
     resources: &[ResourceData],
-    results: &mut HashMap<String, Vec<ResourceResult>>,
-) -> Result<()> {
+) -> Result<HashMap<String, Vec<ResourceResult>>> {
     let symbols = load_exchange_symbols(resources).await?;
 
     let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[
@@ -35,6 +34,7 @@ pub async fn fetch_all_prices(
     );
 
     let start = Instant::now();
+    let mut results = HashMap::new();
 
     // Process results as they complete
     while let Some(result) = futures_set.next().await {
@@ -44,7 +44,7 @@ pub async fn fetch_all_prices(
                     "ℹ️  Successfully fetched prices from {exchange_id} in {:?}",
                     start.elapsed()
                 );
-                fill_results(resources, results, prices).unwrap_or_else(|err| {
+                fill_results(resources, &mut results, prices).unwrap_or_else(|err| {
                     println!("❌ Error filling results for {exchange_id}: {err:?}");
                 });
             }
@@ -56,7 +56,7 @@ pub async fn fetch_all_prices(
 
     println!("🕛 All prices fetched in {:?}", start.elapsed());
 
-    Ok(())
+    Ok(results)
 }
 
 fn fill_results(

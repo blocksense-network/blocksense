@@ -34,9 +34,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let resources = get_resources_from_settings(settings)?;
 
-    let mut results: HashMap<String, Vec<ResourceResult>> = HashMap::new();
-    fetch_all_prices(&resources, &mut results).await?;
-
+    let results = fetch_all_prices(&resources).await?;
     print_results(&resources, &results);
 
     let payload = process_results(results)?;
