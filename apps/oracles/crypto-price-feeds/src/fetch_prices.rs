@@ -7,7 +7,9 @@ use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
     common::{PairPriceData, ResourceData, ResourceResult, USD_SYMBOLS},
-    exchanges::{binance::BinancePriceFetcher, bitfinex::BitfinexPriceFetcher},
+    exchanges::{
+        binance::BinancePriceFetcher, bitfinex::BitfinexPriceFetcher, bitget::BitgetFetcher,
+    },
     traits::prices_fetcher::PricesFetcher,
 };
 
@@ -18,6 +20,7 @@ pub async fn fetch_all_prices(
     let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[
         ("Binance", Box::new(BinancePriceFetcher)),
         ("Bitfinex", Box::new(BitfinexPriceFetcher)),
+        ("Bitget", Box::new(BitgetFetcher)),
     ];
 
     let mut futures_set = FuturesUnordered::from_iter(
