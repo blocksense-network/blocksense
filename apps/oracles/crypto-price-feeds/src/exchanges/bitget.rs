@@ -1,9 +1,12 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Response};
 
+use futures::FutureExt;
 use serde::Deserialize;
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::{
+    common::{http_get_json, PairPriceData},
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct BitgetPriceData {
@@ -16,30 +19,23 @@ pub struct BitgetPriceResponse {
     pub code: String,
     pub data: Vec<BitgetPriceData>,
 }
-struct BitgetFetcher;
+pub struct BitgetFetcher;
 
-impl Fetcher for BitgetFetcher {
-    type ParsedResponse = PairPriceData;
-    type ApiResponse = BitgetPriceResponse;
+impl PricesFetcher for BitgetFetcher {
+    fn fetch(&self) -> futures::future::LocalBoxFuture<Result<PairPriceData>> {
+        async {
+            let response = http_get_json::<BitgetPriceResponse>(
+                "https://api.bitget.com/api/spot/v1/market/tickers",
+                None,
+            )
+            .await?;
 
-    fn parse_response(&self, value: BitgetPriceResponse) -> Result<Self::ParsedResponse> {
-        let response: Self::ParsedResponse = value
-            .data
-            .into_iter()
-            .map(|value| (value.symbol, value.close))
-            .collect();
-
-        Ok(response)
+            Ok(response
+                .data
+                .into_iter()
+                .map(|value| (value.symbol, value.close))
+                .collect())
+        }
+        .boxed_local()
     }
-}
-
-pub async fn get_bitget_prices() -> Result<PairPriceData> {
-    let fetcher = BitgetFetcher {};
-    let req =
-        fetcher.prepare_get_request("https://api.bitget.com/api/spot/v1/market/tickers", None);
-    let resp: Response = send(req?).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
 }
