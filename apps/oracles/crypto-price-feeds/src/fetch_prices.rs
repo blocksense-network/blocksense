@@ -6,7 +6,7 @@ use std::{collections::HashMap, future::Future};
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
-    common::{PairPriceData, ResourceData, ResourceResult, USD_SYMBOLS},
+    common::{PairPriceData, ResourceData, ResourceResult, TradingPair, USD_SYMBOLS},
     exchanges::{
         binance::BinancePriceFetcher, bitfinex::BitfinexPriceFetcher, bitget::BitgetFetcher,
         okx::OKXPriceFetcher,
@@ -17,7 +17,7 @@ use crate::{
 
 pub async fn fetch_all_prices(
     resources: &[ResourceData],
-) -> Result<HashMap<String, Vec<ResourceResult>>> {
+) -> Result<HashMap<TradingPair, Vec<ResourceResult>>> {
     let symbols = load_exchange_symbols(resources).await?;
 
     let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[
@@ -61,7 +61,7 @@ pub async fn fetch_all_prices(
 
 fn fill_results(
     resources: &[ResourceData],
-    results: &mut HashMap<String, Vec<ResourceResult>>,
+    results: &mut HashMap<TradingPair, Vec<ResourceResult>>,
     prices: PairPriceData,
 ) -> Result<()> {
     //TODO(adikov): We need a proper way to get trade volume from Binance API.
