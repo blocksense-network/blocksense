@@ -16,9 +16,9 @@ pub struct BitgetPriceResponse {
     pub code: String,
     pub data: Vec<BitgetPriceData>,
 }
-pub struct BitgetFetcher;
+pub struct BitgetPriceFetcher;
 
-impl PricesFetcher for BitgetFetcher {
+impl PricesFetcher for BitgetPriceFetcher {
     fn fetch(&self) -> futures::future::LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<BitgetPriceResponse>(
