@@ -42,7 +42,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
                     "ℹ️  Successfully fetched prices from {exchange_id} in {:?}",
                     start.elapsed()
                 );
-                fill_results(resources, &mut results, prices).unwrap_or_else(|err| {
+                fill_results(resources, prices, &mut results).unwrap_or_else(|err| {
                     println!("❌ Error filling results for {exchange_id}: {err:?}");
                 });
             }
@@ -59,8 +59,8 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
 
 fn fill_results(
     resources: &[ResourceData],
-    results: &mut TradingPairToResults,
     prices: PairPriceData,
+    results: &mut TradingPairToResults,
 ) -> Result<()> {
     //TODO(adikov): We need a proper way to get trade volume from Binance API.
     for resource in resources {
