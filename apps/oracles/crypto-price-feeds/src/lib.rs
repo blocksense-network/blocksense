@@ -12,7 +12,7 @@ use blocksense_sdk::{
     oracle_component,
 };
 use serde::Deserialize;
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Write};
 
 use crate::common::{ResourceData, ResourceResult, TradingPair};
 use fetch_prices::fetch_all_prices;
@@ -78,21 +78,27 @@ fn get_resources_from_settings(settings: Settings) -> Result<Vec<ResourceData>> 
         .collect()
 }
 
-fn print_results(
-    resources: &Vec<ResourceData>,
-    results: &HashMap<TradingPair, Vec<ResourceResult>>,
-) {
-    let mut missing = "[".to_string();
-    for res in resources {
-        if !results.contains_key(&res.id) {
-            missing.push_str(&format!("({}-{}),", res.id, res.symbol).to_string());
-        }
-    }
-    println!("missing ids(id-symbol): {}]", missing);
+fn print_results(resources: &[ResourceData], results: &HashMap<TradingPair, Vec<ResourceResult>>) {
+    let (mut missing_str, mut found_str) = resources.iter().fold(
+        (String::new(), String::new()),
+        |(mut missing, mut found), res| {
+            if let Some(res_list) = results.get(&res.id) {
+                let _ = write!(found, "({}-{}),", res.id, res_list.len());
+            } else {
+                let _ = write!(missing, "({}-{}),", res.id, res.symbol);
+            }
+            (missing, found)
+        },
+    );
 
-    let mut print = "[".to_string();
-    for (id, results) in results {
-        print.push_str(&format!("({}-{}),", id, results.len()).to_string());
+    // Replace last comma with closing bracket, or just insert "[]" if empty
+    if !missing_str.is_empty() {
+        missing_str.pop(); // Remove last comma
     }
-    println!("(id-exchange_count): {}]", print);
+    if !found_str.is_empty() {
+        found_str.pop(); // Remove last comma
+    }
+
+    println!("missing ids(id-symbol): [{}]", missing_str);
+    println!("(id-exchange_count): [{}]", found_str);
 }
