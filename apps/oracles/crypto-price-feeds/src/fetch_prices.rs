@@ -31,28 +31,25 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
             .map(|(exchange_id, fetcher)| try_tag_future(exchange_id, fetcher.fetch())),
     );
 
-    let start = Instant::now();
+    let before_fetch = Instant::now();
     let mut results = HashMap::new();
 
     // Process results as they complete
     while let Some(result) = futures_set.next().await {
         match result {
             Ok((exchange_id, prices)) => {
-                println!(
-                    "ℹ️  Successfully fetched prices from {exchange_id} in {:?}",
-                    start.elapsed()
-                );
+                let time_taken = before_fetch.elapsed();
+                println!("ℹ️  Successfully fetched prices from {exchange_id} in {time_taken:?}",);
+
                 fill_results(resources, prices, &mut results).unwrap_or_else(|err| {
                     println!("❌ Error filling results for {exchange_id}: {err:?}");
                 });
             }
-            Err(err) => {
-                println!("❌ Error processing future: {err:?}");
-            }
+            Err(err) => println!("❌ Error processing future: {err:?}"),
         }
     }
 
-    println!("🕛 All prices fetched in {:?}", start.elapsed());
+    println!("🕛 All prices fetched in {:?}", before_fetch.elapsed());
 
     Ok(results)
 }
