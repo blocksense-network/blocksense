@@ -6,21 +6,27 @@ use anyhow::Context;
 use blocksense_sdk::spin::key_value::Store;
 use itertools::Itertools;
 
-use crate::common::ResourceData;
+use crate::{
+    common::{ResourceData, TradingPair},
+    exchanges::okx::fetch_okx_symbols,
+};
 
 const SYMBOLS_KEY: &str = "symbols";
 const RESOURCES_HASH_KEY: &str = "resources_hash";
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct SymbolsData;
+pub struct SymbolsData {
+    pub okx: Vec<TradingPair>,
+}
 
-#[allow(dead_code)]
 impl SymbolsData {
     // NOTE: Passing resources in case we want to get the intersection of the symbols we want and
     // symbols the exchange supports
     pub async fn from_resources(_resources: &[ResourceData]) -> Result<Self> {
-        Ok(Self {})
+        Ok(Self {
+            okx: fetch_okx_symbols().await?,
+        })
     }
 
     pub fn load(store: &Store) -> Result<Self> {
@@ -70,7 +76,6 @@ fn get_stored_resources_hash(store: &Store) -> Result<u64> {
     Ok(u64::from_be_bytes(stored_hash_bytes))
 }
 
-#[allow(dead_code)]
 pub async fn load_exchange_symbols(resources: &[ResourceData]) -> Result<SymbolsData> {
     let mut store = Store::open_default()?;
 
