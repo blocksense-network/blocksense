@@ -1,6 +1,7 @@
 mod common;
 mod exchanges;
 mod fetch_prices;
+mod symbols_cache;
 mod traits;
 mod vwap;
 
