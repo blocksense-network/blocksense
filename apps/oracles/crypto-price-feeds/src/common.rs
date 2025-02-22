@@ -7,7 +7,9 @@ use url::Url;
 
 pub const USD_SYMBOLS: [&str; 3] = ["USD", "USDC", "USDT"];
 
-pub type PairPriceData = HashMap<String, String>;
+pub type TradingPair = String;
+pub type Price = String;
+pub type PairPriceData = HashMap<TradingPair, Price>;
 
 #[derive(Debug, Hash)]
 pub struct ResourceData {

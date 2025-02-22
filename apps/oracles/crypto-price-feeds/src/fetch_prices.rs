@@ -9,7 +9,9 @@ use crate::{
     common::{PairPriceData, ResourceData, ResourceResult, USD_SYMBOLS},
     exchanges::{
         binance::BinancePriceFetcher, bitfinex::BitfinexPriceFetcher, bitget::BitgetFetcher,
+        okx::OKXPriceFetcher,
     },
+    symbols_cache::load_exchange_symbols,
     traits::prices_fetcher::PricesFetcher,
 };
 
@@ -17,10 +19,13 @@ pub async fn fetch_all_prices(
     resources: &[ResourceData],
     results: &mut HashMap<String, Vec<ResourceResult>>,
 ) -> Result<()> {
+    let symbols = load_exchange_symbols(resources).await?;
+
     let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[
         ("Binance", Box::new(BinancePriceFetcher)),
         ("Bitfinex", Box::new(BitfinexPriceFetcher)),
         ("Bitget", Box::new(BitgetFetcher)),
+        ("OKX", Box::new(OKXPriceFetcher::new(&symbols.okx))),
     ];
 
     let mut futures_set = FuturesUnordered::from_iter(
