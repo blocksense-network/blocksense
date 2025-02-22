@@ -1,26 +1,27 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTrigger,
-  DialogDescription,
+  DialogFooter,
+  DialogClose,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/common/Dialog';
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerHeader,
+  DrawerContent,
+  DrawerTitle,
+  DrawerDescription,
+} from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CodeBlock } from '@/components/common/CodeBlock';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
 import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
 import { shikiDefaultThemes } from '@/config';
@@ -38,6 +39,7 @@ type ABIModalProps = {
 
 export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const [isFormatted, setIsFormatted] = React.useState(true);
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
@@ -55,33 +57,39 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
 
   if (isDesktop) {
     return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <section className="w-min">
-            <TriggerButton tooltipContent={title} />
-          </section>
+      <>
+        <DialogTrigger onClick={() => setOpen(true)} className="btn">
+          ABI
         </DialogTrigger>
-        <DialogContent className="max-w-screen-md">
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogHeader>
             <section className="flex items-center justify-between px-2 pt-2 pb-0">
               <DialogTitle>{title}</DialogTitle>
-              <FormatButton
-                isFormatted={isFormatted}
-                formatHandler={formatHandler}
-              />
+              <div className="flex items-center gap-2">
+                <FormatButton
+                  isFormatted={isFormatted}
+                  formatHandler={formatHandler}
+                />
+              </div>
             </section>
-            <DialogDescription />
           </DialogHeader>
-          <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg">
-            <CodeBlock
-              code={getABI()}
-              lang="json"
-              themes={shikiDefaultThemes.jsonThemes}
-              className="abi-modal--pre"
-            />
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+          <DialogContent>
+            <ScrollArea className="border max-h-[200px] border-neutral-200 dark:border-neutral-600 rounded-lg">
+              <CodeBlock
+                code={getABI()}
+                lang="json"
+                themes={shikiDefaultThemes.jsonThemes}
+                className="abi-modal--pre"
+              />
+            </ScrollArea>
+          </DialogContent>
+          <DialogFooter>
+            <DialogClose onCloseAction={() => setOpen(false)}>
+              Close
+            </DialogClose>
+          </DialogFooter>
+        </Dialog>
+      </>
     );
   }
 
