@@ -9,7 +9,7 @@ pub const USD_SYMBOLS: [&str; 3] = ["USD", "USDC", "USDT"];
 
 pub type PairPriceData = HashMap<String, String>;
 
-#[derive(Debug)]
+#[derive(Debug, Hash)]
 pub struct ResourceData {
     pub symbol: String,
     pub id: String,

@@ -18,3 +18,4 @@ url = "2.5"
 serde = { version = "1.0", features = ["derive"] }
 serde_derive = "1.0.210"
 futures = { workspace = true }
+itertools = "0.14.0"
