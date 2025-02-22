@@ -3,10 +3,7 @@ use anyhow::Result;
 use futures::FutureExt;
 use serde::Deserialize;
 
-use crate::{
-    common::{http_get_json, PairPriceData},
-    traits::prices_fetcher::PricesFetcher,
-};
+use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct BitgetPriceData {

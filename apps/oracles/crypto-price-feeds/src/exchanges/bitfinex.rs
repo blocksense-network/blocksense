@@ -4,10 +4,7 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer};
 use serde_json::{from_value, Value};
 
-use crate::{
-    common::{http_get_json, PairPriceData},
-    traits::prices_fetcher::PricesFetcher,
-};
+use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct TradingPairTicker {
