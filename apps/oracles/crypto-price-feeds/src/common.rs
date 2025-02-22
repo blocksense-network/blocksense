@@ -10,6 +10,7 @@ pub const USD_SYMBOLS: [&str; 3] = ["USD", "USDC", "USDT"];
 pub type TradingPair = String;
 pub type Price = String;
 pub type PairPriceData = HashMap<TradingPair, Price>;
+pub type TradingPairToResults = HashMap<TradingPair, Vec<ResourceResult>>;
 
 #[derive(Debug, Hash)]
 pub struct ResourceData {

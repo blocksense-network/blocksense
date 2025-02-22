@@ -12,9 +12,9 @@ use blocksense_sdk::{
     oracle_component,
 };
 use serde::Deserialize;
-use std::{collections::HashMap, fmt::Write};
+use std::fmt::Write;
 
-use crate::common::{ResourceData, ResourceResult, TradingPair};
+use crate::common::{ResourceData, TradingPairToResults};
 use fetch_prices::fetch_all_prices;
 
 //TODO(adikov): Refacotr:
@@ -43,7 +43,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     Ok(payload)
 }
 
-fn process_results(results: HashMap<TradingPair, Vec<ResourceResult>>) -> Result<Payload> {
+fn process_results(results: TradingPairToResults) -> Result<Payload> {
     let mut payload = Payload::new();
     for (feed_id, results) in results.into_iter() {
         payload.values.push(match vwap::vwap_0(&results) {
@@ -78,7 +78,7 @@ fn get_resources_from_settings(settings: Settings) -> Result<Vec<ResourceData>> 
         .collect()
 }
 
-fn print_results(resources: &[ResourceData], results: &HashMap<TradingPair, Vec<ResourceResult>>) {
+fn print_results(resources: &[ResourceData], results: &TradingPairToResults) {
     let (mut missing_str, mut found_str) = resources.iter().fold(
         (String::new(), String::new()),
         |(mut missing, mut found), res| {
