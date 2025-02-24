@@ -1,7 +1,7 @@
 #![doc = "Volume Weighted Average Price"]
 
+use anyhow::{bail, Context, Result};
 use std::collections::HashMap;
-use anyhow::{bail, Result};
 
 use crate::common::ResourceResult;
 
@@ -29,6 +29,16 @@ fn vwap(exchange_price_points: &ExchangePricePoints) -> Result<f64> {
         .fold(0.0, |acc, (_, price_point)| acc + price_point.volume);
 
     Ok(numerator / denominator)
+}
+
+#[allow(dead_code)]
+pub fn compute_vwap(price_points: &[PricePoint]) -> Result<f64> {
+    price_points
+        .iter()
+        .map(|PricePoint { price, volume }| (price * volume, *volume))
+        .reduce(|(num, denom), (weighted_price, volume)| (num + weighted_price, denom + volume))
+        .map(|(weighted_prices_sum, total_volume)| weighted_prices_sum / total_volume)
+        .context("No price points found")
 }
 
 #[cfg(test)]
@@ -69,6 +79,33 @@ mod tests {
         let exchange_price_points: ExchangePricePoints = HashMap::new();
         let result = vwap(&exchange_price_points);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_compute_vwap() {
+        assert_eq!(
+            compute_vwap(&[
+                PricePoint {
+                    price: 100.0,
+                    volume: 10.0,
+                },
+                PricePoint {
+                    price: 200.0,
+                    volume: 20.0,
+                },
+                PricePoint {
+                    price: 300.0,
+                    volume: 30.0,
+                },
+            ])
+            .unwrap(),
+            233.33333333333334
+        );
+    }
+
+    #[test]
+    fn test_compute_vwap_empty() {
+        assert!(compute_vwap(&[]).is_err());
     }
 }
 
