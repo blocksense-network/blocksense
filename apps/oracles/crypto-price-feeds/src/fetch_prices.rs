@@ -13,6 +13,7 @@ use crate::{
         coinbase::CoinbasePriceFetcher, crypto_com_exchange::CryptoComPriceFetcher,
         gate_io::GateIoPriceFetcher, gemini::GeminiPriceFetcher, kraken::KrakenPriceFetcher,
         kucoin::KuCoinPriceFetcher, mexc::MEXCPriceFetcher, okx::OKXPriceFetcher,
+        upbit::UpBitPriceFetcher,
     },
     symbols_cache::load_exchange_symbols,
     traits::prices_fetcher::PricesFetcher,
@@ -35,6 +36,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
         ("KuCoin", Box::new(KuCoinPriceFetcher)),
         ("MEXC", Box::new(MEXCPriceFetcher)),
         ("OKX", Box::new(OKXPriceFetcher::new(&symbols.okx))),
+        ("Upbit", Box::new(UpBitPriceFetcher::new(&symbols.upbit))),
     ];
 
     let mut futures_set = FuturesUnordered::from_iter(

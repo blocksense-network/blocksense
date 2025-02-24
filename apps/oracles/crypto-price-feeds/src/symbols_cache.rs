@@ -8,7 +8,7 @@ use itertools::Itertools;
 
 use crate::{
     common::{ResourceData, TradingPair},
-    exchanges::{gemini::get_gemini_symbols, okx::fetch_okx_symbols},
+    exchanges::{gemini::get_gemini_symbols, okx::fetch_okx_symbols, upbit::get_upbit_market},
 };
 
 const SYMBOLS_KEY: &str = "symbols";
@@ -19,6 +19,7 @@ const RESOURCES_HASH_KEY: &str = "resources_hash";
 pub struct SymbolsData {
     pub okx: Vec<TradingPair>,
     pub gemini: Vec<TradingPair>,
+    pub upbit: Vec<TradingPair>,
 }
 
 impl SymbolsData {
@@ -28,6 +29,7 @@ impl SymbolsData {
         Ok(Self {
             okx: fetch_okx_symbols().await?,
             gemini: get_gemini_symbols().await?,
+            upbit: get_upbit_market().await?,
         })
     }
 

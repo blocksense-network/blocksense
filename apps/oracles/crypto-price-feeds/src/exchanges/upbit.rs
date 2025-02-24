@@ -1,8 +1,9 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Response};
+
+use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct UpBitMarketResponseData {
@@ -19,65 +20,42 @@ pub struct UpBitTickerResponseData {
 
 type UpBitResponse = Vec<UpBitTickerResponseData>;
 
-struct UpBitMarketFetcher;
+pub struct UpBitPriceFetcher<'a> {
+    pub symbols: &'a [String],
+}
 
-impl Fetcher for UpBitMarketFetcher {
-    type ParsedResponse = Vec<String>;
-    type ApiResponse = UpBitMarketResponse;
+impl<'a> UpBitPriceFetcher<'a> {
+    pub fn new(symbols: &'a [String]) -> Self {
+        Self { symbols }
+    }
+}
 
-    fn parse_response(&self, value: UpBitMarketResponse) -> Result<Self::ParsedResponse> {
-        let markets = value
-            .iter()
-            .map(|market| market.market.clone())
-            .collect::<Self::ParsedResponse>();
+impl PricesFetcher for UpBitPriceFetcher<'_> {
+    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
+        async {
+            let all_markets = self.symbols.join(",");
+            let response = http_get_json::<UpBitResponse>(
+                "https://api.upbit.com/v1/ticker",
+                Some(&[("markets", all_markets.as_str())]),
+            )
+            .await?;
 
-        Ok(markets)
+            Ok(response
+                .into_iter()
+                .map(|price| {
+                    let parts: Vec<&str> = price.market.split('-').collect();
+                    let transformed_market = format!("{}{}", parts[1], parts[0]);
+                    (transformed_market, price.trade_price.to_string())
+                })
+                .collect())
+        }
+        .boxed_local()
     }
 }
 
 pub async fn get_upbit_market() -> Result<Vec<String>> {
-    let fetcher = UpBitMarketFetcher {};
-    let req = fetcher.prepare_get_request("https://api.upbit.com/v1/market/all", None);
-    let resp: Response = send(req?).await?;
+    let response =
+        http_get_json::<UpBitMarketResponse>("https://api.upbit.com/v1/market/all", None).await?;
 
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let markets = fetcher.parse_response(deserialized)?;
-
-    Ok(markets)
-}
-
-struct UpBitPricesFetcher;
-
-impl Fetcher for UpBitPricesFetcher {
-    type ParsedResponse = PairPriceData;
-    type ApiResponse = UpBitResponse;
-
-    fn parse_response(&self, value: UpBitResponse) -> Result<Self::ParsedResponse> {
-        let response: PairPriceData = value
-            .into_iter()
-            .map(|price| {
-                let parts: Vec<&str> = price.market.split('-').collect();
-                let transformed_market = format!("{}{}", parts[1], parts[0]);
-                (transformed_market, price.trade_price.to_string())
-            })
-            .collect();
-
-        Ok(response)
-    }
-}
-
-pub async fn get_upbit_prices() -> Result<PairPriceData> {
-    let markets = get_upbit_market().await?;
-    let all_markets = markets.join(",");
-
-    let fetcher = UpBitPricesFetcher {};
-    let req = fetcher.prepare_get_request(
-        "https://api.upbit.com/v1/ticker",
-        Some(&[("markets", all_markets.as_str())]),
-    );
-    let resp: Response = send(req?).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
+    Ok(response.into_iter().map(|market| market.market).collect())
 }
