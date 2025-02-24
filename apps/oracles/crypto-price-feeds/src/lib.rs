@@ -1,19 +1,6 @@
-mod binance;
-mod binance_us;
-mod bitfinex;
-mod bitget;
-mod bybit;
-mod coinbase;
 mod common;
-mod crypto_com_exchange;
+mod exchanges;
 mod fetch_prices;
-mod gate_io;
-mod gemini;
-mod kraken;
-mod kucoin;
-mod mexc;
-mod okx;
-mod upbit;
 
 use anyhow::{bail, Context, Result};
 // use async_trait::async_trait;

@@ -7,21 +7,22 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use std::future::Future;
 use std::pin::Pin;
 
-use crate::binance::get_binance_prices;
-use crate::binance_us::get_binance_us_prices;
-use crate::bitfinex::get_bitfinex_prices;
-use crate::bitget::get_bitget_prices;
-use crate::bybit::get_bybit_prices;
-use crate::coinbase::get_coinbase_prices;
 use crate::common::{fill_results, PairPriceData, ResourceData, ResourceResult};
-use crate::crypto_com_exchange::get_crypto_com_exchange_prices;
-use crate::gate_io::get_gate_io_prices;
-use crate::gemini::get_gemini_prices;
-use crate::kraken::get_kraken_prices;
-use crate::kucoin::get_kucoin_prices;
-use crate::mexc::get_mexc_prices;
-use crate::okx::get_okx_prices;
-use crate::upbit::get_upbit_prices;
+
+use crate::exchanges::binance::get_binance_prices;
+use crate::exchanges::binance_us::get_binance_us_prices;
+use crate::exchanges::bitfinex::get_bitfinex_prices;
+use crate::exchanges::bitget::get_bitget_prices;
+use crate::exchanges::bybit::get_bybit_prices;
+use crate::exchanges::coinbase::get_coinbase_prices;
+use crate::exchanges::crypto_com_exchange::get_crypto_com_exchange_prices;
+use crate::exchanges::gate_io::get_gate_io_prices;
+use crate::exchanges::gemini::get_gemini_prices;
+use crate::exchanges::kraken::get_kraken_prices;
+use crate::exchanges::kucoin::get_kucoin_prices;
+use crate::exchanges::mexc::get_mexc_prices;
+use crate::exchanges::okx::get_okx_prices;
+use crate::exchanges::upbit::get_upbit_prices;
 
 // Define boxed future type that includes the exchange name
 type BoxedFuture = Pin<Box<dyn Future<Output = Result<(String, PairPriceData)>>>>;
