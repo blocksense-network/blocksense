@@ -24,7 +24,6 @@ pub struct ResourceResult {
     //TODO(adikov): Add balance information when we start getting it.
 }
 
-
 pub trait Fetcher {
     type ParsedResponse;
     type ApiResponse: DeserializeOwned; // Ensure it's deserializable
