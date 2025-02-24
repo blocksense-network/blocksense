@@ -10,7 +10,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/common/ScrollArea';
 import { CodeBlock } from '@/components/common/CodeBlock';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
