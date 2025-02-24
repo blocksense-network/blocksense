@@ -1,5 +1,6 @@
 #![doc = "Volume Weighted Average Price"]
 
+use std::collections::HashMap;
 use anyhow::{bail, Result};
 
 use crate::common::ResourceResult;
@@ -8,6 +9,67 @@ use crate::common::ResourceResult;
 pub struct PricePoint {
     price: f64,
     volume: f64,
+}
+
+#[allow(dead_code)]
+type ExchangePricePoints = HashMap<String, PricePoint>;
+
+#[allow(dead_code)]
+fn vwap(exchange_price_points: &ExchangePricePoints) -> Result<f64> {
+    if exchange_price_points.is_empty() {
+        return Err(anyhow::anyhow!("No price points found"));
+    }
+    let numerator: f64 = exchange_price_points
+        .iter()
+        .fold(0.0, |acc, (_, price_point)| {
+            acc + price_point.volume * price_point.price
+        });
+    let denominator: f64 = exchange_price_points
+        .iter()
+        .fold(0.0, |acc, (_, price_point)| acc + price_point.volume);
+
+    Ok(numerator / denominator)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vwap() {
+        let mut exchange_price_points: ExchangePricePoints = HashMap::new();
+        exchange_price_points.insert(
+            "exchange1".to_string(),
+            PricePoint {
+                price: 100.0,
+                volume: 10.0,
+            },
+        );
+        exchange_price_points.insert(
+            "exchange2".to_string(),
+            PricePoint {
+                price: 200.0,
+                volume: 20.0,
+            },
+        );
+        exchange_price_points.insert(
+            "exchange3".to_string(),
+            PricePoint {
+                price: 300.0,
+                volume: 30.0,
+            },
+        );
+
+        let result = vwap(&exchange_price_points).unwrap();
+        assert_eq!(result, 233.33333333333334);
+    }
+
+    #[test]
+    fn test_vwap_empty() {
+        let exchange_price_points: ExchangePricePoints = HashMap::new();
+        let result = vwap(&exchange_price_points);
+        assert!(result.is_err());
+    }
 }
 
 pub fn vwap_0(results: &[ResourceResult]) -> Result<f64> {
