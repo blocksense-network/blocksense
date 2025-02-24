@@ -1,11 +1,14 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Response};
-use futures::stream::{FuturesUnordered, StreamExt};
-use std::collections::HashMap;
+use futures::{
+    future::LocalBoxFuture,
+    stream::{FuturesUnordered, StreamExt},
+    FutureExt,
+};
+use std::ops::Deref;
 
 use serde::Deserialize;
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct GeminiPriceResponse {
@@ -14,73 +17,54 @@ pub struct GeminiPriceResponse {
 
 type GeminiSymbolsResponse = Vec<String>;
 
-struct GeminiSymbolsFetcher;
+pub struct GeminiPriceFetcher<'a> {
+    pub symbols: &'a [String],
+}
 
-impl Fetcher for GeminiSymbolsFetcher {
-    type ParsedResponse = Vec<String>;
-    type ApiResponse = GeminiSymbolsResponse;
-
-    fn parse_response(&self, value: GeminiSymbolsResponse) -> Result<Self::ParsedResponse> {
-        let response: Vec<String> = value
-            .into_iter()
-            .filter(|symbol| !symbol.ends_with("perp"))
-            .map(|symbol| symbol.to_ascii_uppercase())
-            .collect();
-
-        Ok(response)
+impl<'a> GeminiPriceFetcher<'a> {
+    pub fn new(symbols: &'a [String]) -> Self {
+        Self { symbols }
     }
+}
+
+impl PricesFetcher for GeminiPriceFetcher<'_> {
+    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
+        async {
+            let prices_futures = self
+                .symbols
+                .iter()
+                .map(Deref::deref)
+                .map(fetch_price_for_symbol);
+
+            let mut futures = FuturesUnordered::from_iter(prices_futures);
+            let mut prices = PairPriceData::new();
+
+            while let Some(result) = futures.next().await {
+                if let Ok((symbol, price)) = result {
+                    prices.insert(symbol, price);
+                }
+            }
+
+            Ok(prices)
+        }
+        .boxed_local()
+    }
+}
+
+pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, String)> {
+    let url = format!("https://api.gemini.com/v1/pubticker/{symbol}");
+    let response = http_get_json::<GeminiPriceResponse>(&url, None).await?;
+
+    Ok((symbol.to_string(), response.last))
 }
 
 pub async fn get_gemini_symbols() -> Result<Vec<String>> {
-    let fetcher = GeminiSymbolsFetcher {};
-    let req = fetcher.prepare_get_request("https://api.gemini.com/v1/symbols", None)?;
-    let resp: Response = send(req).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let symbols = fetcher.parse_response(deserialized)?;
+    let response =
+        http_get_json::<GeminiSymbolsResponse>("https://api.gemini.com/v1/symbols", None).await?;
 
-    Ok(symbols)
-}
-
-struct GeminiPriceFetcher;
-
-impl Fetcher for GeminiPriceFetcher {
-    type ParsedResponse = String;
-    type ApiResponse = GeminiPriceResponse;
-
-    fn parse_response(&self, value: GeminiPriceResponse) -> Result<Self::ParsedResponse> {
-        Ok(value.last)
-    }
-}
-pub async fn fetch_gemini_price(symbol: String) -> Option<(String, String)> {
-    let fetcher = GeminiPriceFetcher {};
-    let url = format!("https://api.gemini.com/v1/pubticker/{}", symbol);
-    let req = fetcher.prepare_get_request(&url, None);
-    let response: Response = send(req.ok()?).await.ok()?;
-    if *response.status() != 200 {
-        return None;
-    }
-    let deserialized = fetcher.deserialize_response(response).ok();
-    let price = fetcher.parse_response(deserialized?).ok();
-    Some((symbol, price?))
-}
-
-pub async fn get_gemini_prices() -> Result<PairPriceData> {
-    let symbols = get_gemini_symbols().await?;
-
-    let mut pair_prices: PairPriceData = HashMap::new();
-    let mut futures = FuturesUnordered::new();
-
-    // Spawn all fetches concurrently
-    for symbol in symbols {
-        futures.push(fetch_gemini_price(symbol));
-    }
-
-    // Collect results as they complete
-    while let Some(result) = futures.next().await {
-        if let Some((symbol, price)) = result {
-            pair_prices.insert(symbol, price);
-        }
-    }
-
-    Ok(pair_prices)
+    Ok(response
+        .into_iter()
+        .filter(|symbol| !symbol.ends_with("perp"))
+        .map(|symbol| symbol.to_ascii_uppercase())
+        .collect())
 }

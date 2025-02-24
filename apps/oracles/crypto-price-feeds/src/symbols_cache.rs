@@ -8,7 +8,7 @@ use itertools::Itertools;
 
 use crate::{
     common::{ResourceData, TradingPair},
-    exchanges::okx::fetch_okx_symbols,
+    exchanges::{gemini::get_gemini_symbols, okx::fetch_okx_symbols},
 };
 
 const SYMBOLS_KEY: &str = "symbols";
@@ -18,6 +18,7 @@ const RESOURCES_HASH_KEY: &str = "resources_hash";
 #[serde(deny_unknown_fields)]
 pub struct SymbolsData {
     pub okx: Vec<TradingPair>,
+    pub gemini: Vec<TradingPair>,
 }
 
 impl SymbolsData {
@@ -26,6 +27,7 @@ impl SymbolsData {
     pub async fn from_resources(_resources: &[ResourceData]) -> Result<Self> {
         Ok(Self {
             okx: fetch_okx_symbols().await?,
+            gemini: get_gemini_symbols().await?,
         })
     }
 
