@@ -10,7 +10,7 @@ use crate::{
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
         bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
-        okx::OKXPriceFetcher,
+        coinbase::CoinbasePriceFetcher, okx::OKXPriceFetcher,
     },
     symbols_cache::load_exchange_symbols,
     traits::prices_fetcher::PricesFetcher,
@@ -25,6 +25,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
         ("Bitfinex", Box::new(BitfinexPriceFetcher)),
         ("Bitget", Box::new(BitgetPriceFetcher)),
         ("Bybit", Box::new(BybitPriceFetcher)),
+        ("Coinbase", Box::new(CoinbasePriceFetcher)),
         ("OKX", Box::new(OKXPriceFetcher::new(&symbols.okx))),
     ];
 
