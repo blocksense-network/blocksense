@@ -1,14 +1,16 @@
 use dep::aztec::{
-    prelude::AztecAddress,
+    oracle::storage::storage_read, prelude::AztecAddress,
     protocol_types::storage::map::derive_storage_slot_in_map,
     test::helpers::test_environment::TestEnvironment,
-    oracle::{execution::get_block_number, storage::storage_read},
 };
 
 use crate::AggregatedDataFeedStore;
-use crate::tests::helper_vars::{_58_DATA_FEEDS_STRIDE_0, calculate_feed_index, zero_round_index, one_round_index, two_round_index, three_round_index, ZERO, TWO, THREE};
+use crate::tests::helper_vars::{
+    _58_DATA_FEEDS_STRIDE_0, calculate_feed_index, one_round_index, THREE, three_round_index, TWO,
+    two_round_index, ZERO, zero_round_index,
+};
 
-unconstrained pub fn setup() -> (&mut TestEnvironment, AztecAddress) {
+pub unconstrained fn setup() -> (&mut TestEnvironment, AztecAddress) {
     let mut env = TestEnvironment::new();
     let initializer_call_interface = AggregatedDataFeedStore::interface().constructor();
     let adfs_contract = env.deploy_self("AggregatedDataFeedStore").with_public_void_initializer(
@@ -19,7 +21,7 @@ unconstrained pub fn setup() -> (&mut TestEnvironment, AztecAddress) {
     (&mut env, adfs_contract.to_address())
 }
 
-unconstrained fn assert_feeds_are_stored_in_correct_slots<let END_OF_ROUND_DATA: u32>(
+pub unconstrained fn assert_feeds_are_stored_in_correct_slots<let END_OF_ROUND_DATA: u32>(
     storage_slot: Field,
     block_number: u32,
     adfs_contract_address: AztecAddress,
@@ -28,22 +30,28 @@ unconstrained fn assert_feeds_are_stored_in_correct_slots<let END_OF_ROUND_DATA:
     let mut round_index = ZERO;
     for i in 0..END_OF_ROUND_DATA {
         round_index = __determine_round_index(round_index, i);
-        let data_feed_slot = derive_storage_slot_in_map(storage_slot, calculate_feed_index(i as Field, round_index, ZERO));
-        let data_feed_slot_value: u32 = storage_read(adfs_contract_address, data_feed_slot, block_number);
+        let data_feed_slot = derive_storage_slot_in_map(
+            storage_slot,
+            calculate_feed_index(i as Field, i as Field, ZERO),
+        );
+        let data_feed_slot_value: u32 =
+            storage_read(adfs_contract_address, data_feed_slot, block_number);
         assert(_58_DATA_FEEDS_STRIDE_0[values_iterator] as u32 == data_feed_slot_value);
         values_iterator = values_iterator + THREE;
     }
 }
 
-unconstrained fn assert_get_feed_at_round_produces_correct_result<let END_OF_ROUND_DATA: u32>(
+pub unconstrained fn assert_get_feed_at_round_produces_correct_result<let END_OF_ROUND_DATA: u32>(
     env: &mut TestEnvironment,
-    adfs_contract_address: AztecAddress
+    adfs_contract_address: AztecAddress,
 ) {
     let mut values_iterator = TWO;
     let mut round_index = ZERO;
     for i in 0..END_OF_ROUND_DATA {
         round_index = __determine_round_index(round_index, i);
-        let feed_at_round = AggregatedDataFeedStore::at(adfs_contract_address).get_feed_at_round(i as Field, round_index, ZERO).view(&mut env.public());
+        let feed_at_round = AggregatedDataFeedStore::at(adfs_contract_address)
+            .get_feed_at_round(i as Field, round_index, ZERO)
+            .view(&mut env.public());
         println("feed_at_round");
         println(feed_at_round);
         assert(_58_DATA_FEEDS_STRIDE_0[values_iterator] == feed_at_round);
