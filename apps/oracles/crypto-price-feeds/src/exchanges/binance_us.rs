@@ -1,9 +1,9 @@
 use anyhow::Result;
-use blocksense_sdk::spin::http::{send, Response};
+use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::Deserialize;
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct BinanceUsPriceData {
@@ -13,29 +13,23 @@ pub struct BinanceUsPriceData {
 
 type BinanceUsPriceResponse = Vec<BinanceUsPriceData>;
 
-struct BinanceUsPriceFetcher;
+pub struct BinanceUsPriceFetcher;
 
-impl Fetcher for BinanceUsPriceFetcher {
-    type ParsedResponse = PairPriceData;
-    type ApiResponse = BinanceUsPriceResponse;
+impl PricesFetcher for BinanceUsPriceFetcher {
+    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
+        async {
+            let response = http_get_json::<BinanceUsPriceResponse>(
+                "https://api.binance.us/api/v3/ticker/price",
+                None,
+            )
+            .await?;
 
-    fn parse_response(&self, value: BinanceUsPriceResponse) -> Result<Self::ParsedResponse> {
-        let response: Self::ParsedResponse = value
-            .into_iter()
-            .filter(|value| !value.symbol.ends_with("USD"))
-            .map(|value| (value.symbol, value.price))
-            .collect();
-
-        Ok(response)
+            Ok(response
+                .into_iter()
+                .filter(|value| !value.symbol.ends_with("USD"))
+                .map(|value| (value.symbol, value.price))
+                .collect())
+        }
+        .boxed_local()
     }
-}
-
-pub async fn get_binance_us_prices() -> Result<PairPriceData> {
-    let fetcher = BinanceUsPriceFetcher {};
-    let req = fetcher.prepare_get_request("https://api.binance.us/api/v3/ticker/price", None);
-    let resp: Response = send(req?).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
 }

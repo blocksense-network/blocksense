@@ -8,8 +8,8 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use crate::{
     common::{PairPriceData, ResourceData, ResourceResult, TradingPairToResults, USD_SYMBOLS},
     exchanges::{
-        binance::BinancePriceFetcher, bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher,
-        okx::OKXPriceFetcher,
+        binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
+        bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, okx::OKXPriceFetcher,
     },
     symbols_cache::load_exchange_symbols,
     traits::prices_fetcher::PricesFetcher,
@@ -20,6 +20,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
 
     let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[
         ("Binance", Box::new(BinancePriceFetcher)),
+        ("Binance US", Box::new(BinanceUsPriceFetcher)),
         ("Bitfinex", Box::new(BitfinexPriceFetcher)),
         ("Bitget", Box::new(BitgetPriceFetcher)),
         ("OKX", Box::new(OKXPriceFetcher::new(&symbols.okx))),
