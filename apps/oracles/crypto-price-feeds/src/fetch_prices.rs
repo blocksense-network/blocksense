@@ -9,7 +9,8 @@ use crate::{
     common::{PairPriceData, ResourceData, ResourceResult, TradingPairToResults, USD_SYMBOLS},
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
-        bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, okx::OKXPriceFetcher,
+        bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
+        okx::OKXPriceFetcher,
     },
     symbols_cache::load_exchange_symbols,
     traits::prices_fetcher::PricesFetcher,
@@ -23,6 +24,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
         ("Binance US", Box::new(BinanceUsPriceFetcher)),
         ("Bitfinex", Box::new(BitfinexPriceFetcher)),
         ("Bitget", Box::new(BitgetPriceFetcher)),
+        ("Bybit", Box::new(BybitPriceFetcher)),
         ("OKX", Box::new(OKXPriceFetcher::new(&symbols.okx))),
     ];
 

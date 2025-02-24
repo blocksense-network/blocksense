@@ -1,9 +1,9 @@
-use anyhow::{Ok, Result};
-use blocksense_sdk::spin::http::{send, Response};
+use anyhow::Result;
+use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::Deserialize;
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 //TODO(adikov): Include all the needed fields form the response like volume.
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -26,34 +26,24 @@ pub struct BybitPriceResponse {
     pub ret_msg: String,
     pub result: BybitResult,
 }
+pub struct BybitPriceFetcher;
 
-struct BybitFetcher;
+impl PricesFetcher for BybitPriceFetcher {
+    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
+        async {
+            let response = http_get_json::<BybitPriceResponse>(
+                "https://api.bybit.com/v5/market/tickers",
+                Some(&[("category", "spot"), ("symbols", "")]),
+            )
+            .await?;
 
-impl Fetcher for BybitFetcher {
-    type ParsedResponse = PairPriceData;
-    type ApiResponse = BybitPriceResponse;
-
-    fn parse_response(&self, value: BybitPriceResponse) -> Result<Self::ParsedResponse> {
-        let response: PairPriceData = value
-            .result
-            .list
-            .into_iter()
-            .map(|value| (value.symbol, value.last_price))
-            .collect();
-
-        Ok(response)
+            Ok(response
+                .result
+                .list
+                .into_iter()
+                .map(|value| (value.symbol, value.last_price))
+                .collect())
+        }
+        .boxed_local()
     }
-}
-
-pub async fn get_bybit_prices() -> Result<PairPriceData> {
-    let fetcher = BybitFetcher {};
-    let req = fetcher.prepare_get_request(
-        "https://api.bybit.com/v5/market/tickers",
-        Some(&[("category", "spot"), ("symbols", "")]),
-    );
-    let resp: Response = send(req?).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
 }
