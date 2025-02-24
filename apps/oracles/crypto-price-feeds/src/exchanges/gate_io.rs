@@ -1,9 +1,9 @@
-use anyhow::{Ok, Result};
-use blocksense_sdk::spin::http::{send, Response};
+use anyhow::Result;
+use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::Deserialize;
 
-use crate::common::{Fetcher, PairPriceData};
+use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct GateIoPriceData {
@@ -13,28 +13,22 @@ pub struct GateIoPriceData {
 
 type GateIoPriceResponse = Vec<GateIoPriceData>;
 
-struct GateIoFetcher;
+pub struct GateIoPriceFetcher;
 
-impl Fetcher for GateIoFetcher {
-    type ParsedResponse = PairPriceData;
-    type ApiResponse = GateIoPriceResponse;
+impl PricesFetcher for GateIoPriceFetcher {
+    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
+        async {
+            let response = http_get_json::<GateIoPriceResponse>(
+                "https://api.gateio.ws/api/v4/spot/tickers",
+                None,
+            )
+            .await?;
 
-    fn parse_response(&self, value: Self::ApiResponse) -> Result<Self::ParsedResponse> {
-        let response: Self::ParsedResponse = value
-            .into_iter()
-            .map(|value| (value.currency_pair.replace("_", ""), value.last))
-            .collect();
-
-        Ok(response)
+            Ok(response
+                .into_iter()
+                .map(|value| (value.currency_pair.replace("_", ""), value.last))
+                .collect())
+        }
+        .boxed_local()
     }
-}
-
-pub async fn get_gate_io_prices() -> Result<PairPriceData> {
-    let fetcher = GateIoFetcher {};
-    let req = fetcher.prepare_get_request("https://api.gateio.ws/api/v4/spot/tickers", None);
-    let resp: Response = send(req?).await?;
-    let deserialized = fetcher.deserialize_response(resp)?;
-    let pair_prices: PairPriceData = fetcher.parse_response(deserialized)?;
-
-    Ok(pair_prices)
 }
