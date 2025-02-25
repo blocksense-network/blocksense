@@ -14,6 +14,7 @@ use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use std::io::Error;
+use std::str::FromStr;
 use std::time::Duration;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
@@ -115,10 +116,10 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 info!("Network `{net}` is enabled; initiating second round consensus");
             }
             // TODO: remove when we start using ADFS contracts
-            if provider_settings.contract_version < 2 {
-                info!("Network `{net}` uses legacy contracts; skipping second round consensus");
-                continue;
-            }
+            // if provider_settings.contract_version < 2 {
+            //     info!("Network `{net}` uses legacy contracts; skipping second round consensus");
+            //     continue;
+            // }
             debug!("About to release a read lock on sequencer_config for `{net}` [default]");
             provider_settings
         };
@@ -145,28 +146,30 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         .await
         {
             Ok(res) => {
-                debug!("Got serialized updates for network {net}");
+                info!("Got serialized updates for network {net}");
                 res
             }
             Err(e) => {
-                warn!("Could not get serialized updates for network {net} due to: {e}");
+                info!("Could not get serialized updates for network {net} due to: {e}");
                 continue;
             }
         };
 
         if updates.updates.is_empty() {
-            debug!("No aggregated batch update for network {net}");
+            info!("No aggregated batch update for network {net}");
             continue;
         }
 
         let num_removed_proofs = updates.normalize_proof();
-        debug!("Filtered out {num_removed_proofs} from proofs for network {net}, block_height {block_height}");
+        info!("Filtered out {num_removed_proofs} from proofs for network {net}, block_height {block_height}");
 
         let (contract_address, safe_address, nonce, chain_id, tx_hash, safe_transaction) = {
             let provider = provider.lock().await;
 
             let contract_address = provider.contract_address.unwrap_or(Address::default());
-            let safe_address = provider.safe_address.unwrap_or(Address::default());
+            let safe_address = provider
+                .safe_address
+                .unwrap_or(Address::from_hex("7f09E80DA1dFF8df7F1513E99a3458b228b9e19C").unwrap());
             let contract = SafeMultisig::new(safe_address, &provider.provider);
 
             let nonce = match contract.nonce().call().await {
@@ -234,7 +237,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             }
         };
 
-        debug!("About to send feed values to kafka; network={net}");
+        info!("About to send feed values to kafka; network={net}");
         match kafka_endpoint
             .send(
                 FutureRecord::<(), _>::to("aggregation_consensus").payload(&serialized_updates),

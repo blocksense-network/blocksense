@@ -1,18 +1,18 @@
 spin_manifest_version = 2
 
 [application]
-authors = ["Antoni Dikov"]
-name = "Crypto Price Feeds Oracle"
+name = "Blocksense runtime"
 version = "0.1.0"
+authors = ["blocksense-network"]
 
 [application.trigger.settings]
-interval_time_in_seconds = 10
-sequencer = "http://127.0.0.1:9856/post_reports_batch"
-secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+interval_time_in_seconds = 6
 reporter_id = 0
+sequencer = "http://127.0.0.1:9856"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
 
 [[trigger.oracle]]
-component = "crypto-price-feeds"
+component = "cmc"
 
 [[trigger.oracle.data_feeds]]
 id = "0"
@@ -846,24 +846,217 @@ data = '{"cmc_id":"4642","cmc_quote":"HBAR"}'
 id = "256"
 data = '{"cmc_id":"7501","cmc_quote":"WOO"}'
 
-[component.crypto-price-feeds]
-source = "../../../target/wasm32-wasip1/release/crypto_price_feeds.wasm"
-allowed_outbound_hosts = [
-  "https://api.kraken.com",
-  "https://api.bybit.com",
-  "https://api.coinbase.com",
-  "https://api.binance.com",
-  "https://api.kucoin.com",
-  "https://api.mexc.com",
-  "https://api.crypto.com",
-  "https://api.binance.us",
-  "https://api.gemini.com",
-  "https://api-pub.bitfinex.com",
-  "https://api.upbit.com",
-  "https://api.bitget.com",
-  "https://api.gateio.ws",
-  "https://www.okx.com",
-]
+[[trigger.oracle.capabilities]]
+id = "CMC_API_KEY"
+data = "e9e63086-a2d9-4027-8eab-b50b7c015fa1"
 
-[component.crypto-price-feeds.build]
-command = "cargo build --target wasm32-wasip1 --release"
+[[trigger.oracle]]
+component = "yahoo"
+
+[[trigger.oracle.data_feeds]]
+id = "7"
+data = '{"yf_symbol":"JPM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "16"
+data = '{"yf_symbol":"ILSUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "40"
+data = '{"yf_symbol":"MRNA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "46"
+data = '{"yf_symbol":"UST"}'
+
+[[trigger.oracle.data_feeds]]
+id = "49"
+data = '{"yf_symbol":"MXNUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "50"
+data = '{"yf_symbol":"GME"}'
+
+[[trigger.oracle.data_feeds]]
+id = "53"
+data = '{"yf_symbol":"WTI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "54"
+data = '{"yf_symbol":"NZDUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "62"
+data = '{"yf_symbol":"GBPUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "66"
+data = '{"yf_symbol":"GC=F"}'
+
+[[trigger.oracle.data_feeds]]
+id = "77"
+data = '{"yf_symbol":"CADUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "83"
+data = '{"yf_symbol":"GOOGL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "88"
+data = '{"yf_symbol":"PFE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "94"
+data = '{"yf_symbol":"XOFUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "97"
+data = '{"yf_symbol":"AMZN"}'
+
+[[trigger.oracle.data_feeds]]
+id = "98"
+data = '{"yf_symbol":"TRYUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "100"
+data = '{"yf_symbol":"NFLX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "101"
+data = '{"yf_symbol":"SEKUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "106"
+data = '{"yf_symbol":"ZARUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "107"
+data = '{"yf_symbol":"THBUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "111"
+data = '{"yf_symbol":"AAPL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "114"
+data = '{"yf_symbol":"KESUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "121"
+data = '{"yf_symbol":"KRWUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "122"
+data = '{"yf_symbol":"TSLA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "146"
+data = '{"yf_symbol":"MSFT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "150"
+data = '{"yf_symbol":"CHFUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "153"
+data = '{"yf_symbol":"SHV"}'
+
+[[trigger.oracle.data_feeds]]
+id = "162"
+data = '{"yf_symbol":"QQQ"}'
+
+[[trigger.oracle.data_feeds]]
+id = "164"
+data = '{"yf_symbol":"BRLUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "168"
+data = '{"yf_symbol":"IDRUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "176"
+data = '{"yf_symbol":"INRUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "177"
+data = '{"yf_symbol":"SI-F"}'
+
+[[trigger.oracle.data_feeds]]
+id = "178"
+data = '{"yf_symbol":"XPT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "180"
+data = '{"yf_symbol":"COPUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "181"
+data = '{"yf_symbol":"CSPXUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "184"
+data = '{"yf_symbol":"mSOL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "186"
+data = '{"yf_symbol":"JPYUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "188"
+data = '{"yf_symbol":"SPY"}'
+
+[[trigger.oracle.data_feeds]]
+id = "200"
+data = '{"yf_symbol":"MS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "213"
+data = '{"yf_symbol":"SGDUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "221"
+data = '{"yf_symbol":"CZKUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "222"
+data = '{"yf_symbol":"CNYUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "224"
+data = '{"yf_symbol":"NVDA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "230"
+data = '{"yf_symbol":"IBTAUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "231"
+data = '{"yf_symbol":"COIN"}'
+
+[[trigger.oracle.data_feeds]]
+id = "243"
+data = '{"yf_symbol":"META"}'
+
+[[trigger.oracle.data_feeds]]
+id = "246"
+data = '{"yf_symbol":"PLNUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "247"
+data = '{"yf_symbol":"PHPUSD=X"}'
+
+[[trigger.oracle.data_feeds]]
+id = "253"
+data = '{"yf_symbol":"EURUSD=X"}'
+
+[[trigger.oracle.capabilities]]
+id = "YAHOO_API_KEY"
+data = "xfbfACKQNe2ibfIEuXt1q1uVgYHMnFjW6mENHC7V"
+
+[component.cmc]
+source = "cmc_oracle.wasm"
+allowed_outbound_hosts = ["https://pro-api.coinmarketcap.com"]
+
+[component.yahoo]
+source = "yahoo_oracle.wasm"
+allowed_outbound_hosts = ["https://yfapi.net:443"]

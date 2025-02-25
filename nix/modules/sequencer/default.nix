@@ -12,7 +12,11 @@
 
       mkModule =
         backend:
-        { config, pkgs, ... }:
+        {
+          config,
+          pkgs,
+          ...
+        }:
         let
           cfg = config.services.blocksense;
 
@@ -64,7 +68,6 @@
             (builtins.mapAttrs (
               _n: v:
               (
-
                 (builtins.removeAttrs
                   (configJSON2 v {
                     capabilities = builtins.attrValues (builtins.mapAttrs (id: data: { inherit id data; }) v.api-keys);
@@ -75,7 +78,7 @@
                   ]
                 )
                 // {
-                  oracles = [ ];
+                  oracles = [ { component = "crypto-price-feed"; } ];
                   data_feeds = [ ];
                 }
               )
