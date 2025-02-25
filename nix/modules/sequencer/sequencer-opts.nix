@@ -232,6 +232,7 @@ in
         "transaction_timeout_secs" = 420;
         "transaction_gas_limit" = 7500000;
         "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
+        "contract_version" = 2;
       };
       "ETH2" = {
         "private_key_path" = "/tmp/priv_key_test";

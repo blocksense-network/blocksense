@@ -161,7 +161,9 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             let provider = provider.lock().await;
 
             let contract_address = provider.contract_address.unwrap_or(Address::default());
-            let safe_address = provider.safe_address.unwrap_or(Address::default());
+            let safe_address = provider
+                .safe_address
+                .unwrap_or(Address::from_hex("7f09E80DA1dFF8df7F1513E99a3458b228b9e19C").unwrap());
             let contract = SafeMultisig::new(safe_address, &provider.provider);
 
             let nonce = match contract.nonce().call().await {

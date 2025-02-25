@@ -106,7 +106,7 @@ in
       };
 
       kafka-report-endpoint = {
-        url = null;
+        url = "127.0.0.1:9092";
       };
 
       reporters = [
