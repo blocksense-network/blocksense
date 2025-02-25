@@ -1,4 +1,8 @@
-{ inputs, self, ... }:
+{
+  inputs,
+  self,
+  ...
+}:
 {
   perSystem =
     {
@@ -42,6 +46,8 @@
         reporter = mkApp blocksense-rs "launch_reporter";
         blocksense = mkApp blocksense-rs "blocksense";
         trigger-oracle = mkApp blocksense-rs "trigger-oracle";
+        blockchain_reader = mkApp pkgs.apacheKafka "kafka-console-consumer.sh";
+        aggregate_consensus_reader = mkApp pkgs.apacheKafka "kafka-console-consumer.sh";
       };
       packages = {
         inherit blocksense-rs;
