@@ -9,7 +9,7 @@
     "build:pagefind": "pagefind --site .next/server/app --output-path public/_pagefind && cp -r public/_pagefind/ dist/",
     "dev": "next",
     "dev-watch": "yarn watch:docs-theme & next",
-    "ready-dev-go": "yarn build:deps && yarn dev",
+    "ready-dev-go": "yarn build:with-deps && yarn dev",
     "start": "next start",
     "test": "yarn vitest -w false",
     "ts": "yarn node --import tsx",
