@@ -26,8 +26,8 @@ Blocksense supports the storage and retrieval of historical data feeds, providin
 
 To enhance interoperability and provide a wider range of data access, Blocksense includes a Chainlink representation layer. This layer allows dApps to integrate with Blocksense protocol using the same interface as Chainlink.
 
-- **Chainlink Proxies:** Implements Chainlink AggregatorV3Interface interface to provide access to historical data for a given data feed.
-- **Feeds Registry:** Implements Chainlink FeedRegistryInterface interface to provide access to Chainlink proxies through a given pair of tokens (‘base’, ‘quote’).
+- **CL Aggregator Adapters:** Implements Chainlink AggregatorV3Interface interface to provide access to historical data for a given data feed.
+- **CL Feed Registry Adapter:** Implements ChainlinkCLFeedRegistryAdapterInterface interface to provide access to Chainlink proxies through a given pair of tokens (‘base’, ‘quote’).
 
 ## Delegate Calls and Static Calls
 
@@ -42,18 +42,6 @@ Blocksense employs advanced functionalities to enhance contract interactions and
 - **Upgradeable Proxy:**
   - **Function:** Supports the deployment of upgradeable smart contracts, allowing for protocol updates and improvements without disruption of ongoing services by maintaining the address of the contract.
   - **Features:** Ensures backwards compatibility and future-proofing of the Blocksense protocol by allowing the underlying logic of smart contracts to be upgraded.
-
-## Data Flow Diagram
-
-- **Data Collection and Reporting:**
-  - Reporters collect data from various internet sources and process it using predefined scripts.
-  - Anomaly detection ensures data integrity before reporting to the Blocksense protocol.
-- **Sequencing and Validation:**
-  - The Blocksense sequencer aggregates reports, validates them using cryptographic techniques, and creates transactions for publication on the blockchain.
-- **Publication on Blockchains:**
-  - Validated data feeds are published on EVM-compatible blockchains via Blocksense smart contracts.
-- **Data Consumption:**
-  - dApps and smart contracts access the latest and historical data feeds through Blocksense smart contracts.
 
 ## Summary
 

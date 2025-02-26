@@ -1,23 +1,31 @@
 ---
-title: Historic Data Feed Store
+title: Aggregated Data Feed Store
 ---
 
 import { Callout } from "@blocksense/ui/Callout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@blocksense/ui/Tabs';
 
-# Historical Data Feed Store
+# Aggregated Data Feed Store (ADFS)
 
-Historical Data Feed Store contract is where all data is stored and where all contracts read from. It is written in Solidity assembly and contains only one function: `fallback`.
+Aggregated Data Feed Store contract is where all data is stored and where all contracts read from. It is written in Solidity assembly and contains only one function: fallback.
 
 <Callout type="info" emoji="⚠️">
-  This contract serves as the core logic that dictates how the
-  [UpgradeableProxy](../../reference-documentation/UpgradeableProxy.mdx)
-  contract manages its own storage, handling both data writing and reading
-  operations. It's crucial to understand that all data is exclusively stored
-  within the **UpgradeableProxy** contract. To access this data, users must
-  interact with the `fallback` function of the **UpgradeableProxy** contract
-  which underneath calls the `fallback` function of the
-  **HistoricalDataFeedStore** contract.
+  This contract serves as the core logic that dictates how the [UpgradeableProxyADFS](../../reference-documentation/UpgradeableProxyADFS.mdx) contract
+  manages its own storage, handling both data writing and reading operations. Understanding
+  that all data is exclusively stored within the **UpgradeableProxyADFS** contract is crucial.
+  To access this data, users must interact with the `fallback` function of the **UpgradeableProxyADFS**
+  contract which underneath calls the `fallback` function of the **AggregatedDataFeedStore** contract.
+</Callout>
+
+The examples below show how to call the contract to fetch data. All read calls must start with the first bit set to 1, where the whole selector is 1 byte (0x80 in binary is 0b10000000, i.e. first bit set to 1). To simplify the calls, we have the following types of calls:
+- selector **0x86**: getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
+- selector **0x81**: getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
+- selector **0x82**: getLatestSingleData(uint8 stride, uint120 feedId) returns (bytes)
+- selector **0x84**: getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
+
+<Callout type="info" emoji="ℹ️">
+  - Selector **0x83** will call both getLatestRound and getLatestSingleData.
+  - Selector **0x85** will call both getLatestRound and getLatestData.
 </Callout>
 
 ## Code Examples
@@ -31,7 +39,7 @@ Historical Data Feed Store contract is where all data is stored and where all co
 
 Here is a complete working example. After that, there are more details on how to perform a raw call.
 
-```solidity showLineNumbers copy filename="UpgradeableProxyConsumer.sol"
+```solidity showLineNumbers copy filename="UpgradeableProxyADFSConsumer.sol"
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -41,7 +49,7 @@ import {Blocksense} from 'lib/Blocksense.sol';
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract UpgradeableProxyConsumer {
+contract UpgradeableProxyADFSConsumer {
   address public immutable dataFeedStore;
 
   constructor(address feedAddress) {

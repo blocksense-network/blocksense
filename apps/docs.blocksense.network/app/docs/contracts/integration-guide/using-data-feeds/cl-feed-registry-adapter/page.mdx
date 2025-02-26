@@ -1,20 +1,20 @@
 ---
-title: Feed Registry
+title: CL Feed Registry Adapter
 ---
 import { Callout } from "@blocksense/ui/Callout";
 
-# Feed Registry
+# CL Feed Registry Adaper
 
-The Feed Registry serves as a blockchain-based directory that links assets to their corresponding data feeds. This system allows for direct querying of Blocksense data feeds using asset addresses, eliminating the need-to-know specific feed contract addresses. As a result, smart contracts can efficiently retrieve up-to-date asset prices through a single function call to a unified contract interface.
+The CL Feed Registry Adapter serves as a blockchain-based directory that links assets to their corresponding data feeds. This system allows for direct querying of Blocksense data feeds using asset addresses, eliminating the need-to-know specific feed contract addresses. As a result, smart contracts can efficiently retrieve up-to-date asset prices through a single function call to a unified contract interface.
 
 <Callout type="info" emoji="💡">
-  The Feed Registry exclusively includes feeds associated with canonical token
+  The CL Feed Registry Adapter exclusively includes feeds associated with canonical token
   addresses on a given network. Feeds without a corresponding token address,
   such as those for stock indices, are not included in the registry due to the
   lack of a canonical token representation.
 </Callout>
 
-For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [Feed Registry Reference Documentation](../../reference-documentation/CLFeedRegistryAdapter.mdx).
+For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [CL Feed Registry Adapter Reference Documentation](../../reference-documentation/CLFeedRegistryAdapter.mdx).
 
 ```mermaid
 ---
@@ -29,7 +29,7 @@ flowchart TD
   linkStyle default fill:none,stroke-width:1px,stroke:#1c1917
 
   A[Client] -->|get latest round data| FR[CLFeedRegistryAdapter]
-  FR -->|reads from| DFS[HistoricalDataFeedStore]
+  FR -->|reads from| DFS[AggregatedDataFeedStore]
 
   click FR "/docs/contracts/reference-documentation/contract/CLFeedRegistryAdapter" "Go to CLFeedRegistryAdapter"
 
@@ -39,17 +39,17 @@ flowchart TD
 ```
 
 <Callout type="info" emoji="💡">
-  The Feed Registry exclusively includes feeds associated with canonical token
+  The CL Feed Registry Adapter exclusively includes feeds associated with canonical token
   addresses on a given network. Feeds without a corresponding token address,
   such as those for stock indices, are not included in the registry due to the
   lack of a canonical token representation.
 </Callout>
 
-For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [Feed Registry Reference Documentation](../../reference-documentation/CLFeedRegistryAdapter.mdx).
+For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [CL Feed Registry Adapter Reference Documentation](../../reference-documentation/CLFeedRegistryAdapter.mdx).
 
 ## Base and Quote
 
-The Feed Registry maps feeds from `base` and `quote` address pairs. To get the latest WETH / USDC round data from the registry, call:
+The CL Feed Registry Adapter maps feeds from `base` and `quote` address pairs. To get the latest WETH / USDC round data from the registry, call:
 
 ```solidity copy filename="solidity"
 latestRoundData(address base, address quote)
@@ -68,7 +68,7 @@ latestRoundData(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1
 
 ### Solidity
 
-To consume price data from the Feed Registry, your smart contract should reference [`ICLFeedRegistryAdapter`](/coming-soon), which defines the external functions implemented by the Feed Registry.
+To consume price data from the CL Feed Registry Adapter, your smart contract should reference [`ICLFeedRegistryAdapter`](/coming-soon), which defines the external functions implemented by the CL Feed Registry Adapter.
 
 ```solidity showLineNumbers copy filename="RegistryConsumer.sol"
 // SPDX-License-Identifier: MIT
