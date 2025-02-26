@@ -17,6 +17,8 @@ pub struct BybitPriceData {
     pub symbol: String,
     #[serde(deserialize_with = "as_f64")]
     pub last_price: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub volume24h: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -53,11 +55,13 @@ impl PricesFetcher<'_> for BybitPriceFetcher {
                 .list
                 .into_iter()
                 .map(|value| {
+                    // We need this step because Bybit return the volume denominated in the price currency
+                    let volume = value.volume24h / value.last_price;
                     (
                         value.symbol,
                         PricePoint {
                             price: value.last_price,
-                            volume: 1.0,
+                            volume,
                         },
                     )
                 })
