@@ -3433,6 +3433,7 @@ dependencies = [
  "futures",
  "itertools 0.14.0",
  "serde 1.0.217",
+ "serde-this-or-that",
  "serde_derive",
  "serde_json",
  "url",
@@ -9412,6 +9413,15 @@ dependencies = [
  "num-traits 0.1.43",
  "regex",
  "serde 0.8.23",
+]
+
+[[package]]
+name = "serde-this-or-that"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f90e7ee61f57b2b1a195326bf7ee88651d3d5e688f34bd5971110851764200bf"
+dependencies = [
+ "serde 1.0.217",
 ]
 
 [[package]]
