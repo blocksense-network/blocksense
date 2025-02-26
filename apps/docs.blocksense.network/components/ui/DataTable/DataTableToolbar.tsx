@@ -70,11 +70,13 @@ export function DataTableToolbar<TData>({
             <X className="h-4 w-4" />
           </Button>
         )}
-        <DataTableViewOptions
-          table={table}
-          columnsTitles={columnsTitles}
-          invisibleColumns={invisibleColumns}
-        />
+        <section className="ml-auto">
+          <DataTableViewOptions
+            table={table}
+            columnsTitles={columnsTitles}
+            invisibleColumns={invisibleColumns}
+          />
+        </section>
       </div>
     </div>
   );

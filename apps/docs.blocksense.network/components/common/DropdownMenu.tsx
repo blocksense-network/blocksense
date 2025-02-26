@@ -8,6 +8,8 @@ import {
   useContext,
   HTMLAttributes,
   ReactNode,
+  RefObject,
+  MouseEvent,
 } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -17,7 +19,7 @@ interface DropdownContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
   toggle: () => void;
-  menuRef: React.RefObject<HTMLDivElement>;
+  menuRef: RefObject<HTMLDivElement>;
 }
 const DropdownContext = createContext<DropdownContextValue>(
   {} as DropdownContextValue,
@@ -28,7 +30,7 @@ export const DropdownMenu = ({ children }: { children: ReactNode }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: Event) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
@@ -60,7 +62,7 @@ export const DropdownMenuTrigger = ({
 }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) => {
   const { toggle } = useContext(DropdownContext);
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     toggle();
     if (props.onClick) {
       props.onClick(e);

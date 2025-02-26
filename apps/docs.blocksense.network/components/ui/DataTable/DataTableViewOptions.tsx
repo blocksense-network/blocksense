@@ -37,10 +37,7 @@ export function DataTableViewOptions<TData>({
           View
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="w-[150px] bg-white dark:bg-neutral-900"
-      >
+      <DropdownMenuContent align="end" className="w-[12rem]">
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
