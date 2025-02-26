@@ -19,6 +19,6 @@ pub struct ResourceResult {
     pub id: String,
     pub symbol: String,
     pub usd_symbol: String,
-    pub result: String,
+    pub price: String,
     //TODO(adikov): Add balance information when we start getting it.
 }

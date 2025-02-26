@@ -81,7 +81,7 @@ fn fill_results(
                     id: resource.id.clone(),
                     symbol: resource.symbol.clone(),
                     usd_symbol: quote.to_owned(),
-                    result: price.clone(),
+                    price: price.clone(),
                 });
                 break;
             }

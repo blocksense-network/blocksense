@@ -126,7 +126,7 @@ pub fn vwap_0(results: &[ResourceResult]) -> Result<f64> {
     //   THIS IS NOT THE PROPER IMPLEMENTATION IT IS FOR TEST PURPOSES
     let mut sum: f64 = 0.0f64;
     for res in results {
-        sum += res.result.parse::<f64>()?;
+        sum += res.price.parse::<f64>()?;
     }
 
     Ok(sum / results.len() as f64)
