@@ -56,7 +56,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
                     println!("❌ Error filling results for {exchange_id}: {err:?}");
                 });
             }
-            Err(err) => println!("❌ Error processing future: {err:?}"),
+            Err(err) => println!("❌ Error fetching prices from {exchange_id}: {err:?}"),
         }
     }
 
