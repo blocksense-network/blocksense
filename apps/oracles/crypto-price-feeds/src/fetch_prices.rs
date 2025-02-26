@@ -51,10 +51,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
             Ok(prices) => {
                 let time_taken = before_fetch.elapsed();
                 println!("ℹ️  Successfully fetched prices from {exchange_id} in {time_taken:?}",);
-
-                fill_results(resources, prices, &mut results).unwrap_or_else(|err| {
-                    println!("❌ Error filling results for {exchange_id}: {err:?}");
-                });
+                fill_results(resources, prices, &mut results);
             }
             Err(err) => println!("❌ Error fetching prices from {exchange_id}: {err:?}"),
         }
@@ -69,7 +66,7 @@ fn fill_results(
     resources: &[ResourceData],
     prices: PairPriceData,
     results: &mut TradingPairToResults,
-) -> Result<()> {
+) {
     //TODO(adikov): We need a proper way to get trade volume from Binance API.
     for resource in resources {
         // First USD pair found.
@@ -87,8 +84,6 @@ fn fill_results(
             }
         }
     }
-
-    Ok(())
 }
 
 fn fetch<'a, PF>(symbols: &'a [String]) -> LocalBoxFuture<'a, (&'static str, Result<PairPriceData>)>
