@@ -72,7 +72,7 @@ pub async fn consume_reports(
     num_valid_reporters: usize,
     is_oneshot: bool,
     aggregator: FeedAggregate,
-    history: &Arc<RwLock<FeedAggregateHistory>>,
+    history: &Option<Arc<RwLock<FeedAggregateHistory>>>,
     feed_id: u32,
 ) -> ConsumedReports {
     let values = collect_repoted_values(feed_type, feed_id, reports, slot);
@@ -114,35 +114,38 @@ pub async fn consume_reports(
 
         // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
         if !is_oneshot {
-            if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
-                let ad_score = perform_anomaly_detection(feed_id, history, candidate_value).await;
-                match ad_score {
-                    Ok(ad_score) => {
-                        info!(
-                            "AD_score for {:?} is {}",
-                            result_post_to_contract.value, ad_score
-                        );
-                        ad_score_opt = Some(ad_score)
+            if let Some(history) = history {
+                if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
+                    let ad_score =
+                        perform_anomaly_detection(feed_id, history, candidate_value).await;
+                    match ad_score {
+                        Ok(ad_score) => {
+                            info!(
+                                "AD_score for {:?} is {}",
+                                result_post_to_contract.value, ad_score
+                            );
+                            ad_score_opt = Some(ad_score)
+                        }
+                        Err(e) => {
+                            warn!("Anomaly Detection failed with error - {}", e);
+                        }
                     }
-                    Err(e) => {
-                        warn!("Anomaly Detection failed with error - {}", e);
+                    {
+                        let criteria = PublishCriteria {
+                            feed_id,
+                            skip_publish_if_less_then_percentage,
+                            always_publish_heartbeat_ms,
+                            peg_to_value: None,
+                            peg_tolerance_percentage: 0.0f64,
+                        };
+                        debug!("Get a read lock on history [feed {feed_id}]");
+                        let history_guard = history.read().await;
+                        skip_publishing =
+                            result_post_to_contract.should_skip(&criteria, &history_guard);
+                        debug!("Release the read lock on history [feed {feed_id}]");
                     }
-                }
-                {
-                    let criteria = PublishCriteria {
-                        feed_id,
-                        skip_publish_if_less_then_percentage,
-                        always_publish_heartbeat_ms,
-                        peg_to_value: None,
-                        peg_tolerance_percentage: 0.0f64,
-                    };
-                    debug!("Get a read lock on history [feed {feed_id}]");
-                    let history_guard = history.read().await;
-                    skip_publishing =
-                        result_post_to_contract.should_skip(&criteria, &history_guard);
-                    debug!("Release the read lock on history [feed {feed_id}]");
-                }
-            }
+                };
+            };
         }
         let res = ConsumedReports {
             is_quorum_reached,
@@ -245,12 +248,15 @@ pub async fn perform_anomaly_detection(
         .context("Failed to join feed slots manager anomaly detection!")?
 }
 
+type FeedId = u32;
+type FeedTimestamp = u64;
+type FeedIdToTimetamp = HashMap<FeedId, FeedTimestamp>;
+
 pub async fn validate(
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     mut batch: ConsensusSecondRoundBatch,
-    history: &Arc<RwLock<FeedAggregateHistory>>,
     reporters_keys: HashMap<u64, PublicKey>,
-    feeds_last_updated_slots: &mut HashMap<u32, u64>,
+    feeds_last_updated_slots: &mut FeedIdToTimetamp,
 ) -> Result<()> {
     // Check that all the aggregated values have a corresponding set of votes
     let feed_ids_in_updates: Vec<u32> = batch.updates.iter().map(|u| u.feed_id).collect();
@@ -370,7 +376,7 @@ pub async fn validate(
             num_valid_reporters,
             false,
             get_aggregator(feed_metadata.aggregate_type.as_str()),
-            history,
+            &None,
             update.feed_id,
         )
         .await;
