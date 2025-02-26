@@ -124,7 +124,7 @@ impl FeedSlotsProcessor {
                     num_valid_reporters,
                     is_oneshot,
                     aggregator,
-                    history,
+                    &Some(history.clone()),
                     feed_id,
                 )
                 .await;
