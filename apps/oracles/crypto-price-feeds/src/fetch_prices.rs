@@ -1,7 +1,6 @@
 use anyhow::Result;
 use futures::FutureExt;
 
-use std::collections::HashMap;
 use std::time::Instant;
 
 use futures::stream::{FuturesUnordered, StreamExt};
@@ -43,7 +42,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
     ]);
 
     let before_fetch = Instant::now();
-    let mut results = HashMap::new();
+    let mut results = TradingPairToResults::new();
 
     // Process results as they complete
     while let Some((exchange_id, result)) = futures_set.next().await {
