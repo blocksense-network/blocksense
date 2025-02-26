@@ -3,7 +3,11 @@ use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct UpBitMarketResponseData {
@@ -45,7 +49,13 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
                 .map(|price| {
                     let parts: Vec<&str> = price.market.split('-').collect();
                     let transformed_market = format!("{}{}", parts[1], parts[0]);
-                    (transformed_market, price.trade_price)
+                    (
+                        transformed_market,
+                        PricePoint {
+                            price: price.trade_price,
+                            volume: 1.0,
+                        },
+                    )
                 })
                 .collect())
         }

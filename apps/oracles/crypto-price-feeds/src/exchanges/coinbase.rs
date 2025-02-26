@@ -4,7 +4,11 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct CoinbasePriceData {
@@ -42,7 +46,7 @@ impl PricesFetcher<'_> for CoinbasePriceFetcher {
                     Ok(price_as_number) => {
                         let price = 1.0 / price_as_number;
                         let pair = format!("{}{}", asset, "USD");
-                        Some((pair, price))
+                        Some((pair, PricePoint { price, volume: 1.0 }))
                     }
                     Err(_) => None,
                 })

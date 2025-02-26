@@ -9,7 +9,11 @@ use std::ops::Deref;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct GeminiPriceResponse {
@@ -43,7 +47,7 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
 
             while let Some(result) = futures.next().await {
                 if let Ok((symbol, price)) = result {
-                    prices.insert(symbol, price);
+                    prices.insert(symbol, PricePoint { price, volume: 1.0 });
                 }
             }
 

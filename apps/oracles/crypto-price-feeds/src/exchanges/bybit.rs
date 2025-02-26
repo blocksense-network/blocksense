@@ -4,7 +4,11 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 //TODO(adikov): Include all the needed fields form the response like volume.
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -48,7 +52,15 @@ impl PricesFetcher<'_> for BybitPriceFetcher {
                 .result
                 .list
                 .into_iter()
-                .map(|value| (value.symbol, value.last_price))
+                .map(|value| {
+                    (
+                        value.symbol,
+                        PricePoint {
+                            price: value.last_price,
+                            volume: 1.0,
+                        },
+                    )
+                })
                 .collect())
         }
         .boxed_local()

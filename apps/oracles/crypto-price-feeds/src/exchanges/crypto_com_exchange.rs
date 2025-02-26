@@ -4,7 +4,11 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct CryptoComPriceData {
@@ -47,7 +51,15 @@ impl PricesFetcher<'_> for CryptoComPriceFetcher {
                 .into_iter()
                 //  we should consider what to do with perp
                 .filter(|value| !value.i.contains("-PERP"))
-                .map(|value| (value.i.replace("_", ""), value.a))
+                .map(|value| {
+                    (
+                        value.i.replace("_", ""),
+                        PricePoint {
+                            price: value.a,
+                            volume: 1.0,
+                        },
+                    )
+                })
                 .collect())
         }
         .boxed_local()

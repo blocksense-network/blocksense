@@ -5,7 +5,11 @@ use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::{Deserialize, Deserializer};
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 fn as_f64_option<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
 where
@@ -61,7 +65,15 @@ impl PricesFetcher<'_> for KuCoinPriceFetcher {
                 .into_iter()
                 .filter(|value| value.last.is_some())
                 // KuCoin have symbols in format "X-Y". We need to match logic in `fill_results`
-                .map(|value| (value.symbol.replace("-", ""), value.last.unwrap()))
+                .map(|value| {
+                    (
+                        value.symbol.replace("-", ""),
+                        PricePoint {
+                            price: value.last.unwrap(),
+                            volume: 1.0,
+                        },
+                    )
+                })
                 .collect())
         }
         .boxed_local()

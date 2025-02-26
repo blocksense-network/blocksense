@@ -9,7 +9,11 @@ use std::ops::Deref;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct OKXInstrument {
@@ -62,7 +66,7 @@ impl<'a> PricesFetcher<'a> for OKXPriceFetcher<'a> {
 
             while let Some(result) = futures.next().await {
                 if let Ok((symbol, price)) = result {
-                    prices.insert(symbol.replace("-", ""), price);
+                    prices.insert(symbol.replace("-", ""), PricePoint { price, volume: 1.0 });
                 }
             }
 
@@ -80,7 +84,7 @@ async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, f64)> {
         .data
         .first()
         .context("No data")
-        .map(|data| (data.inst_id.clone(), data.idx_px.clone()))
+        .map(|data| (data.inst_id.clone(), data.idx_px))
 }
 
 pub async fn fetch_okx_symbols() -> Result<Vec<String>> {

@@ -7,7 +7,11 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 fn as_f64_vec<'de, D>(deserializer: D) -> Result<Vec<f64>, D::Error>
 where
@@ -52,14 +56,10 @@ impl PricesFetcher<'_> for KrakenPriceFetcher {
                 .result
                 .into_iter()
                 .map(|(symbol, price_data)| {
-                    let price = price_data
-                        .a
-                        .first()
-                        .with_context(|| {
-                            format!("Kraken has no price in response for symbol: {symbol}")
-                        })?
-                        .clone();
-                    Ok((symbol, price))
+                    let price = *price_data.a.first().with_context(|| {
+                        format!("Kraken has no price in response for symbol: {symbol}")
+                    })?;
+                    Ok((symbol, PricePoint { price, volume: 1.0 }))
                 })
                 .collect::<Result<PairPriceData>>()
         }

@@ -4,7 +4,11 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer};
 use serde_json::{from_value, Value};
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct TradingPairTicker {
@@ -110,7 +114,13 @@ impl PricesFetcher<'_> for BitfinexPriceFetcher {
             Ok(response
                 .into_iter()
                 .filter_map(|ticker| match ticker {
-                    BitfinexPriceResponseData::Trading(data) => Some((data.symbol(), data.price())),
+                    BitfinexPriceResponseData::Trading(data) => Some((
+                        data.symbol(),
+                        PricePoint {
+                            price: data.price(),
+                            volume: 1.0,
+                        },
+                    )),
                     _ => None,
                 })
                 .collect())

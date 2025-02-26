@@ -4,7 +4,11 @@ use futures::FutureExt;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+use crate::{
+    common::{PairPriceData, PricePoint},
+    http::http_get_json,
+    traits::prices_fetcher::PricesFetcher,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct BitgetPriceData {
@@ -39,7 +43,15 @@ impl PricesFetcher<'_> for BitgetPriceFetcher {
             Ok(response
                 .data
                 .into_iter()
-                .map(|value| (value.symbol, value.close))
+                .map(|value| {
+                    (
+                        value.symbol,
+                        PricePoint {
+                            price: value.close,
+                            volume: 1.0,
+                        },
+                    )
+                })
                 .collect())
         }
         .boxed_local()
