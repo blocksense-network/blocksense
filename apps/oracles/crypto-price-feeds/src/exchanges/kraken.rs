@@ -43,10 +43,9 @@ impl PricesFetcher<'_> for KrakenPriceFetcher {
                     let price = price_data
                         .a
                         .first()
-                        .context(format!(
-                            "Kraken has no price in response for symbol: {}",
-                            symbol
-                        ))?
+                        .with_context(|| {
+                            format!("Kraken has no price in response for symbol: {symbol}")
+                        })?
                         .clone();
                     Ok((symbol, price))
                 })
