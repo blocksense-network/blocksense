@@ -24,7 +24,13 @@ pub struct CryptoComPriceResponse {
 
 pub struct CryptoComPriceFetcher;
 
-impl PricesFetcher for CryptoComPriceFetcher {
+impl PricesFetcher<'_> for CryptoComPriceFetcher {
+    const NAME: &'static str = "Crypto.com";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<CryptoComPriceResponse>(

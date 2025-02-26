@@ -21,7 +21,13 @@ pub struct KrakenPriceResponse {
 
 pub struct KrakenPriceFetcher;
 
-impl PricesFetcher for KrakenPriceFetcher {
+impl PricesFetcher<'_> for KrakenPriceFetcher {
+    const NAME: &'static str = "Kraken";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<KrakenPriceResponse>(

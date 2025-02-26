@@ -15,7 +15,13 @@ type GateIoPriceResponse = Vec<GateIoPriceData>;
 
 pub struct GateIoPriceFetcher;
 
-impl PricesFetcher for GateIoPriceFetcher {
+impl PricesFetcher<'_> for GateIoPriceFetcher {
+    const NAME: &'static str = "Gate.io";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<GateIoPriceResponse>(

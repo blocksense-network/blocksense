@@ -24,13 +24,13 @@ pub struct UpBitPriceFetcher<'a> {
     pub symbols: &'a [String],
 }
 
-impl<'a> UpBitPriceFetcher<'a> {
-    pub fn new(symbols: &'a [String]) -> Self {
+impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
+    const NAME: &'static str = "UpBit";
+
+    fn new(symbols: &'a [String]) -> Self {
         Self { symbols }
     }
-}
 
-impl PricesFetcher for UpBitPriceFetcher<'_> {
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let all_markets = self.symbols.join(",");

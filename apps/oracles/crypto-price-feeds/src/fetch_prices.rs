@@ -1,7 +1,8 @@
 use anyhow::Result;
+use futures::FutureExt;
 
+use std::collections::HashMap;
 use std::time::Instant;
-use std::{collections::HashMap, future::Future};
 
 use futures::stream::{FuturesUnordered, StreamExt};
 
@@ -19,39 +20,35 @@ use crate::{
     traits::prices_fetcher::PricesFetcher,
 };
 
+use futures::future::LocalBoxFuture;
+
 pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairToResults> {
     let symbols = load_exchange_symbols(resources).await?;
 
-    let tagged_fetchers: &[(&str, Box<dyn PricesFetcher>)] = &[
-        ("Binance", Box::new(BinancePriceFetcher)),
-        ("Binance US", Box::new(BinanceUsPriceFetcher)),
-        ("Bitfinex", Box::new(BitfinexPriceFetcher)),
-        ("Bitget", Box::new(BitgetPriceFetcher)),
-        ("Bybit", Box::new(BybitPriceFetcher)),
-        ("Coinbase", Box::new(CoinbasePriceFetcher)),
-        ("Crypto.com", Box::new(CryptoComPriceFetcher)),
-        ("Gate.io", Box::new(GateIoPriceFetcher)),
-        ("Gemini", Box::new(GeminiPriceFetcher::new(&symbols.gemini))),
-        ("Kraken", Box::new(KrakenPriceFetcher)),
-        ("KuCoin", Box::new(KuCoinPriceFetcher)),
-        ("MEXC", Box::new(MEXCPriceFetcher)),
-        ("OKX", Box::new(OKXPriceFetcher::new(&symbols.okx))),
-        ("Upbit", Box::new(UpBitPriceFetcher::new(&symbols.upbit))),
-    ];
-
-    let mut futures_set = FuturesUnordered::from_iter(
-        tagged_fetchers
-            .iter()
-            .map(|(exchange_id, fetcher)| try_tag_future(exchange_id, fetcher.fetch())),
-    );
+    let mut futures_set = FuturesUnordered::from_iter([
+        fetch::<BinancePriceFetcher>(&[]),
+        fetch::<BinanceUsPriceFetcher>(&[]),
+        fetch::<BitfinexPriceFetcher>(&[]),
+        fetch::<BitgetPriceFetcher>(&[]),
+        fetch::<BybitPriceFetcher>(&[]),
+        fetch::<CoinbasePriceFetcher>(&[]),
+        fetch::<CryptoComPriceFetcher>(&[]),
+        fetch::<GateIoPriceFetcher>(&[]),
+        fetch::<GeminiPriceFetcher>(&symbols.gemini),
+        fetch::<KrakenPriceFetcher>(&[]),
+        fetch::<KuCoinPriceFetcher>(&[]),
+        fetch::<MEXCPriceFetcher>(&[]),
+        fetch::<OKXPriceFetcher>(&symbols.okx),
+        fetch::<UpBitPriceFetcher>(&symbols.upbit),
+    ]);
 
     let before_fetch = Instant::now();
     let mut results = HashMap::new();
 
     // Process results as they complete
-    while let Some(result) = futures_set.next().await {
+    while let Some((exchange_id, result)) = futures_set.next().await {
         match result {
-            Ok((exchange_id, prices)) => {
+            Ok(prices) => {
                 let time_taken = before_fetch.elapsed();
                 println!("ℹ️  Successfully fetched prices from {exchange_id} in {time_taken:?}",);
 
@@ -94,9 +91,14 @@ fn fill_results(
     Ok(())
 }
 
-async fn try_tag_future<T>(
-    tag: &str,
-    future: impl Future<Output = Result<T>>,
-) -> Result<(&str, T)> {
-    Ok((tag, future.await?))
+fn fetch<'a, PF>(symbols: &'a [String]) -> LocalBoxFuture<'a, (&'static str, Result<PairPriceData>)>
+where
+    PF: PricesFetcher<'a>,
+{
+    async {
+        let fetcher = PF::new(symbols);
+        let res = fetcher.fetch().await;
+        (PF::NAME, res)
+    }
+    .boxed_local()
 }

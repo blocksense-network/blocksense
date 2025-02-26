@@ -92,7 +92,13 @@ impl<'de> Deserialize<'de> for BitfinexPriceResponseData {
 
 pub struct BitfinexPriceFetcher;
 
-impl PricesFetcher for BitfinexPriceFetcher {
+impl PricesFetcher<'_> for BitfinexPriceFetcher {
+    const NAME: &'static str = "Bitfinex";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<Vec<BitfinexPriceResponseData>>(

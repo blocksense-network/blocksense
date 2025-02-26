@@ -15,7 +15,13 @@ type BinancePriceResponse = Vec<BinancePriceData>;
 
 pub struct BinancePriceFetcher;
 
-impl PricesFetcher for BinancePriceFetcher {
+impl PricesFetcher<'_> for BinancePriceFetcher {
+    const NAME: &'static str = "Binance";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<BinancePriceResponse>(

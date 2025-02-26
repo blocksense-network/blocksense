@@ -18,7 +18,13 @@ pub struct BitgetPriceResponse {
 }
 pub struct BitgetPriceFetcher;
 
-impl PricesFetcher for BitgetPriceFetcher {
+impl PricesFetcher<'_> for BitgetPriceFetcher {
+    const NAME: &'static str = "Bitget";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> futures::future::LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<BitgetPriceResponse>(

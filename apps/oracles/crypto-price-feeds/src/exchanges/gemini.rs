@@ -21,13 +21,13 @@ pub struct GeminiPriceFetcher<'a> {
     pub symbols: &'a [String],
 }
 
-impl<'a> GeminiPriceFetcher<'a> {
-    pub fn new(symbols: &'a [String]) -> Self {
+impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
+    const NAME: &'static str = "Gemini";
+
+    fn new(symbols: &'a [String]) -> Self {
         Self { symbols }
     }
-}
 
-impl PricesFetcher for GeminiPriceFetcher<'_> {
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let prices_futures = self

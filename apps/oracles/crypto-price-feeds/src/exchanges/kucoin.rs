@@ -24,7 +24,13 @@ pub struct KuCoinPriceResponse {
 
 pub struct KuCoinPriceFetcher;
 
-impl PricesFetcher for KuCoinPriceFetcher {
+impl PricesFetcher<'_> for KuCoinPriceFetcher {
+    const NAME: &'static str = "KuCoin";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<KuCoinPriceResponse>(

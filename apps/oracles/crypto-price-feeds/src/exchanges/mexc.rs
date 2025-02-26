@@ -15,7 +15,13 @@ type MEXCPriceResponse = Vec<MEXCPriceData>;
 
 pub struct MEXCPriceFetcher;
 
-impl PricesFetcher for MEXCPriceFetcher {
+impl PricesFetcher<'_> for MEXCPriceFetcher {
+    const NAME: &'static str = "MEXC";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<MEXCPriceResponse>(

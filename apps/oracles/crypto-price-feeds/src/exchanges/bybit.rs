@@ -28,7 +28,12 @@ pub struct BybitPriceResponse {
 }
 pub struct BybitPriceFetcher;
 
-impl PricesFetcher for BybitPriceFetcher {
+impl PricesFetcher<'_> for BybitPriceFetcher {
+    const NAME: &'static str = "Bybit";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<BybitPriceResponse>(

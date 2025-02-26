@@ -19,7 +19,13 @@ pub struct CoinbasePriceResponse {
 
 pub struct CoinbasePriceFetcher;
 
-impl PricesFetcher for CoinbasePriceFetcher {
+impl PricesFetcher<'_> for CoinbasePriceFetcher {
+    const NAME: &'static str = "Coinbase";
+
+    fn new(_symbols: &[String]) -> Self {
+        Self
+    }
+
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<CoinbasePriceResponse>(
