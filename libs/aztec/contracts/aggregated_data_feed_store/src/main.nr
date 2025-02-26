@@ -14,8 +14,9 @@ contract AggregatedDataFeedStore {
     /// Each round metadata has id and its data => 4 * 2.
     /// Thus (58 * 3) + (4 * 2) = 182.
     global MAX_FEEDS_AND_ROUNDS_DATA: u32 = 182;
-    global SIXTEEN: Field = 16;
     global TWO: Field = 2;
+    global MAX_ROUND_VALUES_IN_A_FIELD: Field = 15;
+    global ROUND_SIZE_IN_BITS: Field = 16;
     global ROUNDS_MAX_SIZE: Field = 8192; // 2^13
     global ROUND_VALUE_MAX_BITS_SIZE: Field = 65536; // 2^16
     global ROUND_TABLE_SCALAR_VALUE: Field = 41538374868278621028243970633760768; // 2^115
@@ -121,18 +122,18 @@ contract AggregatedDataFeedStore {
     }
 
     fn calculate_round_index(stride: Field, feed_id: Field) -> pub Field {
-        ((ROUND_TABLE_SCALAR_VALUE * stride) + feed_id) / 15
+        ((ROUND_TABLE_SCALAR_VALUE * stride) + feed_id) / MAX_ROUND_VALUES_IN_A_FIELD
     }
 
     fn calculate_slot_position(feed_id: Field) -> pub Field {
-        let quotient = feed_id / 15;
-        let remainder = feed_id - (quotient * 15);
+        let quotient = feed_id / MAX_ROUND_VALUES_IN_A_FIELD;
+        let remainder = feed_id - (quotient * MAX_ROUND_VALUES_IN_A_FIELD);
 
         remainder
     }
 
     fn get_slot_value(row_value: Field, slot_index: Field) -> pub Field {
-        let shift_factor = TWO.pow_32(slot_index * SIXTEEN); //TODO: ROUND_SIZE_IN_BITS
+        let shift_factor = TWO.pow_32(slot_index * ROUND_SIZE_IN_BITS);
         let shifted_value = row_value / shift_factor;
 
         let upper_bits = (shifted_value / ROUND_VALUE_MAX_BITS_SIZE) * ROUND_VALUE_MAX_BITS_SIZE;

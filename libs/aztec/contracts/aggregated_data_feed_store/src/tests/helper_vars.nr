@@ -2,9 +2,10 @@ pub global ZERO: Field = 0;
 pub global ONE: Field = 1;
 pub global TWO: Field = 2;
 pub global THREE: Field = 3;
-pub global FOUR: u32 = 4;
-pub global SIXTEEN: Field = 16;
-pub global FIFTY_EIGHT: u32 = 58;
+pub global MAX_ROUNDS_SIZE_FOR_STRIDE_0: u32 = 4;
+pub global MAX_ROUND_VALUES_IN_A_FIELD: Field = 15;
+pub global ROUND_SIZE_IN_BITS: Field = 16;
+pub global MAX_FEEDS_SIZE_FOR_STRIDE_0: u32 = 58;
 pub global TWO_POW_13: Field = 8192; // 2^13
 pub global TWO_POW_16: Field = 65536; // 2^16
 pub global TWO_POW_115: Field = 41538374868278621028243970633760768; // 2^115
@@ -17,18 +18,18 @@ pub unconstrained fn calculate_feed_index(feed_id: Field, round: Field, stride: 
 }
 
 pub fn calculate_round_index(stride: Field, feed_id: Field) -> Field {
-    ((TWO_POW_115 * stride) + feed_id) / 15
+    ((TWO_POW_115 * stride) + feed_id) / MAX_ROUND_VALUES_IN_A_FIELD
 }
 
 pub fn calculate_slot_position(feed_id: Field) -> Field {
-    let quotient = feed_id / 15;
-    let remainder = feed_id - (quotient * 15);
+    let quotient = feed_id / MAX_ROUND_VALUES_IN_A_FIELD;
+    let remainder = feed_id - (quotient * MAX_ROUND_VALUES_IN_A_FIELD);
 
     remainder
 }
 
 pub fn get_slot_value(row_value: Field, slot_index: Field) -> Field {
-    let shift_factor = TWO.pow_32(slot_index * SIXTEEN);
+    let shift_factor = TWO.pow_32(slot_index * ROUND_SIZE_IN_BITS);
     let shifted_value = row_value / shift_factor;
 
     let upper_bits = (shifted_value / TWO_POW_16) * TWO_POW_16;

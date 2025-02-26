@@ -3,7 +3,8 @@ use dep::aztec::prelude::AztecAddress;
 
 use crate::AggregatedDataFeedStore;
 use crate::tests::helper_vars::{
-    _58_DATA_FEEDS_STRIDE_0, calculate_round_index, calculate_slot_position, FIFTY_EIGHT, FOUR,
+    _58_DATA_FEEDS_STRIDE_0, calculate_round_index, calculate_slot_position,
+    MAX_FEEDS_SIZE_FOR_STRIDE_0, MAX_ROUNDS_SIZE_FOR_STRIDE_0,
 };
 use crate::tests::utils::{
     assert_feeds_are_stored_in_correct_slots, assert_get_feed_at_round_produces_correct_result,
@@ -27,15 +28,18 @@ unconstrained fn test_store_58_data_fields_with_length_1() {
     let block_number = get_block_number();
 
     AggregatedDataFeedStore::at(adfs_contract_address)
-        .set_feeds(_58_DATA_FEEDS_STRIDE_0, FIFTY_EIGHT, FOUR, block_number)
+        .set_feeds(
+            _58_DATA_FEEDS_STRIDE_0,
+            MAX_FEEDS_SIZE_FOR_STRIDE_0,
+            MAX_ROUNDS_SIZE_FOR_STRIDE_0,
+            block_number,
+        )
         .call(&mut env.public());
 
-    let data_feeds_slot = AggregatedDataFeedStore::storage_layout().data_feeds.slot;
-
-    assert_feeds_are_stored_in_correct_slots::<58>(
-        data_feeds_slot,
+    assert_feeds_are_stored_in_correct_slots(
         block_number,
         adfs_contract_address,
+        MAX_FEEDS_SIZE_FOR_STRIDE_0,
     );
 }
 
@@ -45,10 +49,19 @@ unconstrained fn test_get_feed_at_round() {
     let block_number = get_block_number();
 
     AggregatedDataFeedStore::at(adfs_contract_address)
-        .set_feeds(_58_DATA_FEEDS_STRIDE_0, FIFTY_EIGHT, FOUR, block_number)
+        .set_feeds(
+            _58_DATA_FEEDS_STRIDE_0,
+            MAX_FEEDS_SIZE_FOR_STRIDE_0,
+            MAX_ROUNDS_SIZE_FOR_STRIDE_0,
+            block_number,
+        )
         .call(&mut env.public());
 
-    assert_get_feed_at_round_produces_correct_result::<58>(env, adfs_contract_address);
+    assert_get_feed_at_round_produces_correct_result(
+        env,
+        adfs_contract_address,
+        MAX_FEEDS_SIZE_FOR_STRIDE_0,
+    );
 }
 
 #[test]
@@ -57,7 +70,12 @@ unconstrained fn test_get_latest_round() {
     let block_number = get_block_number();
 
     AggregatedDataFeedStore::at(adfs_contract_address)
-        .set_feeds(_58_DATA_FEEDS_STRIDE_0, FIFTY_EIGHT, FOUR, block_number)
+        .set_feeds(
+            _58_DATA_FEEDS_STRIDE_0,
+            MAX_FEEDS_SIZE_FOR_STRIDE_0,
+            MAX_ROUNDS_SIZE_FOR_STRIDE_0,
+            block_number,
+        )
         .call(&mut env.public());
 
     let round_index = calculate_round_index(0, 1);
@@ -92,7 +110,12 @@ unconstrained fn test_get_latest_data() {
     let block_number = get_block_number();
 
     AggregatedDataFeedStore::at(adfs_contract_address)
-        .set_feeds(_58_DATA_FEEDS_STRIDE_0, FIFTY_EIGHT, FOUR, block_number)
+        .set_feeds(
+            _58_DATA_FEEDS_STRIDE_0,
+            MAX_FEEDS_SIZE_FOR_STRIDE_0,
+            MAX_ROUNDS_SIZE_FOR_STRIDE_0,
+            block_number,
+        )
         .call(&mut env.public());
 
     let latest_data = AggregatedDataFeedStore::at(adfs_contract_address)
@@ -107,7 +130,12 @@ unconstrained fn test_block_number_greater_than_previous() {
     let block_number = get_block_number() - 1;
 
     AggregatedDataFeedStore::at(adfs_contract_address)
-        .set_feeds(_58_DATA_FEEDS_STRIDE_0, FIFTY_EIGHT, FOUR, block_number)
+        .set_feeds(
+            _58_DATA_FEEDS_STRIDE_0,
+            MAX_FEEDS_SIZE_FOR_STRIDE_0,
+            MAX_ROUNDS_SIZE_FOR_STRIDE_0,
+            block_number,
+        )
         .call(&mut env.public());
 }
 
@@ -119,7 +147,12 @@ unconstrained fn test_write_when_not_in_access_control() {
     env.impersonate(alice);
 
     AggregatedDataFeedStore::at(adfs_contract_address)
-        .set_feeds(_58_DATA_FEEDS_STRIDE_0, FIFTY_EIGHT, FOUR, block_number)
+        .set_feeds(
+            _58_DATA_FEEDS_STRIDE_0,
+            MAX_FEEDS_SIZE_FOR_STRIDE_0,
+            MAX_ROUNDS_SIZE_FOR_STRIDE_0,
+            block_number,
+        )
         .call(&mut env.public());
 }
 
@@ -129,7 +162,12 @@ unconstrained fn test_get_latest_data_and_round() {
     let block_number = get_block_number();
 
     AggregatedDataFeedStore::at(adfs_contract_address)
-        .set_feeds(_58_DATA_FEEDS_STRIDE_0, FIFTY_EIGHT, FOUR, block_number)
+        .set_feeds(
+            _58_DATA_FEEDS_STRIDE_0,
+            MAX_FEEDS_SIZE_FOR_STRIDE_0,
+            MAX_ROUNDS_SIZE_FOR_STRIDE_0,
+            block_number,
+        )
         .call(&mut env.public());
 
     let input_data_feed_index: Field = 45;
