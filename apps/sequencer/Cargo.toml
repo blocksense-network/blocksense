@@ -7,6 +7,7 @@ edition.workspace = true
 
 [dependencies]
 data_feeds = { path = "../../libs/data_feeds" }
+feeds_processing = { path = "../../libs/feeds_processing"}
 anomaly_detection = { path = "../../libs/anomaly_detection" }
 config = { path = "../../libs/config" }
 blocksense-registry = { path = "../../libs/registry" }
