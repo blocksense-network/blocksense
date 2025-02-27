@@ -121,7 +121,7 @@ impl FeedSlotsProcessor {
                     num_valid_reporters,
                     is_oneshot,
                     aggregator,
-                    &Some(history.clone()),
+                    Some(history.clone()),
                     feed_id,
                 )
                 .await;
@@ -413,7 +413,7 @@ pub mod tests {
         let first_report_start_time = SystemTime::now();
         let always_publish_heartbeat_ms = None;
         let feed_metadata = FeedMetaData::new(
-            name,
+            name.to_string(),
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
@@ -605,7 +605,7 @@ pub mod tests {
         let first_report_start_time = SystemTime::now();
         let always_publish_heartbeat_ms = None;
         let feed_metadata = FeedMetaData::new(
-            name,
+            name.to_string(),
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
@@ -708,7 +708,7 @@ pub mod tests {
             SystemTime::now() - Duration::from_millis(report_interval_ms * 3);
         let always_publish_heartbeat_ms = None;
         let feed_metadata = FeedMetaData::new(
-            name,
+            name.to_string(),
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
@@ -816,7 +816,7 @@ pub mod tests {
             SystemTime::now() - Duration::from_millis(report_interval_ms * 3);
         let always_publish_heartbeat_ms = None;
         let feed_metadata = FeedMetaData::new(
-            name,
+            name.to_string(),
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
@@ -922,7 +922,7 @@ pub mod tests {
         let first_report_start_time =
             SystemTime::now() - Duration::from_millis(report_interval_ms * 3);
         let feed_metadata = FeedMetaData::new(
-            name,
+            name.to_string(),
             report_interval_ms,
             quorum_percentage,
             skip_publish_if_less_then_percentage,
