@@ -14,7 +14,7 @@ The CL Aggregator Adapter is a smart contract that acts as a proxy for a Blockse
   representation.
 </Callout>
 
-For a complete list of functions and parameters for the CLAggregatorAdapter contract, see the [CL Aggregator Adapter Reference Documentation](../../reference-documentation/CLAggregatorAdapter.mdx).
+For a complete list of functions and parameters for the CLAggregatorAdapter contract, see the [CL Aggregator Adapter Reference Documentation](../../reference-documentation/contract/CLAggregatorAdapter.mdx).
 
 ```mermaid
 ---
@@ -36,8 +36,6 @@ flowchart TD
   class DFS dataNode
 ```
 
-For a complete list of functions and parameters for the CLAggregatorAdapter contract, see the [CL Aggregator Adapter Reference Documentation](../../reference-documentation/CLAggregatorAdapter.mdx).
-
 ## Code Examples
 
 ### Solidity
@@ -47,6 +45,9 @@ To consume price data from the CL Aggregator Adapter, your smart contract should
 ```solidity showLineNumbers copy filename="CLAggregatorAdapterConsumer.sol"
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+
+import {IChainlinkAggregator} from 'interfaces/chainlink/IChainlinkAggregator.sol';
+
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
@@ -59,8 +60,36 @@ contract CLAggregatorAdapterConsumer {
     feed = IChainlinkAggregator(feedAddress);
   }
 
-  function getLatestAnswer() external view returns (uint256) {
+  function getDecimals() external view returns (uint8 decimals_) {
+    return feed.decimals();
+  }
+
+  function getDescription() external view returns (string memory description_) {
+    return feed.description();
+  }
+
+  function getLatestAnswer() external view returns (uint256 answer) {
     return uint256(feed.latestAnswer());
+  }
+
+  function getLatestRound() external view returns (uint256 roundId) {
+    return feed.latestRound();
+  }
+
+  function getRoundData(
+    uint80 roundId
+  )
+    external
+    view
+    returns (
+      uint80 roundId_,
+      int256 answer,
+      uint256 startedAt,
+      uint256 updatedAt,
+      uint80 answeredInRound
+    )
+  {
+    return feed.getRoundData(roundId);
   }
 
   function getLatestRoundData()
@@ -107,5 +136,5 @@ To get the feed key the CL Aggregator Adapter is responsible for:
 
 ```js copy filename="javascript"
 const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
-const key = await aggregator.key();
+const id = (await aggregator.id()) >> 120n;
 ```
