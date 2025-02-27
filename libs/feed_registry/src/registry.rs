@@ -53,7 +53,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
     let skip_publish_if_less_then_percentage = 0.0f32; // 0%
     let always_publish_heartbeat_ms = None;
     let fmd1 = FeedMetaData::new(
-        "DOGE/USD",
+        "DOGE/USD".to_string(),
         60000,
         60.0f32, // 60%
         skip_publish_if_less_then_percentage,
@@ -64,7 +64,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         None,
     );
     let fmd2 = FeedMetaData::new(
-        "BTS/USD",
+        "BTS/USD".to_string(),
         30000,
         60.0f32, // 60%
         skip_publish_if_less_then_percentage,
@@ -75,7 +75,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         None,
     );
     let fmd3 = FeedMetaData::new(
-        "ETH/USD",
+        "ETH/USD".to_string(),
         60000,
         60.0f32, // 60%
         skip_publish_if_less_then_percentage,
@@ -102,7 +102,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
         fmdr.push(
             feed.id,
             FeedMetaData::new(
-                &feed.name,
+                feed.name.clone(),
                 feed.report_interval_ms,
                 feed.quorum_percentage,
                 feed.skip_publish_if_less_then_percentage,
@@ -615,7 +615,7 @@ mod tests {
             voting_start_time,
         );
         let regular_feed = FeedMetaData::new(
-            "TestFeed",
+            "TestFeed".to_string(),
             voting_wait_duration_ms,
             10.0f32, // 10%
             1.0f32,  // 1%

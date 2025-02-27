@@ -4,7 +4,7 @@ use config::{FeedConfig, PublishCriteria};
 use data_feeds::feeds_processing::{
     BatchedAggegratesToSend, VotedFeedUpdate, VotedFeedUpdateWithProof,
 };
-use feed_registry::aggregate::{get_aggregator, FeedAggregate};
+use feed_registry::aggregate::FeedAggregate;
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::{DataFeedPayload, FeedMetaData, FeedType, Timestamp};
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
@@ -69,10 +69,10 @@ pub async fn consume_reports(
     skip_publish_if_less_then_percentage: f64,
     always_publish_heartbeat_ms: Option<u128>,
     end_slot_timestamp: Timestamp,
-    num_valid_reporters: usize,
+    num_reporters: usize,
     is_oneshot: bool,
     aggregator: FeedAggregate,
-    history: &Option<Arc<RwLock<FeedAggregateHistory>>>,
+    history: Option<Arc<RwLock<FeedAggregateHistory>>>,
     feed_id: u32,
 ) -> ConsumedReports {
     let values = collect_repoted_values(feed_type, feed_id, reports, slot);
@@ -88,13 +88,13 @@ pub async fn consume_reports(
         }
     } else {
         let total_votes_count = values.len() as f32;
-        let required_votes_count = quorum_percentage * 0.01f32 * (num_valid_reporters as f32);
+        let required_votes_count = quorum_percentage * 0.01f32 * (num_reporters as f32);
         let is_quorum_reached = required_votes_count <= total_votes_count;
         let mut skip_publishing = false;
         if !is_quorum_reached {
             warn!(
                 "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
-                name, &slot, quorum_percentage, total_votes_count, num_valid_reporters
+                name, &slot, quorum_percentage, total_votes_count, num_reporters
             );
         }
 
@@ -117,7 +117,7 @@ pub async fn consume_reports(
             if let Some(history) = history {
                 if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
                     let ad_score =
-                        perform_anomaly_detection(feed_id, history, candidate_value).await;
+                        perform_anomaly_detection(feed_id, history.clone(), candidate_value).await;
                     match ad_score {
                         Ok(ad_score) => {
                             info!(
@@ -191,10 +191,9 @@ pub fn collect_repoted_values(
 
 pub async fn perform_anomaly_detection(
     feed_id: u32,
-    history: &Arc<RwLock<FeedAggregateHistory>>,
+    history: Arc<RwLock<FeedAggregateHistory>>,
     candidate_value: f64,
 ) -> Result<f64, anyhow::Error> {
-    let history = history.clone();
     let anomaly_detection_future = async move {
         debug!("Get a read lock on history [feed {feed_id}]");
         let history_lock = history.read().await;
@@ -276,14 +275,12 @@ pub async fn validate(
     let mut feeds_newly_updated_slots = HashMap::<u32, u64>::new();
 
     for update in &batch.updates {
-        let Some(proof_for_update) = batch.proofs.get(&update.feed_id) else {
-            anyhow::bail!(
-                "Proofs / Updates mismatch: no proof for {}",
-                &update.feed_id
-            );
-        };
+        let proof_for_update = batch
+            .proofs
+            .get(&update.feed_id)
+            .expect("Proofs / Updates mismatch: above checks must verify this cannot happen!");
 
-        let num_valid_reporters = reporters_keys.len();
+        let num_reporters = reporters_keys.len();
 
         let feeds_config = feeds_config.read().await;
 
@@ -291,92 +288,90 @@ pub async fn validate(
             anyhow::bail!("Feed ID {} has no configuration.", &update.feed_id);
         };
 
-        let feed_metadata = FeedMetaData::new(
-            format!("Feed ID: {}", update.feed_id).as_str(),
-            feed_config.report_interval_ms,
-            feed_config.quorum_percentage,
-            feed_config.skip_publish_if_less_then_percentage,
-            feed_config.always_publish_heartbeat_ms,
-            feed_config.first_report_start_time,
-            feed_config.value_type.clone(),
-            feed_config.aggregate_type.clone(),
-            None,
-        );
-
-        // Validate that the update and all the signed votes are for the same slot based on the timestamps and feed_metadata + make sure that this update has not been previously introduced!
-
-        // Get the aggregated value's slot:
-        let aggregated_value_slot = feed_metadata.get_slot(update.end_slot_timestamp);
-
-        // Make sure this slot's value was not previously proposed:
-        if *feeds_last_updated_slots.get(&update.feed_id).unwrap_or(&0) > aggregated_value_slot {
-            anyhow::bail!(
-                "Reintroduction of old value: {:?}, {:?}",
-                update,
-                proof_for_update
-            );
-        }
-        feeds_newly_updated_slots.insert(update.feed_id, aggregated_value_slot);
+        let feed_metadata = FeedMetaData::from_config(feed_config);
 
         drop(feeds_config);
 
+        // Validate that the update and all the signed votes are for the same
+        // slot based on the timestamps and feed_metadata
+        // and make sure that this update has not been previously introduced!
+
+        // Get the aggregated value's slot:
+        let update_slot = feed_metadata.get_slot(update.end_slot_timestamp);
+
+        // Make sure this slot's value was not previously proposed:
+        let update_is_relevant = feeds_last_updated_slots
+            .get(&update.feed_id)
+            .is_some_and(|&slot| slot > update_slot);
+
+        if !update_is_relevant {
+            anyhow::bail!("Reintroduction of old value: {update:?}, {proof_for_update:?}");
+        }
+
+        feeds_newly_updated_slots.insert(update.feed_id, update_slot);
+
         // Check signatures
-        for signed_data in proof_for_update {
-            let Some(reporter_pub_key) =
-                reporters_keys.get(&signed_data.payload_metadata.reporter_id)
+        for raw_vote in proof_for_update {
+            let Some(reporter_pub_key) = reporters_keys.get(&raw_vote.payload_metadata.reporter_id)
             else {
                 anyhow::bail!(
                     "No public key known for reporter with ID {}!",
-                    signed_data.payload_metadata.reporter_id
+                    raw_vote.payload_metadata.reporter_id
                 );
             };
 
             // Make sure that all votes have the same slot as the aggregated value
-            let vote_slot = feed_metadata.get_slot(signed_data.payload_metadata.timestamp);
-            if vote_slot != aggregated_value_slot {
-                anyhow::bail!(
-                    "Received a vote not corresponding to the aggregated value's slot! vote: {:?} aggregated_value_slot: {} calculated vote slot: {}",
-                    signed_data,
-                    aggregated_value_slot,
-                    vote_slot,
-                );
+            let vote_slot = feed_metadata.get_slot(raw_vote.payload_metadata.timestamp);
+            if vote_slot != update_slot {
+                anyhow::bail!(concat!(
+                    "Received a vote not corresponding to the aggregated value's slot! vote: ",
+                    "{raw_vote:?} update_slot: {update_slot} calculated vote slot: {vote_slot}"
+                ));
             }
 
             if !check_signature(
-                &signed_data.payload_metadata.signature.sig,
+                &raw_vote.payload_metadata.signature.sig,
                 reporter_pub_key,
-                signed_data.payload_metadata.feed_id.as_str(),
-                signed_data.payload_metadata.timestamp,
-                &signed_data.result,
+                raw_vote.payload_metadata.feed_id.as_str(),
+                raw_vote.payload_metadata.timestamp,
+                &raw_vote.result,
             ) {
                 anyhow::bail!(
                     "Signature verification failed for vote {:?} from reporter id {} with pub key {:?}",
-                    signed_data,
-                    signed_data.payload_metadata.reporter_id,
+                    raw_vote,
+                    raw_vote.payload_metadata.reporter_id,
                     reporter_pub_key,
                 );
             }
         }
 
-        let proof_for_update: HashMap<u64, DataFeedPayload> = proof_for_update
+        let proof_for_update_mapping: HashMap<u64, DataFeedPayload> = proof_for_update
             .iter()
             .cloned()
             .map(|payload| (payload.payload_metadata.reporter_id, payload))
             .collect();
 
+        let aggregator = match FeedAggregate::create_from_str(feed_metadata.aggregate_type.as_str())
+        {
+            Ok(val) => val,
+            Err(e) => anyhow::bail!("Could not convert {} to a valid aggregator: {e}", {
+                feed_metadata.aggregate_type.as_str()
+            }),
+        };
+
         let consumed_reports_result = consume_reports(
             format!("Feed ID: {}", update.feed_id).as_str(),
-            &proof_for_update,
+            &proof_for_update_mapping,
             &FeedType::Numerical(0.0),
             0,
             feed_metadata.quorum_percentage,
             feed_metadata.skip_publish_if_less_then_percentage as f64,
             feed_metadata.always_publish_heartbeat_ms,
             update.end_slot_timestamp,
-            num_valid_reporters,
+            num_reporters,
             false,
-            get_aggregator(feed_metadata.aggregate_type.as_str()),
-            &None,
+            aggregator,
+            None,
             update.feed_id,
         )
         .await;
@@ -461,11 +456,13 @@ pub async fn validate(
     let tx_hash =
         generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction.clone());
 
-    if tx_hash.to_string() != batch.tx_hash {
+    let tx_hash_str = tx_hash.to_string();
+
+    if tx_hash_str != batch.tx_hash {
         anyhow::bail!(
             "tx_hash mismatch, recvd: {} generated: {}",
             batch.tx_hash,
-            tx_hash.to_string()
+            tx_hash_str
         );
     }
 
