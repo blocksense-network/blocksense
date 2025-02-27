@@ -3,7 +3,7 @@ use std::collections::HashMap;
 pub const USD_SYMBOLS: [&str; 3] = ["USD", "USDC", "USDT"];
 
 pub type TradingPair = String;
-pub type Price = String;
+pub type Price = f64;
 pub type PairPriceData = HashMap<TradingPair, Price>;
 pub type TradingPairToResults = HashMap<TradingPair, Vec<ResourceResult>>;
 
@@ -19,6 +19,6 @@ pub struct ResourceResult {
     pub id: String,
     pub symbol: String,
     pub usd_symbol: String,
-    pub price: String,
+    pub price: f64,
     //TODO(adikov): Add balance information when we start getting it.
 }

@@ -2,13 +2,16 @@ use anyhow::Result;
 
 use futures::FutureExt;
 use serde::Deserialize;
+use serde_this_or_that::as_f64;
 
 use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct BitgetPriceData {
     pub symbol: String,
-    pub close: String,
+
+    #[serde(deserialize_with = "as_f64")]
+    pub close: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]

@@ -7,12 +7,14 @@ use futures::{
 use std::ops::Deref;
 
 use serde::Deserialize;
+use serde_this_or_that::as_f64;
 
 use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct GeminiPriceResponse {
-    pub last: String,
+    #[serde(deserialize_with = "as_f64")]
+    pub last: f64,
 }
 
 type GeminiSymbolsResponse = Vec<String>;
@@ -51,7 +53,7 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
     }
 }
 
-pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, String)> {
+pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, f64)> {
     let url = format!("https://api.gemini.com/v1/pubticker/{symbol}");
     let response = http_get_json::<GeminiPriceResponse>(&url, None).await?;
 

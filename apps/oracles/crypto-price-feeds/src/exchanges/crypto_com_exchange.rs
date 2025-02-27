@@ -2,13 +2,15 @@ use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::Deserialize;
+use serde_this_or_that::as_f64;
 
 use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct CryptoComPriceData {
     pub i: String,
-    pub a: String,
+    #[serde(deserialize_with = "as_f64")]
+    pub a: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]

@@ -7,6 +7,7 @@ use futures::{
 use std::ops::Deref;
 
 use serde::Deserialize;
+use serde_this_or_that::as_f64;
 
 use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
@@ -27,7 +28,8 @@ pub struct OKXTickerData {
     #[serde(rename = "instId")]
     pub inst_id: String,
     #[serde(rename = "idxPx")]
-    pub idx_px: String,
+    #[serde(deserialize_with = "as_f64")]
+    pub idx_px: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -70,7 +72,7 @@ impl<'a> PricesFetcher<'a> for OKXPriceFetcher<'a> {
     }
 }
 
-async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, String)> {
+async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, f64)> {
     let url = format!("https://www.okx.com/api/v5/market/index-tickers?instId={symbol}");
     let response = http_get_json::<OKXTickerResponse>(&url, None).await?;
 

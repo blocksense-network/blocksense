@@ -33,8 +33,8 @@ impl TradingPairTicker {
         no_delimiter.replace("UST", "USDT").replace("UDC", "USDC")
     }
 
-    fn price(&self) -> String {
-        self.last_price.to_string()
+    fn price(&self) -> f64 {
+        self.last_price
     }
 }
 

@@ -45,7 +45,7 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
                 .map(|price| {
                     let parts: Vec<&str> = price.market.split('-').collect();
                     let transformed_market = format!("{}{}", parts[1], parts[0]);
-                    (transformed_market, price.trade_price.to_string())
+                    (transformed_market, price.trade_price)
                 })
                 .collect())
         }

@@ -1,16 +1,28 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use anyhow::{Context, Result};
 use futures::{future::LocalBoxFuture, FutureExt};
 
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 
 use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
 
+fn as_f64_vec<'de, D>(deserializer: D) -> Result<Vec<f64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: Vec<String> = Deserialize::deserialize(deserializer)?;
+    s.into_iter()
+        .map(|s| f64::from_str(&s).map_err(serde::de::Error::custom))
+        .collect()
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct KrakenPriceData {
-    pub a: Vec<String>,
+    #[serde(deserialize_with = "as_f64_vec")]
+    pub a: Vec<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]

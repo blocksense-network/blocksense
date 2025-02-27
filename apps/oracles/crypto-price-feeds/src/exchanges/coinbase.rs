@@ -40,7 +40,7 @@ impl PricesFetcher<'_> for CoinbasePriceFetcher {
                 .into_iter()
                 .filter_map(|(asset, price)| match price.parse::<f64>() {
                     Ok(price_as_number) => {
-                        let price = (1.0 / price_as_number).to_string();
+                        let price = 1.0 / price_as_number;
                         let pair = format!("{}{}", asset, "USD");
                         Some((pair, price))
                     }

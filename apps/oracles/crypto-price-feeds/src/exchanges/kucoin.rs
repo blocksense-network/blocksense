@@ -1,14 +1,30 @@
+use std::str::FromStr;
+
 use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 
 use crate::{common::PairPriceData, http::http_get_json, traits::prices_fetcher::PricesFetcher};
+
+fn as_f64_option<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: Option<String> = Option::deserialize(deserializer)?;
+    match s {
+        Some(s) => f64::from_str(&s)
+            .map(Some)
+            .map_err(serde::de::Error::custom),
+        None => Ok(None),
+    }
+}
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct KuCoinPrice {
     pub symbol: String,
-    pub last: Option<String>,
+    #[serde(deserialize_with = "as_f64_option")]
+    pub last: Option<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
