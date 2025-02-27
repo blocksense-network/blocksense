@@ -14,7 +14,7 @@ The CL Feed Registry Adapter serves as a blockchain-based directory that links a
   lack of a canonical token representation.
 </Callout>
 
-For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [CL Feed Registry Adapter Reference Documentation](../../reference-documentation/CLFeedRegistryAdapter.mdx).
+For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [CL Feed Registry Adapter Reference Documentation](../../reference-documentation/contract/CLFeedRegistryAdapter.mdx).
 
 ```mermaid
 ---
@@ -70,7 +70,7 @@ latestRoundData(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1
 
 To consume price data from the CL Feed Registry Adapter, your smart contract should reference [`ICLFeedRegistryAdapter`](/coming-soon), which defines the external functions implemented by the CL Feed Registry Adapter.
 
-```solidity showLineNumbers copy filename="RegistryConsumer.sol"
+```solidity showLineNumbers copy filename="CLFeedRegistryAdapterConsumer.sol"
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -81,7 +81,7 @@ import 'interfaces/ICLFeedRegistryAdapter.sol';
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract RegistryConsumer {
+contract CLFeedRegistryAdapterConsumer {
   ICLFeedRegistryAdapter public immutable registry;
 
   constructor(address _registry) {
