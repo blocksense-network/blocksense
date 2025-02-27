@@ -46,16 +46,18 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 fn process_results(results: TradingPairToResults) -> Result<Payload> {
     let mut payload = Payload::new();
     for (feed_id, results) in results.into_iter() {
-        payload.values.push(match vwap::vwap_0(&results) {
-            Ok(price) => DataFeedResult {
-                id: feed_id,
-                value: DataFeedResultValue::Numerical(price),
-            },
-            Err(err) => DataFeedResult {
-                id: feed_id,
-                value: DataFeedResultValue::Error(err.to_string()),
-            },
-        });
+        payload
+            .values
+            .push(match vwap::vwap(&results.exchanges_data) {
+                Ok(price) => DataFeedResult {
+                    id: feed_id,
+                    value: DataFeedResultValue::Numerical(price),
+                },
+                Err(err) => DataFeedResult {
+                    id: feed_id,
+                    value: DataFeedResultValue::Error(err.to_string()),
+                },
+            });
     }
 
     Ok(payload)
@@ -83,7 +85,7 @@ fn print_results(resources: &[ResourceData], results: &TradingPairToResults) {
         (String::new(), String::new()),
         |(mut missing, mut found), res| {
             if let Some(res_list) = results.get(&res.id) {
-                let _ = write!(found, "({}-{}),", res.id, res_list.len());
+                let _ = write!(found, "({}-{}),", res.id, res_list.exchanges_data.len());
             } else {
                 let _ = write!(missing, "({}-{}),", res.id, res.symbol);
             }

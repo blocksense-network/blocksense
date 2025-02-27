@@ -6,7 +6,7 @@ use std::time::Instant;
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
-    common::{PairPriceData, ResourceData, ResourceResult, TradingPairToResults, USD_SYMBOLS},
+    common::{ExchangePriceData, PairPriceData, ResourceData, TradingPairToResults, USD_SYMBOLS},
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
         bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
@@ -50,7 +50,11 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
             Ok(prices) => {
                 let time_taken = before_fetch.elapsed();
                 println!("ℹ️  Successfully fetched prices from {exchange_id} in {time_taken:?}",);
-                fill_results(resources, prices, &mut results);
+                let prices_per_exchange = ExchangePriceData {
+                    name: exchange_id.to_owned(),
+                    data: prices,
+                };
+                fill_results(resources, prices_per_exchange, &mut results);
             }
             Err(err) => println!("❌ Error fetching prices from {exchange_id}: {err:?}"),
         }
@@ -63,7 +67,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
 
 fn fill_results(
     resources: &[ResourceData],
-    prices: PairPriceData,
+    prices_per_exchange: ExchangePriceData,
     results: &mut TradingPairToResults,
 ) {
     //TODO(adikov): We need a proper way to get trade volume from Binance API.
@@ -71,14 +75,12 @@ fn fill_results(
         // First USD pair found.
         for quote in USD_SYMBOLS {
             let trading_pair = format!("{}{}", resource.symbol, quote);
-            if let Some(price_point) = prices.get(&trading_pair) {
+            if let Some(price_point) = prices_per_exchange.data.get(&trading_pair) {
                 let res = results.entry(resource.id.clone()).or_default();
-                res.push(ResourceResult {
-                    id: resource.id.clone(),
-                    symbol: resource.symbol.clone(),
-                    usd_symbol: quote.to_owned(),
-                    price: price_point.price,
-                });
+
+                res.symbol = resource.symbol.clone();
+                res.exchanges_data
+                    .insert(prices_per_exchange.name.clone(), price_point.clone());
                 break;
             }
         }
