@@ -1,3 +1,4 @@
+use config::FeedConfig;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
@@ -11,7 +12,7 @@ use tracing::debug;
 use crypto::{JsonSerializableSignature, Signature};
 use num::BigUint;
 
-use crate::aggregate::{get_aggregator, FeedAggregate};
+use crate::aggregate::FeedAggregate;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Repeatability {
@@ -71,7 +72,7 @@ impl FeedMetaData {
 
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        name: &str,
+        name: String,
         report_interval_ms: u64, // Consider oneshot feeds.
         quorum_percentage: f32,
         skip_publish_if_less_then_percentage: f32,
@@ -89,11 +90,26 @@ impl FeedMetaData {
             skip_publish_if_less_then_percentage,
             always_publish_heartbeat_ms,
             first_report_start_time,
-            feed_aggregator: get_aggregator(aggregate_type.as_str()), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
+            feed_aggregator: FeedAggregate::create_from_str(aggregate_type.as_str())
+                .expect("Could not convert {aggregate_type} to a valid aggregator!"), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
             value_type,
             aggregate_type,
             processor_cmd_chan,
         }
+    }
+
+    pub fn from_config(cfg: &FeedConfig) -> Self {
+        Self::new(
+            cfg.name.clone(),
+            cfg.report_interval_ms,
+            cfg.quorum_percentage,
+            cfg.skip_publish_if_less_then_percentage,
+            cfg.always_publish_heartbeat_ms,
+            cfg.first_report_start_time,
+            cfg.value_type.clone(),
+            cfg.aggregate_type.clone(),
+            None,
+        )
     }
 
     pub fn set_processor_cmd_chan(&mut self, send_chan: UnboundedSender<FeedsSlotProcessorCmds>) {

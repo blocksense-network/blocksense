@@ -270,7 +270,7 @@ pub async fn register_feed_with_config(
         }
 
         let new_feed_metadata = FeedMetaData::new(
-            &new_name,
+            new_name,
             new_feed_config.report_interval_ms,
             new_feed_config.quorum_percentage,
             new_feed_config.skip_publish_if_less_then_percentage,
