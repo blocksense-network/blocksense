@@ -41,7 +41,8 @@ async function getBlocksenseFeedsCompatibility(
       );
 
       const dataFeed = feedConfig.feeds.find(
-        feed => feed.price_feed_info.compatibility_info.chainlink === feedName,
+        feed =>
+          feed.additional_feed_info.compatibility_info.chainlink === feedName,
       );
       if (!dataFeed) {
         console.error(`Feed not found for '${feedName}'`);
@@ -49,7 +50,7 @@ async function getBlocksenseFeedsCompatibility(
       }
       const dataFeedId = dataFeed.id;
 
-      const { base, quote } = dataFeed.price_feed_info.pair;
+      const { base, quote } = dataFeed.additional_feed_info.pair;
 
       const baseAddress = isSupportedCurrencySymbol(base)
         ? currencySymbolToDenominationAddress[base]
