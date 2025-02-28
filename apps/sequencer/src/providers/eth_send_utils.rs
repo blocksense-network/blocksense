@@ -1001,7 +1001,7 @@ mod tests {
             p.history.register_feed(feed.id, 100);
         }
         {
-            // Some arbitrart point in time in the past, nothing special about this value
+            // Some arbitrary point in time in the past, nothing special about this value
             let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
             let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
             let v1 = VotedFeedUpdate {
