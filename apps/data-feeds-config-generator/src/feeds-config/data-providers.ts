@@ -63,7 +63,7 @@ function getAllProvidersForFeed(
   feed: SimplifiedFeed,
   exchangeAssets: ExchangeData[],
 ): ProvidersResources {
-  let providers = feed.price_feed_info.arguments ?? {};
+  let providers = {} as any;
 
   const addProvider = (key: string, type: ExchangeData['type'], value: any) => {
     if (value) {
