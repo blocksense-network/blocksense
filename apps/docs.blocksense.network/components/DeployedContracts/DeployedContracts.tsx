@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Callout } from 'nextra/components';
+import { Callout } from '@/components/common/Callout';
 
 import { parseNetworkName } from '@blocksense/base-utils/evm';
 
