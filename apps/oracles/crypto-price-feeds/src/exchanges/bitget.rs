@@ -1,6 +1,6 @@
 use anyhow::Result;
+use futures::{future::LocalBoxFuture, FutureExt};
 
-use futures::FutureExt;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
@@ -11,14 +11,17 @@ use crate::{
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BitgetPriceData {
     pub symbol: String,
-
     #[serde(deserialize_with = "as_f64")]
     pub close: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub base_vol: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BitgetPriceResponse {
     pub code: String,
     pub data: Vec<BitgetPriceData>,
@@ -31,8 +34,7 @@ impl PricesFetcher<'_> for BitgetPriceFetcher {
     fn new(_symbols: &[String]) -> Self {
         Self
     }
-
-    fn fetch(&self) -> futures::future::LocalBoxFuture<Result<PairPriceData>> {
+    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<BitgetPriceResponse>(
                 "https://api.bitget.com/api/spot/v1/market/tickers",
@@ -48,7 +50,7 @@ impl PricesFetcher<'_> for BitgetPriceFetcher {
                         value.symbol,
                         PricePoint {
                             price: value.close,
-                            volume: 1.0,
+                            volume: value.base_vol,
                         },
                     )
                 })
