@@ -203,7 +203,7 @@ function addStableCoinVariants(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
           };
         });
     }
-    return [feed];
+    return [];
   });
 
   return [...feeds, ...stableCoinVariants];
