@@ -1,7 +1,3 @@
-//use std::collections::HashMap;
-
-use data_feeds::feeds_processing::VotedFeedUpdate;
-
 pub mod aggregate_batch_consensus_processor;
 pub mod block_creator;
 pub mod blocks_reader;
@@ -12,6 +8,7 @@ pub mod providers;
 pub mod reporters;
 pub mod sequencer_state;
 
+use data_feeds::feeds_processing::VotedFeedUpdate;
 use feed_registry::types::DataFeedPayload;
 use std::collections::HashMap;
 use tracing::error;

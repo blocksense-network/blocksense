@@ -1,7 +1,6 @@
 use crate::reporters::reporter::SharedReporters;
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
-use alloy::primitives::map::HashMap;
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use config::PublishCriteria;
 use data_feeds::feeds_processing::{VotedFeedUpdate, VotedFeedUpdateWithProof};
@@ -17,7 +16,7 @@ use feed_registry::types::{DataFeedPayload, FeedType};
 use feed_registry::types::{FeedMetaData, Repeatability, Timestamp};
 use prometheus::{inc_metric, metrics::FeedsMetrics};
 use ringbuf::traits::consumer::Consumer;
-use std::hash::RandomState;
+use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc;
@@ -88,7 +87,7 @@ impl FeedSlotsProcessor {
     #[allow(clippy::too_many_arguments)]
     async fn consume_reports(
         &self,
-        reports: &HashMap<u64, DataFeedPayload, RandomState>,
+        reports: &HashMap<u64, DataFeedPayload>,
         feed_type: &FeedType,
         slot: u64,
         quorum_percentage: f32,
@@ -190,7 +189,7 @@ impl FeedSlotsProcessor {
     fn collect_reported_values(
         &self,
         expected_feed_type: &FeedType,
-        reports: &std::collections::HashMap<u64, DataFeedPayload>,
+        reports: &HashMap<u64, DataFeedPayload>,
         slot: u64,
     ) -> Vec<FeedType> {
         let feed_id = self.key;
