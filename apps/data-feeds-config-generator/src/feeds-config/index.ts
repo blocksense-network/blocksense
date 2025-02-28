@@ -198,7 +198,7 @@ function addStableCoinVariants(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
             ...feed,
             full_name,
             price_feed_info: {
-              ...feed.price_feed_info,
+              ...structuredClone(feed.price_feed_info),
               pair,
             },
           };
