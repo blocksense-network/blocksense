@@ -25,7 +25,7 @@ dotenv.config();
 const config: HardhatUserConfig = {
   reflect: {
     outputDir: 'artifacts/docs',
-    exclude: ['test'],
+    exclude: ['test', 'experiments'],
   },
   collectABIs: { outputDir: 'artifacts/docs', exclude: ['test'] },
   enableFileTree: {
