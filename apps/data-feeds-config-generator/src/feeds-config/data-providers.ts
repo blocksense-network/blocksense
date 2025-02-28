@@ -44,7 +44,10 @@ export async function addDataProviders(dataFeeds: SimplifiedFeed[]) {
       const providers = getAllProvidersForFeed(feed, exchangeAssetsMap);
       return {
         ...feed,
-        price_feed_info: { ...feed.price_feed_info, arguments: providers },
+        additional_feed_info: {
+          ...feed.additional_feed_info,
+          arguments: providers,
+        },
       };
     }),
   );
@@ -97,7 +100,10 @@ function getPriceFeedDataProvidersInfo<T>(
   exchangeAssets: AssetInfo[],
 ): Record<string, string[]> | null {
   const supportedAssets = exchangeAssets.filter(symbol =>
-    isPairSupportedByCryptoProvider(feed.price_feed_info.pair, symbol.pair),
+    isPairSupportedByCryptoProvider(
+      feed.additional_feed_info.pair,
+      symbol.pair,
+    ),
   );
   const providerInfo = supportedAssets.reduce(
     (acc, asset) => {
@@ -119,7 +125,7 @@ function getPriceFeedDataProvidersInfo<T>(
 
 // Filter feeds that have a quote
 function filterFeedsWithQuotes(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
-  return feeds.filter(feed => feed.price_feed_info.pair.quote);
+  return feeds.filter(feed => feed.additional_feed_info.pair.quote);
 }
 
 // Save data to JSON file

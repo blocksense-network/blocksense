@@ -18,7 +18,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "weETH",
           "quote": "USD"
@@ -61,7 +61,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MLN",
           "quote": "ETH"
@@ -101,7 +101,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAL",
           "quote": "USD"
@@ -201,7 +201,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAL",
           "quote": "ETH"
@@ -241,7 +241,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAL",
           "quote": "USDT"
@@ -311,7 +311,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAL",
           "quote": "USDC"
@@ -351,7 +351,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "HSK",
           "quote": "USD"
@@ -411,7 +411,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "HSK",
           "quote": "USDT"
@@ -461,7 +461,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "C98",
           "quote": "USD"
@@ -555,7 +555,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "C98",
           "quote": "USDT"
@@ -625,7 +625,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GMT",
           "quote": "USD"
@@ -728,7 +728,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GMT",
           "quote": "USDT"
@@ -798,7 +798,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GMT",
           "quote": "USDC"
@@ -848,7 +848,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XMR",
           "quote": "USD"
@@ -926,7 +926,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XMR",
           "quote": "USDT"
@@ -984,7 +984,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XMR",
           "quote": "USDC"
@@ -1032,7 +1032,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AUD",
           "quote": "USD"
@@ -1091,7 +1091,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AUD",
           "quote": "USDT"
@@ -1131,7 +1131,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AUD",
           "quote": "USDC"
@@ -1171,7 +1171,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DOT",
           "quote": "USD"
@@ -1297,7 +1297,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DOT",
           "quote": "BNB"
@@ -1337,7 +1337,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DOT",
           "quote": "USDT"
@@ -1430,7 +1430,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DOT",
           "quote": "USDC"
@@ -1503,7 +1503,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WELL",
           "quote": "USD"
@@ -1586,7 +1586,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WELL",
           "quote": "USDT"
@@ -1646,7 +1646,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BETH",
           "quote": "USD"
@@ -1703,7 +1703,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BETH",
           "quote": "USDT"
@@ -1748,7 +1748,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDD",
           "quote": "USD"
@@ -1809,7 +1809,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDD",
           "quote": "USDT"
@@ -1859,7 +1859,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDD",
           "quote": "USDC"
@@ -1899,7 +1899,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CBETH",
           "quote": "ETH"
@@ -1939,7 +1939,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CBETH",
           "quote": "USD"
@@ -1979,7 +1979,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ALPACA",
           "quote": "USD"
@@ -2044,7 +2044,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ALPACA",
           "quote": "USDT"
@@ -2099,7 +2099,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LUSD",
           "quote": "USD"
@@ -2144,7 +2144,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FXS",
           "quote": "USD"
@@ -2239,7 +2239,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FXS",
           "quote": "USDT"
@@ -2314,7 +2314,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RDNT",
           "quote": "USD"
@@ -2400,7 +2400,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RDNT",
           "quote": "USDT"
@@ -2470,7 +2470,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RDNT",
           "quote": "USDC"
@@ -2510,7 +2510,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MNT",
           "quote": "USD"
@@ -2591,7 +2591,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MNT",
           "quote": "USDT"
@@ -2651,7 +2651,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MNT",
           "quote": "USDC"
@@ -2691,7 +2691,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDC",
           "quote": "USD"
@@ -2801,7 +2801,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDC",
           "quote": "BNB"
@@ -2841,7 +2841,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDC",
           "quote": "USDT"
@@ -2934,7 +2934,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MASK",
           "quote": "USD"
@@ -3046,7 +3046,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MASK",
           "quote": "USDT"
@@ -3131,7 +3131,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MASK",
           "quote": "USDC"
@@ -3171,7 +3171,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WIN",
           "quote": "USD"
@@ -3252,7 +3252,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WIN",
           "quote": "USDT"
@@ -3317,7 +3317,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WIN",
           "quote": "USDC"
@@ -3357,7 +3357,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AVAIL",
           "quote": "USD"
@@ -3427,7 +3427,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AVAIL",
           "quote": "USDT"
@@ -3487,7 +3487,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "THETA",
           "quote": "USD"
@@ -3570,7 +3570,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "THETA",
           "quote": "USDT"
@@ -3640,7 +3640,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "THETA",
           "quote": "USDC"
@@ -3680,7 +3680,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MKR",
           "quote": "USD"
@@ -3797,7 +3797,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MKR",
           "quote": "ETH"
@@ -3837,7 +3837,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MKR",
           "quote": "USDT"
@@ -3917,7 +3917,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MKR",
           "quote": "USDC"
@@ -3957,7 +3957,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PYUSD",
           "quote": "USD"
@@ -4046,7 +4046,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PYUSD",
           "quote": "USDT"
@@ -4111,7 +4111,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SKY",
           "quote": "USD"
@@ -4176,7 +4176,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SKY",
           "quote": "USDT"
@@ -4221,7 +4221,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "OM",
           "quote": "USD"
@@ -4318,7 +4318,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "OM",
           "quote": "USDT"
@@ -4388,7 +4388,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "OM",
           "quote": "USDC"
@@ -4438,7 +4438,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAT",
           "quote": "USD"
@@ -4556,7 +4556,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAT",
           "quote": "ETH"
@@ -4601,7 +4601,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAT",
           "quote": "USDT"
@@ -4686,7 +4686,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAT",
           "quote": "USDC"
@@ -4736,7 +4736,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USD+",
           "quote": "USD"
@@ -4783,7 +4783,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "THB",
           "quote": "USD"
@@ -4826,7 +4826,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "NEAR",
           "quote": "USD"
@@ -4949,7 +4949,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "NEAR",
           "quote": "USDT"
@@ -5039,7 +5039,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "NEAR",
           "quote": "USDC"
@@ -5109,7 +5109,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PLN",
           "quote": "USD"
@@ -5161,7 +5161,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PLN",
           "quote": "USDT"
@@ -5201,7 +5201,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MLN",
           "quote": "USD"
@@ -5285,7 +5285,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MLN",
           "quote": "USDT"
@@ -5340,7 +5340,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MLN",
           "quote": "USDC"
@@ -5380,7 +5380,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "IOTX",
           "quote": "USD"
@@ -5472,7 +5472,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "IOTX",
           "quote": "USDT"
@@ -5542,7 +5542,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BNB",
           "quote": "USD"
@@ -5639,7 +5639,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BNB",
           "quote": "USDT"
@@ -5719,7 +5719,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BNB",
           "quote": "USDC"
@@ -5789,7 +5789,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KNC",
           "quote": "USD"
@@ -5888,7 +5888,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KNC",
           "quote": "USDT"
@@ -5958,7 +5958,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KNC",
           "quote": "USDC"
@@ -5998,7 +5998,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XAVA",
           "quote": "USD"
@@ -6063,7 +6063,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XAVA",
           "quote": "USDT"
@@ -6118,7 +6118,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ADA",
           "quote": "USD"
@@ -6252,7 +6252,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ADA",
           "quote": "BNB"
@@ -6292,7 +6292,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ADA",
           "quote": "USDT"
@@ -6395,7 +6395,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ADA",
           "quote": "USDC"
@@ -6483,7 +6483,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VAI",
           "quote": "USD"
@@ -6552,7 +6552,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VAI",
           "quote": "USDT"
@@ -6607,7 +6607,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SPELL",
           "quote": "USD"
@@ -6707,7 +6707,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SPELL",
           "quote": "USDT"
@@ -6782,7 +6782,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DPI",
           "quote": "USD"
@@ -6825,7 +6825,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ENJ",
           "quote": "USD"
@@ -6932,7 +6932,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ENJ",
           "quote": "ETH"
@@ -6977,7 +6977,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ENJ",
           "quote": "USDT"
@@ -7062,7 +7062,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ENJ",
           "quote": "USDC"
@@ -7102,7 +7102,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WOO",
           "quote": "USD"
@@ -7202,7 +7202,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WOO",
           "quote": "USDT"
@@ -7277,7 +7277,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MAGIC",
           "quote": "USD"
@@ -7375,7 +7375,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MAGIC",
           "quote": "USDT"
@@ -7455,7 +7455,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MAGIC",
           "quote": "USDC"
@@ -7495,7 +7495,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BADGER",
           "quote": "USD"
@@ -7585,7 +7585,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BADGER",
           "quote": "USDT"
@@ -7650,7 +7650,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BADGER",
           "quote": "USDC"
@@ -7690,7 +7690,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "APE",
           "quote": "USD"
@@ -7819,7 +7819,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "APE",
           "quote": "USDT"
@@ -7912,7 +7912,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "APE",
           "quote": "USDC"
@@ -7980,7 +7980,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CAKE",
           "quote": "USD"
@@ -8061,7 +8061,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CAKE",
           "quote": "BNB"
@@ -8101,7 +8101,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CAKE",
           "quote": "USDT"
@@ -8171,7 +8171,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CAKE",
           "quote": "USDC"
@@ -8211,7 +8211,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "QI",
           "quote": "USD"
@@ -8291,7 +8291,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "QI",
           "quote": "USDT"
@@ -8351,7 +8351,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GNO",
           "quote": "USD"
@@ -8435,7 +8435,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GNO",
           "quote": "USDT"
@@ -8495,7 +8495,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DODO",
           "quote": "USD"
@@ -8574,7 +8574,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DODO",
           "quote": "USDT"
@@ -8639,7 +8639,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MOVR",
           "quote": "USD"
@@ -8734,7 +8734,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MOVR",
           "quote": "USDT"
@@ -8809,7 +8809,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MOVR",
           "quote": "USDC"
@@ -8849,7 +8849,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AVAX",
           "quote": "USD"
@@ -8982,7 +8982,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AVAX",
           "quote": "USDT"
@@ -9080,7 +9080,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AVAX",
           "quote": "USDC"
@@ -9158,7 +9158,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "STX",
           "quote": "USD"
@@ -9265,7 +9265,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "STX",
           "quote": "USDT"
@@ -9345,7 +9345,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "STX",
           "quote": "USDC"
@@ -9400,7 +9400,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EOS",
           "quote": "USD"
@@ -9520,7 +9520,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EOS",
           "quote": "BNB"
@@ -9560,7 +9560,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EOS",
           "quote": "USDT"
@@ -9648,7 +9648,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EOS",
           "quote": "USDC"
@@ -9721,7 +9721,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "STETH",
           "quote": "ETH"
@@ -9761,7 +9761,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USD0",
           "quote": "USD"
@@ -9804,7 +9804,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GMX",
           "quote": "USD"
@@ -9898,7 +9898,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GMX",
           "quote": "USDT"
@@ -9973,7 +9973,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XVS",
           "quote": "BNB"
@@ -10013,7 +10013,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XVS",
           "quote": "USD"
@@ -10073,7 +10073,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XVS",
           "quote": "USDT"
@@ -10123,7 +10123,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DASH",
           "quote": "USD"
@@ -10201,7 +10201,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DASH",
           "quote": "USDT"
@@ -10256,7 +10256,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BONE",
           "quote": "USD"
@@ -10330,7 +10330,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BONE",
           "quote": "USDT"
@@ -10390,7 +10390,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BONE",
           "quote": "USDC"
@@ -10430,7 +10430,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ULTI",
           "quote": "USD"
@@ -10506,7 +10506,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ULTI",
           "quote": "USDT"
@@ -10571,7 +10571,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BUSD",
           "quote": "USD"
@@ -10631,7 +10631,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BUSD",
           "quote": "USDT"
@@ -10676,7 +10676,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "METIS",
           "quote": "USD"
@@ -10765,7 +10765,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "METIS",
           "quote": "USDT"
@@ -10840,7 +10840,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "METIS",
           "quote": "USDC"
@@ -10880,7 +10880,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AMPL",
           "quote": "ETH"
@@ -10920,7 +10920,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AMPL",
           "quote": "USD"
@@ -10975,7 +10975,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AMPL",
           "quote": "USDT"
@@ -11020,7 +11020,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ATOM",
           "quote": "USD"
@@ -11143,7 +11143,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ATOM",
           "quote": "USDT"
@@ -11236,7 +11236,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ATOM",
           "quote": "USDC"
@@ -11309,7 +11309,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AAVE",
           "quote": "USD"
@@ -11429,7 +11429,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AAVE",
           "quote": "ETH"
@@ -11482,7 +11482,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AAVE",
           "quote": "USDT"
@@ -11562,7 +11562,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AAVE",
           "quote": "USDC"
@@ -11617,7 +11617,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GNS",
           "quote": "USD"
@@ -11692,7 +11692,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GNS",
           "quote": "USDT"
@@ -11752,7 +11752,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UST",
           "quote": "USD"
@@ -11820,7 +11820,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UST",
           "quote": "USDT"
@@ -11878,7 +11878,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UST",
           "quote": "USDC"
@@ -11921,7 +11921,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDE",
           "quote": "USD"
@@ -11983,7 +11983,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDE",
           "quote": "USDT"
@@ -12043,7 +12043,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDE",
           "quote": "USDC"
@@ -12088,7 +12088,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "YFI",
           "quote": "USD"
@@ -12203,7 +12203,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "YFI",
           "quote": "BNB"
@@ -12243,7 +12243,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "YFI",
           "quote": "ETH"
@@ -12283,7 +12283,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "YFI",
           "quote": "USDT"
@@ -12358,7 +12358,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "YFI",
           "quote": "USDC"
@@ -12398,7 +12398,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WBTC",
           "quote": "USD"
@@ -12498,7 +12498,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WBTC",
           "quote": "BTC"
@@ -12568,7 +12568,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WBTC",
           "quote": "ETH"
@@ -12608,7 +12608,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WBTC",
           "quote": "USDT"
@@ -12678,7 +12678,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WBTC",
           "quote": "USDC"
@@ -12723,7 +12723,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MIM",
           "quote": "USD"
@@ -12775,7 +12775,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BCH",
           "quote": "BNB"
@@ -12815,7 +12815,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BCH",
           "quote": "USD"
@@ -12941,7 +12941,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BCH",
           "quote": "USDT"
@@ -13034,7 +13034,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BCH",
           "quote": "USDC"
@@ -13112,7 +13112,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RLUSD",
           "quote": "USD"
@@ -13155,7 +13155,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "REN",
           "quote": "ETH"
@@ -13195,7 +13195,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "REN",
           "quote": "USD"
@@ -13293,7 +13293,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "REN",
           "quote": "USDT"
@@ -13363,7 +13363,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZIL",
           "quote": "USD"
@@ -13456,7 +13456,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZIL",
           "quote": "USDT"
@@ -13536,7 +13536,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZIL",
           "quote": "USDC"
@@ -13581,7 +13581,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AERO",
           "quote": "USD"
@@ -13671,7 +13671,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AERO",
           "quote": "USDT"
@@ -13731,7 +13731,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MVI",
           "quote": "USD"
@@ -13774,7 +13774,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "INJ",
           "quote": "USD"
@@ -13889,7 +13889,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "INJ",
           "quote": "USDT"
@@ -13969,7 +13969,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "INJ",
           "quote": "USDC"
@@ -14029,7 +14029,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDS",
           "quote": "USD"
@@ -14095,7 +14095,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDS",
           "quote": "USDT"
@@ -14140,7 +14140,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDS",
           "quote": "USDC"
@@ -14180,7 +14180,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SOL",
           "quote": "USD"
@@ -14323,7 +14323,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SOL",
           "quote": "USDT"
@@ -14426,7 +14426,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SOL",
           "quote": "USDC"
@@ -14509,7 +14509,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BOO",
           "quote": "USD"
@@ -14564,7 +14564,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BOO",
           "quote": "USDT"
@@ -14609,7 +14609,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EURC",
           "quote": "USD"
@@ -14667,7 +14667,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EURC",
           "quote": "USDC"
@@ -14712,7 +14712,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AXS",
           "quote": "USD"
@@ -14824,7 +14824,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AXS",
           "quote": "USDT"
@@ -14909,7 +14909,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AXS",
           "quote": "USDC"
@@ -14949,7 +14949,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CRV",
           "quote": "USD"
@@ -15068,7 +15068,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CRV",
           "quote": "ETH"
@@ -15118,7 +15118,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CRV",
           "quote": "USDT"
@@ -15198,7 +15198,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CRV",
           "quote": "USDC"
@@ -15248,7 +15248,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ARB",
           "quote": "USD"
@@ -15373,7 +15373,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ARB",
           "quote": "USDT"
@@ -15458,7 +15458,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ARB",
           "quote": "USDC"
@@ -15518,7 +15518,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KLAY",
           "quote": "USD"
@@ -15573,7 +15573,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KLAY",
           "quote": "USDT"
@@ -15618,7 +15618,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MAVIA",
           "quote": "USD"
@@ -15694,7 +15694,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MAVIA",
           "quote": "USDT"
@@ -15759,7 +15759,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ETH",
           "quote": "USD"
@@ -15908,7 +15908,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ETC",
           "quote": "USD"
@@ -16026,7 +16026,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ETH",
           "quote": "BTC"
@@ -16126,7 +16126,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ETH",
           "quote": "USDT"
@@ -16234,7 +16234,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ETH",
           "quote": "USDC"
@@ -16322,7 +16322,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ETC",
           "quote": "USDT"
@@ -16407,7 +16407,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ETC",
           "quote": "USDC"
@@ -16457,7 +16457,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AUSD",
           "quote": "USD"
@@ -16500,7 +16500,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "COMP",
           "quote": "USD"
@@ -16617,7 +16617,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "COMP",
           "quote": "USDT"
@@ -16697,7 +16697,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "COMP",
           "quote": "USDC"
@@ -16737,7 +16737,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "POL",
           "quote": "USD"
@@ -16850,7 +16850,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "POL",
           "quote": "USDT"
@@ -16930,7 +16930,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "POL",
           "quote": "USDC"
@@ -16980,7 +16980,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ANKR",
           "quote": "USD"
@@ -17086,7 +17086,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ANKR",
           "quote": "USDT"
@@ -17161,7 +17161,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ANKR",
           "quote": "USDC"
@@ -17201,7 +17201,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PERP",
           "quote": "USD"
@@ -17301,7 +17301,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PERP",
           "quote": "USDT"
@@ -17376,7 +17376,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PERP",
           "quote": "USDC"
@@ -17416,7 +17416,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LINA",
           "quote": "USD"
@@ -17486,7 +17486,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LINA",
           "quote": "USDT"
@@ -17546,7 +17546,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDP",
           "quote": "USD"
@@ -17613,7 +17613,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDP",
           "quote": "USDT"
@@ -17668,7 +17668,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "OGN",
           "quote": "USD"
@@ -17762,7 +17762,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "OGN",
           "quote": "USDT"
@@ -17827,7 +17827,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ICP",
           "quote": "USD"
@@ -17944,7 +17944,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ICP",
           "quote": "USDT"
@@ -18029,7 +18029,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ICP",
           "quote": "USDC"
@@ -18094,7 +18094,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VET",
           "quote": "USD"
@@ -18181,7 +18181,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VET",
           "quote": "USDT"
@@ -18251,7 +18251,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CAD",
           "quote": "USD"
@@ -18301,7 +18301,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CAD",
           "quote": "USDT"
@@ -18341,7 +18341,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "1INCH",
           "quote": "USD"
@@ -18447,7 +18447,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "1INCH",
           "quote": "USDT"
@@ -18527,7 +18527,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "1INCH",
           "quote": "USDC"
@@ -18567,7 +18567,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ONG",
           "quote": "USD"
@@ -18642,7 +18642,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ONG",
           "quote": "USDT"
@@ -18702,7 +18702,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XTZ",
           "quote": "BNB"
@@ -18742,7 +18742,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XTZ",
           "quote": "USD"
@@ -18868,7 +18868,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XTZ",
           "quote": "USDT"
@@ -18961,7 +18961,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XTZ",
           "quote": "USDC"
@@ -19014,7 +19014,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "META",
           "quote": "USD"
@@ -19065,7 +19065,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BEAM",
           "quote": "USD"
@@ -19150,7 +19150,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BEAM",
           "quote": "USDT"
@@ -19215,7 +19215,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CBBTC",
           "quote": "USD"
@@ -19258,7 +19258,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XCN",
           "quote": "USD"
@@ -19339,7 +19339,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XCN",
           "quote": "USDT"
@@ -19399,7 +19399,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DEGEN",
           "quote": "USD"
@@ -19489,7 +19489,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DEGEN",
           "quote": "USDT"
@@ -19549,7 +19549,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "POL",
           "quote": "ETH"
@@ -19594,7 +19594,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PAXG",
           "quote": "USD"
@@ -19689,7 +19689,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "PAXG",
           "quote": "USDT"
@@ -19759,7 +19759,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SXP",
           "quote": "USD"
@@ -19834,7 +19834,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SXP",
           "quote": "USDT"
@@ -19899,7 +19899,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CHR",
           "quote": "USD"
@@ -19986,7 +19986,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CHR",
           "quote": "USDT"
@@ -20051,7 +20051,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDV",
           "quote": "USD"
@@ -20094,7 +20094,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GME",
           "quote": "USD"
@@ -20153,7 +20153,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GME",
           "quote": "USDT"
@@ -20198,7 +20198,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WEMIX",
           "quote": "USD"
@@ -20273,7 +20273,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WEMIX",
           "quote": "USDT"
@@ -20333,7 +20333,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MANA",
           "quote": "USD"
@@ -20455,7 +20455,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MANA",
           "quote": "ETH"
@@ -20505,7 +20505,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MANA",
           "quote": "USDT"
@@ -20598,7 +20598,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MANA",
           "quote": "USDC"
@@ -20656,7 +20656,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SLP",
           "quote": "USD"
@@ -20748,7 +20748,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SLP",
           "quote": "USDT"
@@ -20828,7 +20828,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SLP",
           "quote": "USDC"
@@ -20868,7 +20868,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CFX",
           "quote": "USD"
@@ -20951,7 +20951,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CFX",
           "quote": "USDT"
@@ -21016,7 +21016,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CFX",
           "quote": "USDC"
@@ -21066,7 +21066,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MATIC",
           "quote": "USD"
@@ -21150,7 +21150,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MATIC",
           "quote": "USDT"
@@ -21208,7 +21208,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MATIC",
           "quote": "USDC"
@@ -21256,7 +21256,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DGB",
           "quote": "USD"
@@ -21342,7 +21342,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DGB",
           "quote": "USDT"
@@ -21412,7 +21412,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DGB",
           "quote": "USDC"
@@ -21452,7 +21452,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RPL",
           "quote": "USD"
@@ -21551,7 +21551,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RPL",
           "quote": "USDT"
@@ -21621,7 +21621,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RPL",
           "quote": "USDC"
@@ -21661,7 +21661,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CELO",
           "quote": "USD"
@@ -21757,7 +21757,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CELO",
           "quote": "USDT"
@@ -21832,7 +21832,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CELO",
           "quote": "USDC"
@@ -21872,7 +21872,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "JOE",
           "quote": "USD"
@@ -21954,7 +21954,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "JOE",
           "quote": "USDT"
@@ -22019,7 +22019,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "JOE",
           "quote": "USDC"
@@ -22059,7 +22059,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LBTC",
           "quote": "BTC"
@@ -22099,7 +22099,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GRT",
           "quote": "ETH"
@@ -22139,7 +22139,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ALPHA",
           "quote": "USD"
@@ -22234,7 +22234,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ALPHA",
           "quote": "USDT"
@@ -22299,7 +22299,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ALPHA",
           "quote": "USDC"
@@ -22339,7 +22339,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "NVDA",
           "quote": "USD"
@@ -22382,7 +22382,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "QUICK",
           "quote": "USD"
@@ -22464,7 +22464,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "QUICK",
           "quote": "USDT"
@@ -22524,7 +22524,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GBP",
           "quote": "USD"
@@ -22572,7 +22572,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GBP",
           "quote": "USDT"
@@ -22612,7 +22612,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CHZ",
           "quote": "USD"
@@ -22731,7 +22731,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CHZ",
           "quote": "USDT"
@@ -22816,7 +22816,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CHZ",
           "quote": "USDC"
@@ -22866,7 +22866,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RSR",
           "quote": "USD"
@@ -22957,7 +22957,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RSR",
           "quote": "USDT"
@@ -23027,7 +23027,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RSR",
           "quote": "USDC"
@@ -23072,7 +23072,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "COQ",
           "quote": "USD"
@@ -23147,7 +23147,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "COQ",
           "quote": "USDT"
@@ -23207,7 +23207,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WSTETH",
           "quote": "USD"
@@ -23250,7 +23250,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LTC",
           "quote": "BNB"
@@ -23290,7 +23290,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LTC",
           "quote": "USD"
@@ -23417,7 +23417,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LTC",
           "quote": "USDT"
@@ -23505,7 +23505,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LTC",
           "quote": "USDC"
@@ -23583,7 +23583,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DPX",
           "quote": "USD"
@@ -23626,7 +23626,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KRW",
           "quote": "USD"
@@ -23669,7 +23669,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "METH",
           "quote": "USD"
@@ -23719,7 +23719,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "METH",
           "quote": "USDT"
@@ -23759,7 +23759,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FRAX",
           "quote": "USD"
@@ -23809,7 +23809,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FRAX",
           "quote": "USDT"
@@ -23849,7 +23849,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AXL",
           "quote": "USD"
@@ -23923,7 +23923,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "AXL",
           "quote": "USDT"
@@ -23978,7 +23978,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SUSHI",
           "quote": "USD"
@@ -24094,7 +24094,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SUSHI",
           "quote": "ETH"
@@ -24139,7 +24139,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SUSHI",
           "quote": "USDT"
@@ -24219,7 +24219,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SUSHI",
           "quote": "USDC"
@@ -24259,7 +24259,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "HBAR",
           "quote": "USD"
@@ -24360,7 +24360,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "HBAR",
           "quote": "USDT"
@@ -24445,7 +24445,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "HBAR",
           "quote": "USDC"
@@ -24495,7 +24495,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TRX",
           "quote": "USD"
@@ -24610,7 +24610,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TRX",
           "quote": "USDT"
@@ -24695,7 +24695,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TRX",
           "quote": "USDC"
@@ -24765,7 +24765,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SHIB",
           "quote": "USD"
@@ -24910,7 +24910,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SHIB",
           "quote": "USDT"
@@ -25008,7 +25008,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SHIB",
           "quote": "USDC"
@@ -25086,7 +25086,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FDUSD",
           "quote": "USD"
@@ -25158,7 +25158,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FDUSD",
           "quote": "USDT"
@@ -25218,7 +25218,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FDUSD",
           "quote": "USDC"
@@ -25263,7 +25263,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SPY",
           "quote": "USD"
@@ -25306,7 +25306,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XLM",
           "quote": "USD"
@@ -25432,7 +25432,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XLM",
           "quote": "USDT"
@@ -25527,7 +25527,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XLM",
           "quote": "USDC"
@@ -25587,7 +25587,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "HIGH",
           "quote": "USD"
@@ -25668,7 +25668,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "HIGH",
           "quote": "USDT"
@@ -25733,7 +25733,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LIT",
           "quote": "USD"
@@ -25800,7 +25800,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LIT",
           "quote": "USDT"
@@ -25840,7 +25840,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZBU",
           "quote": "USD"
@@ -25900,7 +25900,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZBU",
           "quote": "USDT"
@@ -25950,7 +25950,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BSW",
           "quote": "USD"
@@ -26022,7 +26022,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BSW",
           "quote": "USDT"
@@ -26082,7 +26082,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDT",
           "quote": "USD"
@@ -26167,7 +26167,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDT",
           "quote": "USDC"
@@ -26217,7 +26217,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SNX",
           "quote": "USD"
@@ -26323,7 +26323,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SNX",
           "quote": "ETH"
@@ -26373,7 +26373,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SNX",
           "quote": "USDT"
@@ -26453,7 +26453,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SNX",
           "quote": "USDC"
@@ -26493,7 +26493,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAND",
           "quote": "BNB"
@@ -26533,7 +26533,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAND",
           "quote": "USD"
@@ -26629,7 +26629,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAND",
           "quote": "USDT"
@@ -26699,7 +26699,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BAND",
           "quote": "USDC"
@@ -26739,7 +26739,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "COP",
           "quote": "USD"
@@ -26782,7 +26782,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ONT",
           "quote": "USD"
@@ -26870,7 +26870,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ONT",
           "quote": "USDT"
@@ -26940,7 +26940,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ONT",
           "quote": "USDC"
@@ -26990,7 +26990,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "APE",
           "quote": "ETH"
@@ -27030,7 +27030,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DAI",
           "quote": "USD"
@@ -27145,7 +27145,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DAI",
           "quote": "BNB"
@@ -27185,7 +27185,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DAI",
           "quote": "USDT"
@@ -27268,7 +27268,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DAI",
           "quote": "USDC"
@@ -27318,7 +27318,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FTM",
           "quote": "USD"
@@ -27377,7 +27377,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FTM",
           "quote": "ETH"
@@ -27417,7 +27417,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FTM",
           "quote": "USDT"
@@ -27462,7 +27462,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FTM",
           "quote": "USDC"
@@ -27502,7 +27502,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UNI",
           "quote": "USD"
@@ -27633,7 +27633,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UNI",
           "quote": "BNB"
@@ -27673,7 +27673,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UNI",
           "quote": "ETH"
@@ -27726,7 +27726,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UNI",
           "quote": "USDT"
@@ -27811,7 +27811,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UNI",
           "quote": "USDC"
@@ -27876,7 +27876,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TUSD",
           "quote": "ETH"
@@ -27916,7 +27916,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XRP",
           "quote": "BNB"
@@ -27956,7 +27956,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "OP",
           "quote": "USD"
@@ -28075,7 +28075,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "OP",
           "quote": "USDT"
@@ -28160,7 +28160,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "OP",
           "quote": "USDC"
@@ -28230,7 +28230,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ALCX",
           "quote": "USD"
@@ -28310,7 +28310,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ALCX",
           "quote": "USDT"
@@ -28365,7 +28365,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ALCX",
           "quote": "USDC"
@@ -28405,7 +28405,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XRP",
           "quote": "USD"
@@ -28545,7 +28545,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XRP",
           "quote": "USDT"
@@ -28648,7 +28648,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "XRP",
           "quote": "USDC"
@@ -28726,7 +28726,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TRB",
           "quote": "USD"
@@ -28811,7 +28811,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TRB",
           "quote": "USDT"
@@ -28876,7 +28876,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TRB",
           "quote": "USDC"
@@ -28926,7 +28926,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BTC",
           "quote": "USD"
@@ -29067,7 +29067,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BTC",
           "quote": "USDT"
@@ -29167,7 +29167,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "BTC",
           "quote": "USDC"
@@ -29247,7 +29247,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FOXY",
           "quote": "USD"
@@ -29314,7 +29314,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FOXY",
           "quote": "USDT"
@@ -29369,7 +29369,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KAVA",
           "quote": "USD"
@@ -29474,7 +29474,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KAVA",
           "quote": "USDT"
@@ -29549,7 +29549,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SUSD",
           "quote": "USD"
@@ -29604,7 +29604,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SUSD",
           "quote": "USDT"
@@ -29649,7 +29649,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CUSD",
           "quote": "USD"
@@ -29706,7 +29706,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CUSD",
           "quote": "USDT"
@@ -29751,7 +29751,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SUSD",
           "quote": "ETH"
@@ -29791,7 +29791,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZRX",
           "quote": "USD"
@@ -29912,7 +29912,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDX",
           "quote": "USD"
@@ -29957,7 +29957,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LISTA",
           "quote": "USD"
@@ -30027,7 +30027,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ANON",
           "quote": "USD"
@@ -30092,7 +30092,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USR",
           "quote": "USD"
@@ -30135,7 +30135,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDL",
           "quote": "USD"
@@ -30178,7 +30178,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "JLP",
           "quote": "USD"
@@ -30221,7 +30221,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CORE",
           "quote": "USD"
@@ -30294,7 +30294,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LBTC",
           "quote": "USD"
@@ -30346,7 +30346,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VVV",
           "quote": "USD"
@@ -30409,7 +30409,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MORPHO",
           "quote": "USD"
@@ -30504,7 +30504,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KLIMA",
           "quote": "USD"
@@ -30559,7 +30559,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZRX",
           "quote": "ETH"
@@ -30599,7 +30599,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USD0++",
           "quote": "USD"
@@ -30642,7 +30642,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZRX",
           "quote": "USDT"
@@ -30727,7 +30727,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ZRX",
           "quote": "USDC"
@@ -30767,7 +30767,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LISTA",
           "quote": "USDT"
@@ -30827,7 +30827,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ANON",
           "quote": "USDT"
@@ -30872,7 +30872,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CORE",
           "quote": "USDT"
@@ -30932,7 +30932,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CORE",
           "quote": "USDC"
@@ -30972,7 +30972,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LBTC",
           "quote": "USDT"
@@ -31012,7 +31012,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VVV",
           "quote": "USDT"
@@ -31062,7 +31062,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MORPHO",
           "quote": "USDT"
@@ -31127,7 +31127,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MORPHO",
           "quote": "USDC"
@@ -31167,7 +31167,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KLIMA",
           "quote": "USDT"
@@ -31212,7 +31212,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CVX",
           "quote": "USD"
@@ -31306,7 +31306,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CVX",
           "quote": "USDT"
@@ -31371,7 +31371,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "CVX",
           "quote": "USDC"
@@ -31411,7 +31411,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LRC",
           "quote": "ETH"
@@ -31456,7 +31456,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KNC",
           "quote": "ETH"
@@ -31501,7 +31501,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TSLA",
           "quote": "USD"
@@ -31544,7 +31544,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VELO",
           "quote": "USD"
@@ -31632,7 +31632,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VELO",
           "quote": "USDT"
@@ -31697,7 +31697,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "VELO",
           "quote": "USDC"
@@ -31737,7 +31737,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "COIN",
           "quote": "USD"
@@ -31782,7 +31782,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FIL",
           "quote": "USD"
@@ -31908,7 +31908,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FIL",
           "quote": "ETH"
@@ -31966,7 +31966,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FIL",
           "quote": "USDT"
@@ -32051,7 +32051,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FIL",
           "quote": "USDC"
@@ -32116,7 +32116,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "STORJ",
           "quote": "USD"
@@ -32222,7 +32222,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "STORJ",
           "quote": "USDT"
@@ -32297,7 +32297,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "STORJ",
           "quote": "USDC"
@@ -32337,7 +32337,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MIMATIC",
           "quote": "USD"
@@ -32380,7 +32380,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KSM",
           "quote": "USD"
@@ -32487,7 +32487,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KSM",
           "quote": "USDT"
@@ -32572,7 +32572,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "KSM",
           "quote": "USDC"
@@ -32612,7 +32612,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FET",
           "quote": "USD"
@@ -32733,7 +32733,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FET",
           "quote": "USDT"
@@ -32818,7 +32818,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FET",
           "quote": "USDC"
@@ -32878,7 +32878,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EUR",
           "quote": "USD"
@@ -32937,7 +32937,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EUR",
           "quote": "USDT"
@@ -32987,7 +32987,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "EUR",
           "quote": "USDC"
@@ -33027,7 +33027,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LINK",
           "quote": "USD"
@@ -33160,7 +33160,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LINK",
           "quote": "ETH"
@@ -33228,7 +33228,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LINK",
           "quote": "BNB"
@@ -33268,7 +33268,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LINK",
           "quote": "USDT"
@@ -33366,7 +33366,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "LINK",
           "quote": "USDC"
@@ -33444,7 +33444,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SAND",
           "quote": "USD"
@@ -33563,7 +33563,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SAND",
           "quote": "USDT"
@@ -33648,7 +33648,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "SAND",
           "quote": "USDC"
@@ -33698,7 +33698,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "NULS",
           "quote": "USD"
@@ -33764,7 +33764,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "NULS",
           "quote": "USDT"
@@ -33819,7 +33819,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "NULS",
           "quote": "USDC"
@@ -33859,7 +33859,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RNDR",
           "quote": "USD"
@@ -33916,7 +33916,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RNDR",
           "quote": "USDT"
@@ -33966,7 +33966,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RNDR",
           "quote": "USDC"
@@ -34006,7 +34006,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FTT",
           "quote": "ETH"
@@ -34051,7 +34051,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FTT",
           "quote": "USD"
@@ -34127,7 +34127,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FTT",
           "quote": "USDT"
@@ -34192,7 +34192,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "FTT",
           "quote": "USDC"
@@ -34232,7 +34232,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "MSFT",
           "quote": "USD"
@@ -34275,7 +34275,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UMA",
           "quote": "USD"
@@ -34379,7 +34379,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UMA",
           "quote": "USDT"
@@ -34449,7 +34449,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "UMA",
           "quote": "USDC"
@@ -34489,7 +34489,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RUNE",
           "quote": "USD"
@@ -34584,7 +34584,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RUNE",
           "quote": "USDT"
@@ -34654,7 +34654,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RUNE",
           "quote": "USDC"
@@ -34704,7 +34704,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GHST",
           "quote": "ETH"
@@ -34744,7 +34744,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GHST",
           "quote": "USD"
@@ -34833,7 +34833,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GHST",
           "quote": "USDT"
@@ -34893,7 +34893,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "GHST",
           "quote": "USDC"
@@ -34933,7 +34933,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DOGE",
           "quote": "USD"
@@ -35089,7 +35089,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DOGE",
           "quote": "USDT"
@@ -35184,7 +35184,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "DOGE",
           "quote": "USDC"
@@ -35254,7 +35254,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WING",
           "quote": "USD"
@@ -35321,7 +35321,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "WING",
           "quote": "USDT"
@@ -35376,7 +35376,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ONE",
           "quote": "USD"
@@ -35474,7 +35474,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ONE",
           "quote": "USDT"
@@ -35554,7 +35554,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "ONE",
           "quote": "USDC"
@@ -35599,7 +35599,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RON",
           "quote": "USD"
@@ -35665,7 +35665,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RON",
           "quote": "USDT"
@@ -35720,7 +35720,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "RON",
           "quote": "USDC"
@@ -35760,7 +35760,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDM",
           "quote": "USD"
@@ -35810,7 +35810,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "USDM",
           "quote": "USDT"
@@ -35850,7 +35850,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TUSD",
           "quote": "USD"
@@ -35948,7 +35948,7 @@
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
-      "price_feed_info": {
+      "additional_feed_info": {
         "pair": {
           "base": "TUSD",
           "quote": "USDT"

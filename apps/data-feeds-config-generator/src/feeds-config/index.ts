@@ -48,7 +48,7 @@ function feedFromChainLinkFeedInfo(
   return {
     description,
     full_name,
-    price_feed_info: {
+    additional_feed_info: {
       pair: pair,
       decimals: getHighestDecimals(additionalData),
       category,
@@ -175,7 +175,7 @@ function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
   const seenPairs = new Set<string>();
 
   return dataFeeds.filter(feed => {
-    const pairKey = pairToString(feed.price_feed_info.pair);
+    const pairKey = pairToString(feed.additional_feed_info.pair);
 
     if (seenPairs.has(pairKey)) {
       return false;
@@ -188,7 +188,7 @@ function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
 
 function addStableCoinVariants(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
   const stableCoinVariants = feeds.flatMap(feed => {
-    const { base, quote } = feed.price_feed_info.pair;
+    const { base, quote } = feed.additional_feed_info.pair;
     if (quote in stableCoins) {
       return stableCoins[quote as keyof typeof stableCoins]
         .map(altStableCoin => createPair(base, altStableCoin))
@@ -197,8 +197,8 @@ function addStableCoinVariants(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
           return {
             ...feed,
             full_name,
-            price_feed_info: {
-              ...structuredClone(feed.price_feed_info),
+            additional_feed_info: {
+              ...structuredClone(feed.additional_feed_info),
               pair,
             },
           };
@@ -224,7 +224,7 @@ function removeUnsupportedRateDataFeeds(
   return dataFeeds.filter(
     feed =>
       !unsupported.some(x =>
-        feed.price_feed_info.compatibility_info.chainlink
+        feed.additional_feed_info.compatibility_info.chainlink
           .toLowerCase()
           .includes(x),
       ),
@@ -252,7 +252,8 @@ export async function generateFeedConfig(
   const dataFeedsWithCryptoResources = (
     await addDataProviders(dataFeedsWithStableCoinVariants)
   ).filter(
-    dataFeed => Object.keys(dataFeed.price_feed_info.arguments).length !== 0,
+    dataFeed =>
+      Object.keys(dataFeed.additional_feed_info.arguments).length !== 0,
   );
 
   let rawDataFeedsOnMainnets = Object.entries(rawDataFeeds).filter(

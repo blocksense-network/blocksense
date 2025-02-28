@@ -218,8 +218,8 @@ export const NewFeedSchema = S.mutable(
       first_report_start_unix_time_ms: S.Number,
     }),
 
-    // TODO: This field should be optional depending on the `type`.
-    price_feed_info: S.mutable(
+    // TODO: This field should be optional / different depending on the `type`.
+    additional_feed_info: S.mutable(
       S.Struct({
         pair: PairSchema,
         decimals: S.Number,
