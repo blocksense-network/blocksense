@@ -995,6 +995,11 @@ mod tests {
             assert!(nonce.is_ok());
             assert_eq!(nonce.unwrap(), 1);
         }
+
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP TWO - Prepare sample updates and write to the contract
+        /////////////////////////////////////////////////////////////////////
+
         {
             let providers = sequencer_state.providers.read().await;
             let mut p = providers.get(network1).unwrap().lock().await;
@@ -1050,6 +1055,10 @@ mod tests {
             assert!(p3.is_ok());
         }
 
+        /////////////////////////////////////////////////////////////////////
+        // BIG STEP THREE - Read data from contract and verify that it's correct
+        /////////////////////////////////////////////////////////////////////
+
         let msg = sequencer_state
             .deploy_contract(network1, MULTICALL_CONTRACT_NAME)
             .await
@@ -1064,9 +1073,10 @@ mod tests {
                 .await
                 .expect("Can't get latest values from contract");
             assert_eq!(latest.len(), 1);
-            assert_eq!(latest[0].feed_id, 1_u32);
-            assert_eq!(latest[0].num_updates, 3_u128);
-            assert_eq!(latest[0].value, Some(FeedType::Numerical(104011.78f64)));
+            let latest = latest[0].clone().expect("no error in feed");
+            assert_eq!(latest.feed_id, 1_u32);
+            assert_eq!(latest.num_updates, 3_u128);
+            assert_eq!(latest.value, FeedType::Numerical(104011.78f64));
 
             let history = p_lock
                 .get_historical_values_for_feed(feed.id, &[0_u128, 1_u128, 2_u128, 3_u128, 4_u128])
@@ -1075,29 +1085,69 @@ mod tests {
 
             assert_eq!(history.len(), 5);
 
-            assert_eq!(history[0].feed_id, 1_u32);
-            assert_eq!(history[1].feed_id, 1_u32);
-            assert_eq!(history[2].feed_id, 1_u32);
-            assert_eq!(history[3].feed_id, 1_u32);
-            assert_eq!(history[4].feed_id, 1_u32);
+            let feed_ids: Vec<u32> = history
+                .iter()
+                .map(|x| match x {
+                    Ok(x) => x.feed_id,
+                    Err(x) => x.feed_id,
+                })
+                .collect();
 
-            assert_eq!(history[0].value, None);
-            assert_eq!(history[1].value, Some(FeedType::Numerical(103082.01f64)));
-            assert_eq!(history[2].value, Some(FeedType::Numerical(103012.21f64)));
-            assert_eq!(history[3].value, Some(FeedType::Numerical(104011.78f64)));
-            assert_eq!(history[4].value, None);
+            let errors: Vec<Option<&str>> = history
+                .iter()
+                .map(|x| match x {
+                    Ok(_) => None,
+                    Err(x) => Some(x.error.as_str()),
+                })
+                .collect();
 
-            assert_eq!(history[0].num_updates, 0_u128);
-            assert_eq!(history[1].num_updates, 1_u128);
-            assert_eq!(history[2].num_updates, 2_u128);
-            assert_eq!(history[3].num_updates, 3_u128);
-            assert_eq!(history[4].num_updates, 4_u128);
+            let values: Vec<Option<FeedType>> = history
+                .iter()
+                .map(|x| match x {
+                    Ok(x) => Some(x.value.clone()),
+                    Err(_) => None,
+                })
+                .collect();
 
-            assert_eq!(history[0].published, 0_u128);
-            assert_ne!(history[1].published, 0_u128);
-            assert_ne!(history[2].published, 0_u128);
-            assert_ne!(history[3].published, 0_u128);
-            assert_eq!(history[4].published, 0_u128);
+            let vec_num_updates: Vec<u128> = history
+                .iter()
+                .map(|x| match x {
+                    Ok(x) => x.num_updates,
+                    Err(x) => x.num_updates,
+                })
+                .collect();
+
+            let vec_published: Vec<Option<u128>> = history
+                .iter()
+                .map(|x| match x {
+                    Ok(x) => Some(x.published),
+                    Err(_) => None,
+                })
+                .collect();
+
+            assert_eq!(feed_ids[0], 1_u32);
+            assert_eq!(feed_ids[1], 1_u32);
+            assert_eq!(feed_ids[2], 1_u32);
+            assert_eq!(feed_ids[3], 1_u32);
+            assert_eq!(feed_ids[4], 1_u32);
+
+            assert_eq!(errors[0], Some("Timestamp is zero"));
+            assert_eq!(values[1], Some(FeedType::Numerical(103082.01f64)));
+            assert_eq!(values[2], Some(FeedType::Numerical(103012.21f64)));
+            assert_eq!(values[3], Some(FeedType::Numerical(104011.78f64)));
+            assert_eq!(errors[4], Some("Timestamp is zero"));
+
+            assert_eq!(vec_num_updates[0], 0_u128);
+            assert_eq!(vec_num_updates[1], 1_u128);
+            assert_eq!(vec_num_updates[2], 2_u128);
+            assert_eq!(vec_num_updates[3], 3_u128);
+            assert_eq!(vec_num_updates[4], 4_u128);
+
+            assert_eq!(vec_published[0], None);
+            assert_ne!(vec_published[1], Some(0_u128));
+            assert_ne!(vec_published[2], Some(0_u128));
+            assert_ne!(vec_published[3], Some(0_u128));
+            assert_eq!(vec_published[4], None);
         }
 
         {

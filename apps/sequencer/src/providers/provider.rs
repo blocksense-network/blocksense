@@ -21,7 +21,9 @@ use config::AllFeedsConfig;
 use reqwest::{Client, Url};
 
 use config::{PublishCriteria, SequencerConfig};
-use data_feeds::feeds_processing::{PublishedFeedUpdate, VotedFeedUpdate};
+use data_feeds::feeds_processing::{
+    PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
+};
 use eyre::{eyre, Result};
 use feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
 use feed_registry::types::FeedType;
@@ -363,7 +365,7 @@ impl RpcProvider {
     pub async fn get_latest_values(
         &self,
         feed_ids: &[u32],
-    ) -> Result<Vec<PublishedFeedUpdate>, eyre::Error> {
+    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
         let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
         let contract = MulticallInstance::new(multicall, self.provider.clone());
@@ -415,7 +417,7 @@ impl RpcProvider {
         &self,
         feed_id: u32,
         updates: &[u128],
-    ) -> Result<Vec<PublishedFeedUpdate>> {
+    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
         let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
 
@@ -585,7 +587,10 @@ impl RpcProvider {
     ) -> Result<u32> {
         let latest = self.get_latest_values(&[feed_id]).await?;
         if !latest.is_empty() {
-            let num_updates = latest[0].num_updates;
+            let num_updates = match &latest[0] {
+                Ok(latest) => latest.num_updates,
+                Err(latest) => latest.num_updates,
+            };
             let limit = if (limit_entries as u128) < num_updates {
                 limit_entries
             } else {
@@ -620,11 +625,11 @@ impl RpcProvider {
 
             let mut count: u32 = 0;
             for v in values {
-                let Some(value) = v.value else {
+                let Ok(v) = v else {
                     continue;
                 };
                 let elem = HistoryEntry {
-                    value,
+                    value: v.value,
                     update_number: v.num_updates,
                     end_slot_timestamp: v.published,
                 };
