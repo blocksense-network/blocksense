@@ -3,7 +3,7 @@ import { Schema as S } from 'effect';
 /**
  * Schema for the relevant information about products received from BinanceTR Exchange.
  */
-export const BinanceTRExchangeInfoRespSchema = S.mutable(
+export const BinanceTRInfoRespSchema = S.mutable(
   S.Struct({
     data: S.Struct({
       list: S.Array(
@@ -17,9 +17,7 @@ export const BinanceTRExchangeInfoRespSchema = S.mutable(
   }),
 );
 
-export type BinanceTRExchangeInfoResp = S.Schema.Type<
-  typeof BinanceTRExchangeInfoRespSchema
->;
+export type BinanceTRInfoResp = S.Schema.Type<typeof BinanceTRInfoRespSchema>;
 
 /**
  * Schema for the data relevant to a BinanceTR Exchange oracle.
@@ -28,12 +26,10 @@ export type BinanceTRExchangeInfoResp = S.Schema.Type<
  *      https://www.binance.tr/apidocs/#compressedaggregate-trades-list
  *      https://www.binance.tr/apidocs/#recent-trades-list
  */
-export const BinanceTRExchangeAssetInfoSchema = S.mutable(
+export const BinanceTRAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
   }),
 );
 
-export type BinanceTRExchangeAssetInfo = S.Schema.Type<
-  typeof BinanceTRExchangeAssetInfoSchema
->;
+export type BinanceTRAssetInfo = S.Schema.Type<typeof BinanceTRAssetInfoSchema>;

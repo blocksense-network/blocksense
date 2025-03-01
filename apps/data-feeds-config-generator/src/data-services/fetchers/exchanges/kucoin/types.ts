@@ -3,7 +3,7 @@ import { Schema as S } from 'effect';
 /**
  * Schema for the relevant information about products received from KuCoin Exchange.
  */
-export const KuCoinExchangeInfoRespSchema = S.mutable(
+export const KuCoinInfoRespSchema = S.mutable(
   S.Struct({
     data: S.Array(
       S.Struct({
@@ -15,21 +15,17 @@ export const KuCoinExchangeInfoRespSchema = S.mutable(
   }),
 );
 
-export type KuCoinExchangeInfoResp = S.Schema.Type<
-  typeof KuCoinExchangeInfoRespSchema
->;
+export type KuCoinInfoResp = S.Schema.Type<typeof KuCoinInfoRespSchema>;
 
 /**
  * Schema for the data relevant to a KuCoin Exchange oracle.
  *
  * Ref: https://www.kucoin.com/docs/rest/spot-trading/market-data/get-all-tickers
  */
-const KuCoinExchangeAssetInfoSchema = S.mutable(
+const KuCoinAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
   }),
 );
 
-export type KuCoinExchangeAssetInfo = S.Schema.Type<
-  typeof KuCoinExchangeAssetInfoSchema
->;
+export type KuCoinAssetInfo = S.Schema.Type<typeof KuCoinAssetInfoSchema>;

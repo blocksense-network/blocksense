@@ -1,19 +1,19 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
 import {
-  BinanceTRExchangeAssetInfo,
-  BinanceTRExchangeInfoResp,
-  BinanceTRExchangeInfoRespSchema,
+  BinanceTRAssetInfo,
+  BinanceTRInfoResp,
+  BinanceTRInfoRespSchema,
 } from './types';
 
 /**
  * Class to fetch assets information from BinanceTR Exchange.
  */
-export class BinanceTRExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<BinanceTRExchangeAssetInfo>
+export class BinanceTRAssetsFetcher
+  implements ExchangeAssetsFetcher<BinanceTRAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<BinanceTRExchangeAssetInfo>[]> {
-    const assets = await fetchBinanceTRExchangeInfo();
+  async fetchAssets(): Promise<AssetInfo<BinanceTRAssetInfo>[]> {
+    const assets = await fetchBinanceTRInfo();
     return assets.data.list.map(asset => ({
       pair: {
         base: asset.baseAsset,
@@ -31,8 +31,8 @@ export class BinanceTRExchangeAssetsFetcher
  *
  * Ref: https://www.binance.tr/apidocs/#get-all-supported-trading-symbol
  */
-export async function fetchBinanceTRExchangeInfo(): Promise<BinanceTRExchangeInfoResp> {
+export async function fetchBinanceTRInfo(): Promise<BinanceTRInfoResp> {
   const url = 'https://www.binance.tr/open/v1/common/symbols';
 
-  return fetchAndDecodeJSON(BinanceTRExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(BinanceTRInfoRespSchema, url);
 }

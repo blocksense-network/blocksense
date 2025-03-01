@@ -1,24 +1,24 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
 import {
-  GeminiExchangeAssetInfo,
-  GeminiExchangeSymbolDetailsInfoResp,
-  GeminiExchangeSymbolDetailsInfoRespSchema,
-  GeminiExchangeSymbolsInfoResp,
-  GeminiExchangeSymbolsInfoRespSchema,
+  GeminiAssetInfo,
+  GeminiSymbolDetailsInfoResp,
+  GeminiSymbolDetailsInfoRespSchema,
+  GeminiSymbolsInfoResp,
+  GeminiSymbolsInfoRespSchema,
 } from './types';
 
 /**
  * Class to fetch assets information from Gemini Exchange.
  */
-export class GeminiExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<GeminiExchangeAssetInfo>
+export class GeminiAssetsFetcher
+  implements ExchangeAssetsFetcher<GeminiAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<GeminiExchangeAssetInfo>[]> {
-    const result: AssetInfo<GeminiExchangeAssetInfo>[] = [];
-    const assets = await fetchGeminiExchangeSymbolsInfo();
+  async fetchAssets(): Promise<AssetInfo<GeminiAssetInfo>[]> {
+    const result: AssetInfo<GeminiAssetInfo>[] = [];
+    const assets = await fetchGeminiSymbolsInfo();
     for (const asset of assets) {
-      const assetDetails = await fetchGeminiExchangeSymbolDetailsInfo(asset);
+      const assetDetails = await fetchGeminiSymbolDetailsInfo(asset);
       result.push({
         pair: {
           base: assetDetails.base_currency,
@@ -38,10 +38,10 @@ export class GeminiExchangeAssetsFetcher
  *
  * Ref: https://docs.gemini.com/rest-api/#symbols
  */
-export async function fetchGeminiExchangeSymbolsInfo(): Promise<GeminiExchangeSymbolsInfoResp> {
+export async function fetchGeminiSymbolsInfo(): Promise<GeminiSymbolsInfoResp> {
   const url = 'https://api.gemini.com/v1/symbols';
 
-  return fetchAndDecodeJSON(GeminiExchangeSymbolsInfoRespSchema, url);
+  return fetchAndDecodeJSON(GeminiSymbolsInfoRespSchema, url);
 }
 
 /**
@@ -49,10 +49,10 @@ export async function fetchGeminiExchangeSymbolsInfo(): Promise<GeminiExchangeSy
  *
  * Ref: https://docs.gemini.com/rest-api/#symbol-details
  */
-export async function fetchGeminiExchangeSymbolDetailsInfo(
+export async function fetchGeminiSymbolDetailsInfo(
   symbol: string,
-): Promise<GeminiExchangeSymbolDetailsInfoResp> {
+): Promise<GeminiSymbolDetailsInfoResp> {
   const url = `https://api.gemini.com/v1/symbols/details/${symbol}`;
 
-  return fetchAndDecodeJSON(GeminiExchangeSymbolDetailsInfoRespSchema, url);
+  return fetchAndDecodeJSON(GeminiSymbolDetailsInfoRespSchema, url);
 }

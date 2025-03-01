@@ -1,19 +1,15 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
-import {
-  KuCoinExchangeAssetInfo,
-  KuCoinExchangeInfoResp,
-  KuCoinExchangeInfoRespSchema,
-} from './types';
+import { KuCoinAssetInfo, KuCoinInfoResp, KuCoinInfoRespSchema } from './types';
 
 /**
  * Class to fetch assets information from KuCoin Exchange.
  */
-export class KuCoinExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<KuCoinExchangeAssetInfo>
+export class KuCoinAssetsFetcher
+  implements ExchangeAssetsFetcher<KuCoinAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<KuCoinExchangeAssetInfo>[]> {
-    const assets = await fetchKuCoinExchangeInfo();
+  async fetchAssets(): Promise<AssetInfo<KuCoinAssetInfo>[]> {
+    const assets = await fetchKuCoinInfo();
     return assets.data.map(asset => ({
       pair: {
         base: asset.baseCurrency,
@@ -31,8 +27,8 @@ export class KuCoinExchangeAssetsFetcher
  *
  * Ref: https://www.kucoin.com/docs/rest/spot-trading/market-data/get-symbols-list
  */
-export async function fetchKuCoinExchangeInfo(): Promise<KuCoinExchangeInfoResp> {
+export async function fetchKuCoinInfo(): Promise<KuCoinInfoResp> {
   const url = 'https://api.kucoin.com/api/v2/symbols';
 
-  return fetchAndDecodeJSON(KuCoinExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(KuCoinInfoRespSchema, url);
 }

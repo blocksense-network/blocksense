@@ -3,16 +3,16 @@ import { Schema as S } from 'effect';
 /**
  * Schema for the relevant information about symbols received from Gemini Exchange.
  */
-export const GeminiExchangeSymbolsInfoRespSchema = S.mutable(S.Array(S.String));
+export const GeminiSymbolsInfoRespSchema = S.mutable(S.Array(S.String));
 
-export type GeminiExchangeSymbolsInfoResp = S.Schema.Type<
-  typeof GeminiExchangeSymbolsInfoRespSchema
+export type GeminiSymbolsInfoResp = S.Schema.Type<
+  typeof GeminiSymbolsInfoRespSchema
 >;
 
 /**
  * Schema for the relevant information about symbol details received from Gemini Exchange.
  */
-export const GeminiExchangeSymbolDetailsInfoRespSchema = S.mutable(
+export const GeminiSymbolDetailsInfoRespSchema = S.mutable(
   S.Struct({
     symbol: S.String,
     base_currency: S.String,
@@ -20,8 +20,8 @@ export const GeminiExchangeSymbolDetailsInfoRespSchema = S.mutable(
   }),
 );
 
-export type GeminiExchangeSymbolDetailsInfoResp = S.Schema.Type<
-  typeof GeminiExchangeSymbolDetailsInfoRespSchema
+export type GeminiSymbolDetailsInfoResp = S.Schema.Type<
+  typeof GeminiSymbolDetailsInfoRespSchema
 >;
 
 /**
@@ -29,12 +29,10 @@ export type GeminiExchangeSymbolDetailsInfoResp = S.Schema.Type<
  *
  * Ref: https://docs.gemini.com/rest-api/#ticker
  */
-const GeminiExchangeAssetInfoSchema = S.mutable(
+const GeminiAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
   }),
 );
 
-export type GeminiExchangeAssetInfo = S.Schema.Type<
-  typeof GeminiExchangeAssetInfoSchema
->;
+export type GeminiAssetInfo = S.Schema.Type<typeof GeminiAssetInfoSchema>;

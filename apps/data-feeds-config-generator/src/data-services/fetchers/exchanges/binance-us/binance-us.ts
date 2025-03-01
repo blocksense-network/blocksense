@@ -1,19 +1,19 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
 import {
-  BinanceUSExchangeAssetInfo,
-  BinanceUSExchangeInfoResp,
-  BinanceUSExchangeInfoRespSchema,
+  BinanceUSAssetInfo,
+  BinanceUSInfoResp,
+  BinanceUSInfoRespSchema,
 } from './types';
 
 /**
  * Class to fetch assets information from BinanceUS Exchange.
  */
-export class BinanceUSExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<BinanceUSExchangeAssetInfo>
+export class BinanceUSAssetsFetcher
+  implements ExchangeAssetsFetcher<BinanceUSAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<BinanceUSExchangeAssetInfo>[]> {
-    const assets = await fetchBinanceUSExchangeInfo();
+  async fetchAssets(): Promise<AssetInfo<BinanceUSAssetInfo>[]> {
+    const assets = await fetchBinanceUSInfo();
     return assets.symbols
       .filter(asset => !asset.symbol.endsWith('USD'))
       .map(asset => ({
@@ -33,8 +33,8 @@ export class BinanceUSExchangeAssetsFetcher
  *
  * Ref: https://docs.binance.us/#get-system-status
  */
-export async function fetchBinanceUSExchangeInfo(): Promise<BinanceUSExchangeInfoResp> {
+export async function fetchBinanceUSInfo(): Promise<BinanceUSInfoResp> {
   const url = 'https://api.binance.us/api/v3/exchangeInfo';
 
-  return fetchAndDecodeJSON(BinanceUSExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(BinanceUSInfoRespSchema, url);
 }

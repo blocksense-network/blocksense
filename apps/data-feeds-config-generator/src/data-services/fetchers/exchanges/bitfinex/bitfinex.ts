@@ -1,19 +1,19 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
 import {
-  BitfinexExchangeAssetInfo,
-  BitfinexExchangeInfoResp,
-  BitfinexExchangeInfoRespSchema,
+  BitfinexAssetInfo,
+  BitfinexInfoResp,
+  BitfinexInfoRespSchema,
 } from './types';
 
 /**
  * Class to fetch assets information from Bitfinex Exchange.
  */
-export class BitfinexExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<BitfinexExchangeAssetInfo>
+export class BitfinexAssetsFetcher
+  implements ExchangeAssetsFetcher<BitfinexAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<BitfinexExchangeAssetInfo>[]> {
-    const assets = await fetchBitfinexExchangeInfo();
+  async fetchAssets(): Promise<AssetInfo<BitfinexAssetInfo>[]> {
+    const assets = await fetchBitfinexInfo();
     return assets[0].map(asset => {
       const pair = splitPair(asset);
       return {
@@ -31,10 +31,10 @@ export class BitfinexExchangeAssetsFetcher
  *
  * Ref: https://docs.bitfinex.com/reference/rest-public-conf
  */
-export async function fetchBitfinexExchangeInfo(): Promise<BitfinexExchangeInfoResp> {
+export async function fetchBitfinexInfo(): Promise<BitfinexInfoResp> {
   const url = 'https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange';
 
-  return fetchAndDecodeJSON(BitfinexExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(BitfinexInfoRespSchema, url);
 }
 
 export function splitPair(pair: string): {
