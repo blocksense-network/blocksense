@@ -3,7 +3,7 @@ import { Schema as S } from 'effect';
 /**
  * Schema for the relevant information about products received from OKX Exchange.
  */
-export const OKXExchangeInfoRespSchema = S.mutable(
+export const OKXInfoRespSchema = S.mutable(
   S.Struct({
     data: S.Array(
       S.Struct({
@@ -15,21 +15,17 @@ export const OKXExchangeInfoRespSchema = S.mutable(
   }),
 );
 
-export type OKXExchangeInfoResp = S.Schema.Type<
-  typeof OKXExchangeInfoRespSchema
->;
+export type OKXInfoResp = S.Schema.Type<typeof OKXInfoRespSchema>;
 
 /**
  * Schema for the data relevant to a OKX Exchange oracle.
  *
  * Ref: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-tickers
  */
-const OKXExchangeAssetInfoSchema = S.mutable(
+const OKXAssetInfoSchema = S.mutable(
   S.Struct({
     instId: S.String,
   }),
 );
 
-export type OKXExchangeAssetInfo = S.Schema.Type<
-  typeof OKXExchangeAssetInfoSchema
->;
+export type OKXAssetInfo = S.Schema.Type<typeof OKXAssetInfoSchema>;

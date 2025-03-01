@@ -1,19 +1,19 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
 import {
-  CoinbaseExchangeAssetInfo,
-  CoinbaseExchangeInfoResp,
-  CoinbaseExchangeInfoRespSchema,
+  CoinbaseAssetInfo,
+  CoinbaseInfoResp,
+  CoinbaseInfoRespSchema,
 } from './types';
 
 /**
  * Class to fetch assets information from Coinbase Exchange.
  */
-export class CoinbaseExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<CoinbaseExchangeAssetInfo>
+export class CoinbaseAssetsFetcher
+  implements ExchangeAssetsFetcher<CoinbaseAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<CoinbaseExchangeAssetInfo>[]> {
-    const assets = await fetchCoinbaseExchangeInfo();
+  async fetchAssets(): Promise<AssetInfo<CoinbaseAssetInfo>[]> {
+    const assets = await fetchCoinbaseInfo();
     return assets.map(asset => ({
       pair: {
         base: asset.base_currency,
@@ -31,8 +31,8 @@ export class CoinbaseExchangeAssetsFetcher
  *
  * Ref: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproducts
  */
-export async function fetchCoinbaseExchangeInfo(): Promise<CoinbaseExchangeInfoResp> {
+export async function fetchCoinbaseInfo(): Promise<CoinbaseInfoResp> {
   const url = 'https://api.exchange.coinbase.com/products';
 
-  return fetchAndDecodeJSON(CoinbaseExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(CoinbaseInfoRespSchema, url);
 }

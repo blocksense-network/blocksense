@@ -3,7 +3,7 @@ import { Schema as S } from 'effect';
 /**
  * Schema for the relevant information about products received from GateIo Exchange.
  */
-export const GateIoExchangeInfoRespSchema = S.mutable(
+export const GateIoInfoRespSchema = S.mutable(
   S.Array(
     S.Struct({
       id: S.String,
@@ -13,21 +13,17 @@ export const GateIoExchangeInfoRespSchema = S.mutable(
   ),
 );
 
-export type GateIoExchangeInfoResp = S.Schema.Type<
-  typeof GateIoExchangeInfoRespSchema
->;
+export type GateIoInfoResp = S.Schema.Type<typeof GateIoInfoRespSchema>;
 
 /**
  * Schema for the data relevant to a GateIo Exchange oracle.
  *
  * Ref: https://www.gate.io/docs/developers/apiv4/en/#spot
  */
-const GateIoExchangeAssetInfoSchema = S.mutable(
+const GateIoAssetInfoSchema = S.mutable(
   S.Struct({
     id: S.String,
   }),
 );
 
-export type GateIoExchangeAssetInfo = S.Schema.Type<
-  typeof GateIoExchangeAssetInfoSchema
->;
+export type GateIoAssetInfo = S.Schema.Type<typeof GateIoAssetInfoSchema>;

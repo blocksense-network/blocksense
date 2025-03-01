@@ -1,19 +1,13 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
-import {
-  MEXCExchangeAssetInfo,
-  MEXCExchangeInfoResp,
-  MEXCExchangeInfoRespSchema,
-} from './types';
+import { MEXCAssetInfo, MEXCInfoResp, MEXCInfoRespSchema } from './types';
 
 /**
  * Class to fetch assets information from MEXC Exchange.
  */
-export class MEXCExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<MEXCExchangeAssetInfo>
-{
-  async fetchAssets(): Promise<AssetInfo<MEXCExchangeAssetInfo>[]> {
-    const assets = await fetchMEXCExchangeInfo();
+export class MEXCAssetsFetcher implements ExchangeAssetsFetcher<MEXCAssetInfo> {
+  async fetchAssets(): Promise<AssetInfo<MEXCAssetInfo>[]> {
+    const assets = await fetchMEXCInfo();
     return assets.symbols.map(asset => ({
       pair: {
         base: asset.baseAsset,
@@ -31,8 +25,8 @@ export class MEXCExchangeAssetsFetcher
  *
  * Ref: https://mexcdevelop.github.io/apidocs/spot_v3_en/#api-default-symbol
  */
-export async function fetchMEXCExchangeInfo(): Promise<MEXCExchangeInfoResp> {
+export async function fetchMEXCInfo(): Promise<MEXCInfoResp> {
   const url = 'https://api.mexc.com/api/v3/exchangeInfo';
 
-  return fetchAndDecodeJSON(MEXCExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(MEXCInfoRespSchema, url);
 }

@@ -2,8 +2,8 @@ import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
 import {
   BinanceAssetInfo,
-  BinanceExchangeInfoResp,
-  BinanceExchangeInfoRespSchema,
+  BinanceInfoResp,
+  BinanceInfoRespSchema,
 } from './types';
 
 /**
@@ -31,8 +31,8 @@ export class BinanceAssetsFetcher
  *
  * Ref: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/public-api-endpoints#exchange-information
  */
-export async function fetchBinanceSymbolsInfo(): Promise<BinanceExchangeInfoResp> {
+export async function fetchBinanceSymbolsInfo(): Promise<BinanceInfoResp> {
   const url = 'https://api.binance.com/api/v3/exchangeInfo';
 
-  return fetchAndDecodeJSON(BinanceExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(BinanceInfoRespSchema, url);
 }

@@ -3,7 +3,7 @@ import { Schema as S } from 'effect';
 /**
  * Schema for the relevant information about products received from CryptoCom Exchange.
  */
-export const CryptoComExchangeInfoRespSchema = S.mutable(
+export const CryptoComInfoRespSchema = S.mutable(
   S.Struct({
     result: S.Struct({
       data: S.Array(
@@ -17,21 +17,17 @@ export const CryptoComExchangeInfoRespSchema = S.mutable(
   }),
 );
 
-export type CryptoComExchangeInfoResp = S.Schema.Type<
-  typeof CryptoComExchangeInfoRespSchema
->;
+export type CryptoComInfoResp = S.Schema.Type<typeof CryptoComInfoRespSchema>;
 
 /**
  * Schema for the data relevant to a CryptoCom Exchange oracle.
  *
  * Ref: https://exchange-docs.crypto.com/exchange/v1/rest-ws/index.html#public-get-tickers
  */
-const CryptoComExchangeAssetInfoSchema = S.mutable(
+const CryptoComAssetInfoSchema = S.mutable(
   S.Struct({
     instrument_name: S.String,
   }),
 );
 
-export type CryptoComExchangeAssetInfo = S.Schema.Type<
-  typeof CryptoComExchangeAssetInfoSchema
->;
+export type CryptoComAssetInfo = S.Schema.Type<typeof CryptoComAssetInfoSchema>;

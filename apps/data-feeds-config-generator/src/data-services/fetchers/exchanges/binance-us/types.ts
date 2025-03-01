@@ -3,7 +3,7 @@ import { Schema as S } from 'effect';
 /**
  * Schema for the relevant information about products received from BinanceUS Exchange.
  */
-export const BinanceUSExchangeInfoRespSchema = S.mutable(
+export const BinanceUSInfoRespSchema = S.mutable(
   S.Struct({
     symbols: S.Array(
       S.Struct({
@@ -15,21 +15,17 @@ export const BinanceUSExchangeInfoRespSchema = S.mutable(
   }),
 );
 
-export type BinanceUSExchangeInfoResp = S.Schema.Type<
-  typeof BinanceUSExchangeInfoRespSchema
->;
+export type BinanceUSInfoResp = S.Schema.Type<typeof BinanceUSInfoRespSchema>;
 
 /**
  * Schema for the data relevant to a BinanceUS Exchange oracle.
  *
  * Ref: https://docs.binance.us/#get-live-ticker-price
  */
-const BinanceUSExchangeAssetInfoSchema = S.mutable(
+const BinanceUSAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
   }),
 );
 
-export type BinanceUSExchangeAssetInfo = S.Schema.Type<
-  typeof BinanceUSExchangeAssetInfoSchema
->;
+export type BinanceUSAssetInfo = S.Schema.Type<typeof BinanceUSAssetInfoSchema>;
