@@ -92,13 +92,19 @@ pub fn naive_packing(feed_result: &FeedType, digits_in_fraction: usize) -> Vec<u
     feed_result.as_bytes(digits_in_fraction)
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct PublishedFeedUpdate {
     pub feed_id: u32,
     pub num_updates: u128,
-    pub value: Option<FeedType>,
+    pub value: FeedType,
     pub published: Timestamp, // in seconds since UNIX_EPOCH
-    pub error: Option<String>,
+}
+
+#[derive(Clone, Debug)]
+pub struct PublishedFeedUpdateError {
+    pub feed_id: u32,
+    pub num_updates: u128,
+    pub error: String,
 }
 
 impl PublishedFeedUpdate {
@@ -107,47 +113,41 @@ impl PublishedFeedUpdate {
         variant: FeedType,
         digits_in_fraction: usize,
         data: &[u8],
-    ) -> PublishedFeedUpdate {
+    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
         if data.len() != 64 {
-            return PublishedFeedUpdate::error(feed_id, "Data size is not exactly 64 bytes");
+            return Err(PublishedFeedUpdate::error(
+                feed_id,
+                "Data size is not exactly 64 bytes",
+            ));
         }
         let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
         let j2: [u8; 16] = data[48..64].try_into().expect("Impossible");
         let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
         let timestamp_u64 = u64::from_be_bytes(j3);
         match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
-            Ok(latest) => PublishedFeedUpdate {
+            Ok(latest) => Ok(PublishedFeedUpdate {
                 feed_id,
                 num_updates: u128::from_be_bytes(j2),
-                value: Some(latest),
+                value: latest,
                 published: timestamp_u64 as u128,
-                error: None,
-            },
-            Err(msg) => PublishedFeedUpdate::error(feed_id, &msg),
+            }),
+            Err(msg) => Err(PublishedFeedUpdate::error(feed_id, &msg)),
         }
     }
 
-    pub fn none(feed_id: u32) -> PublishedFeedUpdate {
-        PublishedFeedUpdate {
+    pub fn error(feed_id: u32, message: &str) -> PublishedFeedUpdateError {
+        PublishedFeedUpdateError {
             feed_id,
             num_updates: 0,
-            value: None,
-            published: 0,
-            error: None,
+            error: message.to_owned(),
         }
     }
 
-    pub fn error(feed_id: u32, message: &str) -> PublishedFeedUpdate {
-        PublishedFeedUpdate {
-            feed_id,
-            num_updates: 0,
-            value: None,
-            published: 0,
-            error: Some(message.to_string()),
-        }
-    }
-
-    pub fn error_num_update(feed_id: u32, message: &str, num_updates: u128) -> PublishedFeedUpdate {
+    pub fn error_num_update(
+        feed_id: u32,
+        message: &str,
+        num_updates: u128,
+    ) -> PublishedFeedUpdateError {
         let mut r = PublishedFeedUpdate::error(feed_id, message);
         r.num_updates = num_updates;
         r
@@ -159,33 +159,36 @@ impl PublishedFeedUpdate {
         variant: FeedType,
         digits_in_fraction: usize,
         data: &[u8],
-    ) -> PublishedFeedUpdate {
+    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
         if data.len() != 32 {
-            return PublishedFeedUpdate::error_num_update(
+            return Err(PublishedFeedUpdate::error_num_update(
                 feed_id,
                 "Data size is not exactly 32 bytes",
                 num_updates,
-            );
+            ));
         }
         let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
         let timestamp_u64 = u64::from_be_bytes(j3);
         if timestamp_u64 == 0 {
-            return PublishedFeedUpdate::error_num_update(
+            return Err(PublishedFeedUpdate::error_num_update(
                 feed_id,
                 "Timestamp is zero",
                 num_updates,
-            );
+            ));
         }
         let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
         match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
-            Ok(value) => PublishedFeedUpdate {
+            Ok(value) => Ok(PublishedFeedUpdate {
                 feed_id,
                 num_updates,
-                value: Some(value),
+                value,
                 published: timestamp_u64 as u128,
-                error: None,
-            },
-            Err(msg) => PublishedFeedUpdate::error_num_update(feed_id, &msg, num_updates),
+            }),
+            Err(msg) => Err(PublishedFeedUpdate::error_num_update(
+                feed_id,
+                &msg,
+                num_updates,
+            )),
         }
     }
 }
