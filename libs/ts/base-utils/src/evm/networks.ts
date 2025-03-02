@@ -7,7 +7,11 @@
 
 import { Schema as S } from 'effect';
 
-import { getEnvString, getOptionalEnvString } from '../env/functions';
+import {
+  getEnvString,
+  getEnvStringNotAssert,
+  getOptionalEnvString,
+} from '../env/functions';
 import { EthereumAddress, TxHash } from './hex-types';
 import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
 import { NumberFromSelfBigIntOrString } from '../numeric';
@@ -528,12 +532,25 @@ export function getAddressExplorerUrl(
 export type NetworkNameToEnvVar<Net extends NetworkName> =
   `RPC_URL_${KebabToSnakeCase<Net>}`;
 
+export type NetworkNameToExplorerApiKeyEnvVar<Net extends NetworkName> =
+  `${KebabToSnakeCase<Net>}_API_KEY`;
+
 export type RpcUrlEnvVarNames = NetworkNameToEnvVar<NetworkName>;
 
 export function getRpcUrlEnvVar<Net extends NetworkName>(
   network: Net,
 ): NetworkNameToEnvVar<Net> {
   return `RPC_URL_${kebabToSnakeCase(network)}`;
+}
+
+export function getExplorerApiKeyEnvVar<Net extends NetworkName>(
+  network: Net,
+): NetworkNameToExplorerApiKeyEnvVar<Net> {
+  return `${kebabToSnakeCase(network)}_API_KEY`;
+}
+
+export function getExplorerApiKey(network: NetworkName): string | null {
+  return getEnvStringNotAssert(network);
 }
 
 export function getRpcUrl(network: NetworkName): string {

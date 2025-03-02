@@ -3,8 +3,9 @@ import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
-import { API_ENDPOINTS, API_KEYS, Transaction } from '../types';
+import { API_ENDPOINTS, Transaction } from '../types';
 import {
+  getExplorerApiKey,
   getOptionalRpcUrl,
   networkMetadata,
   NetworkName,
@@ -149,7 +150,7 @@ const fetchTransactionsForNetwork = async (
     network,
   ) as keyof typeof API_ENDPOINTS;
   const apiUrl = API_ENDPOINTS[snakeCaseNetwork];
-  const apikey = API_KEYS[snakeCaseNetwork];
+  const apikey = getExplorerApiKey(network);
   if (!apiUrl) {
     console.log(chalk.red(`Skipping ${network}: Missing API configuration`));
     return { transactions: [], firstTxTime: '', lastTxTime: '' };
