@@ -63,16 +63,18 @@ impl PricesFetcher<'_> for KuCoinPriceFetcher {
                 .data
                 .ticker
                 .into_iter()
-                .filter(|value| value.last.is_some())
-                // KuCoin have symbols in format "X-Y". We need to match logic in `fill_results`
-                .map(|value| {
-                    (
-                        value.symbol.replace("-", ""),
-                        PricePoint {
-                            price: value.last.unwrap(),
-                            volume: 1.0,
-                        },
-                    )
+                .filter_map(|value| {
+                    if let Some(last_price) = value.last {
+                        Some((
+                            value.symbol.replace("-", ""),
+                            PricePoint {
+                                price: last_price,
+                                volume: 1.0,
+                            },
+                        ))
+                    } else {
+                        None
+                    }
                 })
                 .collect())
         }
