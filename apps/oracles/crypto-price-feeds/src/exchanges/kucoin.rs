@@ -29,6 +29,8 @@ pub struct KuCoinPrice {
     pub symbol: String,
     #[serde(deserialize_with = "as_f64_option")]
     pub last: Option<f64>,
+    #[serde(deserialize_with = "as_f64_option")]
+    pub vol: Option<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -63,18 +65,15 @@ impl PricesFetcher<'_> for KuCoinPriceFetcher {
                 .data
                 .ticker
                 .into_iter()
-                .filter_map(|value| {
-                    if let Some(last_price) = value.last {
-                        Some((
-                            value.symbol.replace("-", ""),
-                            PricePoint {
-                                price: last_price,
-                                volume: 1.0,
-                            },
-                        ))
-                    } else {
-                        None
-                    }
+                .filter_map(|value| match (value.last, value.vol) {
+                    (Some(last_price), Some(volume)) => Some((
+                        value.symbol.replace("-", ""),
+                        PricePoint {
+                            price: last_price,
+                            volume,
+                        },
+                    )),
+                    _ => None,
                 })
                 .collect())
         }
