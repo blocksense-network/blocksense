@@ -186,7 +186,7 @@ impl RpcProvider {
         let contracts = RpcProvider::prepare_contracts(p);
         let mut feeds_variants: HashMap<u32, (FeedType, usize)> = HashMap::new();
         for f in feeds_config.feeds.iter() {
-            info!("{:?}", f);
+            debug!("Registering feed for network; feed={f:?}; network={network}");
             match FeedType::get_variant_from_string(f.value_type.as_str()) {
                 Ok(variant) => {
                     feeds_variants.insert(f.id, (variant, f.decimals as usize));
