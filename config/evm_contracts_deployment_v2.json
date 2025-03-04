@@ -1,0 +1,179 @@
+{
+  "local": {
+    "chainId": 99999999999,
+    "contracts": {
+      "coreContracts": {
+        "OnlySequencerGuard": {
+          "address": "0x6bF751F8F1d007F13eCED0a030c0b7A4d814E67F",
+          "constructorArgs": [
+            "0x220d20cd972f2cE5264c356d80356147DDA226d5",
+            "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        "AccessControl": {
+          "address": "0xf19B4a848F2781f94b42c9a5e4017Bc3356966DE",
+          "constructorArgs": [
+            "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+          ]
+        },
+        "AggregatedDataFeedStore": {
+          "address": "0x52D79961d35d0A01631a3D0cB77f18562b8b3a12",
+          "constructorArgs": [
+            "0xf19B4a848F2781f94b42c9a5e4017Bc3356966DE"
+          ]
+        },
+        "UpgradeableProxyADFS": {
+          "address": "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4",
+          "constructorArgs": [
+            "0x52D79961d35d0A01631a3D0cB77f18562b8b3a12",
+            "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+          ]
+        },
+        "CLFeedRegistryAdapter": {
+          "address": "0x07313D6b748423942078a82c1d202796e9f2214D",
+          "constructorArgs": [
+            "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        }
+      },
+      "CLAggregatorAdapter": [
+        {
+          "description": "Wrapped eETH",
+          "base": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3912955854540fb9ccfacd6eC4BE14ef41159B57",
+          "constructorArgs": [
+            "Wrapped eETH",
+            18,
+            0,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Wrapped eETH",
+          "base": null,
+          "quote": null,
+          "address": "0x59332bFf0B4311a55A074d20cBec96Ee3aEb949c",
+          "constructorArgs": [
+            "Wrapped eETH",
+            18,
+            1,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Wrapped eETH",
+          "base": null,
+          "quote": null,
+          "address": "0x5A04FdbD0fDF7F474F58DBF399F79B4250c6D0ab",
+          "constructorArgs": [
+            "Wrapped eETH",
+            18,
+            2,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Melon",
+          "base": "0xec67005c4E498Ec7f55E092bd1d35cbC47C91892",
+          "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "address": "0xeE5F743EB283bE07d3A73bca0b2AA6E15480AA49",
+          "constructorArgs": [
+            "Melon",
+            18,
+            3,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Melon",
+          "base": null,
+          "quote": null,
+          "address": "0x38F030bA79f0F4690294D67e003675021226CC08",
+          "constructorArgs": [
+            "Melon",
+            18,
+            4,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Balancer",
+          "base": "0xba100000625a3754423978a60c9317c58a424e3D",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x47116d02E84323143d1D16c11D952dA620c15e86",
+          "constructorArgs": [
+            "Balancer",
+            8,
+            5,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Balancer",
+          "base": "0xba100000625a3754423978a60c9317c58a424e3D",
+          "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "address": "0xB72bF80937933e12044cF3b2ea2eA5dbBC325D4e",
+          "constructorArgs": [
+            "Balancer",
+            18,
+            6,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Balancer",
+          "base": null,
+          "quote": null,
+          "address": "0x847480ff8E2456Fa08C0D7AFb081a16BaA16c28D",
+          "constructorArgs": [
+            "Balancer",
+            8,
+            7,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Balancer",
+          "base": null,
+          "quote": null,
+          "address": "0x77d61142EbEc86F4fF8dD207938D13190a457Af7",
+          "constructorArgs": [
+            "Balancer",
+            8,
+            8,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "Balancer",
+          "base": null,
+          "quote": null,
+          "address": "0x06EA4b66E8c6Cd3B44baB11Db8A03E650349F614",
+          "constructorArgs": [
+            "Balancer",
+            18,
+            9,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        },
+        {
+          "description": "HashKey Platform Token",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xA923812b37e07AD366DA4a9120544101559Ce6cF",
+          "constructorArgs": [
+            "HashKey Platform Token",
+            8,
+            10,
+            "0xADF5aa5455e90749a24794fD5F84514b86dFd2C4"
+          ]
+        }
+      ],
+      "AdminMultisig": "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+      "SequencerMultisig": "0x220d20cd972f2cE5264c356d80356147DDA226d5"
+    }
+  }
+}
