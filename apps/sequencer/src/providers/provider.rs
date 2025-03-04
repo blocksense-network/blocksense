@@ -16,17 +16,18 @@ use alloy::{
     signers::local::PrivateKeySigner,
 };
 
+use alloy_primitives::Bytes;
 use config::AllFeedsConfig;
 use reqwest::{Client, Url};
 
 use config::{PublishCriteria, SequencerConfig};
-use data_feeds::feeds_processing::VotedFeedUpdate;
+use data_feeds::feeds_processing::{PublishedFeedUpdate, VotedFeedUpdate};
 use eyre::{eyre, Result};
-use feed_registry::registry::FeedAggregateHistory;
+use feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
 use feed_registry::types::FeedType;
 use paste::paste;
 use prometheus::{metrics::ProviderMetrics, process_provider_getter};
-use ringbuf::traits::{Consumer, Observer};
+use ringbuf::traits::{Consumer, Observer, RingBuffer};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -36,6 +37,8 @@ use tokio::time::error::Elapsed;
 use tokio::time::Duration;
 use tracing::{debug, error, info, warn};
 
+use crate::providers::multicall::Multicall;
+use crate::providers::provider::Multicall::MulticallInstance;
 use crate::BatchedAggegratesToSend;
 use std::time::Instant;
 
@@ -246,6 +249,10 @@ impl RpcProvider {
             .event_contract_address
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
+        let multicall_address = p
+            .multicall_contract_address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
 
         let mut contracts = vec![];
         contracts.push(Contract {
@@ -272,6 +279,13 @@ impl RpcProvider {
             name: GNOSIS_SAFE_CONTRACT_NAME.to_string(),
             address: safe_address,
             byte_code: None,
+            contract_version: 1,
+        });
+
+        contracts.push(Contract {
+            name: MULTICALL_CONTRACT_NAME.to_string(),
+            address: multicall_address,
+            byte_code: Some(Multicall::BYTECODE.to_vec()),
             contract_version: 1,
         });
 
@@ -344,6 +358,110 @@ impl RpcProvider {
                 c.address = Some(*address);
             }
         }
+    }
+
+    pub async fn get_latest_values(
+        &self,
+        feed_ids: &[u32],
+    ) -> Result<Vec<PublishedFeedUpdate>, eyre::Error> {
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
+        let contract = MulticallInstance::new(multicall, self.provider.clone());
+        let calldata: Vec<Multicall::Call> = feed_ids
+            .iter()
+            .map(|feed_id| {
+                let call_data = Bytes::copy_from_slice(&[
+                    ((*feed_id >> 24 & 0xFF_u32) | 0xC0) as u8,
+                    (*feed_id >> 16 & 0xFF_u32) as u8,
+                    (*feed_id >> 8 & 0xFF_u32) as u8,
+                    (*feed_id & 0xFF_u32) as u8,
+                ]);
+                Multicall::Call {
+                    target: data_feed,
+                    callData: call_data,
+                }
+            })
+            .collect();
+        let mut digits: Vec<usize> = vec![];
+        let mut variants: Vec<FeedType> = vec![];
+        for feed_id in feed_ids.iter() {
+            let Some((variant, digits_in_fraction)) = self.feeds_variants.get(feed_id) else {
+                return Err(eyre!(
+                    "Unknown variant and number of digits for feed with id = {feed_id}"
+                ));
+            };
+            digits.push(*digits_in_fraction);
+            variants.push(variant.clone());
+        }
+
+        let aggregate_return = contract.aggregate(calldata).call().await?;
+        let res = aggregate_return
+            .returnData
+            .into_iter()
+            .enumerate()
+            .map(|(count, data)| {
+                PublishedFeedUpdate::latest(
+                    feed_ids[count],
+                    variants[count].clone(),
+                    digits[count],
+                    &data.0,
+                )
+            })
+            .collect();
+        Ok(res)
+    }
+
+    pub async fn get_historical_values_for_feed(
+        &self,
+        feed_id: u32,
+        updates: &[u128],
+    ) -> Result<Vec<PublishedFeedUpdate>> {
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
+
+        let contract = MulticallInstance::new(multicall, self.provider.clone());
+
+        let calldata: Vec<Multicall::Call> = updates
+            .iter()
+            .map(|update| {
+                let mut a = [
+                    ((feed_id >> 24 & 0xFF_u32) | 0x20) as u8,
+                    (feed_id >> 16 & 0xFF_u32) as u8,
+                    (feed_id >> 8 & 0xFF_u32) as u8,
+                    (feed_id & 0xFF_u32) as u8,
+                ]
+                .to_vec();
+                a.append(&mut 0_u128.to_be_bytes().to_vec());
+                a.append(&mut update.to_be_bytes().to_vec());
+
+                let call_data = Bytes::copy_from_slice(&a);
+                Multicall::Call {
+                    target: data_feed,
+                    callData: call_data,
+                }
+            })
+            .collect();
+        let Some((variant, digits_in_fraction)) = self.feeds_variants.get(&feed_id) else {
+            return Err(eyre!(
+                "Unknown variant and number of digits for feed with id = {feed_id}"
+            ));
+        };
+        let aggregate_return = contract.aggregate(calldata).call().await?;
+        let res = aggregate_return
+            .returnData
+            .into_iter()
+            .enumerate()
+            .map(|(count, data)| {
+                PublishedFeedUpdate::nth(
+                    feed_id,
+                    updates[count],
+                    variant.clone(),
+                    *digits_in_fraction,
+                    &data.0,
+                )
+            })
+            .collect();
+        Ok(res)
     }
 
     pub fn get_history_capacity(&self, feed_id: u32) -> Option<usize> {
@@ -457,6 +575,65 @@ impl RpcProvider {
             };
         } else {
             warn!("No contract address set for network {}", network);
+        }
+    }
+
+    pub async fn load_history_from_chain(
+        &mut self,
+        feed_id: u32,
+        limit_entries: u32,
+    ) -> Result<u32> {
+        let latest = self.get_latest_values(&[feed_id]).await?;
+        if !latest.is_empty() {
+            let num_updates = latest[0].num_updates;
+            let limit = if (limit_entries as u128) < num_updates {
+                limit_entries
+            } else {
+                num_updates as u32
+            };
+            let Some(capacity) = self.get_history_capacity(feed_id) else {
+                return Err(eyre!("History is not registered for feed id = {feed_id}"));
+            };
+            let limit = if capacity < (limit as usize) {
+                capacity as u32
+            } else {
+                limit as u32
+            };
+
+            let end_update_num = num_updates + 1;
+            let mut start_update_num = (num_updates + 1) - (limit as u128);
+
+            let last_update_num = self.get_last_update_num_from_history(feed_id);
+            if start_update_num < last_update_num + 1 {
+                start_update_num = last_update_num + 1
+            }
+
+            let range = start_update_num..end_update_num;
+
+            let updates = range.collect::<Vec<u128>>();
+            let values = self
+                .get_historical_values_for_feed(feed_id, &updates)
+                .await?;
+            let Some(history) = self.history.get_mut(feed_id) else {
+                return Err(eyre!("History is not registered for feed id = {feed_id}"));
+            };
+
+            let mut count: u32 = 0;
+            for v in values {
+                let Some(value) = v.value else {
+                    continue;
+                };
+                let elem = HistoryEntry {
+                    value,
+                    update_number: v.num_updates,
+                    end_slot_timestamp: v.published,
+                };
+                let _ = history.push_overwrite(elem);
+                count += 1;
+            }
+            Ok(count)
+        } else {
+            Ok(0)
         }
     }
 }
