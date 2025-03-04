@@ -27,6 +27,8 @@ where
 pub struct KrakenPriceData {
     #[serde(deserialize_with = "as_f64_vec")]
     pub a: Vec<f64>,
+    #[serde(deserialize_with = "as_f64_vec")]
+    pub v: Vec<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -59,7 +61,10 @@ impl PricesFetcher<'_> for KrakenPriceFetcher {
                     let price = *price_data.a.first().with_context(|| {
                         format!("Kraken has no price in response for symbol: {symbol}")
                     })?;
-                    Ok((symbol, PricePoint { price, volume: 1.0 }))
+                    let volume = *price_data.v.get(1).with_context(|| {
+                        format!("Kraken has no second volume in response for symbol: {symbol}")
+                    })?;
+                    Ok((symbol, PricePoint { price, volume }))
                 })
                 .collect::<Result<PairPriceData>>()
         }

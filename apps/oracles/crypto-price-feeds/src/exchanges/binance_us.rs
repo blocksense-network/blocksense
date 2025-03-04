@@ -11,10 +11,13 @@ use crate::{
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BinanceUsPriceData {
     pub symbol: String,
     #[serde(deserialize_with = "as_f64")]
-    pub price: f64,
+    pub last_price: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub volume: f64,
 }
 
 type BinanceUsPriceResponse = Vec<BinanceUsPriceData>;
@@ -31,7 +34,7 @@ impl PricesFetcher<'_> for BinanceUsPriceFetcher {
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
             let response = http_get_json::<BinanceUsPriceResponse>(
-                "https://api.binance.us/api/v3/ticker/price",
+                "https://api.binance.us/api/v3/ticker/24hr",
                 None,
             )
             .await?;
@@ -43,8 +46,8 @@ impl PricesFetcher<'_> for BinanceUsPriceFetcher {
                     (
                         value.symbol,
                         PricePoint {
-                            price: value.price,
-                            volume: 1.0,
+                            price: value.last_price,
+                            volume: value.volume,
                         },
                     )
                 })
