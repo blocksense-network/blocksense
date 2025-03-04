@@ -9,6 +9,7 @@ import {
   NewFeed,
   NewFeedsConfig,
   createPair,
+  pairToString,
 } from '@blocksense/config-types/data-feeds-config';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
@@ -42,7 +43,7 @@ function feedFromChainLinkFeedInfo(
   const clName = getFieldFromAggregatedData(additionalData, 'name');
 
   const pair = getBaseQuote(additionalData);
-  const full_name = pair.toString();
+  const full_name = pairToString(pair);
 
   return {
     description,
@@ -174,7 +175,7 @@ function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
   const seenPairs = new Set<string>();
 
   return dataFeeds.filter(feed => {
-    const pairKey = feed.price_feed_info.pair.toString();
+    const pairKey = pairToString(feed.price_feed_info.pair);
 
     if (seenPairs.has(pairKey)) {
       return false;
@@ -192,7 +193,7 @@ function addStableCoinVariants(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
       return stableCoins[quote as keyof typeof stableCoins]
         .map(altStableCoin => createPair(base, altStableCoin))
         .map(pair => {
-          const full_name = pair.toString();
+          const full_name = pairToString(pair);
           return {
             ...feed,
             full_name,

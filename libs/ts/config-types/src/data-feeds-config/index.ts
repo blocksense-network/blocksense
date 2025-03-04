@@ -48,20 +48,16 @@ export type Pair = S.Schema.Type<typeof PairSchema>;
 
 /**
  * Creates a `Pair` object with the given base and quote currencies.
- * The returned object includes a `toString` method for convenient string
- * representation in the format "base / quote".
  */
-export function createPair<Base extends string, Quote extends string>(
-  base: Base,
-  quote: Quote,
-): { base: Base; quote: Quote; toString: () => `${Base} / ${Quote}` } {
-  return {
-    base,
-    quote,
-    toString() {
-      return `${this.base} / ${this.quote}`;
-    },
-  };
+export function createPair(base: string, quote: string): Pair {
+  return { base, quote };
+}
+
+/**
+ * Canonical string representation of a `Pair` object.
+ */
+export function pairToString(pair: Pair): string {
+  return `${pair.base} / ${pair.quote}`;
 }
 
 export const FirstReportStartTimeSchema = S.mutable(
