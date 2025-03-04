@@ -15,7 +15,7 @@ use serde::Deserialize;
 use std::fmt::Write;
 
 use crate::common::{ResourceData, TradingPairToResults};
-use fetch_prices::fetch_all_prices;
+use fetch_prices::{fetch_all_prices, filter_volume_0};
 
 //TODO(adikov): Refacotr:
 //1. Move all specific exchange logic to separate files.
@@ -46,18 +46,18 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 fn process_results(results: TradingPairToResults) -> Result<Payload> {
     let mut payload = Payload::new();
     for (feed_id, results) in results.into_iter() {
-        payload
-            .values
-            .push(match vwap::vwap(&results.exchanges_data) {
-                Ok(price) => DataFeedResult {
-                    id: feed_id,
-                    value: DataFeedResultValue::Numerical(price),
-                },
-                Err(err) => DataFeedResult {
-                    id: feed_id,
-                    value: DataFeedResultValue::Error(err.to_string()),
-                },
-            });
+        let filtered_exchanges = filter_volume_0(&results.exchanges_data);
+
+        payload.values.push(match vwap::vwap(&filtered_exchanges) {
+            Ok(price) => DataFeedResult {
+                id: feed_id,
+                value: DataFeedResultValue::Numerical(price),
+            },
+            Err(err) => DataFeedResult {
+                id: feed_id,
+                value: DataFeedResultValue::Error(err.to_string()),
+            },
+        });
     }
 
     Ok(payload)
