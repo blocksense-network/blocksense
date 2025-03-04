@@ -6,7 +6,10 @@ use std::time::Instant;
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
-    common::{ExchangePriceData, PairPriceData, ResourceData, TradingPairToResults, USD_SYMBOLS},
+    common::{
+        ExchangePriceData, ExchangePricePoints, PairPriceData, ResourceData, TradingPairToResults,
+        USD_SYMBOLS,
+    },
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
         bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
@@ -97,4 +100,17 @@ where
         (PF::NAME, res)
     }
     .boxed_local()
+}
+
+pub fn filter_volume_0(prices: &ExchangePricePoints) -> ExchangePricePoints {
+    prices
+        .iter()
+        .filter_map(|(exchange, price_point)| {
+            if price_point.volume > 0.0 {
+                Some((exchange.clone(), price_point.clone()))
+            } else {
+                None
+            }
+        })
+        .collect()
 }
