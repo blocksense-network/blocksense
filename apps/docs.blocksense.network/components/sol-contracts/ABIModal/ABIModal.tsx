@@ -56,36 +56,34 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
 
   if (isDesktop) {
     return (
-      <>
+      <Dialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <DialogTrigger onClick={() => setIsOpen(true)} asChild>
           <section className="w-min">
             <TriggerButton tooltipContent={title} />
           </section>
         </DialogTrigger>
-        <Dialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
-          <DialogContent className="max-w-screen-md">
-            <DialogHeader>
-              <section className="flex items-center justify-between px-2 pt-2 pb-0">
-                <DialogTitle>{title}</DialogTitle>
-                <FormatButton
-                  isFormatted={isFormatted}
-                  formatHandler={formatHandler}
-                />
-              </section>
-              <DialogDescription />
-            </DialogHeader>
-            <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg max-h-[59vh] overflow-auto">
-              <CodeBlock
-                code={getABI()}
-                lang="json"
-                themes={shikiDefaultThemes.jsonThemes}
-                className="abi-modal--pre"
+        <DialogContent className="max-w-screen-md">
+          <DialogHeader>
+            <section className="flex items-center justify-between px-2 pt-2 pb-0">
+              <DialogTitle>{title}</DialogTitle>
+              <FormatButton
+                isFormatted={isFormatted}
+                formatHandler={formatHandler}
               />
-            </ScrollArea>
-            <DialogClose onClick={() => setIsOpen(false)}>Close</DialogClose>
-          </DialogContent>
-        </Dialog>
-      </>
+            </section>
+            <DialogDescription />
+          </DialogHeader>
+          <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg max-h-[50vh] overflow-auto">
+            <CodeBlock
+              code={getABI()}
+              lang="json"
+              themes={shikiDefaultThemes.jsonThemes}
+              className="abi-modal--pre"
+            />
+          </ScrollArea>
+          <DialogClose onClick={() => setIsOpen(false)}>Close</DialogClose>
+        </DialogContent>
+      </Dialog>
     );
   }
 

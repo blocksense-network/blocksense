@@ -1,153 +1,96 @@
-'use client';
-
 import React, {
-  useEffect,
-  useRef,
   useState,
-  ReactNode,
-  MouseEvent,
-  useCallback,
-  useContext,
+  useRef,
+  useEffect,
   createContext,
+  useContext,
   HTMLAttributes,
+  ReactNode,
+  RefObject,
+  MouseEvent,
 } from 'react';
 
 import { cn } from '@/lib/utils';
 import { Icon } from '@blocksense/ui/Icon';
 import { Button } from '@blocksense/ui/Button';
 
-type DialogProps = {
-  isOpen?: boolean;
-  onClose?: () => void;
-  children: ReactNode;
-  className?: string;
-};
-
-const DialogContext = createContext<{
-  open: boolean;
-  setOpen: (value: boolean) => void;
-}>({
-  open: false,
-  setOpen: () => {},
-});
+interface DialogContextValue {
+  isOpen: boolean;
+  setOpen: (open: boolean) => void;
+  toggle: () => void;
+  dialogRef: RefObject<HTMLDivElement>;
+}
+const DialogContext = createContext<DialogContextValue>(
+  {} as DialogContextValue,
+);
 
 export const Dialog = ({
+  children,
   isOpen,
   onClose,
-  children,
-  className,
-  ...props
-}: DialogProps) => {
+}: {
+  children: ReactNode;
+  isOpen: boolean;
+  onClose?: () => void;
+}) => {
   const dialogRef = useRef<HTMLDivElement>(null);
-  const [open, setOpenState] = useState(false);
-
-  const dialogOpen = isOpen !== undefined ? isOpen : open;
-
-  const setOpen = (value: boolean) => {
-    setOpenState(value);
-    if (onClose && !value) {
-      onClose();
-    }
-  };
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpen(false);
-      }
-    };
-
-    if (dialogOpen) {
-      document.body.classList.add('overflow-hidden');
-      document.addEventListener('keydown', handleKeyDown);
-    } else {
-      document.body.classList.remove('overflow-hidden');
-    }
-
-    return () => {
-      document.body.classList.remove('overflow-hidden');
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [dialogOpen]);
-
-  const handleBackdropClick = useCallback(
-    (event: MouseEvent<HTMLDialogElement>) => {
+    const handleClickOutside = (event: Event) => {
       if (
         dialogRef.current &&
         !dialogRef.current.contains(event.target as Node)
       ) {
-        setOpen(false);
+        if (onClose) onClose();
       }
-    },
-    [],
-  );
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (onClose) onClose();
+      }
+    };
+    if (isOpen) {
+      document.body.classList.add('overflow-hidden');
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
-  if (!dialogOpen) return null;
+  const toggle = () => {
+    if (onClose) onClose();
+  };
 
   return (
-    <DialogContext.Provider value={{ open: dialogOpen, setOpen }}>
-      <dialog
-        className={cn(
-          'dialog fixed inset-0 z-50 flex items-center justify-center w-full',
-          className,
-        )}
-        onClick={handleBackdropClick}
-        role="dialog"
-        aria-modal="true"
-        {...props}
-      >
-        <div className="dialog__background fixed inset-0 bg-black opacity-75"></div>
-        <section
-          ref={dialogRef}
-          className="dialog__content fixed top-[15%] max-h-[70%] bg-white p-6 shadow-lg z-10 w-[48rem] dark:bg-neutral-900 dark:border-neutral-600"
-        >
-          {children}
-        </section>
-      </dialog>
+    <DialogContext.Provider
+      value={{ isOpen, setOpen: toggle, toggle, dialogRef }}
+    >
+      {children}
     </DialogContext.Provider>
   );
 };
 
-type DialogContentProps = {
-  children: ReactNode;
-  className?: string;
-};
-
-export const DialogContent = ({
-  children,
-  className,
-  ...props
-}: DialogContentProps) => (
-  <div
-    className={cn(
-      'dialog__content-body relative bg-white z-10 max-w-lg w-full dark:bg-neutral-900 dark:border-neutral-600',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-  </div>
-);
-
-type DialogTriggerProps = {
-  className?: string;
-  children: ReactNode;
-  onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
-  asChild?: boolean;
-};
-
 export const DialogTrigger = ({
-  className,
   children,
-  onClick,
   asChild = false,
   ...props
-}: DialogTriggerProps) => {
-  const { open, setOpen } = useContext(DialogContext);
+}: HTMLAttributes<HTMLDivElement> & {
+  children: ReactNode;
+  asChild?: boolean;
+}) => {
+  const { toggle } = useContext(DialogContext);
 
-  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    if (onClick) onClick(e);
-    setOpen(!open);
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
+    toggle();
+    if (props.onClick) {
+      props.onClick(e);
+    }
   };
 
   if (asChild) {
@@ -157,17 +100,48 @@ export const DialogTrigger = ({
   }
 
   return (
-    <Button
-      className={cn(
-        'dialog__trigger',
-        className,
-        open && 'dialog__trigger--active',
-      )}
+    <div
       onClick={handleClick}
       {...props}
+      className={cn('dialog__trigger cursor-pointer', props.className)}
     >
       {children}
-    </Button>
+    </div>
+  );
+};
+
+type DialogContentProps = {
+  className?: string;
+  children: ReactNode;
+};
+
+export const DialogContent = ({
+  className,
+  children,
+  ...props
+}: DialogContentProps) => {
+  const { isOpen, dialogRef } = useContext(DialogContext);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className={cn(
+        'dialog fixed inset-0 z-50 flex items-center justify-center w-full',
+        className,
+      )}
+      role="dialog"
+      aria-modal="true"
+      {...props}
+    >
+      <div className="dialog__background fixed inset-0 bg-black opacity-75"></div>
+      <section
+        ref={dialogRef}
+        className="dialog__content fixed top-[15%] left-1/2 transform -translate-x-1/2 max-h-[70%] bg-white p-6 shadow-lg z-10 w-[48rem] dark:bg-neutral-900 border dark:border-neutral-600"
+      >
+        {children}
+      </section>
+    </div>
   );
 };
 
@@ -227,27 +201,36 @@ export const DialogFooter = ({
 );
 
 type DialogCloseProps = {
-  onClick: () => void;
   children: ReactNode;
+  onClick: () => void;
 };
 
-export const DialogClose = ({ onClick, children }: DialogCloseProps) => (
-  <Button
-    onClick={onClick}
-    className="dialog__close-btn p-0 h-4 absolute -top-2 -right-2 text-gray-700 hover:text-gray-900 border border-gray-200 rounded-xs"
-  >
-    <Icon
-      className="h-4 w-4"
-      size="xs"
-      icon={{
-        type: 'image',
-        src: '/icons/escape.svg',
-      }}
-      ariaLabel="Escape"
-    />
-    <span className="sr-only">{children}</span>
-  </Button>
-);
+export const DialogClose = ({ children, onClick }: DialogCloseProps) => {
+  const { setOpen } = useContext(DialogContext);
+
+  const handleClick = () => {
+    setOpen(false);
+    if (onClick) onClick();
+  };
+
+  return (
+    <Button
+      onClick={handleClick}
+      className="dialog__close-btn p-0 h-4 absolute top-4 right-4 text-gray-700 hover:text-gray-900 border border-gray-200 rounded-xs"
+    >
+      <Icon
+        className="h-4 w-4"
+        size="xs"
+        icon={{
+          type: 'image',
+          src: '/icons/escape.svg',
+        }}
+        ariaLabel="Escape"
+      />
+      <span className="sr-only">{children}</span>
+    </Button>
+  );
+};
 
 Dialog.displayName = 'Dialog';
 DialogContent.displayName = 'DialogContent';
