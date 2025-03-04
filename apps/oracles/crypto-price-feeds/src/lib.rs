@@ -46,18 +46,18 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 fn process_results(results: TradingPairToResults) -> Result<Payload> {
     let mut payload = Payload::new();
     for (feed_id, results) in results.into_iter() {
-        payload
-            .values
-            .push(match vwap::vwap(&results.exchanges_data) {
-                Ok(price) => DataFeedResult {
-                    id: feed_id,
-                    value: DataFeedResultValue::Numerical(price),
-                },
-                Err(err) => DataFeedResult {
-                    id: feed_id,
-                    value: DataFeedResultValue::Error(err.to_string()),
-                },
-            });
+        let price_points = results.exchanges_data.values();
+
+        payload.values.push(match vwap::compute_vwap(price_points) {
+            Ok(price) => DataFeedResult {
+                id: feed_id,
+                value: DataFeedResultValue::Numerical(price),
+            },
+            Err(err) => DataFeedResult {
+                id: feed_id,
+                value: DataFeedResultValue::Error(err.to_string()),
+            },
+        });
     }
 
     Ok(payload)
