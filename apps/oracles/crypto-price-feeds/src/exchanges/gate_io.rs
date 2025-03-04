@@ -15,6 +15,8 @@ pub struct GateIoPriceData {
     pub currency_pair: String,
     #[serde(deserialize_with = "as_f64")]
     pub last: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub base_volume: f64,
 }
 
 type GateIoPriceResponse = Vec<GateIoPriceData>;
@@ -43,7 +45,7 @@ impl PricesFetcher<'_> for GateIoPriceFetcher {
                         value.currency_pair.replace("_", ""),
                         PricePoint {
                             price: value.last,
-                            volume: 1.0,
+                            volume: value.base_volume,
                         },
                     )
                 })
