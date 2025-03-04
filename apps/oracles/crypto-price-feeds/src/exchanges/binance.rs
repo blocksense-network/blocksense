@@ -16,6 +16,8 @@ pub struct BinancePriceData {
     pub symbol: String,
     #[serde(deserialize_with = "as_f64")]
     pub last_price: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub volume: f64,
 }
 
 type BinancePriceResponse = Vec<BinancePriceData>;
@@ -44,7 +46,7 @@ impl PricesFetcher<'_> for BinancePriceFetcher {
                         value.symbol,
                         PricePoint {
                             price: value.last_price,
-                            volume: 1.0,
+                            volume: value.volume,
                         },
                     )
                 })
