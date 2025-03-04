@@ -5,17 +5,19 @@
       <pre>The programmable oracle for trustless compute.</pre>
     </td>
     <td valign="center">
-      <img src="./docs/assets/img/blocksense-logo.jpg" align="center" width="120">
+      <a href="https://docs.blocksense.network" target="_blank">
+        <img src="./docs/assets/img/blocksense-logo.jpg" align="center" width="120">
+      </a>
     </td>
   </tr>
 </table>
 
 ---
 
-![✅ CI](https://github.com/blocksense-network/blocksense/actions/workflows/ci.yml/badge.svg)
-![⭐ GitHub Stars](https://img.shields.io/github/stars/blocksense-network/blocksense?style=social)
-![🍴 GitHub Forks](https://img.shields.io/github/forks/blocksense-network/blocksense?style=social)
-![🚀 Pull Requests](https://img.shields.io/github/issues-pr/blocksense-network/blocksense)
+[![✅ CI](https://github.com/blocksense-network/blocksense/actions/workflows/ci.yml/badge.svg)](https://github.com/blocksense-network/blocksense/actions)
+[![⭐ GitHub Stars](https://img.shields.io/github/stars/blocksense-network/blocksense?style=social)](https://github.com/blocksense-network/blocksense/stargazers)
+[![🍴 GitHub Forks](https://img.shields.io/github/forks/blocksense-network/blocksense?style=social)](https://github.com/blocksense-network/blocksense/network/members)
+[![🚀 Pull Requests](https://img.shields.io/github/issues-pr/blocksense-network/blocksense)](https://github.com/blocksense-network/blocksense/pulls)
 
 ## 🚀 Overview
 
