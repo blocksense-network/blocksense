@@ -36,7 +36,7 @@ export const ScrollArea = ({
   return (
     <ScrollAreaContext.Provider value={{ scrollPosition, setScrollPosition }}>
       <section
-        className={cn('scroll-area max-h[100vh] overflow-auto', className)}
+        className={cn('scroll-area max-h-[100vh] overflow-auto', className)}
         role="region"
         aria-label="Scrollable content"
         {...props}
