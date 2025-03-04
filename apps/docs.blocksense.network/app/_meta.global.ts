@@ -21,9 +21,9 @@ export default {
               'using-data-feeds': {
                 title: 'Using data feeds',
                 items: {
-                  'feed-registry': '',
-                  'chainlink-proxy': '',
-                  'historic-data-feed': '',
+                  'cl-feed-registry-adapter': '',
+                  'cl-aggregator-adapter': '',
+                  'aggregated-data-feed-store': '',
                 },
               },
             },
