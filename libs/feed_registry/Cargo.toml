@@ -10,15 +10,15 @@ crypto = { path = "../crypto" }
 config = { path = "../config" }
 utils = { path = "../utils" }
 
-serde = { version = "1.0.216", features = ["derive"] }
-serde_json = "1.0.137"
+serde = { version = "1.0.218", features = ["derive"] }
+serde_json = "1.0.139"
 thiserror = "2.0.11"
 tracing = { version = "0.1.41", features = ["async-await", "log"] }
 ringbuf = "0.4.7"
 tokio = { version = "1.4.0", features = ["full"] }
 num = { version = "0.4.3", features = ["serde"] }
 futures = "0.3.31"
-anyhow = "1.0.89"
-strum = { version = "0.26.3", features = ["derive"] }
-strum_macros = "0.26.4"
+anyhow = "1.0.96"
+strum = { version = "0.27.1", features = ["derive"] }
+strum_macros = "0.27.1"
 chrono = { workspace = true }
