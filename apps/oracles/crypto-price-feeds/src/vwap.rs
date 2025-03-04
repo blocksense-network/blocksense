@@ -22,13 +22,14 @@ pub fn vwap(exchange_price_points: &ExchangePricePoints) -> Result<f64> {
 }
 
 #[allow(dead_code)]
-pub fn compute_vwap(price_points: &[PricePoint]) -> Result<f64> {
+pub fn compute_vwap<'a>(price_points: impl IntoIterator<Item = &'a PricePoint>) -> Result<f64> {
     price_points
-        .iter()
+        .into_iter()
+        .filter(|pp| pp.volume > 0.0)
         .map(|PricePoint { price, volume }| (price * volume, *volume))
         .reduce(|(num, denom), (weighted_price, volume)| (num + weighted_price, denom + volume))
-        .map(|(weighted_prices_sum, total_volume)| weighted_prices_sum / total_volume)
         .context("No price points found")
+        .map(|(weighted_prices_sum, total_volume)| weighted_prices_sum / total_volume)
 }
 
 #[cfg(test)]
