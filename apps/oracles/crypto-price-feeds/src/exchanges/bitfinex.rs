@@ -40,6 +40,10 @@ impl TradingPairTicker {
     fn price(&self) -> f64 {
         self.last_price
     }
+
+    fn volume(&self) -> f64 {
+        self.volume
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -118,7 +122,7 @@ impl PricesFetcher<'_> for BitfinexPriceFetcher {
                         data.symbol(),
                         PricePoint {
                             price: data.price(),
-                            volume: 1.0,
+                            volume: data.volume(),
                         },
                     )),
                     _ => None,
