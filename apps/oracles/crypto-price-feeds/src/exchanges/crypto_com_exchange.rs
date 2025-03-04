@@ -15,6 +15,8 @@ pub struct CryptoComPriceData {
     pub i: String,
     #[serde(deserialize_with = "as_f64")]
     pub a: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub v: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -56,7 +58,7 @@ impl PricesFetcher<'_> for CryptoComPriceFetcher {
                         value.i.replace("_", ""),
                         PricePoint {
                             price: value.a,
-                            volume: 1.0,
+                            volume: value.v,
                         },
                     )
                 })
