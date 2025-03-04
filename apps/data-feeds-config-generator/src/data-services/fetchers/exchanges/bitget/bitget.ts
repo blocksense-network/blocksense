@@ -1,19 +1,15 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
-import {
-  BitgetExchangeAssetInfo,
-  BitgetExchangeInfoResp,
-  BitgetExchangeInfoRespSchema,
-} from './types';
+import { BitgetAssetInfo, BitgetInfoResp, BitgetInfoRespSchema } from './types';
 
 /**
  * Class to fetch assets information from Bitget Exchange.
  */
-export class BitgetExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<BitgetExchangeAssetInfo>
+export class BitgetAssetsFetcher
+  implements ExchangeAssetsFetcher<BitgetAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<BitgetExchangeAssetInfo>[]> {
-    const assets = await fetchBitgetExchangeInfo();
+  async fetchAssets(): Promise<AssetInfo<BitgetAssetInfo>[]> {
+    const assets = await fetchBitgetInfo();
     return assets.data.map(asset => ({
       pair: {
         base: asset.baseCoin,
@@ -31,8 +27,8 @@ export class BitgetExchangeAssetsFetcher
  *
  * Ref: https://bitgetlimited.github.io/apidoc/en/spot/#get-symbols
  */
-export async function fetchBitgetExchangeInfo(): Promise<BitgetExchangeInfoResp> {
+export async function fetchBitgetInfo(): Promise<BitgetInfoResp> {
   const url = 'https://api.bitget.com/api/spot/v1/public/products';
 
-  return fetchAndDecodeJSON(BitgetExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(BitgetInfoRespSchema, url);
 }

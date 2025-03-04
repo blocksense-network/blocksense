@@ -3,7 +3,7 @@ import { Schema as S } from 'effect';
 /**
  * Schema for the relevant information about symbols received from Binance.
  */
-export const BinanceExchangeInfoRespSchema = S.mutable(
+export const BinanceInfoRespSchema = S.mutable(
   S.Struct({
     symbols: S.mutable(
       S.Array(
@@ -17,9 +17,7 @@ export const BinanceExchangeInfoRespSchema = S.mutable(
   }),
 );
 
-export type BinanceExchangeInfoResp = S.Schema.Type<
-  typeof BinanceExchangeInfoRespSchema
->;
+export type BinanceInfoResp = S.Schema.Type<typeof BinanceInfoRespSchema>;
 
 /**
  * Schema for the data relevant to a Binance oracle.

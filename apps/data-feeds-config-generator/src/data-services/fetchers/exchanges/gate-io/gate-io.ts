@@ -1,19 +1,15 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
-import {
-  GateIoExchangeAssetInfo,
-  GateIoExchangeInfoResp,
-  GateIoExchangeInfoRespSchema,
-} from './types';
+import { GateIoAssetInfo, GateIoInfoResp, GateIoInfoRespSchema } from './types';
 
 /**
  * Class to fetch assets information from GateIo Exchange.
  */
-export class GateIoExchangeAssetsFetcher
-  implements ExchangeAssetsFetcher<GateIoExchangeAssetInfo>
+export class GateIoAssetsFetcher
+  implements ExchangeAssetsFetcher<GateIoAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<GateIoExchangeAssetInfo>[]> {
-    const assets = await fetchGateIoExchangeInfo();
+  async fetchAssets(): Promise<AssetInfo<GateIoAssetInfo>[]> {
+    const assets = await fetchGateIoInfo();
     return assets.map(asset => ({
       pair: {
         base: asset.base,
@@ -31,8 +27,8 @@ export class GateIoExchangeAssetsFetcher
  *
  * Ref: https://www.gate.io/docs/developers/apiv4/en/#get-details-of-a-specific-currency
  */
-export async function fetchGateIoExchangeInfo(): Promise<GateIoExchangeInfoResp> {
+export async function fetchGateIoInfo(): Promise<GateIoInfoResp> {
   const url = 'https://api.gateio.ws/api/v4/spot/currency_pairs';
 
-  return fetchAndDecodeJSON(GateIoExchangeInfoRespSchema, url);
+  return fetchAndDecodeJSON(GateIoInfoRespSchema, url);
 }
