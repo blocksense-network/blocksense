@@ -852,6 +852,7 @@ allowed_outbound_hosts = [
   "https://api.kraken.com",
   "https://api.bybit.com",
   "https://api.coinbase.com",
+  "https://api.exchange.coinbase.com",
   "https://api1.binance.com",
   "https://api.kucoin.com",
   "https://api.mexc.com",
