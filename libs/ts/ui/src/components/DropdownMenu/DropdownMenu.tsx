@@ -1,6 +1,6 @@
 'use client';
 
-import {
+import React, {
   useState,
   useRef,
   useEffect,
@@ -12,8 +12,8 @@ import {
   MouseEvent,
 } from 'react';
 
-import { cn } from '@/lib/utils';
 import { Icon } from '@blocksense/ui/Icon';
+import { cn } from '../../utils';
 
 interface DropdownContextValue {
   open: boolean;

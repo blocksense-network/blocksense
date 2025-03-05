@@ -11,7 +11,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/common/DropdownMenu';
+} from '@blocksense/ui/DropdownMenu';
+
 import { ColumnsTitlesType } from '@/components/ui/DataTable/DataTable';
 
 interface DataTableViewOptionsProps<TData> {
