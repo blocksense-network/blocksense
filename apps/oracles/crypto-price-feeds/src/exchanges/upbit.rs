@@ -20,6 +20,7 @@ type UpBitMarketResponse = Vec<UpBitMarketResponseData>;
 pub struct UpBitTickerResponseData {
     pub market: String,
     pub trade_price: f64,
+    pub acc_trade_volume_24h: f64,
 }
 
 type UpBitResponse = Vec<UpBitTickerResponseData>;
@@ -46,14 +47,14 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
 
             Ok(response
                 .into_iter()
-                .map(|price| {
-                    let parts: Vec<&str> = price.market.split('-').collect();
+                .map(|data| {
+                    let parts: Vec<&str> = data.market.split('-').collect();
                     let transformed_market = format!("{}{}", parts[1], parts[0]);
                     (
                         transformed_market,
                         PricePoint {
-                            price: price.trade_price,
-                            volume: 1.0,
+                            price: data.trade_price,
+                            volume: data.acc_trade_volume_24h,
                         },
                     )
                 })
