@@ -8,7 +8,7 @@ use itertools::Itertools;
 
 use crate::{
     common::{ResourceData, TradingPair},
-    exchanges::{gemini::get_gemini_symbols, okx::fetch_okx_symbols, upbit::get_upbit_market},
+    exchanges::{gemini::get_gemini_symbols, upbit::get_upbit_market},
 };
 
 const SYMBOLS_KEY: &str = "symbols";
@@ -17,7 +17,6 @@ const RESOURCES_HASH_KEY: &str = "resources_hash";
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SymbolsData {
-    pub okx: Vec<TradingPair>,
     pub gemini: Vec<TradingPair>,
     pub upbit: Vec<TradingPair>,
 }
@@ -27,7 +26,6 @@ impl SymbolsData {
     // symbols the exchange supports
     pub async fn from_resources(_resources: &[ResourceData]) -> Result<Self> {
         Ok(Self {
-            okx: fetch_okx_symbols().await?,
             gemini: get_gemini_symbols().await?,
             upbit: get_upbit_market().await?,
         })

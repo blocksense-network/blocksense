@@ -37,7 +37,7 @@ pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairT
         fetch::<KrakenPriceFetcher>(&[]),
         fetch::<KuCoinPriceFetcher>(&[]),
         fetch::<MEXCPriceFetcher>(&[]),
-        fetch::<OKXPriceFetcher>(&symbols.okx),
+        fetch::<OKXPriceFetcher>(&[]),
         fetch::<UpBitPriceFetcher>(&symbols.upbit),
     ]);
 
