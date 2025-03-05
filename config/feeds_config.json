@@ -7146,6 +7146,32 @@
       "value_type": "Numerical",
       "aggregate_type": "Median",
       "stride": 0
+    },
+    {
+      "id": 606,
+      "name": "ExSat BTC",
+      "fullName": "Exsat network bitcoin wallet total holdings in satoshi",
+      "description": "ExSat / sats",
+      "decimals": 0,
+      "report_interval_ms": 3600000,
+      "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 86400000,
+      "type": "Crypto",
+      "script": "exsat",
+      "pair": {
+        "base": "Exsat",
+        "quote": "satoshi"
+      },
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "resources": {},
+      "value_type": "Numerical",
+      "aggregate_type": "Median",
+      "stride": 0
     }
+
   ]
 }

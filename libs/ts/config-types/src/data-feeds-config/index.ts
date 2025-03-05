@@ -31,6 +31,7 @@ export type FeedCategory = S.Schema.Type<typeof FeedCategorySchema>;
 export const ScriptSchema = S.Union(
   S.Literal('CoinMarketCap'),
   S.Literal('YahooFinance'),
+  S.Literal('exsat'),
 ).annotations({ identifier: 'ScriptName' });
 
 export type Script = S.Schema.Type<typeof ScriptSchema>;

@@ -144,6 +144,8 @@ impl AddrMappingsRows {
 
 #[oracle_component]
 async fn oracle_request(_settings: Settings) -> Result<Payload> {
+    println!("Starting oracle component - Exsat");
+
     let exsat = fetch_exsat_custody()
         .await
         .context("Failed to fetch exsat custody file from github")?;

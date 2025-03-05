@@ -485,6 +485,18 @@ pub async fn get_oracle_scripts(
                 allowed_outbound_hosts: vec!["https://yfapi.net:443".to_string()],
                 capabilities: HashSet::from_iter(vec!["YAHOO_API_KEY".to_string()]),
             },
+            OracleScript {
+                id: "exsat".to_string(),
+                name: None,
+                description: None,
+                oracle_script_wasm: "exsat_holdings_oracle.wasm".to_string(),
+                allowed_outbound_hosts: vec![
+                    "https://raw.githubusercontent.com".to_string(),
+                    "https://rpc-us.exsat.network".to_string(),
+                    "https://blockchain.info".to_string(),
+                ],
+                capabilities: HashSet::from_iter(vec![]),
+            },
         ],
     };
 
