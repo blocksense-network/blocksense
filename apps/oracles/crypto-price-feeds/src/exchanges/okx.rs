@@ -16,6 +16,8 @@ pub struct OKXTickerData {
     pub inst_id: String,
     #[serde(deserialize_with = "as_f64")]
     pub last: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub vol24h: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -49,7 +51,7 @@ impl PricesFetcher<'_> for OKXPriceFetcher {
                         value.inst_id.replace("-", ""),
                         PricePoint {
                             price: value.last,
-                            volume: 1.0,
+                            volume: value.vol24h,
                         },
                     )
                 })
