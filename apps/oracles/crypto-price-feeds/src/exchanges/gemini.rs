@@ -4,9 +4,10 @@ use futures::{
     stream::{FuturesUnordered, StreamExt},
     FutureExt,
 };
-use std::ops::Deref;
+use std::{collections::HashMap, ops::Deref};
 
 use serde::Deserialize;
+use serde_json::Value;
 use serde_this_or_that::as_f64;
 
 use crate::{
@@ -19,6 +20,7 @@ use crate::{
 pub struct GeminiPriceResponse {
     #[serde(deserialize_with = "as_f64")]
     pub last: f64,
+    pub volume: HashMap<String, Value>,
 }
 
 type GeminiSymbolsResponse = Vec<String>;
@@ -46,8 +48,8 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
             let mut prices = PairPriceData::new();
 
             while let Some(result) = futures.next().await {
-                if let Ok((symbol, price)) = result {
-                    prices.insert(symbol, PricePoint { price, volume: 1.0 });
+                if let Ok((symbol, price_pint)) = result {
+                    prices.insert(symbol, price_pint);
                 }
             }
 
@@ -57,11 +59,27 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
     }
 }
 
-pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, f64)> {
+pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)> {
     let url = format!("https://api.gemini.com/v1/pubticker/{symbol}");
     let response = http_get_json::<GeminiPriceResponse>(&url, None).await?;
 
-    Ok((symbol.to_string(), response.last))
+    let volume_data = response
+        .volume
+        .iter()
+        .find(|(key, _)| symbol.starts_with(*key));
+
+    let volume = match volume_data {
+        Some((_, value)) => value.as_str().unwrap_or("").parse::<f64>().unwrap_or(0.0),
+        None => 0.0,
+    };
+
+    Ok((
+        symbol.to_string(),
+        PricePoint {
+            price: response.last,
+            volume,
+        },
+    ))
 }
 
 pub async fn get_gemini_symbols() -> Result<Vec<String>> {
