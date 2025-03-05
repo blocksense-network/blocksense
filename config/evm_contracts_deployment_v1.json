@@ -115216,5 +115216,3119 @@
       ],
       "SafeMultisig": "0x23BC561ea93063B0cD12b6E3c690D40c93e29692"
     }
+  },
+  "hemi-sepolia": {
+    "chainId": 743111,
+    "contracts": {
+      "coreContracts": {
+        "HistoricalDataFeedStoreV2": {
+          "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
+          "constructorArgs": [
+            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
+          ]
+        },
+        "UpgradeableProxy": {
+          "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
+          "constructorArgs": [
+            "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
+            "0x23BC561ea93063B0cD12b6E3c690D40c93e29692"
+          ]
+        },
+        "CLFeedRegistryAdapter": {
+          "address": "0x176761e687642dE9BEED6a77028797643C193671",
+          "constructorArgs": [
+            "0x23BC561ea93063B0cD12b6E3c690D40c93e29692",
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        }
+      },
+      "CLAggregatorAdapter": [
+        {
+          "description": "FOXY / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9fAb38E38d526c6ba82879c6bDe1c4Fd73378f17",
+          "constructorArgs": [
+            "FOXY / USD",
+            18,
+            0,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PERP / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xdE518fA4Bd7BD8dBa93c5bE9a238277139C14F76",
+          "constructorArgs": [
+            "PERP / USD",
+            8,
+            1,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MEME / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x5A46d8Ed6Aa3123F2dAa317333FDaDca27E0038f",
+          "constructorArgs": [
+            "MEME / USD",
+            8,
+            2,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SOL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xA09466a337b56A364Da934cC20d59987E9c4e035",
+          "constructorArgs": [
+            "SOL / USD",
+            8,
+            3,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WSTETH / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xbE385BF34E757718FecAe5Dd5ae27c5d36333c63",
+          "constructorArgs": [
+            "WSTETH / USD",
+            8,
+            4,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "TAO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xb058b62f8315Dc8220cE78fa1Bd0753075Fce127",
+          "constructorArgs": [
+            "TAO / USD",
+            8,
+            5,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SAND / USD",
+          "base": "0x3845badAde8e6dFF049820680d1F14bD3903a5d0",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x93b2d3E2Fe51A4cf468B884e276A647051915Ba5",
+          "constructorArgs": [
+            "SAND / USD",
+            8,
+            6,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "JPM / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x08Bcaa44ea08be1a083664605F3AB5c18Fa4674e",
+          "constructorArgs": [
+            "JPM / USD",
+            8,
+            7,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "TRX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xAdc61f8674d697D712Ffbac9a19e8Ff9C30b4f4C",
+          "constructorArgs": [
+            "TRX / USD",
+            8,
+            8,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SUSD / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x17C9231E4D2E45DCcc1A1DEE8A051d15370d85dA",
+          "constructorArgs": [
+            "SUSD / USD",
+            8,
+            9,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FTT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x127Af5D1BB9E628f07793E00fdD98741Ec673Eb2",
+          "constructorArgs": [
+            "FTT / USD",
+            8,
+            10,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CHZ / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x22D8f6F4725d67D206D0f859027cb0dA2F9d0cC4",
+          "constructorArgs": [
+            "CHZ / USD",
+            8,
+            11,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "LINA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x595d337ca53Ca84E9fdC5F948c2D9A52034f4782",
+          "constructorArgs": [
+            "LINA / USD",
+            8,
+            12,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "IMX / USD",
+          "base": "0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8C2cdd3A642242016F87479D369fAbD07EDeDa0D",
+          "constructorArgs": [
+            "IMX / USD",
+            8,
+            13,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FLOW / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x35b080ec2a5B20EF52Fb4080a4636d5fffF343cb",
+          "constructorArgs": [
+            "FLOW / USD",
+            8,
+            14,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "TIA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x627E5F137eF2Ef81C6271bE3159aca1E8725aE8D",
+          "constructorArgs": [
+            "TIA / USD",
+            8,
+            15,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ILS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xcA603Dbd8712021EEa2952fCA451551DD104C8C1",
+          "constructorArgs": [
+            "ILS / USD",
+            8,
+            16,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DPX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xCc9ac1E005C3b279a519D618Ca40aC24a2172BA5",
+          "constructorArgs": [
+            "DPX / USD",
+            8,
+            17,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WING / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x580A95c35Ff4ECd943e0eA4404A86438207f0341",
+          "constructorArgs": [
+            "WING / USD",
+            8,
+            18,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "STORJ / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xDb159bb30d8416513b4eAb20B1124033f1F20Eea",
+          "constructorArgs": [
+            "STORJ / USD",
+            8,
+            19,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SUI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x91Aac31bF469F0001E46e18b91d9871B21F058A8",
+          "constructorArgs": [
+            "SUI / USD",
+            8,
+            20,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PAXG / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6Cb9507E25e5bc4a437Ed75C2ED361d6a131b3f0",
+          "constructorArgs": [
+            "PAXG / USD",
+            8,
+            21,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "VET / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x986162E1369f411465565897D2730d877D87C0Ae",
+          "constructorArgs": [
+            "VET / USD",
+            8,
+            22,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AVAIL / USD",
+          "base": "0xEeB4d8400AEefafC1B2953e0094134A887C76Bd8",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3D4150e9ABaaB517B2f8E57eA90e9040064e5400",
+          "constructorArgs": [
+            "AVAIL / USD",
+            8,
+            23,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AXL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x169760b730487d32b205A5E310F29cC776c70112",
+          "constructorArgs": [
+            "AXL / USD",
+            8,
+            24,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BAL / USD",
+          "base": "0xba100000625a3754423978a60c9317c58a424e3D",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xEe771347EDA3bCCD52D7E0aAD32E13026c0bC9C8",
+          "constructorArgs": [
+            "BAL / USD",
+            8,
+            25,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DPI / USD",
+          "base": "0x1494CA1F11D487c2bBe4543E90080AeBa4BA3C2b",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2e82e561fB98B03b2Bda88EFffB6b79920Eed5BB",
+          "constructorArgs": [
+            "DPI / USD",
+            8,
+            26,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ALCX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8aac5BC9468A50ACFF9FDBd681A1EE823fA27984",
+          "constructorArgs": [
+            "ALCX / USD",
+            8,
+            27,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SHIB / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1284020D95527D78fF0067fe45E285F47a76da40",
+          "constructorArgs": [
+            "SHIB / USD",
+            8,
+            28,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BONK / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xf43CCB4881cB05f673112585eEF3cDd27e8BcDB7",
+          "constructorArgs": [
+            "BONK / USD",
+            18,
+            29,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ANKR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xbA32a9225902CAAE5eb0712a11549C20Edb1684A",
+          "constructorArgs": [
+            "ANKR / USD",
+            8,
+            30,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BTC / USD",
+          "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x43A444AC5d00b96Daf62BC00C50FA47c1aFCf3C3",
+          "constructorArgs": [
+            "BTC / USD",
+            8,
+            31,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MAV / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3f2E69A5204e2DF1B44375d83174FB763947ed2b",
+          "constructorArgs": [
+            "MAV / USD",
+            8,
+            32,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DAI / USD",
+          "base": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9002A3d87b8d5Ec9B8Ebf999DB00C08FAbfcb2B9",
+          "constructorArgs": [
+            "DAI / USD",
+            8,
+            33,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BSW / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE34b31e7DbfE50775619EE58da981f17D95Efc27",
+          "constructorArgs": [
+            "BSW / USD",
+            8,
+            34,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "QUICK / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x67b6F4bf562Ba4D4e0D46823bA92838f7C5F7Ec7",
+          "constructorArgs": [
+            "QUICK / USD",
+            8,
+            35,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "1INCH / USD",
+          "base": "0x111111111117dC0aa78b770fA6A738034120C302",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE4eD1581756B5B113FAc360DB261E8966c41580A",
+          "constructorArgs": [
+            "1INCH / USD",
+            8,
+            36,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MLN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xfcB606144ee7E8F90d5BC8994ED9E3cCE3FAd396",
+          "constructorArgs": [
+            "MLN / USD",
+            8,
+            37,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "COQ / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xFE814dBa1ab661c6805E953Ee907BB7a560BE894",
+          "constructorArgs": [
+            "COQ / USD",
+            18,
+            38,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "TUSD / USD",
+          "base": "0x0000000000085d4780B73119b644AE5ecd22b376",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1e097bC607e98A5E231DFF5AC940758Ba9CE35d6",
+          "constructorArgs": [
+            "TUSD / USD",
+            8,
+            39,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MRNA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x32Ad121A9De573d94dfD20e64446E2dB1E63549e",
+          "constructorArgs": [
+            "MRNA / USD",
+            8,
+            40,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x4E1064ADF0c75aA6bFBd2Ec5D01bE763502b853A",
+          "constructorArgs": [
+            "USDE / USD",
+            8,
+            41,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CFX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x06E686D74A105267dABC5457410B318e15B44EF2",
+          "constructorArgs": [
+            "CFX / USD",
+            8,
+            42,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WBTC / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xb68B780bae5ec684337D78a94fC306a076cE03f9",
+          "constructorArgs": [
+            "WBTC / USD",
+            8,
+            43,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XVS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2f212ab33eE67108991b702E8d38Eebf4fA1eAc8",
+          "constructorArgs": [
+            "XVS / USD",
+            8,
+            44,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BETH / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xEAE3ea6e773300Ea43db6Ed927642323fC91beBC",
+          "constructorArgs": [
+            "BETH / USD",
+            8,
+            45,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "UST / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1C4fA5353d731A9F5B6873AD1Bd47BAb8b8A79d6",
+          "constructorArgs": [
+            "UST / USD",
+            8,
+            46,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ETH / USD",
+          "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x7c9906cb5a589c6fa3DaB8E56267D3Ab687cA52f",
+          "constructorArgs": [
+            "ETH / USD",
+            8,
+            47,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DASH / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8b42a818FB375f1A95331351a9C17F68B4eDd3bf",
+          "constructorArgs": [
+            "DASH / USD",
+            8,
+            48,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MXN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x299b84b617565053DA7029087E4EBE4937D44dA1",
+          "constructorArgs": [
+            "MXN / USD",
+            8,
+            49,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GME / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x619a59a60fB1034c81B0bf15495AA1Bc60FbDF67",
+          "constructorArgs": [
+            "GME / USD",
+            8,
+            50,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "REEF / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xa21b6ba7DFb335bdAd256D1e2848214439552408",
+          "constructorArgs": [
+            "REEF / USD",
+            8,
+            51,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SXP / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x0Fbd1ae2D4BD451DeC562aedA2F5C77c9Da783aC",
+          "constructorArgs": [
+            "SXP / USD",
+            8,
+            52,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WTI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x39A1e1054b85dd6E09DE7b56974ccc0c865035e2",
+          "constructorArgs": [
+            "WTI / USD",
+            8,
+            53,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "NZD / USD",
+          "base": "0x000000000000000000000000000000000000022A",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x757b875516DDe55D874ef0927b65F4654E09c8b4",
+          "constructorArgs": [
+            "NZD / USD",
+            8,
+            54,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WIF / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xcA95D17B4412dCa1afaF8e1f3E70d61925472D4e",
+          "constructorArgs": [
+            "WIF / USD",
+            8,
+            55,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XRP / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6c5Bc31df87623F5B16163Ef40E755cb138A5aB2",
+          "constructorArgs": [
+            "XRP / USD",
+            8,
+            56,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ATOM / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x32Cd76Af76bA5bC9299F33c12d92321F5dA9A988",
+          "constructorArgs": [
+            "ATOM / USD",
+            8,
+            57,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDP / USD",
+          "base": "0x8E870D67F660D95d5be530380D0eC0bd388289E1",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xAa30D5CFf31DB698C7e27CDeb877b2D3a69f32C2",
+          "constructorArgs": [
+            "USDP / USD",
+            8,
+            58,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MASK / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1300E876Cb273ac753e965371f5AfE204DC35C54",
+          "constructorArgs": [
+            "MASK / USD",
+            8,
+            59,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XLM / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE15b8A058443C4a83D685Fc287850c6036F00009",
+          "constructorArgs": [
+            "XLM / USD",
+            8,
+            60,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CAKE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xC9375A182B4314139C2b42Ae7DA3D48B26619C29",
+          "constructorArgs": [
+            "CAKE / USD",
+            8,
+            61,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GBP / USD",
+          "base": "0x000000000000000000000000000000000000033a",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x16C179fd404b8aC771d842996663E5938A91d0B9",
+          "constructorArgs": [
+            "GBP / USD",
+            8,
+            62,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "KAVA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xBb400CC5F35A64b0E4aF7d488206552758128D7A",
+          "constructorArgs": [
+            "KAVA / USD",
+            8,
+            63,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XMR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8324aFd56f7FF89FaD49287d54B58429d980267b",
+          "constructorArgs": [
+            "XMR / USD",
+            8,
+            64,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "EURC / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x680B74359493b63C549d332c0DF532152D1BDC57",
+          "constructorArgs": [
+            "EURC / USD",
+            8,
+            65,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XAG / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE6904f6A6B248FE08da652E76F7248C3c88cc9Ad",
+          "constructorArgs": [
+            "XAG / USD",
+            8,
+            66,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FET / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3D48FF1fc84850229E6Cc62EfecA37ADe88f528e",
+          "constructorArgs": [
+            "FET / USD",
+            8,
+            67,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AXS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xdEe1a03A8d4e48494DA41335f091414a3adA684e",
+          "constructorArgs": [
+            "AXS / USD",
+            8,
+            68,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DOT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x78532D6CaBC043eD3B6F1697d3DE31C6D10BBfe1",
+          "constructorArgs": [
+            "DOT / USD",
+            8,
+            69,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "QNT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE2Ee63BA4A06B4ea2D20401C1608511F88fCDc35",
+          "constructorArgs": [
+            "QNT / USD",
+            8,
+            70,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DYDX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1284004F1a3c9dBaEE27BDA0a19c65A27Ac5E1F2",
+          "constructorArgs": [
+            "DYDX / USD",
+            8,
+            71,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MNT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x7F8e20142842fD3a9C6d9dAA9EbB9151f72B84E2",
+          "constructorArgs": [
+            "MNT / USD",
+            8,
+            72,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "UMA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x33B1098E920459D75a25529F264757193333Db2b",
+          "constructorArgs": [
+            "UMA / USD",
+            8,
+            73,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ZERO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xDEa1A89629fAb0E8eFD79c8e3060B54716A7b598",
+          "constructorArgs": [
+            "ZERO / USD",
+            8,
+            74,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ULTI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x0a39F92F866c0736004162D96dfD758Ece633309",
+          "constructorArgs": [
+            "ULTI / USD",
+            8,
+            75,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "STX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x66c9920aD886C5229D12045c4C167A46C010eAd4",
+          "constructorArgs": [
+            "STX / USD",
+            8,
+            76,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CAD / USD",
+          "base": "0x000000000000000000000000000000000000007c",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8EdEd1c63fF4Af4DAE6C824871121AfE425fC2f5",
+          "constructorArgs": [
+            "CAD / USD",
+            8,
+            77,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "KSM / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9a0dFd438bD0614bb6306D0b7FCa49E0565cEf83",
+          "constructorArgs": [
+            "KSM / USD",
+            8,
+            78,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "JTO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xef48b1028BAFbE4142F5135874AC6209939BDCf4",
+          "constructorArgs": [
+            "JTO / USD",
+            8,
+            79,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDz / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x580B9D9aCd9a823FDDca951c932DA0af67548Cef",
+          "constructorArgs": [
+            "USDz / USD",
+            8,
+            80,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GRT / USD",
+          "base": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xf63590fc8302153212FFbceaF995C31a2d080B0B",
+          "constructorArgs": [
+            "GRT / USD",
+            8,
+            81,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GMT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x5cc80200Ef2595837f290706C0845d9D3e652d45",
+          "constructorArgs": [
+            "GMT / USD",
+            8,
+            82,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GOOGL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xb2701632401996582E54bb24ce34DbA3f9215645",
+          "constructorArgs": [
+            "GOOGL / USD",
+            8,
+            83,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XAI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9F36140040e2F4e5C344B023010c871b4E68A82a",
+          "constructorArgs": [
+            "XAI / USD",
+            8,
+            84,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ALPACA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x5819CD0951A479565d9D3C704b1B0aCaEC41f1D7",
+          "constructorArgs": [
+            "ALPACA / USD",
+            8,
+            85,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MAGIC / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xacd43fe1927483BBE5510fb8C7Bc10E7ce06cDE8",
+          "constructorArgs": [
+            "MAGIC / USD",
+            8,
+            86,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XAVA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6b278BDb8F31A2c3ae7096A17659ac71ea57Fe8F",
+          "constructorArgs": [
+            "XAVA / USD",
+            8,
+            87,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PFE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x88eCb3f4Ac23D3531530A26ad392Ae515cDeF84B",
+          "constructorArgs": [
+            "PFE / USD",
+            8,
+            88,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "QI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x4222802B81e6F2d922B26d430d4Ff5f61F152560",
+          "constructorArgs": [
+            "QI / USD",
+            8,
+            89,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BADGER / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xff9eee1799a4973581Bff13E3AceB8185c49feF9",
+          "constructorArgs": [
+            "BADGER / USD",
+            8,
+            90,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FLOKI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x637Ff6A2DA80bC317d2A2D2CDbC40a2ffE0c1f8a",
+          "constructorArgs": [
+            "FLOKI / USD",
+            8,
+            91,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ZK / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xF5Fda8D99aBafD762EDD8cdc2B478E77CC90bed9",
+          "constructorArgs": [
+            "ZK / USD",
+            8,
+            92,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "LIT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x66A463360DAfe9Eca5460184E48Ee87c399879Cb",
+          "constructorArgs": [
+            "LIT / USD",
+            8,
+            93,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XOF / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2791f051c431eB497833E2CFE9FfaAaC4eCcb09A",
+          "constructorArgs": [
+            "XOF / USD",
+            18,
+            94,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XTZ / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2FFE6441554Ca3920F32bF6E4fF757B3564CD80B",
+          "constructorArgs": [
+            "XTZ / USD",
+            8,
+            95,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MOVR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xA0499e276E7b7F339e7646Ed3203E4E0ABd74B6a",
+          "constructorArgs": [
+            "MOVR / USD",
+            8,
+            96,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AMZN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x5Ebf09478d0532620587fE1F13efC2a1852Ac33e",
+          "constructorArgs": [
+            "AMZN / USD",
+            8,
+            97,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "TRY / USD",
+          "base": "0xc12eCeE46ed65D970EE5C899FCC7AE133AfF9b03",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xb6CD8903A85f00B5A7d57D446e308bBD7DAAf48e",
+          "constructorArgs": [
+            "TRY / USD",
+            8,
+            98,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DOGE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9c086c5d679FaB9fad8bd076e01EFCA68188D5B5",
+          "constructorArgs": [
+            "DOGE / USD",
+            8,
+            99,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "NFLX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xC48f48c0f90e578cD805c1135dc5c03F5d36142F",
+          "constructorArgs": [
+            "NFLX / USD",
+            8,
+            100,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SEK / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9001f0059C1Dfd483D38F5A7Ac774CcF891b2635",
+          "constructorArgs": [
+            "SEK / USD",
+            8,
+            101,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MEW / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8dA8F67004eB6B1Af07987519CE49f625A56e8aA",
+          "constructorArgs": [
+            "MEW / USD",
+            18,
+            102,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MATIC / USD",
+          "base": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xF462ad12278B4489EC64448eB6d7e3CBe4041801",
+          "constructorArgs": [
+            "MATIC / USD",
+            8,
+            103,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ZIL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x50d7CB279C2bFc64f8EB0eEc80a506D13c1BBCC3",
+          "constructorArgs": [
+            "ZIL / USD",
+            8,
+            104,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDS / USD",
+          "base": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x7b3622c0ca34b1172bB76b900DbEfa1047b1635c",
+          "constructorArgs": [
+            "USDS / USD",
+            8,
+            105,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ZAR / USD",
+          "base": "0x00000000000000000000000000000000000002c6",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x933a1b13f53578249BbdEE9E263717E99745f27C",
+          "constructorArgs": [
+            "ZAR / USD",
+            8,
+            106,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "THB / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xDF583eE0D058d7babD03527Da0E7cAc1a25c80E4",
+          "constructorArgs": [
+            "THB / USD",
+            8,
+            107,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "EOS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xD322BA3d6557B64429bcbe6c59e723cef399A40e",
+          "constructorArgs": [
+            "EOS / USD",
+            8,
+            108,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "RSR / USD",
+          "base": "0x320623b8E4fF03373931769A31Fc52A4E78B5d70",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xb1C0bF2fFA1ed4843c5d747AB541b372966B9787",
+          "constructorArgs": [
+            "RSR / USD",
+            8,
+            109,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "UNI / USD",
+          "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x19bbf6952a44B265f734Bf1B91c86536f7E54f79",
+          "constructorArgs": [
+            "UNI / USD",
+            8,
+            110,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AAPL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2f8015D4A622527d94b49CCf84362DfA3cc06795",
+          "constructorArgs": [
+            "AAPL / USD",
+            8,
+            111,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "RDNT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xe3016E23e80E33D07F227838E6e4F7c5881E0756",
+          "constructorArgs": [
+            "RDNT / USD",
+            8,
+            112,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "HIGH / USD",
+          "base": "0x71Ab77b7dbB4fa7e017BC15090b2163221420282",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x4D5DdC0d8c4389fe5677b7c6F86CFf6e149929f0",
+          "constructorArgs": [
+            "HIGH / USD",
+            8,
+            113,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "KES / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2D86cAc7C80aBe5147485AEfb2310cfdDe611F8f",
+          "constructorArgs": [
+            "KES / USD",
+            18,
+            114,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "APE / USD",
+          "base": "0x4d224452801ACEd8B2F0aebE155379bb5D594381",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x4747FB65Be3Ef2A695eeEA058380C25143Df27d8",
+          "constructorArgs": [
+            "APE / USD",
+            8,
+            115,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BCH / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x537112F8a8765c2D237245a81FEF974159eccc91",
+          "constructorArgs": [
+            "BCH / USD",
+            8,
+            116,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CUSD / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xB9983491cF6cf788f1C3887D8937974045a9aA99",
+          "constructorArgs": [
+            "CUSD / USD",
+            8,
+            117,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "COMP / USD",
+          "base": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xa16f31Cc985Ed7e53BfaEAEDFBd270F1E83eA623",
+          "constructorArgs": [
+            "COMP / USD",
+            8,
+            118,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ZEC / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x37419f6Bb12a7c9f597b38f682776691bF87f633",
+          "constructorArgs": [
+            "ZEC / USD",
+            8,
+            119,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ENS / USD",
+          "base": "0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xEacd2dA3d385F714E0A2FefCE86c30DC77793227",
+          "constructorArgs": [
+            "ENS / USD",
+            8,
+            120,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "KRW / USD",
+          "base": "0x000000000000000000000000000000000000019a",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x19C1838aba828afD0F8C85c32F236d982d84048f",
+          "constructorArgs": [
+            "KRW / USD",
+            8,
+            121,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "TSLA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x41039f9820D2F7BE94Ce0eDc43e3f1C74ddcd579",
+          "constructorArgs": [
+            "TSLA / USD",
+            8,
+            122,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MAVIA / USD",
+          "base": "0x24fcFC492C1393274B6bcd568ac9e225BEc93584",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x038f3Bdfa39062a1512Aa2E96516E63dA73e8fdC",
+          "constructorArgs": [
+            "MAVIA / USD",
+            8,
+            123,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ADA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3a79F5FE268237FbBB714aB7ff9522f52dAFEbF0",
+          "constructorArgs": [
+            "ADA / USD",
+            8,
+            124,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GHST / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6Ee99489F69d706A27cA9B2731AFccE2c4EBC218",
+          "constructorArgs": [
+            "GHST / USD",
+            8,
+            125,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AMPL / USD",
+          "base": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xB25dCeA718Af7B519Bc6D19c29a92495c66B3FAE",
+          "constructorArgs": [
+            "AMPL / USD",
+            18,
+            126,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GNS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6296c71cB1755E449A6485B3489a2068fed41779",
+          "constructorArgs": [
+            "GNS / USD",
+            8,
+            127,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDe / USD",
+          "base": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x787C804c709a6E353027D82aD51d236e71B4dA39",
+          "constructorArgs": [
+            "USDe / USD",
+            8,
+            128,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GNO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9E5080E7BDe1cb77FD64eD3e6Ecc8FD1A3018b04",
+          "constructorArgs": [
+            "GNO / USD",
+            8,
+            129,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DODO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x37F8273DB5aA3c54a56C19a74D4515C3631078e7",
+          "constructorArgs": [
+            "DODO / USD",
+            8,
+            130,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDC / USD",
+          "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x479755F48faCf747C63BD58007383F799a5ce595",
+          "constructorArgs": [
+            "USDC / USD",
+            8,
+            131,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "STG / USD",
+          "base": "0xAf5191B0De278C7286d6C7CC6ab6BB8A73bA2Cd6",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1574e794e9A3108d745DE9675A2987509D37C51A",
+          "constructorArgs": [
+            "STG / USD",
+            8,
+            132,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AERO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xA6ffE1C5E0c7d193Ed4a67E025f20879EC14bF1A",
+          "constructorArgs": [
+            "AERO / USD",
+            8,
+            133,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "POL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xe127919bFE93eb9E0357227235423c623eeFbf79",
+          "constructorArgs": [
+            "POL / USD",
+            8,
+            134,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ORDI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x233ee54b52C60982E78A73D5A43aC1561cDB5613",
+          "constructorArgs": [
+            "ORDI / USD",
+            8,
+            135,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "NULS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x234C60924e1692f27F53bC49988244e939f5b836",
+          "constructorArgs": [
+            "NULS / USD",
+            8,
+            136,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "sUSDe / USD",
+          "base": "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x4537435351B49dBb13e95b140C92366567A346bB",
+          "constructorArgs": [
+            "sUSDe / USD",
+            8,
+            137,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BAT / USD",
+          "base": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xd2baFd2d6CF87D03eCa5F69f256D9e6b0B63B6F2",
+          "constructorArgs": [
+            "BAT / USD",
+            8,
+            138,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PEPE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x54B31F791586d3d673483f0320AA66aDc63704Bf",
+          "constructorArgs": [
+            "PEPE / USD",
+            18,
+            139,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FIL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x949c99C7312AAFcE3C13c6B94A7EbB44508D7231",
+          "constructorArgs": [
+            "FIL / USD",
+            8,
+            140,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "YFI / USD",
+          "base": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xe46e771D8c576CAd31f4c349A2a1C20F857B523C",
+          "constructorArgs": [
+            "YFI / USD",
+            8,
+            141,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XCN / USD",
+          "base": "0xA2cd3D43c775978A96BdBf12d733D5A1ED94fb18",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x830821A5d413F241d5F529026206a8178B8FC77f",
+          "constructorArgs": [
+            "XCN / USD",
+            8,
+            142,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "LDO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x457272fa4d69cC2FDC47F7a7227ec2CBCB679F37",
+          "constructorArgs": [
+            "LDO / USD",
+            8,
+            143,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDD / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x87d44c0F27a867bB91c58cFb9d4F40F14c3106E9",
+          "constructorArgs": [
+            "USDD / USD",
+            8,
+            144,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ARB / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8968cdB9B7695f18b75Bdd35B299c9430798813C",
+          "constructorArgs": [
+            "ARB / USD",
+            8,
+            145,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MSFT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x011db282827c00EcF1Db6005EC18A4c08649B6b2",
+          "constructorArgs": [
+            "MSFT / USD",
+            8,
+            146,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDV / USD",
+          "base": "0x0E573Ce2736Dd9637A0b21058352e1667925C7a8",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xD355f86856DDAAbD4c16172F45987ae4D2A43063",
+          "constructorArgs": [
+            "USDV / USD",
+            8,
+            147,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MKR / USD",
+          "base": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xCcE3636d16c1999D78Ad7aE6E63b34EBc14c44BA",
+          "constructorArgs": [
+            "MKR / USD",
+            8,
+            148,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CRV / USD",
+          "base": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8e280e33b94440bC8cfE30252189bbA967ddE6c5",
+          "constructorArgs": [
+            "CRV / USD",
+            8,
+            149,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CHF / USD",
+          "base": "0x00000000000000000000000000000000000002F4",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x96123CA106ab85966aA9a7CacAE9012F7F5653e5",
+          "constructorArgs": [
+            "CHF / USD",
+            8,
+            150,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "IOTX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xB6Bf3a68C27Dc4cfdF85e190d5DE8b641Fbf6281",
+          "constructorArgs": [
+            "IOTX / USD",
+            8,
+            151,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GMX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x59Fb2b0D8C45e1E74ee37Ab85fAbFA409ABBaF83",
+          "constructorArgs": [
+            "GMX / USD",
+            8,
+            152,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SHV / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x11CeD976b281891ADc871F59Fb9d449A11b3e0E1",
+          "constructorArgs": [
+            "SHV / USD",
+            8,
+            153,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "REN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x038d1B7d39a922B91057D2D119f6d3F1cBeAccBB",
+          "constructorArgs": [
+            "REN / USD",
+            8,
+            154,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MIM / USD",
+          "base": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x25C73d1d04554e136D7708700b491fEEB3B0ceF0",
+          "constructorArgs": [
+            "MIM / USD",
+            8,
+            155,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BUSD / USD",
+          "base": "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xAF2F60Ecd53A0cc322A090f909dE7168a2CCe869",
+          "constructorArgs": [
+            "BUSD / USD",
+            8,
+            156,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USD+ / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xDE1bf3FAE1eD6A13964Ae79227B825E750aaDFCE",
+          "constructorArgs": [
+            "USD+ / USD",
+            8,
+            157,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SPELL / USD",
+          "base": "0x090185f2135308BaD17527004364eBcC2D37e5F6",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xEb498F60a46A57490CB20825aE350a0fBbBe2f4D",
+          "constructorArgs": [
+            "SPELL / USD",
+            8,
+            158,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "C98 / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xfC7B1E2E4C9719af65F1F5a1c522461AeF9538a8",
+          "constructorArgs": [
+            "C98 / USD",
+            8,
+            159,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDM / USD",
+          "base": "0x59D9356E565Ab3A36dD77763Fc0d87fEaf85508C",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8F0656ca56035e719922D126870546c70859a944",
+          "constructorArgs": [
+            "USDM / USD",
+            8,
+            160,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AUSD / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xa4A8dB526A9EafAF73fD84023bB6514b92de3E8A",
+          "constructorArgs": [
+            "AUSD / USD",
+            8,
+            161,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "QQQ / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x130fA586CA813e813588C8b43de94C18fAe2D80a",
+          "constructorArgs": [
+            "QQQ / USD",
+            8,
+            162,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "OM / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xCC9cE66e3D84456B4aEb4FF936F87D6DE08F3Bfc",
+          "constructorArgs": [
+            "OM / USD",
+            8,
+            163,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BRL / USD",
+          "base": "0x00000000000000000000000000000000000003Da",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xC36E3EafF0Ae2C99e62a91841De0f898256dbCca",
+          "constructorArgs": [
+            "BRL / USD",
+            8,
+            164,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BLUR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6C67dFC67B4f5dFcD448de9FFC79a504744420c4",
+          "constructorArgs": [
+            "BLUR / USD",
+            8,
+            165,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WIN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xb22b706863f6FE376caC1AC530b4BD2BF51FaDE8",
+          "constructorArgs": [
+            "WIN / USD",
+            8,
+            166,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BOO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x58bf1de772aA8343DB34128eE7De14bECE114624",
+          "constructorArgs": [
+            "BOO / USD",
+            8,
+            167,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "IDR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE7Db277C05429134441cC490EdcD2418D24EBE01",
+          "constructorArgs": [
+            "IDR / USD",
+            8,
+            168,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "JUP / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x64b06Cc8758363e0e14402F23560D05cA044d7AE",
+          "constructorArgs": [
+            "JUP / USD",
+            8,
+            169,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "INJ / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xfe7B4b64eb00F3639ce614D910127F1f73426992",
+          "constructorArgs": [
+            "INJ / USD",
+            8,
+            170,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DGB / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x798dD377167AAbeD64452075b14B9155710f7651",
+          "constructorArgs": [
+            "DGB / USD",
+            8,
+            171,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FORTH / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x7DB53b858c5CBdE675E6f7424095004028A9E1cE",
+          "constructorArgs": [
+            "FORTH / USD",
+            8,
+            172,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "KNC / USD",
+          "base": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3c0C02321779b737dF707F80Aebc25bFEC3d27a1",
+          "constructorArgs": [
+            "KNC / USD",
+            8,
+            173,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PYUSD / USD",
+          "base": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x490901Bd42fc7259315b13A448e44a659dF7854F",
+          "constructorArgs": [
+            "PYUSD / USD",
+            8,
+            174,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CRVUSD / USD",
+          "base": "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x68Db27D4642fC6b2051BcEd35B4eda45eb1a61c5",
+          "constructorArgs": [
+            "CRVUSD / USD",
+            8,
+            175,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "INR / USD",
+          "base": "0x0000000000000000000000000000000000000164",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xBCEF63c891ab75016D2373E5D1265D31cc9ee6Ae",
+          "constructorArgs": [
+            "INR / USD",
+            8,
+            176,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XAU / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xd084FB8020e2Fe8517e452A053adB2b28402dD3c",
+          "constructorArgs": [
+            "XAU / USD",
+            8,
+            177,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "XPT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x373Bdc07414577eAc73AcBd9d8D5Fc99A709B304",
+          "constructorArgs": [
+            "XPT / USD",
+            8,
+            178,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CELO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x32Af08B22804eD135930329B376800BF60907be1",
+          "constructorArgs": [
+            "CELO / USD",
+            8,
+            179,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "COP / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xAB10eDD1F186B69ec3443Ea416003D8513045e61",
+          "constructorArgs": [
+            "COP / USD",
+            8,
+            180,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CSPX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xAe522b7Fabf2AA1E170544D720915681747d6D0e",
+          "constructorArgs": [
+            "CSPX / USD",
+            8,
+            181,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GLMR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x003fDd94C28fc4a44c10a8a54fC91A502Bc7E3bb",
+          "constructorArgs": [
+            "GLMR / USD",
+            8,
+            182,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SEI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1F8FEE7e510a0e281933e35C94C77077a61B45d2",
+          "constructorArgs": [
+            "SEI / USD",
+            8,
+            183,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "mSOL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x7fF280F7EF31a8EA123eDa4e8fbc75FfC078B75E",
+          "constructorArgs": [
+            "mSOL / USD",
+            8,
+            184,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ALPHA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3E7B41590438475D65b008a8eb08fBE5a311db64",
+          "constructorArgs": [
+            "ALPHA / USD",
+            8,
+            185,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "JPY / USD",
+          "base": "0x0000000000000000000000000000000000000188",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6FC868a1e19fCAC9326A10cFf5a9b6C8bB648f3c",
+          "constructorArgs": [
+            "JPY / USD",
+            8,
+            186,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BNB / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xfb0C00C08ac4466726F1A0fe0047b4866C8bB52b",
+          "constructorArgs": [
+            "BNB / USD",
+            8,
+            187,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SPY / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9b129d02559Cf036CA967211E577e30a6f95dcCC",
+          "constructorArgs": [
+            "SPY / USD",
+            8,
+            188,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ICP / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x9B1c06d8cC62364Fd276975d3a8d22935c9b8d96",
+          "constructorArgs": [
+            "ICP / USD",
+            8,
+            189,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "RPL / USD",
+          "base": "0xD33526068D116cE69F19A9ee46F0bd304F21A51f",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3310A767c7e930a238eF98F52805814685d249A7",
+          "constructorArgs": [
+            "RPL / USD",
+            8,
+            190,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "VAI / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x68192Cbc8651a5FdBC29E032f67AF6C0938Ab1BC",
+          "constructorArgs": [
+            "VAI / USD",
+            8,
+            191,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WLD / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6e73e60C5E3B4f75FBAE73f4196D3fC1502bde94",
+          "constructorArgs": [
+            "WLD / USD",
+            8,
+            192,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SATS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x62d1e2023df9d090B05c6b8E71D8C5F951d03836",
+          "constructorArgs": [
+            "SATS / USD",
+            18,
+            193,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "GHO / USD",
+          "base": "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x24aa0936F594eAeb9fe287C20e206D22b68E00B7",
+          "constructorArgs": [
+            "GHO / USD",
+            8,
+            194,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WEMIX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x44747c049E80Bf1DC09026Ee55d4891fB22510aC",
+          "constructorArgs": [
+            "WEMIX / USD",
+            8,
+            195,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ALGO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xdc1C0EA18840627Eb508B27F11896aE00979CD53",
+          "constructorArgs": [
+            "ALGO / USD",
+            8,
+            196,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BAND / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6804573364030822F0d820733dd6Fbc7c164E218",
+          "constructorArgs": [
+            "BAND / USD",
+            8,
+            197,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "OGN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x5a2a50E4F1D26473f0266FC5846619C9fDdB03bf",
+          "constructorArgs": [
+            "OGN / USD",
+            8,
+            198,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SNX / USD",
+          "base": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x0cfC91Db1d90332ee81760684c743E3f8D3EE31C",
+          "constructorArgs": [
+            "SNX / USD",
+            8,
+            199,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x50b5b20564F1c825b48756eC2f7EfdAea0aEFa91",
+          "constructorArgs": [
+            "MS / USD",
+            8,
+            200,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ENJ / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x83d205F8ee61D851461b7FB63aB552a11A12258D",
+          "constructorArgs": [
+            "ENJ / USD",
+            8,
+            201,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AVAX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x58CDDb942DA076f0d8cC9424C44FecCB6FA711eA",
+          "constructorArgs": [
+            "AVAX / USD",
+            8,
+            202,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FDUSD / USD",
+          "base": "0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x936aA027dC0e8b0CBFcDe2FC86bfebb6365C0BB1",
+          "constructorArgs": [
+            "FDUSD / USD",
+            8,
+            203,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SUSHI / USD",
+          "base": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xD6892019AF513419287f155189e484Abaeb59703",
+          "constructorArgs": [
+            "SUSHI / USD",
+            8,
+            204,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "LTC / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xa4aC2B46F2Da935fB392E72211549349EDd9b743",
+          "constructorArgs": [
+            "LTC / USD",
+            8,
+            205,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "TBTC / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x815c97B6c73AcD73704E024522F291e582eF832b",
+          "constructorArgs": [
+            "TBTC / USD",
+            8,
+            206,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "STRK / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xb4EA2a9185d0d632003B9E4D178Df4a82Dd1B557",
+          "constructorArgs": [
+            "STRK / USD",
+            8,
+            207,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "LINK / USD",
+          "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xf17C371e00beBF917c24170249D2D9b82D18F5bD",
+          "constructorArgs": [
+            "LINK / USD",
+            8,
+            208,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USD0 / USD",
+          "base": "0x73A15FeD60Bf67631dC6cd7Bc5B6e8da8190aCF5",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x0Dcf3A779c4439E30F87E1514976B36df78973A3",
+          "constructorArgs": [
+            "USD0 / USD",
+            8,
+            209,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "DEGEN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xA76d3552F7170d5744A4aF3148B2dCC0f3FA01aE",
+          "constructorArgs": [
+            "DEGEN / USD",
+            8,
+            210,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ZRO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3D41051a72Ad7876F88Fe45216d5Bc98400752e7",
+          "constructorArgs": [
+            "ZRO / USD",
+            8,
+            211,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CHR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xf71D1B39Ba1CB44A0c8F151a9Fa6012470fB7B25",
+          "constructorArgs": [
+            "CHR / USD",
+            8,
+            212,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SGD / USD",
+          "base": "0x00000000000000000000000000000000000002be",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x889D8cd9301679af1390a0B47859604482670Fa0",
+          "constructorArgs": [
+            "SGD / USD",
+            8,
+            213,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "THETA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xC8bd9412E0D653b1d4F978D55c4BF0acA4C890be",
+          "constructorArgs": [
+            "THETA / USD",
+            8,
+            214,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CVX / USD",
+          "base": "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x23e8052864082c86F342e06529e6048315BeaCA1",
+          "constructorArgs": [
+            "CVX / USD",
+            8,
+            215,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SRM / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xA9013Cd0A1f2b4AA8A7b1818Ec291543ca4719f8",
+          "constructorArgs": [
+            "SRM / USD",
+            8,
+            216,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "AAVE / USD",
+          "base": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x77dA654049Fda53395a4068cA4538c8cF2B5D9A4",
+          "constructorArgs": [
+            "AAVE / USD",
+            8,
+            217,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ONT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xdD2673f1D7377922DB5eBe61Edc8166E974495f2",
+          "constructorArgs": [
+            "ONT / USD",
+            8,
+            218,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MOG / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xc6db5E7daE53ac49b6fD499900e7B9F42B2D0c11",
+          "constructorArgs": [
+            "MOG / USD",
+            18,
+            219,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "OP / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x78695610fC928c0AD02f0BA0c3ab3f4B27C474bc",
+          "constructorArgs": [
+            "OP / USD",
+            8,
+            220,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CZK / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x580c528189BDD5976197873D3eD9872F3897CD26",
+          "constructorArgs": [
+            "CZK / USD",
+            8,
+            221,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "CNY / USD",
+          "base": "0x000000000000000000000000000000000000009c",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x0fE4865a72D3F5EaA7c3734eFF94ABECE5F1e63c",
+          "constructorArgs": [
+            "CNY / USD",
+            8,
+            222,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FRAX / USD",
+          "base": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x1E2dF5cfc3501558417F94da0b8Bb98067a35f98",
+          "constructorArgs": [
+            "FRAX / USD",
+            8,
+            223,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "NVDA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE0d172357e16cfc87BE49ca7bCAF62C010b9d13e",
+          "constructorArgs": [
+            "NVDA / USD",
+            8,
+            224,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "LUSD / USD",
+          "base": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x7e27f1De70B533514582830Ee5eD9B8041247366",
+          "constructorArgs": [
+            "LUSD / USD",
+            8,
+            225,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "BEAM / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2052e6BCbEd1Ef21F54ca3B2D7436d5710dC0080",
+          "constructorArgs": [
+            "BEAM / USD",
+            8,
+            226,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PENDLE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x158B6f8A0F574f431808630De7C677Fa2Ff501d6",
+          "constructorArgs": [
+            "PENDLE / USD",
+            8,
+            227,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "SLP / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x0e3eD2BBB65C9D49C4950d0702ff4ae028c3D80b",
+          "constructorArgs": [
+            "SLP / USD",
+            8,
+            228,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ASTR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2DA5336f8Ce06D37408F53B8812d5C368Baf19D3",
+          "constructorArgs": [
+            "ASTR / USD",
+            8,
+            229,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "IBTA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xc4D01035a9Cbd59B08c901C09bB544Dfdc788602",
+          "constructorArgs": [
+            "IBTA / USD",
+            8,
+            230,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "COIN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x4ae22bDAFE291CC9F444E717c8Cb4264dfEcf876",
+          "constructorArgs": [
+            "COIN / USD",
+            8,
+            231,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "VELO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x61fa377Dd9367C300600C77E379b504A15fbCE06",
+          "constructorArgs": [
+            "VELO / USD",
+            8,
+            232,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ETC / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xa0dfC4cb195bc49712fD5014A232070643A24b7C",
+          "constructorArgs": [
+            "ETC / USD",
+            8,
+            233,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "JOE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xDdF64C9C46Ea8810d88d654573e638ca1755E21c",
+          "constructorArgs": [
+            "JOE / USD",
+            8,
+            234,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FXS / USD",
+          "base": "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xaAf57F44aA668e35EB63614932a831C28EEA5B82",
+          "constructorArgs": [
+            "FXS / USD",
+            8,
+            235,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "USDT / USD",
+          "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2558f030239B950C3e27194A3c58272a05237c15",
+          "constructorArgs": [
+            "USDT / USD",
+            8,
+            236,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MBOX / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE01C6bAB0a1b8B3118f0451E7463ddb50Be17695",
+          "constructorArgs": [
+            "MBOX / USD",
+            8,
+            237,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ONE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x5DE99F4Ac256c857545628872146829740Bf6b78",
+          "constructorArgs": [
+            "ONE / USD",
+            8,
+            238,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MIMATIC / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x4EbFbf8BA3035D907aFDCe3E7D975A523C808092",
+          "constructorArgs": [
+            "MIMATIC / USD",
+            8,
+            239,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "TRB / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x492D94FbD6B4cAE8bdD2D63658E84aE517058d3b",
+          "constructorArgs": [
+            "TRB / USD",
+            8,
+            240,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "FTM / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xe9C41A465CDc8Ec27da9Ab80acefaCc27984a90d",
+          "constructorArgs": [
+            "FTM / USD",
+            8,
+            241,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "RUNE / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xdbEf367a164d91Cf8ECF56ef35fC36318DE6ff33",
+          "constructorArgs": [
+            "RUNE / USD",
+            8,
+            242,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "META / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xe414E5C354c5a95d9599BD618B4D4c48524530e5",
+          "constructorArgs": [
+            "META / USD",
+            8,
+            243,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "NEAR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x845De9E2a1852Dd2A423B037DF3F21E780981484",
+          "constructorArgs": [
+            "NEAR / USD",
+            8,
+            244,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "APT / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xA3e88eb64A54e339571BF71bD87Aa4038711738e",
+          "constructorArgs": [
+            "APT / USD",
+            8,
+            245,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PLN / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xbF2Bf8415D76E76B173D6da331532ed60Ff76c37",
+          "constructorArgs": [
+            "PLN / USD",
+            8,
+            246,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PHP / USD",
+          "base": "0x0000000000000000000000000000000000000260",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x74e2a63F2B0621A24A3505b08DA94240362A94e5",
+          "constructorArgs": [
+            "PHP / USD",
+            8,
+            247,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "KLAY / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xf79e786Dbe91F49CD0435e13eA54E681Dd6889A6",
+          "constructorArgs": [
+            "KLAY / USD",
+            8,
+            248,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "PYTH / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x383F89FD8792527510787f669055316fBC6FD411",
+          "constructorArgs": [
+            "PYTH / USD",
+            8,
+            249,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ZRX / USD",
+          "base": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xA77445c6c893137fa9F8eF272b5c1bEa80EcAD76",
+          "constructorArgs": [
+            "ZRX / USD",
+            8,
+            250,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "METIS / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xF20B7EFD97D8035A9669A3cF2bCd6B30F4616997",
+          "constructorArgs": [
+            "METIS / USD",
+            8,
+            251,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "MANA / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x8D0367B0E06F40BDEC302171cAc543313C18Ce91",
+          "constructorArgs": [
+            "MANA / USD",
+            8,
+            252,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "EUR / USD",
+          "base": "0x00000000000000000000000000000000000003d2",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x86A6c497C642E0C927D0e2bd0A04dB9d445FEa30",
+          "constructorArgs": [
+            "EUR / USD",
+            8,
+            253,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "ONG / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xAe31D54a75Eb0268397213c12c08A26bc70fAb86",
+          "constructorArgs": [
+            "ONG / USD",
+            8,
+            254,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "HBAR / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xf6914860172D2853CBBb998AC84b355D7f77f4cE",
+          "constructorArgs": [
+            "HBAR / USD",
+            8,
+            255,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        },
+        {
+          "description": "WOO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x0c78B8D225CeF0ea41d5615CA956e42Df6003Ea3",
+          "constructorArgs": [
+            "WOO / USD",
+            8,
+            256,
+            "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c"
+          ]
+        }
+      ],
+      "SafeMultisig": "0x23BC561ea93063B0cD12b6E3c690D40c93e29692"
+    }
   }
 }
