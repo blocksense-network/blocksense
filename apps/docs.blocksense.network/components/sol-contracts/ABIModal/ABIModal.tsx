@@ -17,11 +17,10 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   Drawer,
   DrawerContent,
-  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer';
+} from '@/components/common/Drawer';
 import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
 import { shikiDefaultThemes } from '@/config';
@@ -89,7 +88,7 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger asChild>
+      <DrawerTrigger>
         <section className="w-min">
           <TriggerButton tooltipContent={title} />
         </section>
@@ -103,7 +102,6 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
               formatHandler={formatHandler}
             />
           </section>
-          <DrawerDescription />
         </DrawerHeader>
         <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-md mx-4 mb-4">
           <CodeBlock
