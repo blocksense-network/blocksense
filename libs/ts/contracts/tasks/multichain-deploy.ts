@@ -39,7 +39,10 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 import { kebabToSnakeCase } from '@blocksense/base-utils/string';
 
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
-import { FeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
+import {
+  FeedsConfigSchema,
+  NewFeedsConfigSchema,
+} from '@blocksense/config-types/data-feeds-config';
 import {
   CLAggregatorAdapterData,
   ContractsConfigV2,
@@ -62,22 +65,25 @@ task('deploy', 'Deploy contracts')
 
     const { decodeJSON } = selectDirectory(configDir);
     const { feeds } = await decodeJSON(
-      { name: 'feeds_config' },
-      FeedsConfigSchema,
+      { name: 'feeds_config_new' },
+      NewFeedsConfigSchema,
     );
     const chainlinkCompatibility = await decodeJSON(
-      { name: 'chainlink_compatibility' },
+      { name: 'chainlink_compatibility_new' },
       ChainlinkCompatibilityConfigSchema,
     );
 
     const dataFeedConfig = feeds.map(feed => {
-      const { base, quote } =
-        chainlinkCompatibility.blocksenseFeedsCompatibility[feed.id]
-          .chainlink_compatibility;
+      const compatibilityData =
+        chainlinkCompatibility.blocksenseFeedsCompatibility[feed.id];
+      const { base, quote } = compatibilityData?.chainlink_compatibility ?? {
+        base: null,
+        quote: null,
+      };
       return {
         id: feed.id,
-        description: feed.description,
-        decimals: feed.decimals,
+        description: feed.full_name,
+        decimals: feed.additional_feed_info.decimals,
         base,
         quote,
       };
