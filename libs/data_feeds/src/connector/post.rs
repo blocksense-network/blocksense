@@ -33,7 +33,7 @@ pub fn generate_signature(
 
     match feed_result {
         Ok(result) => {
-            byte_buffer.extend(result.as_bytes(18));
+            byte_buffer.extend(result.as_bytes(18, timestamp as u64));
         }
         Err(error) => {
             warn!("Error parsing recvd result of vote: {}", error);
