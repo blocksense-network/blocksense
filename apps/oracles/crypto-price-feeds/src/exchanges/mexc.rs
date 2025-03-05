@@ -14,7 +14,10 @@ use crate::{
 pub struct MEXCPriceData {
     pub symbol: String,
     #[serde(deserialize_with = "as_f64")]
-    pub price: f64,
+    #[serde(rename = "lastPrice")]
+    pub last_price: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub volume: f64,
 }
 
 type MEXCPriceResponse = Vec<MEXCPriceData>;
@@ -30,11 +33,9 @@ impl PricesFetcher<'_> for MEXCPriceFetcher {
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let response = http_get_json::<MEXCPriceResponse>(
-                "https://api.mexc.com/api/v3/ticker/price",
-                None,
-            )
-            .await?;
+            let response =
+                http_get_json::<MEXCPriceResponse>("https://api.mexc.com/api/v3/ticker/24hr", None)
+                    .await?;
 
             Ok(response
                 .into_iter()
@@ -42,8 +43,8 @@ impl PricesFetcher<'_> for MEXCPriceFetcher {
                     (
                         value.symbol,
                         PricePoint {
-                            price: value.price,
-                            volume: 1.0,
+                            price: value.last_price,
+                            volume: value.volume,
                         },
                     )
                 })
