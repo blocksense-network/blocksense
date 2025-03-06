@@ -18,7 +18,8 @@
     "./Callout": "./src/components/Callout/index.tsx",
     "./Accordion": "./src/components/Accordion/index.tsx",
     "./Icon": "./src/components/Icon/index.tsx",
-    "./DropdownMenu": "./src/components/DropdownMenu/index.tsx"
+    "./DropdownMenu": "./src/components/DropdownMenu/index.tsx",
+    "./Drawer": "./src/components/Drawer/index.tsx"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.7",

@@ -20,7 +20,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/common/Drawer';
+} from '@blocksense/ui/Drawer';
 import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
 import { shikiDefaultThemes } from '@/config';

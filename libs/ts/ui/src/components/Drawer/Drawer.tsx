@@ -5,13 +5,11 @@ import React, {
   useContext,
   useState,
   useEffect,
-  MouseEvent,
   useCallback,
   ReactNode,
-  ReactElement,
 } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../utils';
 
 interface DrawerContextValue {
   isOpen: boolean;
@@ -26,10 +24,12 @@ export const Drawer = ({
   children,
   open,
   onOpenChange,
+  className,
 }: {
   children: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  className?: string;
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(open ?? false);
 
@@ -74,7 +74,7 @@ export const Drawer = ({
 
   return (
     <DrawerContext.Provider value={{ isOpen, toggleOpen: handleOpen }}>
-      {children}
+      <div className={cn(className)}>{children}</div>
     </DrawerContext.Provider>
   );
 };
