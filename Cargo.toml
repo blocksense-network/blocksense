@@ -1,7 +1,6 @@
 [workspace]
 members = [
   "apps/cli",
-  "apps/reporter",
   "apps/sequencer",
   "apps/sequencer_tests",
   "apps/trigger-oracle",
@@ -9,7 +8,6 @@ members = [
   "apps/oracles/gecko-terminal",
   "libs/anomaly_detection",
   "libs/data_feeds",
-  "libs/derive",
   "libs/prometheus",
   "libs/registry",
   "libs/sdk",

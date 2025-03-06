@@ -132,20 +132,8 @@ impl BuildConfig {
 
         let body = client.get(url.clone()).send().await?.text().await?;
 
-        //TODO(melatron): Remove this when data feeds are properly generated.
         let response_json: FeedsResponse = serde_json::from_str(&body)?;
-        config.data_feeds = response_json
-            .feeds
-            .into_iter()
-            .map(|mut feed| {
-                if feed.script == "YahooFinance" {
-                    feed.script = "yahoo".to_string();
-                } else if feed.script == "CoinMarketCap" {
-                    feed.script = "cmc".to_string();
-                }
-                feed
-            })
-            .collect();
+        config.data_feeds = response_json.feeds;
 
         Ok(())
     }

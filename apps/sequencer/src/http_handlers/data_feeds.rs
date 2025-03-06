@@ -593,7 +593,7 @@ pub mod tests {
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use config::{get_test_config_with_single_provider, SequencerConfig};
     use crypto::JsonSerializableSignature;
-    use data_feeds::connector::post::generate_signature;
+    use data_feeds::generate_signature::generate_signature;
     use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
     use regex::Regex;
     use std::collections::HashMap;

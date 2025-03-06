@@ -8,6 +8,7 @@ edition.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+blocksense-registry = { path = "../registry" }
 utils = {path = "../utils"}
 dirs = "6.0.0"
 serde = { version = "1.0.216", features = ["derive"]}

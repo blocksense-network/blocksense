@@ -9,7 +9,6 @@ edition.workspace = true
 
 [dependencies]
 prometheus = { path = "../prometheus" }
-derive = { path = "../derive"}
 utils = { path = "../utils" }
 crypto = { path = "../crypto" }
 feed_registry = { path = "../feed_registry"}

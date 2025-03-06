@@ -6,7 +6,8 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::eth::TransactionRequest,
 };
-use config::{FeedConfig, FeedStrideAndDecimals};
+use blocksense_registry::config::FeedConfig;
+use config::FeedStrideAndDecimals;
 use data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use eyre::{eyre, Result};
 use std::{collections::HashMap, mem, sync::Arc};

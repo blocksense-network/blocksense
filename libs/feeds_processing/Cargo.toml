@@ -6,6 +6,7 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
+blocksense-registry = { path = "../../libs/registry" }
 anomaly_detection = { path = "../../libs/anomaly_detection" }
 feed_registry = { path = "../feed_registry" }
 data_feeds = {path = "../data_feeds"}

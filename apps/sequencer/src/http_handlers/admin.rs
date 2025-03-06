@@ -11,8 +11,8 @@ use alloy::{
     rpc::types::eth::TransactionRequest,
 };
 
-use blocksense_registry::config::{OracleScript, OraclesResponse};
-use config::{AllFeedsConfig, FeedConfig, SequencerConfig};
+use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
+use config::{AllFeedsConfig, SequencerConfig};
 use eyre::eyre;
 use eyre::Result;
 use feed_registry::feed_registration_cmds::{
@@ -503,6 +503,30 @@ pub async fn get_oracle_scripts(
                 description: None,
                 oracle_script_wasm: "gecko_terminal_oracle.wasm".to_string(),
                 allowed_outbound_hosts: vec!["https://app.geckoterminal.com/".to_string()],
+                capabilities: HashSet::from_iter(vec![]),
+            },
+            OracleScript {
+                id: "crypto-price-feeds".to_string(),
+                name: None,
+                description: None,
+                oracle_script_wasm: "crypto-price-feeds.wasm".to_string(),
+                allowed_outbound_hosts: vec![
+                    "https://api.kraken.com".to_string(),
+                    "https://api.bybit.com".to_string(),
+                    "https://api.coinbase.com".to_string(),
+                    "https://api.exchange.coinbase.com".to_string(),
+                    "https://api1.binance.com".to_string(),
+                    "https://api.kucoin.com".to_string(),
+                    "https://api.mexc.com".to_string(),
+                    "https://api.crypto.com".to_string(),
+                    "https://api.binance.us".to_string(),
+                    "https://api.gemini.com".to_string(),
+                    "https://api-pub.bitfinex.com".to_string(),
+                    "https://api.upbit.com".to_string(),
+                    "https://api.bitget.com".to_string(),
+                    "https://api.gateio.ws".to_string(),
+                    "https://www.okx.com".to_string(),
+                ],
                 capabilities: HashSet::from_iter(vec![]),
             },
         ],
