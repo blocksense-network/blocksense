@@ -10,3 +10,4 @@ export * from './components/Callout';
 export * from './components/Drawer';
 export * from './components/Accordion';
 export * from './components/Icon';
+export * from './components/Dialog';
