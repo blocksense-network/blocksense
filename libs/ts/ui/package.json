@@ -20,7 +20,8 @@
     "./Accordion": "./src/components/Accordion/index.tsx",
     "./Icon": "./src/components/Icon/index.tsx",
     "./DropdownMenu": "./src/components/DropdownMenu/index.tsx",
-    "./Drawer": "./src/components/Drawer/index.tsx"
+    "./Drawer": "./src/components/Drawer/index.tsx",
+    "./Dialog": "./src/components/Dialog/index.tsx"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.7",

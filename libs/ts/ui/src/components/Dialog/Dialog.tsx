@@ -10,7 +10,7 @@ import React, {
   MouseEvent,
 } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../utils';
 import { Icon } from '@blocksense/ui/Icon';
 import { Button } from '@blocksense/ui/Button';
 
@@ -143,7 +143,7 @@ export const DialogContent = ({
       <div className="dialog__background fixed inset-0 bg-black opacity-75"></div>
       <section
         ref={dialogRef}
-        className="dialog__content fixed top-[15%] left-1/2 transform -translate-x-1/2 max-h-[70%] bg-white p-6 shadow-lg z-10 w-[48rem] dark:bg-neutral-900 border dark:border-neutral-600"
+        className="dialog__content fixed top-[15%] left-1/2 transform -translate-x-1/2 max-h-[80%] bg-white p-6 shadow-lg z-10 w-[48rem] dark:bg-neutral-900 border dark:border-neutral-600"
       >
         {children}
       </section>
