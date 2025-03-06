@@ -1,6 +1,6 @@
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use anyhow::{anyhow, Context, Result};
-use config::{FeedConfig, PublishCriteria};
+use config::{FeedConfig, FeedStrideAndDecimals, PublishCriteria};
 use data_feeds::feeds_processing::{
     BatchedAggegratesToSend, VotedFeedUpdate, VotedFeedUpdateWithProof,
 };
@@ -251,7 +251,7 @@ type FeedId = u32;
 type FeedTimestamp = u64;
 type FeedIdToTimetamp = HashMap<FeedId, FeedTimestamp>;
 
-pub async fn validate(
+pub async fn validate_sigcheck(
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     mut batch: ConsensusSecondRoundBatch,
     reporters_keys: HashMap<u64, PublicKey>,
@@ -397,11 +397,25 @@ pub async fn validate(
         proofs: batch.proofs,
     };
 
+    let mut strides_and_decimals = HashMap::new();
+    for update in updates_to_serialize.updates.iter() {
+        let feed_id = update.feed_id;
+        debug!("Acquiring a read lock on feeds_config; feed_id={feed_id}");
+        let feed_config = feeds_config.read().await.get(&feed_id).cloned();
+        debug!("Acquired and released a read lock on feeds_config; feed_id={feed_id}");
+
+        strides_and_decimals.insert(
+            feed_id,
+            FeedStrideAndDecimals::from_feed_config(&feed_config),
+        );
+        drop(feed_config);
+    }
+
     let calldata = match adfs_serialize_updates(
         &batch.network,
         &updates_to_serialize,
         None,
-        feeds_config,
+        strides_and_decimals,
         &mut batch.feeds_rounds,
     )
     .await
@@ -469,6 +483,129 @@ pub async fn validate(
     // Store the last updated slots per feed
     for (key, val) in feeds_newly_updated_slots {
         feeds_last_updated_slots.insert(key, val);
+    }
+
+    Ok(())
+}
+
+pub async fn validate(
+    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+    mut batch: ConsensusSecondRoundBatch,
+    last_votes: HashMap<u32, VotedFeedUpdate>,
+    tolerated_deviations: HashMap<u32, f64>,
+) -> Result<()> {
+    for update in &batch.updates {
+        let feed_id = update.feed_id;
+        let Some(reporter_vote) = last_votes.get(&feed_id) else {
+            anyhow::bail!("Failed to get latest vote for feed_id: {}", feed_id);
+        };
+
+        let update_aggregate_value = match update.value {
+            FeedType::Numerical(v) => v,
+            _ => anyhow::bail!(
+                "Non numeric value in update_aggregate_value for feed_id: {}",
+                feed_id
+            ),
+        };
+
+        let reporter_voted_value = match reporter_vote.value {
+            FeedType::Numerical(v) => v,
+            _ => anyhow::bail!(
+                "Non numeric value in reporter_vote for feed_id: {}",
+                feed_id
+            ),
+        };
+
+        let diff = (update_aggregate_value - reporter_voted_value).abs();
+
+        let tolerated_diff_percent = tolerated_deviations.get(&feed_id).unwrap_or(&0.01);
+
+        if reporter_voted_value.abs() < f64::EPSILON {
+            if update_aggregate_value > *tolerated_diff_percent {
+                anyhow::bail!("relative_diff {update_aggregate_value} between reporter_voted_value {reporter_voted_value} and update_aggregate_value {update_aggregate_value} is above {tolerated_diff_percent} for feed_id {feed_id}");
+            }
+        } else {
+            let relative_diff = diff / reporter_voted_value;
+
+            if relative_diff > *tolerated_diff_percent {
+                anyhow::bail!("relative_diff {relative_diff} between reporter_voted_value {reporter_voted_value} and update_aggregate_value {update_aggregate_value} is above {tolerated_diff_percent} for feed_id {feed_id}");
+            }
+        }
+    }
+
+    let updates_to_serialize = BatchedAggegratesToSend {
+        block_height: batch.block_height,
+        updates: batch.updates,
+        proofs: batch.proofs,
+    };
+
+    let calldata = match adfs_serialize_updates(
+        &batch.network,
+        &updates_to_serialize,
+        None,
+        feeds_config,
+        &mut batch.feeds_rounds,
+    )
+    .await
+    {
+        Ok(val) => val,
+        Err(e) => anyhow::bail!("Failed to recreate calldata: {e}"),
+    };
+
+    let calldata = match Bytes::from_hex(calldata) {
+        Ok(b) => b,
+        Err(e) => {
+            anyhow::bail!("calldata is not valid hex string: {}", e);
+        }
+    };
+
+    let contract_address = match Address::from_str(batch.contract_address.as_str()) {
+        Ok(addr) => addr,
+        Err(e) => {
+            anyhow::bail!(
+                "Non valid contract address ({}) provided: {}",
+                batch.contract_address.as_str(),
+                e
+            );
+        }
+    };
+
+    let safe_address = match Address::from_str(batch.safe_address.as_str()) {
+        Ok(addr) => addr,
+        Err(e) => {
+            anyhow::bail!(
+                "Non valid safe address ({}) provided: {}",
+                batch.contract_address.as_str(),
+                e
+            );
+        }
+    };
+    let nonce = match Uint::<256, 4>::from_str(batch.nonce.as_str()) {
+        Ok(n) => n,
+        Err(e) => {
+            anyhow::bail!("Non valid nonce ({}) provided: {}", batch.nonce.as_str(), e);
+        }
+    };
+    let safe_transaction = create_safe_tx(contract_address, calldata, nonce);
+
+    let chain_id: u64 = match batch.chain_id.as_str().parse() {
+        Ok(v) => v,
+        Err(e) => {
+            anyhow::bail!("Non valid chain_id ({}) provided: {}", batch.chain_id, e);
+        }
+    };
+
+    let tx_hash =
+        generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction.clone());
+
+    let tx_hash_str = tx_hash.to_string();
+
+    if tx_hash_str != batch.tx_hash {
+        anyhow::bail!(
+            "tx_hash mismatch, recvd: {} generated: {}",
+            batch.tx_hash,
+            tx_hash_str
+        );
     }
 
     Ok(())
