@@ -358,10 +358,20 @@ const main = async (): Promise<void> => {
         );
         balance = '0';
       } else {
-        const web3 = new Web3(rpcUrl);
-        const balanceWei = await web3.eth.getBalance(address);
-        balance = web3.utils.fromWei(balanceWei, 'ether');
+        try {
+          const web3 = new Web3(rpcUrl);
+          const balanceWei = await web3.eth.getBalance(address);
+          balance = web3.utils.fromWei(balanceWei, 'ether');
+        } catch (error: any) {
+          console.error(
+            chalk.red(
+              `Error fetching balance for ${network}: ${error.message}`,
+            ),
+          );
+          balance = '0';
+        }
       }
+
       if (gasCosts) {
         await logGasCosts(
           network,
