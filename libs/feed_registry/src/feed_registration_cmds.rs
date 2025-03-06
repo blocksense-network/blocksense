@@ -1,4 +1,4 @@
-use config::FeedConfig;
+use blocksense_registry::config::FeedConfig;
 use tokio::sync::mpsc;
 
 #[derive(Debug, Clone)]

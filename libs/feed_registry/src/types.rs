@@ -1,18 +1,17 @@
-use config::FeedConfig;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     fmt::{self, Display},
-    time::{SystemTime, UNIX_EPOCH},
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 use thiserror::Error;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::debug;
 
+use crate::aggregate::FeedAggregate;
+use blocksense_registry::config::FeedConfig;
 use crypto::{JsonSerializableSignature, Signature};
 use num::BigUint;
-
-use crate::aggregate::FeedAggregate;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Repeatability {
@@ -100,14 +99,14 @@ impl FeedMetaData {
 
     pub fn from_config(cfg: &FeedConfig) -> Self {
         Self::new(
-            cfg.name.clone(),
-            cfg.report_interval_ms,
-            cfg.quorum_percentage,
-            cfg.skip_publish_if_less_then_percentage,
-            cfg.always_publish_heartbeat_ms,
-            cfg.first_report_start_time,
+            cfg.full_name.clone(),
+            cfg.schedule.interval_ms,
+            cfg.quorum.percentage,
+            cfg.schedule.deviation_percentage,
+            cfg.schedule.heartbeat_ms,
+            UNIX_EPOCH + Duration::from_millis(cfg.schedule.first_report_start_unix_time_ms),
             cfg.value_type.clone(),
-            cfg.aggregate_type.clone(),
+            cfg.quorum.aggregation.clone(),
             None,
         )
     }
@@ -306,9 +305,9 @@ impl FeedType {
 
     pub fn get_variant_from_string(feed_type: &str) -> Result<FeedType, String> {
         let feed_type = match feed_type {
-            "Numerical" => FeedType::Numerical(0.0f64),
-            "Text" => FeedType::Text("".to_string()),
-            "Bytes" => FeedType::Bytes(vec![]),
+            "numerical" => FeedType::Numerical(0.0f64),
+            "text" => FeedType::Text("".to_string()),
+            "bytes" => FeedType::Bytes(vec![]),
             _ => {
                 return Err(format!("Unsupported feed type {feed_type}"));
             }

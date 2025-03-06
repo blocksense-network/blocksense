@@ -1,6 +1,7 @@
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use anyhow::{anyhow, Context, Result};
-use config::{FeedConfig, FeedStrideAndDecimals, PublishCriteria};
+use blocksense_registry::config::FeedConfig;
+use config::{FeedStrideAndDecimals, PublishCriteria};
 use data_feeds::feeds_processing::{
     BatchedAggegratesToSend, VotedFeedUpdate, VotedFeedUpdateWithProof,
 };
