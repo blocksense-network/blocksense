@@ -2397,6 +2397,7 @@ dependencies = [
  "reqwest-retry",
  "serde 1.0.217",
  "serde_json",
+ "serde_path_to_error",
  "tokio 1.43.0",
  "toml 0.8.19",
  "toml_edit 0.22.22",
@@ -3038,6 +3039,7 @@ name = "config"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "blocksense-registry",
  "dirs 6.0.0",
  "hex",
  "serde 1.0.217",
@@ -3619,7 +3621,6 @@ dependencies = [
  "config 0.1.1",
  "crypto",
  "curl",
- "derive",
  "dirs 6.0.0",
  "erased-serde",
  "feed_registry",
@@ -3691,15 +3692,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "derive"
-version = "0.1.1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.96",
 ]
 
 [[package]]
@@ -4330,6 +4322,7 @@ name = "feed_registry"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "blocksense-registry",
  "chrono",
  "config 0.1.1",
  "crypto",
@@ -8520,20 +8513,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
-name = "reporter"
-version = "0.1.1"
-dependencies = [
- "config 0.1.1",
- "data_feeds",
- "feed_registry",
- "prometheus 0.1.1",
- "serde_json",
- "tokio 1.43.0",
- "tracing-subscriber",
- "utils",
-]
-
-[[package]]
 name = "reqwest"
 version = "0.10.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9329,6 +9308,7 @@ dependencies = [
  "alloy-encode-packed",
  "alloy-primitives",
  "anomaly_detection",
+ "anyhow",
  "async-channel 2.3.1",
  "blockchain_data_model",
  "blocksense-registry",

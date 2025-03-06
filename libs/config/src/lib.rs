@@ -1,10 +1,11 @@
+use blocksense_registry::config::FeedConfig;
 use hex::decode;
-use serde::{de, Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::path::Path;
 use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
-use tracing::{info, trace};
+use tracing::info;
 use utils::constants::{
     FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
 };
@@ -26,118 +27,54 @@ pub trait Validated {
     fn validate(&self, context: &str) -> anyhow::Result<()>;
 }
 
-/// Custom deserializator for the `resources` object in the FeedsConfig. Skips all non-string parsable items
-fn deserialize_resources_as_string<'de, D>(
-    deserializer: D,
-) -> Result<HashMap<String, String>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let raw_map: HashMap<String, serde_json::Value> = HashMap::deserialize(deserializer)?;
-
-    let mut string_map: HashMap<String, String> = HashMap::new();
-
-    for (key, value) in raw_map {
-        // Convert each value to a String, regardless of its original type
-        let value_as_string = match value {
-            serde_json::Value::String(s) => s,
-            serde_json::Value::Number(n) => n.to_string(),
-            serde_json::Value::Bool(b) => b.to_string(),
-            _ => {
-                return Err(de::Error::custom(
-                    "Expected string, number, or boolean for value",
-                ))
-            }
-        };
-
-        string_map.insert(key, value_as_string);
-    }
-
-    trace!("[FeedConfig] Resources: \n{:?}", string_map);
-
-    Ok(string_map)
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
-pub struct FeedConfig {
-    pub id: u32,
-    pub name: String,
-    #[serde(rename = "fullName")] // rename for naming convention
-    pub full_name: String,
-    pub description: String,
-    #[serde(rename = "type")] // rename because of reserved keyword
-    pub _type: String,
-    pub decimals: u8,
-    pub pair: AssetPair,
-    pub report_interval_ms: u64,
-    pub first_report_start_time: SystemTime,
-    #[serde(deserialize_with = "deserialize_resources_as_string")]
-    pub resources: HashMap<String, String>, // TODO(snikolov): Find best way to handle various types of resource data
-    pub quorum_percentage: f32, // The percentage of votes needed to aggregate and post result to contract.
-    #[serde(default = "skip_publish_if_less_then_percentage_default")]
-    pub skip_publish_if_less_then_percentage: f32,
-    #[serde(default)]
-    pub always_publish_heartbeat_ms: Option<u128>,
-    pub script: String,
-    pub value_type: String,
-    pub aggregate_type: String,
-    pub stride: u16,
-}
-
-fn skip_publish_if_less_then_percentage_default() -> f32 {
-    0.0
-}
-
-impl FeedConfig {
-    pub fn compare(left: &FeedConfig, right: &FeedConfig) -> std::cmp::Ordering {
-        left.id.cmp(&right.id)
-    }
-}
-
 impl Validated for FeedConfig {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
         let range_percentage = 0.0f32..=100.0f32;
-        if self.report_interval_ms == 0 {
+        if self.schedule.interval_ms == 0 {
             anyhow::bail!(
                 "{}: report_interval_ms for feed {} with id {} cannot be set to 0",
                 context,
-                self.name,
+                self.full_name,
                 self.id
             );
         }
-        if !range_percentage.contains(&self.quorum_percentage) {
+
+        if !range_percentage.contains(&self.quorum.percentage) {
             anyhow::bail!(
                 "{}: quorum_percentage for feed {} with id {} must be between {} and {}",
                 context,
-                self.name,
+                self.full_name,
                 self.id,
                 range_percentage.start(),
                 range_percentage.end(),
             );
         }
-        if !range_percentage.contains(&self.skip_publish_if_less_then_percentage) {
+
+        if !range_percentage.contains(&self.schedule.deviation_percentage) {
             anyhow::bail!(
             "{}: skip_publish_if_less_then_percentage for feed {} with id {} must be between {} and {}",
             context,
-            self.name,
+            self.full_name,
             self.id,
             range_percentage.start(),
             range_percentage.end(),
         );
         }
-        if self.skip_publish_if_less_then_percentage > 0.0f32 {
+
+        if self.schedule.deviation_percentage > 0.0f32 {
             info!(
                 "{}: Skipping updates in feed {} with id {} that deviate less then {} %",
-                context, self.name, self.id, self.skip_publish_if_less_then_percentage,
+                context, self.full_name, self.id, self.schedule.deviation_percentage,
             );
         }
-        if let Some(value) = self.always_publish_heartbeat_ms {
+
+        if let Some(value) = self.schedule.heartbeat_ms {
             let max_always_publis_heartbeat_ms = 24 * 60 * 60 * 1000;
             if value > max_always_publis_heartbeat_ms {
                 anyhow::bail!(
                     "{}: always_publish_heartbeat_ms for feed {} with id {} must be less then {} ms",
                     context,
-                    self.name,
+                    self.full_name,
                     self.id,
                     max_always_publis_heartbeat_ms,
                 );
