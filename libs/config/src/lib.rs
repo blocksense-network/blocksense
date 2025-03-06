@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use std::path::Path;
 use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
-use tracing::{info, trace};
+use tracing::{info, trace, warn};
 use utils::constants::{
     FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
 };
@@ -144,6 +144,33 @@ impl Validated for FeedConfig {
             }
         };
         Ok(())
+    }
+}
+
+pub struct FeedStrideAndDecimals {
+    pub stride: u16,
+    pub decimals: u8,
+}
+
+impl FeedStrideAndDecimals {
+    pub fn from_feed_config(feed_config: &Option<FeedConfig>) -> FeedStrideAndDecimals {
+        let stride = match &feed_config {
+            Some(f) => f.stride,
+            None => {
+                warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size.");
+                1
+            }
+        };
+
+        let decimals = match &feed_config {
+            Some(f) => f.decimals,
+            None => {
+                warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
+                18
+            }
+        };
+
+        FeedStrideAndDecimals { stride, decimals }
     }
 }
 
