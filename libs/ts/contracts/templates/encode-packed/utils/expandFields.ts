@@ -4,7 +4,7 @@ import {
   ExpandedFieldOrArray,
   PrimitiveField,
   TupleField,
-} from './types';
+} from '../../utils';
 
 export const expandFields = (values: ComponentField): ExpandedField[] => {
   const expandedField = values.map(field => {

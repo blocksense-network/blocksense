@@ -41,3 +41,18 @@ export type Struct = {
   name: string;
   fields: PrimitiveField[];
 };
+
+export type Schema = {
+  isBasic: boolean;
+  isDynamic: boolean;
+  type: string;
+  typeName: string;
+  fixedSize: number;
+  fixedEnd: boolean;
+  length?: number;
+  fieldName?: string;
+  fields?: Schema[];
+  isFixedLen?: boolean[];
+  fieldRangesFixedLen?: { start: number; end: number }[];
+  variableOffsetsPosition?: number[];
+};
