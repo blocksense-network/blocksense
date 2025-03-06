@@ -1,3 +1,5 @@
+'use client';
+
 import React, {
   useState,
   useRef,
@@ -8,9 +10,10 @@ import React, {
   ReactNode,
   RefObject,
   MouseEvent,
+  ButtonHTMLAttributes,
 } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../utils';
 import { Icon } from '@blocksense/ui/Icon';
 import { Button } from '@blocksense/ui/Button';
 
@@ -140,10 +143,10 @@ export const DialogContent = ({
       aria-modal="true"
       {...props}
     >
-      <div className="dialog__background fixed inset-0 bg-black opacity-75"></div>
+      <div className="dialog__background fixed inset-0 bg-black opacity-75" />
       <section
         ref={dialogRef}
-        className="dialog__content fixed top-[15%] left-1/2 transform -translate-x-1/2 max-h-[70%] bg-white p-6 shadow-lg z-10 w-[48rem] dark:bg-neutral-900 border dark:border-neutral-600"
+        className="dialog__content fixed top-[15%] left-1/2 transform -translate-x-1/2 max-h-[80%] bg-white p-6 shadow-lg z-10 w-[48rem] dark:bg-neutral-900 border dark:border-neutral-600"
       >
         {children}
       </section>
@@ -182,13 +185,7 @@ export const DialogDescription = ({
   children,
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) => (
-  <p
-    className={cn(
-      'dialog__description text-sm text-muted-foreground',
-      className,
-    )}
-    {...props}
-  >
+  <p className={cn('dialog__description text-sm', className)} {...props}>
     {children}
   </p>
 );
@@ -206,21 +203,16 @@ export const DialogFooter = ({
   </footer>
 );
 
-type DialogCloseProps = {
-  children: ReactNode;
-};
-
-export const DialogClose = ({ children }: DialogCloseProps) => {
+export const DialogClose = ({
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement>) => {
   const { handleClose } = useContext(DialogContext);
-
-  const handleClick = () => {
-    handleClose();
-  };
 
   return (
     <Button
-      onClick={handleClick}
+      onClick={handleClose}
       className="dialog__close-btn p-0 h-4 absolute top-4 right-4 text-gray-700 hover:text-gray-900 border border-gray-200 rounded-xs"
+      {...props}
     >
       <Icon
         className="h-4 w-4"
@@ -231,7 +223,6 @@ export const DialogClose = ({ children }: DialogCloseProps) => {
         }}
         ariaLabel="Escape"
       />
-      <span className="sr-only">{children}</span>
     </Button>
   );
 };
