@@ -50,6 +50,7 @@
         oracle-scripts = {
           cmc-wasm = mkOracleScript "cmc";
           yahoo-wasm = mkOracleScript "yahoo";
+          exsat-wasm = mkOracleScript "exsat_network";
         };
 
         spinPlugins = {
