@@ -3,7 +3,7 @@ import {
   ExpandedField,
   ExpandedFieldOrArray,
   GenerateDecoderConfig,
-} from '../utils';
+} from '../../utils';
 import { generateDecoderDynamicDataLines } from './dynArrayStringBytes';
 import { generateDecoderFixedBytesLines } from './fixedBytesField';
 import { generateDecoderPrimitiveLines } from './primitiveField';
