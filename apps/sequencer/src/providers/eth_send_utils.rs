@@ -6,7 +6,7 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::eth::TransactionRequest,
 };
-use config::FeedConfig;
+use blocksense_registry::config::FeedConfig;
 use data_feeds::feeds_processing::VotedFeedUpdate;
 use eyre::{eyre, Result};
 use std::{collections::HashMap, mem, sync::Arc};
@@ -64,7 +64,7 @@ async fn legacy_serialize_updates(
         let feed_config = feeds_config.read().await.get(&feed_id).cloned();
 
         let digits_in_fraction = match &feed_config {
-            Some(f) => f.decimals,
+            Some(f) => f.additional_feed_info.decimals,
             None => {
                 warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
                 18

@@ -111,9 +111,9 @@ impl Debug for FeedAggregate {
 
 pub fn get_aggregator(aggredate_type: &str) -> FeedAggregate {
     match aggredate_type {
-        "Median" => FeedAggregate::MedianAggregator,
-        "Majority" => FeedAggregate::MajorityVoteAggregator,
-        "Average" => FeedAggregate::AverageAggregator,
+        "median" => FeedAggregate::MedianAggregator,
+        "majority" => FeedAggregate::MajorityVoteAggregator,
+        "average" => FeedAggregate::AverageAggregator,
         _ => panic!("Unknown aggregate type: {}", aggredate_type),
     }
 }
