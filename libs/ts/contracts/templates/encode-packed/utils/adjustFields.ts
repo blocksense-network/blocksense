@@ -1,4 +1,4 @@
-import { ExpandedField, ExpandedFieldOrArray } from './types';
+import { ExpandedField, ExpandedFieldOrArray } from '../../utils';
 
 export const calculateFieldShift = (fields: ExpandedField[]) => {
   let prevSizeSum = 0;
