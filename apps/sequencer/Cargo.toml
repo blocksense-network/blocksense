@@ -49,6 +49,7 @@ tokio = { workspace = true }
 chrono = { workspace = true }
 
 # misc
+anyhow = "1"
 eyre = "0.6.12"
 actix-web = "4.6.0"
 actix-multipart = "0.7.2"

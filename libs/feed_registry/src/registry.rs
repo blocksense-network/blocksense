@@ -12,6 +12,7 @@ use ringbuf::{
     traits::{Consumer, RingBuffer},
     HeapRb, SharedRb,
 };
+use std::time::UNIX_EPOCH;
 use tokio::{sync::RwLock, time};
 use tracing::{debug, info};
 use utils::time::current_unix_time;
@@ -102,14 +103,14 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
         fmdr.push(
             feed.id,
             FeedMetaData::new(
-                &feed.name,
-                feed.report_interval_ms,
-                feed.quorum_percentage,
-                feed.skip_publish_if_less_then_percentage,
-                feed.always_publish_heartbeat_ms,
-                feed.first_report_start_time,
+                &feed.full_name,
+                feed.schedule.interval_ms,
+                feed.quorum.percentage,
+                feed.schedule.deviation_percentage,
+                feed.schedule.heartbeat_ms,
+                UNIX_EPOCH + Duration::from_millis(feed.schedule.first_report_start_unix_time_ms),
                 feed.value_type.clone(),
-                feed.aggregate_type.clone(),
+                feed.quorum.aggregation.clone(),
                 None, // Will be filled once FeedsSlotsManager is started and processors are up and running.
             ),
         );

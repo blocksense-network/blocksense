@@ -1,14 +1,12 @@
 [workspace]
 members = [
   "apps/cli",
-  "apps/reporter",
   "apps/sequencer",
   "apps/sequencer_tests",
   "apps/trigger-oracle",
   "apps/oracles/crypto-price-feeds",
   "libs/anomaly_detection",
   "libs/data_feeds",
-  "libs/derive",
   "libs/prometheus",
   "libs/registry",
   "libs/sdk",

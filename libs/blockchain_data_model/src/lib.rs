@@ -3,20 +3,17 @@ pub mod in_mem_db;
 use anyhow::Result;
 use ssz_rs::prelude::*;
 
-type HashType = [u8; 32];
-pub type FeedIdChunk = [u8; 4];
-pub type DataChunk = [u8; 32];
+pub const DATA_CHUNK_SIZE: usize = 32;
+pub const KEY_CHUNK_SIZE: usize = 32;
+type HashType = [u8; DATA_CHUNK_SIZE];
+pub type FeedIdChunk = [u8; KEY_CHUNK_SIZE];
+pub type DataChunk = [u8; DATA_CHUNK_SIZE];
+pub type Resources = [Option<DataChunk>; DATA_CHUNK_SIZE];
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct AssetPair {
     pub base: DataChunk,
     pub quote: DataChunk,
-}
-
-#[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
-pub struct Resources {
-    pub resource_keys: [Option<DataChunk>; 32],
-    pub resource_values: [Option<DataChunk>; 32],
 }
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]

@@ -36009,6 +36009,38 @@
           "chainlink": "TUSD / USD"
         }
       }
+    },
+    {
+      "id": 686,
+      "full_name": "Exsat network bitcoin wallet total holdings in satoshi",
+      "description": "ExSat / sats",
+      "type": "price-feed",
+      "oracle_id": "exsat",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 86400000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "Exsat",
+          "quote": "satoshi"
+        },
+        "decimals": 0,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {},
+      },
+      "compatibility_info": {
+          "chainlink": "TUSD / USD"
+        }
     }
   ]
 }

@@ -16,7 +16,7 @@ use crypto::JsonSerializableSignature;
 use curl::easy::Handler;
 use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
-use data_feeds::connector::post::generate_signature;
+use data_feeds::generate_signature::generate_signature;
 use eyre::Result;
 use feed_registry::registry::await_time;
 use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
@@ -118,8 +118,8 @@ async fn spawn_sequencer(
         .expect("Feeds array empty!")
         .clone();
     feed.id = 1;
-    feed.report_interval_ms = 3000;
-    feed.quorum_percentage = 0.1;
+    feed.schedule.interval_ms = 3000;
+    feed.quorum.percentage = 0.1;
 
     let feeds = json!({
         "feeds": [

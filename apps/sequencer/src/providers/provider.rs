@@ -189,7 +189,8 @@ impl RpcProvider {
             debug!("Registering feed for network; feed={f:?}; network={network}");
             match FeedType::get_variant_from_string(f.value_type.as_str()) {
                 Ok(variant) => {
-                    feeds_variants.insert(f.id, (variant, f.decimals as usize));
+                    feeds_variants
+                        .insert(f.id, (variant, f.additional_feed_info.decimals as usize));
                 }
                 _ => {
                     error!("Unknown feed value variant = {}", f.value_type);
