@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { TupleField, PrimitiveField } from './types';
+import { TupleField, PrimitiveField } from '../../utils';
 
 export const processFieldsAndEncodeData = (
   fields: (PrimitiveField | TupleField)[],
