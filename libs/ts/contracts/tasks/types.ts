@@ -14,6 +14,7 @@ export interface NetworkConfig {
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
   deployReadAccessControl: boolean;
+  deployCLAdapters: boolean;
   readWhitelistAddresses: EthereumAddress[];
   adminMultisig: MultisigConfig;
   safeAddresses: {

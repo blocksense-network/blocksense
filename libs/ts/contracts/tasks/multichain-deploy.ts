@@ -140,10 +140,9 @@ task('deploy', 'Deploy contracts')
         'address',
         config.deployReadAccessControl ? 'address' : '',
       ].filter(str => str !== '');
-      const adfsData = [
-        accessControlAddress,
-        config.deployReadAccessControl,
-      ].filter(str => str !== '');
+      const adfsData = [accessControlAddress, readAccessControlAddress].filter(
+        str => str !== '',
+      );
 
       const adfsAddress = await predictAddress(
         artifacts,
@@ -186,32 +185,6 @@ task('deploy', 'Deploy contracts')
           salt: proxySalt,
           value: 0n,
         },
-        {
-          name: ContractNames.CLFeedRegistryAdapter,
-          argsTypes: ['address', 'address'],
-          argsValues: [adminMultisigAddress, upgradeableProxyAddress],
-          salt: ethers.id('registry'),
-          value: 0n,
-        },
-        ...dataFeedConfig.map(data => {
-          return {
-            name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
-            argsValues: [
-              data.description,
-              data.decimals,
-              data.id,
-              upgradeableProxyAddress,
-            ],
-            salt: ethers.id('aggregator'),
-            value: 0n,
-            feedRegistryInfo: {
-              description: data.description,
-              base: data.base,
-              quote: data.quote,
-            },
-          };
-        }),
       ];
 
       if (config.deployReadAccessControl) {
@@ -223,6 +196,38 @@ task('deploy', 'Deploy contracts')
           salt: readAccessControlSalt,
           value: 0n,
         });
+      }
+
+      if (config.deployCLAdapters) {
+        contracts.push({
+          name: ContractNames.CLFeedRegistryAdapter,
+          argsTypes: ['address', 'address'],
+          argsValues: [adminMultisigAddress, upgradeableProxyAddress],
+          salt: ethers.id('registry'),
+          value: 0n,
+        });
+
+        contracts.push(
+          ...dataFeedConfig.map(data => {
+            return {
+              name: ContractNames.CLAggregatorAdapter as const,
+              argsTypes: ['string', 'uint8', 'uint32', 'address'],
+              argsValues: [
+                data.description,
+                data.decimals,
+                data.id,
+                upgradeableProxyAddress,
+              ],
+              salt: ethers.id('aggregator'),
+              value: 0n,
+              feedRegistryInfo: {
+                description: data.description,
+                base: data.base,
+                quote: data.quote,
+              },
+            };
+          }),
+        );
       }
 
       let sequencerMultisig: Safe | undefined;
@@ -273,12 +278,14 @@ task('deploy', 'Deploy contracts')
       console.log(`// balance: ${signerBalancePost} //`);
       console.log(`// balance diff: ${signerBalance - signerBalancePost} //`);
 
-      await registerCLAggregatorAdapters(
-        config,
-        adminMultisig,
-        deployData,
-        artifacts,
-      );
+      if (config.deployCLAdapters) {
+        await registerCLAggregatorAdapters(
+          config,
+          adminMultisig,
+          deployData,
+          artifacts,
+        );
+      }
 
       await setupAccessControl(
         config,
@@ -423,6 +430,13 @@ export const initChain = async (
         .map(address => parseEthereumAddress(address))
     : [];
 
+  const deployCLAdapters = JSON.parse(
+    getOptionalEnvString(
+      'DEPLOY_CL_ADAPTERS_' + kebabToSnakeCase(networkName),
+      'true',
+    ),
+  );
+
   return {
     rpc,
     provider,
@@ -434,6 +448,7 @@ export const initChain = async (
     },
     deployWithSequencerMultisig: deploySequencerMultisig,
     deployReadAccessControl,
+    deployCLAdapters,
     readWhitelistAddresses,
     adminMultisig: {
       signer: admin,
@@ -717,7 +732,7 @@ const setupAccessControl = async (
   );
   if (sequencerMultisig) {
     const isSequencerSet = await guard.getSequencerRole(
-      config.sequencerMultisig.signer.address,
+      getEnvString('SEQUENCER_ADDRESS'),
     );
 
     if (!isSequencerSet) {
