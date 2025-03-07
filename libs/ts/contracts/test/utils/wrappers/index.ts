@@ -1,5 +1,6 @@
 import { IADFSWrapper } from './interfaces/IADFSWrapper';
 import { ADFSWrapper } from './adfs/ADFS';
+import { ADFSReadACWrapper } from './adfs/ADFSReadAC';
 import { ADFSBaseWrapper } from './adfs/ADFSBase';
 import { ADFSBaseGenericWrapper } from './adfs/ADFSBaseGeneric';
 import { ADFSGenericWrapper } from './adfs/ADFSGeneric';
@@ -17,6 +18,7 @@ import { RegistryWrapper } from './oracle/registry/Base';
 export {
   IADFSWrapper,
   ADFSWrapper,
+  ADFSReadACWrapper,
   ADFSBaseWrapper,
   ADFSBaseGenericWrapper,
   ADFSGenericWrapper,
