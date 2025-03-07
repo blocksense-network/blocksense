@@ -346,7 +346,17 @@ const main = async (): Promise<void> => {
       );
     if (transactions.length > 1) {
       const hoursBetweenFirstLastTx = getHourDifference(transactions);
-      const gasCosts = calculateGasCosts(hoursBetweenFirstLastTx, transactions);
+      let gasCosts;
+      try {
+        gasCosts = calculateGasCosts(hoursBetweenFirstLastTx, transactions);
+      } catch (error: any) {
+        console.error(
+          chalk.red(
+            `Error calculating gas costs for ${network}: ${error.message}`,
+          ),
+        );
+        continue;
+      }
       const rpcUrl = getOptionalRpcUrl(network);
       var balance: string;
 
