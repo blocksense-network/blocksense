@@ -210,10 +210,7 @@ pub async fn adfs_serialize_updates(
 
 #[cfg(test)]
 pub mod tests {
-
-    use std::time::SystemTime;
-
-    use config::AssetPair;
+    use config::test_feed_config;
     use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::FeedType;
 
@@ -245,32 +242,6 @@ pub mod tests {
             proofs: HashMap::new(),
         };
 
-        // Helper function to create FeedConfig
-        fn create_feed_config(id: u32, stride: u16) -> FeedConfig {
-            FeedConfig {
-                id,
-                name: "BTC".to_string(),
-                full_name: "Bitcoin".to_string(),
-                description: "A Peer-to-Peer Electronic Cash System".to_string(),
-                _type: "String".to_string(),
-                decimals: 18,
-                pair: AssetPair {
-                    base: "BTC".to_string(),
-                    quote: "USD".to_string(),
-                },
-                report_interval_ms: 50_000,
-                first_report_start_time: SystemTime::now(),
-                resources: HashMap::new(),
-                quorum_percentage: 0.6,
-                skip_publish_if_less_then_percentage: 0.1,
-                always_publish_heartbeat_ms: None,
-                script: "String".to_string(),
-                value_type: "String".to_string(),
-                aggregate_type: "String".to_string(),
-                stride,
-            }
-        }
-
         // Helper function to set round metrics (number of updates for a feed for a network)
         fn set_round_metric(feeds_metrics: &mut FeedsMetrics, feed_id: &str, net: &str, val: u64) {
             feeds_metrics
@@ -295,11 +266,11 @@ pub mod tests {
         }
 
         let config = HashMap::from([
-            (1, create_feed_config(1, 1)),
-            (2, create_feed_config(2, 0)),
-            (3, create_feed_config(3, 0)),
-            (4, create_feed_config(4, 0)),
-            (5, create_feed_config(5, 0)),
+            (1, test_feed_config(1, 1)),
+            (2, test_feed_config(2, 0)),
+            (3, test_feed_config(3, 0)),
+            (4, test_feed_config(4, 0)),
+            (5, test_feed_config(5, 0)),
         ]);
 
         let feeds_metrics = static_feeds_metrics(net);
