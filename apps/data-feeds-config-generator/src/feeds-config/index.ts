@@ -29,6 +29,7 @@ import {
 } from '../data-services/chainlink_feeds';
 import { SimplifiedFeed } from './types';
 import { addDataProviders, stableCoins } from './data-providers';
+import { selectDirectory } from '@blocksense/base-utils/fs';
 
 function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,
@@ -71,9 +72,11 @@ function chainLinkFileNameIsNotTestnet(fileName: string) {
 async function isFeedDataSameOnChain(
   networkName: NetworkName,
   feedInfo: ChainLinkFeedInfo,
-  web3: Web3 = new Web3(getRpcUrl(networkName)),
 ): Promise<boolean> {
   const chainLinkContractAddress = feedInfo.contractAddress;
+  console.log('WENT HERE aaaa');
+  let web3: Web3 = new Web3(getRpcUrl(networkName));
+  console.log('WENT HERE ccc');
 
   const chainLinkContract = new web3.eth.Contract(
     ChainLinkAbi,
@@ -104,6 +107,7 @@ async function checkOnChainData(
   rawDataFeedsOnMainnets: any[],
   feeds: SimplifiedFeed[],
 ) {
+  console.log('WENT HERE dasdas');
   let flatedNonTestnetSupportedFeeds = rawDataFeedsOnMainnets
     .filter(([feedName, _feedData]) =>
       feeds.some(feed => feed.description === feedName),
@@ -121,6 +125,7 @@ async function checkOnChainData(
     })
     .filter(x => x.network && !isTestnet(x.network));
 
+  console.log('WENT HERE bbbb');
   if (
     !(await everyAsync(flatedNonTestnetSupportedFeeds, x =>
       isFeedDataSameOnChain(
@@ -217,7 +222,7 @@ function removeUnsupportedRateDataFeeds(
     'exchange rate',
     'exchange-rate',
     'calculated',
-    'refprice',
+    // 'refprice',
     'marketcap',
   ];
 
@@ -250,7 +255,7 @@ export async function generateFeedConfig(
 
   // Add providers data to the feeds and filter out feeds without providers
   const dataFeedsWithCryptoResources = (
-    await addDataProviders(dataFeedsWithStableCoinVariants)
+    await addDataProviders(supportedCLFeeds)
   ).filter(
     dataFeed =>
       Object.keys(dataFeed.additional_feed_info.arguments).length !== 0,
@@ -296,6 +301,16 @@ export async function generateFeedConfig(
     };
     return feed;
   });
+
+  const { writeJSON } = selectDirectory(
+    '/home/emilivanichkov/code/repos/metacraft-labs/blocksense/monorepo/apps/data-feeds-config-generator',
+  );
+
+  const names = feeds.map(feed => {
+    return feed.full_name;
+  });
+
+  await writeJSON({ content: names, name: 'feeds_names_new' });
 
   return { feeds: feeds };
 }

@@ -155,6 +155,20 @@ export function getBaseQuote(data: AggregatedFeedInfo): Pair {
   const pair = getFieldFromAggregatedData(data, 'pair');
   const name = getFieldFromAggregatedData(data, 'name');
 
+  if (
+    docsBase &&
+    docsQuote &&
+    pair &&
+    pair.length === 2 &&
+    pair[0] &&
+    pair[1] &&
+    (docsBase !== pair[0] || docsQuote !== pair[1])
+  ) {
+    console.warn(
+      `⚠️ Inconsistent data for feed ${name}: docs.baseAsset=${docsBase}, docs.quoteAsset=${docsQuote}, pair=${pair}`,
+    );
+    return createPair('', '');
+  }
   if (docsBase && docsQuote) {
     return createPair(docsBase, docsQuote);
   }
@@ -285,9 +299,29 @@ export async function getAllProposedFeedsRegistryEvents(
 
   const registryContract = new web3.eth.Contract(abi, feedRegistryAddress);
 
+  const transactionReceipt =
+    await web3.eth.getTransactionReceipt(feedRegistryAddress);
+
+  if (!transactionHash) {
+    throw new Error(
+      `No transaction found for contract address ${contractAddress}`,
+    );
+  }
+
+  // Get the transaction receipt
+  const receipt = await web3.eth.getTransactionReceipt(transactionHash);
+
+  if (!receipt) {
+    throw new Error(`No receipt found for transaction hash ${transactionHash}`);
+  }
+
+  // Extract the block number from the transaction receipt
+  const blockNumber = transactionReceipt.blockNumber;
+
+  console.log(registryContract);
   const proposedFeeds = (
     await registryContract.getPastEvents('FeedConfirmed', {
-      fromBlock: 0,
+      fromBlock: 500000,
       toBlock: 'latest',
     })
   )
