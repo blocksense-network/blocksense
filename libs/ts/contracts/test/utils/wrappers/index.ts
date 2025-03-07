@@ -7,6 +7,7 @@ import { ADFSGenericWrapper } from './adfs/ADFSGeneric';
 import { AccessControlWrapper } from './adfs/AccessControl';
 import { UpgradeableProxyADFSBaseWrapper } from './adfs/UpgradeableProxyBase';
 import { UpgradeableProxyADFSWrapper } from './adfs/UpgradeableProxy';
+import { UpgradeableProxyADFSReadACWrapper } from './adfs/UpgradeableProxyReadAC';
 import { UpgradeableProxyADFSGenericWrapper } from './adfs/UpgradeableProxyGeneric';
 import { CLBaseWrapper } from './chainlink/Base';
 import { CLAdapterWrapper } from './chainlink/CLAdapter';
@@ -27,6 +28,7 @@ export {
   // upgradeable
   UpgradeableProxyADFSBaseWrapper,
   UpgradeableProxyADFSWrapper,
+  UpgradeableProxyADFSReadACWrapper,
   UpgradeableProxyADFSGenericWrapper,
 
   // chainlink adapters
