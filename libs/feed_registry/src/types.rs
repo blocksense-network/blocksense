@@ -63,8 +63,8 @@ impl FeedMetaData {
             always_publish_heartbeat_ms,
             first_report_start_time,
             feed_aggregator: FeedAggregate::MajorityVoteAggregator,
-            value_type: "Text".to_string(),
-            aggregate_type: "Average".to_string(),
+            value_type: "text".to_string(),
+            aggregate_type: "average".to_string(),
             processor_cmd_chan: None,
         }
     }

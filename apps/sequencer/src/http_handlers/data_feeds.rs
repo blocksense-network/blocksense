@@ -585,10 +585,8 @@ pub mod tests {
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
     use alloy::primitives::Address;
-    use config::get_test_config_with_no_providers;
     use config::AllFeedsConfig;
-    use config::AssetPair;
-    use config::FeedConfig;
+    use config::{get_test_config_with_no_providers, test_feed_config};
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use config::{get_test_config_with_single_provider, SequencerConfig};
@@ -609,7 +607,7 @@ pub mod tests {
         let metrics_prefix = Some("post_report_from_unknown_reporter_fails_with_401_");
 
         let sequencer_config: SequencerConfig = get_test_config_with_no_providers();
-        let feed_1_config = some_feed_config_with_id_1();
+        let feed_1_config = test_feed_config(1, 0);
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };
@@ -1026,36 +1024,11 @@ pub mod tests {
         );
     }
 
-    pub fn some_feed_config_with_id_1() -> FeedConfig {
-        FeedConfig {
-            id: 1,
-            name: "BTC".to_string(),
-            full_name: "Bitcoin".to_string(),
-            description: "A Peer-to-Peer Electronic Cash System".to_string(),
-            decimals: 10,
-            _type: "Crypto".to_string(),
-            pair: AssetPair {
-                base: "BTC".to_string(),
-                quote: "USD".to_string(),
-            },
-            report_interval_ms: 300,
-            first_report_start_time: SystemTime::now(),
-            resources: HashMap::from([]),
-            quorum_percentage: 1.0f32,
-            skip_publish_if_less_then_percentage: 0.0f32,
-            always_publish_heartbeat_ms: None,
-            script: "script".to_string(),
-            value_type: "Numerical".to_string(),
-            aggregate_type: "Average".to_string(),
-            stride: 0,
-        }
-    }
-
     #[actix_web::test]
     async fn test_get_last_published_value_and_timestamp_registered_feed_id_no_data() {
         let sequencer_config = get_test_config_with_no_providers();
         let all_feeds_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
 
         let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
@@ -1111,7 +1084,7 @@ pub mod tests {
 
         let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
         let all_feeds_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
 
         let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
@@ -1176,7 +1149,7 @@ pub mod tests {
 
         let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
         let all_feeds_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
 
         let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(

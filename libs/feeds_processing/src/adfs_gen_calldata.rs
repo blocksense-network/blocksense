@@ -202,7 +202,6 @@ pub async fn adfs_serialize_updates(
 
 #[cfg(test)]
 pub mod tests {
-
     use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::FeedType;
 

@@ -1,10 +1,12 @@
-use blocksense_registry::config::FeedConfig;
+use blocksense_registry::config::{
+    CompatibilityInfo, FeedConfig, FeedQuorum, FeedSchedule, PriceFeedInfo,
+};
 use hex::decode;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 use std::path::Path;
 use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
+use std::{collections::HashSet, time::UNIX_EPOCH};
 use tracing::{info, warn};
 use utils::constants::{
     FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
@@ -344,6 +346,65 @@ pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
 
 // Utility functions for tests follow:
 
+pub fn test_feed_config(id: u32, stride: u16) -> FeedConfig {
+    FeedConfig {
+        id,
+        full_name: "FOXY".to_owned(),
+        description: "FOXY / USD".to_owned(),
+        feed_type: "price-feed".to_owned(),
+        oracle_id: "crypto-price-feeds".to_owned(),
+        value_type: "numerical".to_owned(),
+        stride,
+        quorum: FeedQuorum {
+            percentage: 100.0,
+            aggregation: "median".to_owned(),
+        },
+        schedule: FeedSchedule {
+            interval_ms: 90000,
+            heartbeat_ms: Some(3600000),
+            deviation_percentage: 0.1,
+            first_report_start_unix_time_ms: SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_millis() as u64,
+        },
+        additional_feed_info: PriceFeedInfo {
+            pair: blocksense_registry::config::AssetPair {
+                base: "FOXY".to_owned(),
+                quote: "USD".to_owned(),
+            },
+            decimals: 18,
+            category: "Crypto".to_owned(),
+            market_hours: Some("Crypto".to_owned()),
+            arguments: serde_json::from_str(
+                r#"
+                {
+                    "aggregators": {
+                        "CoinMarketCap": {
+                          "symbol": [
+                            "weETH"
+                          ],
+                          "id": [
+                            28695
+                          ]
+                        }
+                      }
+                }"#,
+            )
+            .unwrap(),
+        },
+        compatibility_info: Some(CompatibilityInfo {
+            chainlink: "weETH / ETH".to_owned(),
+        }),
+    }
+}
+
+pub fn test_feeds_config(id: u32, stride: u16) -> HashMap<u32, FeedConfig> {
+    let mut feeds_config = HashMap::new();
+    feeds_config.insert(id, test_feed_config(id, stride));
+    feeds_config
+}
+
 pub fn test_data_feed_store_byte_code() -> String {
     "0x60a060405234801561001057600080fd5b506040516101cf3803806101cf83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014561008a6000396000609001526101456000f3fe608060405234801561001057600080fd5b50600060405160046000601c83013751905063e000000081161561008e5763e0000000198116632000000082161561005957806020526004356004603c20015460005260206000f35b805463800000008316156100775781600052806004601c2001546000525b634000000083161561008857806020525b60406000f35b7f00000000000000000000000000000000000000000000000000000000000000003381146100bb57600080fd5b631a2d80ac820361010a57423660045b8181101561010857600481601c376000516004601c2061ffff6001835408806100f2575060015b91829055600483013585179101556024016100cb565b005b600080fdfea26469706673582212204a7c38e6d9b723ea65e6d451d6a8436444c333499ad610af033e7360a2558aea64736f6c63430008180033".to_string()
 }
@@ -451,7 +512,7 @@ mod tests {
             "data_feed_store_byte_code": "0x60a060405234801561001057600080fd5b506040516101cf3803806101cf83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014561008a6000396000609001526101456000f3fe608060405234801561001057600080fd5b50600060405160046000601c83013751905063e000000081161561008e5763e0000000198116632000000082161561005957806020526004356004603c20015460005260206000f35b805463800000008316156100775781600052806004601c2001546000525b634000000083161561008857806020525b60406000f35b7f00000000000000000000000000000000000000000000000000000000000000003381146100bb57600080fd5b631a2d80ac820361010a57423660045b8181101561010857600481601c376000516004601c2061ffff6001835408806100f2575060015b91829055600483013585179101556024016100cb565b005b600080fdfea26469706673582212204a7c38e6d9b723ea65e6d451d6a8436444c333499ad610af033e7360a2558aea64736f6c63430008180033",
             "data_feed_sports_byte_code": "0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033"
             }"#).unwrap();
-        assert_eq!(provider_a.is_enabled, true);
+        assert!(provider_a.is_enabled);
         assert_eq!(provider_a.event_contract_address, None);
         assert_eq!(&provider_a.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&provider_a.url, "http://127.0.0.1:8546");
@@ -529,7 +590,7 @@ mod tests {
                 }
             ]
             }"#).unwrap();
-        assert_eq!(p.is_enabled, true);
+        assert!(p.is_enabled);
         assert_eq!(p.event_contract_address, None);
         assert_eq!(&p.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&p.url, "http://127.0.0.1:8546");

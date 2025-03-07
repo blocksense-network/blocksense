@@ -89,9 +89,9 @@ impl FeedAggregate {
     }
     pub fn create_from_str(aggregate_type: &str) -> anyhow::Result<Self> {
         match aggregate_type {
-            "Median" => Ok(Self::MedianAggregator),
-            "Majority" => Ok(Self::MajorityVoteAggregator),
-            "Average" => Ok(Self::AverageAggregator),
+            "median" => Ok(Self::MedianAggregator),
+            "majority" => Ok(Self::MajorityVoteAggregator),
+            "average" => Ok(Self::AverageAggregator),
             _ => anyhow::bail!("Could not convert {aggregate_type} to a valid aggregator!"),
         }
     }
@@ -114,15 +114,6 @@ impl Debug for FeedAggregate {
             FeedAggregate::MajorityVoteAggregator => write!(f, "FeedAggregate"),
             FeedAggregate::MedianAggregator => write!(f, "MedianAggregator"),
         }
-    }
-}
-
-pub fn get_aggregator(aggredate_type: &str) -> FeedAggregate {
-    match aggredate_type {
-        "median" => FeedAggregate::MedianAggregator,
-        "majority" => FeedAggregate::MajorityVoteAggregator,
-        "average" => FeedAggregate::AverageAggregator,
-        _ => panic!("Unknown aggregate type: {}", aggredate_type),
     }
 }
 
