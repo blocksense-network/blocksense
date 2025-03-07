@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogClose,
   DialogTrigger,
-} from '@/components/common/Dialog';
+} from '@blocksense/ui/Dialog';
 import { ScrollArea } from '@/components/common/ScrollArea';
 import { CodeBlock } from '@/components/common/CodeBlock';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -70,7 +70,6 @@ export const ABIModal = ({ abi, name = '' }: ABIModalProps) => {
                 formatHandler={formatHandler}
               />
             </section>
-            <DialogDescription />
           </DialogHeader>
           <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg max-h-[50vh] overflow-auto">
             <CodeBlock
