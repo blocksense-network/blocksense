@@ -1,5 +1,5 @@
 [package]
-name = "exsat-holdings-oracle"
+name = "exsat-holdings"
 authors = ["Yordan Madzhunkov"]
 description = ""
 version = "0.1.0"
@@ -10,10 +10,9 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wit-bindgen = "0.16.0"
-blocksense-sdk = { path = "../../" }
+blocksense-sdk = { path = "../../../libs/sdk" }
 anyhow = "1.0.82"
 serde_json = "1.0"
 url = "2.5"
 serde = { version = "1.0", features = ["derive"] }
-
-[workspace]
+prettytable-rs = "^0.10"
