@@ -13,6 +13,8 @@ export interface NetworkConfig {
   network: Network;
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
+  deployReadAccessControl: boolean;
+  readWhitelistAddresses: EthereumAddress[];
   adminMultisig: MultisigConfig;
   safeAddresses: {
     multiSendAddress: EthereumAddress;
@@ -34,8 +36,10 @@ export enum ContractNames {
   CLFeedRegistryAdapter = 'CLFeedRegistryAdapter',
   CLAggregatorAdapter = 'CLAggregatorAdapter',
   ADFS = 'AggregatedDataFeedStore',
+  ADFSReadAC = 'AggregatedDataFeedStoreReadAC',
   UpgradeableProxyADFS = 'UpgradeableProxyADFS',
   AccessControl = 'AccessControl',
+  ReadAccessControl = 'ReadAccessControl',
   OnlySequencerGuard = 'OnlySequencerGuard',
 }
 
@@ -43,6 +47,12 @@ export type DeployContract = {
   name: Exclude<
     ContractNames,
     ContractNames.AdminMultisig | ContractNames.SequencerMultisig
+  >;
+  duplicatedName?: Exclude<
+    ContractNames,
+    | ContractNames.AdminMultisig
+    | ContractNames.SequencerMultisig
+    | ContractNames.CLAggregatorAdapter
   >;
   argsTypes: string[];
   argsValues: any[];
