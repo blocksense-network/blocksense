@@ -20,7 +20,6 @@ import {
   DeployContract,
 } from './types';
 import {
-  EthereumAddress,
   getNetworkNameByChainId,
   getRpcUrl,
   isNetworkName,
@@ -39,10 +38,7 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 import { kebabToSnakeCase } from '@blocksense/base-utils/string';
 
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
-import {
-  FeedsConfigSchema,
-  NewFeedsConfigSchema,
-} from '@blocksense/config-types/data-feeds-config';
+import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 import {
   CLAggregatorAdapterData,
   ContractsConfigV2,
@@ -108,12 +104,17 @@ task('deploy', 'Deploy contracts')
       );
 
       const accessControlSalt = ethers.id('accessControl');
+      const readAccessControlSalt = ethers.id('readAccessControl');
       const adfsSalt = ethers.id('aggregatedDataFeedStore');
       // this address starts with '0xADF5...' for local deployment
       // should be recalculated when admin address and/or owners (therefore adminMultisig address) changes
       const proxySalt =
         '0x209fdf6800d7d02ac1cc47ea0409e3064b940123694168d0c33238324bb086e1';
       const safeGuardSalt = ethers.id('onlySafeGuard');
+
+      const ADFSArtifact = config.deployReadAccessControl
+        ? ContractNames.ADFSReadAC
+        : ContractNames.ADFS;
 
       const accessControlAddress = await predictAddress(
         artifacts,
@@ -122,13 +123,35 @@ task('deploy', 'Deploy contracts')
         accessControlSalt,
         abiCoder.encode(['address'], [adminMultisigAddress]),
       );
+
+      let readAccessControlAddress = '';
+
+      if (config.deployReadAccessControl) {
+        readAccessControlAddress = await predictAddress(
+          artifacts,
+          config,
+          ContractNames.AccessControl,
+          readAccessControlSalt,
+          abiCoder.encode(['address'], [adminMultisigAddress]),
+        );
+      }
+
+      const adfsTypes = [
+        'address',
+        config.deployReadAccessControl ? 'address' : '',
+      ].filter(str => str !== '');
+      const adfsData = [accessControlAddress, readAccessControlAddress].filter(
+        str => str !== '',
+      );
+
       const adfsAddress = await predictAddress(
         artifacts,
         config,
-        ContractNames.ADFS,
+        ADFSArtifact,
         adfsSalt,
-        abiCoder.encode(['address'], [accessControlAddress]),
+        abiCoder.encode(adfsTypes, adfsData),
       );
+
       const upgradeableProxyAddress = await predictAddress(
         artifacts,
         config,
@@ -149,9 +172,9 @@ task('deploy', 'Deploy contracts')
           value: 0n,
         },
         {
-          name: ContractNames.ADFS,
-          argsTypes: ['address'],
-          argsValues: [accessControlAddress],
+          name: ADFSArtifact,
+          argsTypes: adfsTypes,
+          argsValues: adfsData,
           salt: adfsSalt,
           value: 0n,
         },
@@ -162,33 +185,50 @@ task('deploy', 'Deploy contracts')
           salt: proxySalt,
           value: 0n,
         },
-        {
+      ];
+
+      if (config.deployReadAccessControl) {
+        contracts.unshift({
+          name: ContractNames.AccessControl,
+          duplicatedName: ContractNames.ReadAccessControl,
+          argsTypes: ['address'],
+          argsValues: [adminMultisigAddress],
+          salt: readAccessControlSalt,
+          value: 0n,
+        });
+      }
+
+      if (config.deployCLAdapters) {
+        contracts.push({
           name: ContractNames.CLFeedRegistryAdapter,
           argsTypes: ['address', 'address'],
           argsValues: [adminMultisigAddress, upgradeableProxyAddress],
           salt: ethers.id('registry'),
           value: 0n,
-        },
-        ...dataFeedConfig.map(data => {
-          return {
-            name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
-            argsValues: [
-              data.description,
-              data.decimals,
-              data.id,
-              upgradeableProxyAddress,
-            ],
-            salt: ethers.id('aggregator'),
-            value: 0n,
-            feedRegistryInfo: {
-              description: data.description,
-              base: data.base,
-              quote: data.quote,
-            },
-          };
-        }),
-      ];
+        });
+
+        contracts.push(
+          ...dataFeedConfig.map(data => {
+            return {
+              name: ContractNames.CLAggregatorAdapter as const,
+              argsTypes: ['string', 'uint8', 'uint32', 'address'],
+              argsValues: [
+                data.description,
+                data.decimals,
+                data.id,
+                upgradeableProxyAddress,
+              ],
+              salt: ethers.id('aggregator'),
+              value: 0n,
+              feedRegistryInfo: {
+                description: data.description,
+                base: data.base,
+                quote: data.quote,
+              },
+            };
+          }),
+        );
+      }
 
       let sequencerMultisig: Safe | undefined;
       let sequencerMultisigAddress = parseEthereumAddress(ethers.ZeroAddress);
@@ -238,12 +278,14 @@ task('deploy', 'Deploy contracts')
       console.log(`// balance: ${signerBalancePost} //`);
       console.log(`// balance diff: ${signerBalance - signerBalancePost} //`);
 
-      await registerCLAggregatorAdapters(
-        config,
-        adminMultisig,
-        deployData,
-        artifacts,
-      );
+      if (config.deployCLAdapters) {
+        await registerCLAggregatorAdapters(
+          config,
+          adminMultisig,
+          deployData,
+          artifacts,
+        );
+      }
 
       await setupAccessControl(
         config,
@@ -374,6 +416,27 @@ export const initChain = async (
     ),
   );
 
+  const deployReadAccessControl = JSON.parse(
+    getOptionalEnvString(
+      'DEPLOY_WITH_READ_AC_' + kebabToSnakeCase(networkName),
+      'false',
+    ),
+  );
+  const envReadWhitelistAddresses =
+    process.env['READ_WHITELIST_ADDRESSES_' + kebabToSnakeCase(networkName)];
+  const readWhitelistAddresses = envReadWhitelistAddresses
+    ? envReadWhitelistAddresses
+        .split(',')
+        .map(address => parseEthereumAddress(address))
+    : [];
+
+  const deployCLAdapters = JSON.parse(
+    getOptionalEnvString(
+      'DEPLOY_CL_ADAPTERS_' + kebabToSnakeCase(networkName),
+      'true',
+    ),
+  );
+
   return {
     rpc,
     provider,
@@ -384,6 +447,9 @@ export const initChain = async (
       threshold: +getOptionalEnvString('REPORTER_THRESHOLD', '1'),
     },
     deployWithSequencerMultisig: deploySequencerMultisig,
+    deployReadAccessControl,
+    deployCLAdapters,
+    readWhitelistAddresses,
     adminMultisig: {
       signer: admin,
       owners: adminOwners,
@@ -559,7 +625,9 @@ const deployContracts = async (
         constructorArgs: contract.argsValues,
       });
     } else {
-      ContractsConfigV2.coreContracts[contract.name] = {
+      ContractsConfigV2.coreContracts[
+        contract.duplicatedName ?? contract.name
+      ] = {
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
       };
@@ -664,7 +732,7 @@ const setupAccessControl = async (
   );
   if (sequencerMultisig) {
     const isSequencerSet = await guard.getSequencerRole(
-      config.sequencerMultisig.signer.address,
+      getEnvString('SEQUENCER_ADDRESS'),
     );
 
     if (!isSequencerSet) {
@@ -683,9 +751,7 @@ const setupAccessControl = async (
     }
   }
 
-  console.log(
-    '\nSetting up access control and adding owners to admin multisig...',
-  );
+  console.log('\nSetting up write access control...');
 
   const accessControl = new ethers.Contract(
     deployData.coreContracts.AccessControl.address,
@@ -720,6 +786,44 @@ const setupAccessControl = async (
   } else {
     console.log('Access control already set up');
   }
+
+  if (config.deployReadAccessControl) {
+    console.log('\nSetting up read access control...');
+
+    const readAccessControl = new ethers.Contract(
+      deployData.coreContracts.ReadAccessControl.address,
+      artifacts.readArtifactSync(ContractNames.AccessControl).abi,
+      config.adminMultisig.signer,
+    );
+
+    for (const whitelistAddress of config.readWhitelistAddresses) {
+      const isAllowed = Boolean(
+        Number(
+          await config.sequencerMultisig.signer.call({
+            to: readAccessControl.target.toString(),
+            data: whitelistAddress,
+          }),
+        ),
+      );
+
+      if (!isAllowed) {
+        const safeTxSetReadAccessControl: SafeTransactionDataPartial = {
+          to: readAccessControl.target.toString(),
+          value: '0',
+          data: ethers.solidityPacked(
+            ['address', 'bool'],
+            [whitelistAddress, true],
+          ),
+          operation: OperationType.Call,
+        };
+        transactions.push(safeTxSetReadAccessControl);
+      } else {
+        console.log('Access control already set up');
+      }
+    }
+  }
+
+  console.log('\nAdding owners to admin multisig...');
 
   const owners = await adminMultisig.getOwners();
   if (owners.length === 1 && config.adminMultisig.owners.length > 0) {
