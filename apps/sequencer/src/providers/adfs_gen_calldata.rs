@@ -1,6 +1,6 @@
 use alloy::hex;
 use alloy_primitives::U256;
-use config::FeedConfig;
+use blocksense_registry::config::FeedConfig;
 use eyre::Result;
 use prometheus::metrics::FeedsMetrics;
 use std::cmp::max;
@@ -78,7 +78,7 @@ pub async fn adfs_serialize_updates(
         };
 
         let digits_in_fraction = match &feed_config {
-            Some(f) => f.decimals,
+            Some(f) => f.additional_feed_info.decimals,
             None => {
                 warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
                 18
