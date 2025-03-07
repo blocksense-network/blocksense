@@ -161,13 +161,14 @@ in
         ];
       };
 
-      exsat = {
-        oracle_script_wasm = "exsat_holdings_oracle.wasm";
+      exsat-holdings = {
+        oracle_script_wasm = "exsat_holdings.wasm";
         capabilities = [ ];
         allowed_outbound_hosts = [
           "https://raw.githubusercontent.com"
           "https://rpc-us.exsat.network"
           "https://blockchain.info"
+          "https://mempool.space"
         ];
       };
 

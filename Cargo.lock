@@ -4280,6 +4280,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "exsat-holdings"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-sdk",
+ "prettytable-rs",
+ "serde 1.0.217",
+ "serde_json",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "extended-isolation-forest"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

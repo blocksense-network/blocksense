@@ -7158,7 +7158,7 @@
       "skip_publish_if_less_then_percentage": 0.1,
       "always_publish_heartbeat_ms": 86400000,
       "type": "Crypto",
-      "script": "exsat",
+      "script": "exsat-holdings",
       "pair": {
         "base": "Exsat",
         "quote": "satoshi"

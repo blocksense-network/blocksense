@@ -60,7 +60,7 @@
       legacyPackages = {
         oracle-scripts = {
           crypto-price-feeds = mkOracleScript /apps/oracles/crypto-price-feeds false;
-          exsat = mkOracleScript /libs/sdk/examples/exsat_network true;
+          exsat-holdings = mkOracleScript /apps/oracles/exsat-holdings false;
           gecko-terminal = mkOracleScript /apps/oracles/gecko-terminal false;
 
           # Legacy oracle scripts
