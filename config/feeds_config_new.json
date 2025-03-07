@@ -36036,7 +36036,7 @@
         "decimals": 0,
         "category": "Crypto",
         "market_hours": "Crypto",
-        "arguments": {},
+        "arguments": {}
       },
       "compatibility_info": {
           "chainlink": "TUSD / USD"
