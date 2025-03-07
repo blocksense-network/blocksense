@@ -29,7 +29,7 @@ use wasmtime_wasi_http::{
 };
 
 use crypto::JsonSerializableSignature;
-use data_feeds::connector::post::generate_signature;
+use data_feeds::generate_signature::generate_signature;
 use feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
 use prometheus::{
     actix_server::handle_prometheus_metrics,
