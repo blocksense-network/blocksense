@@ -571,12 +571,13 @@ pub fn add_admin_services(cfg: &mut ServiceConfig) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
     use crate::providers::provider::init_shared_rpc_providers;
     use actix_test::to_bytes;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
-    use config::{get_test_config_with_no_providers, get_test_config_with_single_provider};
+    use config::{
+        get_test_config_with_no_providers, get_test_config_with_single_provider, test_feed_config,
+    };
     use config::{AllFeedsConfig, SequencerConfig};
     use regex::Regex;
 
@@ -591,8 +592,8 @@ mod tests {
     async fn test_get_feed_report_interval() {
         let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config: SequencerConfig = get_test_config_with_no_providers();
-        let mut feed_1_config = some_feed_config_with_id_1();
-        feed_1_config.report_interval_ms = 321868;
+        let mut feed_1_config = test_feed_config(1, 0);
+        feed_1_config.schedule.interval_ms = 321868;
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };
@@ -705,7 +706,7 @@ mod tests {
         let sequencer_config = get_test_config_with_no_providers();
         let expected_sequencer_config = sequencer_config.clone();
         let mut feeds_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
         let metrics_prefix = "test_get_feeds_config";
         let (
@@ -855,7 +856,7 @@ mod tests {
             });
 
         let feeds_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
         //let metrics_prefix = "disable_provider_changes_sequencer_state";
         let (

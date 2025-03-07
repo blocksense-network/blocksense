@@ -631,13 +631,15 @@ pub async fn eth_batch_send_to_all_contracts(
 mod tests {
     use super::*;
 
-    use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
-    use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
+    use config::{
+        get_test_config_with_multiple_providers, get_test_config_with_single_provider,
+        test_feed_config,
+    };
     use config::{AllFeedsConfig, PublishCriteria};
     use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::Repeatability::Oneshot;
@@ -729,7 +731,7 @@ mod tests {
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
-        let feed_1_config = some_feed_config_with_id_1();
+        let feed_1_config = test_feed_config(1, 0);
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };
@@ -891,7 +893,7 @@ mod tests {
             ),
         ]);
         let feeds_config: AllFeedsConfig = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
         let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
@@ -1143,7 +1145,7 @@ mod tests {
                 p.publishing_criteria.push(c);
             });
 
-        let feed = some_feed_config_with_id_1();
+        let feed = test_feed_config(1, 0);
         let feeds_config: AllFeedsConfig = AllFeedsConfig {
             feeds: vec![feed.clone()],
         };
@@ -1197,7 +1199,7 @@ mod tests {
                 };
                 p.publishing_criteria.push(c);
             });
-        let feed = some_feed_config_with_id_1();
+        let feed = test_feed_config(1, 0);
         let feeds_config: AllFeedsConfig = AllFeedsConfig {
             feeds: vec![feed.clone()],
         };
