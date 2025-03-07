@@ -357,11 +357,10 @@ async fn read_next_feed_slots_manager_cmd(
 mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
-    use config::{AllFeedsConfig, SequencerConfig};
+    use config::{test_feed_config, AllFeedsConfig, SequencerConfig};
     use feed_registry::types::{test_payload_from_result, FeedType};
     use std::time::Duration;
 
-    use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
     use config::get_test_config_with_no_providers;
 
     use crate::feeds::feed_slots_processor::tests::check_received;
@@ -371,10 +370,10 @@ mod tests {
     async fn test_feed_slots_manager_loop() {
         let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config: SequencerConfig = get_test_config_with_no_providers();
-        let mut feed_1_config = some_feed_config_with_id_1();
+        let mut feed_1_config = test_feed_config(1, 0);
         const TIME_INTERVAL: u64 = 2_000_u64;
 
-        feed_1_config.report_interval_ms = TIME_INTERVAL; // lower the report time interval.
+        feed_1_config.schedule.interval_ms = TIME_INTERVAL; // lower the report time interval.
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };

@@ -61,7 +61,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         always_publish_heartbeat_ms,
         start,
         "Numerical".to_string(),
-        "Average".to_string(),
+        "average".to_string(),
         None,
     );
     let fmd2 = FeedMetaData::new(
@@ -72,7 +72,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         always_publish_heartbeat_ms,
         start,
         "Numerical".to_string(),
-        "Average".to_string(),
+        "average".to_string(),
         None,
     );
     let fmd3 = FeedMetaData::new(
@@ -83,7 +83,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         always_publish_heartbeat_ms,
         start,
         "Numerical".to_string(),
-        "Average".to_string(),
+        "average".to_string(),
         None,
     );
 
@@ -622,8 +622,8 @@ mod tests {
             1.0f32,  // 1%
             always_publish_heartbeat_ms,
             current_system_time,
-            "Numeric".to_string(),
-            "Average".to_string(),
+            "numeric".to_string(),
+            "average".to_string(),
             None,
         );
 
