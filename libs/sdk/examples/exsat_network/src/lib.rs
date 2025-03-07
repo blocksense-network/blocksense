@@ -118,27 +118,29 @@ pub struct DictionaryValue {
 
 type Dictionary = HashMap<String, DictionaryValue>;
 
+pub async fn fetch_balance(addresses: &Vec<String>) -> Result<Dictionary> {
+    let base_url = "https://blockchain.info/balance";
+    let url = Url::parse_with_params(base_url, &[("active", addresses.join("|"))])?;
+
+    let mut req = Request::builder();
+    req.method(Method::Get);
+    req.uri(url);
+    let resp: Response = send(req).await?;
+
+    let body = resp.into_body();
+    let string = String::from_utf8(body)?;
+
+    let value: Dictionary = serde_json::from_str(&string)
+        .context(format!("Couldn't parse response from {base_url} properly"))?;
+    Ok(value)
+}
+
 impl AddrMappingsRows {
-    pub async fn fetch_balance(&self) -> Result<Dictionary> {
-        let addresses = self
-            .rows
+    pub fn collect_addresses(&self) -> Vec<String> {
+        self.rows
             .iter()
             .map(|x| x.data.btc_address.clone())
-            .collect::<Vec<String>>();
-        let base_url = "https://blockchain.info/balance";
-        let url = Url::parse_with_params(base_url, &[("active", addresses.join("|"))])?;
-
-        let mut req = Request::builder();
-        req.method(Method::Get);
-        req.uri(url);
-        let resp: Response = send(req).await?;
-
-        let body = resp.into_body();
-        let string = String::from_utf8(body)?;
-
-        let value: Dictionary = serde_json::from_str(&string)
-            .context(format!("Couldn't parse response from {base_url} properly"))?;
-        Ok(value)
+            .collect::<Vec<String>>()
     }
 }
 
@@ -149,16 +151,22 @@ async fn oracle_request(_settings: Settings) -> Result<Payload> {
     let exsat = fetch_exsat_custody()
         .await
         .context("Failed to fetch exsat custody file from github")?;
+
     let mut total = 0_u128;
+    let addrs_with_balance = fetch_balance(&exsat.custody_addresses).await?;
+    for (_btc_address, balance) in addrs_with_balance.iter() {
+        total += balance.final_balance;
+    }
     for custody_id in exsat.custody_ids {
         let mut chunk = Some(AddrMappings::new(custody_id));
         while let Some(addrs) = chunk {
-            let addresses = addrs.fetch_rows().await?;
-            let addrs_with_balance = addresses.fetch_balance().await?;
+            let mappings = addrs.fetch_rows().await?;
+            let addresses = mappings.collect_addresses();
+            let addrs_with_balance = fetch_balance(&addresses).await?;
             for (_btc_address, balance) in addrs_with_balance.iter() {
                 total += balance.final_balance;
             }
-            chunk = addrs.next(&addresses);
+            chunk = addrs.next(&mappings);
         }
     }
     println!("TOTAL = {total} sats");
