@@ -27,8 +27,9 @@ import {
   getFieldFromAggregatedData,
   getHighestDecimals,
 } from '../data-services/chainlink_feeds';
-import { SimplifiedFeed } from './types';
+import { SimplifiedFeed, SimplifiedFeedWithRank } from './types';
 import { addDataProviders, stableCoins } from './data-providers';
+import { fetchAssetsInMarketCapOrder } from '../data-services/fetchers/aggregators/cmc';
 
 function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,
@@ -258,6 +259,46 @@ function removeNonCryptoDataFeeds(
   );
 }
 
+async function addMarketCapRank(
+  feeds: SimplifiedFeed[],
+): Promise<SimplifiedFeedWithRank[]> {
+  const cmcMarketCap = await fetchAssetsInMarketCapOrder();
+
+  return feeds.map(feed => {
+    const asset = cmcMarketCap.find(
+      asset =>
+        asset.symbol.toLowerCase() ===
+        feed.additional_feed_info.pair.base.toLowerCase(),
+    );
+    return {
+      ...feed,
+      rank: asset ? asset.market_cap_rank : Number.MAX_SAFE_INTEGER,
+    };
+  });
+}
+
+// Sort the feeds by rank or description if no rank is available
+function sortFeedsConfig(
+  feeds: SimplifiedFeedWithRank[],
+): SimplifiedFeedWithRank[] {
+  const rankedFeeds = feeds.filter(
+    feed => feed.rank !== Number.MAX_SAFE_INTEGER,
+  );
+  const unrankedFeeds = feeds.filter(
+    feed => feed.rank === Number.MAX_SAFE_INTEGER,
+  );
+
+  const sortedRankedFeeds = rankedFeeds.sort((a, b) => a.rank - b.rank);
+
+  const sortedUnrankedFeeds = unrankedFeeds.sort((a, b) => {
+    const a_ = keccak256(a.description).toString();
+    const b_ = keccak256(b.description).toString();
+    return a_.localeCompare(b_);
+  });
+
+  return [...sortedRankedFeeds, ...sortedUnrankedFeeds];
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
 ): Promise<NewFeedsConfig> {
@@ -299,16 +340,14 @@ export async function generateFeedConfig(
 
   await checkOnChainData(rawDataFeedsOnMainnets, dataFeedsWithCryptoResources);
 
-  // Sort the feeds by description
-  const feedsSortedByDescription = dataFeedsWithCryptoResources.sort((a, b) => {
-    // We hash the descriptions here, to avoid an obvious ordering.
-    const a_ = keccak256(a.description).toString();
-    const b_ = keccak256(b.description).toString();
-    return a_.localeCompare(b_);
-  });
+  // Add market cap rank
+  const dataFeedWithRank = await addMarketCapRank(dataFeedsWithCryptoResources);
+
+  // Sort the feeds
+  const feedsSorted = sortFeedsConfig(dataFeedWithRank);
 
   // Construct the final feeds config
-  const feeds = feedsSortedByDescription.map((simplifiedFeed, id) => {
+  const feeds = feedsSorted.map((simplifiedFeed, id) => {
     const feed: NewFeed = {
       ...simplifiedFeed,
       id,
