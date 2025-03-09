@@ -13,6 +13,7 @@ const ChainLinkFeedDocsInfoSchema = S.Struct({
   productType: S.NullishOr(S.String),
   feedType: S.NullishOr(S.String),
   assetSubClass: S.NullishOr(S.String),
+  hidden: S.NullishOr(S.Boolean),
 }).annotations({ identifier: 'ChainLinkFeedDocsInfo' });
 
 export type ChainLinkFeedDocsInfo = S.Schema.Type<
