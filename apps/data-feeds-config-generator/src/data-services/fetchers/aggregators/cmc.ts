@@ -108,3 +108,65 @@ export async function fetchCMCCryptoList(): Promise<CMCInfoResp> {
 
   return typedData;
 }
+
+const CMCMarketCapDataSchema = S.Struct({
+  cmc_rank: S.Number,
+  id: S.Number,
+  symbol: S.String,
+  name: S.String,
+  quote: S.Struct({
+    USD: S.Struct({
+      market_cap: S.Number,
+    }),
+  }),
+});
+
+export type CMCMarketCapData = S.Schema.Type<typeof CMCMarketCapDataSchema>;
+
+const CMCMarketCapDataRespSchema = S.mutable(
+  S.Struct({
+    data: S.mutable(S.Record({ key: S.String, value: CMCMarketCapDataSchema })),
+  }),
+);
+
+type CMCMarketCapResp = S.Schema.Type<typeof CMCMarketCapDataRespSchema>;
+
+async function fetchMarketCapData(ids: string[]): Promise<CMCMarketCapResp> {
+  const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${ids.join(',')}`;
+
+  const typedData = await fetchAndDecodeJSON(CMCMarketCapDataRespSchema, url, {
+    headers: {
+      'X-CMC_PRO_API_KEY': getEnvString('CMC_API_KEY'),
+    },
+  });
+
+  return typedData;
+}
+
+export async function fetchAssetsInMarketCapOrder(): Promise<
+  (CMCMarketCapData & { market_cap_rank: number })[]
+> {
+  const CHUNK_SIZE = 1000;
+
+  const cmcData = await fetchCMCCryptoList();
+
+  const ids = cmcData.data.map(coin => coin.id.toString());
+  const chunks = [];
+
+  for (let i = 0; i < ids.length; i += CHUNK_SIZE) {
+    chunks.push(ids.slice(i, i + CHUNK_SIZE));
+  }
+
+  const marketCapDataPromises = chunks.map(chunk => fetchMarketCapData(chunk));
+  const marketCapData = await Promise.all(marketCapDataPromises);
+
+  const sortedMarketCapData = marketCapData
+    .flatMap(data => Object.values(data.data))
+    .sort((a, b) => b.quote.USD.market_cap - a.quote.USD.market_cap)
+    .map((coin, index) => ({
+      ...coin,
+      market_cap_rank: index + 1,
+    }));
+
+  return sortedMarketCapData;
+}
