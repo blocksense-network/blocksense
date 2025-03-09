@@ -217,7 +217,6 @@ function removeUnsupportedRateDataFeeds(
     'exchange rate',
     'exchange-rate',
     'calculated',
-    'refprice',
     'marketcap',
   ];
 
