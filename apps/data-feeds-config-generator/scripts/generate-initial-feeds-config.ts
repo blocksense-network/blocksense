@@ -15,13 +15,13 @@ import {
   getAllProposedFeedsInRegistry,
 } from '../src/data-services/chainlink_feeds';
 import { RawDataFeedsSchema } from '../src/data-services/types';
-import { generateFeedConfig } from '../src/feeds-config/index';
+import { generateFeedConfig } from '../src/initial-feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
 import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';
 import {
   getAllPossibleCLFeeds,
   getCLFeedsOnMainnet,
-} from '../src/feeds-config/utils/chainlink';
+} from '../src/initial-feeds-config/utils/chainlink';
 
 async function getOrCreateArtifact<A, I = A>(
   name: string,
