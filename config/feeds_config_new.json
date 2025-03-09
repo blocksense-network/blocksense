@@ -16221,6 +16221,49 @@
     },
     {
       "id": 224,
+      "full_name": "cbBTC / USD",
+      "description": "Coinbase Wrapped BTC",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "cbBTC",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "CBBTC"
+              ],
+              "id": [
+                32994
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "cbBTC/USD-RefPrice-mainnet-production"
+        }
+      }
+    },
+    {
+      "id": 225,
       "full_name": "BUSD / USD",
       "description": "Binance USD",
       "type": "price-feed",
@@ -16280,7 +16323,7 @@
       }
     },
     {
-      "id": 225,
+      "id": 226,
       "full_name": "BUSD / USDT",
       "description": "Binance USD",
       "type": "price-feed",
@@ -16325,7 +16368,7 @@
       }
     },
     {
-      "id": 226,
+      "id": 227,
       "full_name": "METIS / USD",
       "description": "Metis",
       "type": "price-feed",
@@ -16414,7 +16457,7 @@
       }
     },
     {
-      "id": 227,
+      "id": 228,
       "full_name": "METIS / USDT",
       "description": "Metis",
       "type": "price-feed",
@@ -16489,7 +16532,7 @@
       }
     },
     {
-      "id": 228,
+      "id": 229,
       "full_name": "METIS / USDC",
       "description": "Metis",
       "type": "price-feed",
@@ -16529,7 +16572,7 @@
       }
     },
     {
-      "id": 229,
+      "id": 230,
       "full_name": "ENA / USD",
       "description": "Ethena",
       "type": "price-feed",
@@ -16628,7 +16671,7 @@
       }
     },
     {
-      "id": 230,
+      "id": 231,
       "full_name": "ENA / USDT",
       "description": "Ethena",
       "type": "price-feed",
@@ -16698,7 +16741,7 @@
       }
     },
     {
-      "id": 231,
+      "id": 232,
       "full_name": "ENA / USDC",
       "description": "Ethena",
       "type": "price-feed",
@@ -16753,7 +16796,7 @@
       }
     },
     {
-      "id": 232,
+      "id": 233,
       "full_name": "BLAST / USD",
       "description": "Blast",
       "type": "price-feed",
@@ -16846,7 +16889,7 @@
       }
     },
     {
-      "id": 233,
+      "id": 234,
       "full_name": "BLAST / USDT",
       "description": "Blast",
       "type": "price-feed",
@@ -16911,7 +16954,7 @@
       }
     },
     {
-      "id": 234,
+      "id": 235,
       "full_name": "AMPL / USD",
       "description": "Ampleforth",
       "type": "price-feed",
@@ -16966,7 +17009,7 @@
       }
     },
     {
-      "id": 235,
+      "id": 236,
       "full_name": "AMPL / USDT",
       "description": "Ampleforth",
       "type": "price-feed",
@@ -17011,7 +17054,50 @@
       }
     },
     {
-      "id": 236,
+      "id": 237,
+      "full_name": "ezETH / USD",
+      "description": "Renzo Restaked ETH",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ezETH",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "EZETH"
+              ],
+              "id": [
+                29520
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "ezETH/USD-RefPrice-mainnet-production"
+        }
+      }
+    },
+    {
+      "id": 238,
       "full_name": "ATOM / USD",
       "description": "Cosmos",
       "type": "price-feed",
@@ -17134,7 +17220,7 @@
       }
     },
     {
-      "id": 237,
+      "id": 239,
       "full_name": "ATOM / USDT",
       "description": "Cosmos",
       "type": "price-feed",
@@ -17227,7 +17313,7 @@
       }
     },
     {
-      "id": 238,
+      "id": 240,
       "full_name": "ATOM / USDC",
       "description": "Cosmos",
       "type": "price-feed",
@@ -17300,7 +17386,7 @@
       }
     },
     {
-      "id": 239,
+      "id": 241,
       "full_name": "GALA / USD",
       "description": "Gala",
       "type": "price-feed",
@@ -17414,7 +17500,7 @@
       }
     },
     {
-      "id": 240,
+      "id": 242,
       "full_name": "GALA / USDT",
       "description": "Gala",
       "type": "price-feed",
@@ -17494,7 +17580,7 @@
       }
     },
     {
-      "id": 241,
+      "id": 243,
       "full_name": "GALA / USDC",
       "description": "Gala",
       "type": "price-feed",
@@ -17544,7 +17630,7 @@
       }
     },
     {
-      "id": 242,
+      "id": 244,
       "full_name": "AAVE / USD",
       "description": "Aave",
       "type": "price-feed",
@@ -17664,7 +17750,7 @@
       }
     },
     {
-      "id": 243,
+      "id": 245,
       "full_name": "AAVE / ETH",
       "description": "Aave",
       "type": "price-feed",
@@ -17717,7 +17803,7 @@
       }
     },
     {
-      "id": 244,
+      "id": 246,
       "full_name": "AAVE / USDT",
       "description": "Aave",
       "type": "price-feed",
@@ -17797,7 +17883,7 @@
       }
     },
     {
-      "id": 245,
+      "id": 247,
       "full_name": "AAVE / USDC",
       "description": "Aave",
       "type": "price-feed",
@@ -17852,7 +17938,7 @@
       }
     },
     {
-      "id": 246,
+      "id": 248,
       "full_name": "GNS / USD",
       "description": "Gains Network",
       "type": "price-feed",
@@ -17927,7 +18013,7 @@
       }
     },
     {
-      "id": 247,
+      "id": 249,
       "full_name": "GNS / USDT",
       "description": "Gains Network",
       "type": "price-feed",
@@ -17987,7 +18073,7 @@
       }
     },
     {
-      "id": 248,
+      "id": 250,
       "full_name": "USDe / USD",
       "description": "Ethena USDe",
       "type": "price-feed",
@@ -18013,6 +18099,35 @@
         "category": "Crypto",
         "market_hours": "Crypto",
         "arguments": {
+          "exchanges": {
+            "Bitget": {
+              "symbol": [
+                "USDEUSDC_SPBL",
+                "USDEUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "USDEUSDC",
+                "USDEUSDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "USDE_USDT"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "USDE-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "USDEUSDT"
+              ]
+            }
+          },
           "aggregators": {
             "CoinMarketCap": {
               "symbol": [
@@ -18030,7 +18145,7 @@
       }
     },
     {
-      "id": 249,
+      "id": 251,
       "full_name": "USDE / USD",
       "description": "Ethena USDe",
       "type": "price-feed",
@@ -18084,6 +18199,16 @@
                 "USDEUSDT"
               ]
             }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "USDe"
+              ],
+              "id": [
+                29470
+              ]
+            }
           }
         },
         "compatibility_info": {
@@ -18092,7 +18217,112 @@
       }
     },
     {
-      "id": 250,
+      "id": 252,
+      "full_name": "USDe / USDT",
+      "description": "Ethena USDe",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDe",
+          "quote": "USDT"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Bitget": {
+              "symbol": [
+                "USDEUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "USDEUSDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "USDE_USDT"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "USDE-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "USDEUSDT"
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "USDe/USD-RefPrice-DS-Premium-Global-003"
+        }
+      }
+    },
+    {
+      "id": 253,
+      "full_name": "USDe / USDC",
+      "description": "Ethena USDe",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDe",
+          "quote": "USDC"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Bitget": {
+              "symbol": [
+                "USDEUSDC_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "USDEUSDC"
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "USDe/USD-RefPrice-DS-Premium-Global-003"
+        }
+      }
+    },
+    {
+      "id": 254,
       "full_name": "USDE / USDT",
       "description": "Ethena USDe",
       "type": "price-feed",
@@ -18152,7 +18382,7 @@
       }
     },
     {
-      "id": 251,
+      "id": 255,
       "full_name": "USDE / USDC",
       "description": "Ethena USDe",
       "type": "price-feed",
@@ -18197,7 +18427,50 @@
       }
     },
     {
-      "id": 252,
+      "id": 256,
+      "full_name": "SUSDE / USD",
+      "description": "Ethena Staked USDE",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SUSDE",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "sUSDe"
+              ],
+              "id": [
+                29471
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "SUSDE/USD-RefPrice-mainnet-production"
+        }
+      }
+    },
+    {
+      "id": 257,
       "full_name": "YFI / USD",
       "description": "Yearn Finance",
       "type": "price-feed",
@@ -18312,7 +18585,7 @@
       }
     },
     {
-      "id": 253,
+      "id": 258,
       "full_name": "YFI / BNB",
       "description": "Yearn Finance",
       "type": "price-feed",
@@ -18352,7 +18625,7 @@
       }
     },
     {
-      "id": 254,
+      "id": 259,
       "full_name": "YFI / ETH",
       "description": "Yearn Finance",
       "type": "price-feed",
@@ -18392,7 +18665,7 @@
       }
     },
     {
-      "id": 255,
+      "id": 260,
       "full_name": "YFI / USDT",
       "description": "Yearn Finance",
       "type": "price-feed",
@@ -18467,7 +18740,7 @@
       }
     },
     {
-      "id": 256,
+      "id": 261,
       "full_name": "YFI / USDC",
       "description": "Yearn Finance",
       "type": "price-feed",
@@ -18507,7 +18780,7 @@
       }
     },
     {
-      "id": 257,
+      "id": 262,
       "full_name": "ILV / USD",
       "description": "Illuvium",
       "type": "price-feed",
@@ -18599,7 +18872,7 @@
       }
     },
     {
-      "id": 258,
+      "id": 263,
       "full_name": "ILV / USDT",
       "description": "Illuvium",
       "type": "price-feed",
@@ -18674,7 +18947,222 @@
       }
     },
     {
-      "id": 259,
+      "id": 264,
+      "full_name": "wBTC / USD",
+      "description": "Wrapped Bitcoin",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wBTC",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "WBTCUSDT"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "WBTCUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "WBTCUSDT"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "WBTC-USD"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "WBTC_USD"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "WBTC_USDT"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "WBTCUSD"
+              ],
+              "wsname": [
+                "WBTC/USD"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "WBTC-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "WBTCUSDC",
+                "WBTCUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "WBTC-USDC",
+                "WBTC-USDT"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "WBTC"
+              ],
+              "id": [
+                3717
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "wBTC/USD-RefPrice-mainnet-production"
+        }
+      }
+    },
+    {
+      "id": 265,
+      "full_name": "wBTC / USDT",
+      "description": "Wrapped Bitcoin",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wBTC",
+          "quote": "USDT"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "WBTCUSDT"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "WBTCUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "WBTCUSDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "WBTC_USDT"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "WBTC-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "WBTCUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "WBTC-USDT"
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "wBTC/USD-RefPrice-mainnet-production"
+        }
+      }
+    },
+    {
+      "id": 266,
+      "full_name": "wBTC / USDC",
+      "description": "Wrapped Bitcoin",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wBTC",
+          "quote": "USDC"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "MEXC": {
+              "symbol": [
+                "WBTCUSDC"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "WBTC-USDC"
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "wBTC/USD-RefPrice-mainnet-production"
+        }
+      }
+    },
+    {
+      "id": 267,
       "full_name": "SPX / USD",
       "description": "SPX6900",
       "type": "price-feed",
@@ -18753,7 +19241,7 @@
       }
     },
     {
-      "id": 260,
+      "id": 268,
       "full_name": "SPX / USDT",
       "description": "SPX6900",
       "type": "price-feed",
@@ -18808,7 +19296,7 @@
       }
     },
     {
-      "id": 261,
+      "id": 269,
       "full_name": "TRUMP / USD",
       "description": "Official Trump",
       "type": "price-feed",
@@ -18979,7 +19467,7 @@
       }
     },
     {
-      "id": 262,
+      "id": 270,
       "full_name": "TRUMP / USDT",
       "description": "Official Trump",
       "type": "price-feed",
@@ -19072,7 +19560,7 @@
       }
     },
     {
-      "id": 263,
+      "id": 271,
       "full_name": "TRUMP / USDC",
       "description": "Official Trump",
       "type": "price-feed",
@@ -19135,7 +19623,7 @@
       }
     },
     {
-      "id": 264,
+      "id": 272,
       "full_name": "BCH / BNB",
       "description": "Bitcoin Cash",
       "type": "price-feed",
@@ -19175,7 +19663,7 @@
       }
     },
     {
-      "id": 265,
+      "id": 273,
       "full_name": "BCH / USD",
       "description": "Bitcoin Cash",
       "type": "price-feed",
@@ -19301,7 +19789,7 @@
       }
     },
     {
-      "id": 266,
+      "id": 274,
       "full_name": "BCH / USDT",
       "description": "Bitcoin Cash",
       "type": "price-feed",
@@ -19394,7 +19882,7 @@
       }
     },
     {
-      "id": 267,
+      "id": 275,
       "full_name": "BCH / USDC",
       "description": "Bitcoin Cash",
       "type": "price-feed",
@@ -19472,7 +19960,50 @@
       }
     },
     {
-      "id": 268,
+      "id": 276,
+      "full_name": "wstETH / USD",
+      "description": "wstETH",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wstETH",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "WSTETH"
+              ],
+              "id": [
+                12409
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "wstETH/USD-RefPrice-DS-Premium-Global-003"
+        }
+      }
+    },
+    {
+      "id": 277,
       "full_name": "BONK / USD",
       "description": "Bonk",
       "type": "price-feed",
@@ -19602,7 +20133,7 @@
       }
     },
     {
-      "id": 269,
+      "id": 278,
       "full_name": "BONK / USDT",
       "description": "Bonk",
       "type": "price-feed",
@@ -19687,7 +20218,7 @@
       }
     },
     {
-      "id": 270,
+      "id": 279,
       "full_name": "BONK / USDC",
       "description": "Bonk",
       "type": "price-feed",
@@ -19742,7 +20273,7 @@
       }
     },
     {
-      "id": 271,
+      "id": 280,
       "full_name": "RLUSD / USD",
       "description": "Ripple USD",
       "type": "price-feed",
@@ -19785,7 +20316,7 @@
       }
     },
     {
-      "id": 272,
+      "id": 281,
       "full_name": "REN / USD",
       "description": "Ren",
       "type": "price-feed",
@@ -19883,7 +20414,7 @@
       }
     },
     {
-      "id": 273,
+      "id": 282,
       "full_name": "REN / USDT",
       "description": "Ren",
       "type": "price-feed",
@@ -19953,7 +20484,7 @@
       }
     },
     {
-      "id": 274,
+      "id": 283,
       "full_name": "ZIL / USD",
       "description": "Zilliqa",
       "type": "price-feed",
@@ -20046,7 +20577,7 @@
       }
     },
     {
-      "id": 275,
+      "id": 284,
       "full_name": "ZIL / USDT",
       "description": "Zilliqa",
       "type": "price-feed",
@@ -20126,7 +20657,7 @@
       }
     },
     {
-      "id": 276,
+      "id": 285,
       "full_name": "ZIL / USDC",
       "description": "Zilliqa",
       "type": "price-feed",
@@ -20171,7 +20702,7 @@
       }
     },
     {
-      "id": 277,
+      "id": 286,
       "full_name": "IP / USD",
       "description": "Story",
       "type": "price-feed",
@@ -20256,7 +20787,7 @@
       }
     },
     {
-      "id": 278,
+      "id": 287,
       "full_name": "IP / USDT",
       "description": "Story",
       "type": "price-feed",
@@ -20321,7 +20852,7 @@
       }
     },
     {
-      "id": 279,
+      "id": 288,
       "full_name": "AERO / USD",
       "description": "Aerodrome Finance",
       "type": "price-feed",
@@ -20411,7 +20942,7 @@
       }
     },
     {
-      "id": 280,
+      "id": 289,
       "full_name": "AERO / USDT",
       "description": "Aerodrome Finance",
       "type": "price-feed",
@@ -20471,7 +21002,7 @@
       }
     },
     {
-      "id": 281,
+      "id": 290,
       "full_name": "INJ / USD",
       "description": "Injective Protocol",
       "type": "price-feed",
@@ -20586,7 +21117,7 @@
       }
     },
     {
-      "id": 282,
+      "id": 291,
       "full_name": "INJ / USDT",
       "description": "Injective Protocol",
       "type": "price-feed",
@@ -20666,7 +21197,7 @@
       }
     },
     {
-      "id": 283,
+      "id": 292,
       "full_name": "INJ / USDC",
       "description": "Injective Protocol",
       "type": "price-feed",
@@ -20726,7 +21257,7 @@
       }
     },
     {
-      "id": 284,
+      "id": 293,
       "full_name": "USDS / USD",
       "description": "USDS",
       "type": "price-feed",
@@ -20777,9 +21308,11 @@
             "CoinMarketCap": {
               "symbol": [
                 "USDS",
-                "USDS"
+                "USDS",
+                "USDs"
               ],
               "id": [
+                17285,
                 33039,
                 33452
               ]
@@ -20792,7 +21325,7 @@
       }
     },
     {
-      "id": 285,
+      "id": 294,
       "full_name": "USDS / USDT",
       "description": "USDS",
       "type": "price-feed",
@@ -20837,7 +21370,7 @@
       }
     },
     {
-      "id": 286,
+      "id": 295,
       "full_name": "USDS / USDC",
       "description": "USDS",
       "type": "price-feed",
@@ -20877,7 +21410,7 @@
       }
     },
     {
-      "id": 287,
+      "id": 296,
       "full_name": "SOL / USD",
       "description": "Solana",
       "type": "price-feed",
@@ -21020,7 +21553,7 @@
       }
     },
     {
-      "id": 288,
+      "id": 297,
       "full_name": "SOL / USDT",
       "description": "Solana",
       "type": "price-feed",
@@ -21123,7 +21656,7 @@
       }
     },
     {
-      "id": 289,
+      "id": 298,
       "full_name": "SOL / USDC",
       "description": "Solana",
       "type": "price-feed",
@@ -21206,7 +21739,7 @@
       }
     },
     {
-      "id": 290,
+      "id": 299,
       "full_name": "BB / USD",
       "description": "BounceBit",
       "type": "price-feed",
@@ -21289,7 +21822,7 @@
       }
     },
     {
-      "id": 291,
+      "id": 300,
       "full_name": "BB / USDT",
       "description": "BounceBit",
       "type": "price-feed",
@@ -21354,7 +21887,7 @@
       }
     },
     {
-      "id": 292,
+      "id": 301,
       "full_name": "BB / USDC",
       "description": "BounceBit",
       "type": "price-feed",
@@ -21399,7 +21932,7 @@
       }
     },
     {
-      "id": 293,
+      "id": 302,
       "full_name": "EURC / USD",
       "description": "Circle EUR",
       "type": "price-feed",
@@ -21457,7 +21990,7 @@
       }
     },
     {
-      "id": 294,
+      "id": 303,
       "full_name": "EURC / USDC",
       "description": "Circle EUR",
       "type": "price-feed",
@@ -21502,7 +22035,7 @@
       }
     },
     {
-      "id": 295,
+      "id": 304,
       "full_name": "AXS / USD",
       "description": "Axie Infinity",
       "type": "price-feed",
@@ -21614,7 +22147,7 @@
       }
     },
     {
-      "id": 296,
+      "id": 305,
       "full_name": "AXS / USDT",
       "description": "Axie Infinity",
       "type": "price-feed",
@@ -21699,7 +22232,7 @@
       }
     },
     {
-      "id": 297,
+      "id": 306,
       "full_name": "AXS / USDC",
       "description": "Axie Infinity",
       "type": "price-feed",
@@ -21739,7 +22272,7 @@
       }
     },
     {
-      "id": 298,
+      "id": 307,
       "full_name": "CRV / USD",
       "description": "Curve DAO",
       "type": "price-feed",
@@ -21858,7 +22391,7 @@
       }
     },
     {
-      "id": 299,
+      "id": 308,
       "full_name": "CRV / ETH",
       "description": "Curve DAO",
       "type": "price-feed",
@@ -21908,7 +22441,7 @@
       }
     },
     {
-      "id": 300,
+      "id": 309,
       "full_name": "CRV / USDT",
       "description": "Curve DAO",
       "type": "price-feed",
@@ -21988,7 +22521,7 @@
       }
     },
     {
-      "id": 301,
+      "id": 310,
       "full_name": "CRV / USDC",
       "description": "Curve DAO",
       "type": "price-feed",
@@ -22038,7 +22571,7 @@
       }
     },
     {
-      "id": 302,
+      "id": 311,
       "full_name": "ARB / USD",
       "description": "Arbitrum",
       "type": "price-feed",
@@ -22163,7 +22696,7 @@
       }
     },
     {
-      "id": 303,
+      "id": 312,
       "full_name": "ARB / USDT",
       "description": "Arbitrum",
       "type": "price-feed",
@@ -22248,7 +22781,7 @@
       }
     },
     {
-      "id": 304,
+      "id": 313,
       "full_name": "ARB / USDC",
       "description": "Arbitrum",
       "type": "price-feed",
@@ -22308,7 +22841,7 @@
       }
     },
     {
-      "id": 305,
+      "id": 314,
       "full_name": "ARKM / USD",
       "description": "Arkham",
       "type": "price-feed",
@@ -22415,7 +22948,7 @@
       }
     },
     {
-      "id": 306,
+      "id": 315,
       "full_name": "ARKM / USDT",
       "description": "Arkham",
       "type": "price-feed",
@@ -22490,7 +23023,7 @@
       }
     },
     {
-      "id": 307,
+      "id": 316,
       "full_name": "ARKM / USDC",
       "description": "Arkham",
       "type": "price-feed",
@@ -22540,7 +23073,7 @@
       }
     },
     {
-      "id": 308,
+      "id": 317,
       "full_name": "MAVIA / USD",
       "description": "Heroes of Mavia",
       "type": "price-feed",
@@ -22616,7 +23149,7 @@
       }
     },
     {
-      "id": 309,
+      "id": 318,
       "full_name": "MAVIA / USDT",
       "description": "Heroes of Mavia",
       "type": "price-feed",
@@ -22681,7 +23214,7 @@
       }
     },
     {
-      "id": 310,
+      "id": 319,
       "full_name": "ETH / USD",
       "description": "Ethereum",
       "type": "price-feed",
@@ -22830,7 +23363,7 @@
       }
     },
     {
-      "id": 311,
+      "id": 320,
       "full_name": "ETC / USD",
       "description": "Ethereum",
       "type": "price-feed",
@@ -22948,7 +23481,7 @@
       }
     },
     {
-      "id": 312,
+      "id": 321,
       "full_name": "ETH / BTC",
       "description": "Ethereum",
       "type": "price-feed",
@@ -23048,7 +23581,7 @@
       }
     },
     {
-      "id": 313,
+      "id": 322,
       "full_name": "ETH / USDT",
       "description": "Ethereum",
       "type": "price-feed",
@@ -23156,7 +23689,7 @@
       }
     },
     {
-      "id": 314,
+      "id": 323,
       "full_name": "ETH / USDC",
       "description": "Ethereum",
       "type": "price-feed",
@@ -23244,7 +23777,7 @@
       }
     },
     {
-      "id": 315,
+      "id": 324,
       "full_name": "ETC / USDT",
       "description": "Ethereum",
       "type": "price-feed",
@@ -23329,7 +23862,7 @@
       }
     },
     {
-      "id": 316,
+      "id": 325,
       "full_name": "ETC / USDC",
       "description": "Ethereum",
       "type": "price-feed",
@@ -23379,7 +23912,7 @@
       }
     },
     {
-      "id": 317,
+      "id": 326,
       "full_name": "ORDER / USD",
       "description": "Orderly Network",
       "type": "price-feed",
@@ -23449,7 +23982,7 @@
       }
     },
     {
-      "id": 318,
+      "id": 327,
       "full_name": "ORDER / USDT",
       "description": "Orderly Network",
       "type": "price-feed",
@@ -23509,7 +24042,7 @@
       }
     },
     {
-      "id": 319,
+      "id": 328,
       "full_name": "AUSD / USD",
       "description": "AUSD",
       "type": "price-feed",
@@ -23552,7 +24085,7 @@
       }
     },
     {
-      "id": 320,
+      "id": 329,
       "full_name": "COMP / USD",
       "description": "Compound",
       "type": "price-feed",
@@ -23669,7 +24202,7 @@
       }
     },
     {
-      "id": 321,
+      "id": 330,
       "full_name": "COMP / USDT",
       "description": "Compound",
       "type": "price-feed",
@@ -23749,7 +24282,7 @@
       }
     },
     {
-      "id": 322,
+      "id": 331,
       "full_name": "COMP / USDC",
       "description": "Compound",
       "type": "price-feed",
@@ -23789,7 +24322,7 @@
       }
     },
     {
-      "id": 323,
+      "id": 332,
       "full_name": "POL / USD",
       "description": "POL",
       "type": "price-feed",
@@ -23902,7 +24435,7 @@
       }
     },
     {
-      "id": 324,
+      "id": 333,
       "full_name": "POL / USDT",
       "description": "POL",
       "type": "price-feed",
@@ -23982,7 +24515,7 @@
       }
     },
     {
-      "id": 325,
+      "id": 334,
       "full_name": "POL / USDC",
       "description": "POL",
       "type": "price-feed",
@@ -24032,7 +24565,7 @@
       }
     },
     {
-      "id": 326,
+      "id": 335,
       "full_name": "ANKR / USD",
       "description": "Ankr",
       "type": "price-feed",
@@ -24138,7 +24671,7 @@
       }
     },
     {
-      "id": 327,
+      "id": 336,
       "full_name": "ANKR / USDT",
       "description": "Ankr",
       "type": "price-feed",
@@ -24213,7 +24746,7 @@
       }
     },
     {
-      "id": 328,
+      "id": 337,
       "full_name": "ANKR / USDC",
       "description": "Ankr",
       "type": "price-feed",
@@ -24253,7 +24786,7 @@
       }
     },
     {
-      "id": 329,
+      "id": 338,
       "full_name": "HOT / USD",
       "description": "Holo",
       "type": "price-feed",
@@ -24333,7 +24866,7 @@
       }
     },
     {
-      "id": 330,
+      "id": 339,
       "full_name": "HOT / USDT",
       "description": "Holo",
       "type": "price-feed",
@@ -24398,7 +24931,7 @@
       }
     },
     {
-      "id": 331,
+      "id": 340,
       "full_name": "PERP / USD",
       "description": "Perpetual Protocol",
       "type": "price-feed",
@@ -24498,7 +25031,7 @@
       }
     },
     {
-      "id": 332,
+      "id": 341,
       "full_name": "PERP / USDT",
       "description": "Perpetual Protocol",
       "type": "price-feed",
@@ -24573,7 +25106,7 @@
       }
     },
     {
-      "id": 333,
+      "id": 342,
       "full_name": "PERP / USDC",
       "description": "Perpetual Protocol",
       "type": "price-feed",
@@ -24613,7 +25146,7 @@
       }
     },
     {
-      "id": 334,
+      "id": 343,
       "full_name": "OM / USD",
       "description": "MANTRA",
       "type": "price-feed",
@@ -24710,7 +25243,7 @@
       }
     },
     {
-      "id": 335,
+      "id": 344,
       "full_name": "OM / USDT",
       "description": "MANTRA",
       "type": "price-feed",
@@ -24780,7 +25313,7 @@
       }
     },
     {
-      "id": 336,
+      "id": 345,
       "full_name": "OM / USDC",
       "description": "MANTRA",
       "type": "price-feed",
@@ -24830,7 +25363,7 @@
       }
     },
     {
-      "id": 337,
+      "id": 346,
       "full_name": "PEOPLE / USD",
       "description": "ConstitutionDAO",
       "type": "price-feed",
@@ -24915,7 +25448,7 @@
       }
     },
     {
-      "id": 338,
+      "id": 347,
       "full_name": "PEOPLE / USDT",
       "description": "ConstitutionDAO",
       "type": "price-feed",
@@ -24985,7 +25518,7 @@
       }
     },
     {
-      "id": 339,
+      "id": 348,
       "full_name": "PEOPLE / USDC",
       "description": "ConstitutionDAO",
       "type": "price-feed",
@@ -25035,7 +25568,7 @@
       }
     },
     {
-      "id": 340,
+      "id": 349,
       "full_name": "LINA / USD",
       "description": "Linear",
       "type": "price-feed",
@@ -25105,7 +25638,7 @@
       }
     },
     {
-      "id": 341,
+      "id": 350,
       "full_name": "LINA / USDT",
       "description": "Linear",
       "type": "price-feed",
@@ -25165,7 +25698,7 @@
       }
     },
     {
-      "id": 342,
+      "id": 351,
       "full_name": "USDP / USD",
       "description": "Pax Dollar",
       "type": "price-feed",
@@ -25232,7 +25765,7 @@
       }
     },
     {
-      "id": 343,
+      "id": 352,
       "full_name": "USDP / USDT",
       "description": "Pax Dollar",
       "type": "price-feed",
@@ -25287,7 +25820,7 @@
       }
     },
     {
-      "id": 344,
+      "id": 353,
       "full_name": "ORDI / USD",
       "description": "ORDI",
       "type": "price-feed",
@@ -25377,7 +25910,7 @@
       }
     },
     {
-      "id": 345,
+      "id": 354,
       "full_name": "ORDI / USDT",
       "description": "ORDI",
       "type": "price-feed",
@@ -25452,7 +25985,7 @@
       }
     },
     {
-      "id": 346,
+      "id": 355,
       "full_name": "ORDI / USDC",
       "description": "ORDI",
       "type": "price-feed",
@@ -25502,7 +26035,7 @@
       }
     },
     {
-      "id": 347,
+      "id": 356,
       "full_name": "OGN / USD",
       "description": "Origin Protocol",
       "type": "price-feed",
@@ -25596,7 +26129,7 @@
       }
     },
     {
-      "id": 348,
+      "id": 357,
       "full_name": "OGN / USDT",
       "description": "Origin Protocol",
       "type": "price-feed",
@@ -25661,7 +26194,7 @@
       }
     },
     {
-      "id": 349,
+      "id": 358,
       "full_name": "LBTC / USD",
       "description": "LOMBARD STAKED BTC",
       "type": "price-feed",
@@ -25713,7 +26246,7 @@
       }
     },
     {
-      "id": 350,
+      "id": 359,
       "full_name": "LBTC / USDT",
       "description": "LOMBARD STAKED BTC",
       "type": "price-feed",
@@ -25753,7 +26286,7 @@
       }
     },
     {
-      "id": 351,
+      "id": 360,
       "full_name": "ICP / USD",
       "description": "Internet Computer Protocol",
       "type": "price-feed",
@@ -25870,7 +26403,7 @@
       }
     },
     {
-      "id": 352,
+      "id": 361,
       "full_name": "ICP / USDT",
       "description": "Internet Computer Protocol",
       "type": "price-feed",
@@ -25955,7 +26488,7 @@
       }
     },
     {
-      "id": 353,
+      "id": 362,
       "full_name": "ICP / USDC",
       "description": "Internet Computer Protocol",
       "type": "price-feed",
@@ -26020,7 +26553,7 @@
       }
     },
     {
-      "id": 354,
+      "id": 363,
       "full_name": "VET / USD",
       "description": "VeChain",
       "type": "price-feed",
@@ -26107,7 +26640,7 @@
       }
     },
     {
-      "id": 355,
+      "id": 364,
       "full_name": "VET / USDT",
       "description": "VeChain",
       "type": "price-feed",
@@ -26177,7 +26710,7 @@
       }
     },
     {
-      "id": 356,
+      "id": 365,
       "full_name": "1INCH / USD",
       "description": "1inch",
       "type": "price-feed",
@@ -26283,7 +26816,7 @@
       }
     },
     {
-      "id": 357,
+      "id": 366,
       "full_name": "1INCH / USDT",
       "description": "1inch",
       "type": "price-feed",
@@ -26363,7 +26896,7 @@
       }
     },
     {
-      "id": 358,
+      "id": 367,
       "full_name": "1INCH / USDC",
       "description": "1inch",
       "type": "price-feed",
@@ -26403,7 +26936,7 @@
       }
     },
     {
-      "id": 359,
+      "id": 368,
       "full_name": "ONG / USD",
       "description": "Ontology Gas",
       "type": "price-feed",
@@ -26478,7 +27011,7 @@
       }
     },
     {
-      "id": 360,
+      "id": 369,
       "full_name": "ONG / USDT",
       "description": "Ontology Gas",
       "type": "price-feed",
@@ -26538,7 +27071,7 @@
       }
     },
     {
-      "id": 361,
+      "id": 370,
       "full_name": "XTZ / BNB",
       "description": "Tezos",
       "type": "price-feed",
@@ -26578,7 +27111,7 @@
       }
     },
     {
-      "id": 362,
+      "id": 371,
       "full_name": "XTZ / USD",
       "description": "Tezos",
       "type": "price-feed",
@@ -26704,7 +27237,7 @@
       }
     },
     {
-      "id": 363,
+      "id": 372,
       "full_name": "XTZ / USDT",
       "description": "Tezos",
       "type": "price-feed",
@@ -26797,7 +27330,7 @@
       }
     },
     {
-      "id": 364,
+      "id": 373,
       "full_name": "XTZ / USDC",
       "description": "Tezos",
       "type": "price-feed",
@@ -26850,7 +27383,7 @@
       }
     },
     {
-      "id": 365,
+      "id": 374,
       "full_name": "BEAM / USD",
       "description": "Beam",
       "type": "price-feed",
@@ -26935,7 +27468,7 @@
       }
     },
     {
-      "id": 366,
+      "id": 375,
       "full_name": "BEAM / USDT",
       "description": "Beam",
       "type": "price-feed",
@@ -27000,7 +27533,7 @@
       }
     },
     {
-      "id": 367,
+      "id": 376,
       "full_name": "XCN / USD",
       "description": "Chain",
       "type": "price-feed",
@@ -27081,7 +27614,7 @@
       }
     },
     {
-      "id": 368,
+      "id": 377,
       "full_name": "XCN / USDT",
       "description": "Chain",
       "type": "price-feed",
@@ -27141,7 +27674,7 @@
       }
     },
     {
-      "id": 369,
+      "id": 378,
       "full_name": "DEGEN / USD",
       "description": "Degen (Base)",
       "type": "price-feed",
@@ -27231,7 +27764,7 @@
       }
     },
     {
-      "id": 370,
+      "id": 379,
       "full_name": "DEGEN / USDT",
       "description": "Degen (Base)",
       "type": "price-feed",
@@ -27291,7 +27824,7 @@
       }
     },
     {
-      "id": 371,
+      "id": 380,
       "full_name": "POL / ETH",
       "description": "Polygon",
       "type": "price-feed",
@@ -27336,7 +27869,7 @@
       }
     },
     {
-      "id": 372,
+      "id": 381,
       "full_name": "SXP / USD",
       "description": "Swipe",
       "type": "price-feed",
@@ -27411,7 +27944,7 @@
       }
     },
     {
-      "id": 373,
+      "id": 382,
       "full_name": "SXP / USDT",
       "description": "Swipe",
       "type": "price-feed",
@@ -27476,7 +28009,7 @@
       }
     },
     {
-      "id": 374,
+      "id": 383,
       "full_name": "CHR / USD",
       "description": "Chromaway",
       "type": "price-feed",
@@ -27563,7 +28096,7 @@
       }
     },
     {
-      "id": 375,
+      "id": 384,
       "full_name": "CHR / USDT",
       "description": "Chromaway",
       "type": "price-feed",
@@ -27628,7 +28161,7 @@
       }
     },
     {
-      "id": 376,
+      "id": 385,
       "full_name": "PENDLE / USD",
       "description": "Pendle",
       "type": "price-feed",
@@ -27726,7 +28259,7 @@
       }
     },
     {
-      "id": 377,
+      "id": 386,
       "full_name": "PENDLE / USDT",
       "description": "Pendle",
       "type": "price-feed",
@@ -27801,7 +28334,7 @@
       }
     },
     {
-      "id": 378,
+      "id": 387,
       "full_name": "PENDLE / USDC",
       "description": "Pendle",
       "type": "price-feed",
@@ -27851,7 +28384,7 @@
       }
     },
     {
-      "id": 379,
+      "id": 388,
       "full_name": "PENGU / USD",
       "description": "Pudgy Penguins",
       "type": "price-feed",
@@ -27965,7 +28498,7 @@
       }
     },
     {
-      "id": 380,
+      "id": 389,
       "full_name": "PENGU / USDT",
       "description": "Pudgy Penguins",
       "type": "price-feed",
@@ -28053,7 +28586,7 @@
       }
     },
     {
-      "id": 381,
+      "id": 390,
       "full_name": "PENGU / USDC",
       "description": "Pudgy Penguins",
       "type": "price-feed",
@@ -28106,7 +28639,7 @@
       }
     },
     {
-      "id": 382,
+      "id": 391,
       "full_name": "SUI / USD",
       "description": "Sui",
       "type": "price-feed",
@@ -28224,7 +28757,7 @@
       }
     },
     {
-      "id": 383,
+      "id": 392,
       "full_name": "SUI / USDT",
       "description": "Sui",
       "type": "price-feed",
@@ -28304,7 +28837,7 @@
       }
     },
     {
-      "id": 384,
+      "id": 393,
       "full_name": "SUI / USDC",
       "description": "Sui",
       "type": "price-feed",
@@ -28374,7 +28907,7 @@
       }
     },
     {
-      "id": 385,
+      "id": 394,
       "full_name": "WEMIX / USD",
       "description": "WEMIX",
       "type": "price-feed",
@@ -28449,7 +28982,7 @@
       }
     },
     {
-      "id": 386,
+      "id": 395,
       "full_name": "WEMIX / USDT",
       "description": "WEMIX",
       "type": "price-feed",
@@ -28509,7 +29042,7 @@
       }
     },
     {
-      "id": 387,
+      "id": 396,
       "full_name": "MANA / USD",
       "description": "Decentraland",
       "type": "price-feed",
@@ -28631,7 +29164,7 @@
       }
     },
     {
-      "id": 388,
+      "id": 397,
       "full_name": "MANA / ETH",
       "description": "Decentraland",
       "type": "price-feed",
@@ -28681,7 +29214,7 @@
       }
     },
     {
-      "id": 389,
+      "id": 398,
       "full_name": "MANA / USDT",
       "description": "Decentraland",
       "type": "price-feed",
@@ -28774,7 +29307,7 @@
       }
     },
     {
-      "id": 390,
+      "id": 399,
       "full_name": "MANA / USDC",
       "description": "Decentraland",
       "type": "price-feed",
@@ -28832,7 +29365,7 @@
       }
     },
     {
-      "id": 391,
+      "id": 400,
       "full_name": "SLP / USD",
       "description": "Smooth Love Potion",
       "type": "price-feed",
@@ -28924,7 +29457,7 @@
       }
     },
     {
-      "id": 392,
+      "id": 401,
       "full_name": "SLP / USDT",
       "description": "Smooth Love Potion",
       "type": "price-feed",
@@ -29004,7 +29537,7 @@
       }
     },
     {
-      "id": 393,
+      "id": 402,
       "full_name": "SLP / USDC",
       "description": "Smooth Love Potion",
       "type": "price-feed",
@@ -29044,7 +29577,7 @@
       }
     },
     {
-      "id": 394,
+      "id": 403,
       "full_name": "CFX / USD",
       "description": "Conflux",
       "type": "price-feed",
@@ -29127,7 +29660,7 @@
       }
     },
     {
-      "id": 395,
+      "id": 404,
       "full_name": "CFX / USDT",
       "description": "Conflux",
       "type": "price-feed",
@@ -29192,7 +29725,7 @@
       }
     },
     {
-      "id": 396,
+      "id": 405,
       "full_name": "CFX / USDC",
       "description": "Conflux",
       "type": "price-feed",
@@ -29242,7 +29775,7 @@
       }
     },
     {
-      "id": 397,
+      "id": 406,
       "full_name": "MATIC / USD",
       "description": "Polygon (MATIC)",
       "type": "price-feed",
@@ -29326,7 +29859,7 @@
       }
     },
     {
-      "id": 398,
+      "id": 407,
       "full_name": "MATIC / USDT",
       "description": "Polygon (MATIC)",
       "type": "price-feed",
@@ -29384,7 +29917,7 @@
       }
     },
     {
-      "id": 399,
+      "id": 408,
       "full_name": "MATIC / USDC",
       "description": "Polygon (MATIC)",
       "type": "price-feed",
@@ -29432,7 +29965,7 @@
       }
     },
     {
-      "id": 400,
+      "id": 409,
       "full_name": "DGB / USD",
       "description": "Digibyte",
       "type": "price-feed",
@@ -29518,7 +30051,7 @@
       }
     },
     {
-      "id": 401,
+      "id": 410,
       "full_name": "DGB / USDT",
       "description": "Digibyte",
       "type": "price-feed",
@@ -29588,7 +30121,7 @@
       }
     },
     {
-      "id": 402,
+      "id": 411,
       "full_name": "DGB / USDC",
       "description": "Digibyte",
       "type": "price-feed",
@@ -29628,7 +30161,7 @@
       }
     },
     {
-      "id": 403,
+      "id": 412,
       "full_name": "MELANIA / USD",
       "description": "Melania Meme",
       "type": "price-feed",
@@ -29713,7 +30246,7 @@
       }
     },
     {
-      "id": 404,
+      "id": 413,
       "full_name": "MELANIA / USDT",
       "description": "Melania Meme",
       "type": "price-feed",
@@ -29781,7 +30314,7 @@
       }
     },
     {
-      "id": 405,
+      "id": 414,
       "full_name": "MELANIA / USDC",
       "description": "Melania Meme",
       "type": "price-feed",
@@ -29829,7 +30362,7 @@
       }
     },
     {
-      "id": 406,
+      "id": 415,
       "full_name": "S / USD",
       "description": "Sonic",
       "type": "price-feed",
@@ -29921,7 +30454,7 @@
       }
     },
     {
-      "id": 407,
+      "id": 416,
       "full_name": "S / USDT",
       "description": "Sonic",
       "type": "price-feed",
@@ -29991,7 +30524,7 @@
       }
     },
     {
-      "id": 408,
+      "id": 417,
       "full_name": "S / USDC",
       "description": "Sonic",
       "type": "price-feed",
@@ -30041,7 +30574,7 @@
       }
     },
     {
-      "id": 409,
+      "id": 418,
       "full_name": "ALT / USD",
       "description": "Altlayer",
       "type": "price-feed",
@@ -30125,7 +30658,7 @@
       }
     },
     {
-      "id": 410,
+      "id": 419,
       "full_name": "ALT / USDT",
       "description": "Altlayer",
       "type": "price-feed",
@@ -30180,7 +30713,7 @@
       }
     },
     {
-      "id": 411,
+      "id": 420,
       "full_name": "ALT / USDC",
       "description": "Altlayer",
       "type": "price-feed",
@@ -30225,7 +30758,7 @@
       }
     },
     {
-      "id": 412,
+      "id": 421,
       "full_name": "AI / USD",
       "description": "Sleepless AI",
       "type": "price-feed",
@@ -30301,7 +30834,7 @@
       }
     },
     {
-      "id": 413,
+      "id": 422,
       "full_name": "AI / USDT",
       "description": "Sleepless AI",
       "type": "price-feed",
@@ -30351,7 +30884,7 @@
       }
     },
     {
-      "id": 414,
+      "id": 423,
       "full_name": "RPL / USD",
       "description": "Rocket Pool",
       "type": "price-feed",
@@ -30450,7 +30983,7 @@
       }
     },
     {
-      "id": 415,
+      "id": 424,
       "full_name": "RPL / USDT",
       "description": "Rocket Pool",
       "type": "price-feed",
@@ -30520,7 +31053,7 @@
       }
     },
     {
-      "id": 416,
+      "id": 425,
       "full_name": "RPL / USDC",
       "description": "Rocket Pool",
       "type": "price-feed",
@@ -30560,7 +31093,7 @@
       }
     },
     {
-      "id": 417,
+      "id": 426,
       "full_name": "HOOK / USD",
       "description": "Hooked Protocol",
       "type": "price-feed",
@@ -30630,7 +31163,7 @@
       }
     },
     {
-      "id": 418,
+      "id": 427,
       "full_name": "HOOK / USDT",
       "description": "Hooked Protocol",
       "type": "price-feed",
@@ -30690,7 +31223,7 @@
       }
     },
     {
-      "id": 419,
+      "id": 428,
       "full_name": "CELO / USD",
       "description": "Celo",
       "type": "price-feed",
@@ -30786,7 +31319,7 @@
       }
     },
     {
-      "id": 420,
+      "id": 429,
       "full_name": "CELO / USDT",
       "description": "Celo",
       "type": "price-feed",
@@ -30861,7 +31394,7 @@
       }
     },
     {
-      "id": 421,
+      "id": 430,
       "full_name": "CELO / USDC",
       "description": "Celo",
       "type": "price-feed",
@@ -30901,7 +31434,7 @@
       }
     },
     {
-      "id": 422,
+      "id": 431,
       "full_name": "JOE / USD",
       "description": "Trader Joe",
       "type": "price-feed",
@@ -30982,7 +31515,7 @@
       }
     },
     {
-      "id": 423,
+      "id": 432,
       "full_name": "JOE / USDT",
       "description": "Trader Joe",
       "type": "price-feed",
@@ -31042,7 +31575,7 @@
       }
     },
     {
-      "id": 424,
+      "id": 433,
       "full_name": "JOE / USDC",
       "description": "Trader Joe",
       "type": "price-feed",
@@ -31082,7 +31615,7 @@
       }
     },
     {
-      "id": 425,
+      "id": 434,
       "full_name": "STG / USD",
       "description": "Stargate Finance",
       "type": "price-feed",
@@ -31187,7 +31720,7 @@
       }
     },
     {
-      "id": 426,
+      "id": 435,
       "full_name": "STG / USDT",
       "description": "Stargate Finance",
       "type": "price-feed",
@@ -31262,7 +31795,7 @@
       }
     },
     {
-      "id": 427,
+      "id": 436,
       "full_name": "GRT / USD",
       "description": "The Graph",
       "type": "price-feed",
@@ -31378,7 +31911,7 @@
       }
     },
     {
-      "id": 428,
+      "id": 437,
       "full_name": "GRT / ETH",
       "description": "The Graph",
       "type": "price-feed",
@@ -31418,7 +31951,7 @@
       }
     },
     {
-      "id": 429,
+      "id": 438,
       "full_name": "GRT / USDT",
       "description": "The Graph",
       "type": "price-feed",
@@ -31498,7 +32031,7 @@
       }
     },
     {
-      "id": 430,
+      "id": 439,
       "full_name": "GRT / USDC",
       "description": "The Graph",
       "type": "price-feed",
@@ -31538,7 +32071,7 @@
       }
     },
     {
-      "id": 431,
+      "id": 440,
       "full_name": "ALPHA / USD",
       "description": "Alpha Finance",
       "type": "price-feed",
@@ -31633,7 +32166,7 @@
       }
     },
     {
-      "id": 432,
+      "id": 441,
       "full_name": "ALPHA / USDT",
       "description": "Alpha Finance",
       "type": "price-feed",
@@ -31698,7 +32231,7 @@
       }
     },
     {
-      "id": 433,
+      "id": 442,
       "full_name": "ALPHA / USDC",
       "description": "Alpha Finance",
       "type": "price-feed",
@@ -31738,7 +32271,7 @@
       }
     },
     {
-      "id": 434,
+      "id": 443,
       "full_name": "QUICK / USD",
       "description": "Quickswap",
       "type": "price-feed",
@@ -31820,7 +32353,7 @@
       }
     },
     {
-      "id": 435,
+      "id": 444,
       "full_name": "QUICK / USDT",
       "description": "Quickswap",
       "type": "price-feed",
@@ -31880,7 +32413,7 @@
       }
     },
     {
-      "id": 436,
+      "id": 445,
       "full_name": "IMX / USD",
       "description": "Immutable",
       "type": "price-feed",
@@ -31992,7 +32525,7 @@
       }
     },
     {
-      "id": 437,
+      "id": 446,
       "full_name": "IMX / USDT",
       "description": "Immutable",
       "type": "price-feed",
@@ -32077,7 +32610,7 @@
       }
     },
     {
-      "id": 438,
+      "id": 447,
       "full_name": "IMX / USDC",
       "description": "Immutable",
       "type": "price-feed",
@@ -32117,7 +32650,7 @@
       }
     },
     {
-      "id": 439,
+      "id": 448,
       "full_name": "STRK / USD",
       "description": "Starknet",
       "type": "price-feed",
@@ -32228,7 +32761,7 @@
       }
     },
     {
-      "id": 440,
+      "id": 449,
       "full_name": "STRK / USDT",
       "description": "Starknet",
       "type": "price-feed",
@@ -32303,7 +32836,7 @@
       }
     },
     {
-      "id": 441,
+      "id": 450,
       "full_name": "STRK / USDC",
       "description": "Starknet",
       "type": "price-feed",
@@ -32358,7 +32891,7 @@
       }
     },
     {
-      "id": 442,
+      "id": 451,
       "full_name": "AI16Z / USD",
       "description": "ai16z",
       "type": "price-feed",
@@ -32447,7 +32980,7 @@
       }
     },
     {
-      "id": 443,
+      "id": 452,
       "full_name": "AI16Z / USDT",
       "description": "ai16z",
       "type": "price-feed",
@@ -32515,7 +33048,7 @@
       }
     },
     {
-      "id": 444,
+      "id": 453,
       "full_name": "AI16Z / USDC",
       "description": "ai16z",
       "type": "price-feed",
@@ -32563,7 +33096,7 @@
       }
     },
     {
-      "id": 445,
+      "id": 454,
       "full_name": "ETHFI / USD",
       "description": "Ether.fi",
       "type": "price-feed",
@@ -32666,7 +33199,7 @@
       }
     },
     {
-      "id": 446,
+      "id": 455,
       "full_name": "ETHFI / USDT",
       "description": "Ether.fi",
       "type": "price-feed",
@@ -32736,7 +33269,7 @@
       }
     },
     {
-      "id": 447,
+      "id": 456,
       "full_name": "ETHFI / USDC",
       "description": "Ether.fi",
       "type": "price-feed",
@@ -32786,7 +33319,7 @@
       }
     },
     {
-      "id": 448,
+      "id": 457,
       "full_name": "CHZ / USD",
       "description": "Chiliz",
       "type": "price-feed",
@@ -32905,7 +33438,7 @@
       }
     },
     {
-      "id": 449,
+      "id": 458,
       "full_name": "CHZ / USDT",
       "description": "Chiliz",
       "type": "price-feed",
@@ -32990,7 +33523,7 @@
       }
     },
     {
-      "id": 450,
+      "id": 459,
       "full_name": "CHZ / USDC",
       "description": "Chiliz",
       "type": "price-feed",
@@ -33040,7 +33573,7 @@
       }
     },
     {
-      "id": 451,
+      "id": 460,
       "full_name": "MEW / USD",
       "description": "cat in a dogs world",
       "type": "price-feed",
@@ -33140,7 +33673,7 @@
       }
     },
     {
-      "id": 452,
+      "id": 461,
       "full_name": "MEW / USDT",
       "description": "cat in a dogs world",
       "type": "price-feed",
@@ -33210,7 +33743,7 @@
       }
     },
     {
-      "id": 453,
+      "id": 462,
       "full_name": "MEW / USDC",
       "description": "cat in a dogs world",
       "type": "price-feed",
@@ -33250,7 +33783,7 @@
       }
     },
     {
-      "id": 454,
+      "id": 463,
       "full_name": "RSR / USD",
       "description": "Reserve Rights",
       "type": "price-feed",
@@ -33341,7 +33874,7 @@
       }
     },
     {
-      "id": 455,
+      "id": 464,
       "full_name": "RSR / USDT",
       "description": "Reserve Rights",
       "type": "price-feed",
@@ -33411,7 +33944,7 @@
       }
     },
     {
-      "id": 456,
+      "id": 465,
       "full_name": "RSR / USDC",
       "description": "Reserve Rights",
       "type": "price-feed",
@@ -33456,7 +33989,7 @@
       }
     },
     {
-      "id": 457,
+      "id": 466,
       "full_name": "COQ / USD",
       "description": "Coq Inu",
       "type": "price-feed",
@@ -33531,7 +34064,7 @@
       }
     },
     {
-      "id": 458,
+      "id": 467,
       "full_name": "COQ / USDT",
       "description": "Coq Inu",
       "type": "price-feed",
@@ -33591,7 +34124,7 @@
       }
     },
     {
-      "id": 459,
+      "id": 468,
       "full_name": "MANTA / USD",
       "description": "Manta Network",
       "type": "price-feed",
@@ -33668,7 +34201,7 @@
       }
     },
     {
-      "id": 460,
+      "id": 469,
       "full_name": "MANTA / USDT",
       "description": "Manta Network",
       "type": "price-feed",
@@ -33733,7 +34266,7 @@
       }
     },
     {
-      "id": 461,
+      "id": 470,
       "full_name": "MANTA / USDC",
       "description": "Manta Network",
       "type": "price-feed",
@@ -33778,7 +34311,7 @@
       }
     },
     {
-      "id": 462,
+      "id": 471,
       "full_name": "ASTR / USD",
       "description": "Astar",
       "type": "price-feed",
@@ -33879,7 +34412,7 @@
       }
     },
     {
-      "id": 463,
+      "id": 472,
       "full_name": "ASTR / USDT",
       "description": "Astar",
       "type": "price-feed",
@@ -33959,7 +34492,7 @@
       }
     },
     {
-      "id": 464,
+      "id": 473,
       "full_name": "ASTR / USDC",
       "description": "Astar",
       "type": "price-feed",
@@ -33999,7 +34532,7 @@
       }
     },
     {
-      "id": 465,
+      "id": 474,
       "full_name": "WLD / USD",
       "description": "Worldcoin",
       "type": "price-feed",
@@ -34100,7 +34633,7 @@
       }
     },
     {
-      "id": 466,
+      "id": 475,
       "full_name": "WLD / USDT",
       "description": "Worldcoin",
       "type": "price-feed",
@@ -34175,7 +34708,7 @@
       }
     },
     {
-      "id": 467,
+      "id": 476,
       "full_name": "WLD / USDC",
       "description": "Worldcoin",
       "type": "price-feed",
@@ -34235,7 +34768,7 @@
       }
     },
     {
-      "id": 468,
+      "id": 477,
       "full_name": "TAO / USD",
       "description": "Bittensor",
       "type": "price-feed",
@@ -34327,7 +34860,7 @@
       }
     },
     {
-      "id": 469,
+      "id": 478,
       "full_name": "TAO / USDT",
       "description": "Bittensor",
       "type": "price-feed",
@@ -34387,7 +34920,7 @@
       }
     },
     {
-      "id": 470,
+      "id": 479,
       "full_name": "TAO / USDC",
       "description": "Bittensor",
       "type": "price-feed",
@@ -34437,7 +34970,7 @@
       }
     },
     {
-      "id": 471,
+      "id": 480,
       "full_name": "PIXEL / USD",
       "description": "Pixels",
       "type": "price-feed",
@@ -34522,7 +35055,7 @@
       }
     },
     {
-      "id": 472,
+      "id": 481,
       "full_name": "PIXEL / USDT",
       "description": "Pixels",
       "type": "price-feed",
@@ -34592,7 +35125,7 @@
       }
     },
     {
-      "id": 473,
+      "id": 482,
       "full_name": "PIXEL / USDC",
       "description": "Pixels",
       "type": "price-feed",
@@ -34637,7 +35170,7 @@
       }
     },
     {
-      "id": 474,
+      "id": 483,
       "full_name": "POPCAT / USD",
       "description": "POPCAT",
       "type": "price-feed",
@@ -34729,7 +35262,7 @@
       }
     },
     {
-      "id": 475,
+      "id": 484,
       "full_name": "POPCAT / USDT",
       "description": "POPCAT",
       "type": "price-feed",
@@ -34789,7 +35322,7 @@
       }
     },
     {
-      "id": 476,
+      "id": 485,
       "full_name": "EGLD / USD",
       "description": "MultiversX",
       "type": "price-feed",
@@ -34905,7 +35438,7 @@
       }
     },
     {
-      "id": 477,
+      "id": 486,
       "full_name": "EGLD / USDT",
       "description": "MultiversX",
       "type": "price-feed",
@@ -34990,7 +35523,7 @@
       }
     },
     {
-      "id": 478,
+      "id": 487,
       "full_name": "EGLD / USDC",
       "description": "MultiversX",
       "type": "price-feed",
@@ -35030,7 +35563,7 @@
       }
     },
     {
-      "id": 479,
+      "id": 488,
       "full_name": "LTC / BNB",
       "description": "Litecoin",
       "type": "price-feed",
@@ -35070,7 +35603,7 @@
       }
     },
     {
-      "id": 480,
+      "id": 489,
       "full_name": "LTC / USD",
       "description": "Litecoin",
       "type": "price-feed",
@@ -35197,7 +35730,7 @@
       }
     },
     {
-      "id": 481,
+      "id": 490,
       "full_name": "LTC / USDT",
       "description": "Litecoin",
       "type": "price-feed",
@@ -35285,7 +35818,7 @@
       }
     },
     {
-      "id": 482,
+      "id": 491,
       "full_name": "LTC / USDC",
       "description": "Litecoin",
       "type": "price-feed",
@@ -35363,7 +35896,7 @@
       }
     },
     {
-      "id": 483,
+      "id": 492,
       "full_name": "TIA / USD",
       "description": "Celestia",
       "type": "price-feed",
@@ -35474,7 +36007,7 @@
       }
     },
     {
-      "id": 484,
+      "id": 493,
       "full_name": "TIA / USDT",
       "description": "Celestia",
       "type": "price-feed",
@@ -35549,7 +36082,7 @@
       }
     },
     {
-      "id": 485,
+      "id": 494,
       "full_name": "TIA / USDC",
       "description": "Celestia",
       "type": "price-feed",
@@ -35604,7 +36137,7 @@
       }
     },
     {
-      "id": 486,
+      "id": 495,
       "full_name": "EIGEN / USD",
       "description": "Eigenlayer",
       "type": "price-feed",
@@ -35715,7 +36248,7 @@
       }
     },
     {
-      "id": 487,
+      "id": 496,
       "full_name": "EIGEN / USDT",
       "description": "Eigenlayer",
       "type": "price-feed",
@@ -35790,7 +36323,7 @@
       }
     },
     {
-      "id": 488,
+      "id": 497,
       "full_name": "EIGEN / USDC",
       "description": "Eigenlayer",
       "type": "price-feed",
@@ -35835,7 +36368,7 @@
       }
     },
     {
-      "id": 489,
+      "id": 498,
       "full_name": "FRAX / USD",
       "description": "FRAX",
       "type": "price-feed",
@@ -35885,7 +36418,7 @@
       }
     },
     {
-      "id": 490,
+      "id": 499,
       "full_name": "FRAX / USDT",
       "description": "FRAX",
       "type": "price-feed",
@@ -35925,7 +36458,7 @@
       }
     },
     {
-      "id": 491,
+      "id": 500,
       "full_name": "AXL / USD",
       "description": "Axelar",
       "type": "price-feed",
@@ -35999,7 +36532,7 @@
       }
     },
     {
-      "id": 492,
+      "id": 501,
       "full_name": "AXL / USDT",
       "description": "Axelar",
       "type": "price-feed",
@@ -36054,7 +36587,7 @@
       }
     },
     {
-      "id": 493,
+      "id": 502,
       "full_name": "GRIFFAIN / USD",
       "description": "GRIFFAIN",
       "type": "price-feed",
@@ -36127,7 +36660,7 @@
       }
     },
     {
-      "id": 494,
+      "id": 503,
       "full_name": "GRIFFAIN / USDT",
       "description": "GRIFFAIN",
       "type": "price-feed",
@@ -36182,7 +36715,7 @@
       }
     },
     {
-      "id": 495,
+      "id": 504,
       "full_name": "SUSHI / USD",
       "description": "Sushi",
       "type": "price-feed",
@@ -36298,7 +36831,7 @@
       }
     },
     {
-      "id": 496,
+      "id": 505,
       "full_name": "SUSHI / ETH",
       "description": "Sushi",
       "type": "price-feed",
@@ -36343,7 +36876,7 @@
       }
     },
     {
-      "id": 497,
+      "id": 506,
       "full_name": "SUSHI / USDT",
       "description": "Sushi",
       "type": "price-feed",
@@ -36423,7 +36956,7 @@
       }
     },
     {
-      "id": 498,
+      "id": 507,
       "full_name": "SUSHI / USDC",
       "description": "Sushi",
       "type": "price-feed",
@@ -36463,7 +36996,7 @@
       }
     },
     {
-      "id": 499,
+      "id": 508,
       "full_name": "HBAR / USD",
       "description": "Hedera Hashgraph",
       "type": "price-feed",
@@ -36564,7 +37097,7 @@
       }
     },
     {
-      "id": 500,
+      "id": 509,
       "full_name": "HBAR / USDT",
       "description": "Hedera Hashgraph",
       "type": "price-feed",
@@ -36649,7 +37182,7 @@
       }
     },
     {
-      "id": 501,
+      "id": 510,
       "full_name": "HBAR / USDC",
       "description": "Hedera Hashgraph",
       "type": "price-feed",
@@ -36699,7 +37232,7 @@
       }
     },
     {
-      "id": 502,
+      "id": 511,
       "full_name": "TRX / USD",
       "description": "Tron",
       "type": "price-feed",
@@ -36814,7 +37347,7 @@
       }
     },
     {
-      "id": 503,
+      "id": 512,
       "full_name": "TRX / USDT",
       "description": "Tron",
       "type": "price-feed",
@@ -36899,7 +37432,7 @@
       }
     },
     {
-      "id": 504,
+      "id": 513,
       "full_name": "TRX / USDC",
       "description": "Tron",
       "type": "price-feed",
@@ -36969,7 +37502,7 @@
       }
     },
     {
-      "id": 505,
+      "id": 514,
       "full_name": "AEVO / USD",
       "description": "Aevo",
       "type": "price-feed",
@@ -37063,7 +37596,7 @@
       }
     },
     {
-      "id": 506,
+      "id": 515,
       "full_name": "AEVO / USDT",
       "description": "Aevo",
       "type": "price-feed",
@@ -37133,7 +37666,7 @@
       }
     },
     {
-      "id": 507,
+      "id": 516,
       "full_name": "AEVO / USDC",
       "description": "Aevo",
       "type": "price-feed",
@@ -37173,7 +37706,7 @@
       }
     },
     {
-      "id": 508,
+      "id": 517,
       "full_name": "SHIB / USD",
       "description": "Shiba Inu",
       "type": "price-feed",
@@ -37316,7 +37849,7 @@
       }
     },
     {
-      "id": 509,
+      "id": 518,
       "full_name": "SHIB / USDT",
       "description": "Shiba Inu",
       "type": "price-feed",
@@ -37414,7 +37947,7 @@
       }
     },
     {
-      "id": 510,
+      "id": 519,
       "full_name": "SHIB / USDC",
       "description": "Shiba Inu",
       "type": "price-feed",
@@ -37492,7 +38025,7 @@
       }
     },
     {
-      "id": 511,
+      "id": 520,
       "full_name": "FDUSD / USD",
       "description": "First Digital USD",
       "type": "price-feed",
@@ -37564,7 +38097,7 @@
       }
     },
     {
-      "id": 512,
+      "id": 521,
       "full_name": "FDUSD / USDT",
       "description": "First Digital USD",
       "type": "price-feed",
@@ -37624,7 +38157,7 @@
       }
     },
     {
-      "id": 513,
+      "id": 522,
       "full_name": "FDUSD / USDC",
       "description": "First Digital USD",
       "type": "price-feed",
@@ -37669,7 +38202,7 @@
       }
     },
     {
-      "id": 514,
+      "id": 523,
       "full_name": "FARTCOIN / USD",
       "description": "Fartcoin",
       "type": "price-feed",
@@ -37755,7 +38288,7 @@
       }
     },
     {
-      "id": 515,
+      "id": 524,
       "full_name": "FARTCOIN / USDT",
       "description": "Fartcoin",
       "type": "price-feed",
@@ -37818,7 +38351,7 @@
       }
     },
     {
-      "id": 516,
+      "id": 525,
       "full_name": "FARTCOIN / USDC",
       "description": "Fartcoin",
       "type": "price-feed",
@@ -37866,7 +38399,7 @@
       }
     },
     {
-      "id": 517,
+      "id": 526,
       "full_name": "CYBER / USD",
       "description": "CYBER",
       "type": "price-feed",
@@ -37956,7 +38489,7 @@
       }
     },
     {
-      "id": 518,
+      "id": 527,
       "full_name": "CYBER / USDT",
       "description": "CYBER",
       "type": "price-feed",
@@ -38021,7 +38554,7 @@
       }
     },
     {
-      "id": 519,
+      "id": 528,
       "full_name": "XLM / USD",
       "description": "Stellar",
       "type": "price-feed",
@@ -38147,7 +38680,7 @@
       }
     },
     {
-      "id": 520,
+      "id": 529,
       "full_name": "XLM / USDT",
       "description": "Stellar",
       "type": "price-feed",
@@ -38242,7 +38775,7 @@
       }
     },
     {
-      "id": 521,
+      "id": 530,
       "full_name": "XLM / USDC",
       "description": "Stellar",
       "type": "price-feed",
@@ -38302,7 +38835,7 @@
       }
     },
     {
-      "id": 522,
+      "id": 531,
       "full_name": "HIGH / USD",
       "description": "Highstreet",
       "type": "price-feed",
@@ -38383,7 +38916,7 @@
       }
     },
     {
-      "id": 523,
+      "id": 532,
       "full_name": "HIGH / USDT",
       "description": "Highstreet",
       "type": "price-feed",
@@ -38448,7 +38981,7 @@
       }
     },
     {
-      "id": 524,
+      "id": 533,
       "full_name": "BERA / USD",
       "description": "Berachain",
       "type": "price-feed",
@@ -38558,7 +39091,7 @@
       }
     },
     {
-      "id": 525,
+      "id": 534,
       "full_name": "BERA / USDT",
       "description": "Berachain",
       "type": "price-feed",
@@ -38641,7 +39174,7 @@
       }
     },
     {
-      "id": 526,
+      "id": 535,
       "full_name": "BERA / USDC",
       "description": "Berachain",
       "type": "price-feed",
@@ -38689,7 +39222,7 @@
       }
     },
     {
-      "id": 527,
+      "id": 536,
       "full_name": "BLUR / USD",
       "description": "Blur",
       "type": "price-feed",
@@ -38796,7 +39329,7 @@
       }
     },
     {
-      "id": 528,
+      "id": 537,
       "full_name": "BLUR / USDT",
       "description": "Blur",
       "type": "price-feed",
@@ -38871,7 +39404,7 @@
       }
     },
     {
-      "id": 529,
+      "id": 538,
       "full_name": "BLUR / USDC",
       "description": "Blur",
       "type": "price-feed",
@@ -38921,7 +39454,7 @@
       }
     },
     {
-      "id": 530,
+      "id": 539,
       "full_name": "ZEC / USD",
       "description": "ZCash",
       "type": "price-feed",
@@ -39011,7 +39544,7 @@
       }
     },
     {
-      "id": 531,
+      "id": 540,
       "full_name": "ZEC / USDT",
       "description": "ZCash",
       "type": "price-feed",
@@ -39066,7 +39599,7 @@
       }
     },
     {
-      "id": 532,
+      "id": 541,
       "full_name": "ZEC / USDC",
       "description": "ZCash",
       "type": "price-feed",
@@ -39111,7 +39644,7 @@
       }
     },
     {
-      "id": 533,
+      "id": 542,
       "full_name": "ACE / USD",
       "description": "Fusionist",
       "type": "price-feed",
@@ -39195,7 +39728,7 @@
       }
     },
     {
-      "id": 534,
+      "id": 543,
       "full_name": "ACE / USDT",
       "description": "Fusionist",
       "type": "price-feed",
@@ -39260,7 +39793,7 @@
       }
     },
     {
-      "id": 535,
+      "id": 544,
       "full_name": "ACE / USDC",
       "description": "Fusionist",
       "type": "price-feed",
@@ -39300,7 +39833,7 @@
       }
     },
     {
-      "id": 536,
+      "id": 545,
       "full_name": "DYDX / USD",
       "description": "dYdX",
       "type": "price-feed",
@@ -39398,7 +39931,7 @@
       }
     },
     {
-      "id": 537,
+      "id": 546,
       "full_name": "DYDX / USDT",
       "description": "dYdX",
       "type": "price-feed",
@@ -39473,7 +40006,7 @@
       }
     },
     {
-      "id": 538,
+      "id": 547,
       "full_name": "DYDX / USDC",
       "description": "dYdX",
       "type": "price-feed",
@@ -39523,7 +40056,7 @@
       }
     },
     {
-      "id": 539,
+      "id": 548,
       "full_name": "ZBU / USD",
       "description": "Zeebu",
       "type": "price-feed",
@@ -39583,7 +40116,7 @@
       }
     },
     {
-      "id": 540,
+      "id": 549,
       "full_name": "ZBU / USDT",
       "description": "Zeebu",
       "type": "price-feed",
@@ -39633,7 +40166,7 @@
       }
     },
     {
-      "id": 541,
+      "id": 550,
       "full_name": "FLOKI / USD",
       "description": "Floki Inu",
       "type": "price-feed",
@@ -39760,7 +40293,7 @@
       }
     },
     {
-      "id": 542,
+      "id": 551,
       "full_name": "FLOKI / USDT",
       "description": "Floki Inu",
       "type": "price-feed",
@@ -39840,7 +40373,7 @@
       }
     },
     {
-      "id": 543,
+      "id": 552,
       "full_name": "FLOKI / USDC",
       "description": "Floki Inu",
       "type": "price-feed",
@@ -39905,7 +40438,7 @@
       }
     },
     {
-      "id": 544,
+      "id": 553,
       "full_name": "BSW / USD",
       "description": "Biswap",
       "type": "price-feed",
@@ -39977,7 +40510,7 @@
       }
     },
     {
-      "id": 545,
+      "id": 554,
       "full_name": "BSW / USDT",
       "description": "Biswap",
       "type": "price-feed",
@@ -40037,7 +40570,7 @@
       }
     },
     {
-      "id": 546,
+      "id": 555,
       "full_name": "USDT / USD",
       "description": "Tether USD",
       "type": "price-feed",
@@ -40122,7 +40655,7 @@
       }
     },
     {
-      "id": 547,
+      "id": 556,
       "full_name": "USDT / USDC",
       "description": "Tether USD",
       "type": "price-feed",
@@ -40172,7 +40705,7 @@
       }
     },
     {
-      "id": 548,
+      "id": 557,
       "full_name": "SNX / USD",
       "description": "Synthetix Network",
       "type": "price-feed",
@@ -40278,7 +40811,7 @@
       }
     },
     {
-      "id": 549,
+      "id": 558,
       "full_name": "SNX / ETH",
       "description": "Synthetix Network",
       "type": "price-feed",
@@ -40328,7 +40861,7 @@
       }
     },
     {
-      "id": 550,
+      "id": 559,
       "full_name": "SNX / USDT",
       "description": "Synthetix Network",
       "type": "price-feed",
@@ -40408,7 +40941,7 @@
       }
     },
     {
-      "id": 551,
+      "id": 560,
       "full_name": "SNX / USDC",
       "description": "Synthetix Network",
       "type": "price-feed",
@@ -40448,7 +40981,7 @@
       }
     },
     {
-      "id": 552,
+      "id": 561,
       "full_name": "BAND / BNB",
       "description": "Band Protocol",
       "type": "price-feed",
@@ -40488,7 +41021,7 @@
       }
     },
     {
-      "id": 553,
+      "id": 562,
       "full_name": "BAND / USD",
       "description": "Band Protocol",
       "type": "price-feed",
@@ -40584,7 +41117,7 @@
       }
     },
     {
-      "id": 554,
+      "id": 563,
       "full_name": "BAND / USDT",
       "description": "Band Protocol",
       "type": "price-feed",
@@ -40654,7 +41187,7 @@
       }
     },
     {
-      "id": 555,
+      "id": 564,
       "full_name": "BAND / USDC",
       "description": "Band Protocol",
       "type": "price-feed",
@@ -40694,7 +41227,7 @@
       }
     },
     {
-      "id": 556,
+      "id": 565,
       "full_name": "DOGS / USD",
       "description": "DOGS",
       "type": "price-feed",
@@ -40804,7 +41337,7 @@
       }
     },
     {
-      "id": 557,
+      "id": 566,
       "full_name": "DOGS / USDT",
       "description": "DOGS",
       "type": "price-feed",
@@ -40879,7 +41412,7 @@
       }
     },
     {
-      "id": 558,
+      "id": 567,
       "full_name": "DOGS / USDC",
       "description": "DOGS",
       "type": "price-feed",
@@ -40929,7 +41462,7 @@
       }
     },
     {
-      "id": 559,
+      "id": 568,
       "full_name": "ZK / USD",
       "description": "ZKsync",
       "type": "price-feed",
@@ -41032,7 +41565,7 @@
       }
     },
     {
-      "id": 560,
+      "id": 569,
       "full_name": "ZK / USDT",
       "description": "ZKsync",
       "type": "price-feed",
@@ -41107,7 +41640,7 @@
       }
     },
     {
-      "id": 561,
+      "id": 570,
       "full_name": "ZK / USDC",
       "description": "ZKsync",
       "type": "price-feed",
@@ -41157,7 +41690,7 @@
       }
     },
     {
-      "id": 562,
+      "id": 571,
       "full_name": "ONT / USD",
       "description": "Ontology",
       "type": "price-feed",
@@ -41245,7 +41778,7 @@
       }
     },
     {
-      "id": 563,
+      "id": 572,
       "full_name": "ONT / USDT",
       "description": "Ontology",
       "type": "price-feed",
@@ -41315,7 +41848,7 @@
       }
     },
     {
-      "id": 564,
+      "id": 573,
       "full_name": "ONT / USDC",
       "description": "Ontology",
       "type": "price-feed",
@@ -41365,7 +41898,7 @@
       }
     },
     {
-      "id": 565,
+      "id": 574,
       "full_name": "APE / ETH",
       "description": "APECoin",
       "type": "price-feed",
@@ -41405,7 +41938,7 @@
       }
     },
     {
-      "id": 566,
+      "id": 575,
       "full_name": "DAI / USD",
       "description": "DAI",
       "type": "price-feed",
@@ -41519,7 +42052,7 @@
       }
     },
     {
-      "id": 567,
+      "id": 576,
       "full_name": "DAI / BNB",
       "description": "DAI",
       "type": "price-feed",
@@ -41559,7 +42092,7 @@
       }
     },
     {
-      "id": 568,
+      "id": 577,
       "full_name": "DAI / USDT",
       "description": "DAI",
       "type": "price-feed",
@@ -41637,7 +42170,7 @@
       }
     },
     {
-      "id": 569,
+      "id": 578,
       "full_name": "DAI / USDC",
       "description": "DAI",
       "type": "price-feed",
@@ -41687,7 +42220,7 @@
       }
     },
     {
-      "id": 570,
+      "id": 579,
       "full_name": "VIRTUAL / USD",
       "description": "Virtuals Protocol",
       "type": "price-feed",
@@ -41782,7 +42315,7 @@
       }
     },
     {
-      "id": 571,
+      "id": 580,
       "full_name": "VIRTUAL / USDT",
       "description": "Virtuals Protocol",
       "type": "price-feed",
@@ -41860,7 +42393,7 @@
       }
     },
     {
-      "id": 572,
+      "id": 581,
       "full_name": "VIRTUAL / USDC",
       "description": "Virtuals Protocol",
       "type": "price-feed",
@@ -41908,7 +42441,7 @@
       }
     },
     {
-      "id": 573,
+      "id": 582,
       "full_name": "FTM / USD",
       "description": "Fantom",
       "type": "price-feed",
@@ -41967,7 +42500,7 @@
       }
     },
     {
-      "id": 574,
+      "id": 583,
       "full_name": "FTM / USDT",
       "description": "Fantom",
       "type": "price-feed",
@@ -42012,7 +42545,7 @@
       }
     },
     {
-      "id": 575,
+      "id": 584,
       "full_name": "FTM / USDC",
       "description": "Fantom",
       "type": "price-feed",
@@ -42052,7 +42585,7 @@
       }
     },
     {
-      "id": 576,
+      "id": 585,
       "full_name": "ID / USD",
       "description": "SPACE ID",
       "type": "price-feed",
@@ -42135,7 +42668,7 @@
       }
     },
     {
-      "id": 577,
+      "id": 586,
       "full_name": "ID / USDT",
       "description": "SPACE ID",
       "type": "price-feed",
@@ -42205,7 +42738,7 @@
       }
     },
     {
-      "id": 578,
+      "id": 587,
       "full_name": "ID / USDC",
       "description": "SPACE ID",
       "type": "price-feed",
@@ -42245,7 +42778,7 @@
       }
     },
     {
-      "id": 579,
+      "id": 588,
       "full_name": "UNI / USD",
       "description": "Uniswap",
       "type": "price-feed",
@@ -42376,7 +42909,7 @@
       }
     },
     {
-      "id": 580,
+      "id": 589,
       "full_name": "UNI / BNB",
       "description": "Uniswap",
       "type": "price-feed",
@@ -42416,7 +42949,7 @@
       }
     },
     {
-      "id": 581,
+      "id": 590,
       "full_name": "UNI / ETH",
       "description": "Uniswap",
       "type": "price-feed",
@@ -42469,7 +43002,7 @@
       }
     },
     {
-      "id": 582,
+      "id": 591,
       "full_name": "UNI / USDT",
       "description": "Uniswap",
       "type": "price-feed",
@@ -42554,7 +43087,7 @@
       }
     },
     {
-      "id": 583,
+      "id": 592,
       "full_name": "UNI / USDC",
       "description": "Uniswap",
       "type": "price-feed",
@@ -42619,7 +43152,7 @@
       }
     },
     {
-      "id": 584,
+      "id": 593,
       "full_name": "TUSD / ETH",
       "description": "TrueUSD",
       "type": "price-feed",
@@ -42659,7 +43192,7 @@
       }
     },
     {
-      "id": 585,
+      "id": 594,
       "full_name": "XRP / BNB",
       "description": "Ripple",
       "type": "price-feed",
@@ -42699,7 +43232,7 @@
       }
     },
     {
-      "id": 586,
+      "id": 595,
       "full_name": "OP / USD",
       "description": "Optimism",
       "type": "price-feed",
@@ -42818,7 +43351,7 @@
       }
     },
     {
-      "id": 587,
+      "id": 596,
       "full_name": "OP / USDT",
       "description": "Optimism",
       "type": "price-feed",
@@ -42903,7 +43436,7 @@
       }
     },
     {
-      "id": 588,
+      "id": 597,
       "full_name": "OP / USDC",
       "description": "Optimism",
       "type": "price-feed",
@@ -42973,7 +43506,7 @@
       }
     },
     {
-      "id": 589,
+      "id": 598,
       "full_name": "ALCX / USD",
       "description": "Alchemix",
       "type": "price-feed",
@@ -43053,7 +43586,7 @@
       }
     },
     {
-      "id": 590,
+      "id": 599,
       "full_name": "ALCX / USDT",
       "description": "Alchemix",
       "type": "price-feed",
@@ -43108,7 +43641,7 @@
       }
     },
     {
-      "id": 591,
+      "id": 600,
       "full_name": "ALCX / USDC",
       "description": "Alchemix",
       "type": "price-feed",
@@ -43148,7 +43681,7 @@
       }
     },
     {
-      "id": 592,
+      "id": 601,
       "full_name": "XRP / USD",
       "description": "XRP",
       "type": "price-feed",
@@ -43288,7 +43821,7 @@
       }
     },
     {
-      "id": 593,
+      "id": 602,
       "full_name": "XRP / USDT",
       "description": "XRP",
       "type": "price-feed",
@@ -43391,7 +43924,7 @@
       }
     },
     {
-      "id": 594,
+      "id": 603,
       "full_name": "XRP / USDC",
       "description": "XRP",
       "type": "price-feed",
@@ -43469,7 +44002,7 @@
       }
     },
     {
-      "id": 595,
+      "id": 604,
       "full_name": "TRB / USD",
       "description": "Tellor Tributes",
       "type": "price-feed",
@@ -43554,7 +44087,7 @@
       }
     },
     {
-      "id": 596,
+      "id": 605,
       "full_name": "TRB / USDT",
       "description": "Tellor Tributes",
       "type": "price-feed",
@@ -43619,7 +44152,7 @@
       }
     },
     {
-      "id": 597,
+      "id": 606,
       "full_name": "TRB / USDC",
       "description": "Tellor Tributes",
       "type": "price-feed",
@@ -43669,7 +44202,7 @@
       }
     },
     {
-      "id": 598,
+      "id": 607,
       "full_name": "TURBO / USD",
       "description": "Turbo",
       "type": "price-feed",
@@ -43776,7 +44309,7 @@
       }
     },
     {
-      "id": 599,
+      "id": 608,
       "full_name": "TURBO / USDT",
       "description": "Turbo",
       "type": "price-feed",
@@ -43846,7 +44379,7 @@
       }
     },
     {
-      "id": 600,
+      "id": 609,
       "full_name": "TURBO / USDC",
       "description": "Turbo",
       "type": "price-feed",
@@ -43896,7 +44429,7 @@
       }
     },
     {
-      "id": 601,
+      "id": 610,
       "full_name": "ONDO / USD",
       "description": "Ondo",
       "type": "price-feed",
@@ -44000,7 +44533,7 @@
       }
     },
     {
-      "id": 602,
+      "id": 611,
       "full_name": "ONDO / USDT",
       "description": "Ondo",
       "type": "price-feed",
@@ -44075,7 +44608,7 @@
       }
     },
     {
-      "id": 603,
+      "id": 612,
       "full_name": "ONDO / USDC",
       "description": "Ondo",
       "type": "price-feed",
@@ -44130,7 +44663,7 @@
       }
     },
     {
-      "id": 604,
+      "id": 613,
       "full_name": "BTC / USD",
       "description": "Bitcoin",
       "type": "price-feed",
@@ -44271,7 +44804,7 @@
       }
     },
     {
-      "id": 605,
+      "id": 614,
       "full_name": "BTC / USDT",
       "description": "Bitcoin",
       "type": "price-feed",
@@ -44371,7 +44904,7 @@
       }
     },
     {
-      "id": 606,
+      "id": 615,
       "full_name": "BTC / USDC",
       "description": "Bitcoin",
       "type": "price-feed",
@@ -44451,7 +44984,7 @@
       }
     },
     {
-      "id": 607,
+      "id": 616,
       "full_name": "FOXY / USD",
       "description": "Foxy",
       "type": "price-feed",
@@ -44518,7 +45051,7 @@
       }
     },
     {
-      "id": 608,
+      "id": 617,
       "full_name": "FOXY / USDT",
       "description": "Foxy",
       "type": "price-feed",
@@ -44573,7 +45106,7 @@
       }
     },
     {
-      "id": 609,
+      "id": 618,
       "full_name": "JUP / USD",
       "description": "Jupiter",
       "type": "price-feed",
@@ -44688,7 +45221,7 @@
       }
     },
     {
-      "id": 610,
+      "id": 619,
       "full_name": "JUP / USDT",
       "description": "Jupiter",
       "type": "price-feed",
@@ -44768,7 +45301,7 @@
       }
     },
     {
-      "id": 611,
+      "id": 620,
       "full_name": "JUP / USDC",
       "description": "Jupiter",
       "type": "price-feed",
@@ -44818,7 +45351,7 @@
       }
     },
     {
-      "id": 612,
+      "id": 621,
       "full_name": "KAVA / USD",
       "description": "Kava",
       "type": "price-feed",
@@ -44923,7 +45456,7 @@
       }
     },
     {
-      "id": 613,
+      "id": 622,
       "full_name": "KAVA / USDT",
       "description": "Kava",
       "type": "price-feed",
@@ -44998,7 +45531,7 @@
       }
     },
     {
-      "id": 614,
+      "id": 623,
       "full_name": "MICHI / USD",
       "description": "michi",
       "type": "price-feed",
@@ -45066,7 +45599,7 @@
       }
     },
     {
-      "id": 615,
+      "id": 624,
       "full_name": "MICHI / USDT",
       "description": "michi",
       "type": "price-feed",
@@ -45116,7 +45649,7 @@
       }
     },
     {
-      "id": 616,
+      "id": 625,
       "full_name": "CUSD / USD",
       "description": "Celo Dollar",
       "type": "price-feed",
@@ -45173,7 +45706,7 @@
       }
     },
     {
-      "id": 617,
+      "id": 626,
       "full_name": "CUSD / USDT",
       "description": "Celo Dollar",
       "type": "price-feed",
@@ -45218,7 +45751,7 @@
       }
     },
     {
-      "id": 618,
+      "id": 627,
       "full_name": "ZRX / USD",
       "description": "0x",
       "type": "price-feed",
@@ -45338,7 +45871,57 @@
       }
     },
     {
-      "id": 619,
+      "id": 628,
+      "full_name": "deUSD / USD",
+      "description": "",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "deUSD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "exchanges": {
+            "Bitget": {
+              "symbol": [
+                "DEUSDUSDT_SPBL"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "DEUSD"
+              ],
+              "id": [
+                31024
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "deUSD / USD"
+        }
+      }
+    },
+    {
+      "id": 629,
       "full_name": "USDX / USD",
       "description": "",
       "type": "price-feed",
@@ -45383,7 +45966,7 @@
       }
     },
     {
-      "id": 620,
+      "id": 630,
       "full_name": "LISTA / USD",
       "description": "",
       "type": "price-feed",
@@ -45453,7 +46036,7 @@
       }
     },
     {
-      "id": 621,
+      "id": 631,
       "full_name": "ANON / USD",
       "description": "",
       "type": "price-feed",
@@ -45518,7 +46101,7 @@
       }
     },
     {
-      "id": 622,
+      "id": 632,
       "full_name": "USR / USD",
       "description": "",
       "type": "price-feed",
@@ -45561,7 +46144,7 @@
       }
     },
     {
-      "id": 623,
+      "id": 633,
       "full_name": "USDL / USD",
       "description": "",
       "type": "price-feed",
@@ -45604,7 +46187,7 @@
       }
     },
     {
-      "id": 624,
+      "id": 634,
       "full_name": "CORE / USD",
       "description": "",
       "type": "price-feed",
@@ -45677,7 +46260,7 @@
       }
     },
     {
-      "id": 625,
+      "id": 635,
       "full_name": "KLIMA / USD",
       "description": "",
       "type": "price-feed",
@@ -45732,7 +46315,7 @@
       }
     },
     {
-      "id": 626,
+      "id": 636,
       "full_name": "ZRX / ETH",
       "description": "0x",
       "type": "price-feed",
@@ -45772,7 +46355,57 @@
       }
     },
     {
-      "id": 627,
+      "id": 637,
+      "full_name": "USDtb / USD",
+      "description": "",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDtb",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": null,
+        "arguments": {
+          "exchanges": {
+            "Bybit": {
+              "symbol": [
+                "USDTBUSDT"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "USDTb"
+              ],
+              "id": [
+                34691
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "USDtb / USD"
+        }
+      }
+    },
+    {
+      "id": 638,
       "full_name": "USD0++ / USD",
       "description": "",
       "type": "price-feed",
@@ -45815,7 +46448,7 @@
       }
     },
     {
-      "id": 628,
+      "id": 639,
       "full_name": "ZRX / USDT",
       "description": "0x",
       "type": "price-feed",
@@ -45895,7 +46528,7 @@
       }
     },
     {
-      "id": 629,
+      "id": 640,
       "full_name": "ZRX / USDC",
       "description": "0x",
       "type": "price-feed",
@@ -45935,7 +46568,47 @@
       }
     },
     {
-      "id": 630,
+      "id": 641,
+      "full_name": "deUSD / USDT",
+      "description": "",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "deUSD",
+          "quote": "USDT"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "exchanges": {
+            "Bitget": {
+              "symbol": [
+                "DEUSDUSDT_SPBL"
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "deUSD / USD"
+        }
+      }
+    },
+    {
+      "id": 642,
       "full_name": "LISTA / USDT",
       "description": "",
       "type": "price-feed",
@@ -45995,7 +46668,7 @@
       }
     },
     {
-      "id": 631,
+      "id": 643,
       "full_name": "ANON / USDT",
       "description": "",
       "type": "price-feed",
@@ -46040,7 +46713,7 @@
       }
     },
     {
-      "id": 632,
+      "id": 644,
       "full_name": "CORE / USDT",
       "description": "",
       "type": "price-feed",
@@ -46100,7 +46773,7 @@
       }
     },
     {
-      "id": 633,
+      "id": 645,
       "full_name": "CORE / USDC",
       "description": "",
       "type": "price-feed",
@@ -46140,7 +46813,7 @@
       }
     },
     {
-      "id": 634,
+      "id": 646,
       "full_name": "KLIMA / USDT",
       "description": "",
       "type": "price-feed",
@@ -46185,7 +46858,47 @@
       }
     },
     {
-      "id": 635,
+      "id": 647,
+      "full_name": "USDtb / USDT",
+      "description": "",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDtb",
+          "quote": "USDT"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": null,
+        "arguments": {
+          "exchanges": {
+            "Bybit": {
+              "symbol": [
+                "USDTBUSDT"
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "USDtb / USD"
+        }
+      }
+    },
+    {
+      "id": 648,
       "full_name": "CVX / USD",
       "description": "Convex Finance",
       "type": "price-feed",
@@ -46279,7 +46992,7 @@
       }
     },
     {
-      "id": 636,
+      "id": 649,
       "full_name": "CVX / USDT",
       "description": "Convex Finance",
       "type": "price-feed",
@@ -46344,7 +47057,7 @@
       }
     },
     {
-      "id": 637,
+      "id": 650,
       "full_name": "CVX / USDC",
       "description": "Convex Finance",
       "type": "price-feed",
@@ -46384,7 +47097,7 @@
       }
     },
     {
-      "id": 638,
+      "id": 651,
       "full_name": "LRC / ETH",
       "description": "Loopring",
       "type": "price-feed",
@@ -46429,7 +47142,7 @@
       }
     },
     {
-      "id": 639,
+      "id": 652,
       "full_name": "KNC / ETH",
       "description": "Kyber Network Crystal",
       "type": "price-feed",
@@ -46474,7 +47187,7 @@
       }
     },
     {
-      "id": 640,
+      "id": 653,
       "full_name": "VELO / USD",
       "description": "Velo",
       "type": "price-feed",
@@ -46562,7 +47275,7 @@
       }
     },
     {
-      "id": 641,
+      "id": 654,
       "full_name": "VELO / USDT",
       "description": "Velo",
       "type": "price-feed",
@@ -46627,7 +47340,7 @@
       }
     },
     {
-      "id": 642,
+      "id": 655,
       "full_name": "VELO / USDC",
       "description": "Velo",
       "type": "price-feed",
@@ -46667,7 +47380,7 @@
       }
     },
     {
-      "id": 643,
+      "id": 656,
       "full_name": "MERL / USD",
       "description": "Merlin Chain",
       "type": "price-feed",
@@ -46744,7 +47457,7 @@
       }
     },
     {
-      "id": 644,
+      "id": 657,
       "full_name": "MERL / USDT",
       "description": "Merlin Chain",
       "type": "price-feed",
@@ -46809,7 +47522,7 @@
       }
     },
     {
-      "id": 645,
+      "id": 658,
       "full_name": "MERL / USDC",
       "description": "Merlin Chain",
       "type": "price-feed",
@@ -46849,7 +47562,7 @@
       }
     },
     {
-      "id": 646,
+      "id": 659,
       "full_name": "SCR / USD",
       "description": "Scroll",
       "type": "price-feed",
@@ -46937,7 +47650,7 @@
       }
     },
     {
-      "id": 647,
+      "id": 660,
       "full_name": "SCR / USDT",
       "description": "Scroll",
       "type": "price-feed",
@@ -47012,7 +47725,7 @@
       }
     },
     {
-      "id": 648,
+      "id": 661,
       "full_name": "SCR / USDC",
       "description": "Scroll",
       "type": "price-feed",
@@ -47052,7 +47765,7 @@
       }
     },
     {
-      "id": 649,
+      "id": 662,
       "full_name": "FIL / USD",
       "description": "Filecoin",
       "type": "price-feed",
@@ -47178,7 +47891,7 @@
       }
     },
     {
-      "id": 650,
+      "id": 663,
       "full_name": "FIL / ETH",
       "description": "Filecoin",
       "type": "price-feed",
@@ -47236,7 +47949,7 @@
       }
     },
     {
-      "id": 651,
+      "id": 664,
       "full_name": "FIL / USDT",
       "description": "Filecoin",
       "type": "price-feed",
@@ -47321,7 +48034,7 @@
       }
     },
     {
-      "id": 652,
+      "id": 665,
       "full_name": "FIL / USDC",
       "description": "Filecoin",
       "type": "price-feed",
@@ -47386,7 +48099,7 @@
       }
     },
     {
-      "id": 653,
+      "id": 666,
       "full_name": "STORJ / USD",
       "description": "Storj",
       "type": "price-feed",
@@ -47492,7 +48205,7 @@
       }
     },
     {
-      "id": 654,
+      "id": 667,
       "full_name": "STORJ / USDT",
       "description": "Storj",
       "type": "price-feed",
@@ -47567,7 +48280,7 @@
       }
     },
     {
-      "id": 655,
+      "id": 668,
       "full_name": "STORJ / USDC",
       "description": "Storj",
       "type": "price-feed",
@@ -47607,7 +48320,7 @@
       }
     },
     {
-      "id": 656,
+      "id": 669,
       "full_name": "HYPE / USD",
       "description": "Hyperliquid",
       "type": "price-feed",
@@ -47667,7 +48380,7 @@
       }
     },
     {
-      "id": 657,
+      "id": 670,
       "full_name": "HYPE / USDT",
       "description": "Hyperliquid",
       "type": "price-feed",
@@ -47717,7 +48430,7 @@
       }
     },
     {
-      "id": 658,
+      "id": 671,
       "full_name": "FLOW / USD",
       "description": "FLOW (dapper labs)",
       "type": "price-feed",
@@ -47824,7 +48537,7 @@
       }
     },
     {
-      "id": 659,
+      "id": 672,
       "full_name": "FLOW / USDT",
       "description": "FLOW (dapper labs)",
       "type": "price-feed",
@@ -47909,7 +48622,7 @@
       }
     },
     {
-      "id": 660,
+      "id": 673,
       "full_name": "FLOW / USDC",
       "description": "FLOW (dapper labs)",
       "type": "price-feed",
@@ -47949,7 +48662,7 @@
       }
     },
     {
-      "id": 661,
+      "id": 674,
       "full_name": "MAV / USD",
       "description": "Maverick Protocol",
       "type": "price-feed",
@@ -48026,7 +48739,7 @@
       }
     },
     {
-      "id": 662,
+      "id": 675,
       "full_name": "MAV / USDT",
       "description": "Maverick Protocol",
       "type": "price-feed",
@@ -48086,7 +48799,7 @@
       }
     },
     {
-      "id": 663,
+      "id": 676,
       "full_name": "KSM / USD",
       "description": "Kusama",
       "type": "price-feed",
@@ -48193,7 +48906,7 @@
       }
     },
     {
-      "id": 664,
+      "id": 677,
       "full_name": "KSM / USDT",
       "description": "Kusama",
       "type": "price-feed",
@@ -48278,7 +48991,7 @@
       }
     },
     {
-      "id": 665,
+      "id": 678,
       "full_name": "KSM / USDC",
       "description": "Kusama",
       "type": "price-feed",
@@ -48318,7 +49031,7 @@
       }
     },
     {
-      "id": 666,
+      "id": 679,
       "full_name": "ALGO / USD",
       "description": "Algorand",
       "type": "price-feed",
@@ -48433,7 +49146,7 @@
       }
     },
     {
-      "id": 667,
+      "id": 680,
       "full_name": "ALGO / USDT",
       "description": "Algorand",
       "type": "price-feed",
@@ -48521,7 +49234,7 @@
       }
     },
     {
-      "id": 668,
+      "id": 681,
       "full_name": "ALGO / USDC",
       "description": "Algorand",
       "type": "price-feed",
@@ -48594,7 +49307,7 @@
       }
     },
     {
-      "id": 669,
+      "id": 682,
       "full_name": "FET / USD",
       "description": "Fetch.ai",
       "type": "price-feed",
@@ -48715,7 +49428,7 @@
       }
     },
     {
-      "id": 670,
+      "id": 683,
       "full_name": "FET / USDT",
       "description": "Fetch.ai",
       "type": "price-feed",
@@ -48800,7 +49513,7 @@
       }
     },
     {
-      "id": 671,
+      "id": 684,
       "full_name": "FET / USDC",
       "description": "Fetch.ai",
       "type": "price-feed",
@@ -48860,7 +49573,7 @@
       }
     },
     {
-      "id": 672,
+      "id": 685,
       "full_name": "LINK / USD",
       "description": "Chainlink",
       "type": "price-feed",
@@ -48993,7 +49706,7 @@
       }
     },
     {
-      "id": 673,
+      "id": 686,
       "full_name": "LINK / ETH",
       "description": "Chainlink",
       "type": "price-feed",
@@ -49061,7 +49774,7 @@
       }
     },
     {
-      "id": 674,
+      "id": 687,
       "full_name": "LINK / BNB",
       "description": "Chainlink",
       "type": "price-feed",
@@ -49101,7 +49814,7 @@
       }
     },
     {
-      "id": 675,
+      "id": 688,
       "full_name": "LINK / USDT",
       "description": "Chainlink",
       "type": "price-feed",
@@ -49199,7 +49912,7 @@
       }
     },
     {
-      "id": 676,
+      "id": 689,
       "full_name": "LINK / USDC",
       "description": "Chainlink",
       "type": "price-feed",
@@ -49277,7 +49990,7 @@
       }
     },
     {
-      "id": 677,
+      "id": 690,
       "full_name": "SAND / USD",
       "description": "The Sandbox",
       "type": "price-feed",
@@ -49396,7 +50109,7 @@
       }
     },
     {
-      "id": 678,
+      "id": 691,
       "full_name": "SAND / USDT",
       "description": "The Sandbox",
       "type": "price-feed",
@@ -49481,7 +50194,7 @@
       }
     },
     {
-      "id": 679,
+      "id": 692,
       "full_name": "SAND / USDC",
       "description": "The Sandbox",
       "type": "price-feed",
@@ -49531,7 +50244,7 @@
       }
     },
     {
-      "id": 680,
+      "id": 693,
       "full_name": "MOG / USD",
       "description": "Mog Coin",
       "type": "price-feed",
@@ -49625,7 +50338,7 @@
       }
     },
     {
-      "id": 681,
+      "id": 694,
       "full_name": "MOG / USDT",
       "description": "Mog Coin",
       "type": "price-feed",
@@ -49690,7 +50403,7 @@
       }
     },
     {
-      "id": 682,
+      "id": 695,
       "full_name": "SATS / USD",
       "description": "SATS (Ordinals)",
       "type": "price-feed",
@@ -49768,7 +50481,7 @@
       }
     },
     {
-      "id": 683,
+      "id": 696,
       "full_name": "SATS / USDT",
       "description": "SATS (Ordinals)",
       "type": "price-feed",
@@ -49833,7 +50546,7 @@
       }
     },
     {
-      "id": 684,
+      "id": 697,
       "full_name": "SATS / USDC",
       "description": "SATS (Ordinals)",
       "type": "price-feed",
@@ -49873,7 +50586,7 @@
       }
     },
     {
-      "id": 685,
+      "id": 698,
       "full_name": "NULS / USD",
       "description": "Nuls",
       "type": "price-feed",
@@ -49939,7 +50652,7 @@
       }
     },
     {
-      "id": 686,
+      "id": 699,
       "full_name": "NULS / USDT",
       "description": "Nuls",
       "type": "price-feed",
@@ -49994,7 +50707,7 @@
       }
     },
     {
-      "id": 687,
+      "id": 700,
       "full_name": "NULS / USDC",
       "description": "Nuls",
       "type": "price-feed",
@@ -50034,7 +50747,7 @@
       }
     },
     {
-      "id": 688,
+      "id": 701,
       "full_name": "RENDER / USD",
       "description": "Render",
       "type": "price-feed",
@@ -50148,7 +50861,7 @@
       }
     },
     {
-      "id": 689,
+      "id": 702,
       "full_name": "RNDR / USD",
       "description": "Render",
       "type": "price-feed",
@@ -50205,7 +50918,7 @@
       }
     },
     {
-      "id": 690,
+      "id": 703,
       "full_name": "RENDER / USDT",
       "description": "Render",
       "type": "price-feed",
@@ -50290,7 +51003,7 @@
       }
     },
     {
-      "id": 691,
+      "id": 704,
       "full_name": "RENDER / USDC",
       "description": "Render",
       "type": "price-feed",
@@ -50340,7 +51053,7 @@
       }
     },
     {
-      "id": 692,
+      "id": 705,
       "full_name": "RNDR / USDT",
       "description": "Render",
       "type": "price-feed",
@@ -50390,7 +51103,7 @@
       }
     },
     {
-      "id": 693,
+      "id": 706,
       "full_name": "RNDR / USDC",
       "description": "Render",
       "type": "price-feed",
@@ -50430,7 +51143,7 @@
       }
     },
     {
-      "id": 694,
+      "id": 707,
       "full_name": "ZEREBRO / USD",
       "description": "Zerebro",
       "type": "price-feed",
@@ -50508,7 +51221,7 @@
       }
     },
     {
-      "id": 695,
+      "id": 708,
       "full_name": "ZEREBRO / USDT",
       "description": "Zerebro",
       "type": "price-feed",
@@ -50568,7 +51281,7 @@
       }
     },
     {
-      "id": 696,
+      "id": 709,
       "full_name": "FTT / ETH",
       "description": "FTX Token",
       "type": "price-feed",
@@ -50613,7 +51326,7 @@
       }
     },
     {
-      "id": 697,
+      "id": 710,
       "full_name": "FTT / USD",
       "description": "FTX Token",
       "type": "price-feed",
@@ -50689,7 +51402,7 @@
       }
     },
     {
-      "id": 698,
+      "id": 711,
       "full_name": "FTT / USDT",
       "description": "FTX Token",
       "type": "price-feed",
@@ -50754,7 +51467,7 @@
       }
     },
     {
-      "id": 699,
+      "id": 712,
       "full_name": "FTT / USDC",
       "description": "FTX Token",
       "type": "price-feed",
@@ -50794,7 +51507,7 @@
       }
     },
     {
-      "id": 700,
+      "id": 713,
       "full_name": "UMA / USD",
       "description": "UMA",
       "type": "price-feed",
@@ -50898,7 +51611,7 @@
       }
     },
     {
-      "id": 701,
+      "id": 714,
       "full_name": "UMA / USDT",
       "description": "UMA",
       "type": "price-feed",
@@ -50968,7 +51681,7 @@
       }
     },
     {
-      "id": 702,
+      "id": 715,
       "full_name": "UMA / USDC",
       "description": "UMA",
       "type": "price-feed",
@@ -51008,7 +51721,7 @@
       }
     },
     {
-      "id": 703,
+      "id": 716,
       "full_name": "RUNE / USD",
       "description": "THORChain",
       "type": "price-feed",
@@ -51103,7 +51816,7 @@
       }
     },
     {
-      "id": 704,
+      "id": 717,
       "full_name": "RUNE / USDT",
       "description": "THORChain",
       "type": "price-feed",
@@ -51173,7 +51886,7 @@
       }
     },
     {
-      "id": 705,
+      "id": 718,
       "full_name": "RUNE / USDC",
       "description": "THORChain",
       "type": "price-feed",
@@ -51223,7 +51936,7 @@
       }
     },
     {
-      "id": 706,
+      "id": 719,
       "full_name": "GHST / ETH",
       "description": "Aavegotchi",
       "type": "price-feed",
@@ -51263,7 +51976,7 @@
       }
     },
     {
-      "id": 707,
+      "id": 720,
       "full_name": "GHST / USD",
       "description": "Aavegotchi",
       "type": "price-feed",
@@ -51352,7 +52065,7 @@
       }
     },
     {
-      "id": 708,
+      "id": 721,
       "full_name": "GHST / USDT",
       "description": "Aavegotchi",
       "type": "price-feed",
@@ -51412,7 +52125,7 @@
       }
     },
     {
-      "id": 709,
+      "id": 722,
       "full_name": "GHST / USDC",
       "description": "Aavegotchi",
       "type": "price-feed",
@@ -51452,7 +52165,7 @@
       }
     },
     {
-      "id": 710,
+      "id": 723,
       "full_name": "DOGE / USD",
       "description": "Dogecoin",
       "type": "price-feed",
@@ -51608,7 +52321,7 @@
       }
     },
     {
-      "id": 711,
+      "id": 724,
       "full_name": "DOGE / USDT",
       "description": "Dogecoin",
       "type": "price-feed",
@@ -51703,7 +52416,7 @@
       }
     },
     {
-      "id": 712,
+      "id": 725,
       "full_name": "DOGE / USDC",
       "description": "Dogecoin",
       "type": "price-feed",
@@ -51773,7 +52486,7 @@
       }
     },
     {
-      "id": 713,
+      "id": 726,
       "full_name": "ZRO / USD",
       "description": "LayerZero",
       "type": "price-feed",
@@ -51886,7 +52599,7 @@
       }
     },
     {
-      "id": 714,
+      "id": 727,
       "full_name": "ZRO / USDT",
       "description": "LayerZero",
       "type": "price-feed",
@@ -51966,7 +52679,7 @@
       }
     },
     {
-      "id": 715,
+      "id": 728,
       "full_name": "ZRO / USDC",
       "description": "LayerZero",
       "type": "price-feed",
@@ -52016,7 +52729,7 @@
       }
     },
     {
-      "id": 716,
+      "id": 729,
       "full_name": "WING / USD",
       "description": "Wing Finance",
       "type": "price-feed",
@@ -52083,7 +52796,7 @@
       }
     },
     {
-      "id": 717,
+      "id": 730,
       "full_name": "WING / USDT",
       "description": "Wing Finance",
       "type": "price-feed",
@@ -52138,7 +52851,7 @@
       }
     },
     {
-      "id": 718,
+      "id": 731,
       "full_name": "ONE / USD",
       "description": "Harmony",
       "type": "price-feed",
@@ -52236,7 +52949,7 @@
       }
     },
     {
-      "id": 719,
+      "id": 732,
       "full_name": "ONE / USDT",
       "description": "Harmony",
       "type": "price-feed",
@@ -52316,7 +53029,7 @@
       }
     },
     {
-      "id": 720,
+      "id": 733,
       "full_name": "ONE / USDC",
       "description": "Harmony",
       "type": "price-feed",
@@ -52361,7 +53074,7 @@
       }
     },
     {
-      "id": 721,
+      "id": 734,
       "full_name": "RON / USD",
       "description": "Ronin",
       "type": "price-feed",
@@ -52427,7 +53140,7 @@
       }
     },
     {
-      "id": 722,
+      "id": 735,
       "full_name": "RON / USDT",
       "description": "Ronin",
       "type": "price-feed",
@@ -52482,7 +53195,7 @@
       }
     },
     {
-      "id": 723,
+      "id": 736,
       "full_name": "RON / USDC",
       "description": "Ronin",
       "type": "price-feed",
@@ -52522,7 +53235,7 @@
       }
     },
     {
-      "id": 724,
+      "id": 737,
       "full_name": "GOAT / USD",
       "description": "Goatseus Maximus",
       "type": "price-feed",
@@ -52624,7 +53337,7 @@
       }
     },
     {
-      "id": 725,
+      "id": 738,
       "full_name": "GOAT / USDT",
       "description": "Goatseus Maximus",
       "type": "price-feed",
@@ -52694,7 +53407,7 @@
       }
     },
     {
-      "id": 726,
+      "id": 739,
       "full_name": "BIGTIME / USD",
       "description": "Big Time",
       "type": "price-feed",
@@ -52790,7 +53503,7 @@
       }
     },
     {
-      "id": 727,
+      "id": 740,
       "full_name": "BIGTIME / USDT",
       "description": "Big Time",
       "type": "price-feed",
@@ -52860,7 +53573,7 @@
       }
     },
     {
-      "id": 728,
+      "id": 741,
       "full_name": "BIGTIME / USDC",
       "description": "Big Time",
       "type": "price-feed",
@@ -52900,7 +53613,7 @@
       }
     },
     {
-      "id": 729,
+      "id": 742,
       "full_name": "TUSD / USD",
       "description": "True USD",
       "type": "price-feed",
@@ -52998,7 +53711,7 @@
       }
     },
     {
-      "id": 730,
+      "id": 743,
       "full_name": "TUSD / USDT",
       "description": "True USD",
       "type": "price-feed",

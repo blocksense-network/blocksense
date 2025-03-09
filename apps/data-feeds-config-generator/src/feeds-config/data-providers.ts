@@ -140,14 +140,23 @@ export const stableCoins = {
   EUR: ['EURC', 'EURS', 'EURt'],
 };
 
+function equalsCaseInsensitive(a: string, b: string) {
+  // FIXME: find why the following causes the program to hang:
+  // return a.localeCompare(b, undefined, { sensitivity: 'base' }) === 0;
+  return a.toLowerCase() === b.toLowerCase();
+}
+
 // Pair validation logic
 function isPairSupportedByCryptoProvider(
   oracleFeedPair: Pair,
   dataProviderPair: Pair,
 ): boolean {
-  const isBaseCompatible = oracleFeedPair.base === dataProviderPair.base;
+  const isBaseCompatible = equalsCaseInsensitive(
+    oracleFeedPair.base,
+    dataProviderPair.base,
+  );
   const isCompatibleQuote =
-    oracleFeedPair.quote === dataProviderPair.quote ||
+    equalsCaseInsensitive(oracleFeedPair.quote, dataProviderPair.quote) ||
     (oracleFeedPair.quote in stableCoins &&
       // Consider stablecoins quotings equivalent to fiat quotings:
       stableCoins[oracleFeedPair.quote as keyof typeof stableCoins].includes(
