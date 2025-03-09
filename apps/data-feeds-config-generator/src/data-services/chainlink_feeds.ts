@@ -153,13 +153,28 @@ export function getBaseQuote(data: AggregatedFeedInfo): Pair {
   const docsBase = getFieldFromAggregatedData(data, 'docs', 'baseAsset');
   const docsQuote = getFieldFromAggregatedData(data, 'docs', 'quoteAsset');
   const pair = getFieldFromAggregatedData(data, 'pair');
+  const pairBase = pair && pair[0];
+  const pairQuote = pair && pair[1];
   const name = getFieldFromAggregatedData(data, 'name');
 
+  if (
+    docsBase &&
+    docsQuote &&
+    pairBase &&
+    pairQuote &&
+    (docsBase.toLowerCase() !== pairBase.toLowerCase() ||
+      docsQuote.toLowerCase() !== pairQuote.toLowerCase())
+  ) {
+    console.warn(
+      `⚠️ Inconsistent data for feed ${name}: docs.baseAsset=${docsBase}, docs.quoteAsset=${docsQuote}, pair=${pair}`,
+    );
+    return createPair('', '');
+  }
   if (docsBase && docsQuote) {
     return createPair(docsBase, docsQuote);
   }
-  if (pair && pair.length === 2 && pair[0] && pair[1]) {
-    return createPair(pair[0], pair[1]);
+  if (pairBase && pairQuote) {
+    return createPair(pairBase, pairQuote);
   }
   if (name) {
     const [base, quote] = name.split(' / ');
