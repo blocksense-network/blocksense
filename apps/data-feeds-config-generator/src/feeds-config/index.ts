@@ -238,6 +238,14 @@ function removeUnsupportedRateDataFeeds(
   );
 }
 
+function removeNonCryptoDataFeeds(
+  dataFeeds: SimplifiedFeed[],
+): SimplifiedFeed[] {
+  return dataFeeds.filter(feed =>
+    ['', 'Crypto'].some(x => x == feed.additional_feed_info.category),
+  );
+}
+
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
 ): Promise<NewFeedsConfig> {
@@ -251,9 +259,13 @@ export async function generateFeedConfig(
   // Remove unsupported feed types
   const supportedCLFeeds = removeUnsupportedRateDataFeeds(uniqueDataFeeds);
 
+  // Remove non-crypto feeds
+  const supportedCLFeedsCrypto = removeNonCryptoDataFeeds(supportedCLFeeds);
+
   // Add stablecoin variants
-  const dataFeedsWithStableCoinVariants =
-    addStableCoinVariants(supportedCLFeeds);
+  const dataFeedsWithStableCoinVariants = addStableCoinVariants(
+    supportedCLFeedsCrypto,
+  );
 
   // Add providers data to the feeds and filter out feeds without providers
   const dataFeedsWithCryptoResources = (
