@@ -45,13 +45,21 @@ function feedFromChainLinkFeedInfo(
   const pair = getBaseQuote(additionalData);
   const full_name = pairToString(pair);
 
+  const categoryFixup = {
+    crypto: 'Crypto',
+    'Fixed-Income': 'Fixed Income',
+  };
+
   return {
     description,
     full_name,
     additional_feed_info: {
       pair: pair,
       decimals: getHighestDecimals(additionalData),
-      category,
+      category:
+        category in categoryFixup
+          ? categoryFixup[category as keyof typeof categoryFixup]
+          : category,
       market_hours,
       arguments: {},
       compatibility_info: {

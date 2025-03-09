@@ -5,13 +5,11 @@ import { Schema as S } from 'effect';
  */
 export const FeedCategorySchema = S.Union(
   S.Literal(''),
-  S.Literal('crypto'),
   S.Literal('Crypto'),
   S.Literal('Currency'),
   S.Literal('Equities'),
   S.Literal('Fiat'),
   S.Literal('Fixed Income'),
-  S.Literal('Fixed-Income'),
   S.Literal('FX_Spot'),
   S.Literal('Commodities'),
   S.Literal('Forex'),

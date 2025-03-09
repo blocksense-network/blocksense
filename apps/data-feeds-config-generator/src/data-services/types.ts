@@ -40,7 +40,11 @@ const ChainLinkFeedInfoSchema = S.Struct({
   threshold: S.Number,
   valuePrefix: S.String,
   assetName: S.String,
-  feedType: FeedCategorySchema,
+  feedType: S.Union(
+    S.Literal('crypto'),
+    S.Literal('Fixed-Income'),
+    ...FeedCategorySchema.members,
+  ),
   decimals: S.Number,
   docs: ChainLinkFeedDocsInfoSchema,
 }).annotations({ identifier: 'ChainLinkFeedInfo' });
