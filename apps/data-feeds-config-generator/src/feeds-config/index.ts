@@ -156,6 +156,10 @@ export async function getCLFeedsOnMainnet(
   );
   const onMainnetDataFeeds = Object.entries(rawDataFeeds)
     .filter(([_feedName, feedData]) => isDataFeedOnMainnet(feedData.networks))
+    // Remove Pegged Assets Data Feeds
+    .filter(
+      ([_feedName, feedData]) => !isPeggedAssetDataFeed(feedData.networks),
+    )
     .map(([feedName, _feedData]) => {
       return {
         ...feedFromChainLinkFeedInfo(onMainnetCookedDataFeeds[feedName]),
@@ -169,6 +173,12 @@ function isDataFeedOnMainnet(
   networks: Record<string, ChainLinkFeedInfo>,
 ): boolean {
   return Object.keys(networks).some(chainLinkFileNameIsNotTestnet);
+}
+
+function isPeggedAssetDataFeed(networks: Record<string, ChainLinkFeedInfo>) {
+  return Object.values(networks).some(
+    feedData => feedData.docs.assetSubClass == 'Pegged Asset',
+  );
 }
 
 function getUniqueDataFeeds(dataFeeds: SimplifiedFeed[]): SimplifiedFeed[] {
@@ -246,6 +256,8 @@ export async function generateFeedConfig(
   // Get the CL feeds on mainnet
   const mainnetDataFeeds: SimplifiedFeed[] =
     await getCLFeedsOnMainnet(rawDataFeeds);
+
+  // Remove Pegged Assets Data Feeds
 
   // Get the unique data feeds
   const uniqueDataFeeds = getUniqueDataFeeds(mainnetDataFeeds);

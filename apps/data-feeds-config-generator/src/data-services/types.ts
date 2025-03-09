@@ -12,6 +12,7 @@ const ChainLinkFeedDocsInfoSchema = S.Struct({
   marketHours: S.NullishOr(MarketHoursSchema),
   productType: S.NullishOr(S.String),
   feedType: S.NullishOr(S.String),
+  assetSubClass: S.NullishOr(S.String),
 }).annotations({ identifier: 'ChainLinkFeedDocsInfo' });
 
 export type ChainLinkFeedDocsInfo = S.Schema.Type<
