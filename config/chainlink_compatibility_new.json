@@ -2,6 +2,17 @@
   "blocksenseFeedsCompatibility": {
     "0": {
       "id": 0,
+      "description": "REZ/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "3": {
+      "id": 3,
       "description": "weETH / ETH",
       "chainlink_compatibility": {
         "base": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
@@ -15,8 +26,8 @@
         }
       }
     },
-    "1": {
-      "id": 1,
+    "4": {
+      "id": 4,
       "description": "MLN / ETH",
       "chainlink_compatibility": {
         "base": "0xec67005c4E498Ec7f55E092bd1d35cbC47C91892",
@@ -27,8 +38,8 @@
         }
       }
     },
-    "2": {
-      "id": 2,
+    "5": {
+      "id": 5,
       "description": "BAL / USD",
       "chainlink_compatibility": {
         "base": "0xba100000625a3754423978a60c9317c58a424e3D",
@@ -43,8 +54,8 @@
         }
       }
     },
-    "5": {
-      "id": 5,
+    "8": {
+      "id": 8,
       "description": "HSK / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -54,8 +65,8 @@
         }
       }
     },
-    "7": {
-      "id": 7,
+    "10": {
+      "id": 10,
       "description": "C98 / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -65,8 +76,8 @@
         }
       }
     },
-    "9": {
-      "id": 9,
+    "12": {
+      "id": 12,
       "description": "GMT / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -77,8 +88,8 @@
         }
       }
     },
-    "12": {
-      "id": 12,
+    "15": {
+      "id": 15,
       "description": "XMR / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -90,8 +101,8 @@
         }
       }
     },
-    "15": {
-      "id": 15,
+    "18": {
+      "id": 18,
       "description": "AUD / USD",
       "chainlink_compatibility": {
         "base": "0x0000000000000000000000000000000000000024",
@@ -107,8 +118,30 @@
         }
       }
     },
-    "18": {
-      "id": 18,
+    "21": {
+      "id": 21,
+      "description": "HMSTR/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "24": {
+      "id": 24,
+      "description": "PNUT/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "27": {
+      "id": 27,
       "description": "DOT / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -127,8 +160,8 @@
         }
       }
     },
-    "19": {
-      "id": 19,
+    "28": {
+      "id": 28,
       "description": "DOT / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -138,8 +171,8 @@
         }
       }
     },
-    "22": {
-      "id": 22,
+    "31": {
+      "id": 31,
       "description": "WELL / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -150,8 +183,8 @@
         }
       }
     },
-    "24": {
-      "id": 24,
+    "33": {
+      "id": 33,
       "description": "BETH / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -161,8 +194,19 @@
         }
       }
     },
-    "26": {
-      "id": 26,
+    "35": {
+      "id": 35,
+      "description": "BRETT/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "38": {
+      "id": 38,
       "description": "USDD / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -172,8 +216,8 @@
         }
       }
     },
-    "29": {
-      "id": 29,
+    "41": {
+      "id": 41,
       "description": "CBETH / ETH",
       "chainlink_compatibility": {
         "base": "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
@@ -187,8 +231,8 @@
         }
       }
     },
-    "30": {
-      "id": 30,
+    "42": {
+      "id": 42,
       "description": "CBETH / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -199,8 +243,8 @@
         }
       }
     },
-    "31": {
-      "id": 31,
+    "43": {
+      "id": 43,
       "description": "ALPACA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -211,8 +255,8 @@
         }
       }
     },
-    "33": {
-      "id": 33,
+    "45": {
+      "id": 45,
       "description": "LUSD / USD",
       "chainlink_compatibility": {
         "base": "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0",
@@ -224,8 +268,8 @@
         }
       }
     },
-    "34": {
-      "id": 34,
+    "46": {
+      "id": 46,
       "description": "FXS / USD",
       "chainlink_compatibility": {
         "base": "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0",
@@ -241,8 +285,8 @@
         }
       }
     },
-    "36": {
-      "id": 36,
+    "48": {
+      "id": 48,
       "description": "RDNT / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -255,8 +299,8 @@
         }
       }
     },
-    "39": {
-      "id": 39,
+    "51": {
+      "id": 51,
       "description": "MNT / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -267,8 +311,19 @@
         }
       }
     },
-    "42": {
-      "id": 42,
+    "54": {
+      "id": 54,
+      "description": "IQ/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "57": {
+      "id": 57,
       "description": "USDC / USD",
       "chainlink_compatibility": {
         "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -304,8 +359,8 @@
         }
       }
     },
-    "43": {
-      "id": 43,
+    "58": {
+      "id": 58,
       "description": "USDC / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -315,8 +370,8 @@
         }
       }
     },
-    "45": {
-      "id": 45,
+    "60": {
+      "id": 60,
       "description": "MASK / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -326,8 +381,52 @@
         }
       }
     },
-    "48": {
-      "id": 48,
+    "63": {
+      "id": 63,
+      "description": "PAIN/USD-RefPrice-mainnet-production",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "65": {
+      "id": 65,
+      "description": "NEIROETH/USD-RefPrice-mainnet-production",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "67": {
+      "id": 67,
+      "description": "QNT/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "69": {
+      "id": 69,
+      "description": "EDU/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "71": {
+      "id": 71,
       "description": "WIN / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -337,8 +436,8 @@
         }
       }
     },
-    "51": {
-      "id": 51,
+    "74": {
+      "id": 74,
       "description": "AVAIL / USD",
       "chainlink_compatibility": {
         "base": "0xEeB4d8400AEefafC1B2953e0094134A887C76Bd8",
@@ -349,8 +448,19 @@
         }
       }
     },
-    "53": {
-      "id": 53,
+    "76": {
+      "id": 76,
+      "description": "AIXBT/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "79": {
+      "id": 79,
       "description": "THETA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -360,8 +470,8 @@
         }
       }
     },
-    "56": {
-      "id": 56,
+    "82": {
+      "id": 82,
       "description": "MKR / USD",
       "chainlink_compatibility": {
         "base": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
@@ -378,8 +488,8 @@
         }
       }
     },
-    "57": {
-      "id": 57,
+    "83": {
+      "id": 83,
       "description": "MKR / ETH",
       "chainlink_compatibility": {
         "base": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
@@ -390,8 +500,8 @@
         }
       }
     },
-    "60": {
-      "id": 60,
+    "86": {
+      "id": 86,
       "description": "PYUSD / USD",
       "chainlink_compatibility": {
         "base": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
@@ -401,8 +511,8 @@
         }
       }
     },
-    "62": {
-      "id": 62,
+    "88": {
+      "id": 88,
       "description": "SKY / USD",
       "chainlink_compatibility": {
         "base": "0x56072C95FAA701256059aa122697B133aDEd9279",
@@ -412,8 +522,41 @@
         }
       }
     },
-    "64": {
-      "id": 64,
+    "90": {
+      "id": 90,
+      "description": "MEME/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "93": {
+      "id": 93,
+      "description": "MORPHO/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "96": {
+      "id": 96,
+      "description": "ENS/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "99": {
+      "id": 99,
       "description": "BAT / USD",
       "chainlink_compatibility": {
         "base": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
@@ -426,8 +569,8 @@
         }
       }
     },
-    "65": {
-      "id": 65,
+    "100": {
+      "id": 100,
       "description": "BAT / ETH",
       "chainlink_compatibility": {
         "base": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
@@ -437,8 +580,8 @@
         }
       }
     },
-    "68": {
-      "id": 68,
+    "103": {
+      "id": 103,
       "description": "USD+ / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -449,8 +592,8 @@
         }
       }
     },
-    "69": {
-      "id": 69,
+    "104": {
+      "id": 104,
       "description": "THB / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -461,8 +604,8 @@
         }
       }
     },
-    "70": {
-      "id": 70,
+    "105": {
+      "id": 105,
       "description": "NEAR / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -478,8 +621,8 @@
         }
       }
     },
-    "73": {
-      "id": 73,
+    "108": {
+      "id": 108,
       "description": "PLN / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -489,8 +632,8 @@
         }
       }
     },
-    "75": {
-      "id": 75,
+    "110": {
+      "id": 110,
       "description": "MLN / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -501,8 +644,8 @@
         }
       }
     },
-    "78": {
-      "id": 78,
+    "113": {
+      "id": 113,
       "description": "IOTX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -512,8 +655,8 @@
         }
       }
     },
-    "80": {
-      "id": 80,
+    "115": {
+      "id": 115,
       "description": "BNB / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -537,8 +680,8 @@
         }
       }
     },
-    "83": {
-      "id": 83,
+    "118": {
+      "id": 118,
       "description": "KNC / USD",
       "chainlink_compatibility": {
         "base": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
@@ -554,8 +697,8 @@
         }
       }
     },
-    "86": {
-      "id": 86,
+    "121": {
+      "id": 121,
       "description": "XAVA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -565,8 +708,19 @@
         }
       }
     },
-    "88": {
-      "id": 88,
+    "123": {
+      "id": 123,
+      "description": "LDO/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "126": {
+      "id": 126,
       "description": "ADA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -582,8 +736,8 @@
         }
       }
     },
-    "89": {
-      "id": 89,
+    "127": {
+      "id": 127,
       "description": "ADA / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -593,8 +747,19 @@
         }
       }
     },
-    "92": {
-      "id": 92,
+    "130": {
+      "id": 130,
+      "description": "LPT/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "133": {
+      "id": 133,
       "description": "VAI / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -604,8 +769,8 @@
         }
       }
     },
-    "94": {
-      "id": 94,
+    "135": {
+      "id": 135,
       "description": "SPELL / USD",
       "chainlink_compatibility": {
         "base": "0x090185f2135308BaD17527004364eBcC2D37e5F6",
@@ -619,8 +784,63 @@
         }
       }
     },
-    "96": {
-      "id": 96,
+    "137": {
+      "id": 137,
+      "description": "GOAT/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "139": {
+      "id": 139,
+      "description": "USUAL/USD-RefPrice-mainnet-production",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "142": {
+      "id": 142,
+      "description": "IO/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "145": {
+      "id": 145,
+      "description": "APT/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "148": {
+      "id": 148,
+      "description": "VVV/USD-RefPrice-mainnet-production",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "150": {
+      "id": 150,
       "description": "DPI / USD",
       "chainlink_compatibility": {
         "base": "0x1494CA1F11D487c2bBe4543E90080AeBa4BA3C2b",
@@ -632,8 +852,8 @@
         }
       }
     },
-    "97": {
-      "id": 97,
+    "151": {
+      "id": 151,
       "description": "ENJ / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -644,8 +864,8 @@
         }
       }
     },
-    "98": {
-      "id": 98,
+    "152": {
+      "id": 152,
       "description": "ENJ / ETH",
       "chainlink_compatibility": {
         "base": "0xF629cBd94d3791C9250152BD8dfBDF380E2a3B9c",
@@ -655,8 +875,8 @@
         }
       }
     },
-    "101": {
-      "id": 101,
+    "155": {
+      "id": 155,
       "description": "WOO / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -668,8 +888,19 @@
         }
       }
     },
-    "103": {
-      "id": 103,
+    "157": {
+      "id": 157,
+      "description": "MOODENG/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "160": {
+      "id": 160,
       "description": "MAGIC / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -680,8 +911,19 @@
         }
       }
     },
-    "106": {
-      "id": 106,
+    "163": {
+      "id": 163,
+      "description": "BLUR/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "166": {
+      "id": 166,
       "description": "BADGER / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -691,8 +933,8 @@
         }
       }
     },
-    "109": {
-      "id": 109,
+    "169": {
+      "id": 169,
       "description": "APE / USD",
       "chainlink_compatibility": {
         "base": "0x4d224452801ACEd8B2F0aebE155379bb5D594381",
@@ -707,8 +949,8 @@
         }
       }
     },
-    "112": {
-      "id": 112,
+    "172": {
+      "id": 172,
       "description": "CAKE / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -720,8 +962,8 @@
         }
       }
     },
-    "113": {
-      "id": 113,
+    "173": {
+      "id": 173,
       "description": "CAKE / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -731,8 +973,8 @@
         }
       }
     },
-    "116": {
-      "id": 116,
+    "176": {
+      "id": 176,
       "description": "QI / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -742,8 +984,8 @@
         }
       }
     },
-    "118": {
-      "id": 118,
+    "178": {
+      "id": 178,
       "description": "GNO / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -753,8 +995,8 @@
         }
       }
     },
-    "120": {
-      "id": 120,
+    "180": {
+      "id": 180,
       "description": "DODO / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -767,8 +1009,8 @@
         }
       }
     },
-    "122": {
-      "id": 122,
+    "182": {
+      "id": 182,
       "description": "MOVR / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -778,8 +1020,8 @@
         }
       }
     },
-    "125": {
-      "id": 125,
+    "185": {
+      "id": 185,
       "description": "AVAX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -800,8 +1042,8 @@
         }
       }
     },
-    "128": {
-      "id": 128,
+    "188": {
+      "id": 188,
       "description": "STX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -813,8 +1055,8 @@
         }
       }
     },
-    "131": {
-      "id": 131,
+    "191": {
+      "id": 191,
       "description": "EOS / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -827,8 +1069,8 @@
         }
       }
     },
-    "132": {
-      "id": 132,
+    "192": {
+      "id": 192,
       "description": "EOS / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -838,8 +1080,8 @@
         }
       }
     },
-    "135": {
-      "id": 135,
+    "195": {
+      "id": 195,
       "description": "STETH / ETH",
       "chainlink_compatibility": {
         "base": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
@@ -853,8 +1095,30 @@
         }
       }
     },
-    "136": {
-      "id": 136,
+    "196": {
+      "id": 196,
+      "description": "SEI/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "199": {
+      "id": 199,
+      "description": "POLYX/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "201": {
+      "id": 201,
       "description": "USD0 / USD",
       "chainlink_compatibility": {
         "base": "0x73A15FeD60Bf67631dC6cd7Bc5B6e8da8190aCF5",
@@ -864,8 +1128,30 @@
         }
       }
     },
-    "137": {
-      "id": 137,
+    "202": {
+      "id": 202,
+      "description": "SCR/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "205": {
+      "id": 205,
+      "description": "TURBO/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "208": {
+      "id": 208,
       "description": "GMX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -879,8 +1165,30 @@
         }
       }
     },
-    "139": {
-      "id": 139,
+    "210": {
+      "id": 210,
+      "description": "CROAK/USD-RefPrice-mainnet-production",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "211": {
+      "id": 211,
+      "description": "JTO/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "214": {
+      "id": 214,
       "description": "XVS / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -890,8 +1198,8 @@
         }
       }
     },
-    "140": {
-      "id": 140,
+    "215": {
+      "id": 215,
       "description": "XVS / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -903,8 +1211,8 @@
         }
       }
     },
-    "142": {
-      "id": 142,
+    "217": {
+      "id": 217,
       "description": "DASH / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -914,8 +1222,63 @@
         }
       }
     },
-    "144": {
-      "id": 144,
+    "219": {
+      "id": 219,
+      "description": "USD/CHF-RefPrice-DSstaging-Premium-Global-004",
+      "chainlink_compatibility": {
+        "base": "0x0000000000000000000000000000000000000348",
+        "quote": "0x00000000000000000000000000000000000002F4",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "220": {
+      "id": 220,
+      "description": "USD/JPY-RefPrice-DSstaging-Premium-Global-004",
+      "chainlink_compatibility": {
+        "base": "0x0000000000000000000000000000000000000348",
+        "quote": "0x0000000000000000000000000000000000000188",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "221": {
+      "id": 221,
+      "description": "USD/CAD-RefPrice-DSstaging-Premium-Global-004",
+      "chainlink_compatibility": {
+        "base": "0x0000000000000000000000000000000000000348",
+        "quote": "0x000000000000000000000000000000000000007c",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "222": {
+      "id": 222,
+      "description": "ACE/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "225": {
+      "id": 225,
+      "description": "GALA/USD-RefPrice-DSstaging-Premium-Global-003-dead-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "228": {
+      "id": 228,
       "description": "BONE / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -926,8 +1289,8 @@
         }
       }
     },
-    "147": {
-      "id": 147,
+    "231": {
+      "id": 231,
       "description": "ULTI / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -937,8 +1300,8 @@
         }
       }
     },
-    "149": {
-      "id": 149,
+    "233": {
+      "id": 233,
       "description": "BUSD / USD",
       "chainlink_compatibility": {
         "base": "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
@@ -950,8 +1313,8 @@
         }
       }
     },
-    "151": {
-      "id": 151,
+    "235": {
+      "id": 235,
       "description": "METIS / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -962,8 +1325,30 @@
         }
       }
     },
-    "154": {
-      "id": 154,
+    "238": {
+      "id": 238,
+      "description": "ENA/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "241": {
+      "id": 241,
+      "description": "BLAST/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "243": {
+      "id": 243,
       "description": "AMPL / ETH",
       "chainlink_compatibility": {
         "base": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
@@ -973,8 +1358,8 @@
         }
       }
     },
-    "155": {
-      "id": 155,
+    "244": {
+      "id": 244,
       "description": "AMPL / USD",
       "chainlink_compatibility": {
         "base": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
@@ -984,8 +1369,8 @@
         }
       }
     },
-    "157": {
-      "id": 157,
+    "246": {
+      "id": 246,
       "description": "ATOM / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -999,8 +1384,8 @@
         }
       }
     },
-    "160": {
-      "id": 160,
+    "249": {
+      "id": 249,
       "description": "AAVE / USD",
       "chainlink_compatibility": {
         "base": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
@@ -1027,8 +1412,8 @@
         }
       }
     },
-    "161": {
-      "id": 161,
+    "250": {
+      "id": 250,
       "description": "AAVE / ETH",
       "chainlink_compatibility": {
         "base": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
@@ -1039,8 +1424,8 @@
         }
       }
     },
-    "164": {
-      "id": 164,
+    "253": {
+      "id": 253,
       "description": "GNS / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1051,8 +1436,8 @@
         }
       }
     },
-    "166": {
-      "id": 166,
+    "255": {
+      "id": 255,
       "description": "UST / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1062,8 +1447,8 @@
         }
       }
     },
-    "169": {
-      "id": 169,
+    "258": {
+      "id": 258,
       "description": "USDe / USD",
       "chainlink_compatibility": {
         "base": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
@@ -1079,8 +1464,8 @@
         }
       }
     },
-    "172": {
-      "id": 172,
+    "261": {
+      "id": 261,
       "description": "YFI / USD",
       "chainlink_compatibility": {
         "base": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
@@ -1099,8 +1484,8 @@
         }
       }
     },
-    "173": {
-      "id": 173,
+    "262": {
+      "id": 262,
       "description": "YFI / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -1110,8 +1495,8 @@
         }
       }
     },
-    "174": {
-      "id": 174,
+    "263": {
+      "id": 263,
       "description": "YFI / ETH",
       "chainlink_compatibility": {
         "base": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
@@ -1122,8 +1507,19 @@
         }
       }
     },
-    "177": {
-      "id": 177,
+    "266": {
+      "id": 266,
+      "description": "ILV/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "268": {
+      "id": 268,
       "description": "WBTC / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1141,8 +1537,8 @@
         }
       }
     },
-    "178": {
-      "id": 178,
+    "269": {
+      "id": 269,
       "description": "WBTC / BTC",
       "chainlink_compatibility": {
         "base": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
@@ -1154,8 +1550,8 @@
         }
       }
     },
-    "179": {
-      "id": 179,
+    "270": {
+      "id": 270,
       "description": "WBTC / ETH",
       "chainlink_compatibility": {
         "base": null,
@@ -1165,8 +1561,30 @@
         }
       }
     },
-    "182": {
-      "id": 182,
+    "273": {
+      "id": 273,
+      "description": "SPX/USD-RefPrice-mainnet-production",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "275": {
+      "id": 275,
+      "description": "MOG/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "277": {
+      "id": 277,
       "description": "MIM / USD",
       "chainlink_compatibility": {
         "base": "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3",
@@ -1180,8 +1598,8 @@
         }
       }
     },
-    "183": {
-      "id": 183,
+    "278": {
+      "id": 278,
       "description": "BCH / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -1191,8 +1609,8 @@
         }
       }
     },
-    "184": {
-      "id": 184,
+    "279": {
+      "id": 279,
       "description": "BCH / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1206,8 +1624,19 @@
         }
       }
     },
-    "187": {
-      "id": 187,
+    "282": {
+      "id": 282,
+      "description": "HOOK/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "284": {
+      "id": 284,
       "description": "RLUSD / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1217,8 +1646,8 @@
         }
       }
     },
-    "188": {
-      "id": 188,
+    "285": {
+      "id": 285,
       "description": "REN / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1228,8 +1657,8 @@
         }
       }
     },
-    "190": {
-      "id": 190,
+    "287": {
+      "id": 287,
       "description": "ZIL / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1241,8 +1670,19 @@
         }
       }
     },
-    "193": {
-      "id": 193,
+    "290": {
+      "id": 290,
+      "description": "IP/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "292": {
+      "id": 292,
       "description": "AERO / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1252,8 +1692,8 @@
         }
       }
     },
-    "195": {
-      "id": 195,
+    "294": {
+      "id": 294,
       "description": "MVI-USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1263,8 +1703,8 @@
         }
       }
     },
-    "196": {
-      "id": 196,
+    "295": {
+      "id": 295,
       "description": "INJ / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1277,8 +1717,8 @@
         }
       }
     },
-    "199": {
-      "id": 199,
+    "298": {
+      "id": 298,
       "description": "USDS / USD",
       "chainlink_compatibility": {
         "base": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
@@ -1291,8 +1731,8 @@
         }
       }
     },
-    "202": {
-      "id": 202,
+    "301": {
+      "id": 301,
       "description": "SOL / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1313,8 +1753,8 @@
         }
       }
     },
-    "205": {
-      "id": 205,
+    "304": {
+      "id": 304,
       "description": "BOO / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1324,8 +1764,8 @@
         }
       }
     },
-    "207": {
-      "id": 207,
+    "306": {
+      "id": 306,
       "description": "EURC / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1337,8 +1777,8 @@
         }
       }
     },
-    "209": {
-      "id": 209,
+    "308": {
+      "id": 308,
       "description": "AXS / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1354,8 +1794,19 @@
         }
       }
     },
-    "212": {
-      "id": 212,
+    "311": {
+      "id": 311,
+      "description": "WAVES/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "314": {
+      "id": 314,
       "description": "CRV / USD",
       "chainlink_compatibility": {
         "base": "0xD533a949740bb3306d119CC777fa900bA034cd52",
@@ -1374,8 +1825,8 @@
         }
       }
     },
-    "213": {
-      "id": 213,
+    "315": {
+      "id": 315,
       "description": "CRV / ETH",
       "chainlink_compatibility": {
         "base": "0xD533a949740bb3306d119CC777fa900bA034cd52",
@@ -1386,8 +1837,8 @@
         }
       }
     },
-    "216": {
-      "id": 216,
+    "318": {
+      "id": 318,
       "description": "ARB / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1404,8 +1855,8 @@
         }
       }
     },
-    "219": {
-      "id": 219,
+    "321": {
+      "id": 321,
       "description": "KLAY / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1416,8 +1867,30 @@
         }
       }
     },
-    "221": {
-      "id": 221,
+    "323": {
+      "id": 323,
+      "description": "MELANIA/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "326": {
+      "id": 326,
+      "description": "ZEREBRO/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "328": {
+      "id": 328,
       "description": "MAVIA / USD",
       "chainlink_compatibility": {
         "base": "0x24fcFC492C1393274B6bcd568ac9e225BEc93584",
@@ -1428,8 +1901,8 @@
         }
       }
     },
-    "223": {
-      "id": 223,
+    "330": {
+      "id": 330,
       "description": "ETH / USD",
       "chainlink_compatibility": {
         "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
@@ -1466,8 +1939,8 @@
         }
       }
     },
-    "224": {
-      "id": 224,
+    "331": {
+      "id": 331,
       "description": "ETC / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1479,8 +1952,8 @@
         }
       }
     },
-    "225": {
-      "id": 225,
+    "332": {
+      "id": 332,
       "description": "ETH / BTC",
       "chainlink_compatibility": {
         "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
@@ -1492,8 +1965,8 @@
         }
       }
     },
-    "230": {
-      "id": 230,
+    "337": {
+      "id": 337,
       "description": "AUSD / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1503,8 +1976,8 @@
         }
       }
     },
-    "231": {
-      "id": 231,
+    "338": {
+      "id": 338,
       "description": "COMP / USD",
       "chainlink_compatibility": {
         "base": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
@@ -1524,8 +1997,8 @@
         }
       }
     },
-    "234": {
-      "id": 234,
+    "341": {
+      "id": 341,
       "description": "POL / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1541,8 +2014,8 @@
         }
       }
     },
-    "237": {
-      "id": 237,
+    "344": {
+      "id": 344,
       "description": "ANKR / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1553,8 +2026,30 @@
         }
       }
     },
-    "240": {
-      "id": 240,
+    "347": {
+      "id": 347,
+      "description": "HOT/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "349": {
+      "id": 349,
+      "description": "ORDER/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "351": {
+      "id": 351,
       "description": "PERP / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1566,8 +2061,19 @@
         }
       }
     },
-    "243": {
-      "id": 243,
+    "354": {
+      "id": 354,
+      "description": "OM/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "357": {
+      "id": 357,
       "description": "LINA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1577,8 +2083,8 @@
         }
       }
     },
-    "245": {
-      "id": 245,
+    "359": {
+      "id": 359,
       "description": "USDP / USD",
       "chainlink_compatibility": {
         "base": "0x8E870D67F660D95d5be530380D0eC0bd388289E1",
@@ -1588,8 +2094,19 @@
         }
       }
     },
-    "247": {
-      "id": 247,
+    "361": {
+      "id": 361,
+      "description": "ORDI/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "364": {
+      "id": 364,
       "description": "OGN / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1600,8 +2117,19 @@
         }
       }
     },
-    "249": {
-      "id": 249,
+    "366": {
+      "id": 366,
+      "description": "LBTC/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "368": {
+      "id": 368,
       "description": "ICP / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1614,8 +2142,8 @@
         }
       }
     },
-    "252": {
-      "id": 252,
+    "371": {
+      "id": 371,
       "description": "VET / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1625,8 +2153,8 @@
         }
       }
     },
-    "254": {
-      "id": 254,
+    "373": {
+      "id": 373,
       "description": "CAD / USD",
       "chainlink_compatibility": {
         "base": "0x000000000000000000000000000000000000007c",
@@ -1639,8 +2167,8 @@
         }
       }
     },
-    "256": {
-      "id": 256,
+    "375": {
+      "id": 375,
       "description": "1INCH / USD",
       "chainlink_compatibility": {
         "base": "0x111111111117dC0aa78b770fA6A738034120C302",
@@ -1656,8 +2184,8 @@
         }
       }
     },
-    "259": {
-      "id": 259,
+    "378": {
+      "id": 378,
       "description": "ONG / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1667,8 +2195,8 @@
         }
       }
     },
-    "261": {
-      "id": 261,
+    "380": {
+      "id": 380,
       "description": "XTZ / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -1678,8 +2206,8 @@
         }
       }
     },
-    "262": {
-      "id": 262,
+    "381": {
+      "id": 381,
       "description": "XTZ / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1692,8 +2220,8 @@
         }
       }
     },
-    "265": {
-      "id": 265,
+    "384": {
+      "id": 384,
       "description": "META / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1704,8 +2232,8 @@
         }
       }
     },
-    "266": {
-      "id": 266,
+    "385": {
+      "id": 385,
       "description": "BEAM / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1715,8 +2243,8 @@
         }
       }
     },
-    "268": {
-      "id": 268,
+    "387": {
+      "id": 387,
       "description": "cbBTC / USD",
       "chainlink_compatibility": {
         "base": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
@@ -1727,8 +2255,8 @@
         }
       }
     },
-    "269": {
-      "id": 269,
+    "388": {
+      "id": 388,
       "description": "XCN / USD",
       "chainlink_compatibility": {
         "base": "0xA2cd3D43c775978A96BdBf12d733D5A1ED94fb18",
@@ -1738,8 +2266,19 @@
         }
       }
     },
-    "271": {
-      "id": 271,
+    "390": {
+      "id": 390,
+      "description": "ATH/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "393": {
+      "id": 393,
       "description": "DEGEN / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1749,8 +2288,8 @@
         }
       }
     },
-    "273": {
-      "id": 273,
+    "395": {
+      "id": 395,
       "description": "MATIC / ETH",
       "chainlink_compatibility": {
         "base": null,
@@ -1760,8 +2299,8 @@
         }
       }
     },
-    "274": {
-      "id": 274,
+    "396": {
+      "id": 396,
       "description": "PAXG / USD",
       "chainlink_compatibility": {
         "base": "0x45804880De22913dAFE09f4980848ECE6EcbAf78",
@@ -1774,8 +2313,8 @@
         }
       }
     },
-    "276": {
-      "id": 276,
+    "398": {
+      "id": 398,
       "description": "SXP / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1786,8 +2325,30 @@
         }
       }
     },
-    "278": {
-      "id": 278,
+    "400": {
+      "id": 400,
+      "description": "USDe/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "401": {
+      "id": 401,
+      "description": "MERL/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "404": {
+      "id": 404,
       "description": "CHR / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1797,8 +2358,30 @@
         }
       }
     },
-    "280": {
-      "id": 280,
+    "406": {
+      "id": 406,
+      "description": "PENDLE/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "409": {
+      "id": 409,
+      "description": "TAO/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "412": {
+      "id": 412,
       "description": "USDV / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1809,8 +2392,19 @@
         }
       }
     },
-    "281": {
-      "id": 281,
+    "413": {
+      "id": 413,
+      "description": "NEIRO/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "416": {
+      "id": 416,
       "description": "GME / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1820,8 +2414,8 @@
         }
       }
     },
-    "283": {
-      "id": 283,
+    "418": {
+      "id": 418,
       "description": "WEMIX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1832,8 +2426,8 @@
         }
       }
     },
-    "285": {
-      "id": 285,
+    "420": {
+      "id": 420,
       "description": "MANA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1845,8 +2439,8 @@
         }
       }
     },
-    "286": {
-      "id": 286,
+    "421": {
+      "id": 421,
       "description": "MANA / ETH",
       "chainlink_compatibility": {
         "base": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
@@ -1856,8 +2450,8 @@
         }
       }
     },
-    "289": {
-      "id": 289,
+    "424": {
+      "id": 424,
       "description": "SLP / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1867,8 +2461,19 @@
         }
       }
     },
-    "292": {
-      "id": 292,
+    "427": {
+      "id": 427,
+      "description": "PENGU/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "430": {
+      "id": 430,
       "description": "CFX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1878,8 +2483,8 @@
         }
       }
     },
-    "295": {
-      "id": 295,
+    "433": {
+      "id": 433,
       "description": "MATIC / USD",
       "chainlink_compatibility": {
         "base": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
@@ -1903,8 +2508,8 @@
         }
       }
     },
-    "298": {
-      "id": 298,
+    "436": {
+      "id": 436,
       "description": "DGB / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1914,8 +2519,41 @@
         }
       }
     },
-    "301": {
-      "id": 301,
+    "439": {
+      "id": 439,
+      "description": "S/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "442": {
+      "id": 442,
+      "description": "AI/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "444": {
+      "id": 444,
+      "description": "MICHI/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "446": {
+      "id": 446,
       "description": "RPL / USD",
       "chainlink_compatibility": {
         "base": "0xD33526068D116cE69F19A9ee46F0bd304F21A51f",
@@ -1928,8 +2566,8 @@
         }
       }
     },
-    "304": {
-      "id": 304,
+    "449": {
+      "id": 449,
       "description": "CELO / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1942,8 +2580,8 @@
         }
       }
     },
-    "307": {
-      "id": 307,
+    "452": {
+      "id": 452,
       "description": "JOE / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1954,8 +2592,41 @@
         }
       }
     },
-    "310": {
-      "id": 310,
+    "455": {
+      "id": 455,
+      "description": "BIGTIME/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "458": {
+      "id": 458,
+      "description": "STG/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "460": {
+      "id": 460,
+      "description": "GRT/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "461": {
+      "id": 461,
       "description": "GRT / ETH",
       "chainlink_compatibility": {
         "base": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
@@ -1965,8 +2636,19 @@
         }
       }
     },
-    "311": {
-      "id": 311,
+    "464": {
+      "id": 464,
+      "description": "PEOPLE/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "467": {
+      "id": 467,
       "description": "ALPHA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1976,8 +2658,8 @@
         }
       }
     },
-    "314": {
-      "id": 314,
+    "470": {
+      "id": 470,
       "description": "NVDA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1988,8 +2670,8 @@
         }
       }
     },
-    "315": {
-      "id": 315,
+    "471": {
+      "id": 471,
       "description": "QUICK / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -1999,8 +2681,41 @@
         }
       }
     },
-    "317": {
-      "id": 317,
+    "473": {
+      "id": 473,
+      "description": "CAT/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "476": {
+      "id": 476,
+      "description": "IMX/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "479": {
+      "id": 479,
+      "description": "STRK/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "482": {
+      "id": 482,
       "description": "GBP / USD",
       "chainlink_compatibility": {
         "base": "0x000000000000000000000000000000000000033a",
@@ -2015,8 +2730,8 @@
         }
       }
     },
-    "319": {
-      "id": 319,
+    "484": {
+      "id": 484,
       "description": "CHZ / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2028,8 +2743,8 @@
         }
       }
     },
-    "322": {
-      "id": 322,
+    "487": {
+      "id": 487,
       "description": "RSR / USD",
       "chainlink_compatibility": {
         "base": "0x320623b8E4fF03373931769A31Fc52A4E78B5d70",
@@ -2041,8 +2756,8 @@
         }
       }
     },
-    "325": {
-      "id": 325,
+    "490": {
+      "id": 490,
       "description": "COQ / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2052,8 +2767,63 @@
         }
       }
     },
-    "327": {
-      "id": 327,
+    "492": {
+      "id": 492,
+      "description": "MANTA/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "495": {
+      "id": 495,
+      "description": "WLD/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "498": {
+      "id": 498,
+      "description": "POPCAT/USD-RefPrice-mainnet-production",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "500": {
+      "id": 500,
+      "description": "BROCCOLI/USD-RefPrice-mainnet-production",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "502": {
+      "id": 502,
+      "description": "stETH/USD-RefPrice-DS-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x534a7FF707Bc862cAB0Dda546F1B817Be5235b66"
+        }
+      }
+    },
+    "505": {
+      "id": 505,
       "description": "WSTETH / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2068,8 +2838,8 @@
         }
       }
     },
-    "328": {
-      "id": 328,
+    "506": {
+      "id": 506,
       "description": "LTC / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -2079,8 +2849,8 @@
         }
       }
     },
-    "329": {
-      "id": 329,
+    "507": {
+      "id": 507,
       "description": "LTC / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2096,8 +2866,19 @@
         }
       }
     },
-    "332": {
-      "id": 332,
+    "510": {
+      "id": 510,
+      "description": "TIA/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "513": {
+      "id": 513,
       "description": "DPX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2107,8 +2888,19 @@
         }
       }
     },
-    "333": {
-      "id": 333,
+    "514": {
+      "id": 514,
+      "description": "FARTCOIN/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "517": {
+      "id": 517,
       "description": "KRW / USD",
       "chainlink_compatibility": {
         "base": "0x000000000000000000000000000000000000019a",
@@ -2120,8 +2912,8 @@
         }
       }
     },
-    "334": {
-      "id": 334,
+    "518": {
+      "id": 518,
       "description": "mETH / ETH",
       "chainlink_compatibility": {
         "base": "0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa",
@@ -2131,8 +2923,30 @@
         }
       }
     },
-    "336": {
-      "id": 336,
+    "520": {
+      "id": 520,
+      "description": "PYTH/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "523": {
+      "id": 523,
+      "description": "TOKEN/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "525": {
+      "id": 525,
       "description": "FRAX / USD",
       "chainlink_compatibility": {
         "base": "0x853d955aCEf822Db058eb8505911ED77F175b99e",
@@ -2149,8 +2963,8 @@
         }
       }
     },
-    "338": {
-      "id": 338,
+    "527": {
+      "id": 527,
       "description": "AXL / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2161,8 +2975,19 @@
         }
       }
     },
-    "340": {
-      "id": 340,
+    "529": {
+      "id": 529,
+      "description": "GRIFFAIN/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "531": {
+      "id": 531,
       "description": "SUSHI / USD",
       "chainlink_compatibility": {
         "base": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
@@ -2180,8 +3005,8 @@
         }
       }
     },
-    "341": {
-      "id": 341,
+    "532": {
+      "id": 532,
       "description": "SUSHI / ETH",
       "chainlink_compatibility": {
         "base": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
@@ -2192,8 +3017,8 @@
         }
       }
     },
-    "344": {
-      "id": 344,
+    "535": {
+      "id": 535,
       "description": "HBAR / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2203,8 +3028,8 @@
         }
       }
     },
-    "347": {
-      "id": 347,
+    "538": {
+      "id": 538,
       "description": "TRX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2218,8 +3043,19 @@
         }
       }
     },
-    "350": {
-      "id": 350,
+    "541": {
+      "id": 541,
+      "description": "AEVO/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "544": {
+      "id": 544,
       "description": "SHIB / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2235,8 +3071,8 @@
         }
       }
     },
-    "353": {
-      "id": 353,
+    "547": {
+      "id": 547,
       "description": "FDUSD / USD",
       "chainlink_compatibility": {
         "base": "0xc5f0f7b66764F6ec8C8Dff7BA683102295E16409",
@@ -2247,8 +3083,19 @@
         }
       }
     },
-    "356": {
-      "id": 356,
+    "550": {
+      "id": 550,
+      "description": "CYBER/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "552": {
+      "id": 552,
       "description": "SPY / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2260,8 +3107,8 @@
         }
       }
     },
-    "357": {
-      "id": 357,
+    "553": {
+      "id": 553,
       "description": "XLM / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2274,8 +3121,8 @@
         }
       }
     },
-    "360": {
-      "id": 360,
+    "556": {
+      "id": 556,
       "description": "HIGH / USD",
       "chainlink_compatibility": {
         "base": "0x71Ab77b7dbB4fa7e017BC15090b2163221420282",
@@ -2286,8 +3133,8 @@
         }
       }
     },
-    "362": {
-      "id": 362,
+    "558": {
+      "id": 558,
       "description": "LIT / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2297,8 +3144,41 @@
         }
       }
     },
-    "364": {
-      "id": 364,
+    "560": {
+      "id": 560,
+      "description": "BERA/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "563": {
+      "id": 563,
+      "description": "VIRTUAL/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "566": {
+      "id": 566,
+      "description": "ZEC/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "569": {
+      "id": 569,
       "description": "ZBU / USD",
       "chainlink_compatibility": {
         "base": "0xe77f6aCD24185e149e329C1C0F479201b9Ec2f4B",
@@ -2310,8 +3190,8 @@
         }
       }
     },
-    "366": {
-      "id": 366,
+    "571": {
+      "id": 571,
       "description": "BSW / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2321,8 +3201,8 @@
         }
       }
     },
-    "368": {
-      "id": 368,
+    "573": {
+      "id": 573,
       "description": "USDT / USD",
       "chainlink_compatibility": {
         "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
@@ -2358,8 +3238,8 @@
         }
       }
     },
-    "370": {
-      "id": 370,
+    "575": {
+      "id": 575,
       "description": "SNX / USD",
       "chainlink_compatibility": {
         "base": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
@@ -2379,8 +3259,8 @@
         }
       }
     },
-    "371": {
-      "id": 371,
+    "576": {
+      "id": 576,
       "description": "SNX / ETH",
       "chainlink_compatibility": {
         "base": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
@@ -2390,8 +3270,19 @@
         }
       }
     },
-    "374": {
-      "id": 374,
+    "579": {
+      "id": 579,
+      "description": "BB/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "582": {
+      "id": 582,
       "description": "BAND / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -2401,8 +3292,8 @@
         }
       }
     },
-    "375": {
-      "id": 375,
+    "583": {
+      "id": 583,
       "description": "BAND / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2412,8 +3303,41 @@
         }
       }
     },
-    "378": {
-      "id": 378,
+    "586": {
+      "id": 586,
+      "description": "ANIME/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "589": {
+      "id": 589,
+      "description": "DOGS/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "592": {
+      "id": 592,
+      "description": "ZK/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "595": {
+      "id": 595,
       "description": "COP / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2425,8 +3349,8 @@
         }
       }
     },
-    "379": {
-      "id": 379,
+    "596": {
+      "id": 596,
       "description": "ONT / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2436,8 +3360,19 @@
         }
       }
     },
-    "382": {
-      "id": 382,
+    "599": {
+      "id": 599,
+      "description": "TRUMP/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "602": {
+      "id": 602,
       "description": "APE / ETH",
       "chainlink_compatibility": {
         "base": "0x4d224452801ACEd8B2F0aebE155379bb5D594381",
@@ -2447,8 +3382,8 @@
         }
       }
     },
-    "383": {
-      "id": 383,
+    "603": {
+      "id": 603,
       "description": "DAI / USD",
       "chainlink_compatibility": {
         "base": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
@@ -2480,8 +3415,8 @@
         }
       }
     },
-    "384": {
-      "id": 384,
+    "604": {
+      "id": 604,
       "description": "DAI / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -2492,8 +3427,8 @@
         }
       }
     },
-    "387": {
-      "id": 387,
+    "607": {
+      "id": 607,
       "description": "FTM / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2512,8 +3447,8 @@
         }
       }
     },
-    "388": {
-      "id": 388,
+    "608": {
+      "id": 608,
       "description": "FTM / ETH",
       "chainlink_compatibility": {
         "base": "0x4E15361FD6b4BB609Fa63C81A2be19d873717870",
@@ -2523,8 +3458,30 @@
         }
       }
     },
-    "391": {
-      "id": 391,
+    "611": {
+      "id": 611,
+      "description": "AI16Z/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "614": {
+      "id": 614,
+      "description": "PIXEL/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "617": {
+      "id": 617,
       "description": "UNI / USD",
       "chainlink_compatibility": {
         "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
@@ -2544,8 +3501,8 @@
         }
       }
     },
-    "392": {
-      "id": 392,
+    "618": {
+      "id": 618,
       "description": "UNI / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -2555,8 +3512,8 @@
         }
       }
     },
-    "393": {
-      "id": 393,
+    "619": {
+      "id": 619,
       "description": "UNI / ETH",
       "chainlink_compatibility": {
         "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
@@ -2567,8 +3524,8 @@
         }
       }
     },
-    "396": {
-      "id": 396,
+    "622": {
+      "id": 622,
       "description": "TUSD / ETH",
       "chainlink_compatibility": {
         "base": "0x0000000000085d4780B73119b644AE5ecd22b376",
@@ -2578,8 +3535,8 @@
         }
       }
     },
-    "397": {
-      "id": 397,
+    "623": {
+      "id": 623,
       "description": "XRP / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -2589,8 +3546,8 @@
         }
       }
     },
-    "398": {
-      "id": 398,
+    "624": {
+      "id": 624,
       "description": "OP / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2604,8 +3561,8 @@
         }
       }
     },
-    "401": {
-      "id": 401,
+    "627": {
+      "id": 627,
       "description": "ALCX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2615,8 +3572,8 @@
         }
       }
     },
-    "404": {
-      "id": 404,
+    "630": {
+      "id": 630,
       "description": "XRP / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2632,8 +3589,8 @@
         }
       }
     },
-    "407": {
-      "id": 407,
+    "633": {
+      "id": 633,
       "description": "TRB / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2644,8 +3601,8 @@
         }
       }
     },
-    "410": {
-      "id": 410,
+    "636": {
+      "id": 636,
       "description": "BTC / USD",
       "chainlink_compatibility": {
         "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -2682,8 +3639,8 @@
         }
       }
     },
-    "413": {
-      "id": 413,
+    "639": {
+      "id": 639,
       "description": "FOXY / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2693,8 +3650,8 @@
         }
       }
     },
-    "415": {
-      "id": 415,
+    "641": {
+      "id": 641,
       "description": "KAVA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2705,8 +3662,8 @@
         }
       }
     },
-    "417": {
-      "id": 417,
+    "643": {
+      "id": 643,
       "description": "SUSD / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2716,8 +3673,8 @@
         }
       }
     },
-    "419": {
-      "id": 419,
+    "645": {
+      "id": 645,
       "description": "CUSD / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2727,8 +3684,8 @@
         }
       }
     },
-    "421": {
-      "id": 421,
+    "647": {
+      "id": 647,
       "description": "SUSD / ETH",
       "chainlink_compatibility": {
         "base": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
@@ -2738,8 +3695,8 @@
         }
       }
     },
-    "422": {
-      "id": 422,
+    "648": {
+      "id": 648,
       "description": "ZRX / USD",
       "chainlink_compatibility": {
         "base": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
@@ -2752,8 +3709,8 @@
         }
       }
     },
-    "423": {
-      "id": 423,
+    "649": {
+      "id": 649,
       "description": "USDX / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2765,8 +3722,8 @@
         }
       }
     },
-    "424": {
-      "id": 424,
+    "650": {
+      "id": 650,
       "description": "LISTA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2776,8 +3733,8 @@
         }
       }
     },
-    "425": {
-      "id": 425,
+    "651": {
+      "id": 651,
       "description": "ANON / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2788,8 +3745,261 @@
         }
       }
     },
-    "426": {
-      "id": 426,
+    "652": {
+      "id": 652,
+      "description": "ASTR/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "653": {
+      "id": 653,
+      "description": "BONK/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "654": {
+      "id": 654,
+      "description": "XAI/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "655": {
+      "id": 655,
+      "description": "NOT/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "656": {
+      "id": 656,
+      "description": "WIF/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "657": {
+      "id": 657,
+      "description": "MEW/USD-RefPrice-DStaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "658": {
+      "id": 658,
+      "description": "TON/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "659": {
+      "id": 659,
+      "description": "stETH/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "660": {
+      "id": 660,
+      "description": "BOME/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "661": {
+      "id": 661,
+      "description": "ETHFI/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "662": {
+      "id": 662,
+      "description": "PEPE/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "663": {
+      "id": 663,
+      "description": "EIGEN/USD-RefPrice-DStaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "664": {
+      "id": 664,
+      "description": "ONDO/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "665": {
+      "id": 665,
+      "description": "SUI/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "666": {
+      "id": 666,
+      "description": "W/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "667": {
+      "id": 667,
+      "description": "RENDER/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "668": {
+      "id": 668,
+      "description": "SATS/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "669": {
+      "id": 669,
+      "description": "DYDX/USD-RefPrice-DStaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "670": {
+      "id": 670,
+      "description": "ALT/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "671": {
+      "id": 671,
+      "description": "AR/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "672": {
+      "id": 672,
+      "description": "EGLD/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "673": {
+      "id": 673,
+      "description": "JUP/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "674": {
+      "id": 674,
+      "description": "FLOKI/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "675": {
+      "id": 675,
       "description": "USR / USD",
       "chainlink_compatibility": {
         "base": "0x66a1E37c9b0eAddca17d3662D6c05F4DECf3e110",
@@ -2802,8 +4012,8 @@
         }
       }
     },
-    "427": {
-      "id": 427,
+    "676": {
+      "id": 676,
       "description": "USDL / USD",
       "chainlink_compatibility": {
         "base": "0xbdC7c08592Ee4aa51D06C27Ee23D5087D65aDbcD",
@@ -2814,8 +4024,8 @@
         }
       }
     },
-    "428": {
-      "id": 428,
+    "677": {
+      "id": 677,
       "description": "JLP / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2825,8 +4035,8 @@
         }
       }
     },
-    "429": {
-      "id": 429,
+    "678": {
+      "id": 678,
       "description": "CORE / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2836,8 +4046,8 @@
         }
       }
     },
-    "430": {
-      "id": 430,
+    "679": {
+      "id": 679,
       "description": "KLIMA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2847,8 +4057,8 @@
         }
       }
     },
-    "431": {
-      "id": 431,
+    "680": {
+      "id": 680,
       "description": "ZRX / ETH",
       "chainlink_compatibility": {
         "base": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
@@ -2858,8 +4068,8 @@
         }
       }
     },
-    "432": {
-      "id": 432,
+    "681": {
+      "id": 681,
       "description": "USD0++ / USD",
       "chainlink_compatibility": {
         "base": "0x35D8949372D46B7a3D5A56006AE77B215fc69bC0",
@@ -2869,8 +4079,8 @@
         }
       }
     },
-    "440": {
-      "id": 440,
+    "732": {
+      "id": 732,
       "description": "CVX / USD",
       "chainlink_compatibility": {
         "base": "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B",
@@ -2885,8 +4095,8 @@
         }
       }
     },
-    "443": {
-      "id": 443,
+    "735": {
+      "id": 735,
       "description": "LRC / ETH",
       "chainlink_compatibility": {
         "base": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
@@ -2896,8 +4106,8 @@
         }
       }
     },
-    "444": {
-      "id": 444,
+    "736": {
+      "id": 736,
       "description": "KNC / ETH",
       "chainlink_compatibility": {
         "base": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
@@ -2907,8 +4117,19 @@
         }
       }
     },
-    "445": {
-      "id": 445,
+    "737": {
+      "id": 737,
+      "description": "ID/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "740": {
+      "id": 740,
       "description": "TSLA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2921,8 +4142,8 @@
         }
       }
     },
-    "446": {
-      "id": 446,
+    "741": {
+      "id": 741,
       "description": "VELO / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2932,8 +4153,8 @@
         }
       }
     },
-    "449": {
-      "id": 449,
+    "744": {
+      "id": 744,
       "description": "COIN / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2944,8 +4165,8 @@
         }
       }
     },
-    "450": {
-      "id": 450,
+    "745": {
+      "id": 745,
       "description": "FIL / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2960,8 +4181,8 @@
         }
       }
     },
-    "451": {
-      "id": 451,
+    "746": {
+      "id": 746,
       "description": "FIL / ETH",
       "chainlink_compatibility": {
         "base": null,
@@ -2971,8 +4192,8 @@
         }
       }
     },
-    "454": {
-      "id": 454,
+    "749": {
+      "id": 749,
       "description": "STORJ / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2982,8 +4203,8 @@
         }
       }
     },
-    "457": {
-      "id": 457,
+    "752": {
+      "id": 752,
       "description": "MIMATIC / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -2997,8 +4218,30 @@
         }
       }
     },
-    "458": {
-      "id": 458,
+    "753": {
+      "id": 753,
+      "description": "HYPE/USD-RefPrice-mainnet-staging",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    },
+    "755": {
+      "id": 755,
+      "description": "FLOW/USD-RefPrice-DSstaging-Premium-Global-003-dead",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "758": {
+      "id": 758,
       "description": "KSM / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3008,8 +4251,19 @@
         }
       }
     },
-    "461": {
-      "id": 461,
+    "761": {
+      "id": 761,
+      "description": "ALGO/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "764": {
+      "id": 764,
       "description": "FET / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3021,8 +4275,8 @@
         }
       }
     },
-    "464": {
-      "id": 464,
+    "767": {
+      "id": 767,
       "description": "EUR / USD",
       "chainlink_compatibility": {
         "base": "0x00000000000000000000000000000000000003d2",
@@ -3045,8 +4299,8 @@
         }
       }
     },
-    "467": {
-      "id": 467,
+    "770": {
+      "id": 770,
       "description": "LINK / USD",
       "chainlink_compatibility": {
         "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
@@ -3083,8 +4337,8 @@
         }
       }
     },
-    "468": {
-      "id": 468,
+    "771": {
+      "id": 771,
       "description": "LINK / ETH",
       "chainlink_compatibility": {
         "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
@@ -3111,8 +4365,8 @@
         }
       }
     },
-    "469": {
-      "id": 469,
+    "772": {
+      "id": 772,
       "description": "LINK / BNB",
       "chainlink_compatibility": {
         "base": null,
@@ -3123,8 +4377,8 @@
         }
       }
     },
-    "472": {
-      "id": 472,
+    "775": {
+      "id": 775,
       "description": "SAND / USD",
       "chainlink_compatibility": {
         "base": "0x3845badAde8e6dFF049820680d1F14bD3903a5d0",
@@ -3139,8 +4393,8 @@
         }
       }
     },
-    "475": {
-      "id": 475,
+    "778": {
+      "id": 778,
       "description": "NULS / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3150,8 +4404,19 @@
         }
       }
     },
-    "478": {
-      "id": 478,
+    "781": {
+      "id": 781,
+      "description": "OMNI/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "784": {
+      "id": 784,
       "description": "RNDR / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3162,8 +4427,8 @@
         }
       }
     },
-    "481": {
-      "id": 481,
+    "787": {
+      "id": 787,
       "description": "FTT / ETH",
       "chainlink_compatibility": {
         "base": "0x50D1c9771902476076eCFc8B2A83Ad6b9355a4c9",
@@ -3173,8 +4438,8 @@
         }
       }
     },
-    "482": {
-      "id": 482,
+    "788": {
+      "id": 788,
       "description": "FTT / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3185,8 +4450,8 @@
         }
       }
     },
-    "485": {
-      "id": 485,
+    "791": {
+      "id": 791,
       "description": "MSFT / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3198,8 +4463,8 @@
         }
       }
     },
-    "486": {
-      "id": 486,
+    "792": {
+      "id": 792,
       "description": "UMA / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3212,8 +4477,8 @@
         }
       }
     },
-    "489": {
-      "id": 489,
+    "795": {
+      "id": 795,
       "description": "RUNE / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3224,8 +4489,8 @@
         }
       }
     },
-    "492": {
-      "id": 492,
+    "798": {
+      "id": 798,
       "description": "GHST / ETH",
       "chainlink_compatibility": {
         "base": null,
@@ -3235,8 +4500,8 @@
         }
       }
     },
-    "493": {
-      "id": 493,
+    "799": {
+      "id": 799,
       "description": "GHST / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3246,8 +4511,8 @@
         }
       }
     },
-    "496": {
-      "id": 496,
+    "802": {
+      "id": 802,
       "description": "DOGE / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3267,8 +4532,19 @@
         }
       }
     },
-    "499": {
-      "id": 499,
+    "805": {
+      "id": 805,
+      "description": "ZRO/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "808": {
+      "id": 808,
       "description": "WING / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3278,8 +4554,8 @@
         }
       }
     },
-    "501": {
-      "id": 501,
+    "810": {
+      "id": 810,
       "description": "ONE / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3290,8 +4566,8 @@
         }
       }
     },
-    "504": {
-      "id": 504,
+    "813": {
+      "id": 813,
       "description": "RON / USD",
       "chainlink_compatibility": {
         "base": null,
@@ -3302,8 +4578,30 @@
         }
       }
     },
-    "507": {
-      "id": 507,
+    "816": {
+      "id": 816,
+      "description": "MAV/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "818": {
+      "id": 818,
+      "description": "ARKM/USD-RefPrice-DSstaging-Premium-Global-003",
+      "chainlink_compatibility": {
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "chainlink_aggregators": {
+          "arbitrum-mainnet": "0x3caF678232f500b05864dBaDDD9F9dB8760bE072"
+        }
+      }
+    },
+    "821": {
+      "id": 821,
       "description": "USDM / USD",
       "chainlink_compatibility": {
         "base": "0x59D9356E565Ab3A36dD77763Fc0d87fEaf85508C",
@@ -3317,8 +4615,8 @@
         }
       }
     },
-    "509": {
-      "id": 509,
+    "823": {
+      "id": 823,
       "description": "TUSD / USD",
       "chainlink_compatibility": {
         "base": "0x0000000000085d4780B73119b644AE5ecd22b376",
