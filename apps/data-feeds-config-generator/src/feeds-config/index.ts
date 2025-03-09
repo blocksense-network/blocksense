@@ -168,6 +168,8 @@ export async function getCLFeedsOnMainnet(
     .filter(
       ([_feedName, feedData]) => !isPeggedAssetDataFeed(feedData.networks),
     )
+    // Remove CL feeds with hidden docs
+    .filter(([_feedName, feedData]) => !isHiddenDataFeed(feedData.networks))
     .map(([feedName, _feedData]) => {
       return {
         ...feedFromChainLinkFeedInfo(onMainnetCookedDataFeeds[feedName]),
@@ -186,6 +188,12 @@ function isDataFeedOnMainnet(
 function isPeggedAssetDataFeed(networks: Record<string, ChainLinkFeedInfo>) {
   return Object.values(networks).some(
     feedData => feedData.docs.assetSubClass == 'Pegged Asset',
+  );
+}
+
+function isHiddenDataFeed(networks: Record<string, ChainLinkFeedInfo>) {
+  return Object.values(networks).every(
+    feedData => feedData.docs.hidden === true,
   );
 }
 
