@@ -543,11 +543,10 @@ impl FeedSlotsProcessor {
 pub mod tests {
 
     use super::*;
-    use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
-    use config::get_test_config_with_single_provider;
     use config::AllFeedsConfig;
     use config::Reporter;
+    use config::{get_test_config_with_single_provider, test_feed_config};
     use feed_registry::registry::AllFeedsReports;
     use feed_registry::types::test_payload_from_result;
     use feed_registry::types::FeedMetaData;
@@ -627,8 +626,8 @@ pub mod tests {
             skip_publish_if_less_then_percentage,
             always_publish_heartbeat_ms,
             first_report_start_time,
-            "Numerical".to_string(),
-            "Average".to_string(),
+            "numerical".to_string(),
+            "average".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -819,8 +818,8 @@ pub mod tests {
             skip_publish_if_less_then_percentage,
             always_publish_heartbeat_ms,
             first_report_start_time,
-            "Numerical".to_string(),
-            "Average".to_string(),
+            "numerical".to_string(),
+            "average".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -846,7 +845,7 @@ pub mod tests {
         });
 
         let feeds_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
 
         let (sequencer_state, mut rx, _, _, _) =
@@ -922,8 +921,8 @@ pub mod tests {
             skip_publish_if_less_then_percentage,
             always_publish_heartbeat_ms,
             first_report_start_time,
-            "Numerical".to_string(),
-            "Average".to_string(),
+            "numerical".to_string(),
+            "average".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -938,7 +937,7 @@ pub mod tests {
             "http://localhost:8545",
         );
         let feeds_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
         let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
@@ -1030,8 +1029,8 @@ pub mod tests {
             skip_publish_if_less_then_percentage,
             always_publish_heartbeat_ms,
             first_report_start_time,
-            "Numerical".to_string(),
-            "Average".to_string(),
+            "numerical".to_string(),
+            "average".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -1046,7 +1045,7 @@ pub mod tests {
             "http://localhost:8545",
         );
         let feeds_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
         let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, feeds_config).await;
@@ -1136,8 +1135,8 @@ pub mod tests {
             skip_publish_if_less_then_percentage,
             always_publish_heartbeat_ms,
             first_report_start_time,
-            "Numerical".to_string(),
-            "Average".to_string(),
+            "numerical".to_string(),
+            "average".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -1152,7 +1151,7 @@ pub mod tests {
             "http://localhost:8545",
         );
         let all_feed_config = AllFeedsConfig {
-            feeds: vec![some_feed_config_with_id_1()],
+            feeds: vec![test_feed_config(1, 0)],
         };
         let (sequencer_state, mut rx, _, _, _) =
             create_sequencer_state_from_sequencer_config(cfg, metrics_prefix, all_feed_config)

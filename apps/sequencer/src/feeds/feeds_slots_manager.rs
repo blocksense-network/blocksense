@@ -1,7 +1,7 @@
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::sequencer_state::SequencerState;
 use actix_web::web;
-use config::FeedConfig;
+use blocksense_registry::config::FeedConfig;
 use eyre::Result;
 use feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, ProcessorResultValue, RegisterNewAssetFeed,
@@ -11,6 +11,8 @@ use futures::select;
 use futures::stream::{FuturesUnordered, StreamExt};
 use std::io::Error;
 use std::sync::Arc;
+use std::time::Duration;
+use std::time::UNIX_EPOCH;
 use tokio::sync::{mpsc, RwLock};
 use tracing::{debug, error, info, warn};
 
@@ -148,7 +150,7 @@ async fn handle_feeds_slots_manager_cmd(
         FeedsManagementCmds::RegisterNewAssetFeed(register_new_asset_feed) => {
             match register_asset_feed(&sequencer_state, &register_new_asset_feed).await {
                 Ok(registered_feed_metadata) => {
-                    let new_name = register_new_asset_feed.config.name;
+                    let new_name = register_new_asset_feed.config.full_name;
                     let new_id = register_new_asset_feed.config.id;
                     let feed_slots_processor = FeedSlotsProcessor::new(new_name, new_id);
                     let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
@@ -263,7 +265,7 @@ pub async fn register_feed_with_config(
         let keys = reg.get_keys();
 
         new_feed_id = new_feed_config.id;
-        new_name = new_feed_config.name.clone();
+        new_name = new_feed_config.full_name.clone();
 
         if keys.contains(&new_feed_id) {
             eyre::bail!("Cannot register feed ID, feed with this ID {new_feed_id} already exists.");
@@ -271,13 +273,14 @@ pub async fn register_feed_with_config(
 
         let new_feed_metadata = FeedMetaData::new(
             &new_name,
-            new_feed_config.report_interval_ms,
-            new_feed_config.quorum_percentage,
-            new_feed_config.skip_publish_if_less_then_percentage,
-            new_feed_config.always_publish_heartbeat_ms,
-            new_feed_config.first_report_start_time,
+            new_feed_config.schedule.interval_ms,
+            new_feed_config.quorum.percentage,
+            new_feed_config.schedule.deviation_percentage,
+            new_feed_config.schedule.heartbeat_ms,
+            UNIX_EPOCH
+                + Duration::from_millis(new_feed_config.schedule.first_report_start_unix_time_ms),
             new_feed_config.value_type.clone(),
-            new_feed_config.aggregate_type.clone(),
+            new_feed_config.quorum.aggregation.clone(),
             None,
         );
         reg.push(new_feed_id, new_feed_metadata);
@@ -354,11 +357,10 @@ async fn read_next_feed_slots_manager_cmd(
 mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
-    use config::{AllFeedsConfig, SequencerConfig};
+    use config::{test_feed_config, AllFeedsConfig, SequencerConfig};
     use feed_registry::types::{test_payload_from_result, FeedType};
     use std::time::Duration;
 
-    use crate::http_handlers::data_feeds::tests::some_feed_config_with_id_1;
     use config::get_test_config_with_no_providers;
 
     use crate::feeds::feed_slots_processor::tests::check_received;
@@ -368,10 +370,10 @@ mod tests {
     async fn test_feed_slots_manager_loop() {
         let log_handle = init_shared_logging_handle("INFO", false);
         let sequencer_config: SequencerConfig = get_test_config_with_no_providers();
-        let mut feed_1_config = some_feed_config_with_id_1();
+        let mut feed_1_config = test_feed_config(1, 0);
         const TIME_INTERVAL: u64 = 2_000_u64;
 
-        feed_1_config.report_interval_ms = TIME_INTERVAL; // lower the report time interval.
+        feed_1_config.schedule.interval_ms = TIME_INTERVAL; // lower the report time interval.
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };

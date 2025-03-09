@@ -63,8 +63,8 @@ impl FeedMetaData {
             always_publish_heartbeat_ms,
             first_report_start_time,
             feed_aggregator: FeedAggregate::MajorityVoteAggregator,
-            value_type: "Text".to_string(),
-            aggregate_type: "Average".to_string(),
+            value_type: "text".to_string(),
+            aggregate_type: "average".to_string(),
             processor_cmd_chan: None,
         }
     }
@@ -290,9 +290,9 @@ impl FeedType {
 
     pub fn get_variant_from_string(feed_type: &str) -> Result<FeedType, String> {
         let feed_type = match feed_type {
-            "Numerical" => FeedType::Numerical(0.0f64),
-            "Text" => FeedType::Text("".to_string()),
-            "Bytes" => FeedType::Bytes(vec![]),
+            "numerical" => FeedType::Numerical(0.0f64),
+            "text" => FeedType::Text("".to_string()),
+            "bytes" => FeedType::Bytes(vec![]),
             _ => {
                 return Err(format!("Unsupported feed type {feed_type}"));
             }
