@@ -10,8 +10,8 @@ edition.workspace = true
 [dependencies]
 utils = {path = "../utils"}
 dirs = "6.0.0"
-serde = { version = "1.0.216", features = ["derive"]}
-anyhow = "1.0.89"
-serde_json = "1.0.137"
+serde = { version = "1.0.219", features = ["derive"]}
+anyhow = "1.0.97"
+serde_json = "1.0.140"
 hex = "0.4.3"
 tracing = { version = "0.1.41", features = ["log"] }
