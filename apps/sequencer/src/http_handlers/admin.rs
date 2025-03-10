@@ -506,6 +506,7 @@ pub async fn get_oracle_scripts(
                     "https://api.kraken.com".to_string(),
                     "https://api.bybit.com".to_string(),
                     "https://api.coinbase.com".to_string(),
+                    "https://api.exchange.coinbase.com".to_string(),
                     "https://api.binance.com".to_string(),
                     "https://api.kucoin.com".to_string(),
                     "https://api.mexc.com".to_string(),
