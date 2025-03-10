@@ -11,7 +11,7 @@ import {
   DialogClose,
   DialogTrigger,
 } from '@/components/common/Dialog';
-import { ScrollArea } from '@/components/common/ScrollArea';
+import { ScrollArea } from '@blocksense/ui/ScrollArea';
 import { CodeBlock } from '@/components/common/CodeBlock';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {

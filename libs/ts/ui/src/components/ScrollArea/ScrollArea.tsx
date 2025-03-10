@@ -1,13 +1,14 @@
 'use client';
 
-import {
+import React, {
   createContext,
   useContext,
   useState,
   HTMLAttributes,
   ReactNode,
 } from 'react';
-import { cn } from '@/lib/utils';
+
+import { cn } from '../../utils';
 
 type ScrollAreaContextType = {
   scrollPosition: number;
@@ -32,6 +33,7 @@ export const ScrollArea = ({
   ...props
 }: ScrollAreaProps) => {
   const [scrollPosition, setScrollPosition] = useState(0);
+  const scrollAreaId = 'scroll-area-content';
 
   return (
     <ScrollAreaContext.Provider value={{ scrollPosition, setScrollPosition }}>
@@ -41,12 +43,17 @@ export const ScrollArea = ({
         aria-label="Scrollable content"
         {...props}
       >
-        <article className="scroll-area__content max-h-[100%] overflow-auto">
+        <article
+          id={scrollAreaId}
+          className="scroll-area__content max-h-[100%] overflow-auto"
+          aria-labelledby="scroll-area-label"
+        >
           {children}
         </article>
         <ScrollBar
           className="scroll-area__scrollbar"
           scrollPosition={scrollPosition}
+          scrollAreaId={scrollAreaId}
         />
       </section>
     </ScrollAreaContext.Provider>
@@ -57,12 +64,14 @@ type ScrollBarProps = HTMLAttributes<HTMLElement> & {
   className?: string;
   orientation?: 'vertical' | 'horizontal';
   scrollPosition?: number;
+  scrollAreaId?: string;
 };
 
 export const ScrollBar = ({
   className,
   orientation = 'vertical',
   scrollPosition = 0,
+  scrollAreaId,
   ...props
 }: ScrollBarProps) => {
   return (
@@ -79,6 +88,7 @@ export const ScrollBar = ({
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={scrollPosition}
+      aria-controls={scrollAreaId}
       {...props}
     >
       <div
@@ -88,6 +98,7 @@ export const ScrollBar = ({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={scrollPosition}
+        aria-controls={scrollAreaId}
         aria-label="Scroll thumb"
       />
     </aside>
