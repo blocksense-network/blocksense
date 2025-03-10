@@ -10,7 +10,7 @@ import React, {
   HTMLAttributes,
 } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '../../utils';
 import { Icon } from '@blocksense/ui/Icon';
 import { Button } from '@blocksense/ui/Button';
 
@@ -109,7 +109,7 @@ export const SelectTrigger = ({
   return (
     <Button
       className={cn(
-        'select__trigger flex h-10 mt-0 w-full items-center justify-between rounded-md px-2 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50',
+        'select__trigger flex gap-1 h-10 mt-0 w-full items-center justify-between rounded-md px-2 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}
       onClick={toggleOpen}
@@ -261,6 +261,29 @@ export const SelectItem = ({
           />
         )}
       </span>
+      {children}
+    </div>
+  );
+};
+
+type SelectLabelProps = HTMLAttributes<HTMLDivElement> & {
+  className?: string;
+  children: ReactNode;
+};
+
+export const SelectLabel = ({
+  className,
+  children,
+  ...props
+}: SelectLabelProps) => {
+  return (
+    <div
+      className={cn(
+        'select__label relative cursor-default m-1 select-none py-1.5 pl-8 pr-2 font-bold text-sm',
+        className,
+      )}
+      {...props}
+    >
       {children}
     </div>
   );
