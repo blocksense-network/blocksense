@@ -83,7 +83,7 @@ impl FeedMetaData {
         processor_cmd_chan: Option<UnboundedSender<FeedsSlotProcessorCmds>>,
     ) -> FeedMetaData {
         FeedMetaData {
-            name: name.to_string(),
+            name,
             voting_repeatability: Repeatability::Periodic,
             report_interval_ms,
             quorum_percentage,

@@ -17,7 +17,6 @@ use alloy_primitives::{Address, Bytes, Uint, U256};
 use crypto::{verify_signature, PublicKey, Signature};
 use feed_registry::types::FeedResult;
 use std::collections::{HashMap, HashSet};
-use std::hash::RandomState;
 use std::str::FromStr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -62,7 +61,7 @@ pub struct ConsumedReports {
 #[allow(clippy::too_many_arguments)]
 pub async fn consume_reports(
     name: &str,
-    reports: &HashMap<u64, DataFeedPayload, RandomState>,
+    reports: &HashMap<u64, DataFeedPayload>,
     feed_type: &FeedType,
     slot: u64,
     quorum_percentage: f32,
@@ -75,7 +74,7 @@ pub async fn consume_reports(
     history: Option<Arc<RwLock<FeedAggregateHistory>>>,
     feed_id: u32,
 ) -> ConsumedReports {
-    let values = collect_repoted_values(feed_type, feed_id, reports, slot);
+    let values = collect_reported_values(feed_type, feed_id, reports, slot);
 
     if values.is_empty() {
         info!("No reports found for feed: {} slot: {}!", name, &slot);
@@ -162,10 +161,10 @@ pub async fn consume_reports(
     }
 }
 
-pub fn collect_repoted_values(
+pub fn collect_reported_values(
     expected_feed_type: &FeedType,
     feed_id: u32,
-    reports: &std::collections::HashMap<u64, DataFeedPayload>,
+    reports: &HashMap<u64, DataFeedPayload>,
     slot: u64,
 ) -> Vec<FeedType> {
     let mut values: Vec<FeedType> = vec![];
