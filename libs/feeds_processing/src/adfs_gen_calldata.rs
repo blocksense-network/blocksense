@@ -1,7 +1,8 @@
 use alloy::hex;
 use alloy_primitives::U256;
-use config::FeedConfig;
-use eyre::Result;
+use anyhow::Result;
+use config::FeedStrideAndDecimals;
+use data_feeds::feeds_processing::BatchedAggegratesToSend;
 use prometheus::metrics::FeedsMetrics;
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap};
@@ -9,11 +10,9 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use utils::{from_hex_string, to_hex_string};
 
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 
 use alloy_encode_packed::{self, abi::encode_packed, SolidityDataType};
-
-use crate::BatchedAggegratesToSend;
 
 use once_cell::sync::Lazy;
 
@@ -48,7 +47,11 @@ pub async fn adfs_serialize_updates(
     net: &str,
     feed_updates: &BatchedAggegratesToSend,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
-    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+    feeds_rounds: &mut HashMap<u32, u64>, /* The rounds table for the relevant feeds. If the feeds_metrics are provided,
+                                          this map will be filled with the update count for each feed from it. If the
+                                          feeds_metrics is None, feeds_rounds will be used as the source of the updates
+                                          count. */
 ) -> Result<String> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
@@ -63,29 +66,14 @@ pub async fn adfs_serialize_updates(
     // Fill the value updates:
     for update in updates.iter() {
         let feed_id = update.feed_id;
-        debug!("Acquiring a read lock on feeds_config; network={net}; feed_id={feed_id}");
-        let feed_config = feeds_config.read().await.get(&feed_id).cloned();
-        debug!(
-            "Acquired and released a read lock on feeds_config; network={net}; feed_id={feed_id}"
-        );
 
-        let stride = match &feed_config {
-            Some(f) => f.stride,
+        let (stride, digits_in_fraction) = match &feeds_config.get(&feed_id) {
+            Some(f) => (f.stride, f.decimals),
             None => {
-                warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size.");
-                1
+                error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
+                (1, 18)
             }
         };
-
-        let digits_in_fraction = match &feed_config {
-            Some(f) => f.decimals,
-            None => {
-                warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
-                18
-            }
-        };
-
-        drop(feed_config);
 
         let mut round = match &feeds_metrics {
             Some(fm) => {
@@ -97,14 +85,21 @@ pub async fn adfs_serialize_updates(
                     .with_label_values(&[&update.feed_id.to_string(), net])
                     .get();
                 debug!("Acquired and released a read lock on feeds_metrics; network={net}; feed_id={feed_id}");
+                feeds_rounds.insert(feed_id, round);
                 round
             }
-            None => 0,
+            None => *feeds_rounds.get(&feed_id).unwrap_or({
+                error!("feeds_rounds does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
+                &0
+            }),
         };
 
         round %= MAX_HISTORY_ELEMENTS_PER_FEED;
 
-        let (_key, val) = update.encode(digits_in_fraction as usize); // Key is not needed. It is the bytes of the feed_id
+        let (_key, val) = update.encode(
+            digits_in_fraction as usize,
+            update.end_slot_timestamp as u64,
+        ); // Key is not needed. It is the bytes of the feed_id
 
         let id = U256::from(update.feed_id);
         let round = U256::from(round);
@@ -211,9 +206,6 @@ pub async fn adfs_serialize_updates(
 #[cfg(test)]
 pub mod tests {
 
-    use std::time::SystemTime;
-
-    use config::AssetPair;
     use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::FeedType;
 
@@ -245,32 +237,6 @@ pub mod tests {
             proofs: HashMap::new(),
         };
 
-        // Helper function to create FeedConfig
-        fn create_feed_config(id: u32, stride: u16) -> FeedConfig {
-            FeedConfig {
-                id,
-                name: "BTC".to_string(),
-                full_name: "Bitcoin".to_string(),
-                description: "A Peer-to-Peer Electronic Cash System".to_string(),
-                _type: "String".to_string(),
-                decimals: 18,
-                pair: AssetPair {
-                    base: "BTC".to_string(),
-                    quote: "USD".to_string(),
-                },
-                report_interval_ms: 50_000,
-                first_report_start_time: SystemTime::now(),
-                resources: HashMap::new(),
-                quorum_percentage: 0.6,
-                skip_publish_if_less_then_percentage: 0.1,
-                always_publish_heartbeat_ms: None,
-                script: "String".to_string(),
-                value_type: "String".to_string(),
-                aggregate_type: "String".to_string(),
-                stride,
-            }
-        }
-
         // Helper function to set round metrics (number of updates for a feed for a network)
         fn set_round_metric(feeds_metrics: &mut FeedsMetrics, feed_id: &str, net: &str, val: u64) {
             feeds_metrics
@@ -295,11 +261,41 @@ pub mod tests {
         }
 
         let config = HashMap::from([
-            (1, create_feed_config(1, 1)),
-            (2, create_feed_config(2, 0)),
-            (3, create_feed_config(3, 0)),
-            (4, create_feed_config(4, 0)),
-            (5, create_feed_config(5, 0)),
+            (
+                1,
+                FeedStrideAndDecimals {
+                    stride: 1,
+                    decimals: 18,
+                },
+            ),
+            (
+                2,
+                FeedStrideAndDecimals {
+                    stride: 0,
+                    decimals: 18,
+                },
+            ),
+            (
+                3,
+                FeedStrideAndDecimals {
+                    stride: 0,
+                    decimals: 18,
+                },
+            ),
+            (
+                4,
+                FeedStrideAndDecimals {
+                    stride: 0,
+                    decimals: 18,
+                },
+            ),
+            (
+                5,
+                FeedStrideAndDecimals {
+                    stride: 0,
+                    decimals: 18,
+                },
+            ),
         ]);
 
         let feeds_metrics = static_feeds_metrics(net);
@@ -309,7 +305,8 @@ pub mod tests {
                 net,
                 &updates,
                 Some(feeds_metrics.clone()),
-                Arc::new(RwLock::new(config)),
+                config,
+                &mut HashMap::new(),
             )
             .await
             .unwrap()

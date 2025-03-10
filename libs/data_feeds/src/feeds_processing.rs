@@ -23,10 +23,10 @@ pub struct VotedFeedUpdateWithProof {
 }
 
 impl VotedFeedUpdate {
-    pub fn encode(&self, digits_in_fraction: usize) -> (Vec<u8>, Vec<u8>) {
+    pub fn encode(&self, digits_in_fraction: usize, time_stamp: u64) -> (Vec<u8>, Vec<u8>) {
         (
             self.feed_id.to_be_bytes().to_vec(),
-            naive_packing(&self.value, digits_in_fraction),
+            naive_packing(&self.value, digits_in_fraction, time_stamp),
         )
     }
 
@@ -85,11 +85,46 @@ impl VotedFeedUpdate {
     }
 }
 
-pub const REPORT_HEX_SIZE: usize = 64;
-
-pub fn naive_packing(feed_result: &FeedType, digits_in_fraction: usize) -> Vec<u8> {
+pub fn naive_packing(
+    feed_result: &FeedType,
+    digits_in_fraction: usize,
+    time_stamp: u64,
+) -> Vec<u8> {
     //TODO: Return Bytes32 type
-    feed_result.as_bytes(digits_in_fraction)
+    feed_result.as_bytes(digits_in_fraction, time_stamp)
+}
+
+use std::collections::HashMap;
+
+#[derive(Debug, Clone, Default)]
+pub struct BatchedAggegratesToSend {
+    pub block_height: u64,
+    pub updates: Vec<VotedFeedUpdate>,
+    // The key in this map is the feed id for which we provide a proof for the aggregated value.
+    pub proofs: HashMap<u32, Vec<DataFeedPayload>>,
+}
+
+impl BatchedAggegratesToSend {
+    // The updates to be sent to different networks go through multiple filters.
+    // Eventually we might need to reduce the proof to only contain records for
+    // the relevant updates. The following function does that and returns the
+    // count of removed elements.
+    pub fn normalize_proof(&mut self) -> usize {
+        let removed_elements_count = self.proofs.len() - self.updates.len();
+
+        if removed_elements_count > 0 {
+            let mut normalized_proofs = HashMap::new();
+            for update in self.updates.iter() {
+                let Some(proof) = self.proofs.remove(&update.feed_id) else {
+                    error!("Logical ERROR! no proof found for key: {}", update.feed_id);
+                    continue;
+                };
+                normalized_proofs.insert(update.feed_id, proof);
+            }
+            self.proofs = normalized_proofs;
+        }
+        removed_elements_count
+    }
 }
 
 #[cfg(test)]
@@ -104,7 +139,7 @@ mod tests {
     #[test]
     fn naive_packing_numerical_value() {
         let value = 42.42;
-        let bytes = naive_packing(&FeedType::Numerical(value), 18);
+        let bytes = naive_packing(&FeedType::Numerical(value), 18, 0);
 
         let reversed = FeedType::from_bytes(bytes, FeedType::Numerical(0.0), 18).unwrap();
 
@@ -115,7 +150,7 @@ mod tests {
     fn naive_packing_string_value() {
         let value = "blocksense"; // size is 10
         let feed_value = FeedType::Text(value.to_string());
-        let bytes = naive_packing(&feed_value, 18);
+        let bytes = naive_packing(&feed_value, 18, 0);
 
         let mut buf = [0; 10];
         buf.copy_from_slice(&bytes[..10]);
@@ -132,7 +167,7 @@ mod tests {
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
-        let (encoded_key, encoded_value) = update.encode(18);
+        let (encoded_key, encoded_value) = update.encode(18, 0);
         assert_eq!("0000002a", to_hex_string(encoded_key, None));
         assert_eq!(
             "00000000000000000000000000000007b2a557a6d97800000000000000000000",
@@ -266,7 +301,7 @@ mod tests {
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
-        let (encoded_key, encoded_value) = update.encode(18);
+        let (encoded_key, encoded_value) = update.encode(18, 0);
         assert_eq!("0000002a", to_hex_string(encoded_key, None));
         assert_eq!(
             "00000000000000000000000000000007b2a557a6d97800000000000000000000",

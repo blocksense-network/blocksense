@@ -6,23 +6,22 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::eth::TransactionRequest,
 };
-use config::FeedConfig;
-use data_feeds::feeds_processing::VotedFeedUpdate;
+use config::{FeedConfig, FeedStrideAndDecimals};
+use data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use eyre::{eyre, Result};
 use std::{collections::HashMap, mem, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 use utils::to_hex_string;
 
 use crate::{
-    providers::adfs_gen_calldata::adfs_serialize_updates,
     providers::provider::{
         parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders,
         EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
     },
     sequencer_state::SequencerState,
-    BatchedAggegratesToSend,
 };
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
+use feeds_processing::adfs_gen_calldata::adfs_serialize_updates;
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_metric_by};
@@ -49,7 +48,7 @@ pub async fn deploy_contract(
 async fn legacy_serialize_updates(
     net: &str,
     updates: &BatchedAggegratesToSend,
-    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
 ) -> Result<String> {
     let mut result: String = Default::default();
 
@@ -61,17 +60,20 @@ async fn legacy_serialize_updates(
     let mut num_reported_feeds = 0;
     for update in &updates.updates {
         let feed_id = update.feed_id;
-        let feed_config = feeds_config.read().await.get(&feed_id).cloned();
+        let feed_config = feeds_config.get(&feed_id);
 
         let digits_in_fraction = match &feed_config {
             Some(f) => f.decimals,
             None => {
-                warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
+                error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
                 18
             }
         };
 
-        let (key, val) = update.encode(digits_in_fraction as usize);
+        let (key, val) = update.encode(
+            digits_in_fraction as usize,
+            update.end_slot_timestamp as u64,
+        );
 
         num_reported_feeds += 1;
         result += to_hex_string(key, None).as_str();
@@ -111,6 +113,7 @@ pub async fn get_serialized_updates_for_network(
     provider_settings: &config::Provider,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    feeds_rounds: &mut HashMap<u32, u64>,
 ) -> Result<String> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider.lock().await;
@@ -131,14 +134,44 @@ pub async fn get_serialized_updates_for_network(
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
+    let mut strides_and_decimals = HashMap::new();
+    for update in updates.updates.iter() {
+        let feed_id = update.feed_id;
+        debug!("Acquiring a read lock on feeds_config; network={net}; feed_id={feed_id}");
+        let feed_config = feeds_config.read().await.get(&feed_id).cloned();
+        debug!(
+            "Acquired and released a read lock on feeds_config; network={net}; feed_id={feed_id}"
+        );
+
+        strides_and_decimals.insert(
+            feed_id,
+            FeedStrideAndDecimals::from_feed_config(&feed_config),
+        );
+        drop(feed_config);
+    }
+
     let serialized_updates = match contract_version {
-        1 => match legacy_serialize_updates(net, updates, feeds_config).await {
-            Ok(result) => result,
-            Err(e) => eyre::bail!("Legacy serialization failed: {}!", e),
+        1 => match legacy_serialize_updates(net, updates, strides_and_decimals).await {
+            Ok(result) => {
+                debug!("legacy_serialize_updates result = {result}");
+                result
+            }
+            Err(e) => eyre::bail!("Legacy serialization failed: {e}!"),
         },
-        2 => match adfs_serialize_updates(net, updates, feeds_metrics, feeds_config).await {
-            Ok(result) => result,
-            Err(e) => eyre::bail!("ADFS serialization failed: {}!", e),
+        2 => match adfs_serialize_updates(
+            net,
+            updates,
+            feeds_metrics,
+            strides_and_decimals,
+            feeds_rounds,
+        )
+        .await
+        {
+            Ok(result) => {
+                debug!("adfs_serialize_updates result = {result}");
+                result
+            }
+            Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
         },
         _ => eyre::bail!("Unsupported contract version set for network {net}!"),
     };
@@ -158,6 +191,7 @@ pub async fn eth_batch_send_to_contract(
     transaction_retry_timeout_secs: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<u32>)> {
+    let mut feeds_rounds = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
         &provider,
@@ -165,6 +199,7 @@ pub async fn eth_batch_send_to_contract(
         &provider_settings,
         feeds_metrics,
         feeds_config,
+        &mut feeds_rounds,
     )
     .await?;
 
@@ -604,15 +639,12 @@ mod tests {
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
-    use config::{
-        get_test_config_with_multiple_providers, get_test_config_with_single_provider, AssetPair,
-    };
+    use config::{get_test_config_with_multiple_providers, get_test_config_with_single_provider};
     use config::{AllFeedsConfig, PublishCriteria};
     use data_feeds::feeds_processing::VotedFeedUpdate;
     use feed_registry::types::Repeatability::Oneshot;
     use regex::Regex;
     use std::str::FromStr;
-    use std::time::SystemTime;
     use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
@@ -623,34 +655,16 @@ mod tests {
         None
     }
 
-    fn test_feeds_config() -> Arc<RwLock<HashMap<u32, FeedConfig>>> {
+    fn test_feeds_config() -> HashMap<u32, FeedStrideAndDecimals> {
         let mut feeds_config = HashMap::new();
         feeds_config.insert(
             0,
-            FeedConfig {
-                id: 0,
-                name: "FOXY".to_string(),
-                full_name: "Foxy".to_string(),
-                description: "FOXY / USD".to_string(),
-                decimals: 18,
-                report_interval_ms: 90000,
-                quorum_percentage: 100.0,
-                skip_publish_if_less_then_percentage: 0.1,
-                always_publish_heartbeat_ms: Some(3600000),
-                _type: "Crypto".to_string(),
-                script: "CoinMarketCap".to_string(),
-                pair: AssetPair {
-                    base: "FOXY".to_string(),
-                    quote: "USD".to_string(),
-                },
-                first_report_start_time: SystemTime::now(),
-                resources: HashMap::new(),
-                value_type: "Numerical".to_string(),
-                aggregate_type: "Median".to_string(),
+            FeedStrideAndDecimals {
                 stride: 0,
+                decimals: 18,
             },
         );
-        Arc::new(RwLock::new(feeds_config))
+        feeds_config
     }
 
     #[tokio::test]
