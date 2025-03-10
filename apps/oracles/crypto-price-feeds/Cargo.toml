@@ -9,6 +9,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
+blocksense-registry = { path = "../../../libs/registry" }
 async-trait = "0.1"
 wit-bindgen = "0.16.0"
 blocksense-sdk = { path = "../../../libs/sdk" }

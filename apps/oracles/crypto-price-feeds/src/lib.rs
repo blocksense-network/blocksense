@@ -15,6 +15,7 @@ use serde::Deserialize;
 use std::fmt::Write;
 
 use crate::common::{ResourceData, TradingPairToResults};
+use blocksense_registry::config::FeedConfig;
 use fetch_prices::fetch_all_prices;
 
 //TODO(adikov): Refacotr:
@@ -32,7 +33,7 @@ struct CmcResource {
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("Starting oracle component");
 
-    let resources = get_resources_from_settings(settings)?;
+    let resources = get_resources_from_settings(&settings)?;
 
     let results = fetch_all_prices(&resources).await?;
     print_results(&resources, &results);
@@ -63,21 +64,22 @@ fn process_results(results: TradingPairToResults) -> Result<Payload> {
     Ok(payload)
 }
 
-fn get_resources_from_settings(settings: Settings) -> Result<Vec<ResourceData>> {
-    //TODO(adikov): Make sure citrea feeds exist so that we can properly test.
-    // let citrea_feeds = vec!["BTCUSD", "ETHUSD", "EURCUSD", "USDTUSD", "USDCUSD", "PAXGUSD", "TBTCUSD", "WBTCUSD", "WSTETHUSD"];
-    settings
-        .data_feeds
-        .into_iter()
-        .map(|feed| {
-            serde_json::from_str::<CmcResource>(&feed.data)
-                .map(|cmc_resource| ResourceData {
-                    symbol: cmc_resource.cmc_quote,
-                    id: feed.id,
-                })
-                .context("Couldn't parse Data Feed resource properly")
-        })
-        .collect()
+fn get_resources_from_settings(settings: &Settings) -> Result<Vec<ResourceData>> {
+    let mut price_feeds = Vec::new();
+
+    for feed_setting in &settings.data_feeds {
+        let feed_config = serde_json::from_str::<FeedConfig>(&feed_setting.data)
+            .context("Couldn't parse data feed")?;
+
+        if feed_config.feed_type == "price-feed" {
+            price_feeds.push(ResourceData {
+                symbol: feed_config.additional_feed_info.pair.base,
+                id: feed_config.id.to_string(),
+            });
+        }
+    }
+
+    Ok(price_feeds)
 }
 
 fn print_results(resources: &[ResourceData], results: &TradingPairToResults) {

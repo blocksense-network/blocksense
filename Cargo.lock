@@ -3431,6 +3431,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "blocksense-registry",
  "blocksense-sdk",
  "futures",
  "itertools 0.14.0",
