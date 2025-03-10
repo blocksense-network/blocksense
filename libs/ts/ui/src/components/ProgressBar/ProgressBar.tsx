@@ -1,27 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 
 type ProgressBarProps = {
   value?: number;
   isIndeterminate?: boolean;
   size?: number;
+  className?: string;
 };
 
 export const ProgressBar = ({
   value = 0,
   isIndeterminate = false,
   size = 40,
+  className = '',
 }: ProgressBarProps) => {
-  const [animatedValue, setAnimatedValue] = useState(value);
-
-  useEffect(() => {
-    setAnimatedValue(value);
-  }, [value]);
-
   return (
     <section
-      className="progress-bar progress-bar__wrapper flex items-center justify-center w-full"
+      className={`progress-bar progress-bar__wrapper flex items-center justify-center w-full ${className}`}
       aria-live="polite"
     >
       {isIndeterminate ? (
@@ -58,10 +54,10 @@ export const ProgressBar = ({
       ) : (
         <progress
           className="progress-bar__progress w-full h-2.5 bg-gray-100 rounded-full"
-          value={animatedValue}
+          value={value}
           max={100}
           role="progressbar"
-          aria-valuenow={animatedValue}
+          aria-valuenow={value}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label="Progress"
