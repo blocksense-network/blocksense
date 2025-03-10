@@ -47,7 +47,7 @@ pub async fn adfs_serialize_updates(
     net: &str,
     feed_updates: &BatchedAggegratesToSend,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
-    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+    strides_and_decimals: HashMap<u32, FeedStrideAndDecimals>,
     feeds_rounds: &mut HashMap<u32, u64>, /* The rounds table for the relevant feeds. If the feeds_metrics are provided,
                                           this map will be filled with the update count for each feed from it. If the
                                           feeds_metrics is None, feeds_rounds will be used as the source of the updates
@@ -67,10 +67,10 @@ pub async fn adfs_serialize_updates(
     for update in updates.iter() {
         let feed_id = update.feed_id;
 
-        let (stride, digits_in_fraction) = match &feeds_config.get(&feed_id) {
+        let (stride, digits_in_fraction) = match &strides_and_decimals.get(&feed_id) {
             Some(f) => (f.stride, f.decimals),
             None => {
-                error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
+                error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
                 (1, 18)
             }
         };

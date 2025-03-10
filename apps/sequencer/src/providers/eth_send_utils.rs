@@ -65,7 +65,7 @@ async fn legacy_serialize_updates(
         let digits_in_fraction = match &feed_config {
             Some(f) => f.decimals,
             None => {
-                error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimale default to 18");
+                error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
                 18
             }
         };
