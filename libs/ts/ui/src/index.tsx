@@ -13,3 +13,4 @@ export * from './components/Drawer';
 export * from './components/Accordion';
 export * from './components/Icon';
 export * from './components/Dialog';
+export * from './components/Select';

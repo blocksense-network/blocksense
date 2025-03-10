@@ -16,7 +16,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/common/Select';
+} from '@blocksense/ui/Select';
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
