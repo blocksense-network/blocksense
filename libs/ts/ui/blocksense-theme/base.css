@@ -24,6 +24,24 @@ main > h1 {
 }
 
 @layer base {
+  progress {
+    width: 100%;
+    height: 10px;
+    background-color: #ffffff;
+  }
+
+  progress::-webkit-progress-value {
+    background-color: #1e40af;
+  }
+
+  progress::-webkit-progress-bar {
+    background-color: #e0e0e0;
+  }
+
+  progress::-moz-progress-bar {
+    background-color: #1e40af;
+  }
+
   pre {
     contain: paint;
     border: 1px solid #ececec;
