@@ -10,6 +10,7 @@ import { EventFragment, TransactionReceipt } from 'ethers';
 export abstract class ADFSBaseWrapper implements IADFSWrapper {
   public contract!: AggregatedDataFeedStore;
   public accessControl!: AccessControlWrapper;
+  public readAccessControl?: AccessControlWrapper;
 
   public async setFeeds(
     sequencer: HardhatEthersSigner,
@@ -292,6 +293,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
 
   public abstract init(
     accessControlData: HardhatEthersSigner | string,
+    readAccessControlData?: HardhatEthersSigner | string,
   ): Promise<void>;
 
   public abstract getName(): string;

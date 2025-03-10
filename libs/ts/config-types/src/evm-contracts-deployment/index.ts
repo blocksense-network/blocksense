@@ -42,9 +42,11 @@ export type CoreContractsV1 = S.Schema.Type<typeof CoreContractsSchemaV1>;
 const CoreContractsSchemaV2 = S.mutable(
   S.Struct({
     AggregatedDataFeedStore: ContractDataSchema,
+    AggregatedDataFeedStoreReadAC: ContractDataSchema,
     UpgradeableProxyADFS: ContractDataSchema,
     CLFeedRegistryAdapter: ContractDataSchema,
     AccessControl: ContractDataSchema,
+    ReadAccessControl: ContractDataSchema,
     OnlySequencerGuard: ContractDataSchema,
   }),
 );
