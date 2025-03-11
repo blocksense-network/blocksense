@@ -18,7 +18,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@/components/common/Popover';
 import { OptionType } from '@/components/ui/DataTable/DataTable';
 
 interface DataTableFacetedFilterProps<TData, TValue> {
@@ -39,20 +39,17 @@ export function DataTableFacetedFilter<TData, TValue>({
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
+      <PopoverTrigger>
         <Button
           variant="outline"
           size="sm"
-          className="h-8 border border-solid border-neutral-200/70 bg-white dark:bg-neutral-900"
+          className="h-8 mt-0 border border-solid border-neutral-200/70 bg-white dark:bg-neutral-900"
         >
           {firstSelectedValue || title}
           <ChevronDown className="ml-1 h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-[200px] p-0 border border-solid border-neutral-200 bg-white dark:bg-neutral-900 dark:border-neutral-600"
-        align="start"
-      >
+      <PopoverContent className="w-[200px]">
         <Command className="py-2">
           <CommandInput className="my-1 h-1 px-2" placeholder={title} />
           <CommandList>
