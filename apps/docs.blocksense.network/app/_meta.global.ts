@@ -43,10 +43,10 @@ export default {
           'reporter-node': '',
         },
       },
-      'programming-languages-rnd': {
-        title: 'Programming Languages R&D',
+      'the-blocksense-noir-compiler': {
+        title: 'Noir Compiler',
         items: {
-          'noir-plonky2-backend': '',
+          'noir-compiler': '',
         },
       },
     },
