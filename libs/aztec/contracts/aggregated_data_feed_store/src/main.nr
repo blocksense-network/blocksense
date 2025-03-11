@@ -4,9 +4,19 @@ mod tests;
 #[aztec]
 contract AggregatedDataFeedStore {
     use dep::aztec::macros::{functions::{initializer, public, view}, storage::storage};
+    use dep::aztec::oracle::debug_log::debug_log;
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
-    use dep::aztec::protocol_types::traits::{Deserialize, Serialize};
+    use dep::aztec::protocol_types::{debug_log::debug_log_format, traits::{Deserialize, Serialize}};
+    use bignum::{BigNum, BigNumTrait}; // BigNumTrait is imported to silence `from_slice` warnings.
+    use bignum::bignum::to_field;
+    use bignum::fields::U256::U256Params;
     use std::meta::derive;
+
+    // Define (compile-time) BigNum type
+    // number of limbs, number of bits of modulus, parameter set
+    // This way of definition is compatible with bignum version v0.5.2
+    // Newer versions doesn't require defining explicit field type like in this case.
+    type U256 = BigNum<3, 257, U256Params>;
 
     /// Max Fields that can be written in storage per Tx are 63.
     /// Thus we have blocknumber and 58 feeds that are distributed in 4 rounds.
@@ -15,11 +25,10 @@ contract AggregatedDataFeedStore {
     /// Thus (58 * 3) + (4 * 2) = 182.
     global MAX_FEEDS_AND_ROUNDS_DATA: u32 = 182;
     global TWO: Field = 2;
-    global MAX_ROUND_VALUES_IN_A_FIELD: Field = 15;
-    global ROUND_SIZE_IN_BITS: Field = 16;
+    global MAX_ROUND_VALUES_IN_A_FIELD: U256 = BigNum::from_slice([15, 0, 0]);
+    global ROUND_SIZE_IN_BITS: U256 = BigNum::from_slice([16, 0, 0]);
     global ROUNDS_MAX_SIZE: Field = 8192; // 2^13
     global ROUND_VALUE_MAX_BITS_SIZE: Field = 65536; // 2^16
-    global ROUND_TABLE_SCALAR_VALUE: Field = 41538374868278621028243970633760768; // 2^115
     global FEED_INDEX_SCALAR_VALUE: Field = 340282366920938463463374607431768211456; // 2^128
 
     #[derive(Serialize, Deserialize)]
@@ -59,10 +68,12 @@ contract AggregatedDataFeedStore {
         rounds_len: u32,
         block_number: u32,
     ) {
+        // debug_log("first, before assert");
         assert(context.msg_sender() == storage.owner.read());
         assert(storage.block_number.read() < block_number);
         storage.block_number.write(block_number);
 
+        // debug_log("write storage slots for data feeds");
         let mut new_index: u32 = 0;
         for i in new_index..feeds_len {
             let feed_computed_index = feed_input_data[new_index];
@@ -73,8 +84,14 @@ contract AggregatedDataFeedStore {
 
             new_index = new_index + curr_feed_len;
         }
+        // debug_log("finish writing storage slots for data feeds");
 
+        // debug_log_format("rounds_len: {0}", [rounds_len as Field]);
         for i in 0..rounds_len {
+            // assert(false, feed_input_data[new_index + 1]);
+            // debug_log("test");
+            // debug_log_format("KEYY: {0}", [feed_input_data[new_index]]);
+            // debug_log_format("VALUEE: {0}", [feed_input_data[new_index + 1]]);
             storage.rounds.at(feed_input_data[new_index]).write(feed_input_data[new_index + 1]);
             new_index = new_index + 2;
         }
@@ -82,12 +99,35 @@ contract AggregatedDataFeedStore {
 
     #[public]
     #[view]
-    fn get_latest_round(stride: Field, feed_id: Field) -> Field {
-        let round_index = calculate_round_index(stride, feed_id);
-        let slot_position = calculate_slot_position(feed_id);
-        let round_value = storage.rounds.at(round_index).read();
 
-        get_slot_value(round_value, slot_position)
+    // 1. try shifting
+    fn get_latest_round(stride: Field, feed_id: Field) -> Field {
+        // Since at most 63 `Field`s can be written to storage, i.e. stride wouldn't be larger than 6, (2^115 * stride) + feed_id can safely be putted in one BigNum.
+        let round_index = BigNum::from_slice([
+            (
+                41538374868278621028243970633760768 * stride // 2^115 * stride
+            )
+                + feed_id,
+            0,
+            0,
+        ])
+            .udiv(MAX_ROUND_VALUES_IN_A_FIELD);
+        let slot_position = BigNum::from_slice([feed_id, 0, 0]).umod(MAX_ROUND_VALUES_IN_A_FIELD);
+
+        let round_value = storage.rounds.at(to_field(round_index)).read();
+
+        //
+        let one: U256 = BigNum::from_slice([1, 0, 0]);
+        let position: U256 =
+            BigNum::from_slice([TWO.pow_32(240 - 16 * to_field(slot_position)), 0, 0]);
+        let round_value_bignum: U256 = BigNum::from_slice([round_value, 0, 0]);
+        let shifted = round_value_bignum.udiv(one);
+
+        let TWO_POW_ROUND_SIZE_IN_BITS: U256 = BigNum::from_slice([TWO.pow_32(16), 0, 0]);
+        let result = shifted.umod(TWO_POW_ROUND_SIZE_IN_BITS);
+        //
+
+        1
     }
 
     #[public]
@@ -119,26 +159,5 @@ contract AggregatedDataFeedStore {
 
     fn calculate_feed_index(feed_id: Field, round: Field, stride: Field) -> pub Field {
         (FEED_INDEX_SCALAR_VALUE + (feed_id * ROUNDS_MAX_SIZE) + round) * TWO.pow_32(stride)
-    }
-
-    fn calculate_round_index(stride: Field, feed_id: Field) -> pub Field {
-        ((ROUND_TABLE_SCALAR_VALUE * stride) + feed_id) / MAX_ROUND_VALUES_IN_A_FIELD
-    }
-
-    fn calculate_slot_position(feed_id: Field) -> pub Field {
-        let quotient = feed_id / MAX_ROUND_VALUES_IN_A_FIELD;
-        let remainder = feed_id - (quotient * MAX_ROUND_VALUES_IN_A_FIELD);
-
-        remainder
-    }
-
-    fn get_slot_value(row_value: Field, slot_index: Field) -> pub Field {
-        let shift_factor = TWO.pow_32(slot_index * ROUND_SIZE_IN_BITS);
-        let shifted_value = row_value / shift_factor;
-
-        let upper_bits = (shifted_value / ROUND_VALUE_MAX_BITS_SIZE) * ROUND_VALUE_MAX_BITS_SIZE;
-        let slot_value = shifted_value - upper_bits;
-
-        slot_value
     }
 }

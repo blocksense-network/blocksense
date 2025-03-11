@@ -10,6 +10,7 @@ pub global TWO_POW_13: Field = 8192; // 2^13
 pub global TWO_POW_16: Field = 65536; // 2^16
 pub global TWO_POW_115: Field = 41538374868278621028243970633760768; // 2^115
 pub global TWO_POW_128: Field = 340282366920938463463374607431768211456; // 2^128
+pub global TWO_POW_126: Field = 0x40000000000000000000000000000000;
 
 pub unconstrained fn calculate_feed_index(feed_id: Field, round: Field, stride: Field) -> Field {
     (TWO_POW_128 * TWO.pow_32(stride))
@@ -28,14 +29,60 @@ pub fn calculate_slot_position(feed_id: Field) -> Field {
     remainder
 }
 
-pub fn get_slot_value(row_value: Field, slot_index: Field) -> Field {
+pub fn get_slot_value(row_value: Field, slot_index: Field) -> u64 {
+    println("row_value");
+    println(row_value);
+    println("slot_index");
+    println(slot_index);
+    println("ROUND_SIZE_IN_BITS");
+    println(ROUND_SIZE_IN_BITS);
+    println("slot_index * ROUND_SIZE_IN_BITS");
+    println(slot_index as u64 * ROUND_SIZE_IN_BITS as u64);
     let shift_factor = TWO.pow_32(slot_index * ROUND_SIZE_IN_BITS);
-    let shifted_value = row_value / shift_factor;
+    println("shift_factor");
+    println(shift_factor);
+    println("row_value");
+    println(row_value);
+    let shifted_value = row_value as u64 / shift_factor as u64;
+    println("shifted_value");
+    println(shifted_value);
 
-    let upper_bits = (shifted_value / TWO_POW_16) * TWO_POW_16;
-    let slot_value = shifted_value - upper_bits;
+    let upper_bits = (shifted_value as u64 / TWO_POW_16 as u64) * TWO_POW_16 as u64;
+    let slot_value = shifted_value as u64 - upper_bits;
 
     slot_value
+}
+
+fn field_mod(base: Field, divider: Field) -> Field {
+    let quotient = (base / divider);
+    println("base");
+    println(base);
+    println("divider");
+    println(divider);
+    println("quotient");
+    println(quotient);
+    println("divider");
+    println(divider);
+    let remainder = base - (quotient * divider);
+
+    remainder as Field
+}
+
+// let id = feed id % 15 * 15
+// let pos = 16 * id
+// let shifted = value from rounds storage / (2 ** pos)
+// return round = shifted  % 2**16
+
+pub fn get_round_value(feed_id: Field, value_from_rounds_storage: Field) -> Field {
+    let feed_id_mod_15 = field_mod(feed_id, 15);
+    println("feed_id_mod_15");
+    println(feed_id_mod_15);
+    let id = feed_id_mod_15 * MAX_ROUND_VALUES_IN_A_FIELD;
+    let pos = 16 * id;
+    let shifted = value_from_rounds_storage / TWO.pow_32(pos);
+    let round_value = field_mod(shifted, TWO.pow_32(ROUND_SIZE_IN_BITS));
+
+    round_value
 }
 
 /// stride 0 = 0
@@ -222,11 +269,11 @@ pub global _58_DATA_FEEDS_STRIDE_0: [Field; 182] = [
     103273774,
     // Rounds
     zero_round_index,
-    ZERO,
+    26959946667150639794667015087019630673637144422540572481103610249216,
     one_round_index,
-    ONE,
+    1766874025136433896750911497805568136923323180981774075523881651146915841,
     two_round_index,
-    TWO,
+    1766874025136433896750911497805568136923323180981774075523881651146915841,
     three_round_index,
-    THREE,
+    1766874025136433896750911497805568136923323180980565131257241468990914560,
 ];

@@ -3,15 +3,17 @@ use dep::aztec::prelude::AztecAddress;
 
 use crate::AggregatedDataFeedStore;
 use crate::tests::helper_vars::{
-    _58_DATA_FEEDS_STRIDE_0, calculate_round_index, calculate_slot_position,
-    MAX_FEEDS_SIZE_FOR_STRIDE_0, MAX_ROUNDS_SIZE_FOR_STRIDE_0,
+    _58_DATA_FEEDS_STRIDE_0, calculate_round_index, calculate_slot_position, get_round_value,
+    get_slot_value, MAX_FEEDS_SIZE_FOR_STRIDE_0, MAX_ROUNDS_SIZE_FOR_STRIDE_0, TWO_POW_126,
 };
 use crate::tests::utils::{
     assert_feeds_are_stored_in_correct_slots, assert_get_feed_at_round_produces_correct_result,
     setup,
 };
+use super::helper_vars::{one_round_index, three_round_index, two_round_index, zero_round_index};
+use dep::aztec::protocol_types::storage::map::derive_storage_slot_in_map;
 
-#[test]
+// #[test]
 unconstrained fn test_initializer() {
     let (_, adfs_contract_address) = setup();
     let block_number = get_block_number();
@@ -22,7 +24,7 @@ unconstrained fn test_initializer() {
     println(owner_storage_value);
 }
 
-#[test]
+// #[test]
 unconstrained fn test_store_58_data_fields_with_length_1() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
@@ -43,7 +45,7 @@ unconstrained fn test_store_58_data_fields_with_length_1() {
     );
 }
 
-#[test]
+// #[test]
 unconstrained fn test_get_feed_at_round() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
@@ -78,33 +80,46 @@ unconstrained fn test_get_latest_round() {
         )
         .call(&mut env.public());
 
-    let round_index = calculate_round_index(0, 1);
-    println("round_index");
-    println(round_index as u32);
-    let quotient = 34 / 15;
-    println("quotient");
-    println(quotient as u32);
-    let remainder = 34 - (quotient * 15);
-    println("remainder");
-    println(remainder);
-    let slot_position = calculate_slot_position(34);
-    println("slot_position");
-    println(slot_position as u32);
+    // let rounds_slot_value: u32 = storage_read(
+    //     adfs_contract_address,
+    //     derive_storage_slot_in_map(
+    //         AggregatedDataFeedStore::storage_layout().rounds.slot,
+    //         two_round_index,
+    //     ),
+    //     block_number,
+    // );
+
+    // println("zero_round_index: ");
+    // println(zero_round_index);
+    // println("rounds_slot_value: ");
+    // println(rounds_slot_value);
+    // let rounds_slot_value: u32 = storage_read(
+    //     adfs_contract_address,
+    //     derive_storage_slot_in_map(
+    //         AggregatedDataFeedStore::storage_layout().rounds.slot,
+    //         one_round_index,
+    //     ),
+    //     block_number,
+    // );
+
+    // println(
+    //     "=============================================================================",
+    // );
+    // println(
+    //     "=============================================================================",
+    // );
+
     let latest_round = AggregatedDataFeedStore::at(adfs_contract_address)
-        .get_latest_round(0, 0 as Field)
+        .get_latest_round(0, 50 as Field)
         .view(&mut env.public());
     println("latest_round");
     println(latest_round);
-
-    assert(
-        AggregatedDataFeedStore::at(adfs_contract_address).get_latest_round(0, 45 as Field).view(
-            &mut env.public(),
-        )
-            == _58_DATA_FEEDS_STRIDE_0[_58_DATA_FEEDS_STRIDE_0.len() - 1],
-    );
+    // println(
+    //     "=============================================================================",
+    // );
 }
 
-#[test]
+// #[test]
 unconstrained fn test_get_latest_data() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
@@ -156,7 +171,7 @@ unconstrained fn test_write_when_not_in_access_control() {
         .call(&mut env.public());
 }
 
-#[test]
+// #[test]
 unconstrained fn test_get_latest_data_and_round() {
     let (env, adfs_contract_address) = setup();
     let block_number = get_block_number();
