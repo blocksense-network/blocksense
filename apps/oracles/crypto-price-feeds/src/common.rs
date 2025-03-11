@@ -1,11 +1,17 @@
 use std::collections::HashMap;
 
-pub const USD_SYMBOLS: [&str; 3] = ["USD", "USDC", "USDT"];
+use serde::{Deserialize, Serialize};
 
 pub type ExchangeName = String;
-pub type TradingPair = String;
+pub type TradingPairSymbol = String;
 pub type Price = f64;
 pub type Volume = f64;
+
+#[derive(Debug, Hash, Serialize, Deserialize)]
+pub struct TradingPair {
+    pub base: String,
+    pub quote: String,
+}
 
 #[derive(Clone, Debug)]
 pub struct PricePoint {
@@ -14,7 +20,7 @@ pub struct PricePoint {
 }
 
 pub type ExchangePricePoints = HashMap<ExchangeName, PricePoint>;
-pub type PairPriceData = HashMap<TradingPair, PricePoint>;
+pub type PairPriceData = HashMap<TradingPairSymbol, PricePoint>;
 
 #[derive(Clone, Debug)]
 pub struct ExchangePriceData {
@@ -22,11 +28,11 @@ pub struct ExchangePriceData {
     pub data: PairPriceData,
 }
 
-pub type TradingPairToResults = HashMap<TradingPair, DataFeedResult>;
+pub type TradingPairToResults = HashMap<TradingPairSymbol, DataFeedResult>;
 
 #[derive(Debug, Hash)]
 pub struct ResourceData {
-    pub symbol: String,
+    pub pair: TradingPair,
     pub id: String,
 }
 

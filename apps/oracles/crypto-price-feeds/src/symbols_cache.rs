@@ -7,7 +7,7 @@ use blocksense_sdk::spin::key_value::Store;
 use itertools::Itertools;
 
 use crate::{
-    common::{ResourceData, TradingPair},
+    common::{ResourceData, TradingPairSymbol},
     exchanges::{gemini::get_gemini_symbols, upbit::get_upbit_market},
 };
 
@@ -17,8 +17,8 @@ const RESOURCES_HASH_KEY: &str = "resources_hash";
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SymbolsData {
-    pub gemini: Vec<TradingPair>,
-    pub upbit: Vec<TradingPair>,
+    pub gemini: Vec<TradingPairSymbol>,
+    pub upbit: Vec<TradingPairSymbol>,
 }
 
 impl SymbolsData {

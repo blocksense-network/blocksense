@@ -6,7 +6,7 @@ use std::time::Instant;
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
-    common::{ExchangePriceData, PairPriceData, ResourceData, TradingPairToResults, USD_SYMBOLS},
+    common::{ExchangePriceData, PairPriceData, ResourceData, TradingPairToResults},
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
         bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
@@ -72,18 +72,30 @@ fn fill_results(
 ) {
     //TODO(adikov): We need a proper way to get trade volume from Binance API.
     for resource in resources {
+        let quote = [resource.pair.quote.as_str()];
+        let quote_alternatives = get_alternative_quotes_for_quote(&resource.pair.quote);
+        let quote_variants = quote.iter().chain(&quote_alternatives);
+
         // First USD pair found.
-        for quote in USD_SYMBOLS {
-            let trading_pair = format!("{}{}", resource.symbol, quote);
+        for quote in quote_variants {
+            let trading_pair = format!("{}{}", resource.pair.base, quote);
             if let Some(price_point) = prices_per_exchange.data.get(&trading_pair) {
                 let res = results.entry(resource.id.clone()).or_default();
 
-                res.symbol = resource.symbol.clone();
+                res.symbol = resource.pair.base.clone();
                 res.exchanges_data
                     .insert(prices_per_exchange.name.clone(), price_point.clone());
                 break;
             }
         }
+    }
+}
+
+fn get_alternative_quotes_for_quote(quote: &str) -> Vec<&str> {
+    if quote == "USD" {
+        vec!["USDT", "USDC"]
+    } else {
+        Vec::new()
     }
 }
 
