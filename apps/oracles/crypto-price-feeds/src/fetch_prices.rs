@@ -70,23 +70,28 @@ fn fill_results(
     prices_per_exchange: ExchangePriceData,
     results: &mut TradingPairToResults,
 ) {
-    //TODO(adikov): We need a proper way to get trade volume from Binance API.
     for resource in resources {
         let quote = [resource.pair.quote.as_str()];
         let quote_alternatives = get_alternative_quotes_for_quote(&resource.pair.quote);
         let quote_variants = quote.iter().chain(&quote_alternatives);
 
-        // First USD pair found.
-        for quote in quote_variants {
-            let trading_pair = format!("{}{}", resource.pair.base, quote);
-            if let Some(price_point) = prices_per_exchange.data.get(&trading_pair) {
-                let res = results.entry(resource.id.clone()).or_default();
+        let trading_pair = format!("{} / {}", resource.pair.base, resource.pair.quote);
 
-                res.symbol = resource.pair.base.clone();
-                res.exchanges_data
-                    .insert(prices_per_exchange.name.clone(), price_point.clone());
-                break;
+        let res = results.entry(resource.id.clone()).or_default();
+        res.symbol = trading_pair.clone();
+
+        for quote in quote_variants {
+            let symbol = format!("{}{}", resource.pair.base, quote);
+            if let Some(price_point) = prices_per_exchange.data.get(&symbol) {
+                res.exchanges_data.insert(
+                    format!("{} {} price", prices_per_exchange.name, quote),
+                    price_point.clone(),
+                );
             }
+        }
+
+        if res.exchanges_data.is_empty() {
+            results.remove(&resource.id);
         }
     }
 }

@@ -85,7 +85,11 @@ fn print_results(resources: &[ResourceData], results: &TradingPairToResults) {
             if let Some(res_list) = results.get(&res.id) {
                 let _ = write!(found, "({}-{}),", res.id, res_list.exchanges_data.len());
             } else {
-                let _ = write!(missing, "({}-{}),", res.id, res.pair.base);
+                let _ = write!(
+                    missing,
+                    "({}-{}/{}),",
+                    res.id, res.pair.base, res.pair.quote
+                );
             }
             (missing, found)
         },
