@@ -11,10 +11,10 @@ use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fmt::Write;
 
-use crate::common::{ResourceData, TradingPairToResults};
+use crate::common::{ResourceData, TradingPair, TradingPairToResults};
 use fetch_prices::fetch_all_prices;
 
 //TODO(adikov): Refacotr:
@@ -22,17 +22,16 @@ use fetch_prices::fetch_all_prices;
 //2. Move URLS to constants
 //3. Try to minimize object cloning.
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-struct CmcResource {
-    pub cmc_id: String,
-    pub cmc_quote: String,
+#[derive(Serialize, Deserialize)]
+struct Data {
+    pub pair: TradingPair,
 }
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("Starting oracle component");
 
-    let resources = get_resources_from_settings(settings)?;
+    let resources = get_resources_from_settings(&settings)?;
 
     let results = fetch_all_prices(&resources).await?;
     print_results(&resources, &results);
@@ -63,21 +62,20 @@ fn process_results(results: TradingPairToResults) -> Result<Payload> {
     Ok(payload)
 }
 
-fn get_resources_from_settings(settings: Settings) -> Result<Vec<ResourceData>> {
-    //TODO(adikov): Make sure citrea feeds exist so that we can properly test.
-    // let citrea_feeds = vec!["BTCUSD", "ETHUSD", "EURCUSD", "USDTUSD", "USDCUSD", "PAXGUSD", "TBTCUSD", "WBTCUSD", "WSTETHUSD"];
-    settings
-        .data_feeds
-        .into_iter()
-        .map(|feed| {
-            serde_json::from_str::<CmcResource>(&feed.data)
-                .map(|cmc_resource| ResourceData {
-                    symbol: cmc_resource.cmc_quote,
-                    id: feed.id,
-                })
-                .context("Couldn't parse Data Feed resource properly")
-        })
-        .collect()
+fn get_resources_from_settings(settings: &Settings) -> Result<Vec<ResourceData>> {
+    let mut price_feeds = Vec::new();
+
+    for feed_setting in &settings.data_feeds {
+        let feed_config =
+            serde_json::from_str::<Data>(&feed_setting.data).context("Couldn't parse data feed")?;
+
+        price_feeds.push(ResourceData {
+            pair: feed_config.pair,
+            id: feed_setting.id.clone(),
+        });
+    }
+
+    Ok(price_feeds)
 }
 
 fn print_results(resources: &[ResourceData], results: &TradingPairToResults) {
@@ -87,7 +85,7 @@ fn print_results(resources: &[ResourceData], results: &TradingPairToResults) {
             if let Some(res_list) = results.get(&res.id) {
                 let _ = write!(found, "({}-{}),", res.id, res_list.exchanges_data.len());
             } else {
-                let _ = write!(missing, "({}-{}),", res.id, res.symbol);
+                let _ = write!(missing, "({}-{}),", res.id, res.pair.base);
             }
             (missing, found)
         },
