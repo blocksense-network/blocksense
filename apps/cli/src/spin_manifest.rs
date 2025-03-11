@@ -95,7 +95,9 @@ impl From<BlocksenseConfig> for AppManifest {
                 );
                 table.insert(
                     "data".to_string(),
-                    toml::Value::String(data_feed.additional_feed_info.arguments.to_string()),
+                    toml::Value::String(
+                        serde_json::to_string(&data_feed.additional_feed_info).unwrap(),
+                    ),
                 );
                 feeds.push(toml::Value::Table(table));
             }
