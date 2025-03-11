@@ -228,7 +228,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             calldata: hex::encode(serialized_updates),
             updates: updates.updates,
             feeds_rounds,
-            proofs: updates.proofs,
+            proofs: HashMap::new(), // No need to propagate signatures; we are currently using deviation-based validation.
         };
 
         let serialized_updates = match serde_json::to_string(&updates_to_kafka) {

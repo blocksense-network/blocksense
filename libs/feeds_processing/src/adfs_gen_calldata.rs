@@ -174,6 +174,18 @@ pub async fn adfs_serialize_updates(
         result.append(&mut result_bytes);
     }
 
+    // In case feed_metrics is none, the feeds_rounds contains all the round indexes needed for serialization.
+    // We use them to populate feeds_info map based on which the round indexes will be serialized
+    if feeds_metrics.is_none() {
+        for (feed_id, round) in feeds_rounds.iter() {
+            if let Some(strides_and_decimals) = strides_and_decimals.get(feed_id) {
+                feeds_info.insert(*feed_id, (strides_and_decimals.stride, *round));
+            } else {
+                panic!("Missing information for strides and decimals for feed_id {feed_id}!");
+            };
+        }
+    };
+
     // Fill the round tables:
     let mut batch_feeds = BTreeMap::new();
 

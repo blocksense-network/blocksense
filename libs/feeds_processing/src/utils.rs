@@ -1,13 +1,12 @@
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use anyhow::{anyhow, Context, Result};
-use blocksense_registry::config::FeedConfig;
 use config::{FeedStrideAndDecimals, PublishCriteria};
 use data_feeds::feeds_processing::{
     BatchedAggegratesToSend, VotedFeedUpdate, VotedFeedUpdateWithProof,
 };
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::registry::FeedAggregateHistory;
-use feed_registry::types::{DataFeedPayload, FeedMetaData, FeedType, Timestamp};
+use feed_registry::types::{DataFeedPayload, FeedType, Timestamp};
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash};
 use ringbuf::traits::consumer::Consumer;
@@ -17,7 +16,7 @@ use alloy::hex::FromHex;
 use alloy_primitives::{Address, Bytes, Uint, U256};
 use crypto::{verify_signature, PublicKey, Signature};
 use feed_registry::types::FeedResult;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -242,247 +241,6 @@ pub async fn perform_anomaly_detection(
         .context("Failed to join feed slots manager anomaly detection!")?
 }
 
-type FeedId = u32;
-type FeedTimestamp = u64;
-type FeedIdToTimetamp = HashMap<FeedId, FeedTimestamp>;
-
-pub async fn validate_sigcheck(
-    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
-    mut batch: ConsensusSecondRoundBatch,
-    reporters_keys: HashMap<u64, PublicKey>,
-    feeds_last_updated_slots: &mut FeedIdToTimetamp,
-) -> Result<()> {
-    // Check that all the aggregated values have a corresponding set of votes
-    let feed_ids_in_updates: Vec<u32> = batch.updates.iter().map(|u| u.feed_id).collect();
-    let feed_ids_in_proof: Vec<u32> = batch.proofs.keys().cloned().collect();
-
-    if feed_ids_in_updates.len() != feed_ids_in_proof.len() {
-        anyhow::bail!("Proofs / Updates size mismatch");
-    }
-
-    let feed_ids_in_updates: HashSet<_> = feed_ids_in_updates.into_iter().collect();
-    let feed_ids_in_proof: HashSet<_> = feed_ids_in_proof.into_iter().collect();
-
-    if feed_ids_in_updates != feed_ids_in_proof {
-        anyhow::bail!("Proofs / Updates mismatch");
-    }
-
-    let mut feeds_newly_updated_slots = HashMap::<u32, u64>::new();
-
-    for update in &batch.updates {
-        let proof_for_update = batch
-            .proofs
-            .get(&update.feed_id)
-            .expect("Proofs / Updates mismatch: above checks must verify this cannot happen!");
-
-        let num_reporters = reporters_keys.len();
-
-        let feeds_config = feeds_config.read().await;
-
-        let Some(feed_config) = feeds_config.get(&update.feed_id) else {
-            anyhow::bail!("Feed ID {} has no configuration.", &update.feed_id);
-        };
-
-        let feed_metadata = FeedMetaData::from_config(feed_config);
-
-        drop(feeds_config);
-
-        // Validate that the update and all the signed votes are for the same
-        // slot based on the timestamps and feed_metadata
-        // and make sure that this update has not been previously introduced!
-
-        // Get the aggregated value's slot:
-        let update_slot = feed_metadata.get_slot(update.end_slot_timestamp);
-
-        // Make sure this slot's value was not previously proposed:
-        let update_is_relevant = feeds_last_updated_slots
-            .get(&update.feed_id)
-            .is_some_and(|&slot| slot > update_slot);
-
-        if !update_is_relevant {
-            anyhow::bail!("Reintroduction of old value: {update:?}, {proof_for_update:?}");
-        }
-
-        feeds_newly_updated_slots.insert(update.feed_id, update_slot);
-
-        // Check signatures
-        for raw_vote in proof_for_update {
-            let Some(reporter_pub_key) = reporters_keys.get(&raw_vote.payload_metadata.reporter_id)
-            else {
-                anyhow::bail!(
-                    "No public key known for reporter with ID {}!",
-                    raw_vote.payload_metadata.reporter_id
-                );
-            };
-
-            // Make sure that all votes have the same slot as the aggregated value
-            let vote_slot = feed_metadata.get_slot(raw_vote.payload_metadata.timestamp);
-            if vote_slot != update_slot {
-                anyhow::bail!(concat!(
-                    "Received a vote not corresponding to the aggregated value's slot! vote: ",
-                    "{raw_vote:?} update_slot: {update_slot} calculated vote slot: {vote_slot}"
-                ));
-            }
-
-            if !check_signature(
-                &raw_vote.payload_metadata.signature.sig,
-                reporter_pub_key,
-                raw_vote.payload_metadata.feed_id.as_str(),
-                raw_vote.payload_metadata.timestamp,
-                &raw_vote.result,
-            ) {
-                anyhow::bail!(
-                    "Signature verification failed for vote {:?} from reporter id {} with pub key {:?}",
-                    raw_vote,
-                    raw_vote.payload_metadata.reporter_id,
-                    reporter_pub_key,
-                );
-            }
-        }
-
-        let proof_for_update_mapping: HashMap<u64, DataFeedPayload> = proof_for_update
-            .iter()
-            .cloned()
-            .map(|payload| (payload.payload_metadata.reporter_id, payload))
-            .collect();
-
-        let aggregator = match FeedAggregate::create_from_str(feed_metadata.aggregate_type.as_str())
-        {
-            Ok(val) => val,
-            Err(e) => anyhow::bail!("Could not convert {} to a valid aggregator: {e}", {
-                feed_metadata.aggregate_type.as_str()
-            }),
-        };
-
-        let consumed_reports_result = consume_reports(
-            format!("Feed ID: {}", update.feed_id).as_str(),
-            &proof_for_update_mapping,
-            &FeedType::Numerical(0.0),
-            0,
-            feed_metadata.quorum_percentage,
-            feed_metadata.skip_publish_if_less_then_percentage as f64,
-            feed_metadata.always_publish_heartbeat_ms,
-            update.end_slot_timestamp,
-            num_reporters,
-            false,
-            aggregator,
-            None,
-            update.feed_id,
-        )
-        .await;
-
-        let Some(result_post_to_contract) = consumed_reports_result.result_post_to_contract else {
-            anyhow::bail!(
-                "Feed ID {}'s proof did not produce a result for sending to contract, but a value is present.",
-                &update.feed_id
-            );
-        };
-
-        if update.value != result_post_to_contract.update.value {
-            anyhow::bail!(
-                "Feed ID {}'s proof did not produce the expected result.",
-                &update.feed_id
-            );
-        }
-    }
-
-    let updates_to_serialize = BatchedAggegratesToSend {
-        block_height: batch.block_height,
-        updates: batch.updates,
-        proofs: batch.proofs,
-    };
-
-    let mut strides_and_decimals = HashMap::new();
-    for update in updates_to_serialize.updates.iter() {
-        let feed_id = update.feed_id;
-        debug!("Acquiring a read lock on feeds_config; feed_id={feed_id}");
-        let feed_config = feeds_config.read().await.get(&feed_id).cloned();
-        debug!("Acquired and released a read lock on feeds_config; feed_id={feed_id}");
-
-        strides_and_decimals.insert(
-            feed_id,
-            FeedStrideAndDecimals::from_feed_config(&feed_config),
-        );
-        drop(feed_config);
-    }
-
-    let calldata = match adfs_serialize_updates(
-        &batch.network,
-        &updates_to_serialize,
-        None,
-        strides_and_decimals,
-        &mut batch.feeds_rounds,
-    )
-    .await
-    {
-        Ok(val) => val,
-        Err(e) => anyhow::bail!("Failed to recreate calldata: {e}"),
-    };
-
-    let calldata = match Bytes::from_hex(calldata) {
-        Ok(b) => b,
-        Err(e) => {
-            anyhow::bail!("calldata is not valid hex string: {}", e);
-        }
-    };
-
-    let contract_address = match Address::from_str(batch.contract_address.as_str()) {
-        Ok(addr) => addr,
-        Err(e) => {
-            anyhow::bail!(
-                "Non valid contract address ({}) provided: {}",
-                batch.contract_address.as_str(),
-                e
-            );
-        }
-    };
-
-    let safe_address = match Address::from_str(batch.safe_address.as_str()) {
-        Ok(addr) => addr,
-        Err(e) => {
-            anyhow::bail!(
-                "Non valid safe address ({}) provided: {}",
-                batch.contract_address.as_str(),
-                e
-            );
-        }
-    };
-    let nonce = match Uint::<256, 4>::from_str(batch.nonce.as_str()) {
-        Ok(n) => n,
-        Err(e) => {
-            anyhow::bail!("Non valid nonce ({}) provided: {}", batch.nonce.as_str(), e);
-        }
-    };
-    let safe_transaction = create_safe_tx(contract_address, calldata, nonce);
-
-    let chain_id: u64 = match batch.chain_id.as_str().parse() {
-        Ok(v) => v,
-        Err(e) => {
-            anyhow::bail!("Non valid chain_id ({}) provided: {}", batch.chain_id, e);
-        }
-    };
-
-    let tx_hash =
-        generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction.clone());
-
-    let tx_hash_str = tx_hash.to_string();
-
-    if tx_hash_str != batch.tx_hash {
-        anyhow::bail!(
-            "tx_hash mismatch, recvd: {} generated: {}",
-            batch.tx_hash,
-            tx_hash_str
-        );
-    }
-
-    // Store the last updated slots per feed
-    for (key, val) in feeds_newly_updated_slots {
-        feeds_last_updated_slots.insert(key, val);
-    }
-
-    Ok(())
-}
-
 pub async fn validate(
     feeds_config: HashMap<u32, FeedStrideAndDecimals>,
     mut batch: ConsensusSecondRoundBatch,
@@ -547,6 +305,13 @@ pub async fn validate(
         Err(e) => anyhow::bail!("Failed to recreate calldata: {e}"),
     };
 
+    if calldata != batch.calldata {
+        warn!(
+            "calldata recvd by sequencer {} is not equal to calldata {} generated by {:?}",
+            batch.calldata, calldata, updates_to_serialize
+        );
+    }
+
     let calldata = match Bytes::from_hex(calldata) {
         Ok(b) => b,
         Err(e) => {
@@ -604,4 +369,162 @@ pub async fn validate(
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+
+    fn create_feeds_config() -> HashMap<u32, FeedStrideAndDecimals> {
+        let mut config = HashMap::new();
+
+        for feed_id in 0..15 {
+            config.insert(
+                feed_id,
+                FeedStrideAndDecimals {
+                    stride: 0,
+                    decimals: 18,
+                },
+            );
+        }
+        config.insert(
+            5,
+            FeedStrideAndDecimals {
+                stride: 0,
+                decimals: 8,
+            },
+        );
+        config.insert(
+            11,
+            FeedStrideAndDecimals {
+                stride: 1,
+                decimals: 4,
+            },
+        );
+        config
+    }
+
+    async fn call_validate_with_values(
+        reporter_last_votes: [f64; 3],
+        aggregated_values: [f64; 3],
+    ) -> Result<()> {
+        let mut last_votes = HashMap::new();
+        // The last votes of the reporter.
+        last_votes.insert(
+            1,
+            VotedFeedUpdate {
+                feed_id: 1,
+                value: FeedType::Numerical(reporter_last_votes[0]),
+                end_slot_timestamp: 1677654321,
+            },
+        );
+        last_votes.insert(
+            5,
+            VotedFeedUpdate {
+                feed_id: 5,
+                value: FeedType::Numerical(reporter_last_votes[1]),
+                end_slot_timestamp: 1677654322,
+            },
+        );
+        last_votes.insert(
+            11,
+            VotedFeedUpdate {
+                feed_id: 11,
+                value: FeedType::Numerical(reporter_last_votes[2]),
+                end_slot_timestamp: 1677654323,
+            },
+        );
+
+        // Aggregated values proposed by the sequencer.
+        let updates = vec![
+            VotedFeedUpdate {
+                feed_id: 1,
+                value: FeedType::Numerical(aggregated_values[0]),
+                end_slot_timestamp: 1677654321,
+            },
+            VotedFeedUpdate {
+                feed_id: 5,
+                value: FeedType::Numerical(aggregated_values[1]),
+                end_slot_timestamp: 1677654322,
+            },
+            VotedFeedUpdate {
+                feed_id: 11,
+                value: FeedType::Numerical(aggregated_values[2]),
+                end_slot_timestamp: 1677654323,
+            },
+        ];
+
+        let mut feeds_rounds: HashMap<u32, u64> = HashMap::new();
+        feeds_rounds.insert(1, 1000);
+        feeds_rounds.insert(5, 2000);
+        feeds_rounds.insert(11, 3000);
+        feeds_rounds.insert(3, 4000);
+
+        let block_height = 100;
+        let network = "ETH".to_string();
+
+        let updates_to_serialize = BatchedAggegratesToSend {
+            block_height,
+            updates: updates.clone(),
+            proofs: HashMap::new(),
+        };
+
+        let calldata = adfs_serialize_updates(
+            network.as_str(),
+            &updates_to_serialize,
+            None,
+            create_feeds_config(),
+            &mut feeds_rounds,
+        )
+        .await
+        .unwrap();
+
+        let consensus_second_rond_batch = ConsensusSecondRoundBatch {
+            sequencer_id: 0,
+            block_height,
+            network,
+            contract_address: "0x663F3ad617193148711d28f5334eE4Ed07016602".to_string(),
+            safe_address: "0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C".to_string(),
+            nonce: "10".to_string(),
+            chain_id: "31337".to_string(),
+            tx_hash: "0x1c856b6abec5d4168b8bdd0509da6f84a486081c19ba2e49e8acc28af6d615dc"
+                .to_string(),
+            calldata,
+            updates,
+            feeds_rounds,
+            proofs: HashMap::new(),
+        };
+
+        validate(
+            create_feeds_config(),
+            consensus_second_rond_batch,
+            last_votes,
+            HashMap::new(),
+        )
+        .await
+    }
+
+    #[tokio::test]
+    async fn test_validate_with_confirmable_input() {
+        // All the last votes of the reporter are within 1% deviation from the aggregated values.
+        match call_validate_with_values([42.1, 110.6, 552.0], [42.5, 111.5, 555.5]).await {
+            Ok(_) => {}
+            Err(e) => {
+                panic!("validate failed with error: {e}")
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn test_validate_with_non_confirmable_input() {
+        // The third vote of the reporter is not within 1% deviation from the aggregated value.
+        match call_validate_with_values([42.1, 110.6, 549.5], [42.5, 111.5, 555.5]).await {
+            Ok(_) => {
+                panic!("validate confirmation of higher than 1% deviation!");
+            }
+            Err(e) => {
+                info!("validate correctly did not approve batch of aggregates: {e}")
+            }
+        }
+    }
 }
