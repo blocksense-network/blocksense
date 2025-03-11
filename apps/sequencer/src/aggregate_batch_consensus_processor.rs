@@ -40,6 +40,7 @@ pub async fn aggregation_batch_consensus_loop(
 
             loop {
                 tokio::select! {
+                    // The first future is a timer that ticks according to the block generation period.
                     _ = block_height_tracker.await_end_of_current_slot(&Repeatability::Periodic) => {
 
                         trace!("processing aggregation_batch_consensus_loop");
@@ -90,6 +91,7 @@ pub async fn aggregation_batch_consensus_loop(
                             }
                         }
                     }
+                    // The second future is a signature received from a reporter on the HTTP endpoint post_aggregated_consensus_vote.
                     Some((signed_aggregate, signature_with_address)) = aggregate_batch_sig_recv.recv() => {
 
                         let block_height = signed_aggregate.block_height;
