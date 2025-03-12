@@ -25,9 +25,14 @@
       };
 
       mkOracleScript =
-        oracle-name:
+        oracle-path: standalone:
         pkgs.callPackage ./oracle-script {
-          inherit craneLib version oracle-name;
+          inherit
+            craneLib
+            version
+            oracle-path
+            standalone
+            ;
           inherit (self.lib) filesets;
         };
 
@@ -54,9 +59,12 @@
       };
       legacyPackages = {
         oracle-scripts = {
-          cmc-wasm = mkOracleScript "cmc";
-          yahoo-wasm = mkOracleScript "yahoo";
-          exsat-wasm = mkOracleScript "exsat_network";
+          crypto-price-feeds = mkOracleScript /apps/oracles/crypto-price-feeds false;
+          exsat-wasm = mkOracleScript /libs/sdk/examples/exsat_network true;
+
+          # Legacy oracle scripts
+          cmc-wasm = mkOracleScript /libs/sdk/examples/cmc true;
+          yahoo-wasm = mkOracleScript /libs/sdk/examples/yahoo true;
         };
 
         spinPlugins = {
