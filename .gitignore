@@ -166,3 +166,7 @@ apps/data-feeds-config-generator/artifacts
 # Storybook
 *storybook.log
 libs/ts/ui/storybook-static
+
+# wasm artifacts
+.spin/
+*.wasm
