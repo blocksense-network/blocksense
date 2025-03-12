@@ -21,6 +21,7 @@
     "build": "yarn run rollup:build-workspace",
     "ts": "yarn node --import tsx",
     "get-chainlink-feeds": "yarn ts scripts/get_chainlink_feeds.ts",
+    "get-cmc-market-cap-data": "yarn ts scripts/get-cmc-market-cap-data.ts",
     "generate-data-feeds-config": "yarn ts scripts/generate-feeds-config.ts",
     "generate": "yarn get-chainlink-feeds && yarn generate-data-feeds-config",
     "fetch-symbols": "yarn ts src/data-services/fetchers/scripts/fetch-symbols.ts",

@@ -109,7 +109,7 @@ export async function fetchCMCCryptoList(): Promise<CMCInfoResp> {
   return typedData;
 }
 
-const CMCMarketCapDataSchema = S.Struct({
+export const CMCMarketCapDataSchema = S.Struct({
   cmc_rank: S.Number,
   id: S.Number,
   symbol: S.String,
@@ -119,11 +119,20 @@ const CMCMarketCapDataSchema = S.Struct({
       market_cap: S.Number,
     }),
   }),
+  market_cap_rank: S.NullishOr(S.Number),
 });
 
 export type CMCMarketCapData = S.Schema.Type<typeof CMCMarketCapDataSchema>;
 
-const CMCMarketCapDataRespSchema = S.mutable(
+export const CMCMarketCapDataResSchema = S.mutable(
+  S.Array(CMCMarketCapDataSchema),
+);
+
+export type CMCMarketCapDataRes = S.Schema.Type<
+  typeof CMCMarketCapDataResSchema
+>;
+
+export const CMCMarketCapDataRespSchema = S.mutable(
   S.Struct({
     data: S.mutable(S.Record({ key: S.String, value: CMCMarketCapDataSchema })),
   }),
@@ -143,9 +152,7 @@ async function fetchMarketCapData(ids: string[]): Promise<CMCMarketCapResp> {
   return typedData;
 }
 
-export async function fetchAssetsInMarketCapOrder(): Promise<
-  (CMCMarketCapData & { market_cap_rank: number })[]
-> {
+export async function fetchAssetsInMarketCapOrder(): Promise<CMCMarketCapDataRes> {
   const BATCH_SIZE = 1000;
 
   const cmcData = await fetchCMCCryptoList();
