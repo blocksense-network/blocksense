@@ -52,7 +52,7 @@ const networks = [
   'manta-sepolia',
   'mantle-sepolia',
   'mezo-matsnet-testnet',
-  'monad-devnet',
+  'monad-testnet',
   'morph-mainnet',
   'morph-holesky',
   'optimism-mainnet',
@@ -82,7 +82,7 @@ const chainIds = [
   250, 4002, 114, 100, 10200, 1666700000, 743111, 1663, 2424, 763373, 2358,
   1285, 59144, 59141, 169, 3441006, 5003, 31611, 41454, 2818, 2810, 10,
   11155420, 5611, 137, 80002, 1101, 2442, 57000, 534352, 534351, 11011, 16,
-  57054, 167000, 167009, 41, 324, 300, 4801,
+  57054, 167000, 167009, 41, 324, 300, 4801, 10143,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -113,13 +113,13 @@ export enum Currency {
   cBTC = 'cBTC',
   CELO = 'CELO',
   CFLR = 'CFLR',
-  DMON = 'DMON',
   FTM = 'FTM',
   INJ = 'INJ',
   MATIC = 'MATIC',
   METIS = 'METIS',
   MNT = 'MNT',
   MOVR = 'MOVR',
+  MON = 'MON',
   ONE = 'ONE',
   POL = 'POL',
   S = 'S',
@@ -371,11 +371,11 @@ export const networkMetadata = {
     explorerUrl: 'https://explorer.test.mezo.org',
     currency: Currency.BTC,
   },
-  'monad-devnet': {
-    chainId: 41454,
+  'monad-testnet': {
+    chainId: 10143,
     isTestnet: true,
-    explorerUrl: 'https://brightstar-884.devnet1.monad.xyz/',
-    currency: Currency.DMON,
+    explorerUrl: 'https://testnet.monadexplorer.com',
+    currency: Currency.MON,
   },
   'morph-mainnet': {
     chainId: 2818,
