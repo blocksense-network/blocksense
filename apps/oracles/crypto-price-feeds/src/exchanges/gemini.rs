@@ -23,8 +23,6 @@ pub struct GeminiPriceResponse {
     pub volume: HashMap<String, Value>,
 }
 
-type GeminiSymbolsResponse = Vec<String>;
-
 pub struct GeminiPriceFetcher<'a> {
     pub symbols: &'a [String],
 }
@@ -80,15 +78,4 @@ pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)
             volume,
         },
     ))
-}
-
-pub async fn get_gemini_symbols() -> Result<Vec<String>> {
-    let response =
-        http_get_json::<GeminiSymbolsResponse>("https://api.gemini.com/v1/symbols", None).await?;
-
-    Ok(response
-        .into_iter()
-        .filter(|symbol| !symbol.ends_with("perp"))
-        .map(|symbol| symbol.to_ascii_uppercase())
-        .collect())
 }

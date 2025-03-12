@@ -6,10 +6,7 @@ use anyhow::Context;
 use blocksense_sdk::spin::key_value::Store;
 use itertools::Itertools;
 
-use crate::{
-    common::{ExchangesSymbols, ResourceData, TradingPairSymbol},
-    exchanges::gemini::get_gemini_symbols,
-};
+use crate::common::{ExchangesSymbols, ResourceData, TradingPairSymbol};
 
 const SYMBOLS_KEY: &str = "symbols";
 const RESOURCES_HASH_KEY: &str = "resources_hash";
@@ -24,7 +21,7 @@ pub struct SymbolsData {
 impl SymbolsData {
     pub async fn from_resources(exchanges_symbols: &ExchangesSymbols) -> Result<Self> {
         Ok(Self {
-            gemini: get_gemini_symbols().await?,
+            gemini: exchanges_symbols.get("Gemini").cloned().unwrap_or_default(),
             upbit: exchanges_symbols.get("Upbit").cloned().unwrap_or_default(),
         })
     }
