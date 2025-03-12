@@ -120,23 +120,6 @@ in
       log-level = "info";
     };
 
-    reporters = {
-      a = {
-        full-batch = true;
-        batch-size = 5;
-        resources = {
-          SECRET_KEY_PATH = "${testKeysDir}/reporter_secret_key";
-          CMC_API_KEY_PATH = "${testKeysDir}/CMC_API_KEY";
-          YH_FINANCE_API_KEY_PATH = "${testKeysDir}/YH_FINANCE_API_KEY";
-        };
-        reporter = {
-          id = 0;
-          pub_key = "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e";
-          address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-        };
-      };
-    };
-
     reporters-v2 = {
       a = {
         reporter-info = {
