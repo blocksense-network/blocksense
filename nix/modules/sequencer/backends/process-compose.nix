@@ -64,6 +64,8 @@ let
               -H 'content-type: application/json' \
               --data-raw '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":0}'
           '';
+          initial_delay_seconds = 0;
+          period_seconds = 1;
           timeout_seconds = 30;
         };
         log_configuration = logsConfig;
@@ -142,6 +144,8 @@ let
           curl -fsSL http://127.0.0.1:${toString cfg.sequencer.admin-port}/health \
             -H 'content-type: application/json'
         '';
+        initial_delay_seconds = 0;
+        period_seconds = 1;
         timeout_seconds = 30;
       };
       environment = [
