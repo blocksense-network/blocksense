@@ -60,11 +60,11 @@
       legacyPackages = {
         oracle-scripts = {
           crypto-price-feeds = mkOracleScript /apps/oracles/crypto-price-feeds false;
-          exsat-wasm = mkOracleScript /libs/sdk/examples/exsat_network true;
+          exsat = mkOracleScript /libs/sdk/examples/exsat_network true;
 
           # Legacy oracle scripts
-          cmc-wasm = mkOracleScript /libs/sdk/examples/cmc true;
-          yahoo-wasm = mkOracleScript /libs/sdk/examples/yahoo true;
+          cmc = mkOracleScript /libs/sdk/examples/cmc true;
+          yahoo = mkOracleScript /libs/sdk/examples/yahoo true;
         };
 
         spinPlugins = {
