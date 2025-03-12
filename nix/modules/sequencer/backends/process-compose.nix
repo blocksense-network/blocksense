@@ -100,26 +100,6 @@ let
     };
   }) cfg.reporters;
 
-  oracleScriptBuilder = lib.mapAttrs' (
-    name:
-    {
-      path,
-      source,
-      build-command,
-      ...
-    }:
-    {
-      name = "oracle-script-builder-${name}";
-      value.process-compose = {
-        command = ''
-          ${build-command} &&
-          cp -v ${source} ${cfg.oracle-scripts.base-dir}
-        '';
-        working_dir = path;
-      };
-    }
-  ) cfg.oracle-scripts.oracles;
-
   reporterV2Instances = lib.mapAttrs' (
     name:
     { log-level, ... }:
@@ -187,7 +167,6 @@ in
   config = lib.mkIf cfg.enable {
     processes =
       anvilImpersonateAndFundInstances
-      // oracleScriptBuilder
       // reporterV2Instances
       // sequencerInstance
       // anvilInstances
