@@ -1,0 +1,276 @@
+{
+  "ethereum-holesky": {
+    "chainId": 17000,
+    "contracts": {
+      "coreContracts": {
+        "AccessControl": {
+          "address": "0x956cE69248c3f504C8f1265b54278Db0e37e7737",
+          "constructorArgs": [
+            "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"
+          ]
+        },
+        "AggregatedDataFeedStore": {
+          "address": "0x600946a5bbd0E83e76D87168ccC5a12F0f980B75",
+          "constructorArgs": [
+            "0x956cE69248c3f504C8f1265b54278Db0e37e7737"
+          ]
+        },
+        "UpgradeableProxyADFS": {
+          "address": "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b",
+          "constructorArgs": [
+            "0x600946a5bbd0E83e76D87168ccC5a12F0f980B75",
+            "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"
+          ]
+        },
+        "CLFeedRegistryAdapter": {
+          "address": "0xe8ED1a072e4876903DF76a99681ff991fF5f1Cad",
+          "constructorArgs": [
+            "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De",
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        "OnlySequencerGuard": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "constructorArgs": []
+        }
+      },
+      "CLAggregatorAdapter": [
+        {
+          "description": "BTC / USD",
+          "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xcBD6FC059bEDc859d43994F5C221d96F9eD5340f",
+          "constructorArgs": [
+            "BTC / USD",
+            8,
+            0,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "ETH / USD",
+          "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xf832B9Cfe11c48ac9AB4DD52F749204231C70DeE",
+          "constructorArgs": [
+            "ETH / USD",
+            8,
+            3,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "BNB / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x5EEa7e34B148374C7beBF2ab5592826d61C6d354",
+          "constructorArgs": [
+            "BNB / USD",
+            8,
+            13,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "SOL / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x6a077C2fFd8Cba025ba0F5a330107B85e0B11d9a",
+          "constructorArgs": [
+            "SOL / USD",
+            8,
+            16,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "LINK / USD",
+          "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0xE17bb9699a2dE1A9E960F0dD2371aB9dc0b8360d",
+          "constructorArgs": [
+            "LINK / USD",
+            8,
+            35,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "UNI / USD",
+          "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x3caB4e1c6b99796427518EDE3c977e3E7f115969",
+          "constructorArgs": [
+            "UNI / USD",
+            8,
+            92,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "AAVE / ETH",
+          "base": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+          "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "address": "0x43Ec7D9a294b35385087aE86EC23687E7EF6ff48",
+          "constructorArgs": [
+            "AAVE / ETH",
+            18,
+            108,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "TAO / USD",
+          "base": null,
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x7dE365cE446f61890dae0978d9256EaBAF49d7ef",
+          "constructorArgs": [
+            "TAO / USD",
+            18,
+            129,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "1INCH / USD",
+          "base": "0x111111111117dC0aa78b770fA6A738034120C302",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "address": "0x2BFCf5ed5F3EE9e4E06b0bFe5D7c5641e8395dF4",
+          "constructorArgs": [
+            "1INCH / USD",
+            8,
+            344,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        }
+      ],
+      "AdminMultisig": "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De",
+      "SequencerMultisig": "0x0000000000000000000000000000000000000000"
+    }
+  },
+  "arbitrum-sepolia": {
+    "chainId": 421614,
+    "contracts": {
+      "coreContracts": {
+        "AggregatedDataFeedStore": {
+          "address": "0x600946a5bbd0E83e76D87168ccC5a12F0f980B75",
+          "constructorArgs": [
+            "0x956cE69248c3f504C8f1265b54278Db0e37e7737"
+          ]
+        },
+        "UpgradeableProxyADFS": {
+          "address": "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b",
+          "constructorArgs": [
+            "0x600946a5bbd0E83e76D87168ccC5a12F0f980B75",
+            "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"
+          ]
+        },
+        "CLFeedRegistryAdapter": {
+          "address": "0xe8ED1a072e4876903DF76a99681ff991fF5f1Cad",
+          "constructorArgs": [
+            "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De",
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        "AccessControl": {
+          "address": "0x956cE69248c3f504C8f1265b54278Db0e37e7737",
+          "constructorArgs": [
+            "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"
+          ]
+        },
+        "OnlySequencerGuard": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "constructorArgs": []
+        }
+      },
+      "CLAggregatorAdapter": [
+        {
+          "description": "BTC / USD",
+          "address": "0xcBD6FC059bEDc859d43994F5C221d96F9eD5340f",
+          "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "constructorArgs": [
+            "BTC / USD",
+            8,
+            0,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "BTC / USDT",
+          "address": "0x983966169B23A351627EB0Dd2FF55a13039f24ac",
+          "base": null,
+          "quote": null,
+          "constructorArgs": [
+            "BTC / USDT",
+            8,
+            1,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "BTC / USDC",
+          "address": "0xBd8EA32Af2F14e60bA5309E6b3A53e8c2894D270",
+          "base": null,
+          "quote": null,
+          "constructorArgs": [
+            "BTC / USDC",
+            8,
+            2,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "ETH / USD",
+          "address": "0xf832B9Cfe11c48ac9AB4DD52F749204231C70DeE",
+          "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "quote": "0x0000000000000000000000000000000000000348",
+          "constructorArgs": [
+            "ETH / USD",
+            8,
+            3,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "ETH / BTC",
+          "address": "0x8a9dD6a8b54f2Df70e05DEB5Ec9Dd0F2E872282b",
+          "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "quote": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+          "constructorArgs": [
+            "ETH / BTC",
+            8,
+            4,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "ETH / USDT",
+          "address": "0xba24E9eC818D3Fa8Cc3bEd91C3FEcF57b1a86635",
+          "base": null,
+          "quote": null,
+          "constructorArgs": [
+            "ETH / USDT",
+            8,
+            5,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        },
+        {
+          "description": "ETH / USDC",
+          "address": "0xEd9Ad21483B42768CA3CfBB1C62E5d3bf01b9a5E",
+          "base": null,
+          "quote": null,
+          "constructorArgs": [
+            "ETH / USDC",
+            8,
+            6,
+            "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
+          ]
+        }
+      ],
+      "SequencerMultisig": "0x0000000000000000000000000000000000000000",
+      "AdminMultisig": "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"
+    }
+  }
+}
