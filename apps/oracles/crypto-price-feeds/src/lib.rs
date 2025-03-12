@@ -13,7 +13,10 @@ use blocksense_sdk::{
 };
 use common::{ExchangeName, ExchangesSymbols};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fmt::Write};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Write,
+};
 
 use crate::common::{ResourceData, TradingPair, TradingPairToResults};
 use fetch_prices::fetch_all_prices;
@@ -83,10 +86,15 @@ fn get_resources_from_settings(
 
         if let Some(exchanges) = feed_config.arguments.exchanges {
             for (exchange, symbols) in exchanges {
-                exchanges_symbols
-                    .entry(exchange)
-                    .or_insert_with(Vec::new)
-                    .extend(symbols.values().cloned().flatten());
+                let entry = exchanges_symbols.entry(exchange).or_insert_with(Vec::new);
+                let mut seen_symbols = entry.iter().cloned().collect::<HashSet<_>>();
+
+                for symbol in symbols.values().cloned().flatten() {
+                    if !seen_symbols.contains(&symbol) {
+                        entry.push(symbol.clone());
+                        seen_symbols.insert(symbol);
+                    }
+                }
             }
         }
 
