@@ -1,7 +1,6 @@
 import { Web3 } from 'web3';
 
 import { assertIsObject } from '@blocksense/base-utils/assert';
-import { selectDirectory } from '@blocksense/base-utils/fs';
 import { getRpcUrl, isTestnet, networkName } from '@blocksense/base-utils/evm';
 
 import {
@@ -26,13 +25,12 @@ import {
   decodeChainLinkFeedsInfo,
 } from './types';
 import { Pair, createPair } from '@blocksense/config-types/data-feeds-config';
+import { CLArtifacts } from './artifacts-downloader';
 
-export async function collectRawDataFeeds(directoryPath: string) {
-  const { readAllJSONFiles } = selectDirectory(directoryPath);
-
+export async function collectRawDataFeeds(clArtifacts: CLArtifacts[]) {
   const rawDataFeeds: RawDataFeeds = {};
 
-  for (const { base, content } of await readAllJSONFiles()) {
+  for (const { base, content } of clArtifacts) {
     const info = decodeChainLinkFeedsInfo(content);
 
     for (const feed of info) {

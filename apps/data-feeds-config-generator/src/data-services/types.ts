@@ -23,7 +23,7 @@ export type ChainLinkFeedDocsInfo = S.Schema.Type<
 /**
  * Schema for the ChainLink feed information.
  */
-const ChainLinkFeedInfoSchema = S.Struct({
+export const ChainLinkFeedInfoSchema = S.Struct({
   compareOffchain: S.String,
   contractAddress: S.String,
   contractType: S.String,

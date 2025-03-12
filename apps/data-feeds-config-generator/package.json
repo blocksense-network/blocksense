@@ -24,7 +24,6 @@
     "get-cmc-market-cap-data": "yarn ts scripts/get-cmc-market-cap-data.ts",
     "get-providers-data": "yarn ts scripts/get-providers-data.ts",
     "generate-data-feeds-config": "yarn ts scripts/generate-feeds-config.ts",
-    "generate": "yarn get-chainlink-feeds && yarn generate-data-feeds-config",
     "fetch-symbols": "yarn ts src/data-services/fetchers/scripts/fetch-symbols.ts",
     "test": "yarn vitest --typecheck -w false"
   },

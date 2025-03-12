@@ -8,33 +8,18 @@ import { keysOf } from '@blocksense/base-utils/array-iter';
 
 import { artifactsDir } from '../paths';
 import { AssetInfo } from '../data-services/exchange-assets';
-import * as aggregatorFetchers from '../data-services/fetchers/aggregators/index';
-import * as exchangeFetchers from '../data-services/fetchers/exchanges/index';
 import { SimplifiedFeed } from './types';
-import { assertNotNull } from '@blocksense/base-utils/assert';
 
-export async function addDataProviders(dataFeeds: SimplifiedFeed[]) {
-  const fetcherCategories = {
-    exchanges: exchangeFetchers,
-    aggregators: aggregatorFetchers,
-  };
-  const allFetchers = { ...exchangeFetchers, ...aggregatorFetchers };
-  const exchangeAssetsMap: ExchangeData[] = await Promise.all(
-    Object.entries(allFetchers).map(async ([name, fetcher]) => {
-      const fetcherData = await new fetcher().fetchAssets();
-      const fetcherName = name.split('AssetsFetcher')[0];
-      return {
-        name: fetcherName,
-        type: assertNotNull(
-          keysOf(fetcherCategories).find(
-            category => name in fetcherCategories[category],
-          ),
-        ),
-        data: fetcherData,
-      };
-    }),
-  );
+export type ProviderData = {
+  name: string;
+  type: 'exchanges' | 'aggregators';
+  data: AssetInfo[];
+};
 
+export async function addDataProviders(
+  dataFeeds: SimplifiedFeed[],
+  exchangeAssetsMap: ProviderData[],
+) {
   // Filter out feeds without a quote pair
   const filteredFeeds = filterFeedsWithQuotes(dataFeeds);
 
@@ -64,11 +49,11 @@ export async function addDataProviders(dataFeeds: SimplifiedFeed[]) {
 // Function to get all providers for a feed
 function getAllProvidersForFeed(
   feed: SimplifiedFeed,
-  exchangeAssets: ExchangeData[],
+  exchangeAssets: ProviderData[],
 ): ProvidersResources {
   const providers: ProvidersResources = {};
 
-  const addProvider = (key: string, type: ExchangeData['type'], value: any) => {
+  const addProvider = (key: string, type: ProviderData['type'], value: any) => {
     if (value) {
       providers[type] ??= {};
       providers[type][key] = value;
@@ -165,15 +150,3 @@ function isPairSupportedByCryptoProvider(
 
   return isBaseCompatible && isCompatibleQuote;
 }
-
-type ExchangeData = {
-  name: string;
-  type: 'exchanges' | 'aggregators';
-  data: AssetInfo[];
-};
-
-export type ProviderData = {
-  name: string;
-  type: 'exchanges' | 'aggregators';
-  data: AssetInfo[];
-};

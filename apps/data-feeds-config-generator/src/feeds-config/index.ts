@@ -29,7 +29,8 @@ import {
 } from '../data-services/chainlink_feeds';
 import { SimplifiedFeed, SimplifiedFeedWithRank } from './types';
 import { addDataProviders, stableCoins } from './data-providers';
-import { fetchAssetsInMarketCapOrder } from '../data-services/fetchers/aggregators/cmc';
+import { CMCMarketCapDataRes } from '../data-services/fetchers/aggregators/cmc';
+import { Artifacts } from '../data-services/artifacts-downloader';
 
 function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,
@@ -267,9 +268,8 @@ function removeNonCryptoDataFeeds(
 
 async function addMarketCapRank(
   feeds: SimplifiedFeed[],
+  cmcMarketCap: CMCMarketCapDataRes,
 ): Promise<SimplifiedFeedWithRank[]> {
-  const cmcMarketCap = await fetchAssetsInMarketCapOrder();
-
   return feeds.map(feed => {
     const asset = cmcMarketCap.find(
       asset =>
@@ -303,6 +303,7 @@ function sortFeedsConfig(
 
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
+  artifacts: Artifacts,
 ): Promise<NewFeedsConfig> {
   // Get the CL feeds on mainnet
   const mainnetDataFeeds: SimplifiedFeed[] =
@@ -324,7 +325,10 @@ export async function generateFeedConfig(
 
   // Add providers data to the feeds and filter out feeds without providers
   const dataFeedsWithCryptoResources = (
-    await addDataProviders(dataFeedsWithStableCoinVariants)
+    await addDataProviders(
+      dataFeedsWithStableCoinVariants,
+      artifacts.exchangeAssets,
+    )
   ).filter(
     dataFeed =>
       Object.keys(dataFeed.additional_feed_info.arguments).length !== 0,
@@ -341,7 +345,10 @@ export async function generateFeedConfig(
   await checkOnChainData(rawDataFeedsOnMainnets, dataFeedsWithCryptoResources);
 
   // Add market cap rank
-  const dataFeedWithRank = await addMarketCapRank(dataFeedsWithCryptoResources);
+  const dataFeedWithRank = await addMarketCapRank(
+    dataFeedsWithCryptoResources,
+    artifacts.cmcMarketCap,
+  );
 
   // Sort the feeds
   const feedsSorted = sortFeedsConfig(dataFeedWithRank);

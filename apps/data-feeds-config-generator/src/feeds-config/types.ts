@@ -5,4 +5,6 @@ export type SimplifiedFeed = Pick<
   'description' | 'full_name' | 'additional_feed_info'
 >;
 
-export type SimplifiedFeedWithRank = SimplifiedFeed & { rank: number | null };
+export type SimplifiedFeedWithRank = SimplifiedFeed & {
+  rank: number | null | undefined;
+};

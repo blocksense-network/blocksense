@@ -8,7 +8,7 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
 import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 
-import { chainlinkFeedsDir, artifactsDir, configDir } from '../src/paths';
+import { artifactsDir, configDir } from '../src/paths';
 import {
   collectRawDataFeeds,
   aggregateNetworkInfoPerField,
@@ -22,6 +22,10 @@ import {
 } from '../src/feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
 import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';
+import {
+  Artifacts,
+  fetchRepoFiles,
+} from '../src/data-services/artifacts-downloader';
 
 async function getOrCreateArtifact<A, I = A>(
   name: string,
@@ -65,11 +69,17 @@ async function saveConfigsToDir(
 const saveArtifacts = saveConfigsToDir.bind(null, artifactsDir);
 const saveConfigs = saveConfigsToDir.bind(null, configDir);
 
-async function main(chainlinkFeedsDir: string) {
+async function main() {
+  const artifacts: Artifacts | null = await fetchRepoFiles();
+
+  if (!artifacts) {
+    throw new Error('Failed to fetch artifacts');
+  }
+
   const rawDataFeeds = await getOrCreateArtifact(
     'raw_chainlink_feeds',
     RawDataFeedsSchema,
-    () => collectRawDataFeeds(chainlinkFeedsDir),
+    () => collectRawDataFeeds(artifacts.clArtifacts),
   );
 
   const aggregatedDataFeeds = await getOrCreateArtifact(
@@ -95,7 +105,7 @@ async function main(chainlinkFeedsDir: string) {
   const feedConfig = await getOrCreateArtifact(
     'feeds_config_new',
     NewFeedsConfigSchema,
-    () => generateFeedConfig(rawDataFeeds),
+    () => generateFeedConfig(rawDataFeeds, artifacts),
   );
 
   const feedRegistryEvents = await getOrCreateArtifact(
@@ -121,4 +131,4 @@ async function main(chainlinkFeedsDir: string) {
   );
 }
 
-await main(chainlinkFeedsDir);
+await main();
