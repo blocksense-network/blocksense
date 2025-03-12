@@ -1,0 +1,28 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Yordan Madzhunkov"]
+name = "GeckoTerminal dex prices"
+version = "0.1.0"
+
+[application.trigger.settings]
+interval_time_in_seconds = 10
+sequencer = "http://127.0.0.1:9856/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+reporter_id = 0
+
+[[trigger.oracle]]
+component = "gecko-terminal"
+
+[[trigger.oracle.data_feeds]]
+id = "607"
+data = '{"network":"monad-testnet", "pool":"0x8552706d9a27013f20ea0f9df8e20b61e283d2d3"}'
+
+
+[component.gecko-terminal]
+source = "target/wasm32-wasip1/release/gecko_terminal_oracle.wasm"
+
+allowed_outbound_hosts = ["https://app.geckoterminal.com/"]
+
+[component.gecko-terminal.build]
+command = "cargo build --target wasm32-wasip1 --release"

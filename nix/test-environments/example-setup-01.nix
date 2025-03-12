@@ -132,19 +132,8 @@ in
     };
 
     oracles = {
-      exsat = {
-        oracle_script_wasm = "exsat_holdings_oracle.wasm";
-        capabilities = [ ];
-        allowed_outbound_hosts = [
-          "https://raw.githubusercontent.com"
-          "https://rpc-us.exsat.network"
-          "https://blockchain.info"
-        ];
-      };
-
       crypto-price-feeds = {
         oracle_script_wasm = "crypto_price_feeds.wasm";
-
         capabilities = [ ];
         allowed_outbound_hosts = [
           "https://api.kraken.com"
@@ -162,6 +151,24 @@ in
           "https://api.bitget.com"
           "https://api.gateio.ws"
           "https://www.okx.com"
+        ];
+      };
+
+      exsat = {
+        oracle_script_wasm = "exsat_holdings_oracle.wasm";
+        capabilities = [ ];
+        allowed_outbound_hosts = [
+          "https://raw.githubusercontent.com"
+          "https://rpc-us.exsat.network"
+          "https://blockchain.info"
+        ];
+      };
+
+      gecko-terminal = {
+        oracle_script_wasm = "gecko_terminal.wasm";
+        capabilities = [ ];
+        allowed_outbound_hosts = [
+          "https://app.geckoterminal.com"
         ];
       };
     };

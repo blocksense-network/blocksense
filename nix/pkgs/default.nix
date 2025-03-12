@@ -61,6 +61,7 @@
         oracle-scripts = {
           crypto-price-feeds = mkOracleScript /apps/oracles/crypto-price-feeds false;
           exsat = mkOracleScript /libs/sdk/examples/exsat_network true;
+          gecko-terminal = mkOracleScript /apps/oracles/gecko-terminal false;
 
           # Legacy oracle scripts
           cmc = mkOracleScript /libs/sdk/examples/cmc true;

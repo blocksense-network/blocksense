@@ -7171,6 +7171,34 @@
       "value_type": "Numerical",
       "aggregate_type": "Median",
       "stride": 0
+    },
+    {
+      "id": 607,
+      "name": "USDT / WMON 0.2%",
+      "fullName": "WMON on monad-testnet pool with contract 0x8552706d9a27013f20ea0f9df8e20b61e283d2d3",
+      "description": "WMON / USDT",
+      "decimals": 8,
+      "report_interval_ms": 90000,
+      "quorum_percentage": 100,
+      "skip_publish_if_less_then_percentage": 0.1,
+      "always_publish_heartbeat_ms": 3600000,
+      "type": "Crypto",
+      "script": "gecko-terminal",
+      "pair": {
+        "base": "WMON",
+        "quote": "USDT"
+      },
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      },
+      "resources": {
+        "network": "monad-testnet",
+        "pool": "0x8552706d9a27013f20ea0f9df8e20b61e283d2d3"
+      },
+      "value_type": "Numerical",
+      "aggregate_type": "Median",
+      "stride": 0
     }
 
   ]

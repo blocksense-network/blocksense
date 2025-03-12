@@ -497,6 +497,14 @@ pub async fn get_oracle_scripts(
                 ],
                 capabilities: HashSet::from_iter(vec![]),
             },
+            OracleScript {
+                id: "gecko_terminal".to_string(),
+                name: None,
+                description: None,
+                oracle_script_wasm: "gecko_terminal_oracle.wasm".to_string(),
+                allowed_outbound_hosts: vec!["https://app.geckoterminal.com/".to_string()],
+                capabilities: HashSet::from_iter(vec![]),
+            },
         ],
     };
 

@@ -4674,6 +4674,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "gecko-terminal"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-sdk",
+ "serde 1.0.217",
+ "serde-this-or-that",
+ "serde_json",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
