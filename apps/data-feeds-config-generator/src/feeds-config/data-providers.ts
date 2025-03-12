@@ -171,3 +171,9 @@ type ExchangeData = {
   type: 'exchanges' | 'aggregators';
   data: AssetInfo[];
 };
+
+export type ProviderData = {
+  name: string;
+  type: 'exchanges' | 'aggregators';
+  data: AssetInfo[];
+};
