@@ -28,8 +28,8 @@
   },
   "exports": {
     "./feeds_config": {
-      "require": "./config/feeds_config.json",
-      "import": "./config/feeds_config.json"
+      "require": "./config/feeds_config_v1.json",
+      "import": "./config/feeds_config_v1.json"
     },
     "./chainlink_compatibility": {
       "require": "./config/chainlink_compatibility.json",
