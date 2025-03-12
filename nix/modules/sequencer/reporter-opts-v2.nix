@@ -30,15 +30,12 @@ with lib;
       };
     };
 
-    api-keys = {
-      CMC_API_KEY = mkOption {
-        type = types.path;
-        description = "The path to the CMC api key.";
-      };
-
-      YAHOO_API_KEY = mkOption {
-        type = types.path;
-        description = "The path to the YF api key.";
+    api-keys = mkOption {
+      type = types.attrsOf types.str;
+      default = { };
+      example = {
+        CMC_API_KEY = "/secrets/CMC_API_KEY";
+        YAHOO_API_KEY = "/secrets/YH_FINANCE_API_KEY";
       };
     };
 

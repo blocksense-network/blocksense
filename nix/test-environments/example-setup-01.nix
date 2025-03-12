@@ -144,10 +144,7 @@ in
           interval_time_in_seconds = 6;
           secret_key = "${testKeysDir}/reporter_secret_key";
         };
-        api-keys = {
-          CMC_API_KEY = "${testKeysDir}/CMC_API_KEY";
-          YAHOO_API_KEY = "${testKeysDir}/YH_FINANCE_API_KEY";
-        };
+        api-keys = { };
       };
     };
   };
