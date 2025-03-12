@@ -391,28 +391,28 @@ export const initChain = async (
     },
     safeAddresses: {
       multiSendAddress: parseEthereumAddress(
-        '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
+        '0xf603AA036D2Fe648F0b8ee51b601e773f4096bf1',
       ),
       multiSendCallOnlyAddress: parseEthereumAddress(
-        '0x9641d764fc13c8B624c04430C7356C1C7C8102e2',
+        '0xe11820360fc41fC7703483CA7933997f682477A9',
       ),
       createCallAddress: parseEthereumAddress(
-        '0x9b35Af71d77eaf8d7e40252370304687390A1A52',
+        '0xA0643A04FAb7f11D9dfd79A22a5D35255109E885',
       ),
       safeSingletonAddress: parseEthereumAddress(
-        '0x41675C099F32341bf84BFc5382aF534df5C7461a',
+        '0xe2D17cEeA58B60101a87cA032689fb0d6DC84aEB',
       ),
       safeProxyFactoryAddress: parseEthereumAddress(
-        '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
+        '0xEF3C826145BD136fcad6e66EdB563DBFB92E9a3E',
       ),
       fallbackHandlerAddress: parseEthereumAddress(
-        '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
+        '0x5A74Efd7f1427727EEF7Ea23ED481cd96f69B7Cb',
       ),
       signMessageLibAddress: parseEthereumAddress(
-        '0xd53cd0aB83D845Ac265BE939c57F53AD838012c9',
+        '0x7a31fad5268d0AbC79CFaD12177747D5d656d4d2',
       ),
       simulateTxAccessorAddress: parseEthereumAddress(
-        '0x3d4BA2E0884aa488718476ca2FB8Efc291A46199',
+        '0x68F58CFBF5153128E8F5d9756761F89C3dd18D2E',
       ),
       safeWebAuthnSharedSignerAddress: parseEthereumAddress(
         // https://github.com/safe-global/safe-modules-deployments/blob/v2.2.4/src/assets/safe-passkey-module/v0.2.1/safe-webauthn-shared-signer.json#L6gs

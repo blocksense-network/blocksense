@@ -74,6 +74,7 @@ const networks = [
   'zksync-mainnet',
   'zksync-sepolia',
   'world-chain-sepolia',
+  'creator-chain-testnet',
 ] as const;
 
 const chainIds = [
@@ -82,7 +83,7 @@ const chainIds = [
   250, 4002, 114, 100, 10200, 1666700000, 743111, 1663, 2424, 763373, 2358,
   1285, 59144, 59141, 169, 3441006, 5003, 31611, 41454, 2818, 2810, 10,
   11155420, 5611, 137, 80002, 1101, 2442, 57000, 534352, 534351, 11011, 16,
-  57054, 167000, 167009, 41, 324, 300, 4801,
+  57054, 167000, 167009, 41, 324, 300, 4801, 66665,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -501,6 +502,12 @@ export const networkMetadata = {
     chainId: 4801,
     isTestnet: true,
     explorerUrl: 'https://worldchain-sepolia.explorer.alchemy.com',
+    currency: Currency.ETH,
+  },
+  'creator-chain-testnet': {
+    chainId: 66665,
+    isTestnet: true,
+    explorerUrl: '',
     currency: Currency.ETH,
   },
 } satisfies {
