@@ -2,7 +2,6 @@ mod common;
 mod exchanges;
 mod fetch_prices;
 mod http;
-mod symbols_cache;
 mod traits;
 mod vwap;
 
@@ -11,7 +10,7 @@ use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
-use common::{ExchangeName, ExchangesSymbols};
+use common::{ExchangeName, ExchangesSymbols, ResourcePairData};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{HashMap, HashSet},
@@ -43,10 +42,10 @@ struct Data {
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("Starting oracle component");
 
-    let (resources, exchanges_symbols) = get_resources_from_settings(&settings)?;
+    let resources = get_resources_from_settings(&settings)?;
 
-    let results = fetch_all_prices(&resources, &exchanges_symbols).await?;
-    print_results(&resources, &results);
+    let results = fetch_all_prices(&resources).await?;
+    print_results(&resources.pairs, &results);
 
     let payload = process_results(results)?;
     println!("Final Payload - {:?}", payload.values);
@@ -74,9 +73,7 @@ fn process_results(results: TradingPairToResults) -> Result<Payload> {
     Ok(payload)
 }
 
-fn get_resources_from_settings(
-    settings: &Settings,
-) -> Result<(Vec<ResourceData>, ExchangesSymbols)> {
+fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
     let mut price_feeds = Vec::new();
     let mut exchanges_symbols: ExchangesSymbols = HashMap::new();
 
@@ -98,16 +95,19 @@ fn get_resources_from_settings(
             }
         }
 
-        price_feeds.push(ResourceData {
+        price_feeds.push(ResourcePairData {
             pair: feed_config.pair,
             id: feed_setting.id.clone(),
         });
     }
 
-    Ok((price_feeds, exchanges_symbols))
+    Ok(ResourceData {
+        pairs: price_feeds,
+        symbols: exchanges_symbols,
+    })
 }
 
-fn print_results(resources: &[ResourceData], results: &TradingPairToResults) {
+fn print_results(resources: &[ResourcePairData], results: &TradingPairToResults) {
     let (mut missing_str, mut found_str) = resources.iter().fold(
         (String::new(), String::new()),
         |(mut missing, mut found), res| {

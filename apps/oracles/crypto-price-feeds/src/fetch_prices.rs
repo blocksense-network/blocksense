@@ -1,5 +1,6 @@
 use anyhow::Result;
 use futures::FutureExt;
+use serde::{Deserialize, Serialize};
 
 use std::time::Instant;
 
@@ -7,7 +8,8 @@ use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
     common::{
-        ExchangePriceData, ExchangesSymbols, PairPriceData, ResourceData, TradingPairToResults,
+        ExchangePriceData, ExchangesSymbols, PairPriceData, ResourceData, ResourcePairData,
+        TradingPairSymbol, TradingPairToResults,
     },
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
@@ -17,17 +19,29 @@ use crate::{
         kucoin::KuCoinPriceFetcher, mexc::MEXCPriceFetcher, okx::OKXPriceFetcher,
         upbit::UpBitPriceFetcher,
     },
-    symbols_cache::load_exchange_symbols,
     traits::prices_fetcher::PricesFetcher,
 };
 
 use futures::future::LocalBoxFuture;
 
-pub async fn fetch_all_prices(
-    resources: &[ResourceData],
-    exchanges_data: &ExchangesSymbols,
-) -> Result<TradingPairToResults> {
-    let symbols = load_exchange_symbols(resources, exchanges_data).await?;
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SymbolsData {
+    pub gemini: Vec<TradingPairSymbol>,
+    pub upbit: Vec<TradingPairSymbol>,
+}
+
+impl SymbolsData {
+    pub fn from_resources(exchanges_symbols: &ExchangesSymbols) -> Result<Self> {
+        Ok(Self {
+            gemini: exchanges_symbols.get("Gemini").cloned().unwrap_or_default(),
+            upbit: exchanges_symbols.get("Upbit").cloned().unwrap_or_default(),
+        })
+    }
+}
+
+pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToResults> {
+    let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let mut futures_set = FuturesUnordered::from_iter([
         fetch::<BinancePriceFetcher>(&[]),
@@ -59,7 +73,7 @@ pub async fn fetch_all_prices(
                     name: exchange_id.to_owned(),
                     data: prices,
                 };
-                fill_results(resources, prices_per_exchange, &mut results);
+                fill_results(&resources.pairs, prices_per_exchange, &mut results);
             }
             Err(err) => println!("❌ Error fetching prices from {exchange_id}: {err:?}"),
         }
@@ -71,7 +85,7 @@ pub async fn fetch_all_prices(
 }
 
 fn fill_results(
-    resources: &[ResourceData],
+    resources: &[ResourcePairData],
     prices_per_exchange: ExchangePriceData,
     results: &mut TradingPairToResults,
 ) {

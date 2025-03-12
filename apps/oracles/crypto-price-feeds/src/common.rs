@@ -32,10 +32,16 @@ pub struct ExchangePriceData {
 
 pub type TradingPairToResults = HashMap<TradingPairSymbol, DataFeedResult>;
 
-#[derive(Debug, Hash)]
-pub struct ResourceData {
+#[derive(Debug)]
+pub struct ResourcePairData {
     pub pair: TradingPair,
     pub id: String,
+}
+
+#[derive(Debug)]
+pub struct ResourceData {
+    pub pairs: Vec<ResourcePairData>,
+    pub symbols: ExchangesSymbols,
 }
 
 #[derive(Debug, Default)]
