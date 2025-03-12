@@ -27,30 +27,18 @@ import {
   fetchRepoFiles,
 } from '../src/data-services/artifacts-downloader';
 
-async function getOrCreateArtifact<A, I = A>(
+async function createArtifact<A, I = A>(
   name: string,
   schema: Schema.Schema<A, I, never> | null,
   create: () => Promise<A>,
+  artifacts: any[],
 ) {
-  const { readJSON, writeJSON } = selectDirectory(artifactsDir);
-  const path = format({ dir: artifactsDir, name, ext: '.json' });
-
   let json: unknown;
-  try {
-    if (process.env['ENABLE_CACHE'] ?? false) {
-      json = await readJSON({ name });
-      console.log(`Loading existing artifact from: '${path}'`);
-    }
-    throw new Error('Skipping cache');
-  } catch {
-    console.log(`Creating new artifact: '${path}'`);
-    const startTime = performance.now();
-    json = await create();
-    const delta = performance.now() - startTime;
-    await writeJSON({ name, content: json });
-    console.log(`Artifact '${path}' created in ${delta.toFixed(2)}ms`);
-  }
-  return schema ? decodeUnknownSync(schema)(json) : (json as A);
+  json = await create();
+  const artifact = schema ? decodeUnknownSync(schema)(json) : (json as A);
+  artifacts.push({ name, content: artifact });
+
+  return artifact;
 }
 
 async function saveConfigsToDir(
@@ -76,45 +64,53 @@ async function main() {
     throw new Error('Failed to fetch artifacts');
   }
 
-  const rawDataFeeds = await getOrCreateArtifact(
+  let DFCGArtifacts = [];
+
+  const rawDataFeeds = await createArtifact(
     'DFCG_0_raw_chainlink_feeds',
     RawDataFeedsSchema,
     () => collectRawDataFeeds(artifacts.clArtifacts),
+    DFCGArtifacts,
   );
 
-  const aggregatedDataFeeds = await getOrCreateArtifact(
+  const aggregatedDataFeeds = await createArtifact(
     'DFCG_1_aggregated_chainlink_feeds',
     null,
     async () => aggregateNetworkInfoPerField(rawDataFeeds),
+    DFCGArtifacts,
   );
 
   // Representation of all the Chainlink data feeds in our feed config format.
-  const allPossibleCLDataFeeds = await getOrCreateArtifact(
+  const allPossibleCLDataFeeds = await createArtifact(
     'DFCG_2_chainlink_all_possible_feeds',
     null,
     async () => getAllPossibleCLFeeds(aggregatedDataFeeds),
+    DFCGArtifacts,
   );
 
   // Representation of all the Chainlink data feeds on mainnets in our feed config format.
-  const onMainnetCLDataFeeds = await getOrCreateArtifact(
+  const onMainnetCLDataFeeds = await createArtifact(
     'DFCG_3_chainlink_on_mainnet_feeds',
     null,
     async () => getCLFeedsOnMainnet(rawDataFeeds),
+    DFCGArtifacts,
   );
 
-  const feedConfig = await getOrCreateArtifact(
+  const feedConfig = await createArtifact(
     'DFCG_4_feeds_config_new',
     NewFeedsConfigSchema,
     () => generateFeedConfig(rawDataFeeds, artifacts),
+    DFCGArtifacts,
   );
 
-  const feedRegistryEvents = await getOrCreateArtifact(
+  const feedRegistryEvents = await createArtifact(
     'DFCG_5_feed_registry_events',
     FeedRegistryEventsPerAggregatorSchema,
     () => getAllProposedFeedsInRegistry('ethereum-mainnet'),
+    DFCGArtifacts,
   );
 
-  const chainlinkCompatConfig = await getOrCreateArtifact(
+  const chainlinkCompatConfig = await createArtifact(
     'DFCG_6_chainlink_compatibility_new',
     ChainlinkCompatibilityConfigSchema,
     () =>
@@ -123,8 +119,10 @@ async function main() {
         feedConfig,
         feedRegistryEvents,
       ),
+    DFCGArtifacts,
   );
 
+  await saveArtifacts(...DFCGArtifacts);
   await saveConfigs(
     { name: 'feeds_config_new', content: feedConfig },
     { name: 'chainlink_compatibility_new', content: chainlinkCompatConfig },
