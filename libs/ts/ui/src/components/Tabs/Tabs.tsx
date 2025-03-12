@@ -3,7 +3,7 @@
 import React from 'react';
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 type TabsContextType = {
   activeTab: string;

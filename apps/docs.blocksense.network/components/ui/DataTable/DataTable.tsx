@@ -26,7 +26,7 @@ import {
 } from '@/components/common/Table';
 import { DataTablePagination } from '@/components/ui/DataTable/DataTablePagination';
 import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar';
-import { cn } from '@/lib/utils';
+import { cn } from '@blocksense/ui/utils';
 import { onLinkClick } from '@/src/utils';
 
 export type OptionType = {

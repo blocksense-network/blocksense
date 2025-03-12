@@ -2,7 +2,7 @@
 
 import React, { ReactNode, LabelHTMLAttributes } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 type LabelProps = {
   className?: string;

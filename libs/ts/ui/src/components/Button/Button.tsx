@@ -3,7 +3,7 @@
 import React from 'react';
 import { FocusEventHandler, MouseEventHandler, ReactNode } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 type Variant =
   | 'action'

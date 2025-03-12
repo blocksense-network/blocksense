@@ -13,7 +13,7 @@ import React, {
   ButtonHTMLAttributes,
 } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 import { Icon } from '@blocksense/ui/Icon';
 import { Button } from '@blocksense/ui/Button';
 

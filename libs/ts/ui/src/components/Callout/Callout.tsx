@@ -2,7 +2,7 @@
 
 import React, { ReactNode, ReactElement } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 const typeToEmoji = {
   default: 'ℹ️',

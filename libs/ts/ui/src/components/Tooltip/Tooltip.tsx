@@ -5,7 +5,7 @@ import React, {
   isValidElement,
 } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 type TooltipProps = {
   position?: 'top' | 'right' | 'bottom' | 'left';

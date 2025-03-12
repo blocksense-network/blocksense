@@ -12,7 +12,7 @@ import React, {
 } from 'react';
 
 import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 type AccordionContextType = {
   openItems: string[];

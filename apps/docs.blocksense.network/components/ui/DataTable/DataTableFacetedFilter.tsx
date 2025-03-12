@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { Column } from '@tanstack/react-table';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@blocksense/ui/utils';
 import { Button } from '@blocksense/ui/Button';
 import {
   Command,

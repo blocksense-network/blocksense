@@ -2,7 +2,7 @@
 
 import React, { ButtonHTMLAttributes } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 type SwitchProps = {
   checked?: boolean;

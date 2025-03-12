@@ -8,7 +8,7 @@ import React, {
   ReactNode,
 } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 type ScrollAreaContextType = {
   scrollPosition: number;

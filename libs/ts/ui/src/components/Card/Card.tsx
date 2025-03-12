@@ -3,7 +3,7 @@
 import React from 'react';
 import { HTMLAttributes } from 'react';
 
-import { cn } from '../../utils';
+import { cn } from '@blocksense/ui/utils';
 
 type Variant = 'default' | 'bordered' | 'shadow' | 'transparent';
 type Size = 'sm' | 'md' | 'lg';
