@@ -65,7 +65,7 @@ task('deploy', 'Deploy contracts')
 
     const { decodeJSON } = selectDirectory(configDir);
     const { feeds } = await decodeJSON(
-      { name: 'feeds_config_new' },
+      { name: 'feeds_config_v2' },
       NewFeedsConfigSchema,
     );
     const chainlinkCompatibility = await decodeJSON(

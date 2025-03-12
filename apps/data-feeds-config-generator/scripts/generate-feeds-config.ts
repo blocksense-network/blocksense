@@ -97,7 +97,7 @@ async function main() {
   );
 
   const feedConfig = await createArtifact(
-    'DFCG_4_feeds_config_new',
+    'DFCG_4_feeds_config_v2',
     NewFeedsConfigSchema,
     () => generateFeedConfig(rawDataFeeds, artifacts),
     DFCGArtifacts,
@@ -124,7 +124,7 @@ async function main() {
 
   await saveArtifacts(...DFCGArtifacts);
   await saveConfigs(
-    { name: 'feeds_config_new', content: feedConfig },
+    { name: 'feeds_config_v2', content: feedConfig },
     { name: 'chainlink_compatibility_new', content: chainlinkCompatConfig },
   );
 }
