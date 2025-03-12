@@ -71,9 +71,8 @@ task('deploy', 'Deploy contracts')
     );
 
     const dataFeedConfig = feeds.map(feed => {
-      const { base, quote } =
-        chainlinkCompatibility.blocksenseFeedsCompatibility[feed.id]
-          .chainlink_compatibility;
+      const base = null;
+      const quote = null;
       return {
         id: feed.id,
         description: feed.description,
@@ -106,7 +105,7 @@ task('deploy', 'Deploy contracts')
       // this address starts with '0xADF5...' for local deployment
       // should be recalculated when admin address and/or owners (therefore adminMultisig address) changes
       const proxySalt =
-        '0x209fdf6800d7d02ac1cc47ea0409e3064b940123694168d0c33238324bb086e1';
+        '0xd3f822a677d82e2f60835df3b0998fc3c540e72cf0066fad8613f529820ab705';
       const safeGuardSalt = ethers.id('onlySafeGuard');
 
       const accessControlAddress = await predictAddress(
