@@ -23,7 +23,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/common/Table';
 import { DataTablePagination } from '@/components/ui/DataTable/DataTablePagination';
 import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar';
 import { cn } from '@/lib/utils';
@@ -136,60 +136,50 @@ export function DataTable<TData, TValue>({
           invisibleColumns={invisibleColumns}
         />
       )}
-      <div className="rounded-md border border-solid border-neutral-200 dark:border-neutral-600">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <TableHead key={header.id} className="pl-2">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map(headerGroup => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map(header => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map(row => (
+              <TableRow
+                key={row.id}
+                onClick={e => onLinkClick(e, router, getRowLink(row))}
+                onAuxClick={e => onLinkClick(e, router, getRowLink(row), true)}
+                className={cn(rowLink && 'cursor-pointer')}
+              >
+                {row.getVisibleCells().map(cell => (
+                  <TableCell key={cell.id} className="px-2 py-2.5">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map(row => (
-                <TableRow
-                  key={row.id}
-                  onClick={e => onLinkClick(e, router, getRowLink(row))}
-                  onAuxClick={e =>
-                    onLinkClick(e, router, getRowLink(row), true)
-                  }
-                  className={cn(rowLink && 'cursor-pointer')}
-                >
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id} className="px-2 py-2.5">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
       <DataTablePagination table={table} />
     </div>
   );

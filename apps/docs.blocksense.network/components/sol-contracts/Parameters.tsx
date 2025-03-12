@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/common/Table';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 
 type Column =
