@@ -69,7 +69,7 @@ task('deploy', 'Deploy contracts')
       NewFeedsConfigSchema,
     );
     const chainlinkCompatibility = await decodeJSON(
-      { name: 'chainlink_compatibility_new' },
+      { name: 'chainlink_compatibility_v2' },
       ChainlinkCompatibilityConfigSchema,
     );
 

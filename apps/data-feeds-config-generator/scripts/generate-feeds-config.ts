@@ -111,7 +111,7 @@ async function main() {
   );
 
   const chainlinkCompatConfig = await createArtifact(
-    'DFCG_6_chainlink_compatibility_new',
+    'DFCG_6_chainlink_compatibility_v2',
     ChainlinkCompatibilityConfigSchema,
     () =>
       generateChainlinkCompatibilityConfig(
@@ -125,7 +125,7 @@ async function main() {
   await saveArtifacts(...DFCGArtifacts);
   await saveConfigs(
     { name: 'feeds_config_v2', content: feedConfig },
-    { name: 'chainlink_compatibility_new', content: chainlinkCompatConfig },
+    { name: 'chainlink_compatibility_v2', content: chainlinkCompatConfig },
   );
 }
 
