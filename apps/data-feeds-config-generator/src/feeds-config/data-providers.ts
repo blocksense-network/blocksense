@@ -37,12 +37,6 @@ export async function addDataProviders(
     }),
   );
 
-  // Write data to JSON file
-  await saveToFile(
-    dataFeedsWithCryptoResources,
-    'dataFeedsWithCryptoResources',
-  );
-
   return dataFeedsWithCryptoResources;
 }
 

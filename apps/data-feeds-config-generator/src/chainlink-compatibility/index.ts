@@ -82,14 +82,6 @@ async function getBlocksenseFeedsCompatibility(
     {} as BlocksenseFeedsCompatibility,
   );
 
-  {
-    const { writeJSON } = selectDirectory(artifactsDir);
-    await writeJSON({
-      content: { blocksenseFeedsCompatibility: blocksenseFeedsCompatibility },
-      name: 'blocksense_feeds_compatibility',
-    });
-  }
-
   return blocksenseFeedsCompatibility;
 }
 
@@ -118,16 +110,6 @@ async function getChainlinkAddressToBlocksenseId(
     },
     {} as ChainlinkAddressToBlocksenseId,
   );
-
-  {
-    const { writeJSON } = selectDirectory(artifactsDir);
-    await writeJSON({
-      content: {
-        chainlinkAddressToBlocksenseId: chainlinkAddressToBlocksenseId,
-      },
-      name: 'chainlink_address_to_blocksense_id',
-    });
-  }
 
   return chainlinkAddressToBlocksenseId;
 }

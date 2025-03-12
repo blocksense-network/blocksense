@@ -77,45 +77,45 @@ async function main() {
   }
 
   const rawDataFeeds = await getOrCreateArtifact(
-    'raw_chainlink_feeds',
+    'DFCG_0_raw_chainlink_feeds',
     RawDataFeedsSchema,
     () => collectRawDataFeeds(artifacts.clArtifacts),
   );
 
   const aggregatedDataFeeds = await getOrCreateArtifact(
-    'aggregated_chainlink_feeds',
+    'DFCG_1_aggregated_chainlink_feeds',
     null,
     async () => aggregateNetworkInfoPerField(rawDataFeeds),
   );
 
   // Representation of all the Chainlink data feeds in our feed config format.
   const allPossibleCLDataFeeds = await getOrCreateArtifact(
-    'step_1_chainlink_all_possible_feeds',
+    'DFCG_2_chainlink_all_possible_feeds',
     null,
     async () => getAllPossibleCLFeeds(aggregatedDataFeeds),
   );
 
   // Representation of all the Chainlink data feeds on mainnets in our feed config format.
   const onMainnetCLDataFeeds = await getOrCreateArtifact(
-    'step_2_chainlink_on_mainnet_feeds',
+    'DFCG_3_chainlink_on_mainnet_feeds',
     null,
     async () => getCLFeedsOnMainnet(rawDataFeeds),
   );
 
   const feedConfig = await getOrCreateArtifact(
-    'feeds_config_new',
+    'DFCG_4_feeds_config_new',
     NewFeedsConfigSchema,
     () => generateFeedConfig(rawDataFeeds, artifacts),
   );
 
   const feedRegistryEvents = await getOrCreateArtifact(
-    'feed_registry_events',
+    'DFCG_5_feed_registry_events',
     FeedRegistryEventsPerAggregatorSchema,
     () => getAllProposedFeedsInRegistry('ethereum-mainnet'),
   );
 
   const chainlinkCompatConfig = await getOrCreateArtifact(
-    'chainlink_compatibility_new',
+    'DFCG_6_chainlink_compatibility_new',
     ChainlinkCompatibilityConfigSchema,
     () =>
       generateChainlinkCompatibilityConfig(
