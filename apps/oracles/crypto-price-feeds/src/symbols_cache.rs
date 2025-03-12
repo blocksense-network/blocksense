@@ -8,7 +8,7 @@ use itertools::Itertools;
 
 use crate::{
     common::{ExchangesSymbols, ResourceData, TradingPairSymbol},
-    exchanges::{gemini::get_gemini_symbols, upbit::get_upbit_market},
+    exchanges::gemini::get_gemini_symbols,
 };
 
 const SYMBOLS_KEY: &str = "symbols";
@@ -22,10 +22,10 @@ pub struct SymbolsData {
 }
 
 impl SymbolsData {
-    pub async fn from_resources(_exchanges_symbols: &ExchangesSymbols) -> Result<Self> {
+    pub async fn from_resources(exchanges_symbols: &ExchangesSymbols) -> Result<Self> {
         Ok(Self {
             gemini: get_gemini_symbols().await?,
-            upbit: get_upbit_market().await?,
+            upbit: exchanges_symbols.get("Upbit").cloned().unwrap_or_default(),
         })
     }
 

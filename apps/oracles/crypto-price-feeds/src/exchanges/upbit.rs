@@ -10,13 +10,6 @@ use crate::{
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct UpBitMarketResponseData {
-    pub market: String,
-}
-
-type UpBitMarketResponse = Vec<UpBitMarketResponseData>;
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct UpBitTickerResponseData {
     pub market: String,
     pub trade_price: f64,
@@ -62,11 +55,4 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
         }
         .boxed_local()
     }
-}
-
-pub async fn get_upbit_market() -> Result<Vec<String>> {
-    let response =
-        http_get_json::<UpBitMarketResponse>("https://api.upbit.com/v1/market/all", None).await?;
-
-    Ok(response.into_iter().map(|market| market.market).collect())
 }
