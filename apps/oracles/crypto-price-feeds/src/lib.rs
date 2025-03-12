@@ -11,7 +11,7 @@ use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
-use common::ExchangeName;
+use common::{ExchangeName, ExchangesSymbols};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt::Write};
 
@@ -40,9 +40,9 @@ struct Data {
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("Starting oracle component");
 
-    let resources = get_resources_from_settings(&settings)?;
+    let (resources, exchanges_symbols) = get_resources_from_settings(&settings)?;
 
-    let results = fetch_all_prices(&resources).await?;
+    let results = fetch_all_prices(&resources, &exchanges_symbols).await?;
     print_results(&resources, &results);
 
     let payload = process_results(results)?;
@@ -71,12 +71,24 @@ fn process_results(results: TradingPairToResults) -> Result<Payload> {
     Ok(payload)
 }
 
-fn get_resources_from_settings(settings: &Settings) -> Result<Vec<ResourceData>> {
+fn get_resources_from_settings(
+    settings: &Settings,
+) -> Result<(Vec<ResourceData>, ExchangesSymbols)> {
     let mut price_feeds = Vec::new();
+    let mut exchanges_symbols: ExchangesSymbols = HashMap::new();
 
     for feed_setting in &settings.data_feeds {
         let feed_config =
             serde_json::from_str::<Data>(&feed_setting.data).context("Couldn't parse data feed")?;
+
+        if let Some(exchanges) = feed_config.arguments.exchanges {
+            for (exchange, symbols) in exchanges {
+                exchanges_symbols
+                    .entry(exchange)
+                    .or_insert_with(Vec::new)
+                    .extend(symbols.values().cloned().flatten());
+            }
+        }
 
         price_feeds.push(ResourceData {
             pair: feed_config.pair,
@@ -84,7 +96,7 @@ fn get_resources_from_settings(settings: &Settings) -> Result<Vec<ResourceData>>
         });
     }
 
-    Ok(price_feeds)
+    Ok((price_feeds, exchanges_symbols))
 }
 
 fn print_results(resources: &[ResourceData], results: &TradingPairToResults) {

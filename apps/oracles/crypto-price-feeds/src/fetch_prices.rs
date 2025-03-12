@@ -6,7 +6,9 @@ use std::time::Instant;
 use futures::stream::{FuturesUnordered, StreamExt};
 
 use crate::{
-    common::{ExchangePriceData, PairPriceData, ResourceData, TradingPairToResults},
+    common::{
+        ExchangePriceData, ExchangesSymbols, PairPriceData, ResourceData, TradingPairToResults,
+    },
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
         bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
@@ -21,8 +23,11 @@ use crate::{
 
 use futures::future::LocalBoxFuture;
 
-pub async fn fetch_all_prices(resources: &[ResourceData]) -> Result<TradingPairToResults> {
-    let symbols = load_exchange_symbols(resources).await?;
+pub async fn fetch_all_prices(
+    resources: &[ResourceData],
+    exchanges_data: &ExchangesSymbols,
+) -> Result<TradingPairToResults> {
+    let symbols = load_exchange_symbols(resources, exchanges_data).await?;
 
     let mut futures_set = FuturesUnordered::from_iter([
         fetch::<BinancePriceFetcher>(&[]),

@@ -7,7 +7,7 @@ use blocksense_sdk::spin::key_value::Store;
 use itertools::Itertools;
 
 use crate::{
-    common::{ResourceData, TradingPairSymbol},
+    common::{ExchangesSymbols, ResourceData, TradingPairSymbol},
     exchanges::{gemini::get_gemini_symbols, upbit::get_upbit_market},
 };
 
@@ -22,9 +22,7 @@ pub struct SymbolsData {
 }
 
 impl SymbolsData {
-    // NOTE: Passing resources in case we want to get the intersection of the symbols we want and
-    // symbols the exchange supports
-    pub async fn from_resources(_resources: &[ResourceData]) -> Result<Self> {
+    pub async fn from_resources(_exchanges_symbols: &ExchangesSymbols) -> Result<Self> {
         Ok(Self {
             gemini: get_gemini_symbols().await?,
             upbit: get_upbit_market().await?,
@@ -78,7 +76,10 @@ fn get_stored_resources_hash(store: &Store) -> Result<u64> {
     Ok(u64::from_be_bytes(stored_hash_bytes))
 }
 
-pub async fn load_exchange_symbols(resources: &[ResourceData]) -> Result<SymbolsData> {
+pub async fn load_exchange_symbols(
+    resources: &[ResourceData],
+    exchanges_symbols: &ExchangesSymbols,
+) -> Result<SymbolsData> {
     let mut store = Store::open_default()?;
 
     let computed_resources_hash = compute_resources_hash(resources);
@@ -91,15 +92,13 @@ pub async fn load_exchange_symbols(resources: &[ResourceData]) -> Result<Symbols
         match SymbolsData::load(&store) {
             Ok(symbols) => symbols,
             Err(_) => {
-                // The symbols schema has been altered, recreate and store them again
-                let symbols = SymbolsData::from_resources(resources).await?;
+                let symbols = SymbolsData::from_resources(exchanges_symbols).await?;
                 symbols.store(&mut store)?;
                 symbols
             }
         }
     } else {
-        // The cached symbols may be outdated as the resources have changed
-        let symbols = SymbolsData::from_resources(resources).await?;
+        let symbols = SymbolsData::from_resources(exchanges_symbols).await?;
         symbols.store(&mut store)?;
         store_resources_hash(&mut store, computed_resources_hash)?;
         symbols

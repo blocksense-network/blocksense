@@ -22,6 +22,8 @@ pub struct PricePoint {
 pub type ExchangePricePoints = HashMap<ExchangeName, PricePoint>;
 pub type PairPriceData = HashMap<TradingPairSymbol, PricePoint>;
 
+pub type ExchangesSymbols = HashMap<ExchangeName, Vec<String>>;
+
 #[derive(Clone, Debug)]
 pub struct ExchangePriceData {
     pub name: ExchangeName,
