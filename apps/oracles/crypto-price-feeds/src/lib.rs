@@ -11,8 +11,9 @@ use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
+use common::ExchangeName;
 use serde::{Deserialize, Serialize};
-use std::fmt::Write;
+use std::{collections::HashMap, fmt::Write};
 
 use crate::common::{ResourceData, TradingPair, TradingPairToResults};
 use fetch_prices::fetch_all_prices;
@@ -22,9 +23,17 @@ use fetch_prices::fetch_all_prices;
 //2. Move URLS to constants
 //3. Try to minimize object cloning.
 
-#[derive(Serialize, Deserialize)]
+type ExchangeData = HashMap<ExchangeName, HashMap<String, Vec<String>>>;
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ExchangesData {
+    exchanges: Option<ExchangeData>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 struct Data {
     pub pair: TradingPair,
+    pub arguments: ExchangesData,
 }
 
 #[oracle_component]
