@@ -1,0 +1,1116 @@
+{
+  "feeds": [
+    {
+      "id": 0,
+      "full_name": "BTC / USD",
+      "description": "Bitcoin",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BTC",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "BTCUSDC",
+                "BTCUSDT"
+              ]
+            },
+            "BinanceTR": {
+              "symbol": [
+                "BTC_USDT"
+              ]
+            },
+            "BinanceUS": {
+              "symbol": [
+                "BTCUSDC",
+                "BTCUSDT"
+              ]
+            },
+            "Bitfinex": {
+              "symbol": [
+                "BTCUSD"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "BTCUSDC_SPBL",
+                "BTCUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "BTCUSDC",
+                "BTCUSDT"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "BTC-USD",
+                "BTC-USDC",
+                "BTC-USDT"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "BTCUSD-250328",
+                "BTCUSD-250425",
+                "BTCUSD-250530",
+                "BTCUSD-250627",
+                "BTCUSD-PERP",
+                "BTC_USD",
+                "BTC_USDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "BTC_USDC",
+                "BTC_USDT"
+              ]
+            },
+            "Gemini": {
+              "symbol": [
+                "BTCUSD",
+                "BTCUSDT"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "BTC-USDC",
+                "BTC-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "BTCUSDC",
+                "BTCUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "BTC-USD",
+                "BTC-USDC",
+                "BTC-USDT"
+              ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-BTC"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "BTC",
+                "BTC",
+                "BTC",
+                "BTC",
+                "BTC"
+              ],
+              "id": [
+                1,
+                31469,
+                31652,
+                32295,
+                34316
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "BTC / USD"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "full_name": "ETH / USD",
+      "description": "Ethereum",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ETH",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "ETHUSDC",
+                "ETHUSDT"
+              ]
+            },
+            "BinanceTR": {
+              "symbol": [
+                "ETH_USDT"
+              ]
+            },
+            "BinanceUS": {
+              "symbol": [
+                "ETHUSDC",
+                "ETHUSDT"
+              ]
+            },
+            "Bitfinex": {
+              "symbol": [
+                "ETHUSD"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "ETHUSDC_SPBL",
+                "ETHUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "ETHUSDC",
+                "ETHUSDT"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "ETH-USD",
+                "ETH-USDC",
+                "ETH-USDT"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "ETHUSD-250328",
+                "ETHUSD-250425",
+                "ETHUSD-250530",
+                "ETHUSD-250627",
+                "ETHUSD-PERP",
+                "ETH_USD",
+                "ETH_USDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "ETH_USDC",
+                "ETH_USDT"
+              ]
+            },
+            "Gemini": {
+              "symbol": [
+                "ETHUSD",
+                "ETHUSDT"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "ETHUSDC",
+                "ETHUSDT",
+                "XETHZUSD"
+              ],
+              "wsname": [
+                "ETH/USD",
+                "ETH/USDC",
+                "ETH/USDT"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "ETH-USDC",
+                "ETH-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "ETHUSDC",
+                "ETHUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "ETH-USD",
+                "ETH-USDC",
+                "ETH-USDT"
+              ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-ETH"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "ETH",
+                "ETH",
+                "ETH"
+              ],
+              "id": [
+                1027,
+                29991,
+                33661
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "ETH / USD"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "full_name": "BNB / USD",
+      "description": "BNB",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BNB",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "BNBUSDC",
+                "BNBUSDT"
+              ]
+            },
+            "BinanceTR": {
+              "symbol": [
+                "BNB_USDT"
+              ]
+            },
+            "BinanceUS": {
+              "symbol": [
+                "BNBUSDT"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "BNBUSDC_SPBL",
+                "BNBUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "BNBUSDC",
+                "BNBUSDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "BNB_USDC",
+                "BNB_USDT"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "BNB-USDC",
+                "BNB-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "BNBUSDC",
+                "BNBUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "BNB-USDC",
+                "BNB-USDT"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "BNB"
+              ],
+              "id": [
+                1839
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "BNB / USD"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "full_name": "SOL / USD",
+      "description": "Solana",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SOL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "SOLUSDC",
+                "SOLUSDT"
+              ]
+            },
+            "BinanceTR": {
+              "symbol": [
+                "SOL_USDT"
+              ]
+            },
+            "BinanceUS": {
+              "symbol": [
+                "SOLUSDC",
+                "SOLUSDT"
+              ]
+            },
+            "Bitfinex": {
+              "symbol": [
+                "SOLUSD"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "SOLUSDC_SPBL",
+                "SOLUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "SOLUSDC",
+                "SOLUSDT"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "SOL-USD",
+                "SOL-USDT"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "SOLUSD-PERP",
+                "SOL_USD",
+                "SOL_USDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "SOL_USDC",
+                "SOL_USDT"
+              ]
+            },
+            "Gemini": {
+              "symbol": [
+                "SOLUSD"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "SOLUSD",
+                "SOLUSDC",
+                "SOLUSDT"
+              ],
+              "wsname": [
+                "SOL/USD",
+                "SOL/USDC",
+                "SOL/USDT"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "SOL-USDC",
+                "SOL-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "SOLUSDC",
+                "SOLUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "SOL-USD",
+                "SOL-USDC",
+                "SOL-USDT"
+              ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-SOL"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "SOL",
+                "SOL",
+                "SOL"
+              ],
+              "id": [
+                16116,
+                28825,
+                5426
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "SOL / USD"
+        }
+      }
+    },
+    {
+      "id": 35,
+      "full_name": "LINK / USD",
+      "description": "Chainlink",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LINK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "LINKUSDC",
+                "LINKUSDT"
+              ]
+            },
+            "BinanceTR": {
+              "symbol": [
+                "LINK_USDT"
+              ]
+            },
+            "BinanceUS": {
+              "symbol": [
+                "LINKUSDT"
+              ]
+            },
+            "Bitfinex": {
+              "symbol": [
+                "LINK:USD"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "LINKUSDC_SPBL",
+                "LINKUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "LINKUSDC",
+                "LINKUSDT"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "LINK-USD",
+                "LINK-USDT"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "LINKUSD-PERP",
+                "LINK_USD",
+                "LINK_USDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "LINK_USDC",
+                "LINK_USDT"
+              ]
+            },
+            "Gemini": {
+              "symbol": [
+                "LINKUSD"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "LINKUSD",
+                "LINKUSDC",
+                "LINKUSDT"
+              ],
+              "wsname": [
+                "LINK/USD",
+                "LINK/USDC",
+                "LINK/USDT"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "LINK-USDC",
+                "LINK-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "LINKUSDC",
+                "LINKUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "LINK-USD",
+                "LINK-USDC",
+                "LINK-USDT"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "LINK"
+              ],
+              "id": [
+                1975
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "LINK / USD"
+        }
+      }
+    },
+    {
+      "id": 91,
+      "full_name": "UNI / USD",
+      "description": "Uniswap",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UNI",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "UNIUSDC",
+                "UNIUSDT"
+              ]
+            },
+            "BinanceUS": {
+              "symbol": [
+                "UNIUSDT"
+              ]
+            },
+            "Bitfinex": {
+              "symbol": [
+                "UNIUSD"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "UNIUSDC_SPBL",
+                "UNIUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "UNIUSDC",
+                "UNIUSDT"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "UNI-USD"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "UNIUSD-PERP",
+                "UNI_USD",
+                "UNI_USDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "UNI_USDC",
+                "UNI_USDT"
+              ]
+            },
+            "Gemini": {
+              "symbol": [
+                "UNIUSD"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "UNIUSD"
+              ],
+              "wsname": [
+                "UNI/USD"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "UNI-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "UNIUSDC",
+                "UNIUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "UNI-USD",
+                "UNI-USDC",
+                "UNI-USDT"
+              ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-UNI"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "UNI",
+                "UNI",
+                "UNI"
+              ],
+              "id": [
+                33433,
+                4307,
+                7083
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "UNI / USD"
+        }
+      }
+    },
+    {
+      "id": 114,
+      "full_name": "AAVE / USD",
+      "description": "Aave",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "AAVE",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "AAVEUSDC",
+                "AAVEUSDT"
+              ]
+            },
+            "BinanceUS": {
+              "symbol": [
+                "AAVEUSDT"
+              ]
+            },
+            "Bitfinex": {
+              "symbol": [
+                "AAVE:USD"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "AAVEUSDC_SPBL",
+                "AAVEUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "AAVEUSDT"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "AAVE-USD"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "AAVEUSD-PERP",
+                "AAVE_USD",
+                "AAVE_USDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "AAVE_USDT"
+              ]
+            },
+            "Gemini": {
+              "symbol": [
+                "AAVEUSD"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "AAVEUSD"
+              ],
+              "wsname": [
+                "AAVE/USD"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "AAVE-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "AAVEUSDC",
+                "AAVEUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "AAVE-USD",
+                "AAVE-USDC",
+                "AAVE-USDT"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "AAVE"
+              ],
+              "id": [
+                7278
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "AAVE / USD"
+        }
+      }
+    },
+    {
+      "id": 121,
+      "full_name": "TAO / USD",
+      "description": "Bittensor",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TAO",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "TAOUSDC",
+                "TAOUSDT"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "TAOUSDC_SPBL",
+                "TAOUSDT_SPBL"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "TAO-USD"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "TAOUSD-PERP",
+                "TAO_USD"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "TAO_USDT"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "TAOUSD"
+              ],
+              "wsname": [
+                "TAO/USD"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "TAO-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "TAOUSDC",
+                "TAOUSDT"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "TAO"
+              ],
+              "id": [
+                22974
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "TAO/USD-RefPrice-DS-Premium-Global-003"
+        }
+      }
+    },
+    {
+      "id": 347,
+      "full_name": "1INCH / USD",
+      "description": "1inch",
+      "type": "price-feed",
+      "oracle_id": "crypto-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "1INCH",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "1INCHUSDT"
+              ]
+            },
+            "BinanceUS": {
+              "symbol": [
+                "1INCHUSDT"
+              ]
+            },
+            "Bitget": {
+              "symbol": [
+                "1INCHUSDT_SPBL"
+              ]
+            },
+            "Bybit": {
+              "symbol": [
+                "1INCHUSDT"
+              ]
+            },
+            "Coinbase": {
+              "id": [
+                "1INCH-USD"
+              ]
+            },
+            "CryptoCom": {
+              "instrument_name": [
+                "1INCHUSD-PERP",
+                "1INCH_USD",
+                "1INCH_USDT"
+              ]
+            },
+            "GateIo": {
+              "id": [
+                "1INCH_USDT"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "1INCHUSD"
+              ],
+              "wsname": [
+                "1INCH/USD"
+              ]
+            },
+            "KuCoin": {
+              "symbol": [
+                "1INCH-USDT"
+              ]
+            },
+            "MEXC": {
+              "symbol": [
+                "1INCHUSDT"
+              ]
+            },
+            "OKX": {
+              "instId": [
+                "1INCH-USDC",
+                "1INCH-USDT"
+              ]
+            }
+          },
+          "aggregators": {
+            "CoinMarketCap": {
+              "symbol": [
+                "1INCH"
+              ],
+              "id": [
+                8104
+              ]
+            }
+          }
+        },
+        "compatibility_info": {
+          "chainlink": "1INCH / USD"
+        }
+      }
+    }
+  ]
+}
