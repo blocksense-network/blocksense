@@ -32,8 +32,8 @@
       "import": "./config/feeds_config_v1.json"
     },
     "./chainlink_compatibility": {
-      "require": "./config/chainlink_compatibility.json",
-      "import": "./config/chainlink_compatibility.json"
+      "require": "./config/chainlink_compatibility_v1.json",
+      "import": "./config/chainlink_compatibility_v1.json"
     },
     "./evm_contracts_deployment_v1": {
       "require": "./config/evm_contracts_deployment_v1.json",
