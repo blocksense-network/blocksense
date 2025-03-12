@@ -22,20 +22,30 @@ pub struct BinanceUsPriceData {
 
 type BinanceUsPriceResponse = Vec<BinanceUsPriceData>;
 
-pub struct BinanceUsPriceFetcher;
+pub struct BinanceUsPriceFetcher<'a> {
+    pub symbols: &'a [String],
+}
 
-impl PricesFetcher<'_> for BinanceUsPriceFetcher {
+impl<'a> PricesFetcher<'a> for BinanceUsPriceFetcher<'a> {
     const NAME: &'static str = "Binance US";
 
-    fn new(_symbols: &[String]) -> Self {
-        Self
+    fn new(symbols: &'a [String]) -> Self {
+        Self { symbols }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
+            let all_symbols = self
+                .symbols
+                .iter()
+                .map(|s| format!("\"{}\"", s))
+                .collect::<Vec<_>>()
+                .join(",");
+            let req_symbols = format!("[{}]", all_symbols);
+
             let response = http_get_json::<BinanceUsPriceResponse>(
                 "https://api.binance.us/api/v3/ticker/24hr",
-                None,
+                Some(&[("symbols", req_symbols.as_str())]),
             )
             .await?;
 
