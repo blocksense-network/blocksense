@@ -45,7 +45,7 @@ let
 
   reportersV2ConfigJSON = builtins.mapAttrs (
     name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
-  ) cfg.reporters;
+  ) cfg.reporters-v2;
 
   anvilInstances = lib.mapAttrs' (
     name:
