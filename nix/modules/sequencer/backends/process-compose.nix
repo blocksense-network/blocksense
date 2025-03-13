@@ -100,21 +100,37 @@ let
     };
   }) cfg.reporters;
 
+  installOracleScripts =
+    dir:
+    lib.pipe self'.legacyPackages.oracle-scripts [
+      builtins.attrValues
+      (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
+      (files: "cp -vf ${files} ${dir}")
+    ];
+
   reporterV2Instances = lib.mapAttrs' (
     name:
     { log-level, ... }:
     {
       name = "blocksense-reporter-v2-${name}";
-      value.process-compose = {
-        command = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
-        environment = [ "RUST_LOG=${log-level}" ];
-        depends_on = {
-          blocksense-sequencer.condition = "process_healthy";
+      value.process-compose =
+        let
+          working_dir = toString (/. + config.devenv.state + /blocksense/reporter/${name});
+        in
+        {
+          command = ''
+            mkdir -p "${working_dir}" &&
+            cd "${working_dir}" &&
+            ${installOracleScripts working_dir} &&
+            ${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up
+          '';
+          environment = [ "RUST_LOG=${log-level}" ];
+          depends_on = {
+            blocksense-sequencer.condition = "process_healthy";
+          };
+          log_configuration = logsConfig;
+          log_location = cfg.logsDir + "/reporter-v2-${name}.log";
         };
-        working_dir = cfg.oracle-scripts.base-dir;
-        log_configuration = logsConfig;
-        log_location = cfg.logsDir + "/reporter-v2-${name}.log";
-      };
     }
   ) cfg.reporters-v2;
 
