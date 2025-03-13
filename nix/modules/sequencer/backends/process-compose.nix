@@ -124,7 +124,7 @@ let
     name:
     { log-level, ... }:
     {
-      name = "reporter-v2-${name}";
+      name = "blocksense-reporter-v2-${name}";
       value.process-compose = {
         command = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
         environment = [ "RUST_LOG=${log-level}" ];
