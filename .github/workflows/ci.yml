@@ -126,9 +126,11 @@ jobs:
         include:
           - project: docs.blocksense.network
           # - project: explorer.blocksense.network
+          - project: ui.blocksense.network
     outputs:
       docsDeploymentMessage: ${{ steps.docs-ws-url.outputs.url }}
       # explorerDeploymentMessage: ${{ steps.explorer-ws-url.outputs.url }}
+      uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -151,30 +153,53 @@ jobs:
       - name: Install JS deps
         run: yarn install
 
-      - name: Build
-        run: yarn workspace @blocksense/docs.blocksense.network build:with-deps
+      - name: Build Docs Website
+        id: build-docs-blocksense-network
+        if: matrix.project == 'docs.blocksense.network'
+        run: |
+          yarn workspace @blocksense/docs.blocksense.network build:with-deps
 
-      - name: Test `@blocksense/base-utils`
-        run: yarn workspace @blocksense/base-utils test
+      - name: Build UI Website
+        id: build-ui-blocksense-network
+        if: matrix.project == 'ui.blocksense.network'
+        run: |
+          yarn workspace @blocksense/ui build-storybook
 
-      - name: Test
-        run: yarn workspace @blocksense/docs.blocksense.network test
-
-      - name: Deploy
-        id: Deploy
+      - name: Deploy Docs Website
+        id: deploy-docs-blocksense-network
         uses: cloudflare/wrangler-action@v3
+        if: matrix.project == 'docs.blocksense.network'
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/docs.blocksense.network/dist --project-name=blocksense
+          command: |
+            pages deploy apps/docs.blocksense.network/dist --project-name=blocksense
+
+      - name: Deploy UI Website
+        id: deploy-ui-blocksense-network
+        uses: cloudflare/wrangler-action@v3
+        if: matrix.project == 'ui.blocksense.network'
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: |
+            pages deploy libs/ts/ui/storybook-static --project-name=blocksense-ui
 
       - name: Collect Docs Deployment URL
         id: docs-ws-url
         if: matrix.project == 'docs.blocksense.network'
         env:
-          DOCS_DEPLOY_URL: ${{ steps.Deploy.outputs.deployment-url }}
+          DOCS_DEPLOY_URL: ${{ steps.deploy-docs-blocksense-network.outputs.deployment-url }}
         run: |
           echo "url=$DOCS_DEPLOY_URL" >> $GITHUB_OUTPUT
+
+      - name: Collect UI Deployment URL
+        id: ui-ws-url
+        if: matrix.project == 'ui.blocksense.network'
+        env:
+          UI_DEPLOY_URL: ${{ steps.deploy-ui-blocksense-network.outputs.deployment-url }}
+        run: |
+          echo "url=$UI_DEPLOY_URL" >> $GITHUB_OUTPUT
 
   comment_on_pr:
     needs: [deploy_websites]
@@ -197,3 +222,4 @@ jobs:
             | Website | Latest Update | Commit |
             |---------------------|----------|----------------------------------------------------------------------|
             | 🌱 [Documentation](${{ needs.deploy_websites.outputs.docsDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
+            | 📖 [UI Components](${{ needs.deploy_websites.outputs.uiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
