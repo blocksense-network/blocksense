@@ -475,7 +475,7 @@ pub async fn get_oracle_scripts(
                 description: None,
                 oracle_script_wasm: "cmc_oracle.wasm".to_string(),
                 allowed_outbound_hosts: vec!["https://pro-api.coinmarketcap.com".to_string()],
-                capabilities: HashSet::from_iter(vec!["CMC_API_KEY".to_string()]),
+                capabilities: HashSet::from_iter(["CMC_API_KEY".to_string()]),
             },
             OracleScript {
                 id: "yahoo".to_string(),
@@ -483,7 +483,7 @@ pub async fn get_oracle_scripts(
                 description: None,
                 oracle_script_wasm: "yahoo_oracle.wasm".to_string(),
                 allowed_outbound_hosts: vec!["https://yfapi.net:443".to_string()],
-                capabilities: HashSet::from_iter(vec!["YAHOO_API_KEY".to_string()]),
+                capabilities: HashSet::from_iter(["YAHOO_API_KEY".to_string()]),
             },
             OracleScript {
                 id: "exsat".to_string(),
@@ -495,7 +495,7 @@ pub async fn get_oracle_scripts(
                     "https://rpc-us.exsat.network".to_string(),
                     "https://blockchain.info".to_string(),
                 ],
-                capabilities: HashSet::from_iter(vec![]),
+                capabilities: HashSet::new(),
             },
             OracleScript {
                 id: "gecko_terminal".to_string(),
@@ -503,7 +503,7 @@ pub async fn get_oracle_scripts(
                 description: None,
                 oracle_script_wasm: "gecko_terminal_oracle.wasm".to_string(),
                 allowed_outbound_hosts: vec!["https://app.geckoterminal.com/".to_string()],
-                capabilities: HashSet::from_iter(vec![]),
+                capabilities: HashSet::new(),
             },
             OracleScript {
                 id: "crypto-price-feeds".to_string(),
@@ -527,7 +527,7 @@ pub async fn get_oracle_scripts(
                     "https://api.gateio.ws".to_string(),
                     "https://www.okx.com".to_string(),
                 ],
-                capabilities: HashSet::from_iter(vec![]),
+                capabilities: HashSet::new(),
             },
         ],
     };
