@@ -18,6 +18,7 @@
     "./Slider": "./src/components/Slider/index.tsx",
     "./Switch": "./src/components/Switch/index.tsx",
     "./Card": "./src/components/Card/index.tsx",
+    "./Command": "./src/components/Command/index.tsx",
     "./Callout": "./src/components/Callout/index.tsx",
     "./Accordion": "./src/components/Accordion/index.tsx",
     "./Icon": "./src/components/Icon/index.tsx",
@@ -30,6 +31,7 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.7",
     "clsx": "^2.1.1",
+    "cmdk": "1.0.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.0.7",
     "tailwindcss-animate": "^1.0.7"
