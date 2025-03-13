@@ -160,13 +160,35 @@ const fetchTransactionsForNetwork = async (
     console.log(chalk.green(network.toUpperCase()));
     console.log(chalk.blue(`Fetching transactions for ${network}...`));
     let response: AxiosResponse<any>;
-    let rawTransactions;
+    let rawTransactions: any[] = [];
     if (network === 'morph-holesky') {
       response = await axios.get(`${apiUrl}/addresses/${address}/transactions`);
       rawTransactions = response.data.items || [];
     } else if (network === 'telos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.results || [];
+    } else if (network === 'cronos-testnet') {
+      let currentPage = 1;
+      let totalPages = 1;
+      do {
+        const page = await axios.get(apiUrl, {
+          params: {
+            module: 'account',
+            action: 'txlist',
+            address,
+            startblock: 0,
+            endblock: 99999999,
+            sort: 'desc',
+            apikey,
+            limit: 100,
+            currentPage,
+          },
+        });
+        const txFromPage = page.data.result;
+        rawTransactions = rawTransactions.concat(txFromPage);
+        totalPages = page.data.pagination.totalPage;
+        currentPage += 1;
+      } while (currentPage <= totalPages);
     } else {
       response = await axios.get(apiUrl, {
         params: {
@@ -324,7 +346,17 @@ const main = async (): Promise<void> => {
       );
     if (transactions.length > 1) {
       const hoursBetweenFirstLastTx = getHourDifference(transactions);
-      const gasCosts = calculateGasCosts(hoursBetweenFirstLastTx, transactions);
+      let gasCosts;
+      try {
+        gasCosts = calculateGasCosts(hoursBetweenFirstLastTx, transactions);
+      } catch (error: any) {
+        console.error(
+          chalk.red(
+            `Error calculating gas costs for ${network}: ${error.message}`,
+          ),
+        );
+        continue;
+      }
       const rpcUrl = getOptionalRpcUrl(network);
       var balance: string;
 
@@ -336,10 +368,20 @@ const main = async (): Promise<void> => {
         );
         balance = '0';
       } else {
-        const web3 = new Web3(rpcUrl);
-        const balanceWei = await web3.eth.getBalance(address);
-        balance = web3.utils.fromWei(balanceWei, 'ether');
+        try {
+          const web3 = new Web3(rpcUrl);
+          const balanceWei = await web3.eth.getBalance(address);
+          balance = web3.utils.fromWei(balanceWei, 'ether');
+        } catch (error: any) {
+          console.error(
+            chalk.red(
+              `Error fetching balance for ${network}: ${error.message}`,
+            ),
+          );
+          balance = '0';
+        }
       }
+
       if (gasCosts) {
         await logGasCosts(
           network,
