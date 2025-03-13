@@ -3,7 +3,7 @@
 ## Overview
 
 ```text
-aztec_contracts
+aztec
 ├── contracts/
 │   ├── historical_data_feed/
 │   │   ├── src
@@ -90,7 +90,7 @@ To execute the tests you must have the following prerequisites:
 > Since the contracts are using version `0.55.1` of Aztec, if you encounter issues during compilation,
 > you may need to switch to that exact aztec version using `aztec-up 0.55.1` and then the compilation should be successful.
 
-5.  Go to the `libs/aztec_contracts/contracts/data_feed_store` directory and execute:
+5.  Go to the `libs/aztec/contracts/data_feed_store` directory and execute:
 
             aztec-nargo compile --silence-warnings
 
@@ -100,9 +100,9 @@ This will generate contracts ABI artifacts in the `target` folder.
 
         aztec codegen target -o src/artifacts
 
-7.  Repeat steps 6 and 7 for the other contract in the `libs/aztec_contracts/contracts/historic_data_feed` directory.
+7.  Repeat steps 6 and 7 for the other contract in the `libs/aztec/contracts/historic_data_feed` directory.
 
-8.  When you complete these steps, you can run the tests by returning to the root directory `aztec_contracts` and executing:
+8.  When you complete these steps, you can run the tests by returning to the root directory `aztec` and executing:
 
         yarn install
         yarn test
