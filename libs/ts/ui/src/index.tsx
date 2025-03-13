@@ -6,6 +6,7 @@ export * from './components/Badge';
 export * from './components/Label';
 export * from './components/ProgressBar';
 export * from './components/ScrollArea';
+export * from './components/Slider';
 export * from './components/Switch';
 export * from './components/Card';
 export * from './components/Callout';

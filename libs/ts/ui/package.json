@@ -15,6 +15,7 @@
     "./Label": "./src/components/Label/index.tsx",
     "./ProgressBar": "./src/components/ProgressBar/index.tsx",
     "./ScrollArea": "./src/components/ScrollArea/index.tsx",
+    "./Slider": "./src/components/Slider/index.tsx",
     "./Switch": "./src/components/Switch/index.tsx",
     "./Card": "./src/components/Card/index.tsx",
     "./Callout": "./src/components/Callout/index.tsx",
