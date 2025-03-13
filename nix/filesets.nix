@@ -10,15 +10,20 @@ with lib.fileset;
     fileset = unions [
       (root + "/Cargo.toml")
       (root + "/Cargo.lock")
+
       (fileFilter (
         file:
         builtins.any file.hasExt [
           "rs"
           "toml"
           "wit"
-          "json"
         ]
       ) root)
+
+      # JSON files
+      (root + "/apps/sequencer_tests/Safe.json")
+      (root + "/apps/sequencer_tests/SafeProxyFactory.json")
+      (root + "/libs/gnosis_safe/safe_abi.json")
     ];
     src = toSource { inherit root fileset; };
   };
