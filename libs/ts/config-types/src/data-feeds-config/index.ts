@@ -23,19 +23,6 @@ export const FeedCategorySchema = S.Union(
  */
 export type FeedCategory = S.Schema.Type<typeof FeedCategorySchema>;
 
-/**
- * Schema for the scripts that can be used to fetch data.
- */
-export const ScriptSchema = S.Union(
-  S.Literal('CoinMarketCap'),
-  S.Literal('YahooFinance'),
-  S.Literal('exsat'),
-).annotations({ identifier: 'ScriptName' });
-
-export type Script = S.Schema.Type<typeof ScriptSchema>;
-
-export const decodeScript = S.decodeUnknownSync(ScriptSchema);
-
 export const PairSchema = S.mutable(
   S.Struct({
     base: S.String,
@@ -88,7 +75,7 @@ export const FeedSchema = S.mutable(
     type: FeedCategorySchema,
     description: S.String,
     decimals: S.Number,
-    script: ScriptSchema,
+    script: S.String,
     pair: PairSchema,
     report_interval_ms: S.Number,
     first_report_start_time: FirstReportStartTimeSchema,
