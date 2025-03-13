@@ -7148,7 +7148,7 @@
       "stride": 0
     },
     {
-      "id": 606,
+      "id": 100000,
       "name": "ExSat BTC",
       "fullName": "Exsat network bitcoin wallet total holdings in satoshi",
       "description": "ExSat / sats",
@@ -7173,7 +7173,7 @@
       "stride": 0
     },
     {
-      "id": 607,
+      "id": 1000000,
       "name": "USDT / WMON 0.2%",
       "fullName": "WMON on monad-testnet pool with contract 0x8552706d9a27013f20ea0f9df8e20b61e283d2d3",
       "description": "WMON / USDT",
