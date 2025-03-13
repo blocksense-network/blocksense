@@ -1,6 +1,10 @@
 use anyhow::Result;
-use futures::{future::LocalBoxFuture, FutureExt};
-use std::collections::HashMap;
+use futures::{
+    future::LocalBoxFuture,
+    stream::{FuturesUnordered, StreamExt},
+    FutureExt,
+};
+use std::ops::Deref;
 
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
@@ -12,69 +16,55 @@ use crate::{
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct CoinbasePriceData {
-    pub currency: String,
-    pub rates: HashMap<String, String>,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct CoinbasePriceResponse {
-    pub data: CoinbasePriceData,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct CoinbaseVolumeData {
-    pub id: String,
     #[serde(deserialize_with = "as_f64")]
-    pub spot_volume_24hour: f64,
+    pub price: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub volume: f64,
 }
 
-pub struct CoinbasePriceFetcher;
+pub struct CoinbasePriceFetcher<'a> {
+    pub symbols: &'a [String],
+}
 
-impl PricesFetcher<'_> for CoinbasePriceFetcher {
+impl<'a> PricesFetcher<'a> for CoinbasePriceFetcher<'a> {
     const NAME: &'static str = "Coinbase";
 
-    fn new(_symbols: &[String]) -> Self {
-        Self
+    fn new(symbols: &'a [String]) -> Self {
+        Self { symbols }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let response = http_get_json::<CoinbasePriceResponse>(
-                "https://api.coinbase.com/v2/exchange-rates",
-                Some(&[("currency", "USD")]),
-            )
-            .await?;
+            let prices_futures = self
+                .symbols
+                .iter()
+                .map(Deref::deref)
+                .map(fetch_price_for_symbol);
 
-            // This request sometimes fails.
-            let volume_response = http_get_json::<Vec<CoinbaseVolumeData>>(
-                "https://api.exchange.coinbase.com/products/volume-summary",
-                None,
-            )
-            .await?;
+            let mut futures = FuturesUnordered::from_iter(prices_futures);
+            let mut prices = PairPriceData::new();
 
-            Ok(response
-                .data
-                .rates
-                .into_iter()
-                .filter_map(|(asset, price)| match price.parse::<f64>() {
-                    Ok(price_as_number) => {
-                        let id = format!("{}-{}", asset, "USD");
+            while let Some(result) = futures.next().await {
+                if let Ok((symbol, price_pint)) = result {
+                    prices.insert(symbol, price_pint);
+                }
+            }
 
-                        let volume = volume_response
-                            .iter()
-                            .find(|data| data.id == id)
-                            .map(|data| data.spot_volume_24hour)
-                            .unwrap_or(0.0);
-
-                        let price = 1.0 / price_as_number;
-                        let pair = format!("{}{}", asset, "USD");
-                        Some((pair, PricePoint { price, volume }))
-                    }
-                    Err(_) => None,
-                })
-                .collect())
+            Ok(prices)
         }
         .boxed_local()
     }
+}
+pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)> {
+    let url = format!("https://api.exchange.coinbase.com/products/{symbol}/ticker");
+    let response = http_get_json::<CoinbasePriceResponse>(&url, None).await?;
+
+    Ok((
+        symbol.to_string().replace("-", ""),
+        PricePoint {
+            price: response.price,
+            volume: response.volume,
+        },
+    ))
 }

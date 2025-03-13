@@ -30,6 +30,7 @@ pub struct SymbolsData {
     pub binance_us: Vec<TradingPairSymbol>,
     pub binance: Vec<TradingPairSymbol>,
     pub bitfinex: Vec<TradingPairSymbol>,
+    pub coinbase: Vec<TradingPairSymbol>,
     pub gemini: Vec<TradingPairSymbol>,
     pub upbit: Vec<TradingPairSymbol>,
 }
@@ -49,6 +50,10 @@ impl SymbolsData {
                 .get("Bitfinex")
                 .cloned()
                 .unwrap_or_default(),
+            coinbase: exchanges_symbols
+                .get("Coinbase")
+                .cloned()
+                .unwrap_or_default(),
             gemini: exchanges_symbols.get("Gemini").cloned().unwrap_or_default(),
             upbit: exchanges_symbols.get("Upbit").cloned().unwrap_or_default(),
         })
@@ -64,7 +69,7 @@ pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToR
         fetch::<BitfinexPriceFetcher>(&symbols.bitfinex),
         fetch::<BitgetPriceFetcher>(&[]),
         fetch::<BybitPriceFetcher>(&[]),
-        fetch::<CoinbasePriceFetcher>(&[]),
+        fetch::<CoinbasePriceFetcher>(&symbols.coinbase),
         fetch::<CryptoComPriceFetcher>(&[]),
         fetch::<GateIoPriceFetcher>(&[]),
         fetch::<GeminiPriceFetcher>(&symbols.gemini),
