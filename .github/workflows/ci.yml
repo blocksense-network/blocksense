@@ -119,17 +119,22 @@ jobs:
         run: cargo test
 
   deploy_websites:
+    name: Deploy ${{ matrix.project }} website
     timeout-minutes: 360
     runs-on: [self-hosted, nixos, x86-64-v3]
     strategy:
       matrix:
         include:
           - project: docs.blocksense.network
-          # - project: explorer.blocksense.network
+            path: apps/docs.blocksense.network/dist
+            project_name: blocksense
+            build_command: yarn workspace @blocksense/docs.blocksense.network build:with-deps
           - project: ui.blocksense.network
+            path: libs/ts/ui/storybook-static
+            project_name: blocksense-ui
+            build_command: yarn workspace @blocksense/ui build-storybook
     outputs:
       docsDeploymentMessage: ${{ steps.docs-ws-url.outputs.url }}
-      # explorerDeploymentMessage: ${{ steps.explorer-ws-url.outputs.url }}
       uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
@@ -153,43 +158,25 @@ jobs:
       - name: Install JS deps
         run: yarn install
 
-      - name: Build Docs Website
-        id: build-docs-blocksense-network
-        if: matrix.project == 'docs.blocksense.network'
-        run: |
-          yarn workspace @blocksense/docs.blocksense.network build:with-deps
+      - name: Build
+        id: build
+        run: ${{ matrix.build_command }}
 
-      - name: Build UI Website
-        id: build-ui-blocksense-network
-        if: matrix.project == 'ui.blocksense.network'
-        run: |
-          yarn workspace @blocksense/ui build-storybook
-
-      - name: Deploy Docs Website
-        id: deploy-docs-blocksense-network
+      - name: Deploy Website
+        id: deploy-website
         uses: cloudflare/wrangler-action@v3
-        if: matrix.project == 'docs.blocksense.network'
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            pages deploy apps/docs.blocksense.network/dist --project-name=blocksense
+            pages deploy ${{ matrix.path }} --project-name=${{ matrix.project_name }}
 
-      - name: Deploy UI Website
-        id: deploy-ui-blocksense-network
-        uses: cloudflare/wrangler-action@v3
-        if: matrix.project == 'ui.blocksense.network'
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: |
-            pages deploy libs/ts/ui/storybook-static --project-name=blocksense-ui
-
+      #TODO(EmilIvanichkovv): Migrate this to the matrix
       - name: Collect Docs Deployment URL
         id: docs-ws-url
         if: matrix.project == 'docs.blocksense.network'
         env:
-          DOCS_DEPLOY_URL: ${{ steps.deploy-docs-blocksense-network.outputs.deployment-url }}
+          DOCS_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
         run: |
           echo "url=$DOCS_DEPLOY_URL" >> $GITHUB_OUTPUT
 
@@ -197,7 +184,7 @@ jobs:
         id: ui-ws-url
         if: matrix.project == 'ui.blocksense.network'
         env:
-          UI_DEPLOY_URL: ${{ steps.deploy-ui-blocksense-network.outputs.deployment-url }}
+          UI_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
         run: |
           echo "url=$UI_DEPLOY_URL" >> $GITHUB_OUTPUT
 
