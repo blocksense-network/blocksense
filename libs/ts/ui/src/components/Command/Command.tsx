@@ -1,8 +1,11 @@
-import { ReactNode, HTMLAttributes, ComponentProps } from 'react';
+'use client';
+
+import React, { ReactNode, HTMLAttributes, ComponentProps } from 'react';
 
 import { Command as CommandPrimitive } from 'cmdk';
 
 import { cn } from '@blocksense/ui/utils';
+
 import { Icon } from '@blocksense/ui/Icon';
 import { Dialog, DialogContent } from '@blocksense/ui/Dialog';
 

@@ -9,6 +9,7 @@ export * from './components/ScrollArea';
 export * from './components/Slider';
 export * from './components/Switch';
 export * from './components/Card';
+export * from './components/Command';
 export * from './components/Callout';
 export * from './components/Drawer';
 export * from './components/Accordion';

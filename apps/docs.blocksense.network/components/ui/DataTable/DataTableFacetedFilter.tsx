@@ -13,7 +13,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@/components/common/Command';
+} from '@blocksense/ui/Command';
 import {
   Popover,
   PopoverContent,
