@@ -35,6 +35,7 @@ alloy = { version = "0.8", features = [
     "pubsub",
 ] }
 
+regex = "1.11.1"
 reqwest = { version = "0.12", default-features = false }
 # async
 tokio = { version = "1.4.0", features = ["full"] }

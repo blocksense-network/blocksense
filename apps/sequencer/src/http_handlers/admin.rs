@@ -415,6 +415,19 @@ pub async fn list_provider_status(sequencer_state: web::Data<SequencerState>) ->
     }
 }
 
+#[get("/get_history")]
+pub async fn get_history(sequencer_state: web::Data<SequencerState>) -> HttpResponse {
+    let history = sequencer_state.feed_aggregate_history.read().await;
+    match serde_json::to_string_pretty(&*history) {
+        Ok(serialized_list) => HttpResponse::Ok()
+            .content_type(ContentType::json())
+            .body(serialized_list),
+        Err(err) => HttpResponse::InternalServerError()
+            .content_type(ContentType::plaintext())
+            .body(err.to_string()),
+    }
+}
+
 #[post("/delete_asset_feed/{feed_id}")]
 pub async fn delete_asset_feed(
     req: HttpRequest,
@@ -564,6 +577,7 @@ pub fn add_admin_services(cfg: &mut ServiceConfig) {
         .service(disable_provider)
         .service(enable_provider)
         .service(list_provider_status)
+        .service(get_history)
         .service(get_oracle_scripts)
         .service(health);
 }

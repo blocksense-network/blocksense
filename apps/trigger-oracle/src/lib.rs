@@ -324,7 +324,14 @@ impl OracleTrigger {
     ) -> TerminationReason {
         let component_id = component.id.clone();
         tracing::trace!("Starting processing loop `{component_id}`");
-        while let Ok(feeds) = signal_receiver.recv().await {
+        loop {
+            let feeds = match signal_receiver.recv().await {
+                Ok(feeds) => feeds,
+                Err(err) => {
+                    tracing::error!("Signal error: {err}");
+                    break;
+                }
+            };
             tracing::trace!(
                 "Oracle script `{}` received a set of {} active feeds",
                 component.id,

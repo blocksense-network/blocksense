@@ -22,6 +22,7 @@ use feed_registry::registry::await_time;
 use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
 use json_patch::merge;
 use port_scanner::scan_port;
+use regex::Regex;
 use serde_json::json;
 use std::io::stdout;
 use std::process::Command;
@@ -545,6 +546,49 @@ async fn main() -> Result<()> {
         let actual_response = send_get_request(
             format!("127.0.0.1:{}/list_provider_status", SEQUENCER_ADMIN_PORT).as_str(),
         );
+        assert_eq!(expected_response, actual_response);
+    }
+
+    fn mask_timestamps(response: &str) -> String {
+        let re = Regex::new(r#""end_slot_timestamp": \d+"#).unwrap();
+        re.replace_all(response, r#""end_slot_timestamp": REDACTED"#)
+            .to_string()
+    }
+
+    println!("\n * Get history returns history of the updates:\n");
+    {
+        let actual_response =
+            send_get_request(format!("127.0.0.1:{}/get_history", SEQUENCER_ADMIN_PORT).as_str());
+
+        let actual_response = mask_timestamps(actual_response.as_str());
+
+        let expected_response = r#"{
+  "aggregate_history": {
+    "1": [
+      {
+        "value": {
+          "Numerical": 80000.8
+        },
+        "update_number": 0,
+        "end_slot_timestamp": REDACTED
+      },
+      {
+        "value": {
+          "Numerical": 123456.7
+        },
+        "update_number": 1,
+        "end_slot_timestamp": REDACTED
+      },
+      {
+        "value": {
+          "Numerical": 115000.5
+        },
+        "update_number": 2,
+        "end_slot_timestamp": REDACTED
+      }
+    ]
+  }
+}"#;
         assert_eq!(expected_response, actual_response);
     }
 

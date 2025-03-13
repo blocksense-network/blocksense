@@ -12,6 +12,7 @@ use ringbuf::{
     traits::{Consumer, RingBuffer},
     HeapRb, SharedRb,
 };
+use serde::{ser::SerializeMap, Deserialize, Serialize, Serializer};
 use std::time::UNIX_EPOCH;
 use tokio::{sync::RwLock, time};
 use tracing::{debug, info};
@@ -131,7 +132,7 @@ impl FeedReports {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct HistoryEntry {
     pub value: FeedType,
     pub update_number: u128,
@@ -145,8 +146,37 @@ impl HistoryEntry {
     }
 }
 
+#[derive(Serialize)]
 pub struct FeedAggregateHistory {
+    #[serde(serialize_with = "serialize_aggregate_history")]
     aggregate_history: HashMap<u32, HeapRb<HistoryEntry>>,
+}
+
+fn serialize_aggregate_history<S>(
+    aggregate_history: &HashMap<u32, HeapRb<HistoryEntry>>,
+    s: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let mut feed_ids: Vec<&u32> = aggregate_history.keys().collect();
+    feed_ids.sort();
+
+    let mut serialize_map = s.serialize_map(Some(feed_ids.len()))?;
+    for feed_id in feed_ids {
+        let mut updates = vec![];
+        let ring_buffer = &aggregate_history[feed_id];
+        let (slice_a, slice_b) = ring_buffer.as_slices();
+        for value in slice_a {
+            updates.push(value);
+        }
+        for value in slice_b {
+            updates.push(value);
+        }
+        serialize_map.serialize_key(feed_id)?;
+        serialize_map.serialize_value(&updates)?;
+    }
+    serialize_map.end()
 }
 
 impl Default for FeedAggregateHistory {

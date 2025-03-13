@@ -9399,6 +9399,7 @@ dependencies = [
  "futures",
  "json-patch",
  "port_scanner",
+ "regex",
  "reqwest 0.12.12",
  "serde 1.0.217",
  "serde_json",
