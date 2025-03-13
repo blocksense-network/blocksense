@@ -52,7 +52,7 @@
             ];
 
           sequencerConfigJSON = configJSON cfg.sequencer {
-            reporters = cfg.sequencer.reporters;
+            inherit (cfg.sequencer) reporters;
             prometheus_port = cfg.sequencer.metrics-port;
           };
 
@@ -60,25 +60,28 @@
             n: v: (configJSON v { prometheus_url = cfg.reporters.${n}.metrics-url; })
           ) cfg.reporters;
 
+          commonBlocksenseConfig = {
+            oracles = builtins.attrValues cfg.oracles;
+            data_feeds = [ ];
+          };
+
+          transformBlocksenseConfig =
+            blocksense-cfg:
+            (builtins.removeAttrs
+              (configJSON2 blocksense-cfg {
+                capabilities = builtins.attrValues (
+                  builtins.mapAttrs (id: data: { inherit id data; }) blocksense-cfg.api-keys
+                );
+              })
+              [
+                "api_keys"
+                "log_level"
+              ]
+            );
+
           blocksenseConfigJSON = lib.pipe cfg.reporters-v2 [
             (builtins.mapAttrs (
-              _n: v:
-              (
-
-                (builtins.removeAttrs
-                  (configJSON2 v {
-                    capabilities = builtins.attrValues (builtins.mapAttrs (id: data: { inherit id data; }) v.api-keys);
-                  })
-                  [
-                    "api_keys"
-                    "log_level"
-                  ]
-                )
-                // {
-                  oracles = [ ];
-                  data_feeds = [ ];
-                }
-              )
+              _n: reporter-config: (transformBlocksenseConfig reporter-config) // commonBlocksenseConfig
             ))
           ];
         in
@@ -109,17 +112,10 @@
               description = mdDoc "The set of reporter instances to run.";
             };
 
-            oracle-scripts = {
-              base-dir = mkOption {
-                type = types.nullOr types.path;
-                default = null;
-                description = mdDoc "Base dir for oracles.";
-              };
-              oracles = mkOption {
-                type = types.attrsOf (mkSubmodule ./oracle-script-opts.nix);
-                default = { };
-                description = mdDoc "The set of oracle scripts to build.";
-              };
+            oracles = mkOption {
+              type = types.attrsOf (mkSubmodule ./oracle-script-opts.nix);
+              default = { };
+              description = mdDoc "The set of oracle scripts to build.";
             };
 
             reporters-v2 = mkOption {

@@ -1,21 +1,41 @@
-{ lib, ... }:
+{
+  lib,
+  self',
+  name,
+  ...
+}:
 with lib;
 {
   options = {
-    path = mkOption {
-      type = types.path;
-      description = mdDoc "Path to the oracle script.";
+    id = mkOption {
+      type =
+        let
+          availableScripts = builtins.attrNames self'.legacyPackages.oracle-scripts;
+        in
+        types.enum availableScripts;
+      default = name;
     };
 
-    build-command = mkOption {
+    name = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    description = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    oracle_script_wasm = mkOption {
       type = types.str;
-      description = mdDoc "Command for building the oracle scripts to wasm.";
-      default = "cargo build --target wasm32-wasip1 --release";
     };
 
-    source = mkOption {
-      type = types.path;
-      description = mdDoc "Path to the wasm target.";
+    allowed_outbound_hosts = mkOption {
+      type = types.listOf types.str;
+    };
+
+    capabilities = mkOption {
+      type = types.listOf types.str;
     };
   };
 }

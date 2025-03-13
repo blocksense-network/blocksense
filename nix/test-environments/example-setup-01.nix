@@ -130,5 +130,40 @@ in
         api-keys = { };
       };
     };
+
+    oracles = {
+      exsat = {
+        oracle_script_wasm = "exsat_holdings_oracle.wasm";
+        capabilities = [ ];
+        allowed_outbound_hosts = [
+          "https://raw.githubusercontent.com"
+          "https://rpc-us.exsat.network"
+          "https://blockchain.info"
+        ];
+      };
+
+      crypto-price-feeds = {
+        oracle_script_wasm = "crypto_price_feeds.wasm";
+
+        capabilities = [ ];
+        allowed_outbound_hosts = [
+          "https://api.kraken.com"
+          "https://api.bybit.com"
+          "https://api.coinbase.com"
+          "https://api.exchange.coinbase.com"
+          "https://api1.binance.com"
+          "https://api.kucoin.com"
+          "https://api.mexc.com"
+          "https://api.crypto.com"
+          "https://api.binance.us"
+          "https://api.gemini.com"
+          "https://api-pub.bitfinex.com"
+          "https://api.upbit.com"
+          "https://api.bitget.com"
+          "https://api.gateio.ws"
+          "https://www.okx.com"
+        ];
+      };
+    };
   };
 }
