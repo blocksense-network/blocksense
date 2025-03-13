@@ -44,6 +44,8 @@ pub struct Trigger {
 pub struct Component {
     source: ComponentSource,
     allowed_outbound_hosts: Vec<String>,
+    #[serde(default)]
+    key_value_stores: Option<Vec<String>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -128,6 +130,7 @@ impl From<BlocksenseConfig> for AppManifest {
                 Component {
                     source: ComponentSource::Local(oracle.oracle_script_wasm.clone()),
                     allowed_outbound_hosts: oracle.allowed_outbound_hosts.clone(),
+                    key_value_stores: Some(vec!["default".into()]),
                 },
             );
         }
@@ -276,14 +279,17 @@ data = ""
 [component.revolut]
 source = "revolut_oracle.wasm"
 allowed_outbound_hosts = ["https://pro-api.coinmarketcap.com"]
+key_value_stores = ["default"]
 
 [component.yahoo]
 source = "yahoo_oracle.wasm"
 allowed_outbound_hosts = ["https://yfapi.net:443"]
+key_value_stores = ["default"]
 
 [component.cmc]
 source = "cmc_oracle.wasm"
 allowed_outbound_hosts = ["https://pro-api.coinmarketcap.com"]
+key_value_stores = ["default"]
 "#;
         let config: BlocksenseConfig = serde_json::from_str(json).expect("Failed to parse json.");
         let toml_config: AppManifest = toml::from_str(toml).expect("Failed to parse toml.");
