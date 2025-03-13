@@ -1,6 +1,6 @@
 use anyhow::Result;
-
 use futures::{future::LocalBoxFuture, FutureExt};
+
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
@@ -22,20 +22,30 @@ pub struct BinancePriceData {
 
 type BinancePriceResponse = Vec<BinancePriceData>;
 
-pub struct BinancePriceFetcher;
+pub struct BinancePriceFetcher<'a> {
+    pub symbols: &'a [String],
+}
 
-impl PricesFetcher<'_> for BinancePriceFetcher {
+impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
     const NAME: &'static str = "Binance";
 
-    fn new(_symbols: &[String]) -> Self {
-        Self
+    fn new(symbols: &'a [String]) -> Self {
+        Self { symbols }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
+            let all_symbols = self
+                .symbols
+                .iter()
+                .map(|s| format!("\"{}\"", s))
+                .collect::<Vec<_>>()
+                .join(",");
+            let req_symbols = format!("[{}]", all_symbols);
+
             let response = http_get_json::<BinancePriceResponse>(
                 "https://api1.binance.com/api/v3/ticker/24hr",
-                None,
+                Some(&[("symbols", req_symbols.as_str())]),
             )
             .await?;
 

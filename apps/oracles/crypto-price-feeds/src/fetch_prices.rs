@@ -28,6 +28,7 @@ use futures::future::LocalBoxFuture;
 #[serde(deny_unknown_fields)]
 pub struct SymbolsData {
     pub binance_us: Vec<TradingPairSymbol>,
+    pub binance: Vec<TradingPairSymbol>,
     pub gemini: Vec<TradingPairSymbol>,
     pub upbit: Vec<TradingPairSymbol>,
 }
@@ -36,9 +37,13 @@ impl SymbolsData {
     pub fn from_resources(exchanges_symbols: &ExchangesSymbols) -> Result<Self> {
         Ok(Self {
             binance_us: exchanges_symbols
-            .get("BinanceUS")
-            .cloned()
-            .unwrap_or_default(),
+                .get("BinanceUS")
+                .cloned()
+                .unwrap_or_default(),
+            binance: exchanges_symbols
+                .get("Binance")
+                .cloned()
+                .unwrap_or_default(),
             gemini: exchanges_symbols.get("Gemini").cloned().unwrap_or_default(),
             upbit: exchanges_symbols.get("Upbit").cloned().unwrap_or_default(),
         })
@@ -49,7 +54,7 @@ pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToR
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let mut futures_set = FuturesUnordered::from_iter([
-        fetch::<BinancePriceFetcher>(&[]),
+        fetch::<BinancePriceFetcher>(&symbols.binance),
         fetch::<BinanceUsPriceFetcher>(&symbols.binance_us),
         fetch::<BitfinexPriceFetcher>(&[]),
         fetch::<BitgetPriceFetcher>(&[]),
