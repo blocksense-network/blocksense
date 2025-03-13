@@ -37,7 +37,12 @@ export async function addDataProviders(
     }),
   );
 
-  return dataFeedsWithCryptoResources;
+  // Filter out feeds without exchange providers
+  const feedsWithExchangeProviders = dataFeedsWithCryptoResources.filter(
+    feed => 'exchanges' in feed.additional_feed_info.arguments,
+  );
+
+  return feedsWithExchangeProviders;
 }
 
 // Function to get all providers for a feed
