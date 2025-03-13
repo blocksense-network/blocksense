@@ -28,7 +28,8 @@ contract AggregatedDataFeedStore {
     global MAX_ROUND_VALUES_IN_A_FIELD: U256 = BigNum::from_slice([15, 0, 0]);
     global ROUND_SIZE_IN_BITS: U256 = BigNum::from_slice([16, 0, 0]);
     global ROUNDS_MAX_SIZE: Field = 8192; // 2^13
-    global ROUND_VALUE_MAX_BITS_SIZE: Field = 65536; // 2^16
+    global TWO_POW_115: u128 = 41538374868278621028243970633760768;
+    global ROUND_VALUE_MAX_BITS_SIZE: U256 = BigNum::from_slice([65536, 0, 0]); // 2^16
     global FEED_INDEX_SCALAR_VALUE: Field = 340282366920938463463374607431768211456; // 2^128
 
     #[derive(Serialize, Deserialize)]
@@ -99,35 +100,26 @@ contract AggregatedDataFeedStore {
 
     #[public]
     #[view]
-
-    // 1. try shifting
     fn get_latest_round(stride: Field, feed_id: Field) -> Field {
-        // Since at most 63 `Field`s can be written to storage, i.e. stride wouldn't be larger than 6, (2^115 * stride) + feed_id can safely be putted in one BigNum.
-        let round_index = BigNum::from_slice([
-            (
-                41538374868278621028243970633760768 * stride // 2^115 * stride
-            )
-                + feed_id,
-            0,
-            0,
-        ])
-            .udiv(MAX_ROUND_VALUES_IN_A_FIELD);
-        let slot_position = BigNum::from_slice([feed_id, 0, 0]).umod(MAX_ROUND_VALUES_IN_A_FIELD);
+        let two_pow_155_bignum: U256 = BigNum::from_slice([(TWO_POW_115 * stride as u128), 0, 0]); // DANGER: 2.pow(147) should be with separated limbs!!!!
+        let feed_id_bignum: U256 = BigNum::from_slice([feed_id as u128, 0, 0]); // DANGER: USE FEED_ID'S LIMBS, DON'T USE ONLY THE FIRST LIMB!
+        let (row_value, _) = unsafe {
+            (two_pow_155_bignum + feed_id_bignum).__udiv_mod(MAX_ROUND_VALUES_IN_A_FIELD)
+        };
+        let round_value = storage.rounds.at(to_field(row_value)).read();
 
-        let round_value = storage.rounds.at(to_field(round_index)).read();
+        let (_, slot_index) = unsafe {
+            BigNum::from_slice([feed_id as u128, 0, 0]).__udiv_mod(MAX_ROUND_VALUES_IN_A_FIELD)
+        };
 
-        //
-        let one: U256 = BigNum::from_slice([1, 0, 0]);
-        let position: U256 =
-            BigNum::from_slice([TWO.pow_32(240 - 16 * to_field(slot_position)), 0, 0]);
-        let round_value_bignum: U256 = BigNum::from_slice([round_value, 0, 0]);
-        let shifted = round_value_bignum.udiv(one);
+        let pos: U256 =
+            BigNum::from_slice([240 as u128 - (16 * to_field(slot_index)) as u128, 0, 0]);
+        let two_pow_pos: U256 = BigNum::from_slice([2, 0, 0]).__pow(pos); // <===== Not enough L2GAS gas left
+        let round_value_bignum: U256 = BigNum::from_slice([round_value as u128, 0, 0]);
 
-        let TWO_POW_ROUND_SIZE_IN_BITS: U256 = BigNum::from_slice([TWO.pow_32(16), 0, 0]);
-        let result = shifted.umod(TWO_POW_ROUND_SIZE_IN_BITS);
-        //
+        // let (shifted, _) = round_value_bignum.__udiv_mod(two_pow_pos);
 
-        1
+        round_value
     }
 
     #[public]

@@ -110,7 +110,7 @@ unconstrained fn test_get_latest_round() {
     // );
 
     let latest_round = AggregatedDataFeedStore::at(adfs_contract_address)
-        .get_latest_round(0, 50 as Field)
+        .get_latest_round(0, 57 as Field)
         .view(&mut env.public());
     println("latest_round");
     println(latest_round);
