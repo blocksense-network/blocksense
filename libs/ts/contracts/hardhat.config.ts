@@ -4,6 +4,7 @@ import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
 import '@nomicfoundation/hardhat-verify';
+import '@nomicfoundation/hardhat-ledger';
 import 'solidity-coverage';
 import '@typechain/hardhat';
 import 'hardhat-contract-sizer';
@@ -12,13 +13,13 @@ import '../sol-reflector/src';
 
 import { fromEntries } from '@blocksense/base-utils/array-iter';
 import {
-  getRpcUrl,
   getOptionalRpcUrl,
   networkName,
   networkMetadata,
 } from '@blocksense/base-utils/evm';
 
 import './tasks';
+import { getOptionalEnvString } from '@blocksense/base-utils';
 
 dotenv.config();
 
@@ -56,10 +57,13 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 99999999999,
       forking: {
-        blockNumber: 21823336,
+        blockNumber: 22044232,
         enabled: process.env.FORKING === 'true',
         url: getOptionalRpcUrl('ethereum-mainnet'),
       },
+      ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
+        ? [getOptionalEnvString('LEDGER_ACCOUNT', '')]
+        : undefined,
     },
     ...fromEntries(
       networkName.literals.map(network => [
