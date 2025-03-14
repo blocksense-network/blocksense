@@ -58,9 +58,7 @@ task('init-chain', '[UTILS] Init chain configuration').setAction(
 
     const ledgerAccountAddress = getOptionalEnvString('LEDGER_ACCOUNT', '');
     if (ledgerAccountAddress) {
-      ledgerAccount = (await ethers.getSigner(ledgerAccountAddress)).connect(
-        provider,
-      );
+      ledgerAccount = await ethers.getSigner(ledgerAccountAddress);
     } else {
       admin = new Wallet(getEnvString('ADMIN_SIGNER_PRIVATE_KEY'), provider);
     }
