@@ -250,7 +250,7 @@ impl TriggerExecutor for OracleTrigger {
         // For each component, run its own timer loop
 
         let components = self.queue_components.clone();
-        tracing::info!("Components: {:?}", &components);
+        tracing::debug!("Components: {:?}", &components);
         tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
             .queue_components
