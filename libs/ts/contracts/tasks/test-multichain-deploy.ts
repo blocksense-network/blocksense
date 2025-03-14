@@ -20,15 +20,19 @@ import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deplo
 import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
 import { Feed } from '../test/utils/wrappers/types';
 
-import { initChain } from './multichain-deploy';
 import { expect } from 'chai';
+import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
+import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
 
 task(
   'test-deploy',
   'Test deployed contracts (only for localhost: THIS SCRIPT MAKES CHANGES TO THE DEPLOYED CONTRACTS)',
-).setAction(async (_, hre) => {
+).setAction(async (_, { ethers, run }) => {
   const network = 'local';
-  const config: NetworkConfig = await initChain(network);
+
+  const config: NetworkConfig = await run('init-chain', {
+    networkName: network,
+  });
 
   if (!config.deployWithSequencerMultisig) {
     console.log('Test needs sequencer multisig set!');
@@ -49,7 +53,7 @@ task(
   const adminMultisig = await Safe.init({
     provider: config.rpc,
     safeAddress: deployment.AdminMultisig,
-    signer: config.adminMultisig.signer.privateKey,
+    signer: config.adminMultisig.signer?.privateKey,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
     },
@@ -98,7 +102,7 @@ task(
   ////////////////////////
   console.log('Writing data in ADFS...');
 
-  const UP = await hre.ethers.getContractAt(
+  const UP = await ethers.getContractAt(
     ContractNames.UpgradeableProxyADFS,
     deployment.coreContracts.UpgradeableProxyADFS.address,
   );
@@ -130,16 +134,15 @@ task(
   });
   writeTx = await apiKit.signTransaction(writeTx);
 
-  const safeGuard = await hre.ethers.getContractAt(
+  const safeGuard = await ethers.getContractAt(
     ContractNames.OnlySequencerGuard,
     deployment.coreContracts.OnlySequencerGuard.address,
   );
 
+  const isValidTransaction = await apiKit.isValidTransaction(writeTx);
   // reporters cannot send signed transactions to upgradeable proxy
   // only sequencer can
-  await expect(
-    apiKit.executeTransaction(writeTx),
-  ).to.be.revertedWithCustomError(safeGuard, 'ExecutorNotSequencer');
+  expect(isValidTransaction).to.be.false;
 
   // sequencer cannot send direct transaction to upgradeable proxy
   // AccessControl will reject this transaction
@@ -152,29 +155,68 @@ task(
   ////////////////////////////////////////////
   console.log('Checking Aggregator and Registry adapters...');
 
-  const PERPAggregator = await hre.ethers.getContractAt(
+  const { decodeJSON } = selectDirectory(configDir);
+  const { feeds } = await decodeJSON(
+    { name: 'feeds_config_new' },
+    NewFeedsConfigSchema,
+  );
+
+  // allowed feeds
+  // filter feeds
+  const chainlinkCompatibility = await decodeJSON(
+    { name: 'chainlink_compatibility_new' },
+    ChainlinkCompatibilityConfigSchema,
+  );
+
+  const dataFeedConfig = feeds.map(feed => {
+    const compatibilityData =
+      chainlinkCompatibility.blocksenseFeedsCompatibility[feed.id];
+    const { base, quote } = compatibilityData?.chainlink_compatibility ?? {
+      base: null,
+      quote: null,
+    };
+    return {
+      id: feed.id,
+      description: feed.full_name,
+      decimals: feed.additional_feed_info.decimals,
+      base,
+      quote,
+    };
+  });
+
+  const aggregator = await ethers.getContractAt(
     ContractNames.CLAggregatorAdapter,
     deployment.CLAggregatorAdapter[1].address,
     sequencerWallet,
   );
 
-  const description = await PERPAggregator.description();
-  expect(description).to.equal('PERP / USD');
-  const latestAnswer = await PERPAggregator.latestAnswer();
+  const description = await aggregator.description();
+  expect(description).to.equal(dataFeedConfig[1].description);
+  const latestAnswer = await aggregator.latestAnswer();
   expect(latestAnswer).to.equal(1234);
 
-  const feedRegistry = await hre.ethers.getContractAt(
+  const feedRegistry = await ethers.getContractAt(
     ContractNames.CLFeedRegistryAdapter,
     deployment.coreContracts.CLFeedRegistryAdapter.address,
     sequencerWallet,
   );
 
-  const feedFromRegistry = await feedRegistry.getFeed(
-    '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
-    '0x0000000000000000000000000000000000000348',
+  const registeredFeed = deployment.CLAggregatorAdapter.find(
+    feed => feed.base && feed.quote,
   );
 
-  expect(feedFromRegistry).to.equal(deployment.CLAggregatorAdapter[6].address);
+  if (!registeredFeed) {
+    throw new Error(
+      'No feed found in deployment config that is registered in Registry',
+    );
+  }
+
+  const feedFromRegistry = await feedRegistry.getFeed(
+    registeredFeed.base!,
+    registeredFeed.quote!,
+  );
+
+  expect(feedFromRegistry).to.equal(registeredFeed.address);
 
   ///////////////////////////////////////////
   // Change sequencer rights in Safe Guard //
@@ -190,11 +232,12 @@ task(
     ]),
     operation: OperationType.Call,
   };
-  const setSequencerTx = await adminMultisig.createTransaction({
-    transactions: [changeSequencerTxData],
-  });
 
-  await adminMultisig.executeTransaction(setSequencerTx);
+  await run('multisig-tx-exec', {
+    transactions: [changeSequencerTxData],
+    safe: adminMultisig,
+    config,
+  });
 
   const newFeed: Feed = {
     id: 1n,
@@ -218,7 +261,7 @@ task(
 
   await apiKit.executeTransaction(writeDataTx);
 
-  const latestAnswer2 = await PERPAggregator.latestAnswer();
+  const latestAnswer2 = await aggregator.latestAnswer();
   expect(latestAnswer2).to.equal(5678);
 
   //////////////////////////////////////
@@ -226,7 +269,7 @@ task(
   //////////////////////////////////////
   console.log('Changing Access Control admin role...');
 
-  const accessControl = await hre.ethers.getContractAt(
+  const accessControl = await ethers.getContractAt(
     ContractNames.AccessControl,
     deployment.coreContracts.AccessControl.address,
   );
@@ -251,11 +294,11 @@ task(
     operation: OperationType.Call,
   };
 
-  let changeAccessControlTx = await adminMultisig.createTransaction({
+  await run('multisig-tx-exec', {
     transactions: [changeAccessControlTxData],
+    safe: adminMultisig,
+    config,
   });
-
-  await adminMultisig.executeTransaction(changeAccessControlTx);
 
   const isAllowedAfter = Boolean(
     Number(
