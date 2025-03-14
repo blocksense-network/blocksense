@@ -12,7 +12,9 @@ use std::{
 use http::uri::Scheme;
 use hyper::Request;
 use tokio::sync::{
-    broadcast::{channel, Receiver as BroadcastReceiver, Sender as BroadcastSender},
+    broadcast::{
+        channel, error::RecvError, Receiver as BroadcastReceiver, Sender as BroadcastSender,
+    },
     mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
 };
 use tracing::Instrument;
@@ -146,6 +148,7 @@ struct Component {
 enum TerminationReason {
     ExitRequested,
     SequencerExitRequested,
+    ReceivedBadSignal(RecvError),
     Other(String),
 }
 
@@ -285,17 +288,27 @@ impl TriggerExecutor for OracleTrigger {
         );
         loops.push(manager);
 
-        let (tr, _, rest) = futures::future::select_all(loops).await;
+        loop {
+            let (tr, _, rest) = futures::future::select_all(loops).await;
 
-        drop(rest);
-        match tr {
-            Ok(TerminationReason::ExitRequested) => {
-                tracing::trace!("Exiting");
-                Ok(())
-            }
-            _ => {
-                tracing::error!("Fatal: {:?}", tr);
-                Err(anyhow::anyhow!("{tr:?}"))
+            match tr.expect("await returns ok") {
+                TerminationReason::ExitRequested => {
+                    tracing::trace!("Exit requested => exiting");
+                    return Ok(());
+                }
+                TerminationReason::SequencerExitRequested => {
+                    tracing::trace!("Sequencer exit requested => exiting");
+                    return Ok(());
+                }
+                TerminationReason::ReceivedBadSignal(err) => {
+                    tracing::error!("Oracle script runner received bad signal: {err:?}");
+                    tracing::trace!("Continuing to run the other runners");
+                    loops = rest;
+                }
+                TerminationReason::Other(message) => {
+                    tracing::error!("Unexpected termination reason: {message}");
+                    return Err(anyhow::anyhow!("{message}"));
+                }
             }
         }
     }
@@ -328,8 +341,7 @@ impl OracleTrigger {
             let feeds = match signal_receiver.recv().await {
                 Ok(feeds) => feeds,
                 Err(err) => {
-                    tracing::error!("Signal error: {err}");
-                    break;
+                    return TerminationReason::ReceivedBadSignal(err);
                 }
             };
             tracing::trace!(
