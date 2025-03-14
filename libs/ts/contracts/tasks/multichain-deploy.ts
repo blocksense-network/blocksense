@@ -46,7 +46,7 @@ task('deploy', 'Deploy contracts')
       ChainlinkCompatibilityConfigSchema,
     );
 
-    const dataFeedConfig = feeds.map(feed => {
+    let dataFeedConfig = feeds.map(feed => {
       const compatibilityData =
         chainlinkCompatibility.blocksenseFeedsCompatibility[feed.id];
       const { base, quote } = compatibilityData?.chainlink_compatibility ?? {
@@ -67,6 +67,12 @@ task('deploy', 'Deploy contracts')
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
     for (const config of configs) {
+      if (Array.isArray(config.feedIds)) {
+        dataFeedConfig = dataFeedConfig.filter(
+          feed => config.feedIds?.includes(feed.id) ?? false,
+        );
+      }
+
       const signer = config.adminMultisig.signer || config.ledgerAccount!;
       const chainId = parseChainId(config.network.chainId);
       console.log(`\n\n// ChainId: ${config.network.chainId}`);
@@ -144,7 +150,7 @@ task('deploy', 'Deploy contracts')
           salt: ethers.id('registry'),
           value: 0n,
         },
-        ...dataFeedConfig.slice(0, 10).map(data => {
+        ...dataFeedConfig.map(data => {
           return {
             name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint32', 'address'],
