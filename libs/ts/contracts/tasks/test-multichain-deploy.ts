@@ -152,15 +152,15 @@ task(
   ////////////////////////////////////////////
   console.log('Checking Aggregator and Registry adapters...');
 
-  const PERPAggregator = await hre.ethers.getContractAt(
+  const aggregator = await hre.ethers.getContractAt(
     ContractNames.CLAggregatorAdapter,
     deployment.CLAggregatorAdapter[1].address,
     sequencerWallet,
   );
 
-  const description = await PERPAggregator.description();
-  expect(description).to.equal('PERP / USD');
-  const latestAnswer = await PERPAggregator.latestAnswer();
+  const description = await aggregator.description();
+  expect(description).to.equal('MLN / ETH');
+  const latestAnswer = await aggregator.latestAnswer();
   expect(latestAnswer).to.equal(1234);
 
   const feedRegistry = await hre.ethers.getContractAt(
@@ -170,11 +170,11 @@ task(
   );
 
   const feedFromRegistry = await feedRegistry.getFeed(
-    '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
-    '0x0000000000000000000000000000000000000348',
+    '0xec67005c4E498Ec7f55E092bd1d35cbC47C91892',
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
   );
 
-  expect(feedFromRegistry).to.equal(deployment.CLAggregatorAdapter[6].address);
+  expect(feedFromRegistry).to.equal(deployment.CLAggregatorAdapter[1].address);
 
   ///////////////////////////////////////////
   // Change sequencer rights in Safe Guard //
@@ -218,7 +218,7 @@ task(
 
   await apiKit.executeTransaction(writeDataTx);
 
-  const latestAnswer2 = await PERPAggregator.latestAnswer();
+  const latestAnswer2 = await aggregator.latestAnswer();
   expect(latestAnswer2).to.equal(5678);
 
   //////////////////////////////////////

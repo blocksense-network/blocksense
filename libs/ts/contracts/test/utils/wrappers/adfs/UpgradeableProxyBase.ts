@@ -3,20 +3,20 @@ import {
   IUpgradeableProxy__factory,
   UpgradeableProxyADFS,
 } from '../../../../typechain';
-import { ADFSWrapper } from './ADFS';
 import { Feed, UpgradeableProxyCallMethods } from '../types';
-import { deployContract } from '../../../experiments/utils/helpers/common';
 import { IUpgradeableProxyADFSWrapper } from '../interfaces/IUpgradeableProxyADFSWarpper';
 import { ADFSGenericWrapper } from './ADFSGeneric';
+import { ADFSWrapper } from './ADFS';
+import { ADFSReadACWrapper } from './ADFSReadAC';
 
 export abstract class UpgradeableProxyADFSBaseWrapper
   implements IUpgradeableProxyADFSWrapper
 {
   public contract!: UpgradeableProxyADFS;
-  public implementation!: ADFSWrapper | ADFSGenericWrapper;
+  public implementation!: ADFSWrapper | ADFSReadACWrapper | ADFSGenericWrapper;
 
   public async upgradeImplementation(
-    newImplementation: ADFSWrapper,
+    newImplementation: ADFSWrapper | ADFSReadACWrapper,
     admin: HardhatEthersSigner,
     opts: {
       txData?: any;
@@ -65,6 +65,7 @@ export abstract class UpgradeableProxyADFSBaseWrapper
   public abstract init(
     adminAddress: string,
     accessControlData: HardhatEthersSigner | string,
+    readAccessControlData?: HardhatEthersSigner | string,
   ): Promise<void>;
 
   public abstract getName(): string;
