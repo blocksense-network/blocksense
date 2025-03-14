@@ -14,8 +14,8 @@
       },
       "schedule": {
         "interval_ms": 90000,
-        "heartbeat_ms": 3600000,
-        "deviation_percentage": 0.1,
+        "heartbeat_ms": 5000,
+        "deviation_percentage": 0.01,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {

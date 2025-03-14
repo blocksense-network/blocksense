@@ -46,7 +46,7 @@ in
       metrics-port = 5551;
 
       block-config = {
-        max_feed_updates_to_batch = 300;
+        max_feed_updates_to_batch = 1;
         block_generation_period = 500;
         genesis_block_timestamp = {
           secs_since_epoch = 1;
@@ -63,43 +63,35 @@ in
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyContractAddressSepolia;
           impersonated_anvil_account = impersonationAddress;
+          allow_feeds = [
+            0 # BTC / USD
+          ];
         };
         b = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyContractAddressHolesky;
           transaction_gas_limit = 20000000;
           allow_feeds = [
-            31 # BTC/USD
-            47 # ETH/USD
-            236 # USDT/USD
-            131 # USDC/USD
-            43 # WBTC/USD
+            0 # BTC / USD
+            # 3 # ETH / USD
+            # 7 # USDT / USD
+            # 19 # USDC / USD
+            # 13 # BNB / USD
+            # 16 # SOL / USD
+            # 32 # wBTC / USD
+            # 35 # LINK / USD
+            # 91 # UNI / USD
+            # 114 # AAVE / USD
+            # 121 # TAO / USD
+            # 347 # 1INCH / USD
           ];
           publishing_criteria = [
             {
-              feed_id = 31;
+              feed_id = 0;
               skip_publish_if_less_then_percentage = 0.1;
-              always_publish_heartbeat_ms = 50000;
+              always_publish_heartbeat_ms = 5000;
             }
-            {
-              feed_id = 47;
-              skip_publish_if_less_then_percentage = 0.1;
-              always_publish_heartbeat_ms = 360000;
-            }
-            {
-              feed_id = 131;
-              skip_publish_if_less_then_percentage = 0.1;
-              always_publish_heartbeat_ms = 360000;
-              peg_to_value = 1.00;
-              peg_tolerance_percentage = 0.2;
-            }
-            {
-              feed_id = 236;
-              skip_publish_if_less_then_percentage = 0.5;
-              always_publish_heartbeat_ms = 360000;
-              peg_to_value = 1.00;
-              peg_tolerance_percentage = 0.1;
-            }
+
           ];
           impersonated_anvil_account = impersonationAddress;
         };
@@ -117,7 +109,7 @@ in
         }
       ];
 
-      log-level = "info";
+      log-level = "debug";
     };
 
     reporters-v2 = {
