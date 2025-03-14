@@ -20,6 +20,19 @@
         rustfmt = self'.legacyPackages.rustToolchain;
       };
     };
+    clippy = {
+      enable = true;
+      packageOverrides = {
+        cargo = self'.legacyPackages.cargoWrapped;
+        clippy = self'.legacyPackages.rustToolchain;
+      };
+
+      settings = {
+        denyWarnings = true;
+        allFeatures = true;
+        extraArgs = "--tests";
+      };
+    };
     prettier = {
       enable = true;
       args = [
