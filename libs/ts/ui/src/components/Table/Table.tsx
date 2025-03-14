@@ -1,6 +1,10 @@
 'use client';
 
-import { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
+import React, {
+  HTMLAttributes,
+  TdHTMLAttributes,
+  ThHTMLAttributes,
+} from 'react';
 
 import { cn } from '@blocksense/ui/utils';
 
@@ -33,7 +37,10 @@ export function TableCaption({
 }: HTMLAttributes<HTMLTableCaptionElement>) {
   return (
     <caption
-      className={cn('table__caption mt-4 text-md font-bold', className)}
+      className={cn(
+        'table__caption py-2 text-md font-bold bg-gray-50 dark:bg-neutral-900',
+        className,
+      )}
       {...props}
     />
   );

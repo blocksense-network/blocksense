@@ -26,6 +26,7 @@
     "./Drawer": "./src/components/Drawer/index.tsx",
     "./Dialog": "./src/components/Dialog/index.tsx",
     "./Select": "./src/components/Select/index.tsx",
+    "./Table": "./src/components/Table/index.tsx",
     "./utils": "./src/lib/utils.ts"
   },
   "dependencies": {

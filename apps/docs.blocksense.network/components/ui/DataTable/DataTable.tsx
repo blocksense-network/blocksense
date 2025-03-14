@@ -23,7 +23,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/common/Table';
+} from '@blocksense/ui/Table';
 import { DataTablePagination } from '@/components/ui/DataTable/DataTablePagination';
 import { DataTableToolbar } from '@/components/ui/DataTable/DataTableToolbar';
 import { cn } from '@blocksense/ui/utils';

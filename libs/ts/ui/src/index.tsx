@@ -16,4 +16,5 @@ export * from './components/Accordion';
 export * from './components/Icon';
 export * from './components/Dialog';
 export * from './components/Select';
+export * from './components/Table';
 export * from './lib/utils';

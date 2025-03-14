@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/common/Table';
+} from '@blocksense/ui/Table';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 
 type Column =
@@ -77,7 +77,7 @@ export const Parameters = ({
       parentTitle={parentTitle}
       titleLevel={titleLevel}
     >
-      <Table className="variables__table mt-6 mb-4">
+      <Table className="variables__table">
         <TableHeader className="variables__table-header">
           <TableRow className="variables__table-header-row">
             {columns.map(column => (
