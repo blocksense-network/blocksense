@@ -2959,3 +2959,6 @@ allowed_outbound_hosts = [
     "https://www.okx.com",
 ]
 key_value_stores = ["default"]
+
+[component.crypto-price-feeds.build]
+command = "cargo build --target wasm32-wasip1 --release"
