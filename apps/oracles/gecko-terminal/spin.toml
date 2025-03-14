@@ -15,12 +15,12 @@ reporter_id = 0
 component = "gecko-terminal"
 
 [[trigger.oracle.data_feeds]]
-id = "607"
+id = "1000000"
 data = '{"network":"monad-testnet", "pool":"0x8552706d9a27013f20ea0f9df8e20b61e283d2d3"}'
 
 
 [component.gecko-terminal]
-source = "target/wasm32-wasip1/release/gecko_terminal_oracle.wasm"
+source = "../../../target/wasm32-wasip1/release/gecko_terminal_oracle.wasm"
 
 allowed_outbound_hosts = ["https://app.geckoterminal.com/"]
 
