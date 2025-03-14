@@ -220,70 +220,52 @@ mod tests {
         };
 
         // No history
-        assert_eq!(
-            update.should_skip(&always_publish_criteria, &history),
-            false
-        );
+        assert!(!update.should_skip(&always_publish_criteria, &history));
 
         history.push_next(
             feed_id,
             FeedType::Numerical(1000.0f64),
             end_slot_timestamp - 1000_u128,
         );
-        assert_eq!(
-            update.should_skip(&always_publish_criteria, &history),
-            false
-        );
-        assert_eq!(update.should_skip(&one_percent_threshold, &history), true);
-        assert_eq!(
-            update.should_skip(&always_publish_every_second, &history),
-            false
-        );
+        assert!(!update.should_skip(&always_publish_criteria, &history));
+        assert!(update.should_skip(&one_percent_threshold, &history));
+        assert!(!update.should_skip(&always_publish_every_second, &history));
 
         history.push_next(
             feed_id,
             FeedType::Numerical(1000.0f64),
             end_slot_timestamp - 900_u128,
         );
-        assert_eq!(
-            update.should_skip(&always_publish_criteria, &history),
-            false
-        );
-        assert_eq!(update.should_skip(&one_percent_threshold, &history), true);
-        assert_eq!(
-            update.should_skip(&always_publish_every_second, &history),
-            true
-        ); // only 900 ms since last update, shoud be skipped
+        assert!(!update.should_skip(&always_publish_criteria, &history));
+        assert!(update.should_skip(&one_percent_threshold, &history));
+        assert!(update.should_skip(&always_publish_every_second, &history)); // only 900 ms since last update, shoud be skipped
 
         let update = VotedFeedUpdate {
             feed_id,
             value: FeedType::Numerical(1010.0),
             end_slot_timestamp,
         };
-        assert_eq!(
-            update.should_skip(&always_publish_criteria, &history),
-            false
-        );
+        assert!(!update.should_skip(&always_publish_criteria, &history));
         // If the price is 1000 and it moved to 1010, I'd say it moved by 1%, not by 100/101 %.
-        assert_eq!(update.should_skip(&one_percent_threshold, &history), false);
+        assert!(!update.should_skip(&one_percent_threshold, &history));
         let update = VotedFeedUpdate {
             feed_id,
             value: FeedType::Numerical(1009.999),
             end_slot_timestamp,
         };
-        assert_eq!(update.should_skip(&one_percent_threshold, &history), true);
+        assert!(update.should_skip(&one_percent_threshold, &history));
         let update = VotedFeedUpdate {
             feed_id,
             value: FeedType::Numerical(990.001),
             end_slot_timestamp,
         };
-        assert_eq!(update.should_skip(&one_percent_threshold, &history), true);
+        assert!(update.should_skip(&one_percent_threshold, &history));
         let update = VotedFeedUpdate {
             feed_id,
             value: FeedType::Numerical(990.000),
             end_slot_timestamp,
         };
-        assert_eq!(update.should_skip(&one_percent_threshold, &history), false);
+        assert!(!update.should_skip(&one_percent_threshold, &history));
     }
 
     #[test]

@@ -766,7 +766,7 @@ pub mod tests {
             history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(130.0),
-                slot_start_in_ms + 1 * report_interval_ms as u128,
+                slot_start_in_ms + report_interval_ms as u128,
             );
             history_guard.push_next(
                 feed_id,
@@ -874,7 +874,7 @@ pub mod tests {
             history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(130.0),
-                slot_start_in_ms + 1 * report_interval_ms as u128,
+                slot_start_in_ms + report_interval_ms as u128,
             );
             history_guard.push_next(
                 feed_id,
@@ -981,7 +981,7 @@ pub mod tests {
             history_guard.push_next(
                 feed_id,
                 FeedType::Numerical(102.1),
-                slot_start_in_ms + 1 * report_interval_ms as u128,
+                slot_start_in_ms + report_interval_ms as u128,
             );
         }
 

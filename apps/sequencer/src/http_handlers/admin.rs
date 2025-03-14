@@ -759,10 +759,10 @@ mod tests {
             let mut recvd_data: AllFeedsConfig =
                 serde_json::from_str(body_str).expect("recvd_data is not valid JSON!");
 
-            assert_eq!(
-                recvd_data.feeds.sort_by(FeedConfig::compare),
-                feeds_config.feeds.sort_by(FeedConfig::compare)
-            );
+            recvd_data.feeds.sort_by(FeedConfig::compare);
+            feeds_config.feeds.sort_by(FeedConfig::compare);
+
+            assert_eq!(recvd_data.feeds, feeds_config.feeds);
         }
 
         {
@@ -905,10 +905,7 @@ mod tests {
 
         {
             let sequencer_config = sequencer_state.sequencer_config.read().await;
-            assert_eq!(
-                true,
-                sequencer_config.providers.get(network).unwrap().is_enabled
-            );
+            assert!(sequencer_config.providers.get(network).unwrap().is_enabled);
         }
 
         let req = test::TestRequest::post()
@@ -920,10 +917,7 @@ mod tests {
         assert_eq!(200, resp.status());
         {
             let sequencer_config = sequencer_state.sequencer_config.read().await;
-            assert_eq!(
-                false,
-                sequencer_config.providers.get(network).unwrap().is_enabled
-            );
+            assert!(!sequencer_config.providers.get(network).unwrap().is_enabled);
         }
     }
 
@@ -952,10 +946,7 @@ mod tests {
         assert_eq!(200, resp.status());
 
         let sequencer_config = sequencer_state.sequencer_config.read().await;
-        assert_eq!(
-            true,
-            sequencer_config.providers.get(network).unwrap().is_enabled
-        );
+        assert!(sequencer_config.providers.get(network).unwrap().is_enabled);
     }
 
     #[actix_web::test]

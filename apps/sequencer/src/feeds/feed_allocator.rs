@@ -434,7 +434,6 @@ mod tests {
         let handles: Vec<_> = (0..5)
             .map(|_| {
                 let allocator = Arc::clone(&allocator);
-                let schema_id = schema_id;
                 thread::spawn(move || {
                     allocator.allocate(
                         number_of_slots,
