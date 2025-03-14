@@ -83,10 +83,10 @@ fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
 
         if let Some(exchanges) = feed_config.arguments.exchanges {
             for (exchange, symbols) in exchanges {
-                let entry = exchanges_symbols.entry(exchange).or_insert_with(Vec::new);
+                let entry = exchanges_symbols.entry(exchange).or_default();
                 let mut seen_symbols = entry.iter().cloned().collect::<HashSet<_>>();
 
-                for symbol in symbols.values().cloned().flatten() {
+                for symbol in symbols.values().flatten().cloned() {
                     if !seen_symbols.contains(&symbol) {
                         entry.push(symbol.clone());
                         seen_symbols.insert(symbol);
