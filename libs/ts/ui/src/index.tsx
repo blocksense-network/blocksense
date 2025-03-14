@@ -17,4 +17,5 @@ export * from './components/Icon';
 export * from './components/Dialog';
 export * from './components/Select';
 export * from './components/Table';
+export * from './components/Popover';
 export * from './lib/utils';

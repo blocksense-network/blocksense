@@ -18,7 +18,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/common/Popover';
+} from '@blocksense/ui/Popover';
 import { OptionType } from '@/components/ui/DataTable/DataTable';
 
 interface DataTableFacetedFilterProps<TData, TValue> {
