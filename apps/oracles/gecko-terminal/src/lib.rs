@@ -222,6 +222,6 @@ mod tests {
             value.data.attributes.address,
             "0x8552706d9a27013f20ea0f9df8e20b61e283d2d3"
         );
-        assert_eq!(value.data.attributes.price_in_usd, 181.783899458886 as f64);
+        assert_eq!(value.data.attributes.price_in_usd, 181.783899458886_f64);
     }
 }

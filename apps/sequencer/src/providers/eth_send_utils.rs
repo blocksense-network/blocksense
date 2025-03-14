@@ -810,7 +810,7 @@ mod tests {
         let provider_settings = cfg
             .providers
             .get(&net)
-            .expect(format!("Config for network {net} not found!").as_str())
+            .unwrap_or_else(|| panic!("Config for network {net} not found!"))
             .clone();
         let feeds_config = Arc::new(RwLock::new(HashMap::<u32, FeedConfig>::new()));
 
@@ -940,7 +940,7 @@ mod tests {
         let updates_oneshot = BatchedAggegratesToSend {
             block_height: 0,
             updates: vec![VotedFeedUpdate::new_decode(
-                &"00000003",
+                "00000003",
                 &value1,
                 end_of_timeslot,
                 FeedType::Text("".to_string()),
@@ -1129,7 +1129,7 @@ mod tests {
         let key_path = get_test_private_key_path();
 
         let mut sequencer_config =
-            get_test_config_with_single_provider(network, key_path.as_path(), &url);
+            get_test_config_with_single_provider(network, key_path.as_path(), url);
 
         sequencer_config
             .providers
@@ -1151,14 +1151,14 @@ mod tests {
         };
         let providers = init_shared_rpc_providers(
             &sequencer_config,
-            Some(&"peg_stable_coin_updates_"),
+            Some("peg_stable_coin_updates_"),
             &feeds_config,
         )
         .await;
         let mut prov2 = providers.write().await;
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
-        provider.update_history(&vec![VotedFeedUpdate {
+        provider.update_history(&[VotedFeedUpdate {
             feed_id: 0x001_u32,
             value: FeedType::Numerical(1.0f64),
             end_slot_timestamp: 0_u128,
@@ -1184,7 +1184,7 @@ mod tests {
         let key_path = get_test_private_key_path();
 
         let mut sequencer_config =
-            get_test_config_with_single_provider(network, key_path.as_path(), &url);
+            get_test_config_with_single_provider(network, key_path.as_path(), url);
 
         sequencer_config
             .providers
@@ -1205,14 +1205,14 @@ mod tests {
         };
         let providers = init_shared_rpc_providers(
             &sequencer_config,
-            Some(&"peg_stable_coin_updates_disabled"),
+            Some("peg_stable_coin_updates_disabled"),
             &feeds_config,
         )
         .await;
         let mut prov2 = providers.write().await;
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
-        provider.update_history(&vec![VotedFeedUpdate {
+        provider.update_history(&[VotedFeedUpdate {
             feed_id: 0x001_u32,
             value: FeedType::Numerical(1.0f64),
             end_slot_timestamp: 0_u128,
