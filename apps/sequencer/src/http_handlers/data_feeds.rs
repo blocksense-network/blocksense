@@ -689,7 +689,7 @@ pub mod tests {
         const HTTP_STATUS_SUCCESS: u16 = 200;
 
         let anvil = Anvil::new().try_spawn().unwrap();
-        let key_path = PathBuf::new().join("/tmp").join("priv_key_test");
+        let key_path = PathBuf::from("/tmp").join("priv_key_test");
         let network = "ETH140";
 
         // Read app config
@@ -1171,12 +1171,12 @@ pub mod tests {
             history.push_next(
                 feed_id,
                 FeedType::Numerical(102754.2f64),
-                end_slot_timestamp + 300_u128 * 0,
+                end_slot_timestamp, /* + 300_u128 * 0*/
             );
             history.push_next(
                 feed_id,
                 FeedType::Numerical(122756.7f64),
-                end_slot_timestamp + 300_u128 * 1,
+                end_slot_timestamp + 300_u128, /* * 1*/
             );
             history.push_next(
                 feed_id,
