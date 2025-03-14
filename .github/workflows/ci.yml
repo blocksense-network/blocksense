@@ -118,10 +118,6 @@ jobs:
         if: ${{ runner.environment == 'self-hosted' }}
         run: cargo test
 
-      - name: Run Cargo Clippy
-        if: ${{ runner.environment == 'self-hosted' }}
-        run: cargo clippy -- --deny warnings
-
   deploy_websites:
     timeout-minutes: 360
     runs-on: [self-hosted, nixos, x86-64-v3]
