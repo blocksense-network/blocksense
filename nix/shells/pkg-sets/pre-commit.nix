@@ -9,15 +9,24 @@
       excludes = [ "libs/sdk/wit/deps" ];
       enable = true;
     };
-    cargo-check = {
-      enable = true;
-      package = self'.legacyPackages.cargoWrapped;
-    };
     rustfmt = {
       enable = true;
       packageOverrides = {
         cargo = self'.legacyPackages.rustToolchain;
         rustfmt = self'.legacyPackages.rustToolchain;
+      };
+    };
+    clippy = {
+      enable = true;
+      packageOverrides = {
+        cargo = self'.legacyPackages.cargoWrapped;
+        clippy = self'.legacyPackages.rustToolchain;
+      };
+
+      settings = {
+        denyWarnings = true;
+        allFeatures = true;
+        extraArgs = "--tests";
       };
     };
     prettier = {
