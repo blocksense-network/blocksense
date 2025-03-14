@@ -39,14 +39,9 @@ pub fn check_signature(
         .chain(timestamp.to_be_bytes().to_vec())
         .collect();
 
-    match feed_result {
-        Ok(result) => {
-            byte_buffer.extend(result.as_bytes(18));
-        }
-        Err(error) => {
-            warn!("Reported error for feed_id {} : {}", feed_id, error);
-        }
-    };
+    if let Ok(result) = feed_result {
+        byte_buffer.extend(result.as_bytes(18));
+    }
     verify_signature(pub_key, signature, &byte_buffer)
 }
 

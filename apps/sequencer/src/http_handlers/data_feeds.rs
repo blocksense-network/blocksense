@@ -91,7 +91,10 @@ async fn process_report(
             debug!("Recvd result from reporter[{}]: {:?}", reporter_id, result);
         }
         Err(error) => {
-            info!("Reported error from reporter[{}]: {}", reporter_id, error);
+            warn!(
+                "Reported error from reporter[{}]: {} for feed_id {}",
+                reporter_id, error, feed_id
+            );
             inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
         }
     };
