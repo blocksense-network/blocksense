@@ -123,16 +123,23 @@ jobs:
         run: cargo clippy -- --deny warnings
 
   deploy_websites:
+    name: Deploy ${{ matrix.project }} website
     timeout-minutes: 360
     runs-on: [self-hosted, nixos, x86-64-v3]
     strategy:
       matrix:
         include:
           - project: docs.blocksense.network
-          # - project: explorer.blocksense.network
+            path: apps/docs.blocksense.network/dist
+            project_name: blocksense
+            build_command: yarn workspace @blocksense/docs.blocksense.network build:with-deps
+          - project: ui.blocksense.network
+            path: libs/ts/ui/storybook-static
+            project_name: blocksense-ui
+            build_command: yarn workspace @blocksense/ui build-storybook
     outputs:
       docsDeploymentMessage: ${{ steps.docs-ws-url.outputs.url }}
-      # explorerDeploymentMessage: ${{ steps.explorer-ws-url.outputs.url }}
+      uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -156,29 +163,34 @@ jobs:
         run: yarn install
 
       - name: Build
-        run: yarn workspace @blocksense/docs.blocksense.network build:with-deps
+        id: build
+        run: ${{ matrix.build_command }}
 
-      - name: Test `@blocksense/base-utils`
-        run: yarn workspace @blocksense/base-utils test
-
-      - name: Test
-        run: yarn workspace @blocksense/docs.blocksense.network test
-
-      - name: Deploy
-        id: Deploy
+      - name: Deploy Website
+        id: deploy-website
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/docs.blocksense.network/dist --project-name=blocksense
+          command: |
+            pages deploy ${{ matrix.path }} --project-name=${{ matrix.project_name }}
 
+      #TODO(EmilIvanichkovv): Migrate this to the matrix
       - name: Collect Docs Deployment URL
         id: docs-ws-url
         if: matrix.project == 'docs.blocksense.network'
         env:
-          DOCS_DEPLOY_URL: ${{ steps.Deploy.outputs.deployment-url }}
+          DOCS_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
         run: |
           echo "url=$DOCS_DEPLOY_URL" >> $GITHUB_OUTPUT
+
+      - name: Collect UI Deployment URL
+        id: ui-ws-url
+        if: matrix.project == 'ui.blocksense.network'
+        env:
+          UI_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
+        run: |
+          echo "url=$UI_DEPLOY_URL" >> $GITHUB_OUTPUT
 
   comment_on_pr:
     needs: [deploy_websites]
@@ -201,3 +213,4 @@ jobs:
             | Website | Latest Update | Commit |
             |---------------------|----------|----------------------------------------------------------------------|
             | 🌱 [Documentation](${{ needs.deploy_websites.outputs.docsDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
+            | 📖 [UI Components](${{ needs.deploy_websites.outputs.uiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
