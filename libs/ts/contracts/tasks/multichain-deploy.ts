@@ -97,6 +97,7 @@ task('deploy', 'Deploy contracts')
         '0x209fdf6800d7d02ac1cc47ea0409e3064b940123694168d0c33238324bb086e1',
       );
       const safeGuardSalt = ethers.id('onlySafeGuard');
+      const safeModuleSalt = ethers.id('adminExecutorModule');
 
       const accessControlAddress = await predictAddress(
         artifacts,
@@ -185,6 +186,13 @@ task('deploy', 'Deploy contracts')
           await sequencerMultisig!.getAddress(),
         );
 
+        contracts.unshift({
+          name: ContractNames.AdminExecutorModule,
+          argsTypes: ['address', 'address'],
+          argsValues: [sequencerMultisigAddress, adminMultisigAddress],
+          salt: safeModuleSalt,
+          value: 0n,
+        });
         contracts.unshift({
           name: ContractNames.OnlySequencerGuard,
           argsTypes: ['address', 'address', 'address'],

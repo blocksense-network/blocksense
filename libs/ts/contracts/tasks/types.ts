@@ -54,6 +54,7 @@ export enum ContractNames {
   UpgradeableProxyADFS = 'UpgradeableProxyADFS',
   AccessControl = 'AccessControl',
   OnlySequencerGuard = 'OnlySequencerGuard',
+  AdminExecutorModule = 'AdminExecutorModule',
 }
 
 export type DeployContract = {

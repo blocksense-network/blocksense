@@ -46,6 +46,7 @@ const CoreContractsSchemaV2 = S.mutable(
     CLFeedRegistryAdapter: ContractDataSchema,
     AccessControl: ContractDataSchema,
     OnlySequencerGuard: ContractDataSchema,
+    AdminExecutorModule: ContractDataSchema,
   }),
 );
 
