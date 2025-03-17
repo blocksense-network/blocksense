@@ -35,13 +35,14 @@ impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let all_symbols = self
-                .symbols
-                .iter()
-                .map(|s| format!("\"{}\"", s))
-                .collect::<Vec<_>>()
-                .join(",");
-            let req_symbols = format!("[{}]", all_symbols);
+            let req_symbols = format!(
+                "[{}]",
+                self.symbols
+                    .iter()
+                    .map(|s| format!("\"{}\"", s))
+                    .collect::<Vec<_>>()
+                    .join(",")
+            );
 
             let response = http_get_json::<BinancePriceResponse>(
                 "https://api1.binance.com/api/v3/ticker/24hr",
