@@ -29,7 +29,7 @@ export class BinanceAssetsFetcher
 /**
  * Function to fetch symbols information from Binance.
  *
- * Ref: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/public-api-endpoints#exchange-information
+ * Ref: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-endpoints#exchange-information
  */
 export async function fetchBinanceSymbolsInfo(): Promise<BinanceInfoResp> {
   const url = 'https://api.binance.com/api/v3/exchangeInfo';

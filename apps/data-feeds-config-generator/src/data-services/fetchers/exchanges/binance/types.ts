@@ -21,7 +21,7 @@ export type BinanceInfoResp = S.Schema.Type<typeof BinanceInfoRespSchema>;
 
 /**
  * Schema for the data relevant to a Binance oracle.
- * Ref: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/public-api-endpoints#symbol-price-ticker
+ * Ref: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints#symbol-price-ticker
  */
 const BinanceAssetInfoSchema = S.mutable(
   S.Struct({
