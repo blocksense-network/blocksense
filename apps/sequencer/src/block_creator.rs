@@ -110,7 +110,7 @@ pub async fn block_creator_loop(
                     }
 
                     feed_update = aggregated_votes_to_block_creator_recv.recv() => {
-                        debug!("Received votes over `aggregated_votes_to_block_creator_recv`");
+                        debug!("Received votes over `aggregated_votes_to_block_creator_recv`: {feed_update:?}");
                         recvd_feed_update_to_block(feed_update, updates, backlog_updates, max_feed_updates_to_batch);
                     }
 

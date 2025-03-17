@@ -166,15 +166,15 @@ impl FeedSlotsProcessor {
             "[post_consumed_reports]: Impossible, quorum reached but no value is reported",
         )?;
 
-        debug!("Awaiting post_to_contract... [feed {feed_id}]");
+        debug!("Awaiting post_to_block_creator... [feed {feed_id}]");
         let result = self
-            .post_to_contract(history, result_post_to_contract, sequencer_state)
+            .post_to_block_creator(history, result_post_to_contract, sequencer_state)
             .await;
-        debug!("Continued after post_to_contract [feed {feed_id}]");
+        debug!("Continued after post_to_block_creator [feed {feed_id}]");
         result
     }
 
-    async fn post_to_contract(
+    async fn post_to_block_creator(
         &self,
         history: &Arc<RwLock<FeedAggregateHistory>>,
         message: VotedFeedUpdateWithProof,
@@ -197,7 +197,7 @@ impl FeedSlotsProcessor {
             .clone();
         result_send
             .send(message)
-            .map_err(|e| eyre!("[post_to_contract]: {e}"))
+            .map_err(|e| eyre!("[post_to_block_creator]: {e}"))
     }
 
     async fn increase_quorum_metric(

@@ -97,7 +97,10 @@ async fn process_report(
 
     match &data_feed.result {
         Ok(result) => {
-            debug!("Recvd result from reporter[{}]: {:?}", reporter_id, result);
+            debug!(
+                "Recvd result from reporter[{}]: {:?} for feed_id {}",
+                reporter_id, result, feed_id
+            );
         }
         Err(error) => {
             warn!(
