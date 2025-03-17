@@ -82,20 +82,31 @@ task(
   // change threshold to 1 for easier testing
   let safeTxChangeThreshold =
     await sequencerMultisig.createChangeThresholdTx(1);
+  const adminExecutorModule = await ethers.getContractAt(
+    'AdminExecutorModule',
+    deployment.coreContracts.AdminExecutorModule.address,
+  );
 
-  for (const owner of config.sequencerMultisig.owners) {
-    const apiKit = await Safe.init({
-      provider: config.rpc,
-      safeAddress: await sequencerMultisig.getAddress(),
-      signer: owner,
-      contractNetworks: {
-        [config.network.chainId.toString()]: config.safeAddresses,
-      },
-    });
-    safeTxChangeThreshold = await apiKit.signTransaction(safeTxChangeThreshold);
-  }
+  const txData =
+    await adminExecutorModule.executeTransaction.populateTransaction(
+      safeTxChangeThreshold.data.data,
+    );
 
-  await sequencerMultisig.executeTransaction(safeTxChangeThreshold);
+  const isValidExecTx = await sequencerMultisig.isValidTransaction(
+    safeTxChangeThreshold,
+  );
+  expect(isValidExecTx).to.be.false;
+
+  const tx = await adminMultisig.createTransaction({
+    transactions: [
+      {
+        to: adminExecutorModule.target.toString(),
+        data: txData.data,
+        value: '0',
+      } as SafeTransactionDataPartial,
+    ],
+  });
+  await adminMultisig.executeTransaction(tx);
 
   ////////////////////////
   // Write data in ADFS //
@@ -157,14 +168,14 @@ task(
 
   const { decodeJSON } = selectDirectory(configDir);
   const { feeds } = await decodeJSON(
-    { name: 'feeds_config_new' },
+    { name: 'feeds_config_v2' },
     NewFeedsConfigSchema,
   );
 
   // allowed feeds
   // filter feeds
   const chainlinkCompatibility = await decodeJSON(
-    { name: 'chainlink_compatibility_new' },
+    { name: 'chainlink_compatibility_v2' },
     ChainlinkCompatibilityConfigSchema,
   );
 
