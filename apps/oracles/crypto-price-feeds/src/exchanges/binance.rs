@@ -1,6 +1,7 @@
 use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 
+use itertools::Itertools;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
@@ -37,11 +38,7 @@ impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
         async {
             let req_symbols = format!(
                 "[{}]",
-                self.symbols
-                    .iter()
-                    .map(|s| format!("\"{}\"", s))
-                    .collect::<Vec<_>>()
-                    .join(",")
+                self.symbols.iter().map(|s| format!("\"{}\"", s)).join(",")
             );
 
             let response = http_get_json::<BinancePriceResponse>(
