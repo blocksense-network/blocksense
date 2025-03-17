@@ -6,7 +6,7 @@ import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-import { getEnvString } from '@blocksense/base-utils';
+import { getEnvString, getOptionalEnvString } from '@blocksense/base-utils';
 
 task('access-control', '[UTILS] Set up access control').setAction(
   async (args, { ethers, artifacts, run }) => {
@@ -57,42 +57,43 @@ task('access-control', '[UTILS] Set up access control').setAction(
       }
     }
 
-    console.log(
-      '\nSetting up access control and adding owners to admin multisig...',
-    );
-
-    const accessControl = new ethers.Contract(
-      deployData.coreContracts.AccessControl.address,
-      artifacts.readArtifactSync(ContractNames.AccessControl).abi,
-      adminSigner,
-    );
-
     const sequencerMultisigAddress = sequencerMultisig
       ? await sequencerMultisig.getAddress()
-      : getEnvString('SEQUENCER_ADDRESS');
+      : getOptionalEnvString('SEQUENCER_ADDRESS', '');
+    if (sequencerMultisigAddress) {
+      console.log(
+        '\nSetting up access control and adding owners to admin multisig...',
+      );
 
-    const isAllowed = Boolean(
-      Number(
-        await sequencerSigner.call({
-          to: accessControl.target.toString(),
-          data: sequencerMultisigAddress,
-        }),
-      ),
-    );
+      const accessControl = new ethers.Contract(
+        deployData.coreContracts.AccessControl.address,
+        artifacts.readArtifactSync(ContractNames.AccessControl).abi,
+        adminSigner,
+      );
 
-    if (!isAllowed) {
-      const safeTxSetAccessControl: SafeTransactionDataPartial = {
-        to: accessControl.target.toString(),
-        value: '0',
-        data: ethers.solidityPacked(
-          ['address', 'bool'],
-          [sequencerMultisigAddress, true],
+      const isAllowed = Boolean(
+        Number(
+          await sequencerSigner.call({
+            to: accessControl.target.toString(),
+            data: sequencerMultisigAddress,
+          }),
         ),
-        operation: OperationType.Call,
-      };
-      transactions.push(safeTxSetAccessControl);
-    } else {
-      console.log('Access control already set up');
+      );
+
+      if (!isAllowed) {
+        const safeTxSetAccessControl: SafeTransactionDataPartial = {
+          to: accessControl.target.toString(),
+          value: '0',
+          data: ethers.solidityPacked(
+            ['address', 'bool'],
+            [sequencerMultisigAddress, true],
+          ),
+          operation: OperationType.Call,
+        };
+        transactions.push(safeTxSetAccessControl);
+      } else {
+        console.log('Access control already set up');
+      }
     }
 
     const owners = await adminMultisig.getOwners();
