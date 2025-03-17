@@ -10,7 +10,7 @@ import {
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 
-import { configDir } from '@blocksense/base-utils/env';
+import { configDir, getOptionalEnvString } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
@@ -92,8 +92,10 @@ task('deploy', 'Deploy contracts')
       const adfsSalt = ethers.id('aggregatedDataFeedStore');
       // this address starts with '0xADF5...' for local deployment
       // should be recalculated when admin address and/or owners (therefore adminMultisig address) changes
-      const proxySalt =
-        '0x209fdf6800d7d02ac1cc47ea0409e3064b940123694168d0c33238324bb086e1';
+      const proxySalt = getOptionalEnvString(
+        'ADFS_UPGRADEABLE_PROXY_SALT',
+        '0x209fdf6800d7d02ac1cc47ea0409e3064b940123694168d0c33238324bb086e1',
+      );
       const safeGuardSalt = ethers.id('onlySafeGuard');
 
       const accessControlAddress = await predictAddress(
