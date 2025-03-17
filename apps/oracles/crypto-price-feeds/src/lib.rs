@@ -121,8 +121,10 @@ fn print_results(
     payload: &Payload,
 ) {
     let mut results_info: Vec<ResultInfo> = Vec::new();
-    let mut missing_info: String = String::new();
+    let mut missing_pairs: String = String::new();
+    let mut missing_pairs_count = 0;
     let mut missing_prices: String = String::new();
+    let mut missing_prices_count = 0;
 
     for resurce in resources.iter() {
         if results.get(&resurce.id).is_some() {
@@ -147,6 +149,7 @@ fn print_results(
             {
                 DataFeedResultValue::Numerical(num) => format!("{num:.8}"),
                 _ => {
+                    missing_prices_count += 1;
                     write!(
                         missing_prices,
                         "{{ {}: {} / {}, exchanges: {:?} }},",
@@ -164,8 +167,9 @@ fn print_results(
                 exchanges,
             });
         } else {
+            missing_pairs_count += 1;
             write!(
-                missing_info,
+                missing_pairs,
                 "{{ {}: {} / {} }},",
                 resurce.id, resurce.pair.base, resurce.pair.quote
             )
@@ -194,10 +198,10 @@ fn print_results(
         ]));
     }
 
-    println!("\nMissing pairs:");
-    println!("[{}]", missing_info);
+    println!("\n{} Missing pairs:", missing_pairs_count);
+    println!("[{}]", missing_pairs);
 
-    println!("\nMissing prices:");
+    println!("\n{} Missing prices:", missing_prices_count);
     println!("[{}]", missing_prices);
 
     println!("\nResults:");
