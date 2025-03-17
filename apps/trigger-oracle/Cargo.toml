@@ -35,8 +35,8 @@ tokio = { workspace = true }
 tokio-scoped = "0.2.0"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-http = "1.1.0"
-hyper = "1.3.1"
+http = "1.3.1"
+hyper = "1.6.0"
 wasmtime = "22.0.0"
 wasmtime-wasi = "22.0.0"
 wasmtime-wasi-http = "22.0.0"
