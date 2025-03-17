@@ -57,6 +57,10 @@ contract OnlySequencerGuard is BaseGuard {
     if (to == ADFS && !sequencers[msgSender]) {
       revert ExecutorNotSequencer();
     }
+
+    if (to == MULTISIG && msgSender != ADMIN_MULTISIG) {
+      revert OnlyAdminMultisig();
+    }
   }
 
   /**

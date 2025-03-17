@@ -100,16 +100,10 @@ task('access-control', '[UTILS] Set up access control').setAction(
     if (owners.length === 1 && config.adminMultisig.owners.length > 0) {
       const adminMultisigAddress = await adminMultisig.getAddress();
       for (const owner of config.adminMultisig.owners) {
-        // addOwnerWithThreshold(address newOwner, uint256 threshold);
-        const safeTxAddOwner: SafeTransactionDataPartial = {
-          to: adminMultisigAddress,
-          value: '0',
-          data:
-            '0x0d582f13' +
-            abiCoder.encode(['address', 'uint256'], [owner, 1]).slice(2),
-          operation: OperationType.Call,
-        };
-        transactions.push(safeTxAddOwner);
+        const safeTxAddOwner = await adminMultisig.createAddOwnerTx({
+          ownerAddress: owner,
+        });
+        transactions.push(safeTxAddOwner.data);
       }
 
       const prevOwnerAddress = config.adminMultisig.owners[0];
@@ -161,28 +155,21 @@ task('access-control', '[UTILS] Set up access control').setAction(
         const sequencerMultisigAddress = await sequencerMultisig.getAddress();
         const sequencerTransactions: SafeTransactionDataPartial[] = [];
 
-        // setGuard(address guard)
-        const safeTxSetGuard: SafeTransactionDataPartial = {
-          to: sequencerMultisigAddress,
-          value: '0',
-          data:
-            '0xe19a9dd9' +
-            abiCoder.encode(['address'], [guard.target]).slice(2),
-          operation: OperationType.Call,
-        };
-        sequencerTransactions.push(safeTxSetGuard);
+        const safeTxSetGuard = await sequencerMultisig.createEnableGuardTx(
+          await guard.getAddress(),
+        );
+        sequencerTransactions.push(safeTxSetGuard.data);
+
+        const safeTxSetModule = await sequencerMultisig.createEnableModuleTx(
+          deployData.coreContracts.AdminExecutorModule.address,
+        );
+        sequencerTransactions.push(safeTxSetModule.data);
 
         for (const owner of config.sequencerMultisig.owners) {
-          // addOwnerWithThreshold(address newOwner, uint256 threshold);
-          const safeTxAddOwner: SafeTransactionDataPartial = {
-            to: sequencerMultisigAddress,
-            value: '0',
-            data:
-              '0x0d582f13' +
-              abiCoder.encode(['address', 'uint256'], [owner, 1]).slice(2),
-            operation: OperationType.Call,
-          };
-          sequencerTransactions.push(safeTxAddOwner);
+          const safeTxAddOwner = await sequencerMultisig.createAddOwnerTx({
+            ownerAddress: owner,
+          });
+          sequencerTransactions.push(safeTxAddOwner.data);
         }
 
         const prevOwnerAddress = config.sequencerMultisig.owners[0];
