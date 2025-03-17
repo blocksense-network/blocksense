@@ -43,6 +43,8 @@ task('multisig-tx-exec', '[UTILS] Execute multisig transactions').setAction(
     }
 
     if (config.adminMultisig.signer) {
+      console.log('\nProposing transaction...');
+
       const txResponse = await safe.executeTransaction(tx);
       const transaction = await config.provider.getTransaction(txResponse.hash);
       await transaction?.wait();
