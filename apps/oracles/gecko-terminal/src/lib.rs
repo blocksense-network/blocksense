@@ -14,6 +14,8 @@ pub struct PoolAttributes {
     pub name: String,
     #[serde(deserialize_with = "as_f64")]
     pub price_in_usd: f64,
+    #[serde(deserialize_with = "as_f64")]
+    pub price_in_target_token: f64,
 }
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
@@ -27,10 +29,17 @@ pub struct GeckoTerminalResponce {
     pub data: GeckoTerminalData,
 }
 
+impl GeckoTerminalResponce {
+    pub fn reserve_price_in_usd(&self) -> f64 {
+        self.data.attributes.price_in_usd / self.data.attributes.price_in_target_token
+    }
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct GeckoTerminalPool {
     pub network: String,
     pub pool: String,
+    pub reverse: bool,
 }
 
 #[oracle_component]
@@ -54,9 +63,14 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
         let string = String::from_utf8(body)?;
         let value: GeckoTerminalResponce = serde_json::from_str(&string)
             .context("Couldn't parse Gecko terminal response properly")?;
+        let price = if pool_with_network.reverse {
+            value.reserve_price_in_usd()
+        } else {
+            value.data.attributes.price_in_usd
+        };
         payload.values.push(DataFeedResult {
             id: feed.id,
-            value: DataFeedResultValue::Numerical(value.data.attributes.price_in_usd),
+            value: DataFeedResultValue::Numerical(price),
         });
     }
     println!("{payload:?}");
@@ -223,5 +237,193 @@ mod tests {
             "0x8552706d9a27013f20ea0f9df8e20b61e283d2d3"
         );
         assert_eq!(value.data.attributes.price_in_usd, 181.783899458886 as f64);
+    }
+
+    #[test]
+    fn test_parsing_responce2() {
+        {
+            let raw = r#"{
+            "data": {
+              "id": "171322119",
+              "type": "pool",
+              "attributes": {
+                "address": "0x264e9b75723d75e3c607627d8e21d2c758db4c80",
+                "name": "USDC / WMON",
+                "fully_diluted_valuation": "99912242.38760373350725",
+                "base_token_id": "38379121",
+                "price_in_usd": "0.99907248024275",
+                "price_in_target_token": "0.06202568233",
+                "reserve_in_usd": "771881.4022",
+                "reserve_threshold_met": true,
+                "from_volume_in_usd": "1182787.01464575",
+                "to_volume_in_usd": "1182787.01464575",
+                "api_address": "0x264e9b75723d75e3c607627d8e21d2c758db4c80",
+                "pool_fee": null,
+                "token_weightages": null,
+                "token_reserves": {
+                  "38379114": {
+                    "reserves": "23812.4025080635",
+                    "reserves_in_usd": 385936.7889807996
+                  },
+                  "38379121": {
+                    "reserves": "384984.918205",
+                    "reserves_in_usd": 385936.7889807977
+                  }
+                },
+                "token_value_data": {
+                  "38379114": {
+                    "fdv_in_usd": 1644321102.7761497,
+                    "market_cap_in_usd": null,
+                    "market_cap_to_holders_ratio": null
+                  },
+                  "38379121": {
+                    "fdv_in_usd": 100252259.55218814,
+                    "market_cap_in_usd": null,
+                    "market_cap_to_holders_ratio": null
+                  }
+                },
+                "balancer_pool_id": null,
+                "swap_count_24h": 132038,
+                "swap_url": "https://swap.bean.exchange/swap?outputCurrency=0xf817257fed379853cde0fa4f97ab987181b1e5ea",
+                "sentiment_votes": {
+                  "total": 0.0,
+                  "up_percentage": 0,
+                  "down_percentage": 0
+                },
+                "price_percent_change": "+0.57%",
+                "price_percent_changes": {
+                  "last_5m": "-0.1%",
+                  "last_15m": "-0.48%",
+                  "last_30m": "+0.36%",
+                  "last_1h": "-0.04%",
+                  "last_6h": "-0.08%",
+                  "last_24h": "+0.6%"
+                },
+                "historical_data": {
+                  "last_5m": {
+                    "swaps_count": 593,
+                    "buyers_count": 356,
+                    "price_in_usd": "1.0065622534",
+                    "sellers_count": 149,
+                    "volume_in_usd": "6124.5596226486",
+                    "buy_swaps_count": 406,
+                    "sell_swaps_count": 187
+                  },
+                  "last_15m": {
+                    "swaps_count": 1694,
+                    "buyers_count": 968,
+                    "price_in_usd": "1.0103727702",
+                    "sellers_count": 429,
+                    "volume_in_usd": "18653.5217858644",
+                    "buy_swaps_count": 1133,
+                    "sell_swaps_count": 561
+                  },
+                  "last_30m": {
+                    "swaps_count": 3382,
+                    "buyers_count": 1838,
+                    "price_in_usd": "1.0019221173",
+                    "sellers_count": 849,
+                    "volume_in_usd": "31374.4927020119",
+                    "buy_swaps_count": 2248,
+                    "sell_swaps_count": 1134
+                  },
+                  "last_1h": {
+                    "swaps_count": 6551,
+                    "buyers_count": 3488,
+                    "price_in_usd": "1.005909513",
+                    "sellers_count": 1651,
+                    "volume_in_usd": "65201.6371308379",
+                    "buy_swaps_count": 4348,
+                    "sell_swaps_count": 2203
+                  },
+                  "last_6h": {
+                    "swaps_count": 37577,
+                    "buyers_count": 18981,
+                    "price_in_usd": "1.0062752729",
+                    "sellers_count": 8834,
+                    "volume_in_usd": "359464.647861938",
+                    "buy_swaps_count": 25236,
+                    "sell_swaps_count": 12341
+                  },
+                  "last_24h": {
+                    "swaps_count": 132038,
+                    "buyers_count": 58038,
+                    "price_in_usd": "0.9995505107",
+                    "sellers_count": 29131,
+                    "volume_in_usd": "1182787.01464575",
+                    "buy_swaps_count": 85971,
+                    "sell_swaps_count": 46067
+                  }
+                },
+                "security_indicators": [],
+                "gt_score": 42.201834862385326,
+                "gt_score_details": {
+                  "info": 0.0,
+                  "pool": 31.25,
+                  "transactions": 100.0,
+                  "holders": 0.0,
+                  "creation": 50.0
+                },
+                "pool_reports_count": 0,
+                "pool_created_at": "2025-03-03T09:23:55.319Z",
+                "latest_swap_timestamp": "2025-03-17T10:45:23Z",
+                "high_low_price_data_by_token_id": {
+                  "38379114": {
+                    "high_price_in_usd_24h": 17.1288829538,
+                    "high_price_timestamp_24h": "2025-03-17T09:00:51Z",
+                    "low_price_in_usd_24h": 16.0266401781,
+                    "low_price_timestamp_24h": "2025-03-17T08:37:39Z"
+                  },
+                  "38379121": {
+                    "high_price_in_usd_24h": 1.0518595445,
+                    "high_price_timestamp_24h": "2025-03-17T09:16:25Z",
+                    "low_price_in_usd_24h": 0.9787653682,
+                    "low_price_timestamp_24h": "2025-03-16T21:11:35Z"
+                  }
+                },
+                "is_nsfw": false,
+                "is_stale_pool": null,
+                "is_pool_address_explorable": true
+              },
+              "relationships": {
+                "dex": {
+                  "data": {
+                    "id": "22120",
+                    "type": "dex"
+                  }
+                },
+                "tokens": {
+                  "data": [
+                    {
+                      "id": "38379114",
+                      "type": "token"
+                    },
+                    {
+                      "id": "38379121",
+                      "type": "token"
+                    }
+                  ]
+                },
+                "pool_metric": {
+                  "data": {
+                    "id": "4818589",
+                    "type": "pool_metric"
+                  }
+                },
+                "pairs": {
+                  "data": [
+                    {
+                      "id": "8883031",
+                      "type": "pair"
+                    }
+                  ]
+                }
+              }
+            }
+          }"#;
+            let value: GeckoTerminalResponce =
+                serde_json::from_str(raw).expect("This should never happen");
+            assert_eq!(value.reserve_price_in_usd(), 16.107400075460806_f64);
+        }
     }
 }
