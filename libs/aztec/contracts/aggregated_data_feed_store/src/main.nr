@@ -101,25 +101,17 @@ contract AggregatedDataFeedStore {
     #[public]
     #[view]
     fn get_latest_round(stride: Field, feed_id: Field) -> Field {
-        let two_pow_155_bignum: U256 = BigNum::from_slice([(TWO_POW_115 * stride as u128), 0, 0]); // DANGER: 2.pow(147) should be with separated limbs!!!!
-        let feed_id_bignum: U256 = BigNum::from_slice([feed_id as u128, 0, 0]); // DANGER: USE FEED_ID'S LIMBS, DON'T USE ONLY THE FIRST LIMB!
-        let (row_value, _) = unsafe {
-            (two_pow_155_bignum + feed_id_bignum).__udiv_mod(MAX_ROUND_VALUES_IN_A_FIELD)
-        };
-        let round_value = storage.rounds.at(to_field(row_value)).read();
+        let id = (feed_id as u128) % 15;
+        let pos = 240 - (16 * id);
+        let two_pow_pos = TWO.pow_32(pos as Field);
+        let row_value = (TWO_POW_115 * (stride as u128) + (feed_id as u128)) / 15;
+        let round_value = storage.rounds.at((row_value as Field)).read();
+        let round_value_bignum: U256 = BigNum::from(round_value);
+        let two_pow_pos_bignum: U256 = BigNum::from(two_pow_pos);
+        let (shifted, _) = round_value_bignum.__udiv_mod(two_pow_pos_bignum);
+        let (_, round) = shifted.__udiv_mod(ROUND_VALUE_MAX_BITS_SIZE);
 
-        let (_, slot_index) = unsafe {
-            BigNum::from_slice([feed_id as u128, 0, 0]).__udiv_mod(MAX_ROUND_VALUES_IN_A_FIELD)
-        };
-
-        let pos: U256 =
-            BigNum::from_slice([240 as u128 - (16 * to_field(slot_index)) as u128, 0, 0]);
-        let two_pow_pos: U256 = BigNum::from_slice([2, 0, 0]).__pow(pos); // <===== Not enough L2GAS gas left
-        let round_value_bignum: U256 = BigNum::from_slice([round_value as u128, 0, 0]);
-
-        // let (shifted, _) = round_value_bignum.__udiv_mod(two_pow_pos);
-
-        round_value
+        to_field(round)
     }
 
     #[public]
