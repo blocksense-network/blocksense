@@ -274,6 +274,7 @@ pub struct SequencerConfig {
     pub providers: HashMap<String, Provider>,
     pub reporters: Vec<Reporter>,
     pub kafka_report_endpoint: KafkaReportEndpoint,
+    pub http_input_buffer_size: Option<usize>,
 }
 
 impl Validated for SequencerConfig {
@@ -436,6 +437,7 @@ pub fn get_test_config_with_no_providers() -> SequencerConfig {
         providers: HashMap::new(),
         reporters: Vec::new(),
         kafka_report_endpoint: KafkaReportEndpoint { url: None },
+        http_input_buffer_size: None,
     }
 }
 

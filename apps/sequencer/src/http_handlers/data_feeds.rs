@@ -21,6 +21,7 @@ use uuid::Uuid;
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
+use config::SequencerConfig;
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::DataFeedPayload;
 use feed_registry::types::FeedMetaData;
@@ -30,6 +31,14 @@ use prometheus::{inc_metric, inc_vec_metric};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::{mpsc, RwLock};
 use tokio::time::Duration;
+
+fn get_max_buffer_size(cfg: &SequencerConfig) -> usize {
+    if let Some(size) = cfg.http_input_buffer_size {
+        size
+    } else {
+        MAX_SIZE
+    }
+}
 
 async fn process_report(
     sequencer_state: &web::Data<SequencerState>,
@@ -188,11 +197,12 @@ pub async fn post_report(
     mut payload: web::Payload,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
+    let max_size = get_max_buffer_size(&*sequencer_state.sequencer_config.read().await);
     let mut body = web::BytesMut::new();
     while let Some(chunk) = payload.next().await {
         let chunk = chunk?;
         // limit max size of in-memory payload
-        if (body.len() + chunk.len()) > MAX_SIZE {
+        if (body.len() + chunk.len()) > max_size {
             return Err(ErrorBadRequest("overflow"));
         }
         body.extend_from_slice(&chunk);
@@ -213,11 +223,13 @@ pub async fn get_last_published_value_and_time(
     payload: web::Payload,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
+    let max_size = get_max_buffer_size(&*sequencer_state.sequencer_config.read().await);
+
     let span = info_span!("get_last_published_value_and_time");
     let _guard = span.enter();
 
     let requested_data_feeds: Vec<GetLastPublishedRequestData> =
-        deserialize_payload_to_vec::<GetLastPublishedRequestData>(payload).await?;
+        deserialize_payload_to_vec::<GetLastPublishedRequestData>(payload, max_size).await?;
     let history = sequencer_state.feed_aggregate_history.read().await;
     let mut results: Vec<LastPublishedValue> = vec![];
     for r in requested_data_feeds {
@@ -262,7 +274,10 @@ pub async fn get_last_published_value_and_time(
 
 use serde::de::DeserializeOwned;
 
-async fn deserialize_payload_to_vec<T>(mut payload: web::Payload) -> Result<Vec<T>, Error>
+async fn deserialize_payload_to_vec<T>(
+    mut payload: web::Payload,
+    max_size: usize,
+) -> Result<Vec<T>, Error>
 where
     T: DeserializeOwned,
 {
@@ -270,7 +285,7 @@ where
     while let Some(chunk) = payload.next().await {
         let chunk = chunk?;
         // limit max size of in-memory payload
-        if (body.len() + chunk.len()) > MAX_SIZE {
+        if (body.len() + chunk.len()) > max_size {
             return Err(ErrorBadRequest("overflow"));
         }
         body.extend_from_slice(&chunk);
@@ -290,11 +305,13 @@ pub async fn post_reports_batch(
     payload: web::Payload,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
+    let max_size = get_max_buffer_size(&*sequencer_state.sequencer_config.read().await);
+
     let span = info_span!("post_reports_batch");
     let _guard = span.enter();
 
     let data_feeds: Vec<DataFeedPayload> =
-        deserialize_payload_to_vec::<DataFeedPayload>(payload).await?;
+        deserialize_payload_to_vec::<DataFeedPayload>(payload, max_size).await?;
     info!("Received batches {}", data_feeds.len());
 
     let mut errors_in_batch = Vec::new();
@@ -317,6 +334,8 @@ pub async fn post_aggregated_consensus_vote(
     mut payload: web::Payload,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
+    let max_size = get_max_buffer_size(&*sequencer_state.sequencer_config.read().await);
+
     let span = info_span!("post_aggregated_consensus_vote");
     let _guard = span.enter();
 
@@ -324,7 +343,7 @@ pub async fn post_aggregated_consensus_vote(
     while let Some(chunk) = payload.next().await {
         let chunk = chunk?;
         // limit max size of in-memory payload
-        if (body.len() + chunk.len()) > MAX_SIZE {
+        if (body.len() + chunk.len()) > max_size {
             return Err(ErrorBadRequest("overflow"));
         }
         body.extend_from_slice(&chunk);
