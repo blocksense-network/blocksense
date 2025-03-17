@@ -63,44 +63,51 @@ in
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyContractAddressSepolia;
           impersonated_anvil_account = impersonationAddress;
-        };
-        b = {
-          private_key_path = "${testKeysDir}/sequencer-private-key";
-          contract_address = upgradeableProxyContractAddressHolesky;
-          transaction_gas_limit = 20000000;
           allow_feeds = [
-            31 # BTC/USD
-            47 # ETH/USD
-            236 # USDT/USD
-            131 # USDC/USD
-            43 # WBTC/USD
+            0 # BTC / USD
+            3 # ETH / USD
+            7 # USDT / USD
+            19 # USDC / USD
+            13 # BNB / USD
+            16 # SOL / USD
+            32 # wBTC / USD
+            35 # LINK / USD
+            91 # UNI / USD
+            114 # AAVE / USD
+            121 # TAO / USD
+            347 # 1INCH / USD
           ];
           publishing_criteria = [
             {
-              feed_id = 31;
-              skip_publish_if_less_then_percentage = 0.1;
-              always_publish_heartbeat_ms = 50000;
+              feed_id = 0;
+              skip_publish_if_less_then_percentage = 0.001;
+              always_publish_heartbeat_ms = 50000; # This might be ignored in favor of the value from the feed config
             }
             {
-              feed_id = 47;
-              skip_publish_if_less_then_percentage = 0.1;
-              always_publish_heartbeat_ms = 360000;
-            }
-            {
-              feed_id = 131;
+              feed_id = 3;
               skip_publish_if_less_then_percentage = 0.1;
               always_publish_heartbeat_ms = 360000;
-              peg_to_value = 1.00;
-              peg_tolerance_percentage = 0.2;
             }
             {
-              feed_id = 236;
+              feed_id = 7;
               skip_publish_if_less_then_percentage = 0.5;
               always_publish_heartbeat_ms = 360000;
               peg_to_value = 1.00;
               peg_tolerance_percentage = 0.1;
             }
+            {
+              feed_id = 19;
+              skip_publish_if_less_then_percentage = 0.1;
+              always_publish_heartbeat_ms = 360000;
+              peg_to_value = 1.00;
+              peg_tolerance_percentage = 0.2;
+            }
           ];
+        };
+        b = {
+          private_key_path = "${testKeysDir}/sequencer-private-key";
+          contract_address = upgradeableProxyContractAddressHolesky;
+          transaction_gas_limit = 20000000;
           impersonated_anvil_account = impersonationAddress;
         };
       };
@@ -124,7 +131,7 @@ in
       a = {
         reporter-info = {
           reporter_id = 0;
-          interval_time_in_seconds = 6;
+          interval_time_in_seconds = 30;
           secret_key = "${testKeysDir}/reporter_secret_key";
         };
         api-keys = { };
