@@ -120,7 +120,11 @@ fn fill_results(
         res.symbol = trading_pair.clone();
 
         for quote in quote_variants {
-            let symbol = format!("{}{}", resource.pair.base, quote);
+            let symbol = format!(
+                "{}{}",
+                resource.pair.base.to_uppercase(),
+                quote.to_uppercase()
+            );
             if let Some(price_point) = prices_per_exchange.data.get(&symbol) {
                 res.exchanges_data.insert(
                     format!("{} {} price", prices_per_exchange.name, quote),
