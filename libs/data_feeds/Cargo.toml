@@ -56,7 +56,7 @@ strum = { version = "0.26.3", features = ["derive"] }
 http = "1.2.0"
 
 # Service APIs
-yahoo_finance_api = {"version" = "2.4.0", features = ["blocking"]}
+yahoo_finance_api = {"version" = "3.0.0", features = ["blocking"]}
 cmc = "0.4.4"
 fred-rs = "0.1.1"
 weer_api = "0.1.1"
