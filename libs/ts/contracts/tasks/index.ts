@@ -8,3 +8,4 @@ import './deployment-utils/multisig-tx-exec';
 import './deployment-utils/deploy-contracts';
 import './deployment-utils/register-cl-adapters';
 import './deployment-utils/access-control';
+import './ms-change-sequencer';
