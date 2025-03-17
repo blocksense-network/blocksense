@@ -270,6 +270,12 @@ in
     };
   };
 
+  http_input_buffer_size = mkOption {
+    type = types.nullOr types.int;
+    default = null;
+    description = mdDoc "The size of the buffer for incoming HTTP requests.";
+  };
+
   log-level = mkOption {
     type = types.enum [
       "debug"
