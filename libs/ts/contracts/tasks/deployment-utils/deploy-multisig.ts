@@ -47,7 +47,7 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
 
     const safeAddress = await protocolKit.getAddress();
 
-    console.log('\nSafeFactory address:', safeAddress);
+    console.log(`\nPredicted ${type} address: ${safeAddress}`);
 
     if (await checkAddressExists(config, safeAddress)) {
       console.log(` -> ${type} already deployed!`);
