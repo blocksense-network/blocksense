@@ -71,9 +71,9 @@ const config: HardhatUserConfig = {
         {
           url: getOptionalRpcUrl(network),
           chainId: networkMetadata[network].chainId,
-          accounts: process.env.SIGNER_PRIVATE_KEY
-            ? [process.env.SIGNER_PRIVATE_KEY]
-            : [],
+          ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
+            ? [getOptionalEnvString('LEDGER_ACCOUNT', '')]
+            : undefined,
         },
       ]),
     ),
