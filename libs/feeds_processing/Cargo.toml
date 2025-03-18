@@ -43,7 +43,6 @@ alloy = { version = "0.8", features = [
     "pubsub",
 ] }
 alloy-primitives = "0.8.19"
-alloy-encode-packed = "0.1.1"
 anyhow = "1.0.89"
 serde_json = { workspace = true }
 serde = { workspace = true }

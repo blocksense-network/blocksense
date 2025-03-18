@@ -12,8 +12,6 @@ use utils::{from_hex_string, to_hex_string};
 
 use tracing::{debug, error, info};
 
-use alloy_encode_packed::{self, abi::encode_packed, SolidityDataType};
-
 use once_cell::sync::Lazy;
 
 const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
@@ -40,6 +38,24 @@ fn truncate_leading_zero_bytes(bytes: Vec<u8>) -> Vec<u8> {
     }
 
     result
+}
+
+fn encode_packed(items: &[&[u8]]) -> (Vec<u8>, String) {
+    /// Pack a single `SolidityDataType` into bytes
+    fn pack(b: &[u8]) -> Vec<u8> {
+        let mut res = Vec::new();
+        res.extend(b);
+        res
+    }
+
+    let res = items.iter().fold(Vec::new(), |mut acc, i| {
+        let pack = pack(i);
+        acc.push(pack);
+        acc
+    });
+    let res = res.join(&[][..]);
+    let hexed = hex::encode(&res);
+    (res, hexed)
 }
 
 /// Serializes the `updates` hash map into a string.
@@ -121,12 +137,12 @@ pub async fn adfs_serialize_updates(
         let index = truncate_leading_zero_bytes(index.to_be_bytes_vec());
 
         let packed_result = vec![
-            SolidityDataType::Bytes(&stride_as_byte),
-            SolidityDataType::Bytes(&index_in_bytes_length),
-            SolidityDataType::Bytes(&index),
-            SolidityDataType::Bytes(&bytes_length),
-            SolidityDataType::Bytes(&bytes_vec),
-            SolidityDataType::Bytes(&val),
+            &stride_as_byte,
+            &index_in_bytes_length,
+            index.as_slice(),
+            &bytes_length,
+            bytes_vec.as_slice(),
+            &val,
         ];
 
         let (mut result_bytes, _hex) = encode_packed(&packed_result);
@@ -182,11 +198,7 @@ pub async fn adfs_serialize_updates(
 
         let val = from_hex_string(&val[2..]).unwrap();
 
-        let packed_result = vec![
-            SolidityDataType::Bytes(&index_in_bytes_length),
-            SolidityDataType::Bytes(&index_bytes),
-            SolidityDataType::Bytes(&val),
-        ];
+        let packed_result = vec![&index_in_bytes_length, index_bytes.as_slice(), &val];
 
         let (mut result_bytes, _hex) = encode_packed(&packed_result);
 

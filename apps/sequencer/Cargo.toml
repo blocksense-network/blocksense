@@ -76,7 +76,6 @@ ringbuf = "0.4.7"
 console-subscriber = "0.4.0"
 rdkafka = { version = "0.37.0", features = ["dynamic-linking"] }
 tokio-stream = "0.1.16"
-alloy-encode-packed = "0.1.1"
 
 [[bin]]
 name = "sequencer"
