@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
   nodejs = pkgs.nodejs_22;
   oldYarn = pkgs.yarn.override { inherit nodejs; };
@@ -8,8 +8,13 @@ let
   };
 in
 {
-  packages = [
-    nodejs
-    yarn
-  ];
+  packages =
+    [
+      nodejs
+      yarn
+      pkgs.python3
+    ]
+    ++ lib.optionals pkgs.stdenv.isLinux [
+      pkgs.udev
+    ];
 }
