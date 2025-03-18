@@ -76,6 +76,10 @@ in
             114 # AAVE / USD
             121 # TAO / USD
             347 # 1INCH / USD
+            50000 # USDT / USD Pegged
+            50001 # USDC / USD Pegged
+            100000 # ExSat BTC
+            1000000 # WMON 0.2% / USDT
           ];
           publishing_criteria = [
             {
@@ -89,14 +93,14 @@ in
               always_publish_heartbeat_ms = 360000;
             }
             {
-              feed_id = 7;
+              feed_id = 50000;
               skip_publish_if_less_then_percentage = 0.5;
               always_publish_heartbeat_ms = 360000;
               peg_to_value = 1.00;
               peg_tolerance_percentage = 0.1;
             }
             {
-              feed_id = 19;
+              feed_id = 50001;
               skip_publish_if_less_then_percentage = 0.1;
               always_publish_heartbeat_ms = 360000;
               peg_to_value = 1.00;
