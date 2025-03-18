@@ -147,6 +147,47 @@
               description = "The materialized configuration for the reporters v2.";
               default = blocksenseConfigJSON;
             };
+
+            _config-dir = mkOption {
+              type = types.package;
+              description = "Config dir";
+              default = pkgs.symlinkJoin {
+                name = "blocksense-configurations";
+                paths =
+                  let
+                    sequencerConfigJSON = pkgs.runCommandLocal "sequencer_config" { } ''
+                      mkdir -p $out
+                      echo '${cfg._sequencer-config-txt}' \
+                        | ${lib.getExe pkgs.jq} > $out/sequencer_config.json
+                    '';
+
+                    reportersConfigJSON = builtins.mapAttrs (
+                      name: _value:
+                      pkgs.runCommandLocal "reporter_config" { } ''
+                        mkdir -p $out/reporter-${name}
+                        echo '${cfg._reporters-config-txt.${name}}' \
+                          | ${lib.getExe pkgs.jq} > $out/reporter-${name}/reporter_config.json
+                      ''
+                    ) cfg.reporters;
+
+                  in
+                  # reportersV2ConfigJSON = builtins.mapAttrs (
+                  #     name: _value: (
+                  #       pkgs.runCommandLocal "blocksense-config" { } ''
+                  #       mkdir -p $out
+                  #       echo '${cfg._blocksense-config-txt.${name}}' \
+                  #       | ${lib.getExe pkgs.jq} > $out/reporter-${name}/blocksense_config.json
+                  #       ''
+                  #       )
+                  #     ) cfg.reporters-v2;
+
+                  [
+                    # sequencerConfigJSON
+                    # reportersConfigJSON
+                  ];
+                # ++ (lib.attrValues reportersV2ConfigJSON);
+              };
+            };
           };
 
           config.services.blocksense = {
