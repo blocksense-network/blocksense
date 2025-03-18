@@ -18,4 +18,5 @@ export * from './components/Dialog';
 export * from './components/Select';
 export * from './components/Table';
 export * from './components/Popover';
+export * from './components/TextArea';
 export * from './lib/utils';

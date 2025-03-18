@@ -28,7 +28,6 @@ type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
 export const TextArea = ({
   label,
   name,
-  value,
   className,
   variant = 'outline',
   labelSize = 'text-base',

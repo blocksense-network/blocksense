@@ -28,6 +28,7 @@
     "./Select": "./src/components/Select/index.tsx",
     "./Table": "./src/components/Table/index.tsx",
     "./Popover": "./src/components/Popover/index.tsx",
+    "./TextArea": "./src/components/TextArea/index.tsx",
     "./utils": "./src/lib/utils.ts"
   },
   "dependencies": {
