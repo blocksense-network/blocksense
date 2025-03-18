@@ -51,6 +51,7 @@ const networks = [
   'manta-mainnet',
   'manta-sepolia',
   'mantle-sepolia',
+  'megaeth-testnet',
   'mezo-matsnet-testnet',
   'monad-testnet',
   'morph-mainnet',
@@ -80,7 +81,7 @@ const chainIds = [
   99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 1313161555,
   43114, 43113, 8453, 84532, 80084, 168587773, 56, 97, 42220, 44787, 5115, 338,
   250, 4002, 114, 100, 10200, 1666700000, 743111, 1663, 2424, 763373, 2358,
-  1285, 59144, 59141, 169, 3441006, 5003, 31611, 10143, 2818, 2810, 10,
+  1285, 59144, 59141, 169, 3441006, 5003, 6342, 31611, 10143, 2818, 2810, 10,
   11155420, 5611, 137, 80002, 1101, 2442, 57000, 534352, 534351, 11011, 16,
   57054, 167000, 167009, 41, 324, 300, 4801,
 ] as const;
@@ -364,6 +365,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://sepolia.mantlescan.xyz/',
     currency: Currency.MNT,
+  },
+  'megaeth-testnet': {
+    chainId: 6342,
+    isTestnet: true,
+    explorerUrl: 'https://www.megaexplorer.xyz',
+    currency: Currency.ETH,
   },
   'mezo-matsnet-testnet': {
     chainId: 31611,
