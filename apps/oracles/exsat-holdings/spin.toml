@@ -16,13 +16,18 @@ component = "exsat-holdings"
 
 [[trigger.oracle.data_feeds]]
 id = "100000"
-data = '{"cmc_id":"","cmc_quote":""}'
+data = '{"pair":{"base":"Exsat","quote":"satoshi"},"decimals":0,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
 
 
 [component.exsat-holdings]
 source = "../../../target/wasm32-wasip1/release/exsat_holdings.wasm"
 key_value_stores = ["default"]
-allowed_outbound_hosts = ["https://raw.githubusercontent.com", "https://rpc-us.exsat.network", "https://blockchain.info", "https://mempool.space"]
+allowed_outbound_hosts = [
+    "https://raw.githubusercontent.com",
+    "https://rpc-us.exsat.network",
+    "https://blockchain.info",
+    "https://mempool.space",
+]
 
 [component.exsat-holdings.build]
 command = "cargo build --target wasm32-wasip1 --release"
