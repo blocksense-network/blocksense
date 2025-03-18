@@ -212,9 +212,11 @@ export const NewFeedSchema = S.mutable(
         category: FeedCategorySchema,
         market_hours: S.NullishOr(MarketHoursSchema),
         arguments: providersResourcesSchema,
-        compatibility_info: S.Struct({
-          chainlink: S.String,
-        }),
+        compatibility_info: S.UndefinedOr(
+          S.Struct({
+            chainlink: S.String,
+          }),
+        ),
       }),
     ),
   }),
