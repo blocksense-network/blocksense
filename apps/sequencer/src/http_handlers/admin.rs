@@ -511,7 +511,7 @@ pub async fn get_oracle_scripts(
                 capabilities: HashSet::new(),
             },
             OracleScript {
-                id: "gecko_terminal".to_string(),
+                id: "gecko-terminal".to_string(),
                 name: None,
                 description: None,
                 oracle_script_wasm: "gecko_terminal_oracle.wasm".to_string(),
