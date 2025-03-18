@@ -53249,6 +53249,68 @@
           "chainlink": "RNDR / USD"
         }
       }
+    },
+    {
+      "id": 100000,
+      "full_name": "ExSat BTC",
+      "description": "Exsat network bitcoin wallet total holdings in satoshi",
+      "type": "price-feed",
+      "oracle_id": "exsat-holdings",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 3600000,
+        "heartbeat_ms": 86400000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "Exsat",
+          "quote": "satoshi"
+        },
+        "decimals": 0,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {}
+      }
+    },
+    {
+      "id": 1000000,
+      "full_name": "WMON 0.2% / USDT",
+      "description": "WMON on monad-testnet pool with contract 0x264e9b75723d75e3c607627d8e21d2c758db4c80",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "WMON",
+          "quote": "USDT"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "network":"monad-testnet",
+          "pool":"0x264e9b75723d75e3c607627d8e21d2c758db4c80",
+          "reverse": true
+        }
+      }
     }
   ]
 }
