@@ -4,6 +4,7 @@ use config::BlockConfig;
 use feed_registry::{registry::SlotTimeTracker, types::Repeatability};
 use gnosis_safe::data_types::ReporterResponse;
 use gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
+use prometheus::{inc_metric, inc_vec_metric};
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, trace};
 use utils::time::{current_unix_time, system_time_to_millis};
@@ -94,6 +95,7 @@ pub async fn aggregation_batch_consensus_loop(
 
                         let block_height = signed_aggregate.block_height;
                         let net = &signed_aggregate.network;
+                        let reporter_id = signed_aggregate.reporter_id;
 
                         // Get quorum size from config before locking batches_awaiting_consensus!
                         let safe_min_quorum = {
@@ -106,6 +108,26 @@ pub async fn aggregation_batch_consensus_loop(
                                 },
                             }
                         };
+
+                        let provider_metrics = {
+                            let providers = sequencer_state.providers.read().await;
+                            match providers.get(net) {
+                                Some(provider) => {
+                                    provider.lock().await.provider_metrics.clone()
+                                },
+                                None => {
+                                    error!("Trying to get the prometheus metrics of a non existent network!");
+                                    continue
+                                },
+                            }
+                        };
+
+                        inc_vec_metric!(
+                            provider_metrics,
+                            net,
+                            total_signed_aggregates_revcd,
+                            reporter_id
+                        );
 
                         let mut batches_awaiting_consensus = sequencer_state
                             .batches_awaiting_consensus
@@ -123,6 +145,12 @@ pub async fn aggregation_batch_consensus_loop(
                         };
 
                         drop(batches_awaiting_consensus);
+
+                        inc_metric!(
+                            provider_metrics,
+                            net,
+                            total_aggregate_quorums_reached
+                        );
 
                         let mut signatures_with_addresses: Vec<&_> = quorum.signatures.values().collect();
                         signatures_with_addresses.sort_by(|a, b| a.signer_address.cmp(&b.signer_address));

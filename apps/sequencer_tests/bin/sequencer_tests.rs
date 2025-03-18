@@ -128,7 +128,7 @@ async fn spawn_sequencer(
         ]}
     );
 
-    write_file("/tmp/feeds_config.json", feeds.to_string().as_bytes()).await;
+    write_file("/tmp/feeds_config_v2.json", feeds.to_string().as_bytes()).await;
 
     thread::spawn(move || {
         let mut command = Command::new("cargo");

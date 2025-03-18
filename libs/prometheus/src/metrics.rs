@@ -149,6 +149,12 @@ pub struct ProviderMetrics {
     pub success_get_max_priority_fee_per_gas: IntCounterVec,
     pub success_get_chain_id: IntCounterVec,
     pub total_timed_out_tx: IntCounterVec,
+    pub total_signed_aggregates_revcd: IntCounterVec,
+    pub total_corrupt_aggregates_signatures_recvd: IntCounterVec,
+    pub total_non_expected_signed_aggregates_revcd: IntCounterVec,
+    pub total_corrupt_aggregates_tx_data_recvd: IntCounterVec,
+    pub total_signed_aggregates_with_incorrect_signatures_revcd: IntCounterVec,
+    pub total_aggregate_quorums_reached: IntCounterVec,
 }
 
 impl ProviderMetrics {
@@ -234,6 +240,36 @@ impl ProviderMetrics {
             total_timed_out_tx: register_int_counter_vec!(
                 format!("{}total_timed_out_tx", prefix),
                 "Total number of tx sent that reached the configured timeout before completion for network",
+                &["Network"]
+            )?,
+            total_signed_aggregates_revcd: register_int_counter_vec!(
+                format!("{}total_signed_aggregates_revcd", prefix),
+                "Total number of second round consensus votes received for a given network by a given reporter",
+                &["Network", "ReporterId"]
+            )?,
+            total_corrupt_aggregates_signatures_recvd: register_int_counter_vec!(
+                format!("{}total_corrupt_aggregates_signatures_recvd", prefix),
+                "Total number of second round consensus votes with corrupt signatures received for a given network by a given reporter",
+                &["Network", "ReporterId"]
+            )?,
+            total_non_expected_signed_aggregates_revcd: register_int_counter_vec!(
+                format!("{}total_non_expected_signed_aggregates_revcd", prefix),
+                "Total number of non expected second round consensus votes received for a given network by a given reporter",
+                &["Network", "ReporterId"]
+            )?,
+            total_corrupt_aggregates_tx_data_recvd: register_int_counter_vec!(
+                format!("{}total_corrupt_aggregates_tx_data_recvd", prefix),
+                "Total number of second round consensus votes with corrupt tx_data received for a given network by a given reporter",
+                &["Network", "ReporterId"]
+            )?,
+            total_signed_aggregates_with_incorrect_signatures_revcd: register_int_counter_vec!(
+                format!("{}total_signed_aggregates_with_incorrect_signatures_revcd", prefix),
+                "Total number of second round consensus votes with non valid signature received for a given network by a given reporter",
+                &["Network", "ReporterId"]
+            )?,
+            total_aggregate_quorums_reached: register_int_counter_vec!(
+                format!("{}total_aggregate_quorums_reached", prefix),
+                "Total number of second round consensus quorums reached for a given network",
                 &["Network"]
             )?,
         })

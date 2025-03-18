@@ -357,8 +357,21 @@ pub async fn post_aggregated_consensus_vote(
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
     let reporter_response: ReporterResponse = serde_json::from_value(v)?;
 
+    let reporter_id = reporter_response.reporter_id;
+    let network = reporter_response.network.as_str();
+
+    let provider_metrics = {
+        let providers = sequencer_state.providers.read().await;
+        match providers.get(network) {
+            Some(provider) => provider.lock().await.provider_metrics.clone(),
+            None => {
+                error!("Trying to get the prometheus metrics of a non existent network!");
+                return Ok(HttpResponse::BadRequest().body("Unknown Network".to_string()));
+            }
+        }
+    };
+
     let (signature, signer_address) = {
-        let reporter_id = reporter_response.reporter_id;
         let reporters = sequencer_state.reporters.read().await;
         let reporter = reporters.get(&reporter_id).cloned();
         drop(reporters);
@@ -370,8 +383,14 @@ pub async fn post_aggregated_consensus_vote(
         let signature = match PrimitiveSignature::from_str(reporter_response.signature.as_str()) {
             Ok(r) => r,
             Err(e) => {
+                inc_vec_metric!(
+                    provider_metrics,
+                    network,
+                    total_corrupt_aggregates_signatures_recvd,
+                    reporter_id
+                );
                 return Ok(HttpResponse::BadRequest()
-                    .body(format!("Could not deserialize signature: {e}")))
+                    .body(format!("Could not deserialize signature: {e}")));
             }
         };
 
@@ -388,6 +407,12 @@ pub async fn post_aggregated_consensus_vote(
         let tx_hash_str = match call_data_with_signatures {
             Some(v) => v.tx_hash,
             None => {
+                inc_vec_metric!(
+                    provider_metrics,
+                    network,
+                    total_non_expected_signed_aggregates_revcd,
+                    reporter_id
+                );
                 return Ok(HttpResponse::BadRequest().body(format!(
                     "No calldata waiting for signatires for block height {} and network {}",
                     reporter_response.block_height,
@@ -398,6 +423,12 @@ pub async fn post_aggregated_consensus_vote(
         let tx_hash = match FixedBytes::<32>::from_str(tx_hash_str.as_str()) {
             Ok(v) => v,
             Err(e) => {
+                inc_vec_metric!(
+                    provider_metrics,
+                    network,
+                    total_corrupt_aggregates_tx_data_recvd,
+                    reporter_id
+                );
                 return Ok(HttpResponse::BadRequest().body(format!(
                     "failed to deserialize tx_data for block height {} and network {}: {}",
                     reporter_response.block_height,
@@ -409,6 +440,12 @@ pub async fn post_aggregated_consensus_vote(
 
         let recovered_address = signature.recover_address_from_prehash(&tx_hash).unwrap();
         if signer_address != recovered_address {
+            inc_vec_metric!(
+                provider_metrics,
+                network,
+                total_signed_aggregates_with_incorrect_signatures_revcd,
+                reporter_id
+            );
             return Ok(HttpResponse::BadRequest().body(format!(
                 "Signature check failure! Expected signer_address: {signer_address} != recovered_address: {recovered_address}"
             )));
