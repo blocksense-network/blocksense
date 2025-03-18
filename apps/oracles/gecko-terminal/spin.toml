@@ -15,8 +15,8 @@ reporter_id = 0
 component = "gecko-terminal"
 
 [[trigger.oracle.data_feeds]]
-id = "100000"
-data = '{"network":"monad-testnet", "pool":"0x264e9b75723d75e3c607627d8e21d2c758db4c80", "reverse": true}'
+id = "1000000"
+data = '{"pair":{"base":"WMON","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"network":"monad-testnet","pool":"0x264e9b75723d75e3c607627d8e21d2c758db4c80","reverse":true}}'
 
 
 [component.gecko-terminal]
