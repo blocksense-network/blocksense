@@ -39,6 +39,10 @@
           shellName = "Lint";
           extraImports = [ ];
         };
+        process-compose = createShell {
+          module = ./pkg-sets/process-compose.nix;
+          shellName = "Process Compose";
+        };
       };
     };
 }
