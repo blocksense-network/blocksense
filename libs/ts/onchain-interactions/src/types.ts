@@ -39,6 +39,7 @@ export const deployedNetworks = [
   'taiko-hekla',
   'telos-testnet',
   'world-chain-sepolia',
+  'monad-testnet',
 ] satisfies NetworkName[];
 
 export const API_KEYS: Record<string, string> = {
@@ -99,6 +100,7 @@ export const API_ENDPOINTS = {
   taikoHekla: 'https://blockscoutapi.hekla.taiko.xyz/api',
   telosTestnet: 'https://api.teloscan.io/v1',
   worldChainSepolia: 'https://worldchain-sepolia.explorer.alchemy.com/api',
+  monadTestnet: 'https://testnet.monadexplorer.com/api',
 };
 
 export type Transaction = {

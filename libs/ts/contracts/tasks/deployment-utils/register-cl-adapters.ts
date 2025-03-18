@@ -9,7 +9,9 @@ import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 task(
   'register-cl-adapters',
   '[UTILS] Register CLAggregatorAdapters in CLFeedRegistryAdapter',
@@ -46,6 +48,7 @@ task(
       data.base,
       data.quote,
     );
+    await delay(500);
 
     if (feed === ethers.ZeroAddress) {
       filteredData.push(data);
@@ -63,6 +66,8 @@ task(
 
   // Set feeds in batches
   for (const batch of batches) {
+    await delay(1000);
+
     const safeTransactionData: SafeTransactionDataPartial = {
       to: registry.target.toString(),
       value: '0',

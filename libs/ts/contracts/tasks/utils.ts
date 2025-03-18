@@ -17,7 +17,9 @@ export const awaitTimeout = (delayMs: number, reason: string) =>
       delayMs,
     ),
   );
-
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 export const predictAddress = async (
   artifacts: Artifacts,
   config: NetworkConfig,
@@ -30,6 +32,7 @@ export const predictAddress = async (
     ['bytes', 'bytes'],
     [artifact.bytecode, args],
   );
+  await delay(200);
 
   return ethers.getCreate2Address(
     config.safeAddresses.createCallAddress,
