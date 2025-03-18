@@ -48,11 +48,11 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let mut payload: Payload = Payload::new();
 
-    for feed in settings.data_feeds {
-        let pool_with_network: GeckoTerminalPool =
-            serde_json::from_str(&feed.data).context("Can't parse GeckoTerminalPool resource")?;
-        let network = pool_with_network.network;
-        let pool = pool_with_network.pool;
+    let gecko_config = get_resources_from_settings(&settings)?;
+
+    for config in gecko_config {
+        let network = config.arguments.network;
+        let pool = config.arguments.pool;
         let url = format!("https://app.geckoterminal.com/api/p1/{network}/pools/{pool}");
         // let url = "https://app.geckoterminal.com/api/p1/monad-testnet/pools/0x8552706d9a27013f20ea0f9df8e20b61e283d2d3";
         let mut req = Request::builder();
@@ -63,18 +63,50 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
         let string = String::from_utf8(body)?;
         let value: GeckoTerminalResponce = serde_json::from_str(&string)
             .context("Couldn't parse Gecko terminal response properly")?;
-        let price = if pool_with_network.reverse {
+        let price = if config.arguments.reverse {
             value.reserve_price_in_usd()
         } else {
             value.data.attributes.price_in_usd
         };
         payload.values.push(DataFeedResult {
-            id: feed.id,
+            id: config.id,
             value: DataFeedResultValue::Numerical(price),
         });
     }
     println!("{payload:?}");
     Ok(payload)
+}
+
+#[derive(Deserialize, Debug)]
+struct FeedArguments {
+    pub arguments: GeckoTerminalPool,
+}
+
+#[derive(Deserialize, Debug)]
+struct FeedConfig {
+    pub id: String,
+    pub arguments: GeckoTerminalPool,
+}
+
+fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
+    let mut config: Vec<FeedConfig> = Vec::new();
+
+    for feed_setting in &settings.data_feeds {
+        //TODO: (EmilIvanichkovv) This is temporary solution
+        if feed_setting.data.contains("pool") {
+            let feed_config = serde_json::from_str::<FeedArguments>(&feed_setting.data)
+                .context("Couldn't parse data feed")?;
+            config.push(FeedConfig {
+                id: feed_setting.id.clone(),
+                arguments: GeckoTerminalPool {
+                    network: feed_config.arguments.network,
+                    pool: feed_config.arguments.pool,
+                    reverse: feed_config.arguments.reverse,
+                },
+            })
+        }
+    }
+    Ok(config)
 }
 
 #[cfg(test)]
