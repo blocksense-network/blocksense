@@ -4,6 +4,8 @@ import {
   BinanceAssetInfo,
   BinanceInfoResp,
   BinanceInfoRespSchema,
+  BinancePrice,
+  BinancePriceSchema,
 } from './types';
 
 /**
@@ -14,15 +16,24 @@ export class BinanceAssetsFetcher
 {
   async fetchAssets(): Promise<AssetInfo<BinanceAssetInfo>[]> {
     const assets = (await fetchBinanceSymbolsInfo()).symbols;
-    return assets.map(asset => ({
-      pair: {
-        base: asset.baseAsset,
-        quote: asset.quoteAsset,
-      },
-      data: {
-        symbol: asset.symbol,
-      },
-    }));
+    const prices = await fetchBinancePricesInfo();
+    return assets.map(asset => {
+      let price = prices.find(p => p.symbol === asset.symbol);
+      if (!price) {
+        console.warn(`[Binance] Price not found for symbol: ${asset.symbol}`);
+        price = { symbol: asset.symbol, lastPrice: '0' };
+      }
+      return {
+        pair: {
+          base: asset.baseAsset,
+          quote: asset.quoteAsset,
+        },
+        data: {
+          symbol: asset.symbol,
+          price: price?.lastPrice,
+        },
+      };
+    });
   }
 }
 
@@ -35,4 +46,10 @@ export async function fetchBinanceSymbolsInfo(): Promise<BinanceInfoResp> {
   const url = 'https://api.binance.com/api/v3/exchangeInfo';
 
   return fetchAndDecodeJSON(BinanceInfoRespSchema, url);
+}
+
+export async function fetchBinancePricesInfo(): Promise<BinancePrice> {
+  const url = `https://api1.binance.com/api/v3/ticker/24hr`;
+
+  return fetchAndDecodeJSON(BinancePriceSchema, url);
 }

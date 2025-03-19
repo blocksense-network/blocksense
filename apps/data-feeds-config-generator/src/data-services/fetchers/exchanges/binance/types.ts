@@ -26,7 +26,19 @@ export type BinanceInfoResp = S.Schema.Type<typeof BinanceInfoRespSchema>;
 const BinanceAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
+    price: S.String,
   }),
 );
 
 export type BinanceAssetInfo = S.Schema.Type<typeof BinanceAssetInfoSchema>;
+
+export const BinancePriceSchema = S.Array(
+  S.mutable(
+    S.Struct({
+      symbol: S.String,
+      lastPrice: S.String,
+    }),
+  ),
+);
+
+export type BinancePrice = S.Schema.Type<typeof BinancePriceSchema>;
