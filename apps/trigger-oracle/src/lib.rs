@@ -12,18 +12,21 @@ use std::{
 
 use http::uri::Scheme;
 use hyper::Request;
-use tokio::sync::{
-    broadcast::{
-        channel, error::RecvError, Receiver as BroadcastReceiver, Sender as BroadcastSender,
+use tokio::{
+    sync::{
+        broadcast::{
+            channel, error::RecvError, Receiver as BroadcastReceiver, Sender as BroadcastSender,
+        },
+        mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
     },
-    mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
+    task::{spawn, Builder, JoinHandle},
 };
 use tracing::Instrument;
+use url::Url;
 
 use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::Message;
-// use rdkafka::message::{BorrowedMessage, Message};
 use tokio_stream::StreamExt;
 
 use outbound_http::OutboundHttpComponent;
@@ -51,7 +54,7 @@ use blocksense_utils::time::current_unix_time;
 
 use blocksense_gnosis_safe::{
     data_types::{ConsensusSecondRoundBatch, ReporterResponse},
-    utils::{bytes_to_hex_string, create_fixed_bytes, create_private_key_signer, sign_hash},
+    utils::{bytes_to_hex_string, create_private_key_signer, hex_str_to_bytes32, sign_hash},
 };
 
 wasmtime::component::bindgen!({
@@ -259,7 +262,7 @@ impl TriggerExecutor for OracleTrigger {
         // This trigger spawns threads, which Ctrl+C does not kill.  So
         // for this case we need to detect Ctrl+C and shut those threads
         // down. For simplicity, we do this by terminating the process.
-        tokio::task::Builder::new()
+        Builder::new()
             .name("ctrl-c watcher")
             .spawn(async move {
                 tracing::trace!("Task ctrl-c watcher started");
@@ -310,7 +313,7 @@ impl TriggerExecutor for OracleTrigger {
         loops.push(secondary_signature);
 
         tracing::trace!("Starting sender to sequencer");
-        let url = url::Url::parse(&self.sequencer.clone())?;
+        let url = Url::parse(&self.sequencer.clone())?;
         let sequencer_post_batch_url = url.join("/post_reports_batch")?;
         let sequencer_aggregated_consensus_url = url.join("/post_aggregated_consensus_vote")?;
         let mut manager = Self::start_manager(
@@ -356,10 +359,10 @@ impl OracleTrigger {
         signal_receiver: BroadcastReceiver<HashSet<DataFeedSetting>>,
         payload_sender: UnboundedSender<(String, Payload)>,
         component: &Component,
-    ) -> tokio::task::JoinHandle<TerminationReason> {
+    ) -> JoinHandle<TerminationReason> {
         let future = Self::execute(engine, signal_receiver, payload_sender, component.clone());
         let task_name = format!("processor for {}", component.id);
-        tokio::task::Builder::new()
+        Builder::new()
             .name(&task_name)
             .spawn(future)
             .unwrap_or_else(|_| panic!("{task_name} failed to start"))
@@ -527,12 +530,12 @@ impl OracleTrigger {
     fn start_secondary_signature_listener(
         kafka_report_endpoint: Option<String>,
         signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
-        kafka_info: Option<String>,
-    ) -> tokio::task::JoinHandle<TerminationReason> {
+        kafka_info: Option<Vec<String>>,
+    ) -> JoinHandle<TerminationReason> {
         let future =
             Self::signal_secondary_signature(kafka_report_endpoint, signal_sender, kafka_info);
 
-        tokio::task::Builder::new()
+        Builder::new()
             .name("sender to sequencer")
             .spawn(future)
             .expect("sender to sequencer failed to start")
@@ -541,13 +544,12 @@ impl OracleTrigger {
     async fn signal_secondary_signature(
         kafka_report_endpoint: Option<String>,
         signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
-        _kafka_info: Option<String>,
+        _kafka_info: Option<Vec<String>>,
     ) -> TerminationReason {
-        // TODO(adikov): remove unwrap/expect
         // TODO(adikov): get all kafka configuration from `kafka_info` parameter
 
         let Some(kafka_report_endpoint) = kafka_report_endpoint else {
-            return TerminationReason::Other("No kafka report provided".to_string());
+            return TerminationReason::Other("No kafka endpoint provided".to_string());
         };
 
         // Configure the Kafka consumer
@@ -572,45 +574,47 @@ impl OracleTrigger {
         };
 
         // Subscribe to the desired topic(s)
-        consumer
-            .subscribe(&["aggregation_consensus"])
-            .expect("Failed to subscribe to topic");
+        if let Err(err) = consumer.subscribe(&["aggregation_consensus"]) {
+            return TerminationReason::Other(format!(
+                "Error while subscribing to kafka topic: {:?}",
+                err
+            ));
+        };
 
         // Asynchronously process messages using a stream
         let mut message_stream = consumer.stream();
 
-        loop {
-            if let Some(message_result) = message_stream.next().await {
-                match message_result {
-                    Ok(message) => {
-                        let payload = match message.payload() {
-                            None => {
-                                tracing::warn!("kafka None message received ");
+        while let Some(message_result) = message_stream.next().await {
+            match message_result {
+                Ok(message) => {
+                    let payload: ConsensusSecondRoundBatch = match message.payload() {
+                        None => {
+                            tracing::warn!("kafka None message received");
+                            continue;
+                        }
+                        Some(bytes) => match serde_json::from_slice(bytes) {
+                            Ok(r) => r,
+                            Err(err) => {
+                                tracing::error!("Error while parsing the message: {:?}", err);
                                 continue;
                             }
-                            Some(bytes) => match serde_json::from_slice(bytes) {
-                                Ok(r) => r,
-                                Err(err) => {
-                                    tracing::error!("Error while parsing the message: {:?}", err);
-                                    continue;
-                                }
-                            },
-                        };
-                        tracing::debug!("kafka message received - {:?}", payload);
+                        },
+                    };
+                    tracing::debug!("kafka message received - {:?}", payload);
 
-                        match signal_sender.send(payload) {
-                            Ok(_) => {
-                                continue;
-                            }
-                            Err(_) => {
-                                break;
-                            }
-                        };
-                    }
-                    Err(err) => {
-                        // Handle message errors
-                        tracing::error!("Error while consuming: {:?}", err);
-                    }
+                    match signal_sender.send(payload) {
+                        Ok(_) => {
+                            continue;
+                        }
+                        Err(_) => {
+                            break;
+                        }
+                    };
+                }
+                Err(err) => {
+                    // Handle message errors
+                    tracing::error!("Error while consuming: {:?}", err);
+                    return TerminationReason::Other(format!("Error while consuming: {:?}", err));
                 }
             }
         }
@@ -619,37 +623,37 @@ impl OracleTrigger {
     }
 
     fn start_manager(
-        rx: UnboundedReceiver<(String, Payload)>,
-        ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
-        sequencer_post_batch: &url::Url,
-        sequencer_aggregated_consensus: &url::Url,
+        payload_rx: UnboundedReceiver<(String, Payload)>,
+        second_consensus_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
+        sequencer_post_batch_url: &Url,
+        sequencer_aggregated_consensus_url: &Url,
         secret_key: &str,
         second_consensus_secret_key: &str,
         reporter_id: u64,
-    ) -> Vec<tokio::task::JoinHandle<TerminationReason>> {
+    ) -> Vec<JoinHandle<TerminationReason>> {
         let process_payload_future = Self::process_payload(
-            rx,
-            sequencer_post_batch.to_owned(),
+            payload_rx,
+            sequencer_post_batch_url.to_owned(),
             secret_key.to_owned(),
             reporter_id,
         );
 
         let process_aggregated_consensus_future = Self::process_aggregated_consensus(
-            ss_rx,
-            sequencer_aggregated_consensus.to_owned(),
+            second_consensus_rx,
+            sequencer_aggregated_consensus_url.to_owned(),
             second_consensus_secret_key.to_owned(),
             reporter_id,
         );
 
         vec![
-            tokio::task::spawn(process_payload_future),
-            tokio::task::spawn(process_aggregated_consensus_future),
+            spawn(process_payload_future),
+            spawn(process_aggregated_consensus_future),
         ]
     }
 
     async fn process_payload(
         mut rx: UnboundedReceiver<(String, Payload)>,
-        sequencer: url::Url,
+        sequencer_url: Url,
         secret_key: String,
         reporter_id: u64,
     ) -> TerminationReason {
@@ -693,12 +697,12 @@ impl OracleTrigger {
 
             tracing::trace!(
                 "Sending to url - {}; {} batches",
-                sequencer.clone(),
+                sequencer_url.clone(),
                 batch_payload.len()
             );
             let client = reqwest::Client::new();
             match client
-                .post(sequencer.clone())
+                .post(sequencer_url.clone())
                 .json(&batch_payload)
                 .send()
                 .await
@@ -727,13 +731,19 @@ impl OracleTrigger {
 
     async fn process_aggregated_consensus(
         mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
-        sequencer: url::Url,
+        sequencer: Url,
         second_consensus_secret_key: String,
         reporter_id: u64,
     ) -> TerminationReason {
         while let Some(aggregated_consensus) = ss_rx.recv().await {
             let signer = create_private_key_signer(second_consensus_secret_key.as_str());
-            let tx = create_fixed_bytes(aggregated_consensus.tx_hash.as_str());
+            let tx = match hex_str_to_bytes32(aggregated_consensus.tx_hash.as_str()) {
+                Ok(t) => t,
+                Err(e) => {
+                    tracing::error!("Failed to parse str to bytes on second consensus: {}", &e);
+                    continue;
+                }
+            };
             let signed = match sign_hash(&signer, &tx).await {
                 Ok(s) => s,
                 Err(e) => {
@@ -742,8 +752,7 @@ impl OracleTrigger {
                 }
             };
 
-            let signature = bytes_to_hex_string(signed.signature.as_bytes().to_vec());
-
+            let signature = bytes_to_hex_string(signed.signature);
             let report = ReporterResponse {
                 block_height: aggregated_consensus.block_height,
                 reporter_id,
