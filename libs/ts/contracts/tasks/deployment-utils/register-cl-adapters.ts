@@ -42,6 +42,11 @@ task(
   const filteredData = [];
 
   for (const data of aggregatorData) {
+    if (!data.base || !data.quote) {
+      console.log(` -> Feed '${data.description}' has no base or quote`);
+      continue;
+    }
+
     const feed = await registry.connect(signer).getFunction('getFeed')(
       data.base,
       data.quote,
