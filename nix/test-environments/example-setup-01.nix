@@ -139,6 +139,7 @@ in
           reporter_id = 0;
           interval_time_in_seconds = 30;
           secret_key = "${testKeysDir}/reporter_secret_key";
+          second_consensus_secret_key = "${testKeysDir}/reporter_secret_key";
         };
         api-keys = { };
       };
