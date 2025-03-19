@@ -8,9 +8,9 @@ DIR="$ROOT/apps/trigger-oracle"
 (cd "$DIR"; cargo build --release)
 
 tar czf "$DIR/trigger-oracle.tar.gz" -C "$ROOT/target/release" ./trigger-oracle
-HASH=$(sha256sum $DIR/trigger-oracle.tar.gz | cut -d' ' -f 1)
+HASH=$(sha256sum "$DIR/trigger-oracle.tar.gz" | cut -d' ' -f 1)
 
-cat > $DIR/trigger-oracle.json << EOF
+cat > "$DIR/trigger-oracle.json" << EOF
 {
     "name": "trigger-oracle",
     "description": "Run Blocksense oracle components at timed intervals",
@@ -23,7 +23,7 @@ cat > $DIR/trigger-oracle.json << EOF
             "os": "linux",
             "arch": "amd64",
             "url": "file://$DIR/trigger-oracle.tar.gz",
-            "sha256": "$HASH"
+            "sha256": "${HASH}"
         }
     ]
 }
@@ -31,4 +31,4 @@ EOF
 
 set -x
 MY_SPIN="${SPIN_BIN:-spin}"
-$MY_SPIN plugin install --file $DIR/trigger-oracle.json --yes
+$MY_SPIN plugin install --file "$DIR/trigger-oracle.json" --yes
