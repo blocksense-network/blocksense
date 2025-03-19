@@ -1,4 +1,8 @@
-{ lib, blocksense, ... }:
+{
+  lib,
+  blocksense,
+  ...
+}:
 with lib;
 {
   options = {
@@ -27,6 +31,15 @@ with lib;
       secret_key = mkOption {
         type = types.path;
         description = "The path to the reporter secret key.";
+      };
+      second_consensus_secret_key = mkOption {
+        type = types.path;
+        description = "The path to the reporter second consensus secret key.";
+      };
+      kafka_endpoint = mkOption {
+        type = types.str;
+        default = "http://127.0.0.1:${toString blocksense.sequencer.kafka-report-endpoint.url}";
+        description = "The url of the kafka server.";
       };
     };
 
