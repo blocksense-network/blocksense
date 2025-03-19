@@ -74,6 +74,7 @@ const networks = [
   'sonic-blaze',
   'taiko-mainnet',
   'taiko-hekla',
+  'taraxa-testnet',
   'telos-testnet',
   'zksync-mainnet',
   'zksync-sepolia',
@@ -86,7 +87,7 @@ const chainIds = [
   18880, 250, 4002, 114, 100, 10200, 1666700000, 743111, 1663, 2424, 763373,
   2358, 1285, 59144, 59141, 169, 3441006, 5003, 6342, 31611, 10143, 2818, 2810,
   10, 11155420, 5611, 137, 80002, 1101, 2442, 57000, 200018, 534352, 534351,
-  11011, 50312, 16, 57054, 167000, 167009, 41, 324, 300, 4801,
+  11011, 50312, 16, 57054, 167000, 167009, 842, 41, 324, 300, 4801,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -129,6 +130,7 @@ export enum Currency {
   ROME = 'ROME',
   S = 'S',
   STT = 'STT',
+  TARA = 'TARA',
   tBNB = 'tBNB',
   TCRO = 'TCRO',
   tFTM = 'tFTM',
@@ -509,6 +511,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://hekla.taikoscan.io',
     currency: Currency.ETH,
+  },
+  'taraxa-testnet': {
+    chainId: 842,
+    isTestnet: true,
+    explorerUrl: 'https://testnet.explorer.taraxa.io',
+    currency: Currency.TARA,
   },
   'telos-testnet': {
     chainId: 41,
