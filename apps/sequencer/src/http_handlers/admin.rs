@@ -35,6 +35,7 @@ pub async fn get_key_from_contract(
     providers: &SharedRpcProviders,
     network: &String,
     key: String,
+    decimals: u8,
 ) -> Result<String> {
     let providers = providers.read().await;
 
@@ -67,12 +68,13 @@ pub async fn get_key_from_contract(
     info!("Call result: {:?}", result);
     // TODO: get from metadata the type of the value.
     // TODO: Refector to not use dummy argument
-    let return_val = match FeedType::from_bytes(result.to_vec(), FeedType::Numerical(0.0), 18) {
-        Ok(val) => val,
-        Err(e) => {
-            return Err(eyre!("Could not deserialize feed from bytes {}", e));
-        }
-    };
+    let return_val =
+        match FeedType::from_bytes(result.to_vec(), FeedType::Numerical(0.0), decimals as usize) {
+            Ok(val) => val,
+            Err(e) => {
+                return Err(eyre!("Could not deserialize feed from bytes {}", e));
+            }
+        };
     info!("Call result: {:?}", return_val);
     Ok(return_val.parse_to_string())
 }
@@ -111,10 +113,25 @@ pub async fn get_key(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let network: String = req.match_info().get("network").ok_or(bad_input)?.parse()?;
     let key: String = req.match_info().query("key").parse()?;
+
+    let feed_id: u32 = match key.parse() {
+        Ok(v) => v,
+        Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
+    };
+
+    let decimals = {
+        let feeds_config = sequencer_state.active_feeds.read().await;
+        if let Some(feed_config) = feeds_config.get(&feed_id) {
+            feed_config.additional_feed_info.decimals
+        } else {
+            return Err(error::ErrorBadRequest("Non-existent feed_id requested!"));
+        }
+    };
+
     info!("getting key {} for network {} ...", key, network);
     let result = actix_web::rt::time::timeout(
         Duration::from_secs(7),
-        get_key_from_contract(&sequencer_state.providers, &network, key),
+        get_key_from_contract(&sequencer_state.providers, &network, key, decimals),
     )
     .await;
     match result {
