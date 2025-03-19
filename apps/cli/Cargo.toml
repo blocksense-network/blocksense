@@ -23,7 +23,7 @@ serde_path_to_error = "0.1"
 serde_json = { workspace = true }
 
 tokio = { workspace = true }
-toml = "0.8.13"
+toml = "0.8.20"
 toml_edit = "0.22.22"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
