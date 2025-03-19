@@ -8,12 +8,13 @@ let
   readJson = path: builtins.fromJSON (builtins.readFile path);
 
   testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-  deploymentFilePath = config.devenv.root + "/config/evm_contracts_deployment_v1.json";
+  deploymentV1FilePath = config.devenv.root + "/config/evm_contracts_deployment_v1.json";
+  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2.json";
 
   upgradeableProxyContractAddressSepolia =
-    (readJson deploymentFilePath)."ethereum-sepolia".contracts.coreContracts.UpgradeableProxy.address;
-  upgradeableProxyContractAddressHolesky =
-    (readJson deploymentFilePath)."ethereum-holesky".contracts.coreContracts.UpgradeableProxy.address;
+    (readJson deploymentV1FilePath)."ethereum-sepolia".contracts.coreContracts.UpgradeableProxy.address;
+  upgradeableProxyADFSContractAddressInk =
+    (readJson deploymentV2FilePath)."ink-sepolia".contracts.coreContracts.UpgradeableProxyADFS.address;
 
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
@@ -35,7 +36,7 @@ in
       b = {
         port = 8547;
         chain-id = 99999999999;
-        fork-url = "wss://ethereum-holesky-rpc.publicnode.com";
+        fork-url = "wss://ink-sepolia.drpc.org";
       };
     };
 
@@ -110,7 +111,8 @@ in
         };
         b = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
-          contract_address = upgradeableProxyContractAddressHolesky;
+          contract_address = upgradeableProxyADFSContractAddressInk;
+          contract_version = 2;
           transaction_gas_limit = 20000000;
           impersonated_anvil_account = impersonationAddress;
         };
