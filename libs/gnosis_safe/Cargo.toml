@@ -9,7 +9,7 @@ edition.workspace = true
 feed_registry = { path = "../feed_registry" }
 data_feeds = {path = "../data_feeds"}
 hex = "0.4.3"
-alloy = { version = "0.8", features = [
+alloy = { version = "0.9", features = [
     "sol-types",
     "contract",
     "network",
@@ -31,7 +31,7 @@ alloy = { version = "0.8", features = [
     "transport-ws",
     "pubsub",
 ] }
-alloy-primitives = "0.8.19"
+alloy-primitives = "0.8"
 anyhow = "1.0.89"
 serde_json = { workspace = true }
 serde = { workspace = true }

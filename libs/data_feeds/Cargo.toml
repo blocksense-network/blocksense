@@ -14,7 +14,7 @@ crypto = { path = "../crypto" }
 feed_registry = { path = "../feed_registry"}
 config = { path = "../config"}
 
-alloy = { version = "0.8", features = [
+alloy = { version = "0.9", features = [
     "sol-types",
     "contract",
     "network",

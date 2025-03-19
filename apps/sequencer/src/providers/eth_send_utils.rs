@@ -445,7 +445,7 @@ pub async fn eth_batch_send_to_contract(
     );
 
     let tx_hash = receipt.transaction_hash;
-    let tx_fee = receipt.gas_used * receipt.effective_gas_price;
+    let tx_fee = (receipt.gas_used as u128) * receipt.effective_gas_price;
     let tx_fee = (tx_fee as f64) / 1e18;
     info!("Transaction with hash {tx_hash} on `{net}` cost {tx_fee} ETH");
 

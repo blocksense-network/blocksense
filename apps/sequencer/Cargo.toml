@@ -16,7 +16,7 @@ utils = { workspace = true }
 feed_registry = { path = "../../libs/feed_registry" }
 blockchain_data_model = { path = "../../libs/blockchain_data_model" }
 
-alloy = { version = "0.8", features = [
+alloy = { version = "0.9", features = [
     "sol-types",
     "contract",
     "network",
@@ -39,7 +39,7 @@ alloy = { version = "0.8", features = [
     "pubsub",
 ] }
 
-alloy-primitives = "0.8.19"
+alloy-primitives = "0.8"
 
 prometheus = { path = "../../libs/prometheus" }
 gnosis_safe = { path = "../../libs/gnosis_safe" }
