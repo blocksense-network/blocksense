@@ -28,12 +28,12 @@ in
     logsDir = config.devenv.root + "/logs/blocksense";
 
     anvil = {
-      a = {
+      ethereum-sepolia = {
         port = 8546;
         chain-id = 99999999999;
         fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
       };
-      b = {
+      ink-sepolia = {
         port = 8547;
         chain-id = 99999999999;
         fork-url = "wss://ink-sepolia.drpc.org";
@@ -56,7 +56,7 @@ in
       };
 
       providers = {
-        a = {
+        ethereum-sepolia = {
           # NOTE: this is an example key included directly to make the setup
           # self-contained.
           # In a production environment, use a secret manager like Agenix, to
@@ -109,7 +109,7 @@ in
             }
           ];
         };
-        b = {
+        ink-sepolia = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyADFSContractAddressInk;
           contract_version = 2;
