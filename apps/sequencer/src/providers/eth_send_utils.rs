@@ -25,7 +25,7 @@ use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use feeds_processing::adfs_gen_calldata::adfs_serialize_updates;
 use futures::stream::FuturesUnordered;
 use paste::paste;
-use prometheus::{inc_metric, inc_metric_by};
+use prometheus::{inc_metric, inc_metric_by, set_metric};
 use prometheus::{metrics::FeedsMetrics, process_provider_getter};
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
@@ -436,12 +436,12 @@ pub async fn eth_batch_send_to_contract(
     inc_metric!(provider_metrics, net, total_tx_sent);
     let gas_used_inc = receipt.gas_used;
     inc_metric_by!(provider_metrics, net, gas_used, gas_used_inc);
-    let effective_gas_price_inc = receipt.effective_gas_price;
-    inc_metric_by!(
+    let effective_gas_price = receipt.effective_gas_price;
+    set_metric!(
         provider_metrics,
         net,
         effective_gas_price,
-        effective_gas_price_inc
+        effective_gas_price
     );
 
     let tx_hash = receipt.transaction_hash;

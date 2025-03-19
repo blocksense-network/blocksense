@@ -120,6 +120,18 @@ macro_rules! inc_metric_by (
 );
 
 #[macro_export]
+macro_rules! set_metric (
+($_component: ident, $_comp_index: ident, $_metric: ident, $_set_val: ident) => (
+    $_component
+    .read() // Holding a read lock here suffice, since the counters are atomic.
+    .await
+    .$_metric
+    .with_label_values(&[&$_comp_index.to_string()])
+    .set($_set_val as i64);
+);
+);
+
+#[macro_export]
 macro_rules! inc_vec_metric (
 ($_component: ident, $_comp_index: ident, $_metric: ident, $_index: ident) => (
     $_component
@@ -135,7 +147,7 @@ macro_rules! inc_vec_metric (
 pub struct ProviderMetrics {
     pub total_tx_sent: IntCounterVec,
     pub gas_used: IntCounterVec,
-    pub effective_gas_price: IntCounterVec,
+    pub effective_gas_price: IntGaugeVec,
     pub transaction_confirmation_times: HistogramVec,
     pub gas_price: HistogramVec,
     pub failed_send_tx: IntCounterVec,
@@ -164,9 +176,10 @@ impl ProviderMetrics {
             "Total amount of gas spend for network",
             &["Network"]
         )?,
-        effective_gas_price: register_int_counter_vec!(
+        effective_gas_price: register_int_gauge_vec!(
             format!("{}effective_gas_price", prefix),
-            "Total amount of Wei spend for network",
+            // Reference: https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionreceipt.
+            "The sum of the base fee and tip paid per unit of gas",
             &["Network"]
         )?,
         transaction_confirmation_times: register_histogram_vec!(
