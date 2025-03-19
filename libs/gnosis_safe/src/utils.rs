@@ -95,35 +95,22 @@ pub fn create_private_key_signer(private_key: &str) -> PrivateKeySigner {
     .unwrap()
 }
 
-fn hex_string_to_bytes(hex_string: &str) -> Result<[u8; 32], String> {
-    let hex_string = if hex_string.starts_with("0x") {
-        &hex_string[2..] // Slice to remove "0x"
-    } else {
-        hex_string
-    };
-
+pub fn hex_str_to_bytes32(hex_string: &str) -> anyhow::Result<FixedBytes<32>> {
+    let hex_string = hex_string.strip_prefix("0x").unwrap_or(hex_string);
     if hex_string.len() != 64 {
         // Exactly 32 bytes * 2 hex chars/byte = 64
-        return Err("Hex string must be exactly 64 characters long".to_string());
+        anyhow::bail!("Hex string must be exactly 64 characters long".to_string());
     }
 
     let mut bytes = [0u8; 32]; // Initialize the array
 
     for i in (0..hex_string.len()).step_by(2) {
         let hex_pair = &hex_string[i..i + 2];
-        let byte = match u8::from_str_radix(hex_pair, 16) {
-            Ok(byte) => byte,
-            Err(err) => return Err(format!("Invalid hex character sequence: {}", err)),
-        };
+        let byte = u8::from_str_radix(hex_pair, 16)?;
         bytes[i / 2] = byte; // Index into the array
     }
 
-    Ok(bytes)
-}
-
-pub fn create_fixed_bytes(tx: &str) -> FixedBytes<32> {
-    let tx = hex_string_to_bytes(tx).unwrap();
-    FixedBytes::<32>::new(tx)
+    Ok(FixedBytes::<32>::new(bytes))
 }
 
 pub async fn sign_hash(
@@ -175,14 +162,8 @@ pub fn signature_to_bytes(signature: PrimitiveSignature) -> Vec<u8> {
     signature_bytes
 }
 
-pub fn bytes_to_hex_string(bytes: Vec<u8>) -> String {
-    // Changed to Vec<u8>
-    let mut hex_string = String::new();
-    for byte in bytes {
-        // Iterate directly over the Vec
-        hex_string.push_str(&format!("{:02x}", byte));
-    }
-    hex_string
+pub fn bytes_to_hex_string(signature: PrimitiveSignature) -> String {
+    hex::encode(signature.as_bytes())
 }
 
 pub async fn get_signature_bytes(
