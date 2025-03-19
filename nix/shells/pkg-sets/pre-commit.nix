@@ -24,9 +24,10 @@
       };
 
       settings = {
-        denyWarnings = true;
         allFeatures = true;
+        denyWarnings = true;
         extraArgs = "--tests";
+        offline = false;
       };
     };
     prettier = {
