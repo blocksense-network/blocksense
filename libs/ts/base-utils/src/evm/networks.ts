@@ -66,6 +66,7 @@ const networks = [
   'polygon-zkevm-cardona',
   'rollux-testnet',
   'rome-testnet',
+  'rootstock-testnet',
   'scroll-mainnet',
   'scroll-sepolia',
   'shape-sepolia',
@@ -86,7 +87,7 @@ const chainIds = [
   43114, 43113, 8453, 84532, 80084, 168587773, 56, 97, 42220, 44787, 5115, 338,
   18880, 250, 4002, 114, 100, 10200, 1666700000, 743111, 1663, 2424, 763373,
   2358, 1285, 59144, 59141, 169, 3441006, 5003, 6342, 31611, 10143, 2818, 2810,
-  10, 11155420, 5611, 137, 80002, 1101, 2442, 57000, 200018, 534352, 534351,
+  10, 11155420, 5611, 137, 80002, 1101, 2442, 57000, 200018, 31, 534352, 534351,
   11011, 50312, 16, 57054, 167000, 167009, 842, 41, 324, 300, 4801,
 ] as const;
 
@@ -134,6 +135,7 @@ export enum Currency {
   tBNB = 'tBNB',
   TCRO = 'TCRO',
   tFTM = 'tFTM',
+  tRBTC = 'tRBTC',
   TSYS = 'TSYS',
   TLOS = 'TLOS',
   tZEN = 'tZEN',
@@ -463,6 +465,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://rome.testnet.romeprotocol.xyz:1000',
     currency: Currency.ROME,
+  },
+  'rootstock-testnet': {
+    chainId: 31,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.rootstock.io',
+    currency: Currency.tRBTC,
   },
   'scroll-mainnet': {
     chainId: 534352,
