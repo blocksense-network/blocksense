@@ -294,9 +294,6 @@ async fn main() -> Result<()> {
         let signer: PrivateKeySigner = anvil.keys()[0].clone().into();
 
         let provider = ProviderBuilder::new()
-            // Adds the `ChainIdFiller`, `GasFiller` and the `NonceFiller` layers.
-            // This is the recommended way to set up the provider.
-            .with_recommended_fillers()
             .wallet(EthereumWallet::from(signer.clone()))
             .on_http(format!("http:127.0.0.1:{port}").as_str().parse().unwrap());
 
@@ -337,6 +334,7 @@ async fn main() -> Result<()> {
                 Bytes::from_hex(encoded.clone()).unwrap(),
                 Uint::from(1500),
             )
+            .call()
             .await
             .unwrap();
 

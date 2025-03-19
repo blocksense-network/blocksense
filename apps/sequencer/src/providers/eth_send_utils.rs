@@ -371,7 +371,7 @@ pub async fn eth_batch_send_to_contract(
         debug!("tx_str={tx_str}");
 
         let tx_result = if is_impersonated {
-            let rpc_url = rpc_handle.client().transport().url().parse()?;
+            let rpc_url = provider.url();
             let rpc_handle = ProviderBuilder::new().on_http(rpc_url);
             debug!("Sending impersonated price feed update transaction to network `{net}`...");
             let result = rpc_handle.send_transaction(tx).await;

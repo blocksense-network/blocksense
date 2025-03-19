@@ -9,7 +9,7 @@ edition.workspace = true
 feed_registry = { path = "../feed_registry" }
 data_feeds = {path = "../data_feeds"}
 hex = "0.4.3"
-alloy = { version = "0.9", features = [
+alloy = { version = "0.11", features = [
     "sol-types",
     "contract",
     "network",

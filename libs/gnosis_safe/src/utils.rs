@@ -6,7 +6,7 @@ use alloy::providers::{
     Identity, RootProvider,
 };
 use alloy::{
-    network::{Ethereum, EthereumWallet},
+    network::EthereumWallet,
     signers::{local::PrivateKeySigner, Signer},
     sol,
     sol_types::SolStruct,
@@ -27,9 +27,7 @@ pub type SafeMultisigInst = SafeMultisigInstance<
             >,
             WalletFiller<EthereumWallet>,
         >,
-        RootProvider<Http<Client>>,
-        Http<Client>,
-        Ethereum,
+        RootProvider,
     >,
 >;
 

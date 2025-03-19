@@ -16,7 +16,7 @@ utils = { workspace = true }
 feed_registry = { path = "../../libs/feed_registry" }
 blockchain_data_model = { path = "../../libs/blockchain_data_model" }
 
-alloy = { version = "0.9", features = [
+alloy = { version = "0.11", features = [
     "sol-types",
     "contract",
     "network",

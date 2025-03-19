@@ -12,7 +12,7 @@ crypto = { path = "../../libs/crypto" }
 config = { path = "../../libs/config" }
 feed_registry = { path = "../../libs/feed_registry" }
 
-alloy = { version = "0.9", features = [
+alloy = { version = "0.11", features = [
     "sol-types",
     "contract",
     "network",

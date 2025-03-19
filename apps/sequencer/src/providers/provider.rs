@@ -1,10 +1,9 @@
 use alloy::providers::Provider;
 use alloy::rpc::types::TransactionRequest;
-use alloy::transports::http::Http;
 use alloy::{
     dyn_abi::DynSolValue,
     hex,
-    network::{Ethereum, EthereumWallet, TransactionBuilder},
+    network::{EthereumWallet, TransactionBuilder},
     primitives::Address,
     providers::{
         fillers::{
@@ -17,7 +16,7 @@ use alloy::{
 };
 
 use config::AllFeedsConfig;
-use reqwest::{Client, Url};
+use reqwest::Url;
 
 use config::{PublishCriteria, SequencerConfig};
 use data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
@@ -46,9 +45,7 @@ pub type ProviderType = FillProvider<
         >,
         WalletFiller<EthereumWallet>,
     >,
-    RootProvider<Http<Client>>,
-    Http<Client>,
-    Ethereum,
+    RootProvider,
 >;
 
 pub fn parse_eth_address(addr: &str) -> Option<Address> {
@@ -84,6 +81,7 @@ pub struct RpcProvider {
     pub publishing_criteria: HashMap<u32, PublishCriteria>,
     pub feeds_variants: HashMap<u32, (FeedType, usize)>,
     pub contracts: Vec<Contract>,
+    pub rpc_url: Url,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -134,14 +132,10 @@ async fn get_rpc_providers(
             .trim()
             .parse()
             .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .wallet(EthereumWallet::from(signer.clone()))
-            .on_http(rpc_url);
 
         let rpc_provider = RpcProvider::new(
             net.as_str(),
-            provider,
+            rpc_url,
             &signer,
             p,
             &provider_metrics,
@@ -171,12 +165,16 @@ async fn get_rpc_providers(
 impl RpcProvider {
     pub fn new(
         network: &str,
-        provider: ProviderType,
+        rpc_url: Url,
         signer: &PrivateKeySigner,
         p: &config::Provider,
         provider_metrics: &Arc<tokio::sync::RwLock<ProviderMetrics>>,
         feeds_config: &AllFeedsConfig,
     ) -> RpcProvider {
+        let provider = ProviderBuilder::new()
+            .wallet(EthereumWallet::from(signer.clone()))
+            .on_http(rpc_url.clone());
+
         let impersonated_anvil_account = p
             .impersonated_anvil_account
             .as_ref()
@@ -211,6 +209,7 @@ impl RpcProvider {
             publishing_criteria,
             feeds_variants,
             contracts,
+            rpc_url,
         }
     }
 
@@ -424,8 +423,8 @@ impl RpcProvider {
             .map(|r| r.is_ok_and(|bytecode| bytecode.to_string() != "0x"))
     }
 
-    pub async fn url(&self) -> &str {
-        self.provider.client().transport().url()
+    pub fn url(&self) -> Url {
+        self.rpc_url.clone()
     }
 
     pub async fn log_if_contract_exists(&self, contract_name: &str) {
@@ -545,9 +544,7 @@ mod tests {
     // Copied from the alloy source code as an example.
     #[tokio::test]
     async fn no_gas_price_or_limit() {
-        let provider = ProviderBuilder::new()
-            .with_recommended_fillers()
-            .on_anvil_with_wallet();
+        let provider = ProviderBuilder::new().on_anvil_with_wallet();
 
         // GasEstimationLayer requires chain_id to be set to handle EIP-1559 tx
         let tx = TransactionRequest {

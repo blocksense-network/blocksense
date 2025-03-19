@@ -20,7 +20,7 @@ hex = "0.4.3"
 ringbuf = "0.4.7"
 tracing = { workspace = true }
 tokio = { workspace = true }
-alloy = { version = "0.9", features = [
+alloy = { version = "0.11", features = [
     "sol-types",
     "contract",
     "network",
