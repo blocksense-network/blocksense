@@ -12,6 +12,7 @@ prometheus = { path = "../../libs/prometheus" }
 data_feeds = { path = "../../libs/data_feeds"}
 feed_registry = { path = "../../libs/feed_registry"}
 crypto = { path = "../../libs/crypto"}
+gnosis_safe = { path = "../../libs/gnosis_safe"}
 utils = { workspace = true }
 
 anyhow = { workspace = true }
@@ -29,6 +30,10 @@ spin-trigger = { git = "https://github.com/blocksense-network/spin", branch="blo
 spin-outbound-networking = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 terminal = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
 outbound-http = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
+
+rdkafka = { version = "0.37.0", features = ["dynamic-linking"] }
+futures-util = "0.3.30"
+tokio-stream = "0.1.16"
 
 url = { workspace = true }
 tokio = { workspace = true }
