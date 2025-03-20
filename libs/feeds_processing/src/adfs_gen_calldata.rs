@@ -71,6 +71,7 @@ pub async fn adfs_serialize_updates(
 ) -> Result<String> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
+    const NUM_FEED_IDS_IN_ROUND_RECORD: u32 = 16;
 
     info!("Preparing a batch of ADFS feeds for network `{net}`");
     result.push(0x00);
@@ -152,18 +153,53 @@ pub async fn adfs_serialize_updates(
         feeds_info.insert(update.feed_id, (stride, round));
     }
 
+    // Add the feed id-s that are part of each record that will be updated
+    if let Some(fm) = &feeds_metrics {
+        for update in updates.iter() {
+            let additional_feeds_begin: u32 =
+                update.feed_id - (update.feed_id % NUM_FEED_IDS_IN_ROUND_RECORD);
+            let additional_feeds_end: u32 = additional_feeds_begin + NUM_FEED_IDS_IN_ROUND_RECORD;
+            for additional_feed_id in additional_feeds_begin..additional_feeds_end {
+                debug!(
+                    "Acquiring a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}"
+                );
+                let round = fm
+                    .read()
+                    .await
+                    .updates_to_networks
+                    .with_label_values(&[&additional_feed_id.to_string(), net])
+                    .get();
+                debug!("Acquired and released a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}");
+                feeds_rounds.insert(additional_feed_id, round);
+                let (stride, _digits_in_fraction) = match &strides_and_decimals
+                    .get(&additional_feed_id)
+                {
+                    Some(f) => (f.stride, f.decimals),
+                    None => {
+                        error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
+                        (1, 18)
+                    }
+                };
+                feeds_info.insert(additional_feed_id, (stride, U256::from(round)));
+            }
+        }
+    }
+
     // Fill the round tables:
     let mut batch_feeds = BTreeMap::new();
 
-    for update in updates.iter() {
-        let (stride, round) = match feeds_info.get(&update.feed_id) {
+    for feed_id in feeds_rounds.keys() {
+        let (stride, round) = match feeds_info.get(feed_id) {
             Some(v) => v,
-            None => continue,
+            None => {
+                error!("feeds_rounds does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
+                continue;
+            }
         };
         let row_index = (U256::from(2).pow(U256::from(115)) * U256::from(*stride)
-            + U256::from(update.feed_id))
-            / U256::from(16);
-        let slot_position = update.feed_id % 16;
+            + U256::from(*feed_id))
+            / U256::from(NUM_FEED_IDS_IN_ROUND_RECORD);
+        let slot_position = feed_id % NUM_FEED_IDS_IN_ROUND_RECORD;
 
         batch_feeds.entry(row_index).or_insert_with(|| {
             // Initialize new row with zeros

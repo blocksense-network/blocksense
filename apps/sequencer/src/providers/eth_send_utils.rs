@@ -195,7 +195,7 @@ pub async fn eth_batch_send_to_contract(
         &provider,
         &mut updates,
         &provider_settings,
-        feeds_metrics,
+        feeds_metrics.clone(),
         feeds_config,
         &mut feeds_rounds,
     )
@@ -280,6 +280,12 @@ pub async fn eth_batch_send_to_contract(
     };
 
     let mut timed_out_count = 0;
+
+    let feeds_to_update_ids: Vec<u32> = updates
+        .updates
+        .iter()
+        .map(|update| update.feed_id)
+        .collect();
 
     loop {
         debug!("loop begin; timed_out_count={timed_out_count}");
@@ -389,6 +395,9 @@ pub async fn eth_batch_send_to_contract(
 
         let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
 
+        increment_feeds_round_indexes(&feeds_to_update_ids, feeds_metrics.clone(), net.as_str())
+            .await;
+
         debug!("Awaiting receipt for transaction to network `{net}`...");
         let receipt_result = spawn(async move {
             actix_web::rt::time::timeout(
@@ -412,15 +421,33 @@ pub async fn eth_batch_send_to_contract(
                     }
                     Err(e) => {
                         warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
+                        decrement_feeds_round_indexes(
+                            &feeds_to_update_ids,
+                            feeds_metrics.clone(),
+                            net.as_str(),
+                        )
+                        .await;
                         timed_out_count += 1;
                     }
                 },
                 Err(e) => {
                     warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
+                    decrement_feeds_round_indexes(
+                        &feeds_to_update_ids,
+                        feeds_metrics.clone(),
+                        net.as_str(),
+                    )
+                    .await;
                     timed_out_count += 1;
                 }
             },
             Err(e) => {
+                decrement_feeds_round_indexes(
+                    &feeds_to_update_ids,
+                    feeds_metrics.clone(),
+                    net.as_str(),
+                )
+                .await;
                 panic!("Join error tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
             }
         }
@@ -461,12 +488,6 @@ pub async fn eth_batch_send_to_contract(
     provider.update_history(&updates.updates);
     drop(provider);
     debug!("Released a read/write lock on provider state for network `{net}`");
-
-    let feeds_to_update_ids = updates
-        .updates
-        .iter()
-        .map(|update| update.feed_id)
-        .collect();
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
 }
@@ -608,16 +629,14 @@ pub async fn eth_batch_send_to_all_contracts(
         all_results += &format!("result from network {net}: Ok -> status: {status}");
         if status == "true" {
             all_results += &format!(", updated_feeds: {updated_feeds:?}");
-            for feed in updated_feeds {
-                // update the round counters accordingly
-                sequencer_state
-                    .feeds_metrics
-                    .read()
-                    .await
-                    .updates_to_networks
-                    .with_label_values(&[&feed.to_string(), &net])
-                    .inc();
-            }
+        } else if status == "false" {
+            all_results += &format!(", failed to update feeds: {updated_feeds:?}");
+            decrement_feeds_round_indexes(
+                &updated_feeds,
+                Some(sequencer_state.feeds_metrics.clone()),
+                net.as_str(),
+            )
+            .await;
         }
         let mut status_map = sequencer_state.provider_status.write().await;
         status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
@@ -625,6 +644,47 @@ pub async fn eth_batch_send_to_all_contracts(
         all_results += "\n"
     }
     Ok(all_results)
+}
+
+async fn increment_feeds_round_indexes(
+    updated_feeds: &Vec<u32>,
+    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    net: &str,
+) {
+    if let Some(fm) = feeds_metrics {
+        for feed in updated_feeds {
+            // update the round counters accordingly
+            fm.read()
+                .await
+                .updates_to_networks
+                .with_label_values(&[&feed.to_string(), net])
+                .inc();
+        }
+    }
+}
+// Since we update the round counters when we post the tx and before we
+// receive its receipt if the tx fails we need to decrease the round indexes.
+async fn decrement_feeds_round_indexes(
+    updated_feeds: &Vec<u32>,
+    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    net: &str,
+) {
+    if let Some(fm) = feeds_metrics {
+        for feed in updated_feeds {
+            // update the round counters accordingly
+            let round_index = fm
+                .read()
+                .await
+                .updates_to_networks
+                .with_label_values(&[&feed.to_string(), net])
+                .get();
+            fm.read()
+                .await
+                .updates_to_networks
+                .with_label_values(&[&feed.to_string(), net])
+                .inc_by(round_index - 1);
+        }
+    }
 }
 
 #[cfg(test)]
