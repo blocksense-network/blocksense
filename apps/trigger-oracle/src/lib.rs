@@ -19,6 +19,7 @@ use tokio::{
         mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
     },
     task::{spawn, Builder, JoinHandle},
+    time::{sleep, Duration},
 };
 use tracing::Instrument;
 use url::Url;
@@ -67,6 +68,9 @@ use blocksense::oracle::oracle_types as oracle;
 
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
+
+const TIME_BEFORE_KAFKA_READ_RETRY_IN_MS: u64 = 500;
+const TOTAL_RETRIES_FOR_KAFKA_READ: u64 = 10;
 
 #[derive(Args)]
 pub struct CliArgs {
@@ -295,7 +299,7 @@ impl TriggerExecutor for OracleTrigger {
 
         tracing::trace!("Starting orchestrator");
         let orchestrator = Self::start_orchestrator(
-            tokio::time::Duration::from_secs(self.interval_time_in_seconds),
+            Duration::from_secs(self.interval_time_in_seconds),
             components,
             signal_data_feed_sender.clone(),
             self.prometheus_url,
@@ -306,7 +310,6 @@ impl TriggerExecutor for OracleTrigger {
         let secondary_signature = Self::start_secondary_signature_listener(
             self.kafka_endpoint,
             aggregated_consensus_sender.clone(),
-            None,
         );
         loops.push(secondary_signature);
 
@@ -437,7 +440,7 @@ impl OracleTrigger {
     }
 
     fn start_orchestrator(
-        time_interval: tokio::time::Duration,
+        time_interval: Duration,
         components: HashMap<String, Component>,
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
         prometheus_url: Option<String>,
@@ -452,7 +455,7 @@ impl OracleTrigger {
     }
 
     async fn signal_data_feeds(
-        time_interval: tokio::time::Duration,
+        time_interval: Duration,
         components: HashMap<String, Component>,
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
         prometheus_url: Option<String>,
@@ -463,7 +466,7 @@ impl OracleTrigger {
             REPORTER_BATCH_COUNTER.inc();
             let batch_count = REPORTER_BATCH_COUNTER.get();
             tracing::trace!("Orchestrator entering sleep [batch_count={batch_count}]");
-            let _ = tokio::time::sleep(time_interval).await;
+            let _ = sleep(time_interval).await;
             tracing::trace!("Orchestrator woke up [batch_count={batch_count}]");
 
             let data_feed_signal: HashSet<DataFeedSetting> = components
@@ -513,10 +516,8 @@ impl OracleTrigger {
     fn start_secondary_signature_listener(
         kafka_report_endpoint: Option<String>,
         signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
-        kafka_info: Option<Vec<String>>,
     ) -> JoinHandle<TerminationReason> {
-        let future =
-            Self::signal_secondary_signature(kafka_report_endpoint, signal_sender, kafka_info);
+        let future = Self::signal_secondary_signature(kafka_report_endpoint, signal_sender);
 
         Builder::new()
             .name("sender to sequencer")
@@ -527,10 +528,7 @@ impl OracleTrigger {
     async fn signal_secondary_signature(
         kafka_report_endpoint: Option<String>,
         signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
-        _kafka_info: Option<Vec<String>>,
     ) -> TerminationReason {
-        // TODO(adikov): get all kafka configuration from `kafka_info` parameter
-
         let Some(kafka_report_endpoint) = kafka_report_endpoint else {
             return TerminationReason::Other("No kafka endpoint provided".to_string());
         };
@@ -566,10 +564,12 @@ impl OracleTrigger {
 
         // Asynchronously process messages using a stream
         let mut message_stream = consumer.stream();
+        let mut total_err_messages = 0;
 
         while let Some(message_result) = message_stream.next().await {
             match message_result {
                 Ok(message) => {
+                    total_err_messages = 0;
                     let payload: ConsensusSecondRoundBatch = match message.payload() {
                         None => {
                             tracing::warn!("kafka None message received");
@@ -597,7 +597,15 @@ impl OracleTrigger {
                 Err(err) => {
                     // Handle message errors
                     tracing::error!("Error while consuming: {:?}", err);
-                    return TerminationReason::Other(format!("Error while consuming: {:?}", err));
+                    total_err_messages += 1;
+                    if total_err_messages >= TOTAL_RETRIES_FOR_KAFKA_READ {
+                        return TerminationReason::Other(format!(
+                            "Error while consuming: {:?}",
+                            err
+                        ));
+                    }
+                    let _ = sleep(Duration::from_millis(TIME_BEFORE_KAFKA_READ_RETRY_IN_MS)).await;
+                    continue;
                 }
             }
         }
