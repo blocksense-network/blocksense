@@ -4,6 +4,8 @@ import {
   BybitAssetInfo,
   BybitInstrumentsInfoResp,
   BybitInstrumentsInfoRespSchema,
+  BybitPrice,
+  BybitPriceSchema,
 } from './types';
 
 /**
@@ -14,15 +16,24 @@ export class BybitAssetsFetcher
 {
   async fetchAssets(): Promise<AssetInfo<BybitAssetInfo>[]> {
     const assets = (await fetchBybitSymbolsInfo()).result.list;
-    return assets.map(asset => ({
-      pair: {
-        base: asset.baseCoin,
-        quote: asset.quoteCoin,
-      },
-      data: {
-        symbol: asset.symbol,
-      },
-    }));
+    const prices = (await fetchBybitPricesInfo()).result.list;
+    return assets.map(asset => {
+      let price = prices.find(p => p.symbol === asset.symbol);
+      if (!price) {
+        console.warn(`[Bybit] Price not found for symbol: ${asset.symbol}`);
+        price = { symbol: asset.symbol, lastPrice: '0' };
+      }
+      return {
+        pair: {
+          base: asset.baseCoin,
+          quote: asset.quoteCoin,
+        },
+        data: {
+          symbol: asset.symbol,
+          price: price.lastPrice,
+        },
+      };
+    });
   }
 }
 
@@ -40,4 +51,10 @@ export async function fetchBybitSymbolsInfo(): Promise<BybitInstrumentsInfoResp>
   }
 
   return data;
+}
+
+export async function fetchBybitPricesInfo(): Promise<BybitPrice> {
+  const url = `https://api.bybit.com/v5/market/tickers?category=spot`;
+
+  return fetchAndDecodeJSON(BybitPriceSchema, url);
 }

@@ -29,10 +29,28 @@ export type BybitInstrumentsInfoResp = S.Schema.Type<
 const BybitAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
+    price: S.String,
   }),
 );
 
 export type BybitAssetInfo = S.Schema.Type<typeof BybitAssetInfoSchema>;
+
+export const BybitPriceSchema = S.mutable(
+  S.Struct({
+    retCode: S.Number,
+    retMsg: S.String,
+    result: S.Struct({
+      list: S.Array(
+        S.Struct({
+          symbol: S.String,
+          lastPrice: S.String,
+        }),
+      ),
+    }),
+  }),
+);
+
+export type BybitPrice = S.Schema.Type<typeof BybitPriceSchema>;
 
 /**
  * Function to decode Bybit symbol information.
