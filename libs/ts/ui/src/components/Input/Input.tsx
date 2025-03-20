@@ -1,13 +1,7 @@
 'use client';
 
 import React from 'react';
-import {
-  FocusEventHandler,
-  MouseEventHandler,
-  ChangeEventHandler,
-  HTMLInputTypeAttribute,
-  ReactNode,
-} from 'react';
+import { InputHTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@blocksense/ui/utils';
 
@@ -32,33 +26,20 @@ const sizes = {
   xl: 'h-14 text-xl px-5',
 };
 
-type InputBaseProps = {
-  className?: string;
+type InputBaseProps = InputHTMLAttributes<HTMLInputElement> & {
   variant?: Variant;
-  size?: Size;
-  onFocus?: FocusEventHandler<HTMLInputElement>;
-  onBlur?: FocusEventHandler<HTMLInputElement>;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
-  onMouseEnter?: MouseEventHandler<HTMLInputElement>;
-  onMouseLeave?: MouseEventHandler<HTMLInputElement>;
+  inputSize?: Size;
   icon?: ReactNode;
-  errorMessage?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  type?: HTMLInputTypeAttribute;
   error?: boolean;
-  value?: string;
 };
 
 export const InputBase = ({
   className,
   variant = 'outline',
-  size = 'sm',
+  inputSize = 'sm',
   disabled = false,
-  placeholder,
   type = 'text',
   error = false,
-  value,
   icon,
   ...props
 }: InputBaseProps) => {
@@ -72,53 +53,30 @@ export const InputBase = ({
   const classNames = cn(
     baseClasses,
     variants[variant],
-    sizes[size],
+    sizes[inputSize],
     errorClasses,
     paddingLeft,
     className,
   );
 
   return (
-    <input
-      className={classNames}
-      type={type}
-      disabled={disabled}
-      placeholder={placeholder}
-      value={value}
-      {...props}
-    />
+    <input className={classNames} type={type} disabled={disabled} {...props} />
   );
 };
 
-type InputProps = {
-  className?: string;
-  variant?: Variant;
-  size?: Size;
-  onFocus?: FocusEventHandler<HTMLInputElement>;
-  onBlur?: FocusEventHandler<HTMLInputElement>;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
-  onMouseEnter?: MouseEventHandler<HTMLInputElement>;
-  onMouseLeave?: MouseEventHandler<HTMLInputElement>;
-  icon?: ReactNode;
+type InputProps = InputBaseProps & {
   errorMessage?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  type?: HTMLInputTypeAttribute;
-  error?: boolean;
-  value?: string;
 };
 
 export const Input = ({
   className,
   variant = 'outline',
-  size = 'md',
+  inputSize = 'md',
   disabled = false,
-  icon,
   errorMessage,
-  placeholder,
   type = 'text',
   error = false,
-  value,
+  icon,
   ...props
 }: InputProps) => {
   return (
@@ -131,12 +89,10 @@ export const Input = ({
       <InputBase
         className={className}
         variant={variant}
-        size={size}
+        inputSize={inputSize}
         disabled={disabled}
-        placeholder={placeholder}
         type={type}
         error={error}
-        value={value}
         icon={icon}
         {...props}
       />
