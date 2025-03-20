@@ -1,8 +1,9 @@
-import React from 'react';
+import { ReactNode } from 'react';
+
 import { Badge } from '@blocksense/ui/Badge';
 
 type DataTableBadgeProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 };
 
