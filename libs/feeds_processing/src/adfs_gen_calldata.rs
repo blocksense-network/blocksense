@@ -88,7 +88,7 @@ pub async fn adfs_serialize_updates(
             Some(f) => (f.stride, f.decimals),
             None => {
                 error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
-                (1, 18)
+                (0, 18)
             }
         };
 
@@ -177,7 +177,7 @@ pub async fn adfs_serialize_updates(
                     Some(f) => (f.stride, f.decimals),
                     None => {
                         error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
-                        (1, 18)
+                        (0, 18)
                     }
                 };
                 feeds_info.insert(additional_feed_id, (stride, U256::from(round)));
