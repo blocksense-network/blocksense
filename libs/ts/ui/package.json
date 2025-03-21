@@ -12,6 +12,7 @@
     "./CopyButton": "./src/components/CopyButton/index.tsx",
     "./Tabs": "./src/components/Tabs/index.tsx",
     "./Badge": "./src/components/Badge/index.tsx",
+    "./Form": "./src/components/Form/index.tsx",
     "./Label": "./src/components/Label/index.tsx",
     "./ProgressBar": "./src/components/ProgressBar/index.tsx",
     "./ScrollArea": "./src/components/ScrollArea/index.tsx",
