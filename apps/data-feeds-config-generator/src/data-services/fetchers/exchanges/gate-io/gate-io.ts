@@ -1,6 +1,12 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
-import { GateIoAssetInfo, GateIoInfoResp, GateIoInfoRespSchema } from './types';
+import {
+  GateIoAssetInfo,
+  GateIoInfoResp,
+  GateIoInfoRespSchema,
+  GateIoPrice,
+  GateIoPriceSchema,
+} from './types';
 
 /**
  * Class to fetch assets information from GateIo Exchange.
@@ -10,15 +16,18 @@ export class GateIoAssetsFetcher
 {
   async fetchAssets(): Promise<AssetInfo<GateIoAssetInfo>[]> {
     const assets = await fetchGateIoInfo();
-    return assets.map(asset => ({
-      pair: {
-        base: asset.base,
-        quote: asset.quote,
-      },
-      data: {
-        id: asset.id,
-      },
-    }));
+    const prices = await fetchGateIoPricesInfo();
+    return assets.map(asset => {
+      let price = prices.find(p => p.currency_pair === asset.id);
+      if (!price) {
+        console.warn(`[GateIo] Price not found for id: ${asset.id}`);
+        price = { currency_pair: asset.id, last: '0' };
+      }
+      return {
+        pair: { base: asset.base, quote: asset.quote },
+        data: { id: asset.id, price: price.last },
+      };
+    });
   }
 }
 
@@ -31,4 +40,10 @@ export async function fetchGateIoInfo(): Promise<GateIoInfoResp> {
   const url = 'https://api.gateio.ws/api/v4/spot/currency_pairs';
 
   return fetchAndDecodeJSON(GateIoInfoRespSchema, url);
+}
+
+export async function fetchGateIoPricesInfo(): Promise<GateIoPrice> {
+  const url = `https://api.gateio.ws/api/v4/spot/tickers`;
+
+  return fetchAndDecodeJSON(GateIoPriceSchema, url);
 }

@@ -23,7 +23,19 @@ export type GateIoInfoResp = S.Schema.Type<typeof GateIoInfoRespSchema>;
 const GateIoAssetInfoSchema = S.mutable(
   S.Struct({
     id: S.String,
+    price: S.String,
   }),
 );
 
 export type GateIoAssetInfo = S.Schema.Type<typeof GateIoAssetInfoSchema>;
+
+export const GateIoPriceSchema = S.Array(
+  S.mutable(
+    S.Struct({
+      currency_pair: S.String,
+      last: S.String,
+    }),
+  ),
+);
+
+export type GateIoPrice = S.Schema.Type<typeof GateIoPriceSchema>;
