@@ -133,16 +133,15 @@ pub async fn get_serialized_updates_for_network(
     debug!("Released a read lock on provider config for `{net}`");
 
     let mut strides_and_decimals = HashMap::new();
-    for update in updates.updates.iter() {
-        let feed_id = update.feed_id;
+    for feed_id in feeds_config.read().await.keys() {
         debug!("Acquiring a read lock on feeds_config; network={net}; feed_id={feed_id}");
-        let feed_config = feeds_config.read().await.get(&feed_id).cloned();
+        let feed_config = feeds_config.read().await.get(feed_id).cloned();
         debug!(
             "Acquired and released a read lock on feeds_config; network={net}; feed_id={feed_id}"
         );
 
         strides_and_decimals.insert(
-            feed_id,
+            *feed_id,
             FeedStrideAndDecimals::from_feed_config(&feed_config),
         );
         drop(feed_config);
