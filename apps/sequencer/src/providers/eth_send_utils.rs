@@ -25,7 +25,7 @@ use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use feeds_processing::adfs_gen_calldata::adfs_serialize_updates;
 use futures::stream::FuturesUnordered;
 use paste::paste;
-use prometheus::{inc_metric, inc_metric_by, set_metric};
+use prometheus::{inc_metric, inc_metric_by, inc_vec_metric, set_metric};
 use prometheus::{metrics::FeedsMetrics, process_provider_getter};
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
@@ -646,21 +646,55 @@ pub async fn eth_batch_send_to_all_contracts(
     Ok(all_results)
 }
 
+async fn log_round_counters(
+    prefix: &str,
+    updated_feeds: &Vec<u32>,
+    feeds_metrics: &Option<Arc<RwLock<FeedsMetrics>>>,
+    net: &str,
+) {
+    if let Some(fm) = feeds_metrics {
+        let mut debug_string =
+            format!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} ");
+        for feed in updated_feeds {
+            let round_index = fm
+                .read()
+                .await
+                .updates_to_networks
+                .with_label_values(&[&feed.to_string(), net])
+                .get();
+            debug_string.push_str(format!("{feed} = {round_index}; ").as_str());
+        }
+        debug!(debug_string);
+    } else {
+        error!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} called with empty metrics");
+    }
+}
+
 async fn increment_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
 ) {
-    if let Some(fm) = feeds_metrics {
+    log_round_counters(
+        "increment_feeds_round_indexes before update",
+        updated_feeds,
+        &feeds_metrics,
+        net,
+    )
+    .await;
+    if let Some(ref fm) = feeds_metrics {
         for feed in updated_feeds {
             // update the round counters accordingly
-            fm.read()
-                .await
-                .updates_to_networks
-                .with_label_values(&[&feed.to_string(), net])
-                .inc();
+            inc_vec_metric!(fm, feed, updates_to_networks, net);
         }
     }
+    log_round_counters(
+        "increment_feeds_round_indexes after update",
+        updated_feeds,
+        &feeds_metrics,
+        net,
+    )
+    .await;
 }
 // Since we update the round counters when we post the tx and before we
 // receive its receipt if the tx fails we need to decrease the round indexes.
@@ -669,7 +703,15 @@ async fn decrement_feeds_round_indexes(
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
 ) {
-    if let Some(fm) = feeds_metrics {
+    log_round_counters(
+        "decrement_feeds_round_indexes before update",
+        updated_feeds,
+        &feeds_metrics,
+        net,
+    )
+    .await;
+
+    if let Some(ref fm) = feeds_metrics {
         for feed in updated_feeds {
             // update the round counters accordingly
             let round_index = fm
@@ -685,6 +727,14 @@ async fn decrement_feeds_round_indexes(
                 .inc_by(round_index - 1);
         }
     }
+
+    log_round_counters(
+        "decrement_feeds_round_indexes after update",
+        updated_feeds,
+        &feeds_metrics,
+        net,
+    )
+    .await;
 }
 
 #[cfg(test)]
