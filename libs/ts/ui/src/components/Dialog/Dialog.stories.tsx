@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { Button } from '@blocksense/ui/Button';
 import { Input } from '@blocksense/ui/Input';
+import { RadioGroup, RadioGroupItem } from '@blocksense/ui/RadioGroup';
 
 import {
   Dialog,
@@ -19,8 +20,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from '../DropdownMenu';
 
 export default {
@@ -179,7 +178,7 @@ export const DialogWithDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [optionA, setOptionA] = useState(false);
   const [optionB, setOptionB] = useState(false);
-  const [radioValue, setRadioValue] = useState('option1');
+  const [selectedOption, setSelectedOption] = useState('option1');
 
   return (
     <Dialog isOpen={isOpen} onClose={() => setIsOpen(false)}>
@@ -225,21 +224,19 @@ export const DialogWithDropdown = () => {
               <DropdownMenuTrigger>
                 <Button>Open Radio Menu</Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent side="bottom" align="start">
-                <DropdownMenuRadioGroup
-                  value={radioValue}
-                  onValueChange={setRadioValue}
+                <RadioGroup
+                  selectedValue={selectedOption}
+                  name="option"
+                  onValueChangeAction={setSelectedOption}
+                  aria-label="Choose an option"
+                  className="p-4"
                 >
-                  <DropdownMenuRadioItem value="option1">
-                    Option 1 {radioValue === 'option1' && '(Selected)'}
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="option2">
-                    Option 2 {radioValue === 'option2' && '(Selected)'}
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="option3">
-                    Option 3 {radioValue === 'option3' && '(Selected)'}
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
+                  <RadioGroupItem value="option1">Option 1</RadioGroupItem>
+                  <RadioGroupItem value="option2">Option 2</RadioGroupItem>
+                  <RadioGroupItem value="option3">Option 3</RadioGroupItem>
+                </RadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

@@ -12,6 +12,7 @@ export * from './components/Card';
 export * from './components/Command';
 export * from './components/Callout';
 export * from './components/Drawer';
+export * from './components/DropdownMenu';
 export * from './components/Accordion';
 export * from './components/Icon';
 export * from './components/Dialog';
