@@ -24,7 +24,19 @@ export type MEXCInfoResp = S.Schema.Type<typeof MEXCInfoRespSchema>;
 const MEXCAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
+    price: S.String,
   }),
 );
 
 export type MEXCAssetInfo = S.Schema.Type<typeof MEXCAssetInfoSchema>;
+
+export const MEXCPriceSchema = S.Array(
+  S.mutable(
+    S.Struct({
+      symbol: S.String,
+      lastPrice: S.String,
+    }),
+  ),
+);
+
+export type MEXCPrice = S.Schema.Type<typeof MEXCPriceSchema>;
