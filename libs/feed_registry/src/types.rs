@@ -202,7 +202,7 @@ impl FeedType {
         }
     }
 
-    pub fn as_bytes(&self, digits_in_fraction: usize) -> Vec<u8> {
+    pub fn as_bytes(&self, digits_in_fraction: usize, timestamp: u64) -> Vec<u8> {
         match self {
             FeedType::Numerical(val) => {
                 let truncate =
@@ -238,7 +238,7 @@ impl FeedType {
                 bytes_vec.append(&mut value_bytes);
 
                 bytes_vec.drain(..8);
-                bytes_vec.extend(vec![0; 8]);
+                bytes_vec.extend(timestamp.to_be_bytes());
 
                 bytes_vec
             }
