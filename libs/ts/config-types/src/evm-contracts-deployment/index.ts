@@ -45,7 +45,8 @@ const CoreContractsSchemaV2 = S.mutable(
     UpgradeableProxyADFS: ContractDataSchema,
     CLFeedRegistryAdapter: ContractDataSchema,
     AccessControl: ContractDataSchema,
-    OnlySequencerGuard: ContractDataSchema,
+    OnlySequencerGuard: S.UndefinedOr(ContractDataSchema),
+    AdminExecutorModule: S.UndefinedOr(ContractDataSchema),
   }),
 );
 
