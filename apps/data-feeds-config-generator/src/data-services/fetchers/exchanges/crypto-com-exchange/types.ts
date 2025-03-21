@@ -11,6 +11,7 @@ export const CryptoComInfoRespSchema = S.mutable(
           symbol: S.String,
           base_ccy: S.String,
           quote_ccy: S.String,
+          inst_type: S.String,
         }),
       ),
     }),
@@ -26,8 +27,26 @@ export type CryptoComInfoResp = S.Schema.Type<typeof CryptoComInfoRespSchema>;
  */
 const CryptoComAssetInfoSchema = S.mutable(
   S.Struct({
-    instrument_name: S.String,
+    symbol: S.String,
+    price: S.String,
   }),
 );
 
 export type CryptoComAssetInfo = S.Schema.Type<typeof CryptoComAssetInfoSchema>;
+
+export const CryptoComPriceSchema = S.mutable(
+  S.Struct({
+    result: S.Struct({
+      data: S.Array(
+        S.mutable(
+          S.Struct({
+            i: S.String,
+            a: S.String,
+          }),
+        ),
+      ),
+    }),
+  }),
+);
+
+export type CryptoComPrice = S.Schema.Type<typeof CryptoComPriceSchema>;
