@@ -82,7 +82,7 @@ Interacting with these contract versions requires slightly different approaches 
 #### Using `UpgradeableProxy` contract
 
 ```bash
-cast call 0xee5a4826068c5326a7f06fd6c7cbf816f096846c --data 0x80000000 --rpc-url http://127.0.0.1:8546 |  cut -c1-50 | cast to-dec
+cast call 0xee5a4826068c5326a7f06fd6c7cbf816f096846c --data 0x80000000 --rpc-url http://127.0.0.1:8546 | cut -c1-50 | cast to-dec
 ```
 
 > Reading last update for feed with id 0
@@ -131,11 +131,13 @@ Command Breakdown:
 
 #### Using `UpgradeableProxyADFS` contract
 
+Here is an example command with breakdown. More examples can be found bellow.
+
 ```bash
-cast call 0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b --data 0x8200000000000000000000000000000000  --rpc-url http://127.0.0.1:8547 |  cut -c1-50 | cast to-dec
+cast call 0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b --data 0x8200000000000000000000000000000000  --rpc-url http://127.0.0.1:8547 | cut -c1-50 | cast to-dec
 ```
 
-> Reading last update for feed with id 0
+> Reading last update for feed with id 0.
 
 Command Breakdown:
 
@@ -161,21 +163,72 @@ Command Breakdown:
     idHex;
   ```
 
-  Easy to copy example for the `getLatestSingleData` operation with stride 0 and id 42
+  > if you want to use the `getFeedAtRound` operation ( `0x86` ) you need to include the `round` as the end of data. The round is a `uint16`, so you need to convert it to hex and pad it to 4 characters (2 bytes).
+  >
+  > ```javascript
+  > // Convert roundId to 2-byte hex string (4 hex chars)
+  > const roundHex = roundId.toString(16).padStart(4, '0');
+  > ```
 
-  ```javascript
-  '0x' +
-    (0x02 | 0x80).toString(16).padStart(2, '0') +
-    (0 & 0xff).toString(16).padStart(2, '0') +
-    (42).toString(16).padStart(30, '0');
-  ```
+  Easy to copy examples for crafting the data parameter:
+
+  - `getLatestSingleData` operation with stride 0 and id 42
+
+    ```javascript
+    '0x' +
+      (0x02 | 0x80).toString(16).padStart(2, '0') +
+      (0 & 0xff).toString(16).padStart(2, '0') +
+      (42).toString(16).padStart(30, '0');
+    ```
+
+  - `getFeedAtRound` operation with stride 0, id 42, and round 5
+
+    ```javascript
+    '0x' +
+      (0x86 | 0x80).toString(16).padStart(2, '0') +
+      (0 & 0xff).toString(16).padStart(2, '0') +
+      (0).toString(16).padStart(30, '0') +
+      (1574).toString(16).padStart(4, '0');
+    ```
 
 - The output is processed with `cut` to extract the first 50 characters, representing the price in hex. It’s then converted to decimal using `cast to-dec`.
 
+**Example calls:**
+
+- Get the **latest update** for feed with id **0** (`getLatestSingleData`)
+
+  ```bash
+  cast call 0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b --data 0x8200000000000000000000000000000000  --rpc-url http://127.0.0.1:8547 | cut -c1-50 | cast to-dec
+  ```
+
+- Get the **latest round** for feed with id **0** (`getLatestRound`)
+
+  ```bash
+    cast call 0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b --data 0x8100000000000000000000000000000000  --rpc-url http://127.0.0.1:8547 | cast to-dec
+  ```
+
+- Get the **latest round and update** for feed with id **0** at the same time
+
+  ```bash
+  cast call 0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b --data 0x8300000000000000000000000000000000  --rpc-url http://127.0.0.1:8547  | \
+    sed 's/^0x//' | \
+    awk '{print "0x" substr($0, 1, 64) "\n0x" substr($0, 65, 48)}' | \
+    xargs -n1 cast to-dec | \
+    awk 'NR==1{print "roundID: " $0} NR==2{print "price:   " $0}'
+  ```
+
+- Get the **update in round 5** for feed with id **3** (`getFeedAtRound`)
+
+  ```bash
+    cast call 0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b --data 0x86000000000000000000000000000000030005  --rpc-url http://127.0.0.1:8547  | cut -c1-50 |cast to-dec
+  ```
+
 #### Using `CLAggregatorAdapter` contract
 
-```
-cast call 0xcBD6FC059bEDc859d43994F5C221d96F9eD5340f "latestAnswer()" --rpc-url http://127.0.0.1:8547 | cast to-dec
+Here is an example command with breakdown. More examples can be found bellow.
+
+```bash
+  cast call 0xcBD6FC059bEDc859d43994F5C221d96F9eD5340f "latestAnswer()" --rpc-url http://127.0.0.1:8547 | cast to-dec
 ```
 
 > Reading the **latest answer** from a `CLAggregatorAdapter` contract
@@ -187,7 +240,42 @@ Command Breakdown:
 - The `rpc-url` points to `anvil-ink-sepolia`.
 - The output is converted to decimal using `cast to-dec`.
 
-</details>
+> INFO: [Full list of functions you can call](https://docs.blocksense.network/docs/contracts/reference-documentation/contract/CLAggregatorAdapter)
+
+**Example calls:**
+
+- Reading the **latest answer** from a `CLAggregatorAdapter` contract
+
+  ```
+  cast call 0xcBD6FC059bEDc859d43994F5C221d96F9eD5340f "latestAnswer()" --rpc-url http://127.0.0.1:8547 | cast to-dec
+  ```
+
+- Reading the **latest round** from a `CLAggregatorAdapter` contract
+
+  ```
+  cast call 0xcBD6FC059bEDc859d43994F5C221d96F9eD5340f "latestRound()" --rpc-url http://127.0.0.1:8547 | cast to-dec
+  ```
+
+- Reading the **update for round 1** from a `CLAggregatorAdapter` contract
+
+  ```
+    cast call 0xcBD6FC059bEDc859d43994F5C221d96F9eD5340f "getRoundData(uint80)" 0x000000000000000000000000000001 --rpc-url http://127.0.0.1:8547 | \
+      sed 's/^0x//' | \
+      awk '{print "0x" substr($0, 1, 64) "\n0x" substr($0, 65, 64)}' | \
+      xargs -n1 cast to-dec | \
+      awk 'NR==1{print "roundID: " $0} NR==2{print "price:   " $0}'
+  ```
+
+  > The `round` parameter can be calculated as `round` padded to 32 hex characters.
+  >
+  > ```javascript
+  > const round = 1;
+  > round.toString().padStart(32, '0');
+  > ```
+  >
+  > > max round is 8191 ( 2^13 -1 )
+
+  </details>
 
 ## Sequencer interaction
 
@@ -228,7 +316,7 @@ Command Breakdown:
 - Get feed configuration for set of feed IDs
 
   ```bash
-  curl -fsSL http://sequencer-testnet-001:5556/get_feeds_config | jq '[ .feeds[] | select(.id | IN(7,19,32,82,1000000))'
+  curl -fsSL http://sequencer-testnet-001:5556/get_feeds_config | jq '[ .feeds[] | select(.id | IN(7,19,32,82,1000000)) ]'
   ```
 
 - Get feed configuration for a specific feed name (e.g. `ETH / USD`)
@@ -243,7 +331,7 @@ Command Breakdown:
   curl -fsSL http://127.0.0.1:5553/get_feeds_config | jq -c '[ .feeds[] | select (.full_name == "ETH / USD") .additional_feed_info.arguments]' | jq
   ```
 
-  - Get specific fields for a set of feeds (e.g. `id`, `full_name`, `schedule`)
+- Get specific fields for a set of feeds (e.g. `id`, `full_name`, `schedule`)
 
   ```bash
   curl -fsSL http://sequencer-testnet-001:5556/get_feeds_config | jq '[ .feeds[] | select(.id | IN(7,19,32,82,1000000)) | {id,full_name,schedule} ]'
@@ -276,3 +364,5 @@ Command Breakdown:
   ```
 
 # Production Environment
+
+soon...
