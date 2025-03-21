@@ -9,6 +9,7 @@ export const CoinbaseInfoRespSchema = S.mutable(
       id: S.String,
       base_currency: S.String,
       quote_currency: S.String,
+      status: S.String,
     }),
   ),
 );
@@ -23,7 +24,14 @@ export type CoinbaseInfoResp = S.Schema.Type<typeof CoinbaseInfoRespSchema>;
 const CoinbaseAssetInfoSchema = S.mutable(
   S.Struct({
     id: S.String,
+    price: S.String,
   }),
 );
 
 export type CoinbaseAssetInfo = S.Schema.Type<typeof CoinbaseAssetInfoSchema>;
+
+export const CoinbasePriceSchema = S.Struct({
+  price: S.String,
+});
+
+export type CoinbasePrice = S.Schema.Type<typeof CoinbasePriceSchema>;
