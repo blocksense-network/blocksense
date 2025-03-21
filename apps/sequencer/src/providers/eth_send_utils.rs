@@ -17,7 +17,7 @@ use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 use crate::{
     providers::provider::{
         parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders,
-        EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
+        HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
     },
     sequencer_state::SequencerState,
 };
@@ -137,8 +137,10 @@ pub async fn get_serialized_updates_for_network(
     }
 
     let contract_version = provider
-        .get_contract(PRICE_FEED_CONTRACT_NAME)
-        .ok_or(eyre!("{PRICE_FEED_CONTRACT_NAME} contract is not set!"))?
+        .get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+        .ok_or(eyre!(
+            "{HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME} contract is not set!"
+        ))?
         .contract_version;
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
@@ -240,9 +242,9 @@ pub async fn eth_batch_send_to_contract(
 
     let signer = &provider.signer;
     let contract_name = if feed_type == Periodic {
-        PRICE_FEED_CONTRACT_NAME
+        HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME
     } else {
-        EVENT_FEED_CONTRACT_NAME
+        SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME
     };
     let contract_address = provider.get_contract_address(contract_name)?;
     info!(
@@ -813,8 +815,12 @@ mod tests {
         .await;
 
         // run
-        let result =
-            deploy_contract(&String::from(network), &providers, PRICE_FEED_CONTRACT_NAME).await;
+        let result = deploy_contract(
+            &String::from(network),
+            &providers,
+            HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
+        )
+        .await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -867,8 +873,12 @@ mod tests {
         .await;
 
         // run
-        let result =
-            deploy_contract(&String::from(network), &providers, EVENT_FEED_CONTRACT_NAME).await;
+        let result = deploy_contract(
+            &String::from(network),
+            &providers,
+            SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+        )
+        .await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -959,7 +969,7 @@ mod tests {
         let address_to_send = provider
             .lock()
             .await
-            .get_contract_address(EVENT_FEED_CONTRACT_NAME)
+            .get_contract_address(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
             .unwrap();
         let result = provider
             .lock()
@@ -1026,7 +1036,7 @@ mod tests {
         .await;
 
         let msg = sequencer_state
-            .deploy_contract(network1, EVENT_FEED_CONTRACT_NAME)
+            .deploy_contract(network1, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
             .await
             .expect("contract deployment failed");
 
@@ -1038,7 +1048,7 @@ mod tests {
             "Did not return valid eth address"
         );
         let msg2 = sequencer_state
-            .deploy_contract(network2, EVENT_FEED_CONTRACT_NAME)
+            .deploy_contract(network2, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
             .await
             .expect("contract deployment failed");
 
@@ -1113,7 +1123,7 @@ mod tests {
 
         // run
         let msg = sequencer_state
-            .deploy_contract(network1, PRICE_FEED_CONTRACT_NAME)
+            .deploy_contract(network1, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
             .await
             .expect("Data feed publishing contract deployment failed!");
         // assert

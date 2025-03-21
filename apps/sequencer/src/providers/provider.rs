@@ -66,8 +66,9 @@ pub struct Contract {
     pub contract_version: u16,
 }
 
-pub const PRICE_FEED_CONTRACT_NAME: &str = "price_feed";
-pub const EVENT_FEED_CONTRACT_NAME: &str = "event_feed";
+pub const HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "HistoricalDataFeedStoreV2";
+pub const SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "SportsDataFeedStoreV2";
+pub const ADFS_CONTRACT_NAME: &str = "AggregatedDataFeedStore";
 pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
 pub const GNOSIS_SAFE_CONTRACT_NAME: &str = "gnosis_safe";
 
@@ -148,10 +149,10 @@ async fn get_rpc_providers(
             feeds_config,
         );
         rpc_provider
-            .log_if_contract_exists(PRICE_FEED_CONTRACT_NAME)
+            .log_if_contract_exists(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
             .await;
         rpc_provider
-            .log_if_contract_exists(EVENT_FEED_CONTRACT_NAME)
+            .log_if_contract_exists(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
             .await;
 
         let rpc_provider = Arc::new(Mutex::new(rpc_provider));
@@ -166,6 +167,20 @@ async fn get_rpc_providers(
     }
 
     providers
+}
+
+pub struct LatestRound {
+    feed_id: u128,
+    round: u16,
+}
+
+impl LatestRound {
+    pub fn new(feed_id: u128, data: &[u8]) -> LatestRound {
+        LatestRound {
+            feed_id,
+            round: data[0] as u16,
+        }
+    }
 }
 
 impl RpcProvider {
@@ -206,7 +221,7 @@ impl RpcProvider {
             signer: signer.clone(),
             safe_min_quorum: p.safe_min_quorum,
             provider_metrics: provider_metrics.clone(),
-            transaction_retries_count_limit: p.transaction_retries_count_limit,
+            transaction_retries_count_limit: p.transaction_retries_count_before_give_up,
             transaction_retry_timeout_secs: p.transaction_retry_timeout_secs,
             retry_fee_increment_fraction: p.retry_fee_increment_fraction,
             transaction_gas_limit: p.transaction_gas_limit,
@@ -259,7 +274,7 @@ impl RpcProvider {
 
         let mut contracts = vec![];
         contracts.push(Contract {
-            name: PRICE_FEED_CONTRACT_NAME.to_string(),
+            name: HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
             address,
             byte_code: p.data_feed_store_byte_code.clone().map(|byte_code| {
                 hex::decode(byte_code.clone())
@@ -269,7 +284,7 @@ impl RpcProvider {
         });
 
         contracts.push(Contract {
-            name: EVENT_FEED_CONTRACT_NAME.to_string(),
+            name: SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
             address: event_address,
             byte_code: p.data_feed_sports_byte_code.clone().map(|byte_code| {
                 hex::decode(byte_code.clone())
@@ -365,12 +380,58 @@ impl RpcProvider {
         }
     }
 
+    pub async fn get_latest_round(
+        &self,
+        feed_id: &u128,
+        stride: u32,
+    ) -> Result<Vec<LatestRound>, eyre::Error> {
+        let call_data = Bytes::copy_from_slice(&[
+            (0x81) as u8,
+            (stride & 0xFF_u32) as u8,
+            ((*feed_id >> 8 * 14) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 13) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 12) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 11) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 10) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 9) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 8) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 7) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 6) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 5) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 4) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 3) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 2) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 1) & 0xFF_u128) as u8,
+            ((*feed_id >> 8 * 0) & 0xFF_u128) as u8,
+        ]);
+
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+
+        let contract = MulticallInstance::new(multicall, self.provider.clone());
+
+        let calldata: Vec<Multicall::Call> = vec![Multicall::Call {
+            target: data_feed,
+            callData: call_data,
+        }];
+
+        let aggregate_return = contract.aggregate(calldata).call().await?;
+        let latest_rounds: Vec<LatestRound> = aggregate_return
+            .returnData
+            .into_iter()
+            .enumerate()
+            .map(|(count, data)| LatestRound::new(*feed_id, &data.0))
+            .collect();
+
+        Ok(latest_rounds)
+    }
+
     pub async fn get_latest_values(
         &self,
         feed_ids: &[u32],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
+        let data_feed = self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
         let contract = MulticallInstance::new(multicall, self.provider.clone());
         let calldata: Vec<Multicall::Call> = feed_ids
             .iter()
@@ -422,7 +483,7 @@ impl RpcProvider {
         updates: &[u128],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
+        let data_feed = self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
 
         let contract = MulticallInstance::new(multicall, self.provider.clone());
 
