@@ -29,6 +29,7 @@
     "./Table": "./src/components/Table/index.tsx",
     "./Popover": "./src/components/Popover/index.tsx",
     "./TextArea": "./src/components/TextArea/index.tsx",
+    "./RadioGroup": "./src/components/RadioGroup/index.tsx",
     "./utils": "./src/lib/utils.ts"
   },
   "dependencies": {

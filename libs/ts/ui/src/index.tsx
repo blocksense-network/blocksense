@@ -19,4 +19,5 @@ export * from './components/Select';
 export * from './components/Table';
 export * from './components/Popover';
 export * from './components/TextArea';
+export * from './components/RadioGroup';
 export * from './lib/utils';
