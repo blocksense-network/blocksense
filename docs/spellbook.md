@@ -11,8 +11,8 @@ A collection of useful commands and scripts for interacting with Blocksense's lo
   - [Logs](#logs)
   - [Reading On-Chain Data with `cast`](#reading-on-chain-data-with-cast)
     - [Reading data from v1 contracts](#reading-data-from-v1-contracts)
-      - [Using `UpgradeableProxy` contract](#using-upgradeableproxy-contract)
-      - [Using `ChainlinkProxy` contract](#using-chainlinkproxy-contract)
+      - Using `UpgradeableProxy` contract
+      - Using `ChainlinkProxy` contract
     - [Reading data from ADFS contracts](#reading-data-from-adfs-contracts)
       - [Using `UpgradeableProxyADFS` contract](#using-upgradeableproxyadfs-contract)
       - [Using `CLAggregatorAdapter` contract](#using-claggregatoradapter-contract)
@@ -76,7 +76,8 @@ Our setup includes two blockchain instances:
 
 Interacting with these contract versions requires slightly different approaches due to changes in their implementations.
 
-### Reading data from v1 contracts
+<details>
+    <summary> <h3>Reading data from v1 contracts</h3></summary>
 
 #### Using `UpgradeableProxy` contract
 
@@ -123,7 +124,10 @@ Command Breakdown:
 - The `rpc-url` points to `anvil-ethereum-sepolia`.
 - The output is converted to decimal using `cast to-dec`.
 
-### Reading data from ADFS contracts
+</details>
+
+<details open>
+    <summary> <h3>Reading data from ADFS contracts</h3></summary>
 
 #### Using `UpgradeableProxyADFS` contract
 
@@ -182,6 +186,8 @@ Command Breakdown:
 - The `latestAnswer()` function is called to retrieve the latest price.
 - The `rpc-url` points to `anvil-ink-sepolia`.
 - The output is converted to decimal using `cast to-dec`.
+
+</details>
 
 ## Sequencer interaction
 
