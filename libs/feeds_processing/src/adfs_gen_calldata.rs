@@ -94,16 +94,37 @@ pub async fn adfs_serialize_updates(
 
         let mut round = match &feeds_metrics {
             Some(fm) => {
-                debug!("Acquiring a read lock on feeds_metrics; network={net}; feed_id={feed_id}");
-                let round = fm
-                    .read()
-                    .await
-                    .updates_to_networks
-                    .with_label_values(&[&update.feed_id.to_string(), net])
-                    .get();
-                debug!("Acquired and released a read lock on feeds_metrics; network={net}; feed_id={feed_id}");
-                feeds_rounds.insert(feed_id, round);
-                round
+                let mut updated_feed_id_round: u64 = 0;
+                // Add the feed id-s that are part of each record that will be updated
+                let additional_feeds_begin: u32 =
+                    update.feed_id - (update.feed_id % NUM_FEED_IDS_IN_ROUND_RECORD);
+                let additional_feeds_end: u32 = additional_feeds_begin + NUM_FEED_IDS_IN_ROUND_RECORD;
+                for additional_feed_id in additional_feeds_begin..additional_feeds_end {
+                    debug!(
+                        "Acquiring a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}"
+                    );
+                    let round = fm
+                        .read()
+                        .await
+                        .updates_to_networks
+                        .with_label_values(&[&additional_feed_id.to_string(), net])
+                        .get();
+                    debug!("Acquired and released a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}");
+                    let (stride, _digits_in_fraction) = match &strides_and_decimals
+                        .get(&additional_feed_id)
+                    {
+                        Some(f) => (f.stride, f.decimals),
+                        None => {
+                            error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
+                            (0, 18)
+                        }
+                    };
+                    feeds_info.insert(additional_feed_id, (stride, round));
+                    if additional_feed_id == update.feed_id {
+                        updated_feed_id_round = round
+                    }
+                }
+                updated_feed_id_round
             }
             None => *feeds_rounds.get(&feed_id).unwrap_or({
                 error!("feeds_rounds does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
@@ -149,53 +170,14 @@ pub async fn adfs_serialize_updates(
         let (mut result_bytes, _hex) = encode_packed(&packed_result);
 
         result.append(&mut result_bytes);
-
-        feeds_info.insert(update.feed_id, (stride, round));
-    }
-
-    // Add the feed id-s that are part of each record that will be updated
-    if let Some(fm) = &feeds_metrics {
-        for update in updates.iter() {
-            let additional_feeds_begin: u32 =
-                update.feed_id - (update.feed_id % NUM_FEED_IDS_IN_ROUND_RECORD);
-            let additional_feeds_end: u32 = additional_feeds_begin + NUM_FEED_IDS_IN_ROUND_RECORD;
-            for additional_feed_id in additional_feeds_begin..additional_feeds_end {
-                debug!(
-                    "Acquiring a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}"
-                );
-                let round = fm
-                    .read()
-                    .await
-                    .updates_to_networks
-                    .with_label_values(&[&additional_feed_id.to_string(), net])
-                    .get();
-                debug!("Acquired and released a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}");
-                feeds_rounds.insert(additional_feed_id, round);
-                let (stride, _digits_in_fraction) = match &strides_and_decimals
-                    .get(&additional_feed_id)
-                {
-                    Some(f) => (f.stride, f.decimals),
-                    None => {
-                        error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
-                        (0, 18)
-                    }
-                };
-                feeds_info.insert(additional_feed_id, (stride, U256::from(round)));
-            }
-        }
     }
 
     // Fill the round tables:
     let mut batch_feeds = BTreeMap::new();
 
-    for feed_id in feeds_rounds.keys() {
-        let (stride, round) = match feeds_info.get(feed_id) {
-            Some(v) => v,
-            None => {
-                error!("feeds_rounds does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
-                continue;
-            }
-        };
+    for (feed_id, (stride, round)) in feeds_info.iter() {
+        feeds_rounds.insert(*feed_id, *round);
+        let round = U256::from(*round);
         let row_index = (U256::from(2).pow(U256::from(115)) * U256::from(*stride)
             + U256::from(*feed_id))
             / U256::from(NUM_FEED_IDS_IN_ROUND_RECORD);

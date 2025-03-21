@@ -97,7 +97,7 @@ impl FeedStrideAndDecimals {
             Some(f) => f.stride,
             None => {
                 warn!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size.");
-                1
+                0
             }
         };
 
