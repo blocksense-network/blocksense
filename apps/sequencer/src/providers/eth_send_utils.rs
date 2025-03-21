@@ -1236,7 +1236,7 @@ mod tests {
             assert_eq!(num_cleared, 3);
             let limit = 2_u32;
             let num_loaded = p_lock
-                .load_history_from_chain(feed.id, limit)
+                .load_history_from_chain_for_feed(feed.id, limit)
                 .await
                 .unwrap();
             assert_eq!(num_loaded, 2);
@@ -1266,7 +1266,7 @@ mod tests {
 
             // Make sure the values are not loaded more then once in history
             let num_loaded = p_lock
-                .load_history_from_chain(feed.id, limit)
+                .load_history_from_chain_for_feed(feed.id, limit)
                 .await
                 .unwrap();
             assert_eq!(num_loaded, 0);
