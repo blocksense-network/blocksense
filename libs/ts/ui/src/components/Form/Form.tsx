@@ -1,6 +1,6 @@
 'use client';
 
-import {
+import React, {
   useState,
   useContext,
   createContext,
@@ -13,7 +13,6 @@ import {
 } from 'react';
 
 import { cn } from '@blocksense/ui/utils';
-
 import { Button } from '@blocksense/ui/Button';
 import { Input } from '@blocksense/ui/Input';
 import { TextArea } from '@blocksense/ui/TextArea';
@@ -120,13 +119,9 @@ export const Form = ({
           <Button className="bg-blue-500 text-white px-4 py-2 rounded-md">
             Submit
           </Button>
-          <button
-            type="button"
-            onClick={resetForm}
-            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md"
-          >
+          <Button onClick={resetForm} className="px-4 py-2 rounded-md">
             Reset
-          </button>
+          </Button>
         </div>
       </form>
     </FormContext.Provider>
@@ -159,7 +154,7 @@ export const FormField = ({
       </Label>
       <Input
         id={name}
-        value={String(values[name] || '')}
+        value={typeof values[name] === 'string' ? values[name] : ''}
         onChange={handleChange}
         placeholder={placeholder}
         aria-label={label}
@@ -180,18 +175,11 @@ export const FormTextArea = ({
     setValue(name, e.target.value);
   };
 
-  const value =
-    values[name] === true
-      ? 'true'
-      : values[name] === false
-        ? 'false'
-        : String(values[name] || '');
-
   return (
     <fieldset className="form__textarea flex flex-col space-y-1">
       <TextArea
         id={name}
-        value={value}
+        value={typeof values[name] === 'string' ? values[name] : ''}
         onChange={handleChange}
         placeholder={placeholder}
         label={label}
