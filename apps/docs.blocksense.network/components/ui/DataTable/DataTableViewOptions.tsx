@@ -1,31 +1,22 @@
-import * as React from 'react';
+'use client';
 
-import { Settings2 } from 'lucide-react';
-import { Table } from '@tanstack/react-table';
+import { useContext } from 'react';
 
 import { Button } from '@blocksense/ui/Button';
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from '@blocksense/ui/DropdownMenu';
+import { DataTableContext } from './DataTableContext';
 
-import { ColumnsTitlesType } from '@/components/ui/DataTable/DataTable';
+export function DataTableViewOptions() {
+  const { columnVisibility, setColumnVisibility } =
+    useContext(DataTableContext);
 
-interface DataTableViewOptionsProps<TData> {
-  table: Table<TData>;
-  columnsTitles: ColumnsTitlesType;
-  invisibleColumns?: string[];
-}
-
-export function DataTableViewOptions<TData>({
-  table,
-  columnsTitles,
-  invisibleColumns,
-}: DataTableViewOptionsProps<TData>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -34,38 +25,24 @@ export function DataTableViewOptions<TData>({
           size="sm"
           className="ml-auto bg-white h-8 flex border-solid border-slate-200 dark:bg-neutral-900"
         >
-          <Settings2 className="mr-2 h-4 w-4" />
           View
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[12rem]">
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {table
-          .getAllColumns()
-          .filter(
-            column =>
-              typeof column.accessorFn !== 'undefined' && column.getCanHide(),
-          )
-          .map(column => {
-            if (
-              invisibleColumns?.includes(column.id) ||
-              !columnsTitles[column.id]
-            ) {
-              return null;
+        {Object.keys(columnVisibility).map(col => (
+          <DropdownMenuCheckboxItem
+            key={col}
+            className="capitalize"
+            checked={!!columnVisibility[col]}
+            onCheckedChange={(checked: boolean) =>
+              setColumnVisibility({ ...columnVisibility, [col]: checked })
             }
-
-            return (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="capitalize"
-                checked={column.getIsVisible()}
-                onCheckedChange={value => column.toggleVisibility(!!value)}
-              >
-                {columnsTitles[column.id as keyof typeof columnsTitles]}
-              </DropdownMenuCheckboxItem>
-            );
-          })}
+          >
+            {col}
+          </DropdownMenuCheckboxItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

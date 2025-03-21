@@ -1,7 +1,7 @@
-import * as React from 'react';
+'use client';
 
+import * as React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
-import { Column } from '@tanstack/react-table';
 
 import { cn } from '@blocksense/ui/utils';
 import { Button } from '@blocksense/ui/Button';
@@ -19,33 +19,29 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@blocksense/ui/Popover';
-import { OptionType } from '@/components/ui/DataTable/DataTable';
 
-interface DataTableFacetedFilterProps<TData, TValue> {
-  column?: Column<TData, TValue>;
-  title?: string;
-  options: OptionType[];
-  data?: TData[];
+interface DataTableFacetedFilterProps {
+  title: string;
+  options: string[];
+  selectedValues: string[];
+  setSelectedValuesAction: (values: string[]) => void;
 }
 
-export function DataTableFacetedFilter<TData, TValue>({
-  column,
+export function DataTableFacetedFilter({
   title,
   options,
-}: DataTableFacetedFilterProps<TData, TValue>) {
-  const facets = column?.getFacetedUniqueValues();
-  const selectedValues = new Set(column?.getFilterValue() as string[]);
-  const [firstSelectedValue] = selectedValues;
-
+  selectedValues = [],
+  setSelectedValuesAction,
+}: DataTableFacetedFilterProps) {
   return (
     <Popover>
       <PopoverTrigger>
         <Button
           variant="outline"
           size="sm"
-          className="h-8 mt-0 border border-solid border-neutral-200/70 bg-white dark:bg-neutral-900"
+          className="h-8 border border-solid border-neutral-200/70 bg-white dark:bg-neutral-900"
         >
-          {firstSelectedValue || title}
+          {title}
           <ChevronDown className="ml-1 h-4 w-4" />
         </Button>
       </PopoverTrigger>
@@ -55,21 +51,19 @@ export function DataTableFacetedFilter<TData, TValue>({
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option, index) => {
-                const isSelected = selectedValues.has(option.value);
-
+              {options.map(option => {
+                const isSelected = selectedValues.includes(option);
                 return (
                   <CommandItem
-                    key={option.value + index.toString()}
+                    key={option}
                     onSelect={() => {
-                      selectedValues.clear();
-                      if (!isSelected) {
-                        selectedValues.add(option.value);
+                      if (isSelected) {
+                        setSelectedValuesAction(
+                          selectedValues.filter(v => v !== option),
+                        );
+                      } else {
+                        setSelectedValuesAction([...selectedValues, option]);
                       }
-                      const filterValues = Array.from(selectedValues);
-                      column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined,
-                      );
                     }}
                   >
                     <div
@@ -80,27 +74,19 @@ export function DataTableFacetedFilter<TData, TValue>({
                           : 'opacity-50 [&_svg]:invisible border-solid border-slate-500',
                       )}
                     >
-                      <Check className={cn('h-4 w-4')} />
+                      <Check className="h-4 w-4" />
                     </div>
-                    {option.icon && (
-                      <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-                    )}
-                    <span>{option.label}</span>
-                    {facets?.get(option.value) && (
-                      <span className="ml-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
-                        {facets.get(option.value)}
-                      </span>
-                    )}
+                    {option}
                   </CommandItem>
                 );
               })}
             </CommandGroup>
-            {selectedValues.size > 0 && (
+            {selectedValues.length > 0 && (
               <>
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => setSelectedValuesAction([])}
                     className="justify-center text-center"
                   >
                     Clear filters
