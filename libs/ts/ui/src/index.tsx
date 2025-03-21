@@ -3,6 +3,7 @@ export * from './components/Input';
 export * from './components/ImageWrapper';
 export * from './components/Tabs';
 export * from './components/Badge';
+export * from './components/Form';
 export * from './components/Label';
 export * from './components/ProgressBar';
 export * from './components/ScrollArea';
