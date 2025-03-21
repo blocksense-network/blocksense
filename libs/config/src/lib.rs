@@ -179,7 +179,7 @@ pub struct Provider {
     pub safe_min_quorum: u32,
     pub event_contract_address: Option<String>,
     pub multicall_contract_address: Option<String>,
-    pub transaction_drop_timeout_secs: u32,
+    pub transaction_retries_count_before_give_up: u32,
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
     pub transaction_gas_limit: u32,
@@ -212,15 +212,9 @@ fn contract_initial_version() -> u16 {
 
 impl Validated for Provider {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
-        if self.transaction_drop_timeout_secs == 0 {
-            anyhow::bail!(
-                "{}: transaction_drop_timeout_secs cannot be set to 0",
-                context
-            );
-        }
         if self.transaction_retry_timeout_secs == 0 {
             anyhow::bail!(
-                "{}: transaction_drop_timeout_secs cannot be set to 0",
+                "{}: transaction_retry_timeout_secs cannot be set to 0",
                 context
             );
         }
@@ -459,7 +453,7 @@ pub fn get_test_config_with_multiple_providers(
                 safe_min_quorum: 1,
                 event_contract_address: None,
                 multicall_contract_address: None,
-                transaction_drop_timeout_secs: 50,
+                transaction_retries_count_before_give_up: 10,
                 transaction_retry_timeout_secs: 24,
                 retry_fee_increment_fraction: 0.1,
                 transaction_gas_limit: 7500000,
@@ -505,7 +499,7 @@ mod tests {
             {
             "private_key_path": "/tmp/priv_key_test",
             "url": "http://127.0.0.1:8546",
-            "transaction_drop_timeout_secs": 42,
+            "transaction_retries_count_before_give_up": 42,
             "transaction_retry_timeout_secs": 20,
             "retry_fee_increment_fraction": 0.1,
             "transaction_gas_limit": 7500000,
@@ -518,7 +512,7 @@ mod tests {
         assert_eq!(provider_a.event_contract_address, None);
         assert_eq!(&provider_a.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&provider_a.url, "http://127.0.0.1:8546");
-        assert_eq!(provider_a.transaction_drop_timeout_secs, 42_u32);
+        assert_eq!(provider_a.transaction_retries_count_before_give_up, 42_u32);
         assert_eq!(provider_a.transaction_retry_timeout_secs, 20_u32);
         assert_eq!(provider_a.retry_fee_increment_fraction, 0.1f64);
         assert_eq!(provider_a.transaction_gas_limit, 7500000_u32);
@@ -545,7 +539,7 @@ mod tests {
             {
             "private_key_path": "/tmp/priv_key_test",
             "url": "http://127.0.0.1:8546",
-            "transaction_drop_timeout_secs": 42,
+            "transaction_retries_count_before_give_up": 42,
             "transaction_retry_timeout_secs": 20,
             "retry_fee_increment_fraction": 0.1,
             "transaction_gas_limit": 7500000,
@@ -596,7 +590,7 @@ mod tests {
         assert_eq!(p.event_contract_address, None);
         assert_eq!(&p.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&p.url, "http://127.0.0.1:8546");
-        assert_eq!(p.transaction_drop_timeout_secs, 42_u32);
+        assert_eq!(p.transaction_retries_count_before_give_up, 42_u32);
         assert_eq!(p.transaction_retry_timeout_secs, 20_u32);
         assert_eq!(p.retry_fee_increment_fraction, 0.1f64);
         assert_eq!(p.transaction_gas_limit, 7500000_u32);

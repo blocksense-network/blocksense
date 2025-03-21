@@ -42,9 +42,9 @@ let
         description = mdDoc "List of publishing criteria for feed per provider customizationo";
       };
 
-      transaction_drop_timeout_secs = mkOption {
+      transaction_retries_count_before_give_up = mkOption {
         type = types.int;
-        default = 420;
+        default = 5;
         description = mdDoc "The timeout for transactions to be dropped.";
       };
 

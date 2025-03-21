@@ -187,6 +187,7 @@ pub async fn eth_batch_send_to_contract(
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
+    transaction_retries_count_before_give_up: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<u32>)> {
     let mut feeds_rounds = HashMap::new();
@@ -286,6 +287,8 @@ pub async fn eth_batch_send_to_contract(
         .iter()
         .map(|update| update.feed_id)
         .collect();
+
+    increment_feeds_round_indexes(&feeds_to_update_ids, feeds_metrics.clone(), net.as_str()).await;
 
     loop {
         debug!("loop begin; timed_out_count={timed_out_count}");
@@ -395,9 +398,6 @@ pub async fn eth_batch_send_to_contract(
 
         let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
 
-        increment_feeds_round_indexes(&feeds_to_update_ids, feeds_metrics.clone(), net.as_str())
-            .await;
-
         debug!("Awaiting receipt for transaction to network `{net}`...");
         let receipt_result = spawn(async move {
             actix_web::rt::time::timeout(
@@ -421,38 +421,24 @@ pub async fn eth_batch_send_to_contract(
                     }
                     Err(e) => {
                         warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                        decrement_feeds_round_indexes(
-                            &feeds_to_update_ids,
-                            feeds_metrics.clone(),
-                            net.as_str(),
-                        )
-                        .await;
                         timed_out_count += 1;
                     }
                 },
                 Err(e) => {
                     warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                    decrement_feeds_round_indexes(
-                        &feeds_to_update_ids,
-                        feeds_metrics.clone(),
-                        net.as_str(),
-                    )
-                    .await;
                     timed_out_count += 1;
                 }
             },
             Err(e) => {
-                decrement_feeds_round_indexes(
-                    &feeds_to_update_ids,
-                    feeds_metrics.clone(),
-                    net.as_str(),
-                )
-                .await;
                 panic!("Join error tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
             }
         }
 
         debug!("matched receipt_result");
+
+        if timed_out_count > transaction_retries_count_before_give_up {
+            return Ok(("timeout".to_string(), feeds_to_update_ids));
+        }
     }
 
     let transaction_time = tx_time.elapsed().as_millis();
@@ -522,7 +508,7 @@ pub async fn eth_batch_send_to_all_contracts(
         for (net, provider) in providers.iter() {
             let updates = updates.clone();
             let (
-                transaction_drop_timeout_secs,
+                transaction_retries_count_before_give_up,
                 transaction_retry_timeout_secs,
                 retry_fee_increment_fraction,
             ) = {
@@ -530,7 +516,7 @@ pub async fn eth_batch_send_to_all_contracts(
                 let p = provider.lock().await;
                 debug!("Acquired and releasing a read lock on provider for network {net}");
                 (
-                    p.transaction_drop_timeout_secs as u64,
+                    p.transaction_retries_count_before_give_up as u64,
                     p.transaction_retry_timeout_secs as u64,
                     p.retry_fee_increment_fraction,
                 )
@@ -553,21 +539,18 @@ pub async fn eth_batch_send_to_all_contracts(
                 let feeds_metrics = feeds_metrics.clone();
                 let provider_settings = provider_settings.clone();
                 collected_futures.push(spawn(async move {
-                    let result = actix_web::rt::time::timeout(
-                        Duration::from_secs(transaction_drop_timeout_secs),
-                        eth_batch_send_to_contract(
-                            net.clone(),
-                            provider.clone(),
-                            provider_settings,
-                            updates,
-                            feed_type,
-                            Some(feeds_metrics),
-                            feeds_config,
-                            transaction_retry_timeout_secs,
-                            retry_fee_increment_fraction,
-                        ),
-                    )
-                    .await;
+                    let result = eth_batch_send_to_contract(
+                        net.clone(),
+                        provider.clone(),
+                        provider_settings,
+                        updates,
+                        feed_type,
+                        Some(feeds_metrics),
+                        feeds_config,
+                        transaction_retry_timeout_secs,
+                        transaction_retries_count_before_give_up,
+                        retry_fee_increment_fraction,
+                    );
                     (result, net, provider)
                 }));
             } else {
@@ -589,8 +572,36 @@ pub async fn eth_batch_send_to_all_contracts(
     let result = futures::future::join_all(collected_futures).await;
     let mut all_results = String::new();
     for v in result {
-        let res = match v {
-            Ok(res) => res,
+        match v {
+            Ok((result, net, provider)) => match result.await {
+                Ok((status, updated_feeds)) => {
+                    all_results += &format!("result from network {net}: Ok -> status: {status}");
+                    if status == "true" {
+                        all_results += &format!(", updated_feeds: {updated_feeds:?}");
+                        let mut status_map = sequencer_state.provider_status.write().await;
+                        status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
+                    } else if status == "false" || status == "timeout" {
+                        all_results +=
+                            &format!(", failed to update feeds: {updated_feeds:?} due to {status}");
+                        decrement_feeds_round_indexes(
+                            &updated_feeds,
+                            Some(sequencer_state.feeds_metrics.clone()),
+                            net.as_str(),
+                        )
+                        .await;
+                        if status == "timeout" {
+                            let provider = provider.lock().await;
+                            let provider_metrics = provider.provider_metrics.clone();
+                            inc_metric!(provider_metrics, net, total_timed_out_tx);
+                        }
+                        let mut status_map = sequencer_state.provider_status.write().await;
+                        status_map.insert(net, ProviderStatus::LastUpdateFailed);
+                    }
+                }
+                Err(e) => {
+                    error!("Got error sending to network {net}: {e}");
+                }
+            },
             Err(e) => {
                 all_results += "JoinError:";
                 error!("JoinError: {}", e.to_string());
@@ -598,48 +609,6 @@ pub async fn eth_batch_send_to_all_contracts(
                 continue;
             }
         };
-
-        let (x, net) = match res {
-            (Ok(x), net, _provider) => (x, net),
-            (Err(e), net, provider) => {
-                let err = format!("Timed out transaction for network {} -> {}", net, e);
-                error!(err);
-                all_results += &err;
-                let provider = provider.lock().await;
-                let provider_metrics = provider.provider_metrics.clone();
-                inc_metric!(provider_metrics, net, total_timed_out_tx);
-                let mut status_map = sequencer_state.provider_status.write().await;
-                status_map.insert(net, ProviderStatus::LastUpdateFailed);
-                continue;
-            }
-        };
-
-        let (status, updated_feeds) = match x {
-            Ok((status, updated_feeds)) => (status, updated_feeds),
-            Err(error_message) => {
-                warn!("Network {net} responded with error: {error_message}");
-                all_results += &format!("result from network {}: Err -> {:?}", net, error_message);
-                let mut status_map = sequencer_state.provider_status.write().await;
-                status_map.insert(net, ProviderStatus::LastUpdateFailed);
-                continue;
-            }
-        };
-
-        // Transaction confirmed, process the status:
-        all_results += &format!("result from network {net}: Ok -> status: {status}");
-        if status == "true" {
-            all_results += &format!(", updated_feeds: {updated_feeds:?}");
-        } else if status == "false" {
-            all_results += &format!(", failed to update feeds: {updated_feeds:?}");
-            decrement_feeds_round_indexes(
-                &updated_feeds,
-                Some(sequencer_state.feeds_metrics.clone()),
-                net.as_str(),
-            )
-            .await;
-        }
-        let mut status_map = sequencer_state.provider_status.write().await;
-        status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
 
         all_results += "\n"
     }
@@ -936,6 +905,7 @@ mod tests {
             None,
             feeds_config,
             50,
+            10,
             0.1,
         )
         .await;
