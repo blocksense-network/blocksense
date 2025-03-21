@@ -11,9 +11,11 @@ contract CLAggregatorAdapter is ICLAggregatorAdapter {
   /// @inheritdoc IChainlinkAggregator
   uint8 public immutable override decimals;
   /// @inheritdoc ICLAggregatorAdapter
-  uint256 public immutable override id;
-  /// @inheritdoc ICLAggregatorAdapter
   address public immutable override dataFeedStore;
+
+  /// @notice The ID of the feed
+  /// @dev The ID is shifted to the left by 120 bits to save gas
+  uint256 internal immutable ID;
 
   /// @inheritdoc IChainlinkAggregator
   string public override description;
@@ -31,18 +33,23 @@ contract CLAggregatorAdapter is ICLAggregatorAdapter {
   ) {
     description = _description;
     decimals = _decimals;
-    id = CLAdapterLib._shiftId(_id);
+    ID = CLAdapterLib._shiftId(_id);
     dataFeedStore = _dataFeedStore;
+  }
+
+  /// @inheritdoc ICLAggregatorAdapter
+  function id() external view override returns (uint256) {
+    return ID >> 120;
   }
 
   /// @inheritdoc IChainlinkAggregator
   function latestAnswer() external view override returns (int256) {
-    return CLAdapterLib._latestAnswer(id, dataFeedStore);
+    return CLAdapterLib._latestAnswer(ID, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
   function latestRound() external view override returns (uint256) {
-    return CLAdapterLib._latestRound(id, dataFeedStore);
+    return CLAdapterLib._latestRound(ID, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
@@ -52,13 +59,13 @@ contract CLAggregatorAdapter is ICLAggregatorAdapter {
     override
     returns (uint80, int256, uint256, uint256, uint80)
   {
-    return CLAdapterLib._latestRoundData(id, dataFeedStore);
+    return CLAdapterLib._latestRoundData(ID, dataFeedStore);
   }
 
   /// @inheritdoc IChainlinkAggregator
   function getRoundData(
     uint80 _roundId
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
-    return CLAdapterLib._getRoundData(_roundId, id, dataFeedStore);
+    return CLAdapterLib._getRoundData(_roundId, ID, dataFeedStore);
   }
 }

@@ -82,7 +82,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
       feedData[feeds[i].base][feeds[i].quote] = FeedData(
         IChainlinkAggregator(feeds[i].feed),
         ICLAggregatorAdapter(feeds[i].feed).decimals(),
-        ICLAggregatorAdapter(feeds[i].feed).id(),
+        CLAdapterLib._shiftId(ICLAggregatorAdapter(feeds[i].feed).id()),
         ICLAggregatorAdapter(feeds[i].feed).description()
       );
     }

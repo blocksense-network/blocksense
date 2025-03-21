@@ -137,5 +137,5 @@ To get the feed key the CL Aggregator Adapter is responsible for:
 
 ```js copy filename="javascript"
 const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
-const id = (await aggregator.id()) >> 120n;
+const id = await aggregator.id();
 ```

@@ -72,6 +72,10 @@ export abstract class CLBaseWrapper {
     expect(await this.contract.description()).to.be.eq(description);
   }
 
+  public async checkId(id: number): Promise<void> {
+    expect(await this.contract.id()).to.be.eq(id);
+  }
+
   public async checkLatestAnswer(
     caller: HardhatEthersSigner,
     answer: string,

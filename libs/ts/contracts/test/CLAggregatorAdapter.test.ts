@@ -64,6 +64,12 @@ describe('CLAggregatorAdapter', function () {
     }
   });
 
+  it('Should check id', async function () {
+    for (const [i, data] of aggregatorData.entries()) {
+      await contractWrappers[i].checkId(data.id);
+    }
+  });
+
   describe('Assert storage', function () {
     for (const [i, data] of aggregatorData.entries()) {
       it(`Should get latest answer for ${data.description}`, async function () {
