@@ -1,7 +1,9 @@
 use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
-use crate::providers::provider::{GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME};
+use crate::providers::provider::{
+    GNOSIS_SAFE_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
+};
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use alloy::hex::{self, ToHexExt};
@@ -163,7 +165,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             let provider = provider.lock().await;
 
             let contract_address = provider
-                .get_contract_address(PRICE_FEED_CONTRACT_NAME)
+                .get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
                 .unwrap_or(Address::default());
             let safe_address = provider
                 .get_contract_address(GNOSIS_SAFE_CONTRACT_NAME)

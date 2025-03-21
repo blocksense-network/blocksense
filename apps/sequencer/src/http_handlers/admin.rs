@@ -24,7 +24,7 @@ use std::collections::{BTreeMap, HashSet};
 
 use crate::http_handlers::data_feeds::register_feed;
 use crate::providers::eth_send_utils::deploy_contract;
-use crate::providers::provider::{SharedRpcProviders, PRICE_FEED_CONTRACT_NAME};
+use crate::providers::provider::{SharedRpcProviders, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME};
 use blocksense_feed_registry::types::FeedType;
 use blocksense_metrics::metrics_collector::gather_and_dump_metrics;
 use tokio::time::Duration;
@@ -50,7 +50,7 @@ pub async fn get_key_from_contract(
 
     let signer = &p.signer;
     let provider = &p.provider;
-    let contract_address = p.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
+    let contract_address = p.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
     info!("sending data to contract_address `{contract_address}` in network `{network}`",);
 
     let mut selector = key;
@@ -890,8 +890,9 @@ mod tests {
                     safe_address: None,
                     safe_min_quorum: 1,
                     event_contract_address: None,
+                    adfs_contract_address: None,
                     multicall_contract_address: None,
-                    transaction_retries_count_limit: 42,
+                    transaction_retries_count_before_give_up: 42,
                     transaction_retry_timeout_secs: 20,
                     retry_fee_increment_fraction: 0.1,
                     transaction_gas_limit: 1337,
