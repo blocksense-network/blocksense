@@ -138,7 +138,7 @@ async fn get_rpc_providers(
             .parse()
             .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
 
-        let rpc_provider = RpcProvider::new(
+        let mut rpc_provider = RpcProvider::new(
             net.as_str(),
             rpc_url,
             &signer,
@@ -152,7 +152,10 @@ async fn get_rpc_providers(
         rpc_provider
             .log_if_contract_exists(EVENT_FEED_CONTRACT_NAME)
             .await;
-
+        rpc_provider
+            .load_history_from_chain(p)
+            .await
+            .expect("Failed loading history from chain!");
         let rpc_provider = Arc::new(Mutex::new(rpc_provider));
 
         providers.insert(net.clone(), rpc_provider.clone());
@@ -579,7 +582,29 @@ impl RpcProvider {
         }
     }
 
-    pub async fn load_history_from_chain(
+    pub async fn load_history_from_chain(&mut self, p: &config::Provider) -> Result<()> {
+        let network = self.network.clone();
+        let rpc_url = self.rpc_url.as_str().to_string();
+        info!("Loading histrory from chain for {network} from {rpc_url}");
+        for crit in p.publishing_criteria.iter() {
+            let feed_id = crit.feed_id;
+            let limit_entries = 100;
+            let result = self
+                .load_history_from_chain_for_feed(feed_id, limit_entries)
+                .await;
+            match result {
+                Ok(num_entries) => {
+                    info!("Loaded {num_entries} entries for feed_id {feed_id} in network {network} from {rpc_url}");
+                }
+                Err(e) => {
+                    error!("Failed to load history feed_id {feed_id} in network {network} from {rpc_url}. Error {e}");
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub async fn load_history_from_chain_for_feed(
         &mut self,
         feed_id: u32,
         limit_entries: u32,
