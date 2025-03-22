@@ -3,7 +3,6 @@
 import React, {
   createContext,
   useContext,
-  ReactNode,
   HTMLAttributes,
   FieldsetHTMLAttributes,
 } from 'react';
@@ -26,7 +25,6 @@ type RadioGroupProps = FieldsetHTMLAttributes<HTMLFieldSetElement> & {
   selectedValue: string;
   name: string;
   onValueChangeAction: (value: string) => void;
-  children: ReactNode;
 };
 
 export const RadioGroup = ({
@@ -51,9 +49,7 @@ export const RadioGroup = ({
   );
 };
 
-type RadioGroupLabelProps = HTMLAttributes<HTMLLabelElement> & {
-  children: ReactNode;
-};
+type RadioGroupLabelProps = HTMLAttributes<HTMLLabelElement>;
 
 export const RadioGroupLabel = ({
   children,
@@ -72,7 +68,6 @@ export const RadioGroupLabel = ({
 
 type RadioGroupItemProps = HTMLAttributes<HTMLDivElement> & {
   value: string;
-  children: ReactNode;
 };
 
 export const RadioGroupItem = ({

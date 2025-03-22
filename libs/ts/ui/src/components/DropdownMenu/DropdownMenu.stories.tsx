@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 
 import { Button } from '@blocksense/ui/Button';
+import { RadioGroup, RadioGroupItem } from '@blocksense/ui/RadioGroup';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuSubTrigger,
@@ -203,7 +202,7 @@ export const CheckboxExample = () => {
 };
 
 export const RadioExample = () => {
-  const [radioValue, setRadioValue] = useState('option1');
+  const [selectedOption, setSelectedOption] = useState('option1');
 
   return (
     <div className="p-4">
@@ -212,20 +211,17 @@ export const RadioExample = () => {
           <Button>Open Radio Menu</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="start">
-          <DropdownMenuRadioGroup
-            value={radioValue}
-            onValueChange={setRadioValue}
+          <RadioGroup
+            selectedValue={selectedOption}
+            name="option"
+            onValueChangeAction={setSelectedOption}
+            aria-label="Choose an option"
+            className="p-4"
           >
-            <DropdownMenuRadioItem value="option1">
-              Option 1 {radioValue === 'option1' && '(Selected)'}
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="option2">
-              Option 2 {radioValue === 'option2' && '(Selected)'}
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="option3">
-              Option 3 {radioValue === 'option3' && '(Selected)'}
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
+            <RadioGroupItem value="option1">Option 1</RadioGroupItem>
+            <RadioGroupItem value="option2">Option 2</RadioGroupItem>
+            <RadioGroupItem value="option3">Option 3</RadioGroupItem>
+          </RadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
