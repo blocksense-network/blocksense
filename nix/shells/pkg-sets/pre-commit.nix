@@ -30,6 +30,9 @@
         offline = false;
       };
     };
+    statix = {
+      enable = true;
+    };
     prettier = {
       enable = true;
       args = [
