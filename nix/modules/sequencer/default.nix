@@ -56,10 +56,6 @@
             prometheus_port = cfg.sequencer.metrics-port;
           };
 
-          reportersConfigJSON = builtins.mapAttrs (
-            n: v: (configJSON v { prometheus_url = cfg.reporters.${n}.metrics-url; })
-          ) cfg.reporters;
-
           commonBlocksenseConfig = {
             oracles = builtins.attrValues cfg.oracles;
             data_feeds = [ ];
@@ -106,12 +102,6 @@
 
             sequencer = import ./sequencer-opts.nix lib;
 
-            reporters = mkOption {
-              type = types.attrsOf (mkSubmodule ./reporter-opts.nix);
-              default = { };
-              description = mdDoc "The set of reporter instances to run.";
-            };
-
             oracles = mkOption {
               type = types.attrsOf (mkSubmodule ./oracle-script-opts.nix);
               default = { };
@@ -134,12 +124,6 @@
               type = types.str;
               description = "The materialized configuration for the sequencer.";
               default = sequencerConfigJSON;
-            };
-
-            _reporters-config-txt = mkOption {
-              type = types.attrsOf types.str;
-              description = "The materialized configuration for the reporters.";
-              default = reportersConfigJSON;
             };
 
             _blocksense-config-txt = mkOption {

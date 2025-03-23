@@ -12,7 +12,7 @@ let
     name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
   ) cfg.reporters-v2;
 
-  inherit (self'.apps) sequencer reporter blocksense;
+  inherit (self'.apps) sequencer blocksense;
 
   anvilInstances = lib.mapAttrs' (
     name:
@@ -29,24 +29,6 @@ let
       };
     }
   ) cfg.anvil;
-
-  reporterInstances = lib.mapAttrs' (name: conf: {
-    name = "blocksense-reporter-${name}";
-    value = {
-      description = "Reporter ${name}";
-      wantedBy = [ "multi-user.target" ];
-      requires = [ "blocksense-sequencer.service" ];
-      environment = {
-        FEEDS_CONFIG_DIR = "${../../../../config}";
-        REPORTER_CONFIG_DIR = "/etc/blocksense/reporter-${name}";
-        RUST_LOG = "${conf.log-level}";
-      };
-      serviceConfig = {
-        ExecStart = reporter.program;
-        Restart = "on-failure";
-      };
-    };
-  }) cfg.reporters;
 
   reporterV2Instances = lib.mapAttrs' (
     name:
@@ -82,11 +64,6 @@ let
       };
     }
   ) cfg.reporters-v2;
-
-  etcEnv = lib.mapAttrs' (name: _conf: {
-    name = "blocksense/reporter-${name}/reporter_config.json";
-    value.text = cfg._reporters-config-txt.${name};
-  }) cfg.reporters;
 in
 {
   config = lib.mkIf cfg.enable {
@@ -94,7 +71,7 @@ in
       "blocksense/sequencer_config.json" = {
         text = cfg._sequencer-config-txt;
       };
-    } // etcEnv;
+    };
 
     systemd.services =
       {
@@ -117,7 +94,6 @@ in
         };
       }
       // anvilInstances
-      // reporterInstances
       // reporterV2Instances;
   };
 }

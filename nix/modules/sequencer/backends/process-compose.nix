@@ -10,7 +10,6 @@ let
 
   inherit (self'.apps)
     sequencer
-    reporter
     blocksense
     blockchain_reader
     aggregate_consensus_reader
@@ -33,15 +32,6 @@ let
     echo '${cfg._sequencer-config-txt}' \
       | ${lib.getExe pkgs.jq} > $out/sequencer_config.json
   '';
-
-  reportersConfigJSON = builtins.mapAttrs (
-    name: _value:
-    pkgs.runCommandLocal "reporter_config" { } ''
-      mkdir -p $out/reporter-${name}
-      echo '${cfg._reporters-config-txt.${name}}' \
-        | ${lib.getExe pkgs.jq} > $out/reporter-${name}/reporter_config.json
-    ''
-  ) cfg.reporters;
 
   reportersV2ConfigJSON = builtins.mapAttrs (
     name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
@@ -85,22 +75,6 @@ let
       };
     };
   }) cfg.sequencer.providers;
-
-  reporterInstances = lib.mapAttrs' (name: conf: {
-    name = "blocksense-reporter-${name}";
-    value.process-compose = {
-      command = "true";
-      environment = [
-        "FEEDS_CONFIG_DIR=${../../../../config}"
-        "REPORTER_CONFIG_DIR=${reportersConfigJSON.${name}}/reporter-${name}"
-        "RUST_LOG=${conf.log-level}"
-      ];
-      depends_on.blocksense-sequencer.condition = "process_started";
-      shutdown.signal = 9;
-      log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/reporter-${name}.log";
-    };
-  }) cfg.reporters;
 
   installOracleScripts =
     dir:
@@ -190,7 +164,6 @@ in
       // reporterV2Instances
       // sequencerInstance
       // anvilInstances
-      // reporterInstances
       // blockchainReader
       // aggregateConsensusReader;
   };
