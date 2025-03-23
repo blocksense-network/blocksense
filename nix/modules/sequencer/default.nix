@@ -75,7 +75,7 @@
               ]
             );
 
-          blocksenseConfigJSON = lib.pipe cfg.reporters-v2 [
+          blocksenseConfigJSON = lib.pipe cfg.reporters [
             (builtins.mapAttrs (
               _n: reporter-config: (transformBlocksenseConfig reporter-config) // commonBlocksenseConfig
             ))
@@ -108,8 +108,8 @@
               description = mdDoc "The set of oracle scripts to build.";
             };
 
-            reporters-v2 = mkOption {
-              type = types.attrsOf (mkSubmodule ./reporter-opts-v2.nix);
+            reporters = mkOption {
+              type = types.attrsOf (mkSubmodule ./reporter-opts.nix);
               default = { };
               description = mdDoc "The set of reporter instances to run.";
             };
@@ -128,7 +128,7 @@
 
             _blocksense-config-txt = mkOption {
               type = types.attrsOf types.raw;
-              description = "The materialized configuration for the reporters v2.";
+              description = "The materialized configuration for the reporters.";
               default = blocksenseConfigJSON;
             };
           };

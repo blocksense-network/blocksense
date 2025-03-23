@@ -33,9 +33,9 @@ let
       | ${lib.getExe pkgs.jq} > $out/sequencer_config.json
   '';
 
-  reportersV2ConfigJSON = builtins.mapAttrs (
+  reportersConfigJSON = builtins.mapAttrs (
     name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
-  ) cfg.reporters-v2;
+  ) cfg.reporters;
 
   anvilInstances = lib.mapAttrs' (
     name:
@@ -84,11 +84,11 @@ let
       (files: "cp -vf ${files} ${dir}")
     ];
 
-  reporterV2Instances = lib.mapAttrs' (
+  reporterInstances = lib.mapAttrs' (
     name:
     { log-level, ... }:
     {
-      name = "blocksense-reporter-v2-${name}";
+      name = "blocksense-reporter-${name}";
       value.process-compose =
         let
           working_dir = toString (/. + config.devenv.state + /blocksense/reporter/${name});
@@ -98,17 +98,17 @@ let
             mkdir -p "${working_dir}" &&
             cd "${working_dir}" &&
             ${installOracleScripts working_dir} &&
-            ${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up
+            ${blocksense.program} node build --from ${reportersConfigJSON.${name}} --up
           '';
           environment = [ "RUST_LOG=${log-level}" ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
           };
           log_configuration = logsConfig;
-          log_location = cfg.logsDir + "/reporter-v2-${name}.log";
+          log_location = cfg.logsDir + "/reporter-${name}.log";
         };
     }
-  ) cfg.reporters-v2;
+  ) cfg.reporters;
 
   sequencerInstance = {
     blocksense-sequencer.process-compose = {
@@ -161,7 +161,7 @@ in
   config = lib.mkIf cfg.enable {
     processes =
       anvilImpersonateAndFundInstances
-      // reporterV2Instances
+      // reporterInstances
       // sequencerInstance
       // anvilInstances
       // blockchainReader

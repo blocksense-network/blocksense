@@ -8,9 +8,9 @@
 let
   cfg = config.services.blocksense;
 
-  reportersV2ConfigJSON = builtins.mapAttrs (
+  reportersConfigJSON = builtins.mapAttrs (
     name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
-  ) cfg.reporters-v2;
+  ) cfg.reporters;
 
   inherit (self'.apps) sequencer blocksense;
 
@@ -30,11 +30,11 @@ let
     }
   ) cfg.anvil;
 
-  reporterV2Instances = lib.mapAttrs' (
+  reporterInstances = lib.mapAttrs' (
     name:
     { log-level, ... }:
     let
-      serviceName = "blocksense-reporter-v2-${name}";
+      serviceName = "blocksense-reporter-${name}";
       wasmCopyCmd = lib.pipe self'.legacyPackages.oracle-scripts [
         builtins.attrValues
         (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
@@ -44,7 +44,7 @@ let
     {
       name = serviceName;
       value = {
-        description = "Reporter v2 ${name}";
+        description = "Reporter ${name}";
         wantedBy = [ "multi-user.target" ];
         requires = [ "blocksense-sequencer.service" ];
         environment = {
@@ -58,12 +58,12 @@ let
           StateDirectory = serviceName;
           WorkingDirectory = "/var/lib/${serviceName}";
           ExecStartPre = wasmCopyCmd;
-          ExecStart = "${blocksense.program} node build --from ${reportersV2ConfigJSON.${name}} --up";
+          ExecStart = "${blocksense.program} node build --from ${reportersConfigJSON.${name}} --up";
           Restart = "on-failure";
         };
       };
     }
-  ) cfg.reporters-v2;
+  ) cfg.reporters;
 in
 {
   config = lib.mkIf cfg.enable {
@@ -94,6 +94,6 @@ in
         };
       }
       // anvilInstances
-      // reporterV2Instances;
+      // reporterInstances;
   };
 }

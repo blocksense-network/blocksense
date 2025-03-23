@@ -133,7 +133,7 @@ in
       log-level = "info";
     };
 
-    reporters-v2 = {
+    reporters = {
       a = {
         reporter-info = {
           reporter_id = 0;
