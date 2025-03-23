@@ -7,18 +7,6 @@
 with lib;
 let
   inherit (self'.legacyPackages) foundry;
-
-  walletOpts = {
-    address.file = mkOption {
-      type = with types; nullOr path;
-      description = "The path to the wallet address";
-    };
-    private-key.file = mkOption {
-      type = with types; nullOr path;
-      default = null;
-      description = "The path of the wallet private key";
-    };
-  };
 in
 {
   options = {
