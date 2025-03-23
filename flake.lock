@@ -763,8 +763,6 @@
           "nixos-modules",
           "nixpkgs-unstable"
         ],
-        "rust-overlay": "rust-overlay",
-        "rust-overlay-2024-08-01": "rust-overlay-2024-08-01",
         "treefmt-nix": [
           "mcl-blockchain",
           "nixos-modules",
@@ -772,11 +770,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1742218272,
-        "narHash": "sha256-vNyFwXAJfc8JdfRLazhopCkC6rwk3L3VSP8F2p+bV5E=",
+        "lastModified": 1742580668,
+        "narHash": "sha256-E952sbCC7FMdnchMM2GygFKdtz1VDpvnNZ/aUX+Ikrw=",
         "owner": "metacraft-labs",
         "repo": "nix-blockchain-development",
-        "rev": "925db50485551ff247b80338254b6ac72e8472ff",
+        "rev": "29117d31dbc31d4c43398ea048d350eb63b69534",
         "type": "github"
       },
       "original": {
@@ -1246,49 +1244,6 @@
         "owner": "rust-lang",
         "ref": "nightly",
         "repo": "rust-analyzer",
-        "type": "github"
-      }
-    },
-    "rust-overlay": {
-      "inputs": {
-        "nixpkgs": [
-          "mcl-blockchain",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1742178793,
-        "narHash": "sha256-S2onMdoDS4tIYd3/Jc5oFEZBr2dJOgPrh9KzSO/bfDw=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "954582a766a50ebef5695a9616c93b5386418c08",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "type": "github"
-      }
-    },
-    "rust-overlay-2024-08-01": {
-      "inputs": {
-        "nixpkgs": [
-          "mcl-blockchain",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1719454714,
-        "narHash": "sha256-MojqG0lyUINkEk0b3kM2drsU5vyaF8DFZe/FAlZVOGs=",
-        "owner": "oxalica",
-        "repo": "rust-overlay",
-        "rev": "d1c527659cf076ecc4b96a91c702d080b213801e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "oxalica",
-        "ref": "snapshot/2024-08-01",
-        "repo": "rust-overlay",
         "type": "github"
       }
     },
