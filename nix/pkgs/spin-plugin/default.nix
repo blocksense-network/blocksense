@@ -3,18 +3,33 @@
   runCommand,
   spin,
   writers,
+  lib,
   ...
 }:
-args@{
-  name,
-  description,
-  homepage,
-  license,
-  packages,
-  spinCompatibility,
-  version,
-}:
+manifestArgs:
 let
+  manifest =
+    (lib.evalModules {
+      modules = [
+        (
+          with lib;
+          with lib.types;
+          {
+            options = {
+              name = mkOption { type = str; };
+              description = mkOption { type = str; };
+              homepage = mkOption { type = str; };
+              license = mkOption { type = str; };
+              packages = mkOption { type = listOf path; };
+              spinCompatibility = mkOption { type = str; };
+              version = mkOption { type = str; };
+            };
+          }
+        )
+        manifestArgs
+      ];
+    }).config;
+
   os =
     {
       linux = "linux";
@@ -51,10 +66,10 @@ let
       sha256 = builtins.hashFile "sha256" archive;
     };
 
-  spinManifestJson = writers.writeJSON "${args.name}.json" (
-    args
+  spinManifestJson = writers.writeJSON "${manifest.name}.json" (
+    manifest
     // {
-      packages = builtins.map mkSpinPackageDescription args.packages;
+      packages = builtins.map mkSpinPackageDescription manifest.packages;
     }
   );
 
