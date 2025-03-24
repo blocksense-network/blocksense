@@ -1,7 +1,7 @@
 use prometheus_framework::{
-    labels, opts, register_counter, register_histogram_vec, register_int_counter,
-    register_int_counter_vec, register_int_gauge, register_int_gauge_vec, Counter, HistogramVec,
-    IntCounter, IntCounterVec, IntGauge, IntGaugeVec,
+    labels, opts, register_counter, register_int_counter, register_int_counter_vec,
+    register_int_gauge, register_int_gauge_vec, Counter, IntCounter, IntCounterVec, IntGauge,
+    IntGaugeVec,
 };
 
 use utils::build_info::{
@@ -19,33 +19,33 @@ lazy_static::lazy_static! {
     pub static ref BATCH_COUNTER: IntCounter =
         register_int_counter!("BATCH_COUNTER", "number of batches served").unwrap();
 
-        pub static ref BATCH_SIZE: IntCounter =
+    pub static ref BATCH_SIZE: IntCounter =
         register_int_counter!("BATCH_SIZE", "batch size").unwrap();
 
-        pub static ref FEED_COUNTER: IntCounter =
+    pub static ref FEED_COUNTER: IntCounter =
         register_int_counter!("FEED_COUNTER", "Available feed count").unwrap();
 
-        pub  static ref UPTIME_COUNTER: Counter =
+    pub  static ref UPTIME_COUNTER: Counter =
         register_counter!("UPTIME_COUNTER", "Runtime(sec) duration of reporter").unwrap();
 
-        pub static ref BATCH_PARSE_TIME_GAUGE: IntGauge = register_int_gauge!("BATCH_PARSE_TIME_GAUGE", "Time(ms) to parse current batch").unwrap();
+    pub static ref BATCH_PARSE_TIME_GAUGE: IntGauge = register_int_gauge!("BATCH_PARSE_TIME_GAUGE", "Time(ms) to parse current batch").unwrap();
 
-        pub static ref BUILD_INFO: IntGauge = register_int_gauge!(opts!(
-            "BUILD_INFO",
-            "BUILD info to identify version of this software product",
-            labels! {
-                "version" => BLOCKSENSE_VERSION,
-                "git_hash" => GIT_HASH,
-                "git_hash_short" => GIT_HASH_SHORT,
-                "git_dirty" => GIT_DIRTY,
-                "git_branch" => GIT_BRANCH,
-                "git_tag" => GIT_TAG,
-                "debug" => VERGEN_CARGO_DEBUG,
-                "features" => VERGEN_CARGO_FEATURES,
-                "optimizations" => VERGEN_CARGO_OPT_LEVEL,
-                "compiler" => VERGEN_RUSTC_SEMVER,
-            }
-        )).unwrap();
+    pub static ref BUILD_INFO: IntGauge = register_int_gauge!(opts!(
+        "BUILD_INFO",
+        "BUILD info to identify version of this software product",
+        labels! {
+            "version" => BLOCKSENSE_VERSION,
+            "git_hash" => GIT_HASH,
+            "git_hash_short" => GIT_HASH_SHORT,
+            "git_dirty" => GIT_DIRTY,
+            "git_branch" => GIT_BRANCH,
+            "git_tag" => GIT_TAG,
+            "debug" => VERGEN_CARGO_DEBUG,
+            "features" => VERGEN_CARGO_FEATURES,
+            "optimizations" => VERGEN_CARGO_OPT_LEVEL,
+            "compiler" => VERGEN_RUSTC_SEMVER,
+        }
+    )).unwrap();
 }
 
 lazy_static::lazy_static! {
@@ -108,20 +108,15 @@ macro_rules! inc_metric (
 );
 
 #[macro_export]
-macro_rules! inc_metric_by (
-($_component: ident, $_comp_index: ident, $_metric: ident, $_inc_val: ident) => (
-    $_component
-    .read() // Holding a read lock here suffice, since the counters are atomic.
-    .await
-    .$_metric
-    .with_label_values(&[&$_comp_index.to_string()])
-    .inc_by($_inc_val as u64);
-);
-);
-
-#[macro_export]
 macro_rules! set_metric (
 ($_component: ident, $_comp_index: ident, $_metric: ident, $_set_val: ident) => (
+    debug!(
+        "Setting metric {} for network {} to {}",
+        stringify!($_metric),
+        stringify!($_comp_index),
+        stringify!($_set_val)
+    );
+
     $_component
     .read() // Holding a read lock here suffice, since the counters are atomic.
     .await
@@ -146,10 +141,10 @@ macro_rules! inc_vec_metric (
 #[derive(Debug)]
 pub struct ProviderMetrics {
     pub total_tx_sent: IntCounterVec,
-    pub gas_used: IntCounterVec,
+    pub gas_used: IntGaugeVec,
     pub effective_gas_price: IntGaugeVec,
-    pub transaction_confirmation_times: HistogramVec,
-    pub gas_price: HistogramVec,
+    pub transaction_confirmation_time: IntGaugeVec,
+    pub gas_price: IntGaugeVec,
     pub failed_send_tx: IntCounterVec,
     pub failed_get_receipt: IntCounterVec,
     pub failed_get_gas_price: IntCounterVec,
@@ -171,28 +166,26 @@ impl ProviderMetrics {
             "Total number of tx sent",
             &["Network"]
         )?,
-        gas_used: register_int_counter_vec!(
+        gas_used: register_int_gauge_vec!(
             format!("{}gas_used", prefix),
-            "Total amount of gas spend for network",
+            "Gas used by each transaction",
             &["Network"]
         )?,
         effective_gas_price: register_int_gauge_vec!(
             format!("{}effective_gas_price", prefix),
             // Reference: https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionreceipt.
-            "The sum of the base fee and tip paid per unit of gas",
+            "Sum of the base fee and tip paid per unit of gas",
             &["Network"]
         )?,
-        transaction_confirmation_times: register_histogram_vec!(
-            format!("{}transaction_confirmation_times", prefix),
-            "Histogram tracking the time it took for update transaction to be confirmed",
+        transaction_confirmation_time: register_int_gauge_vec!(
+            format!("{}transaction_confirmation_time", prefix),
+            "Time it took to send a transaction and receive a receipt",
             &["Network"],
-            (1..).take(40).map(|x| x as f64 * 15000.0).collect(),
         )?,
-        gas_price: register_histogram_vec!(
+        gas_price: register_int_gauge_vec!(
             format!("{}gas_price", prefix),
-            "Histogram tracking the gas price in Gwei reported by the provider",
-            &["Network"],
-            (1..).take(40).map(|x| x as f64).collect(),
+            "Current gas price in wei (base fee)",
+            &["Network"]
         )?,
         failed_send_tx: register_int_counter_vec!(
             format!("{}failed_send_tx", prefix),

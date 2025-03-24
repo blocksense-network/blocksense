@@ -25,7 +25,7 @@ use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use feeds_processing::adfs_gen_calldata::{adfs_serialize_updates, get_neighbour_feed_ids};
 use futures::stream::FuturesUnordered;
 use paste::paste;
-use prometheus::{inc_metric, inc_metric_by, inc_vec_metric, set_metric};
+use prometheus::{inc_metric, inc_vec_metric, set_metric};
 use prometheus::{metrics::FeedsMetrics, process_provider_getter};
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
@@ -250,14 +250,7 @@ pub async fn eth_batch_send_to_contract(
     );
     debug!("Observed gas price (base_fee) for network {net} = {base_fee}");
 
-    debug!("Acquiring a read lock on provider_metrics for network `{net}`");
-    provider_metrics
-        .read()
-        .await
-        .gas_price
-        .with_label_values(&[net.as_str()])
-        .observe((base_fee as f64) / 1000000000.0);
-    debug!("Acquired and released a read lock on provider_metrics for network `{net}`");
+    set_metric!(provider_metrics, net, gas_price, base_fee);
 
     debug!("Getting chain_id for network {net}...");
     let chain_id = process_provider_getter!(
@@ -452,14 +445,16 @@ pub async fn eth_batch_send_to_contract(
         transaction_time, net, receipt
     );
     inc_metric!(provider_metrics, net, total_tx_sent);
-    let gas_used_inc = receipt.gas_used;
-    inc_metric_by!(provider_metrics, net, gas_used, gas_used_inc);
-    let effective_gas_price = receipt.effective_gas_price;
+
+    let gas_used_value = receipt.gas_used;
+    set_metric!(provider_metrics, net, gas_used, gas_used_value);
+
+    let effective_gas_price_value = receipt.effective_gas_price;
     set_metric!(
         provider_metrics,
         net,
         effective_gas_price,
-        effective_gas_price
+        effective_gas_price_value
     );
 
     let tx_hash = receipt.transaction_hash;
@@ -467,14 +462,12 @@ pub async fn eth_batch_send_to_contract(
     let tx_fee = (tx_fee as f64) / 1e18;
     info!("Transaction with hash {tx_hash} on `{net}` cost {tx_fee} ETH");
 
-    debug!("Acquiring a read lock on provider_metrics for network `{net}`");
-    provider_metrics
-        .read()
-        .await
-        .transaction_confirmation_times
-        .with_label_values(&[net.as_str()])
-        .observe(transaction_time as f64);
-    debug!("Acquired and released a read lock on provider_metrics for network `{net}`");
+    set_metric!(
+        provider_metrics,
+        net,
+        transaction_confirmation_time,
+        transaction_time
+    );
 
     provider.update_history(&updates.updates);
     drop(provider);
