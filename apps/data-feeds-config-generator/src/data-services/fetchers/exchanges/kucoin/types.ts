@@ -25,7 +25,23 @@ export type KuCoinInfoResp = S.Schema.Type<typeof KuCoinInfoRespSchema>;
 const KuCoinAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
+    price: S.String,
   }),
 );
 
 export type KuCoinAssetInfo = S.Schema.Type<typeof KuCoinAssetInfoSchema>;
+
+export const KuCoinPriceSchema = S.mutable(
+  S.Struct({
+    data: S.Struct({
+      ticker: S.Array(
+        S.Struct({
+          symbol: S.String,
+          last: S.NullishOr(S.String),
+        }),
+      ),
+    }),
+  }),
+);
+
+export type KuCoinPrice = S.Schema.Type<typeof KuCoinPriceSchema>;
