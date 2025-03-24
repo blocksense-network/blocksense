@@ -1,10 +1,13 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+import { entries } from '@blocksense/base-utils/array-iter';
 import { ExchangeAssetsFetcher, AssetInfo } from '../../../exchange-assets';
 import {
   KrakenAssetInfo,
   KrakenAssetPairsResp,
   KrakenAssetPairsRespSchema,
   KrakenAssetRespSchema,
+  KrakenPrice,
+  KrakenPriceSchema,
 } from './types';
 
 /**
@@ -21,18 +24,28 @@ export class KrakenAssetsFetcher
     );
 
     const assets = (await fetchKrakenSymbolsInfo()).result;
-    return Object.entries(assets).map(([key, value]) => ({
-      pair: {
-        // https://support.kraken.com/hc/en-us/articles/360000920306-API-symbols-and-tickers
-        // Use the altname to get the actual asset name
-        base: assetsData.result[value.base].altname,
-        quote: assetsData.result[value.quote].altname,
-      },
-      data: {
-        pair: key,
-        wsname: value.wsname,
-      },
-    }));
+    const prices = (await fetchKrakenPricesInfo()).result;
+
+    return entries(assets).map(([key, value]) => {
+      let price = prices[key];
+      if (!price) {
+        console.warn(`[Kraken] Price not found for pair: ${key}`);
+        price = { a: ['0'] };
+      }
+      return {
+        pair: {
+          // https://support.kraken.com/hc/en-us/articles/360000920306-API-symbols-and-tickers
+          // Use the altname to get the actual asset name
+          base: assetsData.result[value.base].altname,
+          quote: assetsData.result[value.quote].altname,
+        },
+        data: {
+          pair: key,
+          wsname: value.wsname,
+          price: price.a[0],
+        },
+      };
+    });
   }
 }
 
@@ -51,4 +64,10 @@ export async function fetchKrakenSymbolsInfo(): Promise<KrakenAssetPairsResp> {
   }
 
   return pairsData;
+}
+
+export async function fetchKrakenPricesInfo(): Promise<KrakenPrice> {
+  const url = 'https://api.kraken.com/0/public/Ticker';
+
+  return fetchAndDecodeJSON(KrakenPriceSchema, url);
 }

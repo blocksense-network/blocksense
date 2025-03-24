@@ -41,6 +41,7 @@ const KrakenAssetInfoSchema = S.mutable(
   S.Struct({
     pair: S.String,
     wsname: S.String,
+    price: S.String,
   }),
 );
 
@@ -48,3 +49,17 @@ const KrakenAssetInfoSchema = S.mutable(
  * Type for the information about symbols received from Kraken.
  */
 export type KrakenAssetInfo = S.Schema.Type<typeof KrakenAssetInfoSchema>;
+
+export const KrakenPriceSchema = S.Struct({
+  error: S.Array(S.Any),
+  result: S.Record({
+    key: S.String,
+    value: S.mutable(
+      S.Struct({
+        a: S.Array(S.String),
+      }),
+    ),
+  }),
+});
+
+export type KrakenPrice = S.Schema.Type<typeof KrakenPriceSchema>;
