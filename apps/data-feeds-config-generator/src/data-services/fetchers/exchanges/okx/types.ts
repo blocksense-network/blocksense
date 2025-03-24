@@ -25,7 +25,21 @@ export type OKXInfoResp = S.Schema.Type<typeof OKXInfoRespSchema>;
 const OKXAssetInfoSchema = S.mutable(
   S.Struct({
     instId: S.String,
+    price: S.String,
   }),
 );
 
 export type OKXAssetInfo = S.Schema.Type<typeof OKXAssetInfoSchema>;
+
+export const OKXPriceSchema = S.mutable(
+  S.Struct({
+    data: S.Array(
+      S.Struct({
+        instId: S.String,
+        last: S.String,
+      }),
+    ),
+  }),
+);
+
+export type OKXPrice = S.Schema.Type<typeof OKXPriceSchema>;
