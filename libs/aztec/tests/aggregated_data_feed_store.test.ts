@@ -1,20 +1,30 @@
-import { getInitialTestAccountsWallets } from '@aztec/accounts/testing';
 import {
+  AccountManager,
   AccountWallet,
   CompleteAddress,
   ContractDeployer,
-  createPXEClient,
+  createLogger,
   Fr,
-  getContractInstanceFromDeployParams,
   PXE,
-  TxStatus,
   waitForPXE,
+  TxStatus,
+  createPXEClient,
+  getContractInstanceFromDeployParams,
+  Logger,
 } from '@aztec/aztec.js';
-import { beforeAll, describe, expect, test } from 'vitest';
+import {
+  getInitialTestAccountsWallets,
+  generateSchnorrAccounts,
+} from '@aztec/accounts/testing';
+// import { spawn } from 'child_process';
+// import { SponsoredFeePaymentMethod } from './sponsored_fee_payment_method.js';
+
 import {
   AggregatedDataFeedStoreContract,
   AggregatedDataFeedStoreContractArtifact,
-} from '../contracts/aggregated_data_feed_store/src/artifacts/AggregatedDataFeedStore.js';
+} from '../src/artifacts/AggregatedDataFeedStore.js';
+
+import { beforeAll, describe, expect, test } from 'vitest';
 
 const setupSandbox = async () => {
   const { PXE_URL = 'http://localhost:8080' } = process.env;
@@ -22,42 +32,93 @@ const setupSandbox = async () => {
   await waitForPXE(pxe);
   return pxe;
 };
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const feeds = [
-  {
-    id: 1n,
-    round: 6n,
-    stride: 1n,
-    data: '0x12343267643573',
-    slotsToRead: 1,
-  },
-  {
-    id: 2n,
-    round: 5n,
-    stride: 0n,
-    data: '0x2456',
-  },
-  {
-    id: 3n,
-    round: 4n,
-    stride: 0n,
-    data: '0x3678',
-  },
-  {
-    id: 4n,
-    round: 3n,
-    stride: 0n,
-    data: '0x4890',
-  },
-  {
-    id: 5n,
-    round: 2n,
-    stride: 0n,
-    data: '0x5abc',
-  },
-];
+const ZERO = 0n;
+const ONE = 1;
+const TWO = 2;
+const THREE = 3;
+const MAX_ROUNDS_SIZE_FOR_STRIDE_0 = 4;
+const MAX_ROUND_VALUES_IN_A_FIELD = 15;
+const ROUND_SIZE_IN_BITS = 16;
+const MAX_FEEDS_SIZE_FOR_STRIDE_0 = 58;
+const TWO_POW_16 = 65536; // 2^16
+const TWO_POW_126 = 0x40000000000000000000000000000000n;
+const TWO_POW_115 = BigInt(2) ** BigInt(115);
+const ROUND_VALUE_MAX_BITS_SIZE = 65536n;
 
-describe('Data feed store contract', () => {
+function getLatestRound(stride: bigint, feedId: bigint): bigint {
+  const id = (feedId % BigInt(15)) + BigInt(1);
+  console.log('id: ', id);
+  const pos = BigInt(240) - BigInt(16) * id;
+  const twoPowPos = BigInt(2) ** pos; // 2^pos
+  console.log('pos: ', pos);
+  console.log('twoPowPos: ', twoPowPos);
+
+  let roundValue = 0n;
+  if (feedId < 15) {
+    roundValue =
+      0x0000000100020003000400050006000700080000000000000000000000010002n;
+  } else if (feedId >= 15 && feedId < 30) {
+    roundValue =
+      0x0000000100020003000400050006000700080000000000000000000000010002n;
+  } else if (feedId >= 30 && feedId < 45) {
+    roundValue =
+      0x0000000100020003000400050006000700080000000000000000000000010002n;
+  } else if (feedId >= 45) {
+    roundValue =
+      0x0000000100020003000400050006000700080000000000000000000000010002n;
+  }
+
+  const shifted = roundValue / twoPowPos;
+  console.log('shifted: ', shifted);
+  const round = shifted % ROUND_VALUE_MAX_BITS_SIZE;
+
+  return BigInt(round);
+}
+
+const TWO_POW_128 = BigInt(2) ** BigInt(128);
+const TWO_POW_13 = BigInt(2) ** BigInt(13);
+
+function pow(base: bigint, exp: bigint): bigint {
+  return base ** exp;
+}
+
+function calculateFeedIndex(
+  feedId: bigint,
+  round: bigint,
+  stride: bigint,
+): bigint {
+  return (
+    TWO_POW_128 * pow(BigInt(2), stride) +
+    feedId * TWO_POW_13 * pow(BigInt(2), stride) +
+    round * pow(BigInt(2), stride)
+  );
+}
+
+const _58_DATA_FEEDS_STRIDE_0 = [
+  // Feeds
+  calculateFeedIndex(BigInt(16), BigInt(0), BigInt(0)),
+  ONE,
+  123,
+  calculateFeedIndex(BigInt(16), BigInt(1), BigInt(0)),
+  ONE,
+  456,
+  calculateFeedIndex(BigInt(16), BigInt(2), BigInt(0)),
+  ONE,
+  789,
+  // Rounds
+  0,
+  0x0000000100020003000400050006000700080000000000000000000000010002n,
+  1,
+  0x0000000100020003000400050006000700080000000000000000000000010002n,
+  2,
+  0x0000000100020003000400050006000700080000000000000000000000010002n,
+  3,
+  0x0000000100020003000400050006000700080000000000000000000000010002n,
+].map(x => new Fr(x));
+
+describe('Reading from/Writing to storage', () => {
   let pxe: PXE;
   let wallets: AccountWallet[] = [];
   let accounts: CompleteAddress[] = [];
@@ -68,15 +129,14 @@ describe('Data feed store contract', () => {
     wallets = await getInitialTestAccountsWallets(pxe);
     accounts = wallets.map(w => w.getCompleteAddress());
   });
-
   test('Deploying the contract', async () => {
     const salt = Fr.random();
-    const dataFeedStoreContractArtifact =
+    const aggregatedDataFeedStoreContractArtifact =
       AggregatedDataFeedStoreContractArtifact;
     const deployArgs = wallets[0].getCompleteAddress().address;
 
     const deploymentData = getContractInstanceFromDeployParams(
-      dataFeedStoreContractArtifact,
+      aggregatedDataFeedStoreContractArtifact,
       {
         constructorArgs: [deployArgs],
         salt,
@@ -85,7 +145,7 @@ describe('Data feed store contract', () => {
     );
 
     const deployer = new ContractDeployer(
-      dataFeedStoreContractArtifact,
+      aggregatedDataFeedStoreContractArtifact,
       wallets[0],
     );
     const tx = deployer.deploy(deployArgs).send({ contractAddressSalt: salt });
@@ -100,55 +160,67 @@ describe('Data feed store contract', () => {
 
     const receiptAfterMined = await tx.wait({ wallet: wallets[0] });
 
-    expect(await pxe.getContractInstance(deploymentData.address)).toBeDefined();
     expect(
-      await pxe.isContractPubliclyDeployed(deploymentData.address),
+      await pxe.getContractMetadata((await deploymentData).address),
     ).toBeDefined();
+    expect(
+      (await pxe.getContractMetadata((await deploymentData).address))
+        .contractInstance,
+    ).toBeTruthy();
     expect(receiptAfterMined).toEqual(
       expect.objectContaining({
         status: TxStatus.SUCCESS,
       }),
     );
 
+    console.log(receiptAfterMined.contract.instance.address);
+
     expect(receiptAfterMined.contract.instance.address).toEqual(
-      deploymentData.address,
+      (await deploymentData).address,
     );
   }, 30000);
 
-  // feed_input_data: [Field; MAX_INPUT_ARRAY_SIZE],
-  // block_number: Field,
-  // feeds_len: Field,
-  // rounds_len: Field
-  test('Sets new feeds', async () => {
+  test.only('Sets new feeds', async () => {
     const contract = await AggregatedDataFeedStoreContract.deploy(wallets[0])
       .send()
       .deployed();
 
-    const feedInputData = Array.from(
-      { length: 33 },
-      () => new Fr(Math.floor(Math.random() * 256)),
-    );
-
-    const blockNumber = new Fr(100);
-    const feedLength = 1;
-    const roundsLength = 1;
-
+    const feedsLen = 3;
+    const roundLen = 4;
+    const blockNumber = 4;
     await contract
       .withWallet(wallets[0])
-      .methods.set_feeds(feedInputData, blockNumber, feedLength, roundsLength)
+      .methods.set_feeds(
+        _58_DATA_FEEDS_STRIDE_0,
+        feedsLen,
+        roundLen,
+        blockNumber,
+      )
       .send()
       .wait();
-    // const get_first_feed_tx = await contract.methods
-    //     .get_data_feed(keys[0])
-    //     .simulate();
-    // const get_second_feed_tx = await contract.methods
-    //     .get_data_feed(keys[1])
-    //     .simulate();
-    // for (let i = 0; i < 24; i++) {
-    //     expect(Number(get_first_feed_tx.value[i])).toEqual(values[i]);
-    // }
-    // for (let i = 0; i < 24; i++) {
-    //     expect(Number(get_second_feed_tx.value[i])).toEqual(values[i + 24]);
-    // }
+
+    let feed_id = 16;
+    let feedAtRound = await contract
+      .withWallet(wallets[0])
+      .methods.get_feed_at_round(feed_id, 0, ZERO)
+      .send()
+      .wait();
+    let _feedAtRound = await contract
+      .withWallet(wallets[0])
+      .methods.get_feed_at_round(feed_id, 1, ZERO)
+      .send()
+      .wait();
+
+    let latestRound = await contract
+      .withWallet(wallets[0])
+      .methods.get_latest_round(ZERO, feed_id)
+      .send()
+      .wait();
+
+    let latestData = await contract
+      .withWallet(wallets[0])
+      .methods.get_latest_data(ZERO, feed_id)
+      .send()
+      .wait();
   }, 30000);
 });

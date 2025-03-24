@@ -80,43 +80,11 @@ unconstrained fn test_get_latest_round() {
         )
         .call(&mut env.public());
 
-    // let rounds_slot_value: u32 = storage_read(
-    //     adfs_contract_address,
-    //     derive_storage_slot_in_map(
-    //         AggregatedDataFeedStore::storage_layout().rounds.slot,
-    //         two_round_index,
-    //     ),
-    //     block_number,
-    // );
-
-    // println("zero_round_index: ");
-    // println(zero_round_index);
-    // println("rounds_slot_value: ");
-    // println(rounds_slot_value);
-    // let rounds_slot_value: u32 = storage_read(
-    //     adfs_contract_address,
-    //     derive_storage_slot_in_map(
-    //         AggregatedDataFeedStore::storage_layout().rounds.slot,
-    //         one_round_index,
-    //     ),
-    //     block_number,
-    // );
-
-    // println(
-    //     "=============================================================================",
-    // );
-    // println(
-    //     "=============================================================================",
-    // );
-
     let latest_round = AggregatedDataFeedStore::at(adfs_contract_address)
-        .get_latest_round(0, 26 as Field)
+        .get_latest_round(0, 57 as Field)
         .view(&mut env.public());
     println("latest_round");
     println(latest_round);
-    // println(
-    //     "=============================================================================",
-    // );
 }
 
 // #[test]

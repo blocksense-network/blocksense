@@ -1,22 +1,23 @@
 {
-    "name": "@blocksense/aztec-contracts",
-    "scripts": {
-        "test": "yarn vitest"
-    },
-    "type": "module",
-    "module": "esnext",
-    "dependencies": {
-        "@aztec/aztec.js": "0.72.1",
-        "tslib": "^2.8.1",
-        "vite": "^6.0.7"
-    },
-    "devDependencies": {
-        "@aztec/accounts": "0.72.1",
-        "@aztec/builder": "0.72.1",
-        "@aztec/noir-contracts.js": "0.72.1",
-        "@babel/preset-typescript": "^7.26.0",
-        "@types/node": "^22.10.2",
-        "typescript": "^5.5.4",
-        "vitest": "^3.0.2"
-    }
+  "name": "@blocksense/aztec-contracts",
+  "scripts": {
+    "test": "yarn vitest"
+  },
+  "type": "module",
+  "module": "esnext",
+  "dependencies": {
+    "@aztec/aztec.js": "0.81.0",
+    "tslib": "^2.8.1",
+    "vite": "^6.0.7"
+  },
+  "devDependencies": {
+    "@aztec/accounts": "^0.81.0",
+    "@aztec/builder": "0.81.0",
+    "@aztec/noir-contracts.js": "0.81.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.5.4",
+    "vitest": "^3.0.2"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

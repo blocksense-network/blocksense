@@ -1,5 +1,5 @@
 use dep::aztec::macros::aztec;
-mod tests;
+// mod tests;
 
 #[aztec]
 contract AggregatedDataFeedStore {
@@ -23,7 +23,7 @@ contract AggregatedDataFeedStore {
     /// Each feed metadata has id, length of the data and the actual data => 58 * 3.
     /// Each round metadata has id and its data => 4 * 2.
     /// Thus (58 * 3) + (4 * 2) = 182.
-    global MAX_FEEDS_AND_ROUNDS_DATA: u32 = 182;
+    global MAX_FEEDS_AND_ROUNDS_DATA: u32 = 17;
     global TWO: Field = 2;
     global MAX_ROUND_VALUES_IN_A_FIELD: U256 = BigNum::from_slice([15, 0, 0]);
     global ROUND_SIZE_IN_BITS: U256 = BigNum::from_slice([16, 0, 0]);
@@ -69,7 +69,7 @@ contract AggregatedDataFeedStore {
         rounds_len: u32,
         block_number: u32,
     ) {
-        // debug_log("first, before assert");
+        debug_log("first, before assert");
         assert(context.msg_sender() == storage.owner.read());
         assert(storage.block_number.read() < block_number);
         storage.block_number.write(block_number);
@@ -86,30 +86,71 @@ contract AggregatedDataFeedStore {
             new_index = new_index + curr_feed_len;
         }
         // debug_log("finish writing storage slots for data feeds");
-
+        debug_log("testche");
         // debug_log_format("rounds_len: {0}", [rounds_len as Field]);
         for i in 0..rounds_len {
             // assert(false, feed_input_data[new_index + 1]);
-            // debug_log("test");
-            // debug_log_format("KEYY: {0}", [feed_input_data[new_index]]);
-            // debug_log_format("VALUEE: {0}", [feed_input_data[new_index + 1]]);
+            debug_log("testche");
+            debug_log_format("KEYY: {0}", [feed_input_data[new_index]]);
+            debug_log_format("VALUEE: {0}", [feed_input_data[new_index + 1]]);
             storage.rounds.at(feed_input_data[new_index]).write(feed_input_data[new_index + 1]);
             new_index = new_index + 2;
         }
     }
 
+
+    // Underflow issue!
+    // #[public]
+    // #[view]
+    // fn get_latest_round(stride: Field, feed_id: Field) -> Field {
+    //     let id = (feed_id as u128) % 15;
+    //     debug_log_format("id: {0}", [id as Field]);
+    //     let row_value = (TWO_POW_115 * (stride as u128) + (feed_id as u128)) / 15;
+    //     debug_log_format("row_value: {0}", [row_value as Field]);
+    //     let round_value = storage.rounds.at((row_value as Field)).read();
+
+    //     let round_value_bignum: U256 = BigNum::from(round_value);
+    //     debug_log_format("round_value_bignum: [{0}], [{1}], [{2}]", [round_value_bignum.limbs[0] as Field, round_value_bignum.limbs[1] as Field, round_value_bignum.limbs[2] as Field]);
+    //     let shift_factor: U256 = BigNum::from(TWO.pow_32(id as Field * 16));
+    //     debug_log_format("shift_factor: [{0}], [{1}], [{2}]", [shift_factor.limbs[0] as Field, shift_factor.limbs[1] as Field, shift_factor.limbs[2] as Field]);
+    //     let (shifted_value, _) = round_value_bignum.__udiv_mod(shift_factor);
+    //     debug_log_format("shifted_value: [{0}], [{1}], [{2}]", [shifted_value.limbs[0] as Field, shifted_value.limbs[1] as Field, shifted_value.limbs[2] as Field]);
+
+    //     let (sh_v_2_pow_13, _) = shifted_value.__udiv_mod(ROUND_VALUE_MAX_BITS_SIZE);
+    //     let upper_bits: U256 = sh_v_2_pow_13 * ROUND_VALUE_MAX_BITS_SIZE;
+    //     debug_log_format("upper_bits: [{0}], [{1}], [{2}]", [upper_bits.limbs[0] as Field, upper_bits.limbs[1] as Field, upper_bits.limbs[2] as Field]);
+    //     let slot_value: U256 = sh_v_2_pow_13 - upper_bits;
+
+    //     to_field(slot_value)
+    // }
+
     #[public]
     #[view]
     fn get_latest_round(stride: Field, feed_id: Field) -> Field {
-        let id = (feed_id as u128) % 15;
+        let id = (feed_id as u128) % 15 + 1;
+        debug_log_format("id: {0}", [id as Field]);
         let pos = 240 - (16 * id);
+        debug_log_format("pos: {0}", [pos as Field]);
         let two_pow_pos = TWO.pow_32(pos as Field);
+        debug_log_format("two_pow_pos: {0}", [two_pow_pos as Field]);
         let row_value = (TWO_POW_115 * (stride as u128) + (feed_id as u128)) / 15;
+        debug_log_format("row_value: {0}", [row_value as Field]);
         let round_value = storage.rounds.at((row_value as Field)).read();
+        debug_log_format("round_value: {0}", [round_value as Field]);
         let round_value_bignum: U256 = BigNum::from(round_value);
+        debug_log_format("round_value_bignum: [{0}], [{1}], [{2}]", [round_value_bignum.limbs[0] as Field, round_value_bignum.limbs[1] as Field, round_value_bignum.limbs[2] as Field]);
         let two_pow_pos_bignum: U256 = BigNum::from(two_pow_pos);
+        debug_log_format("two_pow_pos_bignum: [{0}], [{1}], [{2}]", [two_pow_pos_bignum.limbs[0] as Field, two_pow_pos_bignum.limbs[1] as Field, two_pow_pos_bignum.limbs[2] as Field]);
         let (shifted, _) = round_value_bignum.__udiv_mod(two_pow_pos_bignum);
-        let (_, round) = shifted.__udiv_mod(ROUND_VALUE_MAX_BITS_SIZE);
+        debug_log_format("shifted: [{0}], [{1}], [{2}]", [shifted.limbs[0] as Field, shifted.limbs[1] as Field, shifted.limbs[2] as Field]);
+        let (round_q, round_r) = shifted.__udiv_mod(ROUND_VALUE_MAX_BITS_SIZE);
+        debug_log_format("round_q: [{0}], [{1}], [{2}]", [round_q.limbs[0] as Field, round_q.limbs[1] as Field, round_q.limbs[2] as Field]);
+        debug_log_format("round_r: [{0}], [{1}], [{2}]", [round_r.limbs[0] as Field, round_r.limbs[1] as Field, round_r.limbs[2] as Field]);
+
+        let round_q_mul_15 = round_q * ROUND_VALUE_MAX_BITS_SIZE;
+        debug_log_format("round_q_mul_15: [{0}], [{1}], [{2}]", [round_q_mul_15.limbs[0] as Field, round_q_mul_15.limbs[1] as Field, round_q_mul_15.limbs[2] as Field]);
+        let round = shifted - round_q_mul_15;
+        debug_log_format("round: [{0}], [{1}], [{2}]", [round.limbs[0] as Field, round.limbs[1] as Field, round.limbs[2] as Field]);
 
         to_field(round)
     }
@@ -117,16 +158,18 @@ contract AggregatedDataFeedStore {
     #[public]
     #[view]
     fn get_feed_at_round(feed_id: Field, round: Field, stride: Field) -> Field {
+        debug_log_format("for round: {0}", [round]);
+        debug_log_format("calculated feed index is: {0}", [storage.data_feeds.at(calculate_feed_index(feed_id, round, stride)).read()]);
         storage.data_feeds.at(calculate_feed_index(feed_id, round, stride)).read()
     }
 
     #[public]
     #[view]
     fn get_latest_data(stride: Field, feed_id: Field) -> Field {
-        storage
-            .data_feeds
-            .at(calculate_feed_index(feed_id, get_latest_round(stride, feed_id), stride))
-            .read()
+        let latest_round = get_latest_round(stride, feed_id);
+        debug_log_format("for latest_round: {0}", [latest_round]);
+        debug_log_format("the latest data: {0}", [storage.data_feeds.at(calculate_feed_index(feed_id, latest_round, stride)).read()]);
+        storage.data_feeds.at(calculate_feed_index(feed_id, latest_round, stride)).read()
     }
 
     #[public]
