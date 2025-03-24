@@ -30,7 +30,7 @@ task('etherscan-verify', 'Verify contracts on Etherscan').setAction(
         }
       });
 
-    const fileName = 'evm_contracts_deployment_v2';
+    const fileName = `evm_contracts_deployment_v2/${network.name}`;
     const { decodeJSON } = selectDirectory(configDir);
     const deployment = await decodeJSON(
       { name: fileName },

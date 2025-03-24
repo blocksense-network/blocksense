@@ -261,19 +261,20 @@ const saveDeployment = async (
   configs: NetworkConfig[],
   chainsDeployment: DeploymentConfigV2,
 ) => {
-  const fileName = 'evm_contracts_deployment_v2';
-  const { decodeJSON, writeJSON } = selectDirectory(configDir);
-
-  const deploymentContent = await decodeJSON(
-    { name: fileName },
-    DeploymentConfigSchemaV2,
-  ).catch(() => ({}) as DeploymentConfigV2);
+  const { writeJSON } = selectDirectory(configDir);
 
   for (const config of configs) {
     const networkName = getNetworkNameByChainId(
       parseChainId(config.network.chainId),
     );
-    deploymentContent[networkName] = chainsDeployment[networkName];
+
+    const fileName = `evm_contracts_deployment_v2/${networkName}`;
+
+    const deploymentData = {
+      name: networkName,
+      ...chainsDeployment[networkName],
+    };
+
+    await writeJSON({ name: fileName, content: deploymentData });
   }
-  await writeJSON({ name: fileName, content: deploymentContent });
 };
