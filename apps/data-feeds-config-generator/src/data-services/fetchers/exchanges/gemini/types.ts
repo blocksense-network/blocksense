@@ -32,7 +32,14 @@ export type GeminiSymbolDetailsInfoResp = S.Schema.Type<
 const GeminiAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
+    price: S.String,
   }),
 );
 
 export type GeminiAssetInfo = S.Schema.Type<typeof GeminiAssetInfoSchema>;
+
+export const GeminiPriceSchema = S.Struct({
+  last: S.String,
+});
+
+export type GeminiPrice = S.Schema.Type<typeof GeminiPriceSchema>;

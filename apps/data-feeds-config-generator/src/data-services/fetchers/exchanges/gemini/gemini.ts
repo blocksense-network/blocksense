@@ -6,6 +6,8 @@ import {
   GeminiSymbolDetailsInfoRespSchema,
   GeminiSymbolsInfoResp,
   GeminiSymbolsInfoRespSchema,
+  GeminiPrice,
+  GeminiPriceSchema,
 } from './types';
 
 /**
@@ -19,6 +21,7 @@ export class GeminiAssetsFetcher
     const assets = await fetchGeminiSymbolsInfo();
     for (const asset of assets) {
       const assetDetails = await fetchGeminiSymbolDetailsInfo(asset);
+      const price = await fetchGeminiPriceInfo(asset);
       result.push({
         pair: {
           base: assetDetails.base_currency,
@@ -26,6 +29,7 @@ export class GeminiAssetsFetcher
         },
         data: {
           symbol: assetDetails.symbol,
+          price: price.last,
         },
       });
     }
@@ -55,4 +59,17 @@ export async function fetchGeminiSymbolDetailsInfo(
   const url = `https://api.gemini.com/v1/symbols/details/${symbol}`;
 
   return fetchAndDecodeJSON(GeminiSymbolDetailsInfoRespSchema, url);
+}
+
+export async function fetchGeminiPriceInfo(
+  symbol: string,
+): Promise<{ id: string; last: string }> {
+  try {
+    const url = `https://api.gemini.com/v1/pubticker/${symbol}`;
+    const response = await fetchAndDecodeJSON(GeminiPriceSchema, url);
+    return { id: symbol, last: response.last };
+  } catch (error) {
+    console.error(`[Gemini] Error fetching prices: ${error}`);
+    return { id: symbol, last: '0' };
+  }
 }
