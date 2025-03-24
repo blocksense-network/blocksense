@@ -1,10 +1,10 @@
 import { Tooltip } from '@blocksense/ui/Tooltip';
 
-import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
+import { DataTableColumnHeader } from '@/components/common/DataTable/DataTableColumnHeader';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
-import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
+import { DataTableBadge } from '@/components/common/DataTable/DataTableBadge';
 import { NetworkAddressExplorerLink } from '@/components/DeployedContracts/NetworkAddressExplorerLink';
-import { ColumnDef } from '../ui/DataTable/dataTableUtils';
+import { ColumnDef } from '@/components/common/DataTable/dataTableUtils';
 
 export const columns: ColumnDef[] = [
   {

@@ -9,7 +9,7 @@ import {
   CoreContract,
   ProxyContractData,
 } from '@/src/deployed-contracts/types';
-import { DataTable } from '@/components/ui/DataTable/DataTable';
+import { DataTable } from '@/components/common/DataTable/DataTable';
 import { columns as proxyContractsColumns } from '@/components/DeployedContracts/proxyContractsColumns';
 import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
 import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';

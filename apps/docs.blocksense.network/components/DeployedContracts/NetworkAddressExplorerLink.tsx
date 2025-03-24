@@ -8,7 +8,8 @@ import {
   NetworkName,
   EthereumAddress,
 } from '@blocksense/base-utils/evm';
-import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
+
+import { DataTableBadge } from '@/components/common/DataTable/DataTableBadge';
 import { onLinkClick } from '@/src/utils';
 
 type NetworkAddressExplorerLinkProps = {
