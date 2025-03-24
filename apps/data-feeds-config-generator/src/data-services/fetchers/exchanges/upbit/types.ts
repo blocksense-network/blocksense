@@ -21,7 +21,19 @@ export type UpbitMarketResp = S.Schema.Type<typeof UpbitMarketRespSchema>;
 const UpbitAssetInfoSchema = S.mutable(
   S.Struct({
     market: S.String,
+    price: S.String,
   }),
 );
 
 export type UpbitAssetInfo = S.Schema.Type<typeof UpbitAssetInfoSchema>;
+
+export const UpbitPriceSchema = S.Array(
+  S.mutable(
+    S.Struct({
+      market: S.String,
+      trade_price: S.Number,
+    }),
+  ),
+);
+
+export type UpbitPrice = S.Schema.Type<typeof UpbitPriceSchema>;
