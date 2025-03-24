@@ -8,8 +8,6 @@
 {
   flake.nixosModules =
     let
-      inherit (self.lib) dashToUnderscore;
-
       mkModule =
         backend:
         { config, pkgs, ... }:
@@ -21,6 +19,7 @@
 
           specialArgs = {
             inherit
+              pkgs
               self
               self'
               inputs
@@ -35,51 +34,6 @@
               inherit specialArgs;
               modules = [ module ];
             };
-
-          configJSON =
-            config: extraArgs:
-            lib.pipe config [
-              dashToUnderscore
-              (params: params // extraArgs)
-              builtins.toJSON
-            ];
-
-          configJSON2 =
-            config: extraArgs:
-            lib.pipe config [
-              dashToUnderscore
-              (params: params // extraArgs)
-            ];
-
-          sequencerConfigJSON = configJSON cfg.sequencer {
-            inherit (cfg.sequencer) reporters;
-            prometheus_port = cfg.sequencer.metrics-port;
-          };
-
-          commonBlocksenseConfig = {
-            oracles = builtins.attrValues cfg.oracles;
-            data_feeds = [ ];
-          };
-
-          transformBlocksenseConfig =
-            blocksense-cfg:
-            (builtins.removeAttrs
-              (configJSON2 blocksense-cfg {
-                capabilities = builtins.attrValues (
-                  builtins.mapAttrs (id: data: { inherit id data; }) blocksense-cfg.api-keys
-                );
-              })
-              [
-                "api_keys"
-                "log_level"
-              ]
-            );
-
-          blocksenseConfigJSON = lib.pipe cfg.reporters [
-            (builtins.mapAttrs (
-              _n: reporter-config: (transformBlocksenseConfig reporter-config) // commonBlocksenseConfig
-            ))
-          ];
         in
         with lib;
         {
@@ -120,16 +74,20 @@
               description = mdDoc "The Anvil instance to use.";
             };
 
-            _sequencer-config-txt = mkOption {
-              type = types.str;
-              description = "The materialized configuration for the sequencer.";
-              default = sequencerConfigJSON;
+            config-files = mkOption {
+              type = types.attrsOf (mkSubmodule ./config-file-submodule.nix);
+              default = import ./config-files.nix { inherit cfg self lib; };
             };
 
-            _blocksense-config-txt = mkOption {
-              type = types.attrsOf types.raw;
-              description = "The materialized configuration for the reporters.";
-              default = blocksenseConfigJSON;
+            config-dir = mkOption {
+              type = types.package;
+              readOnly = true;
+              default =
+                let
+                  configs = lib.attrValues cfg.config-files;
+                  paths = builtins.map (conf: conf.path) configs;
+                in
+                pkgs.linkFarmFromDrvs "blocksense-config-dir" paths;
             };
           };
 

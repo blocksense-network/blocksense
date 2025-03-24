@@ -5,4 +5,6 @@ lib: {
       name = lib.replaceStrings [ "-" ] [ "_" ] name;
       inherit value;
     }) attrset;
+
+  getReporterConfigFilename = name: "reporter_config_${name}";
 }

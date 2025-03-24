@@ -1,4 +1,4 @@
-{ self', ... }:
+{ self', self, ... }:
 {
   config,
   lib,
@@ -7,10 +7,6 @@
 }:
 let
   cfg = config.services.blocksense;
-
-  reportersConfigJSON = builtins.mapAttrs (
-    name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
-  ) cfg.reporters;
 
   inherit (self'.apps) sequencer blocksense;
 
@@ -58,7 +54,11 @@ let
           StateDirectory = serviceName;
           WorkingDirectory = "/var/lib/${serviceName}";
           ExecStartPre = wasmCopyCmd;
-          ExecStart = "${blocksense.program} node build --from ${reportersConfigJSON.${name}} --up";
+          ExecStart =
+            let
+              reporter-config = cfg.config-files.${self.lib.getReporterConfigFilename name};
+            in
+            "${blocksense.program} node build --from ${reporter-config.path} --up";
           Restart = "on-failure";
         };
       };
@@ -67,12 +67,6 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    environment.etc = {
-      "blocksense/sequencer_config.json" = {
-        text = cfg._sequencer-config-txt;
-      };
-    };
-
     systemd.services =
       {
         blocksense-sequencer = {
@@ -84,7 +78,7 @@ in
           ];
           environment = {
             FEEDS_CONFIG_DIR = "${../../../../config}";
-            SEQUENCER_CONFIG_DIR = "/etc/blocksense";
+            SEQUENCER_CONFIG_DIR = cfg.config-dir;
             SEQUENCER_LOG_LEVEL = "${lib.toUpper cfg.sequencer.log-level}";
           };
           serviceConfig = {
