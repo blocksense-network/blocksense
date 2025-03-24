@@ -1,8 +1,13 @@
-import React from 'react';
+'use client';
+
+import { ReactNode } from 'react';
+
 import { Badge } from '@blocksense/ui/Badge';
 
+import { isCellData, noCellData } from './dataTableUtils';
+
 type DataTableBadgeProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 };
 
@@ -10,14 +15,14 @@ export const DataTableBadge = ({
   children,
   className,
 }: DataTableBadgeProps) => {
-  if (children === null || children === undefined || children === '') {
-    return '-';
+  if (!isCellData(children)) {
+    return noCellData;
   }
 
   return (
     <Badge
       variant="outline"
-      className={`badge--datatable border-solid border-slate-200 px-2 m-0 text-primary-600 bold font-medium whitespace-nowrap hover:bg-neutral-50 hover:border-gray-600 ${className}`}
+      className={`badge--datatable px-2 m-0 text-primary-600 bold font-medium whitespace-nowrap hover:bg-neutral-50 hover:border-gray-600 ${className}`}
     >
       {children}
     </Badge>

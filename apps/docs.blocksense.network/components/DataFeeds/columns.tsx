@@ -1,71 +1,37 @@
-import * as React from 'react';
-
-import { ColumnDef } from '@tanstack/react-table';
+import { Tooltip } from '@blocksense/ui/Tooltip';
 
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
-import { Tooltip } from '@blocksense/ui/Tooltip';
+import { ColumnDef } from '../ui/DataTable/dataTableUtils';
 
-type DataFeed = {
-  id: number;
-  description: string;
-  decimals: number;
-  report_interval_ms: number;
-};
-
-export const dataFeedsColumnsTitles: { [key: string]: string } = {
-  id: 'Id',
-  description: 'Data Feed Name',
-  decimals: 'Decimals',
-  report_interval_ms: 'Refresh Interval (ms)',
-};
-
-export const columns: ColumnDef<DataFeed>[] = [
+export const columns: ColumnDef[] = [
   {
-    accessorKey: 'id',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={dataFeedsColumnsTitles[column.id]}
-        sortingType={'number'}
-      />
-    ),
-    cell: ({ row }) => <DataTableBadge>{row.getValue('id')}</DataTableBadge>,
+    id: 'id',
+    title: 'Id',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
+    cell: ({ row }) => <DataTableBadge>{row.id}</DataTableBadge>,
+    facetedFilter: true,
   },
   {
-    accessorKey: 'description',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={dataFeedsColumnsTitles[column.id]}
-        sortingType={'string'}
-      />
-    ),
+    id: 'description',
+    title: 'Data Feed Name',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (
       <Tooltip position="right">
         <Tooltip.Content>Data Feed Info</Tooltip.Content>
-        <DataTableBadge>{row.getValue('description')}</DataTableBadge>{' '}
+        <DataTableBadge>{row.description}</DataTableBadge>
       </Tooltip>
     ),
   },
   {
-    accessorKey: 'decimals',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={dataFeedsColumnsTitles[column.id]}
-        sortingType={'number'}
-      />
-    ),
+    id: 'decimals',
+    title: 'Decimals',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
+    cell: ({ row }) => <DataTableBadge>{row.decimals}</DataTableBadge>,
   },
   {
-    accessorKey: 'report_interval_ms',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={dataFeedsColumnsTitles[column.id]}
-        sortingType={'number'}
-      />
-    ),
+    id: 'report_interval_ms',
+    title: 'Refresh Interval (ms)',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
   },
 ];

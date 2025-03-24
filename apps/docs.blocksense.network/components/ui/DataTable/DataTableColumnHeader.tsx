@@ -1,48 +1,22 @@
-import * as React from 'react';
+'use client';
 
-import { Column } from '@tanstack/react-table';
-import {
-  ArrowDown01,
-  ArrowDown10,
-  ArrowDownAZ,
-  ArrowDownZA,
-} from 'lucide-react';
+import { ReactNode } from 'react';
 
-interface DataTableColumnHeaderProps<TData, TValue>
-  extends React.HTMLAttributes<HTMLDivElement> {
-  column: Column<TData, TValue>;
-  title: string;
-  sortingType?: 'string' | 'number';
+import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
+
+interface DataTableColumnHeaderProps {
+  title: ReactNode;
 }
 
-export function DataTableColumnHeader<TData, TValue>({
-  column,
-  title,
-  sortingType,
-}: DataTableColumnHeaderProps<TData, TValue>) {
-  if (!column.getCanSort() || !sortingType) {
-    return <span className="capitalize text-sm">{title}</span>;
-  }
-
+export function DataTableColumnHeader({ title }: DataTableColumnHeaderProps) {
   return (
-    <div
-      onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      className="cursor-pointer flex items-center"
-    >
+    <article className="data-table__column-header cursor-pointer flex items-center">
       <span className="capitalize text-sm">{title}</span>
-      <div className="h-4 w-4">
-        {sortingType === 'number' ? (
-          column.getIsSorted() === 'desc' ? (
-            <ArrowDown10 className="ml-2 h-4 w-4" />
-          ) : (
-            <ArrowDown01 className="ml-2 h-4 w-4" />
-          )
-        ) : column.getIsSorted() === 'desc' ? (
-          <ArrowDownZA className="ml-2 h-4 w-4" />
-        ) : (
-          <ArrowDownAZ className="ml-2 h-4 w-4" />
-        )}
-      </div>
-    </div>
+      <ImageWrapper
+        src="/icons/arrow-up-down.svg"
+        alt="Arrow up down"
+        className="ml-2 h-4 w-4 invert"
+      />
+    </article>
   );
 }

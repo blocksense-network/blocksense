@@ -1,8 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Callout } from '@blocksense/ui/Callout';
 
+import { Callout } from '@blocksense/ui/Callout';
 import { parseNetworkName } from '@blocksense/base-utils/evm';
 
 import {
@@ -10,10 +10,7 @@ import {
   ProxyContractData,
 } from '@/src/deployed-contracts/types';
 import { DataTable } from '@/components/ui/DataTable/DataTable';
-import {
-  columns as proxyContractsColumns,
-  proxyColumnsTitles,
-} from '@/components/DeployedContracts/proxyContractsColumns';
+import { columns as proxyContractsColumns } from '@/components/DeployedContracts/proxyContractsColumns';
 import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
 import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';
 import { NetworkIcon } from '@/components/DeployedContracts/NetworkIcon';
@@ -118,9 +115,9 @@ export const DeployedContracts = ({
                   element =>
                     element.network === parseNetworkName(selectedNetwork),
                 )}
-                columnsTitles={proxyColumnsTitles}
                 filterCell="description"
                 rowLink={dataFeedUrl}
+                hasToolbar
               />
             </ContractItemWrapper>
           </div>

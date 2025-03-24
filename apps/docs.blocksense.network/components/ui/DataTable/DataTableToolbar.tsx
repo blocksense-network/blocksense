@@ -1,83 +1,87 @@
-import * as React from 'react';
+'use client';
 
-import { X } from 'lucide-react';
-import { Table } from '@tanstack/react-table';
+import { useContext } from 'react';
 
-import { Button } from '@blocksense/ui/Button';
 import { Input } from '@blocksense/ui/Input';
-import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions';
-import { DataTableFacetedFilter } from '@/components/ui/DataTable/DataTableFacetedFilter';
-import {
-  ColumnsTitlesType,
-  FilterType,
-} from '@/components/ui/DataTable/DataTable';
+import { Button } from '@blocksense/ui/Button';
+import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 
-interface DataTableToolbarProps<TData> {
-  table: Table<TData>;
-  filterCell?: string;
-  filters?: FilterType[];
-  columnsTitles: ColumnsTitlesType;
-  invisibleColumns?: string[];
+import { DataTableContext } from './DataTableContext';
+import { DataTableFacetedFilter } from './DataTableFacetedFilter';
+import { DataTableViewOptions } from './DataTableViewOptions';
+import { FilterType } from './dataTableUtils';
+
+interface DataTableToolbarProps {
+  filterCellTitle?: string;
 }
 
-export function DataTableToolbar<TData>({
-  table,
-  filterCell,
-  filters,
-  columnsTitles,
-  invisibleColumns,
-}: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
+export function DataTableToolbar({ filterCellTitle }: DataTableToolbarProps) {
+  const { searchValue, setSearchValue, facetedFilters, setFacetedFilters } =
+    useContext(DataTableContext);
+
+  const isFiltered =
+    searchValue.trim().length > 0 ||
+    facetedFilters.some(
+      (filter: FilterType) => filter.selectedValues.length > 0,
+    );
 
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-between gap-2">
-      {filterCell && (
-        <div className="flex flex-1 space-x-2 items-start w-full">
-          <div className="flex items-center space-x-2 w-full">
-            <Input
-              placeholder={`Filter ${columnsTitles[filterCell]}...`}
-              value={
-                (table.getColumn(filterCell)?.getFilterValue() as string) ?? ''
-              }
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                table.getColumn(filterCell)?.setFilterValue(event.target.value)
-              }
-              className={`h-8 w-full min-w-[250px] lg:w-[250px] mr-1 lg:mr-2 border-solid border-slate-200 transition-all duration-200`}
-              type="search"
-            />
-          </div>
-        </div>
+    <section className="flex flex-col gap-2">
+      {filterCellTitle && (
+        <aside className="flex space-x-2 items-start w-full">
+          <Input
+            placeholder={`Filter ${filterCellTitle}...`}
+            value={searchValue}
+            onChange={e => setSearchValue(e.target.value)}
+            className="h-8 w-full min-w-[250px] lg:w-[250px] mr-1 lg:mr-2 border-solid border-neutral-200 transition-all duration-200"
+            type="search"
+          />
+        </aside>
       )}
-
-      <div className="flex flex-wrap items-end w-full gap-1 lg:gap-2 mb-2">
-        {filters?.map(
-          filter =>
-            table.getColumn(filter.name) && (
+      <section className="flex flex-wrap gap-2 items-center">
+        {facetedFilters.length > 0 && (
+          <div className="flex items-center gap-2">
+            {facetedFilters.map((facetedFilter: FilterType) => (
               <DataTableFacetedFilter
-                key={filter.name}
-                column={table.getColumn(filter.name)}
-                title={filter.title}
-                options={filter.options}
+                key={facetedFilter.name}
+                title={facetedFilter.title}
+                options={facetedFilter.options}
+                selectedValues={facetedFilter.selectedValues}
+                setSelectedValuesAction={values =>
+                  setFacetedFilters(
+                    facetedFilters.map((filter: FilterType) =>
+                      filter.name === facetedFilter.name
+                        ? { ...filter, selectedValues: values }
+                        : filter,
+                    ),
+                  )
+                }
               />
-            ),
+            ))}
+          </div>
         )}
         {isFiltered && (
           <Button
             variant="highlight"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 p-1"
+            onClick={() => {
+              setSearchValue('');
+              setFacetedFilters(
+                facetedFilters.map(f => ({ ...f, selectedValues: [] })),
+              );
+            }}
+            className="mt-0 h-8 p-1 border-neutral-200 dark:border-neutral-600"
           >
-            <X className="h-4 w-4" />
+            <ImageWrapper
+              src="/icons/escape.svg"
+              alt="Clear filters"
+              className="h-4 w-4 invert"
+            />
           </Button>
         )}
-        <section className="ml-auto">
-          <DataTableViewOptions
-            table={table}
-            columnsTitles={columnsTitles}
-            invisibleColumns={invisibleColumns}
-          />
-        </section>
-      </div>
-    </div>
+        <aside className="ml-auto">
+          <DataTableViewOptions />
+        </aside>
+      </section>
+    </section>
   );
 }

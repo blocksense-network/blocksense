@@ -1,128 +1,87 @@
-import * as React from 'react';
+import { Tooltip } from '@blocksense/ui/Tooltip';
 
-import { ColumnDef } from '@tanstack/react-table';
-
-import { ProxyContractData } from '@/src/deployed-contracts/types';
 import { DataTableColumnHeader } from '@/components/ui/DataTable/DataTableColumnHeader';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { DataTableBadge } from '@/components/ui/DataTable/DataTableBadge';
 import { NetworkAddressExplorerLink } from '@/components/DeployedContracts/NetworkAddressExplorerLink';
-import { Tooltip } from '@blocksense/ui/Tooltip';
+import { ColumnDef } from '../ui/DataTable/dataTableUtils';
 
-export const proxyColumnsTitles: { [key: string]: string } = {
-  description: 'Data Feed Name',
-  id: 'Id',
-  address: 'Blocksense Proxy Address',
-  base: 'Base Address',
-  quote: 'Quote Address',
-  chainlink_proxy: 'CL Aggregator Proxy Address',
-  network: 'Network',
-};
-
-export const columns: ColumnDef<ProxyContractData>[] = [
+export const columns: ColumnDef[] = [
   {
-    accessorKey: 'id',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={proxyColumnsTitles[column.id]}
-      />
-    ),
-    cell: ({ row }) => <DataTableBadge>{row.getValue('id')}</DataTableBadge>,
+    id: 'id',
+    title: 'Id',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
+    cell: ({ row }) => <DataTableBadge>{row.id}</DataTableBadge>,
   },
   {
-    accessorKey: 'description',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={proxyColumnsTitles[column.id]}
-      />
-    ),
+    id: 'description',
+    title: 'Data Feed Name',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (
       <Tooltip position="right">
         <Tooltip.Content>Data Feed Info</Tooltip.Content>
-        <DataTableBadge>{row.getValue('description')}</DataTableBadge>
+        <DataTableBadge>{row.description}</DataTableBadge>
       </Tooltip>
     ),
   },
   {
-    accessorKey: 'network',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={proxyColumnsTitles[column.id]}
-      />
-    ),
+    id: 'network',
+    title: 'Network',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (
       <NetworkAddressExplorerLink
-        address={row.original.address}
-        networks={[row.original.network]}
+        address={row.address}
+        networks={[row.network]}
       />
     ),
   },
   {
-    accessorKey: 'address',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={proxyColumnsTitles[column.id]}
-      />
-    ),
+    id: 'address',
+    title: 'Blocksense Proxy Address',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (
       <ContractAddress
-        network={row.original.network}
-        address={row.getValue('address')}
+        network={row.network}
+        address={row.address}
         copyButton={{ enableCopy: true, background: false }}
         abbreviation={{ hasAbbreviation: true }}
       />
     ),
   },
   {
-    accessorKey: 'base',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={proxyColumnsTitles[column.id]}
-      />
-    ),
+    id: 'base',
+    title: 'Base Address',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (
       <ContractAddress
-        network={row.original.network}
-        address={row.getValue('base')}
+        network={row.network}
+        address={row.base ?? ''}
         copyButton={{ enableCopy: true, background: false }}
         abbreviation={{ hasAbbreviation: true }}
       />
     ),
   },
   {
-    accessorKey: 'quote',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={proxyColumnsTitles[column.id]}
-      />
-    ),
+    id: 'quote',
+    title: 'Quote Address',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (
       <ContractAddress
-        network={row.original.network}
-        address={row.getValue('quote')}
+        network={row.network}
+        address={row.quote ?? ''}
         copyButton={{ enableCopy: true, background: false }}
         abbreviation={{ hasAbbreviation: true }}
       />
     ),
   },
   {
-    accessorKey: 'chainlink_proxy',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title={proxyColumnsTitles[column.id]}
-      />
-    ),
+    id: 'chainlink_proxy',
+    title: 'CL Aggregator Proxy Address',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (
       <ContractAddress
-        network={row.original.network}
-        address={row.getValue('chainlink_proxy')}
+        network={row.network}
+        address={row.chainlink_proxy ?? ''}
         copyButton={{ enableCopy: true, background: false }}
         abbreviation={{ hasAbbreviation: true }}
       />
