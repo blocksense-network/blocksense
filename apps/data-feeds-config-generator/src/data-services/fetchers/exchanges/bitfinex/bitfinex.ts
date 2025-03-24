@@ -4,6 +4,8 @@ import {
   BitfinexAssetInfo,
   BitfinexInfoResp,
   BitfinexInfoRespSchema,
+  BitfinexPrice,
+  BitfinexPriceSchema,
 } from './types';
 
 /**
@@ -14,12 +16,23 @@ export class BitfinexAssetsFetcher
 {
   async fetchAssets(): Promise<AssetInfo<BitfinexAssetInfo>[]> {
     const assets = await fetchBitfinexInfo();
+    const prices = await fetchBitfinexPricesInfo(assets[0]);
     return assets[0].map(asset => {
+      const tickerAsset = `t${asset}`;
       const pair = splitPair(asset);
+      let price = prices.find(p => p[0] === tickerAsset);
+      if (!price) {
+        console.warn(`[Bitfinex] Price not found for symbol: ${tickerAsset}`);
+        price = [tickerAsset, '', '', '', '', '', '', 0];
+      }
       return {
-        ...pair,
+        pair: {
+          base: pair.pair.base,
+          quote: pair.pair.quote,
+        },
         data: {
-          symbol: asset,
+          symbol: tickerAsset,
+          price: price[7].toString(),
         },
       };
     });
@@ -49,7 +62,16 @@ export function splitPair(pair: string): {
       const quote = pair.substring(3);
       return { pair: { base, quote } };
     } else {
-      throw new Error('Unexpected format of pair recieved from Bitfinex');
+      throw new Error('Unexpected format of pair received from Bitfinex');
     }
   }
+}
+
+export async function fetchBitfinexPricesInfo(
+  allSymbols: string[],
+): Promise<BitfinexPrice> {
+  const symbols = allSymbols.map(s => `t${s}`).join(',');
+  const url = `https://api-pub.bitfinex.com/v2/tickers?symbols=${symbols}`;
+
+  return fetchAndDecodeJSON(BitfinexPriceSchema, url);
 }
