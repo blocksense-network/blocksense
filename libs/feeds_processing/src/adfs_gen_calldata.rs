@@ -15,6 +15,7 @@ use tracing::{debug, error, info};
 use once_cell::sync::Lazy;
 
 const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
+const NUM_FEED_IDS_IN_ROUND_RECORD: u32 = 16;
 
 static STRIDES_SIZES: Lazy<HashMap<u16, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
@@ -71,7 +72,6 @@ pub async fn adfs_serialize_updates(
 ) -> Result<String> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
-    const NUM_FEED_IDS_IN_ROUND_RECORD: u32 = 16;
 
     info!("Preparing a batch of ADFS feeds for network `{net}`");
     result.push(0x00);
@@ -96,10 +96,7 @@ pub async fn adfs_serialize_updates(
             Some(fm) => {
                 let mut updated_feed_id_round: u64 = 0;
                 // Add the feed id-s that are part of each record that will be updated
-                let additional_feeds_begin: u32 =
-                    update.feed_id - (update.feed_id % NUM_FEED_IDS_IN_ROUND_RECORD);
-                let additional_feeds_end: u32 = additional_feeds_begin + NUM_FEED_IDS_IN_ROUND_RECORD;
-                for additional_feed_id in additional_feeds_begin..additional_feeds_end {
+                for additional_feed_id in get_neighbour_feed_ids(update.feed_id) {
                     debug!(
                         "Acquiring a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}"
                     );
@@ -228,6 +225,13 @@ pub async fn adfs_serialize_updates(
     info!("Serialized result: {}", hex::encode(result.clone()));
 
     Ok(to_hex_string(result, None))
+}
+
+pub fn get_neighbour_feed_ids(feed_id: u32) -> Vec<u32> {
+    let additional_feeds_begin: u32 = feed_id - (feed_id % NUM_FEED_IDS_IN_ROUND_RECORD);
+    let additional_feeds_end: u32 = additional_feeds_begin + NUM_FEED_IDS_IN_ROUND_RECORD;
+
+    (additional_feeds_begin..additional_feeds_end).collect()
 }
 
 #[cfg(test)]

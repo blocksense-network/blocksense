@@ -10,7 +10,7 @@ use blocksense_registry::config::FeedConfig;
 use config::FeedStrideAndDecimals;
 use data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use eyre::{eyre, Result};
-use std::{collections::HashMap, mem, sync::Arc};
+use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 use utils::to_hex_string;
 
@@ -22,7 +22,7 @@ use crate::{
     sequencer_state::SequencerState,
 };
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
-use feeds_processing::adfs_gen_calldata::adfs_serialize_updates;
+use feeds_processing::adfs_gen_calldata::{adfs_serialize_updates, get_neighbour_feed_ids};
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_metric_by, inc_vec_metric, set_metric};
@@ -133,7 +133,13 @@ pub async fn get_serialized_updates_for_network(
     debug!("Released a read lock on provider config for `{net}`");
 
     let mut strides_and_decimals = HashMap::new();
-    for feed_id in feeds_config.read().await.keys() {
+    let mut relevant_feed_ids = HashSet::new();
+
+    for update in updates.updates.iter() {
+        relevant_feed_ids.extend(get_neighbour_feed_ids(update.feed_id));
+    }
+
+    for feed_id in relevant_feed_ids.iter() {
         debug!("Acquiring a read lock on feeds_config; network={net}; feed_id={feed_id}");
         let feed_config = feeds_config.read().await.get(feed_id).cloned();
         debug!(
