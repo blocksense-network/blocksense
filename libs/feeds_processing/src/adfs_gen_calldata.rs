@@ -5,7 +5,7 @@ use config::FeedStrideAndDecimals;
 use data_feeds::feeds_processing::BatchedAggegratesToSend;
 use prometheus::metrics::FeedsMetrics;
 use std::cmp::max;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use utils::{from_hex_string, to_hex_string};
@@ -79,10 +79,12 @@ pub async fn adfs_serialize_updates(
     result.append(&mut (updates.len() as u32).to_be_bytes().to_vec());
 
     let mut feeds_info = HashMap::new();
+    let mut feeds_ids_with_value_updates = HashSet::new();
 
     // Fill the value updates:
     for update in updates.iter() {
         let feed_id = update.feed_id;
+        feeds_ids_with_value_updates.insert(feed_id);
 
         let (stride, digits_in_fraction) = match &strides_and_decimals.get(&feed_id) {
             Some(f) => (f.stride, f.decimals),
@@ -172,9 +174,12 @@ pub async fn adfs_serialize_updates(
     // Fill the round tables:
     let mut batch_feeds = BTreeMap::new();
 
-    for (feed_id, (stride, round)) in feeds_info.iter() {
-        feeds_rounds.insert(*feed_id, *round);
-        let round = U256::from(*round);
+    for (feed_id, (stride, mut round)) in feeds_info.iter() {
+        if !feeds_ids_with_value_updates.contains(feed_id) && round > 0 {
+            round -= 1; // Get the index of the last updated value
+        }
+        feeds_rounds.insert(*feed_id, round);
+        let round = U256::from(round);
         let row_index = (U256::from(2).pow(U256::from(115)) * U256::from(*stride)
             + U256::from(*feed_id))
             / U256::from(NUM_FEED_IDS_IN_ROUND_RECORD);
