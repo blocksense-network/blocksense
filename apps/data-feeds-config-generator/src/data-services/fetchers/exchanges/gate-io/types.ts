@@ -1,6 +1,20 @@
 import { Schema as S } from 'effect';
 
 /**
+ * Schema for the data relevant to a GateIo Exchange oracle.
+ *
+ * Ref: https://www.gate.io/docs/developers/apiv4/en/#spot
+ */
+const GateIoAssetInfoSchema = S.mutable(
+  S.Struct({
+    id: S.String,
+    price: S.String,
+  }),
+);
+
+export type GateIoAssetInfo = S.Schema.Type<typeof GateIoAssetInfoSchema>;
+
+/**
  * Schema for the relevant information about products received from GateIo Exchange.
  */
 export const GateIoInfoRespSchema = S.mutable(
@@ -14,20 +28,6 @@ export const GateIoInfoRespSchema = S.mutable(
 );
 
 export type GateIoInfoResp = S.Schema.Type<typeof GateIoInfoRespSchema>;
-
-/**
- * Schema for the data relevant to a GateIo Exchange oracle.
- *
- * Ref: https://www.gate.io/docs/developers/apiv4/en/#spot
- */
-const GateIoAssetInfoSchema = S.mutable(
-  S.Struct({
-    id: S.String,
-    price: S.String,
-  }),
-);
-
-export type GateIoAssetInfo = S.Schema.Type<typeof GateIoAssetInfoSchema>;
 
 export const GateIoPriceSchema = S.Array(
   S.mutable(

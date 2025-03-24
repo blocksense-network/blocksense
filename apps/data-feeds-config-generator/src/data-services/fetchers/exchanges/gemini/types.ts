@@ -1,6 +1,20 @@
 import { Schema as S } from 'effect';
 
 /**
+ * Schema for the data relevant to a Gemini Exchange oracle.
+ *
+ * Ref: https://docs.gemini.com/rest-api/#ticker
+ */
+const GeminiAssetInfoSchema = S.mutable(
+  S.Struct({
+    symbol: S.String,
+    price: S.String,
+  }),
+);
+
+export type GeminiAssetInfo = S.Schema.Type<typeof GeminiAssetInfoSchema>;
+
+/**
  * Schema for the relevant information about symbols received from Gemini Exchange.
  */
 export const GeminiSymbolsInfoRespSchema = S.mutable(S.Array(S.String));
@@ -23,20 +37,6 @@ export const GeminiSymbolDetailsInfoRespSchema = S.mutable(
 export type GeminiSymbolDetailsInfoResp = S.Schema.Type<
   typeof GeminiSymbolDetailsInfoRespSchema
 >;
-
-/**
- * Schema for the data relevant to a Gemini Exchange oracle.
- *
- * Ref: https://docs.gemini.com/rest-api/#ticker
- */
-const GeminiAssetInfoSchema = S.mutable(
-  S.Struct({
-    symbol: S.String,
-    price: S.String,
-  }),
-);
-
-export type GeminiAssetInfo = S.Schema.Type<typeof GeminiAssetInfoSchema>;
 
 export const GeminiPriceSchema = S.Struct({
   last: S.String,

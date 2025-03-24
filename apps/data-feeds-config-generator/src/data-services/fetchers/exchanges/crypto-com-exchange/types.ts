@@ -1,6 +1,20 @@
 import { Schema as S } from 'effect';
 
 /**
+ * Schema for the data relevant to a CryptoCom Exchange oracle.
+ *
+ * Ref: https://exchange-docs.crypto.com/exchange/v1/rest-ws/index.html#public-get-tickers
+ */
+const CryptoComAssetInfoSchema = S.mutable(
+  S.Struct({
+    symbol: S.String,
+    price: S.String,
+  }),
+);
+
+export type CryptoComAssetInfo = S.Schema.Type<typeof CryptoComAssetInfoSchema>;
+
+/**
  * Schema for the relevant information about products received from CryptoCom Exchange.
  */
 export const CryptoComInfoRespSchema = S.mutable(
@@ -19,20 +33,6 @@ export const CryptoComInfoRespSchema = S.mutable(
 );
 
 export type CryptoComInfoResp = S.Schema.Type<typeof CryptoComInfoRespSchema>;
-
-/**
- * Schema for the data relevant to a CryptoCom Exchange oracle.
- *
- * Ref: https://exchange-docs.crypto.com/exchange/v1/rest-ws/index.html#public-get-tickers
- */
-const CryptoComAssetInfoSchema = S.mutable(
-  S.Struct({
-    symbol: S.String,
-    price: S.String,
-  }),
-);
-
-export type CryptoComAssetInfo = S.Schema.Type<typeof CryptoComAssetInfoSchema>;
 
 export const CryptoComPriceSchema = S.mutable(
   S.Struct({

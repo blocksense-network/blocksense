@@ -1,4 +1,24 @@
 import { Schema as S } from 'effect';
+
+/**
+ * Schema for the data relevant to a Kraken oracle.
+ *
+ * Ref: https://docs.kraken.com/api/docs/rest-api/get-ticker-information/
+ * Ref: https://docs.kraken.com/api/docs/websocket-v2/ticker ( note that wsname match with symbol in their doc
+ */
+const KrakenAssetInfoSchema = S.mutable(
+  S.Struct({
+    pair: S.String,
+    wsname: S.String,
+    price: S.String,
+  }),
+);
+
+/**
+ * Type for the information about symbols received from Kraken.
+ */
+export type KrakenAssetInfo = S.Schema.Type<typeof KrakenAssetInfoSchema>;
+
 /**
  * Schema for the relevant information about assets received from Kraken.
  */
@@ -30,25 +50,6 @@ export const KrakenAssetRespSchema = S.Struct({
     }),
   }),
 });
-
-/**
- * Schema for the data relevant to a Kraken oracle.
- *
- * Ref: https://docs.kraken.com/api/docs/rest-api/get-ticker-information/
- * Ref: https://docs.kraken.com/api/docs/websocket-v2/ticker ( note that wsname match with symbol in their doc
- */
-const KrakenAssetInfoSchema = S.mutable(
-  S.Struct({
-    pair: S.String,
-    wsname: S.String,
-    price: S.String,
-  }),
-);
-
-/**
- * Type for the information about symbols received from Kraken.
- */
-export type KrakenAssetInfo = S.Schema.Type<typeof KrakenAssetInfoSchema>;
 
 export const KrakenPriceSchema = S.Struct({
   error: S.Array(S.Any),

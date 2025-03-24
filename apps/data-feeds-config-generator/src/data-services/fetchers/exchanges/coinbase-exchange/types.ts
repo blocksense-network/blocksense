@@ -1,6 +1,20 @@
 import { Schema as S } from 'effect';
 
 /**
+ * Schema for the data relevant to a Coinbase Exchange oracle.
+ *
+ * Ref: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductticker
+ */
+const CoinbaseAssetInfoSchema = S.mutable(
+  S.Struct({
+    id: S.String,
+    price: S.String,
+  }),
+);
+
+export type CoinbaseAssetInfo = S.Schema.Type<typeof CoinbaseAssetInfoSchema>;
+
+/**
  * Schema for the relevant information about products received from Coinbase Exchange.
  */
 export const CoinbaseInfoRespSchema = S.mutable(
@@ -15,20 +29,6 @@ export const CoinbaseInfoRespSchema = S.mutable(
 );
 
 export type CoinbaseInfoResp = S.Schema.Type<typeof CoinbaseInfoRespSchema>;
-
-/**
- * Schema for the data relevant to a Coinbase Exchange oracle.
- *
- * Ref: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductticker
- */
-const CoinbaseAssetInfoSchema = S.mutable(
-  S.Struct({
-    id: S.String,
-    price: S.String,
-  }),
-);
-
-export type CoinbaseAssetInfo = S.Schema.Type<typeof CoinbaseAssetInfoSchema>;
 
 export const CoinbasePriceSchema = S.Struct({
   price: S.String,
