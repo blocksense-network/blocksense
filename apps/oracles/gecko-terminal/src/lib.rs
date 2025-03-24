@@ -1,10 +1,12 @@
-use anyhow::{Context, Ok, Result};
+use std::collections::HashMap;
+
+use anyhow::{Context, Result};
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
     spin::http::{send, Method, Request, Response},
 };
-
+use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
 use serde_this_or_that::as_f64;
 
@@ -16,6 +18,30 @@ pub struct PoolAttributes {
     pub price_in_usd: f64,
     #[serde(deserialize_with = "as_f64")]
     pub price_in_target_token: f64,
+    pub historical_data: HistoricalData,
+}
+
+#[derive(Debug, Default, Clone, Deserialize, Serialize)]
+pub struct HistoricalVolumeInfo {
+    pub swaps_count: u128,
+    pub buyers_count: u128,
+    #[serde(deserialize_with = "as_f64")]
+    pub price_in_usd: f64,
+    pub sellers_count: u128,
+    #[serde(deserialize_with = "as_f64")]
+    pub volume_in_usd: f64,
+    pub buy_swaps_count: u128,
+    pub sell_swaps_count: u128,
+}
+
+#[derive(Debug, Default, Clone, Deserialize, Serialize)]
+pub struct HistoricalData {
+    pub last_5m: HistoricalVolumeInfo,
+    pub last_15m: HistoricalVolumeInfo,
+    pub last_30m: HistoricalVolumeInfo,
+    pub last_1h: HistoricalVolumeInfo,
+    pub last_6h: HistoricalVolumeInfo,
+    pub last_24h: HistoricalVolumeInfo,
 }
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
@@ -27,11 +53,21 @@ pub struct GeckoTerminalData {
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub struct GeckoTerminalResponce {
     pub data: GeckoTerminalData,
+    #[serde(default)]
+    pub reverse: bool,
 }
 
 impl GeckoTerminalResponce {
     pub fn reserve_price_in_usd(&self) -> f64 {
         self.data.attributes.price_in_usd / self.data.attributes.price_in_target_token
+    }
+
+    pub fn get_price(&self) -> f64 {
+        if self.reverse {
+            self.reserve_price_in_usd()
+        } else {
+            self.data.attributes.price_in_usd
+        }
     }
 }
 
@@ -42,68 +78,154 @@ pub struct GeckoTerminalPool {
     pub reverse: bool,
 }
 
-#[oracle_component]
-async fn oracle_request(settings: Settings) -> Result<Payload> {
-    println!("Starting oracle component - Gecko Terminal");
-
-    let mut payload: Payload = Payload::new();
-
-    let gecko_config = get_resources_from_settings(&settings)?;
-
-    for config in gecko_config {
-        let network = config.arguments.network;
-        let pool = config.arguments.pool;
+impl GeckoTerminalPool {
+    pub async fn fetch(&self) -> Result<GeckoTerminalResponce> {
+        let network = &self.network;
+        let pool = &self.pool;
         let url = format!("https://app.geckoterminal.com/api/p1/{network}/pools/{pool}");
-        // let url = "https://app.geckoterminal.com/api/p1/monad-testnet/pools/0x8552706d9a27013f20ea0f9df8e20b61e283d2d3";
         let mut req = Request::builder();
         req.method(Method::Get);
         req.uri(url.as_str());
         let resp: Response = send(req).await?;
         let body = resp.into_body();
         let string = String::from_utf8(body)?;
-        let value: GeckoTerminalResponce = serde_json::from_str(&string)
+        let mut value: GeckoTerminalResponce = serde_json::from_str(&string)
             .context("Couldn't parse Gecko terminal response properly")?;
-        let price = if config.arguments.reverse {
-            value.reserve_price_in_usd()
+        value.reverse = self.reverse;
+        Ok(value)
+    }
+}
+
+async fn fetch_all_prices(
+    resourses: &Vec<FeedConfig>,
+) -> Result<HashMap<String, Vec<GeckoTerminalResponce>>> {
+    let mut res = HashMap::new();
+    for config in resourses {
+        let mut v = vec![];
+        for pool in config.arguments.iter() {
+            match pool.fetch().await {
+                Ok(response) => {
+                    v.push(response);
+                }
+                Err(e) => {
+                    println!("Error {e:?} when fetching from {pool:?}");
+                }
+            };
+        }
+        res.insert(config.id.clone(), v);
+    }
+    Ok(res)
+}
+
+fn process_results(reponses: &HashMap<String, Vec<GeckoTerminalResponce>>) -> Result<Payload> {
+    let mut payload: Payload = Payload::new();
+    for (id, responses) in reponses.iter() {
+        let mut total: f64 = 0.0f64;
+        let mut total_weight: f64 = 0.0f64;
+        let mut total_weighted_price: f64 = 0.0f64;
+        let mut count: i32 = 0;
+        for response in responses {
+            let price = response.get_price();
+            let weight = response
+                .data
+                .attributes
+                .historical_data
+                .last_24h
+                .volume_in_usd;
+            total += price;
+            total_weighted_price += price * weight;
+            total_weight += weight;
+            count += 1;
+        }
+        let price = if count == 1 {
+            total
         } else {
-            value.data.attributes.price_in_usd
+            total_weighted_price / total_weight
         };
         payload.values.push(DataFeedResult {
-            id: config.id,
+            id: id.clone(),
             value: DataFeedResultValue::Numerical(price),
         });
     }
-    println!("{payload:?}");
+    Ok(payload)
+}
+
+fn print_results(
+    resourses: &[FeedConfig],
+    reponses: &HashMap<String, Vec<GeckoTerminalResponce>>,
+    payload: &Payload,
+) {
+    let mut table = Table::new();
+    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
+
+    table.set_titles(Row::new(vec![
+        Cell::new("Feed ID").style_spec("bc"),
+        Cell::new("Name").style_spec("bc"),
+        Cell::new("Value").style_spec("bc"),
+        Cell::new("Num Pools").style_spec("bc"),
+    ]));
+
+    for (id, responses) in reponses.iter() {
+        if let Some(resourse) = resourses.iter().find(|x| x.id == *id) {
+            let name = format!("{}/{}", resourse.pair.base, resourse.pair.quote);
+            if let Some(result) = payload.values.iter().find(|x| x.id == *id) {
+                let value = format!("{:?}", result.value);
+                let num_pools = format!("{}", responses.len());
+                table.add_row(Row::new(vec![
+                    Cell::new(&id.to_string()).style_spec("r"),
+                    Cell::new(&name).style_spec("l"),
+                    Cell::new(&value).style_spec("r"),
+                    Cell::new(&num_pools).style_spec("r"),
+                ]));
+            }
+        }
+    }
+
+    table.printstd();
+}
+
+#[oracle_component]
+async fn oracle_request(settings: Settings) -> Result<Payload> {
+    println!("Starting oracle component - Gecko Terminal");
+    let resources = get_resources_from_settings(&settings)?;
+    let results = fetch_all_prices(&resources).await?;
+    let payload = process_results(&results)?;
+    print_results(&resources, &results, &payload);
     Ok(payload)
 }
 
 #[derive(Deserialize, Debug)]
-struct FeedArguments {
-    pub arguments: GeckoTerminalPool,
+struct FeedArgumentsVec {
+    pub pair: Pair,
+    pub arguments: Vec<GeckoTerminalPool>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Pair {
+    pub base: String,
+    pub quote: String,
 }
 
 #[derive(Deserialize, Debug)]
 struct FeedConfig {
     pub id: String,
-    pub arguments: GeckoTerminalPool,
+    pub arguments: Vec<GeckoTerminalPool>,
+    pub pair: Pair,
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
     let mut config: Vec<FeedConfig> = Vec::new();
-
     for feed_setting in &settings.data_feeds {
         //TODO: (EmilIvanichkovv) This is temporary solution
         if feed_setting.data.contains("pool") {
-            let feed_config = serde_json::from_str::<FeedArguments>(&feed_setting.data)
+            let feed_config = serde_json::from_str::<FeedArgumentsVec>(&feed_setting.data)
                 .context("Couldn't parse data feed")?;
-            config.push(FeedConfig {
+            let c = FeedConfig {
                 id: feed_setting.id.clone(),
-                arguments: GeckoTerminalPool {
-                    network: feed_config.arguments.network,
-                    pool: feed_config.arguments.pool,
-                    reverse: feed_config.arguments.reverse,
-                },
-            })
+                arguments: feed_config.arguments,
+                pair: feed_config.pair,
+            };
+            config.push(c);
         }
     }
     Ok(config)

@@ -4497,6 +4497,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "blocksense-sdk",
+ "prettytable-rs",
  "serde 1.0.217",
  "serde-this-or-that",
  "serde_json",
