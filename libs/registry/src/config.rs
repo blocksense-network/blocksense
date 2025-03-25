@@ -118,6 +118,8 @@ pub struct BlocksenseConfig {
 pub struct OracleScript {
     pub id: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub interval_time_in_seconds: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     /// Description for the Oracle script.
     #[serde(default, skip_serializing_if = "Option::is_none")]

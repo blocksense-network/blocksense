@@ -501,6 +501,7 @@ pub async fn get_oracle_scripts(
         oracles: vec![
             OracleScript {
                 id: "cmc".to_string(),
+                interval_time_in_seconds: None,
                 name: None,
                 description: None,
                 oracle_script_wasm: "cmc_oracle.wasm".to_string(),
@@ -509,6 +510,7 @@ pub async fn get_oracle_scripts(
             },
             OracleScript {
                 id: "yahoo".to_string(),
+                interval_time_in_seconds: None,
                 name: None,
                 description: None,
                 oracle_script_wasm: "yahoo_oracle.wasm".to_string(),
@@ -517,6 +519,7 @@ pub async fn get_oracle_scripts(
             },
             OracleScript {
                 id: "exsat".to_string(),
+                interval_time_in_seconds: None,
                 name: None,
                 description: None,
                 oracle_script_wasm: "exsat_holdings_oracle.wasm".to_string(),
@@ -529,6 +532,7 @@ pub async fn get_oracle_scripts(
             },
             OracleScript {
                 id: "gecko-terminal".to_string(),
+                interval_time_in_seconds: None,
                 name: None,
                 description: None,
                 oracle_script_wasm: "gecko_terminal_oracle.wasm".to_string(),
@@ -537,6 +541,7 @@ pub async fn get_oracle_scripts(
             },
             OracleScript {
                 id: "crypto-price-feeds".to_string(),
+                interval_time_in_seconds: None,
                 name: None,
                 description: None,
                 oracle_script_wasm: "crypto-price-feeds.wasm".to_string(),

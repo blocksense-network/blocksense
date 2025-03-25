@@ -36,6 +36,7 @@ pub struct AppDetails {
 pub struct Trigger {
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub component: String,
+    pub interval_time_in_seconds: u64,
     #[serde(flatten)]
     pub config: toml::Table,
 }
@@ -124,6 +125,9 @@ impl From<BlocksenseConfig> for AppManifest {
 
             oracles.push(Trigger {
                 component: oracle.id.clone(),
+                interval_time_in_seconds: oracle
+                    .interval_time_in_seconds
+                    .unwrap_or(config.reporter_info.interval_time_in_seconds),
                 config: table,
             });
 
