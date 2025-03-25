@@ -1,5 +1,4 @@
 export { BinanceAssetsFetcher } from './binance/binance';
-export { BinanceTRAssetsFetcher } from './binance-tr/binance-tr';
 export { BinanceUSAssetsFetcher } from './binance-us/binance-us';
 export { BitfinexAssetsFetcher } from './bitfinex/bitfinex';
 export { BitgetAssetsFetcher } from './bitget/bitget';
