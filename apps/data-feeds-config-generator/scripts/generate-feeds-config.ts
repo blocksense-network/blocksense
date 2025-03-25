@@ -1,10 +1,7 @@
-import { format } from 'node:path';
-
 import { Schema, ParseResult } from 'effect';
 const { decodeUnknownSync } = ParseResult;
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
-
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
 import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 
@@ -15,17 +12,17 @@ import {
   getAllProposedFeedsInRegistry,
 } from '../src/data-services/chainlink_feeds';
 import { RawDataFeedsSchema } from '../src/data-services/types';
-import {
-  generateFeedConfig,
-  getAllPossibleCLFeeds,
-  getCLFeedsOnMainnet,
-} from '../src/feeds-config/index';
+import { generateFeedConfig } from '../src/feeds-config/index';
 import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
 import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';
 import {
   Artifacts,
   fetchRepoFiles,
 } from '../src/data-services/artifacts-downloader';
+import {
+  getAllPossibleCLFeeds,
+  getCLFeedsOnMainnet,
+} from '../src/feeds-config/utils/chainlink';
 
 async function createArtifact<A, I = A>(
   name: string,
