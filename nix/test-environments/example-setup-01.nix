@@ -36,7 +36,7 @@ in
       ink-sepolia = {
         port = 8547;
         chain-id = 99999999999;
-        fork-url = "wss://ink-sepolia.drpc.org";
+        fork-url = "wss://ws-gel-sepolia.inkonchain.com";
       };
     };
 
