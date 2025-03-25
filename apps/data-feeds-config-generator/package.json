@@ -20,7 +20,7 @@
   "scripts": {
     "build": "yarn run rollup:build-workspace",
     "ts": "yarn node --import tsx",
-    "get-chainlink-feeds": "yarn ts scripts/get_chainlink_feeds.ts",
+    "get-chainlink-feeds": "yarn ts scripts/get-chainlink-feeds.ts",
     "get-cmc-market-cap-data": "yarn ts scripts/get-cmc-market-cap-data.ts",
     "get-providers-data": "yarn ts scripts/get-providers-data.ts",
     "generate-initial-feeds-config": "yarn ts scripts/generate-initial-feeds-config.ts",
