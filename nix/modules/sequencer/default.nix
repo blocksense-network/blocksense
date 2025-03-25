@@ -21,6 +21,7 @@
 
           specialArgs = {
             inherit
+              pkgs
               self
               self'
               inputs
@@ -130,6 +131,11 @@
               type = types.attrsOf types.raw;
               description = "The materialized configuration for the reporters.";
               default = blocksenseConfigJSON;
+            };
+
+            config-files = mkOption {
+              type = types.attrsOf (mkSubmodule ./config-file-submodule.nix);
+              default = import ./config-files.nix { inherit cfg self lib; };
             };
           };
 
