@@ -1,5 +1,6 @@
 import {
   DecoderData,
+  DynamicData,
   ExpandedField,
   ExpandedFieldOrArray,
   GenerateDecoderConfig,
@@ -23,6 +24,9 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
   };
   const mainStructName = name;
 
+  const dynamicFields: DynamicData[] = [];
+  let nestedDynamic: string | undefined;
+
   const generateDecoderLines = (
     schema: Schema | Schema[],
     name: string,
@@ -32,18 +36,21 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
     let index = startIndex;
     let location = name;
 
-    // console.log('----> schema', schema);
+    console.log('----> schema', schema);
+    let size = Array.isArray(schema) ? 0 : (schema.fixedSize ?? 0) * 8;
+    if (!Array.isArray(schema) && schema.isDynamic && !schema.fields) {
+      size = 32;
+    }
+
     if (Array.isArray(schema) || (!schema.fields && !schema.length)) {
-      config.bitOffset +=
-        Array.isArray(schema) || schema.isDynamic ? 0 : schema.fixedSize * 8;
+      config.bitOffset += size;
 
       if (
         !Array.isArray(schema) &&
-        (config.prevSize + (schema.fixedSize ?? 0) * 8 >= 256 ||
-          config.bitOffset >= 256)
+        (config.prevSize + size >= 256 || config.bitOffset >= 256)
       ) {
         config.wordOffset += config.prevSize / 8;
-        config.bitOffset = schema.isDynamic ? 0 : (schema.fixedSize ?? 0) * 8;
+        config.bitOffset = size;
         shouldUpdate = true;
         config.prevSize = 0;
       }
@@ -66,39 +73,6 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
         lines.push(...generateDecoderLines(subSchema, name, index));
         index++;
       });
-      // } else if (
-      //   schema.length &&
-      //   (schema.type.match(/\[\d+\]/g) ?? []).length > 1
-      // ) {
-      //   console.log('---> nested fixed array');
-
-      //   console.log('\n ----> schema type', schema.type);
-      //   // remove only last occurrence of '[<number>]'
-      //   const schemaType = schema.type.replace(/\[\d+\](?!.*\[\d+\])/, '');
-      //   console.log('\n ----> schema type', schema.type);
-      //   const matches = [...schemaType.matchAll(/\[(\d+)\]/g)].map(match =>
-      //     Number(match[1]),
-      //   );
-      //   const prevSize = matches.pop() ?? 0;
-
-      //   const fields = Array(schema.length).fill({
-      //     ...schema,
-      //     type: schemaType,
-      //     fixedSize: schema.fixedSize / schema.length,
-      //     length: prevSize,
-      //   });
-
-      //   const innerName = name + '_' + index;
-      //   lines.push(`
-
-      //     {
-      //       // Get address of field at slot ${index} of ${name}
-      //       let ${innerName} := mload(${index ? `add(${name}, ${index * 0x20})` : name})
-      //       ${generateDecoderLines(fields, innerName, 0).join('\n')}
-      //     }
-      //   `);
-    } else if (schema.isDynamic) {
-      throw new Error('Dynamic field not implemented yet');
     } else if (schema.fields) {
       console.log('\n\n---> tuple');
 
@@ -114,30 +88,113 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
         return generateDecoderLines(schema.fields, name, index);
       }
 
-      let fields = schema.fields;
+      if (schema.isDynamic) {
+        // nestedDynamic = schema.fieldName + '_pos';
+        lines.push(`
+          // Get position of ${schema.fieldName}
+          let ${schema.fieldName + '_pos'} := and(shr(${256 - config.bitOffset - 32}, memData), 0xFFFFFFFF)
+        `);
 
-      if (schema.length) {
-        fields = Array(schema.length).fill({
-          ...schema,
-          length: 0,
-          type: schema.type,
+        lines.push(generateBigEndianConversion(schema.fieldName + '_pos'));
+
+        config.prevSize += 32;
+        config.bitOffset += 32;
+
+        schema.isDynamic = false;
+        dynamicFields.push({
+          positionName: schema.fieldName + '_pos',
+          index,
+          location,
+          schema,
+          isGenerated: false,
         });
-      }
+      } else {
+        let fields = schema.fields;
 
-      // console.log('---fields', fields);
+        if (schema.length) {
+          fields = Array(schema.length)
+            .fill(null)
+            .map((_, i) => ({
+              ...schema,
+              length: 0,
+              type: schema.type,
+              fieldName: `${schema.fieldName}_${i}`,
+            }));
+        }
 
-      const innerName = name + '_' + index;
-      // console.log('are be', schema);
-      lines.push(`
+        console.log('fields', fields);
+
+        // console.log('---fields', fields);
+
+        const innerName = name + '_' + index;
+        // console.log('are be', schema);
+        lines.push(`
 
         {
           // Get address of field at slot ${index} of ${name}
           let ${innerName} := mload(${index ? `add(${name}, ${index * 0x20})` : name})
           ${generateDecoderLines(fields, innerName, 0).join('\n')}
+          `);
+
+        for (const field of fields) {
+          console.log('=> field', field);
+          // TODO here it doesn't know how to handle the nested array cuz its not dynamic
+          if (!field.fields && field.isDynamic) {
+            const currentField = dynamicFields.find(
+              dynamicField =>
+                dynamicField.positionName === field.fieldName + '_pos',
+            );
+            if (!currentField) {
+              throw new Error(
+                `Dynamic field ${field.fieldName} not found in dynamicFields`,
+              );
+            }
+            const i = dynamicFields.indexOf(currentField);
+            const nextField =
+              i < dynamicFields.length - 1
+                ? dynamicFields[i + 1].positionName
+                : undefined;
+
+            lines.push(
+              generateDecoderStringBytes(dynamicFields[i], i, nextField),
+            );
+            dynamicFields[i].isGenerated = true;
+          }
+
+          // nestedDynamic = undefined;
         }
+
+        lines.push('}');
+      }
+    } else if (schema.isDynamic) {
+      // TODO maybe move above `if(schema.fields)`
+      console.log('\n\n---> dynamic field');
+      console.log('config', config);
+      // throw new Error('Dynamic field not implemented yet');
+      lines.push(`
+
+        // Get position of ${name}
+        let ${schema.fieldName}_pos := and(shr(${256 - config.bitOffset}, memData), 0xFFFFFFFF)
       `);
+      lines.push(generateBigEndianConversion(schema.fieldName + '_pos'));
+
+      if (nestedDynamic) {
+        lines.push(`
+          // Update nested dynamic pos
+          ${schema.fieldName}_pos := add(${schema.fieldName}_pos, ${nestedDynamic})
+        `);
+      }
+
+      config.prevSize += 32;
+      dynamicFields.push({
+        positionName: schema.fieldName + '_pos',
+        index,
+        location,
+        isGenerated: false,
+      });
     } else if (!schema.isDynamic) {
       console.log('\n\n---> primitive');
+      console.log('config', config);
       if (schema.length) {
         // const innerName = name + '_' + index;
         // // lines.push(
@@ -192,18 +249,18 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
         console.log('\n---> primitive ', schema.fieldName);
 
         lines.push(`
-        // Store the next ${fieldSize} bits of memData at slot ${index} of ${location} ${schema.fieldName ? `for ${schema.fieldName}` : ''}
-        mstore(${index ? `add(${location}, ${index * 0x20})` : location},
-        ${
-          shift === 0
-            ? 'memData'
-            : shift < 0
-              ? `shl(${Math.abs(shift!)}, memData)`
-              : fieldSize < 256
-                ? `and(shr(${shift}, memData), ${'0x' + 'F'.repeat(schema.fixedSize * 2)})`
-                : `shr(${shift}, memData)`
-        })
-      `);
+          // Store the next ${fieldSize} bits of memData at slot ${index} of ${location} ${schema.fieldName ? `for ${schema.fieldName}` : ''}
+          mstore(${index ? `add(${location}, ${index * 0x20})` : location},
+          ${
+            shift === 0
+              ? 'memData'
+              : shift < 0
+                ? `shl(${Math.abs(shift!)}, memData)`
+                : fieldSize < 256
+                  ? `and(shr(${shift}, memData), ${'0x' + 'F'.repeat(schema.fixedSize * 2)})`
+                  : `shr(${shift}, memData)`
+          })
+        `);
       }
     } else {
       throw new Error('Dont know this type');
@@ -214,12 +271,48 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
 
   const lines: string[] = [];
 
-  if (schema.isDynamic) {
-    lines.push(`
-      // Used to track loaded data, data starts at 32 due to length stored in the first 32 bytes
-      let dataPointer := 32
-    `);
+  // if (schema.isDynamic) {
+  //   lines.push(`
+  //     // Used to track loaded data, data starts at 32 due to length stored in the first 32 bytes
+  //     let dataPointer := 32
+  //   `);
+  // }
+
+  lines.push(...generateDecoderLines(schema, name));
+
+  console.log('dynamicFields', dynamicFields);
+  for (let i = 0; i < dynamicFields.length; i++) {
+    if (dynamicFields[i].isGenerated) {
+      continue;
+    }
+    const nextField =
+      i < dynamicFields.length - 1
+        ? dynamicFields[i + 1].positionName
+        : undefined;
+
+    const schema = dynamicFields[i].schema;
+    if (schema) {
+      nestedDynamic = dynamicFields[i].positionName;
+      lines.push(`
+        memData := mload(add(data, add(${nestedDynamic}, 32)))
+      `);
+      config.bitOffset = 0;
+      config.prevSize = 0;
+
+      lines.push(
+        ...generateDecoderLines(
+          schema,
+          dynamicFields[i].location,
+          dynamicFields[i].index,
+        ),
+      );
+      nestedDynamic = undefined;
+    } else {
+      lines.push(generateDecoderStringBytes(dynamicFields[i], i, nextField));
+    }
+
+    dynamicFields[i].isGenerated = true;
   }
 
-  return generateDecoderLines(schema, name);
+  return lines;
 };

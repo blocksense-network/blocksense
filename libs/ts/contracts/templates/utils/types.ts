@@ -56,3 +56,11 @@ export type Schema = {
   fieldRangesFixedLen?: { start: number; end: number }[];
   variableOffsetsPosition?: number[];
 };
+
+export type DynamicData = {
+  positionName: string;
+  index: number;
+  location: string;
+  schema?: Schema;
+  isGenerated: boolean;
+};
