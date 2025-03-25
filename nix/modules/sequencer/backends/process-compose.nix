@@ -1,8 +1,7 @@
-{ self', ... }:
+{ self', self, ... }:
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -24,16 +23,6 @@ let
     disable_json = true;
     flush_each_line = true;
   };
-
-  sequencerConfigJSON = pkgs.runCommandLocal "sequencer_config" { } ''
-    mkdir -p $out
-    echo '${cfg._sequencer-config-txt}' \
-      | ${lib.getExe pkgs.jq} > $out/sequencer_config.json
-  '';
-
-  reportersConfigJSON = builtins.mapAttrs (
-    name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
-  ) cfg.reporters;
 
   anvilInstances = lib.mapAttrs' (
     name:
@@ -92,12 +81,16 @@ let
           working_dir = toString (/. + config.devenv.state + /blocksense/reporter/${name});
         in
         {
-          command = ''
-            mkdir -p "${working_dir}" &&
-            cd "${working_dir}" &&
-            ${installOracleScripts working_dir} &&
-            ${blocksense.program} node build --from ${reportersConfigJSON.${name}} --up
-          '';
+          command =
+            let
+              reporter-config = cfg.config-files.${self.lib.getReporterConfigFilename name};
+            in
+            ''
+              mkdir -p "${working_dir}" &&
+              cd "${working_dir}" &&
+              ${installOracleScripts working_dir} &&
+              ${blocksense.program} node build --from ${reporter-config.path} --up
+            '';
           environment = [ "RUST_LOG=${log-level}" ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
@@ -122,7 +115,7 @@ let
       };
       environment = [
         "FEEDS_CONFIG_DIR=${../../../../config}"
-        "SEQUENCER_CONFIG_DIR=${sequencerConfigJSON}"
+        "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
       ];
       shutdown.signal = 9;
