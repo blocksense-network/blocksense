@@ -31,7 +31,7 @@ export class UpbitAssetsFetcher
         pair: { base, quote },
         data: {
           market: asset.market,
-          price: price.trade_price.toString(),
+          price: price.trade_price,
         },
       };
     });

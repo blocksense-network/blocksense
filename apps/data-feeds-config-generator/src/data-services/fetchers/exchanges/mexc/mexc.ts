@@ -28,7 +28,7 @@ export class MEXCAssetsFetcher implements ExchangeAssetsFetcher<MEXCAssetInfo> {
         },
         data: {
           symbol: asset.symbol,
-          price: price.lastPrice,
+          price: Number(price.lastPrice),
         },
       };
     });

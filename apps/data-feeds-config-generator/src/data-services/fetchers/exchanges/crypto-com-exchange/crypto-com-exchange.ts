@@ -32,7 +32,7 @@ export class CryptoComAssetsFetcher
         },
         data: {
           symbol: asset.symbol,
-          price: price.a,
+          price: Number(price.a),
         },
       };
     });

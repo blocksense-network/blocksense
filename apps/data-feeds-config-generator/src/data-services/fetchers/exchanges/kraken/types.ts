@@ -10,7 +10,7 @@ const KrakenAssetInfoSchema = S.mutable(
   S.Struct({
     pair: S.String,
     wsname: S.String,
-    price: S.String,
+    price: S.Number,
   }),
 );
 

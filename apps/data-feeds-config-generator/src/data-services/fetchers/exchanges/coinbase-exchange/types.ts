@@ -8,7 +8,7 @@ import { Schema as S } from 'effect';
 const CoinbaseAssetInfoSchema = S.mutable(
   S.Struct({
     id: S.String,
-    price: S.String,
+    price: S.Number,
   }),
 );
 

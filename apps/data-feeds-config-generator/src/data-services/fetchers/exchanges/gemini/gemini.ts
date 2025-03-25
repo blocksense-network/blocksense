@@ -29,7 +29,7 @@ export class GeminiAssetsFetcher
         },
         data: {
           symbol: assetDetails.symbol,
-          price: price.last,
+          price: Number(price.last),
         },
       });
     }

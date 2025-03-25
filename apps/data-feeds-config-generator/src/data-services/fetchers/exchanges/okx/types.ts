@@ -8,7 +8,7 @@ import { Schema as S } from 'effect';
 const OKXAssetInfoSchema = S.mutable(
   S.Struct({
     instId: S.String,
-    price: S.String,
+    price: S.Number,
   }),
 );
 

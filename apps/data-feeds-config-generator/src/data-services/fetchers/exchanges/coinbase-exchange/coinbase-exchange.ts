@@ -31,7 +31,7 @@ export class CoinbaseAssetsFetcher
         },
         data: {
           id: asset.id,
-          price: price.price,
+          price: Number(price.price),
         },
       };
     });

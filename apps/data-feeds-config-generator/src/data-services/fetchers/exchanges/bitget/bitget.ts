@@ -32,7 +32,7 @@ export class BitgetAssetsFetcher
         },
         data: {
           symbol: asset.symbolName,
-          price: price.close,
+          price: Number(price.close),
         },
       };
     });

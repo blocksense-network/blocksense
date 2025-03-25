@@ -42,7 +42,7 @@ export class KrakenAssetsFetcher
         data: {
           pair: key,
           wsname: value.wsname,
-          price: price.a[0],
+          price: Number(price.a[0]),
         },
       };
     });

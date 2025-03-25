@@ -7,7 +7,7 @@ import { Schema as S } from 'effect';
 const BinanceAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
-    price: S.String,
+    price: S.Number,
   }),
 );
 

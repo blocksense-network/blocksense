@@ -8,7 +8,7 @@ import { Schema as S } from 'effect';
 const UpbitAssetInfoSchema = S.mutable(
   S.Struct({
     market: S.String,
-    price: S.String,
+    price: S.Number,
   }),
 );
 

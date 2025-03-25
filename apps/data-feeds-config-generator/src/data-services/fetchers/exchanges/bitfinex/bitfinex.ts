@@ -32,7 +32,7 @@ export class BitfinexAssetsFetcher
         },
         data: {
           symbol: tickerAsset,
-          price: price[7].toString(),
+          price: Number(price[7]),
         },
       };
     });

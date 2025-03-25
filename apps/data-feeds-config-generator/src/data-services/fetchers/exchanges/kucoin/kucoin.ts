@@ -30,7 +30,7 @@ export class KuCoinAssetsFetcher
         },
         data: {
           symbol: asset.symbol,
-          price: price.last!,
+          price: Number(price.last!),
         },
       };
     });

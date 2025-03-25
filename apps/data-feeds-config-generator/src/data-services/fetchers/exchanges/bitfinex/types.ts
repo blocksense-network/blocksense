@@ -8,7 +8,7 @@ import { Schema as S } from 'effect';
 export const BitfinexAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
-    price: S.String,
+    price: S.Number,
   }),
 );
 

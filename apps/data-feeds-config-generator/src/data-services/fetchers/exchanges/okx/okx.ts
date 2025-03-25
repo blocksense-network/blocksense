@@ -23,7 +23,7 @@ export class OKXAssetsFetcher implements ExchangeAssetsFetcher<OKXAssetInfo> {
       }
       return {
         pair: { base: asset.baseCcy, quote: asset.quoteCcy },
-        data: { instId: asset.instId, price: price.last },
+        data: { instId: asset.instId, price: Number(price.last) },
       };
     });
   }

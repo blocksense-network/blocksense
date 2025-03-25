@@ -30,7 +30,7 @@ export class BinanceUSAssetsFetcher
         },
         data: {
           symbol: asset.symbol,
-          price: price.lastPrice,
+          price: Number(price.lastPrice),
         },
       };
     });

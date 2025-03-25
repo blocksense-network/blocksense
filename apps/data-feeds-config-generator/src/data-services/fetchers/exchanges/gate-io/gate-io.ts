@@ -25,7 +25,7 @@ export class GateIoAssetsFetcher
       }
       return {
         pair: { base: asset.base, quote: asset.quote },
-        data: { id: asset.id, price: price.last },
+        data: { id: asset.id, price: Number(price.last) },
       };
     });
   }
