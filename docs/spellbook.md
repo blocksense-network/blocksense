@@ -187,8 +187,8 @@ Command Breakdown:
     '0x' +
       (0x86 | 0x80).toString(16).padStart(2, '0') +
       (0 & 0xff).toString(16).padStart(2, '0') +
-      (0).toString(16).padStart(30, '0') +
-      (1574).toString(16).padStart(4, '0');
+      (42).toString(16).padStart(30, '0') +
+      (5).toString(16).padStart(4, '0');
     ```
 
 - The output is processed with `cut` to extract the first 50 characters, representing the price in hex. It’s then converted to decimal using `cast to-dec`.
