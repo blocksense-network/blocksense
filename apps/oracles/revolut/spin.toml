@@ -1,0 +1,48 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Antoni Dikov"]
+name = "Blocksense Oracle Example"
+version = "0.1.0"
+
+[application.trigger.settings]
+interval_time_in_seconds = 10
+sequencer = "http://gpu-server-001:8877/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+reporter_id = 0
+
+[[trigger.oracle]]
+component = "revolut-api-fetcher"
+interval_time_in_seconds = 5
+
+[[trigger.oracle.data_feeds]]
+id = "47"
+data = "ETHUSD"
+
+[[trigger.oracle.data_feeds]]
+id = "31"
+data = "BTCUSD"
+
+[[trigger.oracle]]
+component = "revolut-api"
+interval_time_in_seconds = 15
+
+[[trigger.oracle.data_feeds]]
+id = "253"
+data = "EURUSD"
+
+[component.revolut-api-fetcher]
+source = "target/wasm32-wasip1/release/revolut_oracle.wasm"
+allowed_outbound_hosts = [
+  "https://www.revolut.com",
+]
+[component.revolut-api-fetcher.build]
+command = "cargo build --target wasm32-wasip1 --release"
+
+[component.revolut-api]
+source = "../../../target/wasm32-wasip1/release/revolut_oracle.wasm"
+allowed_outbound_hosts = [
+  "https://www.revolut.com",
+]
+[component.revolut-api.build]
+command = "cargo build --target wasm32-wasip1 --release"
