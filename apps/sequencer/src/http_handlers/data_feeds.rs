@@ -1,6 +1,8 @@
 use actix_web::http::StatusCode;
 use alloy_primitives::{FixedBytes, PrimitiveSignature};
 use chrono::{TimeZone, Utc};
+use crypto::verify_signature;
+use data_feeds::generate_signature::serialize_reporter_vote;
 use eyre::Result;
 use gnosis_safe::utils::SignatureWithAddress;
 use std::str::FromStr;
@@ -25,7 +27,6 @@ use config::SequencerConfig;
 use feed_registry::registry::FeedAggregateHistory;
 use feed_registry::types::DataFeedPayload;
 use feed_registry::types::FeedMetaData;
-use feeds_processing::utils::check_signature;
 use gnosis_safe::data_types::ReporterResponse;
 use prometheus::{inc_metric, inc_vec_metric};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -65,15 +66,17 @@ async fn process_report(
                     }
                 };
                 {
-                    let rlocked_reporter = reporter.read().await;
-                    if !check_signature(
-                        &signature.sig,
-                        &rlocked_reporter.pub_key,
-                        data_feed.payload_metadata.feed_id.as_str(),
+                    let serialized_vote = serialize_reporter_vote(
+                        &data_feed.payload_metadata.feed_id,
                         msg_timestamp,
                         &data_feed.result,
+                    );
+
+                    if !verify_signature(
+                        &signature.sig,
+                        &reporter.read().await.pub_key,
+                        &serialized_vote,
                     ) {
-                        drop(rlocked_reporter);
                         warn!(
                             "Signature check failed for feed_id: {} from reporter_id: {}",
                             feed_id, reporter_id

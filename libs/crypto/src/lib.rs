@@ -17,7 +17,7 @@ pub fn sign_message(sk: &SecretKey, message: &[u8]) -> Signature {
     sk.sign(message, &[], &[])
 }
 
-pub fn verify_signature(pk: &PublicKey, signature: &Signature, message: &[u8]) -> bool {
+pub fn verify_signature(signature: &Signature, pk: &PublicKey, message: &[u8]) -> bool {
     signature.verify(true, message, &[], &[], pk, true) == BLST_ERROR::BLST_SUCCESS
 }
 

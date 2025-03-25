@@ -1,9 +1,14 @@
+use crate::adfs_gen_calldata::adfs_serialize_updates;
+use alloy::hex::FromHex;
+use alloy_primitives::{Address, Bytes, Uint, U256};
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use anyhow::{anyhow, Context, Result};
 use blocksense_registry::config::FeedConfig;
 use config::{FeedStrideAndDecimals, PublishCriteria};
-use data_feeds::feeds_processing::{
-    BatchedAggegratesToSend, VotedFeedUpdate, VotedFeedUpdateWithProof,
+use crypto::{verify_signature, PublicKey};
+use data_feeds::{
+    feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate, VotedFeedUpdateWithProof},
+    generate_signature::serialize_reporter_vote,
 };
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::registry::FeedAggregateHistory;
@@ -11,12 +16,6 @@ use feed_registry::types::{DataFeedPayload, FeedMetaData, FeedType, Timestamp};
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash};
 use ringbuf::traits::consumer::Consumer;
-// use serde_json::from_str;
-use crate::adfs_gen_calldata::adfs_serialize_updates;
-use alloy::hex::FromHex;
-use alloy_primitives::{Address, Bytes, Uint, U256};
-use crypto::{verify_signature, PublicKey, Signature};
-use feed_registry::types::FeedResult;
 use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 use std::sync::Arc;
@@ -24,26 +23,6 @@ use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
 
 pub const AD_MIN_DATA_POINTS_THRESHOLD: usize = 100;
-
-pub fn check_signature(
-    signature: &Signature,
-    pub_key: &PublicKey,
-    feed_id: &str,
-    timestamp: Timestamp,
-    feed_result: &FeedResult,
-) -> bool {
-    let mut byte_buffer: Vec<u8> = feed_id
-        .as_bytes()
-        .iter()
-        .copied()
-        .chain(timestamp.to_be_bytes().to_vec())
-        .collect();
-
-    if let Ok(result) = feed_result {
-        byte_buffer.extend(result.as_bytes(18, timestamp as u64));
-    }
-    verify_signature(pub_key, signature, &byte_buffer)
-}
 
 #[derive(Debug)]
 pub struct ConsumedReports {
@@ -324,12 +303,16 @@ pub async fn validate_sigcheck(
                 ));
             }
 
-            if !check_signature(
-                &raw_vote.payload_metadata.signature.sig,
-                reporter_pub_key,
-                raw_vote.payload_metadata.feed_id.as_str(),
+            let serialized_vote = serialize_reporter_vote(
+                &raw_vote.payload_metadata.feed_id,
                 raw_vote.payload_metadata.timestamp,
                 &raw_vote.result,
+            );
+
+            if !verify_signature(
+                &raw_vote.payload_metadata.signature.sig,
+                reporter_pub_key,
+                &serialized_vote,
             ) {
                 anyhow::bail!(
                     "Signature verification failed for vote {:?} from reporter id {} with pub key {:?}",
