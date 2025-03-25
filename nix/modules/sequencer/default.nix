@@ -137,6 +137,17 @@
               type = types.attrsOf (mkSubmodule ./config-file-submodule.nix);
               default = import ./config-files.nix { inherit cfg self lib; };
             };
+
+            config-dir = mkOption {
+              type = types.package;
+              readOnly = true;
+              default =
+                let
+                  configs = lib.attrValues cfg.config-files;
+                  paths = builtins.map (conf: conf.path) configs;
+                in
+                pkgs.linkFarmFromDrvs "blocksense-config-dir" paths;
+            };
           };
 
           config.services.blocksense = {
