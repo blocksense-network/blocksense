@@ -23,7 +23,7 @@
     "get-chainlink-feeds": "yarn ts scripts/get_chainlink_feeds.ts",
     "get-cmc-market-cap-data": "yarn ts scripts/get-cmc-market-cap-data.ts",
     "get-providers-data": "yarn ts scripts/get-providers-data.ts",
-    "generate-data-feeds-config": "yarn ts scripts/generate-feeds-config.ts",
+    "generate-initial-feeds-config": "yarn ts scripts/generate-initial-feeds-config.ts",
     "fetch-symbols": "yarn ts src/data-services/fetchers/scripts/fetch-symbols.ts",
     "test": "yarn vitest --typecheck -w false"
   },
