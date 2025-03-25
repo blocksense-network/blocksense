@@ -2,7 +2,7 @@ import { Octokit } from '@octokit/rest';
 import { Schema, ParseResult } from 'effect';
 
 import { getEnvString } from '@blocksense/base-utils/env';
-import { ProviderData } from '../feeds-config/data-providers';
+import { ProviderData } from '../generation/initial/data-providers';
 import { ChainLinkFeedInfo, ChainLinkFeedInfoSchema } from './types';
 import {
   CMCMarketCapDataRes,

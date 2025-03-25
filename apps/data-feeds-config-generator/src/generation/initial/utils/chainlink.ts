@@ -8,13 +8,13 @@ import {
   getHighestDecimals,
   CookedDataFeeds,
   aggregateNetworkInfoPerField,
-} from '../../data-services/chainlink_feeds';
+} from '../../../data-services/chainlink_feeds';
 import { SimplifiedFeed } from '../types';
 import {
   parseNetworkFilename,
   chainlinkNetworkNameToChainId,
-} from '../../chainlink-compatibility/types';
-import { ChainLinkFeedInfo, RawDataFeeds } from '../../data-services/types';
+} from '../../../chainlink-compatibility/types';
+import { ChainLinkFeedInfo, RawDataFeeds } from '../../../data-services/types';
 
 export function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,

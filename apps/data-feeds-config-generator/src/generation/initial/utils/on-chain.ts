@@ -4,11 +4,11 @@ import { assertNotNull } from '@blocksense/base-utils/assert';
 import { everyAsync } from '@blocksense/base-utils/async';
 import { NetworkName, getRpcUrl, isTestnet } from '@blocksense/base-utils/evm';
 
-import { ChainLinkFeedInfo } from '../../data-services/types';
+import { ChainLinkFeedInfo } from '../../../data-services/types';
 import {
   chainlinkNetworkNameToChainId,
   parseNetworkFilename,
-} from '../../chainlink-compatibility/types';
+} from '../../../chainlink-compatibility/types';
 import { SimplifiedFeed } from '../types';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';

@@ -6,8 +6,8 @@ import {
 } from '@blocksense/config-types/data-feeds-config';
 import { keysOf } from '@blocksense/base-utils/array-iter';
 
-import { artifactsDir } from '../paths';
-import { AssetInfo } from '../data-services/exchange-assets';
+import { artifactsDir } from '../../paths';
+import { AssetInfo } from '../../data-services/exchange-assets';
 import { SimplifiedFeed } from './types';
 
 export type ProviderData = {

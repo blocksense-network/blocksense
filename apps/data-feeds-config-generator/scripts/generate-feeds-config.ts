@@ -12,7 +12,7 @@ import {
   getAllProposedFeedsInRegistry,
 } from '../src/data-services/chainlink_feeds';
 import { RawDataFeedsSchema } from '../src/data-services/types';
-import { generateFeedConfig } from '../src/feeds-config/index';
+import { generateFeedConfig } from '../src/generation/initial/index';
 import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
 import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';
 import {
@@ -22,7 +22,7 @@ import {
 import {
   getAllPossibleCLFeeds,
   getCLFeedsOnMainnet,
-} from '../src/feeds-config/utils/chainlink';
+} from '../src/generation/initial/utils/chainlink';
 
 async function createArtifact<A, I = A>(
   name: string,

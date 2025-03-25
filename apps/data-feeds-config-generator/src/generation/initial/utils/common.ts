@@ -4,7 +4,7 @@ import { createPair, pairToString } from '@blocksense/config-types';
 
 import { SimplifiedFeed, SimplifiedFeedWithRank } from '../types';
 import { stableCoins } from '../data-providers';
-import { CMCMarketCapDataRes } from '../../data-services/fetchers/aggregators/cmc';
+import { CMCMarketCapDataRes } from '../../../data-services/fetchers/aggregators/cmc';
 
 export function getUniqueDataFeeds(
   dataFeeds: SimplifiedFeed[],

@@ -1,7 +1,7 @@
 import { NewFeedsConfig, NewFeed } from '@blocksense/config-types';
 
-import { Artifacts } from '../data-services/artifacts-downloader';
-import { RawDataFeeds } from '../data-services/types';
+import { Artifacts } from '../../data-services/artifacts-downloader';
+import { RawDataFeeds } from '../../data-services/types';
 import { addDataProviders } from './data-providers';
 import { SimplifiedFeed } from './types';
 import {
