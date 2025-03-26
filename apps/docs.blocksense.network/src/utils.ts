@@ -59,3 +59,11 @@ export const capitalizeWords = (input: string): string => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 };
+
+export const showMsInSeconds = (ms: number): string => {
+  return `${(ms / 1000).toFixed(3)} seconds`;
+};
+
+export const showPercentage = (value: any): string => {
+  return `${value} %`;
+};
