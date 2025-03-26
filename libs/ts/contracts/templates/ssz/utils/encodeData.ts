@@ -257,7 +257,9 @@ export const sszSchema = async (
         field.elementType instanceof ssz.VectorCompositeType ||
         field.elementType instanceof ssz.VectorBasicType ||
         field instanceof ssz.VectorBasicType ||
-        field instanceof ssz.VectorCompositeType
+        field instanceof ssz.VectorCompositeType ||
+        field instanceof ssz.ListCompositeType ||
+        field instanceof ssz.ListBasicType
       ) {
         data.fields = extractFieldsFromSchema(
           {

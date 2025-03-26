@@ -61,6 +61,6 @@ export type DynamicData = {
   positionName: string;
   index: number;
   location: string;
-  schema?: Schema;
+  schema: Schema;
   isGenerated: boolean;
 };
