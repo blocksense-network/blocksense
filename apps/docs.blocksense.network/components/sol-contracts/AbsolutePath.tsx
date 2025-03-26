@@ -1,8 +1,8 @@
 import React from 'react';
+
 import Link from 'next/link';
 
 import { Icon } from '@blocksense/ui/Icon';
-
 import { config } from '@/config';
 import { ghContractFolder } from '@/src/constants';
 
@@ -14,8 +14,9 @@ export const AbsolutePath = ({ absolutePath }: AbsolutePathProps) => {
   return (
     <Link
       className="absolute-path__link font-semibold text-sm flex gap-2 items-center"
-      // href={`${ghContractFolder}${absolutePath}`} //use it after our repo is public on GitHub
-      href={`/coming-soon`}
+      href={`${ghContractFolder}${absolutePath}`}
+      target="_blank"
+      rel="noopener noreferrer"
     >
       <Icon
         className="my-1 dark:invert"

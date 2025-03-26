@@ -1,7 +1,9 @@
 import React from 'react';
-// import { FileTree } from '@blocksense/docs-theme';
-// import { ghContractFolder } from '@/src/constants';
+
 import { FileTree } from 'nextra/components';
+import Link from 'next/link';
+
+import { ghContractFolder } from '@/src/constants';
 
 type TreeNode = {
   name: string;
@@ -11,7 +13,8 @@ type TreeNode = {
 };
 
 export const renderTree = ({ name, children, id, path }: TreeNode) => {
-  // const constructedHref = `${ghContractFolder}contracts/${path}`; //use it after our repo is public on GitHub
+  const constructedHref = `${ghContractFolder}contracts/${path}`;
+
   if (children) {
     return (
       <FileTree.Folder name={<span>{name}</span>} key={id} defaultOpen>
@@ -19,7 +22,11 @@ export const renderTree = ({ name, children, id, path }: TreeNode) => {
       </FileTree.Folder>
     );
   } else {
-    return <FileTree.File name={<span>{name}</span>} key={id} />;
+    return (
+      <Link href={constructedHref} target="_blank" rel="noopener noreferrer">
+        <FileTree.File name={<span>{name}</span>} key={id} />
+      </Link>
+    );
   }
 };
 
