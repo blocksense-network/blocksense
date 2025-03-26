@@ -1,0 +1,19 @@
+{ self, config, ... }:
+let
+  cfg = config.services.blocksense;
+  inherit (self.lib) dashToUnderscore;
+in
+dashToUnderscore {
+  inherit (cfg.sequencer)
+    sequencer-id
+    main-port
+    admin-port
+    block-config
+    providers
+    reporters
+    kafka-report-endpoint
+    http-input-buffer-size
+    ;
+
+  prometheus-port = cfg.sequencer.metrics-port;
+}

@@ -75,8 +75,8 @@
             };
 
             config-files = mkOption {
-              type = types.attrsOf (mkSubmodule ./config-file-submodule.nix);
-              default = import ./config-files.nix { inherit cfg self lib; };
+              type = types.attrsOf (mkSubmodule ./config-files/submodule.nix);
+              default = import ./config-files { inherit config self lib; };
             };
 
             config-dir = mkOption {
