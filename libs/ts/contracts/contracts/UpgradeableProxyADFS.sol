@@ -4,8 +4,8 @@ pragma solidity ^0.8.24;
 import {IUpgradeableProxy} from './interfaces/IUpgradeableProxy.sol';
 
 /// @title UpgradeableProxyADFS
-/// @notice Transaprent proxy contract that allows the implementation to be upgraded
-/// @dev This contract is based on the OpenZeppelin UpgradeableProxy contract
+/// @notice Proxy contract that allows the implementation to be upgraded
+/// @dev This contract is reuses logic from the OpenZeppelin Transparent Proxy contract
 contract UpgradeableProxyADFS {
   /// @notice Slot for the implementation address
   /// @dev The first 4096 addresses are reserved for management values
@@ -36,16 +36,21 @@ contract UpgradeableProxyADFS {
   /// @dev The fallback function is used to delegate calls to the implementation contract
   /// If the sender is the admin, the function will either upgrade to a new
   /// implementation or change the admin, depending on the message signature.
-  /// The admin can only call this contract to modify the proxy, not call the
+  /// In contrast to OZ's Transparent Proxy, the admin can call this contract to modify the proxy, as well as call the
   /// proxied contract.
   fallback() external payable {
     bool isAdmin;
 
-    assembly {
-      isAdmin := eq(caller(), sload(ADMIN_SLOT))
-    }
+    if (
+      msg.sig == IUpgradeableProxy.upgradeTo.selector ||
+      msg.sig == IUpgradeableProxy.setAdmin.selector
+    ) {
+      assembly {
+        isAdmin := eq(caller(), sload(ADMIN_SLOT))
+      }
 
-    if (isAdmin) {
+      if (!isAdmin) revert ProxyDeniedAdminAccess();
+
       if (msg.sig == IUpgradeableProxy.upgradeTo.selector) {
         _upgradeTo(address(bytes20(msg.data[4:])));
         return;
@@ -53,8 +58,6 @@ contract UpgradeableProxyADFS {
         _setAdmin(address(bytes20(msg.data[4:])));
         return;
       }
-
-      revert ProxyDeniedAdminAccess();
     }
 
     assembly {
@@ -100,10 +103,6 @@ contract UpgradeableProxyADFS {
   /// @notice Change the owner of the upgradable proxy
   /// @param newAdmin The address of the new admin
   function _setAdmin(address newAdmin) internal {
-    if (newAdmin == address(0)) {
-      revert InvalidUpgrade(newAdmin);
-    }
-
     assembly {
       sstore(ADMIN_SLOT, newAdmin)
     }

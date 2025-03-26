@@ -101,17 +101,16 @@ describe('UpgradeableProxyADFS', function () {
     await expect(tx).to.be.reverted;
   });
 
-  it('Should revert if admin calls something other than upgrade', async function () {
-    let tx = proxy.proxyCall('setFeeds', admin, [feed]);
+  it('Should allow admin to read feeds', async function () {
+    await proxy.proxyCall('setFeeds', sequencer, [feed]);
 
-    await expect(tx).to.be.revertedWithCustomError(
-      proxy.contract,
-      'ProxyDeniedAdminAccess',
-    );
+    const value = (await proxy.proxyCall('getValues', admin, [feed]))[0];
+    expect(value).to.be.equal(proxy.implementation.formatData(feed));
+  });
 
-    await expect(
-      proxy.proxyCall('getValues', admin, [feed]),
-    ).to.be.revertedWithCustomError(proxy.contract, 'ProxyDeniedAdminAccess');
+  it('Should revert if admin calls set feed', async function () {
+    const tx = proxy.proxyCall('setFeeds', admin, [feed]);
+    await expect(tx).to.be.reverted;
   });
 
   it('Should revert if non-owner calls set feed', async function () {
