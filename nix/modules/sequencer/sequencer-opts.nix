@@ -7,19 +7,19 @@ with lib;
 let
   providerOpts = {
     options = {
-      is_enabled = mkOption {
+      is-enabled = mkOption {
         type = types.bool;
         default = true;
         description = mdDoc "Is the provider enabled or not.";
       };
 
-      contract_version = mkOption {
+      contract-version = mkOption {
         type = types.int;
         default = 1;
-        description = mdDoc "The version of the ETH contract deployed on the network and associated with the parameter contract_address";
+        description = mdDoc "The version of the ETH contract deployed on the network and associated with the parameter contract-address";
       };
 
-      private_key_path = mkOption {
+      private-key-path = mkOption {
         type = types.path;
         description = mdDoc "The path to the private key.";
       };
@@ -30,60 +30,60 @@ let
         description = mdDoc "The URL of the provider.";
       };
 
-      allow_feeds = mkOption {
+      allow-feeds = mkOption {
         type = types.listOf types.int;
         default = [ ];
         description = mdDoc "List of allowed feed ids to be published";
       };
 
-      publishing_criteria = mkOption {
+      publishing-criteria = mkOption {
         type = types.listOf (types.submodule publishingCriteriaOpts);
         default = [ ];
         description = mdDoc "List of publishing criteria for feed per provider customizationo";
       };
 
-      transaction_retries_count_before_give_up = mkOption {
+      transaction-retries-count-before-give-up = mkOption {
         type = types.int;
         default = 5;
         description = mdDoc "The timeout for transactions to be dropped.";
       };
 
-      transaction_retry_timeout_secs = mkOption {
+      transaction-retry-timeout-secs = mkOption {
         type = types.int;
         default = 50;
         description = mdDoc "The timeout for transactions to be retried with higher fee.";
       };
 
-      retry_fee_increment_fraction = mkOption {
+      retry-fee-increment-fraction = mkOption {
         type = types.anything;
         default = 0.1;
         description = mdDoc "The increments to the gas price to apply when retry timeouts are reached.";
       };
 
-      transaction_gas_limit = mkOption {
+      transaction-gas-limit = mkOption {
         type = types.int;
         default = 7500000;
         description = mdDoc "Transaction GAS limit for the provider.";
       };
 
-      contract_address = mkOption {
+      contract-address = mkOption {
         type = types.str;
         description = mdDoc "The Historical Data Feed contract address.";
       };
 
-      safe_address = mkOption {
+      safe-address = mkOption {
         type = types.nullOr types.str;
         default = null;
         description = mdDoc "Address of Gnosis Safe contract.";
       };
 
-      safe_min_quorum = mkOption {
+      safe-min-quorum = mkOption {
         type = types.int;
         default = 1;
         description = mdDoc "Minimum number of reporters to sign the update before it can be posted.";
       };
 
-      impersonated_anvil_account = mkOption {
+      impersonated-anvil-account = mkOption {
         type = types.nullOr types.str;
         default = null;
         description = mdDoc "The account to impersonate for the provider.";
@@ -93,26 +93,26 @@ let
 
   publishingCriteriaOpts = {
     options = {
-      feed_id = mkOption {
+      feed-id = mkOption {
         type = types.int;
         description = mdDoc "Feed id";
       };
-      skip_publish_if_less_then_percentage = mkOption {
+      skip-publish-if-less-then-percentage = mkOption {
         type = types.float;
         default = 0.0;
         description = mdDoc "Publish updates only if they are greater then given threshould as percentage";
       };
-      always_publish_heartbeat_ms = mkOption {
+      always-publish-heartbeat-ms = mkOption {
         type = types.int;
         default = 3600000;
         description = mdDoc "Interval to always publuish updates if there is not enough change";
       };
-      peg_to_value = mkOption {
+      peg-to-value = mkOption {
         type = types.nullOr types.float;
         default = null;
         description = mdDoc "This option is designed for stable coins. They get pegged to this value, if the reported value falls in a percentage window around the pegged value";
       };
-      peg_tolerance_percentage = mkOption {
+      peg-tolerance-percentage = mkOption {
         type = types.float;
         default = 0.0;
         description = mdDoc "This option is designed for stable coins. Defines a tolerance window around the pegged value.";
@@ -122,24 +122,24 @@ let
 
   blockConfigOpts = {
     options = {
-      max_feed_updates_to_batch = mkOption {
+      max-feed-updates-to-batch = mkOption {
         type = types.int;
         default = 1;
         description = mdDoc "The maximum number of keys to batch together before sending a report.";
       };
 
-      block_generation_period = mkOption {
+      block-generation-period = mkOption {
         type = types.int;
         default = 500;
         description = mdDoc "The maximum duration (in ms) to wait before sending aggregating the votes.";
       };
 
-      genesis_block_timestamp = mkOption {
+      genesis-block-timestamp = mkOption {
         type = types.nullOr (types.submodule systemTimeOpts);
         description = mdDoc "Time of genesis of blockchain.";
       };
 
-      aggregation_consensus_discard_period_blocks = mkOption {
+      aggregation-consensus-discard-period-blocks = mkOption {
         type = types.int;
         default = 1000;
         description = mdDoc "Maximum number of blocks to consider for consensus. If there are blocks (batches) that are older and still await consensus, they will be dropped.";
@@ -149,13 +149,13 @@ let
 
   systemTimeOpts = {
     options = {
-      secs_since_epoch = mkOption {
+      secs-since-epoch = mkOption {
         type = types.int;
         default = 0;
         description = mdDoc "Whole seconds since UNIX epoch.";
       };
 
-      nanos_since_epoch = mkOption {
+      nanos-since-epoch = mkOption {
         type = types.int;
         default = 0;
         description = mdDoc "Nanosecond part of time since UNIX epoch.";
@@ -179,7 +179,7 @@ let
         description = mdDoc "Consecutive ids of the reporters.";
       };
 
-      pub_key = mkOption {
+      pub-key = mkOption {
         type = types.str;
         description = mdDoc "BLS public key of the reporter.";
       };
@@ -227,18 +227,18 @@ in
     description = mdDoc "The Ethereum JSON-RPC provider to use for sending tx.";
     example = {
       "ETH1" = {
-        "private_key_path" = "/tmp/priv_key_test";
+        "private-key-path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8545";
-        "transaction_timeout_secs" = 420;
-        "transaction_gas_limit" = 7500000;
-        "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
+        "transaction-timeout-secs" = 420;
+        "transaction-gas-limit" = 7500000;
+        "contract-address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
       "ETH2" = {
-        "private_key_path" = "/tmp/priv_key_test";
+        "private-key-path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8546";
-        "transaction_timeout_secs" = 420;
-        "transaction_gas_limit" = 7500000;
-        "contract_address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
+        "transaction-timeout-secs" = 420;
+        "transaction-gas-limit" = 7500000;
+        "contract-address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
     };
   };
@@ -250,12 +250,12 @@ in
     example = [
       {
         id = 0;
-        pub_key = "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e";
+        pub-key = "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e";
         address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
       }
       {
         id = 1;
-        pub_key = "ea30a8bd97d4f78213320c38215e95b239f8889df885552d85a50665b8b802de85fb40ae9b72d3f67628fa301e81252cd87e";
+        pub-key = "ea30a8bd97d4f78213320c38215e95b239f8889df885552d85a50665b8b802de85fb40ae9b72d3f67628fa301e81252cd87e";
         address = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
       }
     ];

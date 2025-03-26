@@ -54,8 +54,8 @@ let
   anvilImpersonateAndFundInstances = lib.mapAttrs' (name: provider: {
     name = "anvil-impersonate-and-fund-${name}";
     value.process-compose = {
-      command = "cast rpc --rpc-url ${toString provider.url} anvil_impersonateAccount ${toString provider.impersonated_anvil_account} && \
-        cast send --rpc-url ${toString provider.url} ${toString provider.impersonated_anvil_account} --value 1000ether --from 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f --unlocked";
+      command = "cast rpc --rpc-url ${toString provider.url} anvil_impersonateAccount ${toString provider.impersonated-anvil-account} && \
+        cast send --rpc-url ${toString provider.url} ${toString provider.impersonated-anvil-account} --value 1000ether --from 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f --unlocked";
       shutdown.signal = 9;
       depends_on = {
         "anvil-${name}".condition = "process_healthy";
