@@ -9,8 +9,6 @@ let
   inherit (self.lib) getReporterConfigFilename;
   inherit (import ./reporter-config.nix args) mkReporterConfig;
 
-  sequencer-config = import ./sequencer-config.nix args;
-
   reporter-configs = lib.mapAttrs' (
     name: opts: lib.nameValuePair (getReporterConfigFilename name) (mkReporterConfig opts)
   ) cfg.reporters;
@@ -20,6 +18,6 @@ in
 mkModuleSettings (
   reporter-configs
   // {
-    sequencer_config = sequencer-config;
+    sequencer_config = import ./sequencer-config.nix args;
   }
 )
