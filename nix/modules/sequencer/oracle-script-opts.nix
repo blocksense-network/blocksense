@@ -26,15 +26,15 @@ with lib;
       default = null;
     };
 
-    oracle_script_wasm = mkOption {
+    oracle-script-wasm = mkOption {
       type = types.str;
     };
 
-    interval_time_in_seconds = mkOption {
+    interval-time-in-seconds = mkOption {
       type = types.int;
     };
 
-    allowed_outbound_hosts = mkOption {
+    allowed-outbound-hosts = mkOption {
       type = types.listOf types.str;
     };
 

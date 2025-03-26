@@ -14,17 +14,17 @@ with lib;
         description = "The url of the registry.";
       };
 
-      reporter_id = mkOption {
+      reporter-id = mkOption {
         type = types.int;
         description = mdDoc "The reporter id.";
         example = 1;
       };
-      interval_time_in_seconds = mkOption {
+      interval-time-in-seconds = mkOption {
         type = types.int;
         default = 10;
         description = "The period in seconds to poll for new data.";
       };
-      secret_key = mkOption {
+      secret-key = mkOption {
         type = types.path;
         description = "The path to the reporter secret key.";
       };
