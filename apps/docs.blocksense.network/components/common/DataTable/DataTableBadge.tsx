@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 
 import { Badge } from '@blocksense/ui/Badge';
 
-import { isCellData, noCellData } from './dataTableUtils';
+import { cellHaveContent, noCellData } from './dataTableUtils';
 
 type DataTableBadgeProps = {
   children: ReactNode;
@@ -15,7 +15,7 @@ export const DataTableBadge = ({
   children,
   className,
 }: DataTableBadgeProps) => {
-  if (!isCellData(children)) {
+  if (!cellHaveContent(children)) {
     return noCellData;
   }
 

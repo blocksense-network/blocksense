@@ -22,7 +22,7 @@ import {
   DataRowType,
   DataTableProps,
   getSortingState,
-  isCellData,
+  cellHaveContent,
   noCellData,
 } from './dataTableUtils';
 
@@ -49,7 +49,7 @@ function DataTableContent({
     useContext(DataTableContext);
 
   function getRowLink(row: DataRowType) {
-    return rowLink && row.id ? `${rowLink}${row.id}` : '';
+    return rowLink && cellHaveContent(row.id) ? `${rowLink}${row.id}` : '';
   }
 
   return (
@@ -97,7 +97,7 @@ function DataTableContent({
                       <TableCell key={col.id} className="px-2 py-2.5">
                         {typeof col.cell === 'function'
                           ? col.cell({ row })
-                          : isCellData(row[col.id])
+                          : cellHaveContent(row[col.id])
                             ? row[col.id]
                             : noCellData}
                       </TableCell>

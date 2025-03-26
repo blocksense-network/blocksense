@@ -108,10 +108,11 @@ export function getSortingState(
   }
 }
 
-export function isCellData(children: any) {
+export function cellHaveContent(children: any) {
   if (children === null || children === undefined || children === '') {
     return false;
   }
   return true;
 }
+
 export const noCellData = '-';
