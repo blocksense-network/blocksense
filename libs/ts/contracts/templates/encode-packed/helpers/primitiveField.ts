@@ -65,7 +65,7 @@ export const generateDecoderPrimitiveLines = (
       }
       ${
         field.size < 256
-          ? `${generateSwitchCase(field.size, 'gt(offset, 256)')}`
+          ? `${generateSwitchCase(field.size, 'lt(offset, 256)')}`
           : `shift := add(shift, 32)`
       }
       memData := mload(add(data, shift))
