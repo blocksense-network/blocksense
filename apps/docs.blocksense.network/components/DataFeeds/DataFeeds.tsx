@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  decodeFeedsConfig,
+  decodeNewFeedsConfig,
   FeedsConfig,
 } from '@blocksense/config-types/data-feeds-config';
 import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
@@ -8,7 +8,7 @@ import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrap
 import { DataFeedsTable } from '@/components/DataFeeds/DataFeedsTable';
 
 export function getFeedsConfig() {
-  const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
+  const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
   return feedsConfig;
 }
 
