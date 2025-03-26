@@ -7,7 +7,7 @@ import React, {
 
 import { cn } from '@blocksense/ui/utils';
 
-type TooltipProps = {
+export type TooltipProps = {
   position?: 'top' | 'right' | 'bottom' | 'left';
   children: ReactNode;
   contentClassName?: string;
