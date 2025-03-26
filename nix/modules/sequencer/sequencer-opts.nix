@@ -270,7 +270,7 @@ in
     };
   };
 
-  http_input_buffer_size = mkOption {
+  http-input-buffer-size = mkOption {
     type = types.nullOr types.int;
     default = null;
     description = mdDoc "The size of the buffer for incoming HTTP requests.";
