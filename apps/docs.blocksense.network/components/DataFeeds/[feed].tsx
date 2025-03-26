@@ -34,25 +34,25 @@ export default async function DataFeed({ params }: DataFeedProps) {
   }
 
   const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
-  const feedsDeploymentInfo = decodeDeploymentConfigV1(
-    CONTRACTS_DEPLOYMENT_CONFIG,
-  )['ethereum-sepolia']?.contracts?.CLAggregatorAdapter;
+  // const feedsDeploymentInfo = decodeDeploymentConfigV1(
+  //   CONTRACTS_DEPLOYMENT_CONFIG,
+  // )['ethereum-sepolia']?.contracts?.CLAggregatorAdapter;
   const feed = feedsConfig.feeds.find(feed => feed.id === Number(feedId));
 
   if (!feed) {
     return <Error404 />;
   }
 
-  const feedDeploymentInfo = feedsDeploymentInfo?.find(
-    (info: CLAggregatorAdapterData) => info.description === feed.description,
-  );
+  // const feedDeploymentInfo = feedsDeploymentInfo?.find(
+  //   (info: CLAggregatorAdapterData) => info.description === feed.description,
+  // );
 
-  if (!feedDeploymentInfo) {
-    console.error(
-      `No deployment info found for feed: ${feed.description} (${feed.id})`,
-    );
-    return <Error404 />;
-  }
+  // if (!feedDeploymentInfo) {
+  //   console.error(
+  //     `No deployment info found for feed: ${feed.description} (${feed.id})`,
+  //   );
+  //   return <Error404 />;
+  // }
 
   const {
     id,
@@ -64,59 +64,59 @@ export default async function DataFeed({ params }: DataFeedProps) {
     type,
   } = feed;
 
-  const { base, quote, address } = feedDeploymentInfo;
+  // const { base, quote, address } = feedDeploymentInfo;
 
-  const feedRegistry = {
-    directAccess: (
-      <div className="text-sm text-gray-500 ml-2">
-        {
-          <div className="flex gap-2 justify-between items-center break-all">
-            Feed id:
-            <span className="flex gap-2 items-center">
-              <code className="inline">{id}</code>
-              <CopyButton
-                textToCopy={`${id}`}
-                tooltipPosition="top"
-                copyButtonClasses="translate-x-1"
-                background={false}
-              />
-            </span>
-          </div>
-        }
-      </div>
-    ),
-    chainlinkStyleRegistry:
-      base && quote ? (
-        <div className="text-sm text-gray-500 ml-2">
-          <div className="flex flex-col gap-2 justify-between break-all">
-            base:{' '}
-            <ContractAddress
-              address={base}
-              abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
-              copyButton={{ enableCopy: true, background: false }}
-            />
-          </div>
-          <div className="flex flex-col gap-2 justify-between break-all">
-            quote:{''}
-            <ContractAddress
-              address={quote}
-              abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
-              copyButton={{ enableCopy: true, background: false }}
-            />
-          </div>
-        </div>
-      ) : undefined,
-    aggregatorProxyAddress: (
-      <div className="text-sm text-gray-500 ml-2 flex flex-col gap-2 justify-between break-all">
-        address:{' '}
-        <ContractAddress
-          address={address}
-          abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
-          copyButton={{ enableCopy: true, background: false }}
-        />
-      </div>
-    ),
-  };
+  // const feedRegistry = {
+  //   directAccess: (
+  //     <div className="text-sm text-gray-500 ml-2">
+  //       {
+  //         <div className="flex gap-2 justify-between items-center break-all">
+  //           Feed id:
+  //           <span className="flex gap-2 items-center">
+  //             <code className="inline">{id}</code>
+  //             <CopyButton
+  //               textToCopy={`${id}`}
+  //               tooltipPosition="top"
+  //               copyButtonClasses="translate-x-1"
+  //               background={false}
+  //             />
+  //           </span>
+  //         </div>
+  //       }
+  //     </div>
+  //   ),
+  //   chainlinkStyleRegistry:
+  //     base && quote ? (
+  //       <div className="text-sm text-gray-500 ml-2">
+  //         <div className="flex flex-col gap-2 justify-between break-all">
+  //           base:{' '}
+  //           <ContractAddress
+  //             address={base}
+  //             abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+  //             copyButton={{ enableCopy: true, background: false }}
+  //           />
+  //         </div>
+  //         <div className="flex flex-col gap-2 justify-between break-all">
+  //           quote:{''}
+  //           <ContractAddress
+  //             address={quote}
+  //             abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+  //             copyButton={{ enableCopy: true, background: false }}
+  //           />
+  //         </div>
+  //       </div>
+  //     ) : undefined,
+  //   aggregatorProxyAddress: (
+  //     <div className="text-sm text-gray-500 ml-2 flex flex-col gap-2 justify-between break-all">
+  //       address:{' '}
+  //       <ContractAddress
+  //         address={address}
+  //         abbreviation={{ hasAbbreviation: true, bytesToShow: 4 }}
+  //         copyButton={{ enableCopy: true, background: false }}
+  //       />
+  //     </div>
+  //   ),
+  // };
 
   const dataFeedCardArray = [
     {
@@ -173,7 +173,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
             </div>
           </DataFeedCardSection>
         ))}
-        <DataFeedCardSection
+        {/* <DataFeedCardSection
           key={`evm-access-info`}
           title="EVM Access Info"
           description="To access that from this feed on-chain you can use one of the following approaches:"
@@ -231,7 +231,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
           description="If you have any questions speak with our team on one of the following platforms:"
         >
           <DataFeedCardContentItem label="" value={<QuestionsCardContent />} />
-        </DataFeedCardSection>
+        </DataFeedCardSection> */}
       </div>
     </div>
   );
