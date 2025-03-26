@@ -5,12 +5,12 @@
 }:
 let
   cfg = config.services.blocksense;
-  inherit (self.lib) dashToUnderscore;
+  inherit (self.lib) dashToUnderscoreRecursive;
 in
 {
   mkReporterConfig =
     reporter-opts:
-    dashToUnderscore {
+    dashToUnderscoreRecursive {
       inherit (reporter-opts) reporter-info;
 
       capabilities = builtins.attrValues (

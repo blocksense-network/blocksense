@@ -1,9 +1,9 @@
 { self, config, ... }:
 let
   cfg = config.services.blocksense;
-  inherit (self.lib) dashToUnderscore;
+  inherit (self.lib) dashToUnderscoreRecursive;
 in
-dashToUnderscore {
+dashToUnderscoreRecursive {
   inherit (cfg.sequencer)
     sequencer-id
     main-port
