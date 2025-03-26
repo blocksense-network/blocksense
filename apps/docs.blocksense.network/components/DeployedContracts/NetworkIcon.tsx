@@ -2,18 +2,12 @@ import * as React from 'react';
 import { Button } from 'nextra/components';
 
 import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
+import { capitalizeWords } from '@/src/utils';
 
 type NetworkIconProps = {
   network: string;
   isSelected: boolean;
   onClick: () => void;
-};
-
-const capitalizeWords = (input: string): string => {
-  return input
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
 };
 
 export const NetworkIcon = ({
