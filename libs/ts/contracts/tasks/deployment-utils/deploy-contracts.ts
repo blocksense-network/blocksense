@@ -66,18 +66,7 @@ task('deploy-contracts', '[UTILS] Deploy contracts to the network').setAction(
       const contractName = feedName
         ? `CLAggregatorAdapter - ${feedName}`
         : contract.name;
-      if (contract.feedRegistryInfo) {
-        console.log(
-          `Predicted address for '${contractName}': `,
-          contractAddress,
-          contract.feedRegistryInfo,
-        );
-      } else {
-        console.log(
-          `Predicted address for '${contractName}': `,
-          contractAddress,
-        );
-      }
+      console.log(`Predicted address for '${contractName}': `, contractAddress);
 
       if (!(await checkAddressExists(config, contractAddress))) {
         const encodedData = createCall.interface.encodeFunctionData(
