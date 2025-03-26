@@ -4,6 +4,7 @@ use blockchain_data_model::in_mem_db::InMemDb;
 use blockchain_data_model::{
     MAX_ASSET_FEED_UPDATES_IN_BLOCK, MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
 };
+use blocksense_registry::config::FeedConfig;
 use config::BlockConfig;
 use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
 use feed_registry::feed_registration_cmds::{
@@ -17,7 +18,9 @@ use serde_json::json;
 use std::collections::{HashMap, VecDeque};
 use std::io::Error;
 use std::mem;
+use std::sync::Arc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::sync::RwLock;
 use tokio::time::Duration;
 use tracing::{debug, error, info, info_span, warn};
 use utils::time::{current_unix_time, system_time_to_millis};
@@ -111,7 +114,7 @@ pub async fn block_creator_loop(
 
                     feed_update = aggregated_votes_to_block_creator_recv.recv() => {
                         debug!("Received votes over `aggregated_votes_to_block_creator_recv`: {feed_update:?}");
-                        recvd_feed_update_to_block(feed_update, updates, backlog_updates, max_feed_updates_to_batch);
+                        recvd_feed_update_to_block(feed_update, updates, backlog_updates, max_feed_updates_to_batch, &sequencer_state.active_feeds).await;
                     }
 
                     feed_management_cmd = feed_management_cmds_recv.recv() => {
@@ -124,17 +127,30 @@ pub async fn block_creator_loop(
 }
 
 // When we recv feed updates that have passed aggregation, we prepare them to be placed in the next generated block
-fn recvd_feed_update_to_block(
+async fn recvd_feed_update_to_block(
     recvd_feed_update: Option<VotedFeedUpdateWithProof>,
     updates_to_block: &mut Vec<VotedFeedUpdateWithProof>,
     backlog_updates: &mut VecDeque<VotedFeedUpdateWithProof>,
     max_feed_updates_to_batch: usize,
+    feeds_config: &Arc<RwLock<HashMap<u32, FeedConfig>>>,
 ) {
     match recvd_feed_update {
         Some(voted_update) => {
-            let (key, val) = voted_update
-                .update
-                .encode(18, voted_update.update.end_slot_timestamp as u64);
+            let digits_in_fraction: usize = {
+                if let Some(feed_config) =
+                    feeds_config.read().await.get(&voted_update.update.feed_id)
+                {
+                    feed_config.additional_feed_info.decimals.into()
+                } else {
+                    error!("Propagating result for unregistered feed {}! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18", voted_update.update.feed_id);
+                    18
+                }
+            };
+
+            let (key, val) = voted_update.update.encode(
+                digits_in_fraction,
+                voted_update.update.end_slot_timestamp as u64,
+            );
             info!("adding {:?} => {:?} to updates", key, val);
             if updates_to_block.len() < max_feed_updates_to_batch {
                 updates_to_block.push(voted_update);

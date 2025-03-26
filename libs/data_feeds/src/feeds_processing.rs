@@ -23,10 +23,10 @@ pub struct VotedFeedUpdateWithProof {
 }
 
 impl VotedFeedUpdate {
-    pub fn encode(&self, digits_in_fraction: usize, time_stamp: u64) -> (Vec<u8>, Vec<u8>) {
+    pub fn encode(&self, digits_in_fraction: usize, timestamp: u64) -> (Vec<u8>, Vec<u8>) {
         (
             self.feed_id.to_be_bytes().to_vec(),
-            naive_packing(&self.value, digits_in_fraction, time_stamp),
+            naive_packing(&self.value, digits_in_fraction, timestamp),
         )
     }
 
@@ -85,13 +85,9 @@ impl VotedFeedUpdate {
     }
 }
 
-pub fn naive_packing(
-    feed_result: &FeedType,
-    digits_in_fraction: usize,
-    time_stamp: u64,
-) -> Vec<u8> {
+pub fn naive_packing(feed_result: &FeedType, digits_in_fraction: usize, timestamp: u64) -> Vec<u8> {
     //TODO: Return Bytes32 type
-    feed_result.as_bytes(digits_in_fraction, time_stamp)
+    feed_result.as_bytes(digits_in_fraction, timestamp)
 }
 
 use std::collections::HashMap;
