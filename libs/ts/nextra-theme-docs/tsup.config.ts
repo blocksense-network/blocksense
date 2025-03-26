@@ -15,8 +15,7 @@ export default defineConfig({
   bundle: false,
   esbuildPlugins: [reactCompilerPlugin({ filter: /\.tsx?$/ })],
   async onSuccess() {
-    // Use Tailwind CSS CLI because CSS processing by tsup produce different result
-    await $`npx @tailwindcss/cli -i src/style.css -o dist/style.css`;
+    await $`yarn tailwindcss -i src/style.css -o dist/style.css`;
     const styleContent = await fs.readFile(
       path.resolve('dist', 'style.css'),
       'utf8',
