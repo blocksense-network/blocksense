@@ -2042,6 +2042,31 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/nft.blocksense.network@workspace:apps/nft.blocksense.network":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/nft.blocksense.network@workspace:apps/nft.blocksense.network"
+  dependencies:
+    "@blocksense/base-utils": "workspace:*"
+    "@blocksense/ui": "workspace:*"
+    "@tailwindcss/postcss": "npm:^4.0.7"
+    "@types/node": "npm:^22.10.2"
+    "@types/react": "npm:^18.3.3"
+    clsx: "npm:^2.1.1"
+    effect: "npm:^3.12.1"
+    next: "npm:^15.1.4"
+    postcss: "npm:^8.4.49"
+    prettier: "npm:^3.4.2"
+    react: "npm:^18.3.1"
+    react-dom: "npm:^18.3.1"
+    tailwind-merge: "npm:^2.6.0"
+    tailwindcss: "npm:^4.0.7"
+    tailwindcss-animate: "npm:^1.0.7"
+    tslib: "npm:^2.8.1"
+    tsx: "npm:^4.19.2"
+    typescript: "npm:^5.5.4"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/onchain-interactions@workspace:libs/ts/onchain-interactions":
   version: 0.0.0-use.local
   resolution: "@blocksense/onchain-interactions@workspace:libs/ts/onchain-interactions"

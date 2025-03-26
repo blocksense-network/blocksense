@@ -1,0 +1,32 @@
+{
+  "name": "@blocksense/nft.blocksense.network",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "types": "./src/index.ts",
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.3",
+    "prettier": "^3.4.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@blocksense/ui": "workspace:*",
+    "@tailwindcss/postcss": "^4.0.7",
+    "clsx": "^2.1.1",
+    "effect": "^3.12.1",
+    "next": "^15.1.4",
+    "postcss": "^8.4.49",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss": "^4.0.7",
+    "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.19.2"
+  }
+}
