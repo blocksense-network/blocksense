@@ -50,7 +50,7 @@
 
       devenv.shells =
         {
-          default.packages = builtins.attrValues runEnvironments;
+          # default.packages = builtins.attrValues runEnvironments;
         }
         // lib.genAttrs allEnvironmentNames (name: {
           imports = [
