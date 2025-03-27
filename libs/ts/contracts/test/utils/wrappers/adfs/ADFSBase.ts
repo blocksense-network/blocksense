@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { IADFSWrapper } from '../interfaces/IADFSWrapper';
 import { AggregatedDataFeedStore } from '../../../../typechain';
 import { AccessControlWrapper } from './AccessControl';
-import { Feed, ReadFeed, ReadOp } from '../types';
+import { Feed, ReadFeed, ReadOp, WriteOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { EventFragment, TransactionReceipt } from 'ethers';
 
@@ -151,7 +151,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     blockNumber ??= Date.now() + 100;
     const prefix = ethers.solidityPacked(
       ['bytes1', 'uint64', 'uint32'],
-      ['0x00', blockNumber, feeds.length],
+      [ethers.toBeHex(WriteOp.SetFeeds), blockNumber, feeds.length],
     );
 
     const data = feeds.map(feed => {

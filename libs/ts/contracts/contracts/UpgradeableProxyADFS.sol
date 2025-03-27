@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IUpgradeableProxy} from './interfaces/IUpgradeableProxy.sol';
-
 /// @title UpgradeableProxyADFS
 /// @notice Proxy contract that allows the implementation to be upgraded
 /// @dev This contract is reuses logic from the OpenZeppelin Transparent Proxy contract
@@ -38,23 +36,21 @@ contract UpgradeableProxyADFS {
   /// implementation or change the admin, depending on the message signature.
   /// In contrast to OZ's Transparent Proxy, the admin can call this contract to modify the proxy, as well as call the
   /// proxied contract.
+  /// All admin function selectors must have the first byte set to 0x00.
   fallback() external payable {
     bool isAdmin;
 
-    if (
-      msg.sig == IUpgradeableProxy.upgradeTo.selector ||
-      msg.sig == IUpgradeableProxy.setAdmin.selector
-    ) {
+    if (msg.sig == 0x00000001 || msg.sig == 0x00000002) {
       assembly {
         isAdmin := eq(caller(), sload(ADMIN_SLOT))
       }
 
       if (!isAdmin) revert ProxyDeniedAdminAccess();
 
-      if (msg.sig == IUpgradeableProxy.upgradeTo.selector) {
+      if (msg.sig == 0x00000001) {
         _upgradeTo(address(bytes20(msg.data[4:])));
         return;
-      } else if (msg.sig == IUpgradeableProxy.setAdmin.selector) {
+      } else if (msg.sig == 0x00000002) {
         _setAdmin(address(bytes20(msg.data[4:])));
         return;
       }

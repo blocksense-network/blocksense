@@ -14,6 +14,15 @@ export enum ReadOp {
   GetLatestSingleFeedAndRound = 0x03,
 }
 
+export enum WriteOp {
+  SetFeeds = 0x01,
+}
+
+export enum ProxyOp {
+  UpgradeTo = '0x00000001',
+  SetAdmin = '0x00000002',
+}
+
 export type ReadFeed = Omit<Feed, 'data' | 'slotsToRead'> &
   (
     | { data: string; slotsToRead: number } // Both are present

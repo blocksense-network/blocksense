@@ -216,6 +216,11 @@ contract AggregatedDataFeedStore {
     }
 
     /* WRITE - 1st bit of selector is 0 */
+    /*
+      IMPORTANT!
+      Selector 0x00 is reserved for admin operations via Upgradeable Proxy.
+      It should never be implemented as a write operation in this contract to prevent selector collisions.
+    */
     address accessControl = ACCESS_CONTROL;
 
     /*
@@ -247,10 +252,10 @@ contract AggregatedDataFeedStore {
 
       let data := calldataload(0)
       // setFeeds(bytes)
-      if eq(byte(0, data), 0) {
+      if eq(byte(0, data), 0x01) {
         // check if internal blocknumber is already set
         let prevBlockNumber := sload(0x00)
-        let newBlockNumber := shr(184, data)
+        let newBlockNumber := shr(192, shl(8, data))
 
         if eq(prevBlockNumber, newBlockNumber) {
           revert(0x00, 0x00)
