@@ -31,22 +31,22 @@ in
     description = mdDoc "Package to use as Sequencer node.";
   };
 
-  sequencer = import ./sequencer-opts.nix lib;
+  sequencer = import ./sequencer lib;
 
   oracles = mkOption {
-    type = types.attrsOf (mkSubmodule ./oracle-script-opts.nix);
+    type = types.attrsOf (mkSubmodule ./oracle-script.nix);
     default = { };
     description = mdDoc "The set of oracle scripts to build.";
   };
 
   reporters = mkOption {
-    type = types.attrsOf (mkSubmodule ./reporter-opts.nix);
+    type = types.attrsOf (mkSubmodule ./reporter.nix);
     default = { };
     description = mdDoc "The set of reporter instances to run.";
   };
 
   anvil = mkOption {
-    type = types.attrsOf (mkSubmodule ./anvil-opts.nix);
+    type = types.attrsOf (mkSubmodule ./anvil.nix);
     default = { };
     description = mdDoc "The Anvil instance to use.";
   };
