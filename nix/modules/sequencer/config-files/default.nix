@@ -1,11 +1,10 @@
 {
-  config,
+  cfg,
   lib,
   self,
   ...
 }@args:
 let
-  cfg = config.services.blocksense;
   inherit (self.lib) getReporterConfigFilename;
   inherit (import ./reporter-config.nix args) mkReporterConfig;
 
