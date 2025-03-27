@@ -87,6 +87,7 @@ const networks = [
   'songbird-coston',
   'sonic-blaze',
   'status-network-sepolia',
+  'swellchain-testnet',
   'taiko-mainnet',
   'taiko-hekla',
   'taraxa-testnet',
@@ -103,7 +104,7 @@ const chainIds = [
   100, 10200, 1666700000, 743111, 1663, 2424, 763373, 2358, 1285, 59144, 59141,
   994873017, 1952959480, 169, 3441006, 5003, 1750, 59902, 6342, 31611, 10143,
   2818, 2810, 10, 11155420, 5611, 7849306, 98867, 137, 80002, 1101, 2442, 57000,
-  200018, 31, 534352, 534351, 11011, 50312, 16, 57054, 1660990954, 167000,
+  200018, 31, 534352, 534351, 11011, 50312, 16, 57054, 1660990954, 1924, 167000,
   167009, 842, 41, 324, 300, 4801,
 ] as const;
 
@@ -612,6 +613,12 @@ export const networkMetadata = {
     chainId: 1660990954,
     isTestnet: true,
     explorerUrl: 'https://sepoliascan.status.network',
+    currency: Currency.ETH,
+  },
+  'swellchain-testnet': {
+    chainId: 1924,
+    isTestnet: true,
+    explorerUrl: 'https://swell-testnet-explorer.alt.technology',
     currency: Currency.ETH,
   },
   'taiko-mainnet': {
