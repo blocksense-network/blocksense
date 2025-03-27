@@ -394,6 +394,8 @@ pub async fn eth_batch_send_to_contract(
             result
         };
 
+        inc_metric!(provider_metrics, net, total_tx_sent);
+
         let tx_result_str = format!("{tx_result:?}");
         debug!("tx_result_str={tx_result_str}");
 
@@ -447,7 +449,6 @@ pub async fn eth_batch_send_to_contract(
         "Recvd transaction receipt that took {}ms from `{}`: {:?}",
         transaction_time, net, receipt
     );
-    inc_metric!(provider_metrics, net, total_tx_sent);
 
     let gas_used_value = receipt.gas_used;
     set_metric!(provider_metrics, net, gas_used, gas_used_value);
