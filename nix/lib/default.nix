@@ -26,6 +26,4 @@ lib: rec {
         };
     in
     builtins.listToAttrs (map transformAttr (builtins.attrNames attrs));
-
-  getReporterConfigFilename = name: "reporter_config_${name}";
 }

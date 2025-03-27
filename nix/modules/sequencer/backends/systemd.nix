@@ -1,4 +1,4 @@
-{ self', self, ... }:
+{ self', ... }:
 {
   config,
   lib,
@@ -54,11 +54,10 @@ let
           StateDirectory = serviceName;
           WorkingDirectory = "/var/lib/${serviceName}";
           ExecStartPre = wasmCopyCmd;
-          ExecStart =
-            let
-              reporter-config = cfg.config-files.${self.lib.getReporterConfigFilename name};
-            in
-            "${blocksense.program} node build --from ${reporter-config.path} --up";
+          ExecStart = ''
+            ${blocksense.program} node build --up \
+              --from ${cfg.config-files."reporter_config_${name}".path}
+          '';
           Restart = "on-failure";
         };
       };
