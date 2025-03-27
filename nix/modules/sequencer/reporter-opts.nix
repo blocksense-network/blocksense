@@ -1,16 +1,16 @@
-{ lib, blocksense, ... }:
+{ lib, cfg, ... }:
 with lib;
 {
   options = {
     reporter-info = {
       sequencer = mkOption {
         type = types.str;
-        default = "http://127.0.0.1:${toString blocksense.sequencer.main-port}";
+        default = "http://127.0.0.1:${toString cfg.sequencer.main-port}";
         description = "The url of the sequencer.";
       };
       registry = mkOption {
         type = types.str;
-        default = "http://127.0.0.1:${toString blocksense.sequencer.admin-port}";
+        default = "http://127.0.0.1:${toString cfg.sequencer.admin-port}";
         description = "The url of the registry.";
       };
 
@@ -34,7 +34,7 @@ with lib;
       };
       kafka-endpoint = mkOption {
         type = types.str;
-        default = blocksense.sequencer.kafka-report-endpoint.url;
+        default = cfg.sequencer.kafka-report-endpoint.url;
         description = "The url of the kafka server.";
       };
     };
