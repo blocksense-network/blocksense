@@ -1,13 +1,10 @@
-{ self', ... }:
+{ self', cfg, ... }:
 {
-  config,
   lib,
   pkgs,
   ...
 }:
 let
-  cfg = config.services.blocksense;
-
   inherit (self'.apps) sequencer blocksense;
 
   anvilInstances = lib.mapAttrs' (
