@@ -15,7 +15,6 @@
           cfg = config.services.blocksense;
 
           inherit (withSystem pkgs.stdenv.hostPlatform.system (args: args)) inputs' self';
-          inherit (config.services) blocksense;
 
           specialArgs = {
             inherit
@@ -24,7 +23,7 @@
               self'
               inputs
               inputs'
-              blocksense
+              cfg
               ;
           };
 
