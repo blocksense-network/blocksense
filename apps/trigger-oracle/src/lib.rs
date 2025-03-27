@@ -18,6 +18,7 @@ use tokio::{
             channel, error::RecvError, Receiver as BroadcastReceiver, Sender as BroadcastSender,
         },
         mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
+        RwLock,
     },
     task::{spawn, Builder, JoinHandle},
     time::{sleep, Duration},
@@ -68,6 +69,7 @@ use blocksense::oracle::oracle_types as oracle;
 
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
+type DataFeedResults = Arc<RwLock<HashMap<String, FeedType>>>;
 
 const TIME_BEFORE_KAFKA_READ_RETRY_IN_MS: u64 = 500;
 const TOTAL_RETRIES_FOR_KAFKA_READ: u64 = 10;
@@ -280,6 +282,7 @@ impl TriggerExecutor for OracleTrigger {
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
         let (aggregated_consensus_sender, aggregated_consensus_receiver) = unbounded_channel();
         let (signal_data_feed_sender, _) = channel(16);
+        let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
         //TODO(adikov): Move all the logic to a different struct and handle
         //errors properly.
         // For each component, run its own timer loop
@@ -322,6 +325,7 @@ impl TriggerExecutor for OracleTrigger {
         let mut manager = Self::start_manager(
             data_feed_receiver,
             aggregated_consensus_receiver,
+            data_feed_results,
             &sequencer_post_batch_url,
             &sequencer_aggregated_consensus_url,
             &self.secret_key,
@@ -630,9 +634,11 @@ impl OracleTrigger {
         TerminationReason::Other("Signal secondary consensus loop terminated".to_string())
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn start_manager(
         payload_rx: UnboundedReceiver<(String, Payload)>,
         second_consensus_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
+        data_feed_results: DataFeedResults,
         sequencer_post_batch_url: &Url,
         sequencer_aggregated_consensus_url: &Url,
         secret_key: &str,
@@ -641,6 +647,7 @@ impl OracleTrigger {
     ) -> Vec<JoinHandle<TerminationReason>> {
         let process_payload_future = Self::process_payload(
             payload_rx,
+            data_feed_results.clone(),
             sequencer_post_batch_url.to_owned(),
             secret_key.to_owned(),
             reporter_id,
@@ -648,6 +655,7 @@ impl OracleTrigger {
 
         let process_aggregated_consensus_future = Self::process_aggregated_consensus(
             second_consensus_rx,
+            data_feed_results.clone(),
             sequencer_aggregated_consensus_url.to_owned(),
             second_consensus_secret_key.to_owned(),
             reporter_id,
@@ -661,6 +669,7 @@ impl OracleTrigger {
 
     async fn process_payload(
         mut rx: UnboundedReceiver<(String, Payload)>,
+        data_feed_results: DataFeedResults,
         sequencer_url: Url,
         secret_key: String,
         reporter_id: u64,
@@ -675,8 +684,24 @@ impl OracleTrigger {
             let mut batch_payload = vec![];
             for oracle::DataFeedResult { id, value } in payload.values {
                 let result = match value {
-                    oracle::DataFeedResultValue::Numerical(value) => Ok(FeedType::Numerical(value)),
-                    oracle::DataFeedResultValue::Text(value) => Ok(FeedType::Text(value)),
+                    oracle::DataFeedResultValue::Numerical(value) => {
+                        let feed = FeedType::Numerical(value);
+                        data_feed_results
+                            .write()
+                            .await
+                            .entry(id.clone())
+                            .or_insert_with(|| feed.clone());
+                        Ok(feed)
+                    }
+                    oracle::DataFeedResultValue::Text(value) => {
+                        let feed = FeedType::Text(value);
+                        data_feed_results
+                            .write()
+                            .await
+                            .entry(id.clone())
+                            .or_insert_with(|| feed.clone());
+                        Ok(feed)
+                    }
                     oracle::DataFeedResultValue::Error(error_string) => {
                         Err(FeedError::APIError(error_string))
                     }
@@ -686,7 +711,6 @@ impl OracleTrigger {
                         continue;
                     }
                 };
-
                 let signature =
                     generate_signature(&secret_key, id.as_str(), timestamp, &result).unwrap();
 
@@ -739,6 +763,7 @@ impl OracleTrigger {
 
     async fn process_aggregated_consensus(
         mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
+        _data_feed_results: DataFeedResults,
         sequencer: Url,
         second_consensus_secret_key: String,
         reporter_id: u64,
