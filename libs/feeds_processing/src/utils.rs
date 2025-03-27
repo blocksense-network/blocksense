@@ -518,7 +518,7 @@ pub mod tests {
             safe_address: "0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C".to_string(),
             nonce: "10".to_string(),
             chain_id: "31337".to_string(),
-            tx_hash: "0x1c856b6abec5d4168b8bdd0509da6f84a486081c19ba2e49e8acc28af6d615dc"
+            tx_hash: "0xf2ee45d69fc602204159abf6efaf49991f24db7d6ee89b679441d20d15f55bd3"
                 .to_string(),
             calldata: hex::encode(calldata),
             updates,
