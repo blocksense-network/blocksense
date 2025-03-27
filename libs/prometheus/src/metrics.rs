@@ -162,44 +162,44 @@ pub struct ProviderMetrics {
 impl ProviderMetrics {
     pub fn new(prefix: &str) -> Result<ProviderMetrics> {
         Ok(ProviderMetrics {
-        total_tx_sent: register_int_counter_vec!(
-            format!("{}total_tx_sent", prefix),
-            "Total number of tx sent",
-            &["Network"]
-        )?,
-        gas_used: register_int_gauge_vec!(
-            format!("{}gas_used", prefix),
-            "Gas used by each transaction",
-            &["Network"]
-        )?,
-        effective_gas_price: register_int_gauge_vec!(
-            format!("{}effective_gas_price", prefix),
-            // Reference: https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionreceipt.
-            "Sum of the base fee and tip paid per unit of gas",
-            &["Network"]
-        )?,
-        transaction_confirmation_time: register_int_gauge_vec!(
-            format!("{}transaction_confirmation_time", prefix),
-            "Time it took to send a transaction and receive a receipt",
-            &["Network"],
-        )?,
-        gas_price: register_int_gauge_vec!(
-            format!("{}gas_price", prefix),
-            "Current gas price in wei (base fee)",
-            &["Network"]
-        )?,
-        failed_send_tx: register_int_counter_vec!(
-            format!("{}failed_send_tx", prefix),
-            "Total number of failed tx for network",
-            &["Network"]
-        )?,
-        failed_get_receipt: register_int_counter_vec!(
-            format!("{}failed_get_receipt", prefix),
-            "Total number of failed get_receipt req-s for network",
-            &["Network"]
-        )?,
-        failed_get_gas_price: register_int_counter_vec!(
-            format!("{}failed_get_gas_price", prefix),
+            total_tx_sent: register_int_counter_vec!(
+                format!("{}total_tx_sent", prefix),
+                "Total number of tx sent",
+                &["Network"]
+            )?,
+            gas_used: register_int_gauge_vec!(
+                format!("{}gas_used", prefix),
+                "Gas used by each transaction",
+                &["Network"]
+            )?,
+            effective_gas_price: register_int_gauge_vec!(
+                format!("{}effective_gas_price", prefix),
+                // Reference: https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionreceipt.
+                "Sum of the base fee and tip paid per unit of gas",
+                &["Network"]
+            )?,
+            transaction_confirmation_time: register_int_gauge_vec!(
+                format!("{}transaction_confirmation_time", prefix),
+                "Time it took to send a transaction and receive a receipt",
+                &["Network"],
+            )?,
+            gas_price: register_int_gauge_vec!(
+                format!("{}gas_price", prefix),
+                "Current gas price in wei (base fee)",
+                &["Network"]
+            )?,
+            failed_send_tx: register_int_counter_vec!(
+                format!("{}failed_send_tx", prefix),
+                "Total number of failed tx for network",
+                &["Network"]
+            )?,
+            failed_get_receipt: register_int_counter_vec!(
+                format!("{}failed_get_receipt", prefix),
+                "Total number of failed get_receipt req-s for network",
+                &["Network"]
+            )?,
+            failed_get_gas_price: register_int_counter_vec!(
+                format!("{}failed_get_gas_price", prefix),
                 "Total number of failed get_gas_price req-s for network",
                 &["Network"]
             )?,
