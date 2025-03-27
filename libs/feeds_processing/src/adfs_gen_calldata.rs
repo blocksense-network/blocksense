@@ -310,56 +310,51 @@ pub mod tests {
             })
         }
 
-        let config = HashMap::from([
-            (
-                1,
-                FeedStrideAndDecimals {
-                    stride: 1,
-                    decimals: 18,
-                },
-            ),
-            (
-                2,
+        let mut config = HashMap::new();
+
+        for feed_id in 0..16 {
+            config.insert(
+                feed_id,
                 FeedStrideAndDecimals {
                     stride: 0,
                     decimals: 18,
                 },
-            ),
-            (
-                3,
-                FeedStrideAndDecimals {
-                    stride: 0,
-                    decimals: 18,
-                },
-            ),
-            (
-                4,
-                FeedStrideAndDecimals {
-                    stride: 0,
-                    decimals: 18,
-                },
-            ),
-            (
-                5,
-                FeedStrideAndDecimals {
-                    stride: 0,
-                    decimals: 18,
-                },
-            ),
-        ]);
+            );
+        }
+        config.insert(
+            1,
+            FeedStrideAndDecimals {
+                stride: 1,
+                decimals: 18,
+            },
+        );
 
         let feeds_metrics = static_feeds_metrics(net);
 
-        assert_eq!("0000000000499602d2000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200000000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000",
+        let expected_result = "0000000000499602d2000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200000000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
+
+        let mut feeds_rounds = HashMap::new();
+
+        // Call as it will be in the sequencer
+        assert_eq!(
+            expected_result,
             adfs_serialize_updates(
                 net,
                 &updates,
                 Some(feeds_metrics.clone()),
-                config,
-                &mut HashMap::new(),
+                config.clone(),
+                &mut feeds_rounds,
             )
             .await
             .unwrap()
+        );
+
+        // Call as it will be in the reporter (feeds_rounds provided by the sequencer)
+        assert_eq!(
+            expected_result,
+            adfs_serialize_updates(net, &updates, None, config, &mut feeds_rounds,)
+                .await
+                .unwrap()
         );
     }
 }

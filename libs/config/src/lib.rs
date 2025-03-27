@@ -86,6 +86,7 @@ impl Validated for FeedConfig {
     }
 }
 
+#[derive(Clone)]
 pub struct FeedStrideAndDecimals {
     pub stride: u16,
     pub decimals: u8,
