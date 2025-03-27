@@ -1,7 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+//    ___  __         __                           _  __    __                  __
+//   / _ )/ /__  ____/ /__ ___ ___ ___  ___ ___   / |/ /__ / /__    _____  ____/ /__
+//  / _  / / _ \/ __/  '_/(_-</ -_) _ \(_-</ -_) /    / -_) __/ |/|/ / _ \/ __/  '_/
+// /____/_/\___/\__/_/\_\/___/\__/_//_/___/\__/ /_/|_/\__/\__/|__,__/\___/_/ /_/\_\
+//    _____   ____  ___    ___   ___  ________
+//   / __/ | / /  |/  /   / _ | / _ \/ __/ __/
+//  / _/ | |/ / /|_/ /   / __ |/ // / _/_\ \
+// /___/ |___/_/  /_/   /_/ |_/____/_/ /___/
+//
+// Website:         https://blocksense.network/
+// Git Repository:  https://github.com/blocksense-network/blocksense
+
 /// @title CLAdapterLib
+/// @author Aneta Tsvetkova
 /// @notice Library for calling dataFeedStore functions for Chainlink adapters
 /// @dev Contains utility functions for calling gas efficiently dataFeedStore functions and decoding return data
 library CLAdapterLib {

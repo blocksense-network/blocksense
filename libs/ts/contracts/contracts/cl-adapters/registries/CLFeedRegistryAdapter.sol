@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright (c) 2024-2025 Schelling Point Labs Inc.
 pragma solidity ^0.8.24;
 
 import '../../interfaces/ICLFeedRegistryAdapter.sol';
@@ -6,6 +7,7 @@ import {ICLAggregatorAdapter} from '../../interfaces/ICLAggregatorAdapter.sol';
 import {CLAdapterLib} from '../../libraries/CLAdapterLib.sol';
 
 /// @title Registry aggregating information from CLAggregatorAdapters and the feed itself
+/// @author Aneta Tsvetkova
 /// @notice This contract is used to store and retrieve information about feeds
 /// @dev To reduce gas costs, the contract calls the dataFeedStore directly instead of using the CLAggregatorAdapter
 contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {

@@ -3,6 +3,10 @@ pragma solidity ^0.8.24;
 
 import '@safe-global/safe-contracts/contracts/base/ModuleManager.sol';
 
+/// @title AdminExecutorModule
+/// @author Aneta Tsvetkova
+/// @notice Module that allows the admin multisig to execute transactions on the multisig
+/// @dev This module is used to execute transactions on the multisig from the admin multisig
 contract AdminExecutorModule {
   address payable public immutable MULTISIG;
   address public immutable ADMIN_MULTISIG;

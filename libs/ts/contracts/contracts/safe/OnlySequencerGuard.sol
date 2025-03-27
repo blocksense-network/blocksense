@@ -5,6 +5,7 @@ import '@safe-global/safe-contracts/contracts/common/Enum.sol';
 import '@safe-global/safe-contracts/contracts/base/GuardManager.sol';
 
 /// @title OnlySequencerGuard
+/// @author Aneta Tsvetkova
 /// @notice Guard that restricts signed dataFeedStore calls to be only executed by the sequencer
 contract OnlySequencerGuard is BaseGuard {
   mapping(address => bool) public sequencers;

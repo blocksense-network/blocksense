@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
+// SPDX-FileCopyrightText: Copyright (c) 2024-2025 Schelling Point Labs Inc.
 pragma solidity ^0.8.24;
 
 import '../interfaces/ICLAggregatorAdapter.sol';
 import {CLAdapterLib} from '../libraries/CLAdapterLib.sol';
 
 /// @title CLAggregatorAdapter
+/// @author Aneta Tsvetkova
 /// @notice Contract that proxies calls to the dataFeedStore
 /// @notice This contract is responsible for fetching data for one feed only
 contract CLAggregatorAdapter is ICLAggregatorAdapter {
