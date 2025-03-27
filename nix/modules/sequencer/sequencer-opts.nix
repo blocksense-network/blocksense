@@ -1,8 +1,4 @@
 lib:
-# config:
-# let
-#   cfg = config.services.blocksense;
-# in
 with lib;
 let
   providerOpts = {
@@ -26,7 +22,6 @@ let
 
       url = mkOption {
         type = types.str;
-        # default = "http://127.0.0.1:${toString port}";
         description = mdDoc "The URL of the provider.";
       };
 
