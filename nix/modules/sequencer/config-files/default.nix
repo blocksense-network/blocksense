@@ -1,15 +1,13 @@
 {
   cfg,
   lib,
-  self,
   ...
 }@args:
 let
-  inherit (self.lib) getReporterConfigFilename;
   inherit (import ./reporter-config.nix args) mkReporterConfig;
 
   reporter-configs = lib.mapAttrs' (
-    name: opts: lib.nameValuePair (getReporterConfigFilename name) (mkReporterConfig opts)
+    name: opts: lib.nameValuePair "reporter_config_${name}" (mkReporterConfig opts)
   ) cfg.reporters;
 
   mkModuleSettings = builtins.mapAttrs (_: value: { settings = value; });

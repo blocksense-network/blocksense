@@ -1,4 +1,4 @@
-{ self', self, ... }:
+{ self', ... }:
 {
   config,
   lib,
@@ -81,16 +81,13 @@ let
           working_dir = toString (/. + config.devenv.state + /blocksense/reporter/${name});
         in
         {
-          command =
-            let
-              reporter-config = cfg.config-files.${self.lib.getReporterConfigFilename name};
-            in
-            ''
-              mkdir -p "${working_dir}" &&
-              cd "${working_dir}" &&
-              ${installOracleScripts working_dir} &&
-              ${blocksense.program} node build --from ${reporter-config.path} --up
-            '';
+          command = ''
+            mkdir -p "${working_dir}" &&
+            cd "${working_dir}" &&
+            ${installOracleScripts working_dir} &&
+            ${blocksense.program} node build --up \
+              --from ${cfg.config-files."reporter_config_${name}".path}
+          '';
           environment = [ "RUST_LOG=${log-level}" ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
