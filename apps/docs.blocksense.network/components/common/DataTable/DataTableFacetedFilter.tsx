@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 
-import { cn } from '@blocksense/ui/utils';
 import { Button } from '@blocksense/ui/Button';
 import {
   Command,
@@ -19,6 +18,7 @@ import {
   PopoverTrigger,
 } from '@blocksense/ui/Popover';
 import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
+import { Checkbox } from '@blocksense/ui/Checkbox';
 
 interface DataTableFacetedFilterProps {
   title: string;
@@ -33,6 +33,14 @@ export function DataTableFacetedFilter({
   selectedValues = [],
   setSelectedValuesAction,
 }: DataTableFacetedFilterProps) {
+  const handleCheckboxChange = (option: string) => {
+    if (selectedValues.includes(option)) {
+      setSelectedValuesAction(selectedValues.filter(value => value !== option));
+    } else {
+      setSelectedValuesAction([...selectedValues, option]);
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger>
@@ -56,34 +64,19 @@ export function DataTableFacetedFilter({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map(option => {
-                const isSelected = selectedValues.includes(option);
                 return (
                   <CommandItem
                     key={option}
-                    onSelect={() => {
-                      if (isSelected) {
-                        setSelectedValuesAction(
-                          selectedValues.filter(v => v !== option),
-                        );
-                      } else {
-                        setSelectedValuesAction([...selectedValues, option]);
-                      }
-                    }}
+                    onSelect={() => handleCheckboxChange(option)}
                   >
-                    <aside
-                      className={cn(
-                        'mr-2 flex h-4 w-4 items-center justify-center rounded-xs border border-solid border-neutral-400 dark:border-neutral-600 invert',
-                      )}
+                    <Checkbox
+                      id={option}
+                      value={option}
+                      checked={selectedValues.includes(option)}
+                      onChange={() => handleCheckboxChange(option)}
                     >
-                      {isSelected && (
-                        <ImageWrapper
-                          src="/icons/check.svg"
-                          alt="Check"
-                          className="h4 w-4"
-                        />
-                      )}
-                    </aside>
-                    {option}
+                      {option}
+                    </Checkbox>
                   </CommandItem>
                 );
               })}

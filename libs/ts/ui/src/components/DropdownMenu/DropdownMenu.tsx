@@ -10,10 +10,12 @@ import React, {
   ReactNode,
   RefObject,
   MouseEvent,
+  ChangeEvent,
 } from 'react';
 
 import { Icon } from '@blocksense/ui/Icon';
 import { cn, getSideAlignClasses, Align, Side } from '@blocksense/ui/utils';
+import { Checkbox } from '@blocksense/ui/Checkbox';
 
 interface DropdownContextValue {
   open: boolean;
@@ -146,10 +148,20 @@ export const DropdownMenuCheckboxItem = ({
 }: HTMLAttributes<HTMLDivElement> & {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
-  children: ReactNode;
+  children: string;
 }) => {
+  const [dropdownChecked, setDropdownChecked] = useState(checked);
+
+  useEffect(() => {
+    onCheckedChange(dropdownChecked);
+  }, [dropdownChecked]);
+
   const handleClick = () => {
-    onCheckedChange(!checked);
+    setDropdownChecked(state => !state);
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setDropdownChecked(e.target.checked);
   };
 
   return (
@@ -158,18 +170,14 @@ export const DropdownMenuCheckboxItem = ({
       className={cn('dropdown-menu__checkbox-item pr-2', className)}
       {...props}
     >
-      <span className="mr-2 flex items-center justify-center">
-        <Icon
-          icon={{
-            type: 'image',
-            src: '/icons/check.svg',
-          }}
-          ariaLabel="Check"
-          className={`dark:invert ${checked ? 'opacity-100' : 'opacity-0'}`}
-          size="xs"
-        />
-      </span>
-      {children}
+      <Checkbox
+        id={children}
+        value={children}
+        checked={dropdownChecked}
+        onChange={handleChange}
+      >
+        {children}
+      </Checkbox>
     </DropdownMenuItem>
   );
 };
