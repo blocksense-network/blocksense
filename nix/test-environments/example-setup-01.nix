@@ -9,12 +9,12 @@ let
 
   testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
   deploymentV1FilePath = config.devenv.root + "/config/evm_contracts_deployment_v1.json";
-  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2.json";
+  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
 
   upgradeableProxyContractAddressSepolia =
     (readJson deploymentV1FilePath)."ethereum-sepolia".contracts.coreContracts.UpgradeableProxy.address;
   upgradeableProxyADFSContractAddressInk =
-    (readJson deploymentV2FilePath)."ink-sepolia".contracts.coreContracts.UpgradeableProxyADFS.address;
+    (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
 
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
