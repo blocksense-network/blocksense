@@ -71,6 +71,7 @@ const networks = [
   'optimism-sepolia',
   'opbnb-testnet',
   'ozean-poseidon-testnet',
+  'plume-testnet',
   'polygon-mainnet',
   'polygon-amoy',
   'polygon-zkevm-mainnet',
@@ -100,7 +101,7 @@ const chainIds = [
   42220, 44787, 5115, 66665, 338, 111557560, 18880, 250, 4002, 114, 10888, 100,
   10200, 1666700000, 743111, 1663, 2424, 763373, 2358, 1285, 59144, 59141,
   994873017, 1952959480, 169, 3441006, 5003, 1750, 59902, 6342, 31611, 10143,
-  2818, 2810, 10, 11155420, 5611, 7849306, 137, 80002, 1101, 2442, 57000,
+  2818, 2810, 10, 11155420, 5611, 7849306, 98867, 137, 80002, 1101, 2442, 57000,
   200018, 31, 534352, 534351, 11011, 50312, 16, 57054, 1660990954, 167000,
   167009, 842, 41, 324, 300, 4801,
 ] as const;
@@ -143,6 +144,7 @@ export enum Currency {
   MON = 'MON',
   MOVR = 'MOVR',
   ONE = 'ONE',
+  PLUME = 'PLUME',
   POL = 'POL',
   ROME = 'ROME',
   S = 'S',
@@ -513,6 +515,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://ozean-testnet.explorer.caldera.xyz',
     currency: Currency.USDX,
+  },
+  'plume-testnet': {
+    chainId: 98867,
+    isTestnet: true,
+    explorerUrl: 'https://testnet-explorer.plumenetwork.xyz',
+    currency: Currency.PLUME,
   },
   'polygon-mainnet': {
     chainId: 137,
