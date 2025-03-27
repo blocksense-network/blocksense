@@ -209,13 +209,13 @@ export const DialogWithDropdown = () => {
                   checked={optionA}
                   onCheckedChange={setOptionA}
                 >
-                  Option A {optionA ? '(On)' : '(Off)'}
+                  Option A
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
                   checked={optionB}
                   onCheckedChange={setOptionB}
                 >
-                  Option B {optionB ? '(On)' : '(Off)'}
+                  Option B
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuItem>Another Item</DropdownMenuItem>
               </DropdownMenuContent>
