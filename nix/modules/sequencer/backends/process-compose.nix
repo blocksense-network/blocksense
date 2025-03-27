@@ -1,12 +1,10 @@
-{ self', ... }:
+{ self', cfg, ... }:
 {
   config,
   lib,
   ...
 }:
 let
-  cfg = config.services.blocksense;
-
   inherit (self'.apps)
     sequencer
     blocksense
