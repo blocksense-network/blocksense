@@ -156,6 +156,7 @@ pub struct ProviderMetrics {
     pub success_get_max_priority_fee_per_gas: IntCounterVec,
     pub success_get_chain_id: IntCounterVec,
     pub total_timed_out_tx: IntCounterVec,
+    pub is_enabled: IntGaugeVec,
 }
 
 impl ProviderMetrics {
@@ -240,6 +241,11 @@ impl ProviderMetrics {
             total_timed_out_tx: register_int_counter_vec!(
                 format!("{}total_timed_out_tx", prefix),
                 "Total number of tx sent that reached the configured timeout before completion for network",
+                &["Network"]
+            )?,
+            is_enabled: register_int_gauge_vec!(
+                format!("{}is_enabled", prefix),
+                "Whether the network is currently enabled or not",
                 &["Network"]
             )?,
         })

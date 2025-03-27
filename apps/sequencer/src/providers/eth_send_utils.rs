@@ -527,7 +527,16 @@ pub async fn eth_batch_send_to_all_contracts(
             let net = net.clone();
 
             if let Some(provider_settings) = providers_config.get(&net) {
-                if !provider_settings.is_enabled {
+                let is_enabled_value = provider_settings.is_enabled;
+                {
+                    debug!("Acquiring a read lock on provider for network {net}");
+                    let p = provider.lock().await;
+                    debug!("Acquired a read lock on provider for network {net}");
+                    let provider_metrics = p.provider_metrics.clone();
+                    set_metric!(provider_metrics, net, is_enabled, is_enabled_value);
+                    debug!("Released a read lock on provider for network {net}");
+                }
+                if !is_enabled_value {
                     warn!("Network `{net}` is not enabled; skipping it during reporting");
                     continue;
                 } else {
