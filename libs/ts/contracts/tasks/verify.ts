@@ -1,10 +1,9 @@
 import { task } from 'hardhat/config';
 
 import {
-  configDir,
+  configDirs,
   entries,
   EthereumAddress,
-  parseNetworkName,
   selectDirectory,
 } from '@blocksense/base-utils';
 
@@ -29,14 +28,13 @@ task('etherscan-verify', 'Verify contracts on Etherscan').setAction(
           throw e;
         }
       });
-
-    const fileName = `evm_contracts_deployment_v2/${network.name}`;
-    const { decodeJSON } = selectDirectory(configDir);
-    const deployment = await decodeJSON(
-      { name: fileName },
+    const { decodeJSON } = selectDirectory(
+      configDirs.evm_contracts_deployment_v2,
+    );
+    const deploymentData = await decodeJSON(
+      { name: network.name },
       DeploymentConfigSchemaV2,
     );
-    const deploymentData = deployment[parseNetworkName(network.name)];
     if (!deploymentData) {
       console.error(`Deployment data not found for network: '${network.name}'`);
       process.exit(1);

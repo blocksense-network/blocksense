@@ -19,3 +19,10 @@ export const configFiles = {
     'evm_contracts_deployment_v1.json',
   ),
 };
+
+export const configDirs = {
+  ['evm_contracts_deployment_v2']: join(
+    configDir,
+    'evm_contracts_deployment_v2',
+  ),
+};

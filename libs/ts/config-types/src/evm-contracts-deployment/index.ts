@@ -88,16 +88,13 @@ export const DeploymentConfigSchemaV1 = S.mutable(
 export type DeploymentConfigV1 = S.Schema.Type<typeof DeploymentConfigSchemaV1>;
 
 export const DeploymentConfigSchemaV2 = S.mutable(
-  S.Record({
-    key: networkName,
-    value: S.UndefinedOr(
-      S.Struct({
-        chainId: chainId,
-        contracts: ContractsConfigSchemaV2,
-      }),
-    ),
+  S.Struct({
+    name: networkName,
+    chainId: chainId,
+    contracts: ContractsConfigSchemaV2,
   }),
 );
+
 export type DeploymentConfigV2 = S.Schema.Type<typeof DeploymentConfigSchemaV2>;
 
 export const decodeDeploymentConfigV1 = S.decodeUnknownSync(

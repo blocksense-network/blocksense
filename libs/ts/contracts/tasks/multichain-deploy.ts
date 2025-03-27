@@ -10,15 +10,16 @@ import {
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 
-import { configDir, getOptionalEnvString } from '@blocksense/base-utils/env';
+import {
+  configDir,
+  configDirs,
+  getOptionalEnvString,
+} from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
 import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
-import {
-  DeploymentConfigV2,
-  DeploymentConfigSchemaV2,
-} from '@blocksense/config-types/evm-contracts-deployment';
+import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { predictAddress } from './utils';
 
 task('deploy', 'Deploy contracts')
@@ -261,20 +262,18 @@ const saveDeployment = async (
   configs: NetworkConfig[],
   chainsDeployment: DeploymentConfigV2,
 ) => {
-  const { writeJSON } = selectDirectory(configDir);
+  const { writeJSON } = selectDirectory(configDirs.evm_contracts_deployment_v2);
 
   for (const config of configs) {
     const networkName = getNetworkNameByChainId(
       parseChainId(config.network.chainId),
     );
 
-    const fileName = `evm_contracts_deployment_v2/${networkName}`;
-
     const deploymentData = {
       name: networkName,
       ...chainsDeployment[networkName],
     };
 
-    await writeJSON({ name: fileName, content: deploymentData });
+    await writeJSON({ name: networkName, content: deploymentData });
   }
 };
