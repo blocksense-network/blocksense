@@ -8,12 +8,7 @@ import { Input } from '@blocksense/ui/Input';
 
 type CheckboxProps = InputHTMLAttributes<HTMLInputElement>;
 
-export const Checkbox = ({
-  checked,
-  children,
-  className,
-  ...props
-}: CheckboxProps) => {
+export const Checkbox = ({ children, className, ...props }: CheckboxProps) => {
   const inputElement = (
     <Input
       type="checkbox"
@@ -29,6 +24,9 @@ export const Checkbox = ({
       >
         {inputElement}
         <Label
+          onClick={e => {
+            e.stopPropagation();
+          }}
           htmlFor={props.id}
           className="checkbox__label text-md cursor-pointer"
         >

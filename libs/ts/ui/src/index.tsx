@@ -23,4 +23,5 @@ export * from './components/Popover';
 export * from './components/TextArea';
 export * from './components/RadioGroup';
 export * from './components/InfoTip';
+export * from './components/Checkbox';
 export * from './lib/utils';
