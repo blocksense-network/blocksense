@@ -1,6 +1,5 @@
-{ self, config, ... }:
+{ self, cfg, ... }:
 let
-  cfg = config.services.blocksense;
   inherit (self.lib) dashToUnderscoreRecursive;
 in
 dashToUnderscoreRecursive {

@@ -1,10 +1,9 @@
 {
   self,
-  config,
+  cfg,
   ...
 }:
 let
-  cfg = config.services.blocksense;
   inherit (self.lib) dashToUnderscoreRecursive;
 in
 {
