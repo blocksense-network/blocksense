@@ -15,8 +15,7 @@ contracts
 │   │   ├── IChainlinkAggregator.sol
 │   │   └── IChainlinkFeedRegistry.sol
 │   ├── ICLAggregatorAdapter.sol
-│   ├── ICLFeedRegistryAdapter.sol
-│   └── IUpgradeableProxy.sol
+│   └── ICLFeedRegistryAdapter.sol
 ├── libraries
 │   ├── Blocksense.sol
 │   └── CLAdapterLib.sol
@@ -36,7 +35,7 @@ contracts
 
 The `cl-adapters` folder contains the Chainlink aggregator contract - CLAggregatorAdapter.sol. The Chainlink aggregator contract implements the Chainlink aggregator interface. It interacts with the UpgradeableProxyADFS contract to make calls to the data feed store contracts. The `registries` folder contains the CLFeedRegistryAdapter contract which is used to register new data feeds. It stores the immutable data from CL aggregator adapter contracts (id, description and decimals) and directly calls the upgradeable ADFS contract to retrieve data.
 
-The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - ICLFeedRegistryAdapter.sol, the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - ICLAggregatorAdapter.sol and the interface for the upgradeable proxy contract - IUpgradeableProxy.sol.
+The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - ICLFeedRegistryAdapter.sol, the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - ICLAggregatorAdapter.sol.
 
 The `libraries` folder contains the Blocksense library which is used to make calls to the upgradeable ADFS proxy. The CLAdapterLib is used by the Chainlink aggregator contracts and the CLFeedRegistryAdapter contract.
 
@@ -62,7 +61,7 @@ graph TD
 All read calls must start with the first bit set to 1, where the whole selector is 1 byte (0x80 in binary is 0b10000000, i.e. first bit set to 1):
 
 - Setter:
-  - `0x00`
+  - `0x01`: setFeeds
 - Getters:
   - `0x86`: getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
   - `0x81`: getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
@@ -70,6 +69,12 @@ All read calls must start with the first bit set to 1, where the whole selector 
   - `0x84`: getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
   - `0x83` will call both **getLatestRound** and **getLatestSingleData**.
   - `0x85` will call both **getLatestRound** and **getLatestData**.
+
+> [!IMPORTANT]
+> Selector `0x00` is reserved for use by an Upgradeable Proxy:
+>
+> 1. This selector must not be implemented in ADFS to prevent function selector collision.
+> 2. In the Upgradeable Proxy, all admin function selectors must have the first byte set to 0x00.
 
 ### Storage layout representation
 

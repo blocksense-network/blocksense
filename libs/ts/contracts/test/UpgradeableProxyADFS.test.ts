@@ -6,8 +6,7 @@ import {
   UpgradeableProxyADFSWrapper,
 } from './utils/wrappers';
 import { expect } from 'chai';
-import { Feed } from './utils/wrappers/types';
-import { IUpgradeableProxy__factory } from '../typechain';
+import { Feed, ProxyOp } from './utils/wrappers/types';
 import {
   HistoricalDataFeedStore,
   GenericHistoricalDataFeedStore,
@@ -129,12 +128,7 @@ describe('UpgradeableProxyADFS', function () {
       txData: {
         data: ethers.solidityPacked(
           ['bytes4', 'address'],
-          [
-            IUpgradeableProxy__factory.createInterface().getFunction(
-              'upgradeTo',
-            ).selector,
-            await admin.getAddress(),
-          ],
+          [ProxyOp.UpgradeTo, await admin.getAddress()],
         ),
       },
     });

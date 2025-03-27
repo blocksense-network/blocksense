@@ -18,7 +18,7 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
-import { Feed } from '../test/utils/wrappers/types';
+import { Feed, WriteOp } from '../test/utils/wrappers/types';
 
 import { expect } from 'chai';
 import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
@@ -326,7 +326,7 @@ const encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
   blockNumber ??= Date.now() + 100;
   const prefix = ethers.solidityPacked(
     ['bytes1', 'uint64', 'uint32'],
-    ['0x00', blockNumber, feeds.length],
+    [ethers.toBeHex(WriteOp.SetFeeds), blockNumber, feeds.length],
   );
 
   const data = feeds.map(feed => {

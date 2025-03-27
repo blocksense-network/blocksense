@@ -1,11 +1,7 @@
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import {
-  IUpgradeableProxy__factory,
-  UpgradeableProxyADFS,
-} from '../../../../typechain';
+import { UpgradeableProxyADFS } from '../../../../typechain';
 import { ADFSWrapper } from './ADFS';
-import { Feed, UpgradeableProxyCallMethods } from '../types';
-import { deployContract } from '../../../experiments/utils/helpers/common';
+import { Feed, ProxyOp, UpgradeableProxyCallMethods } from '../types';
 import { IUpgradeableProxyADFSWrapper } from '../interfaces/IUpgradeableProxyADFSWarpper';
 import { ADFSGenericWrapper } from './ADFSGeneric';
 
@@ -26,9 +22,9 @@ export abstract class UpgradeableProxyADFSBaseWrapper
 
     return admin.sendTransaction({
       to: this.contract.target,
-      data: IUpgradeableProxy__factory.createInterface()
-        .getFunction('upgradeTo')
-        .selector.concat(newImplementation.contract.target.toString().slice(2)),
+      data: ProxyOp.UpgradeTo.concat(
+        newImplementation.contract.target.toString().slice(2),
+      ),
       ...opts.txData,
     });
   }
@@ -36,9 +32,7 @@ export abstract class UpgradeableProxyADFSBaseWrapper
   public async setAdmin(admin: HardhatEthersSigner, newAdmin: string) {
     return admin.sendTransaction({
       to: this.contract.target,
-      data: IUpgradeableProxy__factory.createInterface()
-        .getFunction('setAdmin')
-        .selector.concat(newAdmin.slice(2)),
+      data: ProxyOp.SetAdmin.concat(newAdmin.slice(2)),
     });
   }
 

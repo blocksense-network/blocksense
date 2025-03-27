@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IUpgradeableProxy} from './interfaces/IUpgradeableProxy.sol';
-
 /// @title UpgradeableProxyADFS
 /// @notice Proxy contract that allows the implementation to be upgraded
 /// @dev This contract is reuses logic from the OpenZeppelin Transparent Proxy contract
@@ -17,6 +15,9 @@ contract UpgradeableProxyADFS {
   /// @notice Slot for the admin of the uprgadeable proxy
   bytes32 internal constant ADMIN_SLOT =
     0x0000000000000000000000000000000000000000000000000000000000000002;
+
+  bytes4 internal constant UPGRADE_TO_SELECTOR = 0x00000001;
+  bytes4 internal constant SET_ADMIN_SELECTOR = 0x00000002;
 
   event Upgraded(address indexed implementation);
   event AdminSet(address indexed newAdmin);
@@ -38,23 +39,21 @@ contract UpgradeableProxyADFS {
   /// implementation or change the admin, depending on the message signature.
   /// In contrast to OZ's Transparent Proxy, the admin can call this contract to modify the proxy, as well as call the
   /// proxied contract.
+  /// All admin function selectors must have the first byte set to 0x00.
   fallback() external payable {
     bool isAdmin;
 
-    if (
-      msg.sig == IUpgradeableProxy.upgradeTo.selector ||
-      msg.sig == IUpgradeableProxy.setAdmin.selector
-    ) {
+    if (msg.sig == UPGRADE_TO_SELECTOR || msg.sig == SET_ADMIN_SELECTOR) {
       assembly {
         isAdmin := eq(caller(), sload(ADMIN_SLOT))
       }
 
       if (!isAdmin) revert ProxyDeniedAdminAccess();
 
-      if (msg.sig == IUpgradeableProxy.upgradeTo.selector) {
+      if (msg.sig == UPGRADE_TO_SELECTOR) {
         _upgradeTo(address(bytes20(msg.data[4:])));
         return;
-      } else if (msg.sig == IUpgradeableProxy.setAdmin.selector) {
+      } else if (msg.sig == SET_ADMIN_SELECTOR) {
         _setAdmin(address(bytes20(msg.data[4:])));
         return;
       }
