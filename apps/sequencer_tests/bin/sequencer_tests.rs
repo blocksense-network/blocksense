@@ -144,19 +144,24 @@ async fn spawn_sequencer(
 
 async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
     let now = SystemTime::now();
-    while !scan_port(SEQUENCER_MAIN_PORT) {
-        await_time(500).await;
-        match now.elapsed() {
-            Ok(elapsed) => {
-                if elapsed.as_secs() > max_time_to_wait_secs {
-                    panic!(
-                        "Sequencer took more than {} seconds to start listening for reports",
-                        max_time_to_wait_secs
-                    );
+
+    let ports = vec![SEQUENCER_MAIN_PORT, SEQUENCER_ADMIN_PORT];
+
+    for port in ports {
+        while !scan_port(port) {
+            await_time(500).await;
+            match now.elapsed() {
+                Ok(elapsed) => {
+                    if elapsed.as_secs() > max_time_to_wait_secs {
+                        panic!(
+                            "Sequencer took more than {} seconds to start listening for reports",
+                            max_time_to_wait_secs
+                        );
+                    }
                 }
-            }
-            Err(e) => {
-                panic!("Error: {e:?}");
+                Err(e) => {
+                    panic!("Error: {e:?}");
+                }
             }
         }
     }
