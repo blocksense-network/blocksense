@@ -71,7 +71,6 @@ pub struct OracleTrigger {
     prometheus_url: Option<String>,
     secret_key: String,
     reporter_id: u64,
-    interval_time_in_seconds: u64,
     queue_components: HashMap<String, Component>,
 }
 
@@ -129,6 +128,7 @@ pub struct OracleTriggerConfig {
     component: String,
     data_feeds: Vec<DataFeedSetting>,
     capabilities: Option<Vec<CapabilitySetting>>,
+    interval_time_in_seconds: Option<u64>,
 }
 
 #[derive(Clone, Debug)]
@@ -136,6 +136,7 @@ struct Component {
     pub id: String,
     pub oracle_settings: HashSet<DataFeedSetting>,
     pub capabilities: Vec<CapabilitySetting>,
+    pub interval_time_in_seconds: u64,
 }
 
 // This is a placeholder - we don't yet detect any situations that would require
@@ -199,6 +200,9 @@ impl TriggerExecutor for OracleTrigger {
                         id: config.component.clone(),
                         oracle_settings: HashSet::from_iter(config.data_feeds.iter().cloned()),
                         capabilities,
+                        interval_time_in_seconds: config
+                            .interval_time_in_seconds
+                            .unwrap_or(interval_time_in_seconds),
                     },
                 )
             })
@@ -212,7 +216,6 @@ impl TriggerExecutor for OracleTrigger {
             prometheus_url,
             secret_key,
             reporter_id,
-            interval_time_in_seconds,
             queue_components,
         })
     }
@@ -269,13 +272,12 @@ impl TriggerExecutor for OracleTrigger {
             .collect();
 
         tracing::trace!("Starting orchestrator");
-        let orchestrator = Self::start_orchestrator(
-            tokio::time::Duration::from_secs(self.interval_time_in_seconds),
+        let mut orchestrators = Self::start_orchestrators(
             components,
             signal_data_feed_sender.clone(),
             self.prometheus_url,
         );
-        loops.push(orchestrator);
+        loops.append(&mut orchestrators);
 
         tracing::trace!("Starting sender to sequencer");
         let url = url::Url::parse(&self.sequencer.clone())?;
@@ -399,45 +401,60 @@ impl OracleTrigger {
         TerminationReason::Other("Oracle execution loop terminated".to_string())
     }
 
-    fn start_orchestrator(
-        time_interval: tokio::time::Duration,
+    fn start_orchestrators(
         components: HashMap<String, Component>,
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
         prometheus_url: Option<String>,
-    ) -> tokio::task::JoinHandle<TerminationReason> {
-        let future =
-            Self::signal_data_feeds(time_interval, components, signal_sender, prometheus_url);
+    ) -> Vec<tokio::task::JoinHandle<TerminationReason>> {
+        let mut join_handles = vec![];
+        for (key, component) in components {
+            let time_interval =
+                tokio::time::Duration::from_secs(component.interval_time_in_seconds);
+            let future = Self::signal_data_feeds(
+                key.clone(),
+                time_interval,
+                component.oracle_settings.clone(),
+                signal_sender.clone(),
+                prometheus_url.clone(),
+            );
+            join_handles.push(
+                tokio::task::Builder::new()
+                    .name(format!("orchestrator-{}", key).as_str())
+                    .spawn(future)
+                    .expect("orchestrator failed to start"),
+            );
+        }
 
-        tokio::task::Builder::new()
-            .name("orchestrator")
-            .spawn(future)
-            .expect("orchestrator failed to start")
+        join_handles
     }
 
     async fn signal_data_feeds(
+        oracle_id: String,
         time_interval: tokio::time::Duration,
-        components: HashMap<String, Component>,
+        oracle_settings: HashSet<DataFeedSetting>,
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
         prometheus_url: Option<String>,
     ) -> TerminationReason {
-        tracing::trace!("Task orchestrator started");
+        tracing::trace!("Task orchestrator-{} started", oracle_id);
         //TODO(adikov): Implement proper logic and remove dummy values
         loop {
             REPORTER_BATCH_COUNTER.inc();
             let batch_count = REPORTER_BATCH_COUNTER.get();
-            tracing::trace!("Orchestrator entering sleep [batch_count={batch_count}]");
+            tracing::trace!(
+                "Orchestrator-{} entering sleep [batch_count={batch_count}]",
+                oracle_id
+            );
             let _ = tokio::time::sleep(time_interval).await;
-            tracing::trace!("Orchestrator woke up [batch_count={batch_count}]");
+            tracing::trace!(
+                "Orchestrator-{} woke up [batch_count={batch_count}]",
+                oracle_id
+            );
 
-            let data_feed_signal: HashSet<DataFeedSetting> = components
-                .values()
-                .flat_map(|comp| comp.oracle_settings.clone())
-                .collect();
             tracing::trace!(
                 "Signal {} data feeds [batch_count={batch_count}]",
-                data_feed_signal.len()
+                oracle_settings.len()
             );
-            let _ = signal_sender.send(data_feed_signal);
+            let _ = signal_sender.send(oracle_settings.clone());
 
             if prometheus_url.is_none() {
                 tracing::trace!("Prometheus URL not set; looping back [batch_count={batch_count}]");
