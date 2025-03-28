@@ -22,6 +22,37 @@ pub struct VotedFeedUpdateWithProof {
     pub proof: Vec<DataFeedPayload>,
 }
 
+#[derive(Debug)]
+pub enum DontSkipReason {
+    ThresholdCrossed,
+    HeartbeatTimedOut,
+    NonNumericalFeed,
+    OneShotFeed,
+}
+
+#[derive(Debug)]
+pub enum DoSkipReason {
+    TooSimilarTooSoon, // threshold not crossed and heartbeat not timed out
+    UnexpectedError(String),
+    NoHistory,
+    NothingToPost,
+}
+
+#[derive(Debug)]
+pub enum SkipDecision {
+    DontSkip(DontSkipReason),
+    DoSkip(DoSkipReason),
+}
+
+impl SkipDecision {
+    pub fn should_skip(&self) -> bool {
+        match *self {
+            SkipDecision::DontSkip(_) => false,
+            SkipDecision::DoSkip(_) => true,
+        }
+    }
+}
+
 impl VotedFeedUpdate {
     pub fn encode(&self, digits_in_fraction: usize, timestamp: u64) -> (Vec<u8>, Vec<u8>) {
         (
@@ -52,35 +83,50 @@ impl VotedFeedUpdate {
         })
     }
 
-    pub fn should_skip(&self, criteria: &PublishCriteria, history: &FeedAggregateHistory) -> bool {
+    pub fn should_skip(
+        &self,
+        criteria: &PublishCriteria,
+        history: &FeedAggregateHistory,
+    ) -> SkipDecision {
         if let FeedType::Numerical(candidate_value) = self.value {
             let feed_id = self.feed_id;
-            let res =
-                history
-                    .last(feed_id)
-                    .is_some_and(|last_published| match last_published.value {
-                        FeedType::Numerical(last) => {
-                            // Note: a price can be negative,
-                            // e.g. there have been cases for electricity and crude oil prices
-                            // This is why we take absolute value
-                            let a = f64::abs(last);
-                            let diff = f64::abs(last - candidate_value);
-                            let skip_time_check =
-                                criteria
-                                    .always_publish_heartbeat_ms.is_none_or(|heartbeat| {
-                                        self.end_slot_timestamp < heartbeat + last_published.end_slot_timestamp
-                                    });
-                            let skip_diff_check = diff * 100.0f64 < criteria.skip_publish_if_less_then_percentage * a;
-                            skip_diff_check && skip_time_check
+            let res: SkipDecision = match history.last(feed_id) {
+                Some(last_published) => match last_published.value {
+                    FeedType::Numerical(last) => {
+                        // Note: a price can be negative,
+                        // e.g. there have been cases for electricity and crude oil prices
+                        // This is why we take absolute value
+                        let a = f64::abs(last);
+                        let diff = f64::abs(last - candidate_value);
+                        let has_heartbeat_timed_out = match criteria.always_publish_heartbeat_ms {
+                            Some(heartbeat) => {
+                                self.end_slot_timestamp
+                                    > heartbeat + last_published.end_slot_timestamp
+                            }
+                            None => false,
+                        };
+                        let is_threshold_crossed =
+                            diff * 100.0f64 > criteria.skip_publish_if_less_then_percentage * a;
+                        if is_threshold_crossed {
+                            SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
+                        } else if has_heartbeat_timed_out {
+                            SkipDecision::DontSkip(DontSkipReason::HeartbeatTimedOut)
+                        } else {
+                            SkipDecision::DoSkip(DoSkipReason::TooSimilarTooSoon)
                         }
-                        _ => {
-                            error!("History for numerical feed with id {feed_id} contains a non-numerical update {:?}.", last_published.value);
-                            false
-                        }
-                    });
+                    }
+                    _ => {
+                        error!("History for numerical feed with id {feed_id} contains a non-numerical update {:?}.", last_published.value);
+                        SkipDecision::DoSkip(DoSkipReason::UnexpectedError(
+                            "history for numerical feed contains non-numerical data".to_owned(),
+                        ))
+                    }
+                },
+                None => SkipDecision::DoSkip(DoSkipReason::NoHistory),
+            };
             res
         } else {
-            false
+            SkipDecision::DontSkip(DontSkipReason::NonNumericalFeed)
         }
     }
 }
@@ -321,52 +367,76 @@ mod tests {
         };
 
         // No history
-        assert!(!update.should_skip(&always_publish_criteria, &history));
+        assert!(!update
+            .should_skip(&always_publish_criteria, &history)
+            .should_skip());
 
         history.push_next(
             feed_id,
             FeedType::Numerical(1000.0f64),
             end_slot_timestamp - 1000_u128,
         );
-        assert!(!update.should_skip(&always_publish_criteria, &history));
-        assert!(update.should_skip(&one_percent_threshold, &history));
-        assert!(!update.should_skip(&always_publish_every_second, &history));
+        assert!(!update
+            .should_skip(&always_publish_criteria, &history)
+            .should_skip());
+        assert!(update
+            .should_skip(&one_percent_threshold, &history)
+            .should_skip());
+        assert!(!update
+            .should_skip(&always_publish_every_second, &history)
+            .should_skip());
 
         history.push_next(
             feed_id,
             FeedType::Numerical(1000.0f64),
             end_slot_timestamp - 900_u128,
         );
-        assert!(!update.should_skip(&always_publish_criteria, &history));
-        assert!(update.should_skip(&one_percent_threshold, &history));
-        assert!(update.should_skip(&always_publish_every_second, &history)); // only 900 ms since last update, shoud be skipped
+        assert!(!update
+            .should_skip(&always_publish_criteria, &history)
+            .should_skip());
+        assert!(update
+            .should_skip(&one_percent_threshold, &history)
+            .should_skip());
+        assert!(update
+            .should_skip(&always_publish_every_second, &history)
+            .should_skip()); // only 900 ms since last update, shoud be skipped
 
         let update = VotedFeedUpdate {
             feed_id,
             value: FeedType::Numerical(1010.0),
             end_slot_timestamp,
         };
-        assert!(!update.should_skip(&always_publish_criteria, &history));
+        assert!(!update
+            .should_skip(&always_publish_criteria, &history)
+            .should_skip());
         // If the price is 1000 and it moved to 1010, I'd say it moved by 1%, not by 100/101 %.
-        assert!(!update.should_skip(&one_percent_threshold, &history));
+        assert!(!update
+            .should_skip(&one_percent_threshold, &history)
+            .should_skip());
         let update = VotedFeedUpdate {
             feed_id,
             value: FeedType::Numerical(1009.999),
             end_slot_timestamp,
         };
-        assert!(update.should_skip(&one_percent_threshold, &history));
+        assert!(update
+            .should_skip(&one_percent_threshold, &history)
+            .should_skip());
         let update = VotedFeedUpdate {
             feed_id,
             value: FeedType::Numerical(990.001),
             end_slot_timestamp,
         };
-        assert!(update.should_skip(&one_percent_threshold, &history));
+        assert!(update
+            .should_skip(&one_percent_threshold, &history)
+            .should_skip());
         let update = VotedFeedUpdate {
             feed_id,
             value: FeedType::Numerical(990.000),
             end_slot_timestamp,
         };
-        assert!(!update.should_skip(&one_percent_threshold, &history));
+        assert!(!update
+            .should_skip(&one_percent_threshold, &history)
+            .should_skip());
     }
 
     #[test]

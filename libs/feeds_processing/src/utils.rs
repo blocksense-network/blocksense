@@ -2,7 +2,8 @@ use anomaly_detection::ingest::anomaly_detector_aggregate;
 use anyhow::{anyhow, Context, Result};
 use config::{FeedStrideAndDecimals, PublishCriteria};
 use data_feeds::feeds_processing::{
-    BatchedAggegratesToSend, VotedFeedUpdate, VotedFeedUpdateWithProof,
+    BatchedAggegratesToSend, DoSkipReason, DontSkipReason, SkipDecision, VotedFeedUpdate,
+    VotedFeedUpdateWithProof,
 };
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::registry::FeedAggregateHistory;
@@ -47,7 +48,7 @@ pub fn check_signature(
 #[derive(Debug)]
 pub struct ConsumedReports {
     pub is_quorum_reached: bool,
-    pub skip_publishing: bool,
+    pub skip_publishing: SkipDecision,
     pub ad_score: Option<f64>,
     pub result_post_to_contract: Option<VotedFeedUpdateWithProof>,
     pub end_slot_timestamp: Timestamp,
@@ -75,7 +76,7 @@ pub async fn consume_reports(
         info!("No reports found for feed: {} slot: {}!", name, &slot);
         ConsumedReports {
             is_quorum_reached: false,
-            skip_publishing: true,
+            skip_publishing: SkipDecision::DoSkip(DoSkipReason::NothingToPost),
             ad_score: None,
             result_post_to_contract: None,
             end_slot_timestamp,
@@ -84,7 +85,6 @@ pub async fn consume_reports(
         let total_votes_count = values.len() as f32;
         let required_votes_count = quorum_percentage * 0.01f32 * (num_reporters as f32);
         let is_quorum_reached = required_votes_count <= total_votes_count;
-        let mut skip_publishing = false;
         if !is_quorum_reached {
             warn!(
                 "Insufficient quorum of reports to post to contract for feed: {} slot: {}! Expected at least a quorum of {}, but received {} out of {} valid votes.",
@@ -107,7 +107,7 @@ pub async fn consume_reports(
         let mut ad_score_opt: Option<f64> = None;
 
         // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
-        if !is_oneshot {
+        let skip_publishing = if !is_oneshot {
             if let Some(history) = history {
                 if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
                     let ad_score =
@@ -124,7 +124,7 @@ pub async fn consume_reports(
                             warn!("Anomaly Detection failed with error - {}", e);
                         }
                     }
-                    {
+                    let skip_decision = {
                         let criteria = PublishCriteria {
                             feed_id,
                             skip_publish_if_less_then_percentage,
@@ -134,13 +134,21 @@ pub async fn consume_reports(
                         };
                         debug!("Get a read lock on history [feed {feed_id}]");
                         let history_guard = history.read().await;
-                        skip_publishing =
+                        let skip_decision =
                             result_post_to_contract.should_skip(&criteria, &history_guard);
                         debug!("Release the read lock on history [feed {feed_id}]");
-                    }
-                };
-            };
-        }
+                        skip_decision
+                    };
+                    skip_decision
+                } else {
+                    SkipDecision::DontSkip(DontSkipReason::NonNumericalFeed)
+                }
+            } else {
+                SkipDecision::DoSkip(DoSkipReason::NoHistory)
+            }
+        } else {
+            SkipDecision::DontSkip(DontSkipReason::OneShotFeed)
+        };
         let res = ConsumedReports {
             is_quorum_reached,
             skip_publishing,

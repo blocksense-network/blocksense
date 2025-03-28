@@ -1,7 +1,7 @@
 use crate::reporters::reporter::SharedReporters;
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
-use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
+use data_feeds::feeds_processing::{DoSkipReason, SkipDecision, VotedFeedUpdateWithProof};
 use eyre::{eyre, ContextCompat, Result};
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::feed_registration_cmds::ProcessorResultValue;
@@ -89,7 +89,7 @@ impl FeedSlotsProcessor {
 
         let mut consumed_reports = ConsumedReports {
             is_quorum_reached: false,
-            skip_publishing: true,
+            skip_publishing: SkipDecision::DoSkip(DoSkipReason::NothingToPost),
             ad_score: None,
             result_post_to_contract: None,
             end_slot_timestamp,
@@ -154,7 +154,7 @@ impl FeedSlotsProcessor {
             return Ok(());
         }
 
-        if consumed_reports.skip_publishing {
+        if consumed_reports.skip_publishing.should_skip() {
             info!(
                 "Skipping publishing for feed_id = {} change is lower then threshold of {} %",
                 feed_id, skip_publish_if_less_then_percentage

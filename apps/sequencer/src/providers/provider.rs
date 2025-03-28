@@ -308,7 +308,9 @@ impl RpcProvider {
             .filter(|update| {
                 self.publishing_criteria
                     .get(&update.feed_id)
-                    .is_none_or(|criteria| !update.should_skip(criteria, &self.history))
+                    .is_none_or(|criteria| {
+                        !update.should_skip(criteria, &self.history).should_skip()
+                    })
             })
             .cloned()
             .collect::<Vec<VotedFeedUpdate>>();
