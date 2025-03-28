@@ -8,6 +8,7 @@ export class UpgradeableProxyADFSGenericWrapper extends UpgradeableProxyADFSBase
   public async init(
     adminAddress: string,
     accessControlData: HardhatEthersSigner | string,
+    implementationCallData: string = '0x',
   ) {
     this.implementation = new ADFSGenericWrapper();
     await this.implementation.init(accessControlData);
@@ -16,6 +17,7 @@ export class UpgradeableProxyADFSGenericWrapper extends UpgradeableProxyADFSBase
       'UpgradeableProxyADFS',
       adminAddress,
       this.implementation.contract.target,
+      implementationCallData,
     );
   }
 

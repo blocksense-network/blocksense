@@ -6,7 +6,7 @@ import {
   UpgradeableProxyADFSWrapper,
 } from './utils/wrappers';
 import { expect } from 'chai';
-import { Feed, ProxyOp } from './utils/wrappers/types';
+import { Feed, ProxyOp, ReadOp } from './utils/wrappers/types';
 import {
   HistoricalDataFeedStore,
   GenericHistoricalDataFeedStore,
@@ -53,7 +53,11 @@ describe('UpgradeableProxyADFS', function () {
     const newImplementation = new ADFSWrapper();
     await newImplementation.init(await sequencer.getAddress());
 
-    const tx = await proxy.upgradeImplementation(newImplementation, admin);
+    const tx = await proxy.upgradeImplementationAndCall(
+      newImplementation,
+      admin,
+      '0x',
+    );
     const receipt = await tx.wait();
 
     console.log('Gas used: ', Number(receipt?.gasUsed));
@@ -76,7 +80,11 @@ describe('UpgradeableProxyADFS', function () {
     const newImplementation = new ADFSWrapper();
     await newImplementation.init(await sequencer.getAddress());
 
-    const tx = await proxy.upgradeImplementation(newImplementation, admin);
+    const tx = await proxy.upgradeImplementationAndCall(
+      newImplementation,
+      admin,
+      '0x',
+    );
     const receipt = await tx.wait();
 
     console.log('Gas used: ', Number(receipt?.gasUsed));
@@ -91,11 +99,97 @@ describe('UpgradeableProxyADFS', function () {
     expect(valueV1).to.be.equal(valueV2);
   });
 
+  it('Should preserve storage when implementation is changed and call implementation with calldata', async function () {
+    await proxy.proxyCall('setFeeds', sequencer, [feed], {
+      blockNumber: 1,
+    });
+
+    const valueV1 = (await proxy.proxyCall('getValues', sequencer, [feed]))[0];
+
+    // set up new implementation
+    const newImplementation = new ADFSWrapper();
+    await newImplementation.init(accessControlAdmin);
+
+    // set admin in access control
+    // this is needed to set a feed via calldata when upgrading to new implementation
+    await newImplementation.accessControl.setAdminStates(
+      accessControlAdmin,
+      [admin.address],
+      [true],
+    );
+    await newImplementation.accessControl.checkAdmin(
+      admin,
+      [admin.address],
+      [1n],
+    );
+
+    const newFeed = {
+      ...feed,
+      round: feed.round + 1n,
+      data: ethers.hexlify(ethers.randomBytes(18)),
+    };
+
+    // set feed at round 2 when upgrading to new implementation
+    const blocknumber = 1234;
+    const callData = newImplementation.encodeDataWrite([newFeed], blocknumber);
+
+    const tx = await proxy.upgradeImplementationAndCall(
+      newImplementation,
+      admin,
+      callData,
+    );
+
+    const receipt = await tx.wait();
+
+    console.log('Gas used: ', Number(receipt?.gasUsed));
+
+    await expect(tx)
+      .to.emit(proxy.contract, 'Upgraded')
+      .withArgs(newImplementation.contract);
+    newImplementation.checkEvent(receipt!, blocknumber);
+
+    // get old value at round 1 and assert that is hasn't changed after upgrade
+    const valueV2 = (
+      await proxy.proxyCall('getValues', sequencer, [feed], {
+        operations: [ReadOp.GetFeedAtRound],
+      })
+    )[0];
+
+    expect(valueV1).to.be.equal(proxy.implementation.formatData(feed));
+    expect(valueV1).to.be.equal(valueV2);
+
+    // get new value at round 2 and assert that the provided calldata on upgrade sets it correctly
+    const newValue = (
+      await proxy.proxyCall('getValues', sequencer, [newFeed])
+    )[0];
+    expect(newValue).to.be.equal(proxy.implementation.formatData(newFeed));
+  });
+
+  it('Should revert when sending msg value for an upgrade without calldata', async function () {
+    const newImplementation = new ADFSWrapper();
+    await newImplementation.init(await sequencer.getAddress());
+    const tx = proxy.upgradeImplementationAndCall(
+      newImplementation,
+      admin,
+      '0x',
+      { txData: { value: 1 } },
+    );
+
+    await expect(tx).to.be.revertedWithCustomError(
+      proxy.contract,
+      'ERC1967NonPayable',
+    );
+  });
+
   it('Should revert if upgrade is not called by the admin', async function () {
     const newImplementation = new ADFSWrapper();
     await newImplementation.init(await sequencer.getAddress());
 
-    const tx = proxy.upgradeImplementation(newImplementation, sequencer);
+    const tx = proxy.upgradeImplementationAndCall(
+      newImplementation,
+      sequencer,
+      '0x',
+    );
 
     await expect(tx).to.be.reverted;
   });
@@ -124,14 +218,19 @@ describe('UpgradeableProxyADFS', function () {
     const newImplementation = new ADFSWrapper();
     await newImplementation.init(await sequencer.getAddress());
 
-    const tx = proxy.upgradeImplementation(newImplementation, admin, {
-      txData: {
-        data: ethers.solidityPacked(
-          ['bytes4', 'address'],
-          [ProxyOp.UpgradeTo, await admin.getAddress()],
-        ),
+    const tx = proxy.upgradeImplementationAndCall(
+      newImplementation,
+      admin,
+      '0x',
+      {
+        txData: {
+          data: ethers.solidityPacked(
+            ['bytes4', 'address'],
+            [ProxyOp.UpgradeTo, await admin.getAddress()],
+          ),
+        },
       },
-    });
+    );
 
     await expect(tx).to.be.reverted;
   });

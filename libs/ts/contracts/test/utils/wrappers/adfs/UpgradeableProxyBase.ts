@@ -11,9 +11,10 @@ export abstract class UpgradeableProxyADFSBaseWrapper
   public contract!: UpgradeableProxyADFS;
   public implementation!: ADFSWrapper | ADFSGenericWrapper;
 
-  public async upgradeImplementation(
+  public async upgradeImplementationAndCall(
     newImplementation: ADFSWrapper,
     admin: HardhatEthersSigner,
+    calldata: string,
     opts: {
       txData?: any;
     } = {},
@@ -24,7 +25,7 @@ export abstract class UpgradeableProxyADFSBaseWrapper
       to: this.contract.target,
       data: ProxyOp.UpgradeTo.concat(
         newImplementation.contract.target.toString().slice(2),
-      ),
+      ).concat(calldata.slice(2)),
       ...opts.txData,
     });
   }
@@ -59,6 +60,7 @@ export abstract class UpgradeableProxyADFSBaseWrapper
   public abstract init(
     adminAddress: string,
     accessControlData: HardhatEthersSigner | string,
+    implementationCallData?: string,
   ): Promise<void>;
 
   public abstract getName(): string;

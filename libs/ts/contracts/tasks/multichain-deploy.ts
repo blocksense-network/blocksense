@@ -120,8 +120,8 @@ task('deploy', 'Deploy contracts')
         ContractNames.UpgradeableProxyADFS,
         proxySalt,
         abiCoder.encode(
-          ['address', 'address'],
-          [adminMultisigAddress, adfsAddress],
+          ['address', 'address', 'bytes'],
+          [adminMultisigAddress, adfsAddress, '0x'],
         ),
       );
 
@@ -142,8 +142,8 @@ task('deploy', 'Deploy contracts')
         },
         {
           name: ContractNames.UpgradeableProxyADFS,
-          argsTypes: ['address', 'address'],
-          argsValues: [adminMultisigAddress, adfsAddress],
+          argsTypes: ['address', 'address', 'bytes'],
+          argsValues: [adminMultisigAddress, adfsAddress, '0x'],
           salt: proxySalt,
           value: 0n,
         },
