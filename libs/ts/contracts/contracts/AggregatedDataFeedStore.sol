@@ -253,21 +253,26 @@ contract AggregatedDataFeedStore {
       let data := calldataload(0)
       // setFeeds(bytes)
       if eq(byte(0, data), 0x01) {
-        // check if internal blocknumber is already set
-        let prevBlockNumber := sload(0x00)
-        let newBlockNumber := shr(192, shl(8, data))
 
-        // new blocknumber must be strictly monotonically increasing
+        ///////////////////////////////////
+        // Update Blocksense blocknumber //
+        ///////////////////////////////////
+        let newBlockNumber := shr(192, shl(8, data))
+        let prevBlockNumber := sload(0x00)
+
+        // ensure it is strictly increasing
         if eq(gt(newBlockNumber, prevBlockNumber), 0) {
           revert(0x00, 0x00)
         }
         sstore(0x00, newBlockNumber)
 
+        ///////////////////////////////////
+        //         Update feeds          //
+        ///////////////////////////////////
         let pointer := 13
         let len := calldatasize()
         let feedsCount := shr(224, shl(72, data))
 
-        /* feed updates */
         /*
                     ┌───────────────────────────────┐   .........  ┌───────────────────────────────┐
                     │          stride 0 (32b)       │              │        stride 2 (128b)        │
@@ -345,7 +350,9 @@ contract AggregatedDataFeedStore {
           }
         }
 
-        /* round table updates */
+        ///////////////////////////////////
+        //       Update round table      //
+        ///////////////////////////////////
         /*
                               ┌───────────────────────────────────────────────────────────────┐
                               │                      latest round table                       │
@@ -366,11 +373,7 @@ contract AggregatedDataFeedStore {
 
                                 max id: (2**115)*32-1                        max slot index: 2**116-1
         */
-        for {
-
-        } lt(pointer, len) {
-
-        } {
+        for {} lt(pointer, len) {} {
           let roundTableData := calldataload(pointer)
           let indexLength := byte(0, roundTableData)
           let index := shr(
@@ -386,7 +389,9 @@ contract AggregatedDataFeedStore {
           sstore(add(ROUND_ADDRESS, index), calldataload(sub(pointer, 32)))
         }
 
-        /* Emit update event */
+        ///////////////////////////////////
+        //  Emit DataFeedsUpdated event  //
+        ///////////////////////////////////
 
         // store blocknumber at slot 0 in memory
         mstore(0x00, newBlockNumber)
