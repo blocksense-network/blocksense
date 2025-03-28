@@ -12,10 +12,12 @@
     "format:write": "pre-commit run --all || pre-commit run --all",
     "generate-data-feeds-config": "yarn workspace '@blocksense/data-feeds-config-generator' generate",
     "build": "yarn build:recursive",
+    "build-single": "yarn workspace $0 run build",
     "build:recursive": "yarn workspaces foreach --from $0 -Rp --topological-dev run build",
     "build:with-deps": "yarn build:recursive $(jq -r .name $INIT_CWD/package.json)",
     "build:all": "yarn workspaces foreach --all -p --topological-dev run build",
     "test": "yarn workspaces foreach --from $0 -Rp --topological-dev run test",
+    "test-single": "yarn workspace $0 run test",
     "test:all": "yarn workspaces foreach --all -p --topological-dev run test"
   },
   "dependenciesMeta": {
