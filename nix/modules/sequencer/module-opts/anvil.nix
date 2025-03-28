@@ -33,8 +33,9 @@ in
       description = "The fork URL to use for the Anvil instance.";
     };
 
-    _command = mkOption {
+    command = mkOption {
       type = types.str;
+      readOnly = true;
       default =
         ''
           ${config.package}/bin/anvil \
