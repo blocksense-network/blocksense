@@ -12,8 +12,10 @@ export const rootDir = getEnvString('GIT_ROOT');
 export const configDir = join(rootDir, 'config');
 
 export const configFiles = {
-  ['feeds_config']: join(configDir, 'feeds_config_v1.json'),
-  ['chainlink_compatibility']: join(configDir, 'chainlink_compatibility_v1'),
+  ['feeds_config_v1']: join(configDir, 'feeds_config_v1.json'),
+  ['feeds_config_v2']: join(configDir, 'feeds_config_v2.json'),
+  ['chainlink_compatibility_v1']: join(configDir, 'chainlink_compatibility_v1'),
+  ['chainlink_compatibility_v2']: join(configDir, 'chainlink_compatibility_v2'),
   ['evm_contracts_deployment_v1']: join(
     configDir,
     'evm_contracts_deployment_v1.json',
