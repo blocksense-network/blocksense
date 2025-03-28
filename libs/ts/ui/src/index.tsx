@@ -23,4 +23,5 @@ export * from './components/Popover';
 export * from './components/TextArea';
 export * from './components/RadioGroup';
 export * from './components/InfoTip';
+export * from './components/DataTable';
 export * from './lib/utils';

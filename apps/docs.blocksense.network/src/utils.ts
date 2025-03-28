@@ -1,5 +1,3 @@
-import { useRouter } from 'next/navigation';
-
 import { previewHexString } from '@blocksense/base-utils/buffer-and-hex';
 import { VariableDocItem } from '@blocksense/sol-reflector';
 
@@ -14,24 +12,6 @@ export const filterVariables = (
 ): VariableDocItem[] => {
   return variables.filter(v => v.constant === false);
 };
-
-export function onLinkClick(
-  e: React.MouseEvent,
-  router: ReturnType<typeof useRouter>,
-  link: string,
-  isTargetBlank?: boolean,
-) {
-  e.preventDefault();
-  e.stopPropagation();
-
-  if (!link) {
-    return;
-  }
-
-  e.ctrlKey || e.metaKey || isTargetBlank
-    ? window.open(link)
-    : router.push(link);
-}
 
 export function stringifyObject(obj: any): string {
   return `'${JSON.stringify(obj)
