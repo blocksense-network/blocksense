@@ -40,12 +40,17 @@ async function getBlocksenseFeedsCompatibility(
           }),
       );
 
-      const dataFeed = feedConfig.feeds.find(
-        feed =>
-          feed.additional_feed_info.compatibility_info.chainlink === feedName,
-      );
+      const dataFeed = feedConfig.feeds.find(feed => {
+        if (!feed.additional_feed_info?.compatibility_info) {
+          return false;
+        }
+        return (
+          feed.additional_feed_info.compatibility_info.chainlink === feedName
+        );
+      });
+
       if (!dataFeed) {
-        console.error(`Feed not found for '${feedName}'`);
+        console.error(`[compatibility] Feed not found for '${feedName}'`);
         return acc; // Return the accumulator unchanged
       }
       const dataFeedId = dataFeed.id;
