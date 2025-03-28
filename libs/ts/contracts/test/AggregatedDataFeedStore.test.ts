@@ -169,6 +169,15 @@ describe('AggregatedDataFeedStore', () => {
       .reverted;
   });
 
+  it('Should revert if blockNumber lower than previous block', async () => {
+    const blockNumber = 1;
+    await contract.setFeeds(sequencer, feeds, { blockNumber });
+
+    await expect(
+      contract.setFeeds(sequencer, feeds, { blockNumber: blockNumber - 1 }),
+    ).to.be.reverted;
+  });
+
   it('[W] Should revert when stride is bigger than max stride (31)', async () => {
     await expect(
       contract.setFeeds(sequencer, [

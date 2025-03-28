@@ -257,7 +257,8 @@ contract AggregatedDataFeedStore {
         let prevBlockNumber := sload(0x00)
         let newBlockNumber := shr(192, shl(8, data))
 
-        if eq(prevBlockNumber, newBlockNumber) {
+        // new blocknumber must be strictly monotonically increasing
+        if eq(gt(newBlockNumber, prevBlockNumber), 0) {
           revert(0x00, 0x00)
         }
         sstore(0x00, newBlockNumber)
