@@ -3,12 +3,12 @@ with lib;
 {
   options = {
     reporter-info = {
-      sequencer = mkOption {
+      sequencer-url = mkOption {
         type = types.str;
         default = "http://127.0.0.1:${toString cfg.sequencer.main-port}";
         description = "The url of the sequencer.";
       };
-      registry = mkOption {
+      registry-url = mkOption {
         type = types.str;
         default = "http://127.0.0.1:${toString cfg.sequencer.admin-port}";
         description = "The url of the registry.";
