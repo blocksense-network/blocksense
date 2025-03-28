@@ -319,7 +319,6 @@ pub struct FeedsMetrics {
 
     // skip-publishing related metrics
     pub skipped_too_similar_too_soon: IntCounterVec,
-    pub skipped_unexpected_error: IntCounterVec,
     pub skipped_nothing_to_post: IntCounterVec,
 
     pub updated_threshold_crossed: IntCounterVec,
@@ -327,6 +326,7 @@ pub struct FeedsMetrics {
     pub updated_no_history: IntCounterVec,
     pub updated_non_numerical_feed: IntCounterVec,
     pub updated_one_shot_feed: IntCounterVec,
+    pub updated_history_error: IntCounterVec,
 }
 
 impl FeedsMetrics {
@@ -351,11 +351,6 @@ impl FeedsMetrics {
             skipped_too_similar_too_soon: register_int_counter_vec!(
                 format!("{}skipped_too_similar_too_soon", prefix),
                 "Number of updates skipped for a given feed, because value did not deviate enough quickly enough",
-                &["FeedId"]
-            )?,
-            skipped_unexpected_error: register_int_counter_vec!(
-                format!("{}skipped_unexpected_error", prefix),
-                "Number of updates skipped for a given feed, because an unexpected error occurred",
                 &["FeedId"]
             )?,
             skipped_nothing_to_post: register_int_counter_vec!(
@@ -387,6 +382,11 @@ impl FeedsMetrics {
             updated_one_shot_feed: register_int_counter_vec!(
                 format!("{}updated_one_shot_feed", prefix),
                 "Number of updates performed for a given feed, because the feed is one shot",
+                &["FeedId"]
+            )?,
+            updated_history_error: register_int_counter_vec!(
+                format!("{}updated_history_error", prefix),
+                "Number of updates performed for a given feed, because they are configured as numerical feed, but the history contained a non-numerical update",
                 &["FeedId"]
             )?,
         })

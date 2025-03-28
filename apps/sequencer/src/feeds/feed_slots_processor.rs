@@ -164,9 +164,6 @@ impl FeedSlotsProcessor {
                     DoSkipReason::TooSimilarTooSoon => {
                         inc_metric!(feed_metrics, feed_id, skipped_too_similar_too_soon)
                     }
-                    DoSkipReason::UnexpectedError(_) => {
-                        inc_metric!(feed_metrics, feed_id, skipped_unexpected_error)
-                    }
                     DoSkipReason::NothingToPost => {
                         inc_metric!(feed_metrics, feed_id, skipped_nothing_to_post)
                     }
@@ -186,6 +183,9 @@ impl FeedSlotsProcessor {
                     }
                     DontSkipReason::OneShotFeed => {
                         inc_metric!(feed_metrics, feed_id, updated_one_shot_feed)
+                    }
+                    DontSkipReason::HistoryError => {
+                        inc_metric!(feed_metrics, feed_id, updated_history_error)
                     }
                 },
             };

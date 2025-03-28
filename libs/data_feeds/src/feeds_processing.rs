@@ -29,12 +29,12 @@ pub enum DontSkipReason {
     NoHistory,
     NonNumericalFeed,
     OneShotFeed,
+    HistoryError,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum DoSkipReason {
     TooSimilarTooSoon, // threshold not crossed and heartbeat not timed out
-    UnexpectedError(String),
     NothingToPost,
 }
 
@@ -117,9 +117,7 @@ impl VotedFeedUpdate {
                     }
                     _ => {
                         error!("History for numerical feed with id {feed_id} contains a non-numerical update {:?}.", last_published.value);
-                        SkipDecision::DoSkip(DoSkipReason::UnexpectedError(
-                            "history for numerical feed contains non-numerical data".to_owned(),
-                        ))
+                        SkipDecision::DontSkip(DontSkipReason::HistoryError)
                     }
                 },
                 None => SkipDecision::DontSkip(DontSkipReason::NoHistory),
@@ -448,6 +446,16 @@ mod tests {
         assert_eq!(
             update.should_skip(&one_percent_threshold, &history),
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
+        );
+
+        history.push_next(
+            feed_id,
+            FeedType::Text("spiderman".to_owned()),
+            end_slot_timestamp - 400_u128,
+        );
+        assert_eq!(
+            update.should_skip(&one_percent_threshold, &history),
+            SkipDecision::DontSkip(DontSkipReason::HistoryError)
         );
     }
 
