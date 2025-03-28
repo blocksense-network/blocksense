@@ -136,7 +136,7 @@ in
     reporters = {
       a = {
         reporter-info = {
-          reporter-id = 0;
+          id = 0;
           interval-time-in-seconds = 30;
           secret-key = "${testKeysDir}/reporter_secret_key";
         };

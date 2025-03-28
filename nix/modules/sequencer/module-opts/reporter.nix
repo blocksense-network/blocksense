@@ -14,7 +14,7 @@ with lib;
         description = "The url of the registry.";
       };
 
-      reporter-id = mkOption {
+      id = mkOption {
         type = types.int;
         description = mdDoc "The reporter id.";
         example = 1;
