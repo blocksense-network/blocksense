@@ -40,3 +40,6 @@ indent_size = 2
 
 [*.rs]
 indent_size = unset
+
+[apps/data-feeds-config-generator/src/data-services/fetchers/exchanges/bitfinex/test/splitPair.output.json]
+insert_final_newline = unset
