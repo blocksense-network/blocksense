@@ -14,8 +14,8 @@ export class UpgradeableProxyADFSWrapper extends UpgradeableProxyADFSBaseWrapper
 
     this.contract = await deployContract<UpgradeableProxyADFS>(
       'UpgradeableProxyADFS',
-      this.implementation.contract.target,
       adminAddress,
+      this.implementation.contract.target,
     );
   }
 
