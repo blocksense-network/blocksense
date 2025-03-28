@@ -9,17 +9,16 @@ in
 {
   mkReporterConfig =
     reporter-opts:
+    with reporter-opts;
     dashToUnderscoreRecursive {
       reporter-info = {
-        inherit (reporter-opts) interval-time-in-seconds secret-key;
-        reporter-id = reporter-opts.id;
-        sequencer = reporter-opts.sequencer-url;
-        registry = reporter-opts.registry-url;
+        inherit interval-time-in-seconds secret-key;
+        reporter-id = id;
+        sequencer = sequencer-url;
+        registry = registry-url;
       };
 
-      capabilities = builtins.attrValues (
-        builtins.mapAttrs (id: data: { inherit id data; }) reporter-opts.api-keys
-      );
+      capabilities = builtins.attrValues (builtins.mapAttrs (id: data: { inherit id data; }) api-keys);
 
       # Shared config
       oracles = builtins.attrValues cfg.oracles;

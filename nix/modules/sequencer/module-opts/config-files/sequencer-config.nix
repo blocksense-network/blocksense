@@ -2,8 +2,9 @@
 let
   inherit (self.lib) dashToUnderscoreRecursive;
 in
+with cfg.sequencer;
 dashToUnderscoreRecursive {
-  inherit (cfg.sequencer)
+  inherit
     sequencer-id
     main-port
     admin-port
@@ -13,6 +14,6 @@ dashToUnderscoreRecursive {
     http-input-buffer-size
     ;
 
-  reporters = cfg.sequencer.whitelisted-reporters;
-  prometheus-port = cfg.sequencer.metrics-port;
+  reporters = whitelisted-reporters;
+  prometheus-port = metrics-port;
 }
