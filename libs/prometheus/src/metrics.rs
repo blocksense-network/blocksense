@@ -316,6 +316,17 @@ pub struct FeedsMetrics {
     pub quorums_reached: IntCounterVec,
     pub failures_to_reach_quorum: IntCounterVec,
     pub updates_to_networks: IntCounterVec,
+
+    // skip-publishing related metrics
+    pub skipped_too_similar_too_soon: IntCounterVec,
+    pub skipped_unexpected_error: IntCounterVec,
+    pub skipped_nothing_to_post: IntCounterVec,
+
+    pub updated_threshold_crossed: IntCounterVec,
+    pub updated_heartbeat_timed_out: IntCounterVec,
+    pub updated_no_history: IntCounterVec,
+    pub updated_non_numerical_feed: IntCounterVec,
+    pub updated_one_shot_feed: IntCounterVec,
 }
 
 impl FeedsMetrics {
@@ -335,6 +346,48 @@ impl FeedsMetrics {
                 format!("{}updates_to_networks", prefix),
                 "Number of updates for a given feed id per Network",
                 &["FeedId", "Network"]
+            )?,
+
+            skipped_too_similar_too_soon: register_int_counter_vec!(
+                format!("{}skipped_too_similar_too_soon", prefix),
+                "Number of updates skipped for a given feed, because value did not deviate enough quickly enough",
+                &["FeedId"]
+            )?,
+            skipped_unexpected_error: register_int_counter_vec!(
+                format!("{}skipped_unexpected_error", prefix),
+                "Number of updates skipped for a given feed, because an unexpected error occurred",
+                &["FeedId"]
+            )?,
+            skipped_nothing_to_post: register_int_counter_vec!(
+                format!("{}skipped_nothing_to_post", prefix),
+                "Number of updates skipped for a given feed, because there was nothing to post",
+                &["FeedId"]
+            )?,
+
+            updated_threshold_crossed: register_int_counter_vec!(
+                format!("{}updated_threshold_crossed", prefix),
+                "Number of updates performed for a given feed, because deviation threshold was crossed",
+                &["FeedId"]
+            )?,
+            updated_heartbeat_timed_out: register_int_counter_vec!(
+                format!("{}updated_heartbeat_timed_out", prefix),
+                "Number of updates performed for a given feed, because heartbeat timed out",
+                &["FeedId"]
+            )?,
+            updated_no_history: register_int_counter_vec!(
+                format!("{}updated_no_history", prefix),
+                "Number of updates performed for a given feed, because there was no history",
+                &["FeedId"]
+            )?,
+            updated_non_numerical_feed: register_int_counter_vec!(
+                format!("{}updated_non_numerical_feed", prefix),
+                "Number of updates performed for a given feed, because the feed is non numerical",
+                &["FeedId"]
+            )?,
+            updated_one_shot_feed: register_int_counter_vec!(
+                format!("{}updated_one_shot_feed", prefix),
+                "Number of updates performed for a given feed, because the feed is one shot",
+                &["FeedId"]
             )?,
         })
     }

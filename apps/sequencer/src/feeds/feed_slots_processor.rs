@@ -1,7 +1,9 @@
 use crate::reporters::reporter::SharedReporters;
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
-use data_feeds::feeds_processing::{DoSkipReason, SkipDecision, VotedFeedUpdateWithProof};
+use data_feeds::feeds_processing::{
+    DoSkipReason, DontSkipReason, SkipDecision, VotedFeedUpdateWithProof,
+};
 use eyre::{eyre, ContextCompat, Result};
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::feed_registration_cmds::ProcessorResultValue;
@@ -146,7 +148,7 @@ impl FeedSlotsProcessor {
         sequencer_state: &Data<SequencerState>,
     ) -> Result<()> {
         let feed_id = self.key;
-        self.increase_quorum_metric(feed_metrics, consumed_reports.is_quorum_reached)
+        self.increase_quorum_metric(&feed_metrics, consumed_reports.is_quorum_reached)
             .await;
 
         if !consumed_reports.is_quorum_reached {
@@ -154,7 +156,42 @@ impl FeedSlotsProcessor {
             return Ok(());
         }
 
-        if consumed_reports.skip_publishing.should_skip() {
+        let skip_decision = &consumed_reports.skip_publishing;
+        if let Some(feed_metrics) = &feed_metrics {
+            let feed_id = self.key;
+            match skip_decision {
+                SkipDecision::DoSkip(reason) => match reason {
+                    DoSkipReason::TooSimilarTooSoon => {
+                        inc_metric!(feed_metrics, feed_id, skipped_too_similar_too_soon)
+                    }
+                    DoSkipReason::UnexpectedError(_) => {
+                        inc_metric!(feed_metrics, feed_id, skipped_unexpected_error)
+                    }
+                    DoSkipReason::NothingToPost => {
+                        inc_metric!(feed_metrics, feed_id, skipped_nothing_to_post)
+                    }
+                },
+                SkipDecision::DontSkip(reason) => match reason {
+                    DontSkipReason::ThresholdCrossed => {
+                        inc_metric!(feed_metrics, feed_id, updated_threshold_crossed)
+                    }
+                    DontSkipReason::HeartbeatTimedOut => {
+                        inc_metric!(feed_metrics, feed_id, updated_heartbeat_timed_out)
+                    }
+                    DontSkipReason::NoHistory => {
+                        inc_metric!(feed_metrics, feed_id, updated_no_history)
+                    }
+                    DontSkipReason::NonNumericalFeed => {
+                        inc_metric!(feed_metrics, feed_id, updated_non_numerical_feed)
+                    }
+                    DontSkipReason::OneShotFeed => {
+                        inc_metric!(feed_metrics, feed_id, updated_one_shot_feed)
+                    }
+                },
+            };
+        }
+
+        if skip_decision.should_skip() {
             info!(
                 "Skipping publishing for feed_id = {} change is lower then threshold of {} %",
                 feed_id, skip_publish_if_less_then_percentage
@@ -202,10 +239,10 @@ impl FeedSlotsProcessor {
 
     async fn increase_quorum_metric(
         &self,
-        feed_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+        feed_metrics: &Option<Arc<RwLock<FeedsMetrics>>>,
         is_quorum_reached: bool,
     ) {
-        if let Some(feed_metrics) = &feed_metrics {
+        if let Some(feed_metrics) = feed_metrics {
             let key_post = self.key;
             if is_quorum_reached {
                 inc_metric!(feed_metrics, key_post, quorums_reached);

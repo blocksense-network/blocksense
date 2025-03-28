@@ -144,7 +144,7 @@ pub async fn consume_reports(
                     SkipDecision::DontSkip(DontSkipReason::NonNumericalFeed)
                 }
             } else {
-                SkipDecision::DoSkip(DoSkipReason::NoHistory)
+                SkipDecision::DontSkip(DontSkipReason::NoHistory)
             }
         } else {
             SkipDecision::DontSkip(DontSkipReason::OneShotFeed)

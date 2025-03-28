@@ -26,6 +26,7 @@ pub struct VotedFeedUpdateWithProof {
 pub enum DontSkipReason {
     ThresholdCrossed,
     HeartbeatTimedOut,
+    NoHistory,
     NonNumericalFeed,
     OneShotFeed,
 }
@@ -34,7 +35,6 @@ pub enum DontSkipReason {
 pub enum DoSkipReason {
     TooSimilarTooSoon, // threshold not crossed and heartbeat not timed out
     UnexpectedError(String),
-    NoHistory,
     NothingToPost,
 }
 
@@ -122,7 +122,7 @@ impl VotedFeedUpdate {
                         ))
                     }
                 },
-                None => SkipDecision::DoSkip(DoSkipReason::NoHistory),
+                None => SkipDecision::DontSkip(DontSkipReason::NoHistory),
             };
             res
         } else {
