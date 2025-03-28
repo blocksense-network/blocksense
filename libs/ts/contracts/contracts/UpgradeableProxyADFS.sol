@@ -26,11 +26,11 @@ contract UpgradeableProxyADFS {
   error InvalidUpgrade(address value);
 
   /// @notice Construct the UpgradeableProxy contract
-  /// @param _logic The address of the initial implementation
-  /// @param _owner The address of the admin
-  constructor(address _logic, address _owner) {
-    _setAdmin(_owner);
-    _upgradeTo(_logic);
+  /// @param owner The address of the admin
+  /// @param logic The address of the initial implementation
+  constructor(address owner, address logic) {
+    _setAdmin(owner);
+    _upgradeTo(logic);
   }
 
   /// @notice Fallback function
