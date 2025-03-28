@@ -173,7 +173,7 @@ pub async fn adfs_serialize_updates(
             if let Some(strides_and_decimals) = strides_and_decimals.get(feed_id) {
                 feeds_info.insert(*feed_id, (strides_and_decimals.stride, *round));
             } else {
-                panic!("Missing information for strides and decimals for feed_id {feed_id}!");
+                feeds_info.insert(*feed_id, (0, 0));
             };
         }
     };

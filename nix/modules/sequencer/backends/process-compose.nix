@@ -17,14 +17,15 @@ let
 
   logsConfig = {
     fields_order = [
-      "time"
-      "level"
+      # "time"
+      # "level"
       "message"
     ];
     no_metadata = true;
     disable_json = true;
-    add_timestamp = true;
+    # add_timestamp = true;
     flush_each_line = true;
+    no_color = true;
   };
 
   sequencerConfigJSON = pkgs.runCommandLocal "sequencer_config" { } ''
@@ -126,6 +127,7 @@ let
         "FEEDS_CONFIG_DIR=${../../../../config}"
         "SEQUENCER_CONFIG_DIR=${sequencerConfigJSON}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
+        "NO_COLOR=1"
       ];
       shutdown.signal = 9;
       depends_on = {
@@ -141,7 +143,7 @@ let
     blockchain-reader.process-compose = {
       command = "${blockchain_reader.program} --bootstrap-server localhost:9092 --topic blockchain --from-beginning";
       shutdown.signal = 9;
-      depends_on.kafka.condition = "process_started";
+      # depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
       log_location = cfg.logsDir + "/blockchain-reader.log";
     };
@@ -151,7 +153,7 @@ let
     aggregate-consensus-reader.process-compose = {
       command = "${aggregate_consensus_reader.program}  --bootstrap-server localhost:9092 --topic aggregation_consensus --from-beginning";
       shutdown.signal = 9;
-      depends_on.kafka.condition = "process_started";
+      # depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
       log_location = cfg.logsDir + "/aggregate-consensus-reader.log";
     };

@@ -79,7 +79,7 @@ let
 
       safe_min_quorum = mkOption {
         type = types.int;
-        default = 5;
+        default = 1;
         description = mdDoc "Minimum number of reporters to sign the update before it can be posted.";
       };
 

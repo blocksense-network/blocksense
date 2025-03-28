@@ -1,5 +1,6 @@
 use crypto::{deserialize_priv_key, sign_message, Signature};
 use feed_registry::types::{FeedResult, Timestamp};
+use tracing::debug;
 
 pub fn generate_signature(
     priv_key_hex: &str,
@@ -7,6 +8,7 @@ pub fn generate_signature(
     timestamp: Timestamp,
     feed_result: &FeedResult,
 ) -> anyhow::Result<Signature> {
+    debug!("generate_signature secret_key: {priv_key_hex}");
     //TODO(adikov): refactor crypto lib to return proper Results, not <val, string>
     let priv_key = deserialize_priv_key(priv_key_hex).expect("Wrong key format!");
 
