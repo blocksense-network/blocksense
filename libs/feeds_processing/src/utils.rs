@@ -412,13 +412,14 @@ pub mod tests {
     }
 
     async fn call_validate_with_values(
+        feed_ids: [u32; 3],
         reporter_last_votes: [f64; 3],
         aggregated_values: [f64; 3],
     ) -> Result<()> {
         let mut last_votes = HashMap::new();
         // The last votes of the reporter.
         last_votes.insert(
-            1,
+            feed_ids[0],
             VotedFeedUpdate {
                 feed_id: 1,
                 value: FeedType::Numerical(reporter_last_votes[0]),
@@ -426,7 +427,7 @@ pub mod tests {
             },
         );
         last_votes.insert(
-            5,
+            feed_ids[1],
             VotedFeedUpdate {
                 feed_id: 5,
                 value: FeedType::Numerical(reporter_last_votes[1]),
@@ -434,7 +435,7 @@ pub mod tests {
             },
         );
         last_votes.insert(
-            11,
+            feed_ids[2],
             VotedFeedUpdate {
                 feed_id: 11,
                 value: FeedType::Numerical(reporter_last_votes[2]),
@@ -445,17 +446,17 @@ pub mod tests {
         // Aggregated values proposed by the sequencer.
         let updates = vec![
             VotedFeedUpdate {
-                feed_id: 1,
+                feed_id: feed_ids[0],
                 value: FeedType::Numerical(aggregated_values[0]),
                 end_slot_timestamp: 1677654321,
             },
             VotedFeedUpdate {
-                feed_id: 5,
+                feed_id: feed_ids[1],
                 value: FeedType::Numerical(aggregated_values[1]),
                 end_slot_timestamp: 1677654322,
             },
             VotedFeedUpdate {
-                feed_id: 11,
+                feed_id: feed_ids[2],
                 value: FeedType::Numerical(aggregated_values[2]),
                 end_slot_timestamp: 1677654323,
             },
@@ -512,24 +513,38 @@ pub mod tests {
     #[tokio::test]
     async fn test_validate_with_confirmable_input() {
         // All the last votes of the reporter are within 1% deviation from the aggregated values.
-        match call_validate_with_values([42.1, 110.6, 552.0], [42.5, 111.5, 555.5]).await {
-            Ok(_) => {}
-            Err(e) => {
-                panic!("validate failed with error: {e}")
-            }
-        }
+        let result =
+            call_validate_with_values([1, 5, 11], [42.1, 110.6, 552.0], [42.5, 111.5, 555.5]).await;
+
+        assert!(
+            result.is_ok(),
+            "validate failed with error: {:?}",
+            result.unwrap_err()
+        );
     }
 
     #[tokio::test]
     async fn test_validate_with_non_confirmable_input() {
         // The third vote of the reporter is not within 1% deviation from the aggregated value.
-        match call_validate_with_values([42.1, 110.6, 549.5], [42.5, 111.5, 555.5]).await {
-            Ok(_) => {
-                panic!("validate confirmation of higher than 1% deviation!");
-            }
-            Err(e) => {
-                info!("validate correctly did not approve batch of aggregates: {e}")
-            }
-        }
+        let result =
+            call_validate_with_values([1, 5, 11], [42.1, 110.6, 549.5], [42.5, 111.5, 555.5]).await;
+
+        assert!(
+            result.is_err(),
+            "validate confirmation of higher than 1% deviation!"
+        );
+
+        // Extract the error and check
+        let expected_error = "is above 0.01 for feed_id 11";
+
+        let error_message = result.unwrap_err().to_string();
+        assert!(
+            error_message.contains(expected_error),
+            "Expected error message to contain {expected_error}, but got: {error_message}",
+        );
+        info!(
+            "validate correctly did not approve batch of aggregates: {:?}",
+            error_message
+        );
     }
 }
