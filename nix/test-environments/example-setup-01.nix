@@ -119,9 +119,7 @@ in
         };
       };
 
-      kafka-report-endpoint = {
-        url = "127.0.0.1:9092";
-      };
+      kafka-report-endpoint = "127.0.0.1:9092";
 
       whitelisted-reporters = [
         {
