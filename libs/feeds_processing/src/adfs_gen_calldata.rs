@@ -284,7 +284,6 @@ pub mod tests {
                 create_voted_feed_update(4, "4890"),
                 create_voted_feed_update(5, "5abc"),
             ],
-            proofs: HashMap::new(),
         };
 
         // Helper function to set round metrics (number of updates for a feed for a network)

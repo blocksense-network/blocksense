@@ -1,5 +1,4 @@
 use data_feeds::feeds_processing::VotedFeedUpdate;
-use feed_registry::types::DataFeedPayload;
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
@@ -17,7 +16,6 @@ pub struct ConsensusSecondRoundBatch {
     pub calldata: String, // TODO: send all data needed to validate and recreate calldata.
     pub updates: Vec<VotedFeedUpdate>,
     pub feeds_rounds: HashMap<u32, u64>,
-    pub proofs: HashMap<u32, Vec<DataFeedPayload>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

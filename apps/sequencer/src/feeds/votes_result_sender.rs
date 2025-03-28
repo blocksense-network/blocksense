@@ -160,9 +160,6 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             continue;
         }
 
-        let num_removed_proofs = updates.normalize_proof();
-        debug!("Filtered out {num_removed_proofs} from proofs for network {net}, block_height {block_height}");
-
         let (contract_address, safe_address, nonce, chain_id, tx_hash, safe_transaction) = {
             let provider = provider.lock().await;
 
@@ -228,7 +225,6 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             calldata: hex::encode(serialized_updates),
             updates: updates.updates,
             feeds_rounds,
-            proofs: HashMap::new(), // No need to propagate signatures; we are currently using deviation-based validation.
         };
 
         let serialized_updates = match serde_json::to_string(&updates_to_kafka) {
