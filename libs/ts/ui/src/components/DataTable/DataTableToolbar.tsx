@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 
 import { Input } from '@blocksense/ui/Input';
 import { Button } from '@blocksense/ui/Button';

@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation';
 
 import { Tooltip } from '@blocksense/ui/Tooltip';
 import { CopyButton } from '@blocksense/ui/CopyButton';
-import { onLinkClick, previewHexStringOrDefault } from '@/src/utils';
+import { onLinkClick } from '@blocksense/ui/utils';
 import {
   getAddressExplorerUrl,
   isEthereumAddress,
   NetworkName,
 } from '@blocksense/base-utils/evm';
+
+import { previewHexStringOrDefault } from '@/src/utils';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 type ContractAddressProps = {

@@ -2,14 +2,14 @@
 
 import { useRef, useState } from 'react';
 
-import { Callout } from '@blocksense/ui/Callout';
 import { parseNetworkName } from '@blocksense/base-utils/evm';
+import { Callout } from '@blocksense/ui/Callout';
+import { DataTable } from '@blocksense/ui/DataTable';
 
 import {
   CoreContract,
   ProxyContractData,
 } from '@/src/deployed-contracts/types';
-import { DataTable } from '@/components/common/DataTable/DataTable';
 import { columns as proxyContractsColumns } from '@/components/DeployedContracts/proxyContractsColumns';
 import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
 import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';

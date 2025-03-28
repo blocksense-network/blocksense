@@ -1,9 +1,8 @@
 'use client';
 
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { onLinkClick } from '@/src/utils';
 import {
   Table,
   TableHeader,
@@ -12,8 +11,7 @@ import {
   TableHead,
   TableCell,
 } from '@blocksense/ui/Table';
-import { cn } from '@blocksense/ui/utils';
-
+import { cn, onLinkClick } from '@blocksense/ui/utils';
 import { DataTableContext, DataTableProvider } from './DataTableContext';
 import { DataTablePagination } from './DataTablePagination';
 import { DataTableToolbar } from './DataTableToolbar';

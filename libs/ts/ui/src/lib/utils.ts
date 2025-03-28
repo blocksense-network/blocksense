@@ -1,8 +1,28 @@
 import { type ClassValue, clsx } from 'clsx';
+import { MouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function onLinkClick(
+  e: MouseEvent,
+  router: ReturnType<typeof useRouter>,
+  link: string,
+  isTargetBlank?: boolean,
+) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (!link) {
+    return;
+  }
+
+  e.ctrlKey || e.metaKey || isTargetBlank
+    ? window.open(link)
+    : router.push(link);
 }
 
 export type Side = 'left' | 'right' | 'top' | 'bottom';

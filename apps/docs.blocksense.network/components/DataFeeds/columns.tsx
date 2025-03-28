@@ -1,8 +1,7 @@
 import { Tooltip } from '@blocksense/ui/Tooltip';
-
-import { DataTableColumnHeader } from '@/components/common/DataTable/DataTableColumnHeader';
-import { DataTableBadge } from '@/components/common/DataTable/DataTableBadge';
-import { ColumnDef } from '@/components/common/DataTable/dataTableUtils';
+import { DataTableColumnHeader } from '@blocksense/ui/DataTable';
+import { DataTableBadge } from '@blocksense/ui/DataTable';
+import { ColumnDef } from '@blocksense/ui/DataTable';
 
 export const columns: ColumnDef[] = [
   {
