@@ -9,17 +9,20 @@ in
 {
   mkReporterConfig =
     reporter-opts:
+    let
+      inherit (reporter-opts) reporter-info;
+    in
     dashToUnderscoreRecursive {
       inherit (reporter-opts.reporter-info)
-        reporter-id
         interval-time-in-seconds
         secret-key
         second-consensus-secret-key
         kafka-endpoint
         ;
 
-      sequencer = reporter-opts.reporter-info.sequencer-url;
-      registry = reporter-opts.reporter-info.registry-url;
+      reporter-id = reporter-info.id;
+      sequencer = reporter-info.sequencer-url;
+      registry = reporter-info.registry-url;
 
       capabilities = builtins.attrValues (
         builtins.mapAttrs (id: data: { inherit id data; }) reporter-opts.api-keys
