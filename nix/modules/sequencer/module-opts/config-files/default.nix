@@ -15,6 +15,6 @@ in
 mkModuleSettings (
   reporter-configs
   // {
-    sequencer_config = import ./sequencer-config.nix args;
+    "sequencer_config" = import ./sequencer-config.nix args;
   }
 )
