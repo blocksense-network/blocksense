@@ -447,6 +447,16 @@ mod tests {
             update.should_skip(&one_percent_threshold, &history),
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
         );
+
+        history.push_next(
+            feed_id,
+            FeedType::Text("spiderman".to_owned()),
+            end_slot_timestamp - 400_u128,
+        );
+        assert_eq!(
+            update.should_skip(&one_percent_threshold, &history),
+            SkipDecision::DontSkip(DontSkipReason::HistoryError)
+        );
     }
 
     #[test]
