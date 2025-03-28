@@ -9,10 +9,10 @@ dashToUnderscoreRecursive {
     admin-port
     block-config
     providers
-    reporters
     kafka-report-endpoint
     http-input-buffer-size
     ;
 
+  reporters = cfg.sequencer.whitelisted-reporters;
   prometheus-port = cfg.sequencer.metrics-port;
 }
