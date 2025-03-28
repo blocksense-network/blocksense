@@ -91,7 +91,7 @@ impl FeedSlotsProcessor {
 
         let mut consumed_reports = ConsumedReports {
             is_quorum_reached: false,
-            skip_publishing: SkipDecision::DoSkip(DoSkipReason::NothingToPost),
+            skip_decision: SkipDecision::DoSkip(DoSkipReason::NothingToPost),
             ad_score: None,
             result_post_to_contract: None,
             end_slot_timestamp,
@@ -156,7 +156,7 @@ impl FeedSlotsProcessor {
             return Ok(());
         }
 
-        let skip_decision = &consumed_reports.skip_publishing;
+        let skip_decision = &consumed_reports.skip_decision;
         if let Some(feed_metrics) = &feed_metrics {
             let feed_id = self.key;
             match skip_decision {

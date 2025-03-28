@@ -48,7 +48,7 @@ pub fn check_signature(
 #[derive(Debug)]
 pub struct ConsumedReports {
     pub is_quorum_reached: bool,
-    pub skip_publishing: SkipDecision,
+    pub skip_decision: SkipDecision,
     pub ad_score: Option<f64>,
     pub result_post_to_contract: Option<VotedFeedUpdateWithProof>,
     pub end_slot_timestamp: Timestamp,
@@ -76,7 +76,7 @@ pub async fn consume_reports(
         info!("No reports found for feed: {} slot: {}!", name, &slot);
         ConsumedReports {
             is_quorum_reached: false,
-            skip_publishing: SkipDecision::DoSkip(DoSkipReason::NothingToPost),
+            skip_decision: SkipDecision::DoSkip(DoSkipReason::NothingToPost),
             ad_score: None,
             result_post_to_contract: None,
             end_slot_timestamp,
@@ -107,7 +107,7 @@ pub async fn consume_reports(
         let mut ad_score_opt: Option<f64> = None;
 
         // Oneshot feeds have no history, so we cannot perform anomaly detection on them.
-        let skip_publishing = if !is_oneshot {
+        let skip_decision = if !is_oneshot {
             if let Some(history) = history {
                 if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
                     let ad_score =
@@ -151,7 +151,7 @@ pub async fn consume_reports(
         };
         let res = ConsumedReports {
             is_quorum_reached,
-            skip_publishing,
+            skip_decision,
             ad_score: ad_score_opt,
             result_post_to_contract: Some(VotedFeedUpdateWithProof {
                 update: result_post_to_contract,
