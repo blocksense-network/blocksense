@@ -111,11 +111,9 @@ async fn process_report(
         }
     };
 
-    trace!(
+    debug!(
         "data_feed = {:?}; feed_id = {:?}; reporter_id = {:?}",
-        data_feed,
-        feed_id,
-        reporter_id
+        data_feed, feed_id, reporter_id
     );
     let feed = {
         let reg = sequencer_state.registry.read().await;

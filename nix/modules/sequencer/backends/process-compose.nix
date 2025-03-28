@@ -141,7 +141,7 @@ let
     blockchain-reader.process-compose = {
       command = "${blockchain_reader.program} --bootstrap-server localhost:9092 --topic blockchain --from-beginning";
       shutdown.signal = 9;
-      depends_on.kafka.condition = "process_started";
+      # depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
       log_location = cfg.logsDir + "/blockchain-reader.log";
     };
@@ -151,7 +151,7 @@ let
     aggregate-consensus-reader.process-compose = {
       command = "${aggregate_consensus_reader.program}  --bootstrap-server localhost:9092 --topic aggregation_consensus --from-beginning";
       shutdown.signal = 9;
-      depends_on.kafka.condition = "process_started";
+      # depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
       log_location = cfg.logsDir + "/aggregate-consensus-reader.log";
     };

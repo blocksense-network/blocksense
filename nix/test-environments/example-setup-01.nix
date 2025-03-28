@@ -19,9 +19,9 @@ let
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
 {
-  services.kafka = {
-    enable = true;
-  };
+  # services.kafka = {
+  #   enable = true;
+  # };
   services.blocksense = {
     enable = true;
 
@@ -112,6 +112,7 @@ in
         ink-sepolia = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyADFSContractAddressInk;
+          safe_address = "0x23BC561ea93063B0cD12b6E3c690D40c93e29692";
           contract_version = 2;
           transaction_gas_limit = 20000000;
           impersonated_anvil_account = impersonationAddress;
@@ -119,7 +120,7 @@ in
       };
 
       kafka-report-endpoint = {
-        url = null;
+        url = "127.0.0.1:9092";
       };
 
       reporters = [
@@ -130,7 +131,7 @@ in
         }
       ];
 
-      log-level = "info";
+      log-level = "debug";
     };
 
     reporters = {
@@ -139,7 +140,7 @@ in
           reporter_id = 0;
           interval_time_in_seconds = 30;
           secret_key = "${testKeysDir}/reporter_secret_key";
-          second_consensus_secret_key = "${testKeysDir}/reporter_secret_key";
+          second_consensus_secret_key = "${testKeysDir}/reporter_second_consensus_secret_key";
         };
         api-keys = { };
       };
