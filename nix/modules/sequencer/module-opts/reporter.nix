@@ -2,41 +2,39 @@
 with lib;
 {
   options = {
-    reporter-info = {
-      sequencer-url = mkOption {
-        type = types.str;
-        default = "http://127.0.0.1:${toString cfg.sequencer.main-port}";
-        description = "The url of the sequencer.";
-      };
-      registry-url = mkOption {
-        type = types.str;
-        default = "http://127.0.0.1:${toString cfg.sequencer.admin-port}";
-        description = "The url of the registry.";
-      };
+    sequencer-url = mkOption {
+      type = types.str;
+      default = "http://127.0.0.1:${toString cfg.sequencer.main-port}";
+      description = "The url of the sequencer.";
+    };
+    registry-url = mkOption {
+      type = types.str;
+      default = "http://127.0.0.1:${toString cfg.sequencer.admin-port}";
+      description = "The url of the registry.";
+    };
 
-      id = mkOption {
-        type = types.int;
-        description = mdDoc "The reporter id.";
-        example = 1;
-      };
-      interval-time-in-seconds = mkOption {
-        type = types.int;
-        default = 10;
-        description = "The period in seconds to poll for new data.";
-      };
-      secret-key = mkOption {
-        type = types.path;
-        description = "The path to the reporter secret key.";
-      };
-      second-consensus-secret-key = mkOption {
-        type = types.path;
-        description = "The path to the reporter second consensus secret key.";
-      };
-      kafka-endpoint = mkOption {
-        type = types.str;
-        default = cfg.sequencer.kafka-report-endpoint.url;
-        description = "The url of the kafka server.";
-      };
+    id = mkOption {
+      type = types.int;
+      description = mdDoc "The reporter id.";
+      example = 1;
+    };
+    interval-time-in-seconds = mkOption {
+      type = types.int;
+      default = 10;
+      description = "The period in seconds to poll for new data.";
+    };
+    secret-key = mkOption {
+      type = types.path;
+      description = "The path to the reporter secret key.";
+    };
+    second-consensus-secret-key = mkOption {
+      type = types.path;
+      description = "The path to the reporter second consensus secret key.";
+    };
+    kafka-endpoint = mkOption {
+      type = types.str;
+      default = cfg.sequencer.kafka-report-endpoint.url;
+      description = "The url of the kafka server.";
     };
 
     api-keys = mkOption {
