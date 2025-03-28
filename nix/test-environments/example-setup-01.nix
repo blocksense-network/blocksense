@@ -118,9 +118,7 @@ in
         };
       };
 
-      kafka-report-endpoint = {
-        url = null;
-      };
+      kafka-report-endpoint = null;
 
       whitelisted-reporters = [
         {

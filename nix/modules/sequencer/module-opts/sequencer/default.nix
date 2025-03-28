@@ -69,12 +69,9 @@ lib: with lib; {
   };
 
   kafka-report-endpoint = mkOption {
-    type = types.submodule (import ./kafka-report-endpoint.nix lib);
-    default = { };
+    type = types.nullOr types.str;
     description = mdDoc "URL to Apache Kafka server that facilitates decentralized communication.";
-    example = {
-      "url" = "127.0.0.1:9092";
-    };
+    example = "127.0.0.1:9092";
   };
 
   http-input-buffer-size = mkOption {

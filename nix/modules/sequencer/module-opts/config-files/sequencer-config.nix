@@ -10,9 +10,10 @@ dashToUnderscoreRecursive {
     admin-port
     block-config
     providers
-    kafka-report-endpoint
     http-input-buffer-size
     ;
+
+  kafka-report-endpoint.url = kafka-report-endpoint;
 
   reporters = whitelisted-reporters;
   prometheus-port = metrics-port;
