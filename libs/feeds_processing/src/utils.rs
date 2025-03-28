@@ -412,14 +412,15 @@ pub mod tests {
     }
 
     async fn call_validate_with_values(
-        feed_ids: [u32; 3],
+        reporter_feed_ids: [u32; 3],
         reporter_last_votes: [f64; 3],
+        aggregated_feed_ids: [u32; 3],
         aggregated_values: [f64; 3],
     ) -> Result<()> {
         let mut last_votes = HashMap::new();
         // The last votes of the reporter.
         last_votes.insert(
-            feed_ids[0],
+            reporter_feed_ids[0],
             VotedFeedUpdate {
                 feed_id: 1,
                 value: FeedType::Numerical(reporter_last_votes[0]),
@@ -427,7 +428,7 @@ pub mod tests {
             },
         );
         last_votes.insert(
-            feed_ids[1],
+            reporter_feed_ids[1],
             VotedFeedUpdate {
                 feed_id: 5,
                 value: FeedType::Numerical(reporter_last_votes[1]),
@@ -435,7 +436,7 @@ pub mod tests {
             },
         );
         last_votes.insert(
-            feed_ids[2],
+            reporter_feed_ids[2],
             VotedFeedUpdate {
                 feed_id: 11,
                 value: FeedType::Numerical(reporter_last_votes[2]),
@@ -446,17 +447,17 @@ pub mod tests {
         // Aggregated values proposed by the sequencer.
         let updates = vec![
             VotedFeedUpdate {
-                feed_id: feed_ids[0],
+                feed_id: aggregated_feed_ids[0],
                 value: FeedType::Numerical(aggregated_values[0]),
                 end_slot_timestamp: 1677654321,
             },
             VotedFeedUpdate {
-                feed_id: feed_ids[1],
+                feed_id: aggregated_feed_ids[1],
                 value: FeedType::Numerical(aggregated_values[1]),
                 end_slot_timestamp: 1677654322,
             },
             VotedFeedUpdate {
-                feed_id: feed_ids[2],
+                feed_id: aggregated_feed_ids[2],
                 value: FeedType::Numerical(aggregated_values[2]),
                 end_slot_timestamp: 1677654323,
             },
@@ -513,8 +514,13 @@ pub mod tests {
     #[tokio::test]
     async fn test_validate_with_confirmable_input() {
         // All the last votes of the reporter are within 1% deviation from the aggregated values.
-        let result =
-            call_validate_with_values([1, 5, 11], [42.1, 110.6, 552.0], [42.5, 111.5, 555.5]).await;
+        let result = call_validate_with_values(
+            [1, 5, 11],
+            [42.1, 110.6, 552.0],
+            [1, 5, 11],
+            [42.5, 111.5, 555.5],
+        )
+        .await;
 
         assert!(
             result.is_ok(),
@@ -526,17 +532,22 @@ pub mod tests {
     #[tokio::test]
     async fn test_validate_with_non_confirmable_input() {
         // The third vote of the reporter is not within 1% deviation from the aggregated value.
-        let result =
-            call_validate_with_values([1, 5, 11], [42.1, 110.6, 549.5], [42.5, 111.5, 555.5]).await;
+        let result = call_validate_with_values(
+            [1, 5, 11],
+            [42.1, 110.6, 549.5],
+            [1, 5, 11],
+            [42.5, 111.5, 555.5],
+        )
+        .await;
 
         assert!(
             result.is_err(),
             "validate confirmation of higher than 1% deviation!"
         );
 
-        // Extract the error and check
         let expected_error = "is above 0.01 for feed_id 11";
 
+        // Extract the error and check
         let error_message = result.unwrap_err().to_string();
         assert!(
             error_message.contains(expected_error),
@@ -544,6 +555,29 @@ pub mod tests {
         );
         info!(
             "validate correctly did not approve batch of aggregates: {:?}",
+            error_message
+        );
+    }
+
+    #[tokio::test]
+    async fn test_validate_with_non_confirmable_input_due_to_missing_vote_from_reporter() {
+        // All the last votes of the reporter are within 1% deviation from the aggregated values.
+        let result = call_validate_with_values(
+            [1, 4, 11],
+            [42.1, 110.6, 552.0],
+            [1, 5, 11],
+            [42.5, 111.5, 555.5],
+        )
+        .await;
+
+        let expected_error = "Failed to get latest vote for feed_id: 5";
+
+        // Extract the error and check
+        let error_message = result.unwrap_err().to_string();
+
+        assert_eq!(
+            error_message, expected_error,
+            "Unexpected error message: {}",
             error_message
         );
     }
