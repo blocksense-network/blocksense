@@ -90,6 +90,7 @@ const networks = [
   'swellchain-testnet',
   'taiko-mainnet',
   'taiko-hekla',
+  'tanssi-demo',
   'taraxa-testnet',
   'telos-testnet',
   'zksync-mainnet',
@@ -105,7 +106,7 @@ const chainIds = [
   994873017, 1952959480, 169, 3441006, 5003, 1750, 59902, 6342, 31611, 10143,
   2818, 2810, 10, 11155420, 5611, 7849306, 98867, 137, 80002, 1101, 2442, 57000,
   200018, 31, 534352, 534351, 11011, 50312, 16, 57054, 1660990954, 1924, 167000,
-  167009, 842, 41, 324, 300, 4801,
+  167009, 5678, 842, 41, 324, 300, 4801,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -152,6 +153,7 @@ export enum Currency {
   ROME = 'ROME',
   S = 'S',
   STT = 'STT',
+  TANGO = 'TANGO',
   TARA = 'TARA',
   tBNB = 'tBNB',
   TCRO = 'TCRO',
@@ -632,6 +634,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://hekla.taikoscan.io',
     currency: Currency.ETH,
+  },
+  'tanssi-demo': {
+    chainId: 5678,
+    isTestnet: true,
+    explorerUrl: 'https://fra-dancebox-3001-bs.a.dancebox.tanssi.network',
+    currency: Currency.TANGO,
   },
   'taraxa-testnet': {
     chainId: 842,
