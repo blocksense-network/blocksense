@@ -50,8 +50,8 @@ lib: with lib; {
     };
   };
 
-  reporters = mkOption {
-    type = types.listOf (types.submodule (import ./known-reporters.nix lib));
+  whitelisted-reporters = mkOption {
+    type = types.listOf (types.submodule (import ./whitelisted-reporters.nix lib));
     default = [ ];
     description = mdDoc "The list of whitelisted reporter public keys.";
     example = [
