@@ -297,7 +297,6 @@ pub async fn validate(
     let updates_to_serialize = BatchedAggegratesToSend {
         block_height: batch.block_height,
         updates: batch.updates,
-        proofs: batch.proofs,
     };
 
     let calldata = match adfs_serialize_updates(
@@ -474,7 +473,6 @@ pub mod tests {
         let updates_to_serialize = BatchedAggegratesToSend {
             block_height,
             updates: updates.clone(),
-            proofs: HashMap::new(),
         };
 
         let calldata = adfs_serialize_updates(
@@ -500,7 +498,6 @@ pub mod tests {
             calldata,
             updates,
             feeds_rounds,
-            proofs: HashMap::new(),
         };
 
         validate(

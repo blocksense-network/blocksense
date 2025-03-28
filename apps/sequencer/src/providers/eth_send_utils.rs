@@ -898,7 +898,6 @@ mod tests {
         let updates_oneshot = BatchedAggegratesToSend {
             block_height: 0,
             updates: vec![voted_update],
-            proofs: HashMap::new(),
         };
         let provider_settings = cfg
             .providers
@@ -1041,7 +1040,6 @@ mod tests {
                 18,
             )
             .unwrap()],
-            proofs: HashMap::new(),
         };
 
         let result =
@@ -1136,17 +1134,14 @@ mod tests {
             let updates1 = BatchedAggegratesToSend {
                 block_height: 0,
                 updates: vec![v1],
-                proofs: HashMap::new(),
             };
             let updates2 = BatchedAggegratesToSend {
                 block_height: 1,
                 updates: vec![v2],
-                proofs: HashMap::new(),
             };
             let updates3 = BatchedAggegratesToSend {
                 block_height: 2,
                 updates: vec![v3],
-                proofs: HashMap::new(),
             };
 
             let p1 =
@@ -1335,7 +1330,6 @@ mod tests {
         let mut updates = BatchedAggegratesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
-            proofs: HashMap::new(),
         };
         filter_allowed_feeds(network, &mut updates, &None);
         let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
@@ -1377,7 +1371,6 @@ mod tests {
         let mut updates = BatchedAggegratesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
-            proofs: HashMap::new(),
         };
 
         filter_allowed_feeds(
@@ -1488,7 +1481,6 @@ mod tests {
         BatchedAggegratesToSend {
             block_height: 1,
             updates: vec![v1, v2, v3, v4, v5],
-            proofs: HashMap::new(),
         }
     }
 

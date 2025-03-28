@@ -281,7 +281,6 @@ async fn generate_block(
         if let Err(e) = batched_votes_send.send(BatchedAggegratesToSend {
             block_height,
             updates: value_updates,
-            proofs,
         }) {
             error!(
                 "Channel for propagating batched updates to sender failed: {}",
