@@ -40,3 +40,4 @@ indent_size = 2
 
 [*.rs]
 indent_size = unset
+
