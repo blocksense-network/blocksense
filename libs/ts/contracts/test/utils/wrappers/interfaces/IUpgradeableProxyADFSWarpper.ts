@@ -14,9 +14,10 @@ export interface IUpgradeableProxyADFSWrapper
   contract: UpgradeableProxyADFS;
   implementation: ADFSWrapper | ADFSGenericWrapper;
 
-  upgradeImplementation(
+  upgradeImplementationAndCall(
     newImplementation: ADFSWrapper,
     admin: HardhatEthersSigner,
+    calldata: string,
     opts?: {
       txData?: any;
     },

@@ -22,12 +22,16 @@ contract UpgradeableProxyADFS {
   error ProxyDeniedAdminAccess();
   error InvalidUpgrade(address value);
 
+  /// @notice Thrown when an upgrade function sees `msg.value > 0` that may be lost.
+  error ERC1967NonPayable();
+
   /// @notice Construct the UpgradeableProxy contract
   /// @param owner The address of the admin
   /// @param logic The address of the initial implementation
-  constructor(address owner, address logic) {
+  /// @param data The data to be passed to the implementation
+  constructor(address owner, address logic, bytes memory data) payable {
     _setAdmin(owner);
-    _upgradeTo(logic);
+    _upgradeToAndCall(logic, data);
   }
 
   /// @notice Fallback function
@@ -48,7 +52,7 @@ contract UpgradeableProxyADFS {
       if (!isAdmin) revert ProxyDeniedAdminAccess();
 
       if (msg.sig == 0x00000001) {
-        _upgradeTo(address(bytes20(msg.data[4:])));
+        _upgradeToAndCall(address(bytes20(msg.data[4:])), msg.data[24:]);
         return;
       } else if (msg.sig == 0x00000002) {
         _setAdmin(address(bytes20(msg.data[4:])));
@@ -73,19 +77,23 @@ contract UpgradeableProxyADFS {
         0
       )
 
-      // Copy the returned data.
-      returndatacopy(0, 0, returndatasize())
-
       if iszero(result) {
         revert(0, returndatasize())
       }
+
+      // Copy the returned data.
+      returndatacopy(0, 0, returndatasize())
+
       return(0, returndatasize())
     }
   }
 
   /// @notice Upgrade the implementation to a new implementation
   /// @param newImplementation The address of the new implementation
-  function _upgradeTo(address newImplementation) internal {
+  function _upgradeToAndCall(
+    address newImplementation,
+    bytes memory data
+  ) internal {
     if (newImplementation.code.length == 0) {
       revert InvalidUpgrade(newImplementation);
     }
@@ -94,6 +102,24 @@ contract UpgradeableProxyADFS {
       sstore(IMPLEMENTATION_SLOT, newImplementation)
     }
     emit Upgraded(newImplementation);
+
+    if (data.length > 0) {
+      assembly {
+        let result := delegatecall(
+          gas(),
+          newImplementation,
+          add(data, 0x20),
+          mload(data),
+          0,
+          0
+        )
+        if iszero(result) {
+          revert(0, 0)
+        }
+      }
+    } else if (msg.value > 0) {
+      revert ERC1967NonPayable();
+    }
   }
 
   /// @notice Change the owner of the upgradable proxy
