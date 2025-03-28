@@ -23,6 +23,6 @@ in
 
       # Shared config
       oracles = builtins.attrValues cfg.oracles;
-      data_feeds = [ ];
+      data-feeds = [ ];
     };
 }
