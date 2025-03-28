@@ -13,6 +13,7 @@
     jq
     curl
     oras
+    just
   ];
 
   enterShell = ''
