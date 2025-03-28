@@ -2,7 +2,6 @@
 
 import React, { useContext } from 'react';
 
-import { Input } from '@blocksense/ui/Input';
 import { Button } from '@blocksense/ui/Button';
 import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 
@@ -10,6 +9,7 @@ import { DataTableContext } from './DataTableContext';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
 import { DataTableViewOptions } from './DataTableViewOptions';
 import { FilterType } from './dataTableUtils';
+import { DataTableSearch } from './DataTableSearch';
 
 interface DataTableToolbarProps {
   filterCellTitle?: string;
@@ -27,19 +27,13 @@ export function DataTableToolbar({ filterCellTitle }: DataTableToolbarProps) {
 
   return (
     <section className="flex flex-col gap-2">
-      {filterCellTitle && (
+      {facetedFilters.length > 0 && filterCellTitle && (
         <aside className="flex space-x-2 items-start w-full">
-          <Input
-            placeholder={`Filter ${filterCellTitle}...`}
-            value={searchValue}
-            onChange={e => setSearchValue(e.target.value)}
-            className="h-8 w-full min-w-[250px] lg:w-[250px] mr-1 lg:mr-2 border-solid border-neutral-200 transition-all duration-200"
-            type="search"
-          />
+          <DataTableSearch filterCellTitle={filterCellTitle} />
         </aside>
       )}
       <section className="flex flex-wrap gap-2 items-center">
-        {facetedFilters.length > 0 && (
+        {facetedFilters.length > 0 ? (
           <div className="flex items-center gap-2">
             {facetedFilters.map((facetedFilter: FilterType) => (
               <DataTableFacetedFilter
@@ -59,6 +53,10 @@ export function DataTableToolbar({ filterCellTitle }: DataTableToolbarProps) {
               />
             ))}
           </div>
+        ) : (
+          filterCellTitle && (
+            <DataTableSearch filterCellTitle={filterCellTitle} />
+          )
         )}
         {isFiltered && (
           <Button
