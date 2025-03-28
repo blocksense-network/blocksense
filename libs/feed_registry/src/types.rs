@@ -209,9 +209,15 @@ impl FeedType {
                     |s: String, max_width: usize| -> String { s.chars().take(max_width).collect() };
 
                 let str_val = val.to_string();
+
                 let val_split: Vec<&str> = str_val.split('.').collect();
 
-                let integer = val_split[0].parse::<BigUint>().unwrap();
+                let integer = match val_split[0].parse::<BigUint>() {
+                    Ok(v) => v,
+                    Err(err) => {
+                        panic!("FeedType::as_bytes error: {err:?}. Value was {val}. Formatted like {str_val:?}");
+                    }
+                };
 
                 let actual_digits_in_fraction: usize;
                 let fraction: BigUint;

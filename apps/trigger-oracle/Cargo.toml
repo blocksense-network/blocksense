@@ -10,12 +10,12 @@ edition = { workspace = true }
 [dependencies]
 prometheus = { path = "../../libs/prometheus" }
 data_feeds = { path = "../../libs/data_feeds"}
+feeds_processing = { path = "../../libs/feeds_processing"}
 feed_registry = { path = "../../libs/feed_registry"}
 crypto = { path = "../../libs/crypto"}
 config = {path = "../../libs/config"}
 gnosis_safe = { path = "../../libs/gnosis_safe"}
 utils = { workspace = true }
-feeds_processing = { path = "../../libs/feeds_processing"}
 
 anyhow = { workspace = true }
 clap = { version = "3.1.15", features = ["derive", "env"] }
