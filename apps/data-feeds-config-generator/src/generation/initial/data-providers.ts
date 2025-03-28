@@ -1,10 +1,10 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
+import { keysOf } from '@blocksense/base-utils/array-iter';
 import {
   Pair,
-  ProvidersResources,
+  CryptoPriceFeedsArgs,
 } from '@blocksense/config-types/data-feeds-config';
-import { keysOf } from '@blocksense/base-utils/array-iter';
 
 import { artifactsDir } from '../../paths';
 import { AssetInfo } from '../../data-services/exchange-assets';
@@ -49,8 +49,8 @@ export async function addDataProviders(
 function getAllProvidersForFeed(
   feed: SimplifiedFeed,
   exchangeAssets: ProviderData[],
-): ProvidersResources {
-  const providers: ProvidersResources = {};
+): CryptoPriceFeedsArgs {
+  const providers: CryptoPriceFeedsArgs = {};
 
   const addProvider = (key: string, type: ProviderData['type'], value: any) => {
     if (value) {
