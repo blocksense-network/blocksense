@@ -38,6 +38,37 @@ jobs:
       - name: nix flake check
         run: nix flake check --impure
 
+  build-and-test-ts-libs-and-apps:
+    runs-on: [self-hosted, nixos, x86-64-v3]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+        if: ${{ runner.environment == 'github-hosted' }}
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v16
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
+          env >> "$GITHUB_ENV"
+
+      - name: Install JS deps
+        run: yarn install
+
+      - name: Build all packages
+        run: just build-ts
+
+      - name: Test all packages
+        run: just test-ts
+
   smart-contracts-tests:
     timeout-minutes: 360
     runs-on: [self-hosted, nixos, x86-64-v3]

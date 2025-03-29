@@ -3,6 +3,17 @@ root-dir := justfile_directory()
 default:
   @just --list
 
+build-ts:
+  yarn build-single @blocksense/base-utils
+  yarn build-single @blocksense/config-types
+  yarn build-single @blocksense/sol-reflector
+  yarn build-single @blocksense/data-feeds-config-generator
+
+test-ts:
+  yarn test-single @blocksense/base-utils
+  yarn test-single @blocksense/config-types
+  yarn test-single @blocksense/data-feeds-config-generator
+
 build-oracle oracle-name:
   #!/usr/bin/env bash
   set -euo pipefail

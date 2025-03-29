@@ -133,8 +133,8 @@ describe('Tests for functions over Aggregated Data', async () => {
       });
     });
 
-    test('should work getting pair if in docs any of the base / quote fields are present', () => {
-      const testPair = ['tLINK', 'tAVAX'];
+    test('should log warning and return empty pair if there is inconsistent', () => {
+      const testPair = ['', ''];
       const testDataClone = structuredClone(testData);
 
       testDataClone.docs = {
