@@ -1,2 +1,7 @@
 @import 'tailwindcss';
 @plugin "tailwindcss-animate";
+
+@theme {
+  --font-geist: var(--font-geist);
+  --font-geist-mono: var(--font-geist-mono);
+}

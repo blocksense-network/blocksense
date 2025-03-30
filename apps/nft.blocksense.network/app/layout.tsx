@@ -1,6 +1,7 @@
 import NextHead from 'next/head';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
+import { geist, geistMono } from '../src/geist';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -51,7 +52,12 @@ export const metadata: Metadata = {
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning>
+    <html
+      lang="en"
+      dir="ltr"
+      className={`${geist.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <NextHead>
         <meta
           name="description"
