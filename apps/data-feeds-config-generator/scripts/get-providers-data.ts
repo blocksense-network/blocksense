@@ -4,7 +4,7 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import * as aggregatorFetchers from '../src/data-services/fetchers/aggregators/index';
 import * as exchangeFetchers from '../src/data-services/fetchers/exchanges/index';
-import { ProviderData } from '../src/feeds-config/data-providers';
+import { ProviderData } from '../src/generation/initial/data-providers';
 import { artifactsDir } from '../src/paths';
 
 async function main() {
