@@ -5,22 +5,24 @@ lib: with lib; {
     description = mdDoc "An identifier for the sequencer, useful when we have more than one.";
   };
 
-  main-port = mkOption {
-    type = types.port;
-    default = 8877;
-    description = mdDoc "The port the sequencer will listen on for incoming reports.";
-  };
+  ports = {
+    main = mkOption {
+      type = types.port;
+      default = 8877;
+      description = mdDoc "The port the sequencer will listen on for incoming reports.";
+    };
 
-  admin-port = mkOption {
-    type = types.port;
-    default = 5556;
-    description = mdDoc "The port the sequencer will listen on for admin requests.";
-  };
+    admin = mkOption {
+      type = types.port;
+      default = 5556;
+      description = mdDoc "The port the sequencer will listen on for admin requests.";
+    };
 
-  metrics-port = mkOption {
-    type = types.port;
-    default = 5555;
-    description = mdDoc "The port the sequencer will listen on for prometheus metrics.";
+    metrics = mkOption {
+      type = types.port;
+      default = 5555;
+      description = mdDoc "The port the sequencer will listen on for prometheus metrics.";
+    };
   };
 
   block-config = mkOption {
