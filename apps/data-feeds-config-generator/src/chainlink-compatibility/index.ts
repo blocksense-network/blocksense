@@ -14,7 +14,7 @@ import {
 import { parseNetworkFilename, chainlinkNetworkNameToChainId } from './types';
 
 import { artifactsDir } from '../paths';
-import { RawDataFeeds } from '../data-services/types';
+import { RawDataFeeds } from '../data-services/fetchers/chainlink/types';
 import { FeedRegistryEventsPerAggregator } from '../chainlink-compatibility/types';
 
 async function getBlocksenseFeedsCompatibility(
