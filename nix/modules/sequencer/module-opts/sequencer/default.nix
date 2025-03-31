@@ -1,5 +1,5 @@
 lib: with lib; {
-  sequencer-id = mkOption {
+  id = mkOption {
     type = types.int;
     default = 1;
     description = mdDoc "An identifier for the sequencer, useful when we have more than one.";
