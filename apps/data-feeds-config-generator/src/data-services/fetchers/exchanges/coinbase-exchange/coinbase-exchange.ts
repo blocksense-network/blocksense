@@ -1,5 +1,5 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../../../exchange-assets';
+import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
 import {
   CoinbaseAssetInfo,
   CoinbaseInfoResp,

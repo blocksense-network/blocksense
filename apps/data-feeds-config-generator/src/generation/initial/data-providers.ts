@@ -7,7 +7,7 @@ import {
 } from '@blocksense/config-types/data-feeds-config';
 
 import { artifactsDir } from '../../paths';
-import { AssetInfo } from '../../data-services/exchange-assets';
+import { AssetInfo } from '../../data-services/fetchers/exchanges/exchange-assets';
 import { SimplifiedFeed } from './types';
 
 export type ProviderData = {

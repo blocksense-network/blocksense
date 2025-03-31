@@ -2,7 +2,7 @@ import { Schema as S } from 'effect';
 
 import { getEnvString } from '@blocksense/base-utils/env';
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../../exchange-assets';
+import { AssetInfo, ExchangeAssetsFetcher } from '../exchanges/exchange-assets';
 
 /**
  * Class to fetch assets information from CoinMarketCap.
