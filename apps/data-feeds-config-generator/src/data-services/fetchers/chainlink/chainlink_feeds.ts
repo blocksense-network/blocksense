@@ -18,14 +18,14 @@ import {
   decodeConfirmedFeedEvent,
   FeedRegistryEventsPerAggregator,
   parseNetworkFilename,
-} from '../chainlink-compatibility/types';
+} from '../../../chainlink-compatibility/types';
 import {
   ChainLinkFeedDocsInfo,
   RawDataFeeds,
   decodeChainLinkFeedsInfo,
 } from './types';
 import { Pair, createPair } from '@blocksense/config-types/data-feeds-config';
-import { CLArtifacts } from './artifacts-downloader';
+import { CLArtifacts } from '../../artifacts-downloader';
 
 export async function collectRawDataFeeds(clArtifacts: CLArtifacts[]) {
   const rawDataFeeds: RawDataFeeds = {};
