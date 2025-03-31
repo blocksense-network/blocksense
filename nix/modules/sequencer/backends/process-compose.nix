@@ -103,7 +103,7 @@ let
       command = "${sequencer.program}";
       readiness_probe = {
         exec.command = ''
-          curl -fsSL http://127.0.0.1:${toString cfg.sequencer.admin-port}/health \
+          curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
             -H 'content-type: application/json'
         '';
         initial_delay_seconds = 0;
