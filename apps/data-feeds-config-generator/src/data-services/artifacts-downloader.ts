@@ -3,7 +3,10 @@ import { Schema, ParseResult } from 'effect';
 
 import { getEnvString } from '@blocksense/base-utils/env';
 import { ProviderData } from '../generation/initial/data-providers';
-import { ChainLinkFeedInfo, ChainLinkFeedInfoSchema } from './types';
+import {
+  ChainLinkFeedInfo,
+  ChainLinkFeedInfoSchema,
+} from './fetchers/chainlink/types';
 import {
   CMCMarketCapDataRes,
   CMCMarketCapDataResSchema,
