@@ -30,6 +30,10 @@ with lib;
       type = types.str;
     };
 
+    interval_time_in_seconds = mkOption {
+      type = types.int;
+    };
+
     allowed_outbound_hosts = mkOption {
       type = types.listOf types.str;
     };
