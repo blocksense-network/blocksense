@@ -6,11 +6,11 @@ import chalk from 'chalk';
 import chalkTemplate from 'chalk-template';
 
 import {
+  getOptionalApiKey,
   getOptionalRpcUrl,
   networkMetadata,
   NetworkName,
 } from '@blocksense/base-utils/evm';
-import { kebabToCamelCase } from '@blocksense/base-utils/string';
 import {
   EthereumAddress,
   parseEthereumAddress,
@@ -18,12 +18,7 @@ import {
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import { throwError } from '@blocksense/base-utils/errors';
 
-import {
-  API_ENDPOINTS,
-  API_KEYS,
-  Transaction,
-  deployedNetworks,
-} from '../types';
+import { Transaction, deployedNetworks } from '../types';
 
 function getHourDifference(transactions: Transaction[]): number {
   const txsLen = transactions.length;
@@ -151,11 +146,8 @@ const fetchTransactionsForNetwork = async (
   firstTxTime: string;
   lastTxTime: string;
 }> => {
-  const snakeCaseNetwork = kebabToCamelCase(
-    network,
-  ) as keyof typeof API_ENDPOINTS;
-  const apiUrl = API_ENDPOINTS[snakeCaseNetwork];
-  const apikey = API_KEYS[snakeCaseNetwork];
+  const apiUrl = networkMetadata[network].explorer?.apiUrl;
+  const apikey = getOptionalApiKey(network);
   if (!apiUrl) {
     console.log(chalk.red(`Skipping ${network}: Missing API configuration`));
     return { transactions: [], firstTxTime: '', lastTxTime: '' };
@@ -177,19 +169,22 @@ const fetchTransactionsForNetwork = async (
       let currentPage = 1;
       let totalPages = 1;
       do {
-        const page = await axios.get(apiUrl, {
-          params: {
-            module: 'account',
-            action: 'txlist',
-            address,
-            startblock: 0,
-            endblock: 99999999,
-            sort: 'desc',
-            apikey,
-            limit: 100,
-            currentPage,
+        const page = await axios.get(
+          'https://explorer-api.cronos.org/testnet/api/v1/account/getTxsByAddress',
+          {
+            params: {
+              module: 'account',
+              action: 'txlist',
+              address,
+              startblock: 0,
+              endblock: 99999999,
+              sort: 'desc',
+              apikey,
+              limit: 100,
+              currentPage,
+            },
           },
-        });
+        );
         const txFromPage = page.data.result;
         rawTransactions = rawTransactions.concat(txFromPage);
         totalPages = page.data.pagination.totalPage;
@@ -202,7 +197,7 @@ const fetchTransactionsForNetwork = async (
           action: 'txlist',
           address,
           startblock: 0,
-          endblock: 99999999,
+          endblock: 999999999,
           sort: 'desc',
           apikey,
         },
