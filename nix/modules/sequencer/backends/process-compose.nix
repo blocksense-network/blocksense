@@ -1,13 +1,10 @@
-{ self', ... }:
+{ self', cfg, ... }:
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
-  cfg = config.services.blocksense;
-
   inherit (self'.apps)
     sequencer
     blocksense
@@ -27,27 +24,17 @@ let
     flush_each_line = true;
   };
 
-  sequencerConfigJSON = pkgs.runCommandLocal "sequencer_config" { } ''
-    mkdir -p $out
-    echo '${cfg._sequencer-config-txt}' \
-      | ${lib.getExe pkgs.jq} > $out/sequencer_config.json
-  '';
-
-  reportersConfigJSON = builtins.mapAttrs (
-    name: _value: pkgs.writers.writeJSON "blocksense-config.json" cfg._blocksense-config-txt.${name}
-  ) cfg.reporters;
-
   anvilInstances = lib.mapAttrs' (
     name:
     {
       port,
-      _command,
+      command,
       ...
     }:
     {
       name = "anvil-${name}";
       value.process-compose = {
-        command = _command;
+        inherit command;
         readiness_probe = {
           exec.command = ''
             curl -fsSL http://127.0.0.1:${toString port}/ \
@@ -67,8 +54,8 @@ let
   anvilImpersonateAndFundInstances = lib.mapAttrs' (name: provider: {
     name = "anvil-impersonate-and-fund-${name}";
     value.process-compose = {
-      command = "cast rpc --rpc-url ${toString provider.url} anvil_impersonateAccount ${toString provider.impersonated_anvil_account} && \
-        cast send --rpc-url ${toString provider.url} ${toString provider.impersonated_anvil_account} --value 1000ether --from 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f --unlocked";
+      command = "cast rpc --rpc-url ${toString provider.url} anvil_impersonateAccount ${toString provider.impersonated-anvil-account} && \
+        cast send --rpc-url ${toString provider.url} ${toString provider.impersonated-anvil-account} --value 1000ether --from 0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f --unlocked";
       shutdown.signal = 9;
       depends_on = {
         "anvil-${name}".condition = "process_healthy";
@@ -98,7 +85,8 @@ let
             mkdir -p "${working_dir}" &&
             cd "${working_dir}" &&
             ${installOracleScripts working_dir} &&
-            ${blocksense.program} node build --from ${reportersConfigJSON.${name}} --up
+            ${blocksense.program} node build --up \
+              --from ${cfg.config-files."reporter_config_${name}".path}
           '';
           environment = [ "RUST_LOG=${log-level}" ];
           depends_on = {
@@ -115,7 +103,7 @@ let
       command = "${sequencer.program}";
       readiness_probe = {
         exec.command = ''
-          curl -fsSL http://127.0.0.1:${toString cfg.sequencer.admin-port}/health \
+          curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
             -H 'content-type: application/json'
         '';
         initial_delay_seconds = 0;
@@ -124,7 +112,7 @@ let
       };
       environment = [
         "FEEDS_CONFIG_DIR=${../../../../config}"
-        "SEQUENCER_CONFIG_DIR=${sequencerConfigJSON}"
+        "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
       ];
       shutdown.signal = 9;
