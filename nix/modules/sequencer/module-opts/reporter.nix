@@ -4,12 +4,12 @@ with lib;
   options = {
     sequencer-url = mkOption {
       type = types.str;
-      default = "http://127.0.0.1:${toString cfg.sequencer.main-port}";
+      default = "http://127.0.0.1:${toString cfg.sequencer.ports.main}";
       description = "The url of the sequencer.";
     };
     registry-url = mkOption {
       type = types.str;
-      default = "http://127.0.0.1:${toString cfg.sequencer.admin-port}";
+      default = "http://127.0.0.1:${toString cfg.sequencer.ports.admin}";
       description = "The url of the registry.";
     };
 
