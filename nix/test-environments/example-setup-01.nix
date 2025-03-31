@@ -41,10 +41,10 @@ in
     };
 
     sequencer = {
-      sequencer-id = 1;
       main-port = 9856;
       admin-port = 5553;
       metrics-port = 5551;
+      id = 1;
 
       block-config = {
         max-feed-updates-to-batch = 300;

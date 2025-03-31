@@ -5,7 +5,6 @@ in
 with cfg.sequencer;
 dashToUnderscoreRecursive {
   inherit
-    sequencer-id
     main-port
     admin-port
     block-config
@@ -13,6 +12,7 @@ dashToUnderscoreRecursive {
     http-input-buffer-size
     ;
 
+  sequencer-id = id;
   kafka-report-endpoint.url = kafka-report-endpoint;
 
   reporters = whitelisted-reporters;
