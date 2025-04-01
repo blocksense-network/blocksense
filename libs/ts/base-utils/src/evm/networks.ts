@@ -98,6 +98,7 @@ const networks = [
   'taraxa-testnet',
   'telos-testnet',
   'world-chain-sepolia',
+  'zephyr-testnet',
   'zksync-mainnet',
   'zksync-sepolia',
 ] as const;
@@ -110,7 +111,7 @@ const chainIds = [
   59141, 4202, 994873017, 1952959480, 169, 3441006, 5003, 1750, 59902, 6342,
   31611, 10143, 2818, 2810, 8801, 5851, 10, 11155420, 5611, 7849306, 98867, 137,
   80002, 1101, 2442, 57000, 200018, 31, 534352, 534351, 11011, 50312, 16, 57054,
-  1660990954, 1924, 167000, 167009, 5678, 842, 41, 4801, 324, 300,
+  1660990954, 1924, 167000, 167009, 5678, 842, 41, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -172,6 +173,7 @@ export enum Currency {
   tZKJ = 'tZKJ',
   USDX = 'USDX',
   xDAI = 'xDAI',
+  Z = 'Z',
 }
 
 /**
@@ -688,6 +690,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://worldchain-sepolia.explorer.alchemy.com',
     currency: Currency.ETH,
+  },
+  'zephyr-testnet': {
+    chainId: 1417429182,
+    isTestnet: true,
+    explorerUrl: 'https://zephyr-blockscout.eu-north-2.gateway.fm',
+    currency: Currency.Z,
   },
   'zksync-mainnet': {
     chainId: 324,
