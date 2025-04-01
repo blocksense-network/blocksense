@@ -49,14 +49,6 @@ export const columns: ColumnDef[] = [
     ),
   },
   {
-    id: 'type',
-    title: 'Feed Type',
-    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
-    cell: ({ row }) => (
-      <DataTableBadge>{capitalizeWords(row.type)}</DataTableBadge>
-    ),
-  },
-  {
     id: 'category',
     title: 'Category',
     header: ({ column }) => <DataTableColumnHeader title={column.title} />,

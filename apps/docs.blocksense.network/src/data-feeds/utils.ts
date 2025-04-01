@@ -1,5 +1,15 @@
 import { keysOf } from '@blocksense/base-utils';
-import { NewFeed } from '@blocksense/config-types';
+import { decodeNewFeedsConfig, NewFeed } from '@blocksense/config-types';
+import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
+
+export function getFeedsConfig() {
+  const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
+  return {
+    priceFeeds: {
+      feeds: feedsConfig.feeds.filter(feed => feed.type === 'price-feed'),
+    },
+  };
+}
 
 export function getDataSources(feed: NewFeed) {
   switch (feed.oracle_id) {
