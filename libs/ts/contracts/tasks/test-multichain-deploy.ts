@@ -8,15 +8,11 @@ import {
 } from '@safe-global/safe-core-sdk-types';
 
 import { NetworkConfig, ContractNames } from './types';
-import {
-  getNetworkNameByChainId,
-  parseChainId,
-} from '@blocksense/base-utils/evm';
 
-import { configDir } from '@blocksense/base-utils/env';
+import { configDirs } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
-import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
+import { DeploymentConfigSchemaV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
 import { Feed, WriteOp } from '../test/utils/wrappers/types';
 
@@ -39,16 +35,15 @@ task(
     return;
   }
 
-  const fileName = 'evm_contracts_deployment_v2';
-  const { readJSON } = selectDirectory(configDir);
-
-  const deployedData: DeploymentConfigV2 = await readJSON({ name: fileName });
-
-  const networkName = getNetworkNameByChainId(
-    parseChainId(config.network.chainId),
+  const { decodeJSON } = selectDirectory(
+    configDirs.evm_contracts_deployment_v2,
+  );
+  const deployedData = await decodeJSON(
+    { name: network },
+    DeploymentConfigSchemaV2,
   );
 
-  const deployment = deployedData[networkName]?.contracts!;
+  const deployment = deployedData?.contracts!;
 
   const adminMultisig = await Safe.init({
     provider: config.rpc,
@@ -84,7 +79,7 @@ task(
     await sequencerMultisig.createChangeThresholdTx(1);
   const adminExecutorModule = await ethers.getContractAt(
     'AdminExecutorModule',
-    deployment.coreContracts.AdminExecutorModule.address,
+    deployment.coreContracts.AdminExecutorModule!.address,
   );
 
   const txData =
@@ -147,7 +142,7 @@ task(
 
   const safeGuard = await ethers.getContractAt(
     ContractNames.OnlySequencerGuard,
-    deployment.coreContracts.OnlySequencerGuard.address,
+    deployment.coreContracts.OnlySequencerGuard!.address,
   );
 
   const isValidTransaction = await apiKit.isValidTransaction(writeTx);
@@ -166,16 +161,13 @@ task(
   ////////////////////////////////////////////
   console.log('Checking Aggregator and Registry adapters...');
 
-  const { decodeJSON } = selectDirectory(configDir);
   const { feeds } = await decodeJSON(
-    { name: 'feeds_config_v2' },
+    { name: '../feeds_config_v2' },
     NewFeedsConfigSchema,
   );
 
-  // allowed feeds
-  // filter feeds
   const chainlinkCompatibility = await decodeJSON(
-    { name: 'chainlink_compatibility_v2' },
+    { name: '../chainlink_compatibility_v2' },
     ChainlinkCompatibilityConfigSchema,
   );
 
