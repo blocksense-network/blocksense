@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "build": "yarn build:collect-artifacts && yarn build:tsc && yarn build:nextra && yarn build:pagefind",
-    "build:collect-artifacts": "yarn workspace @blocksense/contracts sol-reflect",
+    "build:collect-artifacts": "yarn workspace @blocksense/contracts sol-reflect && yarn ts scripts/collect-deployment-artifacts.ts",
     "build:tsc": "yarn tsc -p ./tsconfig.lib.json",
     "build:nextra": "next build",
     "build:pagefind": "pagefind --site .next/server/app --output-path public/_pagefind && cp -r public/_pagefind/ dist/",
