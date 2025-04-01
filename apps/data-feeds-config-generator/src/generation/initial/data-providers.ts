@@ -1,6 +1,7 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
 import { keysOf } from '@blocksense/base-utils/array-iter';
+import { equalsCaseInsensitive } from '@blocksense/base-utils/string';
 import {
   Pair,
   CryptoPriceFeedsArgs,
@@ -128,12 +129,6 @@ export const stableCoins = {
   USD: ['USDT', 'USDC'],
   EUR: ['EURC', 'EURS', 'EURt'],
 };
-
-function equalsCaseInsensitive(a: string, b: string) {
-  // FIXME: find why the following causes the program to hang:
-  // return a.localeCompare(b, undefined, { sensitivity: 'base' }) === 0;
-  return a.toLowerCase() === b.toLowerCase();
-}
 
 // Pair validation logic
 function isPairSupportedByCryptoProvider(
