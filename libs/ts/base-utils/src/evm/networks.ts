@@ -97,9 +97,9 @@ const networks = [
   'tanssi-demo',
   'taraxa-testnet',
   'telos-testnet',
+  'world-chain-sepolia',
   'zksync-mainnet',
   'zksync-sepolia',
-  'world-chain-sepolia',
 ] as const;
 
 const chainIds = [
@@ -110,7 +110,7 @@ const chainIds = [
   59141, 4202, 994873017, 1952959480, 169, 3441006, 5003, 1750, 59902, 6342,
   31611, 10143, 2818, 2810, 8801, 5851, 10, 11155420, 5611, 7849306, 98867, 137,
   80002, 1101, 2442, 57000, 200018, 31, 534352, 534351, 11011, 50312, 16, 57054,
-  1660990954, 1924, 167000, 167009, 5678, 842, 41, 324, 300, 4801,
+  1660990954, 1924, 167000, 167009, 5678, 842, 41, 4801, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -683,6 +683,12 @@ export const networkMetadata = {
     explorerUrl: 'https://testnet.teloscan.io',
     currency: Currency.TLOS,
   },
+  'world-chain-sepolia': {
+    chainId: 4801,
+    isTestnet: true,
+    explorerUrl: 'https://worldchain-sepolia.explorer.alchemy.com',
+    currency: Currency.ETH,
+  },
   'zksync-mainnet': {
     chainId: 324,
     isTestnet: false,
@@ -693,12 +699,6 @@ export const networkMetadata = {
     chainId: 300,
     isTestnet: true,
     explorerUrl: 'https://zksync-sepolia.blockscout.com',
-    currency: Currency.ETH,
-  },
-  'world-chain-sepolia': {
-    chainId: 4801,
-    isTestnet: true,
-    explorerUrl: 'https://worldchain-sepolia.explorer.alchemy.com',
     currency: Currency.ETH,
   },
 } satisfies {
