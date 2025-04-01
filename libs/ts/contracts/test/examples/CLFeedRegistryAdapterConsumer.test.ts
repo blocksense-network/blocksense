@@ -40,7 +40,7 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
     const registryOwner = (await ethers.getSigners())[11];
 
     const proxy = new UpgradeableProxyADFSWrapper();
-    await proxy.init(await admin.getAddress(), accessControlAdmin);
+    await proxy.init(admin, accessControlAdmin);
 
     await proxy.implementation.accessControl.setAdminStates(
       accessControlAdmin,
