@@ -16,7 +16,11 @@ export class UpgradeableProxyADFSGenericWrapper extends UpgradeableProxyADFSBase
     this.contract = await deployContract<UpgradeableProxyADFS>(
       'UpgradeableProxyADFS',
       admin.address,
-      this.implementation.contract.target,
+    );
+
+    this.upgradeImplementationAndCall(
+      this.implementation,
+      admin,
       implementationCallData,
     );
   }
