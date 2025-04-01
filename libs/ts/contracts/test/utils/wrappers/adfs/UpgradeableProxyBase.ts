@@ -58,7 +58,7 @@ export abstract class UpgradeableProxyADFSBaseWrapper
   }
 
   public abstract init(
-    adminAddress: string,
+    admin: HardhatEthersSigner,
     accessControlData: HardhatEthersSigner | string,
     implementationCallData?: string,
   ): Promise<void>;
