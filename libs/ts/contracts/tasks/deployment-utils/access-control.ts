@@ -161,7 +161,7 @@ task('access-control', '[UTILS] Set up access control').setAction(
         sequencerTransactions.push(safeTxSetGuard.data);
 
         const safeTxSetModule = await sequencerMultisig.createEnableModuleTx(
-          deployData.coreContracts.AdminExecutorModule.address,
+          deployData.coreContracts.AdminExecutorModule!.address,
         );
         sequencerTransactions.push(safeTxSetModule.data);
 

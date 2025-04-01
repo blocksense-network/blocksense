@@ -40,8 +40,6 @@ task('deploy', 'Deploy contracts')
       NewFeedsConfigSchema,
     );
 
-    // allowed feeds
-    // filter feeds
     const chainlinkCompatibility = await decodeJSON(
       { name: 'chainlink_compatibility_v2' },
       ChainlinkCompatibilityConfigSchema,
@@ -91,11 +89,10 @@ task('deploy', 'Deploy contracts')
 
       const accessControlSalt = ethers.id('accessControl');
       const adfsSalt = ethers.id('aggregatedDataFeedStore');
-      // this address starts with '0xADF5...' for local deployment
-      // should be recalculated when admin address and/or owners (therefore adminMultisig address) changes
+      // env variable can be set to achieve an address that starts with '0xADF5'
       const proxySalt = getOptionalEnvString(
         'ADFS_UPGRADEABLE_PROXY_SALT',
-        '0x209fdf6800d7d02ac1cc47ea0409e3064b940123694168d0c33238324bb086e1',
+        ethers.id('upgradeableProxy'),
       );
       const safeGuardSalt = ethers.id('onlySafeGuard');
       const safeModuleSalt = ethers.id('adminExecutorModule');
@@ -107,22 +104,12 @@ task('deploy', 'Deploy contracts')
         accessControlSalt,
         abiCoder.encode(['address'], [adminMultisigAddress]),
       );
-      const adfsAddress = await predictAddress(
-        artifacts,
-        config,
-        ContractNames.ADFS,
-        adfsSalt,
-        abiCoder.encode(['address'], [accessControlAddress]),
-      );
       const upgradeableProxyAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.UpgradeableProxyADFS,
         proxySalt,
-        abiCoder.encode(
-          ['address', 'address', 'bytes'],
-          [adminMultisigAddress, adfsAddress, '0x'],
-        ),
+        abiCoder.encode(['address'], [adminMultisigAddress]),
       );
 
       const contracts: DeployContract[] = [
@@ -142,8 +129,8 @@ task('deploy', 'Deploy contracts')
         },
         {
           name: ContractNames.UpgradeableProxyADFS,
-          argsTypes: ['address', 'address', 'bytes'],
-          argsValues: [adminMultisigAddress, adfsAddress, '0x'],
+          argsTypes: ['address'],
+          argsValues: [adminMultisigAddress],
           salt: proxySalt,
           value: 0n,
         },
@@ -218,12 +205,16 @@ task('deploy', 'Deploy contracts')
         address: parseEthereumAddress(ethers.ZeroAddress),
         constructorArgs: [],
       };
+
       chainsDeployment[networkName] = {
         chainId,
         contracts: {
           ...deployData,
           AdminMultisig: adminMultisigAddress,
-          SequencerMultisig: sequencerMultisigAddress,
+          SequencerMultisig:
+            sequencerMultisigAddress === ethers.ZeroAddress
+              ? undefined
+              : sequencerMultisigAddress,
         },
       };
       const signerBalancePost = await config.provider.getBalance(
@@ -231,6 +222,12 @@ task('deploy', 'Deploy contracts')
       );
       console.log(`// balance: ${signerBalancePost} //`);
       console.log(`// balance diff: ${signerBalance - signerBalancePost} //`);
+
+      await run('upgrade-proxy-implementation', {
+        config,
+        safe: adminMultisig,
+        deployData,
+      });
 
       await run('register-cl-adapters', {
         config,
@@ -248,10 +245,7 @@ task('deploy', 'Deploy contracts')
       if (!config.deployWithSequencerMultisig) {
         chainsDeployment[
           networkName
-        ].contracts.coreContracts.OnlySequencerGuard = {
-          address: parseEthereumAddress(ethers.ZeroAddress),
-          constructorArgs: [],
-        };
+        ].contracts.coreContracts.OnlySequencerGuard = undefined;
       }
     }
 
