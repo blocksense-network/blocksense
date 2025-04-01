@@ -18,7 +18,7 @@ export type ProviderData = {
 
 export async function addDataProviders(
   dataFeeds: SimplifiedFeed[],
-  exchangeAssetsMap: ProviderData[],
+  providersData: ProviderData[],
 ) {
   // Filter out feeds without a quote pair
   const filteredFeeds = filterFeedsWithQuotes(dataFeeds);
@@ -26,7 +26,10 @@ export async function addDataProviders(
   // Map feeds with providers
   const dataFeedsWithCryptoResources = await Promise.all(
     filteredFeeds.map(async feed => {
-      const providers = getAllProvidersForFeed(feed, exchangeAssetsMap);
+      const providers = getAllProvidersForPair(
+        feed.additional_feed_info.pair,
+        providersData,
+      );
       return {
         ...feed,
         additional_feed_info: {
@@ -45,10 +48,10 @@ export async function addDataProviders(
   return feedsWithExchangeProviders;
 }
 
-// Function to get all providers for a feed
-function getAllProvidersForFeed(
-  feed: SimplifiedFeed,
-  exchangeAssets: ProviderData[],
+// Function to get all providers for a pair
+export function getAllProvidersForPair(
+  pair: Pair,
+  providersData: ProviderData[],
 ): CryptoPriceFeedsArgs {
   const providers: CryptoPriceFeedsArgs = {};
 
@@ -59,11 +62,11 @@ function getAllProvidersForFeed(
     }
   };
 
-  exchangeAssets.forEach(exchangeData => {
+  providersData.forEach(exchangeData => {
     addProvider(
       exchangeData.name,
       exchangeData.type,
-      getPriceFeedDataProvidersInfo(feed, exchangeData.data),
+      getProviderResourcesForPair(pair, exchangeData.data),
     );
   });
 
@@ -71,35 +74,35 @@ function getAllProvidersForFeed(
 }
 
 /**
- * Get provider resources for a given feed.
+ * Get provider resources for a given pair.
  *
  * This code takes an array of supported assets by an exchange and reduces it into a single object (`providerInfo`).
  * Each key in the `providerInfo` object corresponds to a key found in the `data` property of the assets.
  * The values are arrays that aggregate all the values associated with that key across all assets.
  * If no data is aggregated (i.e., `providerInfo` has no keys), the function returns `null`.
  * Otherwise, it returns the `providerInfo` object.
+ *
+ * If `excludePriceInfo` is true, the `price` key is excluded from the aggregation.
  */
-function getPriceFeedDataProvidersInfo<T>(
-  feed: SimplifiedFeed,
-  exchangeAssets: AssetInfo[],
+export function getProviderResourcesForPair(
+  pair: Pair,
+  providerAssets: AssetInfo[],
+  excludePriceInfo: boolean = true,
   includeStableCoins: boolean = true,
-): Record<string, string[]> | null {
-  const supportedAssets = exchangeAssets.filter(symbol =>
-    isPairSupportedByCryptoProvider(
-      feed.additional_feed_info.pair,
-      symbol.pair,
-      includeStableCoins,
-    ),
+): Record<string, (string | number)[]> | null {
+  const supportedAssets = providerAssets.filter(symbol =>
+    isPairSupportedByCryptoProvider(pair, symbol.pair, includeStableCoins),
   );
   const providerInfo = supportedAssets.reduce(
     (acc, asset) => {
       keysOf(asset.data).forEach(key => {
+        if (excludePriceInfo && key === 'price') return;
         const curr = acc[key] ?? [];
         acc[key] = [...curr, asset.data[key]].sort();
       });
       return acc;
     },
-    {} as Record<string, string[]>,
+    {} as Record<string, (string | number)[]>,
   );
 
   if (keysOf(providerInfo).length === 0) {
@@ -134,20 +137,20 @@ function equalsCaseInsensitive(a: string, b: string) {
 
 // Pair validation logic
 function isPairSupportedByCryptoProvider(
-  oracleFeedPair: Pair,
+  pair: Pair,
   dataProviderPair: Pair,
   includeStableCoins: boolean = true,
 ): boolean {
   const isBaseCompatible = equalsCaseInsensitive(
-    oracleFeedPair.base,
+    pair.base,
     dataProviderPair.base,
   );
   const isCompatibleQuote =
-    equalsCaseInsensitive(oracleFeedPair.quote, dataProviderPair.quote) ||
+    equalsCaseInsensitive(pair.quote, dataProviderPair.quote) ||
     (includeStableCoins &&
-      oracleFeedPair.quote in stableCoins &&
+      pair.quote in stableCoins &&
       // Consider stablecoins quotings equivalent to fiat quotings:
-      stableCoins[oracleFeedPair.quote as keyof typeof stableCoins].includes(
+      stableCoins[pair.quote as keyof typeof stableCoins].includes(
         dataProviderPair.quote,
       ));
 
