@@ -170,15 +170,15 @@ async fn get_rpc_providers(
 }
 
 pub struct LatestRound {
-    feed_id: u128,
-    round: u16,
+    _feed_id: u128,
+    _round: u16,
 }
 
 impl LatestRound {
-    pub fn new(feed_id: u128, data: &[u8]) -> LatestRound {
+    pub fn new(_feed_id: u128, data: &[u8]) -> LatestRound {
         LatestRound {
-            feed_id,
-            round: data[0] as u16,
+            _feed_id,
+            _round: data[0] as u16,
         }
     }
 }
@@ -386,23 +386,23 @@ impl RpcProvider {
         stride: u32,
     ) -> Result<Vec<LatestRound>, eyre::Error> {
         let call_data = Bytes::copy_from_slice(&[
-            (0x81) as u8,
+            0x81_u8,
             (stride & 0xFF_u32) as u8,
-            ((*feed_id >> 8 * 14) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 13) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 12) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 11) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 10) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 9) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 8) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 7) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 6) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 5) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 4) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 3) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 2) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 1) & 0xFF_u128) as u8,
-            ((*feed_id >> 8 * 0) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 14)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 13)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 12)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 11)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 10)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 9)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 8)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 7)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 6)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 5)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 4)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 3)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8 * 2)) & 0xFF_u128) as u8,
+            ((*feed_id >> (8/* * 1*/)) & 0xFF_u128) as u8,
+            ((*feed_id/* >> (8 * 0)*/) & 0xFF_u128) as u8,
         ]);
 
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
@@ -419,8 +419,7 @@ impl RpcProvider {
         let latest_rounds: Vec<LatestRound> = aggregate_return
             .returnData
             .into_iter()
-            .enumerate()
-            .map(|(count, data)| LatestRound::new(*feed_id, &data.0))
+            .map(|data| LatestRound::new(*feed_id, &data.0))
             .collect();
 
         Ok(latest_rounds)
