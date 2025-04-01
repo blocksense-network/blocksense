@@ -61,7 +61,7 @@ export const capitalizeWords = (input: string): string => {
 };
 
 export const showMsInSeconds = (ms: number): string => {
-  return `${(ms / 1000).toFixed(3)} seconds`;
+  return `${(ms / 1000).toFixed(2)} seconds`;
 };
 
 export const showPercentage = (value: any): string => {
