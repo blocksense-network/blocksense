@@ -81,20 +81,20 @@ contract AggregatedDataFeedStore {
           // base feed index: (feedId * 2**13) * 2**stride
           // find start index for round: baseFeedIndex + round * 2**stride
           let startIndex := add(
-            mul(mul(feedId, 0x2000), strideSlots),
-            mul(round, strideSlots)
+            shl(stride, shl(13, feedId)),
+            shl(stride, round)
           )
 
           // `startSlot` and `slots` are used to read a slice from the feed
+          // check `_callSingleDataFeed` in contracts/libraries/Blocksense.sol for more info about `calldatasize`
           if gt(calldatasize(), 19) {
             // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
-            let lastFeedIndex := sub(
-              mul(mul(add(feedId, 1), 0x2000), strideSlots),
-              1
-            )
+            let lastFeedIndex := sub(shl(stride, shl(13, add(feedId, 1))), 1)
 
-            // startIndex + startSlot
-            startIndex := add(startIndex, shr(224, shl(16, data)))
+            // read startSlot from calldata
+            let startSlot := shr(224, shl(16, data))
+            startIndex := add(startIndex, startSlot)
+
             // strideSlots = slots
             strideSlots := shr(224, shl(48, data))
             if iszero(strideSlots) {
@@ -134,7 +134,8 @@ contract AggregatedDataFeedStore {
         }
 
         // feedId%16 * 16
-        let pos := shl(4, mod(feedId, 16))
+        // mod is represented as `feedId % 2^4 = feedId & (2^4 - 1)`
+        let pos := shl(4, and(feedId, 15))
         let round := shr(
           sub(240, pos),
           and(
@@ -142,10 +143,7 @@ contract AggregatedDataFeedStore {
               add(
                 ROUND_ADDRESS,
                 // find round table slot: (2**115 * stride + feedId)/16
-                shr(
-                  4,
-                  add(mul(0x80000000000000000000000000000, stride), feedId)
-                )
+                shr(4, add(shl(115, stride), feedId))
               )
             ),
             shr(
@@ -159,6 +157,7 @@ contract AggregatedDataFeedStore {
 
         // 0x83 will call both getLatestRound and getLatestSingleData
         // 0x85 will call both getLatestRound and getLatestData
+
         // getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
         if and(selector, 0x01) {
           len := 32
@@ -168,7 +167,7 @@ contract AggregatedDataFeedStore {
         // getLatestSingleData(uint8 stride, uint120 feedId) returns (bytes)
         if and(selector, 0x02) {
           // find start index for round: feedId * 2**13 + round
-          let startIndex := add(mul(feedId, 0x2000), round)
+          let startIndex := add(shl(13, feedId), round)
 
           // load feed data from storage and store it in memory
           mstore(
@@ -187,20 +186,20 @@ contract AggregatedDataFeedStore {
           // base feed index: (feedId * 2**13) * 2**stride
           // find start index for round: baseFeedIndex + round * 2**stride
           let startIndex := add(
-            mul(mul(feedId, 0x2000), strideSlots),
-            mul(round, strideSlots)
+            shl(stride, shl(13, feedId)),
+            shl(stride, round)
           )
 
           // `startSlot` and `slots` are used to read a slice from the feed
+          // check `_callSingleDataFeed` in contracts/libraries/Blocksense.sol for more info about `calldatasize`
           if gt(calldatasize(), 19) {
             // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
-            let lastFeedIndex := sub(
-              mul(mul(add(feedId, 1), 0x2000), strideSlots),
-              1
-            )
+            let lastFeedIndex := sub(shl(stride, shl(13, add(feedId, 1))), 1)
 
-            // startIndex + startSlot
-            startIndex := add(startIndex, shr(224, data))
+            // read startSlot from calldata
+            let startSlot := shr(224, data)
+            startIndex := add(startIndex, startSlot)
+
             // strideSlots = slots
             strideSlots := shr(224, shl(32, data))
             if iszero(strideSlots) {
@@ -265,9 +264,9 @@ contract AggregatedDataFeedStore {
       mstore(ptr, 0)
 
       let data := calldataload(0)
+
       // setFeeds(bytes)
       if eq(byte(0, data), 0x01) {
-
         ///////////////////////////////////
         // Update Blocksense blocknumber //
         ///////////////////////////////////
@@ -283,9 +282,12 @@ contract AggregatedDataFeedStore {
         ///////////////////////////////////
         //         Update feeds          //
         ///////////////////////////////////
-        let pointer := 13
+
         let len := calldatasize()
         let feedsCount := shr(224, shl(72, data))
+        // selector (1b) + blocknumber (8b) + feeds count (4b) = 13b
+        // points to the start of the feeds data
+        let pointer := 13
 
         /*
                     ┌───────────────────────────────┐   .........  ┌───────────────────────────────┐
@@ -315,29 +317,36 @@ contract AggregatedDataFeedStore {
           if gt(stride, 31) {
             revert(0, 0)
           }
-
+          // get correct stride address based on provided stride
           let strideAddress := shl(stride, DATA_FEED_ADDRESS)
 
+          // get length of index (feedId + round)
           let indexLength := byte(1, metadata)
+          // bytes to bits as shift op code works with bits (for next line)
           let indexLengthBits := shl(3, indexLength)
+          // get index (max: 16b)
           let index := shr(sub(256, indexLengthBits), shl(16, metadata))
 
-          // 5b
+          // get length of bytes to write (max: 5b)
           let bytesLength := byte(add(2, indexLength), metadata)
+          // get bytes to write based on bytes length above (in most cases will save gas from calldata length)
           let bytesToWrite := shr(
             sub(256, shl(3, bytesLength)),
             shl(add(24, indexLengthBits), metadata)
           )
 
+          // where actual data (to be written) starts
           pointer := add(pointer, add(3, add(indexLength, bytesLength)))
 
           // divide by 32 to get number of slots to write
           let slots := shr(5, bytesToWrite)
-          // remainding bytes to write
-          let remainderSlot := mod(bytesToWrite, 0x20)
+          // remaining bytes to write
+          // remainderSlot = bytesToWrite % 32
+          let remainderSlot := and(bytesToWrite, 31)
 
           // cannot write outside stride space
           if gt(
+            // calculate address of last slot at which input data will be stored
             add(index, sub(add(slots, gt(remainderSlot, 0)), 1)),
             // maxWriteAddress: next stride address - current stride address - 1
             sub(sub(shl(add(stride, 1), DATA_FEED_ADDRESS), strideAddress), 1)
@@ -345,6 +354,7 @@ contract AggregatedDataFeedStore {
             revert(0, 0)
           }
 
+          // store full 32 bytes data
           for {
             let j := 0x00
           } lt(j, slots) {
@@ -354,6 +364,7 @@ contract AggregatedDataFeedStore {
             sstore(add(strideAddress, add(index, j)), calldataload(pointer))
           }
 
+          // store remainder slot (if any)
           if remainderSlot {
             let remainderSlotData := calldataload(pointer)
             sstore(
@@ -387,9 +398,15 @@ contract AggregatedDataFeedStore {
 
                                 max id: (2**115)*32-1                        max slot index: 2**116-1
         */
-        for {} lt(pointer, len) {} {
+        for {
+
+        } lt(pointer, len) {
+          pointer := add(pointer, 0x20)
+        } {
           let roundTableData := calldataload(pointer)
+          // how many bytes to read for index (max: 15b)
           let indexLength := byte(0, roundTableData)
+          // get round table index at which to store rounds
           let index := shr(
             sub(256, shl(3, indexLength)),
             shl(8, roundTableData)
@@ -399,8 +416,9 @@ contract AggregatedDataFeedStore {
             revert(0, 0)
           }
 
-          pointer := add(pointer, add(indexLength, 33))
-          sstore(add(ROUND_ADDRESS, index), calldataload(sub(pointer, 32)))
+          // update pointer to start start of round data
+          pointer := add(pointer, add(indexLength, 1))
+          sstore(add(ROUND_ADDRESS, index), calldataload(pointer))
         }
 
         ///////////////////////////////////

@@ -100,7 +100,9 @@ contract UpgradeableProxyADFS {
   /// Note: The 0x00 prefix in the calldata helps avoid clashes in ADFS' custom
   /// function selector.
   fallback() external payable {
-    if (msg.sig == UPGRADE_TO_AND_CALL_SELECTOR || msg.sig == SET_ADMIN_SELECTOR) {
+    if (
+      msg.sig == UPGRADE_TO_AND_CALL_SELECTOR || msg.sig == SET_ADMIN_SELECTOR
+    ) {
       bool isAdmin;
 
       assembly {
