@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import { Callout } from '@blocksense/ui/Callout';
 import { parseNetworkName } from '@blocksense/base-utils/evm';
 
+import { capitalizeWords } from '@/src/utils';
 import {
   CoreContract,
   ProxyContractData,
@@ -99,7 +100,7 @@ export const DeployedContracts = ({
           </ContractItemWrapper>
           <div className="mt-6">
             <ContractItemWrapper
-              title="Aggregator Proxy Contracts"
+              title="Chainlink Aggregator Adapter Contracts"
               titleLevel={2}
               itemsLength={deployedProxyContracts.length}
             >
@@ -109,6 +110,10 @@ export const DeployedContracts = ({
                 proxy contracts. Additionally, the table provides information
                 about data feed names, IDs, and relevant addresses.
               </Callout>
+
+              <div className="pt-2 text-2xl text-center font-semibold text-black leading-none tracking-tight dark:text-white">
+                {`${capitalizeWords(selectedNetwork)}`}
+              </div>
               <DataTable
                 columns={proxyContractsColumns}
                 data={deployedProxyContracts.filter(
