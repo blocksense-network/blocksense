@@ -35,6 +35,11 @@ export default {
       'data-feeds': {
         items: {
           overview: '',
+          'data-feed-types': {
+            items: {
+              'price-feeds': '',
+            },
+          },
           'creating-data-feeds': '',
         },
       },
