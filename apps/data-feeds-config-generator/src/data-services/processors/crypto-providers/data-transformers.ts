@@ -94,3 +94,68 @@ export function isPairSupportedByCryptoProvider(
 
   return isBaseCompatible && isCompatibleQuote;
 }
+
+// TODO: Add tests
+/**
+ * Retrieves price data for a specific trading pair from exchange providers.
+ *
+ * @param pair - The trading pair for which price data is being fetched.
+ * @param providersData - An array of crypto provider data containing exchange information.
+ * @returns An array of records where each record maps an exchange name to its price for the given pair.
+ */
+export function getExchangesPriceDataForPair(
+  pair: Pair,
+  providersData: CryptoProviderData[],
+): Record<string, number>[] {
+  const exchangesInfo = providersData.filter(
+    ({ type }) => type === 'exchanges',
+  );
+  const exchangesPrices = exchangesInfo
+    .map(({ name, data }) => {
+      const exchangeDataForPair = getProviderResourcesForPair(
+        pair,
+        data,
+        false,
+        false,
+      );
+      if (!exchangeDataForPair) return null;
+
+      const price = exchangeDataForPair[
+        'price' as keyof typeof exchangeDataForPair
+      ]?.[0] as number;
+      return price !== undefined ? { [name]: price } : null;
+    })
+    .filter(entry => entry !== null);
+
+  return exchangesPrices;
+}
+
+// TODO: Add tests
+/**
+ * Removes price outliers from the provided crypto provider data
+ * based on the specified feed pair and outlier providers.
+ *
+ * @param providersData - An array of crypto provider data objects.
+ * @param feedPair - The base and quote pair to filter outliers for.
+ * @param outliners - An array of provider names considered as outliers.
+ * @returns A new array of crypto provider data with outliers removed for the specified pair.
+ */
+export function removePriceOutliers(
+  providersData: CryptoProviderData[],
+  feedPair: Pair,
+  outliners: string[],
+) {
+  const { base, quote } = feedPair;
+  const cleared = providersData.map(provider => {
+    if (outliners.includes(provider.name)) {
+      return {
+        ...provider,
+        data: provider.data.filter(
+          ({ pair }) => pair.base !== base || pair.quote !== quote,
+        ),
+      };
+    }
+    return provider;
+  });
+  return cleared;
+}
