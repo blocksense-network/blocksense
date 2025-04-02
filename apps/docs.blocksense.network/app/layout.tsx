@@ -31,6 +31,7 @@ export const metadata: Metadata = {
     template: '%s',
   },
   openGraph: {
+    title: 'Blocksense Network',
     url: 'https://docs.blocksense.network',
     images: [
       {
