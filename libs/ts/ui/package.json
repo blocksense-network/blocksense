@@ -32,6 +32,7 @@
     "./TextArea": "./src/components/TextArea/index.tsx",
     "./RadioGroup": "./src/components/RadioGroup/index.tsx",
     "./InfoTip": "./src/components/InfoTip/index.tsx",
+    "./DataTable": "./src/components/DataTable/index.tsx",
     "./utils": "./src/lib/utils.ts"
   },
   "dependencies": {

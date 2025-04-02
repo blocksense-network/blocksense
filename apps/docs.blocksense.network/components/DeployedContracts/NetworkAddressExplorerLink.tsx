@@ -1,5 +1,5 @@
 'use client';
-import * as React from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -8,9 +8,8 @@ import {
   NetworkName,
   EthereumAddress,
 } from '@blocksense/base-utils/evm';
-
-import { DataTableBadge } from '@/components/common/DataTable/DataTableBadge';
-import { onLinkClick } from '@/src/utils';
+import { DataTableBadge } from '@blocksense/ui/DataTable';
+import { onLinkClick } from '@blocksense/ui/utils';
 
 type NetworkAddressExplorerLinkProps = {
   address: EthereumAddress;
