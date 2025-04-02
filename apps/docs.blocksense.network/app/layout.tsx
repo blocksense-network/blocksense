@@ -10,7 +10,7 @@ import { updatePageMapWithContractsRefDoc } from '@/src/pageMap';
 export const metadata: Metadata = {
   description:
     'Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes.',
-  metadataBase: new URL('https://blocksense.network/'),
+  metadataBase: new URL('https://docs.blocksense.network/'),
   keywords: [
     'Blocksense',
     'ZK rollup',
@@ -30,6 +30,22 @@ export const metadata: Metadata = {
     absolute: '',
     template: '%s',
   },
+  openGraph: {
+    url: 'https://docs.blocksense.network',
+    images: [
+      {
+        url: '/images/blocksense_og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Blocksense OG Image',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    images: ['/images/blocksense_og.png'],
+    site: 'https://x.com/blocksense_',
+  },
   icons: {
     icon: [
       {
@@ -48,9 +64,6 @@ export const metadata: Metadata = {
   },
   other: {
     'msapplication-TileColor': '#fff',
-  },
-  twitter: {
-    site: 'https://x.com/blocksense_',
   },
 };
 
@@ -78,7 +91,7 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
           property="og:description"
           content="The zk rollup for programmable oracles."
         />
-        <meta property="og:image" content="/images/blocksense-og.png" />
+        <meta property="og:image" content="/images/blocksense_og.png" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Blocksense Network" />
@@ -86,7 +99,7 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
           name="twitter:description"
           content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
         />
-        <meta name="twitter:image" content="/images/blocksense-og.png" />
+        <meta name="twitter:image" content="/images/blocksense_og.png" />
       </NextHead>
       <body className="md:px-4 lg:px-30">
         <Layout
