@@ -82,11 +82,13 @@ function getAllProvidersForFeed(
 function getPriceFeedDataProvidersInfo<T>(
   feed: SimplifiedFeed,
   exchangeAssets: AssetInfo[],
+  includeStableCoins: boolean = true,
 ): Record<string, string[]> | null {
   const supportedAssets = exchangeAssets.filter(symbol =>
     isPairSupportedByCryptoProvider(
       feed.additional_feed_info.pair,
       symbol.pair,
+      includeStableCoins,
     ),
   );
   const providerInfo = supportedAssets.reduce(
@@ -134,6 +136,7 @@ function equalsCaseInsensitive(a: string, b: string) {
 function isPairSupportedByCryptoProvider(
   oracleFeedPair: Pair,
   dataProviderPair: Pair,
+  includeStableCoins: boolean = true,
 ): boolean {
   const isBaseCompatible = equalsCaseInsensitive(
     oracleFeedPair.base,
@@ -141,7 +144,8 @@ function isPairSupportedByCryptoProvider(
   );
   const isCompatibleQuote =
     equalsCaseInsensitive(oracleFeedPair.quote, dataProviderPair.quote) ||
-    (oracleFeedPair.quote in stableCoins &&
+    (includeStableCoins &&
+      oracleFeedPair.quote in stableCoins &&
       // Consider stablecoins quotings equivalent to fiat quotings:
       stableCoins[oracleFeedPair.quote as keyof typeof stableCoins].includes(
         dataProviderPair.quote,
