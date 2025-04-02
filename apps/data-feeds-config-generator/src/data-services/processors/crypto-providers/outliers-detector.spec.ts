@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { detectOutliers } from './data-providers';
-import { TSemaphore } from 'effect';
+import { detectPriceOutliers } from './outliers-detector';
 
 describe('`data-providers.ts` tests', () => {
   test('should return an empty array when no exchange has >10% price difference', () => {
@@ -19,7 +18,7 @@ describe('`data-providers.ts` tests', () => {
       ],
     };
     const expectedResult: string[] = [];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -28,7 +27,7 @@ describe('`data-providers.ts` tests', () => {
       'ADA / USDT': [{ Binance: 1 }, { Bitget: 1.1 }],
     };
     const expectedResult: string[] = [];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -37,7 +36,7 @@ describe('`data-providers.ts` tests', () => {
       'BTC / USDT': [{ Binance: 30000 }, { Bitget: 32999 }, { Bybit: 31000 }],
     };
     const expectedResult: string[] = [];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -50,7 +49,7 @@ describe('`data-providers.ts` tests', () => {
       ],
     };
     const expectedResult: string[] = [];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -67,7 +66,7 @@ describe('`data-providers.ts` tests', () => {
     };
 
     const expectedResult: string[] = ['Binance'];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -84,7 +83,7 @@ describe('`data-providers.ts` tests', () => {
       ],
     };
     const expectedResult: string[] = ['Binance', 'BinanceUS'];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -93,7 +92,7 @@ describe('`data-providers.ts` tests', () => {
       'BTC / USDT': [],
     };
     const expectedResult: string[] = [];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -107,7 +106,7 @@ describe('`data-providers.ts` tests', () => {
       ],
     };
     const expectedResult: string[] = [];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -116,7 +115,7 @@ describe('`data-providers.ts` tests', () => {
       'BTC / USDT': [{ Binance: 30000 }],
     };
     const expectedResult: string[] = [];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -125,7 +124,7 @@ describe('`data-providers.ts` tests', () => {
       'BTC / USDT': [{ Binance: 0 }, { Bitget: 0 }, { Bybit: 0 }],
     };
     const expectedResult: string[] = ['Binance', 'Bitget', 'Bybit'];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -134,7 +133,7 @@ describe('`data-providers.ts` tests', () => {
       'BTC / USDT': [{ Binance: 30000 }, { Bitget: 330000 }, { Bybit: 31000 }],
     };
     const expectedResult: string[] = ['Bitget'];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -147,7 +146,7 @@ describe('`data-providers.ts` tests', () => {
       ],
     };
     const expectedResult: string[] = ['Binance', 'Bitget', 'Bybit'];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 
@@ -156,7 +155,7 @@ describe('`data-providers.ts` tests', () => {
       'BTC / USDT': [{ Binance: 30000 }, { Bitget: -33000 }, { Bybit: 31000 }],
     };
     const expectedResult: string[] = ['Bitget'];
-    const result = detectOutliers(input);
+    const result = detectPriceOutliers(input);
     expect(result).toEqual(expectedResult);
   });
 });
