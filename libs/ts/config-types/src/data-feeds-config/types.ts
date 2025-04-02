@@ -1,6 +1,6 @@
 import { Schema as S } from 'effect';
 
-import { cryptoPriceFeedsArgsSchema, geckoTerminalArgsSchema } from './oracles';
+import { AdditionalFeedInfoSchema, OracleIdSchema } from './oracles';
 /**
  * Schema for the data feed category ( Chainlink compatible ).
  */
@@ -156,7 +156,7 @@ export const NewFeedSchema = S.mutable(
     type: S.Union(S.Literal('price-feed')).annotations({
       identifier: 'FeedType',
     }),
-    oracle_id: S.String,
+    oracle_id: OracleIdSchema,
 
     value_type: S.Union(
       S.Literal('numerical'),
@@ -182,21 +182,7 @@ export const NewFeedSchema = S.mutable(
       first_report_start_unix_time_ms: S.Number,
     }),
 
-    // TODO: This field should be optional / different depending on the `type`.
-    additional_feed_info: S.mutable(
-      S.Struct({
-        pair: PairSchema,
-        decimals: S.Number,
-        category: FeedCategorySchema,
-        market_hours: S.NullishOr(MarketHoursSchema),
-        arguments: S.Union(cryptoPriceFeedsArgsSchema, geckoTerminalArgsSchema),
-        compatibility_info: S.UndefinedOr(
-          S.Struct({
-            chainlink: S.String,
-          }),
-        ),
-      }),
-    ),
+    additional_feed_info: AdditionalFeedInfoSchema,
   }),
 );
 
