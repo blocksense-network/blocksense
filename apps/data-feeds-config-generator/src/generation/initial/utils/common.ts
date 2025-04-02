@@ -3,8 +3,8 @@ import keccak256 from 'keccak256';
 import { createPair, pairToString } from '@blocksense/config-types';
 
 import { SimplifiedFeed, SimplifiedFeedWithRank } from '../types';
-import { stableCoins } from '../data-providers';
 import { CMCMarketCapDataRes } from '../../../data-services/fetchers/aggregators/cmc';
+import { stableCoins } from '../../../data-services/processors/crypto-providers/constants';
 
 export function getUniqueDataFeeds(
   dataFeeds: SimplifiedFeed[],
