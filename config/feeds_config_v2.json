@@ -26,6 +26,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -167,6 +168,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -267,6 +269,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -347,6 +350,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -496,6 +500,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -596,6 +601,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -704,6 +710,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -792,6 +799,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Coinbase": {
@@ -877,6 +885,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Coinbase": {
@@ -927,6 +936,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1067,6 +1077,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1107,6 +1118,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1210,6 +1222,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1288,6 +1301,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1385,6 +1399,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1465,6 +1480,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1535,6 +1551,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1678,6 +1695,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1781,6 +1799,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1864,6 +1883,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -1974,6 +1994,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2014,6 +2035,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2107,6 +2129,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2241,6 +2264,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2281,6 +2305,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2384,6 +2409,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2472,6 +2498,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2628,6 +2655,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2723,6 +2751,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2793,6 +2822,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2908,6 +2938,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -2993,6 +3024,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3063,6 +3095,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3163,6 +3196,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3233,6 +3267,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "MEXC": {
@@ -3278,6 +3313,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3411,6 +3447,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3479,6 +3516,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3519,6 +3557,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3617,6 +3656,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3695,6 +3735,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3796,6 +3837,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3881,6 +3923,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3931,6 +3974,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -3999,6 +4043,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4044,6 +4089,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4084,6 +4130,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4210,6 +4257,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4305,6 +4353,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4365,6 +4414,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4498,6 +4548,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4596,6 +4647,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4674,6 +4726,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4817,6 +4870,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4915,6 +4969,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -4993,6 +5048,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5111,6 +5167,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5191,6 +5248,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5261,6 +5319,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5301,6 +5360,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5427,6 +5487,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5520,6 +5581,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5598,6 +5660,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5638,6 +5701,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5765,6 +5829,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5853,6 +5918,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -5931,6 +5997,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6036,6 +6103,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6114,6 +6182,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6177,6 +6246,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6274,6 +6344,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6344,6 +6415,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6394,6 +6466,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6520,6 +6593,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6560,6 +6634,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6653,6 +6728,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -6726,6 +6802,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -6798,6 +6875,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -6870,6 +6948,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -6930,6 +7009,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -6975,6 +7055,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -7035,6 +7116,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -7080,6 +7162,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7194,6 +7277,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7234,6 +7318,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7312,6 +7397,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -7362,6 +7448,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -7422,6 +7509,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -7472,6 +7560,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7550,6 +7639,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7608,6 +7698,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Kraken": {
@@ -7656,6 +7747,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7787,6 +7879,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7827,6 +7920,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7880,6 +7974,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -7965,6 +8060,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8030,6 +8126,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8148,6 +8245,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8233,6 +8331,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8293,6 +8392,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8416,6 +8516,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8506,6 +8607,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8576,6 +8678,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8749,6 +8852,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8839,6 +8943,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -8909,6 +9014,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9027,6 +9133,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9112,6 +9219,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9162,6 +9270,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -9267,6 +9376,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -9342,6 +9452,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -9402,6 +9513,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9519,6 +9631,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9604,6 +9717,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9669,6 +9783,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9789,6 +9904,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9842,6 +9958,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9922,6 +10039,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -9977,6 +10095,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -10058,6 +10177,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -10118,6 +10238,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -10158,6 +10279,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10250,6 +10372,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10310,6 +10433,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10360,6 +10484,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10447,6 +10572,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10517,6 +10643,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10589,6 +10716,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10649,6 +10777,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10694,6 +10823,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10803,6 +10933,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10878,6 +11009,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -10933,6 +11065,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11046,6 +11179,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11091,6 +11225,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11171,6 +11306,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11221,6 +11357,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11347,6 +11484,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11405,6 +11543,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11490,6 +11629,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11555,6 +11695,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "MEXC": {
@@ -11607,6 +11748,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "MEXC": {
@@ -11647,6 +11789,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11762,6 +11905,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11850,6 +11994,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -11923,6 +12068,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12037,6 +12183,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12122,6 +12269,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12172,6 +12320,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12295,6 +12444,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12388,6 +12538,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12461,6 +12612,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12586,6 +12738,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12671,6 +12824,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12731,6 +12885,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12847,6 +13002,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12927,6 +13083,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -12982,6 +13139,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13101,6 +13259,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13186,6 +13345,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13256,6 +13416,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13348,6 +13509,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13418,6 +13580,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13468,6 +13631,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13589,6 +13753,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13674,6 +13839,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13734,6 +13900,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13833,6 +14000,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13903,6 +14071,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -13958,6 +14127,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14075,6 +14245,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "KuCoin": {
@@ -14115,6 +14286,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14195,6 +14367,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -14235,6 +14408,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -14295,6 +14469,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -14345,6 +14520,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14452,6 +14628,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14532,6 +14709,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14587,6 +14765,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14702,6 +14881,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14782,6 +14962,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14842,6 +15023,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -14954,6 +15136,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15039,6 +15222,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -15079,6 +15263,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15185,6 +15370,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15265,6 +15451,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15366,6 +15553,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15441,6 +15629,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15501,6 +15690,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15584,6 +15774,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15654,6 +15845,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -15694,6 +15886,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15810,6 +16003,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15850,6 +16044,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -15930,6 +16125,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -15970,6 +16166,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16073,6 +16270,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16143,6 +16341,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16193,6 +16392,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16323,6 +16523,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16408,6 +16609,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16463,6 +16665,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16583,6 +16786,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16663,6 +16867,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16723,6 +16928,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16843,6 +17049,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16883,6 +17090,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -16971,6 +17179,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17044,6 +17253,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17158,6 +17368,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17238,6 +17449,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17288,6 +17500,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -17377,6 +17590,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -17442,6 +17656,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17482,6 +17697,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17608,6 +17824,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17701,6 +17918,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17754,6 +17972,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17873,6 +18092,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -17958,6 +18178,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18008,6 +18229,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18118,6 +18340,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18201,6 +18424,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18249,6 +18473,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18356,6 +18581,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18431,6 +18657,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18481,6 +18708,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18588,6 +18816,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18673,6 +18902,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -18713,6 +18943,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18840,6 +19071,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18920,6 +19152,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -18985,6 +19218,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19101,6 +19335,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19186,6 +19421,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19241,6 +19477,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19363,6 +19600,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19413,6 +19651,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19506,6 +19745,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -19564,6 +19804,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19683,6 +19924,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19733,6 +19975,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19813,6 +20056,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19863,6 +20107,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -19970,6 +20215,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20045,6 +20291,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20090,6 +20337,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20207,6 +20455,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20292,6 +20541,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20337,6 +20587,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -20403,6 +20654,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -20458,6 +20710,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -20498,6 +20751,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20610,6 +20864,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20695,6 +20950,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -20735,6 +20991,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20833,6 +21090,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20873,6 +21131,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -20953,6 +21212,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21043,6 +21303,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21098,6 +21359,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21143,6 +21405,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21248,6 +21511,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21323,6 +21587,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21421,6 +21686,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21496,6 +21762,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21546,6 +21813,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -21627,6 +21895,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -21687,6 +21956,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21816,6 +22086,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21896,6 +22167,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -21951,6 +22223,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22062,6 +22335,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22137,6 +22411,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22192,6 +22467,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22273,6 +22549,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22313,6 +22590,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22383,6 +22661,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22423,6 +22702,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22507,6 +22787,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22565,6 +22846,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22613,6 +22895,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -22703,6 +22986,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -22763,6 +23047,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22882,6 +23167,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -22967,6 +23253,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23017,6 +23304,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -23067,6 +23355,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -23107,6 +23396,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -23180,6 +23470,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -23240,6 +23531,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -23280,6 +23572,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23375,6 +23668,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23445,6 +23739,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23495,6 +23790,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23586,6 +23882,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23661,6 +23958,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23716,6 +24014,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23799,6 +24098,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23864,6 +24164,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23914,6 +24215,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -23959,6 +24261,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24035,6 +24338,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24100,6 +24404,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "MEXC": {
@@ -24140,6 +24445,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24269,6 +24575,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24309,6 +24616,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24402,6 +24710,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24470,6 +24779,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -24565,6 +24875,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -24643,6 +24954,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Kraken": {
@@ -24691,6 +25003,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24803,6 +25116,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24891,6 +25205,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -24944,6 +25259,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25061,6 +25377,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25141,6 +25458,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -25181,6 +25499,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25255,6 +25574,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25310,6 +25630,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25408,6 +25729,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25483,6 +25805,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25533,6 +25856,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -25612,6 +25936,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -25667,6 +25992,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25751,6 +26077,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -25811,6 +26138,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -25906,6 +26234,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -25971,6 +26300,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -26011,6 +26341,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -26102,6 +26433,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -26172,6 +26504,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -26217,6 +26550,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -26300,6 +26634,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -26360,6 +26695,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -26400,6 +26736,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -26485,6 +26822,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -26550,6 +26888,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": "",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -26600,6 +26939,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": "",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -26640,6 +26980,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -26746,6 +27087,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -26796,6 +27138,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -26876,6 +27219,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -26916,6 +27260,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -27002,6 +27347,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -27065,6 +27411,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Kraken": {
@@ -27113,6 +27460,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27219,6 +27567,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27299,6 +27648,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -27339,6 +27689,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27417,6 +27768,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27472,6 +27824,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27583,6 +27936,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27658,6 +28012,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27703,6 +28058,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27806,6 +28162,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27881,6 +28238,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -27931,6 +28289,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -28038,6 +28397,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -28123,6 +28483,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -28163,6 +28524,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -28241,6 +28603,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -28306,6 +28669,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -28346,6 +28710,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -28447,6 +28812,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -28527,6 +28893,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -28567,6 +28934,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -28660,6 +29028,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -28740,6 +29109,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "KuCoin": {
@@ -28785,6 +29155,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitfinex": {
@@ -28882,6 +29253,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -28947,6 +29319,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -28987,6 +29360,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29094,6 +29468,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29169,6 +29544,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29219,6 +29595,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29323,6 +29700,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29398,6 +29776,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29453,6 +29832,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -29514,6 +29894,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -29564,6 +29945,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "KuCoin": {
@@ -29604,6 +29986,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29722,6 +30105,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29767,6 +30151,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29852,6 +30237,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -29902,6 +30288,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30014,6 +30401,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30099,6 +30487,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -30139,6 +30528,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30222,6 +30612,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30292,6 +30683,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -30332,6 +30724,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30452,6 +30845,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30492,6 +30886,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30572,6 +30967,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -30612,6 +31008,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30725,6 +31122,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30805,6 +31203,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30855,6 +31254,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -30935,6 +31335,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -31000,6 +31401,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -31075,6 +31477,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -31135,6 +31538,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -31225,6 +31629,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -31300,6 +31705,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -31350,6 +31756,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -31446,6 +31853,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -31521,6 +31929,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -31561,6 +31970,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -31650,6 +32060,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -31718,6 +32129,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Kraken": {
@@ -31766,6 +32178,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -31860,6 +32273,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -31925,6 +32339,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -31965,6 +32380,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -32059,6 +32475,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -32124,6 +32541,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32230,6 +32648,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32305,6 +32724,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32345,6 +32765,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32460,6 +32881,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32500,6 +32922,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "MEXC": {
@@ -32540,6 +32963,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32615,6 +33039,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -32655,6 +33080,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32762,6 +33188,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32807,6 +33234,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -32892,6 +33320,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -32932,6 +33361,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33050,6 +33480,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33130,6 +33561,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33175,6 +33607,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33273,6 +33706,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33353,6 +33787,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33398,6 +33833,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitfinex": {
@@ -33498,6 +33934,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -33568,6 +34005,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -33608,6 +34046,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33724,6 +34163,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Coinbase": {
@@ -33769,6 +34209,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33849,6 +34290,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -33889,6 +34331,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -33981,6 +34424,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34051,6 +34495,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34154,6 +34599,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34224,6 +34670,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34274,6 +34721,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34374,6 +34822,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34449,6 +34898,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -34541,6 +34991,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -34601,6 +35052,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34708,6 +35160,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34778,6 +35231,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34828,6 +35282,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34914,6 +35369,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -34984,6 +35440,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -35024,6 +35481,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35069,6 +35527,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35163,6 +35622,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35233,6 +35693,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35283,6 +35744,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35377,6 +35839,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35452,6 +35915,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Coinbase": {
@@ -35510,6 +35974,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Coinbase": {
@@ -35555,6 +36020,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35658,6 +36124,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35728,6 +36195,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -35778,6 +36246,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35872,6 +36341,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -35942,6 +36412,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36030,6 +36501,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36100,6 +36572,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36150,6 +36623,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36225,6 +36699,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36290,6 +36765,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36366,6 +36842,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36426,6 +36903,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36466,6 +36944,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36562,6 +37041,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36632,6 +37112,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -36672,6 +37153,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36779,6 +37261,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36854,6 +37337,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36904,6 +37388,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -36992,6 +37477,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37062,6 +37548,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37102,6 +37589,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37208,6 +37696,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37283,6 +37772,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -37323,6 +37813,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37422,6 +37913,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37492,6 +37984,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -37532,6 +38025,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37611,6 +38105,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37671,6 +38166,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37711,6 +38207,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37805,6 +38302,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -37875,6 +38373,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -37915,6 +38414,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38004,6 +38504,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38079,6 +38580,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -38119,6 +38621,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38230,6 +38733,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38305,6 +38809,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38350,6 +38855,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38447,6 +38953,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38512,6 +39019,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38552,6 +39060,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38656,6 +39165,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38726,6 +39236,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -38766,6 +39277,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -38836,6 +39348,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -38896,6 +39409,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -38973,6 +39487,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39038,6 +39553,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39083,6 +39599,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39167,6 +39684,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39222,6 +39740,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39267,6 +39786,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39367,6 +39887,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39442,6 +39963,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39541,6 +40063,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39616,6 +40139,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39661,6 +40185,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39737,6 +40262,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39797,6 +40323,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -39837,6 +40364,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -39934,6 +40462,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40004,6 +40533,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40049,6 +40579,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -40137,6 +40668,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -40202,6 +40734,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -40242,6 +40775,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40342,6 +40876,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40412,6 +40947,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -40452,6 +40988,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40492,6 +41029,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40552,6 +41090,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40602,6 +41141,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40689,6 +41229,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40754,6 +41295,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40829,6 +41371,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -40889,6 +41432,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitfinex": {
@@ -40982,6 +41526,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -41047,6 +41592,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -41143,6 +41689,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -41213,6 +41760,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -41253,6 +41801,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41345,6 +41894,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41420,6 +41970,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41487,6 +42038,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41542,6 +42094,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41627,6 +42180,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41697,6 +42251,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41747,6 +42302,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41832,6 +42388,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41897,6 +42454,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -41947,6 +42505,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42032,6 +42591,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42102,6 +42662,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42147,6 +42708,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42239,6 +42801,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42304,6 +42867,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42396,6 +42960,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42476,6 +43041,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -42516,6 +43082,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -42566,6 +43133,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -42606,6 +43174,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -42666,6 +43235,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -42716,6 +43286,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42798,6 +43369,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42858,6 +43430,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -42898,6 +43471,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -42986,6 +43560,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43061,6 +43636,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -43101,6 +43677,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43211,6 +43788,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43286,6 +43864,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43336,6 +43915,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43401,6 +43981,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43456,6 +44037,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": "",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -43523,6 +44105,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": "",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -43568,6 +44151,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43662,6 +44246,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43732,6 +44317,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43831,6 +44417,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43876,6 +44463,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -43946,6 +44534,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -43986,6 +44575,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44069,6 +44659,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44134,6 +44725,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44179,6 +44771,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44239,6 +44832,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44284,6 +44878,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44365,6 +44960,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44430,6 +45026,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44470,6 +45067,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44565,6 +45163,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44640,6 +45239,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -44680,6 +45280,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -44782,6 +45383,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -44852,6 +45454,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44928,6 +45531,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -44978,6 +45582,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45077,6 +45682,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45142,6 +45748,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45187,6 +45794,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -45261,6 +45869,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -45321,6 +45930,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -45361,6 +45971,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45446,6 +46057,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45506,6 +46118,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45551,6 +46164,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45630,6 +46244,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45695,6 +46310,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45775,6 +46391,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45835,6 +46452,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45925,6 +46543,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -45990,6 +46609,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -46067,6 +46687,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -46132,6 +46753,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -46172,6 +46794,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -46262,6 +46885,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -46322,6 +46946,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -46403,6 +47028,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -46468,6 +47094,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -46543,6 +47170,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -46603,6 +47231,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -46678,6 +47307,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -46738,6 +47368,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -46811,6 +47442,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -46866,6 +47498,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -46960,6 +47593,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47025,6 +47659,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47123,6 +47758,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47203,6 +47839,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -47243,6 +47880,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47348,6 +47986,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47423,6 +48062,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -47524,6 +48164,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -47584,6 +48225,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -47624,6 +48266,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47714,6 +48357,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47779,6 +48423,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -47819,6 +48464,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47903,6 +48549,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -47968,6 +48615,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -48008,6 +48656,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -48065,6 +48714,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -48110,6 +48760,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -48187,6 +48838,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -48247,6 +48899,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -48342,6 +48995,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -48407,6 +49061,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -48447,6 +49102,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -48517,6 +49173,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -48577,6 +49234,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -48632,6 +49290,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -48677,6 +49336,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -48747,6 +49407,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -48807,6 +49468,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -48885,6 +49547,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -48945,6 +49608,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -49015,6 +49679,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -49075,6 +49740,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49161,6 +49827,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49231,6 +49898,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -49271,6 +49939,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49356,6 +50025,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "MEXC": {
@@ -49396,6 +50066,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49451,6 +50122,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -49491,6 +50163,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49573,6 +50246,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49633,6 +50307,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49713,6 +50388,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49768,6 +50444,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -49808,6 +50485,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49909,6 +50587,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -49984,6 +50663,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -50024,6 +50704,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50064,6 +50745,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50154,6 +50836,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50214,6 +50897,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -50254,6 +50938,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50326,6 +51011,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50386,6 +51072,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50453,6 +51140,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50508,6 +51196,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "OKX": {
@@ -50548,6 +51237,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50615,6 +51305,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50670,6 +51361,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitfinex": {
@@ -50748,6 +51440,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -50803,6 +51496,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50873,6 +51567,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -50933,6 +51628,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -51101,6 +51797,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -51194,6 +51891,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -51262,6 +51960,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -51338,6 +52037,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -51403,6 +52103,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -51468,6 +52169,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -51523,6 +52225,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -51621,6 +52324,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -51691,6 +52395,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -51767,6 +52472,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -51832,6 +52538,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -51887,6 +52594,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -51932,6 +52640,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -51997,6 +52706,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -52042,6 +52752,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -52125,6 +52836,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -52185,6 +52897,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -52252,6 +52965,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bybit": {
@@ -52307,6 +53021,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -52392,6 +53107,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -52460,6 +53176,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Kraken": {
@@ -52508,6 +53225,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -52576,6 +53294,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -52626,6 +53345,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "CryptoCom": {
@@ -52677,6 +53397,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -52722,6 +53443,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Coinbase": {
@@ -52785,6 +53507,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "GateIo": {
@@ -52835,6 +53558,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -52920,6 +53644,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Bitget": {
@@ -52985,6 +53710,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -53044,6 +53770,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -53089,6 +53816,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -53129,6 +53857,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -53186,6 +53915,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -53236,6 +53966,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Binance": {
@@ -53276,6 +54007,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Coinbase": {
@@ -53341,6 +54073,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "crypto-price-feeds",
         "arguments": {
           "exchanges": {
             "Gemini": {
@@ -53386,6 +54119,7 @@
         "decimals": 0,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "exsat-holdings",
         "arguments": {}
       }
     },
@@ -53415,6 +54149,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "gecko-terminal",
         "arguments": [
           {
             "network": "monad-testnet",
@@ -53450,6 +54185,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "gecko-terminal",
         "arguments": [
           {
             "network": "base",
@@ -53485,6 +54221,7 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
+        "oracle_id": "gecko-terminal",
         "arguments": [
           {
             "network": "base",
