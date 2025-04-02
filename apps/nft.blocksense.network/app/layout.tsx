@@ -78,7 +78,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         <meta name="twitter:image" content="/images/nft-og.png" />
         <link rel="icon" href="/images/nft-favicon.png" type="image/png" />
       </NextHead>
-      <body className="nft-drop-layout__body md:px-4 lg:px-30 dark:bg-neutral-900 dark:text-neutral-300">
+      <body className="nft-drop-layout__body md:px-4 lg:px-30  dark:text-neutral-300">
         <header className="nft-drop-layout__header">
           <nav className="nft-drop-layout__navbar">
             <a

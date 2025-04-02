@@ -3,11 +3,8 @@ import { Footer } from './components/common/Footer';
 
 const fonts = [
   '/fonts/fira/FiraCode-Regular.woff2',
-  '/fonts/noto-sans/NotoSans-Light.woff2',
-  '/fonts/noto-sans/NotoSans-Regular.woff2',
-  '/fonts/noto-sans/NotoSans-Thin.woff2',
-  '/fonts/noto-sans/NotoSans-Bold.woff2',
-  '/fonts/SpaceMono-Bold.woff2',
+  '/fonts/geist/Geist-Regular.woff2',
+  '/fonts/geist/GeistMono-Regular.woff2',
 ];
 
 export default {

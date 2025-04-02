@@ -21,9 +21,9 @@ export const config = {
 };
 
 export const gettingStartedConfig = {
-  title: 'The ZK rollup for verifiable data and compute services',
+  title: 'The zk rollup for programmable oracles.',
   description:
-    'A fully decentralized protocol with groundbreaking cost efficiency. Everyone will finally be able to create secure oracles in minutes.',
+    'A fully decentralized protocol with groundbreaking cost efficiency. Everyone will be able to create secure oracles for every chain and every meta.',
 };
 
 export const shikiDefaultThemes = {

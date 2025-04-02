@@ -2,6 +2,10 @@
 
 @variant dark (&:where(.dark *));
 
+.dark body {
+  background: var(--bg-color-dark);
+}
+
 .dark a {
   @apply text-neutral-200;
 }
@@ -11,16 +15,16 @@
 }
 
 .dark button {
-  @apply bg-neutral-900 border-neutral-600;
+  @apply border-neutral-600;
+  background: var(--bg-color-dark);
 }
 
 .dark button:hover {
-  @apply bg-neutral-800;
+  background: var(--bg-color-dark);
 }
 
 .dark pre {
   @apply border-neutral-600;
-  /* matching bg color for our styles */
   background-color: #1c1c1c !important;
 }
 
@@ -33,7 +37,7 @@
 
 .dark
   .x\:bg-gray-100.x\:pb-\[env\(safe-area-inset-bottom\)\].x\:dark\:bg-neutral-900.x\:print\:bg-transparent {
-  @apply bg-neutral-900;
+  background: var(--bg-color-dark);
 }
 
 .dark .nextra-sidebar ul > li a:hover {
@@ -41,15 +45,18 @@
 }
 
 .dark .nextra-mobile-nav {
-  @apply bg-neutral-900 text-neutral-300;
+  @apply text-neutral-300;
+  background: var(--bg-color-dark);
 }
 
 .dark .nextra-filetree {
-  @apply bg-neutral-900 border-neutral-600;
+  @apply border-neutral-600;
+  background: var(--bg-color-dark);
 }
 
 .dark .tabs {
-  @apply bg-neutral-900 border-neutral-600;
+  @apply border-neutral-600;
+  background: var(--bg-color-dark);
 }
 
 .dark .nextra-callout {
@@ -118,4 +125,41 @@
 
 .dark .pagination__link--next:hover {
   @apply text-blue-700;
+}
+
+.dark .nextra-search input {
+  @apply border-neutral-600;
+  background: var(--bg-color-dark);
+}
+
+.dark .contract-base-info {
+  background: var(--bg-color-dark);
+}
+
+.dark .contract-base-info__description {
+  background: var(--bg-color-dark);
+}
+
+.dark .accordion-item {
+  background: var(--bg-color-dark);
+}
+
+.dark .button {
+  background: var(--bg-color-dark);
+}
+
+.dark button:hover {
+  @apply bg-neutral-700;
+}
+
+.dark .card {
+  background: var(--bg-color-dark);
+}
+
+.dark input {
+  background: var(--bg-color-dark);
+}
+
+.dark badge {
+  background: var(--bg-color-dark);
 }

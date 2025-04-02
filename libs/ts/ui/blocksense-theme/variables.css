@@ -3,23 +3,11 @@
 @variant dark (&:where(.dark *));
 
 @theme {
-  --font-display: 'Noto Sans', sans-serif;
-  --font-sans: 'Noto Sans', sans-serif;
-  --font-regular: 'Noto Sans Regular', sans-serif;
-  --font-italic: 'Noto Sans Italic', sans-serif;
-  --font-light: 'Noto Sans Light', sans-serif;
-  --font-light-italic: 'Noto Sans Light Italic', sans-serif;
-  --font-medium: 'Noto Sans Medium', sans-serif;
-  --font-semi-bold: 'Noto Sans SemiBold', sans-serif;
-  --font-semi-bold-italic: 'Noto Sans SemiBold Italic', sans-serif;
-  --font-thin: 'Noto Sans Thin', sans-serif;
-  --font-thin-italic: 'Noto Sans Thin Italic', sans-serif;
-  --font-bold: 'Noto Sans Bold', sans-serif;
-  --font-bold-italic: 'Noto Sans Bold Italic', sans-serif;
-  --font-extra-bold: 'Noto Sans Extra Bold', sans-serif;
-  --font-black: 'Noto Sans Black', sans-serif;
+  --font-geist: 'Geist Regular', sans-serif;
+  --font-sans: 'Geist Regular', sans-serif;
+  --font-geist-mono: 'Geist Mono', sans-serif;
+  --font-thin: 'Geist Thin', sans-serif;
   --font-mono: 'Fira Code', monospace;
-  --font-mono-space-bold: 'Space Mono Bold', monospace;
 
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
@@ -27,6 +15,9 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
   --breakpoint-3xl: 1920px;
+
+  --bg-color: #fffbfa;
+  --bg-color-dark: #2b2929;
 
   --focus-border-color: #2fa6ff;
   --transparent-color: transparent;

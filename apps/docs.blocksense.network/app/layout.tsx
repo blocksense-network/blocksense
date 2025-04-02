@@ -55,7 +55,9 @@ export const metadata: Metadata = {
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
   const navbar = (
     <Navbar
-      logo={<span>blocksense</span>}
+      logo={
+        <div className="bg-[url('/images/blocksense-logo__dark.png')] dark:bg-[url('/images/blocksense-logo__light.png')] h-[29.89px] w-[142px] bg-contain bg-no-repeat" />
+      }
       projectLink="https://github.com/blocksense-network/blocksense"
     />
   );
@@ -72,7 +74,7 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
         />
         <meta
           property="og:description"
-          content="The ZK rollup for verifiable data and compute services. Soon everyone will be able to create secure oracles in minutes."
+          content="The zk rollup for programmable oracles."
         />
         <meta property="og:image" content="/images/blocksense-og.png" />
         <meta property="og:type" content="website" />
@@ -89,7 +91,7 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
           type="image/png"
         />
       </NextHead>
-      <body className="md:px-4 lg:px-30 dark:bg-neutral-900 dark:text-neutral-300">
+      <body className="md:px-4 lg:px-30">
         <Layout
           navbar={navbar}
           pageMap={pageMap}

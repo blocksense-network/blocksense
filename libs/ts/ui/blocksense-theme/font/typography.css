@@ -5,7 +5,7 @@
 @layer base {
   h1 {
     @apply font-bold;
-    font-family: var(--font-display);
+    font-family: var(--font-geist);
   }
 
   h2 {
@@ -13,19 +13,19 @@
   }
 
   h3 {
-    font-family: var(--font-display);
+    font-family: var(--font-geist);
   }
 
   h4 {
-    font-family: var(--font-display);
+    font-family: var(--font-geist);
   }
 
   h5 {
-    font-family: var(--font-regular);
+    font-family: var(--font-geist);
   }
 
   h6 {
-    font-family: var(--font-display);
+    font-family: var(--font-geist);
   }
 
   p {
