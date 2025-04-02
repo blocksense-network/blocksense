@@ -12,8 +12,10 @@ blocksense-metrics = { workspace = true }
 blocksense-data-feeds = { workspace = true }
 blocksense-feed-registry = { workspace = true }
 blocksense-crypto = { workspace = true }
+blocksense-config = { workspace = true }
 blocksense-utils = { workspace = true }
 blocksense-gnosis-safe = { workspace = true }
+blocksense-feeds-processing = { workspace = true }
 
 anyhow = { workspace = true }
 clap = { version = "3.1.15", features = ["derive", "env"] }
