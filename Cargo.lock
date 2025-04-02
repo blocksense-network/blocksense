@@ -10673,9 +10673,11 @@ name = "trigger-oracle"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "blocksense-config",
  "blocksense-crypto",
  "blocksense-data-feeds",
  "blocksense-feed-registry",
+ "blocksense-feeds-processing",
  "blocksense-gnosis-safe",
  "blocksense-metrics",
  "blocksense-utils",
