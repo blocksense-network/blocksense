@@ -4,7 +4,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '../carouselCode/CarouselCode';
+} from '../carouselCode/Carousel';
 
 export const CarouselDemo = () => {
   return (
