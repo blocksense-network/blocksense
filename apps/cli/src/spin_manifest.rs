@@ -103,6 +103,14 @@ impl From<BlocksenseConfig> for AppManifest {
                     toml::Value::String(data_feed.id.to_string()),
                 );
                 table.insert(
+                    "stride".to_string(),
+                    toml::Value::Integer(data_feed.stride as i64),
+                );
+                table.insert(
+                    "decimals".to_string(),
+                    toml::Value::Integer(data_feed.additional_feed_info.decimals as i64),
+                );
+                table.insert(
                     "data".to_string(),
                     toml::Value::String(
                         serde_json::to_string(&data_feed.additional_feed_info).unwrap(),
