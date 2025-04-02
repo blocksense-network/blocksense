@@ -188,6 +188,16 @@ in
           "https://api.geckoterminal.com"
         ];
       };
+
+      eth-rpc = {
+        oracle_script_wasm = "eth_rpc.wasm";
+        interval_time_in_seconds = 10;
+        capabilities = [ ];
+        allowed_outbound_hosts = [
+          "https://eth.llamarpc.com"
+          "https://rpc.eth.gateway.fm"
+        ];
+      };
     };
   };
 }

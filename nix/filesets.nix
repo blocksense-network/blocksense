@@ -17,13 +17,11 @@ with lib.fileset;
           "rs"
           "toml"
           "wit"
+          "json"
+          "sol"
         ]
       ) root)
 
-      # JSON files
-      (root + "/apps/sequencer_tests/Safe.json")
-      (root + "/apps/sequencer_tests/SafeProxyFactory.json")
-      (root + "/libs/gnosis_safe/safe_abi.json")
     ];
     src = toSource { inherit root fileset; };
   };

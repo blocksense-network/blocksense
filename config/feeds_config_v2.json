@@ -53658,6 +53658,35 @@
           }
         ]
       }
+    },
+    {
+      "id": 1000003,
+      "full_name": "YieldNest convertToAssets",
+      "description": "YieldNest convertToAssets call on 0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb",
+      "type": "price-feed",
+      "oracle_id": "eth-rpc",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": []
+      }
     }
   ]
 }

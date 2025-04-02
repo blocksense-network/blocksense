@@ -542,6 +542,18 @@ pub async fn get_oracle_scripts(
                 capabilities: HashSet::new(),
             },
             OracleScript {
+                id: "eth-rpc".to_string(),
+                interval_time_in_seconds: None,
+                name: None,
+                description: None,
+                oracle_script_wasm: "eth_rpc.wasm".to_string(),
+                allowed_outbound_hosts: vec![
+                    "https://eth.llamarpc.com".to_string(),
+                    "https://rpc.eth.gateway.fm".to_string(),
+                ],
+                capabilities: HashSet::new(),
+            },
+            OracleScript {
                 id: "crypto-price-feeds".to_string(),
                 interval_time_in_seconds: None,
                 name: None,

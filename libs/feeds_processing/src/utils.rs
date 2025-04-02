@@ -126,7 +126,7 @@ pub async fn consume_reports(
                             warn!("Anomaly Detection failed with error - {}", e);
                         }
                     }
-                    let skip_decision = {
+                    {
                         let criteria = PublishCriteria {
                             feed_id,
                             skip_publish_if_less_then_percentage,
@@ -140,8 +140,7 @@ pub async fn consume_reports(
                             result_post_to_contract.should_skip(&criteria, &history_guard);
                         debug!("Release the read lock on history [feed {feed_id}]");
                         skip_decision
-                    };
-                    skip_decision
+                    }
                 } else {
                     SkipDecision::DontSkip(DontSkipReason::NonNumericalFeed)
                 }

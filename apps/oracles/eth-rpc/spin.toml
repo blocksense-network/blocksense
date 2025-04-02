@@ -1,0 +1,27 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Yordan Madzhunkov"]
+name = "Etherium RPC"
+version = "0.1.0"
+
+[application.trigger.settings]
+interval_time_in_seconds = 90
+sequencer = "http://127.0.0.1:9856/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+reporter_id = 0
+
+[[trigger.oracle]]
+component = "eth-rpc"
+
+[[trigger.oracle.data_feeds]]
+id = "1000003"
+data = '{"pair":{"base":"USR","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[]}'
+
+[component.eth-rpc]
+source = "../../../target/wasm32-wasip1/release/eth_rpc.wasm"
+
+allowed_outbound_hosts = ["https://eth.llamarpc.com", "https://rpc.eth.gateway.fm"]
+
+[component.eth-rpc.build]
+command = "cargo build --target wasm32-wasip1 --release"
