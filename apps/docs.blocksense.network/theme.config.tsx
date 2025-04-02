@@ -40,7 +40,6 @@ export default {
         content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
       />
       <meta name="twitter:image" content="/images/blocksense-og.png" />
-      <link rel="icon" href="/images/blocksense-favicon.png" type="image/png" />
       {fonts.map(font => (
         <link
           key={font}

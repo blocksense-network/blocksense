@@ -33,13 +33,15 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
+        rel: 'icon',
         media: '(prefers-color-scheme: dark)',
-        url: '/images/blocksense-favicon.png',
+        url: '/images/blocksense-favicon-dark.png',
         type: 'image/png',
       },
       {
+        rel: 'icon',
         media: '(prefers-color-scheme: light)',
-        url: '/images/blocksense-favicon.png',
+        url: '/images/blocksense-favicon-light.png',
         type: 'image/png',
       },
     ],
@@ -85,11 +87,6 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
           content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
         />
         <meta name="twitter:image" content="/images/blocksense-og.png" />
-        <link
-          rel="icon"
-          href="/images/blocksense-favicon.png"
-          type="image/png"
-        />
       </NextHead>
       <body className="md:px-4 lg:px-30">
         <Layout
