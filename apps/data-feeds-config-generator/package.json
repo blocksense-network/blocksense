@@ -5,8 +5,8 @@
   "types": "src/index.ts",
   "exports": {
     "./feeds_config": {
-      "require": "./config/feeds_config_v1.json",
-      "import": "./config/feeds_config_v1.json"
+      "require": "./config/feeds_config_v2.json",
+      "import": "./config/feeds_config_v2.json"
     },
     "./chainlink_compatibility": {
       "require": "./config/chainlink_compatibility_v1.json",

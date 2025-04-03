@@ -1,10 +1,11 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Callout } from '@blocksense/ui/Callout';
 import { parseNetworkName } from '@blocksense/base-utils/evm';
 
+import { capitalizeWords } from '@/src/utils';
 import {
   CoreContract,
   ProxyContractData,
@@ -15,6 +16,11 @@ import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrap
 import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';
 import { NetworkIcon } from '@/components/DeployedContracts/NetworkIcon';
 import { dataFeedUrl } from '@/src/constants';
+import { useHash } from '@/hooks/useHash';
+import {
+  cellHaveContent,
+  DataRowType,
+} from '../common/DataTable/dataTableUtils';
 
 type DeployedContractsProps = {
   parsedCoreContracts: CoreContract[];
@@ -25,15 +31,36 @@ export const DeployedContracts = ({
   parsedCoreContracts: deployedCoreContracts,
   parsedProxyContracts: deployedProxyContracts,
 }: DeployedContractsProps) => {
-  const [selectedNetwork, setSelectedNetwork] = useState<string | null>(null);
+  const [selectedNetwork, setSelectedNetwork] = useState('');
   const contractsRef = useRef<HTMLDivElement | null>(null);
+  const { hash, setNewHash } = useHash();
 
-  const handleNetworkClick = (network: string) => {
-    setSelectedNetwork(network);
-    setTimeout(() => {
-      contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 300);
-  };
+  useEffect(() => {
+    const networkFromHash = hash.replace('#', '');
+    if (!networkFromHash) {
+      setSelectedNetwork('');
+      return;
+    }
+
+    const network =
+      networkFromHash &&
+      deployedCoreContracts[0].networks.find(n => n === networkFromHash);
+
+    if (network) {
+      setSelectedNetwork(network);
+      setTimeout(() => {
+        contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    } else {
+      setSelectedNetwork('');
+    }
+  }, [deployedCoreContracts, hash]);
+
+  function getRowLink(row: DataRowType) {
+    return dataFeedUrl && cellHaveContent(row.id)
+      ? `${dataFeedUrl}${row.id}${hash}`
+      : '';
+  }
 
   return (
     <section className="mt-4">
@@ -53,7 +80,7 @@ export const DeployedContracts = ({
               network={network}
               isSelected={selectedNetwork === network}
               onClick={() => {
-                handleNetworkClick(network);
+                setNewHash(`#${network}`);
               }}
             />
           ))}
@@ -99,7 +126,7 @@ export const DeployedContracts = ({
           </ContractItemWrapper>
           <div className="mt-6">
             <ContractItemWrapper
-              title="Aggregator Proxy Contracts"
+              title="Chainlink Aggregator Adapter Contracts"
               titleLevel={2}
               itemsLength={deployedProxyContracts.length}
             >
@@ -109,6 +136,10 @@ export const DeployedContracts = ({
                 proxy contracts. Additionally, the table provides information
                 about data feed names, IDs, and relevant addresses.
               </Callout>
+
+              <div className="pt-2 text-2xl text-center font-semibold text-black leading-none tracking-tight dark:text-white">
+                {`${capitalizeWords(selectedNetwork)}`}
+              </div>
               <DataTable
                 columns={proxyContractsColumns}
                 data={deployedProxyContracts.filter(
@@ -116,7 +147,7 @@ export const DeployedContracts = ({
                     element.network === parseNetworkName(selectedNetwork),
                 )}
                 filterCell="description"
-                rowLink={dataFeedUrl}
+                getRowLink={getRowLink}
                 hasToolbar
               />
             </ContractItemWrapper>

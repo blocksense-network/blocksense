@@ -1,4 +1,4 @@
-import { decodeFeedsConfig } from '@blocksense/config-types/data-feeds-config';
+import { decodeNewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
 
 import DataFeed, { generateStaticParams } from '@/components/DataFeeds/[feed]';
@@ -10,11 +10,11 @@ export async function generateMetadata({ params }) {
   let metadata = { title: 'Data Feed' };
 
   if (feedId) {
-    const feedsConfig = decodeFeedsConfig(DATA_FEEDS);
+    const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
     const feed = feedsConfig.feeds.find(feed => feed.id === Number(feedId));
 
     if (feed) {
-      metadata = { title: `${feed.description} | ID: ${feed.id}` };
+      metadata = { title: `${feed.full_name} | ID: ${feed.id}` };
     }
   }
 

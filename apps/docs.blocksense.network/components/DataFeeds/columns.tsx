@@ -13,25 +13,46 @@ export const columns: ColumnDef[] = [
     facetedFilter: true,
   },
   {
-    id: 'description',
+    id: 'name',
     title: 'Data Feed Name',
     header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (
       <Tooltip position="right">
-        <Tooltip.Content>Data Feed Info</Tooltip.Content>
-        <DataTableBadge>{row.description}</DataTableBadge>
+        <Tooltip.Content>{row.description}</Tooltip.Content>
+        <DataTableBadge>{row.full_name}</DataTableBadge>
       </Tooltip>
+    ),
+  },
+  {
+    id: 'base',
+    title: 'Base',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
+    cell: ({ row }) => (
+      <DataTableBadge>{row.additional_feed_info.pair.base}</DataTableBadge>
+    ),
+  },
+  {
+    id: 'quote',
+    title: 'Quote',
+    header: ({ column }) => <DataTableColumnHeader title={column.title} />,
+    cell: ({ row }) => (
+      <DataTableBadge>{row.additional_feed_info.pair.quote}</DataTableBadge>
     ),
   },
   {
     id: 'decimals',
     title: 'Decimals',
     header: ({ column }) => <DataTableColumnHeader title={column.title} />,
-    cell: ({ row }) => <DataTableBadge>{row.decimals}</DataTableBadge>,
+    cell: ({ row }) => (
+      <DataTableBadge>{row.additional_feed_info.decimals}</DataTableBadge>
+    ),
   },
   {
-    id: 'report_interval_ms',
-    title: 'Refresh Interval (ms)',
+    id: 'category',
+    title: 'Category',
     header: ({ column }) => <DataTableColumnHeader title={column.title} />,
+    cell: ({ row }) => (
+      <DataTableBadge>{row.additional_feed_info.category}</DataTableBadge>
+    ),
   },
 ];

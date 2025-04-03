@@ -162,6 +162,7 @@ process-compose.yml
 
 # Data files like chainlink feeds, cmc assets, etc.
 apps/data-feeds-config-generator/artifacts
+apps/docs.blocksense.network/artifacts
 
 # Storybook
 *storybook.log
