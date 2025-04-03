@@ -1,7 +1,11 @@
 'use client';
+
+import { useEffect, useState } from 'react';
+
 import { DeploymentConfigV2, NewFeed } from '@blocksense/config-types';
 import { NetworkName } from '@blocksense/base-utils/evm';
-import { useState } from 'react';
+
+import { useHash } from '@/hooks/useHash';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -9,7 +13,6 @@ import {
   DropdownMenuItem,
 } from '@blocksense/ui/DropdownMenu';
 import { Button } from '@blocksense/ui/Button';
-import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 import { Card, CardHeader, CardTitle } from '@blocksense/ui/Card';
 import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
@@ -48,7 +51,7 @@ const NetworkDropdown = ({
           }
           className="mt-0 bg-white flex justify-center h-8 border-solid border-neutral-200 dark:bg-neutral-600"
         >
-          {capitalizeWords(selectedNetwork)}
+          {capitalizeWords(selectedNetwork) || 'Select Network'}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[12rem]">
@@ -186,7 +189,27 @@ export const NetworkAccessCard = ({
   const [deploymentInfo, setDeploymentInfo] = useState<DeploymentConfigV2>(
     feedsDeploymentInfo.find(networkData => networkData.name === networks[0])!,
   );
+  const { hash, setNewHash } = useHash();
+  const networkFromHash = hash.replace('#', '');
+
+  useEffect(() => {
+    if (networkFromHash && networks.includes(networkFromHash as NetworkName)) {
+      changeNetwork(networkFromHash as NetworkName);
+    }
+  }, [feedsDeploymentInfo, networks, networkFromHash]);
+
+  useEffect(() => {
+    if (selectedNetwork && selectedNetwork !== networkFromHash) {
+      setNewHash(`#${selectedNetwork}`);
+    }
+  }, [selectedNetwork]);
+
   const handleNetworkSelect = (network: NetworkName) => {
+    setNewHash(`#${network}`);
+    changeNetwork(network);
+  };
+
+  const changeNetwork = (network: NetworkName) => {
     setSelectedNetwork(network);
     setDeploymentInfo(feedsDeploymentInfo.find(data => data.name === network)!);
   };
