@@ -4,7 +4,7 @@ use alloy::{
     dyn_abi::DynSolValue,
     hex,
     network::{EthereumWallet, TransactionBuilder},
-    primitives::Address,
+    primitives::{Address, Bytes},
     providers::{
         fillers::{
             BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller,
@@ -15,10 +15,8 @@ use alloy::{
     signers::local::PrivateKeySigner,
 };
 
-use alloy_primitives::Bytes;
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
-use reqwest::Url;
-
+use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
