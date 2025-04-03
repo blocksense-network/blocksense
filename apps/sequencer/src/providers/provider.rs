@@ -72,6 +72,7 @@ pub const ADFS_CONTRACT_NAME: &str = "AggregatedDataFeedStore";
 pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
 pub const GNOSIS_SAFE_CONTRACT_NAME: &str = "gnosis_safe";
 
+type RoundCounters = HashMap<u128, u128>; // for each key (feed_id) we store its round counter
 pub struct RpcProvider {
     pub network: String,
     pub provider: ProviderType,
@@ -88,6 +89,7 @@ pub struct RpcProvider {
     pub feeds_variants: HashMap<u32, (FeedType, usize)>,
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
+    pub round_counters: RoundCounters,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -230,6 +232,7 @@ impl RpcProvider {
             feeds_variants,
             contracts,
             rpc_url,
+            round_counters: HashMap::new(),
         }
     }
 

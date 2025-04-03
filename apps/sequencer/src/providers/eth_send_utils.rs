@@ -226,6 +226,20 @@ pub async fn eth_batch_send_to_contract(
     let mut provider = provider.lock().await;
     debug!("Acquired a read/write lock on provider state for network `{net}`");
 
+    let feeds_to_update_ids: Vec<u32> = updates
+        .updates
+        .iter()
+        .map(|update| update.feed_id)
+        .collect();
+
+    increment_feeds_round_indexes(
+        &feeds_to_update_ids,
+        feeds_metrics.clone(),
+        net.as_str(),
+        &mut provider,
+    )
+    .await;
+
     let signer = &provider.signer;
     let contract_name = if feed_type == Periodic {
         HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME
@@ -284,14 +298,6 @@ pub async fn eth_batch_send_to_contract(
     };
 
     let mut timed_out_count = 0;
-
-    let feeds_to_update_ids: Vec<u32> = updates
-        .updates
-        .iter()
-        .map(|update| update.feed_id)
-        .collect();
-
-    increment_feeds_round_indexes(&feeds_to_update_ids, feeds_metrics.clone(), net.as_str()).await;
 
     loop {
         debug!("loop begin; timed_out_count={timed_out_count}");
@@ -600,6 +606,7 @@ pub async fn eth_batch_send_to_all_contracts(
                             &updated_feeds,
                             Some(sequencer_state.feeds_metrics.clone()),
                             net.as_str(),
+                            &mut (*provider.lock().await),
                         )
                         .await;
                         if status == "timeout" {
@@ -656,6 +663,7 @@ async fn increment_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
+    provider: &mut RpcProvider,
 ) {
     log_round_counters(
         "increment_feeds_round_indexes before update",
@@ -664,6 +672,12 @@ async fn increment_feeds_round_indexes(
         net,
     )
     .await;
+
+    for feed in updated_feeds {
+        let round_counter = provider.round_counters.entry(*feed as u128).or_insert(0);
+        *round_counter += 1;
+    }
+
     if let Some(ref fm) = feeds_metrics {
         for feed in updated_feeds {
             // update the round counters accordingly
@@ -684,6 +698,7 @@ async fn decrement_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
+    provider: &mut RpcProvider,
 ) {
     log_round_counters(
         "decrement_feeds_round_indexes before update",
@@ -692,6 +707,11 @@ async fn decrement_feeds_round_indexes(
         net,
     )
     .await;
+
+    for feed in updated_feeds {
+        let round_counter = provider.round_counters.entry(*feed as u128).or_insert(0);
+        *round_counter -= 1;
+    }
 
     if let Some(ref fm) = feeds_metrics {
         for feed in updated_feeds {
