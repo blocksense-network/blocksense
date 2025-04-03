@@ -129,7 +129,6 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         // perform this filtering
         let mut updates = updates.clone();
 
-        let feeds_metrics = sequencer_state.feeds_metrics.clone();
         let feeds_config = sequencer_state.active_feeds.clone();
 
         let mut feeds_rounds = HashMap::new();
@@ -139,7 +138,6 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             provider,
             &mut updates,
             &provider_settings,
-            Some(feeds_metrics),
             feeds_config,
             &mut feeds_rounds,
         )

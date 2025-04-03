@@ -3,19 +3,18 @@ use alloy_primitives::U256;
 use anyhow::Result;
 use config::FeedStrideAndDecimals;
 use data_feeds::feeds_processing::BatchedAggegratesToSend;
-use prometheus::metrics::FeedsMetrics;
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap, HashSet};
-use std::sync::Arc;
-use tokio::sync::RwLock;
 use utils::{from_hex_string, to_hex_string};
 
-use tracing::{debug, error, info};
+use tracing::{error, info};
 
 use once_cell::sync::Lazy;
 
 const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
 const NUM_FEED_IDS_IN_ROUND_RECORD: u32 = 16;
+
+pub type RoundCounters = HashMap<u32, u64>; // for each key (feed_id) we store its round counter
 
 static STRIDES_SIZES: Lazy<HashMap<u16, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
@@ -63,11 +62,11 @@ fn encode_packed(items: &[&[u8]]) -> (Vec<u8>, String) {
 pub async fn adfs_serialize_updates(
     net: &str,
     feed_updates: &BatchedAggegratesToSend,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    round_counters: Option<&RoundCounters>,
     strides_and_decimals: HashMap<u32, FeedStrideAndDecimals>,
-    feeds_rounds: &mut HashMap<u32, u64>, /* The rounds table for the relevant feeds. If the feeds_metrics are provided,
+    feeds_rounds: &mut HashMap<u32, u64>, /* The rounds table for the relevant feeds. If the round_counters are provided,
                                           this map will be filled with the update count for each feed from it. If the
-                                          feeds_metrics is None, feeds_rounds will be used as the source of the updates
+                                          round_counters is None, feeds_rounds will be used as the source of the updates
                                           count. */
 ) -> Result<String> {
     let mut result = Vec::<u8>::new();
@@ -94,21 +93,14 @@ pub async fn adfs_serialize_updates(
             }
         };
 
-        let mut round = match &feeds_metrics {
-            Some(fm) => {
+        let mut round = match &round_counters {
+            Some(rc) => {
                 let mut updated_feed_id_round: u64 = 0;
                 // Add the feed id-s that are part of each record that will be updated
                 for additional_feed_id in get_neighbour_feed_ids(update.feed_id) {
-                    debug!(
-                        "Acquiring a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}"
-                    );
-                    let round = fm
-                        .read()
-                        .await
-                        .updates_to_networks
-                        .with_label_values(&[&additional_feed_id.to_string(), net])
-                        .get();
-                    debug!("Acquired and released a read lock on feeds_metrics; network={net}; feed_id={additional_feed_id}");
+                    let round = rc.get(&additional_feed_id).cloned().unwrap_or(0);
+
+
                     let (stride, _digits_in_fraction) = match &strides_and_decimals
                         .get(&additional_feed_id)
                     {
@@ -120,7 +112,7 @@ pub async fn adfs_serialize_updates(
                     };
                     feeds_info.insert(additional_feed_id, (stride, round));
                     if additional_feed_id == update.feed_id {
-                        updated_feed_id_round = round
+                        updated_feed_id_round = round;
                     }
                 }
                 updated_feed_id_round
@@ -176,7 +168,7 @@ pub async fn adfs_serialize_updates(
 
     // In case feed_metrics is none, the feeds_rounds contains all the round indexes needed for serialization.
     // We use them to populate feeds_info map based on which the round indexes will be serialized
-    if feeds_metrics.is_none() {
+    if round_counters.is_none() {
         for (feed_id, round) in feeds_rounds.iter() {
             if let Some(strides_and_decimals) = strides_and_decimals.get(feed_id) {
                 feeds_info.insert(*feed_id, (strides_and_decimals.stride, *round));
@@ -286,28 +278,12 @@ pub mod tests {
             ],
         };
 
-        // Helper function to set round metrics (number of updates for a feed for a network)
-        fn set_round_metric(feeds_metrics: &mut FeedsMetrics, feed_id: &str, net: &str, val: u64) {
-            feeds_metrics
-                .updates_to_networks
-                .with_label_values(&[feed_id, net])
-                .inc_by(val);
-        }
-
-        use std::sync::OnceLock;
-
-        fn static_feeds_metrics(net: &str) -> &'static Arc<RwLock<FeedsMetrics>> {
-            static VALUE: OnceLock<Arc<RwLock<FeedsMetrics>>> = OnceLock::new();
-            VALUE.get_or_init(|| {
-                let mut feeds_metrics = FeedsMetrics::new("test_adfs_serialize").unwrap();
-                set_round_metric(&mut feeds_metrics, "1", net, 6);
-                set_round_metric(&mut feeds_metrics, "2", net, 5);
-                set_round_metric(&mut feeds_metrics, "3", net, 4);
-                set_round_metric(&mut feeds_metrics, "4", net, 3);
-                set_round_metric(&mut feeds_metrics, "5", net, 2);
-                Arc::new(RwLock::new(feeds_metrics))
-            })
-        }
+        let mut round_counters = RoundCounters::new();
+        round_counters.insert(1, 6);
+        round_counters.insert(2, 5);
+        round_counters.insert(3, 4);
+        round_counters.insert(4, 3);
+        round_counters.insert(5, 2);
 
         let mut config = HashMap::new();
 
@@ -328,8 +304,6 @@ pub mod tests {
             },
         );
 
-        let feeds_metrics = static_feeds_metrics(net);
-
         let expected_result = "0000000000499602d2000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200000000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
         let mut feeds_rounds = HashMap::new();
@@ -340,7 +314,7 @@ pub mod tests {
             adfs_serialize_updates(
                 net,
                 &updates,
-                Some(feeds_metrics.clone()),
+                Some(&round_counters),
                 config.clone(),
                 &mut feeds_rounds,
             )

@@ -17,6 +17,7 @@ use alloy::{
 
 use alloy_primitives::Bytes;
 use config::AllFeedsConfig;
+use feeds_processing::adfs_gen_calldata::RoundCounters;
 use reqwest::Url;
 
 use config::{PublishCriteria, SequencerConfig};
@@ -87,6 +88,7 @@ pub struct RpcProvider {
     pub feeds_variants: HashMap<u32, (FeedType, usize)>,
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
+    pub round_counters: RoundCounters,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -215,6 +217,7 @@ impl RpcProvider {
             feeds_variants,
             contracts,
             rpc_url,
+            round_counters: HashMap::new(),
         }
     }
 

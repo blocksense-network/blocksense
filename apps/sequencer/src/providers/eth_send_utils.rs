@@ -22,7 +22,9 @@ use crate::{
     sequencer_state::SequencerState,
 };
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
-use feeds_processing::adfs_gen_calldata::{adfs_serialize_updates, get_neighbour_feed_ids};
+use feeds_processing::adfs_gen_calldata::{
+    adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
+};
 use futures::stream::FuturesUnordered;
 use paste::paste;
 use prometheus::{inc_metric, inc_vec_metric, set_metric};
@@ -109,15 +111,14 @@ pub fn filter_allowed_feeds(
 // Will reduce the updates to only the relevant for the network
 pub async fn get_serialized_updates_for_network(
     net: &str,
-    provider: &Arc<Mutex<RpcProvider>>,
+    provider_mutex: &Arc<Mutex<RpcProvider>>,
     updates: &mut BatchedAggegratesToSend,
     provider_settings: &config::Provider,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     feeds_rounds: &mut HashMap<u32, u64>,
 ) -> Result<String> {
     debug!("Acquiring a read lock on provider config for `{net}`");
-    let provider = provider.lock().await;
+    let provider = provider_mutex.lock().await;
     debug!("Acquired a read lock on provider config for `{net}`");
     filter_allowed_feeds(net, updates, &provider_settings.allow_feeds);
     provider.peg_stable_coins_to_value(updates);
@@ -164,21 +165,24 @@ pub async fn get_serialized_updates_for_network(
             }
             Err(e) => eyre::bail!("Legacy serialization failed: {e}!"),
         },
-        2 => match adfs_serialize_updates(
-            net,
-            updates,
-            feeds_metrics,
-            strides_and_decimals,
-            feeds_rounds,
-        )
-        .await
-        {
-            Ok(result) => {
-                debug!("adfs_serialize_updates result = {result}");
-                result
+        2 => {
+            let provider = provider_mutex.lock().await;
+            match adfs_serialize_updates(
+                net,
+                updates,
+                Some(&provider.round_counters),
+                strides_and_decimals,
+                feeds_rounds,
+            )
+            .await
+            {
+                Ok(result) => {
+                    debug!("adfs_serialize_updates result = {result}");
+                    result
+                }
+                Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
             }
-            Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
-        },
+        }
         _ => eyre::bail!("Unsupported contract version set for network {net}!"),
     };
 
@@ -192,7 +196,6 @@ pub async fn eth_batch_send_to_contract(
     provider_settings: config::Provider,
     mut updates: BatchedAggegratesToSend,
     feed_type: Repeatability,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
     transaction_retries_count_before_give_up: u64,
@@ -204,7 +207,6 @@ pub async fn eth_batch_send_to_contract(
         &provider,
         &mut updates,
         &provider_settings,
-        feeds_metrics.clone(),
         feeds_config,
         &mut feeds_rounds,
     )
@@ -223,6 +225,14 @@ pub async fn eth_batch_send_to_contract(
     debug!("Acquiring a read/write lock on provider state for network `{net}`");
     let mut provider = provider.lock().await;
     debug!("Acquired a read/write lock on provider state for network `{net}`");
+
+    let feeds_to_update_ids: Vec<u32> = updates
+        .updates
+        .iter()
+        .map(|update| update.feed_id)
+        .collect();
+
+    increment_feeds_round_indexes(&feeds_to_update_ids, net.as_str(), &mut provider).await;
 
     let signer = &provider.signer;
     let contract_name = if feed_type == Periodic {
@@ -282,14 +292,6 @@ pub async fn eth_batch_send_to_contract(
     };
 
     let mut timed_out_count = 0;
-
-    let feeds_to_update_ids: Vec<u32> = updates
-        .updates
-        .iter()
-        .map(|update| update.feed_id)
-        .collect();
-
-    increment_feeds_round_indexes(&feeds_to_update_ids, feeds_metrics.clone(), net.as_str()).await;
 
     loop {
         debug!("loop begin; timed_out_count={timed_out_count}");
@@ -504,7 +506,6 @@ pub async fn eth_batch_send_to_all_contracts(
         let providers_config = &providers_config_guard.providers;
 
         // No lock, we propagete the shared objects to the created futures
-        let feeds_metrics = sequencer_state.feeds_metrics.clone();
         let feeds_config = sequencer_state.active_feeds.clone();
 
         for (net, provider) in providers.iter() {
@@ -547,7 +548,6 @@ pub async fn eth_batch_send_to_all_contracts(
                 let provider = provider.clone();
 
                 let feeds_config = feeds_config.clone();
-                let feeds_metrics = feeds_metrics.clone();
                 let provider_settings = provider_settings.clone();
                 collected_futures.push(spawn(async move {
                     let result = eth_batch_send_to_contract(
@@ -556,7 +556,6 @@ pub async fn eth_batch_send_to_all_contracts(
                         provider_settings,
                         updates,
                         feed_type,
-                        Some(feeds_metrics),
                         feeds_config,
                         transaction_retry_timeout_secs,
                         transaction_retries_count_before_give_up,
@@ -589,6 +588,12 @@ pub async fn eth_batch_send_to_all_contracts(
                     all_results += &format!("result from network {net}: Ok -> status: {status}");
                     if status == "true" {
                         all_results += &format!(", updated_feeds: {updated_feeds:?}");
+                        increment_feeds_round_metrics(
+                            &updated_feeds,
+                            Some(sequencer_state.feeds_metrics.clone()),
+                            net.as_str(),
+                        )
+                        .await;
                         let mut status_map = sequencer_state.provider_status.write().await;
                         status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
                     } else if status == "false" || status == "timeout" {
@@ -596,8 +601,8 @@ pub async fn eth_batch_send_to_all_contracts(
                             &format!(", failed to update feeds: {updated_feeds:?} due to {status}");
                         decrement_feeds_round_indexes(
                             &updated_feeds,
-                            Some(sequencer_state.feeds_metrics.clone()),
                             net.as_str(),
+                            &mut (*provider.lock().await),
                         )
                         .await;
                         if status == "timeout" {
@@ -629,49 +634,40 @@ pub async fn eth_batch_send_to_all_contracts(
 async fn log_round_counters(
     prefix: &str,
     updated_feeds: &Vec<u32>,
-    feeds_metrics: &Option<Arc<RwLock<FeedsMetrics>>>,
+    round_counters: &mut RoundCounters,
     net: &str,
 ) {
-    if let Some(fm) = feeds_metrics {
-        let mut debug_string =
-            format!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} ");
-        for feed in updated_feeds {
-            let round_index = fm
-                .read()
-                .await
-                .updates_to_networks
-                .with_label_values(&[&feed.to_string(), net])
-                .get();
-            debug_string.push_str(format!("{feed} = {round_index}; ").as_str());
-        }
-        debug!(debug_string);
-    } else {
-        error!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} called with empty metrics");
+    let mut debug_string =
+        format!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} ");
+    for feed in updated_feeds {
+        let round_index = round_counters.get(feed).unwrap_or(&0_u64);
+        debug_string.push_str(format!("{feed} = {round_index}; ").as_str());
     }
+    debug!(debug_string);
 }
 
 async fn increment_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
+    provider: &mut RpcProvider,
 ) {
     log_round_counters(
         "increment_feeds_round_indexes before update",
         updated_feeds,
-        &feeds_metrics,
+        &mut provider.round_counters,
         net,
     )
     .await;
-    if let Some(ref fm) = feeds_metrics {
-        for feed in updated_feeds {
-            // update the round counters accordingly
-            inc_vec_metric!(fm, feed, updates_to_networks, net);
-        }
+
+    for feed in updated_feeds {
+        let round_counter = provider.round_counters.entry(*feed).or_insert(0);
+        *round_counter += 1;
     }
+
     log_round_counters(
         "increment_feeds_round_indexes after update",
         updated_feeds,
-        &feeds_metrics,
+        &mut provider.round_counters,
         net,
     )
     .await;
@@ -680,41 +676,44 @@ async fn increment_feeds_round_indexes(
 // receive its receipt if the tx fails we need to decrease the round indexes.
 async fn decrement_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
+    provider: &mut RpcProvider,
 ) {
     log_round_counters(
         "decrement_feeds_round_indexes before update",
         updated_feeds,
-        &feeds_metrics,
+        &mut provider.round_counters,
         net,
     )
     .await;
 
-    if let Some(ref fm) = feeds_metrics {
-        for feed in updated_feeds {
-            // update the round counters accordingly
-            let round_index = fm
-                .read()
-                .await
-                .updates_to_networks
-                .with_label_values(&[&feed.to_string(), net])
-                .get();
-            fm.read()
-                .await
-                .updates_to_networks
-                .with_label_values(&[&feed.to_string(), net])
-                .inc_by(round_index - 1);
+    for feed in updated_feeds {
+        let round_counter = provider.round_counters.entry(*feed).or_insert(0);
+        if *round_counter > 0 {
+            *round_counter -= 1;
         }
     }
 
     log_round_counters(
         "decrement_feeds_round_indexes after update",
         updated_feeds,
-        &feeds_metrics,
+        &mut provider.round_counters,
         net,
     )
     .await;
+}
+
+async fn increment_feeds_round_metrics(
+    updated_feeds: &Vec<u32>,
+    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    net: &str,
+) {
+    if let Some(ref fm) = feeds_metrics {
+        for feed in updated_feeds {
+            // update the round counters' metrics accordingly
+            inc_vec_metric!(fm, feed, updates_to_networks, net);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -912,7 +911,6 @@ mod tests {
             provider_settings,
             updates_oneshot,
             Oneshot,
-            None,
             feeds_config,
             50,
             10,
