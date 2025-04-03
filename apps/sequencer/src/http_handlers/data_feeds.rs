@@ -15,14 +15,14 @@ use feed_registry::types::{GetLastPublishedRequestData, LastPublishedValue, Repo
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
-use tracing::{debug, error, info, info_span, trace, warn};
+use tracing::{debug, error, info, info_span, warn};
 use uuid::Uuid;
 
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
 use config::SequencerConfig;
-use feed_registry::registry::FeedAggregateHistory;
+use feed_registry::registry::{FeedAggregateHistory, VoteStatus};
 use feed_registry::types::DataFeedPayload;
 use feed_registry::types::FeedMetaData;
 use feeds_processing::utils::check_signature;
@@ -111,12 +111,7 @@ async fn process_report(
         }
     };
 
-    trace!(
-        "data_feed = {:?}; feed_id = {:?}; reporter_id = {:?}",
-        data_feed,
-        feed_id,
-        reporter_id
-    );
+    debug!("data_feed = {:?}", data_feed,);
     let feed = {
         let reg = sequencer_state.registry.read().await;
         debug!("getting feed_id = {}", &feed_id);
@@ -142,28 +137,31 @@ async fn process_report(
     match report_relevance {
         ReportRelevance::Relevant => {
             let mut reports = sequencer_state.reports.write().await;
-            if reports.push(feed_id, reporter_id, data_feed).await {
-                debug!(
-                    "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
-                    reporter_id, feed_id
-                );
-                inc_vec_metric!(
-                    reporter_metrics,
-                    reporter_id,
-                    timely_reports_per_feed,
-                    feed_id
-                );
-            } else {
-                debug!(
-                    "Recvd revote from reporter_id = {} for feed_id = {}",
-                    reporter_id, feed_id
-                );
-                inc_vec_metric!(
-                    reporter_metrics,
-                    reporter_id,
-                    total_revotes_for_same_slot_per_feed,
-                    feed_id
-                );
+            match reports.push(feed_id, reporter_id, data_feed).await {
+                VoteStatus::FirstVoteForSlot => {
+                    debug!(
+                        "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
+                        reporter_id, feed_id
+                    );
+                    inc_vec_metric!(
+                        reporter_metrics,
+                        reporter_id,
+                        timely_reports_per_feed,
+                        feed_id
+                    );
+                }
+                VoteStatus::RevoteForSlot(prev_vote) => {
+                    debug!(
+                        "Recvd revote from reporter_id = {} for feed_id = {} prev_vote = {:?}",
+                        reporter_id, feed_id, prev_vote
+                    );
+                    inc_vec_metric!(
+                        reporter_metrics,
+                        reporter_id,
+                        total_revotes_for_same_slot_per_feed,
+                        feed_id
+                    );
+                }
             }
             return HttpResponse::Ok().into(); // <- send response
         }
