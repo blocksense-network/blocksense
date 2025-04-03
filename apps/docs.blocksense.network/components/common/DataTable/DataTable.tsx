@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext } from 'react';
+import { MouseEvent, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { onLinkClick } from '@/src/utils';
@@ -42,15 +42,11 @@ function DataTableContent({
   columns,
   filterCell = '',
   hasToolbar,
-  rowLink,
+  getRowLink,
 }: DataTableProps) {
   const router = useRouter();
   const { sorting, setSorting, columnVisibility, paginatedData } =
     useContext(DataTableContext);
-
-  function getRowLink(row: DataRowType) {
-    return rowLink && cellHaveContent(row.id) ? `${rowLink}${row.id}` : '';
-  }
 
   return (
     <section className="space-y-4 mt-2">
@@ -87,9 +83,13 @@ function DataTableContent({
             paginatedData.map((row, rowIndex) => (
               <TableRow
                 key={rowIndex}
-                onClick={e => onLinkClick(e, router, getRowLink(row))}
-                onAuxClick={e => onLinkClick(e, router, getRowLink(row), true)}
-                className={cn(rowLink && 'cursor-pointer')}
+                onClick={(e: MouseEvent<HTMLTableRowElement>) =>
+                  getRowLink && onLinkClick(e, router, getRowLink(row))
+                }
+                onAuxClick={(e: MouseEvent<HTMLTableRowElement>) =>
+                  getRowLink && onLinkClick(e, router, getRowLink(row), true)
+                }
+                className={cn(getRowLink && 'cursor-pointer')}
               >
                 {columns.map(
                   col =>
