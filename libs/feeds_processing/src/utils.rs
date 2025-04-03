@@ -251,13 +251,13 @@ pub async fn perform_anomaly_detection(
         .context("Failed to join feed slots manager anomaly detection!")?
 }
 
-pub async fn validate(
-    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
-    mut batch: ConsensusSecondRoundBatch,
-    last_votes: HashMap<u32, VotedFeedUpdate>,
-    tolerated_deviations: HashMap<u32, f64>,
+fn check_aggregated_votes_deviation(
+    updates: &[VotedFeedUpdate],
+    block_height: u64,
+    last_votes: &HashMap<u32, VotedFeedUpdate>,
+    tolerated_deviations: &HashMap<u32, f64>,
 ) -> Result<()> {
-    for update in &batch.updates {
+    for update in updates {
         let feed_id = update.feed_id;
         let Some(reporter_vote) = last_votes.get(&feed_id) else {
             anyhow::bail!("Failed to get latest vote for feed_id: {}", feed_id);
@@ -286,12 +286,27 @@ pub async fn validate(
         let upper_bound = reporter_voted_value + tolerated_difference;
 
         if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
-            let block_height = batch.block_height;
             let difference = (reporter_voted_value - update_aggregate_value).abs();
             let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
             anyhow::bail!("Final answer for feed={feed_id}, block_height={block_height}, deviates more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}");
         }
     }
+
+    Ok(())
+}
+
+pub async fn validate(
+    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+    mut batch: ConsensusSecondRoundBatch,
+    last_votes: HashMap<u32, VotedFeedUpdate>,
+    tolerated_deviations: HashMap<u32, f64>,
+) -> Result<()> {
+    check_aggregated_votes_deviation(
+        &batch.updates,
+        batch.block_height,
+        &last_votes,
+        &tolerated_deviations,
+    )?;
 
     let updates_to_serialize = BatchedAggegratesToSend {
         block_height: batch.block_height,
