@@ -16,6 +16,11 @@ import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrap
 import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';
 import { NetworkIcon } from '@/components/DeployedContracts/NetworkIcon';
 import { dataFeedUrl } from '@/src/constants';
+import { useHash } from '@/hooks/useHash';
+import {
+  cellHaveContent,
+  DataRowType,
+} from '../common/DataTable/dataTableUtils';
 
 type DeployedContractsProps = {
   parsedCoreContracts: CoreContract[];
@@ -28,6 +33,7 @@ export const DeployedContracts = ({
 }: DeployedContractsProps) => {
   const [selectedNetwork, setSelectedNetwork] = useState<string | null>(null);
   const contractsRef = useRef<HTMLDivElement | null>(null);
+  const { hash } = useHash();
 
   const handleNetworkClick = (network: string) => {
     setSelectedNetwork(network);
@@ -35,6 +41,12 @@ export const DeployedContracts = ({
       contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
   };
+
+  function getRowLink(row: DataRowType) {
+    return dataFeedUrl && cellHaveContent(row.id)
+      ? `${dataFeedUrl}${row.id}${hash}`
+      : '';
+  }
 
   return (
     <section className="mt-4">
@@ -121,7 +133,7 @@ export const DeployedContracts = ({
                     element.network === parseNetworkName(selectedNetwork),
                 )}
                 filterCell="description"
-                rowLink={dataFeedUrl}
+                getRowLink={getRowLink}
                 hasToolbar
               />
             </ContractItemWrapper>
