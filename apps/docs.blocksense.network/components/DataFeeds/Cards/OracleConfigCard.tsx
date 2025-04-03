@@ -1,12 +1,6 @@
 import { NewFeed } from '@blocksense/config-types';
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@blocksense/ui/Card';
-import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
+import { Card, CardHeader, CardTitle } from '@blocksense/ui/Card';
 
 import { CodeBlock } from '@/components/common/CodeBlock';
 import { ScrollArea } from '@blocksense/ui/ScrollArea';
@@ -17,17 +11,8 @@ type DataFeedCardProps = {
 };
 
 export const OracleConfigCard = ({ feed }: DataFeedCardProps) => {
-  const oracleConfigInfo = {
-    title: 'Oracle Configuration',
-    description: '',
-    items: [
-      { label: 'Component', value: feed.oracle_id },
-      { label: 'Report Data Type', value: 'f64' },
-    ],
-  };
-
   return (
-    <Card className="data-feed-card-section mx-auto">
+    <Card className="data-feed-card-section">
       <CardHeader className="data-feed-card__header flex flex-col space-y-1.5 px-4 mt-3 mb-3">
         <div className="flex items-center justify-center md:justify-around">
           <CardTitle className="data-feed-card__title text-xl font-semibold text-gray-900">

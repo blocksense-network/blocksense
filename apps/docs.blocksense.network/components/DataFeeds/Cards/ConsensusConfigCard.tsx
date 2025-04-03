@@ -44,16 +44,14 @@ export const ConsensusConfigCard = ({ feed }: DataFeedCardProps) => {
         'This is the default configuration. Values may vary depending on the network the data feed is deployed.'
       }
     >
-      <div>
-        <div className="data-feed-card-content grid grid-cols-2 gap-4">
-          {consensusInfo.items.map((item, idx) => (
-            <DataFeedCardContentItem
-              key={idx}
-              label={item.label}
-              value={item.value}
-            />
-          ))}
-        </div>
+      <div className="data-feed-card-content grid grid-cols-2 gap-4">
+        {consensusInfo.items.map((item, idx) => (
+          <DataFeedCardContentItem
+            key={idx}
+            label={item.label}
+            value={item.value}
+          />
+        ))}
       </div>
     </DataFeedCardSection>
   );
