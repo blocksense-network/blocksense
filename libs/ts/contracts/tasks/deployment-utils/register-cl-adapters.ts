@@ -9,7 +9,9 @@ import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 task(
   'register-cl-adapters',
   '[UTILS] Register CLAggregatorAdapters in CLFeedRegistryAdapter',
@@ -36,7 +38,7 @@ task(
   );
 
   // Split into batches of 100
-  const BATCH_LENGTH = 100;
+  const BATCH_LENGTH = 100; //lower this if crash
   const batches: Array<Array<CLAggregatorAdapterData>> = [];
   const aggregatorData = deployData.CLAggregatorAdapter.filter(d => d.base);
   const filteredData = [];
@@ -46,7 +48,7 @@ task(
       console.log(` -> Feed '${data.description}' has no base or quote`);
       continue;
     }
-
+    // await delay(300);
     const feed = await registry.connect(signer).getFunction('getFeed')(
       data.base,
       data.quote,
@@ -68,6 +70,8 @@ task(
 
   // Set feeds in batches
   for (const batch of batches) {
+    // await delay(300);
+
     const safeTransactionData: SafeTransactionDataPartial = {
       to: registry.target.toString(),
       value: '0',

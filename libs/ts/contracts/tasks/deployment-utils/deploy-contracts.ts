@@ -13,6 +13,9 @@ import { task } from 'hardhat/config';
 import { DeployContract, ContractNames, NetworkConfig } from '../types';
 import { predictAddress, checkAddressExists } from '../utils';
 
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 task('deploy-contracts', '[UTILS] Deploy contracts to the network').setAction(
   async (args, { ethers, artifacts, run }) => {
     const {
@@ -40,9 +43,11 @@ task('deploy-contracts', '[UTILS] Deploy contracts to the network').setAction(
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
-    const BATCH_LENGTH = 30;
+    const BATCH_LENGTH = 30; //lower this if crash
     const transactions: SafeTransactionDataPartial[] = [];
     for (const [index, contract] of contracts.entries()) {
+      // await delay(300);
+
       const encodedArgs = abiCoder.encode(
         contract.argsTypes,
         contract.argsValues,
