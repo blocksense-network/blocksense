@@ -1,10 +1,6 @@
 import * as React from 'react';
-import Link from 'next/link';
 
-import {
-  decodeNewFeedsConfig,
-  FeedsConfig,
-} from '@blocksense/config-types/data-feeds-config';
+import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 import { DataFeedsTable } from '@/components/DataFeeds/DataFeedsTable';
 
