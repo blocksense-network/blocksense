@@ -3,7 +3,6 @@ import { Tooltip } from '@blocksense/ui/Tooltip';
 import { DataTableColumnHeader } from '@/components/common/DataTable/DataTableColumnHeader';
 import { DataTableBadge } from '@/components/common/DataTable/DataTableBadge';
 import { ColumnDef } from '@/components/common/DataTable/dataTableUtils';
-import { capitalizeWords } from '@/src/utils';
 
 export const columns: ColumnDef[] = [
   {

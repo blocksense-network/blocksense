@@ -1,4 +1,4 @@
-import { NewFeed, NewFeedsConfig } from '@blocksense/config-types';
+import { NewFeed } from '@blocksense/config-types';
 import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
 import { DataFeedCardSection } from '../DataFeedCardSection';
 import { getDataSources } from '@/src/data-feeds/utils';
