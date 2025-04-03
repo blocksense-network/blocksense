@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+
 import {
   Card,
   CardHeader,
@@ -25,7 +26,7 @@ export const DataFeedCardSection = ({
     <Card className="data-feed-card-section px-2 py-2">
       <CardHeader className="data-feed-card__header flex flex-col space-y-1.5 px-4 mt-3 mb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="data-feed-card__title text-xl font-semibold text-gray-900">
+          <CardTitle className="data-feed-card__title text-xl font-semibold">
             {title}
           </CardTitle>
           {info && (
