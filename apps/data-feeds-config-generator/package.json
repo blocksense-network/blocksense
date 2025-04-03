@@ -25,6 +25,7 @@
     "get-providers-data": "yarn ts scripts/get-providers-data.ts",
     "generate-initial-feeds-config": "yarn ts scripts/generate-initial-feeds-config.ts",
     "fetch-symbols": "yarn ts src/data-services/fetchers/scripts/fetch-symbols.ts",
+    "update-exchanges-argument-config": "yarn ts scripts/update-exchanges-argument-config.ts",
     "test": "yarn vitest --typecheck -w false"
   },
   "devDependencies": {
