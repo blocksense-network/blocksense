@@ -30,14 +30,14 @@
     "test": "yarn vitest -w false --passWithNoTests"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "glob": "^11.0.0",
-    "tsx": "^4.19.2",
+    "@types/node": "^22.14.0",
+    "glob": "^11.0.1",
+    "tsx": "^4.19.3",
     "typescript": "^5.5.4",
-    "vitest": "^3.0.2"
+    "vitest": "^3.1.1"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
-    "effect": "^3.12.1"
+    "effect": "^3.14.5"
   }
 }
