@@ -272,25 +272,34 @@ impl Default for AllFeedsReports {
     }
 }
 
+pub enum VoteStatus {
+    FirstVoteForSlot,
+    RevoteForSlot(Box<DataFeedPayload>),
+}
+
 impl AllFeedsReports {
     pub fn new() -> AllFeedsReports {
         AllFeedsReports {
             reports: HashMap::new(),
         }
     }
-    pub async fn push(&mut self, feed_id: u32, reporter_id: u64, data: DataFeedPayload) -> bool {
+    pub async fn push(
+        &mut self,
+        feed_id: u32,
+        reporter_id: u64,
+        data: DataFeedPayload,
+    ) -> VoteStatus {
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
             }))
         }); //TODO: Reject votes for unregistered feed ID-s
         let mut res = res.write().await;
-        if let std::collections::hash_map::Entry::Vacant(e) = res.report.entry(reporter_id) {
-            // Stick to first vote from a reporter.
-            e.insert(data);
-            return true;
+
+        match res.report.insert(reporter_id, data) {
+            Some(old_value) => VoteStatus::RevoteForSlot(Box::new(old_value)),
+            None => VoteStatus::FirstVoteForSlot,
         }
-        false
     }
     pub fn get(&self, feed_id: u32) -> Option<Arc<RwLock<FeedReports>>> {
         self.reports.get(&feed_id).cloned()
