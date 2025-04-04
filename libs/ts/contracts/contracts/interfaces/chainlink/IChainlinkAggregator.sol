@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 interface IChainlinkAggregator {
   /// @notice Decimals for the feed data
