@@ -285,11 +285,13 @@ fn check_aggregated_votes_deviation(
         let lower_bound = reporter_voted_value - tolerated_difference;
         let upper_bound = reporter_voted_value + tolerated_difference;
 
+        let difference = (reporter_voted_value - update_aggregate_value).abs();
+        let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
+
         if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
-            let difference = (reporter_voted_value - update_aggregate_value).abs();
-            let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
-            warn!("Final answer for feed={feed_id}, block_height={block_height}, deviates more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}");
+            anyhow::bail!("Final answer for feed={feed_id}, block_height={block_height}, deviates more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}");
         }
+        debug!("Final answer for feed={feed_id}, block_height={block_height}, deviates {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}");
     }
 
     Ok(())
