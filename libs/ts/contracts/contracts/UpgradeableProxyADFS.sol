@@ -75,11 +75,8 @@ contract UpgradeableProxyADFS {
 
   /// @notice Construct the UpgradeableProxy contract
   /// @param owner The address of the admin
-  /// @param logic The address of the initial implementation
-  /// @param data The data to be passed to the implementation
-  constructor(address owner, address logic, bytes memory data) payable {
+  constructor(address owner) payable {
     _setAdmin(owner);
-    _upgradeToAndCall(logic, data);
   }
 
   /// @notice Fallback function

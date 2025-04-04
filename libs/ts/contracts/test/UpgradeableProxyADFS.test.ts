@@ -39,7 +39,7 @@ describe('UpgradeableProxyADFS', function () {
     accessControlAdmin = (await ethers.getSigners())[5];
 
     proxy = new UpgradeableProxyADFSWrapper();
-    await proxy.init(await admin.getAddress(), accessControlAdmin);
+    await proxy.init(admin, accessControlAdmin);
 
     await proxy.implementation.accessControl.setAdminStates(
       accessControlAdmin,
@@ -51,7 +51,7 @@ describe('UpgradeableProxyADFS', function () {
   it('Should upgrade implementation', async function () {
     const targetBefore = proxy.implementation.contract.target;
     const newImplementation = new ADFSWrapper();
-    await newImplementation.init(await sequencer.getAddress());
+    await newImplementation.init(sequencer.address);
 
     const tx = await proxy.upgradeImplementationAndCall(
       newImplementation,
@@ -78,7 +78,7 @@ describe('UpgradeableProxyADFS', function () {
     const valueV1 = (await proxy.proxyCall('getValues', sequencer, [feed]))[0];
 
     const newImplementation = new ADFSWrapper();
-    await newImplementation.init(await sequencer.getAddress());
+    await newImplementation.init(sequencer.address);
 
     const tx = await proxy.upgradeImplementationAndCall(
       newImplementation,
@@ -167,7 +167,7 @@ describe('UpgradeableProxyADFS', function () {
 
   it('Should revert when sending msg value for an upgrade without calldata', async function () {
     const newImplementation = new ADFSWrapper();
-    await newImplementation.init(await sequencer.getAddress());
+    await newImplementation.init(sequencer);
     const tx = proxy.upgradeImplementationAndCall(
       newImplementation,
       admin,
@@ -183,7 +183,7 @@ describe('UpgradeableProxyADFS', function () {
 
   it('Should revert if upgrade is not called by the admin', async function () {
     const newImplementation = new ADFSWrapper();
-    await newImplementation.init(await sequencer.getAddress());
+    await newImplementation.init(sequencer.address);
 
     const tx = proxy.upgradeImplementationAndCall(
       newImplementation,
@@ -216,7 +216,7 @@ describe('UpgradeableProxyADFS', function () {
 
   it('Should revert if the new implementation is not a contract', async function () {
     const newImplementation = new ADFSWrapper();
-    await newImplementation.init(await sequencer.getAddress());
+    await newImplementation.init(sequencer.address);
 
     const tx = proxy.upgradeImplementationAndCall(
       newImplementation,
@@ -226,7 +226,7 @@ describe('UpgradeableProxyADFS', function () {
         txData: {
           data: ethers.solidityPacked(
             ['bytes4', 'address'],
-            [ProxyOp.UpgradeTo, await admin.getAddress()],
+            [ProxyOp.UpgradeTo, admin.address],
           ),
         },
       },
@@ -267,17 +267,17 @@ describe('UpgradeableProxyADFS', function () {
           UpgradeableProxyHistoricalDataFeedStoreV1Wrapper,
           UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
         ],
-        ...Array(2).fill([await admin.getAddress()]),
+        ...Array(2).fill([admin.address]),
       );
 
       await initWrappers(
         historicalContractGenericWrappers,
         [UpgradeableProxyHistoricalDataFeedStoreGenericV1Wrapper],
-        ...Array(1).fill([await admin.getAddress()]),
+        ...Array(1).fill([admin.address]),
       );
 
       proxy = new UpgradeableProxyADFSWrapper();
-      await proxy.init(await admin.getAddress(), accessControlAdmin);
+      await proxy.init(admin, accessControlAdmin);
 
       await proxy.implementation.accessControl.setAdminStates(
         accessControlAdmin,
@@ -286,7 +286,7 @@ describe('UpgradeableProxyADFS', function () {
       );
 
       genericProxy = new UpgradeableProxyADFSGenericWrapper();
-      await genericProxy.init(await admin.getAddress(), accessControlAdmin);
+      await genericProxy.init(admin, accessControlAdmin);
 
       await genericProxy.implementation.accessControl.setAdminStates(
         accessControlAdmin,

@@ -41,7 +41,7 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
     caller = (await ethers.getSigners())[6];
 
     proxy = new UpgradeableProxyADFSWrapper();
-    await proxy.init(await admin.getAddress(), accessControlAdmin);
+    await proxy.init(admin, accessControlAdmin);
 
     await proxy.implementation.accessControl.setAdminStates(
       accessControlAdmin,

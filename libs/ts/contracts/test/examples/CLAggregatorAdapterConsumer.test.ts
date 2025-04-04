@@ -20,7 +20,7 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
     const accessControlAdmin = (await ethers.getSigners())[5];
 
     const proxy = new UpgradeableProxyADFSWrapper();
-    await proxy.init(await admin.getAddress(), accessControlAdmin);
+    await proxy.init(admin, accessControlAdmin);
 
     await proxy.implementation.accessControl.setAdminStates(
       accessControlAdmin,
