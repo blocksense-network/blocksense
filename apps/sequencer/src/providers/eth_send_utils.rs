@@ -1,6 +1,6 @@
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
-    hex::FromHex,
+    hex,
     network::TransactionBuilder,
     primitives::Bytes,
     providers::{Provider, ProviderBuilder},
@@ -49,11 +49,11 @@ pub async fn deploy_contract(
 }
 
 /// Serializes the `updates` hash map into a string.
-async fn legacy_serialize_updates(
+fn legacy_serialize_updates(
     net: &str,
     updates: &BatchedAggegratesToSend,
     feeds_config: HashMap<u32, FeedStrideAndDecimals>,
-) -> Result<String> {
+) -> Vec<u8> {
     let mut result: String = Default::default();
 
     let selector = "0x1a2d80ac";
@@ -85,7 +85,7 @@ async fn legacy_serialize_updates(
     }
     info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
 
-    Ok(result)
+    hex::decode(result).expect("result is a valid hex string")
 }
 
 /// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
@@ -117,7 +117,7 @@ pub async fn get_serialized_updates_for_network(
     provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     feeds_rounds: &mut HashMap<u32, u64>,
-) -> Result<String> {
+) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider_mutex.lock().await;
     debug!("Acquired a read lock on provider config for `{net}`");
@@ -127,14 +127,14 @@ pub async fn get_serialized_updates_for_network(
 
     // Don’t post to Smart Contract if we have 0 updates
     if updates.updates.is_empty() {
-        return Ok("".to_string());
+        return Ok(Vec::new());
     }
 
     let contract_version = provider
         .get_contract(PRICE_FEED_CONTRACT_NAME)
         .ok_or(eyre!("{PRICE_FEED_CONTRACT_NAME} contract is not set!"))?
         .contract_version;
-    drop(provider);
+    // drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
     let mut strides_and_decimals = HashMap::new();
@@ -158,13 +158,11 @@ pub async fn get_serialized_updates_for_network(
     }
 
     let serialized_updates = match contract_version {
-        1 => match legacy_serialize_updates(net, updates, strides_and_decimals).await {
-            Ok(result) => {
-                debug!("legacy_serialize_updates result = {result}");
-                result
-            }
-            Err(e) => eyre::bail!("Legacy serialization failed: {e}!"),
-        },
+        1 => {
+            let bytes = legacy_serialize_updates(net, updates, strides_and_decimals);
+            debug!("legacy_serialize_updates result = {}", hex::encode(&bytes));
+            bytes
+        }
         2 => {
             let provider = provider_mutex.lock().await;
             match adfs_serialize_updates(
@@ -176,9 +174,9 @@ pub async fn get_serialized_updates_for_network(
             )
             .await
             {
-                Ok(result) => {
-                    debug!("adfs_serialize_updates result = {result}");
-                    result
+                Ok(bytes) => {
+                    debug!("adfs_serialize_updates result = {}", hex::encode(&bytes));
+                    bytes
                 }
                 Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
             }
@@ -249,10 +247,7 @@ pub async fn eth_batch_send_to_contract(
     let provider_metrics = &provider.provider_metrics;
     let rpc_handle = &provider.provider;
 
-    let calldata_str = serialized_updates;
-
-    let input =
-        Bytes::from_hex(calldata_str).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
+    let input = Bytes::from(serialized_updates);
 
     debug!("Observing gas price (base_fee) for network {net}...");
     let base_fee = process_provider_getter!(
@@ -728,8 +723,11 @@ mod tests {
 
     use crate::providers::provider::{init_shared_rpc_providers, MULTICALL_CONTRACT_NAME};
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
-    use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
+    use alloy::{
+        hex::FromHex,
+        primitives::{Address, TxKind},
+    };
     use alloy::{node_bindings::Anvil, providers::Provider};
     use blocksense_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,
@@ -1329,21 +1327,19 @@ mod tests {
 
     #[tokio::test]
     async fn compute_keys_vals_ignores_networks_not_on_the_list() {
-        let selector = "0x1a2d80ac";
+        let selector = "1a2d80ac";
         let network = "dont_filter_me";
         let mut updates = BatchedAggegratesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
         };
         filter_allowed_feeds(network, &mut updates, &None);
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
-            .await
-            .expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
         let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
         let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
-        let ab = format!("{selector}{a}{b}");
-        let ba = format!("{selector}{b}{a}");
+        let ab = hex::decode(format!("{selector}{a}{b}")).unwrap();
+        let ba = hex::decode(format!("{selector}{b}{a}")).unwrap();
         // It is undeterministic what the order will be, so checking both possibilities.
         assert!(ab == serialized_updates || ba == serialized_updates);
     }
@@ -1393,14 +1389,12 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
-            .await
-            .expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
         // Note: bye is filtered out:
         assert_eq!(
             serialized_updates,
-            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
+            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
         );
 
         // Berachain
@@ -1419,13 +1413,11 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
-            .await
-            .expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
         assert_eq!(
             serialized_updates,
-            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
+            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
         );
 
         // Manta
@@ -1443,13 +1435,11 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
-            .await
-            .expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
         assert_eq!(
             serialized_updates,
-            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
+            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
         );
     }
 

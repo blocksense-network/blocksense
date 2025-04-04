@@ -321,7 +321,7 @@ async fn main() -> Result<()> {
                 _owners: vec![owner],
                 _threshold: Uint::from(1),
                 to: Address::default(),
-                data: Bytes::from_hex("0x").unwrap(),
+                data: Bytes::new(),
                 fallbackHandler: Address::from_str("0xfd0732dc9e303f09fcef3a7388ad10a83459ec99")
                     .ok()
                     .unwrap(),
