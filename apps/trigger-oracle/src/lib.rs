@@ -832,7 +832,10 @@ impl OracleTrigger {
                     );
                 }
                 Err(e) => {
-                    tracing::error!("Failed to validate second consensus: {}", &e);
+                    tracing::error!(
+                        "Failed to validate second consensus for block_height={block_height}: {}",
+                        &e
+                    );
                     continue;
                 }
             };
