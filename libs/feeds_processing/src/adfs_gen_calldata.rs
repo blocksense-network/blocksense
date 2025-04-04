@@ -69,7 +69,7 @@ pub async fn adfs_serialize_updates(
                                           this map will be filled with the update count for each feed from it. If the
                                           feeds_metrics is None, feeds_rounds will be used as the source of the updates
                                           count. */
-) -> Result<String> {
+) -> Result<Vec<u8>> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
 
@@ -244,7 +244,7 @@ pub async fn adfs_serialize_updates(
 
     info!("Serialized result: {}", hex::encode(result.clone()));
 
-    Ok(to_hex_string(result, None))
+    Ok(result)
 }
 
 pub fn get_neighbour_feed_ids(feed_id: u32) -> Vec<u32> {
@@ -337,23 +337,27 @@ pub mod tests {
         // Call as it will be in the sequencer
         assert_eq!(
             expected_result,
-            adfs_serialize_updates(
-                net,
-                &updates,
-                Some(feeds_metrics.clone()),
-                config.clone(),
-                &mut feeds_rounds,
+            hex::encode(
+                adfs_serialize_updates(
+                    net,
+                    &updates,
+                    Some(feeds_metrics.clone()),
+                    config.clone(),
+                    &mut feeds_rounds,
+                )
+                .await
+                .unwrap()
             )
-            .await
-            .unwrap()
         );
 
         // Call as it will be in the reporter (feeds_rounds provided by the sequencer)
         assert_eq!(
             expected_result,
-            adfs_serialize_updates(net, &updates, None, config, &mut feeds_rounds,)
-                .await
-                .unwrap()
+            hex::encode(
+                adfs_serialize_updates(net, &updates, None, config, &mut feeds_rounds,)
+                    .await
+                    .unwrap()
+            )
         );
     }
 }
