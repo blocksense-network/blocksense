@@ -528,6 +528,12 @@ pub async fn eth_batch_send_to_all_contracts(
             let net = net.clone();
 
             if let Some(provider_settings) = providers_config.get(&net) {
+                if provider_settings.safe_address.is_some() {
+                    info!(
+                        "Network `{net}` is configured for two phase consensus in sequencer; skipping direct update"
+                    );
+                    continue;
+                }
                 let is_enabled_value = provider_settings.is_enabled;
                 {
                     debug!("Acquiring a read lock on provider for network {net}");
