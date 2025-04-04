@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 import {ICLFeedRegistryAdapter} from '../../interfaces/ICLFeedRegistryAdapter.sol';
 import {IChainlinkAggregator} from '../../interfaces/chainlink/IChainlinkAggregator.sol';

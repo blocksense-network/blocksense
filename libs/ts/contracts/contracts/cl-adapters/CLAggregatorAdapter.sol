@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: Copyright (c) 2024-2025 Schelling Point Labs Inc.
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 import '../interfaces/ICLAggregatorAdapter.sol';
 import {CLAdapterLib} from '../libraries/CLAdapterLib.sol';
