@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 /// @notice Decoder for stored packed sports data
 library EncodePackedDecoder {
@@ -14,7 +14,7 @@ library EncodePackedDecoder {
   function decode(
     bytes memory data
   ) external pure returns (<%= returnType %> memory <%= mainStructName %>) {
-    assembly {
+    assembly ('memory-safe') {
       // First 32 bytes are the length of the data
       let memData := mload(add(data, 32))
       <%= containsDynamicData ? 'let shift := 0' : '' %>
