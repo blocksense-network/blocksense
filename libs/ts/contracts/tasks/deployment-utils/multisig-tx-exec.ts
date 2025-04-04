@@ -1,5 +1,6 @@
-import { toBeArray, TransactionResponse } from 'ethers';
+import { toBeArray } from 'ethers';
 
+import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types';
 import Safe, {
   SigningMethod,
   EthSafeSignature,
@@ -8,18 +9,13 @@ import {
   calculateSafeTransactionHash,
   adjustVInSignature,
 } from '@safe-global/protocol-kit/dist/src/utils';
-import {
-  SafeTransaction,
-  SafeTransactionDataPartial,
-  TransactionOptions,
-} from '@safe-global/safe-core-sdk-types';
 
-import { parseTxHash } from '@blocksense/base-utils';
+import { assertNotNull } from '@blocksense/base-utils';
 
-import { NetworkConfig } from '../types';
+import type { NetworkConfig } from '../types';
 
 type Params = {
-  transactions: SafeTransactionDataPartial[] | SafeTransaction;
+  transactions: SafeTransactionDataPartial[];
   safe: Safe;
   config: NetworkConfig;
 };
@@ -29,19 +25,9 @@ export async function executeMultisigTransaction({
   safe,
   config,
 }: Params): Promise<string | undefined> {
-  let tx: SafeTransaction;
-
-  if (Array.isArray(transactions)) {
-    if (transactions.length === 0) {
-      console.log('No transactions to execute');
-      return;
-    }
-    tx = await safe.createTransaction({
-      transactions,
-    });
-  } else {
-    tx = transactions;
-  }
+  const tx = await safe.createTransaction({
+    transactions,
+  });
 
   if (config.adminMultisig.signer) {
     console.log('\nProposing transaction...');
@@ -51,7 +37,7 @@ export async function executeMultisigTransaction({
     await transaction?.wait();
 
     console.log('-> tx hash', txResponse.hash);
-    return parseTxHash(txResponse.hash);
+    return txResponse.hash;
   }
 
   const message = calculateSafeTransactionHash(
@@ -60,10 +46,12 @@ export async function executeMultisigTransaction({
     safe.getContractVersion(),
     await safe.getChainId(),
   );
-  const ledgerAddress = await config.ledgerAccount!.getAddress();
-  const signedMessage = await config.ledgerAccount!.signMessage!(
-    toBeArray(message),
+  const signer = assertNotNull(
+    config.ledgerAccount,
+    'Ledger signer address not specified',
   );
+  const ledgerAddress = await signer.getAddress();
+  const signedMessage = await signer.signMessage(toBeArray(message));
   const signature = await adjustVInSignature(
     SigningMethod.ETH_SIGN,
     signedMessage,
@@ -74,47 +62,19 @@ export async function executeMultisigTransaction({
 
   console.log('\nProposing transaction...');
 
-  const txResponse = await executeTransaction(tx, safe, config, {
-    nonce: await config.provider.getTransactionCount(
-      await config.ledgerAccount!.getAddress(),
-    ),
-  });
+  const safeContract = assertNotNull(
+    safe.getContractManager().safeContract,
+    'Safe contract not found',
+  );
+  const data = await safe.getEncodedTransaction(tx);
+  const receipt = await signer
+    .sendTransaction({
+      to: safeContract.getAddress(),
+      data,
+    })
+    .then(tx => tx.wait(1))
+    .then(receipt => receipt!);
 
-  const transaction = await config.provider.getTransaction(txResponse.hash);
-  await transaction?.wait();
-  console.log('-> tx hash', txResponse.hash);
-  return parseTxHash(txResponse.hash);
+  console.log('-> tx hash', receipt.hash);
+  return receipt.hash;
 }
-
-const executeTransaction = async (
-  safeTransaction: SafeTransaction,
-  safe: Safe,
-  config: NetworkConfig,
-  options?: TransactionOptions,
-): Promise<TransactionResponse> => {
-  const args = [
-    safeTransaction.data.to,
-    BigInt(safeTransaction.data.value),
-    safeTransaction.data.data,
-    safeTransaction.data.operation,
-    BigInt(safeTransaction.data.safeTxGas),
-    BigInt(safeTransaction.data.baseGas),
-    BigInt(safeTransaction.data.gasPrice),
-    safeTransaction.data.gasToken,
-    safeTransaction.data.refundReceiver,
-    safeTransaction.encodedSignatures(),
-  ];
-
-  const safeContract = safe.getContractManager().safeContract;
-
-  if (!safeContract) {
-    throw new Error('Safe contract not found');
-  }
-
-  const contractData: any = safeContract.encode('execTransaction', args);
-  return config.ledgerAccount!.sendTransaction({
-    to: safeContract.getAddress(),
-    value: 0,
-    data: contractData,
-  });
-};
