@@ -4,7 +4,7 @@ use crate::providers::eth_send_utils::{
 use crate::providers::provider::{GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
-use alloy::hex::{FromHex, ToHexExt};
+use alloy::hex::{self, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, U256};
@@ -158,6 +158,8 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             continue;
         }
 
+        let serialized_updates_hex = hex::encode(&serialized_updates);
+
         let (contract_address, safe_address, nonce, chain_id, tx_hash, safe_transaction) = {
             let provider = provider.lock().await;
 
@@ -177,15 +179,11 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 }
             };
 
-            info!("Got block height {block_height} and serialized updates = {serialized_updates}",);
+            info!(
+                "Got block height {block_height} and serialized updates = {serialized_updates_hex}",
+            );
 
-            let calldata = match Bytes::from_hex(serialized_updates.clone()) {
-                Ok(b) => b,
-                Err(e) => {
-                    error!("[serialized_updates] is not valid hex string: {}", e);
-                    return;
-                }
-            };
+            let calldata = Bytes::from(serialized_updates);
 
             let safe_transaction = create_safe_tx(contract_address, calldata, nonce._0);
 
@@ -222,7 +220,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             chain_id: chain_id.to_string(),
             tx_hash: tx_hash.to_string(),
             network: net.to_string(),
-            calldata: serialized_updates,
+            calldata: serialized_updates_hex,
             updates: updates.updates,
             feeds_rounds,
         };
