@@ -32,17 +32,9 @@ type CarouselContextProps = {
   orientation: 'horizontal' | 'vertical';
 };
 
-const CarouselContext = createContext<CarouselContextProps | null>(null);
-
-function useCarousel() {
-  const context = useContext(CarouselContext);
-
-  if (!context) {
-    throw new Error('useCarousel must be used within a <Carousel />');
-  }
-
-  return context;
-}
+const CarouselContext = createContext<CarouselContextProps>(
+  {} as CarouselContextProps,
+);
 
 export const Carousel = ({
   orientation = 'horizontal',
@@ -66,12 +58,18 @@ export const Carousel = ({
         clientHeight,
       } = container;
 
+      const SCROLL_THRESHOLD_BUFFER = 5; // Accounts for minor browser rounding inaccuracies
+
       if (orientation === 'horizontal') {
         setCanScrollPrev(scrollLeft > 0);
-        setCanScrollNext(scrollLeft + clientWidth < scrollWidth);
+        setCanScrollNext(
+          scrollLeft + clientWidth < scrollWidth - SCROLL_THRESHOLD_BUFFER,
+        );
       } else {
         setCanScrollPrev(scrollTop > 0);
-        setCanScrollNext(scrollTop + clientHeight < scrollHeight);
+        setCanScrollNext(
+          scrollTop + clientHeight < scrollHeight - SCROLL_THRESHOLD_BUFFER,
+        );
       }
     }
   }, [orientation]);
@@ -113,6 +111,7 @@ export const Carousel = ({
         container.removeEventListener('scroll', updateScrollState);
       };
     }
+    return undefined; // Explicitly return undefined when no cleanup is needed
   }, [updateScrollState]);
 
   return (
@@ -127,7 +126,7 @@ export const Carousel = ({
       }}
     >
       <div
-        className={cn('relative', className)}
+        className={cn('carousel relative', className)}
         role="region"
         aria-roledescription="carousel"
         {...props}
@@ -143,14 +142,14 @@ export const CarouselContent = ({
   children,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => {
-  const { contentRef, orientation } = useCarousel(); // Use contentRef from context
+  const { contentRef, orientation } = useContext(CarouselContext); // Use the useCarousel hook to ensure non-null context
 
   return (
     <div ref={contentRef} className="overflow-hidden">
       <div
         className={cn(
-          'flex',
-          orientation === 'horizontal' ? '' : 'flex-col',
+          'carousel__content flex',
+          orientation === 'horizontal' ? '' : 'flex-col items-center',
           className,
         )}
         {...props}
@@ -168,7 +167,10 @@ export const CarouselItem = ({
 }: HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
-      className={cn('flex-shrink-0 flex-grow-0 basis-full', className)}
+      className={cn(
+        'carousel__item flex flex-shrink-0 flex-grow-0 basis-full justify-center items-center',
+        className,
+      )}
       {...props}
     >
       {children}
@@ -182,14 +184,15 @@ export const CarouselPrevious = ({
   size = 'icon',
   ...props
 }: React.ComponentProps<typeof Button>) => {
-  const { scrollPrev, canScrollPrev, orientation } = useCarousel();
+  const { scrollPrev, canScrollPrev, orientation } =
+    useContext(CarouselContext);
 
   return (
     <Button
       variant={variant}
       size={size}
       className={cn(
-        'absolute h-8 w-8 rounded-full',
+        'carousel__prev-button absolute h-8 w-8 rounded-full',
         orientation === 'horizontal'
           ? '-left-12 top-1/2 -translate-y-1/2'
           : '-top-12 left-1/2 -translate-x-1/2 rotate-90',
@@ -214,14 +217,15 @@ export const CarouselNext = ({
   size = 'icon',
   ...props
 }: React.ComponentProps<typeof Button>) => {
-  const { scrollNext, canScrollNext, orientation } = useCarousel();
+  const { scrollNext, canScrollNext, orientation } =
+    useContext(CarouselContext);
 
   return (
     <Button
       variant={variant}
       size={size}
       className={cn(
-        'absolute h-8 w-8 rounded-full',
+        'carousel__next-button absolute h-8 w-8 rounded-full',
         orientation === 'horizontal'
           ? '-right-12 top-1/2 -translate-y-1/2'
           : '-bottom-12 left-1/2 -translate-x-1/2 rotate-90',
