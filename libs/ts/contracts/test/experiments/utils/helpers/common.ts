@@ -11,8 +11,6 @@ import {
   HistoricalDataFeedStoreGenericV1,
   HistoricalDataFeedStoreV1,
   HistoricalDataFeedStoreV2,
-  SportsConsumer as BaseSportsConsumer,
-  SportsGenericConsumer,
 } from '../../../../typechain';
 import { RpcStructLog } from 'hardhat/internal/hardhat-network/provider/output';
 import { IBaseWrapper, IWrapper } from '../../utils/wrappers';
@@ -30,8 +28,6 @@ export type HistoricalDataFeedStore =
 export type GenericHistoricalDataFeedStore = HistoricalDataFeedStoreGenericV1;
 
 export type Consumer = BaseConsumer | HistoricalConsumer;
-
-export type SportsConsumer = BaseSportsConsumer | SportsGenericConsumer;
 
 export interface TransmissionData {
   value: string;
@@ -76,47 +72,6 @@ export const setDataFeeds = async <
   }
 
   return { receipts, receiptsGeneric, keys, values };
-};
-
-export const setSportsDataFeeds = async <
-  G extends BaseContract,
-  B extends BaseContract,
->(
-  genericContractWrappers: IWrapper<G>[],
-  contractWrappers: IWrapper<B>[],
-  valuesPerKeyCount: number[],
-  start: number = 0,
-) => {
-  let prevKey = 0;
-  const keys = Array.from({ length: valuesPerKeyCount.length }, (_, i) => {
-    const res = prevKey + (i > 0 ? valuesPerKeyCount[i - 1] : 0) + start;
-    prevKey = res;
-    return res;
-  });
-  const values: string[] = [];
-  const descriptions: string[] = keys.map(key =>
-    ethers.encodeBytes32String(`Hello, World! ${key}`),
-  );
-
-  for (const valuesPerKey of valuesPerKeyCount) {
-    const parsedValues: string[] = [];
-    for (let i = 0; i < valuesPerKey; i++) {
-      parsedValues.push(encodeData([i + start]));
-    }
-    values.push(parsedValues.join(';'));
-  }
-
-  const receipts = [];
-  for (const contract of contractWrappers) {
-    receipts.push(await contract.setFeeds(keys, values, descriptions));
-  }
-
-  const receiptsGeneric = [];
-  for (const contract of genericContractWrappers) {
-    receiptsGeneric.push(await contract.setFeeds(keys, values, descriptions));
-  }
-
-  return { receipts, receiptsGeneric, keys, values, descriptions };
 };
 
 export const printGasUsage = async <
