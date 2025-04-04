@@ -75,8 +75,16 @@ impl From<BlocksenseConfig> for AppManifest {
             toml::Value::String(config.reporter_info.sequencer),
         );
         table.insert(
+            "kafka_endpoint".to_string(),
+            toml::Value::String(config.reporter_info.kafka_endpoint),
+        );
+        table.insert(
             "secret_key".to_string(),
             toml::Value::String(config.reporter_info.secret_key),
+        );
+        table.insert(
+            "second_consensus_secret_key".to_string(),
+            toml::Value::String(config.reporter_info.second_consensus_secret_key),
         );
         trigger_global_configs.insert("settings".to_string(), table);
 
@@ -93,6 +101,14 @@ impl From<BlocksenseConfig> for AppManifest {
                 table.insert(
                     "id".to_string(),
                     toml::Value::String(data_feed.id.to_string()),
+                );
+                table.insert(
+                    "stride".to_string(),
+                    toml::Value::Integer(data_feed.stride as i64),
+                );
+                table.insert(
+                    "decimals".to_string(),
+                    toml::Value::Integer(data_feed.additional_feed_info.decimals as i64),
                 );
                 table.insert(
                     "data".to_string(),

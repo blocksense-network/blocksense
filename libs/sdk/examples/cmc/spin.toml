@@ -8,7 +8,9 @@ version = "0.1.0"
 [application.trigger.settings]
 interval_time_in_seconds = 10
 sequencer = "http://127.0.0.1:9856/post_reports_batch"
+kafka_endpoint = "127.0.0.1:9092"
 secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+second_consensus_secret_key = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 reporter_id = 0
 
 [[trigger.oracle]]
