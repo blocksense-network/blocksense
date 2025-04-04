@@ -4,7 +4,7 @@ use crate::providers::eth_send_utils::{
 use crate::providers::provider::{GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
-use alloy::hex::{self, FromHex, ToHexExt};
+use alloy::hex::{FromHex, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, U256};
@@ -177,6 +177,8 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 }
             };
 
+            info!("Got block height {block_height} and serialized updates = {serialized_updates}",);
+
             let calldata = match Bytes::from_hex(serialized_updates.clone()) {
                 Ok(b) => b,
                 Err(e) => {
@@ -220,7 +222,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             chain_id: chain_id.to_string(),
             tx_hash: tx_hash.to_string(),
             network: net.to_string(),
-            calldata: hex::encode(serialized_updates),
+            calldata: serialized_updates,
             updates: updates.updates,
             feeds_rounds,
         };
