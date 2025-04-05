@@ -1,0 +1,76 @@
+/* Typography for medium and large screens (min-width: 768px) */
+@media screen and (min-width: 768px) {
+  :root {
+    --font-h1-size: 3rem;
+    --font-h2-size: 2rem;
+    --font-h3-size: 1.5rem;
+    --font-h4-size: 1.25rem;
+    --font-h4-secondary-size: 1rem;
+    --font-p-size: 1rem;
+
+    --line-height-h1: 1.1;
+    --line-height-h2: 1.1;
+    --line-height-h3: 1.1;
+    --line-height-h4: 1.1;
+    --line-height-h4-secondary: 1.1;
+    --line-height-p: 1.4;
+  }
+
+  @layer base {
+    h1 {
+      font-family: var(--font-geist);
+      font-size: var(--font-h1-size);
+      font-weight: 500;
+      line-height: var(--line-height-h1);
+      letter-spacing: -1.44px;
+    }
+
+    h2 {
+      font-family: var(--font-geist);
+      font-size: var(--font-h2-size);
+      font-weight: 500;
+      line-height: var(--line-height-h2);
+      letter-spacing: -0.96px;
+    }
+
+    h3 {
+      font-family: var(--font-geist);
+      font-size: var(--font-h3-size);
+      font-weight: 500;
+      line-height: var(--line-height-h3);
+      letter-spacing: -0.72px;
+    }
+
+    h4 {
+      font-family: var(--font-geist);
+      font-size: var(--font-h4-size);
+      font-weight: 500;
+      line-height: var(--line-height-h4);
+      letter-spacing: -0.6px;
+    }
+
+    h4.secondary {
+      font-family: var(--font-geist);
+      font-size: var(--font-h4-secondary-size);
+      font-weight: 500;
+      line-height: var(--line-height-h4-secondary);
+      letter-spacing: -0.48px;
+    }
+
+    p {
+      font-family: var(--font-geist);
+      font-size: var(--font-p-size);
+      font-weight: 400;
+      line-height: var(--line-height-p);
+      letter-spacing: -0.48px;
+    }
+
+    a {
+      font-family: var(--font-geist);
+      font-size: 16px;
+      font-weight: var(--sds-typography-body-font-weight-regular);
+      line-height: 16px;
+      text-decoration: none;
+    }
+  }
+}

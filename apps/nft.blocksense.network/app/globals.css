@@ -1,17 +1,5 @@
 @import 'tailwindcss';
 @plugin "tailwindcss-animate";
 
-@theme {
-  --font-geist: var(--font-geist);
-  --font-geist-mono: var(--font-geist-mono);
-}
-
-@layer base {
-  body {
-    font-family: var(--font-geist);
-  }
-
-  header a {
-    font-family: var(--font-geist-mono);
-  }
-}
+@import './typography/default.css';
+@import './typography/medium-large.css';
