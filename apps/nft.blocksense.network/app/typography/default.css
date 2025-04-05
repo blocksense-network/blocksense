@@ -1,0 +1,85 @@
+/* Default typography for mobile */
+:root {
+  --font-geist: var(--font-geist);
+  --font-geist-mono: var(--font-geist-mono);
+  --font-size-h1: 2.25rem;
+  --font-size-h2: 1.625rem;
+  --font-size-h3: 1rem;
+  --font-size-h4: 1rem;
+  --font-size-body: 1rem;
+
+  --line-height-h1: 1.1;
+  --line-height-h2: 1.1;
+  --line-height-h3: 1.2;
+  --line-height-h4: 1.4;
+  --line-height-body: 1.4;
+
+  --white: #fffbfa;
+  --sds-typography-body-font-weight-regular: 400;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-geist);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+  }
+
+  header a {
+    font-family: var(--font-geist-mono);
+  }
+
+  h1 {
+    color: var(--white);
+    font-family: var(--font-geist);
+    font-size: var(--font-size-h1);
+    font-weight: 500;
+    line-height: var(--line-height-h1);
+    letter-spacing: -1.08px;
+  }
+
+  h2 {
+    color: var(--white);
+    font-family: var(--font-geist);
+    font-size: var(--font-size-h2);
+    font-weight: 500;
+    line-height: var(--line-height-h2);
+    letter-spacing: -0.78px;
+  }
+
+  h3 {
+    color: var(--white);
+    font-family: var(--font-geist);
+    font-size: var(--font-size-h3);
+    font-weight: 500;
+    line-height: var(--line-height-h3);
+    letter-spacing: -0.48px;
+  }
+
+  h4 {
+    color: var(--white);
+    font-family: var(--font-geist);
+    font-size: var(--font-size-h4);
+    font-weight: 500;
+    line-height: var(--line-height-h4);
+    letter-spacing: -0.48px;
+  }
+
+  p {
+    color: #d9d9d9;
+    font-family: var(--font-geist);
+    font-size: var(--font-size-body);
+    font-weight: 400;
+    line-height: var(--line-height-body);
+    letter-spacing: -0.48px;
+  }
+
+  a {
+    color: var(--white);
+    font-family: var(--font-geist);
+    font-size: 16px;
+    font-weight: var(--sds-typography-body-font-weight-regular);
+    line-height: 16px;
+    text-decoration: none;
+  }
+}
