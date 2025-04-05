@@ -14,7 +14,15 @@
   --line-height-h4: 1.4;
   --line-height-body: 1.4;
 
-  --white: #fffbfa;
+  --black: #000000;
+  --white: #ffffff;
+  --darkGray: #2b2929;
+  --charcoalGray: #444141;
+  --lightGray: #9c9c9c;
+  --paleGray: #d9d9d9;
+  --brightYellow: #eeff00;
+  --softIvory: #fffbfa;
+
   --sds-typography-body-font-weight-regular: 400;
 }
 
@@ -30,7 +38,7 @@
   }
 
   h1 {
-    color: var(--white);
+    color: var(--softIvory);
     font-family: var(--font-geist);
     font-size: var(--font-size-h1);
     font-weight: 500;
@@ -39,7 +47,7 @@
   }
 
   h2 {
-    color: var(--white);
+    color: var(--softIvory);
     font-family: var(--font-geist);
     font-size: var(--font-size-h2);
     font-weight: 500;
@@ -48,7 +56,7 @@
   }
 
   h3 {
-    color: var(--white);
+    color: var(--softIvory);
     font-family: var(--font-geist);
     font-size: var(--font-size-h3);
     font-weight: 500;
@@ -57,7 +65,7 @@
   }
 
   h4 {
-    color: var(--white);
+    color: var(--softIvory);
     font-family: var(--font-geist);
     font-size: var(--font-size-h4);
     font-weight: 500;
@@ -66,7 +74,7 @@
   }
 
   p {
-    color: #d9d9d9;
+    color: var(--paleGray);
     font-family: var(--font-geist);
     font-size: var(--font-size-body);
     font-weight: 400;
@@ -75,7 +83,7 @@
   }
 
   a {
-    color: var(--white);
+    color: var(--softIvory);
     font-family: var(--font-geist);
     font-size: 16px;
     font-weight: var(--sds-typography-body-font-weight-regular);

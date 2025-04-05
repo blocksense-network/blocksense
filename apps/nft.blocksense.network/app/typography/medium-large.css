@@ -18,7 +18,6 @@
 
   @layer base {
     h1 {
-      color: var(--white);
       font-family: var(--font-geist);
       font-size: var(--font-h1-size);
       font-weight: 500;
@@ -27,7 +26,6 @@
     }
 
     h2 {
-      color: var(--white);
       font-family: var(--font-geist);
       font-size: var(--font-h2-size);
       font-weight: 500;
@@ -36,7 +34,6 @@
     }
 
     h3 {
-      color: var(--white);
       font-family: var(--font-geist);
       font-size: var(--font-h3-size);
       font-weight: 500;
@@ -45,7 +42,6 @@
     }
 
     h4 {
-      color: var(--white);
       font-family: var(--font-geist);
       font-size: var(--font-h4-size);
       font-weight: 500;
@@ -54,7 +50,6 @@
     }
 
     h4.secondary {
-      color: var(--white);
       font-family: var(--font-geist);
       font-size: var(--font-h4-secondary-size);
       font-weight: 500;
@@ -63,7 +58,6 @@
     }
 
     p {
-      color: #d9d9d9;
       font-family: var(--font-geist);
       font-size: var(--font-p-size);
       font-weight: 400;
@@ -72,7 +66,6 @@
     }
 
     a {
-      color: var(--white);
       font-family: var(--font-geist);
       font-size: 16px;
       font-weight: var(--sds-typography-body-font-weight-regular);
