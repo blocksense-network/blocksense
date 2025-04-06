@@ -61,14 +61,6 @@ let
     };
   }) cfg.sequencer.providers;
 
-  installOracleScripts =
-    dir:
-    lib.pipe self'.legacyPackages.oracle-scripts [
-      builtins.attrValues
-      (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
-      (files: "cp -vf ${files} ${dir}")
-    ];
-
   reporterInstances = lib.mapAttrs' (
     name:
     { log-level, ... }:
@@ -82,7 +74,6 @@ let
           command = ''
             mkdir -p "${working_dir}" &&
             cd "${working_dir}" &&
-            ${installOracleScripts working_dir} &&
             ${blocksense.program} node build --up \
               --from ${cfg.config-files."reporter_config_${name}".path}
           '';

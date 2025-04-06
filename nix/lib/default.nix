@@ -1,10 +1,9 @@
 lib: rec {
-  dashToUnderscore =
-    attrset:
-    lib.mapAttrs' (name: value: {
-      name = lib.replaceStrings [ "-" ] [ "_" ] name;
-      inherit value;
-    }) attrset;
+  dashToUnderscore = lib.replaceStrings [ "-" ] [ "_" ];
+
+  dashToUnderscoreAttrs = lib.mapAttrs' (
+    name: value: lib.nameValuePair (dashToUnderscore name) value
+  );
 
   dashToUnderscoreRecursive =
     attrs:
@@ -15,7 +14,7 @@ lib: rec {
           value = attrs.${attr};
         in
         {
-          name = lib.replaceStrings [ "-" ] [ "_" ] attr;
+          name = dashToUnderscore attr;
           value =
             if builtins.isAttrs value then
               dashToUnderscoreRecursive value

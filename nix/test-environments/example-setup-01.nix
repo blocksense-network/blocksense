@@ -144,7 +144,6 @@ in
 
     oracles = {
       crypto-price-feeds = {
-        oracle-script-wasm = "crypto_price_feeds.wasm";
         exec-interval = 40;
         capabilities = [ ];
         allowed-outbound-hosts = [
@@ -167,7 +166,6 @@ in
       };
 
       exsat-holdings = {
-        oracle-script-wasm = "exsat_holdings.wasm";
         exec-interval = 300;
         capabilities = [ ];
         allowed-outbound-hosts = [
@@ -179,7 +177,6 @@ in
       };
 
       gecko-terminal = {
-        oracle-script-wasm = "gecko_terminal.wasm";
         exec-interval = 10;
         capabilities = [ ];
         allowed-outbound-hosts = [
@@ -188,7 +185,6 @@ in
       };
 
       eth-rpc = {
-        oracle-script-wasm = "eth_rpc.wasm";
         exec-interval = 10;
         capabilities = [ ];
         allowed-outbound-hosts = [

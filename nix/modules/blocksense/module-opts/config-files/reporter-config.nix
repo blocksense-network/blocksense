@@ -4,7 +4,7 @@
   ...
 }:
 let
-  inherit (self.lib) dashToUnderscoreRecursive;
+  inherit (self.lib) dashToUnderscoreRecursive dashToUnderscore;
 
   mkOracleScriptConfig =
     script-opts:
@@ -16,9 +16,9 @@ let
         exec-interval
         allowed-outbound-hosts
         capabilities
-        oracle-script-wasm
         ;
 
+      oracle-script-wasm = "${script-opts.package}/lib/${dashToUnderscore script-opts.id}.wasm";
       interval-time-in-seconds = script-opts.exec-interval;
     };
 
