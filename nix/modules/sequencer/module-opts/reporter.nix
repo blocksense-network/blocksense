@@ -2,35 +2,40 @@
 with lib;
 {
   options = {
+    id = mkOption {
+      type = types.int;
+      description = mdDoc "The reporter id.";
+      example = 1;
+    };
+
     sequencer-url = mkOption {
       type = types.str;
       default = "http://127.0.0.1:${toString cfg.sequencer.ports.main}";
       description = "The url of the sequencer.";
     };
+
     registry-url = mkOption {
       type = types.str;
       default = "http://127.0.0.1:${toString cfg.sequencer.ports.admin}";
       description = "The url of the registry.";
     };
 
-    id = mkOption {
-      type = types.int;
-      description = mdDoc "The reporter id.";
-      example = 1;
-    };
     default-exec-interval = mkOption {
       type = types.int;
       default = 10;
       description = "Default component execution interval in seconds";
     };
+
     secret-key-path = mkOption {
       type = types.path;
       description = "The path to the reporter secret key.";
     };
+
     second-consensus-secret-key = mkOption {
       type = types.path;
       description = "The path to the reporter second consensus secret key.";
     };
+
     kafka-endpoint = mkOption {
       type = types.str;
       default = cfg.sequencer.kafka-report-endpoint;
