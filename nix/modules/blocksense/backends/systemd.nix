@@ -28,11 +28,6 @@ let
     { log-level, ... }:
     let
       serviceName = "blocksense-reporter-${name}";
-      wasmCopyCmd = lib.pipe self'.legacyPackages.oracle-scripts [
-        builtins.attrValues
-        (lib.concatMapStringsSep " " (p: "${p}/lib/*"))
-        (files: "${lib.getExe pkgs.bash} -c 'set -x; cp ${files} %S/${serviceName}'")
-      ];
     in
     {
       name = serviceName;
@@ -50,7 +45,6 @@ let
         serviceConfig = {
           StateDirectory = serviceName;
           WorkingDirectory = "/var/lib/${serviceName}";
-          ExecStartPre = wasmCopyCmd;
           ExecStart = ''
             ${blocksense.program} node build --up \
               --from ${cfg.config-files."reporter_config_${name}".path}

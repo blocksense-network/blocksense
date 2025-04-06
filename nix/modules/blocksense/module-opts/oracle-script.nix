@@ -1,7 +1,8 @@
 {
+  name,
   lib,
   self',
-  name,
+  config,
   ...
 }:
 with lib;
@@ -26,13 +27,15 @@ with lib;
       default = null;
     };
 
-    oracle-script-wasm = mkOption {
-      type = types.str;
+    package = mkOption {
+      type = types.package;
+      description = "Package of the wasm component to execute.";
+      default = self'.legacyPackages.oracle-scripts.${config.id};
     };
 
     exec-interval = mkOption {
       type = types.int;
-      description = "Component execution interval in seconds";
+      description = "Component execution interval in seconds.";
     };
 
     allowed-outbound-hosts = mkOption {

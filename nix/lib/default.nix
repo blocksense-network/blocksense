@@ -1,10 +1,9 @@
 lib: rec {
-  dashToUnderscore =
-    attrset:
-    lib.mapAttrs' (name: value: {
-      name = lib.replaceStrings [ "-" ] [ "_" ] name;
-      inherit value;
-    }) attrset;
+  kebabToSnakeCase = lib.replaceStrings [ "-" ] [ "_" ];
+
+  kebabToSnakeCaseAttrs = lib.mapAttrs' (
+    name: value: lib.nameValuePair (kebabToSnakeCase name) value
+  );
 
   dashToUnderscoreRecursive =
     attrs:
