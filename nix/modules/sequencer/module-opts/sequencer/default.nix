@@ -26,7 +26,7 @@ lib: with lib; {
   };
 
   block-config = mkOption {
-    type = types.submodule (import ./block-config lib);
+    type = types.submodule (import ./block-config.nix lib);
     description = mdDoc "Block creation configuration.";
   };
 

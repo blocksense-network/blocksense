@@ -6,7 +6,7 @@ use gnosis_safe::data_types::ReporterResponse;
 use gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, trace};
-use utils::time::{current_unix_time, system_time_to_millis};
+use utils::time::current_unix_time;
 
 use crate::providers::provider::GNOSIS_SAFE_CONTRACT_NAME;
 use crate::sequencer_state::SequencerState;
@@ -23,15 +23,10 @@ pub async fn aggregation_batch_consensus_loop(
     tokio::task::Builder::new()
         .name("aggregation_batch_consensus_loop")
         .spawn_local(async move {
-            let block_genesis_time = match block_config.genesis_block_timestamp {
-                Some(genesis_time) => system_time_to_millis(genesis_time),
-                None => current_unix_time(),
-            };
-
             let block_height_tracker = SlotTimeTracker::new(
                 "aggregation_batch_consensus_loop".to_string(),
                 Duration::from_millis(block_config.block_generation_period),
-                block_genesis_time,
+                block_config.genesis_block_timestamp_ms.unwrap_or_else(current_unix_time),
             );
 
             let timeout_period_blocks = block_config.aggregation_consensus_discard_period_blocks;

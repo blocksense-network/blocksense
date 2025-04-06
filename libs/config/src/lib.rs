@@ -250,7 +250,7 @@ impl Validated for Reporter {
 pub struct BlockConfig {
     pub max_feed_updates_to_batch: usize,
     pub block_generation_period: u64,
-    pub genesis_block_timestamp: Option<SystemTime>,
+    pub genesis_block_timestamp_ms: Option<u128>,
     pub aggregation_consensus_discard_period_blocks: u64,
 }
 
@@ -426,7 +426,7 @@ pub fn get_test_config_with_no_providers() -> SequencerConfig {
         block_config: BlockConfig {
             max_feed_updates_to_batch: 1,
             block_generation_period: 500,
-            genesis_block_timestamp: None,
+            genesis_block_timestamp_ms: None,
             aggregation_consensus_discard_period_blocks: 100,
         },
         providers: HashMap::new(),
