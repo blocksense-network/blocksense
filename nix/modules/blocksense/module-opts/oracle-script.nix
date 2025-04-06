@@ -30,8 +30,9 @@ with lib;
       type = types.str;
     };
 
-    interval-time-in-seconds = mkOption {
+    exec-interval = mkOption {
       type = types.int;
+      description = "Component execution interval in seconds";
     };
 
     allowed-outbound-hosts = mkOption {

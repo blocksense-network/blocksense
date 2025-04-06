@@ -5,6 +5,23 @@
 }:
 let
   inherit (self.lib) dashToUnderscoreRecursive;
+
+  mkOracleScriptConfig =
+    script-opts:
+    dashToUnderscoreRecursive {
+      inherit (script-opts)
+        id
+        name
+        description
+        exec-interval
+        allowed-outbound-hosts
+        capabilities
+        oracle-script-wasm
+        ;
+
+      interval-time-in-seconds = script-opts.exec-interval;
+    };
+
 in
 {
   mkReporterConfig =
@@ -23,7 +40,7 @@ in
       );
 
       # Shared config
-      oracles = builtins.attrValues cfg.oracles;
+      oracles = builtins.map mkOracleScriptConfig (builtins.attrValues cfg.oracles);
       data-feeds = [ ];
     };
 }

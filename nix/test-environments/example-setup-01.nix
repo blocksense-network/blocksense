@@ -143,7 +143,7 @@ in
     oracles = {
       crypto-price-feeds = {
         oracle-script-wasm = "crypto_price_feeds.wasm";
-        interval-time-in-seconds = 40;
+        exec-interval = 40;
         capabilities = [ ];
         allowed-outbound-hosts = [
           "https://api.kraken.com"
@@ -166,7 +166,7 @@ in
 
       exsat-holdings = {
         oracle-script-wasm = "exsat_holdings.wasm";
-        interval-time-in-seconds = 300;
+        exec-interval = 300;
         capabilities = [ ];
         allowed-outbound-hosts = [
           "https://raw.githubusercontent.com"
@@ -178,7 +178,7 @@ in
 
       gecko-terminal = {
         oracle-script-wasm = "gecko_terminal.wasm";
-        interval-time-in-seconds = 10;
+        exec-interval = 10;
         capabilities = [ ];
         allowed-outbound-hosts = [
           "https://app.geckoterminal.com"
