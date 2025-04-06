@@ -143,7 +143,6 @@ in
     oracles = {
       crypto-price-feeds = {
         exec-interval = 40;
-        capabilities = [ ];
         allowed-outbound-hosts = [
           "https://api.kraken.com"
           "https://api.bybit.com"
@@ -165,7 +164,6 @@ in
 
       exsat-holdings = {
         exec-interval = 300;
-        capabilities = [ ];
         allowed-outbound-hosts = [
           "https://raw.githubusercontent.com"
           "https://rpc-us.exsat.network"
@@ -176,7 +174,6 @@ in
 
       gecko-terminal = {
         exec-interval = 10;
-        capabilities = [ ];
         allowed-outbound-hosts = [
           "https://app.geckoterminal.com"
         ];
