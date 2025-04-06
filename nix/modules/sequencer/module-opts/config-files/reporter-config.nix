@@ -12,10 +12,10 @@ in
     dashToUnderscoreRecursive {
       reporter-info = {
         reporter-id = reporter-opts.id;
-        secret-key = reporter-opts.secret-key-path;
         sequencer = reporter-opts.sequencer-url;
         registry = reporter-opts.registry-url;
         interval-time-in-seconds = reporter-opts.default-exec-interval;
+        secret-key = reporter-opts.secret-key-path;
       };
 
       capabilities = builtins.attrValues (
