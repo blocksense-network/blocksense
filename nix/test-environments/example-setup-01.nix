@@ -135,8 +135,8 @@ in
     reporters = {
       a = {
         id = 0;
-        interval-time-in-seconds = 30;
-        secret-key = "${testKeysDir}/reporter_secret_key";
+        default-exec-interval = 30;
+        secret-key-path = "${testKeysDir}/reporter_secret_key";
         second-consensus-secret-key = "${testKeysDir}/reporter_second_consensus_secret_key";
         api-keys = { };
       };
