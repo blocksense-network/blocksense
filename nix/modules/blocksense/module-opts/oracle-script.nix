@@ -42,8 +42,10 @@ with lib;
       type = types.listOf types.str;
     };
 
-    capabilities = mkOption {
+    api-keys = mkOption {
       type = types.listOf types.str;
+      description = "A set of api keys the oracle script requires.";
+      default = [ ];
     };
   };
 }

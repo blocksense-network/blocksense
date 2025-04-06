@@ -15,11 +15,11 @@ let
         description
         exec-interval
         allowed-outbound-hosts
-        capabilities
         ;
 
       oracle-script-wasm = "${script-opts.package}/lib/${dashToUnderscore script-opts.id}.wasm";
       interval-time-in-seconds = script-opts.exec-interval;
+      capabilities = script-opts.api-keys;
     };
 
 in
