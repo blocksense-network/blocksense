@@ -18,12 +18,12 @@ with lib;
       description = mdDoc "The reporter id.";
       example = 1;
     };
-    interval-time-in-seconds = mkOption {
+    default-exec-interval = mkOption {
       type = types.int;
       default = 10;
-      description = "The period in seconds to poll for new data.";
+      description = "Default component execution interval in seconds";
     };
-    secret-key = mkOption {
+    secret-key-path = mkOption {
       type = types.path;
       description = "The path to the reporter secret key.";
     };

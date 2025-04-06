@@ -11,10 +11,11 @@ in
     reporter-opts:
     dashToUnderscoreRecursive {
       reporter-info = {
-        inherit (reporter-opts) interval-time-in-seconds secret-key;
         reporter-id = reporter-opts.id;
+        secret-key = reporter-opts.secret-key-path;
         sequencer = reporter-opts.sequencer-url;
         registry = reporter-opts.registry-url;
+        interval-time-in-seconds = reporter-opts.default-exec-interval;
       };
 
       capabilities = builtins.attrValues (
