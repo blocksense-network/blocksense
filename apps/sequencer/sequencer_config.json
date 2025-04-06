@@ -6,10 +6,7 @@
   "block_config": {
     "max_feed_updates_to_batch": 1,
     "block_generation_period": 500,
-    "genesis_block_timestamp": {
-      "secs_since_epoch": 0,
-      "nanos_since_epoch": 0
-    },
+    "genesis_block_timestamp_ms": 0,
     "aggregation_consensus_discard_period_blocks": 1000
   },
   "providers": {

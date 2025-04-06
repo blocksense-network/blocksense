@@ -12,8 +12,8 @@ lib: with lib; {
       description = mdDoc "The maximum duration (in ms) to wait before sending aggregating the votes.";
     };
 
-    genesis-block-timestamp = mkOption {
-      type = types.nullOr (types.submodule (import ./system-time.nix lib));
+    genesis-block-timestamp-ms = mkOption {
+      type = types.nullOr types.int;
       description = mdDoc "Time of genesis of blockchain.";
     };
 

@@ -52,10 +52,7 @@ in
       block-config = {
         max-feed-updates-to-batch = 300;
         block-generation-period = 500;
-        genesis-block-timestamp = {
-          secs-since-epoch = 1;
-          nanos-since-epoch = 1;
-        };
+        genesis-block-timestamp-ms = 0;
       };
 
       providers = {

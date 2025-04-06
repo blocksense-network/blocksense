@@ -12,7 +12,7 @@ use blocksense_feed_registry::feed_registration_cmds::{
 use blocksense_feed_registry::registry::SlotTimeTracker;
 use blocksense_feed_registry::types::Repeatability;
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::time::{current_unix_time, system_time_to_millis};
+use blocksense_utils::time::current_unix_time;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use serde_json::json;
@@ -54,15 +54,10 @@ pub async fn block_creator_loop(
             }
             info!("block_generation_period set to {}", block_generation_period);
 
-            let block_genesis_time = match block_config.genesis_block_timestamp {
-                Some(genesis_time) => system_time_to_millis(genesis_time),
-                None => current_unix_time(),
-            };
-
             let block_generation_time_tracker = SlotTimeTracker::new(
                 "block_creator_loop".to_string(),
                 Duration::from_millis(block_generation_period),
-                block_genesis_time,
+                block_config.genesis_block_timestamp_ms.unwrap_or_else(current_unix_time),
             );
 
             // Updates that overflowed the capacity of a block
@@ -355,7 +350,7 @@ mod tests {
         let block_config = BlockConfig {
             max_feed_updates_to_batch: 3,
             block_generation_period: 100,
-            genesis_block_timestamp: None,
+            genesis_block_timestamp_ms: None,
             aggregation_consensus_discard_period_blocks: 100,
         };
 
