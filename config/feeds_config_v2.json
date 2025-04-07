@@ -53427,7 +53427,7 @@
     {
       "id": 1000001,
       "full_name": "USDZ / USD",
-      "description": "USDz on base pool with contract 0xcf88b8bf7ccce2d836878e538197eb20fc673bce",
+      "description": "USDz on base from a few pools",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
@@ -53454,6 +53454,51 @@
           {
             "network": "base",
             "pool": "0xcf88b8bf7ccce2d836878e538197eb20fc673bce",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0x6d0b9c9e92a3de30081563c3657b5258b3ffa38b",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0xebf0e4da26a0d040c2343a9e072a0d0b8cf1e0b0",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0x96cc4b6a75fa1dfea66091589d1f25aff3aa0318",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0xcea8ef6ce6235f2c2cdd13c9e8a3ed470725a638",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0xde5ff829fef54d1bdec957d9538a306f0ead1368",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0x2ce63497999f520cc2afaaadbcfc37afd9def4b0",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0xe722e6bce1a598e6b5d26e9975bf44140d2aa3e5",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0x4ef1e503c4f1e5664ac98294d0e42ddc9c0ff961",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0x2c206c7de24787f85b5c52d2ea339adc6d5af40f",
             "reverse": false
           }
         ]
