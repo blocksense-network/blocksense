@@ -6,25 +6,50 @@ with lib.fileset;
 {
   inherit (lib.fileset) trace;
 
-  rustSrc = rec {
-    fileset = unions [
-      (root + "/Cargo.toml")
-      (root + "/Cargo.lock")
+  rustFilter =
+    args:
+    let
+      src =
+        (
+          if (builtins.isString args || builtins.isPath args) then
+            [ args ]
+          else if builtins.isAttrs args then
+            if builtins.isList args.src then args.src else [ args.src ]
+          else if builtins.isList args then
+            args
+          else
+            throw "src must be a string, path or list"
+        )
+        ++ [ ../.cargo ];
 
-      (fileFilter (
-        file:
-        builtins.any file.hasExt [
-          "rs"
-          "toml"
-          "wit"
+      additional =
+        if builtins.isAttrs args then
+          if builtins.hasAttr "additional" args then
+            if builtins.isList args.additional then args.additional else [ args.additional ]
+          else
+            [ ]
+        else
+          [ ];
+
+      fileset = unions (
+        [
+          (root + "/Cargo.toml")
+          (root + "/Cargo.lock")
         ]
-      ) root)
-
-      # JSON files
-      (root + "/apps/sequencer_tests/Safe.json")
-      (root + "/apps/sequencer_tests/SafeProxyFactory.json")
-      (root + "/libs/gnosis_safe/safe_abi.json")
-    ];
-    src = toSource { inherit root fileset; };
-  };
+        ++ (builtins.concatMap (x: [
+          (fileFilter (
+            file:
+            builtins.any file.hasExt [
+              "rs"
+              "toml"
+              "wit"
+              "lock"
+              "json"
+            ]
+          ) x)
+        ]) src)
+        ++ additional
+      );
+    in
+    toSource { inherit root fileset; };
 }
