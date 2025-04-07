@@ -50,8 +50,6 @@ impl PricesFetcher<'_> for CryptoComPriceFetcher {
                 .result
                 .data
                 .into_iter()
-                //  we should consider what to do with perp
-                .filter(|value| !value.i.contains("-PERP"))
                 .map(|value| {
                     (
                         value.i.replace("_", ""),
