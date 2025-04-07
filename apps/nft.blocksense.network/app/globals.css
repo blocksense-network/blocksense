@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @plugin "tailwindcss-animate";
 
+@import './design-system/colors.css';
 @import './typography/default.css';
 @import './typography/medium-large.css';

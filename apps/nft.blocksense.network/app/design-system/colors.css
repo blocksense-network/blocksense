@@ -1,0 +1,18 @@
+/*
+  Global Color Tokens
+*/
+:root {
+  --black: #2b2929;
+  --white: #fffbfa;
+  --neonYellow: #eeff00;
+  --grayLight: #d9d9d9;
+  --grayMedium: #9c9c9c;
+  --grayDark: #454242;
+}
+
+@layer base {
+  body {
+    background: var(--black);
+    color: var(--grayLight);
+  }
+}
