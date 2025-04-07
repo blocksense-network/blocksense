@@ -1,8 +1,11 @@
 {
-  self,
   config,
+  pkgs,
   ...
 }:
+let
+  generated-cfg-dir = "$GIT_ROOT/config/generated";
+in
 {
   imports = [
     ./js.nix
@@ -10,20 +13,21 @@
     ./anvil.nix
     ./kafka.nix
 
-    self.nixosModules.blocksense-process-compose
-    ../../test-environments/example-setup-01.nix
   ];
 
-  enterShell =
-    let
-      generated-config-dir = "${config.devenv.root}/config/generated";
-      install-config-dir-symlink = ''
-        [[ -L ${generated-config-dir} ]] && unlink ${generated-config-dir}
-        ln -fs ${config.services.blocksense.config-dir} ${generated-config-dir}
-      '';
-    in
-    ''
-      ln -fs ${config.process.managers.process-compose.configFile} ${config.devenv.root}/process-compose.yml
-      ${install-config-dir-symlink}
-    '';
+  packages = [
+    (pkgs.writeShellScript "process-compose" ''
+      ${pkgs.lib.getExe pkgs.process-compose} -f "${generated-cfg-dir}/process-compose.yml" "$@"
+    '')
+  ];
+
+  enterShell = ''
+    git clean -fdx -- ${generated-cfg-dir}
+
+    ln -fs ${config.process.managers.process-compose.configFile} "${generated-cfg-dir}/process-compose.yml"
+
+    for file in "${config.services.blocksense.config-dir}"/*; do
+      ln -s "$file" "${generated-cfg-dir}/$(basename "$file")"
+    done
+  '';
 }

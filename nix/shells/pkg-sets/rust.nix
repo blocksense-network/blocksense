@@ -22,7 +22,7 @@
     fi
   '';
 
-  packages = self'.packages.blocksense-rs.buildInputs ++ [
+  packages = [
     self'.legacyPackages.cargoWrapped
     self'.legacyPackages.spinWrapped
     self'.legacyPackages.rustToolchain

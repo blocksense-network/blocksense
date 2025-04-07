@@ -9,7 +9,6 @@
   packages = with pkgs; [
     figlet
     clolcat
-    alejandra
     jq
     curl
     oras
