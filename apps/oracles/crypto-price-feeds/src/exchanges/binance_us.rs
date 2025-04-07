@@ -48,7 +48,6 @@ impl<'a> PricesFetcher<'a> for BinanceUsPriceFetcher<'a> {
 
             Ok(response
                 .into_iter()
-                .filter(|value| !value.symbol.ends_with("USD"))
                 .map(|value| {
                     (
                         value.symbol,
