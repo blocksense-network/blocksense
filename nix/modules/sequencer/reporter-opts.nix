@@ -50,13 +50,14 @@ with lib;
 
     log-level = mkOption {
       type = types.enum [
+        "trigger=trace,feeds_processing=info"
         "trigger=debug"
         "trigger=info"
         "trigger=warn"
         "trigger=error"
         "trigger=trace"
       ];
-      default = "trigger=trace";
+      default = "trigger=trace,feeds_processing=info";
       description = mdDoc "The log level for the reporter.";
     };
   };
