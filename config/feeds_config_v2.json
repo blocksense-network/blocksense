@@ -53537,19 +53537,49 @@
             "reverse": false
           },
           {
+            "network": "base",
+            "pool": "0xb924561a57fc60041414b8471cbc99d3497097fa",
+            "reverse": false
+          },
+          {
+            "network": "base",
+            "pool": "0x97c9750305a39e06002edd851f3d37a862ac7060",
+            "reverse": false
+          },
+          {
             "network": "eth",
             "pool": "0x3ee841f47947fefbe510366e4bbb49e145484195",
             "reverse": false
           },
           {
             "network": "eth",
-            "pool": "0x4628f13651ead6793f8d838b34b8f8522fb0cc52",
+            "pool": "0xc907ba505c2e1cbc4658c395d4a2c7e6d2c32656",
             "reverse": false
           },
           {
             "network": "eth",
-            "pool": "0xc907ba505c2e1cbc4658c395d4a2c7e6d2c32656",
+            "pool": "0x8bb9cd887dd51c5aa8d7da9e244c94bec035e47c",
             "reverse": false
+          },
+          {
+            "network": "eth",
+            "pool": "0x8461537a9bfc5a1df57cf825f8a58049ef61557b",
+            "reverse": false
+          },
+          {
+            "network": "eth",
+            "pool": "0x4628f13651ead6793f8d838b34b8f8522fb0cc52",
+            "reverse": true
+          },
+          {
+            "network": "eth",
+            "pool": "0x38de22a3175708d45e7c7c64cd78479c8b56f76e",
+            "reverse": true
+          },
+          {
+            "network": "eth",
+            "pool": "0xd552716f3bba4224a19d7eb37a31650d7ae10144",
+            "reverse": true
           }
         ]
       }
