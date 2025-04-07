@@ -32,15 +32,15 @@
     "@blocksense/contracts": "workspace:*",
     "@octokit/rest": "^21.1.1",
     "@types/keccak": "^3",
-    "@types/node": "^22.10.2",
-    "effect": "^3.12.1",
-    "glob": "^11.0.0",
+    "@types/node": "^22.14.0",
+    "effect": "^3.14.6",
+    "glob": "^11.0.1",
     "keccak": "^3.0.4",
     "keccak256": "^1.0.6",
-    "tsx": "^4.19.2",
+    "tsx": "^4.19.3",
     "typescript": "^5.5.4",
-    "vitest": "^3.0.2",
-    "yahoo-finance2": "^2.13.2"
+    "vitest": "^3.1.1",
+    "yahoo-finance2": "^2.13.3"
   },
   "dependencies": {
     "@blocksense/config-types": "workspace:*",
