@@ -19,23 +19,22 @@
 
       version = "dev";
 
-      blocksense-rs = pkgs.callPackage ./blocksense-rs {
-        inherit craneLib version;
+    cargoArtifacts = pkgs.callPackage ./cargo-deps {
+      inherit craneLib;
         inherit (self.lib) filesets;
       };
 
-      mkOracleScript =
-        oracle-path: standalone:
-        pkgs.callPackage ./oracle-script {
-          inherit
-            craneLib
-            version
-            oracle-path
-            standalone
-            ;
+    craneBuilder = pkgs.callPackage ./crane-builder {
+      inherit craneLib;
+      cargoArtifacts = cargoArtifacts {};
           inherit (self.lib) filesets;
         };
 
+    mkRustPackage = pkgSet:
+      builtins.mapAttrs (
+        name: value: craneBuilder (value // {pname = name;})
+      )
+      pkgSet;
       mkApp = package: exeName: {
         type = "app";
         program = "${package}/bin/${exeName}";
