@@ -171,22 +171,30 @@ impl PublishCriteria {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct ContractConfig {
+    pub name: String,
+    pub address: Option<String>,
+    pub byte_code: Option<String>,
+    pub contract_version: u16,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 // #[serde(rename_all = "PascalCase")]
 pub struct Provider {
     pub private_key_path: String,
     pub url: String,
-    pub contract_address: Option<String>,
+    //pub contract_address: Option<String>,
     pub safe_address: Option<String>,
     pub safe_min_quorum: u32,
-    pub event_contract_address: Option<String>,
-    pub multicall_contract_address: Option<String>,
+    //pub event_contract_address: Option<String>,
+    //pub multicall_contract_address: Option<String>,
     pub transaction_retries_count_before_give_up: u32,
-    pub adfs_contract_address: Option<String>,
+    //pub adfs_contract_address: Option<String>,
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
     pub transaction_gas_limit: u32,
-    pub data_feed_store_byte_code: Option<String>,
-    pub data_feed_sports_byte_code: Option<String>,
+    //pub data_feed_store_byte_code: Option<String>,
+    //pub data_feed_sports_byte_code: Option<String>,
     pub impersonated_anvil_account: Option<String>,
 
     /// Whether data is written to the network (provider) or not. Useful for devops, if a single
@@ -200,8 +208,11 @@ pub struct Provider {
     #[serde(default)]
     pub publishing_criteria: Vec<PublishCriteria>,
 
-    #[serde(default = "contract_initial_version")]
-    pub contract_version: u16, // TODO: remove when migration ot ADFS contracts is complete
+    //#[serde(default = "contract_initial_version")]
+    //pub contract_version: u16, // TODO: remove when migration ot ADFS contracts is complete
+
+    #[serde(default)]
+    pub contracts: Vec<ContractConfig>,
 }
 
 fn default_is_enabled() -> bool {
@@ -450,23 +461,30 @@ pub fn get_test_config_with_multiple_providers(
                     .expect("Error in private_key_path: ")
                     .to_string(),
                 url: url.to_string(),
-                contract_address: Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string()),
                 safe_address: None,
                 safe_min_quorum: 1,
-                event_contract_address: None,
-                adfs_contract_address: None,
-                multicall_contract_address: None,
                 transaction_retries_count_before_give_up: 10,
                 transaction_retry_timeout_secs: 24,
                 retry_fee_increment_fraction: 0.1,
                 transaction_gas_limit: 7500000,
-                data_feed_store_byte_code: Some(test_data_feed_store_byte_code()),
-                data_feed_sports_byte_code: Some(test_data_feed_sports_byte_code()),
                 is_enabled: true,
                 allow_feeds: None,
                 publishing_criteria: vec![],
                 impersonated_anvil_account: None,
-                contract_version: 1,
+                contracts: vec![
+                    Contract {
+                        name: HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
+                        address: Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string()),
+                        byte_code: Some(test_data_feed_store_byte_code()),
+                        contract_version: 1
+                    }, 
+                    Contract {
+                        name: SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+                        address: None,
+                        byte_code: Some(test_data_feed_sports_byte_code()),
+                        contract_version: 1
+                    }
+                ]
             },
         );
     }
@@ -512,25 +530,25 @@ mod tests {
             "data_feed_sports_byte_code": "0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033"
             }"#).unwrap();
         assert!(provider_a.is_enabled);
-        assert_eq!(provider_a.event_contract_address, None);
+        //assert_eq!(provider_a.event_contract_address, None);
         assert_eq!(&provider_a.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&provider_a.url, "http://127.0.0.1:8546");
         assert_eq!(provider_a.transaction_retries_count_limit, 42_u32);
         assert_eq!(provider_a.transaction_retry_timeout_secs, 20_u32);
         assert_eq!(provider_a.retry_fee_increment_fraction, 0.1f64);
         assert_eq!(provider_a.transaction_gas_limit, 7500000_u32);
-        assert_eq!(
-            provider_a.contract_address,
-            Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string())
-        );
-        assert_eq!(
-            provider_a.data_feed_store_byte_code,
-            Some(test_data_feed_store_byte_code())
-        );
-        assert_eq!(
-            provider_a.data_feed_sports_byte_code,
-            Some(test_data_feed_sports_byte_code())
-        );
+        // assert_eq!(
+        //     provider_a.contract_address,
+        //     Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string())
+        // );
+        // assert_eq!(
+        //     provider_a.data_feed_store_byte_code,
+        //     Some(test_data_feed_store_byte_code())
+        // );
+        // assert_eq!(
+        //     provider_a.data_feed_sports_byte_code,
+        //     Some(test_data_feed_sports_byte_code())
+        // );
         assert_eq!(provider_a.allow_feeds, None);
         assert_eq!(provider_a.publishing_criteria.len(), 0);
         assert_eq!(provider_a.impersonated_anvil_account, None);
@@ -590,25 +608,25 @@ mod tests {
             ]
             }"#).unwrap();
         assert!(p.is_enabled);
-        assert_eq!(p.event_contract_address, None);
+        // assert_eq!(p.event_contract_address, None);
         assert_eq!(&p.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&p.url, "http://127.0.0.1:8546");
         assert_eq!(p.transaction_retries_count_limit, 42_u32);
         assert_eq!(p.transaction_retry_timeout_secs, 20_u32);
         assert_eq!(p.retry_fee_increment_fraction, 0.1f64);
         assert_eq!(p.transaction_gas_limit, 7500000_u32);
-        assert_eq!(
-            p.contract_address,
-            Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string())
-        );
-        assert_eq!(
-            p.data_feed_store_byte_code,
-            Some(test_data_feed_store_byte_code())
-        );
-        assert_eq!(
-            p.data_feed_sports_byte_code,
-            Some(test_data_feed_sports_byte_code())
-        );
+        // assert_eq!(
+        //     p.contract_address,
+        //     Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string())
+        // );
+        // assert_eq!(
+        //     p.data_feed_store_byte_code,
+        //     Some(test_data_feed_store_byte_code())
+        // );
+        // assert_eq!(
+        //     p.data_feed_sports_byte_code,
+        //     Some(test_data_feed_sports_byte_code())
+        // );
         assert_eq!(p.allow_feeds, None);
         assert_eq!(p.publishing_criteria.len(), 8);
         assert_eq!(p.impersonated_anvil_account, None);

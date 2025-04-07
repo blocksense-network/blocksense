@@ -56,13 +56,7 @@ pub fn parse_eth_address(addr: &str) -> Option<Address> {
     contract_address
 }
 
-#[derive(Clone)]
-pub struct Contract {
-    pub name: String,
-    pub address: Option<Address>,
-    pub byte_code: Option<Vec<u8>>,
-    pub contract_version: u16,
-}
+
 
 pub const HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "HistoricalDataFeedStoreV2";
 pub const SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "SportsDataFeedStoreV2";
@@ -269,7 +263,6 @@ impl RpcProvider {
             .multicall_contract_address
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
-
         let mut contracts = vec![];
         contracts.push(Contract {
             name: HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
