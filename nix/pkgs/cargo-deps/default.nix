@@ -12,21 +12,28 @@
   darwin,
   iconv,
   curl,
+  perl,
   filesets,
   autoPatchelfHook,
   version ? "dev",
-}:
-let
-  sharedAttrs = {
-    pname = "blocksense";
-    inherit (filesets.rustSrc) src;
+}: {
+  cargoLock ? ../../../Cargo.lock,
+  cargoToml ? ../../../Cargo.toml,
+  sourceRootDir ? ".",
+  extraArgs ? "",
+  pname ? "blocksense-cargo",
+}: let
+  sharedAttrs = rec {
+    inherit pname;
+
+    src = filesets.rustFilter [];
 
     nativeBuildInputs =
       [
         git
         pkg-config
       ]
-      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+      ++ lib.optionals stdenv.isLinux [autoPatchelfHook]
       ++ lib.optionals stdenv.isDarwin [
         # Needed by https://github.com/a1ien/rusb/blob/v0.7.0-libusb1-sys/libusb1-sys/build.rs#L27
         darwin.DarwinTools
@@ -59,11 +66,24 @@ let
     doCheck = false;
     strictDeps = true;
 
+    cargoVendorDir = craneLib.vendorCargoDeps {inherit cargoLock;};
+
+    postUnpack = ''
+      cd $sourceRoot/${sourceRootDir}
+      sourceRoot="."
+    '';
+
+    inherit cargoToml;
+
     preBuild = lib.optionalString stdenv.isLinux ''
       addAutoPatchelfSearchPath ${libgcc.lib}/lib/
     '';
+    cargoExtraArgs = extraArgs;
   };
-
-  cargoArtifacts = craneLib.buildDepsOnly (sharedAttrs // { name = "blocksense-cargo-deps"; });
 in
-craneLib.buildPackage (sharedAttrs // { inherit version cargoArtifacts; })
+  craneLib.buildDepsOnly (sharedAttrs
+    // {
+      passthru = {
+        inherit sharedAttrs;
+      };
+    })
