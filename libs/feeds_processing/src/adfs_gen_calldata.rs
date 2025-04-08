@@ -117,7 +117,7 @@ pub async fn adfs_serialize_updates(
                 }
                 updated_feed_id_round
             }
-            None => *feeds_rounds.get(&feed_id).unwrap_or({
+            None => *feeds_rounds.get(&feed_id).unwrap_or_else(|| {
                 error!("feeds_rounds does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
                 &0
             }),
