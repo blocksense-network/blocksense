@@ -19,7 +19,7 @@
 }:
 let
   root = ../../..;
-  src = craneLib.cleanCargoSource ./.;
+  src = craneLib.cleanCargoSource root;
 
   # localDepsFileSetForCrate = crate-path:{}
 
@@ -45,16 +45,34 @@ let
       ];
     };
 
+  resolvePackageNameByPath =
+    crate-path:
+    let
+      cargo-toml = craneLib.cleanCargoToml { cargoToml = "${crate-path}/Cargo.toml"; };
+    in
+    cargo-toml.package.name;
+
   # Resolve local dependency paths for crate
   resolveLocalDependencies =
     crate-path:
     let
       cargo-toml = craneLib.cleanCargoToml { cargoToml = "${crate-path}/Cargo.toml"; };
+
       local-dependencies = lib.filterAttrs (
         key: value: builtins.isAttrs value && builtins.hasAttr "path" value
       ) cargo-toml.dependencies;
+
+      local-dependencies-resolved-aliases = lib.mapAttrs' (
+        name:
+        { path, ... }:
+        let
+          absolute-path = crate-path + "/${path}";
+        in
+        lib.nameValuePair (resolvePackageNameByPath absolute-path) absolute-path
+      ) local-dependencies;
+
     in
-    local-dependencies;
+    local-dependencies-resolved-aliases;
 
   sharedAttrs = {
     pname = "blocksense";
@@ -123,14 +141,12 @@ let
     key: value: builtins.isAttrs value && builtins.hasAttr "path" value
   ) workspace-dependencies;
 
-  # testing = fileSetForCrate (root + /apps/sequencer); # (/. + "${root}/apps/sequencer");
-  testing = resolveLocalDependencies (root + /. + "/apps/../apps/sequencer");
+  # testing = resolveLocalDependencies (root + /. + "/apps/../apps/sequencer");
+  # testing = resolveLocalDependencies (root + /. + "/apps/sequencer");
+  testing = resolveLocalDependencies (root + "/libs/feeds_processing");
 in
 {
   inherit blocksense-rs;
-  testing = writeTextFile {
-    name = "testing";
-    text = (builtins.toJSON testing);
-  };
+  inherit testing;
 }
 # craneLib.buildPackage (sharedAttrs // { inherit version cargoArtifacts; })

@@ -60,9 +60,9 @@
       };
       packages = {
         inherit blocksense-rs;
-        inherit testing;
       };
       legacyPackages = {
+        inherit testing;
         oracle-scripts = {
           crypto-price-feeds = mkOracleScript /apps/oracles/crypto-price-feeds false;
           exsat-holdings = mkOracleScript /apps/oracles/exsat-holdings false;
