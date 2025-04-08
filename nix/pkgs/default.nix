@@ -198,28 +198,28 @@
       };
 
       oracle-scripts = mkRustPackage rec {
-        oracle-script-crypto-price-feeds = {
+        crypto-price-feeds = {
           packageName = "crypto-price-feeds";
           members = [
             "apps/oracles/crypto-price-feeds"
             "libs/sdk"
           ];
         };
-        oracle-script-exsat-holdings = {
+        exsat-holdings = {
           packageName = "exsat-holdings";
           members = [
             "apps/oracles/exsat-holdings"
             "libs/sdk"
           ];
         };
-        oracle-script-gecko-terminal = {
+        gecko-terminal = {
           packageName = "gecko-terminal";
           members = [
             "apps/oracles/gecko-terminal"
             "libs/sdk"
           ];
         };
-        oracle-script-cmc = {
+        cmc = {
           packageName = "cmc-oracle";
           members = [
             "libs/sdk/examples/cmc"
@@ -232,7 +232,7 @@
             sourceRootDir = "libs/sdk/examples/cmc";
           };
         };
-        oracle-script-yahoo = {
+        yahoo = {
           packageName = "yahoo-oracle";
           members = [
             "libs/sdk/examples/yahoo"
@@ -245,7 +245,7 @@
             sourceRootDir = "libs/sdk/examples/yahoo";
           };
         };
-        oracle-script-revolut = {
+        revolut = {
           packageName = "revolut-oracle";
           members = [
             "libs/sdk/examples/revolut"
@@ -262,7 +262,11 @@
 
       blocksense-rs = pkgs.symlinkJoin {
         name = "blocksense-rs";
-        paths = builtins.attrValues (rust-packages // rust-libraries // oracle-scripts);
+        paths = builtins.attrValues (
+          rust-packages
+          // rust-libraries
+          // (lib.mapAttrs' (name: value: lib.nameValuePair ("oracle-script-" + name) value) oracle-scripts)
+        );
       };
 
       mkApp = package: exeName: {
