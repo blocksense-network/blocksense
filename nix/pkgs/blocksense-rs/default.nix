@@ -52,7 +52,17 @@ let
     in
     cargo-toml.package.name;
 
+  resolveTransitiveLocalDependencies =
+    crate-path:
+    let
+      direct-dependencies = resolveLocalDependencies crate-path;
+      direct-dependency-paths = builtins.attrValues direct-dependencies;
+      dependencies-of-direct-dependencies = builtins.map resolveLocalDependencies direct-dependency-paths;
+    in
+    direct-dependencies // (lib.mergeAttrsList dependencies-of-direct-dependencies);
+
   # Resolve local dependency paths for crate
+  # TODO: Handle workspace.dependencies ({ workspace = true })
   resolveLocalDependencies =
     crate-path:
     let
@@ -70,9 +80,22 @@ let
         in
         lib.nameValuePair (resolvePackageNameByPath absolute-path) absolute-path
       ) local-dependencies;
-
     in
     local-dependencies-resolved-aliases;
+
+  packageWorkspaceMembers =
+    let
+      cargo-toml = craneLib.cleanCargoToml { cargoToml = "${root}/Cargo.toml"; };
+    in
+    builtins.listToAttrs (
+      builtins.map (
+        crate-path:
+        let
+          absolute-path = "${root}/${crate-path}";
+        in
+        lib.nameValuePair (resolvePackageNameByPath absolute-path) absolute-path
+      ) cargo-toml.workspace.members
+    );
 
   sharedAttrs = {
     pname = "blocksense";
@@ -143,7 +166,9 @@ let
 
   # testing = resolveLocalDependencies (root + /. + "/apps/../apps/sequencer");
   # testing = resolveLocalDependencies (root + /. + "/apps/sequencer");
-  testing = resolveLocalDependencies (root + "/libs/feeds_processing");
+  # testing = resolveLocalDependencies (root + "/libs/feeds_processing");
+  # testing = resolveTransitiveLocalDependencies (root + "/apps/sequencer");
+  testing = packageWorkspaceMembers;
 in
 {
   inherit blocksense-rs;
