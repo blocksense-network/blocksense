@@ -46,3 +46,4 @@ alloy-primitives = "0.8"
 anyhow = "1.0.89"
 serde_json = { workspace = true }
 serde = { workspace = true }
+itertools = "0.14.0"

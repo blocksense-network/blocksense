@@ -1,7 +1,7 @@
 use crate::adfs_gen_calldata::adfs_serialize_updates;
 use alloy_primitives::{Address, Bytes, Uint, U256};
 use anomaly_detection::ingest::anomaly_detector_aggregate;
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use config::{FeedStrideAndDecimals, PublishCriteria};
 use crypto::{verify_signature, PublicKey, Signature};
 use data_feeds::feeds_processing::{
@@ -14,6 +14,7 @@ use feed_registry::types::FeedResult;
 use feed_registry::types::{DataFeedPayload, FeedType, Timestamp};
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash};
+use itertools::Itertools;
 use ringbuf::traits::consumer::Consumer;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -253,6 +254,8 @@ fn check_aggregated_votes_deviation(
     last_votes: &HashMap<u32, VotedFeedUpdate>,
     tolerated_deviations: &HashMap<u32, f64>,
 ) -> Result<()> {
+    let mut errors = Vec::new();
+
     for update in updates {
         let feed_id = update.feed_id;
         let Some(reporter_vote) = last_votes.get(&feed_id) else {
@@ -285,9 +288,13 @@ fn check_aggregated_votes_deviation(
         let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
 
         if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
-            anyhow::bail!("Final answer for feed={feed_id}, block_height={block_height}, deviates more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}");
+            errors.push(format!("Final answer for feed={feed_id}, block_height={block_height}, deviates more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}"));
         }
-        debug!("Final answer for feed={feed_id}, block_height={block_height}, deviates {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}");
+        debug!("Final answer for feed={feed_id}, block_height={block_height}, deviates by {deviated_by_percent}%");
+    }
+
+    if !errors.is_empty() {
+        bail!(errors.iter().join("\n"));
     }
 
     Ok(())
