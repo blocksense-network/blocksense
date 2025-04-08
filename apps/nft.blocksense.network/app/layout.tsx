@@ -2,6 +2,7 @@ import NextHead from 'next/head';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import { geist, geistMono } from '../src/geist';
+import { Footer } from '../components/Footer';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -79,6 +80,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         <link rel="icon" href="/images/nft-favicon.png" type="image/png" />
       </NextHead>
       <body className="nft-drop-layout__body md:px-4 lg:px-30  dark:text-neutral-300">
+        {/* ToDo: Replace header below with Header component */}
         <header className="nft-drop-layout__header">
           <nav className="nft-drop-layout__navbar">
             <a
@@ -90,11 +92,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
           </nav>
         </header>
         <main className="nft-drop-layout__main">{children}</main>
-        <footer className="nft-drop-layout__footer">
-          <p className="nft-drop-layout__footer-text">
-            &copy; {new Date().getFullYear()} Blocksense. All rights reserved.
-          </p>
-        </footer>
+        <Footer />
       </body>
     </html>
   );
