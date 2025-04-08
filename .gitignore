@@ -170,6 +170,3 @@ libs/ts/ui/storybook-static
 # wasm artifacts
 .spin/
 *.wasm
-
-# Generated Blocksense config files symlink
-config/generated
