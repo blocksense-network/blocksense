@@ -44,7 +44,10 @@ use wasmtime_wasi_http::{
 use config::FeedStrideAndDecimals;
 use crypto::JsonSerializableSignature;
 use data_feeds::{feeds_processing::VotedFeedUpdate, generate_signature::generate_signature};
-use feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
+use feed_registry::{
+    registry::SlotTimeTracker,
+    types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData, Repeatability},
+};
 use feeds_processing::utils::validate;
 use prometheus::{
     actix_server::handle_prometheus_metrics,
@@ -159,7 +162,7 @@ pub struct OracleTriggerConfig {
     interval_time_in_seconds: Option<u64>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct Component {
     pub id: String,
     pub oracle_settings: HashSet<DataFeedSetting>,
@@ -304,7 +307,10 @@ impl TriggerExecutor for OracleTrigger {
                 );
             }
         }
-        tracing::debug!("Components: {:?}", &components);
+        tracing::debug!(
+            "Components: {}",
+            &serde_json::to_string_pretty(&components).unwrap(),
+        );
         tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
             .queue_components
@@ -498,6 +504,8 @@ impl OracleTrigger {
     ) -> TerminationReason {
         tracing::trace!("Task orchestrator-{} started", oracle_id);
         //TODO(adikov): Implement proper logic and remove dummy values
+        let time_tracker = SlotTimeTracker::new("feed_update".into(), time_interval, 0);
+
         loop {
             REPORTER_BATCH_COUNTER.inc();
             let batch_count = REPORTER_BATCH_COUNTER.get();
@@ -505,7 +513,11 @@ impl OracleTrigger {
                 "Orchestrator-{} entering sleep [batch_count={batch_count}]",
                 oracle_id
             );
-            let _ = sleep(time_interval).await;
+
+            time_tracker
+                .await_end_of_current_slot(&Repeatability::Periodic)
+                .await;
+
             tracing::trace!(
                 "Orchestrator-{} woke up [batch_count={batch_count}]",
                 oracle_id
@@ -703,40 +715,8 @@ impl OracleTrigger {
             let mut batch_payload = vec![];
             for oracle::DataFeedResult { id, value } in payload.values {
                 let result = match value {
-                    oracle::DataFeedResultValue::Numerical(value) => {
-                        let feed = FeedType::Numerical(value);
-                        if let Ok(feed_id) = id.parse::<u32>() {
-                            latest_votes
-                                .write()
-                                .await
-                                .entry(feed_id)
-                                .or_insert_with(|| VotedFeedUpdate {
-                                    feed_id,
-                                    value: feed.clone(),
-                                    end_slot_timestamp: timestamp,
-                                });
-                            Ok(feed)
-                        } else {
-                            Err(FeedError::APIError(format!("Id cannot be parsed - {}", id)))
-                        }
-                    }
-                    oracle::DataFeedResultValue::Text(value) => {
-                        let feed = FeedType::Text(value);
-                        if let Ok(feed_id) = id.parse::<u32>() {
-                            latest_votes
-                                .write()
-                                .await
-                                .entry(feed_id)
-                                .or_insert_with(|| VotedFeedUpdate {
-                                    feed_id,
-                                    value: feed.clone(),
-                                    end_slot_timestamp: timestamp,
-                                });
-                            Ok(feed)
-                        } else {
-                            Err(FeedError::APIError(format!("Id cannot be parsed - {}", id)))
-                        }
-                    }
+                    oracle::DataFeedResultValue::Numerical(value) => Ok(FeedType::Numerical(value)),
+                    oracle::DataFeedResultValue::Text(value) => Ok(FeedType::Text(value)),
                     oracle::DataFeedResultValue::Error(error_string) => {
                         Err(FeedError::APIError(error_string))
                     }
@@ -746,6 +726,7 @@ impl OracleTrigger {
                         continue;
                     }
                 };
+
                 let signature =
                     generate_signature(&secret_key, id.as_str(), timestamp, &result).unwrap();
 
@@ -778,6 +759,7 @@ impl OracleTrigger {
                     let status = res.status();
                     let contents = res.text().await.unwrap();
                     tracing::trace!("Sequencer responded with status={status} and text={contents}",);
+                    update_latest_results(&mut (*latest_votes.write().await), batch_payload);
                 }
                 Err(e) => {
                     //TODO(adikov): Add code from the error - e.status()
@@ -1039,5 +1021,26 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
         Ok(HostFutureIncomingResponse::Pending(
             wasmtime_wasi::runtime::spawn(response_handle),
         ))
+    }
+}
+
+fn update_latest_results(
+    latest_votes: &mut HashMap<u32, VotedFeedUpdate>,
+    batch: Vec<DataFeedPayload>,
+) {
+    for vote in batch {
+        let timestamp = vote.payload_metadata.timestamp;
+        let feed_id = vote.payload_metadata.feed_id.parse().unwrap();
+
+        if let Ok(value) = vote.result {
+            _ = latest_votes.insert(
+                feed_id,
+                VotedFeedUpdate {
+                    feed_id,
+                    value,
+                    end_slot_timestamp: timestamp,
+                },
+            );
+        }
     }
 }

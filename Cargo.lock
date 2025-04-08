@@ -4181,6 +4181,7 @@ dependencies = [
  "feed_registry",
  "gnosis_safe",
  "hex",
+ "itertools 0.14.0",
  "once_cell",
  "prometheus 0.1.1",
  "ringbuf",
