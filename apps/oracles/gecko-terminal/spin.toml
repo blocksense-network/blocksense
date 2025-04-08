@@ -16,7 +16,7 @@ component = "gecko-terminal"
 
 [[trigger.oracle.data_feeds]]
 id = "1000000"
-data = '{"pair":{"base":"WMON","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"monad-testnet","pool":"0x264e9b75723d75e3c607627d8e21d2c758db4c80","reverse":true}]}'
+data = '{"pair":{"base":"WMON","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"monad-testnet","pool":"0x264e9b75723d75e3c607627d8e21d2c758db4c80","reverse":true},{"network":"monad-testnet","pool":"0x8552706d9a27013f20ea0f9df8e20b61e283d2d3","reverse":true},{"network":"monad-testnet","pool":"0x5323821de342c56b80c99fbc7cd725f2da8eb87b","reverse":true},{"network":"monad-testnet","pool":"0x6e4b7be5ef7f8950c76baa0bd90125bc9b33c8db","reverse":true},{"network":"monad-testnet","pool":"0x212fde77a42d55f980d0a0304e7eebe1e999c60f","reverse":true},{"network":"monad-testnet","pool":"0xc0ce32eee0eb8bf24fa2b00923a78abc5002f91e","reverse":true},{"network":"monad-testnet","pool":"0x786f4aa162457ecdf8fa4657759fa3e86c9394ff","reverse":true},{"network":"monad-testnet","pool":"0xf2afc5aa9965cdb2d4be94823c98411291b61297","reverse":true},{"network":"monad-testnet","pool":"0xf22d36b6bee8a7fd51def4e3badf35a8733b284f","reverse":true},{"network":"monad-testnet","pool":"0xe8a806ae6ecb1f02063e21c6f0579b145399ee5f","reverse":true}]}'
 
 [[trigger.oracle.data_feeds]]
 id = "1000001"
