@@ -14,12 +14,52 @@
   curl,
   filesets,
   autoPatchelfHook,
+  writeTextFile,
   version ? "dev",
 }:
 let
+  root = ../../..;
+  src = craneLib.cleanCargoSource ./.;
+
+  # localDepsFileSetForCrate = crate-path:{}
+
+  fileSetForCrate =
+    crate-path:
+    lib.fileset.toSource {
+      inherit root;
+      fileset = lib.fileset.unions [
+        # (root + ./Cargo.toml)
+        # (root + ./Cargo.lock)
+        (craneLib.fileset.commonCargoSources crate-path)
+        # (localDepsFileSetForCrate crate-path)
+      ];
+
+    };
+
+  fileSetForCrateWithDeps =
+    crate-path:
+    lib.fileset.toSource {
+      root = crate-path;
+      fileset = lib.fileset.unions [
+        (craneLib.fileset.commonCargoSources crate-path)
+      ];
+    };
+
+  # Resolve local dependency paths for crate
+  resolveLocalDependencies =
+    crate-path:
+    let
+      cargo-toml = craneLib.cleanCargoToml { cargoToml = "${crate-path}/Cargo.toml"; };
+      local-dependencies = lib.filterAttrs (
+        key: value: builtins.isAttrs value && builtins.hasAttr "path" value
+      ) cargo-toml.dependencies;
+    in
+    local-dependencies;
+
   sharedAttrs = {
     pname = "blocksense";
     inherit (filesets.rustSrc) src;
+    # inherit src;
 
     nativeBuildInputs =
       [
@@ -64,6 +104,33 @@ let
     '';
   };
 
-  cargoArtifacts = craneLib.buildDepsOnly (sharedAttrs // { name = "blocksense-cargo-deps"; });
+  cargoDeps = craneLib.buildDepsOnly (sharedAttrs // { name = "blocksense-cargo-deps"; });
+
+  blocksense-rs = craneLib.buildPackage (
+    sharedAttrs
+    // {
+      inherit version;
+      cargoArtifacts = cargoDeps;
+    }
+  );
+
+  root-cargo-toml = craneLib.cleanCargoToml { cargoToml = "${root}/Cargo.toml"; };
+
+  workspace-members = root-cargo-toml.workspace.members;
+  workspace-dependencies = root-cargo-toml.workspace.dependencies;
+
+  workspace-dependencies-with-path = lib.filterAttrs (
+    key: value: builtins.isAttrs value && builtins.hasAttr "path" value
+  ) workspace-dependencies;
+
+  # testing = fileSetForCrate (root + /apps/sequencer); # (/. + "${root}/apps/sequencer");
+  testing = resolveLocalDependencies (root + /. + "/apps/../apps/sequencer");
 in
-craneLib.buildPackage (sharedAttrs // { inherit version cargoArtifacts; })
+{
+  inherit blocksense-rs;
+  testing = writeTextFile {
+    name = "testing";
+    text = (builtins.toJSON testing);
+  };
+}
+# craneLib.buildPackage (sharedAttrs // { inherit version cargoArtifacts; })

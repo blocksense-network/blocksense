@@ -19,10 +19,14 @@
 
       version = "dev";
 
-      blocksense-rs = pkgs.callPackage ./blocksense-rs {
-        inherit craneLib version;
-        inherit (self.lib) filesets;
-      };
+      inherit
+        (pkgs.callPackage ./blocksense-rs {
+          inherit craneLib version;
+          inherit (self.lib) filesets;
+        })
+        blocksense-rs
+        testing
+        ;
 
       mkOracleScript =
         oracle-path: standalone:
@@ -56,6 +60,7 @@
       };
       packages = {
         inherit blocksense-rs;
+        inherit testing;
       };
       legacyPackages = {
         oracle-scripts = {
