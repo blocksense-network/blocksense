@@ -7,9 +7,10 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 
+use blocksense_sdk::http::http_get_json;
+
 use crate::{
     common::{PairPriceData, PricePoint},
-    http::http_get_json,
     traits::prices_fetcher::PricesFetcher,
 };
 

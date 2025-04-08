@@ -14,6 +14,7 @@ pub mod wit {
     // });
 }
 
+pub mod http;
 pub mod oracle;
 pub mod price_pair;
 

@@ -1,6 +1,6 @@
 use anyhow::{bail, Result};
-use blocksense_sdk::spin::http::{send, Method, Request, Response};
 use serde::de::DeserializeOwned;
+use spin_sdk::http::{send, Method, Request, Response};
 use url::Url;
 
 pub type QueryParam<'a, 'b> = (&'a str, &'b str);

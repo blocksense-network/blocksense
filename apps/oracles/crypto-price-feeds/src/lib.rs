@@ -1,7 +1,6 @@
 mod common;
 mod exchanges;
 mod fetch_prices;
-mod http;
 mod traits;
 mod vwap;
 
