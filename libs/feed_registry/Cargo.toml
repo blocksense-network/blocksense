@@ -24,4 +24,4 @@ strum_macros = { workspace = true }
 chrono = { workspace = true }
 
 [dev-dependencies]
-futures = { workspace = true}
+futures = { workspace = true }

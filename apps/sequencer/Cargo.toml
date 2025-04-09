@@ -47,12 +47,12 @@ blocksense-gnosis-safe = { workspace = true }
 reqwest = { workspace = true }
 # async
 tokio = { workspace = true }
-chrono = { workspace = true }
 
 # misc
 anyhow = { workspace = true }
 eyre = { workspace = true }
 actix-web = { workspace = true }
+chrono = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
 futures = { workspace = true }
