@@ -1,22 +1,21 @@
+use crate::adfs_gen_calldata::adfs_serialize_updates;
+use alloy::hex::FromHex;
+use alloy_primitives::{Address, Bytes, Uint, U256};
 use anomaly_detection::ingest::anomaly_detector_aggregate;
 use anyhow::{anyhow, Context, Result};
 use config::{FeedStrideAndDecimals, PublishCriteria};
+use crypto::{verify_signature, PublicKey, Signature};
 use data_feeds::feeds_processing::{
     BatchedAggegratesToSend, DoSkipReason, DontSkipReason, SkipDecision, VotedFeedUpdate,
     VotedFeedUpdateWithProof,
 };
 use feed_registry::aggregate::FeedAggregate;
 use feed_registry::registry::FeedAggregateHistory;
+use feed_registry::types::FeedResult;
 use feed_registry::types::{DataFeedPayload, FeedType, Timestamp};
 use gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash};
 use ringbuf::traits::consumer::Consumer;
-// use serde_json::from_str;
-use crate::adfs_gen_calldata::adfs_serialize_updates;
-use alloy::hex::FromHex;
-use alloy_primitives::{Address, Bytes, Uint, U256};
-use crypto::{verify_signature, PublicKey, Signature};
-use feed_registry::types::FeedResult;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -277,20 +276,17 @@ pub async fn validate(
             ),
         };
 
-        let diff = (update_aggregate_value - reporter_voted_value).abs();
+        let tolerated_diff_percent = tolerated_deviations.get(&feed_id).unwrap_or(&0.5);
+        let tolerated_difference = (tolerated_diff_percent / 100.0) * reporter_voted_value;
 
-        let tolerated_diff_percent = tolerated_deviations.get(&feed_id).unwrap_or(&0.01);
+        let lower_bound = reporter_voted_value - tolerated_difference;
+        let upper_bound = reporter_voted_value + tolerated_difference;
 
-        if reporter_voted_value.abs() < f64::EPSILON {
-            if update_aggregate_value > *tolerated_diff_percent {
-                anyhow::bail!("relative_diff {update_aggregate_value} between reporter_voted_value {reporter_voted_value} and update_aggregate_value {update_aggregate_value} is above {tolerated_diff_percent} for feed_id {feed_id}");
-            }
-        } else {
-            let relative_diff = diff / reporter_voted_value;
-
-            if relative_diff > *tolerated_diff_percent {
-                anyhow::bail!("relative_diff {relative_diff} between reporter_voted_value {reporter_voted_value} and update_aggregate_value {update_aggregate_value} is above {tolerated_diff_percent} for feed_id {feed_id}");
-            }
+        if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
+            let block_height = batch.block_height;
+            let difference = (reporter_voted_value - update_aggregate_value).abs();
+            let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
+            anyhow::bail!("Final answer for feed={feed_id}, block_height={block_height}, deviates more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}");
         }
     }
 
