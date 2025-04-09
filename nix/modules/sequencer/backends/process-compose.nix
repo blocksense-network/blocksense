@@ -17,13 +17,11 @@ let
 
   logsConfig = {
     fields_order = [
-      "time"
-      "level"
       "message"
     ];
     no_metadata = true;
+    no_color = true;
     disable_json = true;
-    add_timestamp = true;
     flush_each_line = true;
   };
 
