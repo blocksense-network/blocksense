@@ -34,7 +34,7 @@ with lib;
       };
       kafka_endpoint = mkOption {
         type = types.str;
-        default = "http://127.0.0.1:${toString blocksense.sequencer.kafka-report-endpoint.url}";
+        default = blocksense.sequencer.kafka-report-endpoint.url;
         description = "The url of the kafka server.";
       };
     };
