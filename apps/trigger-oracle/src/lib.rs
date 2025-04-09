@@ -806,6 +806,7 @@ impl OracleTrigger {
     ) -> TerminationReason {
         while let Some(aggregated_consensus) = ss_rx.recv().await {
             let signer = create_private_key_signer(second_consensus_secret_key.as_str());
+
             let tx = match hex_str_to_bytes32(aggregated_consensus.tx_hash.as_str()) {
                 Ok(t) => t,
                 Err(e) => {
@@ -814,16 +815,9 @@ impl OracleTrigger {
                 }
             };
 
-            let signed = match sign_hash(&signer, &tx).await {
-                Ok(s) => s,
-                Err(e) => {
-                    tracing::error!("Failed to sign hash on second consensus: {}", &e);
-                    continue;
-                }
-            };
-
             let block_height = aggregated_consensus.block_height;
             let network = aggregated_consensus.network.clone();
+
             match validate(
                 feeds_config.clone(),
                 aggregated_consensus,
@@ -835,6 +829,14 @@ impl OracleTrigger {
                 Ok(()) => (),
                 Err(e) => {
                     tracing::error!("Failed to validate second consensus: {}", &e);
+                    continue;
+                }
+            };
+
+            let signed = match sign_hash(&signer, &tx).await {
+                Ok(s) => s,
+                Err(e) => {
+                    tracing::error!("Failed to sign hash on second consensus: {}", &e);
                     continue;
                 }
             };
