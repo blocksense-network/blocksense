@@ -279,20 +279,17 @@ pub async fn validate(
             ),
         };
 
-        let diff = (update_aggregate_value - reporter_voted_value).abs();
+        let tolerated_diff_percent = tolerated_deviations.get(&feed_id).unwrap_or(&0.5);
+        let tolerated_difference = (tolerated_diff_percent / 100.0) * reporter_voted_value;
 
-        let tolerated_diff_percent = tolerated_deviations.get(&feed_id).unwrap_or(&0.01);
+        let lower_bound = reporter_voted_value - tolerated_difference;
+        let upper_bound = reporter_voted_value + tolerated_difference;
 
-        if reporter_voted_value.abs() < f64::EPSILON {
-            if update_aggregate_value > *tolerated_diff_percent {
-                anyhow::bail!("relative_diff {update_aggregate_value} between reporter_voted_value {reporter_voted_value} and update_aggregate_value {update_aggregate_value} is above {tolerated_diff_percent} for feed_id {feed_id}");
-            }
-        } else {
-            let relative_diff = diff / reporter_voted_value;
-
-            if relative_diff > *tolerated_diff_percent {
-                anyhow::bail!("relative_diff {relative_diff} between reporter_voted_value {reporter_voted_value} and update_aggregate_value {update_aggregate_value} is above {tolerated_diff_percent} for feed_id {feed_id}");
-            }
+        if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
+            let block_height = batch.block_height;
+            let difference = (reporter_voted_value - update_aggregate_value).abs();
+            let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
+            anyhow::bail!("Final answer for feed={feed_id}, block_height={block_height}, deviates more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}");
         }
     }
 
