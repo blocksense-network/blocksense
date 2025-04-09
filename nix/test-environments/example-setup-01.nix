@@ -112,6 +112,7 @@ in
         ink-sepolia = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyADFSContractAddressInk;
+          safe_address = "0x23BC561ea93063B0cD12b6E3c690D40c93e29692";
           contract_version = 2;
           transaction_gas_limit = 20000000;
           impersonated_anvil_account = impersonationAddress;
