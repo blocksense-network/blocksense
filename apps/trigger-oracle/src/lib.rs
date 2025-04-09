@@ -43,8 +43,13 @@ use wasmtime_wasi_http::{
 
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_crypto::JsonSerializableSignature;
-use blocksense_data_feeds::{feeds_processing::VotedFeedUpdate, generate_signature::generate_signature};
-use blocksense_feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
+use blocksense_data_feeds::{
+    feeds_processing::VotedFeedUpdate, generate_signature::generate_signature,
+};
+use blocksense_feed_registry::{
+    registry::SlotTimeTracker,
+    types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData, Repeatability},
+};
 use blocksense_feeds_processing::utils::validate;
 use blocksense_metrics::{
     actix_server::handle_prometheus_metrics,
@@ -498,6 +503,8 @@ impl OracleTrigger {
     ) -> TerminationReason {
         tracing::trace!("Task orchestrator-{} started", oracle_id);
         //TODO(adikov): Implement proper logic and remove dummy values
+        let time_tracker = SlotTimeTracker::new("feed_update".into(), time_interval, 0);
+
         loop {
             REPORTER_BATCH_COUNTER.inc();
             let batch_count = REPORTER_BATCH_COUNTER.get();
@@ -505,7 +512,11 @@ impl OracleTrigger {
                 "Orchestrator-{} entering sleep [batch_count={batch_count}]",
                 oracle_id
             );
-            let _ = sleep(time_interval).await;
+
+            time_tracker
+                .await_end_of_current_slot(&Repeatability::Periodic)
+                .await;
+
             tracing::trace!(
                 "Orchestrator-{} woke up [batch_count={batch_count}]",
                 oracle_id
