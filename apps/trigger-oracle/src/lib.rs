@@ -1,4 +1,7 @@
+mod custom_serde;
+
 use clap::Args;
+use custom_serde::serialize_string_as_json;
 use serde::{Deserialize, Serialize};
 
 use std::{
@@ -127,6 +130,7 @@ pub struct DataFeedSetting {
     pub id: String,
     pub stride: u16,
     pub decimals: u8,
+    #[serde(serialize_with = "serialize_string_as_json")]
     pub data: String,
 }
 
@@ -164,7 +168,7 @@ pub struct OracleTriggerConfig {
     interval_time_in_seconds: Option<u64>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct Component {
     pub id: String,
     pub oracle_settings: HashSet<DataFeedSetting>,
@@ -309,7 +313,10 @@ impl TriggerExecutor for OracleTrigger {
                 );
             }
         }
-        tracing::debug!("Components: {:?}", &components);
+        tracing::debug!(
+            "Components: {}",
+            &serde_json::to_string_pretty(&components).unwrap(),
+        );
         tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
             .queue_components
