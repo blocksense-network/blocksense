@@ -131,9 +131,8 @@ let
   packageWorkspaceMembers =
     let
       cargo-toml = craneLib.cleanCargoToml { cargoToml = "${root}/Cargo.toml"; };
-    in
-    builtins.listToAttrs (
-      builtins.map (
+
+      derivationFromCratePath =
         crate-path:
         let
           absolute-path = "${root}/${crate-path}";
@@ -147,9 +146,13 @@ let
               cargoExtraArgs = "-p ${name}";
             }
           );
-        }
-      ) cargo-toml.workspace.members
-    );
+        };
+      result = builtins.listToAttrs (builtins.map derivationFromCratePath cargo-toml.workspace.members);
+    in
+    result;
+  # builtins.map (member: derivationFromCratePath member) cargo-toml.workspace.members;
+  # builtins.map (member: builtins.isPath ("${root}/${member}")) cargo-toml.workspace.members;
+  # builtins.map (member: builtins.isPath (root + "/${member}")) cargo-toml.workspace.members;
 
   sharedAttrs = {
     pname = "blocksense";
