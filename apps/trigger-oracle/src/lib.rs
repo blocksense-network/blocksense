@@ -826,7 +826,11 @@ impl OracleTrigger {
             )
             .await
             {
-                Ok(()) => (),
+                Ok(_) => {
+                    tracing::info!(
+                        "Validated batch to post to contract: block_height={block_height}"
+                    );
+                }
                 Err(e) => {
                     tracing::error!("Failed to validate second consensus: {}", &e);
                     continue;
