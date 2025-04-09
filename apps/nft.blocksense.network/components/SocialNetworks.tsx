@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 
 import telegramIcon from '/public/icons/telegram.svg';
 import xIcon from '/public/icons/x.svg';
@@ -27,7 +26,7 @@ export const SocialNetworks = () => {
   return (
     <section className="social-networks flex items-center justify-center gap-2">
       {socialNetworks.map(network => (
-        <Link
+        <a
           href={network.url}
           key={network.name}
           className="social-network bg-[var(--gray-dark)] rounded-[0.5rem] w-12 h-12 flex items-center justify-center"
@@ -41,7 +40,7 @@ export const SocialNetworks = () => {
             src={network.icon}
             alt={network.name}
           />
-        </Link>
+        </a>
       ))}
     </section>
   );
