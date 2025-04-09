@@ -11,15 +11,15 @@ config = { path = "../config" }
 utils = { path = "../utils" }
 blocksense-registry = { path = "../registry" }
 
-serde = { version = "1.0.216", features = ["derive"] }
-serde_json = "1.0.137"
-thiserror = "2.0.11"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+thiserror = "2.0.12"
 tracing = { version = "0.1.41", features = ["async-await", "log"] }
-ringbuf = "0.4.7"
-tokio = { version = "1.4.0", features = ["full"] }
+ringbuf = "0.4.8"
+tokio = { version = "1.44.2", features = ["full"] }
 num = { version = "0.4.3", features = ["serde"] }
 futures = "0.3.31"
-anyhow = "1.0.89"
-strum = { version = "0.26.3", features = ["derive"] }
-strum_macros = "0.26.4"
+anyhow = "1.0.97"
+strum = { version = "0.27.1", features = ["derive"] }
+strum_macros = "0.27.1"
 chrono = { workspace = true }

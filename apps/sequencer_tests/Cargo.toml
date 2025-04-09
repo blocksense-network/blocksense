@@ -38,17 +38,17 @@ alloy = { version = "0.11", features = [
 regex = "1.11.1"
 reqwest = { version = "0.12", default-features = false }
 # async
-tokio = { version = "1.4.0", features = ["full"] }
+tokio = { version = "1.44.2", features = ["full"] }
 
 # misc
 eyre = "0.6.12"
-serde = { version = "1.0.216", features = ["derive"]}
+serde = { version = "1.0.219", features = ["derive"]}
 futures = "0.3.31"
 tracing = { version = "0.1.41", features = ["async-await", "log"] }
 url = "2.5.4"
 port_scanner = "0.1.5"
 curl = "0.4.47"
-serde_json = "1.0.137"
+serde_json = "1.0.140"
 json-patch = "4.0.0"
 
 [[bin]]
