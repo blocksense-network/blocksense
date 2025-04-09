@@ -60,5 +60,5 @@ yahoo_finance_api = {"version" = "3.0.0", features = ["blocking"]}
 cmc = "0.4.4"
 fred-rs = "0.1.1"
 weer_api = "0.1.1"
-tokio = "1.39.2"
+tokio = { workspace = true }
 tokio-test = "0.4.4"

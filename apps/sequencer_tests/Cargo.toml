@@ -38,7 +38,7 @@ alloy = { version = "0.11", features = [
 regex = "1.11.1"
 reqwest = { version = "0.12", default-features = false }
 # async
-tokio = { version = "1.4.0", features = ["full"] }
+tokio = { workspace = true }
 
 # misc
 eyre = "0.6.12"

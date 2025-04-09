@@ -47,9 +47,9 @@ gnosis_safe = { path = "../../libs/gnosis_safe" }
 reqwest = { workspace = true }
 # async
 tokio = { workspace = true }
-chrono = { workspace = true }
 
 # misc
+chrono = { workspace = true }
 anyhow = "1"
 eyre = "0.6.12"
 actix-web = "4.6.0"
