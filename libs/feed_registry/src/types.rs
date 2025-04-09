@@ -211,7 +211,15 @@ impl FeedType {
                 let str_val = val.to_string();
                 let val_split: Vec<&str> = str_val.split('.').collect();
 
-                let integer = val_split[0].parse::<BigUint>().unwrap();
+                // BUG: A crash happened on the reporter side. Our guess is that the value was
+                // some of the special values of the floating point standard (IEEE 754).
+                // Left these logs in order to diagnose it later.
+                let integer = match val_split[0].parse::<BigUint>() {
+                    Ok(v) => v,
+                    Err(err) => {
+                        panic!("FeedType::as_bytes error: {err:?}. Value was {val}. Formatted like {str_val:?}");
+                    }
+                };
 
                 let actual_digits_in_fraction: usize;
                 let fraction: BigUint;
