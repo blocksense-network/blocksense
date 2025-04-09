@@ -1,4 +1,5 @@
 {
+  perl,
   lib,
   craneLib,
   pkg-config,
@@ -37,14 +38,14 @@ let
       );
     };
 
-  fileSetForCrateWithDeps =
-    crate-path:
-    lib.fileset.toSource {
-      root = crate-path;
-      fileset = lib.fileset.unions [
-        (craneLib.fileset.commonCargoSources crate-path)
-      ];
-    };
+  # fileSetForCrateWithDeps =
+  #   crate-path:
+  #   lib.fileset.toSource {
+  #     root = crate-path;
+  #     fileset = lib.fileset.unions [
+  #       (craneLib.fileset.commonCargoSources crate-path)
+  #     ];
+  #   };
 
   resolvePackageNameByPath =
     crate-path:
@@ -126,16 +127,22 @@ let
 
     doCheck = false; # TODO: Figure out why it's failing with doCheck
     strictDeps = true;
+
+    preBuild = lib.optionalString stdenv.isLinux ''
+      addAutoPatchelfSearchPath ${libgcc.lib}/lib/
+    '';
   };
+
+  # patchWorkspaceCargoTomlMembers =
 
   packageWorkspaceMembers =
     let
       cargo-toml = craneLib.cleanCargoToml { cargoToml = "${root}/Cargo.toml"; };
 
       derivationFromCratePath =
-        crate-path:
+        relative-crate-path:
         let
-          absolute-path = "${root}/${crate-path}";
+          absolute-path = root + "/${relative-crate-path}";
         in
         rec {
           name = resolvePackageNameByPath absolute-path;
@@ -143,7 +150,26 @@ let
             common-attrs
             // {
               pname = name;
+              src = fileSetForCrate absolute-path;
+              cargoArtifacts = cargo-deps;
               cargoExtraArgs = "-p ${name}";
+              preConfigure = ''
+                ${perl}/bin/perl -0777 -pi -e 's|members = \[.*?\]|members = [ "${
+                  builtins.replaceStrings [ "/" ] [ "\/" ] (
+                    lib.concatStringsSep "\",\\n\"" [
+                      "libs/data_feeds"
+                      "apps/sequencer"
+                      "libs/feeds_processing"
+                      "libs/anomaly_detection"
+                      "libs/config"
+                      "libs/registry"
+                      "libs/utils"
+                      "libs/feed_registry"
+                      "libs/blockchain_data_model"
+                    ]
+                  )
+                }" ]|s' Cargo.toml
+              '';
             }
           );
         };
@@ -154,60 +180,13 @@ let
   # builtins.map (member: builtins.isPath ("${root}/${member}")) cargo-toml.workspace.members;
   # builtins.map (member: builtins.isPath (root + "/${member}")) cargo-toml.workspace.members;
 
-  sharedAttrs = {
-    pname = "blocksense";
-    inherit (filesets.rustSrc) src;
-
-    nativeBuildInputs =
-      [
-        git
-        pkg-config
-      ]
-      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
-      ++ lib.optionals stdenv.isDarwin [
-        # Needed by https://github.com/a1ien/rusb/blob/v0.7.0-libusb1-sys/libusb1-sys/build.rs#L27
-        darwin.DarwinTools
-      ];
-
-    buildInputs =
-      [
-        # Neeeded by alloy-signer-{ledger,trezor,wallet}
-        libusb1
-        openssl
-        zstd
-        rdkafka
-      ]
-      ++ lib.optionals stdenv.isDarwin [
-        iconv
-
-        darwin.apple_sdk.frameworks.Security
-        darwin.apple_sdk.frameworks.AppKit
-
-        # Used by ggml / llama.cpp
-        darwin.apple_sdk.frameworks.Accelerate
-
-        curl
-      ];
-
-    env = {
-      ZSTD_SYS_USE_PKG_CONFIG = true;
-    };
-
-    doCheck = false;
-    strictDeps = true;
-
-    preBuild = lib.optionalString stdenv.isLinux ''
-      addAutoPatchelfSearchPath ${libgcc.lib}/lib/
-    '';
-  };
-
-  cargoDeps = craneLib.buildDepsOnly (sharedAttrs // { name = "blocksense-cargo-deps"; });
+  cargo-deps = craneLib.buildDepsOnly (common-attrs // { name = "blocksense-cargo-deps"; });
 
   blocksense-rs = craneLib.buildPackage (
-    sharedAttrs
+    common-attrs
     // {
       inherit version;
-      cargoArtifacts = cargoDeps;
+      cargoArtifacts = cargo-deps;
     }
   );
 
