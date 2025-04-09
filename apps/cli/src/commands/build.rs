@@ -90,16 +90,9 @@ impl BuildConfig {
     }
 
     async fn read_secrets(config: &mut BlocksenseConfig) -> Result<()> {
-        let secret_key_path = &config.reporter_info.secret_key;
-        let mut secret_key = fs::read_to_string(secret_key_path)
-            .await
-            .context(format!("No such file - {}", &secret_key_path))?;
-        secret_key = secret_key
-            .strip_suffix(&"\n")
-            .unwrap_or(&secret_key)
-            .to_string();
-        tracing::info!("Secret key {:?}", &secret_key);
-        config.reporter_info.secret_key = secret_key;
+        replace_filepath_with_content(&mut config.reporter_info.secret_key).await?;
+        replace_filepath_with_content(&mut config.reporter_info.second_consensus_secret_key)
+            .await?;
 
         for capability in config.capabilities.iter_mut() {
             let api_key_path = &capability
@@ -184,4 +177,12 @@ impl BuildConfig {
 
         Ok(())
     }
+}
+
+async fn replace_filepath_with_content(filepath: &mut String) -> Result<()> {
+    let content = fs::read_to_string(&filepath)
+        .await
+        .context(format!("No such file - {}", &filepath))?;
+    *filepath = content.trim().to_string();
+    Ok(())
 }
