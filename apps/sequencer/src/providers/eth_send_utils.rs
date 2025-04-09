@@ -155,7 +155,6 @@ pub async fn get_serialized_updates_for_network(
             *feed_id,
             FeedStrideAndDecimals::from_feed_config(&feed_config),
         );
-        drop(feed_config);
     }
 
     let serialized_updates = match contract_version {
