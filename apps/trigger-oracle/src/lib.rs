@@ -714,40 +714,8 @@ impl OracleTrigger {
             let mut batch_payload = vec![];
             for oracle::DataFeedResult { id, value } in payload.values {
                 let result = match value {
-                    oracle::DataFeedResultValue::Numerical(value) => {
-                        let feed = FeedType::Numerical(value);
-                        if let Ok(feed_id) = id.parse::<u32>() {
-                            latest_votes
-                                .write()
-                                .await
-                                .entry(feed_id)
-                                .or_insert_with(|| VotedFeedUpdate {
-                                    feed_id,
-                                    value: feed.clone(),
-                                    end_slot_timestamp: timestamp,
-                                });
-                            Ok(feed)
-                        } else {
-                            Err(FeedError::APIError(format!("Id cannot be parsed - {}", id)))
-                        }
-                    }
-                    oracle::DataFeedResultValue::Text(value) => {
-                        let feed = FeedType::Text(value);
-                        if let Ok(feed_id) = id.parse::<u32>() {
-                            latest_votes
-                                .write()
-                                .await
-                                .entry(feed_id)
-                                .or_insert_with(|| VotedFeedUpdate {
-                                    feed_id,
-                                    value: feed.clone(),
-                                    end_slot_timestamp: timestamp,
-                                });
-                            Ok(feed)
-                        } else {
-                            Err(FeedError::APIError(format!("Id cannot be parsed - {}", id)))
-                        }
-                    }
+                    oracle::DataFeedResultValue::Numerical(value) => Ok(FeedType::Numerical(value)),
+                    oracle::DataFeedResultValue::Text(value) => Ok(FeedType::Text(value)),
                     oracle::DataFeedResultValue::Error(error_string) => {
                         Err(FeedError::APIError(error_string))
                     }
@@ -757,6 +725,7 @@ impl OracleTrigger {
                         continue;
                     }
                 };
+
                 let signature =
                     generate_signature(&secret_key, id.as_str(), timestamp, &result).unwrap();
 
@@ -789,6 +758,9 @@ impl OracleTrigger {
                     let status = res.status();
                     let contents = res.text().await.unwrap();
                     tracing::trace!("Sequencer responded with status={status} and text={contents}",);
+
+                    let mut latest_votes = latest_votes.write().await;
+                    update_latest_votes(&mut latest_votes, batch_payload);
                 }
                 Err(e) => {
                     //TODO(adikov): Add code from the error - e.status()
@@ -1050,5 +1022,25 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
         Ok(HostFutureIncomingResponse::Pending(
             wasmtime_wasi::runtime::spawn(response_handle),
         ))
+    }
+}
+
+fn update_latest_votes(
+    latest_votes: &mut HashMap<u32, VotedFeedUpdate>,
+    batch: Vec<DataFeedPayload>,
+) {
+    for vote in batch {
+        let feed_id = vote.payload_metadata.feed_id.parse().unwrap();
+
+        if let Ok(value) = vote.result {
+            _ = latest_votes.insert(
+                feed_id,
+                VotedFeedUpdate {
+                    feed_id,
+                    value,
+                    end_slot_timestamp: vote.payload_metadata.timestamp,
+                },
+            );
+        }
     }
 }
