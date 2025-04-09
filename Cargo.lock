@@ -2161,6 +2161,7 @@ dependencies = [
  "blocksense-registry",
  "blocksense-utils",
  "hex",
+ "itertools 0.14.0",
  "once_cell",
  "ringbuf",
  "serde 1.0.217",
