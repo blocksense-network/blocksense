@@ -149,10 +149,11 @@ let
           value = craneLib.buildPackage (
             common-attrs
             // {
-              pname = name;
+              inherit name;
               src = fileSetForCrate absolute-path;
               cargoArtifacts = cargo-deps;
-              cargoExtraArgs = "-p ${name}";
+              CARGO_PROFILE = "dev";
+              cargoExtraArgs = "--package ${name}";
               preConfigure = ''
                 ${perl}/bin/perl -0777 -pi -e 's|members = \[.*?\]|members = [ "${
                   builtins.replaceStrings [ "/" ] [ "\/" ] (
@@ -185,6 +186,7 @@ let
   blocksense-rs = craneLib.buildPackage (
     common-attrs
     // {
+      pname = "blocksense-rs";
       inherit version;
       cargoArtifacts = cargo-deps;
     }
