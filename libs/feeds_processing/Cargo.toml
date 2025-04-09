@@ -45,3 +45,4 @@ alloy-primitives = { workspace = true }
 anyhow = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
+itertools = "0.14.0"
