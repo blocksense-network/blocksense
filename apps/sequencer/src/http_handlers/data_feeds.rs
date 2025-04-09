@@ -17,7 +17,7 @@ use blocksense_feed_registry::types::{
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
-use tracing::{debug, error, info, info_span, trace, warn};
+use tracing::{debug, error, info, info_span, warn};
 use uuid::Uuid;
 
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
@@ -113,11 +113,9 @@ async fn process_report(
         }
     };
 
-    trace!(
+    debug!(
         "data_feed = {:?}; feed_id = {:?}; reporter_id = {:?}",
-        data_feed,
-        feed_id,
-        reporter_id
+        data_feed, feed_id, reporter_id
     );
     let feed = {
         let reg = sequencer_state.registry.read().await;
