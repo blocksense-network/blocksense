@@ -19,7 +19,7 @@
 }:
 let
   root = ../../..;
-  src = craneLib.cleanCargoSource root;
+  # src = craneLib.cleanCargoSource root;
 
   # localDepsFileSetForCrate = crate-path:{}
 
@@ -27,13 +27,14 @@ let
     crate-path:
     lib.fileset.toSource {
       inherit root;
-      fileset = lib.fileset.unions [
-        # (root + ./Cargo.toml)
-        # (root + ./Cargo.lock)
-        (craneLib.fileset.commonCargoSources crate-path)
-        # (localDepsFileSetForCrate crate-path)
-      ];
-
+      fileset = lib.fileset.unions (
+        [
+          (root + /Cargo.toml)
+          (root + /Cargo.lock)
+          (craneLib.fileset.commonCargoSources crate-path)
+        ]
+        ++ (builtins.attrValues (resolveTransitiveLocalDependencies crate-path))
+      );
     };
 
   fileSetForCrateWithDeps =
@@ -83,6 +84,50 @@ let
     in
     local-dependencies-resolved-aliases;
 
+  common-attrs = {
+    inherit (filesets.rustSrc) src;
+
+    nativeBuildInputs =
+      [
+        git
+        pkg-config
+      ]
+      ++ lib.optionals stdenv.isLinux [ autoPatchelfHook ]
+      ++ lib.optionals stdenv.isDarwin [
+        # Needed by https://github.com/a1ien/rusb/blob/v0.7.0-libusb1-sys/libusb1-sys/build.rs#L27
+        darwin.DarwinTools
+      ];
+
+    buildInputs =
+      [
+        # Neeeded by alloy-signer-{ledger,trezor,wallet}
+        libusb1
+        openssl
+        zstd
+        rdkafka
+      ]
+      ++ lib.optionals stdenv.isDarwin [
+        iconv
+
+        darwin.apple_sdk.frameworks.Security
+        darwin.apple_sdk.frameworks.AppKit
+
+        # Used by ggml / llama.cpp
+        darwin.apple_sdk.frameworks.Accelerate
+
+        curl
+      ];
+
+    env = {
+      ZSTD_SYS_USE_PKG_CONFIG = true;
+    };
+
+    doInstallCargoArtifacts = true;
+
+    doCheck = false; # TODO: Figure out why it's failing with doCheck
+    strictDeps = true;
+  };
+
   packageWorkspaceMembers =
     let
       cargo-toml = craneLib.cleanCargoToml { cargoToml = "${root}/Cargo.toml"; };
@@ -93,14 +138,22 @@ let
         let
           absolute-path = "${root}/${crate-path}";
         in
-        lib.nameValuePair (resolvePackageNameByPath absolute-path) absolute-path
+        rec {
+          name = resolvePackageNameByPath absolute-path;
+          value = craneLib.buildPackage (
+            common-attrs
+            // {
+              pname = name;
+              cargoExtraArgs = "-p ${name}";
+            }
+          );
+        }
       ) cargo-toml.workspace.members
     );
 
   sharedAttrs = {
     pname = "blocksense";
     inherit (filesets.rustSrc) src;
-    # inherit src;
 
     nativeBuildInputs =
       [
@@ -168,6 +221,7 @@ let
   # testing = resolveLocalDependencies (root + /. + "/apps/sequencer");
   # testing = resolveLocalDependencies (root + "/libs/feeds_processing");
   # testing = resolveTransitiveLocalDependencies (root + "/apps/sequencer");
+  # testing = fileSetForCrate (root + "/libs/feeds_processing");
   testing = packageWorkspaceMembers;
 in
 {
