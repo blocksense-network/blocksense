@@ -32,13 +32,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        media: '(prefers-color-scheme: dark)',
-        url: '/images/nft-favicon.png',
-        type: 'image/png',
-      },
-      {
-        media: '(prefers-color-scheme: light)',
-        url: '/images/nft-favicon.png',
+        rel: 'icon',
+        url: '/icons/blocksense-favicon-dark.png',
         type: 'image/png',
       },
     ],
@@ -77,7 +72,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
           content="Explore exclusive NFT drops and mint your NFTs on Blocksense. Join the digital revolution today."
         />
         <meta name="twitter:image" content="/images/nft-og.png" />
-        <link rel="icon" href="/images/nft-favicon.png" type="image/png" />
       </NextHead>
       <body className="nft-drop-layout__body md:px-4 lg:px-30  dark:text-neutral-300">
         {/* ToDo: Replace header below with Header component */}
