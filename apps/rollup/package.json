@@ -24,7 +24,7 @@
     "rollup-plugin-string-import": "^1.2.5",
     "rollup-plugin-typescript2": "^0.36.0",
     "tslib": "^2.8.1",
-    "typescript": "5.2.2"
+    "typescript": "5.5.4"
   },
   "bin": {
     "rollup-bundle": "bundle.mjs"

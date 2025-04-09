@@ -1829,7 +1829,7 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.26.0"
     "@types/node": "npm:^22.10.2"
     tslib: "npm:^2.8.1"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
     vite: "npm:^6.0.7"
     vitest: "npm:^3.0.2"
   languageName: unknown
@@ -1843,7 +1843,7 @@ __metadata:
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
     tsx: "npm:^4.19.2"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
     vitest: "npm:^3.0.2"
   languageName: unknown
   linkType: soft
@@ -1857,7 +1857,7 @@ __metadata:
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
     tsx: "npm:^4.19.2"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
     vitest: "npm:^3.0.2"
   languageName: unknown
   linkType: soft
@@ -1918,7 +1918,7 @@ __metadata:
     keccak: "npm:^3.0.4"
     keccak256: "npm:^1.0.6"
     tsx: "npm:^4.19.2"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
     vitest: "npm:^3.0.2"
     web3: "npm:^4.16.0"
     yahoo-finance2: "npm:^2.13.2"
@@ -1959,7 +1959,7 @@ __metadata:
     tailwindcss-animate: "npm:^1.0.7"
     tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
     vaul: "npm:^1.1.2"
     vitest: "npm:^3.0.2"
   languageName: unknown
@@ -1983,7 +1983,7 @@ __metadata:
     react-dom: "npm:^18.3.1"
     tailwindcss: "npm:^4.0.7"
     tsx: "npm:^4.19.2"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
   languageName: unknown
   linkType: soft
 
@@ -1995,7 +1995,7 @@ __metadata:
     prettier: "npm:^3.4.2"
     react: "npm:^18.3.1"
     ts-node: "npm:^10.9.2"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
     wrangler: "npm:^3.109.2"
   dependenciesMeta:
     "@openzeppelin/contracts@5.0.2":
@@ -2028,7 +2028,7 @@ __metadata:
     scroll-into-view-if-needed: "npm:^3.1.0"
     tailwindcss: "npm:^4.0.7"
     tsup: "npm:8.3.5"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
     vitest: "npm:^3.0.0"
     zod: "npm:^3.22.3"
     zod-validation-error: "npm:^3.0.0"
@@ -2063,7 +2063,7 @@ __metadata:
     tailwindcss-animate: "npm:^1.0.7"
     tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
   languageName: unknown
   linkType: soft
 
@@ -2101,7 +2101,7 @@ __metadata:
     rollup-plugin-string-import: "npm:^1.2.5"
     rollup-plugin-typescript2: "npm:^0.36.0"
     tslib: "npm:^2.8.1"
-    typescript: "npm:5.2.2"
+    typescript: "npm:5.5.4"
   bin:
     rollup-bundle: bundle.mjs
   languageName: unknown
@@ -2120,7 +2120,7 @@ __metadata:
     solidity-ast: "npm:^0.4.59"
     ts-node: "npm:^10.9.2"
     tsx: "npm:^4.19.2"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
     web3-types: "npm:^1.10.0"
   languageName: unknown
   linkType: soft
@@ -13371,7 +13371,7 @@ __metadata:
     babel-plugin-react-compiler: "npm:0.0.0-experimental-22c6e49-20241219"
     react-compiler-webpack: "npm:0.1.2"
     tsup: "npm:8.3.5"
-    typescript: "npm:^5.5.4"
+    typescript: "npm:5.5.4"
   languageName: unknown
   linkType: soft
 
@@ -25142,17 +25142,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.2.2":
-  version: 5.2.2
-  resolution: "typescript@npm:5.2.2"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10c0/91ae3e6193d0ddb8656d4c418a033f0f75dec5e077ebbc2bd6d76439b93f35683936ee1bdc0e9cf94ec76863aa49f27159b5788219b50e1cd0cd6d110aa34b07
-  languageName: node
-  linkType: hard
-
-"typescript@npm:^5.5.4":
+"typescript@npm:5.5.4":
   version: 5.5.4
   resolution: "typescript@npm:5.5.4"
   bin:
@@ -25162,17 +25152,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.2.2#optional!builtin<compat/typescript>":
-  version: 5.2.2
-  resolution: "typescript@patch:typescript@npm%3A5.2.2#optional!builtin<compat/typescript>::version=5.2.2&hash=f3b441"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 10c0/062c1cee1990e6b9419ce8a55162b8dc917eb87f807e4de0327dbc1c2fa4e5f61bc0dd4e034d38ff541d1ed0479b53bcee8e4de3a4075c51a1724eb6216cb6f5
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@npm%3A^5.5.4#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>":
   version: 5.5.4
   resolution: "typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"
   bin:
