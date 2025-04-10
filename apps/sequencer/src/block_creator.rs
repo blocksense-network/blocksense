@@ -1,17 +1,18 @@
 use actix_web::web::Data;
 use alloy::hex;
-use blockchain_data_model::in_mem_db::InMemDb;
-use blockchain_data_model::{
+use blocksense_blockchain_data_model::in_mem_db::InMemDb;
+use blocksense_blockchain_data_model::{
     MAX_ASSET_FEED_UPDATES_IN_BLOCK, MAX_FEED_ID_TO_DELETE_IN_BLOCK, MAX_NEW_FEEDS_IN_BLOCK,
 };
-use blocksense_registry::config::FeedConfig;
-use config::BlockConfig;
-use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
-use feed_registry::feed_registration_cmds::{
+use blocksense_config::BlockConfig;
+use blocksense_data_feeds::feeds_processing::VotedFeedUpdateWithProof;
+use blocksense_feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
-use feed_registry::registry::SlotTimeTracker;
-use feed_registry::types::Repeatability;
+use blocksense_feed_registry::registry::SlotTimeTracker;
+use blocksense_feed_registry::types::Repeatability;
+use blocksense_registry::config::FeedConfig;
+use blocksense_utils::time::{current_unix_time, system_time_to_millis};
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use serde_json::json;
@@ -23,11 +24,10 @@ use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::sync::RwLock;
 use tokio::time::Duration;
 use tracing::{debug, error, info, info_span, warn};
-use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::feeds::feed_config_conversions::feed_config_to_block;
 use crate::sequencer_state::SequencerState;
-use data_feeds::feeds_processing::BatchedAggegratesToSend;
+use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
 
 pub async fn block_creator_loop(
     sequencer_state: Data<SequencerState>,
@@ -339,12 +339,12 @@ async fn generate_block(
 #[cfg(test)]
 mod tests {
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
-    use config::get_test_config_with_no_providers;
-    use config::AllFeedsConfig;
-    use config::BlockConfig;
-    use data_feeds::feeds_processing::VotedFeedUpdate;
-    use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
-    use feed_registry::types::{FeedType, Timestamp};
+    use blocksense_config::get_test_config_with_no_providers;
+    use blocksense_config::AllFeedsConfig;
+    use blocksense_config::BlockConfig;
+    use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
+    use blocksense_data_feeds::feeds_processing::VotedFeedUpdateWithProof;
+    use blocksense_feed_registry::types::{FeedType, Timestamp};
     use std::time::Duration;
     use tokio::sync::mpsc;
     use tokio::time;

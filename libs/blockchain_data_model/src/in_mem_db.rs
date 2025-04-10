@@ -3,12 +3,12 @@ use crate::{
     MAX_NEW_FEEDS_IN_BLOCK,
 };
 use anyhow::Result;
+use blocksense_utils::time::current_unix_time;
 use hex::FromHex;
 use hex_literal::hex;
 use ssz_rs::{Node, SimpleSerialize};
 use std::collections::HashMap;
 use tracing::error;
-use utils::time::current_unix_time;
 
 const GENESIS_HASH: HashType =
     hex!("ec59d3d7860eadc9207b6ccf7c897b23b6b8e82d3d4b80212dfebc15a6b16b17");

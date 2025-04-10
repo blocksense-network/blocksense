@@ -6,15 +6,15 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
-data_feeds = { workspace = true }
-feeds_processing = { workspace = true }
-anomaly_detection = { workspace = true }
-config = { workspace = true }
+blocksense-data-feeds = { workspace = true }
+blocksense-feeds-processing = { workspace = true }
+blocksense-anomaly-detection = { workspace = true }
+blocksense-config = { workspace = true }
 blocksense-registry = { workspace = true }
-crypto = { workspace = true }
-utils = { workspace = true }
-feed_registry = { workspace = true }
-blockchain_data_model = { workspace = true }
+blocksense-crypto = { workspace = true }
+blocksense-utils = { workspace = true }
+blocksense-feed-registry = { workspace = true }
+blocksense-blockchain-data-model = { workspace = true }
 
 alloy = { workspace = true, features = [
     "sol-types",
@@ -42,7 +42,7 @@ alloy = { workspace = true, features = [
 alloy-primitives = { workspace = true }
 
 blocksense-metrics = { workspace = true }
-gnosis_safe = { workspace = true }
+blocksense-gnosis-safe = { workspace = true }
 
 reqwest = { workspace = true }
 # async

@@ -1,9 +1,9 @@
 use std::sync::Mutex;
 
 use actix_web::{web, App, HttpServer};
+use blocksense_utils::get_env_var;
 use prometheus::TextEncoder;
 use reqwest::Client;
-use utils::get_env_var;
 
 use crate::{
     metrics::BUILD_INFO,

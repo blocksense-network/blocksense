@@ -1,6 +1,6 @@
-use gnosis_safe::data_types::ConsensusSecondRoundBatch;
-use gnosis_safe::data_types::ReporterResponse;
-use gnosis_safe::utils::{SafeTx, SignatureWithAddress};
+use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
+use blocksense_gnosis_safe::data_types::ReporterResponse;
+use blocksense_gnosis_safe::utils::{SafeTx, SignatureWithAddress};
 use std::collections::{HashMap, VecDeque};
 use tracing::{debug, error, warn};
 

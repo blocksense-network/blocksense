@@ -3,9 +3,9 @@ use std::io::IsTerminal;
 use anyhow::*;
 
 use blocksense_cli::commands::{dev::DevCommands, node::NodeCommands};
+use blocksense_utils::build_info::BuildInfo;
 use clap::Parser;
 use lazy_static::lazy_static;
-use utils::build_info::BuildInfo;
 lazy_static! {
     pub static ref BUILD_INFO: BuildInfo = BuildInfo::default();
     pub static ref BUILD_INFO_STR: String =

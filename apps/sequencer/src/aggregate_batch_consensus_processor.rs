@@ -1,18 +1,18 @@
 use actix_web::web::Data;
 use alloy::hex::ToHexExt;
-use config::BlockConfig;
-use feed_registry::{registry::SlotTimeTracker, types::Repeatability};
-use gnosis_safe::data_types::ReporterResponse;
-use gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
+use blocksense_config::BlockConfig;
+use blocksense_feed_registry::{registry::SlotTimeTracker, types::Repeatability};
+use blocksense_gnosis_safe::data_types::ReporterResponse;
+use blocksense_gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
+use blocksense_utils::time::{current_unix_time, system_time_to_millis};
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, trace};
-use utils::time::{current_unix_time, system_time_to_millis};
 
 use crate::providers::provider::GNOSIS_SAFE_CONTRACT_NAME;
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
+use blocksense_gnosis_safe::utils::SafeMultisig;
 use futures_util::stream::{FuturesUnordered, StreamExt};
-use gnosis_safe::utils::SafeMultisig;
 use std::{io::Error, time::Duration};
 
 pub async fn aggregation_batch_consensus_loop(

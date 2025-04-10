@@ -5,8 +5,9 @@ use std::{
 };
 
 use crate::types::{DataFeedPayload, FeedMetaData, FeedType, Repeatability, Timestamp};
+use blocksense_config::AllFeedsConfig;
+use blocksense_utils::time::current_unix_time;
 use chrono::{DateTime, TimeZone, Utc};
-use config::AllFeedsConfig;
 use ringbuf::{
     storage::Heap,
     traits::{Consumer, RingBuffer},
@@ -16,7 +17,6 @@ use serde::{ser::SerializeMap, Deserialize, Serialize, Serializer};
 use std::time::UNIX_EPOCH;
 use tokio::{sync::RwLock, time};
 use tracing::{debug, info};
-use utils::time::current_unix_time;
 
 /// Map representing feed_id -> FeedMetaData
 #[derive(Debug)]
@@ -394,7 +394,7 @@ pub async fn await_time(time_to_await_ms: u64) {
 
 #[cfg(test)]
 mod tests {
-    use utils::time::current_unix_time;
+    use blocksense_utils::time::current_unix_time;
 
     use crate::registry::new_feeds_meta_data_reg_with_test_data;
     use crate::registry::AllFeedsReports;

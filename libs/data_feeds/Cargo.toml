@@ -1,5 +1,5 @@
 [package]
-name = "data_feeds"
+name = "blocksense-data-feeds"
 version.workspace = true
 authors.workspace = true
 license.workspace = true
@@ -7,10 +7,10 @@ edition.workspace = true
 
 
 [dependencies]
-utils = { workspace = true }
-crypto = { workspace = true }
-feed_registry = { workspace = true }
-config = { workspace = true }
+blocksense-utils = { workspace = true }
+blocksense-crypto = { workspace = true }
+blocksense-feed-registry = { workspace = true }
+blocksense-config = { workspace = true }
 
 log = { workspace = true }
 anyhow = { workspace = true }

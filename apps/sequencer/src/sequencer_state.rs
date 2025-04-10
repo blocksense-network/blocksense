@@ -5,18 +5,20 @@ use crate::providers::provider::SharedRpcProviders;
 use crate::providers::provider::{init_shared_rpc_providers, RpcProvider};
 use crate::reporters::reporter::init_shared_reporters;
 use crate::reporters::reporter::SharedReporters;
-use blockchain_data_model::in_mem_db::InMemDb;
+use blocksense_blockchain_data_model::in_mem_db::InMemDb;
+use blocksense_config::{AllFeedsConfig, SequencerConfig};
+use blocksense_data_feeds::feeds_processing::VotedFeedUpdateWithProof;
+use blocksense_feed_registry::feed_registration_cmds::FeedsManagementCmds;
+use blocksense_feed_registry::registry::new_feeds_meta_data_reg_from_config;
+use blocksense_feed_registry::registry::{
+    AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry,
+};
+use blocksense_gnosis_safe::data_types::ReporterResponse;
+use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use blocksense_metrics::metrics::FeedsMetrics;
 use blocksense_registry::config::FeedConfig;
-use config::AllFeedsConfig;
-use config::SequencerConfig;
-use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
+use blocksense_utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 use eyre::eyre;
-use feed_registry::feed_registration_cmds::FeedsManagementCmds;
-use feed_registry::registry::new_feeds_meta_data_reg_from_config;
-use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, FeedMetaDataRegistry};
-use gnosis_safe::data_types::ReporterResponse;
-use gnosis_safe::utils::SignatureWithAddress;
 use rdkafka::producer::FutureProducer;
 use rdkafka::ClientConfig;
 use std::collections::HashMap;
@@ -25,7 +27,6 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::sync::Mutex;
 use tokio::sync::RwLock;
-use utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 
 pub struct SequencerState {
     pub registry: Arc<RwLock<FeedMetaDataRegistry>>,

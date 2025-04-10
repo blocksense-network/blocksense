@@ -4,7 +4,7 @@ use prometheus::{
     IntGaugeVec,
 };
 
-use utils::build_info::{
+use blocksense_utils::build_info::{
     BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
     VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
 };

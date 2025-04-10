@@ -1,25 +1,25 @@
 use crate::reporters::reporter::SharedReporters;
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
-use blocksense_metrics::{inc_metric, metrics::FeedsMetrics};
-use data_feeds::feeds_processing::{
+use blocksense_data_feeds::feeds_processing::{
     DoSkipReason, DontSkipReason, SkipDecision, VotedFeedUpdateWithProof,
 };
-use eyre::{eyre, ContextCompat, Result};
-use feed_registry::aggregate::FeedAggregate;
-use feed_registry::feed_registration_cmds::ProcessorResultValue;
-use feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, SlotTimeTracker};
-use feed_registry::types::{
+use blocksense_feed_registry::feed_registration_cmds::ProcessorResultValue;
+use blocksense_feed_registry::registry::{AllFeedsReports, FeedAggregateHistory, SlotTimeTracker};
+use blocksense_feed_registry::types::{
     FeedMetaData, FeedType, FeedsSlotProcessorCmds, Repeatability, Timestamp,
 };
-use feeds_processing::utils::{consume_reports, ConsumedReports};
+use blocksense_feed_registry::{aggregate::FeedAggregate, registry::FeedReports};
+use blocksense_feeds_processing::utils::{consume_reports, ConsumedReports};
+use blocksense_metrics::{inc_metric, metrics::FeedsMetrics};
+use blocksense_utils::time::current_unix_time;
+use eyre::{eyre, ContextCompat, Result};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc;
 use tokio::sync::RwLock;
 use tracing::error;
 use tracing::{debug, info};
-use utils::time::current_unix_time;
 
 pub struct FeedSlotsProcessor {
     name: String,
@@ -46,16 +46,15 @@ impl FeedSlotsProcessor {
         &self,
         feed_id: u32,
         reports: &Arc<RwLock<AllFeedsReports>>,
-    ) -> Option<Arc<RwLock<feed_registry::registry::FeedReports>>> {
+    ) -> Option<Arc<RwLock<FeedReports>>> {
         debug!("Get a read lock on all reports [feed {feed_id}]");
-        let result: Option<Arc<RwLock<feed_registry::registry::FeedReports>>> =
-            match reports.read().await.get(feed_id) {
-                Some(x) => Some(x),
-                None => {
-                    info!("No reports found!");
-                    None
-                }
-            };
+        let result: Option<Arc<RwLock<FeedReports>>> = match reports.read().await.get(feed_id) {
+            Some(x) => Some(x),
+            None => {
+                info!("No reports found!");
+                None
+            }
+        };
         debug!("Release the read lock on all reports [feed {feed_id}]");
         result
     }
@@ -373,17 +372,17 @@ pub mod tests {
 
     use super::*;
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
-    use config::AllFeedsConfig;
-    use config::Reporter;
-    use config::{get_test_config_with_single_provider, test_feed_config};
-    use feed_registry::registry::AllFeedsReports;
-    use feed_registry::types::test_payload_from_result;
-    use feed_registry::types::FeedMetaData;
+    use blocksense_config::AllFeedsConfig;
+    use blocksense_config::Reporter;
+    use blocksense_config::{get_test_config_with_single_provider, test_feed_config};
+    use blocksense_feed_registry::registry::AllFeedsReports;
+    use blocksense_feed_registry::types::test_payload_from_result;
+    use blocksense_feed_registry::types::FeedMetaData;
+    use blocksense_utils::test_env::get_test_private_key_path;
     use std::sync::Arc;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::RwLock;
     use tokio::time::error::Elapsed;
-    use utils::test_env::get_test_private_key_path;
 
     pub fn check_received(
         received: Result<Option<VotedFeedUpdateWithProof>, Elapsed>,

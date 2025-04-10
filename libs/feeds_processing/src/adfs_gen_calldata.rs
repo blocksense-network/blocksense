@@ -1,11 +1,11 @@
 use alloy::hex;
 use alloy_primitives::U256;
 use anyhow::Result;
-use config::FeedStrideAndDecimals;
-use data_feeds::feeds_processing::BatchedAggegratesToSend;
+use blocksense_config::FeedStrideAndDecimals;
+use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
+use blocksense_utils::{from_hex_string, to_hex_string};
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap, HashSet};
-use utils::{from_hex_string, to_hex_string};
 
 use tracing::{error, info};
 
@@ -248,8 +248,8 @@ pub fn get_neighbour_feed_ids(feed_id: u32) -> Vec<u32> {
 
 #[cfg(test)]
 pub mod tests {
-    use data_feeds::feeds_processing::VotedFeedUpdate;
-    use feed_registry::types::FeedType;
+    use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
+    use blocksense_feed_registry::types::FeedType;
 
     use super::*;
 

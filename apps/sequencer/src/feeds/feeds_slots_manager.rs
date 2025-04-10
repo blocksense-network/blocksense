@@ -1,12 +1,12 @@
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::sequencer_state::SequencerState;
 use actix_web::web;
-use blocksense_registry::config::FeedConfig;
-use eyre::Result;
-use feed_registry::feed_registration_cmds::{
+use blocksense_feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, ProcessorResultValue, RegisterNewAssetFeed,
 };
-use feed_registry::types::{FeedMetaData, FeedsSlotProcessorCmds::Terminate};
+use blocksense_feed_registry::types::{FeedMetaData, FeedsSlotProcessorCmds::Terminate};
+use blocksense_registry::config::FeedConfig;
+use eyre::Result;
 use futures::select;
 use futures::stream::{FuturesUnordered, StreamExt};
 use std::io::Error;
@@ -357,14 +357,14 @@ async fn read_next_feed_slots_manager_cmd(
 mod tests {
     use super::*;
     use crate::providers::provider::init_shared_rpc_providers;
-    use config::{test_feed_config, AllFeedsConfig, SequencerConfig};
-    use feed_registry::types::{test_payload_from_result, FeedType};
+    use blocksense_config::{test_feed_config, AllFeedsConfig, SequencerConfig};
+    use blocksense_feed_registry::types::{test_payload_from_result, FeedType};
     use std::time::Duration;
 
-    use config::get_test_config_with_no_providers;
+    use blocksense_config::get_test_config_with_no_providers;
 
     use crate::feeds::feed_slots_processor::tests::check_received;
-    use utils::logging::init_shared_logging_handle;
+    use blocksense_utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
     async fn test_feed_slots_manager_loop() {

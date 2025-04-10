@@ -1,5 +1,5 @@
 [package]
-name = "feeds_processing"
+name = "blocksense-feeds-processing"
 version.workspace = true
 authors.workspace = true
 license.workspace = true
@@ -7,13 +7,13 @@ edition.workspace = true
 
 [dependencies]
 blocksense-registry = { workspace = true }
-anomaly_detection = { workspace = true }
-feed_registry = { workspace = true }
-data_feeds = { workspace = true }
-config = { workspace = true }
-utils = { workspace = true }
-gnosis_safe = { workspace = true }
-crypto = { workspace = true }
+blocksense-anomaly-detection = { workspace = true }
+blocksense-feed-registry = { workspace = true }
+blocksense-data-feeds = { workspace = true }
+blocksense-config = { workspace = true }
+blocksense-utils = { workspace = true }
+blocksense-gnosis-safe = { workspace = true }
+blocksense-crypto = { workspace = true }
 once_cell = { workspace = true }
 hex = { workspace = true }
 ringbuf = { workspace = true }
