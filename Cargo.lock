@@ -2147,6 +2147,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "blocksense-metrics"
+version = "0.1.1"
+dependencies = [
+ "actix-web",
+ "anyhow",
+ "lazy_static 1.5.0",
+ "prometheus",
+ "reqwest 0.12.12",
+ "utils",
+]
+
+[[package]]
 name = "blocksense-registry"
 version = "0.1.1"
 dependencies = [
@@ -3402,7 +3414,7 @@ dependencies = [
  "fred-rs",
  "http 1.2.0",
  "log",
- "prometheus 0.1.1",
+ "prometheus",
  "rand 0.8.5",
  "reqwest 0.12.12",
  "ringbuf",
@@ -4174,6 +4186,7 @@ dependencies = [
  "alloy-primitives",
  "anomaly_detection",
  "anyhow",
+ "blocksense-metrics",
  "blocksense-registry",
  "config 0.1.1",
  "crypto",
@@ -4182,7 +4195,6 @@ dependencies = [
  "gnosis_safe",
  "hex",
  "once_cell",
- "prometheus 0.1.1",
  "ringbuf",
  "serde 1.0.217",
  "serde_json",
@@ -7837,18 +7849,6 @@ dependencies = [
 
 [[package]]
 name = "prometheus"
-version = "0.1.1"
-dependencies = [
- "actix-web",
- "anyhow",
- "lazy_static 1.5.0",
- "prometheus 0.13.4",
- "reqwest 0.12.12",
- "utils",
-]
-
-[[package]]
-name = "prometheus"
 version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d33c28a30771f7f96db69893f78b857f7450d7e0237e9c8fc6427a81bae7ed1"
@@ -9270,6 +9270,7 @@ dependencies = [
  "anyhow",
  "async-channel 2.3.1",
  "blockchain_data_model",
+ "blocksense-metrics",
  "blocksense-registry",
  "bytes 1.9.0",
  "chrono",
@@ -9287,7 +9288,6 @@ dependencies = [
  "gnosis_safe",
  "once_cell",
  "paste",
- "prometheus 0.1.1",
  "rand 0.8.5",
  "rdkafka",
  "regex",
@@ -11305,6 +11305,7 @@ name = "trigger-oracle"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "blocksense-metrics",
  "clap 3.2.25",
  "crypto",
  "data_feeds",
@@ -11315,7 +11316,6 @@ dependencies = [
  "is-terminal",
  "log",
  "outbound-http",
- "prometheus 0.1.1",
  "reqwest 0.12.12",
  "serde 1.0.217",
  "serde_json",

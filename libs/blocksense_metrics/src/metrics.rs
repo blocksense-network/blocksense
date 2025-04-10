@@ -1,4 +1,4 @@
-use prometheus_framework::{
+use prometheus::{
     labels, opts, register_counter, register_int_counter, register_int_counter_vec,
     register_int_gauge, register_int_gauge_vec, Counter, IntCounter, IntCounterVec, IntGauge,
     IntGaugeVec,

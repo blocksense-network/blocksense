@@ -21,14 +21,15 @@ use crate::{
     },
     sequencer_state::SequencerState,
 };
+use blocksense_metrics::{
+    inc_metric, inc_vec_metric, metrics::FeedsMetrics, process_provider_getter, set_metric,
+};
 use feed_registry::types::{Repeatability, Repeatability::Periodic};
 use feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
 use futures::stream::FuturesUnordered;
 use paste::paste;
-use prometheus::{inc_metric, inc_vec_metric, set_metric};
-use prometheus::{metrics::FeedsMetrics, process_provider_getter};
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
 
