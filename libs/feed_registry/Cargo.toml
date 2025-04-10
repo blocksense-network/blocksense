@@ -18,8 +18,10 @@ tracing = { workspace = true, features = ["async-await", "log"] }
 ringbuf = { workspace = true }
 tokio = { workspace = true }
 num = { workspace = true, features = ["serde"] }
-futures = { workspace = true }
 anyhow = { workspace = true }
 strum = { workspace = true, features = ["derive"] }
 strum_macros = { workspace = true }
 chrono = { workspace = true }
+
+[dev-dependencies]
+futures = { workspace = true}

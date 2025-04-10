@@ -12,7 +12,6 @@ feed_registry = { workspace = true }
 data_feeds = { workspace = true }
 config = { workspace = true }
 utils = { workspace = true }
-blocksense-metrics = { workspace = true }
 gnosis_safe = { workspace = true }
 crypto = { workspace = true }
 once_cell = { workspace = true }

@@ -16,7 +16,6 @@ name = "hdbscan_detector_test"
 path = "bin/hdbscan_detector_test.rs"
 
 [dependencies]
-num = { workspace = true }
 rand = { workspace = true }
 rand_distr = { workspace = true }
 serde = { workspace = true }

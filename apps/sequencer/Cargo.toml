@@ -53,14 +53,10 @@ chrono = { workspace = true }
 anyhow = { workspace = true }
 eyre = { workspace = true }
 actix-web = { workspace = true }
-actix-multipart = { workspace = true }
-actix-test = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
 futures = { workspace = true }
-envload = { workspace = true }
 once_cell = { workspace = true }
-async-channel = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 bytes = { workspace = true }
@@ -70,12 +66,14 @@ paste = { workspace = true }
 regex = { workspace = true }
 tempfile = { workspace = true }
 time = { workspace = true }
-conv = { workspace = true }
 uuid = { workspace = true, features = ["v4"] }
 ringbuf = { workspace = true }
 console-subscriber = { workspace = true }
 rdkafka = { workspace = true, features = ["dynamic-linking"] }
 tokio-stream = { workspace = true }
+
+[dev-dependencies]
+actix-test = { workspace = true }
 
 [[bin]]
 name = "sequencer"

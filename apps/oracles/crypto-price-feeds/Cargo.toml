@@ -9,7 +9,6 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-async-trait = { workspace = true }
 wit-bindgen = { workspace = true }
 blocksense-sdk = { workspace = true }
 anyhow = { workspace = true }
