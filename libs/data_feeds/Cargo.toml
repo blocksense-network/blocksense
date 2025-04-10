@@ -7,34 +7,10 @@ edition.workspace = true
 
 
 [dependencies]
-prometheus = { workspace = true }
 utils = { workspace = true }
 crypto = { workspace = true }
 feed_registry = { workspace = true }
 config = { workspace = true }
-
-alloy = { workspace = true, features = [
-    "sol-types",
-    "contract",
-    "network",
-    "node-bindings",
-    "providers",
-    "rpc",
-    "rpc-client",
-    "rpc-types-eth",
-    "rpc-types-trace",
-    "signers",
-    "signer-keystore",
-    "signer-ledger",
-    "signer-mnemonic",
-    "signer-trezor",
-    "signer-yubihsm",
-    "transports",
-    "transport-http",
-    "transport-ipc",
-    "transport-ws",
-    "pubsub",
-] }
 
 log = { workspace = true }
 anyhow = { workspace = true }
@@ -43,21 +19,9 @@ tracing = { workspace = true, features = ["async-await", "log"] }
 tracing-subscriber = { workspace = true, features = ["json"] }
 serde_json = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-erased-serde = { workspace = true }
 ringbuf = { workspace = true }
-reqwest = { workspace = true, features = ["blocking", "json"] }
 rand = { workspace = true }
-curl = { workspace = true }
-async-trait = { workspace = true }
-assert_cmd = { workspace = true }
 dirs = { workspace = true }
 strum = { workspace = true, features = ["derive"] }
 http = { workspace = true }
-
-# Service APIs
-yahoo_finance_api = { workspace = true, features = ["blocking"] }
-cmc = { workspace = true }
-fred-rs = { workspace = true }
-weer_api = { workspace = true }
 tokio = { workspace = true }
-tokio-test = { workspace = true }

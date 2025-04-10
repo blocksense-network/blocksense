@@ -28,7 +28,6 @@ edition = "2021"
 
 [workspace.dependencies]
 anyhow = "1"
-is-terminal = "0.4"
 futures = "0.3"
 serde = { version = "1.0", features = ["derive"]}
 serde_json = "1.0"
@@ -41,38 +40,28 @@ tracing = { version = "0.1", features = ["async-await", "log"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 utils = { path = "libs/utils" }
 chrono = "0.4.39"
-actix-multipart = "0.7.2"
 actix-test = "0.1.5"
 actix-web = "4.6.0"
 alloy = "0.11"
 alloy-primitives = "0.8"
 anomaly_detection = { path = "libs/anomaly_detection" }
-assert_cmd = "2.0.14"
-async-channel = "2.3.0"
-async-trait = "0.1.83"
 blockchain_data_model = { path = "libs/blockchain_data_model" }
 blocksense-macro = { path = "libs/sdk/macro" }
 blocksense-registry = { path = "libs/registry" }
 blocksense-sdk = { path = "libs/sdk" }
 blst = "0.3.12"
 bytes = "1.9.0"
-camino = "1.1.7"
-cmc = "0.4.4"
 config = { path = "libs/config" }
 console-subscriber = "0.4.0"
-conv = "0.3.3"
 crypto = { path = "libs/crypto" }
 csv = "1.3.0"
 curl = "0.4.47"
 data_feeds = { path = "libs/data_feeds" }
 dirs = "6.0.0"
-envload = "0.1.1"
-erased-serde = "0.4.4"
 extended-isolation-forest = "0.2.3"
 eyre = "0.6.12"
 feed_registry = { path = "libs/feed_registry" }
 feeds_processing = { path = "libs/feeds_processing" }
-fred-rs = "0.1.1"
 futures-util = "0.3.30"
 gnosis_safe = { path = "libs/gnosis_safe" }
 hdbscan = "0.9.0"
@@ -102,7 +91,6 @@ reqwest-retry = "0.7"
 ringbuf = "0.4.7"
 serde-this-or-that = "0.5.0"
 serde_derive = "1.0.210"
-serde_path_to_error = "0.1"
 spin-app = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 spin-core = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 spin-outbound-networking = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
@@ -116,9 +104,7 @@ tempfile = "3.13.0"
 terminal = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 thiserror = "2.0.11"
 time = "0.3.36"
-tokio-scoped = "0.2.0"
 tokio-stream = "0.1.16"
-tokio-test = "0.4.4"
 toml = "0.8.13"
 toml_edit = "0.22.22"
 uuid = "1.12.1"
@@ -126,6 +112,4 @@ vergen = "9.0.4"
 wasmtime = "22.0.0"
 wasmtime-wasi = "22.0.0"
 wasmtime-wasi-http = "22.0.0"
-weer_api = "0.1.1"
 wit-bindgen = "0.16.0"
-yahoo_finance_api = "3.0.0"

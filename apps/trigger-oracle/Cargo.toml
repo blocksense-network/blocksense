@@ -17,7 +17,6 @@ utils = { workspace = true }
 anyhow = { workspace = true }
 clap = { version = "3.1.15", features = ["derive", "env"] }
 futures = { workspace = true }
-is-terminal = { workspace = true }
 log = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
@@ -32,7 +31,6 @@ outbound-http = { workspace = true }
 
 url = { workspace = true }
 tokio = { workspace = true }
-tokio-scoped = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 http = { workspace = true }
