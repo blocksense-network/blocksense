@@ -8,10 +8,10 @@ edition = { workspace = true }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-prometheus = { path = "../../libs/prometheus" }
-data_feeds = { path = "../../libs/data_feeds"}
-feed_registry = { path = "../../libs/feed_registry"}
-crypto = { path = "../../libs/crypto"}
+prometheus = { workspace = true }
+data_feeds = { workspace = true }
+feed_registry = { workspace = true }
+crypto = { workspace = true }
 utils = { workspace = true }
 
 anyhow = { workspace = true }
@@ -23,20 +23,20 @@ reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 
-spin-app = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
-spin-core = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
-spin-trigger = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
-spin-outbound-networking = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
-terminal = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
-outbound-http = { git = "https://github.com/blocksense-network/spin", branch="blocksense"}
+spin-app = { workspace = true }
+spin-core = { workspace = true }
+spin-trigger = { workspace = true }
+spin-outbound-networking = { workspace = true }
+terminal = { workspace = true }
+outbound-http = { workspace = true }
 
 url = { workspace = true }
 tokio = { workspace = true }
-tokio-scoped = "0.2.0"
+tokio-scoped = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-http = "1.1.0"
-hyper = "1.3.1"
-wasmtime = "22.0.0"
-wasmtime-wasi = "22.0.0"
-wasmtime-wasi-http = "22.0.0"
+http = { workspace = true }
+hyper = { workspace = true }
+wasmtime = { workspace = true }
+wasmtime-wasi = { workspace = true }
+wasmtime-wasi-http = { workspace = true }
