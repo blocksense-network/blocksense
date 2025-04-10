@@ -179,7 +179,7 @@ pub async fn get_serialized_updates_for_network(
                 }
                 Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
             }
-        },
+        }
         _ => eyre::bail!("Unsupported contract version set for network {net}!"),
     };
 

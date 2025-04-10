@@ -140,6 +140,8 @@ pub async fn aggregation_batch_consensus_loop(
                             tokio::task::Builder::new()
                                 .name(format!("safe_tx_sender network={net} block={block_height}").as_str())
                                 .spawn_local(async move {
+
+                                    let mut timed_out_count = 0;
                                     let block_height = signed_aggregate.block_height;
                                     let net = &signed_aggregate.network;
                                     let providers = sequencer_state_clone.providers.read().await;
@@ -160,7 +162,7 @@ pub async fn aggregation_batch_consensus_loop(
                                         eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_nonce._0, safe_tx.nonce);
                                     }
 
-                                    Ok(match contract
+                                    let result = match contract
                                     .execTransaction(
                                         safe_tx.to,
                                         safe_tx.value,
@@ -183,7 +185,9 @@ pub async fn aggregation_batch_consensus_loop(
                                         Err(e) => {
                                             eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
                                         }
-                                    })
+                                    };
+
+                                    Ok(result)
                                 }).expect("Failed to spawn tx sender for network {net} Blocksense block height: {block_height}!")
                         );
                     }
