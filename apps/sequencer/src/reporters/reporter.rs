@@ -1,7 +1,7 @@
 use alloy::primitives::Address;
+use blocksense_config::SequencerConfig;
+use blocksense_crypto::{deserialize_public_key, PublicKey, MULTIFORMATS_BLS_PUBKYE_PREFIX};
 use blocksense_metrics::metrics::ReporterMetrics;
-use config::SequencerConfig;
-use crypto::{deserialize_public_key, PublicKey, MULTIFORMATS_BLS_PUBKYE_PREFIX};
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;

@@ -9,8 +9,8 @@ use tokio::sync::mpsc::UnboundedSender;
 use tracing::debug;
 
 use crate::aggregate::FeedAggregate;
+use blocksense_crypto::{JsonSerializableSignature, Signature};
 use blocksense_registry::config::FeedConfig;
-use crypto::{JsonSerializableSignature, Signature};
 use num::BigUint;
 
 #[derive(Debug, PartialEq, Copy, Clone)]

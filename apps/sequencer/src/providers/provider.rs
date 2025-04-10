@@ -16,18 +16,17 @@ use alloy::{
 };
 
 use alloy_primitives::Bytes;
-use config::AllFeedsConfig;
-use feeds_processing::adfs_gen_calldata::RoundCounters;
+use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
 use reqwest::Url;
 
-use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
-use config::{PublishCriteria, SequencerConfig};
-use data_feeds::feeds_processing::{
+use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
+use blocksense_data_feeds::feeds_processing::{
     BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
+use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
+use blocksense_feed_registry::types::FeedType;
+use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
 use eyre::{eyre, Result};
-use feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
-use feed_registry::types::FeedType;
 use paste::paste;
 use ringbuf::traits::{Consumer, Observer, RingBuffer};
 use serde::{Deserialize, Serialize};
@@ -174,7 +173,7 @@ impl RpcProvider {
         network: &str,
         rpc_url: Url,
         signer: &PrivateKeySigner,
-        p: &config::Provider,
+        p: &blocksense_config::Provider,
         provider_metrics: &Arc<tokio::sync::RwLock<ProviderMetrics>>,
         feeds_config: &AllFeedsConfig,
     ) -> RpcProvider {
@@ -222,7 +221,7 @@ impl RpcProvider {
     }
 
     pub fn prepare_history(
-        p: &config::Provider,
+        p: &blocksense_config::Provider,
     ) -> (FeedAggregateHistory, HashMap<u32, PublishCriteria>) {
         let mut history = FeedAggregateHistory::new();
         let mut publishing_criteria: HashMap<u32, PublishCriteria> = HashMap::new();
@@ -240,7 +239,7 @@ impl RpcProvider {
         (history, publishing_criteria)
     }
 
-    pub fn prepare_contracts(p: &config::Provider) -> Vec<Contract> {
+    pub fn prepare_contracts(p: &blocksense_config::Provider) -> Vec<Contract> {
         let address = p
             .contract_address
             .as_ref()
@@ -658,12 +657,12 @@ mod tests {
         rpc::types::eth::request::TransactionRequest,
     };
     use alloy_primitives::address;
-    use utils::test_env::get_test_private_key_path;
+    use blocksense_utils::test_env::get_test_private_key_path;
 
     use crate::providers::provider::get_rpc_providers;
     use alloy::consensus::Transaction;
     use alloy::providers::Provider as AlloyProvider;
-    use config::get_test_config_with_single_provider;
+    use blocksense_config::get_test_config_with_single_provider;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {

@@ -1,13 +1,13 @@
 use anyhow::anyhow;
-use config::PublishCriteria;
-use feed_registry::registry::FeedAggregateHistory;
-use feed_registry::types::DataFeedPayload;
-use feed_registry::types::FeedType;
-use feed_registry::types::Timestamp;
+use blocksense_config::PublishCriteria;
+use blocksense_feed_registry::{
+    registry::FeedAggregateHistory,
+    types::{DataFeedPayload, FeedType, Timestamp},
+};
+use blocksense_utils::from_hex_string;
 use log::error;
 use serde::Deserialize;
 use serde::Serialize;
-use utils::from_hex_string;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotedFeedUpdate {
@@ -243,10 +243,10 @@ impl PublishedFeedUpdate {
 
 #[cfg(test)]
 mod tests {
+    use blocksense_utils::to_hex_string;
     use std::time::SystemTime;
-    use utils::to_hex_string;
 
-    use feed_registry::types::FeedType;
+    use blocksense_feed_registry::types::FeedType;
 
     use super::*;
 

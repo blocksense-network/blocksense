@@ -1,6 +1,10 @@
 use blocksense_registry::config::{
     CompatibilityInfo, FeedConfig, FeedQuorum, FeedSchedule, PriceFeedInfo,
 };
+use blocksense_utils::constants::{
+    FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
+};
+use blocksense_utils::{get_config_file_path, read_file};
 use hex::decode;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -8,10 +12,6 @@ use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
 use std::{collections::HashSet, time::UNIX_EPOCH};
 use tracing::{info, warn};
-use utils::constants::{
-    FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
-};
-use utils::{get_config_file_path, read_file};
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct AssetPair {

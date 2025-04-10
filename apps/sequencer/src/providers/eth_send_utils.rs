@@ -6,13 +6,13 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::eth::TransactionRequest,
 };
+use blocksense_config::FeedStrideAndDecimals;
+use blocksense_data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use config::FeedStrideAndDecimals;
-use data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
+use blocksense_utils::to_hex_string;
 use eyre::{eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
-use utils::to_hex_string;
 
 use crate::{
     providers::provider::{
@@ -21,12 +21,12 @@ use crate::{
     },
     sequencer_state::SequencerState,
 };
+use blocksense_feed_registry::types::{Repeatability, Repeatability::Periodic};
+use blocksense_feeds_processing::adfs_gen_calldata::{
+    adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
+};
 use blocksense_metrics::{
     inc_metric, inc_vec_metric, metrics::FeedsMetrics, process_provider_getter, set_metric,
-};
-use feed_registry::types::{Repeatability, Repeatability::Periodic};
-use feeds_processing::adfs_gen_calldata::{
-    adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
 use futures::stream::FuturesUnordered;
 use paste::paste;
@@ -114,7 +114,7 @@ pub async fn get_serialized_updates_for_network(
     net: &str,
     provider_mutex: &Arc<Mutex<RpcProvider>>,
     updates: &mut BatchedAggegratesToSend,
-    provider_settings: &config::Provider,
+    provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     feeds_rounds: &mut HashMap<u32, u64>,
 ) -> Result<String> {
@@ -194,7 +194,7 @@ pub async fn get_serialized_updates_for_network(
 pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
-    provider_settings: config::Provider,
+    provider_settings: blocksense_config::Provider,
     mut updates: BatchedAggegratesToSend,
     feed_type: Repeatability,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
@@ -726,19 +726,19 @@ mod tests {
     use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{node_bindings::Anvil, providers::Provider};
-    use config::{
+    use blocksense_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,
         test_feed_config,
     };
-    use config::{AllFeedsConfig, PublishCriteria};
-    use data_feeds::feeds_processing::VotedFeedUpdate;
-    use feed_registry::registry::HistoryEntry;
-    use feed_registry::types::Repeatability::Oneshot;
+    use blocksense_config::{AllFeedsConfig, PublishCriteria};
+    use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
+    use blocksense_feed_registry::registry::HistoryEntry;
+    use blocksense_feed_registry::types::Repeatability::Oneshot;
+    use blocksense_utils::test_env::get_test_private_key_path;
     use regex::Regex;
     use ringbuf::traits::Consumer;
     use std::str::FromStr;
     use std::time::UNIX_EPOCH;
-    use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -891,7 +891,7 @@ mod tests {
             &result_key,
             &result_value,
             end_slot_timestamp,
-            feed_registry::types::FeedType::Numerical(0.0f64),
+            blocksense_feed_registry::types::FeedType::Numerical(0.0f64),
             18,
         )
         .unwrap();
@@ -1342,7 +1342,7 @@ mod tests {
         // It is undeterministic what the order will be, so checking both possibilities.
         assert!(ab == serialized_updates || ba == serialized_updates);
     }
-    use feed_registry::types::FeedType;
+    use blocksense_feed_registry::types::FeedType;
 
     fn get_updates_test_data() -> Vec<VotedFeedUpdate> {
         //let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);

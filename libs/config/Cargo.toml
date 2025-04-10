@@ -1,5 +1,5 @@
 [package]
-name = "config"
+name = "blocksense-config"
 version.workspace = true
 authors.workspace = true
 license.workspace = true
@@ -9,7 +9,7 @@ edition.workspace = true
 
 [dependencies]
 blocksense-registry = { workspace = true }
-utils = { workspace = true }
+blocksense-utils = { workspace = true }
 dirs = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 anyhow = { workspace = true }

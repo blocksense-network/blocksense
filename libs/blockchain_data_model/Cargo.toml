@@ -1,12 +1,12 @@
 [package]
-name = "blockchain_data_model"
+name = "blocksense-blockchain-data-model"
 version.workspace = true
 authors.workspace = true
 license.workspace = true
 edition.workspace = true
 
 [dependencies]
-utils = { workspace = true }
+blocksense-utils = { workspace = true }
 serde = { workspace = true, features = ["derive", "serde_derive"] }
 ssz_rs = { workspace = true }
 hex-literal = { workspace = true }

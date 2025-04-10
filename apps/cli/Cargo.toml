@@ -27,4 +27,4 @@ tracing-subscriber = { workspace = true }
 url = { workspace = true }
 
 blocksense-registry = { workspace = true }
-utils = { workspace = true }
+blocksense-utils = { workspace = true }

@@ -6,11 +6,11 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
-data_feeds = { workspace = true }
-utils = { workspace = true }
-crypto = { workspace = true }
-config = { workspace = true }
-feed_registry = { workspace = true }
+blocksense-data-feeds = { workspace = true }
+blocksense-utils = { workspace = true }
+blocksense-crypto = { workspace = true }
+blocksense-config = { workspace = true }
+blocksense-feed-registry = { workspace = true }
 
 alloy = { workspace = true, features = ["sol-types", "contract", "network", "node-bindings", "providers", "rpc", "rpc-client", "rpc-types-eth", "rpc-types-trace", "signers", "signer-keystore", "signer-ledger", "signer-mnemonic", "signer-trezor", "signer-yubihsm", "transports", "transport-http", "transport-ipc", "transport-ws", "pubsub"] }
 

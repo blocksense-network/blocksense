@@ -11,22 +11,22 @@ use alloy::{
     rpc::types::eth::TransactionRequest,
 };
 
-use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
-use config::{AllFeedsConfig, SequencerConfig};
-use eyre::eyre;
-use eyre::Result;
-use feed_registry::feed_registration_cmds::{
+use blocksense_config::{AllFeedsConfig, SequencerConfig};
+use blocksense_feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
+use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
+use blocksense_utils::logging::tokio_console_active;
+use eyre::eyre;
+use eyre::Result;
 use futures::StreamExt;
 use std::collections::{BTreeMap, HashSet};
-use utils::logging::tokio_console_active;
 
 use crate::http_handlers::data_feeds::register_feed;
 use crate::providers::eth_send_utils::deploy_contract;
 use crate::providers::provider::{SharedRpcProviders, PRICE_FEED_CONTRACT_NAME};
+use blocksense_feed_registry::types::FeedType;
 use blocksense_metrics::metrics_collector::gather_and_dump_metrics;
-use feed_registry::types::FeedType;
 use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
@@ -340,7 +340,8 @@ async fn set_provider_is_enabled(
     info!("reading previous state of 'is_enabled' for network {network_name}");
 
     let sequencer_config = sequencer_state.sequencer_config.read().await;
-    let provider: &config::Provider = match sequencer_config.providers.get(&network_name) {
+    let provider: &blocksense_config::Provider = match sequencer_config.providers.get(&network_name)
+    {
         Some(provider) => provider,
         None => {
             let message = format!("No provider for network {network_name}");
@@ -365,14 +366,15 @@ async fn set_provider_is_enabled(
     drop(sequencer_config);
 
     let mut sequencer_config = sequencer_state.sequencer_config.write().await;
-    let provider: &mut config::Provider = match sequencer_config.providers.get_mut(&network_name) {
-        Some(v) => v,
-        None => {
-            return Err(error::ErrorInternalServerError(format!(
-                "Network {network_name} seems to disapear. This should never happen!"
-            )));
-        }
-    };
+    let provider: &mut blocksense_config::Provider =
+        match sequencer_config.providers.get_mut(&network_name) {
+            Some(v) => v,
+            None => {
+                return Err(error::ErrorInternalServerError(format!(
+                    "Network {network_name} seems to disapear. This should never happen!"
+                )));
+            }
+        };
     provider.is_enabled = is_enabled;
     // Dropping write lock, just out of good hygiene.
     drop(sequencer_config);
@@ -611,16 +613,16 @@ mod tests {
     use actix_test::to_bytes;
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
-    use config::{
+    use blocksense_config::{
         get_test_config_with_no_providers, get_test_config_with_single_provider, test_feed_config,
     };
-    use config::{AllFeedsConfig, SequencerConfig};
+    use blocksense_config::{AllFeedsConfig, SequencerConfig};
     use regex::Regex;
 
+    use blocksense_utils::logging::init_shared_logging_handle;
+    use blocksense_utils::test_env::get_test_private_key_path;
     use std::path::PathBuf;
     use tokio::sync::mpsc;
-    use utils::logging::init_shared_logging_handle;
-    use utils::test_env::get_test_private_key_path;
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
 
@@ -869,7 +871,7 @@ mod tests {
             .providers
             .entry(network.to_string())
             .and_modify(|provider| {
-                *provider = config::Provider {
+                *provider = blocksense_config::Provider {
                     private_key_path: key_path.to_str().unwrap().to_owned(),
                     url,
                     contract_address: None,

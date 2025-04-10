@@ -1,5 +1,5 @@
 [package]
-name = "utils"
+name = "blocksense-utils"
 version.workspace = true
 authors.workspace = true
 license.workspace = true

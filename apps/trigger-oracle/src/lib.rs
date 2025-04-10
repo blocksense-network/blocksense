@@ -1,5 +1,5 @@
+use blocksense_data_feeds::generate_signature::generate_signature;
 use clap::Args;
-use data_feeds::generate_signature::generate_signature;
 use serde::{Deserialize, Serialize};
 
 use std::{
@@ -31,6 +31,8 @@ use wasmtime_wasi_http::{
     types::HostFutureIncomingResponse, HttpResult,
 };
 
+use blocksense_crypto::JsonSerializableSignature;
+use blocksense_feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
 use blocksense_metrics::{
     actix_server::handle_prometheus_metrics,
     metrics::{
@@ -39,9 +41,7 @@ use blocksense_metrics::{
     },
     TextEncoder,
 };
-use crypto::JsonSerializableSignature;
-use feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
-use utils::time::current_unix_time;
+use blocksense_utils::time::current_unix_time;
 
 wasmtime::component::bindgen!({
     path: "../../libs/sdk/wit",

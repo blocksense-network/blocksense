@@ -1,4 +1,4 @@
-use data_feeds::feeds_processing::VotedFeedUpdate;
+use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};

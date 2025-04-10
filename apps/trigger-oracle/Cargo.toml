@@ -9,10 +9,10 @@ edition = { workspace = true }
 
 [dependencies]
 blocksense-metrics = { workspace = true }
-data_feeds = { workspace = true }
-feed_registry = { workspace = true }
-crypto = { workspace = true }
-utils = { workspace = true }
+blocksense-data-feeds = { workspace = true }
+blocksense-feed-registry = { workspace = true }
+blocksense-crypto = { workspace = true }
+blocksense-utils = { workspace = true }
 
 anyhow = { workspace = true }
 clap = { version = "3.1.15", features = ["derive", "env"] }

@@ -1,14 +1,14 @@
 [package]
-name = "feed_registry"
+name = "blocksense-feed-registry"
 version.workspace = true
 authors.workspace = true
 license.workspace = true
 edition.workspace = true
 
 [dependencies]
-crypto = { workspace = true }
-config = { workspace = true }
-utils = { workspace = true }
+blocksense-crypto = { workspace = true }
+blocksense-config = { workspace = true }
+blocksense-utils = { workspace = true }
 blocksense-registry = { workspace = true }
 
 serde = { workspace = true, features = ["derive"] }

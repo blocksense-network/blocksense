@@ -1,4 +1,6 @@
-use anomaly_detection::{extended_isolation_forest::make_f64_forest, ingest::read_csv_to_vec};
+use blocksense_anomaly_detection::{
+    extended_isolation_forest::make_f64_forest, ingest::read_csv_to_vec,
+};
 
 fn main() {
     let values = read_csv_to_vec("../../python_scripts/yfinance_nvda.csv", "Close").unwrap();

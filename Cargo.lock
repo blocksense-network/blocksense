@@ -1088,20 +1088,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "anomaly_detection"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "csv",
- "extended-isolation-forest",
- "hdbscan",
- "rand 0.8.5",
- "rand_distr",
- "serde 1.0.217",
- "tracing",
-]
-
-[[package]]
 name = "ansi_term"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2028,19 +2014,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "blockchain_data_model"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "hex",
- "hex-literal",
- "serde 1.0.217",
- "ssz_rs",
- "tracing",
- "utils",
-]
-
-[[package]]
 name = "blocking"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2054,11 +2027,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "blocksense-anomaly-detection"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "csv",
+ "extended-isolation-forest",
+ "hdbscan",
+ "rand 0.8.5",
+ "rand_distr",
+ "serde 1.0.217",
+ "tracing",
+]
+
+[[package]]
+name = "blocksense-blockchain-data-model"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "blocksense-utils",
+ "hex",
+ "hex-literal",
+ "serde 1.0.217",
+ "ssz_rs",
+ "tracing",
+]
+
+[[package]]
 name = "blocksense-cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "blocksense-registry",
+ "blocksense-utils",
  "clap 4.5.26",
  "indexmap 2.7.1",
  "lazy_static 1.5.0",
@@ -2074,7 +2075,112 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "url",
- "utils",
+]
+
+[[package]]
+name = "blocksense-config"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "blocksense-registry",
+ "blocksense-utils",
+ "dirs 6.0.0",
+ "hex",
+ "serde 1.0.217",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
+name = "blocksense-crypto"
+version = "0.1.1"
+dependencies = [
+ "blst",
+ "hex",
+ "serde 1.0.217",
+]
+
+[[package]]
+name = "blocksense-data-feeds"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "blocksense-config",
+ "blocksense-crypto",
+ "blocksense-feed-registry",
+ "blocksense-utils",
+ "dirs 6.0.0",
+ "http 1.2.0",
+ "log",
+ "rand 0.8.5",
+ "ringbuf",
+ "serde 1.0.217",
+ "serde_json",
+ "strum",
+ "thiserror 2.0.11",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "blocksense-feed-registry"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "blocksense-config",
+ "blocksense-crypto",
+ "blocksense-registry",
+ "blocksense-utils",
+ "chrono",
+ "futures",
+ "num",
+ "ringbuf",
+ "serde 1.0.217",
+ "serde_json",
+ "strum",
+ "strum_macros",
+ "thiserror 2.0.11",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "blocksense-feeds-processing"
+version = "0.1.1"
+dependencies = [
+ "alloy",
+ "alloy-primitives",
+ "anyhow",
+ "blocksense-anomaly-detection",
+ "blocksense-config",
+ "blocksense-crypto",
+ "blocksense-data-feeds",
+ "blocksense-feed-registry",
+ "blocksense-gnosis-safe",
+ "blocksense-registry",
+ "blocksense-utils",
+ "hex",
+ "once_cell",
+ "ringbuf",
+ "serde 1.0.217",
+ "serde_json",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "blocksense-gnosis-safe"
+version = "0.1.1"
+dependencies = [
+ "alloy",
+ "alloy-primitives",
+ "anyhow",
+ "blocksense-data-feeds",
+ "blocksense-feed-registry",
+ "hex",
+ "serde 1.0.217",
+ "serde_json",
 ]
 
 [[package]]
@@ -2092,10 +2198,10 @@ version = "0.1.1"
 dependencies = [
  "actix-web",
  "anyhow",
+ "blocksense-utils",
  "lazy_static 1.5.0",
  "prometheus",
  "reqwest 0.12.12",
- "utils",
 ]
 
 [[package]]
@@ -2118,6 +2224,21 @@ dependencies = [
  "spin-sdk",
  "url",
  "wit-bindgen",
+]
+
+[[package]]
+name = "blocksense-utils"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "console-subscriber",
+ "dirs 6.0.0",
+ "hex",
+ "once_cell",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "vergen",
 ]
 
 [[package]]
@@ -2681,20 +2802,6 @@ dependencies = [
 
 [[package]]
 name = "config"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "blocksense-registry",
- "dirs 6.0.0",
- "hex",
- "serde 1.0.217",
- "serde_json",
- "tracing",
- "utils",
-]
-
-[[package]]
-name = "config"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1b1b9d958c2b1368a663f05538fc1b5975adce1e19f435acceae987aceeeb369"
@@ -3040,15 +3147,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a81dae078cea95a014a339291cec439d2f232ebe854a9d672b796c6afafa9b7"
 
 [[package]]
-name = "crypto"
-version = "0.1.1"
-dependencies = [
- "blst",
- "hex",
- "serde 1.0.217",
-]
-
-[[package]]
 name = "crypto-bigint"
 version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3247,29 +3345,6 @@ name = "data-encoding"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8566979429cf69b49a5c740c60791108e86440e8be149bbea4fe54d2c32d6e2"
-
-[[package]]
-name = "data_feeds"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "config 0.1.1",
- "crypto",
- "dirs 6.0.0",
- "feed_registry",
- "http 1.2.0",
- "log",
- "rand 0.8.5",
- "ringbuf",
- "serde 1.0.217",
- "serde_json",
- "strum",
- "thiserror 2.0.11",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "utils",
-]
 
 [[package]]
 name = "dbl"
@@ -3944,52 +4019,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "feed_registry"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "blocksense-registry",
- "chrono",
- "config 0.1.1",
- "crypto",
- "futures",
- "num",
- "ringbuf",
- "serde 1.0.217",
- "serde_json",
- "strum",
- "strum_macros",
- "thiserror 2.0.11",
- "tokio",
- "tracing",
- "utils",
-]
-
-[[package]]
-name = "feeds_processing"
-version = "0.1.1"
-dependencies = [
- "alloy",
- "alloy-primitives",
- "anomaly_detection",
- "anyhow",
- "blocksense-registry",
- "config 0.1.1",
- "crypto",
- "data_feeds",
- "feed_registry",
- "gnosis_safe",
- "hex",
- "once_cell",
- "ringbuf",
- "serde 1.0.217",
- "serde_json",
- "tokio",
- "tracing",
- "utils",
-]
-
-[[package]]
 name = "ff"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4365,20 +4394,6 @@ name = "glob"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
-
-[[package]]
-name = "gnosis_safe"
-version = "0.1.1"
-dependencies = [
- "alloy",
- "alloy-primitives",
- "anyhow",
- "data_feeds",
- "feed_registry",
- "hex",
- "serde 1.0.217",
- "serde_json",
-]
 
 [[package]]
 name = "group"
@@ -7623,7 +7638,7 @@ checksum = "a0de80796b316aec75344095a6d2ef68ec9b8f573b9e7adc821149ba3598e270"
 dependencies = [
  "ansi_term",
  "atty",
- "config 0.11.0",
+ "config",
  "directories",
  "petgraph",
  "serde 1.0.217",
@@ -8723,23 +8738,24 @@ dependencies = [
  "actix-web",
  "alloy",
  "alloy-primitives",
- "anomaly_detection",
  "anyhow",
- "blockchain_data_model",
+ "blocksense-anomaly-detection",
+ "blocksense-blockchain-data-model",
+ "blocksense-config",
+ "blocksense-crypto",
+ "blocksense-data-feeds",
+ "blocksense-feed-registry",
+ "blocksense-feeds-processing",
+ "blocksense-gnosis-safe",
  "blocksense-metrics",
  "blocksense-registry",
+ "blocksense-utils",
  "bytes",
  "chrono",
- "config 0.1.1",
  "console-subscriber",
- "crypto",
- "data_feeds",
  "eyre",
- "feed_registry",
- "feeds_processing",
  "futures",
  "futures-util",
- "gnosis_safe",
  "once_cell",
  "paste",
  "rand 0.8.5",
@@ -8755,7 +8771,6 @@ dependencies = [
  "tokio-stream",
  "tracing",
  "tracing-subscriber",
- "utils",
  "uuid 1.12.1",
 ]
 
@@ -8764,12 +8779,13 @@ name = "sequencer_tests"
 version = "0.1.1"
 dependencies = [
  "alloy",
- "config 0.1.1",
- "crypto",
+ "blocksense-config",
+ "blocksense-crypto",
+ "blocksense-data-feeds",
+ "blocksense-feed-registry",
+ "blocksense-utils",
  "curl",
- "data_feeds",
  "eyre",
- "feed_registry",
  "futures",
  "json-patch",
  "port_scanner",
@@ -8780,7 +8796,6 @@ dependencies = [
  "tokio",
  "tracing",
  "url",
- "utils",
 ]
 
 [[package]]
@@ -10658,11 +10673,12 @@ name = "trigger-oracle"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "blocksense-crypto",
+ "blocksense-data-feeds",
+ "blocksense-feed-registry",
  "blocksense-metrics",
+ "blocksense-utils",
  "clap 3.2.25",
- "crypto",
- "data_feeds",
- "feed_registry",
  "futures",
  "http 1.2.0",
  "hyper 1.5.2",
@@ -10680,7 +10696,6 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "url",
- "utils",
  "wasmtime",
  "wasmtime-wasi",
  "wasmtime-wasi-http",
@@ -10906,21 +10921,6 @@ name = "utf8parse"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
-
-[[package]]
-name = "utils"
-version = "0.1.1"
-dependencies = [
- "anyhow",
- "console-subscriber",
- "dirs 6.0.0",
- "hex",
- "once_cell",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "vergen",
-]
 
 [[package]]
 name = "uuid"
