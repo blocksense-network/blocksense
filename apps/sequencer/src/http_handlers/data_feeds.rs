@@ -78,7 +78,7 @@ async fn process_report(
                     ) {
                         drop(rlocked_reporter);
                         warn!(
-                            "Signature check failed for feed_id: {} from reporter_id: {} data_feed: {}",
+                            "Signature check failed for feed_id: {} from reporter_id: {} data_feed: {:?}",
                             feed_id, reporter_id, data_feed
                         );
                         inc_metric!(reporter_metrics, reporter_id, non_valid_signature);

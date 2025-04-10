@@ -178,3 +178,32 @@ pub async fn get_signature_bytes(
         .collect();
     signature_bytes
 }
+
+#[cfg(test)]
+mod tests {
+    use alloy::hex::FromHex;
+
+    use super::*;
+    use crate::utils::SafeMultisig::SafeMultisigCalls::nonce;
+
+    #[test]
+    fn test_tx_hash() {
+        let chain_id = 111;
+
+        let num: u32 = 42;
+        let uint256: Uint<256, 4> = Uint::from(num);
+
+        let contract_address =
+            Address::from_hex("0x663F3ad617193148711d28f5334eE4Ed07016602").unwrap();
+        let safe_address = Address::from_hex("0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C").unwrap();
+
+        let calldata = Bytes::from("0xDEADBEEF");
+
+        let mut safe_transaction = create_safe_tx(contract_address, calldata, uint256);
+
+        let tx_hash_old_gas =
+            generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction.clone());
+
+        // safe_transaction.max_fee_per_gas = 0;
+    }
+}

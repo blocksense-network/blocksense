@@ -1,6 +1,7 @@
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::{SafeTx, SignatureWithAddress};
+use std::collections::HashSet;
 use std::collections::{HashMap, VecDeque};
 use tracing::{debug, error, warn};
 
@@ -15,6 +16,7 @@ pub struct CallDataWithSignatures {
     pub tx_hash: String,
     pub safe_tx: SafeTx,
     pub signatures: HashMap<u64, SignatureWithAddress>,
+    pub updated_feeds_ids: HashSet<u32>,
 }
 
 pub struct AggregationBatchConsensus {
@@ -61,6 +63,9 @@ impl AggregationBatchConsensus {
             return;
         }
 
+        let feeds_to_update_ids: Vec<u32> =
+            batch.updates.iter().map(|update| update.feed_id).collect();
+
         self.backlog_batches.push_back(key.clone());
         self.in_progress_batches.insert(
             key,
@@ -68,6 +73,7 @@ impl AggregationBatchConsensus {
                 tx_hash: batch.tx_hash.clone(),
                 safe_tx: safe_transaction,
                 signatures: HashMap::new(),
+                updated_feeds_ids: feeds_to_update_ids.into_iter().collect(),
             },
         );
     }

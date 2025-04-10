@@ -135,6 +135,8 @@ pub async fn aggregation_batch_consensus_loop(
                             tokio::task::Builder::new()
                                 .name(format!("safe_tx_sender network={net} block={block_height}").as_str())
                                 .spawn_local(async move {
+
+                                    let mut timed_out_count = 0;
                                     let block_height = signed_aggregate.block_height;
                                     let net = &signed_aggregate.network;
                                     let providers = sequencer_state_clone.providers.read().await;
