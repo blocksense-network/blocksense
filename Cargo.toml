@@ -16,7 +16,9 @@ members = [
   "libs/config",
   "libs/crypto",
   "libs/feed_registry",
-  "libs/blockchain_data_model"]
+  "libs/blockchain_data_model",
+  "libs/feeds_processing"
+]
 
 resolver = "2"
 
