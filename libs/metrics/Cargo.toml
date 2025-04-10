@@ -1,5 +1,5 @@
 [package]
-name = "prometheus"
+name = "blocksense-metrics"
 version.workspace = true
 authors.workspace = true
 license.workspace = true
@@ -9,9 +9,7 @@ edition.workspace = true
 
 [dependencies]
 utils = { workspace = true }
-# Note(stanm): Stefan really wanted to keep the library called the same, so we
-# alias the framework.
-prometheus_framework = { workspace = true }
+prometheus = { workspace = true }
 actix-web = { workspace = true }
 reqwest = { workspace = true }
 anyhow = { workspace = true }

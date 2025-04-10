@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
 use actix_web::{web, App, HttpServer};
-use prometheus_framework::TextEncoder;
+use prometheus::TextEncoder;
 use reqwest::Client;
 use utils::get_env_var;
 
@@ -36,7 +36,7 @@ pub async fn handle_prometheus_metrics(
 
     BUILD_INFO.set(1);
 
-    let metric_families = prometheus_framework::gather();
+    let metric_families = prometheus::gather();
     encoder.encode_utf8(&metric_families, &mut buffer).unwrap();
 
     let _ = client

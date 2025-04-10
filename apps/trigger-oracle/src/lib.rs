@@ -1,4 +1,5 @@
 use clap::Args;
+use data_feeds::generate_signature::generate_signature;
 use serde::{Deserialize, Serialize};
 
 use std::{
@@ -30,10 +31,7 @@ use wasmtime_wasi_http::{
     types::HostFutureIncomingResponse, HttpResult,
 };
 
-use crypto::JsonSerializableSignature;
-use data_feeds::generate_signature::generate_signature;
-use feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
-use prometheus::{
+use blocksense_metrics::{
     actix_server::handle_prometheus_metrics,
     metrics::{
         REPORTER_BATCH_COUNTER, REPORTER_FAILED_SEQ_REQUESTS, REPORTER_FAILED_WASM_EXECS,
@@ -41,6 +39,8 @@ use prometheus::{
     },
     TextEncoder,
 };
+use crypto::JsonSerializableSignature;
+use feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
 use utils::time::current_unix_time;
 
 wasmtime::component::bindgen!({
