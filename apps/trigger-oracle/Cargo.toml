@@ -8,7 +8,7 @@ edition = { workspace = true }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-prometheus = { workspace = true }
+blocksense-metrics = { workspace = true }
 data_feeds = { workspace = true }
 feed_registry = { workspace = true }
 crypto = { workspace = true }

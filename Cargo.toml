@@ -9,7 +9,7 @@ members = [
   "apps/oracles/gecko-terminal",
   "libs/anomaly_detection",
   "libs/data_feeds",
-  "libs/prometheus",
+  "libs/metrics",
   "libs/registry",
   "libs/sdk",
   "libs/utils",
@@ -91,10 +91,8 @@ paste = "1.0.15"
 port_scanner = "0.1.5"
 prettytable-rs = "0.10"
 proc-macro2 = "1"
-prometheus = { path = "libs/prometheus" }
-# Note(stanm): Stefan really wanted to keep the library called the same, so we
-# alias the framework.
-prometheus_framework = { package = "prometheus", version = "0.13.4" }
+blocksense-metrics = { path = "libs/metrics" }
+prometheus = { package = "prometheus", version = "0.13.4" }
 quote = "1.0"
 rand_distr = "0.4.3"
 rdkafka = "0.37.0"

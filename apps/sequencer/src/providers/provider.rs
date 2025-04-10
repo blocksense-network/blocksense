@@ -20,6 +20,7 @@ use config::AllFeedsConfig;
 use feeds_processing::adfs_gen_calldata::RoundCounters;
 use reqwest::Url;
 
+use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
 use config::{PublishCriteria, SequencerConfig};
 use data_feeds::feeds_processing::{
     BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
@@ -28,7 +29,6 @@ use eyre::{eyre, Result};
 use feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
 use feed_registry::types::FeedType;
 use paste::paste;
-use prometheus::{metrics::ProviderMetrics, process_provider_getter};
 use ringbuf::traits::{Consumer, Observer, RingBuffer};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

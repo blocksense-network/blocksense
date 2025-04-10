@@ -41,7 +41,7 @@ alloy = { workspace = true, features = [
 
 alloy-primitives = { workspace = true }
 
-prometheus = { workspace = true }
+blocksense-metrics = { workspace = true }
 gnosis_safe = { workspace = true }
 
 reqwest = { workspace = true }

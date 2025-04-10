@@ -1,6 +1,7 @@
 use crate::reporters::reporter::SharedReporters;
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
+use blocksense_metrics::{inc_metric, metrics::FeedsMetrics};
 use data_feeds::feeds_processing::{
     DoSkipReason, DontSkipReason, SkipDecision, VotedFeedUpdateWithProof,
 };
@@ -12,7 +13,6 @@ use feed_registry::types::{
     FeedMetaData, FeedType, FeedsSlotProcessorCmds, Repeatability, Timestamp,
 };
 use feeds_processing::utils::{consume_reports, ConsumedReports};
-use prometheus::{inc_metric, metrics::FeedsMetrics};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::mpsc;

@@ -1,5 +1,5 @@
-use prometheus_framework::Encoder;
-use prometheus_framework::TextEncoder;
+use prometheus::Encoder;
+use prometheus::TextEncoder;
 
 use anyhow::Result;
 
@@ -12,7 +12,7 @@ pub fn gather_and_dump_metrics() -> Result<String> {
     // Actual strings are set internally as labels by the BUILD_INFO gauge.
     BUILD_INFO.set(1);
     // Gather the metrics.
-    let metric_families = prometheus_framework::gather();
+    let metric_families = prometheus::gather();
     // Encode them to send.
     if let Err(e) = encoder.encode(&metric_families, &mut buffer) {
         return Err(anyhow::anyhow!("{}", e.to_string()));
