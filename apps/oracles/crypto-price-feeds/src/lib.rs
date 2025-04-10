@@ -120,8 +120,8 @@ fn print_results(
     payload: &Payload,
 ) {
     let mut results_info: Vec<ResultInfo> = Vec::new();
-    let mut missing_pairs: String = String::new();
-    let mut missing_pairs_count = 0;
+    let mut pairs_with_missing_exchange_data: String = String::new();
+    let mut pairs_with_missing_exchange_data_count = 0;
     let mut missing_prices: String = String::new();
     let mut missing_prices_count = 0;
 
@@ -166,9 +166,9 @@ fn print_results(
                 exchanges,
             });
         } else {
-            missing_pairs_count += 1;
+            pairs_with_missing_exchange_data_count += 1;
             write!(
-                missing_pairs,
+                pairs_with_missing_exchange_data,
                 "{{ {}: {} / {} }},",
                 resurce.id, resurce.pair.base, resurce.pair.quote
             )
@@ -197,10 +197,16 @@ fn print_results(
         ]));
     }
 
-    println!("\n{} Missing pairs:", missing_pairs_count);
-    println!("[{}]", missing_pairs);
+    println!(
+        "\n{} Pairs with no exchange data:",
+        pairs_with_missing_exchange_data_count
+    );
+    println!("[{}]", pairs_with_missing_exchange_data);
 
-    println!("\n{} Missing prices:", missing_prices_count);
+    println!(
+        "\n{} Pairs with missing price / volume data from exchange:",
+        missing_prices_count
+    );
     println!("[{}]", missing_prices);
 
     println!("\nResults:");
