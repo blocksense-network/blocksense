@@ -29,6 +29,10 @@ craneLib.buildPackage (
       src = builtins.map (x: ../../.. + "/${x}") memberList;
       inherit additional;
     };
+
+    # This is necessary, as 'cargo build' WILL fail if any of the members' files are not present
+    # in the source tree. This is a workaround to avoid having to include all of them in the
+    # fileset.
     preConfigure = ''
       ${perl}/bin/perl -0777 -pi -e 's|members = \[.*?\]|members = [ "${
         builtins.replaceStrings [ "/" ] [ "\/" ] (lib.concatStringsSep "\",\\n\"" memberList)
