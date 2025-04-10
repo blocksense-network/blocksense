@@ -6,21 +6,21 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
-blocksense-registry = { path = "../../libs/registry" }
-anomaly_detection = { path = "../../libs/anomaly_detection" }
-feed_registry = { path = "../feed_registry" }
-data_feeds = {path = "../data_feeds"}
-config = {path = "../config"}
-utils = {path = "../utils"}
-prometheus = {path = "../prometheus"}
-gnosis_safe = {path = "../gnosis_safe"}
-crypto = { path = "../../libs/crypto" }
-once_cell = "1.20.2"
-hex = "0.4.3"
-ringbuf = "0.4.7"
+blocksense-registry = { workspace = true }
+anomaly_detection = { workspace = true }
+feed_registry = { workspace = true }
+data_feeds = { workspace = true }
+config = { workspace = true }
+utils = { workspace = true }
+prometheus = { workspace = true }
+gnosis_safe = { workspace = true }
+crypto = { workspace = true }
+once_cell = { workspace = true }
+hex = { workspace = true }
+ringbuf = { workspace = true }
 tracing = { workspace = true }
 tokio = { workspace = true }
-alloy = { version = "0.11", features = [
+alloy = { workspace = true, features = [
     "sol-types",
     "contract",
     "network",
@@ -42,7 +42,7 @@ alloy = { version = "0.11", features = [
     "transport-ws",
     "pubsub",
 ] }
-alloy-primitives = "0.8"
-anyhow = "1.0.89"
+alloy-primitives = { workspace = true }
+anyhow = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true }

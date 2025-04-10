@@ -11,8 +11,8 @@ edition.workspace = true
 utils = { workspace = true }
 # Note(stanm): Stefan really wanted to keep the library called the same, so we
 # alias the framework.
-prometheus_framework = { package = "prometheus", version = "0.13.4" }
-actix-web = "4.5.1"
+prometheus_framework = { workspace = true }
+actix-web = { workspace = true }
 reqwest = { workspace = true }
 anyhow = { workspace = true }
-lazy_static = "1.4.0"
+lazy_static = { workspace = true }
