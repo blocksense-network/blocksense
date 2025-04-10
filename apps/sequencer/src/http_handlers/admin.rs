@@ -536,7 +536,7 @@ pub async fn get_oracle_scripts(
                 name: None,
                 description: None,
                 oracle_script_wasm: "gecko_terminal_oracle.wasm".to_string(),
-                allowed_outbound_hosts: vec!["https://app.geckoterminal.com/".to_string()],
+                allowed_outbound_hosts: vec!["https://api.geckoterminal.com".to_string()],
                 capabilities: HashSet::new(),
             },
             OracleScript {
