@@ -13,7 +13,7 @@
   version ? "dev",
   extraArgs ? "",
   trueCargoArtifacts ? cargoArtifacts,
-  isOracleScript ? false,
+  target ? "",
 }:
 let
   memberList = if builtins.isList members then members else [ members ];
@@ -24,7 +24,7 @@ craneLib.buildPackage (
     inherit version pname;
     cargoArtifacts = trueCargoArtifacts;
     cargoExtraArgs =
-      extraArgs + (lib.optionalString isOracleScript "--target wasm32-wasip1") + " -p " + packageName;
+      extraArgs + (lib.optionalString (target != "") ("--target " + target)) + " -p " + packageName;
     src = filesets.rustFilter {
       src = builtins.map (x: ../../.. + "/${x}") memberList;
       inherit additional;

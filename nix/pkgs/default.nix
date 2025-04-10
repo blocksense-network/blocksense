@@ -197,68 +197,70 @@
         };
       };
 
-      oracle-scripts = mkRustPackage rec {
-        crypto-price-feeds = {
-          packageName = "crypto-price-feeds";
-          members = [
-            "apps/oracles/crypto-price-feeds"
-            "libs/sdk"
-          ];
-        };
-        exsat-holdings = {
-          packageName = "exsat-holdings";
-          members = [
-            "apps/oracles/exsat-holdings"
-            "libs/sdk"
-          ];
-        };
-        gecko-terminal = {
-          packageName = "gecko-terminal";
-          members = [
-            "apps/oracles/gecko-terminal"
-            "libs/sdk"
-          ];
-        };
-        cmc = {
-          packageName = "cmc-oracle";
-          members = [
-            "libs/sdk/examples/cmc"
-            "libs/sdk"
-          ];
-          trueCargoArtifacts = cargoArtifacts {
-            pname = "cmc-cargo";
-            cargoLock = ../../libs/sdk/examples/cmc/Cargo.lock;
-            cargoToml = ../../libs/sdk/examples/cmc/Cargo.toml;
-            sourceRootDir = "libs/sdk/examples/cmc";
+      oracle-scripts = mkRustPackage (
+        lib.mapAttrs (_name: value: (value // { target = "wasm32-wasip1"; })) {
+          crypto-price-feeds = {
+            packageName = "crypto-price-feeds";
+            members = [
+              "apps/oracles/crypto-price-feeds"
+              "libs/sdk"
+            ];
           };
-        };
-        yahoo = {
-          packageName = "yahoo-oracle";
-          members = [
-            "libs/sdk/examples/yahoo"
-            "libs/sdk"
-          ];
-          trueCargoArtifacts = cargoArtifacts {
-            pname = "yahoo-cargo";
-            cargoLock = ../../libs/sdk/examples/yahoo/Cargo.lock;
-            cargoToml = ../../libs/sdk/examples/yahoo/Cargo.toml;
-            sourceRootDir = "libs/sdk/examples/yahoo";
+          exsat-holdings = {
+            packageName = "exsat-holdings";
+            members = [
+              "apps/oracles/exsat-holdings"
+              "libs/sdk"
+            ];
           };
-        };
-        revolut = {
-          packageName = "revolut-oracle";
-          members = [
-            "libs/sdk/examples/revolut"
-            "libs/sdk"
-          ];
-          trueCargoArtifacts = cargoArtifacts {
-            pname = "revolut-cargo";
-            cargoLock = ../../libs/sdk/examples/revolut/Cargo.lock;
-            cargoToml = ../../libs/sdk/examples/revolut/Cargo.toml;
-            sourceRootDir = "libs/sdk/examples/revolut";
+          gecko-terminal = {
+            packageName = "gecko-terminal";
+            members = [
+              "apps/oracles/gecko-terminal"
+              "libs/sdk"
+            ];
           };
-        };
-      };
+          cmc = {
+            packageName = "cmc-oracle";
+            members = [
+              "libs/sdk/examples/cmc"
+              "libs/sdk"
+            ];
+            trueCargoArtifacts = cargoArtifacts {
+              pname = "cmc-cargo";
+              cargoLock = ../../libs/sdk/examples/cmc/Cargo.lock;
+              cargoToml = ../../libs/sdk/examples/cmc/Cargo.toml;
+              sourceRootDir = "libs/sdk/examples/cmc";
+            };
+          };
+          yahoo = {
+            packageName = "yahoo-oracle";
+            members = [
+              "libs/sdk/examples/yahoo"
+              "libs/sdk"
+            ];
+            trueCargoArtifacts = cargoArtifacts {
+              pname = "yahoo-cargo";
+              cargoLock = ../../libs/sdk/examples/yahoo/Cargo.lock;
+              cargoToml = ../../libs/sdk/examples/yahoo/Cargo.toml;
+              sourceRootDir = "libs/sdk/examples/yahoo";
+            };
+          };
+          revolut = {
+            packageName = "revolut-oracle";
+            members = [
+              "libs/sdk/examples/revolut"
+              "libs/sdk"
+            ];
+            trueCargoArtifacts = cargoArtifacts {
+              pname = "revolut-cargo";
+              cargoLock = ../../libs/sdk/examples/revolut/Cargo.lock;
+              cargoToml = ../../libs/sdk/examples/revolut/Cargo.toml;
+              sourceRootDir = "libs/sdk/examples/revolut";
+            };
+          };
+        }
+      );
 
       blocksense-rs = pkgs.symlinkJoin {
         name = "blocksense-rs";
