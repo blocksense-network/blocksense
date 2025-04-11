@@ -17,7 +17,7 @@ alloy = { workspace = true, features = ["sol-types", "contract", "network", "nod
 regex = { workspace = true }
 reqwest = { workspace = true }
 # async
-tokio = { version = "1.4.0", features = ["full"] }
+tokio = { version = "1.44.2", features = ["full"] }
 
 # misc
 eyre = { workspace = true }
