@@ -185,7 +185,7 @@ in
         interval_time_in_seconds = 10;
         capabilities = [ ];
         allowed_outbound_hosts = [
-          "https://app.geckoterminal.com"
+          "https://api.geckoterminal.com"
         ];
       };
     };
