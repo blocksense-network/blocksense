@@ -15,7 +15,7 @@
     let
       rust = self'.legacyPackages.rustToolchain;
 
-      craneLib = (inputs.mcl-blockchain.inputs.crane.mkLib pkgs).overrideToolchain rust;
+      craneLib = (inputs.mcl-nixos-modules.inputs.crane.mkLib pkgs).overrideToolchain rust;
 
       version = "dev";
 
