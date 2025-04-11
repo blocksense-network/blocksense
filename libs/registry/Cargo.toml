@@ -14,5 +14,5 @@ name = "blocksense_registry"
 
 [dependencies]
 anyhow = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
+serde = { workspace = true }
 serde_json = { workspace = true }

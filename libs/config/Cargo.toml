@@ -11,8 +11,8 @@ edition.workspace = true
 blocksense-registry = { workspace = true }
 blocksense-utils = { workspace = true }
 dirs = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
+serde = { workspace = true }
 anyhow = { workspace = true }
 serde_json = { workspace = true }
 hex = { workspace = true }
-tracing = { workspace = true, features = ["log"] }
+tracing = { workspace = true }

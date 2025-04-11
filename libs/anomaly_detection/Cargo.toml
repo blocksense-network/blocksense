@@ -23,4 +23,4 @@ extended-isolation-forest = { workspace = true }
 hdbscan = { workspace = true }
 csv = { workspace = true }
 anyhow = { workspace = true }
-tracing = { workspace = true, features = ["log"] }
+tracing = { workspace = true }

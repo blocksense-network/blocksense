@@ -10,8 +10,8 @@ edition.workspace = true
 [dependencies]
 hex = { workspace = true }
 tokio = { workspace = true }
-tracing = { workspace = true, features = ["async-await", "log"] }
-tracing-subscriber = { workspace = true, features = ["json"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
 once_cell = { workspace = true }
 console-subscriber = { workspace = true }
 dirs = { workspace = true }
@@ -19,4 +19,4 @@ anyhow = { workspace = true }
 
 [build-dependencies]
 # All features enabled
-vergen = { workspace = true, features = ["build", "cargo", "rustc", "si"] }
+vergen = { workspace = true }
