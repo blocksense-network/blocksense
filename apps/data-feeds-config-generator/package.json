@@ -38,7 +38,7 @@
     "keccak": "^3.0.4",
     "keccak256": "^1.0.6",
     "tsx": "^4.19.2",
-    "typescript": "5.5.4",
+    "typescript": "5.8.3",
     "vitest": "^3.0.2",
     "yahoo-finance2": "^2.13.2"
   },
