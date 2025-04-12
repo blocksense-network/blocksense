@@ -1,6 +1,6 @@
 { pkgs, lib, ... }:
 let
-  nodejs = pkgs.nodejs_22;
+  nodejs = pkgs.nodejs_23;
   corepack = pkgs.corepack.override { inherit nodejs; };
 in
 {
