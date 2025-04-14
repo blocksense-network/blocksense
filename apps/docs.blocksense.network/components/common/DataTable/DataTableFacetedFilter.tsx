@@ -10,7 +10,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
 } from '@blocksense/ui/Command';
 import {
   Popover,
@@ -19,6 +18,7 @@ import {
 } from '@blocksense/ui/Popover';
 import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 import { Checkbox } from '@blocksense/ui/Checkbox';
+import { Separator } from '@blocksense/ui';
 
 interface DataTableFacetedFilterProps {
   title: string;
@@ -83,7 +83,7 @@ export function DataTableFacetedFilter({
             </CommandGroup>
             {selectedValues.length > 0 && (
               <>
-                <CommandSeparator />
+                <Separator className="command__separator" />
                 <CommandGroup>
                   <CommandItem
                     onSelect={() => setSelectedValuesAction([])}

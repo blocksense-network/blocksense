@@ -205,21 +205,6 @@ export const DropdownMenuLabel = ({
   );
 };
 
-export const DropdownMenuSeparator = ({
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) => {
-  return (
-    <div
-      className={cn(
-        'dropdown-menu__separator my-1 h-px bg-neutral-200 dark:bg-neutral-500',
-        className,
-      )}
-      {...props}
-    />
-  );
-};
-
 export const DropdownMenuShortcut = ({
   className,
   ...props
