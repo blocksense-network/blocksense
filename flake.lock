@@ -3,23 +3,19 @@
     "agenix": {
       "inputs": {
         "darwin": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nix-darwin"
         ],
         "home-manager": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "home-manager"
         ],
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ],
         "systems": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "systems"
         ]
       },
@@ -72,23 +68,19 @@
     "cachix": {
       "inputs": {
         "devenv": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "devenv"
         ],
         "flake-compat": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-compat"
         ],
         "git-hooks": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "git-hooks-nix"
         ],
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs-unstable"
         ]
       },
@@ -124,24 +116,20 @@
     "devenv": {
       "inputs": {
         "cachix": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "cachix"
         ],
         "flake-compat": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-compat"
         ],
         "git-hooks": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "git-hooks-nix"
         ],
         "nix": "nix",
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -178,8 +166,7 @@
     "devshell": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix",
           "nixpkgs"
         ]
@@ -201,8 +188,7 @@
     "disko": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -223,29 +209,27 @@
     "dlang-nix": {
       "inputs": {
         "flake-compat": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-compat"
         ],
         "flake-parts": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-parts"
         ],
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1714055636,
-        "narHash": "sha256-8LCyIPAK4/4ge03ohCIWpoJrMGgoCaOriALzt7gPxHE=",
+        "lastModified": 1744030092,
+        "narHash": "sha256-EwKNnBBTpjgNH20nfhJocGh6rZQJji0/8i1qsaviiGQ=",
         "owner": "PetarKirov",
         "repo": "dlang.nix",
-        "rev": "dab4c199ad644dc23b0b9481e2e5a063e9492b84",
+        "rev": "ab6b8f72d7b56bfd0b12e189fc4dfaed9d46de76",
         "type": "github"
       },
       "original": {
         "owner": "PetarKirov",
+        "ref": "feat/build-dub-package",
         "repo": "dlang.nix",
-        "rev": "dab4c199ad644dc23b0b9481e2e5a063e9492b84",
         "type": "github"
       }
     },
@@ -254,51 +238,42 @@
         "devour-flake": "devour-flake",
         "devshell": "devshell",
         "fenix": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "fenix"
         ],
         "flake-compat": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-compat"
         ],
         "flake-parts": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-parts"
         ],
         "flake-utils": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-utils"
         ],
         "foundry-nix": "foundry-nix",
         "lib-extras": "lib-extras",
         "nimbus-eth2": "nimbus-eth2",
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixos-2405"
         ],
         "nixpkgs-2311": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixos-2311"
         ],
         "nixpkgs-unstable": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs-unstable"
         ],
         "systems": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "systems"
         ],
         "treefmt-nix": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "treefmt-nix"
         ]
       },
@@ -319,8 +294,7 @@
     "fenix": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ],
         "rust-analyzer-src": "rust-analyzer-src"
@@ -358,8 +332,7 @@
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "devenv",
           "nix",
           "nixpkgs"
@@ -382,8 +355,7 @@
     "flake-parts_2": {
       "inputs": {
         "nixpkgs-lib": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -404,8 +376,7 @@
     "flake-parts_3": {
       "inputs": {
         "nixpkgs-lib": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "terranix",
           "nixpkgs"
         ]
@@ -427,8 +398,7 @@
     "flake-parts_4": {
       "inputs": {
         "nixpkgs-lib": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "validator-ejector",
           "nixpkgs"
         ]
@@ -480,8 +450,7 @@
     "flake-utils": {
       "inputs": {
         "systems": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "systems"
         ]
       },
@@ -502,8 +471,7 @@
     "flake-utils-plus": {
       "inputs": {
         "flake-utils": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-utils"
         ]
       },
@@ -524,14 +492,12 @@
     "foundry-nix": {
       "inputs": {
         "flake-utils": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix",
           "flake-utils"
         ],
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix",
           "nixpkgs"
         ]
@@ -554,14 +520,12 @@
     "git-hooks-nix": {
       "inputs": {
         "flake-compat": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-compat"
         ],
         "gitignore": "gitignore",
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -582,8 +546,7 @@
     "gitignore": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "git-hooks-nix",
           "nixpkgs"
         ]
@@ -605,13 +568,11 @@
     "hercules-ci-effects": {
       "inputs": {
         "flake-parts": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-parts"
         ],
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -632,8 +593,7 @@
     "home-manager": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -655,27 +615,23 @@
     "lib-extras": {
       "inputs": {
         "devshell": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix",
           "devshell"
         ],
         "flake-parts": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix",
           "flake-parts"
         ],
         "flake-root": "flake-root",
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix",
           "nixpkgs"
         ],
         "treefmt-nix": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix",
           "treefmt-nix"
         ]
@@ -711,89 +667,66 @@
         "type": "github"
       }
     },
-    "mcl-blockchain": {
+    "mcl-nixos-modules": {
       "inputs": {
-        "crane": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "crane"
-        ],
-        "devenv": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "devenv"
-        ],
-        "ethereum_nix": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "ethereum-nix"
-        ],
-        "fenix": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "fenix"
-        ],
-        "flake-compat": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "flake-compat"
-        ],
-        "flake-parts": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "flake-parts"
-        ],
-        "flake-utils": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "flake-utils"
-        ],
-        "nix2container": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "nix2container"
-        ],
-        "nixos-modules": "nixos-modules",
+        "agenix": "agenix",
+        "cachix": "cachix",
+        "crane": "crane",
+        "devenv": "devenv",
+        "disko": "disko",
+        "dlang-nix": "dlang-nix",
+        "ethereum-nix": "ethereum-nix",
+        "fenix": "fenix",
+        "flake-compat": "flake-compat",
+        "flake-parts": "flake-parts_2",
+        "flake-utils": "flake-utils",
+        "flake-utils-plus": "flake-utils-plus",
+        "git-hooks-nix": "git-hooks-nix",
+        "hercules-ci-effects": "hercules-ci-effects",
+        "home-manager": "home-manager",
+        "microvm": "microvm",
+        "nix-darwin": "nix-darwin",
+        "nix2container": "nix2container",
+        "nixd": "nixd",
+        "nixos-2311": "nixos-2311",
+        "nixos-2405": "nixos-2405",
+        "nixos-2411": "nixos-2411",
+        "nixos-anywhere": "nixos-anywhere",
+        "nixos-images": "nixos-images",
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "nixpkgs"
+          "mcl-nixos-modules",
+          "nixos-2411"
         ],
-        "nixpkgs-unstable": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "nixpkgs-unstable"
-        ],
-        "treefmt-nix": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "treefmt-nix"
-        ]
+        "nixpkgs-unstable": "nixpkgs-unstable",
+        "systems": "systems",
+        "terranix": "terranix",
+        "treefmt-nix": "treefmt-nix_2",
+        "validator-ejector": "validator-ejector",
+        "vscode-server": "vscode-server"
       },
       "locked": {
-        "lastModified": 1744135841,
-        "narHash": "sha256-oryKkPZwP4zw7p0udm0THp6eHmjq+DaMHU6WD/eX96A=",
+        "lastModified": 1744363886,
+        "narHash": "sha256-Cq3zlwpaDMHL3MkKoikY79b6lt9/BmmC6TiDsnaYLRI=",
         "owner": "metacraft-labs",
-        "repo": "nix-blockchain-development",
-        "rev": "e999f1ba40d98fb79fb0bc60f42a9cc6d47d29f5",
+        "repo": "nixos-modules",
+        "rev": "3de2ebf5fd8220b4294adc9bd8430bb55f753ab3",
         "type": "github"
       },
       "original": {
         "owner": "metacraft-labs",
-        "repo": "nix-blockchain-development",
+        "ref": "feat/nix-blockchain-development-migration",
+        "repo": "nixos-modules",
         "type": "github"
       }
     },
     "microvm": {
       "inputs": {
         "flake-utils": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-utils"
         ],
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ],
         "spectrum": "spectrum"
@@ -830,8 +763,7 @@
     "nimbus-eth2": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix",
           "nixpkgs-unstable"
         ]
@@ -856,26 +788,22 @@
     "nix": {
       "inputs": {
         "flake-compat": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "devenv"
         ],
         "flake-parts": "flake-parts",
         "libgit2": "libgit2",
         "nixpkgs": "nixpkgs",
         "nixpkgs-23-11": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "devenv"
         ],
         "nixpkgs-regression": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "devenv"
         ],
         "pre-commit-hooks": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "devenv"
         ]
       },
@@ -897,8 +825,7 @@
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -919,13 +846,11 @@
     "nix2container": {
       "inputs": {
         "flake-utils": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-utils"
         ],
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -946,8 +871,7 @@
     "nixd": {
       "inputs": {
         "flake-parts": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-parts"
         ],
         "flake-root": "flake-root_2",
@@ -1019,29 +943,24 @@
     "nixos-anywhere": {
       "inputs": {
         "disko": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "disko"
         ],
         "flake-parts": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-parts"
         ],
         "nixos-images": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixos-images"
         ],
         "nixos-stable": "nixos-stable",
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ],
         "treefmt-nix": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "treefmt-nix"
         ]
       },
@@ -1062,13 +981,11 @@
     "nixos-images": {
       "inputs": {
         "nixos-stable": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixos-2405"
         ],
         "nixos-unstable": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs-unstable"
         ]
       },
@@ -1083,58 +1000,6 @@
       "original": {
         "owner": "nix-community",
         "repo": "nixos-images",
-        "type": "github"
-      }
-    },
-    "nixos-modules": {
-      "inputs": {
-        "agenix": "agenix",
-        "cachix": "cachix",
-        "crane": "crane",
-        "devenv": "devenv",
-        "disko": "disko",
-        "dlang-nix": "dlang-nix",
-        "ethereum-nix": "ethereum-nix",
-        "fenix": "fenix",
-        "flake-compat": "flake-compat",
-        "flake-parts": "flake-parts_2",
-        "flake-utils": "flake-utils",
-        "flake-utils-plus": "flake-utils-plus",
-        "git-hooks-nix": "git-hooks-nix",
-        "hercules-ci-effects": "hercules-ci-effects",
-        "home-manager": "home-manager",
-        "microvm": "microvm",
-        "nix-darwin": "nix-darwin",
-        "nix2container": "nix2container",
-        "nixd": "nixd",
-        "nixos-2311": "nixos-2311",
-        "nixos-2405": "nixos-2405",
-        "nixos-2411": "nixos-2411",
-        "nixos-anywhere": "nixos-anywhere",
-        "nixos-images": "nixos-images",
-        "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
-          "nixos-2411"
-        ],
-        "nixpkgs-unstable": "nixpkgs-unstable",
-        "systems": "systems",
-        "terranix": "terranix",
-        "treefmt-nix": "treefmt-nix_2",
-        "validator-ejector": "validator-ejector",
-        "vscode-server": "vscode-server"
-      },
-      "locked": {
-        "lastModified": 1744126481,
-        "narHash": "sha256-6qzfhsOljSn0POCQIkowzHGAu2GcDoDdJ0aG2G6NGz0=",
-        "owner": "metacraft-labs",
-        "repo": "nixos-modules",
-        "rev": "0e577672eaf01c19bb539e6c4bf60673972020a7",
-        "type": "github"
-      },
-      "original": {
-        "owner": "metacraft-labs",
-        "repo": "nixos-modules",
         "type": "github"
       }
     },
@@ -1221,38 +1086,33 @@
     "root": {
       "inputs": {
         "devenv": [
-          "mcl-blockchain",
+          "mcl-nixos-modules",
           "devenv"
         ],
         "ethereum-nix": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "ethereum-nix"
         ],
         "fenix": [
-          "mcl-blockchain",
+          "mcl-nixos-modules",
           "fenix"
         ],
         "flake-parts": [
-          "mcl-blockchain",
+          "mcl-nixos-modules",
           "flake-parts"
         ],
-        "mcl-blockchain": "mcl-blockchain",
-        "mcl-nixos-modules": [
-          "mcl-blockchain",
-          "nixos-modules"
-        ],
+        "mcl-nixos-modules": "mcl-nixos-modules",
         "mk-shell-bin": "mk-shell-bin",
         "nix2container": [
-          "mcl-blockchain",
+          "mcl-nixos-modules",
           "nix2container"
         ],
         "nixpkgs": [
-          "mcl-blockchain",
+          "mcl-nixos-modules",
           "nixpkgs"
         ],
         "nixpkgs-unstable": [
-          "mcl-blockchain",
+          "mcl-nixos-modules",
           "nixpkgs-unstable"
         ]
       }
@@ -1326,8 +1186,7 @@
         "bats-support": "bats-support",
         "flake-parts": "flake-parts_3",
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ],
         "systems": "systems_2",
@@ -1365,8 +1224,7 @@
     "treefmt-nix": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixd",
           "nixpkgs"
         ]
@@ -1388,8 +1246,7 @@
     "treefmt-nix_2": {
       "inputs": {
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -1411,8 +1268,7 @@
       "inputs": {
         "flake-parts": "flake-parts_4",
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },
@@ -1434,13 +1290,11 @@
     "vscode-server": {
       "inputs": {
         "flake-utils": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "flake-utils"
         ],
         "nixpkgs": [
-          "mcl-blockchain",
-          "nixos-modules",
+          "mcl-nixos-modules",
           "nixpkgs"
         ]
       },

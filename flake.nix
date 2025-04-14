@@ -15,15 +15,14 @@
   };
 
   inputs = {
-    mcl-blockchain.url = "github:metacraft-labs/nix-blockchain-development";
-    nixpkgs.follows = "mcl-blockchain/nixpkgs";
-    nixpkgs-unstable.follows = "mcl-blockchain/nixpkgs-unstable";
-    mcl-nixos-modules.follows = "mcl-blockchain/nixos-modules";
-    ethereum-nix.follows = "mcl-blockchain/nixos-modules/ethereum-nix";
-    flake-parts.follows = "mcl-blockchain/flake-parts";
-    fenix.follows = "mcl-blockchain/fenix";
-    devenv.follows = "mcl-blockchain/devenv";
-    nix2container.follows = "mcl-blockchain/nix2container";
+    mcl-nixos-modules.url = "github:metacraft-labs/nixos-modules/feat/nix-blockchain-development-migration";
+    nixpkgs.follows = "mcl-nixos-modules/nixpkgs";
+    nixpkgs-unstable.follows = "mcl-nixos-modules/nixpkgs-unstable";
+    ethereum-nix.follows = "mcl-nixos-modules/ethereum-nix";
+    flake-parts.follows = "mcl-nixos-modules/flake-parts";
+    fenix.follows = "mcl-nixos-modules/fenix";
+    devenv.follows = "mcl-nixos-modules/devenv";
+    nix2container.follows = "mcl-nixos-modules/nix2container";
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
   };
 
