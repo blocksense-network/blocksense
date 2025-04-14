@@ -109,6 +109,7 @@ function createConfig(packageDir, format) {
         dir: `${packageDir}/dist/${format}`,
         format: format,
         entryFileNames: `[name].${{ esm: 'mjs', cjs: 'cjs' }[format]}`,
+        sourcemap: tsconfig.config.compilerOptions.sourceMap,
       },
     ],
     plugins: [
