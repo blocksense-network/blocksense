@@ -100,7 +100,7 @@ export const encodeDataAndTimestamp = (
   const value = '0x' + data.toString(16).padStart(48, '0');
   const timestamp =
     '0x' +
-    BigInt(timestampValue ?? Math.floor(Date.now() / 1000))
+    BigInt(timestampValue ?? Math.floor(Date.now()))
       .toString(16)
       .padStart(16, '0');
   return ethers.concat([value, timestamp]);
