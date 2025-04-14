@@ -185,7 +185,10 @@ library CLAdapterLib {
   /// @return answer The value stored for the feed at the given round ID
   /// @return timestamp The timestamp when the value was stored
   function _decodeData(bytes32 data) internal pure returns (int256, uint256) {
-    return (int256(uint256(uint192(bytes24(data)))), uint64(uint256(data)));
+    return (
+      int256(uint256(uint192(bytes24(data)))),
+      uint64(uint256(data)) / 1000 // timestamp is stored in milliseconds
+    );
   }
 
   /// @notice Shifts the feed id to the left by 120 bits

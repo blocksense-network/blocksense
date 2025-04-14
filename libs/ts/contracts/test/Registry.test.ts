@@ -445,7 +445,8 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
         caller,
         TOKENS.ETH,
         TOKENS.USD,
-        encodeDataAndTimestamp(answers[2], updates[2]),
+        // timestamp in CL is stored in seconds, but we store it in milliseconds
+        encodeDataAndTimestamp(answers[2], updates[2] * 1000n),
         roundData[2].roundId,
       );
 
@@ -493,7 +494,8 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
         caller,
         TOKENS.ETH,
         TOKENS.USD,
-        encodeDataAndTimestamp(answers[2], updates[2]),
+        // timestamp in CL is stored in seconds, but we store it in milliseconds
+        encodeDataAndTimestamp(answers[2], updates[2] * 1000n),
         1n,
       );
 
