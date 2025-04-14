@@ -134,7 +134,7 @@ pub async fn get_serialized_updates_for_network(
         .get_contract(PRICE_FEED_CONTRACT_NAME)
         .ok_or(eyre!("{PRICE_FEED_CONTRACT_NAME} contract is not set!"))?
         .contract_version;
-    // drop(provider);
+    drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
     let mut strides_and_decimals = HashMap::new();
