@@ -37,7 +37,7 @@ with lib;
     };
 
     kafka-endpoint = mkOption {
-      type = types.str;
+      type = types.nullOr types.str;
       default = cfg.sequencer.kafka-report-endpoint;
       description = "The url of the kafka server.";
     };
