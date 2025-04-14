@@ -28,13 +28,14 @@ in
     reporter-opts:
     dashToUnderscoreRecursive {
       reporter-info = {
-        inherit (reporter-opts) second-consensus-secret-key kafka-endpoint;
+        inherit (reporter-opts) kafka-endpoint;
 
         reporter-id = reporter-opts.id;
         sequencer = reporter-opts.sequencer-url;
         registry = reporter-opts.registry-url;
         interval-time-in-seconds = reporter-opts.default-exec-interval;
         secret-key = reporter-opts.secret-key-path;
+        second-consensus-secret-key = reporter-opts.second-consensus-secret-key-path;
       };
 
       capabilities = builtins.attrValues (

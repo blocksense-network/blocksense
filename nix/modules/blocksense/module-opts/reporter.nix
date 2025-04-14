@@ -31,7 +31,7 @@ with lib;
       description = "The path to the reporter secret key.";
     };
 
-    second-consensus-secret-key = mkOption {
+    second-consensus-secret-key-path = mkOption {
       type = types.path;
       description = "The path to the reporter second consensus secret key.";
     };
