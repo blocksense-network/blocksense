@@ -34,6 +34,7 @@
     "./InfoTip": "./src/components/InfoTip/index.tsx",
     "./Checkbox": "./src/components/Checkbox/index.tsx",
     "./Carousel": "./src/components/Carousel/index.tsx",
+    "./Separator": "./src/components/Separator/index.tsx",
     "./utils": "./src/lib/utils.ts"
   },
   "dependencies": {

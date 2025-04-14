@@ -25,4 +25,5 @@ export * from './components/RadioGroup';
 export * from './components/InfoTip';
 export * from './components/Checkbox';
 export * from './components/Carousel';
+export * from './components/Separator';
 export * from './lib/utils';
