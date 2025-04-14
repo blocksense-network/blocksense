@@ -23,7 +23,7 @@ export const config = {
 export const gettingStartedConfig = {
   title: 'The zk rollup for programmable oracles.',
   description:
-    'A fully decentralized protocol with groundbreaking cost efficiency. Everyone will be able to create secure oracles for every chain and every meta.',
+    'A fully decentralized protocol with groundbreaking cost efficiency. For every chain and every meta.',
 };
 
 export const shikiDefaultThemes = {
