@@ -134,6 +134,7 @@ function createConfig(packageDir, format) {
         composite: false,
         declaration: format != 'cjs',
         declarationMap: format != 'cjs',
+        noEmitOnError: true,
         noEmit: format == 'cjs',
         outDir:
           format == 'cjs' ? undefined : `${packageDir}/dist/${format}/types`,
