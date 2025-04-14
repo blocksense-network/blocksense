@@ -109,4 +109,18 @@ contract BlocksenseADFSConsumer {
         slotsCount
       );
   }
+
+  function getEpochSeconds(uint256 id) external view returns (uint64) {
+    return
+      Blocksense._getEpochSeconds(
+        Blocksense._getLatestSingleFeedData(adfs, id)
+      );
+  }
+
+  function getEpochMilliseconds(uint256 id) external view returns (uint64) {
+    return
+      Blocksense._getEpochMilliseconds(
+        Blocksense._getLatestSingleFeedData(adfs, id)
+      );
+  }
 }

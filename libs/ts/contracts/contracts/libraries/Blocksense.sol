@@ -263,6 +263,14 @@ library Blocksense {
       );
   }
 
+  function _getEpochSeconds(bytes32 data) internal pure returns (uint64) {
+    return uint64(uint256(data)) / 1000;
+  }
+
+  function _getEpochMilliseconds(bytes32 data) internal pure returns (uint64) {
+    return uint64(uint256(data));
+  }
+
   /// @notice Calls the dataFeedStore with the given data for stride 0 feeds
   /// @dev Using assembly achieves lower gas costs
   /// Used as a call() function to dataFeedStore
