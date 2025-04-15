@@ -34,7 +34,7 @@ in
         fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
       };
       ink-sepolia = {
-        port = 8547;
+        port = 8545;
         chain-id = 99999999999;
         fork-url = "wss://ws-gel-sepolia.inkonchain.com";
       };
@@ -112,7 +112,7 @@ in
         ink-sepolia = {
           private_key_path = "${testKeysDir}/sequencer-private-key";
           contract_address = upgradeableProxyADFSContractAddressInk;
-          safe_address = "0x23BC561ea93063B0cD12b6E3c690D40c93e29692";
+          safe_address = "0xCab0DF91Cda16b675c948b03c1B633BC0eb73101";
           contract_version = 2;
           transaction_gas_limit = 20000000;
           impersonated_anvil_account = impersonationAddress;
