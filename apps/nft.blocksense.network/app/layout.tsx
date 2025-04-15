@@ -77,7 +77,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       </NextHead>
       <body className="nft-drop-layout__body">
         <Navbar />
-        <main className="nft-drop-layout__main">{children}</main>
+        <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
         <Footer />
       </body>
     </html>

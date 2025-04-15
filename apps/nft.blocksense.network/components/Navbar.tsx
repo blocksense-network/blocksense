@@ -39,15 +39,15 @@ const navLinks = [
 
 const DesktopNavbar = () => {
   return (
-    <header className="navbar hidden md:flex fixed w-full bg-[var(--black)] text-[var(--white)] justify-between items-center px-20 py-[1.125rem]">
+    <header className="navbar hidden md:flex z-20 fixed w-full bg-[var(--black)] text-[var(--white)] justify-between items-center px-20 py-[1.125rem]">
       <Logo />
       <nav className="navbar__nav flex gap-8">
         {navLinks.map(link => (
           <a
             key={link.label}
             href={link.href}
-            target={'_blank'}
-            rel={'noopener noreferrer'}
+            target="_blank"
+            rel="noopener noreferrer"
             className="navbar__link"
           >
             {link.label}
@@ -77,10 +77,8 @@ const MobileNavbar = () => {
   };
 
   return (
-    <header
-      className={`navbar md:hidden ${isOpen && 'text-[var(--white)] flex flex-col h-screen overflow-auto'}`}
-    >
-      <section className="navbar__header-section fixed w-full bg-[var(--black)] flex justify-between items-center px-5 py-4">
+    <header className="navbar md:hidden relative">
+      <section className="navbar__header-section fixed top-0 w-full bg-[var(--black)] flex justify-between items-center px-5 py-4 z-20">
         <Logo />
         <button
           onClick={toggleMenu}
@@ -95,14 +93,14 @@ const MobileNavbar = () => {
         </button>
       </section>
       {isOpen && (
-        <nav className="navbar__nav flex-1 w-full px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)]">
+        <nav className="fixed top-[3.85rem] left-0 w-full h-[calc(100vh-3.85rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto">
           <section className="flex flex-col gap-8 text-center">
             {navLinks.map(link => (
               <a
                 key={link.label}
                 href={link.href}
-                target={'_blank'}
-                rel={'noopener noreferrer'}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={closeNavbar}
                 className="navbar__link"
               >
