@@ -1,7 +1,8 @@
 import { join, dirname } from 'node:path';
 import { createRequire } from 'node:module';
 
-import type { StorybookConfig } from '@storybook/nextjs';
+import type { StorybookConfig } from '@storybook/experimental-nextjs-vite';
+import { mergeConfig } from 'vite';
 
 const require = createRequire(import.meta.url);
 
@@ -13,17 +14,48 @@ function getAbsolutePath(value: string) {
   return dirname(require.resolve(join(value, 'package.json')));
 }
 
+type RollupLog = { code: string; message: string };
+
+const warningsToIgnore = {
+  SOURCEMAP_ERROR: ["Can't resolve original location of error"],
+  MODULE_LEVEL_DIRECTIVE: ['use client'],
+};
+
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+
   addons: [
     getAbsolutePath('@storybook/addon-essentials'),
     getAbsolutePath('@chromatic-com/storybook'),
     getAbsolutePath('@storybook/addon-interactions'),
   ],
+
   framework: {
-    name: getAbsolutePath('@storybook/nextjs'),
+    name: getAbsolutePath('@storybook/experimental-nextjs-vite'),
     options: {},
   },
+
+  async viteFinal(config) {
+    return mergeConfig(config, {
+      build: {
+        rollupOptions: {
+          onwarn(
+            warning: RollupLog,
+            defaultHandler: (warning: RollupLog) => void,
+          ) {
+            if (warning.code in warningsToIgnore) {
+              const messagesToIgnore: string[] = warningsToIgnore[warning.code];
+              if (messagesToIgnore.some(m => warning.message.includes(m))) {
+                return;
+              }
+            }
+            defaultHandler(warning);
+          },
+        },
+      },
+    });
+  },
+
   staticDirs: [
     {
       from: '../assets/fonts',
@@ -34,5 +66,9 @@ const config: StorybookConfig = {
       to: 'icons',
     },
   ],
+
+  docs: {
+    autodocs: true,
+  },
 };
 export default config;

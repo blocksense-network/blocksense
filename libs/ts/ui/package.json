@@ -50,6 +50,7 @@
     "@storybook/addon-interactions": "^8.6.12",
     "@storybook/addon-onboarding": "^8.6.12",
     "@storybook/blocks": "^8.6.12",
+    "@storybook/experimental-nextjs-vite": "^8.6.12",
     "@storybook/nextjs": "^8.6.12",
     "@storybook/react": "^8.6.12",
     "@storybook/test": "^8.6.12",
@@ -58,7 +59,8 @@
     "next": "^15.1.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "storybook": "^8.6.12"
+    "storybook": "^8.6.12",
+    "vite": "^6.2.6"
   },
   "peerDependencies": {
     "@types/react": "*",
