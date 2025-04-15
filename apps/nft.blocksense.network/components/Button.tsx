@@ -32,7 +32,7 @@ export const Button = ({
 
   return (
     <button
-      className={`button ${variantStyle[variant]} text-[var(--black)] px-8 py-4 cursor-pointer rounded-[2.5rem] font-semibold tracking-[-0.32px] leading-[120%] ${disabled && 'opacity-[0.3] pointer-events-none'} ${isLoading && `${variantStyle['secondary']} flex gap-1 items-center justify-center`} ${className}`}
+      className={`button ${variantStyle[variant]} text-[var(--black)] px-8 py-4 cursor-pointer rounded-[2.5rem] font-bold tracking-[-0.32px] leading-[120%] ${disabled && 'opacity-[0.3] pointer-events-none'} ${isLoading && `${variantStyle['secondary']} flex gap-1 items-center justify-center`} ${className}`}
       disabled={disabled}
       onClick={handleClick}
       {...props}
