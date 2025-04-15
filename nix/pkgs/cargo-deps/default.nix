@@ -16,10 +16,18 @@
   autoPatchelfHook,
   version ? "dev",
 }:
+{
+  cargoLock ? ../../../Cargo.lock,
+  cargoToml ? ../../../Cargo.toml,
+  sourceRootDir ? ".",
+  extraArgs ? "",
+  pname ? "blocksense-cargo",
+}:
 let
-  sharedAttrs = {
-    pname = "blocksense";
-    inherit (filesets.rustSrc) src;
+  sharedAttrs = rec {
+    inherit pname version;
+
+    src = filesets.rustFilter [ ];
 
     nativeBuildInputs =
       [
@@ -59,11 +67,26 @@ let
     doCheck = false;
     strictDeps = true;
 
+    cargoVendorDir = craneLib.vendorCargoDeps { inherit cargoLock; };
+
+    postUnpack = ''
+      cd $sourceRoot/${sourceRootDir}
+      sourceRoot="."
+    '';
+
+    inherit cargoToml;
+
     preBuild = lib.optionalString stdenv.isLinux ''
       addAutoPatchelfSearchPath ${libgcc.lib}/lib/
     '';
+    cargoExtraArgs = extraArgs;
   };
-
-  cargoArtifacts = craneLib.buildDepsOnly (sharedAttrs // { name = "blocksense-cargo-deps"; });
 in
-craneLib.buildPackage (sharedAttrs // { inherit version cargoArtifacts; })
+craneLib.buildDepsOnly (
+  sharedAttrs
+  // {
+    passthru = {
+      inherit sharedAttrs;
+    };
+  }
+)
