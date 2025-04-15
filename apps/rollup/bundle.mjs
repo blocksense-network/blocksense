@@ -89,6 +89,20 @@ function createConfig(packageDir, format) {
         }),
     ),
 
+    onwarn(warning, warn) {
+      // Filter out the empty chunk warning
+      // The warning code might be 'EMPTY_BUNDLE'
+      if (
+        warning.code === 'EMPTY_BUNDLE' ||
+        (typeof warning.message === 'string' &&
+          warning.message.includes('Generated an empty chunk'))
+      ) {
+        return;
+      }
+      // Handle all other warnings normally
+      warn(warning);
+    },
+
     external: (id, parentId, _isResolved) => {
       const absPath = path.isAbsolute(id)
         ? id
