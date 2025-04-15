@@ -53660,7 +53660,7 @@
       }
     },
     {
-      "id": 1000003,
+      "id": 100001,
       "full_name": "YieldNest convertToAssets",
       "description": "YieldNest convertToAssets call on 0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb",
       "type": "price-feed",
@@ -53679,11 +53679,11 @@
       },
       "additional_feed_info": {
         "pair": {
-          "base": "USR",
-          "quote": "USD"
+          "base": "",
+          "quote": ""
         },
-        "decimals": 8,
-        "category": "Crypto",
+        "decimals": 0,
+        "category": "",
         "market_hours": "Crypto",
         "arguments": []
       }
