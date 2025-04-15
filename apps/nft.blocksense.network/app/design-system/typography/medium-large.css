@@ -19,6 +19,18 @@
   }
 
   @layer base {
+    body {
+      color: var(--gray-light);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    input {
+      color: var(--white);
+    }
+
     h1 {
       font-size: var(--font-size-h1);
       font-weight: var(--font-weight-medium);

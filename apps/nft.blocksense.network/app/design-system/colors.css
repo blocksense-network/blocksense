@@ -13,6 +13,5 @@
 @layer base {
   body {
     background: var(--black);
-    color: var(--gray-light);
   }
 }
