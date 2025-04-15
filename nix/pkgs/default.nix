@@ -52,7 +52,7 @@
             "libs/blockchain_data_model"
             "libs/data_feeds"
             "libs/feed_registry"
-            "libs/prometheus"
+            "libs/metrics"
             "libs/feeds_processing"
             "libs/gnosis_safe"
           ];
@@ -66,7 +66,7 @@
             "libs/crypto"
             "libs/data_feeds"
             "libs/feed_registry"
-            "libs/prometheus"
+            "libs/metrics"
           ];
         };
         trigger-oracle = {
@@ -78,7 +78,7 @@
             "libs/crypto"
             "libs/data_feeds"
             "libs/feed_registry"
-            "libs/prometheus"
+            "libs/metrics"
             "libs/sdk"
           ];
         };
@@ -103,37 +103,37 @@
       };
 
       rust-libraries = mkRustPackage rec {
-        anomaly_detection = {
+        blocksense-anomaly-detection = {
           members = "libs/anomaly_detection";
         };
-        blockchain_data_model = {
+        blocksense-blockchain-data-model = {
           members = [
             "libs/blockchain_data_model"
             "libs/utils"
           ];
         };
-        config = {
+        blocksense-config = {
           members = [
             "libs/config"
             "libs/registry"
             "libs/utils"
           ];
         };
-        crypto = {
+        blocksense-crypto = {
           members = "libs/crypto";
         };
-        data_feeds = {
+        blocksense-data-feeds = {
           members = [
             "libs/data_feeds"
             "libs/feed_registry"
-            "libs/prometheus"
+            "libs/metrics"
             "libs/config"
             "libs/registry"
             "libs/utils"
             "libs/crypto"
           ];
         };
-        feed_registry = {
+        blocksense-feed-registry = {
           members = [
             "libs/feed_registry"
             "libs/crypto"
@@ -142,13 +142,13 @@
             "libs/utils"
           ];
         };
-        feeds_processing = {
+        blocksense-feeds-processing = {
           members = [
             "libs/feeds_processing"
             "libs/anomaly_detection"
             "libs/data_feeds"
             "libs/feed_registry"
-            "libs/prometheus"
+            "libs/metrics"
             "libs/gnosis_safe"
             "libs/crypto"
             "libs/config"
@@ -156,22 +156,21 @@
             "libs/utils"
           ];
         };
-        gnosis_safe = {
+        blocksense-gnosis-safe = {
           members = [
             "libs/gnosis_safe"
             "libs/data_feeds"
             "libs/feed_registry"
-            "libs/prometheus"
+            "libs/metrics"
             "libs/crypto"
             "libs/config"
             "libs/registry"
             "libs/utils"
           ];
         };
-        prometheus = {
-          packageName = "prometheus@0.1.1";
+        blocksense-metrics = {
           members = [
-            "libs/prometheus"
+            "libs/metrics"
             "libs/utils"
           ];
         };
@@ -190,7 +189,7 @@
             "libs/sdk/macro"
           ];
         };
-        utils = {
+        blocksense-utils = {
           members = [
             "libs/utils"
           ];
