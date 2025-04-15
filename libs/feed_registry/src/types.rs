@@ -193,7 +193,7 @@ pub enum FeedType {
     Text(String),
     Bytes(Vec<u8>),
 }
-
+use std::str::FromStr;
 impl FeedType {
     pub fn sizeof(&self) -> usize {
         match self {
@@ -217,9 +217,7 @@ impl FeedType {
                 // Left these logs in order to diagnose it later.
                 let integer = match val_split[0].parse::<BigUint>() {
                     Ok(v) => v,
-                    Err(err) => {
-                        bail!("FeedType::as_bytes error: {err:?}. Value was {val}. Formatted like {str_val:?}");
-                    }
+                    Err(err) => BigUint::from_str("0").unwrap(),
                 };
 
                 let actual_digits_in_fraction: usize;

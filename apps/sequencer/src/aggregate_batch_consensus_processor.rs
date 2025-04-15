@@ -15,6 +15,9 @@ use blocksense_gnosis_safe::utils::SafeMultisig;
 use futures_util::stream::{FuturesUnordered, StreamExt};
 use std::{io::Error, time::Duration};
 
+use alloy_primitives::Uint;
+use std::str::FromStr;
+
 pub async fn aggregation_batch_consensus_loop(
     sequencer_state: Data<SequencerState>,
     block_config: BlockConfig,

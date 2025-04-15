@@ -107,7 +107,7 @@ let
       shutdown.signal = 9;
       depends_on = {
         "anvil-impersonate-and-fund-ethereum-sepolia".condition = "process_completed_successfully";
-        "anvil-impersonate-and-fund-ink-sepolia".condition = "process_completed_successfully";
+        # "anvil-impersonate-and-fund-ink-sepolia".condition = "process_completed_successfully";
       };
       log_configuration = logsConfig;
       log_location = cfg.logsDir + "/sequencer.log";
