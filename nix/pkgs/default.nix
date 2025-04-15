@@ -78,6 +78,9 @@
             "libs/crypto"
             "libs/data_feeds"
             "libs/feed_registry"
+            "libs/feeds_processing"
+            "libs/anomaly_detection"
+            "libs/gnosis_safe"
             "libs/metrics"
             "libs/sdk"
           ];
@@ -225,12 +228,6 @@
               "libs/sdk/examples/cmc"
               "libs/sdk"
             ];
-            trueCargoArtifacts = cargoArtifacts {
-              pname = "cmc-cargo";
-              cargoLock = ../../libs/sdk/examples/cmc/Cargo.lock;
-              cargoToml = ../../libs/sdk/examples/cmc/Cargo.toml;
-              sourceRootDir = "libs/sdk/examples/cmc";
-            };
           };
           yahoo = {
             packageName = "yahoo-oracle";
@@ -238,12 +235,6 @@
               "libs/sdk/examples/yahoo"
               "libs/sdk"
             ];
-            trueCargoArtifacts = cargoArtifacts {
-              pname = "yahoo-cargo";
-              cargoLock = ../../libs/sdk/examples/yahoo/Cargo.lock;
-              cargoToml = ../../libs/sdk/examples/yahoo/Cargo.toml;
-              sourceRootDir = "libs/sdk/examples/yahoo";
-            };
           };
           revolut = {
             packageName = "revolut-oracle";
@@ -251,12 +242,6 @@
               "libs/sdk/examples/revolut"
               "libs/sdk"
             ];
-            trueCargoArtifacts = cargoArtifacts {
-              pname = "revolut-cargo";
-              cargoLock = ../../libs/sdk/examples/revolut/Cargo.lock;
-              cargoToml = ../../libs/sdk/examples/revolut/Cargo.toml;
-              sourceRootDir = "libs/sdk/examples/revolut";
-            };
           };
         }
       );
