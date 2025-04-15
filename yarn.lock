@@ -2093,13 +2093,12 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^16.0.0"
     "@rollup/plugin-typescript": "npm:^12.1.2"
     "@types/rollup-plugin-peer-deps-external": "npm:^2"
+    chalk-template: "npm:^1.1.0"
     get-tsconfig: "npm:^4.8.1"
     glob: "npm:^11.0.0"
     rollup: "npm:^4.20.0"
     rollup-plugin-delete: "npm:^2.0.0"
     rollup-plugin-peer-deps-external: "npm:^2.2.4"
-    rollup-plugin-string-import: "npm:^1.2.5"
-    rollup-plugin-typescript2: "npm:^0.36.0"
     tslib: "npm:^2.8.1"
     typescript: "npm:5.8.3"
   bin:
@@ -6138,16 +6137,6 @@ __metadata:
     tslib:
       optional: true
   checksum: 10c0/f447e23371bb1815030446ada3f57608bc6665f8aa2cd7343c4aa18021790fa3ba4783146ea576fb650d6ec68876182d0bc789a05b1a9163c09b16c17efdf868
-  languageName: node
-  linkType: hard
-
-"@rollup/pluginutils@npm:^4.1.2":
-  version: 4.2.1
-  resolution: "@rollup/pluginutils@npm:4.2.1"
-  dependencies:
-    estree-walker: "npm:^2.0.1"
-    picomatch: "npm:^2.2.2"
-  checksum: 10c0/3ee56b2c8f1ed8dfd0a92631da1af3a2dfdd0321948f089b3752b4de1b54dc5076701eadd0e5fc18bd191b77af594ac1db6279e83951238ba16bf8a414c64c48
   languageName: node
   linkType: hard
 
@@ -14259,7 +14248,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"estree-walker@npm:^2.0.1, estree-walker@npm:^2.0.2":
+"estree-walker@npm:^2.0.2":
   version: 2.0.2
   resolution: "estree-walker@npm:2.0.2"
   checksum: 10c0/53a6c54e2019b8c914dc395890153ffdc2322781acf4bd7d1a32d7aedc1710807bdcd866ac133903d5629ec601fbb50abe8c2e5553c7f5a0afdd9b6af6c945af
@@ -14726,7 +14715,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-cache-dir@npm:^3.3.1, find-cache-dir@npm:^3.3.2":
+"find-cache-dir@npm:^3.3.1":
   version: 3.3.2
   resolution: "find-cache-dir@npm:3.3.2"
   dependencies:
@@ -20859,7 +20848,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"picomatch@npm:^2.0.4, picomatch@npm:^2.2.1, picomatch@npm:^2.2.2, picomatch@npm:^2.3.1":
+"picomatch@npm:^2.0.4, picomatch@npm:^2.2.1, picomatch@npm:^2.3.1":
   version: 2.3.1
   resolution: "picomatch@npm:2.3.1"
   checksum: 10c0/26c02b8d06f03206fc2ab8d16f19960f2ff9e81a658f831ecb656d8f17d9edc799e8364b1f4a7873e89d9702dff96204be0fa26fe4181f6843f040f819dac4be
@@ -22643,33 +22632,6 @@ __metadata:
   peerDependencies:
     rollup: "*"
   checksum: 10c0/86c969e38165363d1831997cb765a351bbc03b76c68496aa3c5714e4545f3335489da92d069c6b7785cbf9b1df6d1d7e16c5ccfa31aad4f9f00dd4f9c6f2258b
-  languageName: node
-  linkType: hard
-
-"rollup-plugin-string-import@npm:^1.2.5":
-  version: 1.2.5
-  resolution: "rollup-plugin-string-import@npm:1.2.5"
-  dependencies:
-    "@rollup/pluginutils": "npm:^5.1.0"
-  peerDependencies:
-    rollup: 4.20.0
-  checksum: 10c0/66cfc5aa6cb94c459b9d0d2767237d2770aebce0b1607d3f7f0df264d28ab76ae5a0ef69bcf3a69a41deded26c17e5177dacd97919446f8039a1adcdf390ef87
-  languageName: node
-  linkType: hard
-
-"rollup-plugin-typescript2@npm:^0.36.0":
-  version: 0.36.0
-  resolution: "rollup-plugin-typescript2@npm:0.36.0"
-  dependencies:
-    "@rollup/pluginutils": "npm:^4.1.2"
-    find-cache-dir: "npm:^3.3.2"
-    fs-extra: "npm:^10.0.0"
-    semver: "npm:^7.5.4"
-    tslib: "npm:^2.6.2"
-  peerDependencies:
-    rollup: ">=1.26.3"
-    typescript: ">=2.4.0"
-  checksum: 10c0/3c8d17cd852ded36eaad2759caf170f90e091d8f86ff7b016d1823bc8b507b8f689156bcccda348fc88471681dc79cc9eb13ddb09a4dfcf0d07ac9a249e2d79b
   languageName: node
   linkType: hard
 
@@ -24811,7 +24773,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.6.2":
+"tslib@npm:^2.0.0":
   version: 2.6.3
   resolution: "tslib@npm:2.6.3"
   checksum: 10c0/2598aef53d9dbe711af75522464b2104724d6467b26a60f2bdac8297d2b5f1f6b86a71f61717384aa8fd897240467aaa7bcc36a0700a0faf751293d1331db39a
