@@ -1,3 +1,7 @@
+/**
+ * @deprecated This script is deprecated and should no longer be used.
+ */
+
 import { Schema, ParseResult } from 'effect';
 const { decodeUnknownSync } = ParseResult;
 
