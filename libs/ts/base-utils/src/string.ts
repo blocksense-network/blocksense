@@ -47,3 +47,17 @@ export function kebabToCamelCase<Str extends string>(
     char.toUpperCase(),
   ) as KebabToCamelCase<Str>;
 }
+
+/**
+ * Compares two strings for equality in a case-insensitive manner.
+ *
+ * @param a - The first string to compare.
+ * @param b - The second string to compare.
+ * @returns `true` if the strings are equal ignoring case, otherwise `false`.
+ *
+ * @todo Investigate why using `localeCompare` with `{ sensitivity: 'base' }`
+ * causes the program to hang and consider re-enabling it for better locale support.
+ */
+export function equalsCaseInsensitive(a: string, b: string) {
+  return a.toLowerCase() === b.toLowerCase();
+}

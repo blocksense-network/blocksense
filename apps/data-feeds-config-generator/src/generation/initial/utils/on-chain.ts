@@ -4,7 +4,7 @@ import { assertNotNull } from '@blocksense/base-utils/assert';
 import { everyAsync } from '@blocksense/base-utils/async';
 import { NetworkName, getRpcUrl, isTestnet } from '@blocksense/base-utils/evm';
 
-import { ChainLinkFeedInfo } from '../../../data-services/types';
+import { ChainLinkFeedInfo } from '../../../data-services/fetchers/chainlink/types';
 import {
   chainlinkNetworkNameToChainId,
   parseNetworkFilename,
