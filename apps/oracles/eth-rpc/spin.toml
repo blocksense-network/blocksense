@@ -15,9 +15,8 @@ reporter_id = 0
 component = "eth-rpc"
 
 [[trigger.oracle.data_feeds]]
-id = "1000003"
-data = '{"pair":{"base":"USR","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[]}'
-
+id = "100001"
+data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":[]}'
 [component.eth-rpc]
 source = "../../../target/wasm32-wasip1/release/eth_rpc.wasm"
 
