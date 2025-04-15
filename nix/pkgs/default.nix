@@ -103,6 +103,12 @@
             "libs/sdk"
           ];
         };
+        eth-rpc = {
+          members = [
+            "apps/oracles/eth-rpc"
+            "libs/sdk"
+          ];
+        };
       };
 
       rust-libraries = mkRustPackage rec {
@@ -219,6 +225,12 @@
             packageName = "gecko-terminal";
             members = [
               "apps/oracles/gecko-terminal"
+              "libs/sdk"
+            ];
+          };
+          eth-rpc = {
+            members = [
+              "apps/oracles/eth-rpc"
               "libs/sdk"
             ];
           };
