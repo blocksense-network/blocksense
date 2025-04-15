@@ -26,12 +26,12 @@ const HeroDesktop = () => {
         className="z-[-1]"
       />
       <section className="max-w-[66.875rem] mx-auto">
-        <article className="hero flex gap-[1.625rem] justify-between items-center relative z-10 pb-20">
-          <section className="flex-1 flex flex-col gap-[3.375rem] justify-between max-w-[36rem]">
+        <article className="hero flex gap-[1.625rem] justify-between pb-20">
+          <section className="flex-1 flex flex-col gap-10 justify-between max-w-[36rem]">
             <h1>Join the Blocksense crew with your pirate NFT</h1>
             <Button className="w-fit">Claim your very own pirate NFT</Button>
           </section>
-          <p className="flex-1 max-w-[27rem]">
+          <p className="flex-1 max-w-[27rem] pt-[0.75rem]">
             As the fully programmable ZK oracle protocol with groundbreaking
             cost efficiency, Blocksense will soon let everyone create secure
             oracles in minutes.
