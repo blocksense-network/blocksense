@@ -10,6 +10,8 @@ import {
 } from './utils/process-compose';
 
 import { expectedPCStatuses03 } from './expected';
+import { execa } from 'execa';
+import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 
 describe.sequential('E2E Tests with process-compose', async () => {
   beforeAll(async () => {
@@ -47,5 +49,34 @@ describe.sequential('E2E Tests with process-compose', async () => {
     const processes = await parseProcessesStatus();
 
     expect(processes).toEqual(expectedPCStatuses03);
+  });
+
+  describe.sequential('Reporter behavior based on logs', async () => {
+    const reporterLogsFile =
+      getProcessComposeLogsFiles('example-setup-03')['reporter-a'];
+
+    test('Reporter should NOT panic', async () => {
+      const result = await execa('rg', ['-i', 'panic', reporterLogsFile], {
+        reject: false,
+      });
+      expect(result.exitCode).toBe(1);
+    });
+
+    test('Reporter should NOT receive errors from Sequencer', async () => {
+      const result = await execa(
+        'rg',
+        [
+          '-i',
+          '--pcre2',
+          'Sequencer responded with status=(?!200)\\d+',
+          reporterLogsFile,
+        ],
+        {
+          reject: false,
+        },
+      );
+
+      expect(result.exitCode).toBe(1);
+    });
   });
 });
