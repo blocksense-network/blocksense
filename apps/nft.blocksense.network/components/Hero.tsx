@@ -1,4 +1,8 @@
+'use client';
+
 import Image from 'next/image';
+import { useEffect } from 'react';
+import { TwitterApi } from 'twitter-api-v2';
 
 import { Button } from './Button';
 import heroVector from '/public/images/hero-vector.svg';
@@ -15,6 +19,46 @@ export const Hero = () => {
 };
 
 const HeroDesktop = () => {
+  const userId = '1055914045544337448';
+
+  const getUserFromGuild = async () => {
+    const response = await fetch(
+      `https://discord.com/api/v10/guilds/${process.env['NEXT_PUBLIC_GUILD_ID']}/members/${userId}`,
+      {
+        headers: {
+          Authorization: `Bot ${process.env['NEXT_PUBLIC_BOT_TOKEN']}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+    return response.json();
+  };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const response = await getUserFromGuild();
+      console.log(response);
+    };
+    fetchUserData();
+  }, []);
+
+  // useEffect(() => {
+  // const fetchUserData = async () => {
+  //   const xToken = process.env['NEXT_PUBLIC_X_TOKEN'];
+  //   if (!xToken) {
+  //     console.error('NEXT_PUBLIC_X_TOKEN is not defined');
+  //     return;
+  //   }
+  //   const twitterClient = new TwitterApi(xToken);
+  //   // Tell typescript it's a readonly app
+  //   const readOnlyClient = twitterClient.readOnly;
+  //   // Play with the built in methods
+  //   const user = await readOnlyClient.v2.userByUsername('r_dimchev');
+  //   console.log(user);
+  // };
+  // fetchUserData();
+  // }, []);
+
   return (
     <section className="hidden md:block relative px-20 pb-8 pt-[4.672rem]">
       <Image

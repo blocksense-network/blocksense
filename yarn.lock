@@ -2064,6 +2064,7 @@ __metadata:
     tailwindcss-animate: "npm:^1.0.7"
     tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
+    twitter-api-v2: "npm:^1.22.0"
     typescript: "npm:5.8.3"
   languageName: unknown
   linkType: soft
@@ -25536,6 +25537,13 @@ __metadata:
   version: 1.0.3
   resolution: "tweetnacl@npm:1.0.3"
   checksum: 10c0/069d9df51e8ad4a89fbe6f9806c68e06c65be3c7d42f0701cc43dba5f0d6064686b238bbff206c5addef8854e3ce00c643bff59432ea2f2c639feab0ee1a93f9
+  languageName: node
+  linkType: hard
+
+"twitter-api-v2@npm:^1.22.0":
+  version: 1.22.0
+  resolution: "twitter-api-v2@npm:1.22.0"
+  checksum: 10c0/64a8cb0844eb69b4fa0fe74a2009a26211707d574fb5924913e30ef2e98564f576f2ce972ac8ebd8a034fbd5ad419ad3959d30a645d3b4002e6a06a183ae0709
   languageName: node
   linkType: hard
 
