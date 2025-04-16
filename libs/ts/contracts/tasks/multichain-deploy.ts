@@ -188,10 +188,11 @@ task('deploy', 'Deploy contracts')
           salt: create2ContractSalts.clFeedRegistry,
           value: 0n,
         },
-        ...dataFeedConfig.map((data): DeployContract => {
+        ...dataFeedConfig.map(data => {
+          const { base, quote } = getCLRegistryPair(data.id);
           return {
             name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
+            argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
               data.description,
               data.additional_feed_info.decimals,
@@ -203,8 +204,8 @@ task('deploy', 'Deploy contracts')
             feedRegistryInfo: {
               feedId: data.id,
               description: `${data.full_name} (${data.id})`,
-              base: data.base,
-              quote: data.quote,
+              base,
+              quote,
             },
           };
         }),
