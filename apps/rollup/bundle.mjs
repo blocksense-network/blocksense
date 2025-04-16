@@ -58,13 +58,14 @@ async function build(packageDir, relativeDir, format) {
   } catch (error) {
     console.log(
       error.message
+        .replace(/^\[plugin ([^\]]*)\] (\S+):/, '├─ ❌ [$2]')
         .replace(
           /^\[plugin typescript\]\s+(\S+)\s+\((\d+:\d+)\):\s+@rollup\/plugin-typescript\s+(TS\d+):/,
           '├─ ❌ $1:$2 - error $3:',
         )
         .replace(/^\s+/gm, '│       '),
     );
-    console.log(error.frame.replace(/^/gm, '│     '));
+    if (error.frame) console.log(error.frame.replace(/^/gm, '│     '));
     console.log(chalkTemplate`╰─ {red Building {bold ${relativeDir}} failed.}`);
     process.exit(1);
   } finally {
