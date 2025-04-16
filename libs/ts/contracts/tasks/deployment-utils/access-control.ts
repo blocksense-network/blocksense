@@ -41,12 +41,15 @@ export async function setUpAccessControl({
   const abiCoder = new AbiCoder();
   const transactions: SafeTransactionDataPartial[] = [];
 
-  const guard = new Contract(
+  const { OnlySequencerGuard__factory } = await import(
+    '@blocksense/contracts/typechain'
+  );
+
+  const guard = OnlySequencerGuard__factory.connect(
     assertNotNull(
       deployData.coreContracts.OnlySequencerGuard,
       'OnlySequencerGuard is not specified in the deployment data',
     ).address,
-    artifacts.readArtifactSync(ContractNames.OnlySequencerGuard).abi,
     adminSigner,
   );
   if (sequencerMultisig) {
