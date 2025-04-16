@@ -30,6 +30,15 @@
     line-height: var(--line-height-body);
     font-weight: var(--font-weight-regular);
     letter-spacing: var(--letter-spacing-body);
+    color: var(--gray-light);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  input {
+    color: var(--white);
   }
 
   h1 {
