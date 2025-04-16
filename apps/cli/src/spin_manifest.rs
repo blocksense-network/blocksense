@@ -75,6 +75,10 @@ impl From<BlocksenseConfig> for AppManifest {
             toml::Value::String(config.reporter_info.sequencer),
         );
         table.insert(
+            "prometheus_url".to_string(),
+            toml::Value::String(config.reporter_info.prometheus_url),
+        );
+        table.insert(
             "kafka_endpoint".to_string(),
             toml::Value::String(config.reporter_info.kafka_endpoint),
         );
