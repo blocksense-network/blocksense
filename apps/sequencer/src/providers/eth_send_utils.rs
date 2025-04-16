@@ -15,13 +15,13 @@ use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 
 use crate::{
-    providers::provider::{
-        parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders,
-        HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
-    },
+    providers::provider::{parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders},
     sequencer_state::SequencerState,
 };
 use blocksense_feed_registry::types::{Repeatability, Repeatability::Periodic};
+use blocksense_config::{
+    HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+};
 use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
@@ -759,7 +759,7 @@ async fn increment_feeds_round_metrics(
 mod tests {
     use super::*;
 
-    use crate::providers::provider::{init_shared_rpc_providers, MULTICALL_CONTRACT_NAME};
+    use crate::providers::provider::init_shared_rpc_providers;
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{
@@ -769,7 +769,7 @@ mod tests {
     use alloy::{node_bindings::Anvil, providers::Provider};
     use blocksense_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,
-        test_feed_config,
+        test_feed_config, MULTICALL_CONTRACT_NAME,
     };
     use blocksense_config::{AllFeedsConfig, PublishCriteria};
     use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;

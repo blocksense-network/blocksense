@@ -17,7 +17,13 @@ use alloy::{
 
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
 use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
-use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
+
+use blocksense_config::{
+    AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig,
+    ADFS_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
+    SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+};
+
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
@@ -56,13 +62,31 @@ pub fn parse_eth_address(addr: &str) -> Option<Address> {
     contract_address
 }
 
-
-
-pub const HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "HistoricalDataFeedStoreV2";
-pub const SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "SportsDataFeedStoreV2";
-pub const ADFS_CONTRACT_NAME: &str = "AggregatedDataFeedStore";
-pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
-pub const GNOSIS_SAFE_CONTRACT_NAME: &str = "gnosis_safe";
+#[derive(Clone)]
+pub struct Contract {
+    pub name: String,
+    pub address: Option<Address>,
+    pub byte_code: Option<Vec<u8>>,
+    pub contract_version: u16,
+}
+impl Contract {
+    pub fn new(config: &ContractConfig) -> Result<Contract> {
+        let address = config
+            .address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
+        let byte_code = config
+            .byte_code
+            .as_ref()
+            .and_then(|byte_code| hex::decode(byte_code.clone()).ok());
+        Ok(Contract {
+            name: config.name.clone(),
+            address,
+            byte_code,
+            contract_version: config.contract_version,
+        })
+    }
+}
 
 pub struct RpcProvider {
     pub network: String,
@@ -193,7 +217,7 @@ impl RpcProvider {
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
         let (history, publishing_criteria) = RpcProvider::prepare_history(p);
-        let contracts = RpcProvider::prepare_contracts(p);
+        let contracts = RpcProvider::prepare_contracts(p).expect("Error in prepare_contracts");
         let mut feeds_variants: HashMap<u32, (FeedType, usize)> = HashMap::new();
         for f in feeds_config.feeds.iter() {
             debug!("Registering feed for network; feed={f:?}; network={network}");
@@ -246,59 +270,16 @@ impl RpcProvider {
         (history, publishing_criteria)
     }
 
-    pub fn prepare_contracts(p: &blocksense_config::Provider) -> Vec<Contract> {
-        let address = p
-            .contract_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let safe_address = p
-            .safe_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let event_address = p
-            .event_contract_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let multicall_address = p
-            .multicall_contract_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let mut contracts = vec![];
-        contracts.push(Contract {
-            name: HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
-            address,
-            byte_code: p.data_feed_store_byte_code.clone().map(|byte_code| {
-                hex::decode(byte_code.clone())
-                    .expect("data_feed_store_byte_code for provider is not valid hex string!")
-            }),
-            contract_version: p.contract_version,
-        });
-
-        contracts.push(Contract {
-            name: SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
-            address: event_address,
-            byte_code: p.data_feed_sports_byte_code.clone().map(|byte_code| {
-                hex::decode(byte_code.clone())
-                    .expect("data_feed_sports_byte_code for provider is not valid hex string!")
-            }),
-            contract_version: p.contract_version,
-        });
-
-        contracts.push(Contract {
-            name: GNOSIS_SAFE_CONTRACT_NAME.to_string(),
-            address: safe_address,
-            byte_code: None,
-            contract_version: 1,
-        });
-
-        contracts.push(Contract {
-            name: MULTICALL_CONTRACT_NAME.to_string(),
-            address: multicall_address,
-            byte_code: Some(Multicall::BYTECODE.to_vec()),
-            contract_version: 1,
-        });
-
-        contracts
+    pub fn prepare_contracts(p: &blocksense_config::Provider) -> Result<Vec<Contract>> {
+        let mut res = vec![];
+        for config in &p.contracts {
+            let mut contract = Contract::new(config)?;
+            if config.name == MULTICALL_CONTRACT_NAME {
+                contract.byte_code = Some(Multicall::BYTECODE.to_vec());
+            }
+            res.push(contract);
+        }
+        Ok(res)
     }
 
     pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {

@@ -13,6 +13,12 @@ use std::{collections::HashMap, fmt::Debug};
 use std::{collections::HashSet, time::UNIX_EPOCH};
 use tracing::{info, warn};
 
+pub const HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "HistoricalDataFeedStoreV2";
+pub const SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "SportsDataFeedStoreV2";
+pub const ADFS_CONTRACT_NAME: &str = "AggregatedDataFeedStore";
+pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
+pub const GNOSIS_SAFE_CONTRACT_NAME: &str = "gnosis_safe";
+
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct AssetPair {
     pub base: String,
@@ -207,9 +213,6 @@ pub struct Provider {
 
     #[serde(default)]
     pub publishing_criteria: Vec<PublishCriteria>,
-
-    //#[serde(default = "contract_initial_version")]
-    //pub contract_version: u16, // TODO: remove when migration ot ADFS contracts is complete
 
     #[serde(default)]
     pub contracts: Vec<ContractConfig>,
@@ -472,19 +475,31 @@ pub fn get_test_config_with_multiple_providers(
                 publishing_criteria: vec![],
                 impersonated_anvil_account: None,
                 contracts: vec![
-                    Contract {
-                        name: HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
+                    ContractConfig {
+                        name: HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
                         address: Some("0x663F3ad617193148711d28f5334eE4Ed07016602".to_string()),
                         byte_code: Some(test_data_feed_store_byte_code()),
-                        contract_version: 1
-                    }, 
-                    Contract {
-                        name: SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+                        contract_version: contract_initial_version(),
+                    },
+                    ContractConfig {
+                        name: SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
                         address: None,
                         byte_code: Some(test_data_feed_sports_byte_code()),
-                        contract_version: 1
-                    }
-                ]
+                        contract_version: contract_initial_version(),
+                    },
+                    ContractConfig {
+                        name: GNOSIS_SAFE_CONTRACT_NAME.to_string(),
+                        address: Some("0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C".to_string()),
+                        byte_code: None,
+                        contract_version: 1,
+                    },
+                    ContractConfig {
+                        name: MULTICALL_CONTRACT_NAME.to_string(),
+                        address: None,
+                        byte_code: None,
+                        contract_version: 1,
+                    },
+                ],
             },
         );
     }
