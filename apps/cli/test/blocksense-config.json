@@ -19,6 +19,6 @@
     "second_consensus_secret_key": "/home/adikov/code/repos/blocksense/nix/test-environments/test-keys/reporter_secret_key",
     "sequencer": "http://127.0.0.1:9856",
     "kafka_endpoint": "http://127.0.0.1:9092",
-    "prometheus_url": "http://127.0.0.1:9091"
+    "metrics_url": "http://127.0.0.1:9091"
   }
 }

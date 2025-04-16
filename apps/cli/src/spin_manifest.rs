@@ -76,8 +76,8 @@ impl From<BlocksenseConfig> for AppManifest {
         );
 
         table.insert(
-            "prometheus_url".to_string(),
-            toml::Value::String(config.reporter_info.prometheus_url),
+            "metrics_url".to_string(),
+            toml::Value::String(config.reporter_info.metrics_url),
         );
 
         if let Some(kafka_endpoint) = config.reporter_info.kafka_endpoint {
