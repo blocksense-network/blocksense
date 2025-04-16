@@ -79,5 +79,7 @@ in
       }
       // anvilInstances
       // reporterInstances;
+
+    services.prometheus.pushgateway.enable = true;
   };
 }
