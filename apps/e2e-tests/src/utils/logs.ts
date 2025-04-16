@@ -35,11 +35,11 @@ export function logMessage(
   logLevelConfig[level].logFunction(rendered.join('\n'));
 }
 
-export function logProcessComposeInfo(status: 'Starting' | 'Stopping'): void {
+export function logTestEnvironmentInfo(status: 'Starting' | 'Stopping'): void {
   const time = new Date();
   logMessage(
     'info',
-    `${status} process-compose`,
+    `${status} test environment`,
     `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
   );
 }
