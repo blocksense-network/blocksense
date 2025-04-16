@@ -47,3 +47,7 @@ export function kebabToCamelCase<Str extends string>(
     char.toUpperCase(),
   ) as KebabToCamelCase<Str>;
 }
+
+export function padNumber(num: number | bigint, size: number, padChar = ' ') {
+  return num.toString().padStart(size, padChar);
+}
