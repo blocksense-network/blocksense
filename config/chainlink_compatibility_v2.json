@@ -9,7 +9,7 @@
         "chainlink_aggregators": {
           "ethereum-mainnet": "0xdc715c751f1cc129A6b47fEDC87D9918a4580502",
           "ethereum-sepolia": "0x6B4181139e9500D0C21788e7c6B21c1d0d9b1112",
-          "andromeda-mainnet": "0x0F13cfAE20B3df71EEEFd67a260ECf0CF15629fA",
+          "metis-andromeda-mainnet": "0x0F13cfAE20B3df71EEEFd67a260ECf0CF15629fA",
           "arbitrum-mainnet": "0x942d00008D658dbB40745BBEc89A93c253f9B882",
           "arbitrum-sepolia": "0xd94522a6feF7779f672f4C88eb672da9222f2eAc",
           "avalanche-mainnet": "0xa9Afa74dDAC812B86Eeaa60A035c6592470F4A48",
@@ -47,7 +47,7 @@
         "chainlink_aggregators": {
           "ethereum-mainnet": "0x7d4E742018fb52E48b08BE73d041C18B21de6Fb5",
           "ethereum-sepolia": "0x719E22E3D4b690E5d96cCb40619180B5427F14AE",
-          "andromeda-mainnet": "0x9656158b18Bc67ed62EcE17b385ac2A696513010",
+          "metis-andromeda-mainnet": "0x9656158b18Bc67ed62EcE17b385ac2A696513010",
           "arbitrum-mainnet": "0x3607e46698d218B3a5Cae44bF381475C0a5e2ca7",
           "arbitrum-sepolia": "0xf3138B59cAcbA1a4d7d24fA7b184c20B3941433e",
           "avalanche-mainnet": "0x9ff520924dC295074F43a8a01Ee30a4D39a4223b",
@@ -97,7 +97,7 @@
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
           "ethereum-mainnet": "0x0d5F4aADf3fde31BBB55dB5F42C080F18aD54Df5",
-          "andromeda-mainnet": "0x49B7d3d231b993C9Aa29E122647e035aaf8B773B",
+          "metis-andromeda-mainnet": "0x49B7d3d231b993C9Aa29E122647e035aaf8B773B",
           "arbitrum-mainnet": "0xCb35fE6E53e71b30301Ec4a3948Da4Ad3c65ACe4",
           "arbitrum-sepolia": "0xa2b3137BeBe6f817fcb34e96339d04cbC5229B2c",
           "avalanche-mainnet": "0xd761cFc03e833FEBB04297Cc1aB7291D80c9595f",
@@ -210,7 +210,7 @@
         "chainlink_aggregators": {
           "ethereum-mainnet": "0xc9E1a09622afdB659913fefE800fEaE5DBbFe9d7",
           "ethereum-sepolia": "0x0524b20f305e2e2F7990B9AfE28B4D5e4a76eA0C",
-          "andromeda-mainnet": "0x5969848719F7571bDFe0e899014C270Ed39B8384",
+          "metis-andromeda-mainnet": "0x5969848719F7571bDFe0e899014C270Ed39B8384",
           "arbitrum-mainnet": "0x2946220288DbBF77dF0030fCecc2a8348CbBE32C",
           "arbitrum-sepolia": "0xfe43Eb2649F3bcce80443F9E43C793146148C141",
           "avalanche-mainnet": "0x65527d2556ffFEe7e545C5eE5B81f5DAe925cE00",
@@ -333,7 +333,7 @@
         "chainlink_aggregators": {
           "ethereum-mainnet": "0x96d6e33B411dc1f4E3F1e894A5A5d9CE0F96738D",
           "ethereum-sepolia": "0x95e14f9a6B6326e3B73Ad2467af1d67108dc0b87",
-          "andromeda-mainnet": "0x86f1FCb32ac073951d3156929A93428902F30765",
+          "metis-andromeda-mainnet": "0x86f1FCb32ac073951d3156929A93428902F30765",
           "arbitrum-mainnet": "0x9b8DdcF800a7BfCdEbaD6D65514dE59160a2C9CC",
           "arbitrum-sepolia": "0x961AD289351459A45fC90884eF3AB0278ea95DDE",
           "avalanche-mainnet": "0x9FC8683EFf42913f0F1F32EEc2f21340017FCDdB",
@@ -635,7 +635,7 @@
         "chainlink_aggregators": {
           "ethereum-mainnet": "0x709783ab12b65fD6cd948214EEe6448f3BdD72A3",
           "ethereum-sepolia": "0x90FeD00c44aE95f96A7883af38782Ef937c72A03",
-          "andromeda-mainnet": "0x2d338D3b5AF189984A03c6785899Cc681aBe6C4B",
+          "metis-andromeda-mainnet": "0x2d338D3b5AF189984A03c6785899Cc681aBe6C4B",
           "arbitrum-mainnet": "0xFc06bB03a9e1D8033f87eA6A682cbd65477A43b9",
           "arbitrum-sepolia": "0xAc6DB6d5538Cd07f58afee9dA736ce192119017B",
           "avalanche-mainnet": "0x94BdDfA622FcEB1b44e50608cb02f1a583784224",
@@ -824,7 +824,7 @@
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
           "ethereum-mainnet": "0xd8B9aA6E811c935eF63e877CFA7Be276931293DA",
-          "andromeda-mainnet": "0x420AF689F50b9F7B67fe506237c877b98bb24dDA",
+          "metis-andromeda-mainnet": "0x420AF689F50b9F7B67fe506237c877b98bb24dDA",
           "arbitrum-mainnet": "0x3c6AbdA21358c15601A3175D8dd66D0c572cc904",
           "arbitrum-sepolia": "0x291E71A06d103FaF48BE7251BaC6C134c1b961f1",
           "avalanche-mainnet": "0xc03C33937F4Ae48f72a9563abfDde76D46B8548F",
@@ -2717,7 +2717,7 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348",
         "chainlink_aggregators": {
-          "andromeda-mainnet": "0x526B00801b2a09Cb730b3d2132a85fD75D0D9A44",
+          "metis-andromeda-mainnet": "0x526B00801b2a09Cb730b3d2132a85fD75D0D9A44",
           "arbitrum-sepolia": "0x2aE4072A1e1b3CAFD7eF1b74Eb6C331e03fF332E"
         }
       }
