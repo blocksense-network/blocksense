@@ -1,5 +1,7 @@
 import { task } from 'hardhat/config';
 
+import { formatEther } from 'ethers/utils';
+
 import Safe from '@safe-global/protocol-kit';
 
 import { NetworkConfig, ContractNames, DeployContract } from './types';
@@ -11,6 +13,7 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import { getOptionalEnvString } from '@blocksense/base-utils/env';
+import { padNumber } from '@blocksense/base-utils/string';
 
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { predictAddress } from './utils';
@@ -110,28 +113,28 @@ task('deploy', 'Deploy contracts')
         await adminMultisig.getAddress(),
       );
 
-      const accessControlSalt = ethers.id('accessControl');
-      const adfsSalt = ethers.id('aggregatedDataFeedStore');
-      // env variable can be set to achieve an address that starts with '0xADF5'
-      const proxySalt = getOptionalEnvString(
-        'ADFS_UPGRADEABLE_PROXY_SALT',
-        ethers.id('upgradeableProxy'),
-      );
-      const safeGuardSalt = ethers.id('onlySafeGuard');
-      const safeModuleSalt = ethers.id('adminExecutorModule');
+      // const accessControlSalt = ethers.id('accessControl');
+      // const adfsSalt = ethers.id('aggregatedDataFeedStore');
+      // // env variable can be set to achieve an address that starts with '0xADF5'
+      // const proxySalt = getOptionalEnvString(
+      //   'ADFS_UPGRADEABLE_PROXY_SALT',
+      //   ethers.id('upgradeableProxy'),
+      // );
+      // const safeGuardSalt = ethers.id('onlySafeGuard');
+      // const safeModuleSalt = ethers.id('adminExecutorModule');
 
       const accessControlAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.AccessControl,
-        accessControlSalt,
+        create2ContractSalts.accessControl,
         abiCoder.encode(['address'], [adminMultisigAddress]),
       );
       const upgradeableProxyAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.UpgradeableProxyADFS,
-        proxySalt,
+        create2ContractSalts.proxy,
         abiCoder.encode(['address'], [adminMultisigAddress]),
       );
 
@@ -140,47 +143,48 @@ task('deploy', 'Deploy contracts')
           name: ContractNames.AccessControl,
           argsTypes: ['address'],
           argsValues: [adminMultisigAddress],
-          salt: accessControlSalt,
+          salt: create2ContractSalts.accessControl,
           value: 0n,
         },
         {
           name: ContractNames.ADFS,
           argsTypes: ['address'],
           argsValues: [accessControlAddress],
-          salt: adfsSalt,
+          salt: create2ContractSalts.adfs,
           value: 0n,
         },
         {
           name: ContractNames.UpgradeableProxyADFS,
           argsTypes: ['address'],
           argsValues: [adminMultisigAddress],
-          salt: proxySalt,
+          salt: create2ContractSalts.proxy,
           value: 0n,
         },
         {
           name: ContractNames.CLFeedRegistryAdapter,
           argsTypes: ['address', 'address'],
           argsValues: [adminMultisigAddress, upgradeableProxyAddress],
-          salt: ethers.id('registry'),
+          salt: create2ContractSalts.clFeedRegistry,
           value: 0n,
         },
-        ...dataFeedConfig.map((data): DeployContract => {
+        ...dataFeedConfig.map(data => {
+          const { base, quote } = getCLRegistryPair(data.id);
           return {
             name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
+            argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
               data.description,
-              data.decimals,
+              data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
             ],
-            salt: ethers.id('aggregator'),
+            salt: create2ContractSalts.clAggregatorProxy,
             value: 0n,
             feedRegistryInfo: {
               feedId: data.id,
               description: `${data.full_name} (${data.id})`,
-              base: data.base,
-              quote: data.quote,
+              base,
+              quote,
             },
           };
         }),
@@ -202,7 +206,7 @@ task('deploy', 'Deploy contracts')
           name: ContractNames.AdminExecutorModule,
           argsTypes: ['address', 'address'],
           argsValues: [sequencerMultisigAddress, adminMultisigAddress],
-          salt: safeModuleSalt,
+          salt: create2ContractSalts.safeModule,
           value: 0n,
         });
         contracts.unshift({
@@ -213,7 +217,7 @@ task('deploy', 'Deploy contracts')
             adminMultisigAddress,
             upgradeableProxyAddress,
           ],
-          salt: safeGuardSalt,
+          salt: create2ContractSalts.safeGuard,
           value: 0n,
         });
       }
