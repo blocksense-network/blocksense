@@ -6,28 +6,31 @@ name = "Exsat network btc holdings"
 version = "0.1.0"
 
 [application.trigger.settings]
-interval_time_in_seconds = 600
-sequencer = "http://127.0.0.1:9856/post_reports_batch"
-secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+interval_time_in_seconds = 300
 reporter_id = 0
+sequencer = "http://127.0.0.1:8877/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+second_consensus_secret_key = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+kafka_endpoint = "http://127.0.0.1:9092"
 
 [[trigger.oracle]]
 component = "exsat-holdings"
 
 [[trigger.oracle.data_feeds]]
 id = "100000"
+stride = 0
+decimals = 0
 data = '{"pair":{"base":"Exsat","quote":"satoshi"},"decimals":0,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
-
 
 [component.exsat-holdings]
 source = "../../../target/wasm32-wasip1/release/exsat_holdings.wasm"
-key_value_stores = ["default"]
 allowed_outbound_hosts = [
-    "https://raw.githubusercontent.com",
-    "https://rpc-us.exsat.network",
-    "https://blockchain.info",
-    "https://mempool.space",
+  "https://raw.githubusercontent.com",
+  "https://rpc-us.exsat.network",
+  "https://blockchain.info",
+  "https://mempool.space",
 ]
+key_value_stores = ["default"]
 
 [component.exsat-holdings.build]
 command = "cargo build --target wasm32-wasip1 --release"
