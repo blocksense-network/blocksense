@@ -2,7 +2,8 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   # Function to read and parse the JSON file
   readJson = path: builtins.fromJSON (builtins.readFile path);
 
@@ -16,7 +17,8 @@
     (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
 
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
-in {
+in
+{
   services.kafka = {
     enable = true;
   };
@@ -110,7 +112,7 @@ in {
         ink-sepolia = {
           private-key-path = "${testKeysDir}/sequencer-private-key";
           contract-address = upgradeableProxyADFSContractAddressInk;
-          safe-address = "0xCab0DF91Cda16b675c948b03c1B633BC0eb73101";
+          safe-address = "0xb5E44842297a6DF2dA16f9c32b7513e66F078391";
           contract-version = 2;
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
@@ -136,7 +138,7 @@ in {
         default-exec-interval = 30;
         secret-key-path = "${testKeysDir}/reporter_secret_key";
         second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
-        api-keys = {};
+        api-keys = { };
       };
     };
 
