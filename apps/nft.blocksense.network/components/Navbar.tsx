@@ -39,8 +39,8 @@ const navLinks = [
 
 const DesktopNavbar = () => {
   return (
-    <header className="navbar hidden md:flex z-20 fixed w-full bg-[var(--black)] text-[var(--white)] px-20 py-[1.125rem]">
-      <div className="w-full max-w-[66.875rem] mx-auto flex justify-between items-center">
+    <header className="navbar hidden md:flex bg-[var(--black)/0.85] backdrop-blur-2xl z-10 fixed w-full text-[var(--white)] px-20 py-[1.125rem]">
+      <div className="w-full max-w-[66.875rem] mx-auto z-30 flex justify-between items-center">
         <Logo />
         <nav className="navbar__nav flex gap-8">
           {navLinks.map(link => (
