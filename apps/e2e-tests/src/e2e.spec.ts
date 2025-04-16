@@ -1,22 +1,51 @@
-import { afterAll, beforeAll, describe, test } from 'vitest';
-import { $ } from 'execa';
+import { deepStrictEqual } from 'assert';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
-import { logProcessComposeInfo } from './utils/logs';
+import { loopWhile, sleep } from '@blocksense/base-utils/async';
+
+import {
+  parseProcessesStatus,
+  startEnvironment,
+  stopEnvironment,
+} from './utils/process-compose';
+
+import { expectedPCStatuses03 } from './expected';
 
 describe.sequential('E2E Tests with process-compose', async () => {
   beforeAll(async () => {
-    // Start the process-compose
-    logProcessComposeInfo('Starting');
-    await $`process-compose up -D`;
+    await startEnvironment('example-setup-03');
   });
 
   afterAll(async () => {
-    // Stop the process-compose
-    logProcessComposeInfo('Stopping');
-    await $`process-compose down`;
+    await stopEnvironment();
   });
-  test('should start the process-compose', async () => {
-    const { stdout } = await $`process-compose info`;
-    console.log(stdout);
+
+  test('Test processes state shortly after start', async () => {
+    const equal = await loopWhile(
+      (equal: boolean) => !equal,
+      async () => {
+        try {
+          const processes = await parseProcessesStatus();
+          deepStrictEqual(processes, expectedPCStatuses03);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      1000,
+      10,
+    );
+    expect(equal).toBe(true);
+  });
+
+  test('Test processes state after 2 mins', async () => {
+    // TODO: (EmilIvanichkovv): Consider reading `the total_tx_sent` metrics from the sequencer instead of wait for something unspecified to happen.
+    // Wait for the processes to work for 5 minutes
+    await sleep(2 * 60 * 1000);
+
+    // Get the processes status
+    const processes = await parseProcessesStatus();
+
+    expect(processes).toEqual(expectedPCStatuses03);
   });
 });
