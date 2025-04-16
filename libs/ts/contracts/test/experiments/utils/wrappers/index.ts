@@ -102,6 +102,9 @@ export {
   CLRegistryBaseWrapper,
 
   // interfaces
+};
+
+export type {
   IBaseWrapper,
   ISetWrapper as IWrapper,
   IConsumerWrapper,
