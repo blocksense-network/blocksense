@@ -6,11 +6,7 @@ import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-import {
-  assertNotNull,
-  getEnvString,
-  getOptionalEnvString,
-} from '@blocksense/base-utils';
+import { getEnvString, getOptionalEnvString } from '@blocksense/base-utils';
 
 task('access-control', '[UTILS] Set up access control').setAction(
   async (args, { ethers, artifacts, run }) => {
@@ -35,12 +31,12 @@ task('access-control', '[UTILS] Set up access control').setAction(
     const abiCoder = new ethers.AbiCoder();
     const transactions: SafeTransactionDataPartial[] = [];
 
-    const guard = new ethers.Contract(
-      assertNotNull(
-        deployData.coreContracts.OnlySequencerGuard,
-        'OnlySequencerGuard is not specified in the deployment data',
-      ).address,
-      artifacts.readArtifactSync(ContractNames.OnlySequencerGuard).abi,
+    const { OnlySequencerGuard__factory } = await import(
+      '../../dist/typechain/index.js'
+    );
+
+    const guard = OnlySequencerGuard__factory.connect(
+      deployData.coreContracts.OnlySequencerGuard!.address,
       adminSigner,
     );
     if (sequencerMultisig) {

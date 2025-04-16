@@ -1,5 +1,7 @@
 import { task } from 'hardhat/config';
 
+import { formatEther } from 'ethers/utils';
+
 import Safe from '@safe-global/protocol-kit';
 
 import { NetworkConfig, ContractNames, DeployContract } from './types';
@@ -11,6 +13,7 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import { getOptionalEnvString } from '@blocksense/base-utils/env';
+import { padNumber } from '@blocksense/base-utils/string';
 
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { predictAddress } from './utils';
@@ -170,13 +173,14 @@ task('deploy', 'Deploy contracts')
           salt: create2ContractSalts.clFeedRegistry,
           value: 0n,
         },
-        ...dataFeedConfig.map((data): DeployContract => {
+        ...dataFeedConfig.map(data => {
+          const { base, quote } = getCLRegistryPair(data.id);
           return {
             name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
+            argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
               data.description,
-              data.decimals,
+              data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
             ],
@@ -185,8 +189,8 @@ task('deploy', 'Deploy contracts')
             feedRegistryInfo: {
               feedId: data.id,
               description: `${data.full_name} (${data.id})`,
-              base: data.base,
-              quote: data.quote,
+              base,
+              quote,
             },
           };
         }),
