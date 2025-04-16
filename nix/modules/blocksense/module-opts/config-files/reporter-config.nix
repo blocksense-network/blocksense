@@ -28,7 +28,7 @@ in
     reporter-opts:
     dashToUnderscoreRecursive {
       reporter-info = {
-        inherit (reporter-opts) kafka-endpoint;
+        inherit (reporter-opts) kafka-endpoint metrics-url;
 
         reporter-id = reporter-opts.id;
         sequencer = reporter-opts.sequencer-url;
