@@ -8,6 +8,7 @@ use blocksense_utils::time::current_unix_time;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info};
 
+use crate::providers::eth_send_utils::increment_feeds_round_indexes;
 use crate::providers::provider::GNOSIS_SAFE_CONTRACT_NAME;
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
@@ -125,6 +126,12 @@ pub async fn aggregation_batch_consensus_loop(
 
                         drop(batches_awaiting_consensus);
 
+                        {
+                            let providers = sequencer_state.providers.read().await;
+                            let mut provider = providers.get(net).unwrap().lock().await;
+                            let updated_feeds_ids = quorum.updated_feeds_ids.iter().cloned().collect();
+                            increment_feeds_round_indexes(&updated_feeds_ids, net, &mut provider).await;
+                        }
                         let mut signatures_with_addresses: Vec<&_> = quorum.signatures.values().collect();
                         signatures_with_addresses.sort_by(|a, b| a.signer_address.cmp(&b.signer_address));
                         let signature_bytes: Vec<u8> = signatures_with_addresses

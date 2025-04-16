@@ -225,6 +225,11 @@ pub async fn adfs_serialize_updates(
         v.push_str(temp.as_str());
     }
 
+    println!(
+        "DEBUG: round counters for net {}; block_height: {}  {:?}",
+        net, feed_updates.block_height, feeds_rounds
+    );
+
     let mut round_data = Vec::<u8>::new();
 
     for (index, val) in batch_feeds {
