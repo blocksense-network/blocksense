@@ -5,7 +5,7 @@ const links = [
   { name: 'Blog', href: 'https://blog.blocksense.network/' },
   { name: 'Docs', href: 'https://docs.blocksense.network/' },
   { name: 'How it works', href: 'https://blocksense.network/#howitworks' },
-  { name: 'About it', href: 'https://blocksense.network/#about' },
+  { name: 'About us', href: 'https://blocksense.network/#about' },
 ];
 
 export const Footer = () => {
