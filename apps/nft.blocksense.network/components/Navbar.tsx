@@ -39,21 +39,23 @@ const navLinks = [
 
 const DesktopNavbar = () => {
   return (
-    <header className="navbar hidden md:flex z-20 fixed w-full bg-[var(--black)] text-[var(--white)] justify-between items-center px-20 py-[1.125rem]">
-      <Logo />
-      <nav className="navbar__nav flex gap-8">
-        {navLinks.map(link => (
-          <a
-            key={link.label}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="navbar__link"
-          >
-            {link.label}
-          </a>
-        ))}
-      </nav>
+    <header className="navbar hidden md:flex z-20 fixed w-full bg-[var(--black)] text-[var(--white)] px-20 py-[1.125rem]">
+      <div className="w-full max-w-[66.875rem] mx-auto flex justify-between items-center">
+        <Logo />
+        <nav className="navbar__nav flex gap-8">
+          {navLinks.map(link => (
+            <a
+              key={link.label}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="navbar__link"
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 };
