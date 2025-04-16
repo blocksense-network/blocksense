@@ -5,11 +5,7 @@ use blocksense_utils::get_env_var;
 use prometheus::TextEncoder;
 use reqwest::Client;
 
-use crate::{
-    metrics::BUILD_INFO,
-    registry::{pull_buffer, push_to_buffer},
-    AppState,
-};
+use crate::{metrics::BUILD_INFO, registry::push_to_buffer, AppState};
 
 pub async fn run_actix_server() -> std::io::Result<()> {
     let sequencer_state = web::Data::new(AppState {
@@ -20,7 +16,6 @@ pub async fn run_actix_server() -> std::io::Result<()> {
         App::new()
             .app_data(sequencer_state.clone())
             .service(push_to_buffer)
-            .service(pull_buffer)
     })
     .bind(
         get_env_var::<String>("PROMETHEUS_URL_SERVER")
