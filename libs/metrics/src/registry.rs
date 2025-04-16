@@ -2,7 +2,7 @@ use actix_web::{get, post, web, HttpResponse, Responder};
 
 use crate::AppState;
 
-#[post("/push")]
+#[post("/metrics/job/reporter")]
 async fn push_to_buffer(data: web::Data<AppState>, body: String) -> impl Responder {
     let mut buffer = data.buffer.lock().unwrap();
     buffer.clear();

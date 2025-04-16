@@ -12,6 +12,7 @@ sequencer = "http://127.0.0.1:8877/post_reports_batch"
 secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
 second_consensus_secret_key = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 kafka_endpoint = "http://127.0.0.1:9092"
+prometheus_url = "http://127.0.0.1:9091"
 
 [[trigger.oracle]]
 component = "cex-price-feeds"

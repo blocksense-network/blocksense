@@ -86,6 +86,9 @@ pub struct ReporterInfo {
     /// Sequencer URL
     #[serde(default)]
     pub sequencer: String,
+    /// Prometheus URL
+    #[serde(default)]
+    pub prometheus_url: String,
     /// Kafka endpoint
     pub kafka_endpoint: Option<String>,
     /// Registry URL
