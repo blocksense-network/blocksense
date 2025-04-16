@@ -96,6 +96,7 @@ const networks = [
   'songbird-coston',
   'sonic-blaze',
   'status-network-sepolia',
+  'superseed-mainnet',
   'superseed-sepolia',
   'swellchain-testnet',
   'taiko-mainnet',
@@ -119,8 +120,8 @@ const chainIds = [
   763373, 2358, 1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006,
   5000, 5003, 1750, 59902, 6342, 31611, 10143, 2818, 2810, 8801, 5851, 10,
   11155420, 5611, 7849306, 98867, 137, 80002, 1101, 2442, 57000, 200018, 31,
-  534352, 534351, 11011, 50312, 16, 57054, 1660990954, 53302, 1924, 167000,
-  167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
+  534352, 534351, 11011, 50312, 16, 57054, 1660990954, 5330, 53302, 1924,
+  167000, 167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -686,6 +687,12 @@ export const networkMetadata = {
     chainId: 1660990954,
     isTestnet: true,
     explorerUrl: 'https://sepoliascan.status.network',
+    currency: Currency.ETH,
+  },
+  'superseed-mainnet': {
+    chainId: 5330,
+    isTestnet: false,
+    explorerUrl: 'https://explorer.superseed.xyz',
     currency: Currency.ETH,
   },
   'superseed-sepolia': {
