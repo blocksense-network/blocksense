@@ -163,8 +163,25 @@ function createConfig(packageDir, format) {
         declarationMap: format != 'cjs',
         noEmitOnError: true,
         noEmit: format == 'cjs',
-        outDir:
-          format == 'cjs' ? undefined : `${packageDir}/dist/${format}/types`,
+        /**
+         * If we set `outDir` to `${packageDir}/dist/${format}`, rollup would
+         * produce source maps of the form: `../../../src/array-iter.ts`,
+         * instead of: `../../src/array-iter.ts`, since the source map file
+         * is located at `dist/esm/array-iter.mjs.map.
+         *
+         * If we set `outDir` to `${packageDir}/dist` or out '..' rollup fails
+         * with the following error:
+         * > [@rollup/plugin-typescript] Path of Typescript compiler option
+         * > 'outDir' must be located inside Rollup 'dir' option.
+         *
+         * For reference, see:
+         * https://github.com/rollup/plugins/blob/typescript-v12.1.2/packages/typescript/src/options/validate.ts#L65
+         *
+         * The same error appears if we omit `outDir` from the config, so in
+         * summary, the only working option is to set it explicitly to `undefined`.
+         * ¯\_(ツ)_/¯
+         */
+        outDir: undefined,
         declarationDir:
           format == 'cjs' ? undefined : `${packageDir}/dist/${format}/types`,
       }),
