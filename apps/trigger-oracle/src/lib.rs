@@ -98,7 +98,7 @@ pub struct CliArgs {
 pub struct OracleTrigger {
     engine: TriggerAppEngine<Self>,
     sequencer: String,
-    prometheus_url: Option<String>,
+    metrics_url: Option<String>,
     kafka_endpoint: Option<String>,
     secret_key: String,
     second_consensus_secret_key: String,
@@ -118,7 +118,7 @@ struct TriggerMetadataParent {
 struct TriggerMetadata {
     interval_time_in_seconds: Option<u64>,
     sequencer: Option<String>,
-    prometheus_url: Option<String>,
+    metrics_url: Option<String>,
     kafka_endpoint: Option<String>,
     secret_key: Option<String>,
     second_consensus_secret_key: Option<String>,
@@ -215,7 +215,7 @@ impl TriggerExecutor for OracleTrigger {
             .interval_time_in_seconds
             .expect("Report time interval not provided");
         let sequencer = metadata.sequencer.expect("Sequencer URL is not provided");
-        let prometheus_url = metadata.prometheus_url;
+        let metrics_url = metadata.metrics_url;
         let secret_key = metadata.secret_key.expect("Secret key is not provided");
 
         let second_consensus_secret_key = if metadata.kafka_endpoint.is_some() {
@@ -261,7 +261,7 @@ impl TriggerExecutor for OracleTrigger {
         Ok(Self {
             engine,
             sequencer,
-            prometheus_url,
+            metrics_url,
             kafka_endpoint,
             secret_key,
             second_consensus_secret_key,
@@ -341,7 +341,7 @@ impl TriggerExecutor for OracleTrigger {
         let mut orchestrators = Self::start_orchestrators(
             components,
             signal_data_feed_sender.clone(),
-            self.prometheus_url,
+            self.metrics_url,
         );
         loops.append(&mut orchestrators);
 
@@ -510,7 +510,7 @@ impl OracleTrigger {
     fn start_orchestrators(
         components: HashMap<String, Component>,
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
-        prometheus_url: Option<String>,
+        metrics_url: Option<String>,
     ) -> Vec<tokio::task::JoinHandle<TerminationReason>> {
         let mut join_handles = vec![];
         for (key, component) in components {
@@ -521,7 +521,7 @@ impl OracleTrigger {
                 time_interval,
                 component.oracle_settings.clone(),
                 signal_sender.clone(),
-                prometheus_url.clone(),
+                metrics_url.clone(),
             );
             join_handles.push(
                 tokio::task::Builder::new()
@@ -539,7 +539,7 @@ impl OracleTrigger {
         time_interval: tokio::time::Duration,
         oracle_settings: HashSet<DataFeedSetting>,
         signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
-        prometheus_url: Option<String>,
+        metrics_url: Option<String>,
     ) -> TerminationReason {
         tracing::trace!("Task orchestrator-{} started", oracle_id);
         //TODO(adikov): Implement proper logic and remove dummy values
@@ -568,32 +568,28 @@ impl OracleTrigger {
             );
             let _ = signal_sender.send(oracle_settings.clone());
 
-            if prometheus_url.is_none() {
-                tracing::trace!("Prometheus URL not set; looping back [batch_count={batch_count}]");
+            if metrics_url.is_none() {
+                tracing::trace!("Metrics URL not set; looping back [batch_count={batch_count}]");
                 continue;
             }
 
-            let prometheus_url = prometheus_url
+            let metrics_url = metrics_url
                 .clone()
-                .expect("Prometheus URL should be provided.");
-            tracing::trace!(
-                "Sending metrics to prometheus at {prometheus_url} [batch_count={batch_count}]"
-            );
+                .expect("Metrics URL should be provided.");
+            tracing::trace!("Sending metrics at {metrics_url} [batch_count={batch_count}]");
             let metrics_result = handle_prometheus_metrics(
                 &reqwest::Client::new(),
-                &prometheus_url,
+                &metrics_url,
                 &TextEncoder::new(),
             )
             .await;
 
             match metrics_result {
                 Ok(_) => {
-                    tracing::trace!("Sent metrics to prometheus [batch_count={batch_count}]");
+                    tracing::trace!("Sent metrics [batch_count={batch_count}]");
                 }
                 Err(e) => {
-                    tracing::error!(
-                        "Error handling Prometheus metrics: {e:?} [batch_count={batch_count}]"
-                    );
+                    tracing::error!("Error handling metrics: {e:?} [batch_count={batch_count}]");
                 }
             }
         }
