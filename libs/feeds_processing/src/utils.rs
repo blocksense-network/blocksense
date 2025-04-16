@@ -510,16 +510,40 @@ pub mod tests {
         .await
         .unwrap();
 
+        let contract_address = "0x663F3ad617193148711d28f5334eE4Ed07016602";
+        let nonce_str = "10";
+        let chain_id = 31337;
+        let safe_address_str = "0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C";
+
+        let nonce = match Uint::<256, 4>::from_str(nonce_str) {
+            Ok(n) => n,
+            Err(e) => {
+                anyhow::bail!("Non valid nonce ({}) provided: {}", nonce_str, e);
+            }
+        };
+
+        let safe_transaction = create_safe_tx(
+            Address::from_str(contract_address).unwrap(),
+            Bytes::from(calldata.clone()),
+            nonce,
+        );
+
+        let tx_hash = generate_transaction_hash(
+            Address::from_str(safe_address_str).unwrap(),
+            U256::from(chain_id),
+            safe_transaction,
+        )
+        .to_vec();
+
         let consensus_second_rond_batch = ConsensusSecondRoundBatch {
             sequencer_id: 0,
             block_height,
             network,
-            contract_address: "0x663F3ad617193148711d28f5334eE4Ed07016602".to_string(),
-            safe_address: "0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C".to_string(),
-            nonce: "10".to_string(),
-            chain_id: "31337".to_string(),
-            tx_hash: "0xf2ee45d69fc602204159abf6efaf49991f24db7d6ee89b679441d20d15f55bd3"
-                .to_string(),
+            contract_address: contract_address.to_string(),
+            safe_address: safe_address_str.to_string(),
+            nonce: nonce_str.to_string(),
+            chain_id: chain_id.to_string(),
+            tx_hash: hex::encode(tx_hash),
             calldata: hex::encode(calldata),
             updates,
             feeds_rounds,
