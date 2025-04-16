@@ -21,6 +21,10 @@ test-ts:
   yarn test-single @blocksense/base-utils
   yarn test-single @blocksense/config-types
   yarn test-single @blocksense/data-feeds-config-generator
+  yarn workspace @blocksense/e2e-tests run test:unit
+
+test-e2e:
+  yarn workspace @blocksense/e2e-tests run test:e2e
 
 build-oracle oracle-name:
   #!/usr/bin/env bash
