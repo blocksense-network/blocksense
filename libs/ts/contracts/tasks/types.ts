@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@blocksense/base-utils/evm';
+import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { JsonRpcProvider, Network, Signer, Wallet } from 'ethers';
 
 export interface MultisigConfig {
@@ -11,10 +11,11 @@ interface NetworkConfigBase {
   rpc: string;
   provider: JsonRpcProvider;
   network: Network;
+  networkName: NetworkName;
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
   adminMultisig: MultisigConfig;
-  feedIds?: number[];
+  feedIds: 'all' | number[];
   safeAddresses: {
     multiSendAddress: EthereumAddress;
     multiSendCallOnlyAddress: EthereumAddress;

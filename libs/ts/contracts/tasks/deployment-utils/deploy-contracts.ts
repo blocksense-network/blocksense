@@ -82,7 +82,7 @@ task('deploy-contracts', '[UTILS] Deploy contracts to the network').setAction(
         };
         transactions.push(safeTransactionData);
       } else {
-        console.log(' -> Contract already deployed!');
+        console.log(`  -> ✅ already deployed`);
       }
 
       if (contract.name === ContractNames.CLAggregatorAdapter) {
