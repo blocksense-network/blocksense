@@ -11,12 +11,14 @@ use alloy::{
     rpc::types::eth::TransactionRequest,
 };
 
-use blocksense_config::{AllFeedsConfig, SequencerConfig};
+
+use blocksense_config::{AllFeedsConfig, SequencerConfig, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME};
+use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
 use blocksense_feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
-use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
 use blocksense_utils::logging::tokio_console_active;
+
 use eyre::eyre;
 use eyre::Result;
 use futures::StreamExt;
@@ -24,9 +26,9 @@ use std::collections::{BTreeMap, HashSet};
 
 use crate::http_handlers::data_feeds::register_feed;
 use crate::providers::eth_send_utils::deploy_contract;
-use crate::providers::provider::{SharedRpcProviders, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME};
 use blocksense_feed_registry::types::FeedType;
 use blocksense_metrics::metrics_collector::gather_and_dump_metrics;
+use crate::providers::provider::SharedRpcProviders;
 use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
@@ -91,8 +93,13 @@ pub async fn deploy(
         "Deploying contract for network `{}` and feed type `{}` ...",
         network, feed_type
     );
-    let contact_name = &feed_type;
-    match deploy_contract(&network, &sequencer_state.providers, contact_name).await {
+    let contract_name = match feed_type.as_str() {
+        "price_feed" => HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
+        "event_feed" => SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
+        _ => "UNKNOWN_CONTRACT".to_string(),
+    };
+
+    match deploy_contract(&network, &sequencer_state.providers, &contract_name).await {
         Ok(result) => Ok(HttpResponse::Ok()
             .content_type(ContentType::plaintext())
             .body(result)),
@@ -627,6 +634,7 @@ mod tests {
     use alloy::node_bindings::Anvil;
     use blocksense_config::{
         get_test_config_with_no_providers, get_test_config_with_single_provider, test_feed_config,
+        ContractConfig, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
     };
     use blocksense_config::{AllFeedsConfig, SequencerConfig};
     use regex::Regex;
@@ -883,26 +891,34 @@ mod tests {
             .providers
             .entry(network.to_string())
             .and_modify(|provider| {
+                let contracts = vec![
+                    ContractConfig {
+                        name: HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
+                        address: None,
+                        byte_code: Some("0x60a060405234801561001057600080fd5b506040516101cf3803806101cf83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014561008a6000396000609001526101456000f3fe608060405234801561001057600080fd5b50600060405160046000601c83013751905063e000000081161561008e5763e0000000198116632000000082161561005957806020526004356004603c20015460005260206000f35b805463800000008316156100775781600052806004601c2001546000525b634000000083161561008857806020525b60406000f35b7f00000000000000000000000000000000000000000000000000000000000000003381146100bb57600080fd5b631a2d80ac820361010a57423660045b8181101561010857600481601c376000516004601c2061ffff6001835408806100f2575060015b91829055600483013585179101556024016100cb565b005b600080fdfea26469706673582212204a7c38e6d9b723ea65e6d451d6a8436444c333499ad610af033e7360a2558aea64736f6c63430008180033".to_string()),
+                        contract_version: 1_u16,
+                    },
+                    ContractConfig {
+                        name: SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME.to_string(),
+                        address: None,
+                        byte_code: Some("0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033".to_string()),
+                        contract_version: 1_u16,
+                    }
+                ];
                 *provider = blocksense_config::Provider {
                     private_key_path: key_path.to_str().unwrap().to_owned(),
                     url,
-                    contract_address: None,
                     safe_address: None,
                     safe_min_quorum: 1,
-                    event_contract_address: None,
-                    adfs_contract_address: None,
-                    multicall_contract_address: None,
                     transaction_retries_count_before_give_up: 42,
                     transaction_retry_timeout_secs: 20,
                     retry_fee_increment_fraction: 0.1,
                     transaction_gas_limit: 1337,
-                    data_feed_store_byte_code: Some("0x60a060405234801561001057600080fd5b506040516101cf3803806101cf83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014561008a6000396000609001526101456000f3fe608060405234801561001057600080fd5b50600060405160046000601c83013751905063e000000081161561008e5763e0000000198116632000000082161561005957806020526004356004603c20015460005260206000f35b805463800000008316156100775781600052806004601c2001546000525b634000000083161561008857806020525b60406000f35b7f00000000000000000000000000000000000000000000000000000000000000003381146100bb57600080fd5b631a2d80ac820361010a57423660045b8181101561010857600481601c376000516004601c2061ffff6001835408806100f2575060015b91829055600483013585179101556024016100cb565b005b600080fdfea26469706673582212204a7c38e6d9b723ea65e6d451d6a8436444c333499ad610af033e7360a2558aea64736f6c63430008180033".to_string()),
-                    data_feed_sports_byte_code: Some("0x60a0604052348015600e575f80fd5b503373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff168152505060805161020e61005a5f395f60b1015261020e5ff3fe608060405234801561000f575f80fd5b5060045f601c375f5163800000008116156100ad5760043563800000001982166040517ff0000f000f00000000000000000000000000000000000000000000000000000081528160208201527ff0000f000f0000000000000001234000000000000000000000000000000000016040820152606081205f5b848110156100a5578082015460208202840152600181019050610087565b506020840282f35b505f7f000000000000000000000000000000000000000000000000000000000000000090503381146100dd575f80fd5b5f51631a2d80ac81036101d4576040513660045b818110156101d0577ff0000f000f0000000000000000000000000000000000000000000000000000008352600481603c8501377ff0000f000f000000000000000123400000000000000000000000000000000001604084015260608320600260048301607e86013760608401516006830192505f5b81811015610184576020810284013581840155600181019050610166565b50806020028301925060208360408701377fa826448a59c096f4c3cbad79d038bc4924494a46fc002d46861890ec5ac62df0604060208701a150506020810190506080830192506100f1565b5f80f35b5f80fdfea2646970667358221220b77f3ab2f01a4ba0833f1da56458253968f31db408e07a18abc96dd87a272d5964736f6c634300081a0033".to_string()),
                     is_enabled,
                     allow_feeds: None,
                     impersonated_anvil_account: None,
                     publishing_criteria: vec![],
-                    contract_version: 1,
+                    contracts,
                 }
             });
 
