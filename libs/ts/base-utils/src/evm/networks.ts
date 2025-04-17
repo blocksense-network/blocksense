@@ -89,6 +89,7 @@ const networks = [
   'optimism-sepolia',
   'opbnb-testnet',
   'ozean-poseidon-testnet',
+  'pharos-devnet',
   'plume-testnet',
   'polygon-mainnet',
   'polygon-amoy',
@@ -129,9 +130,9 @@ const chainIds = [
   1666700000, 743111, 560048, 1663, 2424, 57073, 763373, 2221, 2358, 1284, 1287,
   1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006, 5000, 5003,
   1750, 59902, 6342, 31611, 10143, 2818, 2810, 8801, 5851, 10, 11155420, 5611,
-  7849306, 98867, 137, 80002, 1101, 2442, 57000, 200018, 31, 534352, 534351,
-  11011, 50312, 16, 57054, 1660990954, 5330, 53302, 1924, 2390, 167000, 167009,
-  5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
+  7849306, 50002, 98867, 137, 80002, 1101, 2442, 57000, 200018, 31, 534352,
+  534351, 11011, 50312, 16, 57054, 1660990954, 5330, 53302, 1924, 2390, 167000,
+  167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -661,6 +662,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://ozean-testnet.explorer.caldera.xyz',
     currency: Currency.USDX,
+  },
+  'pharos-devnet': {
+    chainId: 50002,
+    isTestnet: true,
+    explorerUrl: 'https://pharosscan.xyz',
+    currency: Currency.ETH,
   },
   'plume-testnet': {
     chainId: 98867,
