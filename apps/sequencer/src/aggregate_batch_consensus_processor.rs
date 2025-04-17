@@ -155,8 +155,7 @@ pub async fn aggregation_batch_consensus_loop(
                                         eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_nonce._0, safe_tx.nonce);
                                     }
 
-                                    Ok(match contract
-                                    .execTransaction(
+                                    let receipt = match contract.execTransaction(
                                         safe_tx.to,
                                         safe_tx.value,
                                         safe_tx.data,
@@ -172,13 +171,16 @@ pub async fn aggregation_batch_consensus_loop(
                                     .await {
                                         Ok(v) => {
                                             info!("Posted tx for network {net}, Blocksense block height: {block_height}! Waiting for receipt ...");
-                                            v.get_receipt()
-                                            .await
+                                            let receipt = v.get_receipt().await;
+                                            info!("Got receipt for network {net}, Blocksense block height: {block_height}! {:?}", receipt);
+                                            receipt
                                         }
                                         Err(e) => {
                                             eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
                                         }
-                                    })
+                                    };
+
+                                    Ok(receipt)
                                 }).expect("Failed to spawn tx sender for network {net} Blocksense block height: {block_height}!")
                         );
                     }
