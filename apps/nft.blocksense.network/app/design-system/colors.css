@@ -8,6 +8,9 @@
   --gray-light: #d9d9d9;
   --gray-medium: #9c9c9c;
   --gray-dark: #454242;
+
+  --red: #e74c3c;
+  --green: #4caf50;
 }
 
 @layer base {
