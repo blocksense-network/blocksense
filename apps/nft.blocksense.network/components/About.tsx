@@ -110,7 +110,7 @@ const AboutDesktop = () => {
 
 const AboutMobile = () => {
   return (
-    <section className="about about--mobile md:hidden px-[1.25rem] pt-[2.5rem] pb-[3rem] flex flex-col gap-[2.5rem]">
+    <section className="about about--mobile md:hidden px-5 pt-[2.5rem] pb-[3rem] flex flex-col gap-[2.5rem]">
       <header className="about__text about__text--mobile">
         <h2 className="about__title about__title--mobile font-bold mb-[1.5rem] text-[1.25rem] leading-tight">
           What the pirate NFT gives you:
