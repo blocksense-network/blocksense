@@ -4,6 +4,10 @@ let
   corepack = pkgs.corepack.override { inherit nodejs; };
 in
 {
+  imports = [
+    ./anvil.nix
+  ];
+
   packages =
     [
       nodejs
