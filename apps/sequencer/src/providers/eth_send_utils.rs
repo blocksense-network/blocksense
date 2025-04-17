@@ -290,6 +290,11 @@ pub async fn eth_batch_send_to_contract(
 
     loop {
         debug!("loop begin; timed_out_count={timed_out_count}");
+
+        if timed_out_count > transaction_retries_count_before_give_up {
+            return Ok(("timeout".to_string(), feeds_to_update_ids));
+        }
+
         let tx;
         if timed_out_count == 0 {
             tx = TransactionRequest::default()
@@ -299,30 +304,16 @@ pub async fn eth_batch_send_to_contract(
                 .input(Some(input.clone()).into());
             debug!("Sending initial tx: {tx:?}");
         } else {
-            debug!("Getting nonce for network {net} and address {contract_address}...");
-            let mut nonce = match rpc_handle
-                .get_transaction_count(contract_address)
-                .latest()
-                .await
-            {
-                Ok(nonce) => {
-                    debug!("Got nonce={nonce} for network {net} and address {contract_address}");
-                    nonce
-                }
-                Err(err) => {
-                    debug!("Failed to get nonce for network {net} and address {contract_address} due to {err}");
-                    return Err(err.into());
-                }
-            };
+            debug!("Retrying to send updates to network {net} for {timed_out_count}-th time");
 
-            // TODO: remove previous, if this fixes nonce=1
-            if nonce == 1 {
-                debug!("Getting nonce for network {net} and address {sender_address}...");
-                nonce = match rpc_handle
-                    .get_transaction_count(sender_address)
-                    .latest()
-                    .await
-                {
+            debug!("Getting nonce for network {net} and address {sender_address}...");
+            let nonce = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.get_transaction_count(sender_address).latest(),
+            )
+            .await
+            {
+                Ok(nonce_result) => match nonce_result {
                     Ok(nonce) => {
                         debug!("Got nonce={nonce} for network {net} and address {sender_address}");
                         nonce
@@ -331,32 +322,61 @@ pub async fn eth_batch_send_to_contract(
                         debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
                         return Err(err.into());
                     }
-                };
-            }
+                },
+                Err(err) => {
+                    warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
+                    timed_out_count += 1;
+                    continue;
+                }
+            };
 
             let price_increment = 1.0 + (timed_out_count as f64 * retry_fee_increment_fraction);
 
             debug!("Getting gas_price for network {net}...");
-            let gas_price = match rpc_handle.get_gas_price().await {
-                Ok(gas_price) => {
-                    debug!("Got gas_price={gas_price} for network {net}");
-                    gas_price
-                }
+            let gas_price = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.get_gas_price(),
+            )
+            .await
+            {
+                Ok(gas_price_result) => match gas_price_result {
+                    Ok(gas_price) => {
+                        debug!("Got gas_price={gas_price} for network {net}");
+                        gas_price
+                    }
+                    Err(err) => {
+                        debug!("Failed to get gas_price for network {net} due to {err}");
+                        return Err(err.into());
+                    }
+                },
                 Err(err) => {
-                    debug!("Failed to get gas_price for network {net} due to {err}");
-                    return Err(err.into());
+                    warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
+                    timed_out_count += 1;
+                    continue;
                 }
             };
 
             debug!("Getting priority_fee for network {net}...");
-            let mut priority_fee = match rpc_handle.get_max_priority_fee_per_gas().await {
-                Ok(priority_fee) => {
-                    debug!("Got priority_fee={priority_fee} for network {net}");
-                    priority_fee
-                }
+            let mut priority_fee = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.get_max_priority_fee_per_gas(),
+            )
+            .await
+            {
+                Ok(priority_fee_result) => match priority_fee_result {
+                    Ok(priority_fee) => {
+                        debug!("Got priority_fee={priority_fee} for network {net}");
+                        priority_fee
+                    }
+                    Err(err) => {
+                        debug!("Failed to get priority_fee for network {net} due to {err}");
+                        return Err(err.into());
+                    }
+                },
                 Err(err) => {
-                    debug!("Failed to get priority_fee for network {net} due to {err}");
-                    return Err(err.into());
+                    warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
+                    timed_out_count += 1;
+                    continue;
                 }
             };
 
@@ -386,7 +406,19 @@ pub async fn eth_batch_send_to_contract(
             result
         } else {
             debug!("Sending price feed update transaction to network `{net}`...");
-            let result = rpc_handle.send_transaction(tx).await;
+            let result = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.send_transaction(tx),
+            )
+            .await
+            {
+                Ok(post_tx_res) => post_tx_res,
+                Err(err) => {
+                    warn!("Timed out while trying to post tx to RPC for network {net} and address {sender_address} due to {err}");
+                    timed_out_count += 1;
+                    continue;
+                }
+            };
             debug!("Sent price feed update transaction to network `{net}`");
             result
         };
@@ -399,45 +431,32 @@ pub async fn eth_batch_send_to_contract(
         let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
 
         debug!("Awaiting receipt for transaction to network `{net}`...");
-        let receipt_result = spawn(async move {
-            actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                receipt_future.get_receipt(),
-            )
-            .await
-        })
+        let receipt_result = actix_web::rt::time::timeout(
+            Duration::from_secs(transaction_retry_timeout_secs),
+            receipt_future.get_receipt(),
+        )
         .await;
         debug!("Done awaiting receipt for transaction to network `{net}`");
 
         debug!("matching receipt_result...");
 
         match receipt_result {
-            Ok(outer_result) => match outer_result {
-                Ok(inner_result) => match inner_result {
-                    Ok(r) => {
-                        debug!("Received valid receipt for transaction to network `{net}`");
-                        receipt = r;
-                        break;
-                    }
-                    Err(e) => {
-                        warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                        timed_out_count += 1;
-                    }
-                },
+            Ok(inner_result) => match inner_result {
+                Ok(r) => {
+                    debug!("Received valid receipt for transaction to network `{net}`");
+                    receipt = r;
+                    break;
+                }
                 Err(e) => {
-                    warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
+                    warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
                     timed_out_count += 1;
                 }
             },
             Err(e) => {
-                panic!("Join error tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
+                warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
+                timed_out_count += 1;
+                continue;
             }
-        }
-
-        debug!("matched receipt_result");
-
-        if timed_out_count > transaction_retries_count_before_give_up {
-            return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
     }
 
