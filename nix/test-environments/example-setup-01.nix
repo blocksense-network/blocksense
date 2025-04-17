@@ -188,6 +188,11 @@ in
           "https://rpc.eth.gateway.fm"
         ];
       };
+
+      stock-price-feeds = {
+        exec-interval = 60;
+        allowed-outbound-hosts = [ ];
+      };
     };
   };
 }
