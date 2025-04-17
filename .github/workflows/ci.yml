@@ -4,16 +4,19 @@ on:
   # Enable option to manually run the action:
   workflow_dispatch:
 
-  # Run on the `main` branch or on PRs that target it:
-  push:
-    branches:
-      - main
+  # Run on PRs that target `main` it:
   pull_request:
     branches:
       - main
 
   # Run the pipeline for each PR part of merge queues as well
   merge_group:
+
+# Automatically cancel any in-progress workflow runs from earlier commits
+# on the same branch or pull request (e.g., after a force push)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.repository }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
@@ -107,15 +110,30 @@ jobs:
       - name: Measure contract size
         run: yarn workspace @blocksense/contracts size
 
+  set-runner-matrix-for-rust:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - id: set
+        name: Set Runner Matrix
+        run: |
+          if [[ "${{ github.event_name }}" == "merge_group" ]]; then
+            echo 'matrix={"include":[' \
+              '{"runner":["self-hosted","nixos","x86-64-v3"],"system":"x86_64-linux"},' \
+              '{"runner":"macos-latest-xlarge","system":"aarch64-darwin"}' \
+            ']}' >> $GITHUB_OUTPUT
+          else
+            echo 'matrix={"include":[' \
+              '{"runner":["self-hosted","nixos","x86-64-v3"],"system":"x86_64-linux"}' \
+            ']}' >> $GITHUB_OUTPUT
+          fi
+
   rust:
+    needs: set-runner-matrix-for-rust
     timeout-minutes: 360
     strategy:
-      matrix:
-        include:
-          - runner: [self-hosted, nixos, x86-64-v3]
-            system: x86_64-linux
-          - runner: macos-latest-xlarge
-            system: aarch64-darwin
+      matrix: ${{ fromJson(needs.set-runner-matrix-for-rust.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
 
     steps:
