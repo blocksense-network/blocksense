@@ -64,17 +64,17 @@ const AboutDesktop = () => {
           <Image
             src={bsxAssets.pirate.src}
             alt={bsxAssets.pirate.alt}
-            className="about__image about__image--rounded"
+            className="about__image about__image--desktop"
             quality={100}
             unoptimized
           />
         </header>
         <article className="about__row about__row--bottom flex gap-4 items-center">
-          <section className="about__gallery about__gallery--desktop flex gap-[1rem]">
+          <section className="about__gallery about__gallery--desktop max-w-[30.5rem] flex gap-[1rem]">
             <Image
               src={bsxAssets.parrot.src}
               alt={bsxAssets.parrot.alt}
-              className="about__image about__image--rounded"
+              className="about__image about__image--desktop"
               quality={100}
               unoptimized
             />
@@ -82,14 +82,14 @@ const AboutDesktop = () => {
               <Image
                 src={bsxAssets.robot.src}
                 alt={bsxAssets.robot.alt}
-                className="about__image about__image--rounded"
+                className="about__image about__image--desktop"
                 quality={100}
                 unoptimized
               />
               <Image
                 src={bsxAssets.warrior.src}
                 alt={bsxAssets.warrior.alt}
-                className="about__image about__image--rounded"
+                className="about__image about__image--desktop"
                 quality={100}
                 unoptimized
               />
