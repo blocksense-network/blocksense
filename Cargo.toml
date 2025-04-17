@@ -8,6 +8,7 @@ members = [
   "apps/oracles/exsat-holdings",
   "apps/oracles/gecko-terminal",
   "apps/oracles/eth-rpc",
+  "apps/oracles/stock-price-feeds",
   "libs/anomaly_detection",
   "libs/data_feeds",
   "libs/metrics",
