@@ -111,7 +111,7 @@ in
         };
         ink-sepolia = {
           private-key-path = "${testKeysDir}/sequencer-private-key";
-          contract-address = upgradeableProxyADFSContractAddressInk;
+          contract-address = "0x0568367FCB22C16B5dEc8214Ad06bA3C20C9f2bE";
           safe-address = "0xb5E44842297a6DF2dA16f9c32b7513e66F078391";
           contract-version = 2;
           transaction-gas-limit = 20000000;

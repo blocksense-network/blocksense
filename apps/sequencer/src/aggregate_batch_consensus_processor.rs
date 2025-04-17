@@ -167,6 +167,8 @@ pub async fn aggregation_batch_consensus_loop(
                                         eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_nonce._0, safe_tx.nonce);
                                     }
 
+                                    info!("About to post tx {safe_tx:?} for network {net}, Blocksense block height: {block_height}");
+
                                     let receipt = match contract.execTransaction(
                                         safe_tx.to,
                                         safe_tx.value,

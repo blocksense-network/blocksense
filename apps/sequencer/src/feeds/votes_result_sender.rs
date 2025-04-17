@@ -232,7 +232,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             }
         };
 
-        debug!("About to send feed values to kafka; network={net}");
+        info!("About to send feed values to kafka; network={net}, serialized_updates={serialized_updates}");
         match kafka_endpoint
             .send(
                 FutureRecord::<(), _>::to("aggregation_consensus").payload(&serialized_updates),
