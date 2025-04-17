@@ -39,3 +39,13 @@ export async function everyAsync<T>(
   const boolArray = await Promise.all(array.map(asyncPredicate));
   return boolArray.every(b => b);
 }
+
+/**
+ * Pauses the execution of an asynchronous function for a specified duration.
+ *
+ * @param ms - The number of milliseconds to sleep before resolving the promise.
+ * @returns A promise that resolves after the specified duration.
+ */
+export function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
