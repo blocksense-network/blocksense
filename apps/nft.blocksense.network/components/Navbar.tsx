@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 import { Logo } from './Logo';
+import { ClaimNFTButton } from './ClaimNFTButton';
 import { SocialNetworks } from './SocialNetworks';
-import { Button } from './Button';
 import openIcon from '/public/icons/open.svg';
 import closeIcon from '/public/icons/close.svg';
 
@@ -110,9 +110,10 @@ const MobileNavbar = () => {
               </a>
             ))}
           </section>
-          <Button className="navbar__button w-full">
-            Claim your very own pirate NFT
-          </Button>
+          <ClaimNFTButton
+            className="navbar__button w-full"
+            onClick={closeNavbar}
+          />
           <SocialNetworks />
         </nav>
       )}

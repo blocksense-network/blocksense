@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { Button } from './Button';
+import { ClaimNFTButton } from './ClaimNFTButton';
 import heroVector from '/public/images/hero-vector.svg';
 import heroPirateFlag from '/public/images/hero-pirate-flag.png';
 import heroPirateFlagMobile from '/public/images/hero-pirate-flag-mobile.png';
@@ -29,7 +29,7 @@ const HeroDesktop = () => {
         <article className="hero flex gap-[1.625rem] justify-between pb-20">
           <section className="flex-1 flex flex-col gap-10 justify-between max-w-[36rem]">
             <h1>Join the Blocksense crew with your pirate NFT</h1>
-            <Button className="w-fit">Claim your very own pirate NFT</Button>
+            <ClaimNFTButton className="w-fit" />
           </section>
           <p className="flex-1 max-w-[27rem] pt-[0.75rem]">
             As the fully programmable ZK oracle protocol with groundbreaking
@@ -75,7 +75,7 @@ const HeroMobile = () => {
         Become an early adopter by joining the fast-growing Blocksense
         community!
       </p>
-      <Button className="w-full">Claim your very own pirate NFT</Button>
+      <ClaimNFTButton className="w-fit" />
     </article>
   );
 };
