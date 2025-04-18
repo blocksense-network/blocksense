@@ -1,19 +1,23 @@
+import assert from 'node:assert';
+
 import { task } from 'hardhat/config';
+import { Network, Signer, Wallet } from 'ethers';
+
 import {
-  NetworkName,
+  isNetworkName,
   getRpcUrl,
   kebabToSnakeCase,
   parseEthereumAddress,
   getOptionalEnvString,
   getEnvString,
 } from '@blocksense/base-utils';
-import { Network, Signer, Wallet } from 'ethers';
+
 import { awaitTimeout } from '../utils';
 import { NetworkConfig } from '../types';
 
 task('init-chain', '[UTILS] Init chain configuration').setAction(
-  async (args, { ethers }) => {
-    const { networkName }: { networkName: NetworkName } = args;
+  async ({ networkName }, { ethers }) => {
+    assert(isNetworkName(networkName), `Invalid network name: ${networkName}`);
     const rpc = getRpcUrl(networkName);
     const provider = new ethers.JsonRpcProvider(rpc);
 
@@ -72,6 +76,7 @@ task('init-chain', '[UTILS] Init chain configuration').setAction(
       rpc,
       provider,
       network,
+      networkName,
       sequencerMultisig: {
         signer: admin,
         owners: sequencerOwners,
