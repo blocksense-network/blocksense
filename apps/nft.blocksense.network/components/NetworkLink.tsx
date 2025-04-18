@@ -20,25 +20,38 @@ export const NetworkLink = ({
   message,
 }: NetworkLinkProps) => {
   return (
-    <article className="flex flex-col gap-2">
-      <a href={link} target="_blank" rel="noopener noreferrer">
+    <article className="network-link__container flex flex-col gap-2">
+      <a
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="network_link"
+      >
         <section
           className={`flex items-center justify-between bg-[var(--gray-dark)] border border-[var(--gray-dark)] px-4 py-3 rounded-2xl ${status === 'error' && 'border-[var(--red)]'} ${status === 'success' && 'border-[var(--green)]'}`}
         >
           <article className="flex items-center md:gap-[0.875rem] gap-2">
-            <Image src={blocksenseEllipseIcon} alt="Blocksense Ellipse" />
+            <Image
+              src={blocksenseEllipseIcon}
+              alt="Blocksense Ellipse"
+              className="network-link__blocksense-icon"
+            />
             <section>
-              <p className="text-[var(--white)] md:text-base text-sm">
+              <p className="network-link__title text-[var(--white)] md:text-base text-sm">
                 {title}
               </p>
               {description && (
-                <p className="text-[var(--gray-medium)] md:text-sm text-xs">
+                <p className="network-link__description text-[var(--gray-medium)] md:text-sm text-xs">
                   {description}
                 </p>
               )}
             </section>
           </article>
-          <Image src={sendArrowIcon} alt="Send Arrow" />
+          <Image
+            src={sendArrowIcon}
+            alt="Send Arrow"
+            className="network-link__send-icon"
+          />
         </section>
       </a>
       <StatusMessage status={status} message={message} />

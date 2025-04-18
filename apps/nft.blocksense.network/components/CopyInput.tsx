@@ -33,11 +33,11 @@ export const CopyInput = ({
   return (
     <label
       htmlFor={id}
-      className={`flex md:gap-3 gap-2 items-center border border-[var(--gray-dark)] ${isCopied && 'border-[var(--green)] bg-[var(--gray-dark)]'} text-[var(--gray-medium)] rounded-2xl md:px-4 md:py-5 p-4 ${isCopied ? 'border-[var(--green)]' : 'hover:border-[var(--gray-light)] focus-within:border-[var(--gray-light)]'} ${labelClassName}`}
+      className={`copy-input__label flex md:gap-3 gap-2 items-center border border-[var(--gray-dark)] ${isCopied && 'border-[var(--green)] bg-[var(--gray-dark)]'} text-[var(--gray-medium)] rounded-2xl md:px-4 md:py-5 p-4 ${isCopied ? 'border-[var(--green)]' : 'hover:border-[var(--gray-light)] focus-within:border-[var(--gray-light)]'} ${labelClassName}`}
     >
       <input
         id={id}
-        className={`flex-1 bg-transparent focus:outline-none ${className}`}
+        className={`copy-input flex-1 bg-transparent focus:outline-none ${className}`}
         disabled={disabled}
         value={isCopied ? 'Copied' : value}
         readOnly
@@ -49,7 +49,7 @@ export const CopyInput = ({
         onClick={onCopyClick}
         disabled={disabled}
         aria-label="Copy input content"
-        className="w-6 h-6 flex items-center justify-center cursor-pointer"
+        className="copy-input__button w-6 h-6 flex items-center justify-center cursor-pointer"
       >
         {isCopied ? (
           <Image src={checkIcon} alt="Copied" />

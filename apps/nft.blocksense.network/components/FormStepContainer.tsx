@@ -5,5 +5,9 @@ type FormStepContainerProps = {
 };
 
 export const FormStepContainer = ({ children }: FormStepContainerProps) => {
-  return <article className="flex flex-col md:gap-6 gap-4">{children}</article>;
+  return (
+    <article className="form-step__container flex flex-col md:gap-6 gap-4">
+      {children}
+    </article>
+  );
 };
