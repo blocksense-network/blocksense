@@ -47,14 +47,14 @@ export const Input = ({
         : 'border-[var(--gray-dark)]';
 
   return (
-    <article className="flex flex-col gap-2">
+    <article className="input__container flex flex-col gap-2">
       <label
         htmlFor={id}
-        className={`flex md:gap-3 gap-2 items-center rounded-2xl md:px-4 md:py-5 p-4 text-[var(--gray-medium)] border ${borderColor} hover:border-[var(--gray-light)] focus-within:border-[var(--gray-light)] transition duration-300 ease-in-out ${labelClassName}`}
+        className={`input__label flex md:gap-3 gap-2 items-center rounded-2xl md:px-4 md:py-5 p-4 text-[var(--gray-medium)] border ${borderColor} hover:border-[var(--gray-light)] focus-within:border-[var(--gray-light)] transition duration-300 ease-in-out ${labelClassName}`}
       >
         <input
           id={id}
-          className={`flex-1 bg-transparent focus:outline-none ${className}`}
+          className={`input flex-1 bg-transparent focus:outline-none ${className}`}
           disabled={disabled}
           onChange={onInputChange}
           value={value}
@@ -64,8 +64,20 @@ export const Input = ({
           <InputLoadingIcon />
         ) : (
           <>
-            {status === 'error' && <Image src={exclamationIcon} alt="Error" />}
-            {status === 'success' && <Image src={checkIcon} alt="Success" />}
+            {status === 'error' && (
+              <Image
+                src={exclamationIcon}
+                alt="Error"
+                className="input__error-icon"
+              />
+            )}
+            {status === 'success' && (
+              <Image
+                src={checkIcon}
+                alt="Success"
+                className="input__success-icon"
+              />
+            )}
           </>
         )}
       </label>

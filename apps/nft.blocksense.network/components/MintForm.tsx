@@ -10,7 +10,7 @@ import { NetworkLink } from './NetworkLink';
 import { Separator } from './Separator';
 import { CopyInput } from './CopyInput';
 
-const separatorClassName = 'md:my-8 my-6';
+const separatorClassName = 'mint-form__separator md:my-8 my-6';
 
 type MintFormProps = {
   onSuccessAction: () => void;
@@ -47,7 +47,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
   };
 
   return (
-    <form className="border border-[var(--gray-dark)] md:rounded-3xl rounded-2xl md:p-8 px-4 py-6">
+    <form className="mint-form border border-[var(--gray-dark)] md:rounded-3xl rounded-2xl md:p-8 px-4 py-6">
       <FormStepContainer>
         <FormStepTitle title="Follow us on X" number={1} />
         <NetworkLink
@@ -125,7 +125,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       <Button
         onClick={onMintClick}
         isLoading={mintLoading}
-        className="w-full md:mt-8 mt-6"
+        className="mint-form_button w-full md:mt-8 mt-6"
       >
         Mint My NFT
       </Button>

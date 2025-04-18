@@ -20,7 +20,7 @@ export const StatusMessage = ({
 
   return (
     <p
-      className={`text-xs leading-[120%] tracking-[-0.023rem] ${status === 'error' && 'text-[var(--red)]'} ${status === 'success' && 'text-[var(--green)]'} ${className}`}
+      className={`status-message text-xs leading-[120%] tracking-[-0.023rem] ${status === 'error' && 'text-[var(--red)]'} ${status === 'success' && 'text-[var(--green)]'} ${className}`}
       {...props}
     >
       {message}
