@@ -10,22 +10,45 @@ import './globals.css';
 export const metadata: Metadata = {
   description:
     'Explore exclusive NFT drops and be part of the next digital revolution. Mint your NFT now on the Blocksense platform.',
-  metadataBase: new URL('https://blocksense.network/'),
+  metadataBase: new URL('https://nft.blocksense.network/'),
   keywords: [
     'NFT Drop',
-    'Blocksense',
     'Mint NFT',
-    'Digital Revolution',
-    'Exclusive NFT',
-    'Blockchain',
-    'Smart contracts',
-    'Decentralized',
     'NFT Collection',
+    'Blockchain',
+    'Smart Contracts',
+    'Decentralized',
+    'Crypto Art',
+    'Web3',
+    'Digital Ownership',
+    'NFT Marketplace',
+    'Exclusive NFT',
+    'Tokenized Assets',
+    'Digital Revolution',
+    'Ethereum',
+    'Metaverse',
   ],
+  openGraph: {
+    title: 'Blocksense NFT Drop',
+    url: 'https://nft.blocksense.network/',
+    images: [
+      {
+        url: '/images/hero-pirate-flag-mobile.png',
+        width: 1200,
+        height: 630,
+        alt: 'Blocksense NFT Drop OG Image',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    images: ['/images/hero-pirate-flag-mobile.png'],
+    site: 'https://x.com/blocksense_',
+  },
   generator: 'Next.js',
   applicationName: 'Blocksense NFT Drop',
   appleWebApp: {
-    title: 'NFT Drop - Blocksense',
+    title: 'Blocksense - NFT Drop',
   },
   title: {
     absolute: '',
@@ -43,9 +66,6 @@ export const metadata: Metadata = {
   other: {
     'msapplication-TileColor': '#000',
   },
-  twitter: {
-    site: 'https://twitter.com/blocksense_',
-  },
 };
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
@@ -59,21 +79,31 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       <NextHead>
         <meta
           name="description"
-          content="Explore exclusive NFT drops and be part of the next digital revolution. Mint your NFT now on the Blocksense platform."
+          content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
         />
         <meta
           property="og:description"
-          content="Join the latest NFT drop on Blocksense! Discover, mint, and own exclusive digital art."
+          content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
         />
-        <meta property="og:image" content="/images/nft-og.png" />
+        <meta
+          property="og:image"
+          content="/images/hero-pirate-flag-mobile.png"
+        />
         <meta property="og:type" content="website" />
+        <meta
+          name="twitter:image"
+          content="/images/hero-pirate-flag-mobile.png"
+        />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="NFT Drop - Blocksense" />
+        <meta name="twitter:title" content="Blocksense - NFT Drop" />
         <meta
           name="twitter:description"
           content="Explore exclusive NFT drops and mint your NFTs on Blocksense. Join the digital revolution today."
         />
-        <meta name="twitter:image" content="/images/nft-og.png" />
+        <meta
+          name="twitter:image"
+          content="/images/hero-pirate-flag-mobile.png"
+        />
       </NextHead>
       <body className="nft-drop-layout__body">
         <Navbar />
