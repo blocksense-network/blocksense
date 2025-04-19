@@ -49,7 +49,7 @@ const DesktopNavbar = () => {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="navbar__link"
+              className="navbar__link  hover:opacity-80 transition-opacity duration-200"
             >
               {link.label}
             </a>
@@ -104,7 +104,7 @@ const MobileNavbar = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={closeNavbar}
-                className="navbar__link"
+                className="navbar__link hover:opacity-80 active:opacity-80 transition-opacity duration-20"
               >
                 {link.label}
               </a>
