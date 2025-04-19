@@ -1,23 +1,30 @@
 'use client';
 
 import Link from 'next/link';
+import * as motion from 'motion/react-client';
+
+import { Button } from 'components/Button';
 
 const ErrorPage = () => {
   return (
-    <section className="error-page flex flex-col h-[calc(100vh-16rem)] items-center justify-center">
-      <article className="error-page__container flex flex-col justify-center items-center p-6 max-w-md w-full h-full">
-        <h1 className="error-page__title">500 - Internal Server Error</h1>
-        <p className="error-page__message mt-2 text-lg">
-          Something happened, try again later
-        </p>
-        <Link
-          href="/"
-          className="error-page__link mt-4 inline-block px-6 py-2 text-sm font-bold"
-        >
+    <motion.article
+      className="error-page h-[calc(100vh-19rem)] flex flex-col justify-center items-center p-6 gap-4 w-full"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.35,
+        delay: 0.1,
+        ease: [0.25, 0.8, 0.25, 1],
+      }}
+    >
+      <h1 className="error-page__title">500 - Internal Server Error</h1>
+      <p className="error-page__message">Something happened, try again later</p>
+      <Link href="/" className="cta__link">
+        <Button variant="primary" className="cta__button">
           Back to Home
-        </Link>
-      </article>
-    </section>
+        </Button>
+      </Link>
+    </motion.article>
   );
 };
 
