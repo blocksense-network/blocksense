@@ -79,13 +79,13 @@
     "test": "yarn vitest --typecheck -w false"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "glob": "^11.0.0",
-    "tsx": "^4.19.2",
+    "@types/node": "^22.14.1",
+    "glob": "^11.0.1",
+    "tsx": "^4.19.3",
     "typescript": "5.8.3",
-    "vitest": "^3.0.2"
+    "vitest": "^3.1.1"
   },
   "dependencies": {
-    "effect": "^3.12.1"
+    "effect": "^3.14.11"
   }
 }
