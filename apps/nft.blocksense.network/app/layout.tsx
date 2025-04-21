@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     url: 'https://nft.blocksense.network/',
     images: [
       {
-        url: '/images/hero-pirate-flag-mobile.png',
+        url: '/images/blocksense_og.png',
         width: 1200,
         height: 630,
         alt: 'Blocksense NFT Drop OG Image',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     type: 'website',
   },
   twitter: {
-    images: ['/images/hero-pirate-flag-mobile.png'],
+    images: ['/images/blocksense_og.png'],
     site: 'https://x.com/blocksense_',
   },
   generator: 'Next.js',
@@ -85,25 +85,16 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
           property="og:description"
           content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
         />
-        <meta
-          property="og:image"
-          content="/images/hero-pirate-flag-mobile.png"
-        />
+        <meta property="og:image" content="/images/blocksense_og.png" />
         <meta property="og:type" content="website" />
-        <meta
-          name="twitter:image"
-          content="/images/hero-pirate-flag-mobile.png"
-        />
+        <meta name="twitter:image" content="/images/blocksense_og.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Blocksense - NFT Drop" />
         <meta
           name="twitter:description"
           content="Explore exclusive NFT drops and mint your NFTs on Blocksense. Join the digital revolution today."
         />
-        <meta
-          name="twitter:image"
-          content="/images/hero-pirate-flag-mobile.png"
-        />
+        <meta name="twitter:image" content="/images/blocksense_og.png" />
       </NextHead>
       <body className="nft-drop-layout__body">
         <Navbar />
