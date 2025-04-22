@@ -1,13 +1,16 @@
-import NextHead from 'next/head';
+import './globals.css';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 
 import { geist, geistMono } from '../src/geist';
-import { Footer } from '../components/Footer';
 import { Navbar } from '../components/Navbar';
-import './globals.css';
+import { Footer } from '../components/Footer';
 
 export const metadata: Metadata = {
+  title: {
+    template: '%s - NFT Drop',
+    default: 'Blocksense NFT Drop',
+  },
   description:
     'Explore exclusive NFT drops and be part of the next digital revolution. Mint your NFT now on the Blocksense platform.',
   metadataBase: new URL('https://nft.blocksense.network/'),
@@ -30,7 +33,10 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: 'Blocksense NFT Drop',
+    description:
+      'Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes.',
     url: 'https://nft.blocksense.network/',
+    type: 'website',
     images: [
       {
         url: '/images/blocksense_og.png',
@@ -39,20 +45,19 @@ export const metadata: Metadata = {
         alt: 'Blocksense NFT Drop OG Image',
       },
     ],
-    type: 'website',
   },
   twitter: {
-    images: ['/images/blocksense_og.png'],
+    card: 'summary_large_image',
     site: 'https://x.com/blocksense_',
+    title: 'Blocksense - NFT Drop',
+    description:
+      'Explore exclusive NFT drops and mint your NFTs on Blocksense. Join the digital revolution today.',
+    images: ['/images/blocksense_og.png'],
   },
-  generator: 'Next.js',
   applicationName: 'Blocksense NFT Drop',
+  generator: 'Next.js',
   appleWebApp: {
     title: 'Blocksense - NFT Drop',
-  },
-  title: {
-    absolute: '',
-    template: '%s - NFT Drop',
   },
   icons: {
     icon: [
@@ -68,6 +73,31 @@ export const metadata: Metadata = {
   },
 };
 
+const GTMScript = () => (
+  <script
+    dangerouslySetInnerHTML={{
+      __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-WB9ZRVTV');`,
+    }}
+  />
+);
+
+const GTMNoScript = () => (
+  <div
+    dangerouslySetInnerHTML={{
+      __html: `
+        <noscript>
+          <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WB9ZRVTV"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+        </noscript>
+      `,
+    }}
+  />
+);
+
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html
@@ -76,27 +106,11 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <NextHead>
-        <meta
-          name="description"
-          content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
-        />
-        <meta
-          property="og:description"
-          content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
-        />
-        <meta property="og:image" content="/images/blocksense_og.png" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:image" content="/images/blocksense_og.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Blocksense - NFT Drop" />
-        <meta
-          name="twitter:description"
-          content="Explore exclusive NFT drops and mint your NFTs on Blocksense. Join the digital revolution today."
-        />
-        <meta name="twitter:image" content="/images/blocksense_og.png" />
-      </NextHead>
+      <head>
+        <GTMScript />
+      </head>
       <body className="nft-drop-layout__body">
+        <GTMNoScript />
         <Navbar />
         <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
         <Footer />
