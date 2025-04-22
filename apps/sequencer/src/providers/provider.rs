@@ -19,8 +19,8 @@ use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
 use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 
 use blocksense_config::{
-    AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig,
-    ADFS_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
+    AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig, ADFS_CONTRACT_NAME,
+    HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
     SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
 };
 

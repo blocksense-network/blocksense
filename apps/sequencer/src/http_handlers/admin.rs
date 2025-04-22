@@ -11,12 +11,14 @@ use alloy::{
     rpc::types::eth::TransactionRequest,
 };
 
-
-use blocksense_config::{AllFeedsConfig, SequencerConfig, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME};
-use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
+use blocksense_config::{
+    AllFeedsConfig, SequencerConfig, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
+    SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+};
 use blocksense_feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
+use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
 use blocksense_utils::logging::tokio_console_active;
 
 use eyre::eyre;
@@ -26,9 +28,9 @@ use std::collections::{BTreeMap, HashSet};
 
 use crate::http_handlers::data_feeds::register_feed;
 use crate::providers::eth_send_utils::deploy_contract;
+use crate::providers::provider::SharedRpcProviders;
 use blocksense_feed_registry::types::FeedType;
 use blocksense_metrics::metrics_collector::gather_and_dump_metrics;
-use crate::providers::provider::SharedRpcProviders;
 use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
