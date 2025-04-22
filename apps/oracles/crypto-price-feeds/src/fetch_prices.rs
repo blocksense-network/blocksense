@@ -1,15 +1,15 @@
 use anyhow::Result;
-use futures::FutureExt;
 use serde::{Deserialize, Serialize};
 
 use std::time::Instant;
 
 use futures::stream::{FuturesUnordered, StreamExt};
 
+use blocksense_sdk::{traits::prices_fetcher::fetch, traits::prices_fetcher::TradingPairSymbol};
+
 use crate::{
     common::{
-        ExchangePriceData, ExchangesSymbols, PairPriceData, ResourceData, ResourcePairData,
-        TradingPairSymbol, TradingPairToResults,
+        ExchangePriceData, ExchangesSymbols, ResourceData, ResourcePairData, TradingPairToResults,
     },
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
@@ -19,10 +19,7 @@ use crate::{
         kucoin::KuCoinPriceFetcher, mexc::MEXCPriceFetcher, okx::OKXPriceFetcher,
         upbit::UpBitPriceFetcher,
     },
-    traits::prices_fetcher::PricesFetcher,
 };
-
-use futures::future::LocalBoxFuture;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -145,16 +142,4 @@ fn get_alternative_quotes_for_quote(quote: &str) -> Vec<&str> {
     } else {
         Vec::new()
     }
-}
-
-fn fetch<'a, PF>(symbols: &'a [String]) -> LocalBoxFuture<'a, (&'static str, Result<PairPriceData>)>
-where
-    PF: PricesFetcher<'a>,
-{
-    async {
-        let fetcher = PF::new(symbols);
-        let res = fetcher.fetch().await;
-        (PF::NAME, res)
-    }
-    .boxed_local()
 }

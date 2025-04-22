@@ -3,11 +3,9 @@ use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 
-use blocksense_sdk::http::http_get_json;
-
-use crate::{
-    common::{PairPriceData, PricePoint},
-    traits::prices_fetcher::PricesFetcher,
+use blocksense_sdk::{
+    http::http_get_json,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
