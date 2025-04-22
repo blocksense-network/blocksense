@@ -2573,6 +2573,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "blocksense-macro",
+ "futures",
  "reqwest 0.12.12",
  "serde 1.0.217",
  "serde_json",
