@@ -14,8 +14,8 @@ const NFTDropPage = () => {
     <>
       <Hero />
       <Form />
-      <CTA />
       <About />
+      <CTA />
     </>
   );
 };
