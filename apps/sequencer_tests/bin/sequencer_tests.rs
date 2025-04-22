@@ -85,15 +85,15 @@ async fn write_file(key_path: &str, content: &[u8]) {
 
 async fn spawn_sequencer(
     eth_networks_ports: &[i32],
-    safe_contracts_per_net: &[String],
+    _safe_contracts_per_net: &[String], // TODO: use when integration test starts using two rounds consensus
 ) -> thread::JoinHandle<()> {
     let config_patch = json!(
     {
         "main_port": SEQUENCER_MAIN_PORT,
         "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
-            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "safe_address": safe_contracts_per_net[0]},
-            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "safe_address": safe_contracts_per_net[1]}
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "safe_address": None::<String>},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "safe_address": None::<String>}
         },
     });
 
