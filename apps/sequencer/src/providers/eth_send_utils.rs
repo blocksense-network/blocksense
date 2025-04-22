@@ -18,10 +18,10 @@ use crate::{
     providers::provider::{parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders},
     sequencer_state::SequencerState,
 };
-use blocksense_feed_registry::types::{Repeatability, Repeatability::Periodic};
 use blocksense_config::{
     HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
 };
+use blocksense_feed_registry::types::{Repeatability, Repeatability::Periodic};
 use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
