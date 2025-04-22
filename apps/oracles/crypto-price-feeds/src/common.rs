@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 
+use blocksense_sdk::traits::prices_fetcher::{PairPriceData, PricePoint, TradingPairSymbol};
 use serde::{Deserialize, Serialize};
 
 pub type ExchangeName = String;
-pub type TradingPairSymbol = String;
-pub type Price = f64;
-pub type Volume = f64;
 
 #[derive(Debug, Hash, Serialize, Deserialize)]
 pub struct TradingPair {
@@ -13,14 +11,7 @@ pub struct TradingPair {
     pub quote: String,
 }
 
-#[derive(Clone, Debug)]
-pub struct PricePoint {
-    pub price: Price,
-    pub volume: Volume,
-}
-
 pub type ExchangePricePoints = HashMap<ExchangeName, PricePoint>;
-pub type PairPriceData = HashMap<TradingPairSymbol, PricePoint>;
 
 pub type ExchangesSymbols = HashMap<ExchangeName, Vec<String>>;
 

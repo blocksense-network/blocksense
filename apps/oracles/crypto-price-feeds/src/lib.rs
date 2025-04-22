@@ -1,7 +1,6 @@
 mod common;
 mod exchanges;
 mod fetch_prices;
-mod traits;
 mod vwap;
 
 use anyhow::{Context, Result};
