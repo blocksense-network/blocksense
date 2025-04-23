@@ -2,7 +2,7 @@
   "name": "@blocksense/nft.blocksense.network",
   "version": "0.0.0",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3002",
     "build": "next build",
     "start": "next start"
   },
