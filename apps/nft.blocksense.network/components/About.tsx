@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 import aboutVector from '/public/images/about-vector.svg';
@@ -20,8 +23,29 @@ export const About = () => {
 };
 
 const AboutDesktop = () => {
+  const [inView, setInView] = useState(false);
+  const desktopRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry?.isIntersecting ?? false);
+      },
+      { threshold: 0.1 },
+    );
+
+    if (desktopRef.current) observer.observe(desktopRef.current);
+
+    return () => {
+      if (desktopRef.current) observer.unobserve(desktopRef.current);
+    };
+  }, []);
+
   return (
-    <section className="hidden md:block px-20 relative py-[7.75rem]">
+    <section
+      ref={desktopRef}
+      className="hidden md:block px-20 relative py-[7.75rem]"
+    >
       <Image
         src={aboutVector}
         alt="About Vector"
@@ -31,12 +55,24 @@ const AboutDesktop = () => {
         className="z-[-1]"
       />
       <section className="about about--desktop max-w-[58.5rem] mx-auto">
-        <header className="about__row about__row--top flex justify-between gap-4 items-center mb-[4rem]">
-          <section className="about__text about__text--left max-w-[36rem]">
-            <h2 className="about__title about__title--primary text-[2rem] mb-6">
+        <header
+          className={`about__row about__row--top flex justify-between gap-4 items-center mb-[4rem] transition-all duration-800 ease-out transform origin-bottom ${
+            inView
+              ? 'opacity-100 translate-y-0 scale-100'
+              : 'opacity-0 translate-y-12 scale-95'
+          }`}
+        >
+          <section
+            className={`about__text about__text--left max-w-[36rem] transition-all duration-800 ease-out ${
+              inView
+                ? 'delay-[180ms] opacity-100 translate-y-0'
+                : 'opacity-0 translate-y-6'
+            }`}
+          >
+            <h2 className="about__title text-[2rem] mb-6">
               What the pirate NFT gives you:
             </h2>
-            <p className="about__description about__description--primary max-w-[28.75rem]">
+            <p className="about__description max-w-[28.75rem]">
               Congrats! Your proof-of-membership pirate NFT should now be in
               your wallet.
               <br />
@@ -49,39 +85,55 @@ const AboutDesktop = () => {
           <Image
             src={bsxPirate}
             alt="Pirate NFT"
-            className="about__image about__image--desktop max-w-max"
+            className={`about__image max-w-max transition-all duration-800 ease-out ${
+              inView
+                ? 'delay-[350ms] opacity-100 translate-y-0'
+                : 'opacity-0 translate-y-6'
+            }`}
             quality={100}
             unoptimized
           />
         </header>
         <article className="about__row about__row--bottom flex justify-between gap-4 items-center">
-          <section className="about__gallery about__gallery--desktop max-w-[30.75rem] flex gap-[1.25rem]">
+          <section
+            className={`about__gallery max-w-[30.75rem] flex gap-[1.25rem] transition-all duration-800 ease-out ${
+              inView
+                ? 'delay-[500ms] opacity-100 translate-y-0'
+                : 'opacity-0 translate-y-6'
+            }`}
+          >
             <Image
               src={bsxParrot}
               alt="Blocksense Parrot"
-              className="about__image about__image--desktop max-w-max"
+              className="about__image max-w-max"
               quality={100}
               unoptimized
             />
-            <div className="about__stack about__stack--vertical flex flex-col gap-[1rem]">
+            <div className="about__stack flex flex-col gap-[1rem]">
               <Image
                 src={bsxWarrior}
                 alt="Blocksense Warrior"
-                className="about__image about__image--desktop max-w-max"
+                className="about__image max-w-max"
                 quality={100}
                 unoptimized
               />
               <Image
                 src={bsxRobot}
                 alt="Blocksense Robot"
-                className="about__image about__image--desktop max-w-max"
+                className="about__image max-w-max"
                 quality={100}
                 unoptimized
               />
             </div>
           </section>
-          <aside className="about__details about__details--text max-w-[22.688rem] mx-auto">
-            <p className="about__paragraph about__paragraph--primary">
+          <aside
+            className={`about__details max-w-[22.688rem] transition-all duration-800 ease-out ${
+              inView
+                ? 'delay-[650ms] opacity-100 translate-y-0'
+                : 'opacity-0 translate-y-6'
+            }`}
+          >
+            <p className="about__paragraph">
               HINT: It will be a unique collection of NFTs by a famous artist.
               We can’t divulge any more details now, but trust us, it will be
               worth it.
@@ -94,19 +146,46 @@ const AboutDesktop = () => {
 };
 
 const AboutMobile = () => {
+  const [inView, setInView] = useState(false);
+  const mobileRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry?.isIntersecting ?? false);
+      },
+      { threshold: 0.1 },
+    );
+
+    if (mobileRef.current) observer.observe(mobileRef.current);
+
+    return () => {
+      if (mobileRef.current) observer.unobserve(mobileRef.current);
+    };
+  }, []);
+
   return (
-    <section className="about about--mobile md:hidden px-5 py-12 flex flex-col gap-12">
-      <header className="about__text about__text--mobile">
-        <h2 className="about__title about__title--mobile mb-[1.5rem] leading-[120%]">
+    <section
+      ref={mobileRef}
+      className="about about--mobile md:hidden px-5 py-12 flex flex-col gap-12"
+    >
+      <header
+        className={`about__text transition-all duration-800 ease-out ${
+          inView
+            ? 'opacity-100 translate-y-0 delay-[180ms]'
+            : 'opacity-0 translate-y-6'
+        }`}
+      >
+        <h2 className="about__title mb-[1.5rem] leading-[120%]">
           What the pirate NFT gives you:
         </h2>
-        <p className="about__description about__description--mobile">
+        <p className="about__description">
           Congrats! Your proof-of-membership pirate NFT should now be in your
           wallet.
         </p>
         <br />
         <br />
-        <p className="about__description about__description--mobile__secondary max-w-[27rem]">
+        <p className="about__description max-w-[27rem]">
           Once you mint the first NFT, you officially join the Blocksense crew —
           your gateway into our pirate world and your key to exclusive drops
           like the upcoming second one.
@@ -115,35 +194,51 @@ const AboutMobile = () => {
       <Image
         src={bsxPirate}
         alt="Pirate NFT Mobile"
-        className="about__image about__image--rounded w-full"
+        className={`about__image w-full transition-all duration-800 ease-out ${
+          inView
+            ? 'opacity-100 translate-y-0 delay-[350ms]'
+            : 'opacity-0 translate-y-6'
+        }`}
         quality={100}
         unoptimized
       />
-      <footer className="about__details about__details--mobile">
-        <p className="about__paragraph about__paragraph--mobile">
+      <footer
+        className={`about__details transition-all duration-800 ease-out ${
+          inView
+            ? 'opacity-100 translate-y-0 delay-[500ms]'
+            : 'opacity-0 translate-y-6'
+        }`}
+      >
+        <p className="about__paragraph">
           HINT: It will be a unique collection of NFTs by a famous artist. We
           can’t divulge any more details now, but trust us, it will be worth it.
         </p>
       </footer>
-      <div className="about__gallery about__gallery--mobile flex flex-col gap-4 w-full">
+      <div
+        className={`about__gallery flex flex-col gap-4 w-full transition-all duration-800 ease-out ${
+          inView
+            ? 'opacity-100 translate-y-0 delay-[650ms]'
+            : 'opacity-0 translate-y-6'
+        }`}
+      >
         <Image
           src={bsxParrotMobile}
           alt="Blocksense Parrot Mobile"
-          className="about__image about__image--rounded w-full h-auto"
+          className="about__image w-full h-auto"
           quality={100}
           unoptimized
         />
         <Image
           src={bsxWarriorMobile}
           alt="Blocksense Warrior Mobile"
-          className="about__image about__image--rounded w-full h-auto"
+          className="about__image w-full h-auto"
           quality={100}
           unoptimized
         />
         <Image
           src={bsxRobotMobile}
           alt="Blocksense Robot Mobile"
-          className="about__image about__image--rounded w-full h-auto"
+          className="about__image w-full h-auto"
           quality={100}
           unoptimized
         />
