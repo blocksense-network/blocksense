@@ -196,7 +196,7 @@ pub async fn eth_batch_send_to_contract(
     feed_type: Repeatability,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
-    transaction_retries_count_before_give_up: u64,
+    transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<u32>)> {
     let mut feeds_rounds = HashMap::new();
@@ -286,17 +286,17 @@ pub async fn eth_batch_send_to_contract(
         }
     };
 
-    let mut timed_out_count = 0;
+    let mut transaction_retries_count = 0;
 
     loop {
-        debug!("loop begin; timed_out_count={timed_out_count}");
+        debug!("loop begin; transaction_retries_count={transaction_retries_count}");
 
-        if timed_out_count > transaction_retries_count_before_give_up {
+        if transaction_retries_count > transaction_retries_count_limit {
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
 
         let tx;
-        if timed_out_count == 0 {
+        if transaction_retries_count == 0 {
             tx = TransactionRequest::default()
                 .to(contract_address)
                 .from(sender_address)
@@ -304,7 +304,9 @@ pub async fn eth_batch_send_to_contract(
                 .input(Some(input.clone()).into());
             debug!("Sending initial tx: {tx:?}");
         } else {
-            debug!("Retrying to send updates to network {net} for {timed_out_count}-th time");
+            debug!(
+                "Retrying to send updates to network {net} for {transaction_retries_count}-th time"
+            );
 
             debug!("Getting nonce for network {net} and address {sender_address}...");
             let nonce = match actix_web::rt::time::timeout(
@@ -325,12 +327,13 @@ pub async fn eth_batch_send_to_contract(
                 },
                 Err(err) => {
                     warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
-                    timed_out_count += 1;
+                    transaction_retries_count += 1;
                     continue;
                 }
             };
 
-            let price_increment = 1.0 + (timed_out_count as f64 * retry_fee_increment_fraction);
+            let price_increment =
+                1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
 
             debug!("Getting gas_price for network {net}...");
             let gas_price = match actix_web::rt::time::timeout(
@@ -351,7 +354,7 @@ pub async fn eth_batch_send_to_contract(
                 },
                 Err(err) => {
                     warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
-                    timed_out_count += 1;
+                    transaction_retries_count += 1;
                     continue;
                 }
             };
@@ -375,7 +378,7 @@ pub async fn eth_batch_send_to_contract(
                 },
                 Err(err) => {
                     warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
-                    timed_out_count += 1;
+                    transaction_retries_count += 1;
                     continue;
                 }
             };
@@ -391,7 +394,7 @@ pub async fn eth_batch_send_to_contract(
                 .max_priority_fee_per_gas(priority_fee)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
-            debug!("Retrying for {timed_out_count}-th time tx: {tx:?}");
+            debug!("Retrying for {transaction_retries_count}-th time tx: {tx:?}");
         }
 
         let tx_str = format!("{tx:?}");
@@ -415,7 +418,7 @@ pub async fn eth_batch_send_to_contract(
                 Ok(post_tx_res) => post_tx_res,
                 Err(err) => {
                     warn!("Timed out while trying to post tx to RPC for network {net} and address {sender_address} due to {err}");
-                    timed_out_count += 1;
+                    transaction_retries_count += 1;
                     continue;
                 }
             };
@@ -449,12 +452,12 @@ pub async fn eth_batch_send_to_contract(
                 }
                 Err(e) => {
                     warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                    timed_out_count += 1;
+                    transaction_retries_count += 1;
                 }
             },
             Err(e) => {
                 warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                timed_out_count += 1;
+                transaction_retries_count += 1;
                 continue;
             }
         }
@@ -525,7 +528,7 @@ pub async fn eth_batch_send_to_all_contracts(
         for (net, provider) in providers.iter() {
             let updates = updates.clone();
             let (
-                transaction_retries_count_before_give_up,
+                transaction_retries_count_limit,
                 transaction_retry_timeout_secs,
                 retry_fee_increment_fraction,
             ) = {
@@ -533,7 +536,7 @@ pub async fn eth_batch_send_to_all_contracts(
                 let p = provider.lock().await;
                 debug!("Acquired and releasing a read lock on provider for network {net}");
                 (
-                    p.transaction_retries_count_before_give_up as u64,
+                    p.transaction_retries_count_limit as u64,
                     p.transaction_retry_timeout_secs as u64,
                     p.retry_fee_increment_fraction,
                 )
@@ -578,7 +581,7 @@ pub async fn eth_batch_send_to_all_contracts(
                         feed_type,
                         feeds_config,
                         transaction_retry_timeout_secs,
-                        transaction_retries_count_before_give_up,
+                        transaction_retries_count_limit,
                         retry_fee_increment_fraction,
                     );
                     (result, net, provider)
