@@ -55,7 +55,7 @@ const HeroDesktop = () => {
             }`}
           >
             <h1 className="text-[2.5rem] leading-tight">
-              Join the Blocksense crew with your pirate NFT
+              Join the Blocksense <br /> crew with your pirate NFT
             </h1>
             <ClaimNFTButton className="w-fit" />
           </section>
@@ -119,7 +119,7 @@ const HeroMobile = () => {
             : 'opacity-0 -translate-x-8'
         }`}
       >
-        Join the Blocksense crew with your pirate NFT
+        Join the Blocksense <br /> crew with your pirate NFT
       </h1>
       <Image
         src={heroPirateFlagMobile}
@@ -155,7 +155,7 @@ const HeroMobile = () => {
             : 'opacity-0 -translate-x-8'
         }`}
       >
-        <ClaimNFTButton className="w-fit" />
+        <ClaimNFTButton className="w-full" />
       </div>
     </article>
   );

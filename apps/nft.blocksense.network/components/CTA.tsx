@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from 'components/Button';
 import bgCtaDesktop from '/public/images/bg-cta-desktop.png';
@@ -16,56 +16,55 @@ export const CTA = () => {
   );
 };
 
-const CTADesktop = () => {
+const useRevealOnView = (threshold = 0.5) => {
+  const ref = useRef<HTMLDivElement | null>(null);
   const [show, setShow] = useState(false);
-  const sectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry && entry.isIntersecting) {
-          setShow(true);
-        } else {
-          setShow(false);
+      entries => {
+        const entry = entries[0];
+        if (entry) {
+          setShow(entry.isIntersecting);
         }
       },
-      { threshold: 0.5 },
+      { threshold },
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    const currentRef = ref.current;
+    if (currentRef) observer.observe(currentRef);
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
+      if (currentRef) observer.unobserve(currentRef);
     };
-  }, []);
+  }, [threshold]);
+
+  return { ref, show };
+};
+
+const CTADesktop = () => {
+  const { ref, show } = useRevealOnView();
 
   return (
-    <section
-      ref={sectionRef} // Bind the ref to the section
-      className="cta cta-desktop p-8 hidden md:block"
-    >
+    <section ref={ref} className="cta cta-desktop p-8 hidden md:block">
       <section
-        className={`cta-desktop__container bg-[var(--gray-dark)] px-12 py-16 rounded-3xl max-w-[76.875rem] mx-auto relative transition-all duration-1200 ease-out transform ${
+        className={`cta-desktop__container bg-[var(--gray-dark)] px-12 py-16 rounded-3xl max-w-[76.875rem] mx-auto relative transition-all duration-1000 ease-out transform will-change-transform ${
           show
             ? 'opacity-100 translate-x-0 scale-100'
             : 'opacity-0 -translate-x-12 scale-95'
         }`}
       >
-        <div className="cta__overlay absolute inset-0 bg-gradient-to-b from-[rgba(43,41,41,0)] z-20 via-[rgba(43,41,41,0)] to-[rgba(38,38,38,0.7)]" />
+        <div className="cta__overlay absolute inset-0 bg-gradient-to-b from-[rgba(43,41,41,0)] via-[rgba(43,41,41,0)] to-[rgba(38,38,38,0.7)] z-20" />
         <article className="cta__inner relative flex items-center max-w-[34.9375rem] z-30">
           <section
-            className={`cta__content flex flex-col justify-center items-start text-left transition-all duration-1200 ease-out transform ${
+            className={`cta__content flex flex-col justify-center items-start text-left transition-all duration-1000 ease-out transform will-change-transform ${
               show
                 ? 'opacity-100 translate-x-0 scale-100'
                 : 'opacity-0 translate-x-8 scale-95'
             }`}
           >
             <h1
-              className={`cta__title mb-12 transition-all duration-1200 ease-out ${
+              className={`cta__title mb-12 transition-all duration-1000 ease-out ${
                 show
                   ? 'opacity-100 translate-x-0 scale-100'
                   : 'opacity-0 translate-x-4 scale-95'
@@ -84,7 +83,7 @@ const CTADesktop = () => {
               >
                 <Button
                   variant="primary"
-                  className={`cta__button transition-all duration-1000 ease-in-out transform ${
+                  className={`cta__button transition-all duration-700 ease-in-out transform ${
                     show
                       ? 'opacity-100 scale-100 translate-x-0'
                       : 'opacity-0 -translate-x-10 scale-95'
@@ -100,7 +99,7 @@ const CTADesktop = () => {
               >
                 <Button
                   variant="secondary"
-                  className={`cta__button transition-all duration-1000 ease-in-out transform ${
+                  className={`cta__button transition-all duration-700 ease-in-out transform ${
                     show
                       ? 'opacity-100 scale-100 translate-x-0'
                       : 'opacity-0 -translate-x-10 scale-95'
@@ -127,49 +126,17 @@ const CTADesktop = () => {
 };
 
 const CTAMobile = () => {
-  const [show, setShow] = useState(false);
-  const sectionRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry && entry.isIntersecting) {
-          setShow(true);
-        } else {
-          setShow(false);
-        }
-      },
-      { threshold: 0.5 },
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
+  const { ref, show } = useRevealOnView();
 
   return (
     <section
-      ref={sectionRef} // Bind the ref to the section
-      className={`cta cta--mobile md:hidden bg-[var(--gray-dark)] my-12 rounded-2xl mx-5 transition-all duration-1200 ease-out transform ${
-        show
-          ? 'opacity-100 translate-x-0 scale-100'
-          : 'opacity-0 -translate-x-12 scale-95'
+      ref={ref}
+      className={`cta cta--mobile md:hidden bg-[var(--gray-dark)] my-12 rounded-2xl mx-5 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] transform will-change-transform ${
+        show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}
     >
       <article className="cta__inner relative flex flex-col gap-8 px-4 pt-8">
-        <h1
-          className={`cta__title text-center transition-all duration-1200 ease-in-out transform ${
-            show
-              ? 'opacity-100 translate-x-0 scale-100'
-              : 'opacity-0 translate-x-4 scale-95'
-          }`}
-        >
+        <h1 className="cta__title text-center">
           The zk rollup for programmable oracles
         </h1>
         <nav
@@ -181,14 +148,7 @@ const CTAMobile = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button
-              variant="primary"
-              className={`cta__button w-full transition-all duration-1000 ease-in-out transform ${
-                show
-                  ? 'opacity-100 scale-100 translate-x-0'
-                  : 'opacity-0 -translate-x-10 scale-95'
-              }`}
-            >
+            <Button variant="primary" className="cta__button w-full">
               Start building
             </Button>
           </a>
@@ -197,14 +157,7 @@ const CTAMobile = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button
-              variant="secondary"
-              className={`cta__button w-full transition-all duration-1000 ease-in-out transform ${
-                show
-                  ? 'opacity-100 scale-100 translate-x-0'
-                  : 'opacity-0 -translate-x-10 scale-95'
-              }`}
-            >
+            <Button variant="secondary" className="cta__button w-full">
               Let’s talk
             </Button>
           </a>
