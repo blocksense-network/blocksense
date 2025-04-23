@@ -14,12 +14,12 @@ const links = [
 
 export const Footer = () => {
   const [inView, setInView] = useState(false);
-  const footerRef = useRef(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           setInView(true);
         } else {
           setInView(false);
