@@ -30,10 +30,28 @@ export async function updateExchangesArgumentConfig(): Promise<NewFeedsConfig> {
 
   const providersData = await getCryptoProvidersData();
 
-  const normalizedProvidersData = normalizeAllPriceFeedsProviders(
-    feedsConfig.feeds,
-    providersData,
-  );
+  let normalizedProvidersData: CryptoProviderData[] = providersData;
+  for (const feed of feedsConfig.feeds) {
+    const pair = feed.additional_feed_info.pair;
+    const initialExchangePrices = getExchangesPriceDataForPair(
+      pair,
+      providersData,
+    );
+    const outlierExchanges = detectPriceOutliers(
+      initialExchangePrices,
+      ({ dataSourceName, price }) =>
+        console.log(
+          `Detected Outlier : ${dataSourceName} (${price}) ` +
+            `for feed ${feed.full_name}`,
+        ),
+    );
+
+    normalizedProvidersData = removePriceOutliers(
+      providersData,
+      pair,
+      outlierExchanges,
+    );
+  }
 
   const updatedFeedConfig = feedsConfig.feeds.map(feed => {
     const providers = getAllProvidersForPair(
@@ -60,41 +78,4 @@ export async function updateExchangesArgumentConfig(): Promise<NewFeedsConfig> {
   });
 
   return { feeds: updatedFeedConfig };
-}
-
-function normalizeAllPriceFeedsProviders(
-  feeds: SimplifiedFeed[],
-  providersData: CryptoProviderData[],
-) {
-  let normalizedProvidersData: CryptoProviderData[] = providersData;
-  feeds.forEach(feed => {
-    normalizedProvidersData = filterOutlierProvidersForFeed(
-      feed,
-      normalizedProvidersData,
-    );
-  });
-
-  return normalizedProvidersData;
-}
-
-function filterOutlierProvidersForFeed(
-  feed: SimplifiedFeed,
-  providersData: CryptoProviderData[],
-) {
-  const pair = feed.additional_feed_info.pair;
-  const initialExchangePrices = getExchangesPriceDataForPair(
-    pair,
-    providersData,
-  );
-  const outlierExchanges = detectPriceOutliers({
-    [feed.full_name]: initialExchangePrices,
-  });
-
-  const normalizedProvidersData = removePriceOutliers(
-    providersData,
-    pair,
-    outlierExchanges,
-  );
-
-  return normalizedProvidersData;
 }
