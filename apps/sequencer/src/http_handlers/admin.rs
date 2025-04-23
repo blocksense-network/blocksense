@@ -891,7 +891,7 @@ mod tests {
                     safe_min_quorum: 1,
                     event_contract_address: None,
                     multicall_contract_address: None,
-                    transaction_retries_count_before_give_up: 42,
+                    transaction_retries_count_limit: 42,
                     transaction_retry_timeout_secs: 20,
                     retry_fee_increment_fraction: 0.1,
                     transaction_gas_limit: 1337,
