@@ -12,15 +12,18 @@
     "@types/react": "^18.3.3",
     "prettier": "^3.4.2",
     "tslib": "^2.8.1",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "wrangler": "^4.13.0"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
     "@blocksense/ui": "workspace:*",
+    "@cloudflare/workers-types": "^4.20250423.0",
+    "@effect/platform": "^0.80.13",
     "@next/third-parties": "^15.3.1",
     "@tailwindcss/postcss": "^4.0.7",
     "clsx": "^2.1.1",
-    "effect": "^3.12.1",
+    "effect": "^3.14.13",
     "next": "^15.1.4",
     "postcss": "^8.4.49",
     "react": "^18.3.1",
@@ -28,6 +31,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.0.7",
     "tailwindcss-animate": "^1.0.7",
+    "thirdweb": "^5.95.3",
     "tsx": "^4.19.2"
   }
 }

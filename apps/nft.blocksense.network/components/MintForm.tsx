@@ -2,7 +2,12 @@
 
 import { ChangeEvent, MouseEvent, useState } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
+import { Effect } from 'effect';
+import { ConnectButton, darkTheme, useActiveAccount } from 'thirdweb/react';
+import { signMessage } from 'thirdweb/utils';
+import { createWallet } from 'thirdweb/wallets';
 
+import { apiClient } from 'service/client';
 import { Button } from './Button';
 import { FormStepTitle } from './FormStepTitle';
 import { FormStepContainer } from './FormStepContainer';
@@ -10,6 +15,53 @@ import { Input } from './Input';
 import { NetworkLink } from './NetworkLink';
 import { Separator } from './Separator';
 import { CopyInput } from './CopyInput';
+import { client, mintNFT } from '@/mint';
+
+const wallets = [createWallet('io.metamask'), createWallet('walletConnect')];
+
+const isDiscordUserMemberOfGuild = (username: string) =>
+  Effect.runPromise(
+    Effect.gen(function* () {
+      const client = yield* apiClient;
+      const response = yield* client.discord.isDiscordUserMemberOfGuild({
+        payload: { username },
+      });
+      return response;
+    }),
+  );
+
+const isXUserFollowing = (username: string) =>
+  Effect.runPromise(
+    Effect.gen(function* () {
+      const client = yield* apiClient;
+      const response = yield* client.x.isXUserFollowing({
+        payload: { username },
+      });
+      return response;
+    }),
+  );
+
+const hasXUserRetweeted = (userId: string, retweetCode: string) =>
+  Effect.runPromise(
+    Effect.gen(function* () {
+      const client = yield* apiClient;
+      const response = yield* client.x.hasXUserRetweeted({
+        payload: { userId, retweetCode },
+      });
+      return response;
+    }),
+  );
+
+const mintNftBackend = (accountAddress: string) =>
+  Effect.runPromise(
+    Effect.gen(function* () {
+      const client = yield* apiClient;
+      const response = yield* client.mint.generateMintSignature({
+        payload: { accountAddress },
+      });
+      return response;
+    }),
+  );
 
 const separatorClassName = 'mint-form__separator md:my-8 my-6';
 
@@ -22,6 +74,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
   const [xLoading, setXLoading] = useState(false);
   const [xError, setXError] = useState('');
   const [xSuccess, setXSuccess] = useState('');
+  const [xUserId, setXUserId] = useState<string | null>(null);
 
   const [discord, setDiscord] = useState('');
   const [discordLoading, setDiscordLoading] = useState(false);
@@ -29,10 +82,16 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
   const [discordSuccess, setDiscordSuccess] = useState('');
 
   const [retweetCode, setRetweetCode] = useState('');
+  const [retweetError, setRetweetError] = useState('');
+  const [retweetSuccess, setRetweetSuccess] = useState('');
+
   const [mintLoading, setMintLoading] = useState(false);
 
-  const onMintClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const account = useActiveAccount();
+
+  const onMintClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    // await verifyRetweet();
 
     sendGAEvent('event', 'mintButtonClicked', {
       xHandle,
@@ -40,15 +99,27 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       retweetCode,
     });
 
-    sendGAEvent('event', 'mintedNFT', {
-      xHandle,
-      discord,
-      retweetCode,
-    });
+    if (!account) {
+      return;
+    }
 
-    setRetweetCode('');
-    // setMintLoading(true);
-    onSuccessAction();
+    setMintLoading(true);
+    try {
+      const { payload, signature } = await mintNftBackend(account.address);
+      await mintNFT(account, payload, signature);
+
+      sendGAEvent('event', 'mintedNFT', {
+        xHandle,
+        discord,
+        retweetCode,
+      });
+
+      onSuccessAction();
+    } catch (err: any) {
+      setRetweetError(err.message);
+    } finally {
+      setMintLoading(false);
+    }
   };
 
   const onXHandleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +128,96 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
 
   const onDiscordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDiscord(e.target.value);
+  };
+
+  const verifyDiscord = async () => {
+    setDiscordLoading(true);
+    try {
+      const { isMember } = await isDiscordUserMemberOfGuild(discord);
+      if (!isMember) {
+        setDiscordError('You are not a member of our Discord server');
+        setDiscordSuccess('');
+        return;
+      } else {
+        setDiscordError('');
+        setDiscordSuccess('User verified successfully');
+      }
+    } catch (err: any) {
+      setDiscordError(err.message);
+    } finally {
+      setDiscordLoading(false);
+    }
+  };
+
+  const verifyXHandle = async () => {
+    setXLoading(true);
+    try {
+      const { isFollowing, userId } = await isXUserFollowing(xHandle);
+
+      setXUserId(userId);
+      if (!isFollowing) {
+        setXError('You are not following us on X');
+        setXSuccess('');
+        return;
+      } else {
+        setXError('');
+        setXSuccess('User verified successfully');
+      }
+    } catch (err: any) {
+      setXError(err.message);
+    } finally {
+      setXLoading(false);
+    }
+  };
+
+  const verifyRetweet = async () => {
+    setMintLoading(true);
+
+    if (!xUserId) {
+      setRetweetError('X user ID is not available');
+      setMintLoading(false);
+      return;
+    }
+
+    try {
+      const { isRetweeted, isCodeCorrect } = await hasXUserRetweeted(
+        xUserId,
+        retweetCode,
+      );
+
+      if (!isRetweeted) {
+        setRetweetError('You have not quote re-posted our announcement');
+        setRetweetSuccess('');
+      } else if (!isCodeCorrect) {
+        setRetweetError('Your retweet does not contain the correct code');
+        setRetweetSuccess('');
+      } else {
+        setRetweetError('');
+        setRetweetSuccess('User verified successfully');
+      }
+    } catch (err: any) {
+      setRetweetError(err.message);
+    } finally {
+      setMintLoading(false);
+    }
+  };
+
+  const onSignMessageClick = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!account) {
+      return;
+    }
+
+    try {
+      const message = `🏴‍☠️ Ahoy! ${discord}, known as @${xHandle}, is part of the Blocksense crew now — welcome aboard!`;
+      const signature = await signMessage({
+        message,
+        account,
+      });
+      setRetweetCode(signature);
+    } catch (err: any) {
+      setRetweetError(err.message);
+    }
   };
 
   return (
@@ -97,6 +258,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
             isLoading={xLoading}
             status={xError ? 'error' : xSuccess ? 'success' : undefined}
             message={xError ? xError : xSuccess ? xSuccess : ''}
+            onBlur={verifyXHandle}
           />
           <Input
             value={discord}
@@ -110,6 +272,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
             message={
               discordError ? discordError : discordSuccess ? discordSuccess : ''
             }
+            onBlur={verifyDiscord}
           />
         </section>
       </FormStepContainer>
@@ -117,6 +280,29 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       <Separator className={separatorClassName} />
 
       <FormStepContainer>
+        <ConnectButton
+          client={client}
+          wallets={wallets}
+          connectButton={{ label: 'Connect Your Wallet' }}
+          connectModal={{
+            size: 'compact',
+            showThirdwebBranding: false,
+          }}
+          theme={darkTheme({
+            colors: {
+              modalBg: 'hsl(0, 0%, 15%)',
+              borderColor: 'hsl(0, 2%, 26%)',
+              separatorLine: 'hsl(0, 2%, 26%)',
+              accentText: 'hsl(0, 0%, 100%)',
+              success: 'hsl(0, 0%, 85%)',
+            },
+          })}
+        />
+
+        <Button onClick={onSignMessageClick}>
+          Sign message with your wallet to continue
+        </Button>
+
         <FormStepTitle
           title="Copy your unique generated code and retweet our announcement with it"
           number={4}
@@ -130,7 +316,13 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
           />
           <NetworkLink
             title="Retweet our announcement"
-            link={`https://x.com/intent/post?text=${retweetCode}%20https://x.com/blocksense_/status/tweet_id`} //TODO: Add correct tweet_id
+            link={`https://x.com/intent/post?text=${retweetCode}%20https://x.com/blocksense_/status/${process.env['NEXT_PUBLIC_X_BLOCKSENSE_TWEET_ID']}`} //TODO: Add correct tweet_id
+            status={
+              retweetError ? 'error' : retweetSuccess ? 'success' : undefined
+            }
+            message={
+              retweetError ? retweetError : retweetSuccess ? retweetSuccess : ''
+            }
           />
         </section>
       </FormStepContainer>
