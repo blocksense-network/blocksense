@@ -17,3 +17,5 @@ url = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde-this-or-that = { workspace = true }
 prettytable-rs = { workspace = true }
+futures = { workspace = true }
+itertools = { workspace = true }
