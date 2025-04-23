@@ -1,16 +1,17 @@
 export function detectPriceOutliers(
-  feedPriceData: Record<string, Record<string, number>[]>,
+  pricesArray: Record<string, number>[],
+  onOutlierCb: (params: { dataSourceName: string; price: number }) => void,
 ): string[] {
-  const outlinerts: string[] = [];
-  const [asset, pricesArray] = Object.entries(feedPriceData)[0];
+  const outliers: string[] = [];
 
   const zeroPricesFiltered = pricesArray.filter(priceData => {
     const [exchangeName, price] = Object.entries(priceData)[0];
     if (price === 0 || price < 0 || price === null) {
-      console.log(
-        `Detected Outlier : ${exchangeName} (${price}) for feed ${asset}`,
-      );
-      outlinerts.push(exchangeName);
+      onOutlierCb({
+        dataSourceName: exchangeName,
+        price,
+      });
+      outliers.push(exchangeName);
       return false;
     }
     return true;
@@ -34,11 +35,12 @@ export function detectPriceOutliers(
   exchanges.forEach(exchange => {
     const price = prices[exchange];
     if (Math.abs(price - medianPrice) / medianPrice > 0.1) {
-      console.log(
-        `Detected Outlier : ${exchange} (${price}) for feed ${asset}`,
-      );
-      outlinerts.push(exchange);
+      onOutlierCb({
+        dataSourceName: exchange,
+        price,
+      });
+      outliers.push(exchange);
     }
   });
-  return outlinerts;
+  return outliers;
 }
