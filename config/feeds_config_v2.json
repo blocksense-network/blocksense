@@ -53152,7 +53152,17 @@
         "decimals": 8,
         "category": "Equities",
         "market_hours": "US_Equities",
-        "arguments": {}
+        "arguments": {
+          "providers": [
+            "AlphaVantage",
+            "PolygonIO",
+            "Finnhum",
+            "YahooFinance",
+            "twelvedata",
+            "Tiingo",
+            "FMP"
+          ]
+        }
       }
     },
     {
@@ -53181,7 +53191,17 @@
         "decimals": 8,
         "category": "Equities",
         "market_hours": "US_Equities",
-        "arguments": {}
+        "arguments": {
+          "providers": [
+            "AlphaVantage",
+            "PolygonIO",
+            "Finnhum",
+            "YahooFinance",
+            "twelvedata",
+            "Tiingo",
+            "FMP"
+          ]
+        }
       }
     }
   ]
