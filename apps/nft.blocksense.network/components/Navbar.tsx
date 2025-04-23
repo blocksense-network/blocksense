@@ -92,7 +92,7 @@ const MobileNavbar = () => {
 
   return (
     <header className="navbar md:hidden relative">
-      <section className="navbar__header-section fixed top-0 w-full bg-[var(--black)] flex justify-between items-center px-5 py-4 z-20">
+      <section className="navbar__header-section fixed top-0 w-full bg-[var(--black)] flex justify-between items-center px-5 py-4 z-50">
         <Logo
           className={`transition-all duration-700 ease-out transform origin-left ${
             show
