@@ -1,9 +1,14 @@
-import Link from 'next/link';
+const BLOCKSENSE_URL = 'https://blocksense.network/';
 
 export const Logo = () => {
   return (
-    <Link href="/" className="logo">
-      <img src="/images/logo.svg" alt="blocksense logo" />
-    </Link>
+    <a
+      href={BLOCKSENSE_URL}
+      className="bs logo"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <img src="/images/logo.svg" alt="Blocksense logo" />
+    </a>
   );
 };
