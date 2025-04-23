@@ -12,24 +12,12 @@ export function getAllProvidersForPair(
 ): CryptoPriceFeedsArgs {
   const providers: CryptoPriceFeedsArgs = {};
 
-  const addProvider = (
-    key: string,
-    type: CryptoProviderData['type'],
-    value: any,
-  ) => {
-    if (value) {
-      providers[type] ??= {};
-      providers[type][key] = value;
-    }
-  };
-
-  providersData.forEach(exchangeData => {
-    addProvider(
-      exchangeData.name,
-      exchangeData.type,
-      getProviderResourcesForPair(pair, exchangeData.data),
-    );
-  });
+  for (const { name, type, data } of providersData) {
+    const resources = getProviderResourcesForPair(pair, data);
+    if (!resources) continue;
+    providers[type] ??= {};
+    providers[type][name] = resources;
+  }
 
   return providers;
 }
