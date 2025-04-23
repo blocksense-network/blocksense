@@ -127,7 +127,7 @@ const AboutDesktop = () => {
             </div>
           </section>
           <aside
-            className={`about__details max-w-[22.688rem] transition-all duration-800 ease-out ${
+            className={`about__details max-w-[22.688rem] mx-auto transition-all duration-800 ease-out ${
               inView
                 ? 'delay-[650ms] opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-6'

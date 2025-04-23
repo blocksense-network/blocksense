@@ -77,6 +77,7 @@ const MobileNavbar = () => {
       return () => clearTimeout(timeout);
     } else {
       setShow(false);
+      return;
     }
   }, [isOpen]);
 
@@ -87,19 +88,13 @@ const MobileNavbar = () => {
     };
   }, [isOpen]);
 
-  const toggleMenu = () => setIsOpen(state => !state);
+  const toggleMenu = () => setIsOpen((prevState: boolean) => !prevState);
   const closeNavbar = () => setIsOpen(false);
 
   return (
     <header className="navbar md:hidden relative">
       <section className="navbar__header-section fixed top-0 w-full bg-[var(--black)] flex justify-between items-center px-5 py-4 z-50">
-        <Logo
-          className={`transition-all duration-700 ease-out transform origin-left ${
-            show
-              ? 'opacity-100 translate-x-0 scale-100'
-              : 'opacity-0 -translate-x-4 scale-90'
-          }`}
-        />
+        <Logo />
         <button
           onClick={toggleMenu}
           aria-expanded={isOpen}
@@ -113,7 +108,7 @@ const MobileNavbar = () => {
         </button>
       </section>
       {isOpen && (
-        <nav className="fixed top-[3.85rem] left-0 w-full h-[calc(100vh-3.85rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto">
+        <nav className="fixed top-[3.85rem] left-0 w-full h-[calc(100vh-3.85rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto z-50">
           <section className="flex flex-col gap-8 text-center w-full">
             {navLinks.map((link, i) => (
               <a
