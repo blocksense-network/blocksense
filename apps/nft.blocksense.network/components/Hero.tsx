@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 import { ClaimNFTButton } from './ClaimNFTButton';
@@ -15,8 +18,25 @@ export const Hero = () => {
 };
 
 const HeroDesktop = () => {
+  const [inView, setInView] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry?.isIntersecting ?? false),
+      { threshold: 0.1 },
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => {
+      if (ref.current) observer.unobserve(ref.current);
+    };
+  }, []);
+
   return (
-    <section className="hidden md:block relative px-20 pb-8 pt-[4.672rem]">
+    <section
+      ref={ref}
+      className="hidden md:block relative px-20 pb-8 pt-[4.672rem]"
+    >
       <Image
         src={heroVector}
         alt="Hero Vector"
@@ -27,11 +47,25 @@ const HeroDesktop = () => {
       />
       <section className="max-w-[66.875rem] mx-auto">
         <article className="hero flex gap-[1.625rem] justify-between pb-20">
-          <section className="flex-1 flex flex-col gap-10 justify-between max-w-[36rem]">
-            <h1>Join the Blocksense crew with your pirate NFT</h1>
+          <section
+            className={`flex-1 flex flex-col gap-10 justify-between max-w-[36rem] transition-all duration-[700ms] ease-out ${
+              inView
+                ? 'opacity-100 translate-x-0 delay-75'
+                : 'opacity-0 -translate-x-8'
+            }`}
+          >
+            <h1 className="text-[2.5rem] leading-tight">
+              Join the Blocksense crew with your pirate NFT
+            </h1>
             <ClaimNFTButton className="w-fit" />
           </section>
-          <p className="flex-1 max-w-[27rem] pt-[0.75rem]">
+          <p
+            className={`flex-1 max-w-[27rem] pt-[0.75rem] transition-all duration-[700ms] ease-out ${
+              inView
+                ? 'opacity-100 translate-x-0 delay-150'
+                : 'opacity-0 translate-x-8'
+            }`}
+          >
             As the fully programmable ZK oracle protocol with groundbreaking
             cost efficiency, Blocksense will soon let everyone create secure
             oracles in minutes.
@@ -44,7 +78,11 @@ const HeroDesktop = () => {
         <Image
           src={heroPirateFlag}
           alt="Hero Pirate Flag"
-          className="w-full mt-8"
+          className={`w-full mt-8 transition-all duration-[700ms] ease-out ${
+            inView
+              ? 'opacity-100 translate-y-0 delay-250'
+              : 'opacity-0 translate-y-8'
+          }`}
           unoptimized
           priority
           quality={100}
@@ -55,18 +93,53 @@ const HeroDesktop = () => {
 };
 
 const HeroMobile = () => {
+  const [inView, setInView] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry?.isIntersecting ?? false),
+      { threshold: 0.1 },
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => {
+      if (ref.current) observer.unobserve(ref.current);
+    };
+  }, []);
+
   return (
-    <article className="md:hidden flex flex-col gap-[2.188rem] px-5 pt-[2.172rem] pb-12">
-      <h1>Join the Blocksense crew with your pirate NFT</h1>
+    <article
+      ref={ref}
+      className="md:hidden flex flex-col gap-[2.188rem] px-5 pt-[2.172rem] pb-12"
+    >
+      <h1
+        className={`text-[2rem] transition-all duration-[700ms] ease-out ${
+          inView
+            ? 'opacity-100 -translate-x-0 delay-75'
+            : 'opacity-0 -translate-x-8'
+        }`}
+      >
+        Join the Blocksense crew with your pirate NFT
+      </h1>
       <Image
         src={heroPirateFlagMobile}
         alt="Hero Pirate Flag Mobile"
-        className="mx-auto w-full"
+        className={`mx-auto w-full transition-all duration-[700ms] ease-out ${
+          inView
+            ? 'opacity-100 -translate-y-0 delay-150'
+            : 'opacity-0 -translate-y-8'
+        }`}
         unoptimized
         priority
         quality={100}
       />
-      <p>
+      <p
+        className={`transition-all duration-[700ms] ease-out ${
+          inView
+            ? 'opacity-100 translate-x-0 delay-250'
+            : 'opacity-0 translate-x-8'
+        }`}
+      >
         As the fully programmable ZK oracle protocol with groundbreaking cost
         efficiency, Blocksense will soon let everyone create secure oracles in
         minutes.
@@ -75,7 +148,15 @@ const HeroMobile = () => {
         Become an early adopter by joining the fast-growing Blocksense
         community!
       </p>
-      <ClaimNFTButton className="w-fit" />
+      <div
+        className={`transition-all duration-[700ms] ease-out ${
+          inView
+            ? 'opacity-100 -translate-x-0 delay-350'
+            : 'opacity-0 -translate-x-8'
+        }`}
+      >
+        <ClaimNFTButton className="w-fit" />
+      </div>
     </article>
   );
 };
