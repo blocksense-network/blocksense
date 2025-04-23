@@ -30,8 +30,9 @@ data = '{"pair":{"base":"SPY","quote":"USD"},"decimals":8,"category":"Equities",
 
 [component.stock-price-feeds]
 source = "../../../target/wasm32-wasip1/release/stock_price_feeds.wasm"
-
-allowed_outbound_hosts = []
+allowed_outbound_hosts = [
+  "https://www.alphavantage.co",
+]
 
 [component.stock-price-feeds.build]
 command = "cargo build --target wasm32-wasip1 --release"

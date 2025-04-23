@@ -1,4 +1,5 @@
 mod fetch_prices;
+mod providers;
 mod types;
 
 use anyhow::{Context, Result};
