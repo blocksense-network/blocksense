@@ -27,6 +27,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.0.7",
     "tailwindcss-animate": "^1.0.7",
+    "thirdweb": "^5.95.3",
     "tsx": "^4.19.2"
   }
 }
