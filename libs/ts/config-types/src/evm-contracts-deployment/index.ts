@@ -66,7 +66,7 @@ const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
     coreContracts: CoreContractsSchemaV2,
     CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
-    SequencerMultisig: ethereumAddress,
+    SequencerMultisig: S.optional(ethereumAddress),
     AdminMultisig: ethereumAddress,
   }),
 );
