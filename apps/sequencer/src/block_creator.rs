@@ -142,10 +142,16 @@ async fn recvd_feed_update_to_block(
                 }
             };
 
-            let (key, val) = voted_update.update.encode(
+            let (key, val) = match voted_update.update.encode(
                 digits_in_fraction,
                 voted_update.update.end_slot_timestamp as u64,
-            );
+            ) {
+                Ok((k, v)) => (k, v),
+                Err(e) => {
+                    error!("Error converting value for feed id {} to bytes {}. Skipping inclusion in block!", voted_update.update.feed_id, e);
+                    return;
+                }
+            };
             info!("adding {:?} => {:?} to updates", key, val);
             if updates_to_block.len() < max_feed_updates_to_batch {
                 updates_to_block.push(voted_update);
