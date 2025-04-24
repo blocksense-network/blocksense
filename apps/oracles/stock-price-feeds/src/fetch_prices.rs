@@ -9,7 +9,11 @@ use blocksense_sdk::traits::prices_fetcher::{fetch, TradingPairSymbol};
 
 use crate::{
     providers::alpha_vantage::AlphaVantagePriceFetcher,
-    types::{PairToResults, ProviderPriceData, ProvidersSymbols, ResourceData, ResourcePairData},
+    types::{
+        Capabilities, ProviderPriceData, ProvidersSymbols, PairToResults, ResourceData,
+        ResourcePairData,
+    },
+    utils::get_api_key,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -33,11 +37,16 @@ impl SymbolsData {
     The `fetch_all_prices` function is very similar to the one we use in `crypto-price-feeds` oracle.
     It should be moved to blocksense-sdk
 */
-pub async fn fetch_all_prices(resources: &ResourceData) -> Result<PairToResults> {
+pub async fn fetch_all_prices(
+    resources: &ResourceData,
+    capabilities: Option<&Capabilities>,
+) -> Result<PairToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
-    let mut futures_set =
-        FuturesUnordered::from_iter([fetch::<AlphaVantagePriceFetcher>(&symbols.alpha_vantage)]);
+    let mut futures_set = FuturesUnordered::from_iter([fetch::<AlphaVantagePriceFetcher>(
+        &symbols.alpha_vantage,
+        get_api_key(capabilities, "ALPHAVANTAGE_API_KEY"),
+    )]);
 
     let before_fetch = Instant::now();
     let mut results = PairToResults::new();

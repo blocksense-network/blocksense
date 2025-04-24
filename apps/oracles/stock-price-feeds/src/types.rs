@@ -51,6 +51,8 @@ pub struct ResourceData {
     pub symbols: ProvidersSymbols,
 }
 
+pub type Capabilities = HashMap<String, String>;
+
 /* Oracle results related types */
 
 #[derive(Debug, Default)]

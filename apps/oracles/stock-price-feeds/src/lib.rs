@@ -1,6 +1,7 @@
 mod fetch_prices;
 mod providers;
 mod types;
+mod utils;
 
 use anyhow::{Context, Result};
 use itertools::Itertools;
@@ -14,15 +15,19 @@ use blocksense_sdk::{
 };
 
 use fetch_prices::fetch_all_prices;
-use types::{FeedConfigData, PairToResults, ProvidersSymbols, ResourceData, ResourcePairData};
+
+use types::{
+    Capabilities, FeedConfigData, ProvidersSymbols, PairToResults, ResourceData, ResourcePairData,
+};
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("Starting oracle component - Stock Price Feeds");
 
+    let capabilities = get_capabilities_from_settings(&settings)?;
     let resources = get_resources_from_settings(&settings)?;
 
-    let results = fetch_all_prices(&resources).await?;
+    let results = fetch_all_prices(&resources, Some(&capabilities)).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);
@@ -48,6 +53,14 @@ fn process_results(results: &PairToResults) -> Result<Payload> {
     }
 
     Ok(payload)
+}
+
+fn get_capabilities_from_settings(settings: &Settings) -> Result<Capabilities> {
+    Ok(settings
+        .capabilities
+        .iter()
+        .map(|cap| (cap.id.to_string(), cap.data.to_string()))
+        .collect())
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {

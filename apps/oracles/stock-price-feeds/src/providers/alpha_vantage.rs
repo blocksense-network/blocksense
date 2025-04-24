@@ -44,11 +44,18 @@ impl<'a> PricesFetcher<'a> for AlphaVantagePriceFetcher<'a> {
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
+            let api_key = match self.api_key {
+                Some(key) => key,
+                None => {
+                    return Err(Error::msg("API key is required for AlphaVantage"));
+                }
+            };
+
             let prices_futures = self
                 .symbols
                 .iter()
                 .map(Deref::deref)
-                .map(fetch_price_for_symbol);
+                .map(|symbol| fetch_price_for_symbol(symbol, api_key));
 
             let mut futures = FuturesUnordered::from_iter(prices_futures);
             let mut prices = PairPriceData::new();
@@ -73,14 +80,14 @@ impl<'a> PricesFetcher<'a> for AlphaVantagePriceFetcher<'a> {
     }
 }
 
-pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)> {
+pub async fn fetch_price_for_symbol(symbol: &str, api_key: &str) -> Result<(String, PricePoint)> {
     let url = "https://www.alphavantage.co/query".to_string();
     let response = http_get_json::<AlphaVantageResponse>(
         &url,
         Some(&[
             ("function", "GLOBAL_QUOTE"),
             ("symbol", symbol),
-            ("apikey", "demo"), //TODO:(EmilIvanichkovv): replace with real API key
+            ("apikey", api_key),
         ]),
     )
     .await;
