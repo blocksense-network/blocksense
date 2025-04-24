@@ -48,7 +48,7 @@ const CTADesktop = () => {
   return (
     <section ref={ref} className="cta cta-desktop p-8 hidden md:block">
       <section
-        className={`cta-desktop__container bg-[var(--gray-dark)] px-12 py-16 rounded-3xl max-w-[76.875rem] mx-auto relative transition-all duration-1000 ease-out transform will-change-transform ${
+        className={`cta-desktop__container bg-[var(--gray-dark)] px-12 py-16 rounded-3xl max-w-[71.25rem] mx-auto relative transition-all duration-1000 ease-out transform will-change-transform ${
           show
             ? 'opacity-100 translate-x-0 scale-100'
             : 'opacity-0 -translate-x-12 scale-95'

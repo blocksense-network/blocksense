@@ -54,7 +54,7 @@ const AboutDesktop = () => {
         sizes="100vw"
         className="z-[-1]"
       />
-      <section className="about about--desktop max-w-[58.5rem] mx-auto">
+      <section className="about about--desktop max-w-[59.125rem] mx-auto">
         <header
           className={`about__row about__row--top flex justify-between gap-4 items-center mb-[4rem] transition-all duration-800 ease-out transform origin-bottom ${
             inView

@@ -45,7 +45,7 @@ const HeroDesktop = () => {
         sizes="100vw"
         className="z-[-1]"
       />
-      <section className="max-w-[66.875rem] mx-auto">
+      <section className="max-w-[71.25rem] mx-auto">
         <article className="hero flex gap-[1.625rem] justify-between pb-20">
           <section
             className={`flex-1 flex flex-col gap-10 justify-between max-w-[36rem] transition-all duration-[700ms] ease-out ${
@@ -78,7 +78,7 @@ const HeroDesktop = () => {
         <Image
           src={heroPirateFlag}
           alt="Hero Pirate Flag"
-          className={`w-full mt-8 transition-all duration-[700ms] ease-out ${
+          className={`w-full max-w-[71.25rem] mt-8 transition-all duration-[700ms] ease-out ${
             inView
               ? 'opacity-100 translate-y-0 delay-250'
               : 'opacity-0 translate-y-8'

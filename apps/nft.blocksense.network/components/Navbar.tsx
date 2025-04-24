@@ -35,7 +35,7 @@ const DesktopNavbar = () => {
 
   return (
     <header className="navbar hidden md:flex bg-[var(--black)/0.85] backdrop-blur-2xl z-10 fixed w-full text-[var(--white)] px-20 py-[1.125rem]">
-      <div className="w-full max-w-[66.875rem] mx-auto z-30 flex justify-between items-center">
+      <div className="w-full max-w-[71.25rem] mx-auto z-30 flex justify-between items-center">
         <div
           className={`transition-all duration-1000 ease-out transform origin-top ${
             show
