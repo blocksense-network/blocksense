@@ -1,6 +1,5 @@
 import cn from 'clsx';
 // eslint-disable-next-line no-restricted-imports -- since we don't need newWindow prop
-import NextLink from 'next/link';
 import { Anchor } from 'nextra/components';
 import { DiscordIcon, GitHubIcon } from 'nextra/icons';
 import { element } from 'nextra/schemas';
@@ -55,12 +54,14 @@ export const Navbar: FC<NavbarProps> = props => {
         className="x:mx-auto x:flex x:max-w-(--nextra-content-width) x:items-center x:justify-end x:gap-4 x:pl-[max(env(safe-area-inset-left),1.5rem)] x:pr-[max(env(safe-area-inset-right),1.5rem)]"
       >
         {logoLink ? (
-          <NextLink
-            href={typeof logoLink === 'string' ? logoLink : '/'}
+          <a
+            href="https://blocksense.network/"
             className="x:transition-opacity x:focus-visible:nextra-focus x:flex x:items-center x:hover:opacity-75 x:me-auto"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {logo}
-          </NextLink>
+          </a>
         ) : (
           <div className="x:flex x:items-center x:me-auto">{logo}</div>
         )}
