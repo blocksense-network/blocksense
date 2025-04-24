@@ -45,7 +45,7 @@ export const Footer = () => {
       className="footer text-[var(--white)] px-5 pt-12 pb-12 md:px-20 md:pt-16 md:pb-12"
       role="contentinfo"
     >
-      <div className="max-w-[66.875rem] mx-auto">
+      <div className="max-w-[71.25rem] mx-auto">
         <section className="footer__top flex flex-col gap-8 md:flex-row md:justify-between md:items-start md:gap-0">
           <header
             className={`footer__logo mb-8 md:mb-0 transition-all duration-800 ease-out transform origin-bottom ${
