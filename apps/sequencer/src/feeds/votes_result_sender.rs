@@ -7,11 +7,13 @@ use alloy::hex::{self, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, U256};
+use blocksense_config::{
+    ADFS_CONTRACT_NAME, GNOSIS_SAFE_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
+};
 use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
 use blocksense_feed_registry::types::Repeatability::Periodic;
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
-use blocksense_config::{ADFS_CONTRACT_NAME, GNOSIS_SAFE_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME};
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use std::io::Error;
@@ -115,14 +117,20 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             } else {
                 info!("Network `{net}` is enabled; initiating second round consensus");
             }
-            if provider_settings.contracts.iter().find(|x| x.name == GNOSIS_SAFE_CONTRACT_NAME).is_none() {
+            if provider_settings
+                .get_contract_config(GNOSIS_SAFE_CONTRACT_NAME)
+                .is_none()
+            {
                 info!("Network `{net}` not configured for second round consensus - skipping");
                 continue;
             }
             // TODO: remove when we start using ADFS contracts
-            if provider_settings.contracts.iter().find(|x| x.name == ADFS_CONTRACT_NAME).is_none() {
-                 info!("Network `{net}` uses legacy contracts; skipping second round consensus");
-                 continue;
+            if provider_settings
+                .get_contract_config(ADFS_CONTRACT_NAME)
+                .is_none()
+            {
+                info!("Network `{net}` uses legacy contracts; skipping second round consensus");
+                continue;
             }
             debug!("About to release a read lock on sequencer_config for `{net}` [default]");
             provider_settings
