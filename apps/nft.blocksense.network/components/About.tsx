@@ -70,16 +70,21 @@ const AboutDesktop = () => {
             }`}
           >
             <h2 className="about__title text-[2rem] mb-6">
-              What the pirate NFT gives you:
+              What's next for a flag-carrying pirate like you?
             </h2>
             <p className="about__description max-w-[28.75rem]">
               Congrats! Your proof-of-membership pirate NFT should now be in
               your wallet.
               <br />
               <br />
-              Once you mint the first NFT, you officially join the Blocksense
-              crew — your gateway into our pirate world and your key to
-              exclusive drops like the upcoming second one.
+              With this NFT you are officially part of the Blocksense crew. This
+              unlocks your gateway into our pirate world of hidden loot and
+              limited-edition drops.
+              <br />
+              <br />
+              So, get ready to help us navigate the rough waters of mainnet.
+              You’ll have to show your merit but the rewards will be more than
+              worth it!
             </p>
           </section>
           <Image
@@ -134,9 +139,9 @@ const AboutDesktop = () => {
             }`}
           >
             <p className="about__paragraph">
-              HINT: It will be a unique collection of NFTs by a famous artist.
-              We can’t divulge any more details now, but trust us, it will be
-              worth it.
+              <span className="font-bold">HINT:</span> We’re collaborating on a
+              unique limited NFT collection with an up-and-coming pop artist who
+              has exhibited at the heart of Paris and New York City.
             </p>
           </aside>
         </article>
@@ -177,18 +182,20 @@ const AboutMobile = () => {
         }`}
       >
         <h2 className="about__title mb-[1.5rem] leading-[120%]">
-          What the pirate NFT gives you:
+          What's next for a flag-carrying pirate like you?
         </h2>
-        <p className="about__description">
+        <p className="about__description max-w-[27rem]">
           Congrats! Your proof-of-membership pirate NFT should now be in your
           wallet.
-        </p>
-        <br />
-        <br />
-        <p className="about__description max-w-[27rem]">
-          Once you mint the first NFT, you officially join the Blocksense crew —
-          your gateway into our pirate world and your key to exclusive drops
-          like the upcoming second one.
+          <br />
+          <br />
+          With this NFT you are officially part of the Blocksense crew. This
+          unlocks your gateway into our pirate world of hidden loot and
+          limited-edition drops.
+          <br />
+          <br />
+          So, get ready to help us navigate the rough waters of mainnet. You’ll
+          have to show your merit but the rewards will be more than worth it!
         </p>
       </header>
       <Image
@@ -210,8 +217,9 @@ const AboutMobile = () => {
         }`}
       >
         <p className="about__paragraph">
-          HINT: It will be a unique collection of NFTs by a famous artist. We
-          can’t divulge any more details now, but trust us, it will be worth it.
+          <span className="font-bold">HINT:</span> We’re collaborating on a
+          unique limited NFT collection with an up-and-coming pop artist who has
+          exhibited at the heart of Paris and New York City.
         </p>
       </footer>
       <div
