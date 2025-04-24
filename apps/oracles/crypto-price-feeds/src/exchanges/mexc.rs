@@ -32,9 +32,12 @@ impl PricesFetcher<'_> for MEXCPriceFetcher {
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let response =
-                http_get_json::<MEXCPriceResponse>("https://api.mexc.com/api/v3/ticker/24hr", None)
-                    .await?;
+            let response = http_get_json::<MEXCPriceResponse>(
+                "https://api.mexc.com/api/v3/ticker/24hr",
+                None,
+                None,
+            )
+            .await?;
 
             Ok(response
                 .into_iter()

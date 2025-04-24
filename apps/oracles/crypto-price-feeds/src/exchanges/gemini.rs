@@ -58,7 +58,7 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
 
 pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)> {
     let url = format!("https://api.gemini.com/v1/pubticker/{symbol}");
-    let response = http_get_json::<GeminiPriceResponse>(&url, None).await?;
+    let response = http_get_json::<GeminiPriceResponse>(&url, None, None).await?;
 
     let volume_data = response
         .volume

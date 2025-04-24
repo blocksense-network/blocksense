@@ -50,6 +50,7 @@ impl PricesFetcher<'_> for KrakenPriceFetcher {
             let response = http_get_json::<KrakenPriceResponse>(
                 "https://api.kraken.com/0/public/Ticker",
                 None,
+                None,
             )
             .await?;
 

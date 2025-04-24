@@ -38,6 +38,7 @@ impl PricesFetcher<'_> for BitgetPriceFetcher {
             let response = http_get_json::<BitgetPriceResponse>(
                 "https://api.bitget.com/api/spot/v1/market/tickers",
                 None,
+                None,
             )
             .await?;
 

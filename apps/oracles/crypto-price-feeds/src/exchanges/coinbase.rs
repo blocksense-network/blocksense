@@ -57,7 +57,7 @@ impl<'a> PricesFetcher<'a> for CoinbasePriceFetcher<'a> {
 }
 pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)> {
     let url = format!("https://api.exchange.coinbase.com/products/{symbol}/ticker");
-    let response = http_get_json::<CoinbasePriceResponse>(&url, None).await?;
+    let response = http_get_json::<CoinbasePriceResponse>(&url, None, None).await?;
 
     Ok((
         symbol.to_string().replace("-", ""),

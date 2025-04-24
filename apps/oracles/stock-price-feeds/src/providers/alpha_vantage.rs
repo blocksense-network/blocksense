@@ -89,6 +89,7 @@ pub async fn fetch_price_for_symbol(symbol: &str, api_key: &str) -> Result<(Stri
             ("symbol", symbol),
             ("apikey", api_key),
         ]),
+        None,
     )
     .await;
 

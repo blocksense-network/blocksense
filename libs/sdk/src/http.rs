@@ -6,10 +6,12 @@ use spin_sdk::http::{send, Method, Request, Response};
 use url::Url;
 
 pub type QueryParam<'a, 'b> = (&'a str, &'b str);
+pub type HeaderParam<'a, 'b> = (&'a str, &'b str);
 
 pub fn prepare_get_request(
     base_url: &str,
     params: Option<&[QueryParam<'_, '_>]>,
+    headers: Option<&[HeaderParam<'_, '_>]>,
 ) -> Result<Request> {
     let url = match params {
         Some(p) => Url::parse_with_params(base_url, p)?,
@@ -21,14 +23,25 @@ pub fn prepare_get_request(
     req.uri(url.as_str());
     req.header("Accepts", "application/json");
     req.header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
+
+    if let Some(hdrs) = headers {
+        for (key, value) in hdrs {
+            req.header(*key, *value);
+        }
+    }
+
     Ok(req.build())
 }
 
-pub async fn http_get_json<T>(url: &str, params: Option<&[QueryParam<'_, '_>]>) -> Result<T>
+pub async fn http_get_json<T>(
+    url: &str,
+    params: Option<&[QueryParam<'_, '_>]>,
+    headers: Option<&[HeaderParam<'_, '_>]>,
+) -> Result<T>
 where
     T: DeserializeOwned,
 {
-    let request = prepare_get_request(url, params)?;
+    let request = prepare_get_request(url, params, headers)?;
     let response: Response = send(request).await?;
 
     let status_code: u16 = *response.status();

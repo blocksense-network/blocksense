@@ -57,6 +57,7 @@ impl PricesFetcher<'_> for KuCoinPriceFetcher {
             let response = http_get_json::<KuCoinPriceResponse>(
                 "https://api.kucoin.com/api/v1/market/allTickers",
                 None,
+                None,
             )
             .await?;
 

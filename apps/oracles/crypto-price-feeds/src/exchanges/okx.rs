@@ -39,6 +39,7 @@ impl PricesFetcher<'_> for OKXPriceFetcher {
             let response = http_get_json::<OKXTickerResponse>(
                 "https://www.okx.com/api/v5/market/tickers",
                 Some(&[("instType", "SPOT")]),
+                None,
             )
             .await?;
 
