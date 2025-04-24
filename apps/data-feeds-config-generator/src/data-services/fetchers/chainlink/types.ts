@@ -16,9 +16,7 @@ const ChainLinkFeedDocsInfoSchema = S.Struct({
   hidden: S.NullishOr(S.Boolean),
 }).annotations({ identifier: 'ChainLinkFeedDocsInfo' });
 
-export type ChainLinkFeedDocsInfo = S.Schema.Type<
-  typeof ChainLinkFeedDocsInfoSchema
->;
+export type ChainLinkFeedDocsInfo = typeof ChainLinkFeedDocsInfoSchema.Type;
 
 /**
  * Schema for the ChainLink feed information.
@@ -54,7 +52,7 @@ export const ChainLinkFeedInfoSchema = S.Struct({
 /**
  * Type for the ChainLink feed information.
  */
-export type ChainLinkFeedInfo = S.Schema.Type<typeof ChainLinkFeedInfoSchema>;
+export type ChainLinkFeedInfo = typeof ChainLinkFeedInfoSchema.Type;
 
 /**
  * Function to decode an array of ChainLink feed information.
@@ -77,4 +75,4 @@ export const RawDataFeedsSchema = S.mutable(
   }),
 ).annotations({ identifier: 'RawDataFeeds' });
 
-export type RawDataFeeds = S.Schema.Type<typeof RawDataFeedsSchema>;
+export type RawDataFeeds = typeof RawDataFeedsSchema.Type;

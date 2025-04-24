@@ -20,9 +20,7 @@ export const cryptoPriceFeedsArgsSchema = S.mutable(
   }),
 );
 
-export type CryptoPriceFeedsArgs = S.Schema.Type<
-  typeof cryptoPriceFeedsArgsSchema
->;
+export type CryptoPriceFeedsArgs = typeof cryptoPriceFeedsArgsSchema.Type;
 
 // `gecko-terminal` Oracle related Types
 export const geckoTerminalArgsSchema = S.mutable(
