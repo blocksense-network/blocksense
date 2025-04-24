@@ -65,3 +65,7 @@ export function kebabToCamelCase<Str extends string>(
 export function equalsCaseInsensitive(a: string, b: string) {
   return a.toLowerCase() === b.toLowerCase();
 }
+
+export function padNumber(num: number | bigint, size: number, padChar = ' ') {
+  return num.toString().padStart(size, padChar);
+}
