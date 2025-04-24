@@ -12,7 +12,7 @@ const GateIoAssetInfoSchema = S.mutable(
   }),
 );
 
-export type GateIoAssetInfo = S.Schema.Type<typeof GateIoAssetInfoSchema>;
+export type GateIoAssetInfo = typeof GateIoAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from GateIo Exchange.
@@ -27,7 +27,7 @@ export const GateIoInfoRespSchema = S.mutable(
   ),
 );
 
-export type GateIoInfoResp = S.Schema.Type<typeof GateIoInfoRespSchema>;
+export type GateIoInfoResp = typeof GateIoInfoRespSchema.Type;
 
 export const GateIoPriceSchema = S.Array(
   S.mutable(
@@ -38,4 +38,4 @@ export const GateIoPriceSchema = S.Array(
   ),
 );
 
-export type GateIoPrice = S.Schema.Type<typeof GateIoPriceSchema>;
+export type GateIoPrice = typeof GateIoPriceSchema.Type;

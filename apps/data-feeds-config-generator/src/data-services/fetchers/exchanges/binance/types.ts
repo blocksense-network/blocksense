@@ -11,7 +11,7 @@ const BinanceAssetInfoSchema = S.mutable(
   }),
 );
 
-export type BinanceAssetInfo = S.Schema.Type<typeof BinanceAssetInfoSchema>;
+export type BinanceAssetInfo = typeof BinanceAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about symbols received from Binance.
@@ -30,7 +30,7 @@ export const BinanceInfoRespSchema = S.mutable(
   }),
 );
 
-export type BinanceInfoResp = S.Schema.Type<typeof BinanceInfoRespSchema>;
+export type BinanceInfoResp = typeof BinanceInfoRespSchema.Type;
 
 export const BinancePriceSchema = S.Array(
   S.mutable(
@@ -41,4 +41,4 @@ export const BinancePriceSchema = S.Array(
   ),
 );
 
-export type BinancePrice = S.Schema.Type<typeof BinancePriceSchema>;
+export type BinancePrice = typeof BinancePriceSchema.Type;
