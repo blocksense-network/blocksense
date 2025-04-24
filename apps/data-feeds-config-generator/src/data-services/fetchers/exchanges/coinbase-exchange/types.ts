@@ -12,7 +12,7 @@ const CoinbaseAssetInfoSchema = S.mutable(
   }),
 );
 
-export type CoinbaseAssetInfo = S.Schema.Type<typeof CoinbaseAssetInfoSchema>;
+export type CoinbaseAssetInfo = typeof CoinbaseAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from Coinbase Exchange.
@@ -28,10 +28,10 @@ export const CoinbaseInfoRespSchema = S.mutable(
   ),
 );
 
-export type CoinbaseInfoResp = S.Schema.Type<typeof CoinbaseInfoRespSchema>;
+export type CoinbaseInfoResp = typeof CoinbaseInfoRespSchema.Type;
 
 export const CoinbasePriceSchema = S.Struct({
   price: S.String,
 });
 
-export type CoinbasePrice = S.Schema.Type<typeof CoinbasePriceSchema>;
+export type CoinbasePrice = typeof CoinbasePriceSchema.Type;

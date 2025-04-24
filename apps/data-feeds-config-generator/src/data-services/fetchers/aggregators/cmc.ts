@@ -45,7 +45,7 @@ export const CMCInfoSchema = S.Struct({
   ),
 }).annotations({ identifier: 'CMCInfo' });
 
-export type CMCInfo = S.Schema.Type<typeof CMCInfoSchema>;
+export type CMCInfo = typeof CMCInfoSchema.Type;
 
 /**
  * Function to decode CoinMarketCap information.
@@ -77,7 +77,7 @@ export const CMCInfoRespSchema = S.mutable(
   }),
 );
 
-export type CMCInfoResp = S.Schema.Type<typeof CMCInfoRespSchema>;
+export type CMCInfoResp = typeof CMCInfoRespSchema.Type;
 
 /**
  * Schema for the data relevant to a CoinMarketCap oracle.
@@ -91,7 +91,7 @@ const CMCAssetInfoSchema = S.mutable(
   }),
 );
 
-export type CMCAssetInfo = S.Schema.Type<typeof CMCAssetInfoSchema>;
+export type CMCAssetInfo = typeof CMCAssetInfoSchema.Type;
 
 /**
  * Function to decode CoinMarketCap symbol information.
@@ -122,15 +122,13 @@ export const CMCMarketCapDataSchema = S.Struct({
   market_cap_rank: S.NullishOr(S.Number),
 });
 
-export type CMCMarketCapData = S.Schema.Type<typeof CMCMarketCapDataSchema>;
+export type CMCMarketCapData = typeof CMCMarketCapDataSchema.Type;
 
 export const CMCMarketCapDataResSchema = S.mutable(
   S.Array(CMCMarketCapDataSchema),
 );
 
-export type CMCMarketCapDataRes = S.Schema.Type<
-  typeof CMCMarketCapDataResSchema
->;
+export type CMCMarketCapDataRes = typeof CMCMarketCapDataResSchema.Type;
 
 export const CMCMarketCapDataRespSchema = S.mutable(
   S.Struct({
@@ -138,7 +136,7 @@ export const CMCMarketCapDataRespSchema = S.mutable(
   }),
 );
 
-type CMCMarketCapResp = S.Schema.Type<typeof CMCMarketCapDataRespSchema>;
+type CMCMarketCapResp = typeof CMCMarketCapDataRespSchema.Type;
 
 async function fetchMarketCapData(ids: string[]): Promise<CMCMarketCapResp> {
   const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${ids.join(',')}`;

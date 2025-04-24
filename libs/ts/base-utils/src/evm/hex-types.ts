@@ -16,7 +16,7 @@ export const ethereumAddress = hexDataString.pipe(
   S.brand('EthereumAddress'),
   S.annotations({ identifier: 'EthereumAddress' }),
 );
-export type EthereumAddress = S.Schema.Type<typeof ethereumAddress>;
+export type EthereumAddress = typeof ethereumAddress.Type;
 export const isEthereumAddress = S.is(ethereumAddress);
 export const parseEthereumAddress = S.decodeUnknownSync(ethereumAddress);
 
@@ -26,7 +26,7 @@ export const hash32byte = hexDataString.pipe(
   S.pattern(/^0x([0-9a-fA-F]{64})$/),
   S.brand('32 byte hex string'),
 );
-export type Hash32byte = S.Schema.Type<typeof hash32byte>;
+export type Hash32byte = typeof hash32byte.Type;
 
 export const isHash32byte = S.is(hash32byte);
 export const parseHash32byte = S.decodeUnknownSync(hash32byte);
@@ -37,7 +37,7 @@ export const txHash = hash32byte.pipe(
   S.brand('EVM TxHash'),
   S.annotations({ identifier: 'EVM TxHash' }),
 );
-export type TxHash = S.Schema.Type<typeof txHash>;
+export type TxHash = typeof txHash.Type;
 
 export const isTxHash = S.is(txHash);
 export const parseTxHash = S.decodeUnknownSync(txHash);

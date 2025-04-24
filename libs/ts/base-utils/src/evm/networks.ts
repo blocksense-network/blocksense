@@ -140,7 +140,7 @@ const chainIds = [
 export const networkName = S.Literal(...networks);
 export const isNetworkName = S.is(networkName);
 export const parseNetworkName = S.decodeUnknownSync(networkName);
-export type NetworkName = S.Schema.Type<typeof networkName>;
+export type NetworkName = typeof networkName.Type;
 
 export const chainId = S.compose(
   NumberFromSelfBigIntOrString,
@@ -148,12 +148,12 @@ export const chainId = S.compose(
 );
 export const isChainId = S.is(chainId);
 export const parseChainId = S.decodeUnknownSync(chainId);
-export type ChainId = S.Schema.Type<typeof chainId>;
+export type ChainId = typeof chainId.Type;
 
 export const network = S.Union(networkName, chainId);
 export const isNetwork = S.is(network);
 export const parseNetwork = S.decodeUnknownSync(network);
-export type Network = S.Schema.Type<typeof network>;
+export type Network = typeof network.Type;
 
 export enum Currency {
   ETH = 'ETH',
