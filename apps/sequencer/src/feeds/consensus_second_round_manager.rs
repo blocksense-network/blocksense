@@ -111,7 +111,9 @@ impl AggregationBatchConsensus {
         &mut self,
         current_block_height: u64,
         retention_time_blocks: u64,
-    ) {
+    ) -> Vec<(String, CallDataWithSignatures)> {
+        // Return all timed out batches
+        let mut timed_out_batches = Vec::new();
         // Pop elements older than time_point and check if they also need to be removed from in_progress_batches
         while let Some(key) = self.backlog_batches.front() {
             if key.block_height + retention_time_blocks >= current_block_height {
@@ -124,11 +126,13 @@ impl AggregationBatchConsensus {
                     key.network,
                     key.block_height,
                     calldata_with_signatures);
+                timed_out_batches.push((key.network.clone(), calldata_with_signatures));
             } else {
                 debug!("{key:?} has collected quorum of signatures");
             }
             self.backlog_batches.pop_front();
         }
+        timed_out_batches
     }
 }
 

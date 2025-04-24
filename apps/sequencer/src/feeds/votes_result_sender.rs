@@ -1,7 +1,8 @@
+use crate::providers::eth_send_utils::increment_feeds_round_indexes;
 use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
-use crate::providers::provider::{GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME};
+use crate::providers::provider::{self, GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use alloy::hex::{self, ToHexExt};
@@ -156,6 +157,8 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             debug!("No aggregated batch update for network {net}");
             continue;
         }
+        // After filtering for the network, we extract the feed_id-s that need round counter increment
+        let updated_feeds_ids = updates.updates.iter().cloned().map(|u| u.feed_id).collect();
 
         let serialized_updates_hex = hex::encode(&serialized_updates);
 
@@ -252,6 +255,11 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             Err(e) => {
                 error!("Failed to send batch of aggregated feed values for network: {net}, block height: {block_height} to kafka endpoint! {e:?}")
             }
+        }
+
+        {
+            let mut provider = provider.lock().await;
+            increment_feeds_round_indexes(&updated_feeds_ids, net, &mut provider).await;
         }
     }
 }
