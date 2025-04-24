@@ -12,7 +12,7 @@ const UpbitAssetInfoSchema = S.mutable(
   }),
 );
 
-export type UpbitAssetInfo = S.Schema.Type<typeof UpbitAssetInfoSchema>;
+export type UpbitAssetInfo = typeof UpbitAssetInfoSchema.Type;
 
 /**
  * Schema for the market information received from Upbit.
@@ -25,7 +25,7 @@ export const UpbitMarketRespSchema = S.Array(
   }),
 );
 
-export type UpbitMarketResp = S.Schema.Type<typeof UpbitMarketRespSchema>;
+export type UpbitMarketResp = typeof UpbitMarketRespSchema.Type;
 
 export const UpbitPriceSchema = S.Array(
   S.mutable(
@@ -36,4 +36,4 @@ export const UpbitPriceSchema = S.Array(
   ),
 );
 
-export type UpbitPrice = S.Schema.Type<typeof UpbitPriceSchema>;
+export type UpbitPrice = typeof UpbitPriceSchema.Type;

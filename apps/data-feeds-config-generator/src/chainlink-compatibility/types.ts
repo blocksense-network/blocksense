@@ -42,9 +42,9 @@ export const chainlinkSupportedNetworkFileName = S.Literal(
   ...chainlinkSupportedNetworkFileNames,
 );
 
-export type ChainlinkSupportedNetworkFileName = S.Schema.Type<
-  typeof chainlinkSupportedNetworkFileName
->;
+export type ChainlinkSupportedNetworkFileName =
+  typeof chainlinkSupportedNetworkFileName.Type;
+
 export const isChainlinkSupportedNetworkFileName = S.is(
   chainlinkSupportedNetworkFileName,
 );
@@ -144,7 +144,7 @@ export const ConfirmedFeedEvent = S.Struct({
   sender: ethereumAddress,
 });
 
-export type ConfirmedFeedEvent = S.Schema.Type<typeof ConfirmedFeedEvent>;
+export type ConfirmedFeedEvent = typeof ConfirmedFeedEvent.Type;
 
 export const decodeConfirmedFeedEvent = S.decodeUnknownSync(ConfirmedFeedEvent);
 
@@ -153,6 +153,5 @@ export const FeedRegistryEventsPerAggregatorSchema = S.Record({
   value: ConfirmedFeedEvent,
 });
 
-export type FeedRegistryEventsPerAggregator = S.Schema.Type<
-  typeof FeedRegistryEventsPerAggregatorSchema
->;
+export type FeedRegistryEventsPerAggregator =
+  typeof FeedRegistryEventsPerAggregatorSchema.Type;

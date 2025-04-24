@@ -26,7 +26,7 @@ export const FeedCategorySchema = S.Union(
 /**
  * Type for the data feed categories.
  */
-export type FeedCategory = S.Schema.Type<typeof FeedCategorySchema>;
+export type FeedCategory = typeof FeedCategorySchema.Type;
 
 export const PairSchema = S.mutable(
   S.Struct({
@@ -35,7 +35,7 @@ export const PairSchema = S.mutable(
   }),
 ).annotations({ identifier: 'Pair' });
 
-export type Pair = S.Schema.Type<typeof PairSchema>;
+export type Pair = typeof PairSchema.Type;
 
 /**
  * Creates a `Pair` object with the given base and quote currencies.
@@ -92,7 +92,7 @@ export const FeedSchema = S.mutable(
 /**
  * The Data Feed type.
  */
-export type Feed = S.Schema.Type<typeof FeedSchema>;
+export type Feed = typeof FeedSchema.Type;
 
 /**
  * Function to decode the Data Feed.
@@ -111,7 +111,7 @@ export const FeedsConfigSchema = S.mutable(
 /**
  * Type for the Data Feeds configuration.
  */
-export type FeedsConfig = S.Schema.Type<typeof FeedsConfigSchema>;
+export type FeedsConfig = typeof FeedsConfigSchema.Type;
 
 /**
  * Function to decode Data Feeds configuration.
@@ -128,7 +128,7 @@ export const FeedTypeSchema = S.Union(S.Literal('price-feed')).annotations({
 /**
  * Type for the data feed type.
  */
-export type FeedType = S.Schema.Type<typeof FeedTypeSchema>;
+export type FeedType = typeof FeedTypeSchema.Type;
 
 /**
  * Schema for the data feed market hours ( Chainlink compatible ).
@@ -149,7 +149,7 @@ export const MarketHoursSchema = S.Union(
   S.Literal('US_Equities'),
 ).annotations({ identifier: 'MarketHours' });
 
-export type MarketHours = S.Schema.Type<typeof MarketHoursSchema>;
+export type MarketHours = typeof MarketHoursSchema.Type;
 
 export const NewFeedSchema = S.mutable(
   S.Struct({
@@ -208,7 +208,7 @@ export const NewFeedSchema = S.mutable(
   }),
 );
 
-export type NewFeed = S.Schema.Type<typeof NewFeedSchema>;
+export type NewFeed = typeof NewFeedSchema.Type;
 
 /**
  * Schema for the Data Feeds configuration.
@@ -222,7 +222,7 @@ export const NewFeedsConfigSchema = S.mutable(
 /**
  * Type for the Data Feeds configuration.
  */
-export type NewFeedsConfig = S.Schema.Type<typeof NewFeedsConfigSchema>;
+export type NewFeedsConfig = typeof NewFeedsConfigSchema.Type;
 
 /**
  * Function to decode Data Feeds configuration.
