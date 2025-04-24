@@ -8,9 +8,9 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use blocksense_sdk::traits::prices_fetcher::{fetch, TradingPairSymbol};
 
 use crate::{
-    providers::alpha_vantage::AlphaVantagePriceFetcher,
+    providers::{alpha_vantage::AlphaVantagePriceFetcher, yahoo_finance::YFPriceFetcher},
     types::{
-        Capabilities, ProviderPriceData, ProvidersSymbols, PairToResults, ResourceData,
+        Capabilities, PairToResults, ProviderPriceData, ProvidersSymbols, ResourceData,
         ResourcePairData,
     },
     utils::get_api_key,
@@ -20,6 +20,7 @@ use crate::{
 #[serde(deny_unknown_fields)]
 pub struct SymbolsData {
     pub alpha_vantage: Vec<TradingPairSymbol>,
+    pub yahoo_finance: Vec<TradingPairSymbol>,
 }
 
 impl SymbolsData {
@@ -27,6 +28,10 @@ impl SymbolsData {
         Ok(Self {
             alpha_vantage: providers_symbols
                 .get("AlphaVantage")
+                .cloned()
+                .unwrap_or_default(),
+            yahoo_finance: providers_symbols
+                .get("YahooFinance")
                 .cloned()
                 .unwrap_or_default(),
         })
@@ -43,10 +48,16 @@ pub async fn fetch_all_prices(
 ) -> Result<PairToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
-    let mut futures_set = FuturesUnordered::from_iter([fetch::<AlphaVantagePriceFetcher>(
-        &symbols.alpha_vantage,
-        get_api_key(capabilities, "ALPHAVANTAGE_API_KEY"),
-    )]);
+    let mut futures_set = FuturesUnordered::from_iter([
+        fetch::<AlphaVantagePriceFetcher>(
+            &symbols.alpha_vantage,
+            get_api_key(capabilities, "ALPHAVANTAGE_API_KEY"),
+        ),
+        fetch::<YFPriceFetcher>(
+            &symbols.yahoo_finance,
+            get_api_key(capabilities, "YAHOO_FINANCE_API_KEY"),
+        ),
+    ]);
 
     let before_fetch = Instant::now();
     let mut results = PairToResults::new();

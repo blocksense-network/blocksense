@@ -17,7 +17,7 @@ use blocksense_sdk::{
 use fetch_prices::fetch_all_prices;
 
 use types::{
-    Capabilities, FeedConfigData, ProvidersSymbols, PairToResults, ResourceData, ResourcePairData,
+    Capabilities, FeedConfigData, PairToResults, ProvidersSymbols, ResourceData, ResourcePairData,
 };
 
 #[oracle_component]
