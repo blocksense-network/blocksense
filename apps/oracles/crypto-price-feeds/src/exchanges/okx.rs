@@ -30,7 +30,7 @@ pub struct OKXPriceFetcher;
 impl PricesFetcher<'_> for OKXPriceFetcher {
     const NAME: &'static str = "OKX";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 

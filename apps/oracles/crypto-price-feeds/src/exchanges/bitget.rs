@@ -30,7 +30,7 @@ pub struct BitgetPriceFetcher;
 impl PricesFetcher<'_> for BitgetPriceFetcher {
     const NAME: &'static str = "Bitget";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {

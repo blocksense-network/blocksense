@@ -29,7 +29,7 @@ pub struct GeminiPriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
     const NAME: &'static str = "Gemini";
 
-    fn new(symbols: &'a [String]) -> Self {
+    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
         Self { symbols }
     }
 

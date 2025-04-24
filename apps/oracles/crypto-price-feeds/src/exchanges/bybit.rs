@@ -38,7 +38,7 @@ pub struct BybitPriceFetcher;
 impl PricesFetcher<'_> for BybitPriceFetcher {
     const NAME: &'static str = "Bybit";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
