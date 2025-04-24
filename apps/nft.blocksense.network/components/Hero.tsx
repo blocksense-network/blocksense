@@ -68,7 +68,7 @@ const HeroDesktop = () => {
           >
             As the fully programmable ZK oracle protocol with groundbreaking
             cost efficiency, Blocksense will soon let everyone create secure
-            oracles in minutes.
+            oracles in minutes. For every chain and every meta.
             <br />
             <br />
             Become an early adopter by joining the fast-growing Blocksense
