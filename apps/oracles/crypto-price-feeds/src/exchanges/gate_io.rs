@@ -25,7 +25,7 @@ pub struct GateIoPriceFetcher;
 impl PricesFetcher<'_> for GateIoPriceFetcher {
     const NAME: &'static str = "Gate.io";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 

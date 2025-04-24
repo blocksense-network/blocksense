@@ -26,7 +26,7 @@ pub struct MEXCPriceFetcher;
 impl PricesFetcher<'_> for MEXCPriceFetcher {
     const NAME: &'static str = "MEXC";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 

@@ -29,7 +29,7 @@ pub struct BinanceUsPriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for BinanceUsPriceFetcher<'a> {
     const NAME: &'static str = "Binance US";
 
-    fn new(symbols: &'a [String]) -> Self {
+    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
         Self { symbols }
     }
 

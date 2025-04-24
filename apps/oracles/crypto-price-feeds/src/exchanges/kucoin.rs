@@ -48,7 +48,7 @@ pub struct KuCoinPriceFetcher;
 impl PricesFetcher<'_> for KuCoinPriceFetcher {
     const NAME: &'static str = "KuCoin";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 

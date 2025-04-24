@@ -34,7 +34,7 @@ pub struct CryptoComPriceFetcher;
 impl PricesFetcher<'_> for CryptoComPriceFetcher {
     const NAME: &'static str = "Crypto.com";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 

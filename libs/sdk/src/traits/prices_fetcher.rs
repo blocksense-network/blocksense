@@ -19,18 +19,23 @@ pub type PairPriceData = HashMap<TradingPairSymbol, PricePoint>;
 pub trait PricesFetcher<'a> {
     const NAME: &'static str;
 
-    fn new(symbols: &'a [String]) -> Self;
+    fn new(symbols: &'a [String], api_key: Option<&'a str>) -> Self;
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>>;
 }
 
 pub fn fetch<'a, PF>(
     symbols: &'a [String],
+    api_key: Option<&'a str>,
 ) -> LocalBoxFuture<'a, (&'static str, Result<PairPriceData>)>
 where
     PF: PricesFetcher<'a>,
 {
-    async {
-        let fetcher = PF::new(symbols);
+    async move {
+        let fetcher = match api_key {
+            Some(key) => PF::new(symbols, Some(key)),
+            None => PF::new(symbols, None),
+        };
+
         let res = fetcher.fetch().await;
         (PF::NAME, res)
     }

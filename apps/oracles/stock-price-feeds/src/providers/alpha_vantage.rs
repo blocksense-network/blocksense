@@ -32,13 +32,14 @@ pub struct AlphaVantageResponse {
 
 pub struct AlphaVantagePriceFetcher<'a> {
     pub symbols: &'a [String],
+    api_key: Option<&'a str>,
 }
 
 impl<'a> PricesFetcher<'a> for AlphaVantagePriceFetcher<'a> {
     const NAME: &'static str = "AlphaVantage";
 
-    fn new(symbols: &'a [String]) -> Self {
-        Self { symbols }
+    fn new(symbols: &'a [String], api_key: Option<&'a str>) -> Self {
+        Self { symbols, api_key }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {

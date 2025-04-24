@@ -29,7 +29,7 @@ pub struct CoinbasePriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for CoinbasePriceFetcher<'a> {
     const NAME: &'static str = "Coinbase";
 
-    fn new(symbols: &'a [String]) -> Self {
+    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
         Self { symbols }
     }
 

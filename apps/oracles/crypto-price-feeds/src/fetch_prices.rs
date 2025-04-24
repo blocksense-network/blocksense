@@ -61,20 +61,20 @@ pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToR
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let mut futures_set = FuturesUnordered::from_iter([
-        fetch::<BinancePriceFetcher>(&symbols.binance),
-        fetch::<BinanceUsPriceFetcher>(&symbols.binance_us),
-        fetch::<BitfinexPriceFetcher>(&symbols.bitfinex),
-        fetch::<BitgetPriceFetcher>(&[]),
-        fetch::<BybitPriceFetcher>(&[]),
-        fetch::<CoinbasePriceFetcher>(&symbols.coinbase),
-        fetch::<CryptoComPriceFetcher>(&[]),
-        fetch::<GateIoPriceFetcher>(&[]),
-        fetch::<GeminiPriceFetcher>(&symbols.gemini),
-        fetch::<KrakenPriceFetcher>(&[]),
-        fetch::<KuCoinPriceFetcher>(&[]),
-        fetch::<MEXCPriceFetcher>(&[]),
-        fetch::<OKXPriceFetcher>(&[]),
-        fetch::<UpBitPriceFetcher>(&symbols.upbit),
+        fetch::<BinancePriceFetcher>(&symbols.binance, None),
+        fetch::<BinanceUsPriceFetcher>(&symbols.binance_us, None),
+        fetch::<BitfinexPriceFetcher>(&symbols.bitfinex, None),
+        fetch::<BitgetPriceFetcher>(&[], None),
+        fetch::<BybitPriceFetcher>(&[], None),
+        fetch::<CoinbasePriceFetcher>(&symbols.coinbase, None),
+        fetch::<CryptoComPriceFetcher>(&[], None),
+        fetch::<GateIoPriceFetcher>(&[], None),
+        fetch::<GeminiPriceFetcher>(&symbols.gemini, None),
+        fetch::<KrakenPriceFetcher>(&[], None),
+        fetch::<KuCoinPriceFetcher>(&[], None),
+        fetch::<MEXCPriceFetcher>(&[], None),
+        fetch::<OKXPriceFetcher>(&[], None),
+        fetch::<UpBitPriceFetcher>(&symbols.upbit, None),
     ]);
 
     let before_fetch = Instant::now();
