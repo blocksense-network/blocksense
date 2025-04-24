@@ -42,6 +42,10 @@ task(
     operation: OperationType.Call,
   };
 
+  console.log(
+    `Upgrading proxy implementation to ${deployData.coreContracts.AggregatedDataFeedStore.address}`,
+  );
+
   await run('multisig-tx-exec', {
     transactions: [safeTransactionData],
     safe,

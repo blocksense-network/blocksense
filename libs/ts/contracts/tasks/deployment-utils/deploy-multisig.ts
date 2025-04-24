@@ -50,7 +50,7 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
     console.log(`\nPredicted ${type} address: ${safeAddress}`);
 
     if (await checkAddressExists(config, safeAddress)) {
-      console.log(` -> ${type} already deployed!`);
+      console.log(`  -> ✅ already deployed`);
       return protocolKit.connect({
         provider: config.rpc,
         signer: signer?.privateKey,
@@ -78,7 +78,7 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
       transactionHash.hash,
     );
 
-    console.log('-> Safe deployment tx hash:', transactionReceipt?.hash);
+    console.log('    ✅ Safe deployment tx hash:', transactionReceipt?.hash);
 
     return protocolKit.connect({ safeAddress });
   },
