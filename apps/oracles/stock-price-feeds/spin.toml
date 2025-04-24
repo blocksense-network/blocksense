@@ -34,5 +34,9 @@ allowed_outbound_hosts = [
   "https://www.alphavantage.co",
 ]
 
+[[trigger.oracle.capabilities]]
+data = "4DIDDYTCVFDYDP27"
+id = "ALPHAVANTAGE_API_KEY"
+
 [component.stock-price-feeds.build]
 command = "cargo build --target wasm32-wasip1 --release"
