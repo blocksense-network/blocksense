@@ -46,6 +46,7 @@ impl PricesFetcher<'_> for BybitPriceFetcher {
             let response = http_get_json::<BybitPriceResponse>(
                 "https://api.bybit.com/v5/market/tickers",
                 Some(&[("category", "spot"), ("symbols", "")]),
+                None,
             )
             .await?;
 

@@ -34,6 +34,7 @@ impl PricesFetcher<'_> for GateIoPriceFetcher {
             let response = http_get_json::<GateIoPriceResponse>(
                 "https://api.gateio.ws/api/v4/spot/tickers",
                 None,
+                None,
             )
             .await?;
 

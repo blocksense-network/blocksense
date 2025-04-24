@@ -34,6 +34,7 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
             let response = http_get_json::<UpBitResponse>(
                 "https://api.upbit.com/v1/ticker",
                 Some(&[("markets", all_markets.as_str())]),
+                None,
             )
             .await?;
 

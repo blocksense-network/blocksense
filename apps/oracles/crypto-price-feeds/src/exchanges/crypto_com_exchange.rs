@@ -43,6 +43,7 @@ impl PricesFetcher<'_> for CryptoComPriceFetcher {
             let response = http_get_json::<CryptoComPriceResponse>(
                 "https://api.crypto.com/exchange/v1/public/get-tickers",
                 None,
+                None,
             )
             .await?;
 

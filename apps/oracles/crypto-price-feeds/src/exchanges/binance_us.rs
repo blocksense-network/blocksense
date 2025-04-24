@@ -43,6 +43,7 @@ impl<'a> PricesFetcher<'a> for BinanceUsPriceFetcher<'a> {
             let response = http_get_json::<BinanceUsPriceResponse>(
                 "https://api.binance.us/api/v3/ticker/24hr",
                 Some(&[("symbols", req_symbols.as_str())]),
+                None,
             )
             .await?;
 

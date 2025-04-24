@@ -60,6 +60,7 @@ impl<'a> PricesFetcher<'a> for BitfinexPriceFetcher<'a> {
             let response = http_get_json::<Vec<TradingPairTicker>>(
                 "https://api-pub.bitfinex.com/v2/tickers",
                 Some(&[("symbols", all_symbols.as_str())]),
+                None,
             )
             .await?;
 
