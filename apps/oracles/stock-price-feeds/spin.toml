@@ -32,11 +32,16 @@ data = '{"pair":{"base":"SPY","quote":"USD"},"decimals":8,"category":"Equities",
 source = "../../../target/wasm32-wasip1/release/stock_price_feeds.wasm"
 allowed_outbound_hosts = [
   "https://www.alphavantage.co",
+  "https://yfapi.net"
 ]
 
 [[trigger.oracle.capabilities]]
 data = "4DIDDYTCVFDYDP27"
 id = "ALPHAVANTAGE_API_KEY"
+
+[[trigger.oracle.capabilities]]
+data = "uLQo1q92aE9ttxGsNj0aO6bdGwXlf8oL8MG7OGma"
+id = "YAHOO_FINANCE_API_KEY"
 
 [component.stock-price-feeds.build]
 command = "cargo build --target wasm32-wasip1 --release"
