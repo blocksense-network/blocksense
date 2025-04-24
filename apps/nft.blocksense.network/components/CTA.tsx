@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Button } from 'components/Button';
 import bgCtaDesktop from '/public/images/bg-cta-desktop.png';
-import bgCtaMobile from '/public/images/bg-cta-mobile.png';
 
 export const CTA = () => {
   return (
@@ -135,7 +134,7 @@ const CTAMobile = () => {
         show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}
     >
-      <article className="cta__inner relative flex flex-col gap-8 px-4 pt-8">
+      <article className="cta__inner relative flex flex-col gap-8 px-4 pt-8 z-20">
         <h1 className="cta__title text-center">
           The zk rollup for programmable oracles
         </h1>
@@ -164,11 +163,11 @@ const CTAMobile = () => {
         </nav>
       </article>
       <Image
-        src={bgCtaMobile}
+        src={bgCtaDesktop}
         alt="CTA Background Mobile"
         priority
-        className="object-cover w-full rounded-b-2xl"
         quality={100}
+        className="object-cover mt-[-3rem]"
         unoptimized
       />
     </section>
