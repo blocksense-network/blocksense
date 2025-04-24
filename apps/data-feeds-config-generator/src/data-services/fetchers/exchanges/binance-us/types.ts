@@ -12,7 +12,7 @@ const BinanceUSAssetInfoSchema = S.mutable(
   }),
 );
 
-export type BinanceUSAssetInfo = S.Schema.Type<typeof BinanceUSAssetInfoSchema>;
+export type BinanceUSAssetInfo = typeof BinanceUSAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from BinanceUS Exchange.
@@ -29,7 +29,7 @@ export const BinanceUSInfoRespSchema = S.mutable(
   }),
 );
 
-export type BinanceUSInfoResp = S.Schema.Type<typeof BinanceUSInfoRespSchema>;
+export type BinanceUSInfoResp = typeof BinanceUSInfoRespSchema.Type;
 
 export const BinanceUSPriceSchema = S.Array(
   S.mutable(
@@ -40,4 +40,4 @@ export const BinanceUSPriceSchema = S.Array(
   ),
 );
 
-export type BinanceUSPrice = S.Schema.Type<typeof BinanceUSPriceSchema>;
+export type BinanceUSPrice = typeof BinanceUSPriceSchema.Type;

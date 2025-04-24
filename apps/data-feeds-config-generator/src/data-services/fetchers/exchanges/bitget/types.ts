@@ -13,7 +13,7 @@ const BitgetAssetInfoSchema = S.mutable(
   }),
 );
 
-export type BitgetAssetInfo = S.Schema.Type<typeof BitgetAssetInfoSchema>;
+export type BitgetAssetInfo = typeof BitgetAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from Bitget Exchange.
@@ -30,7 +30,7 @@ export const BitgetInfoRespSchema = S.mutable(
   }),
 );
 
-export type BitgetInfoResp = S.Schema.Type<typeof BitgetInfoRespSchema>;
+export type BitgetInfoResp = typeof BitgetInfoRespSchema.Type;
 
 export const BitgetPriceSchema = S.mutable(
   S.Struct({
@@ -45,4 +45,4 @@ export const BitgetPriceSchema = S.mutable(
   }),
 );
 
-export type BitgetPrice = S.Schema.Type<typeof BitgetPriceSchema>;
+export type BitgetPrice = typeof BitgetPriceSchema.Type;
