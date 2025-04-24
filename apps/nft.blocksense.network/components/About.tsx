@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 import aboutVector from '/public/images/about-vector.svg';
@@ -13,6 +12,8 @@ import bsxParrotMobile from '/public/images/bsx-parrot-mobile.png';
 import bsxRobotMobile from '/public/images/bsx-robot-mobile.png';
 import bsxWarriorMobile from '/public/images/bsx-warrior-mobile.png';
 
+import { useRevealOnView } from 'hooks/useRevealOnView';
+
 export const About = () => {
   return (
     <>
@@ -23,27 +24,11 @@ export const About = () => {
 };
 
 const AboutDesktop = () => {
-  const [inView, setInView] = useState(false);
-  const desktopRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setInView(entry?.isIntersecting ?? false);
-      },
-      { threshold: 0.1 },
-    );
-
-    if (desktopRef.current) observer.observe(desktopRef.current);
-
-    return () => {
-      if (desktopRef.current) observer.unobserve(desktopRef.current);
-    };
-  }, []);
+  const { targetRef, show } = useRevealOnView();
 
   return (
     <section
-      ref={desktopRef}
+      ref={targetRef}
       className="hidden md:block px-20 relative py-[7.75rem]"
     >
       <Image
@@ -57,14 +42,14 @@ const AboutDesktop = () => {
       <section className="about about--desktop max-w-[59.125rem] mx-auto">
         <header
           className={`about__row about__row--top flex justify-between gap-4 items-center mb-[4rem] transition-all duration-800 ease-out transform origin-bottom ${
-            inView
+            show
               ? 'opacity-100 translate-y-0 scale-100'
               : 'opacity-0 translate-y-12 scale-95'
           }`}
         >
           <section
             className={`about__text about__text--left max-w-[28.875rem] transition-all duration-800 ease-out ${
-              inView
+              show
                 ? 'delay-[180ms] opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-6'
             }`}
@@ -91,7 +76,7 @@ const AboutDesktop = () => {
             src={bsxPirate}
             alt="Pirate NFT"
             className={`about__image max-w-max transition-all duration-800 ease-out ${
-              inView
+              show
                 ? 'delay-[350ms] opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-6'
             }`}
@@ -102,7 +87,7 @@ const AboutDesktop = () => {
         <article className="about__row about__row--bottom flex justify-between gap-4 items-center">
           <section
             className={`about__gallery max-w-[30.75rem] flex gap-[1.25rem] transition-all duration-800 ease-out ${
-              inView
+              show
                 ? 'delay-[500ms] opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-6'
             }`}
@@ -133,7 +118,7 @@ const AboutDesktop = () => {
           </section>
           <aside
             className={`about__details max-w-[22.688rem] mx-auto transition-all duration-800 ease-out ${
-              inView
+              show
                 ? 'delay-[650ms] opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-6'
             }`}
@@ -151,32 +136,16 @@ const AboutDesktop = () => {
 };
 
 const AboutMobile = () => {
-  const [inView, setInView] = useState(false);
-  const mobileRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setInView(entry?.isIntersecting ?? false);
-      },
-      { threshold: 0.1 },
-    );
-
-    if (mobileRef.current) observer.observe(mobileRef.current);
-
-    return () => {
-      if (mobileRef.current) observer.unobserve(mobileRef.current);
-    };
-  }, []);
+  const { targetRef, show } = useRevealOnView();
 
   return (
     <section
-      ref={mobileRef}
+      ref={targetRef}
       className="about about--mobile md:hidden px-5 py-12 flex flex-col gap-12"
     >
       <header
         className={`about__text transition-all duration-800 ease-out ${
-          inView
+          show
             ? 'opacity-100 translate-y-0 delay-[180ms]'
             : 'opacity-0 translate-y-6'
         }`}
@@ -202,7 +171,7 @@ const AboutMobile = () => {
         src={bsxPirate}
         alt="Pirate NFT Mobile"
         className={`about__image w-full transition-all duration-800 ease-out ${
-          inView
+          show
             ? 'opacity-100 translate-y-0 delay-[350ms]'
             : 'opacity-0 translate-y-6'
         }`}
@@ -211,7 +180,7 @@ const AboutMobile = () => {
       />
       <footer
         className={`about__details transition-all duration-800 ease-out ${
-          inView
+          show
             ? 'opacity-100 translate-y-0 delay-[500ms]'
             : 'opacity-0 translate-y-6'
         }`}
@@ -224,7 +193,7 @@ const AboutMobile = () => {
       </footer>
       <div
         className={`about__gallery flex flex-col gap-4 w-full transition-all duration-800 ease-out ${
-          inView
+          show
             ? 'opacity-100 translate-y-0 delay-[650ms]'
             : 'opacity-0 translate-y-6'
         }`}

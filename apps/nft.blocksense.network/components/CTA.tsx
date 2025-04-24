@@ -1,10 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
 
 import { Button } from 'components/Button';
 import bgCtaDesktop from '/public/images/bg-cta-desktop.png';
+
+import { useRevealOnView } from 'hooks/useRevealOnView';
 
 export const CTA = () => {
   return (
@@ -15,37 +16,11 @@ export const CTA = () => {
   );
 };
 
-const useRevealOnView = (threshold = 0.5) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        const entry = entries[0];
-        if (entry) {
-          setShow(entry.isIntersecting);
-        }
-      },
-      { threshold },
-    );
-
-    const currentRef = ref.current;
-    if (currentRef) observer.observe(currentRef);
-
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [threshold]);
-
-  return { ref, show };
-};
-
 const CTADesktop = () => {
-  const { ref, show } = useRevealOnView();
+  const { targetRef, show } = useRevealOnView(0.5);
 
   return (
-    <section ref={ref} className="cta cta-desktop p-8 hidden md:block">
+    <section ref={targetRef} className="cta cta-desktop p-8 hidden md:block">
       <section
         className={`cta-desktop__container bg-[var(--gray-dark)] px-12 py-16 rounded-3xl max-w-[71.25rem] mx-auto relative transition-all duration-1000 ease-out transform will-change-transform ${
           show
@@ -125,11 +100,11 @@ const CTADesktop = () => {
 };
 
 const CTAMobile = () => {
-  const { ref, show } = useRevealOnView();
+  const { targetRef, show } = useRevealOnView(0.5);
 
   return (
     <section
-      ref={ref}
+      ref={targetRef}
       className={`cta cta--mobile md:hidden bg-[var(--gray-dark)] my-12 rounded-2xl mx-5 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] transform will-change-transform ${
         show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}
