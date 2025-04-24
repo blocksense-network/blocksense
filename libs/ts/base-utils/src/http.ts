@@ -4,7 +4,7 @@ export function fetchAndDecodeJSON<A, I>(
   schema: S.Schema<A, I>,
   url: string | URL | globalThis.Request,
   fetchOptions?: RequestInit,
-): Promise<S.Schema.Type<typeof schema>> {
+): Promise<typeof schema.Type> {
   return fetch(url, {
     headers: {
       Accept: 'application/json',

@@ -12,7 +12,7 @@ const CryptoComAssetInfoSchema = S.mutable(
   }),
 );
 
-export type CryptoComAssetInfo = S.Schema.Type<typeof CryptoComAssetInfoSchema>;
+export type CryptoComAssetInfo = typeof CryptoComAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from CryptoCom Exchange.
@@ -32,7 +32,7 @@ export const CryptoComInfoRespSchema = S.mutable(
   }),
 );
 
-export type CryptoComInfoResp = S.Schema.Type<typeof CryptoComInfoRespSchema>;
+export type CryptoComInfoResp = typeof CryptoComInfoRespSchema.Type;
 
 export const CryptoComPriceSchema = S.mutable(
   S.Struct({
@@ -49,4 +49,4 @@ export const CryptoComPriceSchema = S.mutable(
   }),
 );
 
-export type CryptoComPrice = S.Schema.Type<typeof CryptoComPriceSchema>;
+export type CryptoComPrice = typeof CryptoComPriceSchema.Type;
