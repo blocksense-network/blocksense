@@ -6,8 +6,7 @@ import {
   networkName,
 } from '@blocksense/base-utils/evm';
 
-const ParameterType = S.Union(ethereumAddress, S.String, S.Number, S.Boolean);
-
+const ParameterType = S.Union(S.String, S.Number, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
 
 const ContractDataSchema = S.Struct({
@@ -15,14 +14,11 @@ const ContractDataSchema = S.Struct({
   constructorArgs: FunctionArgs,
 });
 
-export type ContractData = typeof ContractDataSchema.Type;
-
 export const CLAggregatorAdapterDataSchema = S.Struct({
+  ...ContractDataSchema.fields,
   description: S.String,
-  address: ethereumAddress,
   base: S.NullOr(ethereumAddress),
   quote: S.NullOr(ethereumAddress),
-  constructorArgs: FunctionArgs,
 });
 
 export type CLAggregatorAdapterData = typeof CLAggregatorAdapterDataSchema.Type;
@@ -35,8 +31,6 @@ const CoreContractsSchemaV1 = S.mutable(
   }),
 );
 
-export type CoreContractsV1 = typeof CoreContractsSchemaV1.Type;
-
 const CoreContractsSchemaV2 = S.mutable(
   S.Struct({
     AggregatedDataFeedStore: ContractDataSchema,
@@ -48,8 +42,6 @@ const CoreContractsSchemaV2 = S.mutable(
   }),
 );
 
-export type CoreContractsV2 = typeof CoreContractsSchemaV2.Type;
-
 const ContractsConfigSchemaV1 = S.mutable(
   S.Struct({
     coreContracts: CoreContractsSchemaV1,
@@ -57,8 +49,6 @@ const ContractsConfigSchemaV1 = S.mutable(
     SafeMultisig: ethereumAddress,
   }),
 );
-
-export type ContractsConfigV1 = typeof ContractsConfigSchemaV1.Type;
 
 const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
@@ -83,8 +73,6 @@ export const DeploymentConfigSchemaV1 = S.mutable(
   }),
 );
 
-export type DeploymentConfigV1 = typeof DeploymentConfigSchemaV1.Type;
-
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
     name: networkName,
@@ -94,11 +82,3 @@ export const DeploymentConfigSchemaV2 = S.mutable(
 );
 
 export type DeploymentConfigV2 = typeof DeploymentConfigSchemaV2.Type;
-
-export const decodeDeploymentConfigV1 = S.decodeUnknownSync(
-  DeploymentConfigSchemaV1,
-);
-
-export const decodeDeploymentConfigV2 = S.decodeUnknownSync(
-  DeploymentConfigSchemaV2,
-);
