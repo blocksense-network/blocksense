@@ -17,7 +17,7 @@ const KrakenAssetInfoSchema = S.mutable(
 /**
  * Type for the information about symbols received from Kraken.
  */
-export type KrakenAssetInfo = S.Schema.Type<typeof KrakenAssetInfoSchema>;
+export type KrakenAssetInfo = typeof KrakenAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about assets received from Kraken.
@@ -37,9 +37,7 @@ export const KrakenAssetPairsRespSchema = S.Struct({
   }),
 });
 
-export type KrakenAssetPairsResp = S.Schema.Type<
-  typeof KrakenAssetPairsRespSchema
->;
+export type KrakenAssetPairsResp = typeof KrakenAssetPairsRespSchema.Type;
 
 export const KrakenAssetRespSchema = S.Struct({
   error: S.Array(S.Any),
@@ -63,4 +61,4 @@ export const KrakenPriceSchema = S.Struct({
   }),
 });
 
-export type KrakenPrice = S.Schema.Type<typeof KrakenPriceSchema>;
+export type KrakenPrice = typeof KrakenPriceSchema.Type;

@@ -12,7 +12,7 @@ export const BitfinexAssetInfoSchema = S.mutable(
   }),
 );
 
-export type BitfinexAssetInfo = S.Schema.Type<typeof BitfinexAssetInfoSchema>;
+export type BitfinexAssetInfo = typeof BitfinexAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from Bitfinex Exchange.
@@ -21,7 +21,7 @@ export const BitfinexInfoRespSchema = S.mutable(
   S.Array(S.mutable(S.Array(S.String))),
 );
 
-export type BitfinexInfoResp = S.Schema.Type<typeof BitfinexInfoRespSchema>;
+export type BitfinexInfoResp = typeof BitfinexInfoRespSchema.Type;
 
 /**
  * Schema for the price information received from Bitfinex Exchange.
@@ -30,4 +30,4 @@ export const BitfinexPriceSchema = S.mutable(
   S.Array(S.Array(S.Union(S.String, S.Number))),
 );
 
-export type BitfinexPrice = S.Schema.Type<typeof BitfinexPriceSchema>;
+export type BitfinexPrice = typeof BitfinexPriceSchema.Type;
