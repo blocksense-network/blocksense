@@ -15,7 +15,7 @@ const ContractDataSchema = S.Struct({
   constructorArgs: FunctionArgs,
 });
 
-export type ContractData = S.Schema.Type<typeof ContractDataSchema>;
+export type ContractData = typeof ContractDataSchema.Type;
 
 export const CLAggregatorAdapterDataSchema = S.Struct({
   description: S.String,
@@ -25,9 +25,7 @@ export const CLAggregatorAdapterDataSchema = S.Struct({
   constructorArgs: FunctionArgs,
 });
 
-export type CLAggregatorAdapterData = S.Schema.Type<
-  typeof CLAggregatorAdapterDataSchema
->;
+export type CLAggregatorAdapterData = typeof CLAggregatorAdapterDataSchema.Type;
 
 const CoreContractsSchemaV1 = S.mutable(
   S.Struct({
@@ -37,7 +35,7 @@ const CoreContractsSchemaV1 = S.mutable(
   }),
 );
 
-export type CoreContractsV1 = S.Schema.Type<typeof CoreContractsSchemaV1>;
+export type CoreContractsV1 = typeof CoreContractsSchemaV1.Type;
 
 const CoreContractsSchemaV2 = S.mutable(
   S.Struct({
@@ -50,7 +48,7 @@ const CoreContractsSchemaV2 = S.mutable(
   }),
 );
 
-export type CoreContractsV2 = S.Schema.Type<typeof CoreContractsSchemaV2>;
+export type CoreContractsV2 = typeof CoreContractsSchemaV2.Type;
 
 const ContractsConfigSchemaV1 = S.mutable(
   S.Struct({
@@ -60,7 +58,7 @@ const ContractsConfigSchemaV1 = S.mutable(
   }),
 );
 
-export type ContractsConfigV1 = S.Schema.Type<typeof ContractsConfigSchemaV1>;
+export type ContractsConfigV1 = typeof ContractsConfigSchemaV1.Type;
 
 const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
@@ -71,7 +69,7 @@ const ContractsConfigSchemaV2 = S.mutable(
   }),
 );
 
-export type ContractsConfigV2 = S.Schema.Type<typeof ContractsConfigSchemaV2>;
+export type ContractsConfigV2 = typeof ContractsConfigSchemaV2.Type;
 
 export const DeploymentConfigSchemaV1 = S.mutable(
   S.Record({
@@ -85,7 +83,7 @@ export const DeploymentConfigSchemaV1 = S.mutable(
   }),
 );
 
-export type DeploymentConfigV1 = S.Schema.Type<typeof DeploymentConfigSchemaV1>;
+export type DeploymentConfigV1 = typeof DeploymentConfigSchemaV1.Type;
 
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
@@ -95,7 +93,7 @@ export const DeploymentConfigSchemaV2 = S.mutable(
   }),
 );
 
-export type DeploymentConfigV2 = S.Schema.Type<typeof DeploymentConfigSchemaV2>;
+export type DeploymentConfigV2 = typeof DeploymentConfigSchemaV2.Type;
 
 export const decodeDeploymentConfigV1 = S.decodeUnknownSync(
   DeploymentConfigSchemaV1,

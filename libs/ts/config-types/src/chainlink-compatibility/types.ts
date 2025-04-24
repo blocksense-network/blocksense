@@ -9,9 +9,7 @@ export const ChainlinkAggregatorsSchema = S.Record({
   value: S.UndefinedOr(ethereumAddress),
 }).annotations({ identifier: 'ChainlinkAggregators' });
 
-export type ChainlinkAggregators = S.Schema.Type<
-  typeof ChainlinkAggregatorsSchema
->;
+export type ChainlinkAggregators = typeof ChainlinkAggregatorsSchema.Type;
 
 export const ChainlinkCompatibilityDataSchema = S.Struct({
   base: S.NullOr(ethereumAddress),
@@ -19,9 +17,8 @@ export const ChainlinkCompatibilityDataSchema = S.Struct({
   chainlink_aggregators: ChainlinkAggregatorsSchema,
 }).annotations({ identifier: 'ChainlinkCompatibilityData' });
 
-export type ChainlinkCompatibilityData = S.Schema.Type<
-  typeof ChainlinkCompatibilityDataSchema
->;
+export type ChainlinkCompatibilityData =
+  typeof ChainlinkCompatibilityDataSchema.Type;
 
 export const BlocksenseFeedsCompatibilitySchema = S.Record({
   key: S.String,
@@ -32,27 +29,24 @@ export const BlocksenseFeedsCompatibilitySchema = S.Record({
   }),
 }).annotations({ identifier: 'BlocksenseFeedsCompatibility' });
 
-export type BlocksenseFeedsCompatibility = S.Schema.Type<
-  typeof BlocksenseFeedsCompatibilitySchema
->;
+export type BlocksenseFeedsCompatibility =
+  typeof BlocksenseFeedsCompatibilitySchema.Type;
 
 export const ChainlinkAddressToBlocksenseIdSchema = S.Record({
   key: S.String,
   value: S.NullishOr(S.Number),
 }).annotations({ identifier: 'ChainlinkAddressToBlocksenseId' });
 
-export type ChainlinkAddressToBlocksenseId = S.Schema.Type<
-  typeof ChainlinkAddressToBlocksenseIdSchema
->;
+export type ChainlinkAddressToBlocksenseId =
+  typeof ChainlinkAddressToBlocksenseIdSchema.Type;
 
 export const ChainlinkCompatibilityConfigSchema = S.Struct({
   blocksenseFeedsCompatibility: BlocksenseFeedsCompatibilitySchema,
   chainlinkAddressToBlocksenseId: ChainlinkAddressToBlocksenseIdSchema,
 }).annotations({ identifier: 'ChainlinkCompatibilityConfig' });
 
-export type ChainlinkCompatibilityConfig = S.Schema.Type<
-  typeof ChainlinkCompatibilityConfigSchema
->;
+export type ChainlinkCompatibilityConfig =
+  typeof ChainlinkCompatibilityConfigSchema.Type;
 
 export const decodeChainlinkCompatibilityConfig = S.decodeUnknownSync(
   ChainlinkCompatibilityConfigSchema,

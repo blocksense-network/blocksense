@@ -12,7 +12,7 @@ const MEXCAssetInfoSchema = S.mutable(
   }),
 );
 
-export type MEXCAssetInfo = S.Schema.Type<typeof MEXCAssetInfoSchema>;
+export type MEXCAssetInfo = typeof MEXCAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from MEXC Exchange.
@@ -29,7 +29,7 @@ export const MEXCInfoRespSchema = S.mutable(
   }),
 );
 
-export type MEXCInfoResp = S.Schema.Type<typeof MEXCInfoRespSchema>;
+export type MEXCInfoResp = typeof MEXCInfoRespSchema.Type;
 
 export const MEXCPriceSchema = S.Array(
   S.mutable(
@@ -40,4 +40,4 @@ export const MEXCPriceSchema = S.Array(
   ),
 );
 
-export type MEXCPrice = S.Schema.Type<typeof MEXCPriceSchema>;
+export type MEXCPrice = typeof MEXCPriceSchema.Type;
