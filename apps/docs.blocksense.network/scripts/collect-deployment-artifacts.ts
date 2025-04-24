@@ -14,7 +14,7 @@ export async function collectDeploymentData() {
   );
 
   const deploymentFiles = await Promise.all(
-    networks.map(async net => await readEvmDeployment(net)),
+    networks.map(async net => await readEvmDeployment(net, true)),
   );
 
   const { writeJSON } = selectDirectory(artifactsFolder);

@@ -31,4 +31,15 @@ describe('Configuration files decoding', async () => {
       expect(() => readEvmDeployment(net)).not.toThrow();
     }
   });
+
+  test('should return null when network deployment is missing', async () => {
+    const result = await readEvmDeployment('nonExistentNetwork' as any);
+    expect(result).toBeNull();
+  });
+
+  test('should throw when network deployment is missing and throwOnError is true', async () => {
+    await expect(
+      readEvmDeployment('nonExistentNetwork' as any, true),
+    ).rejects.toThrow();
+  });
 });

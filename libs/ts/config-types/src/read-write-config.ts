@@ -36,11 +36,26 @@ export function writeConfig<Name extends ConfigFileName>(
   return writeJSON({ name: configName, content });
 }
 
-export function readEvmDeployment(network: NetworkName) {
+export function readEvmDeployment(
+  network: NetworkName,
+  throwIfNotFound?: false,
+): Promise<DeploymentConfigV2 | null>;
+export function readEvmDeployment(
+  network: NetworkName,
+  throwIfNotFound: true,
+): Promise<DeploymentConfigV2>;
+export function readEvmDeployment(
+  network: NetworkName,
+  throwIfNotFound = false,
+): Promise<DeploymentConfigV2 | null> {
   const { decodeJSON } = selectDirectory(
     configDirs.evm_contracts_deployment_v2,
   );
-  return decodeJSON({ name: network }, DeploymentConfigSchemaV2);
+  return decodeJSON({ name: network }, DeploymentConfigSchemaV2).catch(err =>
+    throwIfNotFound || !err.message.includes('ENOENT')
+      ? Promise.reject(err)
+      : null,
+  );
 }
 
 export function writeEvmDeployment(
