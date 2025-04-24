@@ -30,7 +30,7 @@ task(
     return;
   }
 
-  const { contracts: deployment } = await readEvmDeployment(network);
+  const { contracts: deployment } = await readEvmDeployment(network, true);
 
   const adminMultisig = await Safe.init({
     provider: config.rpc,
