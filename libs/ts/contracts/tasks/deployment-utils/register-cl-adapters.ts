@@ -26,6 +26,7 @@ task(
 
   // The difference between setting n and n+1 feeds via CLFeedRegistryAdapter::setFeeds is slightly above 55k gas.
   console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
+  console.log('------------------------------------------------------------');
 
   const signer = config.adminMultisig.signer || config.ledgerAccount!;
 
@@ -43,7 +44,7 @@ task(
 
   for (const data of aggregatorData) {
     if (!data.base || !data.quote) {
-      console.log(` -> Feed '${data.description}' has no base or quote`);
+      console.log(` -> Feed '${data.description}' has no base or quote`, '\n');
       continue;
     }
 
@@ -55,11 +56,15 @@ task(
     if (feed === ethers.ZeroAddress) {
       filteredData.push(data);
     } else {
-      console.log(` -> Feed '${data.description}' already registered`, {
-        base: data.base,
-        quote: data.quote,
-        feed,
-      });
+      console.log(
+        ` -> Feed '${data.description}' already registered`,
+        {
+          base: data.base,
+          quote: data.quote,
+          feed,
+        },
+        '\n',
+      );
     }
   }
   for (let i = 0; i < filteredData.length; i += BATCH_LENGTH) {
@@ -80,6 +85,10 @@ task(
       ]),
       operation: OperationType.Call,
     };
+
+    console.log(
+      `Registering ${batch.length} CLAggregatorAdapters in CLFeedRegistryAdapter`,
+    );
 
     await run('multisig-tx-exec', {
       transactions: [safeTransactionData],
