@@ -1,3 +1,4 @@
+mod consensus_second_round;
 mod custom_serde;
 
 use clap::Args;
@@ -23,15 +24,9 @@ use tokio::{
         RwLock,
     },
     task::{spawn, Builder, JoinHandle},
-    time::{sleep, Duration},
 };
 use tracing::Instrument;
 use url::Url;
-
-use rdkafka::config::ClientConfig;
-use rdkafka::consumer::{Consumer, StreamConsumer};
-use rdkafka::Message;
-use tokio_stream::StreamExt;
 
 use outbound_http::OutboundHttpComponent;
 use spin_app::MetadataKey;
@@ -53,7 +48,6 @@ use blocksense_feed_registry::{
     registry::SlotTimeTracker,
     types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData, Repeatability},
 };
-use blocksense_feeds_processing::utils::validate;
 use blocksense_metrics::{
     actix_server::handle_prometheus_metrics,
     metrics::{
@@ -64,11 +58,6 @@ use blocksense_metrics::{
 };
 use blocksense_utils::time::current_unix_time;
 
-use blocksense_gnosis_safe::{
-    data_types::{ConsensusSecondRoundBatch, ReporterResponse},
-    utils::{bytes_to_hex_string, create_private_key_signer, hex_str_to_bytes32, sign_hash},
-};
-
 wasmtime::component::bindgen!({
     path: "../../libs/sdk/wit",
     world: "blocksense-oracle",
@@ -77,12 +66,11 @@ wasmtime::component::bindgen!({
 
 use blocksense::oracle::oracle_types as oracle;
 
+use crate::consensus_second_round::start_second_consensus_tasks;
+
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
 type DataFeedResults = Arc<RwLock<HashMap<u32, VotedFeedUpdate>>>;
-
-const TIME_BEFORE_KAFKA_READ_RETRY_IN_MS: u64 = 500;
-const TOTAL_RETRIES_FOR_KAFKA_READ: u64 = 10;
 
 #[derive(Args)]
 pub struct CliArgs {
@@ -839,194 +827,6 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
             wasmtime_wasi::runtime::spawn(response_handle),
         ))
     }
-}
-
-fn start_second_consensus_tasks(
-    reporter_id: u64,
-    kafka_endpoint: String,
-    sequencer_url: &Url,
-    second_consensus_secret_key: String,
-    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
-    latest_votes: DataFeedResults,
-) -> anyhow::Result<Vec<JoinHandle<TerminationReason>>> {
-    let (aggregated_consensus_sender, aggregated_consensus_receiver) = unbounded_channel();
-
-    let futures = vec![
-        tokio::spawn(signal_secondary_signature(
-            kafka_endpoint,
-            aggregated_consensus_sender,
-        )),
-        tokio::spawn(process_aggregated_consensus(
-            aggregated_consensus_receiver,
-            feeds_config,
-            latest_votes,
-            sequencer_url.join("/post_aggregated_consensus_vote")?,
-            second_consensus_secret_key,
-            reporter_id,
-        )),
-    ];
-
-    Ok(futures)
-}
-
-async fn process_aggregated_consensus(
-    mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
-    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
-    latest_votes: DataFeedResults,
-    sequencer: Url,
-    second_consensus_secret_key: String,
-    reporter_id: u64,
-) -> TerminationReason {
-    while let Some(aggregated_consensus) = ss_rx.recv().await {
-        let signer = create_private_key_signer(&second_consensus_secret_key);
-
-        let tx = match hex_str_to_bytes32(aggregated_consensus.tx_hash.as_str()) {
-            Ok(t) => t,
-            Err(e) => {
-                tracing::error!("Failed to parse str to bytes on second consensus: {}", &e);
-                continue;
-            }
-        };
-
-        let block_height = aggregated_consensus.block_height;
-        let network = aggregated_consensus.network.clone();
-
-        match validate(
-            feeds_config.clone(),
-            aggregated_consensus,
-            latest_votes.read().await.clone(),
-            HashMap::new(),
-        )
-        .await
-        {
-            Ok(_) => {
-                tracing::info!("Validated batch to post to contract: block_height={block_height}");
-            }
-            Err(e) => {
-                tracing::error!(
-                    "Failed to validate second consensus for block_height={block_height}: {}",
-                    &e
-                );
-                continue;
-            }
-        };
-
-        let signed = match sign_hash(&signer, &tx).await {
-            Ok(s) => s,
-            Err(e) => {
-                tracing::error!("Failed to sign hash on second consensus: {}", &e);
-                continue;
-            }
-        };
-
-        let signature = bytes_to_hex_string(signed.signature);
-        let report = ReporterResponse {
-            block_height,
-            reporter_id,
-            network,
-            signature,
-        };
-
-        tracing::trace!("Sending to url - {}; {:?} hash", sequencer.clone(), &report);
-
-        let client = reqwest::Client::new();
-        match client.post(sequencer.clone()).json(&report).send().await {
-            Ok(res) => {
-                let contents = res.text().await.unwrap();
-                tracing::trace!("Sequencer responded with: {}", &contents);
-            }
-            Err(e) => {
-                //TODO(adikov): Add code from the error - e.status()
-                REPORTER_FAILED_SEQ_REQUESTS
-                    .with_label_values(&["404"])
-                    .inc();
-
-                tracing::error!("Sequencer failed to respond with: {}", &e);
-            }
-        };
-    }
-    TerminationReason::SequencerExitRequested
-}
-
-async fn signal_secondary_signature(
-    kafka_report_endpoint: String,
-    signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
-) -> TerminationReason {
-    // Configure the Kafka consumer
-    let consumer: StreamConsumer = match ClientConfig::new()
-        .set("bootstrap.servers", kafka_report_endpoint)
-        .set("group.id", "no_commit_group") // Consumer group ID
-        .set("enable.auto.commit", "false") // Disable auto-commit
-        .set("auto.offset.reset", "latest") // Start from latest always
-        .set("socket.timeout.ms", "300000")
-        .set("session.timeout.ms", "400000")
-        .set("max.poll.interval.ms", "500000")
-        .create()
-    {
-        Ok(consumer) => consumer,
-        Err(err) => {
-            tracing::error!("Error while creating kafka consumer: {:?}", err);
-            return TerminationReason::Other(format!(
-                "Error while creating kafka consumer: {:?}",
-                err
-            ));
-        }
-    };
-
-    // Subscribe to the desired topic(s)
-    if let Err(err) = consumer.subscribe(&["aggregation_consensus"]) {
-        return TerminationReason::Other(format!(
-            "Error while subscribing to kafka topic: {:?}",
-            err
-        ));
-    };
-
-    // Asynchronously process messages using a stream
-    let mut message_stream = consumer.stream();
-    let mut total_err_messages = 0;
-
-    while let Some(message_result) = message_stream.next().await {
-        match message_result {
-            Ok(message) => {
-                total_err_messages = 0;
-                let payload: ConsensusSecondRoundBatch = match message.payload() {
-                    None => {
-                        tracing::warn!("kafka None message received");
-                        continue;
-                    }
-                    Some(bytes) => match serde_json::from_slice(bytes) {
-                        Ok(r) => r,
-                        Err(err) => {
-                            tracing::error!("Error while parsing the message: {:?}", err);
-                            continue;
-                        }
-                    },
-                };
-                tracing::debug!("kafka message received - {:?}", payload);
-
-                match signal_sender.send(payload) {
-                    Ok(_) => {
-                        continue;
-                    }
-                    Err(_) => {
-                        break;
-                    }
-                };
-            }
-            Err(err) => {
-                // Handle message errors
-                tracing::error!("Error while consuming: {:?}", err);
-                total_err_messages += 1;
-                if total_err_messages >= TOTAL_RETRIES_FOR_KAFKA_READ {
-                    return TerminationReason::Other(format!("Error while consuming: {:?}", err));
-                }
-                let _ = sleep(Duration::from_millis(TIME_BEFORE_KAFKA_READ_RETRY_IN_MS)).await;
-                continue;
-            }
-        }
-    }
-
-    TerminationReason::Other("Signal secondary consensus loop terminated".to_string())
 }
 
 fn update_latest_votes(
