@@ -21,7 +21,6 @@ use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 use blocksense_config::{
     AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig, ADFS_CONTRACT_NAME,
     HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
-    SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
 };
 
 use blocksense_data_feeds::feeds_processing::{
@@ -164,12 +163,12 @@ async fn get_rpc_providers(
             &provider_metrics,
             feeds_config,
         );
-        rpc_provider
-            .log_if_contract_exists(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+
+        for c in &rpc_provider.contracts {
+            rpc_provider
+            .log_if_contract_exists(&c.name)
             .await;
-        rpc_provider
-            .log_if_contract_exists(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
-            .await;
+        }
 
         let rpc_provider = Arc::new(Mutex::new(rpc_provider));
 
@@ -273,11 +272,7 @@ impl RpcProvider {
     pub fn prepare_contracts(p: &blocksense_config::Provider) -> Result<Vec<Contract>> {
         let mut res = vec![];
         for config in &p.contracts {
-            let mut contract = Contract::new(config)?;
-            if config.name == MULTICALL_CONTRACT_NAME {
-                contract.byte_code = Some(Multicall::BYTECODE.to_vec());
-            }
-            res.push(contract);
+            res.push(Contract::new(config)?);
         }
         Ok(res)
     }
@@ -403,6 +398,7 @@ impl RpcProvider {
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
         let data_feed = self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
+        //let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
         let contract = MulticallInstance::new(multicall, self.provider.clone());
         let calldata: Vec<Multicall::Call> = feed_ids
             .iter()
@@ -432,6 +428,7 @@ impl RpcProvider {
         }
 
         let aggregate_return = contract.aggregate(calldata).call().await?;
+
         let res = aggregate_return
             .returnData
             .into_iter()
@@ -579,6 +576,15 @@ impl RpcProvider {
             .map(|r| r.is_ok_and(|bytecode| bytecode.to_string() != "0x"))
     }
 
+    pub async fn read_contract_bytecode(
+        &self,
+        addr: &Address,
+        timeout_duration: Duration,
+    ) -> Result<Bytes> {
+        Ok(actix_web::rt::time::timeout(timeout_duration, self.provider.get_code_at(*addr))
+            .await??)
+    }
+
     pub fn url(&self) -> Url {
         self.rpc_url.clone()
     }
@@ -587,23 +593,26 @@ impl RpcProvider {
         let address = self.get_contract_address(contract_name).ok();
         let network = self.network.as_str();
         if let Some(addr) = address {
-            info!("Contract {contract_name} for network {network} address set to {addr}. Checking if contract exists ...");
-
             let result = self
-                .can_read_contract_bytecode(&addr, Duration::from_secs(5))
+                .read_contract_bytecode(&addr, Duration::from_secs(5))
                 .await;
             match result {
-                Ok(exists) => {
+                Ok(byte_code) => {
+                    let exists = byte_code.len() > 0;
                     if exists {
-                        info!(
-                            "Contract for network {} exists on address {}",
-                            network, addr
-                        );
+                        if let Some(expected_byte_code) = self.get_contract(contract_name).and_then(|x| x.byte_code) {
+                            let a = byte_code.0.to_vec();
+                            let same_byte_code = expected_byte_code.eq(&a);
+                            if same_byte_code {
+                                info!("Contract {contract_name} exists in network {network} on {addr} matching byte code!");
+                            } else {
+                                warn!("Contract {contract_name} exists in network {network} on {addr} but bytecode differs! Found {byte_code:?} expected {expected_byte_code:?}");
+                            }
+                        } else {
+                            warn!("Contract {contract_name} exists in network {network} on {addr} and reference code provided");
+                        }
                     } else {
-                        warn!(
-                            "No contract for network {} exists on address {}",
-                            network, addr
-                        );
+                        warn!("Contract {contract_name} not found in network {network} on {addr}");
                     }
                 }
                 Err(e) => {
@@ -611,7 +620,7 @@ impl RpcProvider {
                 }
             };
         } else {
-            warn!("No contract address set for network {}", network);
+            warn!("Contract {contract_name} no address set for network {network}");
         }
     }
 
@@ -690,11 +699,12 @@ mod tests {
     };
     use alloy_primitives::address;
     use blocksense_utils::test_env::get_test_private_key_path;
+    use tracing::info_span;
 
     use crate::providers::provider::get_rpc_providers;
     use alloy::consensus::Transaction;
     use alloy::providers::Provider as AlloyProvider;
-    use blocksense_config::get_test_config_with_single_provider;
+    use blocksense_config::{get_test_config_with_single_provider, test_feed_config};
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
@@ -803,5 +813,66 @@ mod tests {
 
         // assert
         assert_eq!(result.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn fork_test_provider() -> Result<()> {
+        let span = info_span!("fork_test_provider");
+        let _guard = span.enter();
+
+        let network = "ETH";
+        let fork_url = "https://rpc-gel-sepolia.inkonchain.com";
+        let anvil = Anvil::new().fork(fork_url).try_spawn()?;
+        let key_path = get_test_private_key_path();
+
+        let cfg =
+            get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
+        //let feeds_config = AllFeedsConfig { feeds: vec![] };
+        let feed_1_config = test_feed_config(31, 8);
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![feed_1_config],
+        };
+        let providers = get_rpc_providers(&cfg, "fork_test_provider_", &feeds_config).await;
+        {
+            let rpc_provider_guard = providers.get(network).unwrap().lock().await;
+            let block_number = rpc_provider_guard
+                .provider
+                .get_block_number()
+                .await
+                .unwrap();
+            //println!("Block number from provider = {number}");
+            let block_num_at_time_of_writing_this_test = 16500374_u64;
+            assert!(block_number > block_num_at_time_of_writing_this_test);
+            let last_updates = rpc_provider_guard.get_latest_values(&[31]).await.unwrap();
+            println!("last update on chain {last_updates:?}");
+        }
+
+        // let alice = anvil.addresses()[7];
+        // let bob = anvil.addresses()[0];
+
+        // let tx = TransactionRequest::default()
+        //     .with_from(alice)
+        //     .with_to(bob)
+        //     .with_value(U256::from(100))
+        //     // It is required to set the chain_id for EIP-1559 transactions.
+        //     .with_chain_id(anvil.chain_id());
+
+        // // Send the transaction, the nonce (0) is automatically managed by the provider.
+        // let builder = provider.send_transaction(tx.clone()).await?;
+        // let node_hash = *builder.tx_hash();
+        // let pending_tx = provider.get_transaction_by_hash(node_hash).await?.unwrap();
+        // assert_eq!(pending_tx.nonce(), 0);
+
+        // println!("Transaction sent with nonce: {}", pending_tx.nonce());
+
+        // // Send the transaction, the nonce (1) is automatically managed by the provider.
+        // let tx = provider.send_transaction(tx).await?;
+
+        // let receipt = tx.get_receipt().await.unwrap();
+
+        // assert_eq!(receipt.effective_gas_price, 875_175_001);
+        // assert_eq!(receipt.gas_used, 21000);
+
+        Ok(())
     }
 }

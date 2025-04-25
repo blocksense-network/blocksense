@@ -178,6 +178,12 @@ impl PublishedFeedUpdate {
         digits_in_fraction: usize,
         data: &[u8],
     ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+        if data.len() == 0 {
+            return Err(PublishedFeedUpdate::error(
+                feed_id,
+                "Data shows no published updates on chain",
+            ));
+        }
         if data.len() != 64 {
             return Err(PublishedFeedUpdate::error(
                 feed_id,
