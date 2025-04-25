@@ -3,10 +3,9 @@ use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -25,7 +24,7 @@ pub struct UpBitPriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
     const NAME: &'static str = "UpBit";
 
-    fn new(symbols: &'a [String]) -> Self {
+    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
         Self { symbols }
     }
 
@@ -35,6 +34,7 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
             let response = http_get_json::<UpBitResponse>(
                 "https://api.upbit.com/v1/ticker",
                 Some(&[("markets", all_markets.as_str())]),
+                None,
             )
             .await?;
 

@@ -165,7 +165,7 @@ export abstract class CLBaseWrapper {
 
   public getParsedData(data: string): any {
     const value = data.slice(0, 50).padEnd(66, '0');
-    const timestamp = BigInt('0x' + data.slice(50, 66));
+    const timestamp = BigInt('0x' + data.slice(50, 66)) / 1000n;
     const decimal = BigInt(data.slice(0, 50));
 
     return { value, timestamp, decimal };

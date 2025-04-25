@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: Copyright (c) 2024-2025 Schelling Point Labs Inc.
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 //    ___  __         __                           _  __    __                  __
 //   / _ )/ /__  ____/ /__ ___ ___ ___  ___ ___   / |/ /__ / /__    _____  ____/ /__
@@ -75,11 +75,8 @@ contract UpgradeableProxyADFS {
 
   /// @notice Construct the UpgradeableProxy contract
   /// @param owner The address of the admin
-  /// @param logic The address of the initial implementation
-  /// @param data The data to be passed to the implementation
-  constructor(address owner, address logic, bytes memory data) payable {
+  constructor(address owner) payable {
     _setAdmin(owner);
-    _upgradeToAndCall(logic, data);
   }
 
   /// @notice Fallback function
@@ -100,7 +97,9 @@ contract UpgradeableProxyADFS {
   /// Note: The 0x00 prefix in the calldata helps avoid clashes in ADFS' custom
   /// function selector.
   fallback() external payable {
-    if (msg.sig == UPGRADE_TO_AND_CALL_SELECTOR || msg.sig == SET_ADMIN_SELECTOR) {
+    if (
+      msg.sig == UPGRADE_TO_AND_CALL_SELECTOR || msg.sig == SET_ADMIN_SELECTOR
+    ) {
       bool isAdmin;
 
       assembly {

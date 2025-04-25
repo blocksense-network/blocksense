@@ -19,9 +19,6 @@ let
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
 {
-  services.kafka = {
-    enable = true;
-  };
   services.blocksense = {
     enable = true;
 
@@ -41,18 +38,18 @@ in
     };
 
     sequencer = {
-      sequencer-id = 1;
-      main-port = 9856;
-      admin-port = 5553;
-      metrics-port = 5551;
+      id = 1;
+
+      ports = {
+        main = 9856;
+        admin = 5553;
+        metrics = 5551;
+      };
 
       block-config = {
-        max_feed_updates_to_batch = 300;
-        block_generation_period = 500;
-        genesis_block_timestamp = {
-          secs_since_epoch = 1;
-          nanos_since_epoch = 1;
-        };
+        max-feed-updates-to-batch = 300;
+        block-generation-period = 500;
+        genesis-block-timestamp-ms = 0;
       };
 
       providers = {
@@ -61,10 +58,10 @@ in
           # self-contained.
           # In a production environment, use a secret manager like Agenix, to
           # prevent secrets from being copyed to the Nix Store.
-          private_key_path = "${testKeysDir}/sequencer-private-key";
-          contract_address = upgradeableProxyContractAddressSepolia;
-          impersonated_anvil_account = impersonationAddress;
-          allow_feeds = [
+          private-key-path = "${testKeysDir}/sequencer-private-key";
+          contract-address = upgradeableProxyContractAddressSepolia;
+          impersonated-anvil-account = impersonationAddress;
+          allow-feeds = [
             0 # BTC / USD
             3 # ETH / USD
             7 # USDT / USD
@@ -82,50 +79,49 @@ in
             100000 # ExSat BTC
             1000000 # WMON 0.2% / USDT
           ];
-          publishing_criteria = [
+          publishing-criteria = [
             {
-              feed_id = 0;
-              skip_publish_if_less_then_percentage = 0.001;
-              always_publish_heartbeat_ms = 50000; # This might be ignored in favor of the value from the feed config
+              feed-id = 0;
+              skip-publish-if-less-then-percentage = 0.001;
+              always-publish-heartbeat-ms = 50000; # This might be ignored in favor of the value from the feed config
             }
             {
-              feed_id = 3;
-              skip_publish_if_less_then_percentage = 0.1;
-              always_publish_heartbeat_ms = 360000;
+              feed-id = 3;
+              skip-publish-if-less-then-percentage = 0.1;
+              always-publish-heartbeat-ms = 360000;
             }
             {
-              feed_id = 50000;
-              skip_publish_if_less_then_percentage = 0.5;
-              always_publish_heartbeat_ms = 360000;
-              peg_to_value = 1.00;
-              peg_tolerance_percentage = 0.1;
+              feed-id = 50000;
+              skip-publish-if-less-then-percentage = 0.5;
+              always-publish-heartbeat-ms = 360000;
+              peg-to-value = 1.00;
+              peg-tolerance-percentage = 0.1;
             }
             {
-              feed_id = 50001;
-              skip_publish_if_less_then_percentage = 0.1;
-              always_publish_heartbeat_ms = 360000;
-              peg_to_value = 1.00;
-              peg_tolerance_percentage = 0.2;
+              feed-id = 50001;
+              skip-publish-if-less-then-percentage = 0.1;
+              always-publish-heartbeat-ms = 360000;
+              peg-to-value = 1.00;
+              peg-tolerance-percentage = 0.2;
             }
           ];
         };
         ink-sepolia = {
-          private_key_path = "${testKeysDir}/sequencer-private-key";
-          contract_address = upgradeableProxyADFSContractAddressInk;
-          contract_version = 2;
-          transaction_gas_limit = 20000000;
-          impersonated_anvil_account = impersonationAddress;
+          private-key-path = "${testKeysDir}/sequencer-private-key";
+          contract-address = upgradeableProxyADFSContractAddressInk;
+          safe-address = "0x23BC561ea93063B0cD12b6E3c690D40c93e29692";
+          contract-version = 2;
+          transaction-gas-limit = 20000000;
+          impersonated-anvil-account = impersonationAddress;
         };
       };
 
-      kafka-report-endpoint = {
-        url = null;
-      };
+      kafka-report-endpoint = null;
 
-      reporters = [
+      whitelisted-reporters = [
         {
           id = 0;
-          pub_key = "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e";
+          pub-key = "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e";
           address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
         }
       ];
@@ -135,21 +131,17 @@ in
 
     reporters = {
       a = {
-        reporter-info = {
-          reporter_id = 0;
-          interval_time_in_seconds = 30;
-          secret_key = "${testKeysDir}/reporter_secret_key";
-        };
+        id = 0;
+        default-exec-interval = 30;
+        secret-key-path = "${testKeysDir}/reporter_secret_key";
         api-keys = { };
       };
     };
 
     oracles = {
       crypto-price-feeds = {
-        oracle_script_wasm = "crypto_price_feeds.wasm";
-        interval_time_in_seconds = 40;
-        capabilities = [ ];
-        allowed_outbound_hosts = [
+        exec-interval = 40;
+        allowed-outbound-hosts = [
           "https://api.kraken.com"
           "https://api.bybit.com"
           "https://api.coinbase.com"
@@ -169,10 +161,8 @@ in
       };
 
       exsat-holdings = {
-        oracle_script_wasm = "exsat_holdings.wasm";
-        interval_time_in_seconds = 300;
-        capabilities = [ ];
-        allowed_outbound_hosts = [
+        exec-interval = 300;
+        allowed-outbound-hosts = [
           "https://raw.githubusercontent.com"
           "https://rpc-us.exsat.network"
           "https://blockchain.info"
@@ -181,12 +171,23 @@ in
       };
 
       gecko-terminal = {
-        oracle_script_wasm = "gecko_terminal.wasm";
-        interval_time_in_seconds = 10;
-        capabilities = [ ];
-        allowed_outbound_hosts = [
-          "https://app.geckoterminal.com"
+        exec-interval = 10;
+        allowed-outbound-hosts = [
+          "https://api.geckoterminal.com"
         ];
+      };
+
+      eth-rpc = {
+        exec-interval = 10;
+        allowed-outbound-hosts = [
+          "https://eth.llamarpc.com"
+          "https://rpc.eth.gateway.fm"
+        ];
+      };
+
+      stock-price-feeds = {
+        exec-interval = 60;
+        allowed-outbound-hosts = [ ];
       };
     };
   };

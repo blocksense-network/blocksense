@@ -1,13 +1,13 @@
 use anyhow::anyhow;
-use config::PublishCriteria;
-use feed_registry::registry::FeedAggregateHistory;
-use feed_registry::types::DataFeedPayload;
-use feed_registry::types::FeedType;
-use feed_registry::types::Timestamp;
+use blocksense_config::PublishCriteria;
+use blocksense_feed_registry::{
+    registry::FeedAggregateHistory,
+    types::{DataFeedPayload, FeedType, Timestamp},
+};
+use blocksense_utils::from_hex_string;
 use log::error;
 use serde::Deserialize;
 use serde::Serialize;
-use utils::from_hex_string;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotedFeedUpdate {
@@ -29,12 +29,12 @@ pub enum DontSkipReason {
     NoHistory,
     NonNumericalFeed,
     OneShotFeed,
+    HistoryError,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum DoSkipReason {
     TooSimilarTooSoon, // threshold not crossed and heartbeat not timed out
-    UnexpectedError(String),
     NothingToPost,
 }
 
@@ -117,9 +117,7 @@ impl VotedFeedUpdate {
                     }
                     _ => {
                         error!("History for numerical feed with id {feed_id} contains a non-numerical update {:?}.", last_published.value);
-                        SkipDecision::DoSkip(DoSkipReason::UnexpectedError(
-                            "history for numerical feed contains non-numerical data".to_owned(),
-                        ))
+                        SkipDecision::DontSkip(DontSkipReason::HistoryError)
                     }
                 },
                 None => SkipDecision::DontSkip(DontSkipReason::NoHistory),
@@ -245,10 +243,10 @@ impl PublishedFeedUpdate {
 
 #[cfg(test)]
 mod tests {
+    use blocksense_utils::to_hex_string;
     use std::time::SystemTime;
-    use utils::to_hex_string;
 
-    use feed_registry::types::FeedType;
+    use blocksense_feed_registry::types::FeedType;
 
     use super::*;
 
@@ -421,6 +419,16 @@ mod tests {
         assert_eq!(
             update.should_skip(&one_percent_threshold, &history),
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
+        );
+
+        history.push_next(
+            feed_id,
+            FeedType::Text("spiderman".to_owned()),
+            end_slot_timestamp - 400_u128,
+        );
+        assert_eq!(
+            update.should_skip(&one_percent_threshold, &history),
+            SkipDecision::DontSkip(DontSkipReason::HistoryError)
         );
     }
 

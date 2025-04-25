@@ -8,9 +8,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuCheckboxItem,
 } from '@blocksense/ui/DropdownMenu';
+import { Separator } from '@blocksense/ui';
 import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
 
 import { DataTableContext } from './DataTableContext';
@@ -39,7 +39,7 @@ export function DataTableViewOptions() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[12rem]">
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <Separator className="dropdown-menu__separator my-1" />
         {Object.keys(columnVisibility).map(col => (
           <DropdownMenuCheckboxItem
             key={col}

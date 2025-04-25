@@ -1,6 +1,6 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { entries } from '@blocksense/base-utils/array-iter';
-import { ExchangeAssetsFetcher, AssetInfo } from '../../../exchange-assets';
+import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
 import {
   KrakenAssetInfo,
   KrakenAssetPairsResp,

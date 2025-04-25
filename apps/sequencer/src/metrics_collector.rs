@@ -1,5 +1,5 @@
 use actix_web::rt::time;
-use prometheus::metrics_collector::gather_and_dump_metrics;
+use blocksense_metrics::metrics_collector::gather_and_dump_metrics;
 use std::io::Error;
 use tokio::time::Duration;
 

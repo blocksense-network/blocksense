@@ -4,8 +4,11 @@ import { BlocksenseADFSConsumer, RawCallADFSConsumer } from '../../typechain';
 import * as utils from './utils/feedStoreConsumer';
 import { expect } from 'chai';
 import { ADFSWrapper } from '../utils/wrappers';
+import { encodeDataAndTimestamp } from '../utils/helpers/common';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { Feed } from '../utils/wrappers/types';
 
-const feeds = [
+const feeds: Feed[] = [
   {
     id: 1n,
     round: 1n,
@@ -30,11 +33,13 @@ describe('Example: ADFSConsumer', function () {
   let dataFeedStore: ADFSWrapper;
   let blocksenseADFSConsumer: BlocksenseADFSConsumer;
   let rawCallADFSConsumer: RawCallADFSConsumer;
+  let sequencer: HardhatEthersSigner;
+
   const key = 1;
   const round = 1n;
 
   beforeEach(async function () {
-    const sequencer = (await ethers.getSigners())[0];
+    sequencer = (await ethers.getSigners())[0];
     const accessControlOwner = (await ethers.getSigners())[1];
 
     dataFeedStore = new ADFSWrapper();
@@ -139,6 +144,38 @@ describe('Example: ADFSConsumer', function () {
       await getAndCompareData([feed.stride, feed.id], 'getLatestRound');
     });
   }
+
+  it('Should get latest timestamp in seconds', async function () {
+    const timestampNow = Date.now();
+    const feedData = encodeDataAndTimestamp(1234, timestampNow);
+    const feed = {
+      id: 1n,
+      round: 1n,
+      stride: 0n,
+      data: feedData,
+    };
+    await dataFeedStore.setFeeds(sequencer, [feed]);
+
+    const timestamp = await blocksenseADFSConsumer.getEpochSeconds(feed.id);
+    expect(timestamp).to.be.equal(Math.floor(timestampNow / 1000));
+  });
+
+  it('Should get latest timestamp in milliseconds', async function () {
+    const timestampNow = Date.now();
+    const feedData = encodeDataAndTimestamp(1234, timestampNow);
+    const feed = {
+      id: 1n,
+      round: 1n,
+      stride: 0n,
+      data: feedData,
+    };
+    await dataFeedStore.setFeeds(sequencer, [feed]);
+
+    const timestamp = await blocksenseADFSConsumer.getEpochMilliseconds(
+      feed.id,
+    );
+    expect(timestamp).to.be.equal(timestampNow);
+  });
 
   const getAndCompareData = async (
     data: any[],

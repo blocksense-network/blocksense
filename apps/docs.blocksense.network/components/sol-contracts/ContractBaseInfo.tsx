@@ -13,7 +13,7 @@ export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
   return (
     <>
       <AnchorLinkTitle title={contract.name} titleLevel={2} />
-      <div className="contract-base-info border-solid border border-slate-200 bg-white shadow-md px-2 py-2 md:px-4 md:pt-4 pb-0 rounded-md mt-6 mb-6 flex flex-col xl:flex-row items-start dark:bg-neutral-900 dark:border-neutral-600">
+      <div className="contract-base-info border-solid border border-slate-200 bg-white shadow-md px-2 py-2 md:px-4 md:pt-4 pb-0 rounded-md mt-6 mb-6 flex flex-col xl:flex-row items-start dark:border-neutral-600">
         <section className="contract-base-info__content w-full">
           <header className="contract-base-info__header px-2 py-2 flex [@media(max-width:1024px)]:flex-col items-start mb-3  xl:flex-row xl:justify-between xl:items-center">
             <h2 className="contract-base-info__base-contracts-title text-2xl mr-2 font-semibold text-gray-800 dark:text-white">

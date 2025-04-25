@@ -30,6 +30,7 @@ mark {
 
 .nextra-navbar {
   z-index: 40;
+  padding-top: 3px;
 }
 
 .nextra-navbar-blur {
@@ -37,7 +38,7 @@ mark {
 }
 
 .nextra-search input {
-  @apply bg-white border border-solid border-neutral-200 dark:bg-neutral-900 dark:border-neutral-600;
+  @apply bg-white border border-solid border-neutral-200;
 }
 
 .nextra-search-results {

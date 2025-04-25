@@ -4,10 +4,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -26,7 +25,7 @@ pub struct GateIoPriceFetcher;
 impl PricesFetcher<'_> for GateIoPriceFetcher {
     const NAME: &'static str = "Gate.io";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 
@@ -34,6 +33,7 @@ impl PricesFetcher<'_> for GateIoPriceFetcher {
         async {
             let response = http_get_json::<GateIoPriceResponse>(
                 "https://api.gateio.ws/api/v4/spot/tickers",
+                None,
                 None,
             )
             .await?;

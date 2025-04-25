@@ -10,7 +10,7 @@ import { updatePageMapWithContractsRefDoc } from '@/src/pageMap';
 export const metadata: Metadata = {
   description:
     'Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes.',
-  metadataBase: new URL('https://blocksense.network/'),
+  metadataBase: new URL('https://docs.blocksense.network/'),
   keywords: [
     'Blocksense',
     'ZK rollup',
@@ -30,16 +30,35 @@ export const metadata: Metadata = {
     absolute: '',
     template: '%s',
   },
+  openGraph: {
+    title: 'Blocksense Network',
+    url: 'https://docs.blocksense.network',
+    images: [
+      {
+        url: '/images/blocksense_og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Blocksense OG Image',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    images: ['/images/blocksense_og.png'],
+    site: 'https://x.com/blocksense_',
+  },
   icons: {
     icon: [
       {
+        rel: 'icon',
         media: '(prefers-color-scheme: dark)',
-        url: '/images/blocksense-favicon.png',
+        url: '/images/blocksense-favicon-dark.png',
         type: 'image/png',
       },
       {
+        rel: 'icon',
         media: '(prefers-color-scheme: light)',
-        url: '/images/blocksense-favicon.png',
+        url: '/images/blocksense-favicon-light.png',
         type: 'image/png',
       },
     ],
@@ -47,15 +66,14 @@ export const metadata: Metadata = {
   other: {
     'msapplication-TileColor': '#fff',
   },
-  twitter: {
-    site: 'https://x.com/blocksense_',
-  },
 };
 
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
   const navbar = (
     <Navbar
-      logo={<span>blocksense</span>}
+      logo={
+        <div className="bg-[url('/images/blocksense-logo__dark.png')] dark:bg-[url('/images/blocksense-logo__light.png')] h-[29.89px] w-[142px] bg-contain bg-no-repeat" />
+      }
       projectLink="https://github.com/blocksense-network/blocksense"
     />
   );
@@ -72,9 +90,9 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
         />
         <meta
           property="og:description"
-          content="The ZK rollup for verifiable data and compute services. Soon everyone will be able to create secure oracles in minutes."
+          content="The zk rollup for programmable oracles."
         />
-        <meta property="og:image" content="/images/blocksense-og.png" />
+        <meta property="og:image" content="/images/blocksense_og.png" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Blocksense Network" />
@@ -82,14 +100,9 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
           name="twitter:description"
           content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
         />
-        <meta name="twitter:image" content="/images/blocksense-og.png" />
-        <link
-          rel="icon"
-          href="/images/blocksense-favicon.png"
-          type="image/png"
-        />
+        <meta name="twitter:image" content="/images/blocksense_og.png" />
       </NextHead>
-      <body className="md:px-4 lg:px-30 dark:bg-neutral-900 dark:text-neutral-300">
+      <body className="md:px-4 lg:px-30">
         <Layout
           navbar={navbar}
           pageMap={pageMap}

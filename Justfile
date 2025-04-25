@@ -3,11 +3,18 @@ root-dir := justfile_directory()
 default:
   @just --list
 
-build-ts:
-  yarn build-single @blocksense/base-utils
-  yarn build-single @blocksense/config-types
-  yarn build-single @blocksense/sol-reflector
-  yarn build-single @blocksense/data-feeds-config-generator
+build-ts package="all":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  if [[ {{package}} == "all" ]]; then
+    yarn build-single @blocksense/base-utils
+    yarn build-single @blocksense/config-types
+    yarn build-single @blocksense/sol-reflector
+    yarn build-single @blocksense/contracts
+    yarn build-single @blocksense/data-feeds-config-generator
+  else
+    yarn workspace {{package}} run build
+  fi
 
 test-ts:
   yarn test-single @blocksense/base-utils

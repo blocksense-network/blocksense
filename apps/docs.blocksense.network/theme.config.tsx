@@ -3,11 +3,8 @@ import { Footer } from './components/common/Footer';
 
 const fonts = [
   '/fonts/fira/FiraCode-Regular.woff2',
-  '/fonts/noto-sans/NotoSans-Light.woff2',
-  '/fonts/noto-sans/NotoSans-Regular.woff2',
-  '/fonts/noto-sans/NotoSans-Thin.woff2',
-  '/fonts/noto-sans/NotoSans-Bold.woff2',
-  '/fonts/SpaceMono-Bold.woff2',
+  '/fonts/geist/Geist-Regular.woff2',
+  '/fonts/geist/GeistMono-Regular.woff2',
 ];
 
 export default {
@@ -34,7 +31,7 @@ export default {
         property="og:description"
         content="The ZK rollup for verifiable data and compute services. Soon everyone will be able to create secure oracles in minutes."
       />
-      <meta property="og:image" content="/images/blocksense-og.png" />
+      <meta property="og:image" content="/images/blocksense_og.png" />
       <meta property="og:type" content="website" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Blocksense Network" />
@@ -42,8 +39,7 @@ export default {
         name="twitter:description"
         content="Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes."
       />
-      <meta name="twitter:image" content="/images/blocksense-og.png" />
-      <link rel="icon" href="/images/blocksense-favicon.png" type="image/png" />
+      <meta name="twitter:image" content="/images/blocksense_og.png" />
       {fonts.map(font => (
         <link
           key={font}

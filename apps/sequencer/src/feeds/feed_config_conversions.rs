@@ -1,4 +1,4 @@
-use blockchain_data_model::{BlockFeedConfig, DataChunk, Resources, DATA_CHUNK_SIZE};
+use blocksense_blockchain_data_model::{BlockFeedConfig, DataChunk, Resources, DATA_CHUNK_SIZE};
 use blocksense_registry::config::{AssetPair, FeedConfig, FeedQuorum, FeedSchedule, PriceFeedInfo};
 
 use anyhow::Result;
@@ -14,7 +14,7 @@ pub fn feed_config_to_block(feed_config: &FeedConfig) -> BlockFeedConfig {
         description: string_to_data_chunk(&feed_config.description),
         _type: string_to_data_chunk(&feed_config.feed_type),
         decimals: feed_config.additional_feed_info.decimals,
-        pair: blockchain_data_model::AssetPair {
+        pair: blocksense_blockchain_data_model::AssetPair {
             base: string_to_data_chunk(feed_config.additional_feed_info.pair.base.as_str()),
             quote: string_to_data_chunk(feed_config.additional_feed_info.pair.quote.as_str()),
         },

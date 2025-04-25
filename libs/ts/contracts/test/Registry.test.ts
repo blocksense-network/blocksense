@@ -69,7 +69,7 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
     registryOwner = (await ethers.getSigners())[11];
 
     proxy = new UpgradeableProxyADFSWrapper();
-    await proxy.init(await admin.getAddress(), accessControlAdmin);
+    await proxy.init(admin, accessControlAdmin);
 
     await proxy.implementation.accessControl.setAdminStates(
       accessControlAdmin,
@@ -445,7 +445,8 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
         caller,
         TOKENS.ETH,
         TOKENS.USD,
-        encodeDataAndTimestamp(answers[2], updates[2]),
+        // timestamp in CL is stored in seconds, but we store it in milliseconds
+        encodeDataAndTimestamp(answers[2], updates[2] * 1000n),
         roundData[2].roundId,
       );
 
@@ -493,7 +494,8 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
         caller,
         TOKENS.ETH,
         TOKENS.USD,
-        encodeDataAndTimestamp(answers[2], updates[2]),
+        // timestamp in CL is stored in seconds, but we store it in milliseconds
+        encodeDataAndTimestamp(answers[2], updates[2] * 1000n),
         1n,
       );
 

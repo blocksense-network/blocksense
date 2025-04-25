@@ -1,0 +1,58 @@
+/* Typography for medium and large screens (min-width: 768px) */
+@media screen and (min-width: 768px) {
+  :root {
+    --font-size-h1: 3rem;
+    --font-size-h2: 2rem;
+    --font-size-h3: 1.5rem;
+    --font-size-h4: 1.25rem;
+
+    --line-height-h1: 110%;
+    --line-height-h2: 110%;
+    --line-height-h3: 110%;
+    --line-height-h4: 110%;
+    --line-height-p: 140%;
+
+    --letter-spacing-h1: -1.44px;
+    --letter-spacing-h2: -0.96px;
+    --letter-spacing-h3: -0.72px;
+    --letter-spacing-h4: -0.6px;
+  }
+
+  @layer base {
+    h1 {
+      font-size: var(--font-size-h1);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-h1);
+      letter-spacing: var(--letter-spacing-h1);
+    }
+
+    h2 {
+      font-size: var(--font-size-h2);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-h2);
+      letter-spacing: var(--letter-spacing-h2);
+    }
+
+    h3 {
+      font-size: var(--font-size-h3);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-h3);
+      letter-spacing: var(--letter-spacing-h3);
+    }
+
+    h4 {
+      font-size: var(--font-size-h4);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--line-height-h4);
+      letter-spacing: var(--letter-spacing-h4);
+    }
+
+    h5 {
+      font-weight: var(--font-weight-medium);
+    }
+
+    p {
+      line-height: var(--line-height-p);
+    }
+  }
+}

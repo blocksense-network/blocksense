@@ -37,7 +37,7 @@ const sizes = {
   icon: 'button--icon-size h-10 w-10 flex items-center justify-center',
 };
 
-type ButtonProps = {
+export type ButtonProps = {
   className?: string;
   variant?: Variant;
   size?: Size;

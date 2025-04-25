@@ -51,7 +51,7 @@ export const ContractAddress = ({
     : previewHexStringOrDefault(address, '-', 6);
 
   return (
-    <section className="flex gap-1.5 justify-between items-center">
+    <section className="flex gap-1.5 items-center">
       <Tooltip contentClassName="bg-gray-900 text-white">
         {abbreviation?.hasAbbreviation && (
           <Tooltip.Content>{address}</Tooltip.Content>

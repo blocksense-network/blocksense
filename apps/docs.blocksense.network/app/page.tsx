@@ -15,7 +15,7 @@ const IndexPage: FC = () => {
         <h1 className="getting-started__title font-bold tracking-tight text-3xl md:text-4xl lg:text-5xl dark:text-white max-w-screen-xl">
           {gettingStartedConfig.title}
         </h1>
-        <p className="getting-started__description font-thin max-w-[40rem] text-gray-900 contrast-125 dark:text-white md:text-lg lg:text-xl">
+        <p className="getting-started__description font-thin max-w-[38rem] text-gray-900 contrast-125 dark:text-white md:text-lg lg:text-xl">
           {gettingStartedConfig.description}
         </p>
         <div className="flex flex-wrap mt-2">

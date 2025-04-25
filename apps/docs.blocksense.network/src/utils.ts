@@ -52,3 +52,18 @@ export function previewHexStringOrDefault(
 ): string {
   return value ? previewHexString(value, bytesToShow) : defaultValue;
 }
+
+export const capitalizeWords = (input: string): string => {
+  return input
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+export const showMsInSeconds = (ms: number): string => {
+  return `${(ms / 1000).toFixed(2)} seconds`;
+};
+
+export const showPercentage = (value: any): string => {
+  return `${value} %`;
+};

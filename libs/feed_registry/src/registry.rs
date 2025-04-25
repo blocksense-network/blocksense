@@ -5,8 +5,9 @@ use std::{
 };
 
 use crate::types::{DataFeedPayload, FeedMetaData, FeedType, Repeatability, Timestamp};
+use blocksense_config::AllFeedsConfig;
+use blocksense_utils::time::current_unix_time;
 use chrono::{DateTime, TimeZone, Utc};
-use config::AllFeedsConfig;
 use ringbuf::{
     storage::Heap,
     traits::{Consumer, RingBuffer},
@@ -16,7 +17,6 @@ use serde::{ser::SerializeMap, Deserialize, Serialize, Serializer};
 use std::time::UNIX_EPOCH;
 use tokio::{sync::RwLock, time};
 use tracing::{debug, info};
-use utils::time::current_unix_time;
 
 /// Map representing feed_id -> FeedMetaData
 #[derive(Debug)]
@@ -272,25 +272,34 @@ impl Default for AllFeedsReports {
     }
 }
 
+pub enum VoteStatus {
+    FirstVoteForSlot,
+    RevoteForSlot(Box<DataFeedPayload>),
+}
+
 impl AllFeedsReports {
     pub fn new() -> AllFeedsReports {
         AllFeedsReports {
             reports: HashMap::new(),
         }
     }
-    pub async fn push(&mut self, feed_id: u32, reporter_id: u64, data: DataFeedPayload) -> bool {
+    pub async fn push(
+        &mut self,
+        feed_id: u32,
+        reporter_id: u64,
+        data: DataFeedPayload,
+    ) -> VoteStatus {
         let res = self.reports.entry(feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
             }))
         }); //TODO: Reject votes for unregistered feed ID-s
         let mut res = res.write().await;
-        if let std::collections::hash_map::Entry::Vacant(e) = res.report.entry(reporter_id) {
-            // Stick to first vote from a reporter.
-            e.insert(data);
-            return true;
+
+        match res.report.insert(reporter_id, data) {
+            Some(old_value) => VoteStatus::RevoteForSlot(Box::new(old_value)),
+            None => VoteStatus::FirstVoteForSlot,
         }
-        false
     }
     pub fn get(&self, feed_id: u32) -> Option<Arc<RwLock<FeedReports>>> {
         self.reports.get(&feed_id).cloned()
@@ -394,7 +403,7 @@ pub async fn await_time(time_to_await_ms: u64) {
 
 #[cfg(test)]
 mod tests {
-    use utils::time::current_unix_time;
+    use blocksense_utils::time::current_unix_time;
 
     use crate::registry::new_feeds_meta_data_reg_with_test_data;
     use crate::registry::AllFeedsReports;

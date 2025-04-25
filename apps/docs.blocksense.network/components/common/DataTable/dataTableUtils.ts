@@ -27,7 +27,7 @@ export interface DataTableProps {
   data: DataType;
   filterCell?: string;
   hasToolbar?: boolean;
-  rowLink?: string;
+  getRowLink?: (row: DataRowType) => string;
 }
 
 export function getFacetedFilters(

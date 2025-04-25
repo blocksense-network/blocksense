@@ -10,16 +10,16 @@ use alloy::providers::ProviderBuilder;
 use alloy::signers::local::PrivateKeySigner;
 use alloy::sol;
 use alloy::sol_types::SolCall;
-use config::get_sequencer_and_feed_configs;
-use config::SequencerConfig;
-use crypto::JsonSerializableSignature;
+use blocksense_config::get_sequencer_and_feed_configs;
+use blocksense_config::SequencerConfig;
+use blocksense_crypto::JsonSerializableSignature;
+use blocksense_data_feeds::generate_signature::generate_signature;
+use blocksense_feed_registry::registry::await_time;
+use blocksense_feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
 use curl::easy::Handler;
 use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
-use data_feeds::generate_signature::generate_signature;
 use eyre::Result;
-use feed_registry::registry::await_time;
-use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
 use json_patch::merge;
 use port_scanner::scan_port;
 use regex::Regex;
@@ -85,15 +85,15 @@ async fn write_file(key_path: &str, content: &[u8]) {
 
 async fn spawn_sequencer(
     eth_networks_ports: &[i32],
-    safe_contracts_per_net: &[String],
+    _safe_contracts_per_net: &[String], // TODO: use when integration test starts using two rounds consensus
 ) -> thread::JoinHandle<()> {
     let config_patch = json!(
     {
         "main_port": SEQUENCER_MAIN_PORT,
         "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
-            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "safe_address": safe_contracts_per_net[0]},
-            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "safe_address": safe_contracts_per_net[1]}
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "safe_address": None::<String>},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "safe_address": None::<String>}
         },
     });
 
@@ -321,7 +321,7 @@ async fn main() -> Result<()> {
                 _owners: vec![owner],
                 _threshold: Uint::from(1),
                 to: Address::default(),
-                data: Bytes::from_hex("0x").unwrap(),
+                data: Bytes::new(),
                 fallbackHandler: Address::from_str("0xfd0732dc9e303f09fcef3a7388ad10a83459ec99")
                     .ok()
                     .unwrap(),

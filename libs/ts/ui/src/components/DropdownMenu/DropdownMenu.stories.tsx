@@ -8,10 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
-  DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuSubTrigger,
 } from './DropdownMenu';
+import { Separator } from '@blocksense/ui';
 
 export default {
   title: 'Components/DropdownMenu',
@@ -29,7 +29,7 @@ export const DefaultDropdown = () => {
           <DropdownMenuLabel>Items</DropdownMenuLabel>
           <DropdownMenuItem>Item One</DropdownMenuItem>
           <DropdownMenuItem>Item Two</DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <Separator className="dropdown-menu__separator my-1" />
           <DropdownMenuItem>Item Three</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -186,13 +186,13 @@ export const CheckboxExample = () => {
             checked={optionA}
             onCheckedChange={setOptionA}
           >
-            Option A {optionA ? '(On)' : '(Off)'}
+            {`Option A ${optionA ? '(On)' : '(Off)'}`}
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
             checked={optionB}
             onCheckedChange={setOptionB}
           >
-            Option B {optionB ? '(On)' : '(Off)'}
+            {`Option B ${optionB ? '(On)' : '(Off)'}`}
           </DropdownMenuCheckboxItem>
           <DropdownMenuItem>Another Item</DropdownMenuItem>
         </DropdownMenuContent>
@@ -237,7 +237,7 @@ export const SubmenuExample = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem>Main Item</DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <Separator className="dropdown-menu__separator my-1" />
           <DropdownMenuSubTrigger
             submenu={
               <DropdownMenuContent side="right" align="start">

@@ -5,7 +5,6 @@ export {
   CommandList,
   CommandEmpty,
   CommandGroup,
-  CommandSeparator,
   CommandItem,
   CommandShortcut,
 } from './Command';

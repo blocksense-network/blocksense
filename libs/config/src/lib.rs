@@ -1,6 +1,10 @@
 use blocksense_registry::config::{
     CompatibilityInfo, FeedConfig, FeedQuorum, FeedSchedule, PriceFeedInfo,
 };
+use blocksense_utils::constants::{
+    FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
+};
+use blocksense_utils::{get_config_file_path, read_file};
 use hex::decode;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -8,10 +12,6 @@ use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
 use std::{collections::HashSet, time::UNIX_EPOCH};
 use tracing::{info, warn};
-use utils::constants::{
-    FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
-};
-use utils::{get_config_file_path, read_file};
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct AssetPair {
@@ -180,7 +180,7 @@ pub struct Provider {
     pub safe_min_quorum: u32,
     pub event_contract_address: Option<String>,
     pub multicall_contract_address: Option<String>,
-    pub transaction_retries_count_before_give_up: u32,
+    pub transaction_retries_count_limit: u32,
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
     pub transaction_gas_limit: u32,
@@ -250,7 +250,7 @@ impl Validated for Reporter {
 pub struct BlockConfig {
     pub max_feed_updates_to_batch: usize,
     pub block_generation_period: u64,
-    pub genesis_block_timestamp: Option<SystemTime>,
+    pub genesis_block_timestamp_ms: Option<u128>,
     pub aggregation_consensus_discard_period_blocks: u64,
 }
 
@@ -426,7 +426,7 @@ pub fn get_test_config_with_no_providers() -> SequencerConfig {
         block_config: BlockConfig {
             max_feed_updates_to_batch: 1,
             block_generation_period: 500,
-            genesis_block_timestamp: None,
+            genesis_block_timestamp_ms: None,
             aggregation_consensus_discard_period_blocks: 100,
         },
         providers: HashMap::new(),
@@ -454,7 +454,7 @@ pub fn get_test_config_with_multiple_providers(
                 safe_min_quorum: 1,
                 event_contract_address: None,
                 multicall_contract_address: None,
-                transaction_retries_count_before_give_up: 10,
+                transaction_retries_count_limit: 10,
                 transaction_retry_timeout_secs: 24,
                 retry_fee_increment_fraction: 0.1,
                 transaction_gas_limit: 7500000,
@@ -500,7 +500,7 @@ mod tests {
             {
             "private_key_path": "/tmp/priv_key_test",
             "url": "http://127.0.0.1:8546",
-            "transaction_retries_count_before_give_up": 42,
+            "transaction_retries_count_limit": 42,
             "transaction_retry_timeout_secs": 20,
             "retry_fee_increment_fraction": 0.1,
             "transaction_gas_limit": 7500000,
@@ -513,7 +513,7 @@ mod tests {
         assert_eq!(provider_a.event_contract_address, None);
         assert_eq!(&provider_a.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&provider_a.url, "http://127.0.0.1:8546");
-        assert_eq!(provider_a.transaction_retries_count_before_give_up, 42_u32);
+        assert_eq!(provider_a.transaction_retries_count_limit, 42_u32);
         assert_eq!(provider_a.transaction_retry_timeout_secs, 20_u32);
         assert_eq!(provider_a.retry_fee_increment_fraction, 0.1f64);
         assert_eq!(provider_a.transaction_gas_limit, 7500000_u32);
@@ -540,7 +540,7 @@ mod tests {
             {
             "private_key_path": "/tmp/priv_key_test",
             "url": "http://127.0.0.1:8546",
-            "transaction_retries_count_before_give_up": 42,
+            "transaction_retries_count_limit": 42,
             "transaction_retry_timeout_secs": 20,
             "retry_fee_increment_fraction": 0.1,
             "transaction_gas_limit": 7500000,
@@ -591,7 +591,7 @@ mod tests {
         assert_eq!(p.event_contract_address, None);
         assert_eq!(&p.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&p.url, "http://127.0.0.1:8546");
-        assert_eq!(p.transaction_retries_count_before_give_up, 42_u32);
+        assert_eq!(p.transaction_retries_count_limit, 42_u32);
         assert_eq!(p.transaction_retry_timeout_secs, 20_u32);
         assert_eq!(p.retry_fee_increment_fraction, 0.1f64);
         assert_eq!(p.transaction_gas_limit, 7500000_u32);

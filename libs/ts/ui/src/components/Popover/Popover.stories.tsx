@@ -7,11 +7,11 @@ import {
   CommandList,
   CommandEmpty,
   CommandGroup,
-  CommandSeparator,
   CommandItem,
   CommandShortcut,
 } from '../Command';
 import { Button } from '../Button';
+import { Separator } from '@blocksense/ui';
 
 const CommandContent = () => (
   <Command className="command-story">
@@ -30,7 +30,7 @@ const CommandContent = () => (
           </CommandShortcut>
         </CommandItem>
       </CommandGroup>
-      <CommandSeparator className="command__separator bg-neutral-200" />
+      <Separator className="command__separator -mx-1" />
       <CommandGroup className="command__group ml-4">
         <CommandItem className="command__item">
           Settings

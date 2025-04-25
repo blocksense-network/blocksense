@@ -3,10 +3,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::Deserialize;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -26,11 +25,9 @@ pub struct TradingPairTicker {
 
 impl TradingPairTicker {
     fn symbol(&self) -> String {
-        // For trading pairs the API uses the format "t[Symbol]"
-        let no_t_prefix = self.symbol.replace("t", "").to_string();
         // When the symbol ( label ) is with more than 3 characters,
         // the API uses the format for the trading pair "t[Symbol1]:[Symbol2]"
-        let no_delimiter = no_t_prefix.replace(":", "");
+        let no_delimiter = self.symbol.replace(":", "");
         // The API uses label `UST` for symbol `USDT` and `UDC` for symbol `USDC`
         // ref: https://api-pub.bitfinex.com/v2/conf/pub:map:currency:label
         no_delimiter.replace("UST", "USDT").replace("UDC", "USDC")
@@ -52,22 +49,18 @@ pub struct BitfinexPriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for BitfinexPriceFetcher<'a> {
     const NAME: &'static str = "Bitfinex";
 
-    fn new(symbols: &'a [String]) -> Self {
+    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
         Self { symbols }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let all_symbols = self
-                .symbols
-                .iter()
-                .map(|s| format!("t{}", s))
-                .collect::<Vec<_>>()
-                .join(",");
+            let all_symbols = self.symbols.join(",");
 
             let response = http_get_json::<Vec<TradingPairTicker>>(
                 "https://api-pub.bitfinex.com/v2/tickers",
                 Some(&[("symbols", all_symbols.as_str())]),
+                None,
             )
             .await?;
 
@@ -75,7 +68,12 @@ impl<'a> PricesFetcher<'a> for BitfinexPriceFetcher<'a> {
                 .into_iter()
                 .map(|ticker| {
                     (
-                        ticker.symbol(),
+                        // Remove 't' prefix from the symbol
+                        ticker
+                            .symbol()
+                            .strip_prefix("t")
+                            .unwrap_or(&ticker.symbol)
+                            .to_string(),
                         PricePoint {
                             price: ticker.price(),
                             volume: ticker.volume(),

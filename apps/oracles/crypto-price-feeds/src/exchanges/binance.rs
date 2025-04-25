@@ -5,10 +5,9 @@ use itertools::Itertools;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -30,7 +29,7 @@ pub struct BinancePriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
     const NAME: &'static str = "Binance";
 
-    fn new(symbols: &'a [String]) -> Self {
+    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
         Self { symbols }
     }
 
@@ -44,6 +43,7 @@ impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
             let response = http_get_json::<BinancePriceResponse>(
                 "https://api1.binance.com/api/v3/ticker/24hr",
                 Some(&[("symbols", req_symbols.as_str())]),
+                None,
             )
             .await?;
 

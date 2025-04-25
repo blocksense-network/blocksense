@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 import {Blocksense} from '../../libraries/Blocksense.sol';
 
@@ -107,6 +107,20 @@ contract BlocksenseADFSConsumer {
         id,
         startSlot,
         slotsCount
+      );
+  }
+
+  function getEpochSeconds(uint256 id) external view returns (uint64) {
+    return
+      Blocksense._getEpochSeconds(
+        Blocksense._getLatestSingleFeedData(adfs, id)
+      );
+  }
+
+  function getEpochMilliseconds(uint256 id) external view returns (uint64) {
+    return
+      Blocksense._getEpochMilliseconds(
+        Blocksense._getLatestSingleFeedData(adfs, id)
       );
   }
 }

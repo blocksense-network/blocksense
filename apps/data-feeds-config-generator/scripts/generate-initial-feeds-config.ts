@@ -1,3 +1,7 @@
+/**
+ * @deprecated This script is deprecated and should no longer be used.
+ */
+
 import { Schema, ParseResult } from 'effect';
 const { decodeUnknownSync } = ParseResult;
 
@@ -10,8 +14,8 @@ import {
   collectRawDataFeeds,
   aggregateNetworkInfoPerField,
   getAllProposedFeedsInRegistry,
-} from '../src/data-services/chainlink_feeds';
-import { RawDataFeedsSchema } from '../src/data-services/types';
+} from '../src/data-services/fetchers/chainlink/chainlink_feeds';
+import { RawDataFeedsSchema } from '../src/data-services/fetchers/chainlink/types';
 import { generateFeedConfig } from '../src/generation/initial/index';
 import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
 import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';

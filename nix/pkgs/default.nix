@@ -62,6 +62,8 @@
           crypto-price-feeds = mkOracleScript /apps/oracles/crypto-price-feeds false;
           exsat-holdings = mkOracleScript /apps/oracles/exsat-holdings false;
           gecko-terminal = mkOracleScript /apps/oracles/gecko-terminal false;
+          eth-rpc = mkOracleScript /apps/oracles/eth-rpc false;
+          stock-price-feeds = mkOracleScript /apps/oracles/stock-price-feeds false;
 
           # Legacy oracle scripts
           cmc = mkOracleScript /libs/sdk/examples/cmc true;

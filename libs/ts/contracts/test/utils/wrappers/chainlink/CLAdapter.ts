@@ -13,7 +13,7 @@ export class CLAdapterWrapper extends CLBaseWrapper {
     proxyData:
       | UpgradeableProxyADFSBaseWrapper
       | {
-          adminAddress: string;
+          admin: HardhatEthersSigner;
           accessControlData: HardhatEthersSigner | string;
         },
   ) {
@@ -22,7 +22,7 @@ export class CLAdapterWrapper extends CLBaseWrapper {
       proxy = proxyData;
     } else {
       proxy = new UpgradeableProxyADFSWrapper();
-      await proxy.init(proxyData.adminAddress, proxyData.accessControlData);
+      await proxy.init(proxyData.admin, proxyData.accessControlData);
     }
 
     this.contract = await deployContract<CLAggregatorAdapter>(

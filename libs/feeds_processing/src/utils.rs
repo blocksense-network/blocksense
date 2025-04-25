@@ -1,22 +1,25 @@
-use anomaly_detection::ingest::anomaly_detector_aggregate;
+use crate::adfs_gen_calldata::adfs_serialize_updates;
+use alloy_primitives::{Address, Bytes, Uint, U256};
+use anyhow::bail;
 use anyhow::{anyhow, Context, Result};
-use config::{FeedStrideAndDecimals, PublishCriteria};
-use data_feeds::feeds_processing::{
+use blocksense_anomaly_detection::ingest::anomaly_detector_aggregate;
+use blocksense_config::{FeedStrideAndDecimals, PublishCriteria};
+use blocksense_crypto::{verify_signature, PublicKey, Signature};
+use blocksense_data_feeds::feeds_processing::{
     BatchedAggegratesToSend, DoSkipReason, DontSkipReason, SkipDecision, VotedFeedUpdate,
     VotedFeedUpdateWithProof,
 };
-use feed_registry::aggregate::FeedAggregate;
-use feed_registry::registry::FeedAggregateHistory;
-use feed_registry::types::{DataFeedPayload, FeedType, Timestamp};
-use gnosis_safe::data_types::ConsensusSecondRoundBatch;
-use gnosis_safe::utils::{create_safe_tx, generate_transaction_hash};
+use blocksense_feed_registry::{
+    aggregate::FeedAggregate,
+    registry::FeedAggregateHistory,
+    types::{DataFeedPayload, FeedResult, FeedType, Timestamp},
+};
+use blocksense_gnosis_safe::{
+    data_types::ConsensusSecondRoundBatch,
+    utils::{create_safe_tx, generate_transaction_hash},
+};
+use itertools::Itertools;
 use ringbuf::traits::consumer::Consumer;
-// use serde_json::from_str;
-use crate::adfs_gen_calldata::adfs_serialize_updates;
-use alloy::hex::FromHex;
-use alloy_primitives::{Address, Bytes, Uint, U256};
-use crypto::{verify_signature, PublicKey, Signature};
-use feed_registry::types::FeedResult;
 use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
@@ -124,7 +127,7 @@ pub async fn consume_reports(
                             warn!("Anomaly Detection failed with error - {}", e);
                         }
                     }
-                    let skip_decision = {
+                    {
                         let criteria = PublishCriteria {
                             feed_id,
                             skip_publish_if_less_then_percentage,
@@ -138,8 +141,7 @@ pub async fn consume_reports(
                             result_post_to_contract.should_skip(&criteria, &history_guard);
                         debug!("Release the read lock on history [feed {feed_id}]");
                         skip_decision
-                    };
-                    skip_decision
+                    }
                 } else {
                     SkipDecision::DontSkip(DontSkipReason::NonNumericalFeed)
                 }
@@ -249,13 +251,15 @@ pub async fn perform_anomaly_detection(
         .context("Failed to join feed slots manager anomaly detection!")?
 }
 
-pub async fn validate(
-    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
-    mut batch: ConsensusSecondRoundBatch,
-    last_votes: HashMap<u32, VotedFeedUpdate>,
-    tolerated_deviations: HashMap<u32, f64>,
+fn check_aggregated_votes_deviation(
+    updates: &[VotedFeedUpdate],
+    block_height: u64,
+    last_votes: &HashMap<u32, VotedFeedUpdate>,
+    tolerated_deviations: &HashMap<u32, f64>,
 ) -> Result<()> {
-    for update in &batch.updates {
+    let mut errors = Vec::new();
+
+    for update in updates {
         let feed_id = update.feed_id;
         let Some(reporter_vote) = last_votes.get(&feed_id) else {
             anyhow::bail!("Failed to get latest vote for feed_id: {}", feed_id);
@@ -277,22 +281,40 @@ pub async fn validate(
             ),
         };
 
-        let diff = (update_aggregate_value - reporter_voted_value).abs();
+        let tolerated_diff_percent = tolerated_deviations.get(&feed_id).unwrap_or(&0.5);
+        let tolerated_difference = (tolerated_diff_percent / 100.0) * reporter_voted_value;
 
-        let tolerated_diff_percent = tolerated_deviations.get(&feed_id).unwrap_or(&0.01);
+        let lower_bound = reporter_voted_value - tolerated_difference;
+        let upper_bound = reporter_voted_value + tolerated_difference;
 
-        if reporter_voted_value.abs() < f64::EPSILON {
-            if update_aggregate_value > *tolerated_diff_percent {
-                anyhow::bail!("relative_diff {update_aggregate_value} between reporter_voted_value {reporter_voted_value} and update_aggregate_value {update_aggregate_value} is above {tolerated_diff_percent} for feed_id {feed_id}");
-            }
-        } else {
-            let relative_diff = diff / reporter_voted_value;
+        let difference = (reporter_voted_value - update_aggregate_value).abs();
+        let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
 
-            if relative_diff > *tolerated_diff_percent {
-                anyhow::bail!("relative_diff {relative_diff} between reporter_voted_value {reporter_voted_value} and update_aggregate_value {update_aggregate_value} is above {tolerated_diff_percent} for feed_id {feed_id}");
-            }
+        if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
+            errors.push(format!("Final answer for feed={feed_id}, block_height={block_height}, deviates by more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}"));
         }
+        debug!("Final answer for feed={feed_id}, block_height={block_height}, deviates by {deviated_by_percent}%");
     }
+
+    if !errors.is_empty() {
+        bail!(errors.iter().join("\n"));
+    }
+
+    Ok(())
+}
+
+pub async fn validate(
+    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+    mut batch: ConsensusSecondRoundBatch,
+    last_votes: HashMap<u32, VotedFeedUpdate>,
+    tolerated_deviations: HashMap<u32, f64>,
+) -> Result<()> {
+    check_aggregated_votes_deviation(
+        &batch.updates,
+        batch.block_height,
+        &last_votes,
+        &tolerated_deviations,
+    )?;
 
     let updates_to_serialize = BatchedAggegratesToSend {
         block_height: batch.block_height,
@@ -312,19 +334,16 @@ pub async fn validate(
         Err(e) => anyhow::bail!("Failed to recreate calldata: {e}"),
     };
 
-    if calldata != batch.calldata {
-        warn!(
+    let batch_calldata_bytes = alloy::hex::decode(&batch.calldata)?;
+
+    if calldata != batch_calldata_bytes {
+        info!(
             "calldata recvd by sequencer {} is not equal to calldata {} generated by {:?}",
-            batch.calldata, calldata, updates_to_serialize
+            batch.calldata,
+            alloy::hex::encode(&calldata),
+            updates_to_serialize
         );
     }
-
-    let calldata = match Bytes::from_hex(calldata) {
-        Ok(b) => b,
-        Err(e) => {
-            anyhow::bail!("calldata is not valid hex string: {}", e);
-        }
-    };
 
     let contract_address = match Address::from_str(batch.contract_address.as_str()) {
         Ok(addr) => addr,
@@ -353,7 +372,8 @@ pub async fn validate(
             anyhow::bail!("Non valid nonce ({}) provided: {}", batch.nonce.as_str(), e);
         }
     };
-    let safe_transaction = create_safe_tx(contract_address, calldata, nonce);
+
+    let safe_transaction = create_safe_tx(contract_address, Bytes::from(calldata.clone()), nonce);
 
     let chain_id: u64 = match batch.chain_id.as_str().parse() {
         Ok(v) => v,
@@ -363,15 +383,16 @@ pub async fn validate(
     };
 
     let tx_hash =
-        generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction.clone());
+        generate_transaction_hash(safe_address, U256::from(chain_id), safe_transaction).to_vec();
 
-    let tx_hash_str = tx_hash.to_string();
-
-    if tx_hash_str != batch.tx_hash {
+    if tx_hash != alloy::hex::decode(&batch.tx_hash)? {
+        let block_height = batch.block_height;
+        let recvd_calldata = batch.calldata;
         anyhow::bail!(
-            "tx_hash mismatch, recvd: {} generated: {}",
+            "tx_hash mismatch, block_height = {block_height}; recvd: {} generated: {}; calc_calldata = {}; recvd_calldata = {recvd_calldata}",
             batch.tx_hash,
-            tx_hash_str
+            hex::encode(tx_hash),
+            hex::encode(calldata),
         );
     }
 
@@ -380,6 +401,8 @@ pub async fn validate(
 
 #[cfg(test)]
 pub mod tests {
+    use std::collections::HashSet;
+
     use super::*;
 
     fn create_feeds_config() -> HashMap<u32, FeedStrideAndDecimals> {
@@ -487,26 +510,62 @@ pub mod tests {
         .await
         .unwrap();
 
+        let contract_address = "0x663F3ad617193148711d28f5334eE4Ed07016602";
+        let nonce_str = "10";
+        let chain_id = 31337;
+        let safe_address_str = "0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C";
+
+        let nonce = match Uint::<256, 4>::from_str(nonce_str) {
+            Ok(n) => n,
+            Err(e) => {
+                anyhow::bail!("Non valid nonce ({}) provided: {}", nonce_str, e);
+            }
+        };
+
+        let safe_transaction = create_safe_tx(
+            Address::from_str(contract_address).unwrap(),
+            Bytes::from(calldata.clone()),
+            nonce,
+        );
+
+        let tx_hash = generate_transaction_hash(
+            Address::from_str(safe_address_str).unwrap(),
+            U256::from(chain_id),
+            safe_transaction,
+        )
+        .to_vec();
+
         let consensus_second_rond_batch = ConsensusSecondRoundBatch {
             sequencer_id: 0,
             block_height,
             network,
-            contract_address: "0x663F3ad617193148711d28f5334eE4Ed07016602".to_string(),
-            safe_address: "0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C".to_string(),
-            nonce: "10".to_string(),
-            chain_id: "31337".to_string(),
-            tx_hash: "0x1c856b6abec5d4168b8bdd0509da6f84a486081c19ba2e49e8acc28af6d615dc"
-                .to_string(),
-            calldata,
+            contract_address: contract_address.to_string(),
+            safe_address: safe_address_str.to_string(),
+            nonce: nonce_str.to_string(),
+            chain_id: chain_id.to_string(),
+            tx_hash: hex::encode(tx_hash),
+            calldata: hex::encode(calldata),
             updates,
             feeds_rounds,
         };
+
+        let feed_ids_union: HashSet<u32> = HashSet::from_iter(
+            reporter_feed_ids
+                .iter()
+                .copied()
+                .chain(aggregated_feed_ids.iter().copied()),
+        );
+
+        let tolerated_deviations = feed_ids_union
+            .into_iter()
+            .map(|feed_id| (feed_id, 1.0))
+            .collect();
 
         validate(
             create_feeds_config(),
             consensus_second_rond_batch,
             last_votes,
-            HashMap::new(),
+            tolerated_deviations,
         )
         .await
     }
@@ -545,7 +604,7 @@ pub mod tests {
             "validate confirmation of higher than 1% deviation!"
         );
 
-        let expected_error = "is above 0.01 for feed_id 11";
+        let expected_error = "deviates by more than";
 
         // Extract the error and check
         let error_message = result.unwrap_err().to_string();

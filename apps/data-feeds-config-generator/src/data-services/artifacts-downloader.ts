@@ -2,12 +2,15 @@ import { Octokit } from '@octokit/rest';
 import { Schema, ParseResult } from 'effect';
 
 import { getEnvString } from '@blocksense/base-utils/env';
-import { ProviderData } from '../generation/initial/data-providers';
-import { ChainLinkFeedInfo, ChainLinkFeedInfoSchema } from './types';
+import {
+  ChainLinkFeedInfo,
+  ChainLinkFeedInfoSchema,
+} from './fetchers/chainlink/types';
 import {
   CMCMarketCapDataRes,
   CMCMarketCapDataResSchema,
 } from './fetchers/aggregators/cmc';
+import { CryptoProviderData } from './processors/crypto-providers/types';
 
 const OWNER = 'blocksense-network';
 const REPO = 'dfcg-artifacts';
@@ -30,7 +33,7 @@ export type CLArtifacts = {
 
 export type Artifacts = {
   cmcMarketCap: CMCMarketCapDataRes;
-  exchangeAssets: ProviderData[];
+  exchangeAssets: CryptoProviderData[];
   clArtifacts: CLArtifacts[];
 };
 

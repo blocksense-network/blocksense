@@ -3,9 +3,8 @@ title: Overview
 ---
 import React from 'react';
 
-import { DataFeeds, getFeedsConfig } from '@/components/DataFeeds/DataFeeds';
+import { DataFeedsOverview } from '@/components/DataFeeds/DataFeedsOverview';
 
 export default function FeedsPage() {
-  const feedsConfig = getFeedsConfig();
-  return <DataFeeds feedsConfig={feedsConfig} />;
+  return <DataFeedsOverview />;
 }

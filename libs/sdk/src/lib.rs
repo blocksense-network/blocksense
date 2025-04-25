@@ -14,8 +14,11 @@ pub mod wit {
     // });
 }
 
+pub mod http;
 pub mod oracle;
-pub mod price_pair;
+
+/// Export the traits for the Spin SDK.
+pub mod traits;
 
 pub use spin_sdk as spin;
 
