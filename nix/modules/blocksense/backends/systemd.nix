@@ -17,7 +17,7 @@ let
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
           ExecStart = command;
-          Restart = "on-failure";
+          Restart = "always";
         };
       };
     }
@@ -49,7 +49,7 @@ let
             ${blocksense.program} node build --up \
               --from ${cfg.config-files."reporter_config_${name}".path}
           '';
-          Restart = "on-failure";
+          Restart = "always";
         };
       };
     }
@@ -73,7 +73,7 @@ in
           };
           serviceConfig = {
             ExecStart = sequencer.program;
-            Restart = "on-failure";
+            Restart = "always";
           };
         };
       }
