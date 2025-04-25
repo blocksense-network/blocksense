@@ -19,9 +19,6 @@ let
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
 {
-  services.kafka = {
-    enable = true;
-  };
   services.blocksense = {
     enable = true;
 
@@ -119,7 +116,7 @@ in
         };
       };
 
-      kafka-report-endpoint = "127.0.0.1:9092";
+      kafka-report-endpoint = null;
 
       whitelisted-reporters = [
         {

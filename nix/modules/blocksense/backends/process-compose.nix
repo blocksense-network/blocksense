@@ -136,12 +136,13 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    processes =
+    processes = lib.mkMerge [
       anvilImpersonateAndFundInstances
-      // reporterInstances
-      // sequencerInstance
-      // anvilInstances
-      // blockchainReader
-      // aggregateConsensusReader;
+      reporterInstances
+      sequencerInstance
+      anvilInstances
+      (lib.mkIf config.services.kafka.enable blockchainReader)
+      (lib.mkIf config.services.kafka.enable aggregateConsensusReader)
+    ];
   };
 }
