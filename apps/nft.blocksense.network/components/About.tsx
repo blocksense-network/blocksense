@@ -63,7 +63,7 @@ const AboutDesktop = () => {
           }`}
         >
           <section
-            className={`about__text about__text--left max-w-[36rem] transition-all duration-800 ease-out ${
+            className={`about__text about__text--left max-w-[28.875rem] transition-all duration-800 ease-out ${
               inView
                 ? 'delay-[180ms] opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-6'
