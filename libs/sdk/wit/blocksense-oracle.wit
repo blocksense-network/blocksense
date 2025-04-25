@@ -1,0 +1,50 @@
+package blocksense:oracle@2.0.0;
+
+interface oracle-types {
+  record data-feed {
+    id: string,
+    data: string,
+  }
+
+  record capability {
+    id: string,
+    data: string,
+  }
+
+  record settings {
+    data-feeds: list<data-feed>,
+    capabilities: list<capability>,
+  }
+
+  variant data-feed-result-value {
+    none,
+    error(string),
+    numerical(f64),
+    text(string),
+  }
+
+  record data-feed-result {
+    id: string,
+    value: data-feed-result-value,
+  }
+
+  record payload {
+    values: list<data-feed-result>
+  }
+
+  variant error {
+    other(string),
+  }
+}
+
+world blocksense-oracle {
+  use oracle-types.{settings, payload, error};
+  import fermyon:spin/variables@2.0.0;
+  import wasi:http/outgoing-handler@0.2.0;
+  // import wasi:io/imports@0.2.0;
+  export handle-oracle-request: func(settings: settings) -> result<payload, error>;
+}
+
+world platform {
+  import fermyon:spin/variables@2.0.0;
+}

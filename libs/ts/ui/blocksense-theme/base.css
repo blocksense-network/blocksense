@@ -1,0 +1,179 @@
+@import 'tailwindcss';
+@import './variables.css';
+@import './states/focus.css';
+@import './font/typography.css';
+@import './nextra.css';
+@import './dark.css';
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+.invert {
+  filter: invert(0);
+}
+
+main > h1 {
+  @apply mt-8;
+}
+
+.x\:bg-gray-100.x\:pb-\[env\(safe-area-inset-bottom\)\].x\:dark\:bg-neutral-900.x\:print\:bg-transparent {
+  @apply bg-white;
+}
+
+@layer base {
+  progress {
+    width: 100%;
+    height: 10px;
+    background-color: #ffffff;
+  }
+
+  progress::-webkit-progress-value {
+    background-color: #1e40af;
+  }
+
+  progress::-webkit-progress-bar {
+    background-color: #e0e0e0;
+  }
+
+  progress::-moz-progress-bar {
+    background-color: #1e40af;
+  }
+
+  pre {
+    contain: paint;
+    border: 1px solid #ececec;
+    border-radius: 0.375rem;
+    padding: 1.25rem 0.75rem;
+  }
+
+  pre code {
+    color: currentColor;
+    border-style: none;
+    border-radius: 0;
+    min-width: 100%;
+    line-height: 1.25rem;
+    display: grid;
+    padding: 0 !important;
+  }
+
+  code span {
+    @apply font-mono;
+    border: transparent;
+  }
+
+  figcaption {
+    font-size: 0.85rem;
+    line-height: 1.5rem;
+    display: block;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  p {
+    @apply font-regular;
+  }
+
+  button {
+    @apply mt-2;
+  }
+
+  footer span {
+    @apply font-bold;
+  }
+
+  header span {
+    font-family: var(--font-mono-space-bold);
+    font-size: 22px;
+  }
+
+  section.dialog__content span,
+  section.drawer__content span {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+  }
+
+  section.dialog__content button > span,
+  section.drawer__content button > span {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 600px) {
+    pre code .line,
+    pre:not([data-theme]) {
+      padding-left: 0.65rem;
+    }
+  }
+
+  html[data-word-wrap] pre .line {
+    display: inline-block;
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  pre .nextra-copy-icon {
+    animation: 0.3s forwards fade-in;
+  }
+
+  .text-xs {
+    font-size: 0.7rem;
+  }
+}
+
+@layer components {
+  .announcement__icon,
+  .error-404__icon,
+  .error-500__icon {
+    padding-right: 23px;
+    line-height: 48px;
+    margin-right: 20px;
+  }
+
+  .contract-base-info__base-contracts-description pre code,
+  .signature__content pre code {
+    overflow-y: scroll;
+    scrollbar-width: none;
+    padding: 0;
+  }
+
+  .contract-item-wrapper__content table {
+    margin-bottom: 0;
+    margin-top: 4;
+  }
+
+  .contract-item-wrapper h6 {
+    padding: 4px 0;
+  }
+
+  .contract-item-wrapper table code {
+    @apply text-sm;
+  }
+
+  .function-details__natspec li,
+  .variable-details__natspec li {
+    margin-bottom: 2px;
+  }
+
+  .h3__separator {
+    @apply border-b border-neutral-200;
+  }
+
+  .abi-modal--pre {
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+}
+
+.nextra-toc a {
+  display: none;
+}

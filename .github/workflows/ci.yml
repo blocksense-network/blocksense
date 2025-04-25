@@ -1,0 +1,243 @@
+name: CI
+
+on:
+  # Enable option to manually run the action:
+  workflow_dispatch:
+
+  # Run on the `main` branch or on PRs that target it:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+  # Run the pipeline for each PR part of merge queues as well
+  merge_group:
+
+jobs:
+  lint:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+        if: ${{ runner.environment == 'github-hosted' }}
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v16
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Check formatting
+        run: nix develop --impure .#pre-commit -c pre-commit run --all-files
+
+      - name: nix flake check
+        run: nix flake check --impure
+
+  build-and-test-ts-libs-and-apps:
+    runs-on: [self-hosted, nixos, x86-64-v3]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+        if: ${{ runner.environment == 'github-hosted' }}
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v16
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
+          env >> "$GITHUB_ENV"
+
+      - name: Install JS deps
+        run: yarn install
+
+      - name: Build all packages
+        run: just build-ts
+
+      - name: Test all packages
+        run: just test-ts
+
+  smart-contracts-tests:
+    timeout-minutes: 360
+    runs-on: [self-hosted, nixos, x86-64-v3]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+        if: ${{ runner.environment == 'github-hosted' }}
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v16
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
+          env >> "$GITHUB_ENV"
+
+      - name: Install JS deps
+        run: yarn install
+
+      - name: Build all contracts
+        run: yarn build:recursive @blocksense/contracts
+
+      - name: Test all contracts
+        run: yarn workspace @blocksense/contracts test
+
+      - name: Measure test coverage
+        run: yarn workspace @blocksense/contracts coverage
+
+      - name: Measure contract size
+        run: yarn workspace @blocksense/contracts size
+
+  rust:
+    timeout-minutes: 360
+    strategy:
+      matrix:
+        include:
+          - runner: [self-hosted, nixos, x86-64-v3]
+            system: x86_64-linux
+          - runner: macos-latest-xlarge
+            system: aarch64-darwin
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+        if: ${{ runner.environment == 'github-hosted' }}
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v16
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Install current Bash on macOS
+        if: runner.os == 'macOS'
+        run: brew install bash
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.${{ matrix.system }}.default || echo exit 1)"
+          env >> "$GITHUB_ENV"
+
+      - name: Build Rust workspace
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: cargo build
+
+      - name: Test Rust workspace
+        if: ${{ runner.environment == 'self-hosted' }}
+        run: cargo test
+
+  deploy_websites:
+    name: Deploy ${{ matrix.project }} website
+    timeout-minutes: 360
+    runs-on: [self-hosted, nixos, x86-64-v3]
+    strategy:
+      matrix:
+        include:
+          - project: docs.blocksense.network
+            path: apps/docs.blocksense.network/dist
+            project_name: blocksense
+            build_command: yarn workspace @blocksense/docs.blocksense.network build:with-deps
+          - project: ui.blocksense.network
+            path: libs/ts/ui/storybook-static
+            project_name: blocksense-ui
+            build_command: yarn workspace @blocksense/ui build-storybook
+    outputs:
+      docsDeploymentMessage: ${{ steps.docs-ws-url.outputs.url }}
+      uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v16
+        if: ${{ runner.environment == 'github-hosted' }}
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v16
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
+          env >> "$GITHUB_ENV"
+
+      - name: Install JS deps
+        run: yarn install
+
+      - name: Build
+        id: build
+        run: ${{ matrix.build_command }}
+
+      - name: Deploy Website
+        id: deploy-website
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: |
+            pages deploy ${{ matrix.path }} --project-name=${{ matrix.project_name }}
+
+      #TODO(EmilIvanichkovv): Migrate this to the matrix
+      - name: Collect Docs Deployment URL
+        id: docs-ws-url
+        if: matrix.project == 'docs.blocksense.network'
+        env:
+          DOCS_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
+        run: |
+          echo "url=$DOCS_DEPLOY_URL" >> $GITHUB_OUTPUT
+
+      - name: Collect UI Deployment URL
+        id: ui-ws-url
+        if: matrix.project == 'ui.blocksense.network'
+        env:
+          UI_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
+        run: |
+          echo "url=$UI_DEPLOY_URL" >> $GITHUB_OUTPUT
+
+  comment_on_pr:
+    needs: [deploy_websites]
+    runs-on: self-hosted
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Get current date and time
+        id: datetime
+        run: |
+          echo "latest_update=$(date +'%d.%m.%Y %H:%M:%S')" >> $GITHUB_OUTPUT
+
+      - name: Comment Deployment Links on the PR
+        uses: marocchino/sticky-pull-request-comment@v2.9.1
+        with:
+          recreate: true
+          message: |
+            ### 🚀 Deployment Links of Blocksense Network websites:
+
+            | Website | Latest Update | Commit |
+            |---------------------|----------|----------------------------------------------------------------------|
+            | 🌱 [Documentation](${{ needs.deploy_websites.outputs.docsDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
+            | 📖 [UI Components](${{ needs.deploy_websites.outputs.uiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |

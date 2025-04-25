@@ -1,0 +1,91 @@
+{
+  "name": "@blocksense/base-utils",
+  "version": "0.0.0",
+  "keywords": [
+    "utils",
+    "helpers"
+  ],
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.cjs",
+      "import": "./dist/esm/index.mjs",
+      "types": "./src/index.ts"
+    },
+    "./array-iter": {
+      "require": "./dist/cjs/array-iter.cjs",
+      "import": "./dist/esm/array-iter.mjs",
+      "types": "./src/array-iter.ts"
+    },
+    "./assert": {
+      "require": "./dist/cjs/assert.cjs",
+      "import": "./dist/esm/assert.mjs",
+      "types": "./src/assert.ts"
+    },
+    "./async": {
+      "require": "./dist/cjs/async.cjs",
+      "import": "./dist/esm/async.mjs",
+      "types": "./src/async.ts"
+    },
+    "./buffer-and-hex": {
+      "require": "./dist/cjs/buffer-and-hex/index.cjs",
+      "import": "./dist/esm/buffer-and-hex/index.mjs",
+      "types": "./src/buffer-and-hex/index.ts"
+    },
+    "./fs": {
+      "require": "./dist/cjs/fs.cjs",
+      "import": "./dist/esm/fs.mjs",
+      "types": "./src/fs.ts"
+    },
+    "./evm": {
+      "require": "./dist/cjs/evm/index.cjs",
+      "import": "./dist/esm/evm/index.mjs",
+      "types": "./src/evm/index.ts"
+    },
+    "./env": {
+      "require": "./dist/cjs/env/index.cjs",
+      "import": "./dist/esm/env/index.mjs",
+      "types": "./src/env/index.ts"
+    },
+    "./http": {
+      "require": "./dist/cjs/http.cjs",
+      "import": "./dist/esm/http.mjs",
+      "types": "./src/http.ts"
+    },
+    "./logging": {
+      "require": "./dist/cjs/logging.cjs",
+      "import": "./dist/esm/logging.mjs",
+      "types": "./src/logging.ts"
+    },
+    "./numeric": {
+      "require": "./dist/cjs/numeric.cjs",
+      "import": "./dist/esm/numeric.mjs",
+      "types": "./src/numeric.ts"
+    },
+    "./string": {
+      "require": "./dist/cjs/string.cjs",
+      "import": "./dist/esm/string.mjs",
+      "types": "./src/string.ts"
+    },
+    "./type-level": {
+      "require": "./dist/cjs/type-level.cjs",
+      "import": "./dist/esm/type-level.mjs",
+      "types": "./src/type-level.ts"
+    }
+  },
+  "scripts": {
+    "build": "yarn run rollup:build-workspace",
+    "ts": "yarn node --import tsx",
+    "test": "yarn vitest --typecheck -w false"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "glob": "^11.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.5.4",
+    "vitest": "^3.0.2"
+  },
+  "dependencies": {
+    "effect": "^3.12.1"
+  }
+}

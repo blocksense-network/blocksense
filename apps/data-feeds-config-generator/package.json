@@ -1,0 +1,49 @@
+{
+  "name": "@blocksense/data-feeds-config-generator",
+  "type": "module",
+  "version": "0.0.0",
+  "types": "src/index.ts",
+  "exports": {
+    "./feeds_config": {
+      "require": "./config/feeds_config_v1.json",
+      "import": "./config/feeds_config_v1.json"
+    },
+    "./chainlink_compatibility": {
+      "require": "./config/chainlink_compatibility_v1.json",
+      "import": "./config/chainlink_compatibility_v1.json"
+    },
+    "./evm_contracts_deployment_v1": {
+      "require": "./config/evm_contracts_deployment_v1.json",
+      "import": "./config/evm_contracts_deployment_v1.json"
+    }
+  },
+  "scripts": {
+    "build": "tsc --noEmit && yarn run rollup:build-workspace",
+    "ts": "yarn node --import tsx",
+    "get-chainlink-feeds": "yarn ts scripts/get-chainlink-feeds.ts",
+    "get-cmc-market-cap-data": "yarn ts scripts/get-cmc-market-cap-data.ts",
+    "get-providers-data": "yarn ts scripts/get-providers-data.ts",
+    "generate-initial-feeds-config": "yarn ts scripts/generate-initial-feeds-config.ts",
+    "fetch-symbols": "yarn ts src/data-services/fetchers/scripts/fetch-symbols.ts",
+    "test": "yarn vitest --typecheck -w false"
+  },
+  "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@blocksense/contracts": "workspace:*",
+    "@octokit/rest": "^21.1.1",
+    "@types/keccak": "^3",
+    "@types/node": "^22.10.2",
+    "effect": "^3.12.1",
+    "glob": "^11.0.0",
+    "keccak": "^3.0.4",
+    "keccak256": "^1.0.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.5.4",
+    "vitest": "^3.0.2",
+    "yahoo-finance2": "^2.13.2"
+  },
+  "dependencies": {
+    "@blocksense/config-types": "workspace:*",
+    "web3": "^4.16.0"
+  }
+}

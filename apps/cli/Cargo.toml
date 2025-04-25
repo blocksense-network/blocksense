@@ -1,0 +1,33 @@
+[package]
+name = "blocksense-cli"
+version = "0.1.0"
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = { workspace = true }
+indexmap = { version = "2", features = ["serde"] }
+camino = "1.1.7"
+clap = { version = "4.5", features=["derive"] }
+is-terminal = { workspace = true }
+lazy_static = "1.4.0"
+log = { workspace = true }
+reqwest = { workspace = true }
+reqwest-middleware = "0.4"
+reqwest-retry = "0.7"
+serde = { workspace = true }
+serde_path_to_error = "0.1"
+serde_json = { workspace = true }
+
+tokio = { workspace = true }
+toml = "0.8.13"
+toml_edit = "0.22.22"
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+url = { workspace = true }
+
+blocksense-registry = { path = "../../libs/registry" }
+utils = { workspace = true }

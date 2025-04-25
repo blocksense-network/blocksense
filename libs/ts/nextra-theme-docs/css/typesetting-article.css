@@ -1,0 +1,28 @@
+article.nextra-body-typesetting-article {
+  font-size: 17px;
+  font-feature-settings:
+    'rlig' 1,
+    'calt' 1;
+  h1 {
+    @apply x:mt-6 x:mb-4 x:text-center;
+    font-size: 2.5rem;
+  }
+  h2 {
+    @apply x:border-none;
+  }
+  a {
+    @apply x:no-underline x:hover:underline;
+  }
+  p {
+    @apply x:leading-8;
+  }
+  code {
+    @apply x:border-none x:dark:bg-neutral-700;
+  }
+  pre code {
+    @apply x:dark:bg-transparent;
+  }
+  .subheading-anchor {
+    @apply x:hover:no-underline;
+  }
+}

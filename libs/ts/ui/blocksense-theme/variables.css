@@ -1,0 +1,34 @@
+@import 'tailwindcss';
+
+@variant dark (&:where(.dark *));
+
+@theme {
+  --font-display: 'Noto Sans', sans-serif;
+  --font-sans: 'Noto Sans', sans-serif;
+  --font-regular: 'Noto Sans Regular', sans-serif;
+  --font-italic: 'Noto Sans Italic', sans-serif;
+  --font-light: 'Noto Sans Light', sans-serif;
+  --font-light-italic: 'Noto Sans Light Italic', sans-serif;
+  --font-medium: 'Noto Sans Medium', sans-serif;
+  --font-semi-bold: 'Noto Sans SemiBold', sans-serif;
+  --font-semi-bold-italic: 'Noto Sans SemiBold Italic', sans-serif;
+  --font-thin: 'Noto Sans Thin', sans-serif;
+  --font-thin-italic: 'Noto Sans Thin Italic', sans-serif;
+  --font-bold: 'Noto Sans Bold', sans-serif;
+  --font-bold-italic: 'Noto Sans Bold Italic', sans-serif;
+  --font-extra-bold: 'Noto Sans Extra Bold', sans-serif;
+  --font-black: 'Noto Sans Black', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --font-mono-space-bold: 'Space Mono Bold', monospace;
+
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 1920px;
+
+  --focus-border-color: #2fa6ff;
+  --transparent-color: transparent;
+  --focus-outline-offset: 0;
+}

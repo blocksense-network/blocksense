@@ -1,0 +1,51 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      time: '00:00'
+      timezone: UTC
+    commit-message:
+      prefix: 'build'
+      include: 'scope'
+    groups:
+      version-updates:
+        applies-to: version-updates
+        update-types:
+          - 'minor'
+          - 'patch'
+      security-updates:
+        applies-to: security-updates
+        update-types:
+          - 'patch'
+
+  - package-ecosystem: cargo
+    directory: '/'
+    schedule:
+      interval: weekly
+      time: '00:00'
+      timezone: UTC
+    commit-message:
+      prefix: 'build'
+      include: 'scope'
+    groups:
+      version-updates:
+        applies-to: version-updates
+        update-types:
+          - 'minor'
+          - 'patch'
+      security-updates:
+        applies-to: security-updates
+        update-types:
+          - 'patch'
+
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: daily
+      time: '00:00'
+      timezone: UTC
+    commit-message:
+      prefix: 'ci'
+      include: 'scope'

@@ -1,0 +1,56 @@
+[package]
+name = "sequencer_tests"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+[dependencies]
+data_feeds = { path = "../../libs/data_feeds" }
+utils = { path = "../../libs/utils" }
+crypto = { path = "../../libs/crypto" }
+config = { path = "../../libs/config" }
+feed_registry = { path = "../../libs/feed_registry" }
+
+alloy = { version = "0.11", features = [
+    "sol-types",
+    "contract",
+    "network",
+    "node-bindings",
+    "providers",
+    "rpc",
+    "rpc-client",
+    "rpc-types-eth",
+    "rpc-types-trace",
+    "signers",
+    "signer-keystore",
+    "signer-ledger",
+    "signer-mnemonic",
+    "signer-trezor",
+    "signer-yubihsm",
+    "transports",
+    "transport-http",
+    "transport-ipc",
+    "transport-ws",
+    "pubsub",
+] }
+
+regex = "1.11.1"
+reqwest = { version = "0.12", default-features = false }
+# async
+tokio = { version = "1.4.0", features = ["full"] }
+
+# misc
+eyre = "0.6.12"
+serde = { version = "1.0.216", features = ["derive"]}
+futures = "0.3.31"
+tracing = { version = "0.1.41", features = ["async-await", "log"] }
+url = "2.5.4"
+port_scanner = "0.1.5"
+curl = "0.4.47"
+serde_json = "1.0.137"
+json-patch = "4.0.0"
+
+[[bin]]
+name = "sequencer_tests"
+path = "bin/sequencer_tests.rs"

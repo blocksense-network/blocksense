@@ -1,0 +1,56 @@
+{
+  "name": "@blocksense/monorepo",
+  "packageManager": "yarn@4.5.0",
+  "workspaces": [
+    "apps/*",
+    "libs/ts/*",
+    "libs/aztec_contracts/"
+  ],
+  "scripts": {
+    "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -e .pre-commit-config.yaml -- $(git rev-parse --show-toplevel)",
+    "format:check": "pre-commit run --all",
+    "format:write": "pre-commit run --all || pre-commit run --all",
+    "generate-data-feeds-config": "yarn workspace '@blocksense/data-feeds-config-generator' generate",
+    "build": "yarn build:recursive",
+    "build-single": "yarn workspace $0 run build",
+    "build:recursive": "yarn workspaces foreach --from $0 -Rp --topological-dev run build",
+    "build:with-deps": "yarn build:recursive $(jq -r .name $INIT_CWD/package.json)",
+    "build:all": "yarn workspaces foreach --all -p --topological-dev run build",
+    "test": "yarn workspaces foreach --from $0 -Rp --topological-dev run test",
+    "test-single": "yarn workspace $0 run test",
+    "test:all": "yarn workspaces foreach --all -p --topological-dev run test"
+  },
+  "dependenciesMeta": {
+    "@openzeppelin/contracts@5.0.2": {
+      "unplugged": true
+    },
+    "next@14.2.5": {
+      "unplugged": true
+    }
+  },
+  "exports": {
+    "./feeds_config": {
+      "require": "./config/feeds_config_v1.json",
+      "import": "./config/feeds_config_v1.json"
+    },
+    "./chainlink_compatibility": {
+      "require": "./config/chainlink_compatibility_v1.json",
+      "import": "./config/chainlink_compatibility_v1.json"
+    },
+    "./evm_contracts_deployment_v1": {
+      "require": "./config/evm_contracts_deployment_v1.json",
+      "import": "./config/evm_contracts_deployment_v1.json"
+    }
+  },
+  "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "prettier": "^3.4.2",
+    "react": "^18.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "wrangler": "^3.109.2"
+  },
+  "resolutions": {
+    "babel-plugin-react-compiler": "patch:babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch"
+  }
+}

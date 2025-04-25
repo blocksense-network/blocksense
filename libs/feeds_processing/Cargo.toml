@@ -1,0 +1,48 @@
+[package]
+name = "feeds_processing"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+[dependencies]
+blocksense-registry = { path = "../../libs/registry" }
+anomaly_detection = { path = "../../libs/anomaly_detection" }
+feed_registry = { path = "../feed_registry" }
+data_feeds = {path = "../data_feeds"}
+config = {path = "../config"}
+utils = {path = "../utils"}
+prometheus = {path = "../prometheus"}
+gnosis_safe = {path = "../gnosis_safe"}
+crypto = { path = "../../libs/crypto" }
+once_cell = "1.20.2"
+hex = "0.4.3"
+ringbuf = "0.4.7"
+tracing = { workspace = true }
+tokio = { workspace = true }
+alloy = { version = "0.11", features = [
+    "sol-types",
+    "contract",
+    "network",
+    "node-bindings",
+    "providers",
+    "rpc",
+    "rpc-client",
+    "rpc-types-eth",
+    "rpc-types-trace",
+    "signers",
+    "signer-keystore",
+    "signer-ledger",
+    "signer-mnemonic",
+    "signer-trezor",
+    "signer-yubihsm",
+    "transports",
+    "transport-http",
+    "transport-ipc",
+    "transport-ws",
+    "pubsub",
+] }
+alloy-primitives = "0.8"
+anyhow = "1.0.89"
+serde_json = { workspace = true }
+serde = { workspace = true }

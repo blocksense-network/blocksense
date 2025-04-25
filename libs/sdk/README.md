@@ -1,0 +1,67 @@
+# Initial implementation for the Blocksense SDK
+
+- [Helper Scripts](../../scripts/sdk/README.md)
+- [Revolut API Example](./examples/README.md)
+
+## SDK Macro
+
+The oracle macro's main purpose is to wrap everything related to WASM and WIT, so that implementing
+oracle scripts using rust is more straightforward.
+
+Usage:
+
+```rust
+use blocksense_sdk::{
+    oracle::{Payload, Settings},
+    oracle_component,
+}
+#[oracle_component]
+async fn my_function(settings: Settings) -> Result<Payload> {
+    unimplemented!()
+}
+```
+
+## Oracle types
+
+Currently we support request/response oracle scripts that receive `Settings` as parameter and should return
+`Result<Payload>`
+
+- `Settings` provide you with
+  - An array of data feed IDs and data(String representation of the resource property from the data feed configuration).
+  - An array of capabilities - IDs and data.
+- `Payload` is the Oracle result which is an array of data feed results.
+  - Numerical - `f64`
+  - Text - `String`
+
+## HTTP library
+
+For an HTTP library we are using [The Spin Rust SDK](https://github.com/fermyon/spin-rust-sdk/tree/main)
+
+Usage:
+
+```rust
+use blocksense_sdk::{
+    oracle::{Payload, Settings},
+    oracle_component,
+    spin::http::{send, Method, Request, Response},
+};
+
+#[oracle_component]
+async fn my_function(_settings: Settings) -> Result<Payload> {
+    // Create the outbound request object
+    let req = Request::builder()
+        .method(Method::Get)
+        .uri("https://random-data-api.fermyon.app/animals/json")
+        .build();
+
+    // Send the request and await the response
+    let res: Response = send(req).await?;
+
+    println!("{:?}", res);  // log the response
+    // TODO(oracle developer): Properly transform the response into an array of data feeds results
+    // that are going to be stored on the oracle smart contract.
+    Ok(Payload {
+        values: vec![],
+    })
+}
+```

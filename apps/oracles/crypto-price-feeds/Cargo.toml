@@ -1,0 +1,23 @@
+[package]
+name = "crypto-price-feeds"
+authors = ["Antoni Dikov"]
+description = ""
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+async-trait = "0.1"
+wit-bindgen = "0.16.0"
+blocksense-sdk = { path = "../../../libs/sdk" }
+anyhow = "1.0.82"
+serde_json = "1.0"
+serde-this-or-that = "0.5.0"
+url = "2.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0.210"
+futures = { workspace = true }
+itertools = "0.14.0"
+prettytable-rs = "0.10"

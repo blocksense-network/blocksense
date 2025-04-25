@@ -1,0 +1,18 @@
+[package]
+name = "exsat-holdings"
+authors = ["Yordan Madzhunkov"]
+description = ""
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.16.0"
+blocksense-sdk = { path = "../../../libs/sdk" }
+anyhow = "1.0.82"
+serde_json = "1.0"
+url = "2.5"
+serde = { version = "1.0", features = ["derive"] }
+prettytable-rs = "^0.10"

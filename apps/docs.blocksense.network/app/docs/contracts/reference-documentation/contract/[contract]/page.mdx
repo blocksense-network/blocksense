@@ -1,0 +1,12 @@
+import  Contract, { generateStaticParams }  from '@/components/ReferenceDocumentation/[contract]';
+
+export { generateStaticParams };
+
+export async function generateMetadata({ params }) {
+  const { contract: contractName } = await params;
+  return { title: contractName };
+}
+
+export default async function ContractPage({ params }) {
+  return <Contract params={params} />;
+}

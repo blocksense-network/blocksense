@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    border: none;
+  }
+
+  *:focus {
+    outline: none;
+  }
+
+  * {
+    @apply border-2;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(229, 231, 235, 0.6) transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  .bg-card {
+    border: 1px solid;
+    @apply border-slate-200 max-w-96 mt-10;
+  }
+
+  .tabs {
+    @apply shadow-md;
+  }
+
+  table {
+    @apply bg-white;
+  }
+
+  table tr {
+    @apply border-b border-gray-200;
+  }
+
+  table th {
+    @apply font-bold text-slate-700;
+  }
+
+  .bg-card,
+  .tabs,
+  .cn-table,
+  table {
+    @apply border border-slate-200;
+  }
+
+  [role='dialog'] pre {
+    border: none;
+  }
+
+  pre {
+    @apply border border-gray-200 rounded-lg p-5;
+    contain: paint;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+
+  pre code {
+    @apply bg-transparent min-w-full;
+    line-height: 1.25rem;
+    display: grid;
+    padding: 0 !important;
+  }
+
+  pre code span {
+    @apply font-mono not-italic;
+  }
+
+  html[data-word-wrap] pre .line {
+    @apply inline-block;
+  }
+
+  pre .nextra-copy-icon {
+    animation: 0.3s forwards fade-in;
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-color-scheme: dark),
+    (prefers-color-scheme: light),
+    (prefers-color-scheme: no-preference) {
+    body {
+      @apply bg-white text-black !important;
+    }
+    .next-error-h1 {
+      @apply border-r border-gray-500 !important;
+    }
+  }
+}

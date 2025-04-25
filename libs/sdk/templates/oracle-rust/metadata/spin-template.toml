@@ -1,0 +1,12 @@
+manifest_version = "1"
+id = "oracle-rust"
+description = "Blocksense oracle using Rust"
+tags = ["oracle", "rust"]
+
+[add_component]
+skip_files = ["spin.toml"]
+[add_component.snippets]
+component = "component.txt"
+
+[parameters]
+project-description = { type = "string",  prompt = "Description", default = "" }

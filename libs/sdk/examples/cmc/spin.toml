@@ -1,0 +1,858 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Antoni Dikov"]
+name = "CMC Oracle"
+version = "0.1.0"
+
+[application.trigger.settings]
+interval_time_in_seconds = 10
+sequencer = "http://127.0.0.1:9856/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+reporter_id = 0
+
+[[trigger.oracle]]
+component = "coinmarketcap"
+
+[[trigger.oracle.data_feeds]]
+id = "0"
+data = '{"cmc_id":"20801","cmc_quote":"FOXY"}'
+
+[[trigger.oracle.data_feeds]]
+id = "1"
+data = '{"cmc_id":"6950","cmc_quote":"PERP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "2"
+data = '{"cmc_id":"1191","cmc_quote":"MEME"}'
+
+[[trigger.oracle.data_feeds]]
+id = "3"
+data = '{"cmc_id":"5426","cmc_quote":"SOL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "4"
+data = '{"cmc_id":"12409","cmc_quote":"WSTETH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "5"
+data = '{"cmc_id":"22974","cmc_quote":"TAO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "6"
+data = '{"cmc_id":"6210","cmc_quote":"SAND"}'
+
+[[trigger.oracle.data_feeds]]
+id = "8"
+data = '{"cmc_id":"1958","cmc_quote":"TRX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "9"
+data = '{"cmc_id":"2927","cmc_quote":"SUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "10"
+data = '{"cmc_id":"4195","cmc_quote":"FTT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "11"
+data = '{"cmc_id":"4066","cmc_quote":"CHZ"}'
+
+[[trigger.oracle.data_feeds]]
+id = "12"
+data = '{"cmc_id":"7102","cmc_quote":"LINA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "13"
+data = '{"cmc_id":"10603","cmc_quote":"IMX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "14"
+data = '{"cmc_id":"4558","cmc_quote":"FLOW"}'
+
+[[trigger.oracle.data_feeds]]
+id = "15"
+data = '{"cmc_id":"18411","cmc_quote":"TIA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "17"
+data = '{"cmc_id":"11188","cmc_quote":"DPX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "18"
+data = '{"cmc_id":"7048","cmc_quote":"WING"}'
+
+[[trigger.oracle.data_feeds]]
+id = "19"
+data = '{"cmc_id":"1772","cmc_quote":"STORJ"}'
+
+[[trigger.oracle.data_feeds]]
+id = "20"
+data = '{"cmc_id":"20947","cmc_quote":"SUI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "21"
+data = '{"cmc_id":"4705","cmc_quote":"PAXG"}'
+
+[[trigger.oracle.data_feeds]]
+id = "22"
+data = '{"cmc_id":"3077","cmc_quote":"VET"}'
+
+[[trigger.oracle.data_feeds]]
+id = "23"
+data = '{"cmc_id":"32376","cmc_quote":"AVAIL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "24"
+data = '{"cmc_id":"15853","cmc_quote":"AXL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "25"
+data = '{"cmc_id":"5728","cmc_quote":"BAL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "26"
+data = '{"cmc_id":"7055","cmc_quote":"DPI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "27"
+data = '{"cmc_id":"8613","cmc_quote":"ALCX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "28"
+data = '{"cmc_id":"5994","cmc_quote":"SHIB"}'
+
+[[trigger.oracle.data_feeds]]
+id = "29"
+data = '{"cmc_id":"23095","cmc_quote":"BONK"}'
+
+[[trigger.oracle.data_feeds]]
+id = "30"
+data = '{"cmc_id":"3783","cmc_quote":"ANKR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "31"
+data = '{"cmc_id":"1","cmc_quote":"BTC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "32"
+data = '{"cmc_id":"18037","cmc_quote":"MAV"}'
+
+[[trigger.oracle.data_feeds]]
+id = "33"
+data = '{"cmc_id":"4943","cmc_quote":"DAI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "34"
+data = '{"cmc_id":"10746","cmc_quote":"BSW"}'
+
+[[trigger.oracle.data_feeds]]
+id = "35"
+data = '{"cmc_id":"8206","cmc_quote":"QUICK"}'
+
+[[trigger.oracle.data_feeds]]
+id = "36"
+data = '{"cmc_id":"8104","cmc_quote":"1INCH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "37"
+data = '{"cmc_id":"1552","cmc_quote":"MLN"}'
+
+[[trigger.oracle.data_feeds]]
+id = "38"
+data = '{"cmc_id":"28675","cmc_quote":"COQ"}'
+
+[[trigger.oracle.data_feeds]]
+id = "39"
+data = '{"cmc_id":"2563","cmc_quote":"TUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "41"
+data = '{"cmc_id":"3792","cmc_quote":"USDE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "42"
+data = '{"cmc_id":"7334","cmc_quote":"CFX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "43"
+data = '{"cmc_id":"3717","cmc_quote":"WBTC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "44"
+data = '{"cmc_id":"7288","cmc_quote":"XVS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "45"
+data = '{"cmc_id":"8353","cmc_quote":"BETH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "47"
+data = '{"cmc_id":"1027","cmc_quote":"ETH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "48"
+data = '{"cmc_id":"131","cmc_quote":"DASH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "51"
+data = '{"cmc_id":"6951","cmc_quote":"REEF"}'
+
+[[trigger.oracle.data_feeds]]
+id = "52"
+data = '{"cmc_id":"4279","cmc_quote":"SXP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "55"
+data = '{"cmc_id":"28752","cmc_quote":"WIF"}'
+
+[[trigger.oracle.data_feeds]]
+id = "56"
+data = '{"cmc_id":"52","cmc_quote":"XRP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "57"
+data = '{"cmc_id":"3794","cmc_quote":"ATOM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "58"
+data = '{"cmc_id":"3330","cmc_quote":"USDP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "59"
+data = '{"cmc_id":"8536","cmc_quote":"MASK"}'
+
+[[trigger.oracle.data_feeds]]
+id = "60"
+data = '{"cmc_id":"512","cmc_quote":"XLM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "61"
+data = '{"cmc_id":"7186","cmc_quote":"CAKE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "63"
+data = '{"cmc_id":"4846","cmc_quote":"KAVA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "64"
+data = '{"cmc_id":"328","cmc_quote":"XMR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "65"
+data = '{"cmc_id":"20641","cmc_quote":"EURC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "67"
+data = '{"cmc_id":"3773","cmc_quote":"FET"}'
+
+[[trigger.oracle.data_feeds]]
+id = "68"
+data = '{"cmc_id":"6783","cmc_quote":"AXS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "69"
+data = '{"cmc_id":"6636","cmc_quote":"DOT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "70"
+data = '{"cmc_id":"3155","cmc_quote":"QNT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "71"
+data = '{"cmc_id":"28324","cmc_quote":"DYDX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "72"
+data = '{"cmc_id":"27075","cmc_quote":"MNT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "73"
+data = '{"cmc_id":"5617","cmc_quote":"UMA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "74"
+data = '{"cmc_id":"28803","cmc_quote":"ZERO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "75"
+data = '{"cmc_id":"31504","cmc_quote":"ULTI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "76"
+data = '{"cmc_id":"1861","cmc_quote":"STX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "78"
+data = '{"cmc_id":"5034","cmc_quote":"KSM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "79"
+data = '{"cmc_id":"28541","cmc_quote":"JTO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "80"
+data = '{"cmc_id":"32824","cmc_quote":"USDz"}'
+
+[[trigger.oracle.data_feeds]]
+id = "81"
+data = '{"cmc_id":"6719","cmc_quote":"GRT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "82"
+data = '{"cmc_id":"18069","cmc_quote":"GMT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "84"
+data = '{"cmc_id":"11726","cmc_quote":"XAI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "85"
+data = '{"cmc_id":"8707","cmc_quote":"ALPACA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "86"
+data = '{"cmc_id":"14783","cmc_quote":"MAGIC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "87"
+data = '{"cmc_id":"9797","cmc_quote":"XAVA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "89"
+data = '{"cmc_id":"8510","cmc_quote":"QI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "90"
+data = '{"cmc_id":"7859","cmc_quote":"BADGER"}'
+
+[[trigger.oracle.data_feeds]]
+id = "91"
+data = '{"cmc_id":"10804","cmc_quote":"FLOKI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "92"
+data = '{"cmc_id":"24091","cmc_quote":"ZK"}'
+
+[[trigger.oracle.data_feeds]]
+id = "93"
+data = '{"cmc_id":"3870","cmc_quote":"LIT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "95"
+data = '{"cmc_id":"2011","cmc_quote":"XTZ"}'
+
+[[trigger.oracle.data_feeds]]
+id = "96"
+data = '{"cmc_id":"9285","cmc_quote":"MOVR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "99"
+data = '{"cmc_id":"74","cmc_quote":"DOGE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "102"
+data = '{"cmc_id":"30126","cmc_quote":"MEW"}'
+
+[[trigger.oracle.data_feeds]]
+id = "103"
+data = '{"cmc_id":"3890","cmc_quote":"MATIC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "104"
+data = '{"cmc_id":"2469","cmc_quote":"ZIL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "105"
+data = '{"cmc_id":"33039","cmc_quote":"USDS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "108"
+data = '{"cmc_id":"1765","cmc_quote":"EOS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "109"
+data = '{"cmc_id":"3964","cmc_quote":"RSR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "110"
+data = '{"cmc_id":"4307","cmc_quote":"UNI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "112"
+data = '{"cmc_id":"21106","cmc_quote":"RDNT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "113"
+data = '{"cmc_id":"11232","cmc_quote":"HIGH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "115"
+data = '{"cmc_id":"7257","cmc_quote":"APE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "116"
+data = '{"cmc_id":"1831","cmc_quote":"BCH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "117"
+data = '{"cmc_id":"7236","cmc_quote":"CUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "118"
+data = '{"cmc_id":"5692","cmc_quote":"COMP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "119"
+data = '{"cmc_id":"1437","cmc_quote":"ZEC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "120"
+data = '{"cmc_id":"13855","cmc_quote":"ENS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "123"
+data = '{"cmc_id":"28829","cmc_quote":"MAVIA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "124"
+data = '{"cmc_id":"2010","cmc_quote":"ADA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "125"
+data = '{"cmc_id":"7046","cmc_quote":"GHST"}'
+
+[[trigger.oracle.data_feeds]]
+id = "126"
+data = '{"cmc_id":"4056","cmc_quote":"AMPL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "127"
+data = '{"cmc_id":"13663","cmc_quote":"GNS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "128"
+data = '{"cmc_id":"29470","cmc_quote":"USDe"}'
+
+[[trigger.oracle.data_feeds]]
+id = "129"
+data = '{"cmc_id":"1659","cmc_quote":"GNO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "130"
+data = '{"cmc_id":"7224","cmc_quote":"DODO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "131"
+data = '{"cmc_id":"3408","cmc_quote":"USDC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "132"
+data = '{"cmc_id":"18934","cmc_quote":"STG"}'
+
+[[trigger.oracle.data_feeds]]
+id = "133"
+data = '{"cmc_id":"17706","cmc_quote":"AERO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "134"
+data = '{"cmc_id":"28321","cmc_quote":"POL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "135"
+data = '{"cmc_id":"25028","cmc_quote":"ORDI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "136"
+data = '{"cmc_id":"2092","cmc_quote":"NULS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "137"
+data = '{"cmc_id":"29471","cmc_quote":"sUSDe"}'
+
+[[trigger.oracle.data_feeds]]
+id = "138"
+data = '{"cmc_id":"1697","cmc_quote":"BAT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "139"
+data = '{"cmc_id":"22454","cmc_quote":"PEPE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "140"
+data = '{"cmc_id":"2280","cmc_quote":"FIL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "141"
+data = '{"cmc_id":"5864","cmc_quote":"YFI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "142"
+data = '{"cmc_id":"501","cmc_quote":"XCN"}'
+
+[[trigger.oracle.data_feeds]]
+id = "143"
+data = '{"cmc_id":"8000","cmc_quote":"LDO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "144"
+data = '{"cmc_id":"19891","cmc_quote":"USDD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "145"
+data = '{"cmc_id":"938","cmc_quote":"ARB"}'
+
+[[trigger.oracle.data_feeds]]
+id = "147"
+data = '{"cmc_id":"28443","cmc_quote":"USDV"}'
+
+[[trigger.oracle.data_feeds]]
+id = "148"
+data = '{"cmc_id":"1518","cmc_quote":"MKR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "149"
+data = '{"cmc_id":"6538","cmc_quote":"CRV"}'
+
+[[trigger.oracle.data_feeds]]
+id = "151"
+data = '{"cmc_id":"2777","cmc_quote":"IOTX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "152"
+data = '{"cmc_id":"11857","cmc_quote":"GMX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "154"
+data = '{"cmc_id":"2539","cmc_quote":"REN"}'
+
+[[trigger.oracle.data_feeds]]
+id = "155"
+data = '{"cmc_id":"162","cmc_quote":"MIM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "156"
+data = '{"cmc_id":"4687","cmc_quote":"BUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "157"
+data = '{"cmc_id":"20317","cmc_quote":"USD+"}'
+
+[[trigger.oracle.data_feeds]]
+id = "158"
+data = '{"cmc_id":"11289","cmc_quote":"SPELL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "159"
+data = '{"cmc_id":"10903","cmc_quote":"C98"}'
+
+[[trigger.oracle.data_feeds]]
+id = "160"
+data = '{"cmc_id":"29569","cmc_quote":"USDM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "161"
+data = '{"cmc_id":"32864","cmc_quote":"AUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "163"
+data = '{"cmc_id":"6536","cmc_quote":"OM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "165"
+data = '{"cmc_id":"23121","cmc_quote":"BLUR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "166"
+data = '{"cmc_id":"4206","cmc_quote":"WIN"}'
+
+[[trigger.oracle.data_feeds]]
+id = "167"
+data = '{"cmc_id":"9608","cmc_quote":"BOO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "169"
+data = '{"cmc_id":"1503","cmc_quote":"JUP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "170"
+data = '{"cmc_id":"7226","cmc_quote":"INJ"}'
+
+[[trigger.oracle.data_feeds]]
+id = "171"
+data = '{"cmc_id":"109","cmc_quote":"DGB"}'
+
+[[trigger.oracle.data_feeds]]
+id = "172"
+data = '{"cmc_id":"9421","cmc_quote":"FORTH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "173"
+data = '{"cmc_id":"9444","cmc_quote":"KNC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "174"
+data = '{"cmc_id":"27772","cmc_quote":"PYUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "175"
+data = '{"cmc_id":"24927","cmc_quote":"CRVUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "179"
+data = '{"cmc_id":"5567","cmc_quote":"CELO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "182"
+data = '{"cmc_id":"6836","cmc_quote":"GLMR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "183"
+data = '{"cmc_id":"23149","cmc_quote":"SEI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "185"
+data = '{"cmc_id":"7232","cmc_quote":"ALPHA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "187"
+data = '{"cmc_id":"1839","cmc_quote":"BNB"}'
+
+[[trigger.oracle.data_feeds]]
+id = "189"
+data = '{"cmc_id":"8916","cmc_quote":"ICP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "190"
+data = '{"cmc_id":"2943","cmc_quote":"RPL"}'
+
+[[trigger.oracle.data_feeds]]
+id = "191"
+data = '{"cmc_id":"7824","cmc_quote":"VAI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "192"
+data = '{"cmc_id":"13502","cmc_quote":"WLD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "193"
+data = '{"cmc_id":"23839","cmc_quote":"SATS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "194"
+data = '{"cmc_id":"23508","cmc_quote":"GHO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "195"
+data = '{"cmc_id":"7548","cmc_quote":"WEMIX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "196"
+data = '{"cmc_id":"4030","cmc_quote":"ALGO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "197"
+data = '{"cmc_id":"4679","cmc_quote":"BAND"}'
+
+[[trigger.oracle.data_feeds]]
+id = "198"
+data = '{"cmc_id":"5117","cmc_quote":"OGN"}'
+
+[[trigger.oracle.data_feeds]]
+id = "199"
+data = '{"cmc_id":"2586","cmc_quote":"SNX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "201"
+data = '{"cmc_id":"2130","cmc_quote":"ENJ"}'
+
+[[trigger.oracle.data_feeds]]
+id = "202"
+data = '{"cmc_id":"5805","cmc_quote":"AVAX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "203"
+data = '{"cmc_id":"26081","cmc_quote":"FDUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "204"
+data = '{"cmc_id":"6758","cmc_quote":"SUSHI"}'
+
+[[trigger.oracle.data_feeds]]
+id = "205"
+data = '{"cmc_id":"2","cmc_quote":"LTC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "206"
+data = '{"cmc_id":"5776","cmc_quote":"TBTC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "207"
+data = '{"cmc_id":"8911","cmc_quote":"STRK"}'
+
+[[trigger.oracle.data_feeds]]
+id = "208"
+data = '{"cmc_id":"1975","cmc_quote":"LINK"}'
+
+[[trigger.oracle.data_feeds]]
+id = "209"
+data = '{"cmc_id":"32307","cmc_quote":"USD0"}'
+
+[[trigger.oracle.data_feeds]]
+id = "210"
+data = '{"cmc_id":"24276","cmc_quote":"DEGEN"}'
+
+[[trigger.oracle.data_feeds]]
+id = "211"
+data = '{"cmc_id":"26997","cmc_quote":"ZRO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "212"
+data = '{"cmc_id":"3978","cmc_quote":"CHR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "214"
+data = '{"cmc_id":"2416","cmc_quote":"THETA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "215"
+data = '{"cmc_id":"9903","cmc_quote":"CVX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "216"
+data = '{"cmc_id":"6187","cmc_quote":"SRM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "217"
+data = '{"cmc_id":"7278","cmc_quote":"AAVE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "218"
+data = '{"cmc_id":"2566","cmc_quote":"ONT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "219"
+data = '{"cmc_id":"27659","cmc_quote":"MOG"}'
+
+[[trigger.oracle.data_feeds]]
+id = "220"
+data = '{"cmc_id":"11840","cmc_quote":"OP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "223"
+data = '{"cmc_id":"6952","cmc_quote":"FRAX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "225"
+data = '{"cmc_id":"9566","cmc_quote":"LUSD"}'
+
+[[trigger.oracle.data_feeds]]
+id = "226"
+data = '{"cmc_id":"3702","cmc_quote":"BEAM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "227"
+data = '{"cmc_id":"9481","cmc_quote":"PENDLE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "228"
+data = '{"cmc_id":"5824","cmc_quote":"SLP"}'
+
+[[trigger.oracle.data_feeds]]
+id = "229"
+data = '{"cmc_id":"12885","cmc_quote":"ASTR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "232"
+data = '{"cmc_id":"7127","cmc_quote":"VELO"}'
+
+[[trigger.oracle.data_feeds]]
+id = "233"
+data = '{"cmc_id":"1321","cmc_quote":"ETC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "234"
+data = '{"cmc_id":"11396","cmc_quote":"JOE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "235"
+data = '{"cmc_id":"6953","cmc_quote":"FXS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "236"
+data = '{"cmc_id":"825","cmc_quote":"USDT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "237"
+data = '{"cmc_id":"9175","cmc_quote":"MBOX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "238"
+data = '{"cmc_id":"2324","cmc_quote":"ONE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "239"
+data = '{"cmc_id":"10238","cmc_quote":"MIMATIC"}'
+
+[[trigger.oracle.data_feeds]]
+id = "240"
+data = '{"cmc_id":"4944","cmc_quote":"TRB"}'
+
+[[trigger.oracle.data_feeds]]
+id = "241"
+data = '{"cmc_id":"3513","cmc_quote":"FTM"}'
+
+[[trigger.oracle.data_feeds]]
+id = "242"
+data = '{"cmc_id":"4157","cmc_quote":"RUNE"}'
+
+[[trigger.oracle.data_feeds]]
+id = "244"
+data = '{"cmc_id":"6535","cmc_quote":"NEAR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "245"
+data = '{"cmc_id":"13473","cmc_quote":"APT"}'
+
+[[trigger.oracle.data_feeds]]
+id = "248"
+data = '{"cmc_id":"4256","cmc_quote":"KLAY"}'
+
+[[trigger.oracle.data_feeds]]
+id = "249"
+data = '{"cmc_id":"28177","cmc_quote":"PYTH"}'
+
+[[trigger.oracle.data_feeds]]
+id = "250"
+data = '{"cmc_id":"1896","cmc_quote":"ZRX"}'
+
+[[trigger.oracle.data_feeds]]
+id = "251"
+data = '{"cmc_id":"9640","cmc_quote":"METIS"}'
+
+[[trigger.oracle.data_feeds]]
+id = "252"
+data = '{"cmc_id":"1966","cmc_quote":"MANA"}'
+
+[[trigger.oracle.data_feeds]]
+id = "254"
+data = '{"cmc_id":"3217","cmc_quote":"ONG"}'
+
+[[trigger.oracle.data_feeds]]
+id = "255"
+data = '{"cmc_id":"4642","cmc_quote":"HBAR"}'
+
+[[trigger.oracle.data_feeds]]
+id = "256"
+data = '{"cmc_id":"7501","cmc_quote":"WOO"}'
+
+[[trigger.oracle.capabilities]]
+data = "1ae0fbaf-5590-424a-865c-71daf04defb1"
+id = "CMC_API_KEY"
+
+[component.coinmarketcap]
+source = "target/wasm32-wasip1/release/cmc_oracle.wasm"
+allowed_outbound_hosts = ["https://pro-api.coinmarketcap.com"]
+
+[component.coinmarketcap.build]
+command = "cargo build --target wasm32-wasip1 --release"

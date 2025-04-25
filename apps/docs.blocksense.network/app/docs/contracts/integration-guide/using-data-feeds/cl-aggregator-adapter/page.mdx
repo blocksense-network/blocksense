@@ -1,0 +1,141 @@
+---
+title: CL Aggregator Adapter
+---
+
+import { Callout } from "@blocksense/ui/Callout";
+
+# CL Aggregator Adapter
+
+The CL Aggregator Adapter is a smart contract that acts as a proxy for a Blocksense feed. It provides easy access to the latest round data and historical round data for a given feed. The CL Aggregator Adapter is responsible for a single feed associated with a specific token pair on a given network. It exposes a part of Chainlink's aggregator interface, hence the name.
+
+<Callout type="info" emoji="💡">
+  Feeds without a corresponding token address, such as those for stock indices,
+  do not have a dedicated CL Aggregator Adapter due to the lack of a canonical token
+  representation.
+</Callout>
+
+For a complete list of functions and parameters for the CLAggregatorAdapter contract, see the [CL Aggregator Adapter Reference Documentation](../../reference-documentation/contract/CLAggregatorAdapter.mdx).
+
+```mermaid
+---
+config:
+    rightAngles: true
+---
+flowchart TD
+  classDef clientNode display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
+  classDef proxyNode,dataNode display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
+  classDef proxyNode:hover,dataNode:hover fill:#fafafa,color:#0000EE,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace, text-decoration: underline, text-underline-offset: 4px;
+
+  A[Client] -->|get feed's data| CP[CLAggregatorAdapter]
+  CP -->|reads from| DFS[AggregatedDataFeedStore]
+
+  click CP "/docs/contracts/reference-documentation/contract/CLAggregatorAdapter" "Go to CLAggregatorAdapter"
+  click DFS "/docs/contracts/reference-documentation/contract/AggregatedDataFeedStore" "Go to AggregatedDataFeedStore"
+
+  class A clientNode
+  class CP proxyNode
+  class DFS dataNode
+```
+
+## Code Examples
+
+### Solidity
+
+To consume price data from the CL Aggregator Adapter, your smart contract should reference [`ICLAggregatorAdapter`](/coming-soon), which defines the external functions implemented by the CL Aggregator Adapter.
+
+```solidity showLineNumbers copy filename="CLAggregatorAdapterConsumer.sol"
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import {IChainlinkAggregator} from 'interfaces/chainlink/IChainlinkAggregator.sol';
+
+/**
+ * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
+ * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
+ * DO NOT USE THIS CODE IN PRODUCTION.
+ */
+contract CLAggregatorAdapterConsumer {
+  IChainlinkAggregator public immutable feed;
+
+  constructor(address feedAddress) {
+    feed = IChainlinkAggregator(feedAddress);
+  }
+
+  function getDecimals() external view returns (uint8 decimals_) {
+    return feed.decimals();
+  }
+
+  function getDescription() external view returns (string memory description_) {
+    return feed.description();
+  }
+
+  function getLatestAnswer() external view returns (uint256 answer) {
+    return uint256(feed.latestAnswer());
+  }
+
+  function getLatestRound() external view returns (uint256 roundId) {
+    return feed.latestRound();
+  }
+
+  function getRoundData(
+    uint80 roundId
+  )
+    external
+    view
+    returns (
+      uint80 roundId_,
+      int256 answer,
+      uint256 startedAt,
+      uint256 updatedAt,
+      uint80 answeredInRound
+    )
+  {
+    return feed.getRoundData(roundId);
+  }
+
+  function getLatestRoundData()
+    external
+    view
+    returns (
+      uint80 roundId,
+      int256 answer,
+      uint256 startedAt,
+      uint256 updatedAt,
+      uint80 answeredInRound
+    )
+  {
+    return feed.latestRoundData();
+  }
+}
+```
+
+### Solidity Hardhat Example
+
+<Callout type="info" emoji="💡">
+You can find a working Hardhat project [here](/coming-soon). Clone the repo
+and follow the setup instructions to run the example locally.
+</Callout>
+
+### Ethers.js v6.x
+
+To get latest price:
+
+```js copy filename="javascript"
+const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
+const price = await aggregator.latestAnswer();
+```
+
+To get round data:
+
+```js copy filename="javascript"
+const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
+const [roundID, answer, startedAt, updatedAt, answeredInRound] =
+  await aggregator.getRoundData(roundId);
+```
+
+To get the feed key the CL Aggregator Adapter is responsible for:
+
+```js copy filename="javascript"
+const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
+const id = await aggregator.id();
+```

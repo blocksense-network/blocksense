@@ -1,0 +1,166 @@
+import { ethers } from 'hardhat';
+import { deployContract } from '../experiments/utils/helpers/common';
+import { BlocksenseADFSConsumer, RawCallADFSConsumer } from '../../typechain';
+import * as utils from './utils/feedStoreConsumer';
+import { expect } from 'chai';
+import { ADFSWrapper } from '../utils/wrappers';
+
+const feeds = [
+  {
+    id: 1n,
+    round: 1n,
+    stride: 0n,
+    data: ethers.hexlify(ethers.randomBytes(32)),
+  },
+  {
+    id: 1n,
+    round: 8191n,
+    stride: 0n,
+    data: ethers.hexlify(ethers.randomBytes(32)),
+  },
+  {
+    id: 1n,
+    round: 1n,
+    stride: 4n,
+    data: ethers.hexlify(ethers.randomBytes(2 ** 4 * 32)),
+  },
+];
+
+describe('Example: ADFSConsumer', function () {
+  let dataFeedStore: ADFSWrapper;
+  let blocksenseADFSConsumer: BlocksenseADFSConsumer;
+  let rawCallADFSConsumer: RawCallADFSConsumer;
+  const key = 1;
+  const round = 1n;
+
+  beforeEach(async function () {
+    const sequencer = (await ethers.getSigners())[0];
+    const accessControlOwner = (await ethers.getSigners())[1];
+
+    dataFeedStore = new ADFSWrapper();
+    await dataFeedStore.init(accessControlOwner);
+    await dataFeedStore.accessControl.setAdminStates(
+      accessControlOwner,
+      [sequencer.address],
+      [true],
+    );
+
+    await dataFeedStore.setFeeds(sequencer, feeds);
+
+    blocksenseADFSConsumer = await deployContract<BlocksenseADFSConsumer>(
+      'BlocksenseADFSConsumer',
+      dataFeedStore.contract.target,
+    );
+    rawCallADFSConsumer = await deployContract<RawCallADFSConsumer>(
+      'RawCallADFSConsumer',
+      dataFeedStore.contract.target,
+    );
+  });
+
+  [
+    { title: 'get latest single feed', fnName: 'getLatestSingleFeedData' },
+    {
+      title: 'get latest single feed and round',
+      fnName: 'getLatestSingleFeedDataAndRound',
+    },
+    {
+      title: 'get single feed data at round',
+      fnName: 'getSingleFeedDataAtRound',
+    },
+  ].forEach(data => {
+    it(`Should ${data.title}`, async function () {
+      await getAndCompareData(
+        [null, key, round],
+        data.fnName as keyof typeof utils,
+      );
+    });
+  });
+
+  [
+    {
+      title: 'get latest feed',
+      fnName: 'getLatestFeedData',
+    },
+    {
+      title: 'get latest feed and round',
+      fnName: 'getLatestFeedDataAndRound',
+    },
+    {
+      title: 'get feed data at round',
+      fnName: 'getFeedDataAtRound',
+    },
+  ].forEach(data => {
+    const feedsWithMultipleSlots = feeds.filter(feed => feed.stride > 0);
+    for (const feed of feedsWithMultipleSlots) {
+      it(`Should ${data.title} for stride ${feed.stride}`, async function () {
+        await getAndCompareData(
+          [feed.stride, key, round],
+          data.fnName as keyof typeof utils,
+        );
+      });
+    }
+  });
+
+  [
+    {
+      title: 'get latest sliced feed',
+      fnName: 'getLatestSlicedFeedData',
+    },
+    {
+      title: 'get latest sliced feed and round',
+      fnName: 'getLatestSlicedFeedDataAndRound',
+    },
+    {
+      title: 'get sliced feed data at round',
+      fnName: 'getSlicedFeedDataAtRound',
+    },
+  ].forEach(data => {
+    const feedsWithMultipleSlots = feeds.filter(feed => feed.stride > 0);
+    for (const feed of feedsWithMultipleSlots) {
+      for (let i = 0; i < 2n ** feed.stride; i++) {
+        it(`Should ${data.title} for stride ${feed.stride} and slice(${i}, ${Number(2n ** feed.stride) - i})`, async function () {
+          await getAndCompareData(
+            [
+              feed.stride,
+              key,
+              data.fnName === 'getSlicedFeedDataAtRound' ? round : null,
+              i,
+              Number(2n ** feed.stride) - i,
+            ],
+            data.fnName as keyof typeof utils,
+          );
+        });
+      }
+    }
+  });
+
+  for (const feed of feeds) {
+    it(`Should get latest round for stride ${feed.stride}`, async function () {
+      await getAndCompareData([feed.stride, feed.id], 'getLatestRound');
+    });
+  }
+
+  const getAndCompareData = async (
+    data: any[],
+    functionName: keyof typeof utils,
+  ) => {
+    const inputsCount =
+      blocksenseADFSConsumer.interface.getFunction(functionName).inputs.length;
+    const filteredData = data.filter(v => v !== null).slice(0, inputsCount);
+
+    const blocksenseData = await blocksenseADFSConsumer.getFunction(
+      functionName,
+    )(...filteredData);
+    const rawCallData = await rawCallADFSConsumer.getFunction(functionName)(
+      ...filteredData,
+    );
+
+    const utilData = await utils[functionName](
+      await dataFeedStore.contract.getAddress(),
+      data,
+    );
+
+    expect(blocksenseData).to.deep.equal(utilData);
+    expect(rawCallData).to.deep.equal(utilData);
+  };
+});
