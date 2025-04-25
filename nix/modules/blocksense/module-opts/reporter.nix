@@ -32,7 +32,8 @@ with lib;
     };
 
     second-consensus-secret-key-path = mkOption {
-      type = types.path;
+      type = types.nullOr types.path;
+      default = null;
       description = "The path to the reporter second consensus secret key.";
     };
 
