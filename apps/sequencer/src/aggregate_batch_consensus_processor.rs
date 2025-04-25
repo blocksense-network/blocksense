@@ -9,9 +9,8 @@ use blocksense_utils::time::current_unix_time;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
-use crate::providers::eth_send_utils::eth_batch_send_to_contract;
 use crate::providers::eth_send_utils::{
-    decrement_feeds_round_indexes, increment_feeds_round_indexes,
+    decrement_feeds_round_indexes, get_tx_retry_params, increment_feeds_round_indexes,
 };
 use crate::providers::provider::{parse_eth_address, GNOSIS_SAFE_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
@@ -205,7 +204,6 @@ pub async fn aggregation_batch_consensus_loop(
                                         let receipt_result = if transaction_retries_count == 0 {
                                             tx_to_send
                                         } else {
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                                             let provider_settings = if let Some(provider_settings) = providers_config.get(net) {
                                                 let is_enabled_value = provider_settings.is_enabled;
@@ -238,90 +236,26 @@ pub async fn aggregation_batch_consensus_loop(
                                                 }
                                             };
 
-                                            debug!("Getting nonce for network {net} and address {sender_address}...");
-                                            let nonce = match actix_web::rt::time::timeout(
-                                                Duration::from_secs(transaction_retry_timeout_secs),
-                                                provider.provider.get_transaction_count(sender_address).latest(),
-                                            )
-                                            .await
-                                            {
-                                                Ok(nonce_result) => match nonce_result {
-                                                    Ok(nonce) => {
-                                                        debug!("Got nonce={nonce} for network {net} and address {sender_address}");
-                                                        nonce
-                                                    }
-                                                    Err(err) => {
-                                                        debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
-                                                        return Err(err.into());
-                                                    }
-                                                },
-                                                Err(err) => {
-                                                    warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
+                                            let (nonce, max_fee_per_gas, priority_fee) = match get_tx_retry_params(
+                                                net.as_str(),
+                                                &provider.provider,
+                                                &sender_address,
+                                                transaction_retry_timeout_secs,
+                                                transaction_retries_count,
+                                                retry_fee_increment_fraction
+                                            ).await {
+                                                Ok(res) => res,
+                                                Err(e) => {
                                                     transaction_retries_count += 1;
                                                     continue;
-                                                }
-                                            };
-
-                                            let price_increment =
-                                                1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
-
-                                            debug!("Getting gas_price for network {net}...");
-                                            let gas_price = match actix_web::rt::time::timeout(
-                                                Duration::from_secs(transaction_retry_timeout_secs),
-                                                provider.provider.get_gas_price(),
-                                            )
-                                            .await
-                                            {
-                                                Ok(gas_price_result) => match gas_price_result {
-                                                    Ok(gas_price) => {
-                                                        debug!("Got gas_price={gas_price} for network {net}");
-                                                        gas_price
-                                                    }
-                                                    Err(err) => {
-                                                        debug!("Failed to get gas_price for network {net} due to {err}");
-                                                        return Err(err.into());
-                                                    }
                                                 },
-                                                Err(err) => {
-                                                    warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
-                                                    transaction_retries_count += 1;
-                                                    continue;
-                                                }
                                             };
-
-                                            debug!("Getting priority_fee for network {net}...");
-                                            let mut priority_fee = match actix_web::rt::time::timeout(
-                                                Duration::from_secs(transaction_retry_timeout_secs),
-                                                provider.provider.get_max_priority_fee_per_gas(),
-                                            )
-                                            .await
-                                            {
-                                                Ok(priority_fee_result) => match priority_fee_result {
-                                                    Ok(priority_fee) => {
-                                                        debug!("Got priority_fee={priority_fee} for network {net}");
-                                                        priority_fee
-                                                    }
-                                                    Err(err) => {
-                                                        debug!("Failed to get priority_fee for network {net} due to {err}");
-                                                        return Err(err.into());
-                                                    }
-                                                },
-                                                Err(err) => {
-                                                    warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
-                                                    transaction_retries_count += 1;
-                                                    continue;
-                                                }
-                                            };
-
-                                            priority_fee = (priority_fee as f64 * price_increment) as u128;
-                                            let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
-                                            max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
 
                                             tx_to_send
                                                 .max_priority_fee_per_gas(priority_fee)
                                                 .max_fee_per_gas(max_fee_per_gas)
                                                 .nonce(nonce)
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
                                         };
 
                                         let receipt = match receipt_result.send().await {

@@ -2,7 +2,7 @@ use actix_web::{rt::spawn, web::Data};
 use alloy::{
     hex,
     network::TransactionBuilder,
-    primitives::Bytes,
+    primitives::{Address, Bytes},
     providers::{Provider, ProviderBuilder},
     rpc::types::eth::TransactionRequest,
 };
@@ -314,84 +314,23 @@ pub async fn eth_batch_send_to_contract(
                 "Retrying to send updates to network {net} for {transaction_retries_count}-th time"
             );
 
-            debug!("Getting nonce for network {net} and address {sender_address}...");
-            let nonce = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.get_transaction_count(sender_address).latest(),
+            let (nonce, max_fee_per_gas, priority_fee) = match get_tx_retry_params(
+                net.as_str(),
+                rpc_handle,
+                &sender_address,
+                transaction_retry_timeout_secs,
+                transaction_retries_count,
+                retry_fee_increment_fraction,
             )
             .await
             {
-                Ok(nonce_result) => match nonce_result {
-                    Ok(nonce) => {
-                        debug!("Got nonce={nonce} for network {net} and address {sender_address}");
-                        nonce
-                    }
-                    Err(err) => {
-                        debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
-                        return Err(err.into());
-                    }
-                },
-                Err(err) => {
-                    warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
+                Ok(res) => res,
+                Err(e) => {
                     transaction_retries_count += 1;
                     continue;
                 }
             };
 
-            let price_increment =
-                1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
-
-            debug!("Getting gas_price for network {net}...");
-            let gas_price = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.get_gas_price(),
-            )
-            .await
-            {
-                Ok(gas_price_result) => match gas_price_result {
-                    Ok(gas_price) => {
-                        debug!("Got gas_price={gas_price} for network {net}");
-                        gas_price
-                    }
-                    Err(err) => {
-                        debug!("Failed to get gas_price for network {net} due to {err}");
-                        return Err(err.into());
-                    }
-                },
-                Err(err) => {
-                    warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
-                    transaction_retries_count += 1;
-                    continue;
-                }
-            };
-
-            debug!("Getting priority_fee for network {net}...");
-            let mut priority_fee = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.get_max_priority_fee_per_gas(),
-            )
-            .await
-            {
-                Ok(priority_fee_result) => match priority_fee_result {
-                    Ok(priority_fee) => {
-                        debug!("Got priority_fee={priority_fee} for network {net}");
-                        priority_fee
-                    }
-                    Err(err) => {
-                        debug!("Failed to get priority_fee for network {net} due to {err}");
-                        return Err(err.into());
-                    }
-                },
-                Err(err) => {
-                    warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
-                    transaction_retries_count += 1;
-                    continue;
-                }
-            };
-
-            priority_fee = (priority_fee as f64 * price_increment) as u128;
-            let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
-            max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
             tx = TransactionRequest::default()
                 .to(contract_address)
                 .nonce(nonce)
@@ -503,6 +442,94 @@ pub async fn eth_batch_send_to_contract(
     debug!("Released a read/write lock on provider state for network `{net}`");
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+use crate::providers::provider::ProviderType;
+
+pub async fn get_tx_retry_params(
+    net: &str,
+    rpc_handle: &ProviderType,
+    sender_address: &Address,
+    transaction_retry_timeout_secs: u64,
+    transaction_retries_count: u64,
+    retry_fee_increment_fraction: f64,
+) -> Result<(u64, u128, u128)> {
+    debug!("Getting nonce for network {net} and address {sender_address}...");
+    let nonce = match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_transaction_count(*sender_address).latest(),
+    )
+    .await
+    {
+        Ok(nonce_result) => match nonce_result {
+            Ok(nonce) => {
+                debug!("Got nonce={nonce} for network {net} and address {sender_address}");
+                nonce
+            }
+            Err(err) => {
+                debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
+                return Err(err.into());
+            }
+        },
+        Err(err) => {
+            warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
+            eyre::bail!("Timed out");
+        }
+    };
+
+    let price_increment = 1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
+
+    debug!("Getting gas_price for network {net}...");
+    let gas_price = match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_gas_price(),
+    )
+    .await
+    {
+        Ok(gas_price_result) => match gas_price_result {
+            Ok(gas_price) => {
+                debug!("Got gas_price={gas_price} for network {net}");
+                gas_price
+            }
+            Err(err) => {
+                debug!("Failed to get gas_price for network {net} due to {err}");
+                return Err(err.into());
+            }
+        },
+        Err(err) => {
+            warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
+            eyre::bail!("Timed out");
+        }
+    };
+
+    debug!("Getting priority_fee for network {net}...");
+    let mut priority_fee = match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_max_priority_fee_per_gas(),
+    )
+    .await
+    {
+        Ok(priority_fee_result) => match priority_fee_result {
+            Ok(priority_fee) => {
+                debug!("Got priority_fee={priority_fee} for network {net}");
+                priority_fee
+            }
+            Err(err) => {
+                debug!("Failed to get priority_fee for network {net} due to {err}");
+                return Err(err.into());
+            }
+        },
+        Err(err) => {
+            warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
+            eyre::bail!("Timed out");
+        }
+    };
+
+    priority_fee = (priority_fee as f64 * price_increment) as u128;
+    let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
+    max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
+
+    Ok((nonce, max_fee_per_gas, priority_fee))
 }
 
 pub async fn eth_batch_send_to_all_contracts(
