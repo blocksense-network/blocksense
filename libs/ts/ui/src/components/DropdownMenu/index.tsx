@@ -5,7 +5,6 @@ export {
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSubTrigger,
 } from './DropdownMenu';

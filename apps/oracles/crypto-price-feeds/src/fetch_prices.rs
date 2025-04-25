@@ -1,15 +1,15 @@
 use anyhow::Result;
-use futures::FutureExt;
 use serde::{Deserialize, Serialize};
 
 use std::time::Instant;
 
 use futures::stream::{FuturesUnordered, StreamExt};
 
+use blocksense_sdk::{traits::prices_fetcher::fetch, traits::prices_fetcher::TradingPairSymbol};
+
 use crate::{
     common::{
-        ExchangePriceData, ExchangesSymbols, PairPriceData, ResourceData, ResourcePairData,
-        TradingPairSymbol, TradingPairToResults,
+        ExchangePriceData, ExchangesSymbols, ResourceData, ResourcePairData, TradingPairToResults,
     },
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
@@ -19,10 +19,7 @@ use crate::{
         kucoin::KuCoinPriceFetcher, mexc::MEXCPriceFetcher, okx::OKXPriceFetcher,
         upbit::UpBitPriceFetcher,
     },
-    traits::prices_fetcher::PricesFetcher,
 };
-
-use futures::future::LocalBoxFuture;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -64,20 +61,20 @@ pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToR
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let mut futures_set = FuturesUnordered::from_iter([
-        fetch::<BinancePriceFetcher>(&symbols.binance),
-        fetch::<BinanceUsPriceFetcher>(&symbols.binance_us),
-        fetch::<BitfinexPriceFetcher>(&symbols.bitfinex),
-        fetch::<BitgetPriceFetcher>(&[]),
-        fetch::<BybitPriceFetcher>(&[]),
-        fetch::<CoinbasePriceFetcher>(&symbols.coinbase),
-        fetch::<CryptoComPriceFetcher>(&[]),
-        fetch::<GateIoPriceFetcher>(&[]),
-        fetch::<GeminiPriceFetcher>(&symbols.gemini),
-        fetch::<KrakenPriceFetcher>(&[]),
-        fetch::<KuCoinPriceFetcher>(&[]),
-        fetch::<MEXCPriceFetcher>(&[]),
-        fetch::<OKXPriceFetcher>(&[]),
-        fetch::<UpBitPriceFetcher>(&symbols.upbit),
+        fetch::<BinancePriceFetcher>(&symbols.binance, None),
+        fetch::<BinanceUsPriceFetcher>(&symbols.binance_us, None),
+        fetch::<BitfinexPriceFetcher>(&symbols.bitfinex, None),
+        fetch::<BitgetPriceFetcher>(&[], None),
+        fetch::<BybitPriceFetcher>(&[], None),
+        fetch::<CoinbasePriceFetcher>(&symbols.coinbase, None),
+        fetch::<CryptoComPriceFetcher>(&[], None),
+        fetch::<GateIoPriceFetcher>(&[], None),
+        fetch::<GeminiPriceFetcher>(&symbols.gemini, None),
+        fetch::<KrakenPriceFetcher>(&[], None),
+        fetch::<KuCoinPriceFetcher>(&[], None),
+        fetch::<MEXCPriceFetcher>(&[], None),
+        fetch::<OKXPriceFetcher>(&[], None),
+        fetch::<UpBitPriceFetcher>(&symbols.upbit, None),
     ]);
 
     let before_fetch = Instant::now();
@@ -145,16 +142,4 @@ fn get_alternative_quotes_for_quote(quote: &str) -> Vec<&str> {
     } else {
         Vec::new()
     }
-}
-
-fn fetch<'a, PF>(symbols: &'a [String]) -> LocalBoxFuture<'a, (&'static str, Result<PairPriceData>)>
-where
-    PF: PricesFetcher<'a>,
-{
-    async {
-        let fetcher = PF::new(symbols);
-        let res = fetcher.fetch().await;
-        (PF::NAME, res)
-    }
-    .boxed_local()
 }

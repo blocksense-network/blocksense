@@ -1,6 +1,6 @@
-use std::env;
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::{env, io::IsTerminal};
 use tracing_subscriber::filter::LevelFilter;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::{filter, fmt, reload, Registry};
@@ -86,12 +86,16 @@ pub fn init_logging_handle(logging_level: &str, tokio_console: bool) -> LoggingH
             // add the console layer to the subscriber
             .with(console_layer)
             // add the logs layer
-            .with(tracing_subscriber::fmt::layer().with_filter(filter))
+            .with(
+                tracing_subscriber::fmt::layer()
+                    .with_ansi(std::io::stderr().is_terminal())
+                    .with_filter(filter),
+            )
             .init();
     } else {
         tracing_subscriber::registry()
             .with(layer_filter)
-            .with(fmt::Layer::default())
+            .with(fmt::Layer::default().with_ansi(std::io::stderr().is_terminal()))
             .init();
     }
     LoggingHandle {

@@ -6,10 +6,10 @@ import {
   CommandList,
   CommandEmpty,
   CommandGroup,
-  CommandSeparator,
   CommandItem,
   CommandShortcut,
 } from './Command';
+import { Separator } from '@blocksense/ui';
 
 export default {
   title: 'Components/Command',
@@ -64,7 +64,7 @@ export const CommandWithCategories = () => (
           </CommandShortcut>
         </CommandItem>
       </CommandGroup>
-      <CommandSeparator className="command__separator bg-neutral-200" />
+      <Separator className="command__separator -mx-1" />
       <CommandGroup className="command__group ml-4">
         <CommandItem className="command__item">
           Settings

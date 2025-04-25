@@ -111,17 +111,6 @@ export const CommandGroup = ({
   />
 );
 
-export const CommandSeparator = ({
-  className,
-  ...props
-}: ComponentProps<typeof CommandPrimitive.Separator>) => (
-  <CommandPrimitive.Separator
-    className={cn('command-separator__line -mx-1 h-px bg-border', className)}
-    {...props}
-    aria-hidden="true"
-  />
-);
-
 export const CommandItem = ({
   className,
   ...props
@@ -156,6 +145,5 @@ CommandInput.displayName = CommandPrimitive.Input.displayName;
 CommandList.displayName = CommandPrimitive.List.displayName;
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
 CommandGroup.displayName = CommandPrimitive.Group.displayName;
-CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 CommandItem.displayName = CommandPrimitive.Item.displayName;
 CommandShortcut.displayName = 'CommandShortcut';

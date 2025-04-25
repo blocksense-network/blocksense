@@ -1,16 +1,16 @@
 use actix_web::web::Data;
 use alloy::hex;
-use blockchain_data_model::{BlockHeader, FeedActions};
-use eyre::Result;
-use feed_registry::feed_registration_cmds::{
+use blocksense_blockchain_data_model::{BlockHeader, FeedActions};
+use blocksense_feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
+use eyre::Result;
 use rdkafka::config::ClientConfig;
 use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::message::{BorrowedMessage, Message};
 use std::io::Error;
 use tokio_stream::StreamExt;
-use tracing::{debug, error, info, trace, warn};
+use tracing::{debug, error, info, warn};
 
 use crate::feeds::feed_config_conversions::block_feed_to_feed_config;
 use crate::sequencer_state::SequencerState;
@@ -86,7 +86,7 @@ async fn process_msg_from_stream(
         match serde_json::from_str::<serde_json::Value>(&String::from_utf8_lossy(payload)) {
             Ok(block) => {
                 match process_block(sequencer_id, sequencer_state, &block).await {
-                    Ok(_) => trace!("Successfully processed block: {block}"),
+                    Ok(_) => debug!("Successfully processed block: {block}"),
                     Err(e) => error!("Error processing block: {block} error: {e}"),
                 };
             }

@@ -4,10 +4,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -35,7 +34,7 @@ pub struct CryptoComPriceFetcher;
 impl PricesFetcher<'_> for CryptoComPriceFetcher {
     const NAME: &'static str = "Crypto.com";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 
@@ -44,6 +43,7 @@ impl PricesFetcher<'_> for CryptoComPriceFetcher {
             let response = http_get_json::<CryptoComPriceResponse>(
                 "https://api.crypto.com/exchange/v1/public/get-tickers",
                 None,
+                None,
             )
             .await?;
 
@@ -51,8 +51,6 @@ impl PricesFetcher<'_> for CryptoComPriceFetcher {
                 .result
                 .data
                 .into_iter()
-                //  we should consider what to do with perp
-                .filter(|value| !value.i.contains("-PERP"))
                 .map(|value| {
                     (
                         value.i.replace("_", ""),

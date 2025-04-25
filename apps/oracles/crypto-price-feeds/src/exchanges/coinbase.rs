@@ -9,10 +9,9 @@ use std::ops::Deref;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -30,7 +29,7 @@ pub struct CoinbasePriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for CoinbasePriceFetcher<'a> {
     const NAME: &'static str = "Coinbase";
 
-    fn new(symbols: &'a [String]) -> Self {
+    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
         Self { symbols }
     }
 
@@ -58,7 +57,7 @@ impl<'a> PricesFetcher<'a> for CoinbasePriceFetcher<'a> {
 }
 pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)> {
     let url = format!("https://api.exchange.coinbase.com/products/{symbol}/ticker");
-    let response = http_get_json::<CoinbasePriceResponse>(&url, None).await?;
+    let response = http_get_json::<CoinbasePriceResponse>(&url, None, None).await?;
 
     Ok((
         symbol.to_string().replace("-", ""),

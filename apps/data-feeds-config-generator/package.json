@@ -5,8 +5,8 @@
   "types": "src/index.ts",
   "exports": {
     "./feeds_config": {
-      "require": "./config/feeds_config_v1.json",
-      "import": "./config/feeds_config_v1.json"
+      "require": "./config/feeds_config_v2.json",
+      "import": "./config/feeds_config_v2.json"
     },
     "./chainlink_compatibility": {
       "require": "./config/chainlink_compatibility_v1.json",
@@ -23,8 +23,8 @@
     "get-chainlink-feeds": "yarn ts scripts/get-chainlink-feeds.ts",
     "get-cmc-market-cap-data": "yarn ts scripts/get-cmc-market-cap-data.ts",
     "get-providers-data": "yarn ts scripts/get-providers-data.ts",
-    "generate-initial-feeds-config": "yarn ts scripts/generate-initial-feeds-config.ts",
     "fetch-symbols": "yarn ts src/data-services/fetchers/scripts/fetch-symbols.ts",
+    "update-exchanges-argument-config": "yarn ts scripts/update-exchanges-argument-config.ts",
     "test": "yarn vitest --typecheck -w false"
   },
   "devDependencies": {
@@ -38,7 +38,7 @@
     "keccak": "^3.0.4",
     "keccak256": "^1.0.6",
     "tsx": "^4.19.2",
-    "typescript": "^5.5.4",
+    "typescript": "5.8.3",
     "vitest": "^3.0.2",
     "yahoo-finance2": "^2.13.2"
   },

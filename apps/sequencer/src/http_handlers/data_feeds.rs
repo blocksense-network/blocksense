@@ -1,33 +1,36 @@
 use actix_web::http::StatusCode;
 use alloy_primitives::{FixedBytes, PrimitiveSignature};
+use blocksense_gnosis_safe::utils::SignatureWithAddress;
+use blocksense_utils::time::current_unix_time;
 use chrono::{TimeZone, Utc};
 use eyre::Result;
-use gnosis_safe::utils::SignatureWithAddress;
 use std::str::FromStr;
 use std::sync::Arc;
-use utils::time::current_unix_time;
 
 use actix_web::error::{ErrorBadRequest, ErrorInternalServerError};
 use actix_web::web::{self, ServiceConfig};
 use actix_web::Error;
 use actix_web::{get, post, HttpResponse};
-use feed_registry::types::{GetLastPublishedRequestData, LastPublishedValue, ReportRelevance};
+use blocksense_feed_registry::types::{
+    GetLastPublishedRequestData, LastPublishedValue, ReportRelevance,
+};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
-use tracing::{debug, error, info, info_span, trace, warn};
+use tracing::{debug, error, info, info_span, warn};
 use uuid::Uuid;
 
 use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
-use config::SequencerConfig;
-use feed_registry::registry::FeedAggregateHistory;
-use feed_registry::types::DataFeedPayload;
-use feed_registry::types::FeedMetaData;
-use feeds_processing::utils::check_signature;
-use gnosis_safe::data_types::ReporterResponse;
-use prometheus::{inc_metric, inc_vec_metric};
+use blocksense_config::SequencerConfig;
+use blocksense_feed_registry::registry::FeedAggregateHistory;
+use blocksense_feed_registry::registry::VoteStatus;
+use blocksense_feed_registry::types::DataFeedPayload;
+use blocksense_feed_registry::types::FeedMetaData;
+use blocksense_feeds_processing::utils::check_signature;
+use blocksense_gnosis_safe::data_types::ReporterResponse;
+use blocksense_metrics::{inc_metric, inc_vec_metric};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::sync::{mpsc, RwLock};
 use tokio::time::Duration;
@@ -111,12 +114,7 @@ async fn process_report(
         }
     };
 
-    trace!(
-        "data_feed = {:?}; feed_id = {:?}; reporter_id = {:?}",
-        data_feed,
-        feed_id,
-        reporter_id
-    );
+    debug!("data_feed = {:?}", data_feed,);
     let feed = {
         let reg = sequencer_state.registry.read().await;
         debug!("getting feed_id = {}", &feed_id);
@@ -142,28 +140,31 @@ async fn process_report(
     match report_relevance {
         ReportRelevance::Relevant => {
             let mut reports = sequencer_state.reports.write().await;
-            if reports.push(feed_id, reporter_id, data_feed).await {
-                debug!(
-                    "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
-                    reporter_id, feed_id
-                );
-                inc_vec_metric!(
-                    reporter_metrics,
-                    reporter_id,
-                    timely_reports_per_feed,
-                    feed_id
-                );
-            } else {
-                debug!(
-                    "Recvd revote from reporter_id = {} for feed_id = {}",
-                    reporter_id, feed_id
-                );
-                inc_vec_metric!(
-                    reporter_metrics,
-                    reporter_id,
-                    total_revotes_for_same_slot_per_feed,
-                    feed_id
-                );
+            match reports.push(feed_id, reporter_id, data_feed).await {
+                VoteStatus::FirstVoteForSlot => {
+                    debug!(
+                        "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
+                        reporter_id, feed_id
+                    );
+                    inc_vec_metric!(
+                        reporter_metrics,
+                        reporter_id,
+                        timely_reports_per_feed,
+                        feed_id
+                    );
+                }
+                VoteStatus::RevoteForSlot(prev_vote) => {
+                    debug!(
+                        "Recvd revote from reporter_id = {} for feed_id = {} prev_vote = {:?}",
+                        reporter_id, feed_id, prev_vote
+                    );
+                    inc_vec_metric!(
+                        reporter_metrics,
+                        reporter_id,
+                        total_revotes_for_same_slot_per_feed,
+                        feed_id
+                    );
+                }
             }
             return HttpResponse::Ok().into(); // <- send response
         }
@@ -610,21 +611,21 @@ pub mod tests {
     use actix_web::{test, App};
     use alloy::node_bindings::Anvil;
     use alloy::primitives::Address;
-    use config::AllFeedsConfig;
-    use config::{get_test_config_with_no_providers, test_feed_config};
+    use blocksense_config::AllFeedsConfig;
+    use blocksense_config::{get_test_config_with_no_providers, test_feed_config};
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
-    use config::{get_test_config_with_single_provider, SequencerConfig};
-    use crypto::JsonSerializableSignature;
-    use data_feeds::generate_signature::generate_signature;
-    use feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
+    use blocksense_config::{get_test_config_with_single_provider, SequencerConfig};
+    use blocksense_crypto::JsonSerializableSignature;
+    use blocksense_data_feeds::generate_signature::generate_signature;
+    use blocksense_feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
+    use blocksense_utils::logging::init_shared_logging_handle;
     use regex::Regex;
     use std::collections::HashMap;
     use std::path::PathBuf;
     use std::str::FromStr;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::mpsc;
-    use utils::logging::init_shared_logging_handle;
 
     #[actix_web::test]
     async fn post_report_from_unknown_reporter_fails_with_401() {

@@ -1,18 +1,18 @@
 use actix_web::{rt::spawn, web::Data};
 use alloy::{
-    hex::FromHex,
+    hex,
     network::TransactionBuilder,
     primitives::Bytes,
     providers::{Provider, ProviderBuilder},
     rpc::types::eth::TransactionRequest,
 };
+use blocksense_config::FeedStrideAndDecimals;
+use blocksense_data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use config::FeedStrideAndDecimals;
-use data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
+use blocksense_utils::to_hex_string;
 use eyre::{eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
-use utils::to_hex_string;
 
 use crate::{
     providers::provider::{
@@ -21,12 +21,15 @@ use crate::{
     },
     sequencer_state::SequencerState,
 };
-use feed_registry::types::{Repeatability, Repeatability::Periodic};
-use feeds_processing::adfs_gen_calldata::{adfs_serialize_updates, get_neighbour_feed_ids};
+use blocksense_feed_registry::types::{Repeatability, Repeatability::Periodic};
+use blocksense_feeds_processing::adfs_gen_calldata::{
+    adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
+};
+use blocksense_metrics::{
+    inc_metric, inc_vec_metric, metrics::FeedsMetrics, process_provider_getter, set_metric,
+};
 use futures::stream::FuturesUnordered;
 use paste::paste;
-use prometheus::{inc_metric, inc_vec_metric, set_metric};
-use prometheus::{metrics::FeedsMetrics, process_provider_getter};
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
 
@@ -46,11 +49,11 @@ pub async fn deploy_contract(
 }
 
 /// Serializes the `updates` hash map into a string.
-async fn legacy_serialize_updates(
+fn legacy_serialize_updates(
     net: &str,
     updates: &BatchedAggegratesToSend,
     feeds_config: HashMap<u32, FeedStrideAndDecimals>,
-) -> Result<String> {
+) -> Vec<u8> {
     let mut result: String = Default::default();
 
     let selector = "0x1a2d80ac";
@@ -82,7 +85,7 @@ async fn legacy_serialize_updates(
     }
     info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
 
-    Ok(result)
+    hex::decode(result).expect("result is a valid hex string")
 }
 
 /// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
@@ -109,15 +112,14 @@ pub fn filter_allowed_feeds(
 // Will reduce the updates to only the relevant for the network
 pub async fn get_serialized_updates_for_network(
     net: &str,
-    provider: &Arc<Mutex<RpcProvider>>,
+    provider_mutex: &Arc<Mutex<RpcProvider>>,
     updates: &mut BatchedAggegratesToSend,
-    provider_settings: &config::Provider,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     feeds_rounds: &mut HashMap<u32, u64>,
-) -> Result<String> {
+) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
-    let provider = provider.lock().await;
+    let provider = provider_mutex.lock().await;
     debug!("Acquired a read lock on provider config for `{net}`");
     filter_allowed_feeds(net, updates, &provider_settings.allow_feeds);
     provider.peg_stable_coins_to_value(updates);
@@ -125,7 +127,7 @@ pub async fn get_serialized_updates_for_network(
 
     // Don’t post to Smart Contract if we have 0 updates
     if updates.updates.is_empty() {
-        return Ok("".to_string());
+        return Ok(Vec::new());
     }
 
     let contract_version = provider
@@ -153,32 +155,32 @@ pub async fn get_serialized_updates_for_network(
             *feed_id,
             FeedStrideAndDecimals::from_feed_config(&feed_config),
         );
-        drop(feed_config);
     }
 
     let serialized_updates = match contract_version {
-        1 => match legacy_serialize_updates(net, updates, strides_and_decimals).await {
-            Ok(result) => {
-                debug!("legacy_serialize_updates result = {result}");
-                result
+        1 => {
+            let bytes = legacy_serialize_updates(net, updates, strides_and_decimals);
+            debug!("legacy_serialize_updates result = {}", hex::encode(&bytes));
+            bytes
+        }
+        2 => {
+            let provider = provider_mutex.lock().await;
+            match adfs_serialize_updates(
+                net,
+                updates,
+                Some(&provider.round_counters),
+                strides_and_decimals,
+                feeds_rounds,
+            )
+            .await
+            {
+                Ok(bytes) => {
+                    debug!("adfs_serialize_updates result = {}", hex::encode(&bytes));
+                    bytes
+                }
+                Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
             }
-            Err(e) => eyre::bail!("Legacy serialization failed: {e}!"),
-        },
-        2 => match adfs_serialize_updates(
-            net,
-            updates,
-            feeds_metrics,
-            strides_and_decimals,
-            feeds_rounds,
-        )
-        .await
-        {
-            Ok(result) => {
-                debug!("adfs_serialize_updates result = {result}");
-                result
-            }
-            Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
-        },
+        }
         _ => eyre::bail!("Unsupported contract version set for network {net}!"),
     };
 
@@ -189,13 +191,12 @@ pub async fn get_serialized_updates_for_network(
 pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
-    provider_settings: config::Provider,
+    provider_settings: blocksense_config::Provider,
     mut updates: BatchedAggegratesToSend,
     feed_type: Repeatability,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
-    transaction_retries_count_before_give_up: u64,
+    transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<u32>)> {
     let mut feeds_rounds = HashMap::new();
@@ -204,7 +205,6 @@ pub async fn eth_batch_send_to_contract(
         &provider,
         &mut updates,
         &provider_settings,
-        feeds_metrics.clone(),
         feeds_config,
         &mut feeds_rounds,
     )
@@ -224,6 +224,14 @@ pub async fn eth_batch_send_to_contract(
     let mut provider = provider.lock().await;
     debug!("Acquired a read/write lock on provider state for network `{net}`");
 
+    let feeds_to_update_ids: Vec<u32> = updates
+        .updates
+        .iter()
+        .map(|update| update.feed_id)
+        .collect();
+
+    increment_feeds_round_indexes(&feeds_to_update_ids, net.as_str(), &mut provider).await;
+
     let signer = &provider.signer;
     let contract_name = if feed_type == Periodic {
         PRICE_FEED_CONTRACT_NAME
@@ -239,10 +247,7 @@ pub async fn eth_batch_send_to_contract(
     let provider_metrics = &provider.provider_metrics;
     let rpc_handle = &provider.provider;
 
-    let calldata_str = serialized_updates;
-
-    let input =
-        Bytes::from_hex(calldata_str).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
+    let input = Bytes::from(serialized_updates);
 
     debug!("Observing gas price (base_fee) for network {net}...");
     let base_fee = process_provider_getter!(
@@ -281,20 +286,17 @@ pub async fn eth_batch_send_to_contract(
         }
     };
 
-    let mut timed_out_count = 0;
-
-    let feeds_to_update_ids: Vec<u32> = updates
-        .updates
-        .iter()
-        .map(|update| update.feed_id)
-        .collect();
-
-    increment_feeds_round_indexes(&feeds_to_update_ids, feeds_metrics.clone(), net.as_str()).await;
+    let mut transaction_retries_count = 0;
 
     loop {
-        debug!("loop begin; timed_out_count={timed_out_count}");
+        debug!("loop begin; transaction_retries_count={transaction_retries_count}");
+
+        if transaction_retries_count > transaction_retries_count_limit {
+            return Ok(("timeout".to_string(), feeds_to_update_ids));
+        }
+
         let tx;
-        if timed_out_count == 0 {
+        if transaction_retries_count == 0 {
             tx = TransactionRequest::default()
                 .to(contract_address)
                 .from(sender_address)
@@ -302,30 +304,18 @@ pub async fn eth_batch_send_to_contract(
                 .input(Some(input.clone()).into());
             debug!("Sending initial tx: {tx:?}");
         } else {
-            debug!("Getting nonce for network {net} and address {contract_address}...");
-            let mut nonce = match rpc_handle
-                .get_transaction_count(contract_address)
-                .latest()
-                .await
-            {
-                Ok(nonce) => {
-                    debug!("Got nonce={nonce} for network {net} and address {contract_address}");
-                    nonce
-                }
-                Err(err) => {
-                    debug!("Failed to get nonce for network {net} and address {contract_address} due to {err}");
-                    return Err(err.into());
-                }
-            };
+            debug!(
+                "Retrying to send updates to network {net} for {transaction_retries_count}-th time"
+            );
 
-            // TODO: remove previous, if this fixes nonce=1
-            if nonce == 1 {
-                debug!("Getting nonce for network {net} and address {sender_address}...");
-                nonce = match rpc_handle
-                    .get_transaction_count(sender_address)
-                    .latest()
-                    .await
-                {
+            debug!("Getting nonce for network {net} and address {sender_address}...");
+            let nonce = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.get_transaction_count(sender_address).latest(),
+            )
+            .await
+            {
+                Ok(nonce_result) => match nonce_result {
                     Ok(nonce) => {
                         debug!("Got nonce={nonce} for network {net} and address {sender_address}");
                         nonce
@@ -334,32 +324,62 @@ pub async fn eth_batch_send_to_contract(
                         debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
                         return Err(err.into());
                     }
-                };
-            }
+                },
+                Err(err) => {
+                    warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
+                    transaction_retries_count += 1;
+                    continue;
+                }
+            };
 
-            let price_increment = 1.0 + (timed_out_count as f64 * retry_fee_increment_fraction);
+            let price_increment =
+                1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
 
             debug!("Getting gas_price for network {net}...");
-            let gas_price = match rpc_handle.get_gas_price().await {
-                Ok(gas_price) => {
-                    debug!("Got gas_price={gas_price} for network {net}");
-                    gas_price
-                }
+            let gas_price = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.get_gas_price(),
+            )
+            .await
+            {
+                Ok(gas_price_result) => match gas_price_result {
+                    Ok(gas_price) => {
+                        debug!("Got gas_price={gas_price} for network {net}");
+                        gas_price
+                    }
+                    Err(err) => {
+                        debug!("Failed to get gas_price for network {net} due to {err}");
+                        return Err(err.into());
+                    }
+                },
                 Err(err) => {
-                    debug!("Failed to get gas_price for network {net} due to {err}");
-                    return Err(err.into());
+                    warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
+                    transaction_retries_count += 1;
+                    continue;
                 }
             };
 
             debug!("Getting priority_fee for network {net}...");
-            let mut priority_fee = match rpc_handle.get_max_priority_fee_per_gas().await {
-                Ok(priority_fee) => {
-                    debug!("Got priority_fee={priority_fee} for network {net}");
-                    priority_fee
-                }
+            let mut priority_fee = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.get_max_priority_fee_per_gas(),
+            )
+            .await
+            {
+                Ok(priority_fee_result) => match priority_fee_result {
+                    Ok(priority_fee) => {
+                        debug!("Got priority_fee={priority_fee} for network {net}");
+                        priority_fee
+                    }
+                    Err(err) => {
+                        debug!("Failed to get priority_fee for network {net} due to {err}");
+                        return Err(err.into());
+                    }
+                },
                 Err(err) => {
-                    debug!("Failed to get priority_fee for network {net} due to {err}");
-                    return Err(err.into());
+                    warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
+                    transaction_retries_count += 1;
+                    continue;
                 }
             };
 
@@ -374,7 +394,7 @@ pub async fn eth_batch_send_to_contract(
                 .max_priority_fee_per_gas(priority_fee)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
-            debug!("Retrying for {timed_out_count}-th time tx: {tx:?}");
+            debug!("Retrying for {transaction_retries_count}-th time tx: {tx:?}");
         }
 
         let tx_str = format!("{tx:?}");
@@ -389,7 +409,19 @@ pub async fn eth_batch_send_to_contract(
             result
         } else {
             debug!("Sending price feed update transaction to network `{net}`...");
-            let result = rpc_handle.send_transaction(tx).await;
+            let result = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.send_transaction(tx),
+            )
+            .await
+            {
+                Ok(post_tx_res) => post_tx_res,
+                Err(err) => {
+                    warn!("Timed out while trying to post tx to RPC for network {net} and address {sender_address} due to {err}");
+                    transaction_retries_count += 1;
+                    continue;
+                }
+            };
             debug!("Sent price feed update transaction to network `{net}`");
             result
         };
@@ -402,45 +434,32 @@ pub async fn eth_batch_send_to_contract(
         let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
 
         debug!("Awaiting receipt for transaction to network `{net}`...");
-        let receipt_result = spawn(async move {
-            actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                receipt_future.get_receipt(),
-            )
-            .await
-        })
+        let receipt_result = actix_web::rt::time::timeout(
+            Duration::from_secs(transaction_retry_timeout_secs),
+            receipt_future.get_receipt(),
+        )
         .await;
         debug!("Done awaiting receipt for transaction to network `{net}`");
 
         debug!("matching receipt_result...");
 
         match receipt_result {
-            Ok(outer_result) => match outer_result {
-                Ok(inner_result) => match inner_result {
-                    Ok(r) => {
-                        debug!("Received valid receipt for transaction to network `{net}`");
-                        receipt = r;
-                        break;
-                    }
-                    Err(e) => {
-                        warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                        timed_out_count += 1;
-                    }
-                },
+            Ok(inner_result) => match inner_result {
+                Ok(r) => {
+                    debug!("Received valid receipt for transaction to network `{net}`");
+                    receipt = r;
+                    break;
+                }
                 Err(e) => {
-                    warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                    timed_out_count += 1;
+                    warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
+                    transaction_retries_count += 1;
                 }
             },
             Err(e) => {
-                panic!("Join error tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
+                warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
+                transaction_retries_count += 1;
+                continue;
             }
-        }
-
-        debug!("matched receipt_result");
-
-        if timed_out_count > transaction_retries_count_before_give_up {
-            return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
     }
 
@@ -504,13 +523,12 @@ pub async fn eth_batch_send_to_all_contracts(
         let providers_config = &providers_config_guard.providers;
 
         // No lock, we propagete the shared objects to the created futures
-        let feeds_metrics = sequencer_state.feeds_metrics.clone();
         let feeds_config = sequencer_state.active_feeds.clone();
 
         for (net, provider) in providers.iter() {
             let updates = updates.clone();
             let (
-                transaction_retries_count_before_give_up,
+                transaction_retries_count_limit,
                 transaction_retry_timeout_secs,
                 retry_fee_increment_fraction,
             ) = {
@@ -518,7 +536,7 @@ pub async fn eth_batch_send_to_all_contracts(
                 let p = provider.lock().await;
                 debug!("Acquired and releasing a read lock on provider for network {net}");
                 (
-                    p.transaction_retries_count_before_give_up as u64,
+                    p.transaction_retries_count_limit as u64,
                     p.transaction_retry_timeout_secs as u64,
                     p.retry_fee_increment_fraction,
                 )
@@ -527,6 +545,12 @@ pub async fn eth_batch_send_to_all_contracts(
             let net = net.clone();
 
             if let Some(provider_settings) = providers_config.get(&net) {
+                if provider_settings.safe_address.is_some() {
+                    info!(
+                        "Network `{net}` is configured for two phase consensus in sequencer; skipping direct update"
+                    );
+                    continue;
+                }
                 let is_enabled_value = provider_settings.is_enabled;
                 {
                     debug!("Acquiring a read lock on provider for network {net}");
@@ -547,7 +571,6 @@ pub async fn eth_batch_send_to_all_contracts(
                 let provider = provider.clone();
 
                 let feeds_config = feeds_config.clone();
-                let feeds_metrics = feeds_metrics.clone();
                 let provider_settings = provider_settings.clone();
                 collected_futures.push(spawn(async move {
                     let result = eth_batch_send_to_contract(
@@ -556,10 +579,9 @@ pub async fn eth_batch_send_to_all_contracts(
                         provider_settings,
                         updates,
                         feed_type,
-                        Some(feeds_metrics),
                         feeds_config,
                         transaction_retry_timeout_secs,
-                        transaction_retries_count_before_give_up,
+                        transaction_retries_count_limit,
                         retry_fee_increment_fraction,
                     );
                     (result, net, provider)
@@ -589,6 +611,12 @@ pub async fn eth_batch_send_to_all_contracts(
                     all_results += &format!("result from network {net}: Ok -> status: {status}");
                     if status == "true" {
                         all_results += &format!(", updated_feeds: {updated_feeds:?}");
+                        increment_feeds_round_metrics(
+                            &updated_feeds,
+                            Some(sequencer_state.feeds_metrics.clone()),
+                            net.as_str(),
+                        )
+                        .await;
                         let mut status_map = sequencer_state.provider_status.write().await;
                         status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
                     } else if status == "false" || status == "timeout" {
@@ -596,8 +624,8 @@ pub async fn eth_batch_send_to_all_contracts(
                             &format!(", failed to update feeds: {updated_feeds:?} due to {status}");
                         decrement_feeds_round_indexes(
                             &updated_feeds,
-                            Some(sequencer_state.feeds_metrics.clone()),
                             net.as_str(),
+                            &mut (*provider.lock().await),
                         )
                         .await;
                         if status == "timeout" {
@@ -629,49 +657,40 @@ pub async fn eth_batch_send_to_all_contracts(
 async fn log_round_counters(
     prefix: &str,
     updated_feeds: &Vec<u32>,
-    feeds_metrics: &Option<Arc<RwLock<FeedsMetrics>>>,
+    round_counters: &mut RoundCounters,
     net: &str,
 ) {
-    if let Some(fm) = feeds_metrics {
-        let mut debug_string =
-            format!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} ");
-        for feed in updated_feeds {
-            let round_index = fm
-                .read()
-                .await
-                .updates_to_networks
-                .with_label_values(&[&feed.to_string(), net])
-                .get();
-            debug_string.push_str(format!("{feed} = {round_index}; ").as_str());
-        }
-        debug!(debug_string);
-    } else {
-        error!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} called with empty metrics");
+    let mut debug_string =
+        format!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} ");
+    for feed in updated_feeds {
+        let round_index = round_counters.get(feed).unwrap_or(&0_u64);
+        debug_string.push_str(format!("{feed} = {round_index}; ").as_str());
     }
+    debug!(debug_string);
 }
 
 async fn increment_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
+    provider: &mut RpcProvider,
 ) {
     log_round_counters(
         "increment_feeds_round_indexes before update",
         updated_feeds,
-        &feeds_metrics,
+        &mut provider.round_counters,
         net,
     )
     .await;
-    if let Some(ref fm) = feeds_metrics {
-        for feed in updated_feeds {
-            // update the round counters accordingly
-            inc_vec_metric!(fm, feed, updates_to_networks, net);
-        }
+
+    for feed in updated_feeds {
+        let round_counter = provider.round_counters.entry(*feed).or_insert(0);
+        *round_counter += 1;
     }
+
     log_round_counters(
         "increment_feeds_round_indexes after update",
         updated_feeds,
-        &feeds_metrics,
+        &mut provider.round_counters,
         net,
     )
     .await;
@@ -680,41 +699,44 @@ async fn increment_feeds_round_indexes(
 // receive its receipt if the tx fails we need to decrease the round indexes.
 async fn decrement_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
-    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
+    provider: &mut RpcProvider,
 ) {
     log_round_counters(
         "decrement_feeds_round_indexes before update",
         updated_feeds,
-        &feeds_metrics,
+        &mut provider.round_counters,
         net,
     )
     .await;
 
-    if let Some(ref fm) = feeds_metrics {
-        for feed in updated_feeds {
-            // update the round counters accordingly
-            let round_index = fm
-                .read()
-                .await
-                .updates_to_networks
-                .with_label_values(&[&feed.to_string(), net])
-                .get();
-            fm.read()
-                .await
-                .updates_to_networks
-                .with_label_values(&[&feed.to_string(), net])
-                .inc_by(round_index - 1);
+    for feed in updated_feeds {
+        let round_counter = provider.round_counters.entry(*feed).or_insert(0);
+        if *round_counter > 0 {
+            *round_counter -= 1;
         }
     }
 
     log_round_counters(
         "decrement_feeds_round_indexes after update",
         updated_feeds,
-        &feeds_metrics,
+        &mut provider.round_counters,
         net,
     )
     .await;
+}
+
+async fn increment_feeds_round_metrics(
+    updated_feeds: &Vec<u32>,
+    feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
+    net: &str,
+) {
+    if let Some(ref fm) = feeds_metrics {
+        for feed in updated_feeds {
+            // update the round counters' metrics accordingly
+            inc_vec_metric!(fm, feed, updates_to_networks, net);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -723,22 +745,25 @@ mod tests {
 
     use crate::providers::provider::{init_shared_rpc_providers, MULTICALL_CONTRACT_NAME};
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
-    use alloy::primitives::{Address, TxKind};
     use alloy::rpc::types::eth::TransactionInput;
+    use alloy::{
+        hex::FromHex,
+        primitives::{Address, TxKind},
+    };
     use alloy::{node_bindings::Anvil, providers::Provider};
-    use config::{
+    use blocksense_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,
         test_feed_config,
     };
-    use config::{AllFeedsConfig, PublishCriteria};
-    use data_feeds::feeds_processing::VotedFeedUpdate;
-    use feed_registry::registry::HistoryEntry;
-    use feed_registry::types::Repeatability::Oneshot;
+    use blocksense_config::{AllFeedsConfig, PublishCriteria};
+    use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
+    use blocksense_feed_registry::registry::HistoryEntry;
+    use blocksense_feed_registry::types::Repeatability::Oneshot;
+    use blocksense_utils::test_env::get_test_private_key_path;
     use regex::Regex;
     use ringbuf::traits::Consumer;
     use std::str::FromStr;
     use std::time::UNIX_EPOCH;
-    use utils::test_env::get_test_private_key_path;
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -891,7 +916,7 @@ mod tests {
             &result_key,
             &result_value,
             end_slot_timestamp,
-            feed_registry::types::FeedType::Numerical(0.0f64),
+            blocksense_feed_registry::types::FeedType::Numerical(0.0f64),
             18,
         )
         .unwrap();
@@ -912,7 +937,6 @@ mod tests {
             provider_settings,
             updates_oneshot,
             Oneshot,
-            None,
             feeds_config,
             50,
             10,
@@ -1325,25 +1349,23 @@ mod tests {
 
     #[tokio::test]
     async fn compute_keys_vals_ignores_networks_not_on_the_list() {
-        let selector = "0x1a2d80ac";
+        let selector = "1a2d80ac";
         let network = "dont_filter_me";
         let mut updates = BatchedAggegratesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
         };
         filter_allowed_feeds(network, &mut updates, &None);
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
-            .await
-            .expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
         let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
         let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
-        let ab = format!("{selector}{a}{b}");
-        let ba = format!("{selector}{b}{a}");
+        let ab = hex::decode(format!("{selector}{a}{b}")).unwrap();
+        let ba = hex::decode(format!("{selector}{b}{a}")).unwrap();
         // It is undeterministic what the order will be, so checking both possibilities.
         assert!(ab == serialized_updates || ba == serialized_updates);
     }
-    use feed_registry::types::FeedType;
+    use blocksense_feed_registry::types::FeedType;
 
     fn get_updates_test_data() -> Vec<VotedFeedUpdate> {
         //let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
@@ -1389,14 +1411,12 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
-            .await
-            .expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
         // Note: bye is filtered out:
         assert_eq!(
             serialized_updates,
-            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
+            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
         );
 
         // Berachain
@@ -1415,13 +1435,11 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
-            .await
-            .expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
         assert_eq!(
             serialized_updates,
-            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
+            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
         );
 
         // Manta
@@ -1439,13 +1457,11 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config())
-            .await
-            .expect("Serialize updates failed!");
+        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
         assert_eq!(
             serialized_updates,
-            format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")
+            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
         );
     }
 

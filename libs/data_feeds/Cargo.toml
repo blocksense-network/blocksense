@@ -1,64 +1,27 @@
 [package]
-name = "data_feeds"
+name = "blocksense-data-feeds"
 version.workspace = true
 authors.workspace = true
 license.workspace = true
 edition.workspace = true
 
 
-
 [dependencies]
-prometheus = { path = "../prometheus" }
-utils = { path = "../utils" }
-crypto = { path = "../crypto" }
-feed_registry = { path = "../feed_registry"}
-config = { path = "../config"}
+blocksense-utils = { workspace = true }
+blocksense-crypto = { workspace = true }
+blocksense-feed-registry = { workspace = true }
+blocksense-config = { workspace = true }
 
-alloy = { version = "0.11", features = [
-    "sol-types",
-    "contract",
-    "network",
-    "node-bindings",
-    "providers",
-    "rpc",
-    "rpc-client",
-    "rpc-types-eth",
-    "rpc-types-trace",
-    "signers",
-    "signer-keystore",
-    "signer-ledger",
-    "signer-mnemonic",
-    "signer-trezor",
-    "signer-yubihsm",
-    "transports",
-    "transport-http",
-    "transport-ipc",
-    "transport-ws",
-    "pubsub",
-] }
-
-log = "0.4.25"
-anyhow = "1.0.89"
-thiserror = "2.0.11"
-tracing = { version = "0.1.41", features = ["async-await", "log"] }
-tracing-subscriber = { version = "0.3.19", features = ["json"] }
-serde_json = "1.0.137"
-serde = { version = "1.0.216", features = ["derive"] }
-erased-serde = "0.4.4"
-ringbuf = "0.4.7"
-reqwest = { version = "0.12.8", features = ["blocking", "json"] }
-rand = "0.8.5"
-curl = "0.4.47"
-async-trait = "0.1.83"
-assert_cmd = "2.0.14"
-dirs = "6.0.0"
-strum = { version = "0.26.3", features = ["derive"] }
-http = "1.2.0"
-
-# Service APIs
-yahoo_finance_api = {"version" = "3.0.0", features = ["blocking"]}
-cmc = "0.4.4"
-fred-rs = "0.1.1"
-weer_api = "0.1.1"
-tokio = "1.39.2"
-tokio-test = "0.4.4"
+log = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true, features = ["async-await", "log"] }
+tracing-subscriber = { workspace = true, features = ["json"] }
+serde_json = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+ringbuf = { workspace = true }
+rand = { workspace = true }
+dirs = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+http = { workspace = true }
+tokio = { workspace = true }

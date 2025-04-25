@@ -4,10 +4,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 //TODO(adikov): Include all the needed fields form the response like volume.
@@ -39,7 +38,7 @@ pub struct BybitPriceFetcher;
 impl PricesFetcher<'_> for BybitPriceFetcher {
     const NAME: &'static str = "Bybit";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
@@ -47,6 +46,7 @@ impl PricesFetcher<'_> for BybitPriceFetcher {
             let response = http_get_json::<BybitPriceResponse>(
                 "https://api.bybit.com/v5/market/tickers",
                 Some(&[("category", "spot"), ("symbols", "")]),
+                None,
             )
             .await?;
 

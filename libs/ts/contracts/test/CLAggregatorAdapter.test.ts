@@ -5,6 +5,7 @@ import {
 } from './utils/wrappers';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { encodeDataAndTimestamp } from './utils/helpers/common';
+import { expect } from 'chai';
 
 const aggregatorData = [
   {
@@ -37,7 +38,7 @@ describe('CLAggregatorAdapter', function () {
     caller = (await ethers.getSigners())[6];
 
     proxy = new UpgradeableProxyADFSWrapper();
-    await proxy.init(await admin.getAddress(), accessControlAdmin);
+    await proxy.init(admin, accessControlAdmin);
 
     await proxy.implementation.accessControl.setAdminStates(
       accessControlAdmin,
@@ -135,6 +136,18 @@ describe('CLAggregatorAdapter', function () {
 
         await contractWrappers[i].checkSetValue(caller, data2);
         await contractWrappers[i].checkLatestRoundData(caller, data2, 2n);
+      });
+
+      it(`Should get latest timestamp in seconds for ${aggregatorData[i].description}`, async function () {
+        const timestamp = Date.now();
+        const data = encodeDataAndTimestamp(1234, timestamp);
+
+        await contractWrappers[i].setFeed(sequencer, data, 1n);
+        const latestRoundData =
+          await contractWrappers[i].contract.latestRoundData();
+        const latestTimestamp = latestRoundData[2];
+
+        expect(latestTimestamp).to.be.eq(Math.floor(timestamp / 1000));
       });
 
       it(`Should get historical data for ${aggregatorData[i].description}`, async function () {

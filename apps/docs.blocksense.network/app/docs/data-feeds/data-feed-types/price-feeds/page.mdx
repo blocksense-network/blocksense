@@ -1,0 +1,12 @@
+---
+title: Price Feeds
+---
+import React from 'react';
+
+import { getFeedsConfig } from '@/src/data-feeds/utils';
+import { DataFeeds } from '@/components/DataFeeds/DataFeeds';
+
+export default function FeedsPage() {
+  const feedsConfig = getFeedsConfig().priceFeeds;
+  return <DataFeeds feedsType={"Price Feeds"} feedsConfig={feedsConfig} />;
+}

@@ -1,1 +1,1 @@
-{ imports = [ ./sequencer ]; }
+{ imports = [ ./blocksense ]; }

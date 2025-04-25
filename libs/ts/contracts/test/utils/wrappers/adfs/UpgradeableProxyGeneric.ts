@@ -6,7 +6,7 @@ import { UpgradeableProxyADFSBaseWrapper } from './UpgradeableProxyBase';
 
 export class UpgradeableProxyADFSGenericWrapper extends UpgradeableProxyADFSBaseWrapper {
   public async init(
-    adminAddress: string,
+    admin: HardhatEthersSigner,
     accessControlData: HardhatEthersSigner | string,
     implementationCallData: string = '0x',
   ) {
@@ -15,8 +15,12 @@ export class UpgradeableProxyADFSGenericWrapper extends UpgradeableProxyADFSBase
 
     this.contract = await deployContract<UpgradeableProxyADFS>(
       'UpgradeableProxyADFS',
-      adminAddress,
-      this.implementation.contract.target,
+      admin.address,
+    );
+
+    this.upgradeImplementationAndCall(
+      this.implementation,
+      admin,
       implementationCallData,
     );
   }

@@ -1,0 +1,27 @@
+@keyframes blink-dot {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  33% {
+    opacity: 1;
+  }
+  66% {
+    opacity: 0;
+  }
+}
+
+.input-loading-icon circle:nth-child(1) {
+  animation: blink-dot 1.5s infinite;
+  animation-delay: 0s;
+}
+
+.input-loading-icon circle:nth-child(2) {
+  animation: blink-dot 1.5s infinite;
+  animation-delay: 0.3s;
+}
+
+.input-loading-icon circle:nth-child(3) {
+  animation: blink-dot 1.5s infinite;
+  animation-delay: 0.6s;
+}

@@ -7,10 +7,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 fn as_f64_vec<'de, D>(deserializer: D) -> Result<Vec<f64>, D::Error>
@@ -42,7 +41,7 @@ pub struct KrakenPriceFetcher;
 impl PricesFetcher<'_> for KrakenPriceFetcher {
     const NAME: &'static str = "Kraken";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 
@@ -50,6 +49,7 @@ impl PricesFetcher<'_> for KrakenPriceFetcher {
         async {
             let response = http_get_json::<KrakenPriceResponse>(
                 "https://api.kraken.com/0/public/Ticker",
+                None,
                 None,
             )
             .await?;

@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 @plugin "tailwindcss-animate";
 
-@theme {
-  --font-geist: var(--font-geist);
-  --font-geist-mono: var(--font-geist-mono);
-}
+@import './design-system/colors.css';
+@import './design-system/typography/default.css';
+@import './design-system/typography/medium-large.css';
+@import './design-system/animations.css';
+@import './design-system/autofill.css';

@@ -1,18 +1,18 @@
 use actix_web::web::Data;
 use alloy::hex::ToHexExt;
-use config::BlockConfig;
-use feed_registry::{registry::SlotTimeTracker, types::Repeatability};
-use gnosis_safe::data_types::ReporterResponse;
-use gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
+use blocksense_config::BlockConfig;
+use blocksense_feed_registry::{registry::SlotTimeTracker, types::Repeatability};
+use blocksense_gnosis_safe::data_types::ReporterResponse;
+use blocksense_gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
+use blocksense_utils::time::current_unix_time;
 use tokio::sync::mpsc::UnboundedReceiver;
-use tracing::{debug, error, info, trace};
-use utils::time::{current_unix_time, system_time_to_millis};
+use tracing::{debug, error, info};
 
 use crate::providers::provider::GNOSIS_SAFE_CONTRACT_NAME;
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
+use blocksense_gnosis_safe::utils::SafeMultisig;
 use futures_util::stream::{FuturesUnordered, StreamExt};
-use gnosis_safe::utils::SafeMultisig;
 use std::{io::Error, time::Duration};
 
 pub async fn aggregation_batch_consensus_loop(
@@ -23,15 +23,10 @@ pub async fn aggregation_batch_consensus_loop(
     tokio::task::Builder::new()
         .name("aggregation_batch_consensus_loop")
         .spawn_local(async move {
-            let block_genesis_time = match block_config.genesis_block_timestamp {
-                Some(genesis_time) => system_time_to_millis(genesis_time),
-                None => current_unix_time(),
-            };
-
             let block_height_tracker = SlotTimeTracker::new(
                 "aggregation_batch_consensus_loop".to_string(),
                 Duration::from_millis(block_config.block_generation_period),
-                block_genesis_time,
+                block_config.genesis_block_timestamp_ms.unwrap_or_else(current_unix_time),
             );
 
             let timeout_period_blocks = block_config.aggregation_consensus_discard_period_blocks;
@@ -43,7 +38,7 @@ pub async fn aggregation_batch_consensus_loop(
                     // The first future is a timer that ticks according to the block generation period.
                     _ = block_height_tracker.await_end_of_current_slot(&Repeatability::Periodic) => {
 
-                        trace!("processing aggregation_batch_consensus_loop");
+                        debug!("processing aggregation_batch_consensus_loop");
 
                         let latest_block_height = block_height_tracker.get_last_slot();
 
@@ -93,6 +88,7 @@ pub async fn aggregation_batch_consensus_loop(
                     }
                     // The second future is a signature received from a reporter on the HTTP endpoint post_aggregated_consensus_vote.
                     Some((signed_aggregate, signature_with_address)) = aggregate_batch_sig_recv.recv() => {
+                        info!("aggregate_batch_sig_recv.recv()");
 
                         let block_height = signed_aggregate.block_height;
                         let net = &signed_aggregate.network;
@@ -159,8 +155,7 @@ pub async fn aggregation_batch_consensus_loop(
                                         eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_nonce._0, safe_tx.nonce);
                                     }
 
-                                    Ok(match contract
-                                    .execTransaction(
+                                    let receipt = match contract.execTransaction(
                                         safe_tx.to,
                                         safe_tx.value,
                                         safe_tx.data,
@@ -176,13 +171,16 @@ pub async fn aggregation_batch_consensus_loop(
                                     .await {
                                         Ok(v) => {
                                             info!("Posted tx for network {net}, Blocksense block height: {block_height}! Waiting for receipt ...");
-                                            v.get_receipt()
-                                            .await
+                                            let receipt = v.get_receipt().await;
+                                            info!("Got receipt for network {net}, Blocksense block height: {block_height}! {:?}", receipt);
+                                            receipt
                                         }
                                         Err(e) => {
                                             eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
                                         }
-                                    })
+                                    };
+
+                                    Ok(receipt)
                                 }).expect("Failed to spawn tx sender for network {net} Blocksense block height: {block_height}!")
                         );
                     }

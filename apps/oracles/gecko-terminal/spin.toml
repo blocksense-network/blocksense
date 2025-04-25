@@ -7,29 +7,36 @@ version = "0.1.0"
 
 [application.trigger.settings]
 interval_time_in_seconds = 10
-sequencer = "http://127.0.0.1:9856/post_reports_batch"
-secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
 reporter_id = 0
+sequencer = "http://127.0.0.1:8877/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+second_consensus_secret_key = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+kafka_endpoint = "http://127.0.0.1:9092"
 
 [[trigger.oracle]]
 component = "gecko-terminal"
 
 [[trigger.oracle.data_feeds]]
 id = "1000000"
-data = '{"pair":{"base":"WMON","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"monad-testnet","pool":"0x264e9b75723d75e3c607627d8e21d2c758db4c80","reverse":true}]}'
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"WMON","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0x264e9b75723d75e3c607627d8e21d2c758db4c80","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0x8552706d9a27013f20ea0f9df8e20b61e283d2d3","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0x5323821de342c56b80c99fbc7cd725f2da8eb87b","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0x6e4b7be5ef7f8950c76baa0bd90125bc9b33c8db","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0x212fde77a42d55f980d0a0304e7eebe1e999c60f","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0xc0ce32eee0eb8bf24fa2b00923a78abc5002f91e","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0x786f4aa162457ecdf8fa4657759fa3e86c9394ff","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0xf2afc5aa9965cdb2d4be94823c98411291b61297","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0xf22d36b6bee8a7fd51def4e3badf35a8733b284f","reverse":true},{"min_volume_usd":500000.0,"network":"monad-testnet","pool":"0xe8a806ae6ecb1f02063e21c6f0579b145399ee5f","reverse":true}]}'
 
 [[trigger.oracle.data_feeds]]
 id = "1000001"
-data = '{"pair":{"base":"USDZ","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"base","pool":"0xcf88b8bf7ccce2d836878e538197eb20fc673bce","reverse":false}]}'
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"USDZ","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"min_volume_usd":10000.0,"network":"base","pool":"0xcf88b8bf7ccce2d836878e538197eb20fc673bce","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0x6d0b9c9e92a3de30081563c3657b5258b3ffa38b","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0xebf0e4da26a0d040c2343a9e072a0d0b8cf1e0b0","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0x96cc4b6a75fa1dfea66091589d1f25aff3aa0318","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0xcea8ef6ce6235f2c2cdd13c9e8a3ed470725a638","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0xde5ff829fef54d1bdec957d9538a306f0ead1368","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0x2ce63497999f520cc2afaaadbcfc37afd9def4b0","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0xe722e6bce1a598e6b5d26e9975bf44140d2aa3e5","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0x4ef1e503c4f1e5664ac98294d0e42ddc9c0ff961","reverse":false},{"min_volume_usd":10000.0,"network":"base","pool":"0x2c206c7de24787f85b5c52d2ea339adc6d5af40f","reverse":false}]}'
 
 [[trigger.oracle.data_feeds]]
 id = "1000002"
-data = '{"pair":{"base":"USR","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"base","pool":"0xd3ee0a3b349237d68517df30bfb66be971f46ad9","reverse":false},{"network":"eth","pool":"0x3ee841f47947fefbe510366e4bbb49e145484195","reverse":false},{"network":"eth","pool":"0x4628f13651ead6793f8d838b34b8f8522fb0cc52","reverse":false},{"network":"eth","pool":"0xc907ba505c2e1cbc4658c395d4a2c7e6d2c32656","reverse":false}]}'
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"USR","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"min_volume_usd":500000.0,"network":"base","pool":"0xd3ee0a3b349237d68517df30bfb66be971f46ad9","reverse":false},{"min_volume_usd":500000.0,"network":"base","pool":"0xb924561a57fc60041414b8471cbc99d3497097fa","reverse":false},{"min_volume_usd":500000.0,"network":"base","pool":"0x97c9750305a39e06002edd851f3d37a862ac7060","reverse":false},{"min_volume_usd":500000.0,"network":"eth","pool":"0x3ee841f47947fefbe510366e4bbb49e145484195","reverse":false},{"min_volume_usd":500000.0,"network":"eth","pool":"0xc907ba505c2e1cbc4658c395d4a2c7e6d2c32656","reverse":false},{"min_volume_usd":500000.0,"network":"eth","pool":"0x8bb9cd887dd51c5aa8d7da9e244c94bec035e47c","reverse":false},{"min_volume_usd":500000.0,"network":"eth","pool":"0x8461537a9bfc5a1df57cf825f8a58049ef61557b","reverse":false},{"min_volume_usd":500000.0,"network":"eth","pool":"0x4628f13651ead6793f8d838b34b8f8522fb0cc52","reverse":true},{"min_volume_usd":500000.0,"network":"eth","pool":"0x38de22a3175708d45e7c7c64cd78479c8b56f76e","reverse":true},{"min_volume_usd":500000.0,"network":"eth","pool":"0xd552716f3bba4224a19d7eb37a31650d7ae10144","reverse":true}]}'
 
 [component.gecko-terminal]
 source = "../../../target/wasm32-wasip1/release/gecko_terminal.wasm"
-
-allowed_outbound_hosts = ["https://app.geckoterminal.com/"]
+allowed_outbound_hosts = ["https://api.geckoterminal.com"]
 
 [component.gecko-terminal.build]
 command = "cargo build --target wasm32-wasip1 --release"

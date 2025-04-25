@@ -1,20 +1,20 @@
 use actix_web::{web, App, HttpServer};
-use feed_registry::feed_registration_cmds::FeedsManagementCmds;
-use gnosis_safe::data_types::ReporterResponse;
-use gnosis_safe::utils::SignatureWithAddress;
+use blocksense_feed_registry::feed_registration_cmds::FeedsManagementCmds;
+use blocksense_gnosis_safe::data_types::ReporterResponse;
+use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
 use tokio::sync::mpsc;
 
-use sequencer::http_handlers::admin::add_admin_services;
-use sequencer::http_handlers::data_feeds::add_main_services;
-use utils::logging::{
+use blocksense_utils::logging::{
     get_log_level, get_shared_logging_handle, init_shared_logging_handle, tokio_console_active,
     SharedLoggingHandle,
 };
+use sequencer::http_handlers::admin::add_admin_services;
+use sequencer::http_handlers::data_feeds::add_main_services;
 
 use actix_web::web::Data;
-use config::{get_sequencer_and_feed_configs, AllFeedsConfig, SequencerConfig};
+use blocksense_config::{get_sequencer_and_feed_configs, AllFeedsConfig, SequencerConfig};
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
@@ -23,12 +23,12 @@ use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
 use tracing::info;
 
-use utils::build_info::{
+use blocksense_utils::build_info::{
     BLOCKSENSE_VERSION, GIT_BRANCH, GIT_DIRTY, GIT_HASH, GIT_HASH_SHORT, GIT_TAG,
     VERGEN_CARGO_DEBUG, VERGEN_CARGO_FEATURES, VERGEN_CARGO_OPT_LEVEL, VERGEN_RUSTC_SEMVER,
 };
 
-use data_feeds::feeds_processing::VotedFeedUpdateWithProof;
+use blocksense_data_feeds::feeds_processing::VotedFeedUpdateWithProof;
 
 type VoteChannel = (
     UnboundedSender<VotedFeedUpdateWithProof>,

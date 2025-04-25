@@ -24,6 +24,9 @@ main > h1 {
 }
 
 @layer base {
+  body {
+    background: var(--bg-color);
+  }
   progress {
     width: 100%;
     height: 10px;
@@ -73,7 +76,7 @@ main > h1 {
   }
 
   p {
-    @apply font-regular;
+    @apply font-geist;
   }
 
   button {
@@ -97,7 +100,7 @@ main > h1 {
 
   section.dialog__content button > span,
   section.drawer__content button > span {
-    font-family: var(--font-display);
+    font-family: var(--font-geist);
     font-size: 0.875rem;
   }
 

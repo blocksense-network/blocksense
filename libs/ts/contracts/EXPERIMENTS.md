@@ -24,8 +24,6 @@ contracts
     ├── DataFeedStoreV2.sol
     ├── HistoricalDataFeedStoreV1.sol
     ├── HistoricalDataFeedStoreV2.sol
-    ├── SportsDataFeedStoreV1.sol
-    ├── SportsDataFeedStoreV2.sol
     └── UpgradeableProxy.sol
 ```
 
@@ -38,8 +36,6 @@ The `libraries` folder contains the Blocksense library which is used to make cal
 Each of the data feed store implementations (DataFeedStoreV1.sol, DataFeedStoreV2.sol, DataFeedStoreV3.sol) is a contract that stores data feed values for a specific data feed key. The data feed key is a maximum of 31 bit integer that uniquely identifies a data feed. The data feed value is stored as `bytes32`. The data feed value is updated by the data feed store contract owner.
 
 The historical data feed contracts (HistoricalDataFeedStoreV1.sol, HistoricalDataFeedStoreV2.sol) store historical data feed values for a specific data feed key. The data feed key is a maximum of 29 bit integer that uniquely identifies a data feed. The data feed value is stored as packed `bytes32` which consists of `bytes24 value` and `uint64 timestamp`. When a new value is set, a counter representing the contiguous history of the stored values is incremented. The data feed value is updated by the data feed store contract owner.
-
-The sports data feed contracts (SportsDataFeedStoreV1.sol, SportsDataFeedStoreV2.sol) store sports data feed values for a specific data feed key. The data feed key is a maximum of 29 bit integer that uniquely identifies a data feed. The data feed value is stored as packed array of `bytes32` and a description is emitted on each feed update. The data feed value is updated by the data feed store contract owner. This contract doesn't support historical data feed values.
 
 ```mermaid
 graph TD
@@ -74,11 +70,6 @@ All calls are handled by a fallback function based on the selector:
 
 > This way the gas cost of calls is reduced as the Solidity compiler will not generate `Linear If-Else Dispatcher` statements for the different selectors.
 
-#### SportsDataFeedStore
-
-- Getter:
-  - There is only one selector `0x80000000` + key which returns the stored value (array of 32b) for the given key.
-
 ### Storage layout representation
 
 - `DataFeedStoreV1.sol` and `DataFeedStoreV2.sol`:
@@ -90,10 +81,6 @@ All calls are handled by a fallback function based on the selector:
 - `HistoricalDataFeedStoreV2.sol`:
   - `mapping(uint32 key => mapping(uint256 counter => Transmission { value, timestamp })) dataFeed`
   - `uint256[] latestCounters`
-- `SportsDataFeedStoreV1.sol`:
-  - Linear array of `bytes32`
-- `SportsDataFeedStoreV2.sol`:
-  - `mapping(uint32 key => bytes32[] dataFeed)`
 
 ## Testing
 

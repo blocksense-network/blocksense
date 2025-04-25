@@ -4,10 +4,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -31,7 +30,7 @@ pub struct OKXPriceFetcher;
 impl PricesFetcher<'_> for OKXPriceFetcher {
     const NAME: &'static str = "OKX";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 
@@ -40,6 +39,7 @@ impl PricesFetcher<'_> for OKXPriceFetcher {
             let response = http_get_json::<OKXTickerResponse>(
                 "https://www.okx.com/api/v5/market/tickers",
                 Some(&[("instType", "SPOT")]),
+                None,
             )
             .await?;
 

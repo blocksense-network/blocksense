@@ -1,8 +1,9 @@
 #![doc = "Volume Weighted Average Price"]
 
 use anyhow::{Context, Result};
+use blocksense_sdk::traits::prices_fetcher::PricePoint;
 
-use crate::common::{ExchangePricePoints, PricePoint};
+use crate::common::ExchangePricePoints;
 
 #[allow(dead_code)]
 pub fn vwap(exchange_price_points: &ExchangePricePoints) -> Result<f64> {

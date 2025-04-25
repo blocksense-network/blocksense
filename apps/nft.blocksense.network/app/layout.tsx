@@ -1,43 +1,69 @@
-import NextHead from 'next/head';
+import './globals.css';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
+
 import { geist, geistMono } from '../src/geist';
-import './globals.css';
+import { Navbar } from '../components/Navbar';
+import { Footer } from '../components/Footer';
 
 export const metadata: Metadata = {
+  title: {
+    template: '%s - NFT Drop',
+    default: 'Blocksense NFT Drop',
+  },
   description:
     'Explore exclusive NFT drops and be part of the next digital revolution. Mint your NFT now on the Blocksense platform.',
-  metadataBase: new URL('https://blocksense.network/'),
+  metadataBase: new URL('https://nft.blocksense.network/'),
   keywords: [
     'NFT Drop',
-    'Blocksense',
     'Mint NFT',
-    'Digital Revolution',
-    'Exclusive NFT',
-    'Blockchain',
-    'Smart contracts',
-    'Decentralized',
     'NFT Collection',
+    'Blockchain',
+    'Smart Contracts',
+    'Decentralized',
+    'Crypto Art',
+    'Web3',
+    'Digital Ownership',
+    'NFT Marketplace',
+    'Exclusive NFT',
+    'Tokenized Assets',
+    'Digital Revolution',
+    'Ethereum',
+    'Metaverse',
   ],
-  generator: 'Next.js',
-  applicationName: 'Blocksense NFT Drop',
-  appleWebApp: {
-    title: 'NFT Drop - Blocksense',
+  openGraph: {
+    title: 'Blocksense NFT Drop',
+    description:
+      'Blocksense is the ZK rollup for scaling oracle data to infinity. Soon everyone will be able to create secure oracles in minutes.',
+    url: 'https://nft.blocksense.network/',
+    type: 'website',
+    images: [
+      {
+        url: '/images/blocksense_og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Blocksense NFT Drop OG Image',
+      },
+    ],
   },
-  title: {
-    absolute: '',
-    template: '%s - NFT Drop',
+  twitter: {
+    card: 'summary_large_image',
+    site: 'https://x.com/blocksense_',
+    title: 'Blocksense - NFT Drop',
+    description:
+      'Explore exclusive NFT drops and mint your NFTs on Blocksense. Join the digital revolution today.',
+    images: ['/images/blocksense_og.png'],
+  },
+  applicationName: 'Blocksense NFT Drop',
+  generator: 'Next.js',
+  appleWebApp: {
+    title: 'Blocksense - NFT Drop',
   },
   icons: {
     icon: [
       {
-        media: '(prefers-color-scheme: dark)',
-        url: '/images/nft-favicon.png',
-        type: 'image/png',
-      },
-      {
-        media: '(prefers-color-scheme: light)',
-        url: '/images/nft-favicon.png',
+        rel: 'icon',
+        url: '/icons/blocksense-favicon-dark.png',
         type: 'image/png',
       },
     ],
@@ -45,10 +71,32 @@ export const metadata: Metadata = {
   other: {
     'msapplication-TileColor': '#000',
   },
-  twitter: {
-    site: 'https://twitter.com/blocksense_',
-  },
 };
+
+const GTMScript = () => (
+  <script
+    dangerouslySetInnerHTML={{
+      __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-WB9ZRVTV');`,
+    }}
+  />
+);
+
+const GTMNoScript = () => (
+  <div
+    dangerouslySetInnerHTML={{
+      __html: `
+        <noscript>
+          <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WB9ZRVTV"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+        </noscript>
+      `,
+    }}
+  />
+);
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
@@ -58,43 +106,14 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <NextHead>
-        <meta
-          name="description"
-          content="Explore exclusive NFT drops and be part of the next digital revolution. Mint your NFT now on the Blocksense platform."
-        />
-        <meta
-          property="og:description"
-          content="Join the latest NFT drop on Blocksense! Discover, mint, and own exclusive digital art."
-        />
-        <meta property="og:image" content="/images/nft-og.png" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="NFT Drop - Blocksense" />
-        <meta
-          name="twitter:description"
-          content="Explore exclusive NFT drops and mint your NFTs on Blocksense. Join the digital revolution today."
-        />
-        <meta name="twitter:image" content="/images/nft-og.png" />
-        <link rel="icon" href="/images/nft-favicon.png" type="image/png" />
-      </NextHead>
-      <body className="nft-drop-layout__body md:px-4 lg:px-30 dark:bg-neutral-900 dark:text-neutral-300">
-        <header className="nft-drop-layout__header">
-          <nav className="nft-drop-layout__navbar">
-            <a
-              href="https://github.com/blocksense-network/blocksense"
-              className="nft-drop-layout__project-link"
-            >
-              Blocksense monorepo
-            </a>
-          </nav>
-        </header>
-        <main className="nft-drop-layout__main">{children}</main>
-        <footer className="nft-drop-layout__footer">
-          <p className="nft-drop-layout__footer-text">
-            &copy; {new Date().getFullYear()} Blocksense. All rights reserved.
-          </p>
-        </footer>
+      <head>
+        <GTMScript />
+      </head>
+      <body className="nft-drop-layout__body">
+        <GTMNoScript />
+        <Navbar />
+        <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
+        <Footer />
       </body>
     </html>
   );

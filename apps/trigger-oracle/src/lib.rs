@@ -1,4 +1,7 @@
+mod custom_serde;
+
 use clap::Args;
+use custom_serde::serialize_string_as_json;
 use serde::{Deserialize, Serialize};
 
 use std::{
@@ -11,13 +14,24 @@ use std::{
 
 use http::uri::Scheme;
 use hyper::Request;
-use tokio::sync::{
-    broadcast::{
-        channel, error::RecvError, Receiver as BroadcastReceiver, Sender as BroadcastSender,
+use tokio::{
+    sync::{
+        broadcast::{
+            channel, error::RecvError, Receiver as BroadcastReceiver, Sender as BroadcastSender,
+        },
+        mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
+        RwLock,
     },
-    mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
+    task::{spawn, Builder, JoinHandle},
+    time::{sleep, Duration},
 };
 use tracing::Instrument;
+use url::Url;
+
+use rdkafka::config::ClientConfig;
+use rdkafka::consumer::{Consumer, StreamConsumer};
+use rdkafka::Message;
+use tokio_stream::StreamExt;
 
 use outbound_http::OutboundHttpComponent;
 use spin_app::MetadataKey;
@@ -30,10 +44,17 @@ use wasmtime_wasi_http::{
     types::HostFutureIncomingResponse, HttpResult,
 };
 
-use crypto::JsonSerializableSignature;
-use data_feeds::generate_signature::generate_signature;
-use feed_registry::types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData};
-use prometheus::{
+use blocksense_config::FeedStrideAndDecimals;
+use blocksense_crypto::JsonSerializableSignature;
+use blocksense_data_feeds::{
+    feeds_processing::VotedFeedUpdate, generate_signature::generate_signature,
+};
+use blocksense_feed_registry::{
+    registry::SlotTimeTracker,
+    types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData, Repeatability},
+};
+use blocksense_feeds_processing::utils::validate;
+use blocksense_metrics::{
     actix_server::handle_prometheus_metrics,
     metrics::{
         REPORTER_BATCH_COUNTER, REPORTER_FAILED_SEQ_REQUESTS, REPORTER_FAILED_WASM_EXECS,
@@ -41,7 +62,12 @@ use prometheus::{
     },
     TextEncoder,
 };
-use utils::time::current_unix_time;
+use blocksense_utils::time::current_unix_time;
+
+use blocksense_gnosis_safe::{
+    data_types::{ConsensusSecondRoundBatch, ReporterResponse},
+    utils::{bytes_to_hex_string, create_private_key_signer, hex_str_to_bytes32, sign_hash},
+};
 
 wasmtime::component::bindgen!({
     path: "../../libs/sdk/wit",
@@ -53,6 +79,10 @@ use blocksense::oracle::oracle_types as oracle;
 
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
+type DataFeedResults = Arc<RwLock<HashMap<u32, VotedFeedUpdate>>>;
+
+const TIME_BEFORE_KAFKA_READ_RETRY_IN_MS: u64 = 500;
+const TOTAL_RETRIES_FOR_KAFKA_READ: u64 = 10;
 
 #[derive(Args)]
 pub struct CliArgs {
@@ -69,7 +99,9 @@ pub struct OracleTrigger {
     engine: TriggerAppEngine<Self>,
     sequencer: String,
     prometheus_url: Option<String>,
+    kafka_endpoint: Option<String>,
     secret_key: String,
+    second_consensus_secret_key: String,
     reporter_id: u64,
     queue_components: HashMap<String, Component>,
 }
@@ -87,13 +119,18 @@ struct TriggerMetadata {
     interval_time_in_seconds: Option<u64>,
     sequencer: Option<String>,
     prometheus_url: Option<String>,
+    kafka_endpoint: Option<String>,
     secret_key: Option<String>,
+    second_consensus_secret_key: Option<String>,
     reporter_id: Option<u64>,
 }
 
 #[derive(Clone, Eq, Debug, Default, Deserialize, Serialize)]
 pub struct DataFeedSetting {
     pub id: String,
+    pub stride: u16,
+    pub decimals: u8,
+    #[serde(serialize_with = "serialize_string_as_json")]
     pub data: String,
 }
 
@@ -131,7 +168,7 @@ pub struct OracleTriggerConfig {
     interval_time_in_seconds: Option<u64>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct Component {
     pub id: String,
     pub oracle_settings: HashSet<DataFeedSetting>,
@@ -180,6 +217,17 @@ impl TriggerExecutor for OracleTrigger {
         let sequencer = metadata.sequencer.expect("Sequencer URL is not provided");
         let prometheus_url = metadata.prometheus_url;
         let secret_key = metadata.secret_key.expect("Secret key is not provided");
+
+        let second_consensus_secret_key = if metadata.kafka_endpoint.is_some() {
+            metadata
+                .second_consensus_secret_key
+                .expect("Second consensus secret key is not provided")
+        } else {
+            "".into()
+        };
+
+        let kafka_endpoint = metadata.kafka_endpoint;
+
         let reporter_id = metadata.reporter_id.expect("Reporter ID is not provided");
         // TODO(adikov) There is a specific case in which one reporter receives task to report multiple
         // data feeds which are gathered from one wasm component. For example -
@@ -214,7 +262,9 @@ impl TriggerExecutor for OracleTrigger {
             engine,
             sequencer,
             prometheus_url,
+            kafka_endpoint,
             secret_key,
+            second_consensus_secret_key,
             reporter_id,
             queue_components,
         })
@@ -238,7 +288,7 @@ impl TriggerExecutor for OracleTrigger {
         // This trigger spawns threads, which Ctrl+C does not kill.  So
         // for this case we need to detect Ctrl+C and shut those threads
         // down. For simplicity, we do this by terminating the process.
-        tokio::task::Builder::new()
+        Builder::new()
             .name("ctrl-c watcher")
             .spawn(async move {
                 tracing::trace!("Task ctrl-c watcher started");
@@ -251,12 +301,28 @@ impl TriggerExecutor for OracleTrigger {
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
         let (signal_data_feed_sender, _) = channel(16);
+        let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
+        let mut feeds_config = HashMap::new();
         //TODO(adikov): Move all the logic to a different struct and handle
         //errors properly.
         // For each component, run its own timer loop
 
         let components = self.queue_components.clone();
-        tracing::debug!("Components: {:?}", &components);
+        for component in components.values() {
+            for df in &component.oracle_settings {
+                feeds_config.insert(
+                    df.id.parse::<u32>()?,
+                    FeedStrideAndDecimals {
+                        stride: df.stride,
+                        decimals: df.decimals,
+                    },
+                );
+            }
+        }
+        tracing::debug!(
+            "Components: {}",
+            &serde_json::to_string_pretty(&components).unwrap(),
+        );
         tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
             .queue_components
@@ -279,12 +345,34 @@ impl TriggerExecutor for OracleTrigger {
         );
         loops.append(&mut orchestrators);
 
+        let url = Url::parse(&self.sequencer.clone())?;
+        let sequencer_aggregated_consensus_url = url.join("/post_aggregated_consensus_vote")?;
+
+        if let Some(endpoint) = self.kafka_endpoint {
+            let (aggregated_consensus_sender, aggregated_consensus_receiver) = unbounded_channel();
+            tracing::trace!("Starting secondary signature");
+            loops.push(Self::start_secondary_signature_listener(
+                endpoint,
+                aggregated_consensus_sender,
+            ));
+
+            tracing::trace!("Starting process_aggregated_consensus");
+            loops.push(tokio::spawn(Self::process_aggregated_consensus(
+                aggregated_consensus_receiver,
+                feeds_config,
+                data_feed_results.clone(),
+                sequencer_aggregated_consensus_url,
+                self.second_consensus_secret_key,
+                self.reporter_id,
+            )));
+        }
+
         tracing::trace!("Starting sender to sequencer");
-        let url = url::Url::parse(&self.sequencer.clone())?;
-        let sequencer_url = url.join("/post_reports_batch")?;
+        let sequencer_post_batch_url = url.join("/post_reports_batch")?;
         let manager = Self::start_manager(
             data_feed_receiver,
-            &sequencer_url,
+            data_feed_results,
+            &sequencer_post_batch_url,
             &self.secret_key,
             self.reporter_id,
         );
@@ -322,10 +410,10 @@ impl OracleTrigger {
         signal_receiver: BroadcastReceiver<HashSet<DataFeedSetting>>,
         payload_sender: UnboundedSender<(String, Payload)>,
         component: &Component,
-    ) -> tokio::task::JoinHandle<TerminationReason> {
+    ) -> JoinHandle<TerminationReason> {
         let future = Self::execute(engine, signal_receiver, payload_sender, component.clone());
         let task_name = format!("processor for {}", component.id);
-        tokio::task::Builder::new()
+        Builder::new()
             .name(&task_name)
             .spawn(future)
             .unwrap_or_else(|_| panic!("{task_name} failed to start"))
@@ -437,6 +525,8 @@ impl OracleTrigger {
     ) -> TerminationReason {
         tracing::trace!("Task orchestrator-{} started", oracle_id);
         //TODO(adikov): Implement proper logic and remove dummy values
+        let time_tracker = SlotTimeTracker::new("feed_update".into(), time_interval, 0);
+
         loop {
             REPORTER_BATCH_COUNTER.inc();
             let batch_count = REPORTER_BATCH_COUNTER.get();
@@ -444,7 +534,11 @@ impl OracleTrigger {
                 "Orchestrator-{} entering sleep [batch_count={batch_count}]",
                 oracle_id
             );
-            let _ = tokio::time::sleep(time_interval).await;
+
+            time_tracker
+                .await_end_of_current_slot(&Repeatability::Periodic)
+                .await;
+
             tracing::trace!(
                 "Orchestrator-{} woke up [batch_count={batch_count}]",
                 oracle_id
@@ -490,24 +584,125 @@ impl OracleTrigger {
         //TerminationReason::Other("Signal data feed loop terminated".to_string())
     }
 
-    fn start_manager(
-        rx: UnboundedReceiver<(String, Payload)>,
-        sequencer: &url::Url,
-        secret_key: &str,
-        reporter_id: u64,
-    ) -> tokio::task::JoinHandle<TerminationReason> {
-        let future =
-            Self::process_payload(rx, sequencer.to_owned(), secret_key.to_owned(), reporter_id);
+    fn start_secondary_signature_listener(
+        kafka_report_endpoint: String,
+        signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
+    ) -> JoinHandle<TerminationReason> {
+        let future = Self::signal_secondary_signature(kafka_report_endpoint, signal_sender);
 
-        tokio::task::Builder::new()
+        Builder::new()
             .name("sender to sequencer")
             .spawn(future)
             .expect("sender to sequencer failed to start")
     }
 
+    async fn signal_secondary_signature(
+        kafka_report_endpoint: String,
+        signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
+    ) -> TerminationReason {
+        // Configure the Kafka consumer
+        let consumer: StreamConsumer = match ClientConfig::new()
+            .set("bootstrap.servers", kafka_report_endpoint)
+            .set("group.id", "no_commit_group") // Consumer group ID
+            .set("enable.auto.commit", "false") // Disable auto-commit
+            .set("auto.offset.reset", "latest") // Start from latest always
+            .set("socket.timeout.ms", "300000")
+            .set("session.timeout.ms", "400000")
+            .set("max.poll.interval.ms", "500000")
+            .create()
+        {
+            Ok(consumer) => consumer,
+            Err(err) => {
+                tracing::error!("Error while creating kafka consumer: {:?}", err);
+                return TerminationReason::Other(format!(
+                    "Error while creating kafka consumer: {:?}",
+                    err
+                ));
+            }
+        };
+
+        // Subscribe to the desired topic(s)
+        if let Err(err) = consumer.subscribe(&["aggregation_consensus"]) {
+            return TerminationReason::Other(format!(
+                "Error while subscribing to kafka topic: {:?}",
+                err
+            ));
+        };
+
+        // Asynchronously process messages using a stream
+        let mut message_stream = consumer.stream();
+        let mut total_err_messages = 0;
+
+        while let Some(message_result) = message_stream.next().await {
+            match message_result {
+                Ok(message) => {
+                    total_err_messages = 0;
+                    let payload: ConsensusSecondRoundBatch = match message.payload() {
+                        None => {
+                            tracing::warn!("kafka None message received");
+                            continue;
+                        }
+                        Some(bytes) => match serde_json::from_slice(bytes) {
+                            Ok(r) => r,
+                            Err(err) => {
+                                tracing::error!("Error while parsing the message: {:?}", err);
+                                continue;
+                            }
+                        },
+                    };
+                    tracing::debug!("kafka message received - {:?}", payload);
+
+                    match signal_sender.send(payload) {
+                        Ok(_) => {
+                            continue;
+                        }
+                        Err(_) => {
+                            break;
+                        }
+                    };
+                }
+                Err(err) => {
+                    // Handle message errors
+                    tracing::error!("Error while consuming: {:?}", err);
+                    total_err_messages += 1;
+                    if total_err_messages >= TOTAL_RETRIES_FOR_KAFKA_READ {
+                        return TerminationReason::Other(format!(
+                            "Error while consuming: {:?}",
+                            err
+                        ));
+                    }
+                    let _ = sleep(Duration::from_millis(TIME_BEFORE_KAFKA_READ_RETRY_IN_MS)).await;
+                    continue;
+                }
+            }
+        }
+
+        TerminationReason::Other("Signal secondary consensus loop terminated".to_string())
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn start_manager(
+        payload_rx: UnboundedReceiver<(String, Payload)>,
+        latest_votes: DataFeedResults,
+        sequencer_post_batch_url: &Url,
+        secret_key: &str,
+        reporter_id: u64,
+    ) -> JoinHandle<TerminationReason> {
+        let process_payload_future = Self::process_payload(
+            payload_rx,
+            latest_votes.clone(),
+            sequencer_post_batch_url.to_owned(),
+            secret_key.to_owned(),
+            reporter_id,
+        );
+
+        spawn(process_payload_future)
+    }
+
     async fn process_payload(
         mut rx: UnboundedReceiver<(String, Payload)>,
-        sequencer: url::Url,
+        latest_votes: DataFeedResults,
+        sequencer_url: Url,
         secret_key: String,
         reporter_id: u64,
     ) -> TerminationReason {
@@ -551,12 +746,12 @@ impl OracleTrigger {
 
             tracing::trace!(
                 "Sending to url - {}; {} batches",
-                sequencer.clone(),
+                sequencer_url.clone(),
                 batch_payload.len()
             );
             let client = reqwest::Client::new();
             match client
-                .post(sequencer.clone())
+                .post(sequencer_url.clone())
                 .json(&batch_payload)
                 .send()
                 .await
@@ -565,6 +760,9 @@ impl OracleTrigger {
                     let status = res.status();
                     let contents = res.text().await.unwrap();
                     tracing::trace!("Sequencer responded with status={status} and text={contents}",);
+
+                    let mut latest_votes = latest_votes.write().await;
+                    update_latest_votes(&mut latest_votes, batch_payload);
                 }
                 Err(e) => {
                     //TODO(adikov): Add code from the error - e.status()
@@ -580,6 +778,87 @@ impl OracleTrigger {
 
         tracing::trace!("Task sender to sequencer ending");
 
+        TerminationReason::SequencerExitRequested
+    }
+
+    async fn process_aggregated_consensus(
+        mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
+        feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+        latest_votes: DataFeedResults,
+        sequencer: Url,
+        second_consensus_secret_key: String,
+        reporter_id: u64,
+    ) -> TerminationReason {
+        while let Some(aggregated_consensus) = ss_rx.recv().await {
+            let signer = create_private_key_signer(second_consensus_secret_key.as_str());
+
+            let tx = match hex_str_to_bytes32(aggregated_consensus.tx_hash.as_str()) {
+                Ok(t) => t,
+                Err(e) => {
+                    tracing::error!("Failed to parse str to bytes on second consensus: {}", &e);
+                    continue;
+                }
+            };
+
+            let block_height = aggregated_consensus.block_height;
+            let network = aggregated_consensus.network.clone();
+
+            match validate(
+                feeds_config.clone(),
+                aggregated_consensus,
+                latest_votes.read().await.clone(),
+                HashMap::new(),
+            )
+            .await
+            {
+                Ok(_) => {
+                    tracing::info!(
+                        "Validated batch to post to contract: block_height={block_height}"
+                    );
+                }
+                Err(e) => {
+                    tracing::error!(
+                        "Failed to validate second consensus for block_height={block_height}: {}",
+                        &e
+                    );
+                    continue;
+                }
+            };
+
+            let signed = match sign_hash(&signer, &tx).await {
+                Ok(s) => s,
+                Err(e) => {
+                    tracing::error!("Failed to sign hash on second consensus: {}", &e);
+                    continue;
+                }
+            };
+
+            let signature = bytes_to_hex_string(signed.signature);
+            let report = ReporterResponse {
+                block_height,
+                reporter_id,
+                network,
+                signature,
+            };
+
+            tracing::trace!("Sending to url - {}; {:?} hash", sequencer.clone(), &report);
+
+            let client = reqwest::Client::new();
+            match client.post(sequencer.clone()).json(&report).send().await {
+                Ok(res) => {
+                    let contents = res.text().await.unwrap();
+                    tracing::trace!("Sequencer responded with: {}", &contents);
+                }
+                Err(e) => {
+                    //TODO(adikov): Add code from the error - e.status()
+                    REPORTER_FAILED_SEQ_REQUESTS
+                        .with_label_values(&["404"])
+                        .inc();
+
+                    tracing::error!("Sequencer failed to respond with: {}", &e);
+                }
+            };
+        }
         TerminationReason::SequencerExitRequested
     }
 
@@ -745,5 +1024,25 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
         Ok(HostFutureIncomingResponse::Pending(
             wasmtime_wasi::runtime::spawn(response_handle),
         ))
+    }
+}
+
+fn update_latest_votes(
+    latest_votes: &mut HashMap<u32, VotedFeedUpdate>,
+    batch: Vec<DataFeedPayload>,
+) {
+    for vote in batch {
+        let feed_id = vote.payload_metadata.feed_id.parse().unwrap();
+
+        if let Ok(value) = vote.result {
+            _ = latest_votes.insert(
+                feed_id,
+                VotedFeedUpdate {
+                    feed_id,
+                    value,
+                    end_slot_timestamp: vote.payload_metadata.timestamp,
+                },
+            );
+        }
     }
 }

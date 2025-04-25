@@ -16,18 +16,18 @@ use alloy::{
 };
 
 use alloy_primitives::Bytes;
-use config::AllFeedsConfig;
+use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
 use reqwest::Url;
 
-use config::{PublishCriteria, SequencerConfig};
-use data_feeds::feeds_processing::{
+use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
+use blocksense_data_feeds::feeds_processing::{
     BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
+use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
+use blocksense_feed_registry::types::FeedType;
+use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
 use eyre::{eyre, Result};
-use feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
-use feed_registry::types::FeedType;
 use paste::paste;
-use prometheus::{metrics::ProviderMetrics, process_provider_getter};
 use ringbuf::traits::{Consumer, Observer, RingBuffer};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -77,7 +77,7 @@ pub struct RpcProvider {
     pub signer: PrivateKeySigner,
     pub safe_min_quorum: u32,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
-    pub transaction_retries_count_before_give_up: u32,
+    pub transaction_retries_count_limit: u32,
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
     pub transaction_gas_limit: u32,
@@ -87,6 +87,7 @@ pub struct RpcProvider {
     pub feeds_variants: HashMap<u32, (FeedType, usize)>,
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
+    pub round_counters: RoundCounters,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -172,7 +173,7 @@ impl RpcProvider {
         network: &str,
         rpc_url: Url,
         signer: &PrivateKeySigner,
-        p: &config::Provider,
+        p: &blocksense_config::Provider,
         provider_metrics: &Arc<tokio::sync::RwLock<ProviderMetrics>>,
         feeds_config: &AllFeedsConfig,
     ) -> RpcProvider {
@@ -205,7 +206,7 @@ impl RpcProvider {
             signer: signer.clone(),
             safe_min_quorum: p.safe_min_quorum,
             provider_metrics: provider_metrics.clone(),
-            transaction_retries_count_before_give_up: p.transaction_retries_count_before_give_up,
+            transaction_retries_count_limit: p.transaction_retries_count_limit,
             transaction_retry_timeout_secs: p.transaction_retry_timeout_secs,
             retry_fee_increment_fraction: p.retry_fee_increment_fraction,
             transaction_gas_limit: p.transaction_gas_limit,
@@ -215,11 +216,12 @@ impl RpcProvider {
             feeds_variants,
             contracts,
             rpc_url,
+            round_counters: HashMap::new(),
         }
     }
 
     pub fn prepare_history(
-        p: &config::Provider,
+        p: &blocksense_config::Provider,
     ) -> (FeedAggregateHistory, HashMap<u32, PublishCriteria>) {
         let mut history = FeedAggregateHistory::new();
         let mut publishing_criteria: HashMap<u32, PublishCriteria> = HashMap::new();
@@ -237,7 +239,7 @@ impl RpcProvider {
         (history, publishing_criteria)
     }
 
-    pub fn prepare_contracts(p: &config::Provider) -> Vec<Contract> {
+    pub fn prepare_contracts(p: &blocksense_config::Provider) -> Vec<Contract> {
         let address = p
             .contract_address
             .as_ref()
@@ -655,12 +657,12 @@ mod tests {
         rpc::types::eth::request::TransactionRequest,
     };
     use alloy_primitives::address;
-    use utils::test_env::get_test_private_key_path;
+    use blocksense_utils::test_env::get_test_private_key_path;
 
     use crate::providers::provider::get_rpc_providers;
     use alloy::consensus::Transaction;
     use alloy::providers::Provider as AlloyProvider;
-    use config::get_test_config_with_single_provider;
+    use blocksense_config::get_test_config_with_single_provider;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {

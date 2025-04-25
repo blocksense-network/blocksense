@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { IADFSWrapper } from '../interfaces/IADFSWrapper';
 import { AggregatedDataFeedStoreGeneric } from '../../../../typechain';
 import { AccessControlWrapper } from './AccessControl';
-import { Feed, ReadOp } from '../types';
+import { Feed, ReadFeed, ReadOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { EventFragment } from 'ethers';
 
@@ -195,7 +195,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     ]);
   };
 
-  public encodeDataRead = (operation: ReadOp, feed: Feed) => {
+  public encodeDataRead = (operation: ReadOp, feed: ReadFeed) => {
     const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
 
     switch (operation) {

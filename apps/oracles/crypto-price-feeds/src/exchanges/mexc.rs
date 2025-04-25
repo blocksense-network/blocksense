@@ -4,10 +4,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -27,15 +26,18 @@ pub struct MEXCPriceFetcher;
 impl PricesFetcher<'_> for MEXCPriceFetcher {
     const NAME: &'static str = "MEXC";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let response =
-                http_get_json::<MEXCPriceResponse>("https://api.mexc.com/api/v3/ticker/24hr", None)
-                    .await?;
+            let response = http_get_json::<MEXCPriceResponse>(
+                "https://api.mexc.com/api/v3/ticker/24hr",
+                None,
+                None,
+            )
+            .await?;
 
             Ok(response
                 .into_iter()

@@ -1,17 +1,13 @@
 { pkgs, lib, ... }:
 let
-  nodejs = pkgs.nodejs_22;
-  oldYarn = pkgs.yarn.override { inherit nodejs; };
-  yarn = pkgs.yarn-berry.override {
-    inherit nodejs;
-    yarn = oldYarn;
-  };
+  nodejs = pkgs.nodejs_23;
+  corepack = pkgs.corepack.override { inherit nodejs; };
 in
 {
   packages =
     [
       nodejs
-      yarn
+      corepack
       pkgs.python3
     ]
     ++ lib.optionals pkgs.stdenv.isLinux [

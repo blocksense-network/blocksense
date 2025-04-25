@@ -1,5 +1,5 @@
-use crypto::{deserialize_priv_key, sign_message, Signature};
-use feed_registry::types::{FeedResult, Timestamp};
+use blocksense_crypto::{deserialize_priv_key, sign_message, Signature};
+use blocksense_feed_registry::types::{FeedResult, Timestamp};
 
 pub fn generate_signature(
     priv_key_hex: &str,

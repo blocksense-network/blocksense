@@ -10,10 +10,11 @@ import del from 'rollup-plugin-delete';
 import { glob } from 'glob';
 import { createRequire } from 'node:module';
 import { getTsconfig } from 'get-tsconfig';
+import chalkTemplate from 'chalk-template';
 
 main().catch(console.error);
 
-function main() {
+async function main() {
   if (process.argv.length !== 3) {
     console.log(`
     Usage:
@@ -24,36 +25,48 @@ function main() {
     process.exit(1);
   }
 
-  const packageDir = `${path.resolve(process.argv[2])}/`;
+  const inputDir = process.argv[2];
+  const relativeDir = path.relative(process.env['GIT_ROOT'] ?? '/', inputDir);
+  const packageDir = `${path.resolve(inputDir)}/`;
+
+  console.log(
+    chalkTemplate`╭─ Building {bold ${relativeDir}} ({underline ${packageDir}})`,
+  );
 
   // DO NOT REMOVE: Chesterson's fence
   process.chdir(packageDir);
 
-  return Promise.all([
-    build(packageDir, 'esm'), //
-    build(packageDir, 'cjs'),
-  ])
-    .then(() =>
-      fs.rename(`${packageDir}/dist/esm/types`, `${packageDir}/dist/types`),
-    )
-    .then(() => console.log('Build finished successfully'));
+  await Promise.all([
+    build(packageDir, relativeDir, 'esm'), //
+    build(packageDir, relativeDir, 'cjs'),
+  ]);
+  await fs.rename(`${packageDir}/dist/esm/types`, `${packageDir}/dist/types`);
+  console.log(
+    chalkTemplate`╰─ Finished {bold ${relativeDir}/dist/\{cjs,esm,types\}} successfully.`,
+  );
 }
 
-async function build(packageDir, format) {
-  console.log(`Building ${packageDir} in ${format} format...`);
-
+async function build(packageDir, relativeDir, format) {
   let bundle;
   try {
     const config = createConfig(packageDir, format);
     bundle = await rollup(config);
 
     for (const outputOptions of config.output) {
-      console.log(`Writing ${format}...`);
       await bundle.write(outputOptions);
-      console.log(`Wrote ${format}`);
     }
   } catch (error) {
-    console.error(error);
+    console.log(
+      error.message
+        .replace(/^\[plugin ([^\]]*)\] (\S+):/, '├─ ❌ [$2]')
+        .replace(
+          /^\[plugin typescript\]\s+(\S+)\s+\((\d+:\d+)\):\s+@rollup\/plugin-typescript\s+(TS\d+):/,
+          '├─ ❌ $1:$2 - error $3:',
+        )
+        .replace(/^\s+/gm, '│       '),
+    );
+    if (error.frame) console.log(error.frame.replace(/^/gm, '│     '));
+    console.log(chalkTemplate`╰─ {red Building {bold ${relativeDir}} failed.}`);
     process.exit(1);
   } finally {
     await bundle?.close();
@@ -89,6 +102,20 @@ function createConfig(packageDir, format) {
         }),
     ),
 
+    onwarn(warning, warn) {
+      // Filter out the empty chunk warning
+      // The warning code might be 'EMPTY_BUNDLE'
+      if (
+        warning.code === 'EMPTY_BUNDLE' ||
+        (typeof warning.message === 'string' &&
+          warning.message.includes('Generated an empty chunk'))
+      ) {
+        return;
+      }
+      // Handle all other warnings normally
+      warn(warning);
+    },
+
     external: (id, parentId, _isResolved) => {
       const absPath = path.isAbsolute(id)
         ? id
@@ -109,6 +136,7 @@ function createConfig(packageDir, format) {
         dir: `${packageDir}/dist/${format}`,
         format: format,
         entryFileNames: `[name].${{ esm: 'mjs', cjs: 'cjs' }[format]}`,
+        sourcemap: tsconfig.config.compilerOptions.sourceMap,
       },
     ],
     plugins: [
@@ -133,9 +161,27 @@ function createConfig(packageDir, format) {
         composite: false,
         declaration: format != 'cjs',
         declarationMap: format != 'cjs',
+        noEmitOnError: true,
         noEmit: format == 'cjs',
-        outDir:
-          format == 'cjs' ? undefined : `${packageDir}/dist/${format}/types`,
+        /**
+         * If we set `outDir` to `${packageDir}/dist/${format}`, rollup would
+         * produce source maps of the form: `../../../src/array-iter.ts`,
+         * instead of: `../../src/array-iter.ts`, since the source map file
+         * is located at `dist/esm/array-iter.mjs.map.
+         *
+         * If we set `outDir` to `${packageDir}/dist` or out '..' rollup fails
+         * with the following error:
+         * > [@rollup/plugin-typescript] Path of Typescript compiler option
+         * > 'outDir' must be located inside Rollup 'dir' option.
+         *
+         * For reference, see:
+         * https://github.com/rollup/plugins/blob/typescript-v12.1.2/packages/typescript/src/options/validate.ts#L65
+         *
+         * The same error appears if we omit `outDir` from the config, so in
+         * summary, the only working option is to set it explicitly to `undefined`.
+         * ¯\_(ツ)_/¯
+         */
+        outDir: undefined,
         declarationDir:
           format == 'cjs' ? undefined : `${packageDir}/dist/${format}/types`,
       }),

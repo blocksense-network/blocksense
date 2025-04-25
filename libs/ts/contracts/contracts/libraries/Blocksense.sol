@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 //    ___  __         __                           _  __    __                  __
 //   / _ )/ /__  ____/ /__ ___ ___ ___  ___ ___   / |/ /__ / /__    _____  ____/ /__
@@ -261,6 +261,14 @@ library Blocksense {
         slotsCount == 0 ? 23 : 27,
         slotsCount > 0 ? slotsCount : (1 << (stride - startSlot))
       );
+  }
+
+  function _getEpochSeconds(bytes32 data) internal pure returns (uint64) {
+    return uint64(uint256(data)) / 1000;
+  }
+
+  function _getEpochMilliseconds(bytes32 data) internal pure returns (uint64) {
+    return uint64(uint256(data));
   }
 
   /// @notice Calls the dataFeedStore with the given data for stride 0 feeds

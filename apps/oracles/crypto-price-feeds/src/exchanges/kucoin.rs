@@ -5,10 +5,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::{Deserialize, Deserializer};
 
-use crate::{
-    common::{PairPriceData, PricePoint},
+use blocksense_sdk::{
     http::http_get_json,
-    traits::prices_fetcher::PricesFetcher,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
 fn as_f64_option<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
@@ -49,7 +48,7 @@ pub struct KuCoinPriceFetcher;
 impl PricesFetcher<'_> for KuCoinPriceFetcher {
     const NAME: &'static str = "KuCoin";
 
-    fn new(_symbols: &[String]) -> Self {
+    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
     }
 
@@ -57,6 +56,7 @@ impl PricesFetcher<'_> for KuCoinPriceFetcher {
         async {
             let response = http_get_json::<KuCoinPriceResponse>(
                 "https://api.kucoin.com/api/v1/market/allTickers",
+                None,
                 None,
             )
             .await?;
