@@ -185,7 +185,7 @@ jobs:
           - project: nft.blocksense.network
             path: apps/nft.blocksense.network/out
             project_name: blocksense-nft
-            build_command: yarn workspace @blocksense/nft.blocksense.network build
+            build_command: yarn workspace @blocksense/nft.blocksense.network build:with-deps
     outputs:
       docsDeploymentMessage: ${{ steps.docs-ws-url.outputs.url }}
       uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
