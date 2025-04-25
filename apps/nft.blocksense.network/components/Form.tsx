@@ -35,7 +35,7 @@ export const Form = () => {
         className="form__article max-w-[32.75rem] mx-auto flex flex-col items-center justify-center md:gap-12 gap-8"
       >
         <h2 className="form__title text-center">
-          Join the crew and receive your NFT by completing ALL THE STEPS!
+          Join the crew and receive your NFT <br /> by completing all the steps:
         </h2>
         <div
           className={`transition-all ease-out transform duration-1000 ${
