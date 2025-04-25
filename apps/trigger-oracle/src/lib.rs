@@ -216,11 +216,18 @@ impl TriggerExecutor for OracleTrigger {
             .expect("Report time interval not provided");
         let sequencer = metadata.sequencer.expect("Sequencer URL is not provided");
         let prometheus_url = metadata.prometheus_url;
-        let kafka_endpoint = metadata.kafka_endpoint;
         let secret_key = metadata.secret_key.expect("Secret key is not provided");
-        let second_consensus_secret_key = metadata
-            .second_consensus_secret_key
-            .expect("Second consensus secret key is not provided");
+
+        let second_consensus_secret_key = if metadata.kafka_endpoint.is_some() {
+            metadata
+                .second_consensus_secret_key
+                .expect("Second consensus secret key is not provided")
+        } else {
+            "".into()
+        };
+
+        let kafka_endpoint = metadata.kafka_endpoint;
+
         let reporter_id = metadata.reporter_id.expect("Reporter ID is not provided");
         // TODO(adikov) There is a specific case in which one reporter receives task to report multiple
         // data feeds which are gathered from one wasm component. For example -

@@ -74,17 +74,22 @@ impl From<BlocksenseConfig> for AppManifest {
             "sequencer".to_string(),
             toml::Value::String(config.reporter_info.sequencer),
         );
-        table.insert(
-            "kafka_endpoint".to_string(),
-            toml::Value::String(config.reporter_info.kafka_endpoint),
-        );
+
+        if let Some(kafka_endpoint) = config.reporter_info.kafka_endpoint {
+            table.insert("kafka_endpoint".into(), toml::Value::String(kafka_endpoint));
+        }
+
+        if let Some(second_consensus_secret_key) = config.reporter_info.second_consensus_secret_key
+        {
+            table.insert(
+                "second_consensus_secret_key".into(),
+                toml::Value::String(second_consensus_secret_key),
+            );
+        }
+
         table.insert(
             "secret_key".to_string(),
             toml::Value::String(config.reporter_info.secret_key),
-        );
-        table.insert(
-            "second_consensus_secret_key".to_string(),
-            toml::Value::String(config.reporter_info.second_consensus_secret_key),
         );
         trigger_global_configs.insert("settings".to_string(), table);
 
