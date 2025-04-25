@@ -1,0 +1,21 @@
+{
+  "capabilities": [
+    {
+      "data": "/home/adikov/code/repos/blocksense/nix/test-environments/test-keys/CMC_API_KEY",
+      "id": "CMC_API_KEY"
+    },
+    {
+      "data": "/home/adikov/code/repos/blocksense/nix/test-environments/test-keys/YH_FINANCE_API_KEY",
+      "id": "YAHOO_API_KEY"
+    }
+  ],
+  "data_feeds": [],
+  "oracles": [],
+  "reporter_info": {
+    "interval_time_in_seconds": 10,
+    "registry": "http://127.0.0.1:5553",
+    "reporter_id": 0,
+    "secret_key": "/home/adikov/code/repos/blocksense/nix/test-environments/test-keys/reporter_secret_key",
+    "sequencer": "http://127.0.0.1:9856"
+  }
+}

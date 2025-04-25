@@ -1,0 +1,137 @@
+@import 'tailwindcss';
+
+input:focus,
+textarea:focus,
+select:focus,
+details:focus,
+[tabindex]:focus,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+details:focus-visible,
+[tabindex]:focus-visible {
+  border: 1px solid var(--focus-border-color);
+  border-radius: 0.5rem;
+  outline: none;
+  outline-offset: 0;
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+ul:focus:not(:focus-visible),
+ol:focus:not(:focus-visible),
+.card:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+fieldset:focus:not(:focus-visible),
+details:focus:not(:focus-visible),
+summary:focus:not(:focus-visible),
+.callout:focus:not(:focus-visible) {
+  outline: none;
+}
+
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus,
+fieldset:focus,
+.details:focus,
+.summary:focus,
+.card:focus,
+.callout:focus {
+  border-radius: 0.375rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+fieldset:focus {
+  border: 1px solid var(--focus-border-color);
+  border-radius: 0.375rem;
+}
+
+ul:focus,
+ol:focus {
+  outline: 1px solid var(--focus-border-color);
+  outline-offset: var(--focus-outline-offset);
+  border-radius: 0.375rem;
+}
+
+.card:focus,
+.card:focus-visible {
+  box-shadow: 0 0 0 4px var(--focus-border-color);
+  border-radius: 0.75rem;
+}
+
+details:focus,
+details:focus-visible,
+summary:focus,
+summary:focus-visible {
+  outline: 1px solid var(--focus-border-color);
+  outline-offset: 2px;
+}
+
+.callout:focus,
+.callout:focus-visible {
+  outline: 1px solid var(--focus-border-color);
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+}
+
+.nextra-navbar ul li a:focus,
+.nextra-navbar ol li a:focus {
+  display: inline-block;
+  border: 1px solid var(--transparent-color);
+  padding: 0.25rem 0.5rem;
+  transition:
+    border-color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+}
+
+.nextra-navbar ul li a:active,
+.nextra-navbar ol li a:active {
+  border: 1px solid var(--focus-border-color);
+  outline: none;
+}
+
+.nextra-navbar ul li button:focus-visible,
+.nextra-navbar ol li button:focus-visible {
+  display: inline-block;
+  border: 1px solid var(--transparent-color);
+  border-radius: inherit;
+  padding: 0.25rem 0.5rem;
+  transition:
+    border-color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+}
+
+.nextra-navbar ul li a.x\\:focus-visible\\:nextra-focus,
+.nextra-navbar ol li a.x\\:focus-visible\\:nextra-focus,
+.nextra-navbar ul li a.x\\:focus\\:nextra-focus,
+.nextra-navbar ol li a.x\\:focus\\:nextra-focus {
+  border-color: var(--focus-border-color);
+}
+
+.link_button:focus,
+.link_button:focus-visible {
+  border: 1px solid var(--focus-border-color);
+  outline: none;
+}
+
+.nextra-filetree ul > li button:focus,
+.nextra-filetree ul > li button:focus-visible {
+  border: 1px solid var(--transparent-color);
+  outline: none;
+}
+
+.nextra-sidebar button:focus,
+.nextra-sidebar button:focus-visible {
+  border: 1px solid var(--focus-border-color);
+  border-radius: 0.5rem;
+  outline: none;
+  outline-offset: 0;
+}

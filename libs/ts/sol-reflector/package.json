@@ -1,0 +1,36 @@
+{
+  "name": "@blocksense/sol-reflector",
+  "version": "0.0.0",
+  "keywords": [
+    "solidity",
+    "documentation"
+  ],
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "ts": "yarn node --import tsx"
+  },
+  "dependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.2",
+    "hardhat": "^2.22.17",
+    "prettier": "^3.4.2",
+    "prettier-plugin-solidity": "^1.4.1",
+    "solidity-ast": "^0.4.59"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.5.4",
+    "web3-types": "^1.10.0"
+  }
+}

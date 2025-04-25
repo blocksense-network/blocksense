@@ -1,0 +1,35 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Yordan Madzhunkov"]
+name = "GeckoTerminal dex prices"
+version = "0.1.0"
+
+[application.trigger.settings]
+interval_time_in_seconds = 10
+sequencer = "http://127.0.0.1:9856/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+reporter_id = 0
+
+[[trigger.oracle]]
+component = "gecko-terminal"
+
+[[trigger.oracle.data_feeds]]
+id = "1000000"
+data = '{"pair":{"base":"WMON","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"monad-testnet","pool":"0x264e9b75723d75e3c607627d8e21d2c758db4c80","reverse":true}]}'
+
+[[trigger.oracle.data_feeds]]
+id = "1000001"
+data = '{"pair":{"base":"USDZ","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"base","pool":"0xcf88b8bf7ccce2d836878e538197eb20fc673bce","reverse":false}]}'
+
+[[trigger.oracle.data_feeds]]
+id = "1000002"
+data = '{"pair":{"base":"USR","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"base","pool":"0xd3ee0a3b349237d68517df30bfb66be971f46ad9","reverse":false},{"network":"eth","pool":"0x3ee841f47947fefbe510366e4bbb49e145484195","reverse":false},{"network":"eth","pool":"0x4628f13651ead6793f8d838b34b8f8522fb0cc52","reverse":false},{"network":"eth","pool":"0xc907ba505c2e1cbc4658c395d4a2c7e6d2c32656","reverse":false}]}'
+
+[component.gecko-terminal]
+source = "../../../target/wasm32-wasip1/release/gecko_terminal.wasm"
+
+allowed_outbound_hosts = ["https://app.geckoterminal.com/"]
+
+[component.gecko-terminal.build]
+command = "cargo build --target wasm32-wasip1 --release"

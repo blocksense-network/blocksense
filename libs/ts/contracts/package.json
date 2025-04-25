@@ -1,0 +1,67 @@
+{
+  "name": "@blocksense/contracts",
+  "exports": {
+    "./docs/*": {
+      "require": "./artifacts/docs/*.json",
+      "import": "./artifacts/docs/*.json"
+    },
+    "./abis/*.json": {
+      "require": "./abis/*.json",
+      "import": "./abis/*.json"
+    },
+    "./abi.json": {
+      "require": "./artifacts/docs/abi.json",
+      "import": "./artifacts/docs/abi.json"
+    },
+    "./contractsFileStructure.json": {
+      "require": "./artifacts/docs/contractsFileStructure.json",
+      "import": "./artifacts/docs/contractsFileStructure.json"
+    }
+  },
+  "scripts": {
+    "clean": "git clean -fdx -e .env",
+    "build": "hardhat compile",
+    "sol-reflect": "yarn build:with-deps && yarn hardhat reflect",
+    "test": "hardhat test",
+    "test:fork": "FORKING=true hardhat test --grep '@fork'",
+    "coverage": "hardhat coverage",
+    "deploy:local": "hardhat run --network localhost",
+    "size": "hardhat size-contracts"
+  },
+  "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@blocksense/config-types": "workspace:*",
+    "@blocksense/sol-reflector": "workspace:*",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-ledger": "^1.0.3",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.12",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@openzeppelin/contracts": "^5.1.0",
+    "@safe-global/api-kit": "^3.0.0",
+    "@safe-global/protocol-kit": "^5.2.4",
+    "@safe-global/safe-contracts": "1.4.1-2",
+    "@safe-global/safe-core-sdk-types": "^5.1.0",
+    "@safe-global/safe-deployments": "^1.37.22",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "4",
+    "@types/ejs": "^3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.2",
+    "chai": "4",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "ethers": "^6.13.4",
+    "hardhat": "^2.22.17",
+    "hardhat-contract-sizer": "^2.10.0",
+    "hardhat-gas-reporter": "^2.2.1",
+    "prettier": "^3.4.1",
+    "prettier-plugin-solidity": "^1.4.1",
+    "solidity-coverage": "^0.8.12",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2"
+  }
+}

@@ -1,0 +1,110 @@
+---
+title: Reporter Node
+---
+
+# Reporter Node — The Blocksense Guide
+
+This document outlines the requirements for running a Blocksense Reporter Node. It also provides a step-by-step guide for doing so.
+
+## Operator Infrastructure Requirements
+
+The Blocksense Reporter Node (BRN) is distributed as an Open Container Initiative (OCI) image. This dictates the following software requirements for running BRN as a Blocksense Node Operator.
+
+### 1. OCI runtime
+
+As a Node Operator, you need to have installed a compatible container runtime. This could be Docker, Podman, Kubernetes, or anything of the like. There is no special configuration of the OCI runtime required in order to instantiate and run the BRN image.
+
+### 2. Observability
+
+The reporter node provides two observability capabilities: logs and metrics.
+
+### Logs
+
+- Logs are printed on **stderr**.
+- The [tracing](https://docs.rs/tracing/latest/tracing/) Rust library is used for scoped structured logging.
+- The log level of various components can be configured by the standard `RUST_LOG` environment variable with the following syntax:
+
+`RUST_LOG=[target][=][level][,...]`.
+
+### Metrics
+
+- Metrics are collected in standard Prometheus format
+- Currently, the Reporter node works in push mode, so you need to run a Prometheus Gateway that is
+
+accessible from the BRN instance and provide the connection details to our software.
+
+### 3. Network Connection
+
+The Blocksense Reporter Node uses a Kafka message queue to communicate with the Blocksense network. For this it requires an outbound connection that requires less than 1Mbps. In addition to this, BRN connects to external data providers via outbound Websocket connections, which require an additional 10Mbps.
+
+Note that you can run the software behind a firewall with a private IP address, as it won’t need to accept any incoming connections.
+
+### 4. System Requirements
+
+The Blocksense Reporter Node is a lightweight program, that has modest system requirements. They are the following:
+
+1. CPU: a single dedicated processor core of a modern CPU is enough to meet the processing requirements of BRN. For example, we have measured demands not to exceed 25% utilization of a single core of a 12th Gen Intel(R) Core(TM) i9-12900K-equipped machine. To be clear: while this is a 24-core system, load from BRN never exceeded 0.25 of a single core. This means that a t2.nano AWS E2 or an e2-micro GCP instance, for example, provides enough compute to run BRN.
+2. RAM: a modest amount of RAM is required to meet the needs of BRN. We have measured this never to exceed 512MB. Providing 512MB to the container running the image will meet the requirements of the software. If it runs out of memory with these constraints, that would indicate a bug in our code and would not be considered the fault of the operator.
+3. Storage: there is no special requirement for data storage, as the current version of BRN is stateless: it always starts by obtaining the network state from the Blocksense network and itself stores nothing on disk between restarts. Account for storage only for logs. Logging produces less than 150 MB of uncompressed text every 24 hours.
+
+Meeting these requirements is sufficient to run a Blocksense Reporter Node.
+
+## Step-by-step guide “how to run”
+
+This guide walks you through running BRN locally on single machine with Ubuntu 24 and Docker. The goal is to get a working instance so that you can verify that your setup is correct. Once you succeed with this, please use your default approach to deploying the software on your cloud of choice.
+
+### 1. Setting up Docker
+
+Open your terminal and update your package list:
+
+```bash
+sudo apt update
+sudo apt install docker.io
+```
+
+Start and enable the Docker service:
+
+```bash
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+Add your user to the Docker group to run Docker commands without sudo:
+
+```bash
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### 2. Acquiring the OCI image
+
+In order to run the Blocksense Reporter Node software, you need to download our OCI image. You can do this by issuing the following command:
+
+```bash
+docker image pull [ghcr.io/blocksense-network/blocksense/reporter:v2](ghcr.io/blocksense-network/blocksense/reporter:v2)
+```
+
+### 3. Running a Reporter Node
+
+Once you have acquired the image, you need to configure a few environment variables. They point to configuration files, so we recommend creating a dedicated directory to contain the files:
+
+```bash
+mkdir -p brn/config
+cd brn
+```
+
+Now, copy the config files that were provided to you by the Blocksense team to the newly created config directory. Once that’s done, set the following environment variables and run the node:
+
+```bash
+FEEDS_CONFIG_DIR="$(pwd)/config" \
+REPORTER_CONFIG_DIR="$(pwd)/config" \
+RUST_LOG="debug" \
+docker run reporter
+```
+
+The Reporter will connect to the Blocksense network and await for a signal to start reporting data feed updates. There is no further configuration that is necessary, as the config files provide the necessary BSN sequencer address.
+
+Congratulations! You successfully started a Blocksense Reporter Node! Welcome to the network!
+
+*Built with love by the blocksense.network team.             Dec, 2024*

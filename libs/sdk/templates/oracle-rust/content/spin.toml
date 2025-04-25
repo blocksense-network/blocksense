@@ -1,0 +1,26 @@
+spin_manifest_version = 2
+
+[application]
+name = "{{project-name}}"
+version = "0.1.0"
+authors = ["{{authors}}"]
+description = "{{project-description}}"
+
+[application.trigger.settings]
+interval_time_in_seconds = 10
+sequencer = "http://gpu-server-001:8877/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+reporter_id = 0
+
+[[trigger.oracle]]
+component = "{{project-name | kebab_case}}"
+[[trigger.oracle.data_feeds]]
+data = "dummy"
+id = "0"
+
+[component.{{project-name | kebab_case}}]
+source = "target/wasm32-wasip1/release/{{project-name | snake_case}}.wasm"
+allowed_outbound_hosts = []
+[component.{{project-name | kebab_case}}.build]
+command = "cargo build --target wasm32-wasip1 --release"
+watch = ["src/**/*.rs", "Cargo.toml"]

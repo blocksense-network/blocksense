@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+@variant dark (&:where(.dark *));
+
+.dark a {
+  @apply text-neutral-200;
+}
+
+.dark .invert {
+  filter: invert(1);
+}
+
+.dark button {
+  @apply bg-neutral-900 border-neutral-600;
+}
+
+.dark button:hover {
+  @apply bg-neutral-800;
+}
+
+.dark pre {
+  @apply border-neutral-600;
+  /* matching bg color for our styles */
+  background-color: #1c1c1c !important;
+}
+
+.dark code {
+  @apply border-neutral-600;
+}
+.dark .h3__separator {
+  @apply border-b border-neutral-600;
+}
+
+.dark
+  .x\:bg-gray-100.x\:pb-\[env\(safe-area-inset-bottom\)\].x\:dark\:bg-neutral-900.x\:print\:bg-transparent {
+  @apply bg-neutral-900;
+}
+
+.dark .nextra-sidebar ul > li a:hover {
+  @apply bg-neutral-700 transition duration-300 ease-in-out;
+}
+
+.dark .nextra-mobile-nav {
+  @apply bg-neutral-900 text-neutral-300;
+}
+
+.dark .nextra-filetree {
+  @apply bg-neutral-900 border-neutral-600;
+}
+
+.dark .tabs {
+  @apply bg-neutral-900 border-neutral-600;
+}
+
+.dark .nextra-callout {
+  @apply bg-neutral-800 border-neutral-600 text-neutral-200 text-sm;
+}
+
+.dark .nextra-sidebar button {
+  @apply font-bold text-neutral-200;
+}
+
+.dark .nextra-sidebar ul > li a {
+  @apply text-neutral-200;
+}
+
+.dark .nextra-sidebar button:hover {
+  @apply text-white transition duration-300 ease-in-out;
+}
+
+.dark .x\:text-base {
+  @apply text-white;
+}
+
+.dark mark {
+  @apply text-blue-500 font-bold;
+}
+
+.dark .nextra-breadcrumb__item:hover {
+  @apply text-neutral-300;
+}
+
+.dark .nextra-breadcrumb__item--active {
+  @apply text-blue-500;
+}
+
+.dark .nextra-breadcrumb__item--inactive {
+  @apply text-gray-300;
+}
+
+.dark .nextra-breadcrumb__item--active:hover {
+  @apply text-neutral-100;
+}
+
+.dark .nextra-breadcrumb__link {
+  @apply text-white;
+}
+
+.dark .nextra-breadcrumb__link--active {
+  @apply text-neutral-300 underline underline-offset-4;
+}
+
+.dark .pagination__link:hover {
+  @apply text-neutral-300;
+}
+
+.dark .pagination__link--prev {
+  @apply text-gray-300;
+}
+
+.dark .pagination__link--prev:hover {
+  @apply text-white;
+}
+
+.dark .pagination__link--next {
+  @apply text-blue-500;
+}
+
+.dark .pagination__link--next:hover {
+  @apply text-blue-700;
+}
