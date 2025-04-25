@@ -91,8 +91,10 @@ impl BuildConfig {
 
     async fn read_secrets(config: &mut BlocksenseConfig) -> Result<()> {
         replace_filepath_with_content(&mut config.reporter_info.secret_key).await?;
-        replace_filepath_with_content(&mut config.reporter_info.second_consensus_secret_key)
-            .await?;
+
+        if let Some(key) = config.reporter_info.second_consensus_secret_key.as_mut() {
+            replace_filepath_with_content(key).await?;
+        }
 
         for capability in config.capabilities.iter_mut() {
             let api_key_path = &capability
