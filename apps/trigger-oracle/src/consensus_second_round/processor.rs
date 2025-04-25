@@ -13,14 +13,14 @@ use url::Url;
 use crate::{DataFeedResults, TerminationReason};
 
 pub async fn process(
-    mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
+    mut receiver: UnboundedReceiver<ConsensusSecondRoundBatch>,
     feeds_config: HashMap<u32, FeedStrideAndDecimals>,
     latest_votes: DataFeedResults,
-    sequencer: Url,
+    sequencer_endpoint: Url,
     second_consensus_secret_key: String,
     reporter_id: u64,
 ) -> TerminationReason {
-    while let Some(aggregated_consensus) = ss_rx.recv().await {
+    while let Some(aggregated_consensus) = receiver.recv().await {
         let signer = create_private_key_signer(&second_consensus_secret_key);
 
         let tx = match hex_str_to_bytes32(aggregated_consensus.tx_hash.as_str()) {
@@ -70,10 +70,19 @@ pub async fn process(
             signature,
         };
 
-        tracing::trace!("Sending to url - {}; {:?} hash", sequencer.clone(), &report);
+        tracing::trace!(
+            "Sending to url - {}; {:?} hash",
+            sequencer_endpoint.clone(),
+            &report
+        );
 
         let client = reqwest::Client::new();
-        match client.post(sequencer.clone()).json(&report).send().await {
+        match client
+            .post(sequencer_endpoint.clone())
+            .json(&report)
+            .send()
+            .await
+        {
             Ok(res) => {
                 let contents = res.text().await.unwrap();
                 tracing::trace!("Sequencer responded with: {}", &contents);
