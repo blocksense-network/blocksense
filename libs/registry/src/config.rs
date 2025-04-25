@@ -80,26 +80,19 @@ impl FeedConfig {
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ReporterInfo {
-    /// Time interval in seconds of executing all oracles
-    #[serde(default)]
     pub interval_time_in_seconds: u64,
     /// Sequencer URL
     #[serde(default)]
     pub sequencer: String,
     /// Kafka endpoint
-    #[serde(default)]
-    pub kafka_endpoint: String,
+    pub kafka_endpoint: Option<String>,
     /// Registry URL
-    #[serde(default)]
     pub registry: String,
     /// Reporter secret key for signing transactions
-    #[serde(default)]
     pub secret_key: String,
     /// Reporter secret key for second consensus
-    #[serde(default)]
-    pub second_consensus_secret_key: String,
+    pub second_consensus_secret_key: Option<String>,
     /// Reporter id
-    #[serde(default)]
     pub reporter_id: u64,
 }
 
