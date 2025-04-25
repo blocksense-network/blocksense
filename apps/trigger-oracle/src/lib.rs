@@ -300,7 +300,6 @@ impl TriggerExecutor for OracleTrigger {
 
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
-        let (aggregated_consensus_sender, aggregated_consensus_receiver) = unbounded_channel();
         let (signal_data_feed_sender, _) = channel(16);
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
         let mut feeds_config = HashMap::new();
@@ -346,29 +345,38 @@ impl TriggerExecutor for OracleTrigger {
         );
         loops.append(&mut orchestrators);
 
-        tracing::trace!("Starting seconndary signature");
-        let secondary_signature = Self::start_secondary_signature_listener(
-            self.kafka_endpoint,
-            aggregated_consensus_sender.clone(),
-        );
-        loops.push(secondary_signature);
+        let url = Url::parse(&self.sequencer.clone())?;
+        let sequencer_aggregated_consensus_url = url.join("/post_aggregated_consensus_vote")?;
+
+        if let Some(endpoint) = self.kafka_endpoint {
+            let (aggregated_consensus_sender, aggregated_consensus_receiver) = unbounded_channel();
+            tracing::trace!("Starting secondary signature");
+            loops.push(Self::start_secondary_signature_listener(
+                endpoint,
+                aggregated_consensus_sender,
+            ));
+
+            tracing::trace!("Starting process_aggregated_consensus");
+            loops.push(tokio::spawn(Self::process_aggregated_consensus(
+                aggregated_consensus_receiver,
+                feeds_config,
+                data_feed_results.clone(),
+                sequencer_aggregated_consensus_url,
+                self.second_consensus_secret_key,
+                self.reporter_id,
+            )));
+        }
 
         tracing::trace!("Starting sender to sequencer");
-        let url = Url::parse(&self.sequencer.clone())?;
         let sequencer_post_batch_url = url.join("/post_reports_batch")?;
-        let sequencer_aggregated_consensus_url = url.join("/post_aggregated_consensus_vote")?;
-        let mut manager = Self::start_manager(
+        let manager = Self::start_manager(
             data_feed_receiver,
-            aggregated_consensus_receiver,
-            feeds_config,
             data_feed_results,
             &sequencer_post_batch_url,
-            &sequencer_aggregated_consensus_url,
             &self.secret_key,
-            &self.second_consensus_secret_key,
             self.reporter_id,
         );
-        loops.append(&mut manager);
+        loops.push(manager);
 
         loop {
             let (tr, _, rest) = futures::future::select_all(loops).await;
@@ -577,7 +585,7 @@ impl OracleTrigger {
     }
 
     fn start_secondary_signature_listener(
-        kafka_report_endpoint: Option<String>,
+        kafka_report_endpoint: String,
         signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
     ) -> JoinHandle<TerminationReason> {
         let future = Self::signal_secondary_signature(kafka_report_endpoint, signal_sender);
@@ -589,13 +597,9 @@ impl OracleTrigger {
     }
 
     async fn signal_secondary_signature(
-        kafka_report_endpoint: Option<String>,
+        kafka_report_endpoint: String,
         signal_sender: UnboundedSender<ConsensusSecondRoundBatch>,
     ) -> TerminationReason {
-        let Some(kafka_report_endpoint) = kafka_report_endpoint else {
-            return TerminationReason::Other("No kafka endpoint provided".to_string());
-        };
-
         // Configure the Kafka consumer
         let consumer: StreamConsumer = match ClientConfig::new()
             .set("bootstrap.servers", kafka_report_endpoint)
@@ -679,15 +683,11 @@ impl OracleTrigger {
     #[allow(clippy::too_many_arguments)]
     fn start_manager(
         payload_rx: UnboundedReceiver<(String, Payload)>,
-        second_consensus_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
-        feeds_config: HashMap<u32, FeedStrideAndDecimals>,
         latest_votes: DataFeedResults,
         sequencer_post_batch_url: &Url,
-        sequencer_aggregated_consensus_url: &Url,
         secret_key: &str,
-        second_consensus_secret_key: &str,
         reporter_id: u64,
-    ) -> Vec<JoinHandle<TerminationReason>> {
+    ) -> JoinHandle<TerminationReason> {
         let process_payload_future = Self::process_payload(
             payload_rx,
             latest_votes.clone(),
@@ -696,19 +696,7 @@ impl OracleTrigger {
             reporter_id,
         );
 
-        let process_aggregated_consensus_future = Self::process_aggregated_consensus(
-            second_consensus_rx,
-            feeds_config,
-            latest_votes.clone(),
-            sequencer_aggregated_consensus_url.to_owned(),
-            second_consensus_secret_key.to_owned(),
-            reporter_id,
-        );
-
-        vec![
-            spawn(process_payload_future),
-            spawn(process_aggregated_consensus_future),
-        ]
+        spawn(process_payload_future)
     }
 
     async fn process_payload(
