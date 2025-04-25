@@ -23,28 +23,15 @@ export const CLAggregatorAdapterDataSchema = S.Struct({
 
 export type CLAggregatorAdapterData = typeof CLAggregatorAdapterDataSchema.Type;
 
-const CoreContractsSchemaV1 = S.mutable(
-  S.Struct({
-    HistoricalDataFeedStoreV2: ContractDataSchema,
-    UpgradeableProxy: ContractDataSchema,
-    CLFeedRegistryAdapter: ContractDataSchema,
-  }),
-);
-
-const CoreContractsSchemaV2 = S.mutable(
-  S.Struct({
-    AggregatedDataFeedStore: ContractDataSchema,
-    UpgradeableProxyADFS: ContractDataSchema,
-    CLFeedRegistryAdapter: ContractDataSchema,
-    AccessControl: ContractDataSchema,
-    OnlySequencerGuard: S.UndefinedOr(ContractDataSchema),
-    AdminExecutorModule: S.UndefinedOr(ContractDataSchema),
-  }),
-);
-
 const ContractsConfigSchemaV1 = S.mutable(
   S.Struct({
-    coreContracts: CoreContractsSchemaV1,
+    coreContracts: S.mutable(
+      S.Struct({
+        HistoricalDataFeedStoreV2: ContractDataSchema,
+        UpgradeableProxy: ContractDataSchema,
+        CLFeedRegistryAdapter: ContractDataSchema,
+      }),
+    ),
     CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
     SafeMultisig: ethereumAddress,
   }),
@@ -52,7 +39,16 @@ const ContractsConfigSchemaV1 = S.mutable(
 
 const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
-    coreContracts: CoreContractsSchemaV2,
+    coreContracts: S.mutable(
+      S.Struct({
+        AggregatedDataFeedStore: ContractDataSchema,
+        UpgradeableProxyADFS: ContractDataSchema,
+        CLFeedRegistryAdapter: ContractDataSchema,
+        AccessControl: ContractDataSchema,
+        OnlySequencerGuard: S.UndefinedOr(ContractDataSchema),
+        AdminExecutorModule: S.UndefinedOr(ContractDataSchema),
+      }),
+    ),
     CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
     SequencerMultisig: ethereumAddress,
     AdminMultisig: ethereumAddress,
