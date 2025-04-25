@@ -98,6 +98,7 @@ const networks = [
   'polygon-zkevm-cardona',
   'rollux-testnet',
   'rome-testnet',
+  'ronin-mainnet',
   'rootstock-testnet',
   'scroll-mainnet',
   'scroll-sepolia',
@@ -134,7 +135,7 @@ const chainIds = [
   1666700000, 743111, 560048, 1663, 2424, 57073, 763373, 2221, 2358, 1284, 1287,
   1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006, 5000, 5003,
   1750, 59902, 6342, 31611, 10143, 2818, 2810, 8801, 5851, 10, 11155420, 5611,
-  7849306, 50002, 98866, 98867, 137, 80002, 1101, 2442, 57000, 200018, 31,
+  7849306, 50002, 98866, 98867, 137, 80002, 1101, 2442, 57000, 200018, 2020, 31,
   534352, 534351, 11011, 50312, 16, 1868, 1946, 146, 57054, 1660990954, 5330,
   53302, 1924, 2390, 167000, 167009, 5678, 842, 41, 130, 1301, 4801, 1417429182,
   324, 300,
@@ -187,6 +188,7 @@ export enum Currency {
   PLUME = 'PLUME',
   POL = 'POL',
   ROME = 'ROME',
+  RON = 'RON',
   S = 'S',
   STT = 'STT',
   sMETIS = 'sMETIS',
@@ -1059,6 +1061,16 @@ export const networkMetadata = {
     },
     currency: Currency.ROME,
   },
+  'ronin-mainnet': {
+    chainId: 2020,
+    isTestnet: false,
+    explorer: {
+      type: 'ronin',
+      webUrl: 'https://app.roninchain.com',
+      apiUrl: null,
+    },
+    currency: Currency.RON,
+  },
   'rootstock-testnet': {
     chainId: 31,
     isTestnet: true,
@@ -1339,6 +1351,7 @@ export const networkMetadata = {
         | 'megaeth'
         | 'bitlayer'
         | 'kava'
+        | 'ronin'
         | 'unknown';
       webUrl: string;
       apiUrl: string | null;
