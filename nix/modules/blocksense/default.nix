@@ -39,7 +39,10 @@
             );
           };
 
-          imports = [ (import backend specialArgs) ];
+          imports = [
+            ./assertions.nix
+            (import backend specialArgs)
+          ];
         };
     in
     {

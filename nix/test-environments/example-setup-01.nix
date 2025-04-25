@@ -134,7 +134,6 @@ in
         id = 0;
         default-exec-interval = 30;
         secret-key-path = "${testKeysDir}/reporter_secret_key";
-        second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
         api-keys = { };
       };
     };
