@@ -2,6 +2,8 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 
+import { ThirdwebProvider } from 'thirdweb/react';
+
 import { geist, geistMono } from '../src/geist';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -110,10 +112,12 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         <GTMScript />
       </head>
       <body className="nft-drop-layout__body">
-        <GTMNoScript />
-        <Navbar />
-        <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
-        <Footer />
+        <ThirdwebProvider>
+          <GTMNoScript />
+          <Navbar />
+          <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
+          <Footer />
+        </ThirdwebProvider>
       </body>
     </html>
   );
