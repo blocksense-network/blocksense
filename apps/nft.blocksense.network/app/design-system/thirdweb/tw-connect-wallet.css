@@ -58,3 +58,12 @@
 .tw-connect-wallet.secondary:hover {
   background-color: #7f8c8d !important;
 }
+
+[data-test='connected-wallet-details'] {
+  background-color: #262626 !important;
+  min-height: 1rem !important;
+  margin-top: 1rem !important;
+  width: 100% !important;
+  text-align: center !important;
+  justify-content: center !important;
+}
