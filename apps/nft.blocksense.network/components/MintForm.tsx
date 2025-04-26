@@ -2,6 +2,10 @@
 
 import { ChangeEvent, MouseEvent, useState } from 'react';
 
+import { ConnectButton } from 'thirdweb/react';
+import { createWallet, inAppWallet } from 'thirdweb/wallets';
+
+import { client } from '../app/lib/client';
 import { Button } from './Button';
 import { FormStepTitle } from './FormStepTitle';
 import { FormStepContainer } from './FormStepContainer';
@@ -11,6 +15,13 @@ import { Separator } from './Separator';
 import { CopyInput } from './CopyInput';
 
 const separatorClassName = 'mint-form__separator md:my-8 my-6';
+
+const wallets = [
+  inAppWallet(),
+  createWallet('io.metamask'),
+  createWallet('com.coinbase.wallet'),
+  createWallet('me.rainbow'),
+];
 
 type MintFormProps = {
   onSuccessAction: () => void;
@@ -129,6 +140,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       >
         Mint My NFT
       </Button>
+      <ConnectButton client={client} wallets={wallets} />
     </form>
   );
 };
