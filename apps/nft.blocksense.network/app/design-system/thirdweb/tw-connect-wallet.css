@@ -1,0 +1,60 @@
+.tw-connect-wallet {
+  width: 100% !important;
+  padding: 1rem 2rem !important;
+  cursor: pointer !important;
+  border-radius: 2.5rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02rem !important;
+  line-height: 120% !important;
+  background-color: #eeff00 !important;
+  color: #262626 !important;
+  transition: background-color 0.3s ease !important;
+  margin-top: 1rem !important;
+}
+
+.tw-connect-wallet:hover {
+  background-color: #eeff00 !important;
+}
+
+.tw-connect-wallet:disabled,
+.tw-connect-wallet.pointer-events-none {
+  opacity: 0.3 !important;
+  pointer-events: none !important;
+}
+
+.tw-connect-wallet.is-loading {
+  display: flex !important;
+  gap: 0.5rem !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #9c9c9c !important;
+}
+
+.tw-connect-wallet .loading-icon {
+  animation: spin 1s infinite linear !important;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) !important;
+  }
+  100% {
+    transform: rotate(360deg) !important;
+  }
+}
+
+.tw-connect-wallet.primary {
+  background-color: #3498db !important;
+}
+
+.tw-connect-wallet.primary:hover {
+  background-color: #2980b9 !important;
+}
+
+.tw-connect-wallet.secondary {
+  background-color: #95a5a6 !important;
+}
+
+.tw-connect-wallet.secondary:hover {
+  background-color: #7f8c8d !important;
+}

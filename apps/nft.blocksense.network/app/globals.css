@@ -6,3 +6,5 @@
 @import './design-system/typography/medium-large.css';
 @import './design-system/animations.css';
 @import './design-system/autofill.css';
+
+@import './design-system/thirdweb/tw-connect-wallet.css';
