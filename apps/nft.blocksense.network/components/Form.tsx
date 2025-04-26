@@ -10,6 +10,15 @@ export const Form = () => {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (showSuccess && ref.current) {
+      ref.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [showSuccess]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry) {
@@ -18,6 +27,7 @@ export const Form = () => {
       },
       { threshold: 0.1 },
     );
+
     if (ref.current) observer.observe(ref.current);
     return () => {
       if (ref.current) observer.unobserve(ref.current);
@@ -32,22 +42,20 @@ export const Form = () => {
     <section className="form md:p-20 px-5 py-8" id="mint-form">
       <article
         ref={ref}
-        className="form__article max-w-[32.75rem] mx-auto flex flex-col items-center justify-center md:gap-12 gap-8"
+        className={`form__article max-w-[32.75rem] mx-auto flex flex-col items-center justify-center md:gap-12 gap-8 transition-all ease-out transform duration-1000 ${
+          inView ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        } delay-200`}
       >
         <h2 className="form__title text-center">
           Join the crew and receive your NFT <br /> by completing all the steps:
         </h2>
         <div
-          className={`transition-all ease-out transform duration-1000 ${
-            inView ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-          } delay-200`}
+          className={`${!showSuccess ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} transition-all ease-out transform duration-1000`}
         >
-          <MintForm onSuccessAction={onSuccess} />
+          {!showSuccess && <MintForm onSuccessAction={onSuccess} />}
         </div>
         <div
-          className={`transition-all ease-out transform duration-1000 ${
-            showSuccess ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-          } delay-500`}
+          className={`${showSuccess ? 'opacity-100 scale-100' : 'opacity-0 scale-95'} transition-all ease-out transform duration-1000`}
         >
           {showSuccess && <SuccessForm />}
         </div>
