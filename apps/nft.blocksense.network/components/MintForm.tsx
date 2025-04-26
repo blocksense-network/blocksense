@@ -4,6 +4,7 @@ import { ChangeEvent, MouseEvent, useState } from 'react';
 
 import { ConnectButton } from 'thirdweb/react';
 import { createWallet, inAppWallet } from 'thirdweb/wallets';
+import { darkTheme } from 'thirdweb/react';
 
 import { client } from '../app/lib/client';
 import { Button } from './Button';
@@ -140,7 +141,25 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       >
         Mint My NFT
       </Button>
-      <ConnectButton client={client} wallets={wallets} />
+      <ConnectButton
+        client={client}
+        wallets={wallets}
+        showAllWallets={false}
+        connectButton={{ label: 'Connect Your Wallet' }}
+        connectModal={{
+          size: 'compact',
+          showThirdwebBranding: false,
+        }}
+        theme={darkTheme({
+          colors: {
+            modalBg: 'hsl(0, 0%, 15%)',
+            borderColor: 'hsl(0, 2%, 26%)',
+            separatorLine: 'hsl(0, 2%, 26%)',
+            accentText: 'hsl(64, 100%, 50%)',
+            success: 'hsl(0, 0%, 85%)',
+          },
+        })}
+      />
     </form>
   );
 };
