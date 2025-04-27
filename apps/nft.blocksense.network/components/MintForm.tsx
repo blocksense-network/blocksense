@@ -1,12 +1,16 @@
 'use client';
 
-import { ChangeEvent, MouseEvent, useState } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useState,
+  MouseEvent,
+} from 'react';
 
-import { ConnectButton } from 'thirdweb/react';
+import { useActiveAccount } from 'thirdweb/react';
 import { createWallet, inAppWallet } from 'thirdweb/wallets';
-import { darkTheme } from 'thirdweb/react';
 
-import { client } from '../app/lib/client';
 import { Button } from './Button';
 import { FormStepTitle } from './FormStepTitle';
 import { FormStepContainer } from './FormStepContainer';
@@ -14,8 +18,8 @@ import { Input } from './Input';
 import { NetworkLink } from './NetworkLink';
 import { Separator } from './Separator';
 import { CopyInput } from './CopyInput';
-
-const separatorClassName = 'mint-form__separator md:my-8 my-6';
+import { ConnectButton, darkTheme } from 'thirdweb/react';
+import { client, getNftBalance, mintNFT } from '@/mint';
 
 const wallets = [
   inAppWallet(),
@@ -24,16 +28,22 @@ const wallets = [
   createWallet('me.rainbow'),
 ];
 
+const separatorClassName = 'mint-form__separator md:my-8 my-6';
+
 type MintFormProps = {
-  onSuccessAction: () => void;
+  onSuccessAction: (metadata: {
+    name: string;
+    description: string;
+    image: string;
+  }) => void;
 };
 
 export const MintForm = ({ onSuccessAction }: MintFormProps) => {
+  const [nftBalance, setBalance] = useState<bigint>(BigInt(0));
   const [xHandle, setXHandle] = useState('');
   const [xLoading, setXLoading] = useState(false);
   const [xError, setXError] = useState('');
   const [xSuccess, setXSuccess] = useState('');
-
   const [discord, setDiscord] = useState('');
   const [discordLoading, setDiscordLoading] = useState(false);
   const [discordError, setDiscordError] = useState('');
@@ -42,12 +52,41 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
   const [retweetCode, setRetweetCode] = useState('');
   const [mintLoading, setMintLoading] = useState(false);
 
-  const onMintClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const account = useActiveAccount();
 
-    setRetweetCode('');
-    // setMintLoading(true);
-    onSuccessAction();
+  useEffect(() => {
+    if (account?.address) {
+      getNftBalance(account.address).then(setBalance);
+    }
+  }, [account]);
+
+  //TODO: Handle this better
+  if (nftBalance > 0) {
+    alert('You already have a token!');
+    return;
+  }
+
+  const mint = useCallback(async () => {
+    if (!account) {
+      alert('Please connect your wallet first.');
+      return;
+    }
+
+    setMintLoading(true);
+
+    try {
+      const metadata = await mintNFT(account);
+      onSuccessAction(metadata);
+    } catch (error: any) {
+      console.error(error);
+      alert('Failed to mint NFT: ' + error.message);
+    } finally {
+      setMintLoading(false);
+    }
+  }, [account, onSuccessAction]);
+  const onMintClick = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    await mint();
   };
 
   const onXHandleChange = (e: ChangeEvent<HTMLInputElement>) => {
