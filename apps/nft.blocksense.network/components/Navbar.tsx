@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'motion/react';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -8,6 +9,19 @@ import { ClaimNFTButton } from './ClaimNFTButton';
 import { SocialNetworks } from './SocialNetworks';
 import openIcon from '/public/icons/open.svg';
 import closeIcon from '/public/icons/close.svg';
+
+const navLinks = [
+  { href: 'https://blog.blocksense.network/', label: 'Blog' },
+  { href: 'https://docs.blocksense.network/', label: 'Docs' },
+  { href: 'https://blocksense.network/#howitworks', label: 'How it works' },
+  { href: 'https://blocksense.network/#about', label: 'About us' },
+];
+
+const animationProps = {
+  initial: { opacity: 0, y: -20, scale: 0.9 },
+  whileInView: { opacity: 1, y: 0, scale: 1 },
+  transition: { duration: 0.8 },
+};
 
 export const Navbar = () => {
   return (
@@ -18,68 +32,41 @@ export const Navbar = () => {
   );
 };
 
-const navLinks = [
-  { href: 'https://blog.blocksense.network/', label: 'Blog' },
-  { href: 'https://docs.blocksense.network/', label: 'Docs' },
-  { href: 'https://blocksense.network/#howitworks', label: 'How it works' },
-  { href: 'https://blocksense.network/#about', label: 'About us' },
-];
-
 const DesktopNavbar = () => {
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setShow(true), 100);
-    return () => clearTimeout(timeout);
-  }, []);
-
   return (
-    <header className="navbar hidden md:flex bg-[var(--black)/0.85] backdrop-blur-2xl z-10 fixed w-full text-[var(--white)] px-20 py-[1.125rem]">
+    <motion.header
+      className="navbar hidden md:flex bg-[var(--black)/0.85] backdrop-blur-2xl z-10 fixed w-full text-[var(--white)] px-20 py-[1.125rem]"
+      {...animationProps}
+    >
       <div className="w-full max-w-[71.25rem] mx-auto z-30 flex justify-between items-center">
-        <div
-          className={`transition-all duration-1000 ease-out transform origin-top ${
-            show
-              ? 'opacity-100 translate-y-0 scale-100'
-              : 'opacity-0 -translate-y-8 scale-90'
-          }`}
-        >
+        <motion.div {...animationProps}>
           <Logo />
-        </div>
+        </motion.div>
         <nav className="navbar__nav flex gap-8">
           {navLinks.map((link, i) => (
-            <a
+            <motion.a
               key={link.label}
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`navbar__link transition-all duration-1000 ease-out transform origin-top ${
-                show
-                  ? `opacity-100 translate-y-0 scale-100 delay-[${(i + 1) * 150}ms]`
-                  : 'opacity-0 -translate-y-8 scale-90'
-              }`}
+              className="navbar__link"
+              {...animationProps}
+              transition={{
+                ...animationProps.transition,
+                delay: (i + 1) * 0.15,
+              }}
             >
               {link.label}
-            </a>
+            </motion.a>
           ))}
         </nav>
       </div>
-    </header>
+    </motion.header>
   );
 };
 
 const MobileNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [show, setShow] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      const timeout = setTimeout(() => setShow(true), 100);
-      return () => clearTimeout(timeout);
-    } else {
-      setShow(false);
-      return;
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -88,55 +75,78 @@ const MobileNavbar = () => {
     };
   }, [isOpen]);
 
-  const toggleMenu = () => setIsOpen((prevState: boolean) => !prevState);
+  const toggleMenu = () => setIsOpen(prevState => !prevState);
   const closeNavbar = () => setIsOpen(false);
 
   return (
     <header className="navbar md:hidden relative">
       <section className="navbar__header-section fixed top-0 w-full bg-[var(--black)] flex justify-between items-center px-5 py-4 z-50">
-        <Logo />
-        <button
-          onClick={toggleMenu}
-          aria-expanded={isOpen}
-          aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        <motion.div {...animationProps}>
+          <Logo />
+        </motion.div>
+        <motion.div
+          {...animationProps}
+          transition={{
+            ...animationProps.transition,
+            delay: 0.3,
+          }}
         >
-          <Image
-            src={isOpen ? closeIcon : openIcon}
-            alt={isOpen ? 'Close' : 'Open'}
-            className={`transition-transform duration-300 ease-in-out ${isOpen ? 'rotate-90' : 'rotate-0'}`}
-          />
-        </button>
+          <button
+            onClick={toggleMenu}
+            aria-expanded={isOpen}
+            aria-label={
+              isOpen ? 'Close navigation menu' : 'Open navigation menu'
+            }
+          >
+            <Image
+              src={isOpen ? closeIcon : openIcon}
+              alt={isOpen ? 'Close' : 'Open'}
+              className={`transition-transform duration-300 ease-in-out ${isOpen ? 'rotate-90' : 'rotate-0'}`}
+            />
+          </button>
+        </motion.div>
       </section>
       {isOpen && (
-        <nav className="fixed top-[3.85rem] left-0 w-full h-[calc(100vh-3.85rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto z-50">
+        <motion.nav
+          className="fixed top-[3.85rem] left-0 w-full h-[calc(100vh-3.85rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto z-50"
+          {...animationProps}
+        >
           <section className="flex flex-col gap-8 text-center w-full">
             {navLinks.map((link, i) => (
-              <a
+              <motion.a
                 key={link.label}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={closeNavbar}
-                className={`navbar__link transition-all duration-700 ease-out transform origin-left ${
-                  show
-                    ? `opacity-100 translate-x-0 scale-100 delay-[${(i + 1) * 100}ms]`
-                    : 'opacity-0 -translate-x-4 scale-90'
-                }`}
+                className="navbar__link"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.5,
+                  delay: i * 0.15,
+                }}
               >
                 {link.label}
-              </a>
+              </motion.a>
             ))}
           </section>
-          <ClaimNFTButton
-            className={`navbar__button w-full transition-all duration-700 ease-out transform origin-left ${
-              show
-                ? 'opacity-100 translate-x-0 scale-100 delay-[500ms]'
-                : 'opacity-0 -translate-x-4 scale-90'
-            }`}
-            onClick={closeNavbar}
-          />
-          <SocialNetworks />
-        </nav>
+          <motion.div
+            className="navbar__button w-full flex justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            <ClaimNFTButton onClick={closeNavbar} />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <SocialNetworks />
+          </motion.div>
+        </motion.nav>
       )}
     </header>
   );
