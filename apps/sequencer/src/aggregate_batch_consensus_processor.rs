@@ -154,6 +154,7 @@ pub async fn aggregation_batch_consensus_loop(
                                 .spawn_local(async move {
 
                                     let mut transaction_retries_count = 0;
+                                    let ids_vec: Vec<_> = quorum.updated_feeds_ids.iter().copied().collect();
 
                                     let block_height = signed_aggregate.block_height;
                                     let net = &signed_aggregate.network;
@@ -162,7 +163,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     let providers_config_guard = sequencer_state.sequencer_config.read().await;
                                     let providers_config = &providers_config_guard.providers;
 
-                                    let provider = providers.get(net).unwrap().lock().await;
+                                    let mut provider = providers.get(net).unwrap().lock().await;
                                     let signer = &provider.signer;
 
                                     let transaction_retries_count_limit = provider.transaction_retries_count_limit as u64;
@@ -175,6 +176,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     let latest_safe_nonce = match contract.nonce().call().await {
                                         Ok(n) => n,
                                         Err(e) => {
+                                            decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
                                             eyre::bail!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}! Blocksense block height: {block_height}");
                                         }
                                     };
@@ -182,6 +184,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     let safe_tx = quorum.safe_tx;
 
                                     if latest_safe_nonce._0 != safe_tx.nonce {
+                                        decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
                                         eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_safe_nonce._0, safe_tx.nonce);
                                     }
 
@@ -206,21 +209,15 @@ pub async fn aggregation_batch_consensus_loop(
                                         } else {
 
                                             let provider_settings = if let Some(provider_settings) = providers_config.get(net) {
-                                                let is_enabled_value = provider_settings.is_enabled;
-                                                {
-                                                    let provider_metrics = provider.provider_metrics.clone();
-                                                }
-                                                if !is_enabled_value {
-                                                    eyre::bail!("Network `{net}` is not enabled; skipping it during reporting");
-                                                } else {
-                                                    info!("Network `{net}` is enabled; reporting...");
-                                                }
                                                 provider_settings
                                             } else {
+                                                decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
                                                 eyre::bail!(
-                                                    "Network `{net}` is not configured in sequencer; skipping it during reporting"
+                                                    "Logical error! Network `{net}` is not configured in sequencer; skipping it during reporting"
                                                 );
                                             };
+
+                                            let provider_metrics = provider.provider_metrics.clone();
 
                                             let (sender_address, is_impersonated) = match &provider_settings.impersonated_anvil_account {
                                                 Some(impersonated_anvil_account) => {
@@ -266,6 +263,7 @@ pub async fn aggregation_batch_consensus_loop(
                                                 receipt
                                             }
                                             Err(e) => {
+                                                decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
                                                 eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
                                             }
                                         };
