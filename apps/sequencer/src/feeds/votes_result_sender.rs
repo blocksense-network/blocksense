@@ -8,7 +8,7 @@ use actix_web::web::Data;
 use alloy::hex::{self, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
-use alloy_primitives::{Address, Bytes, U256};
+use alloy_primitives::{Address, Bytes, Uint, U256};
 use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
 use blocksense_feed_registry::types::Repeatability::Periodic;
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
@@ -173,7 +173,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 .unwrap_or(Address::default());
             let contract = SafeMultisig::new(safe_address, &provider.provider);
 
-            let nonce = match contract.nonce().call().await {
+            let mut nonce = match contract.nonce().call().await {
                 Ok(n) => n,
                 Err(e) => {
                     error!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}!");
@@ -181,11 +181,15 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 }
             };
 
+            let num_tx_in_progress = provider.get_num_tx_in_progress();
+
             info!(
-                "Got block height {block_height} and serialized updates = {serialized_updates_hex}",
+                "Got block height {block_height} and serialized updates = {serialized_updates_hex}; num tx-s being processed = {num_tx_in_progress}",
             );
 
             let calldata = Bytes::from(serialized_updates);
+
+            nonce._0 += Uint::from(num_tx_in_progress);
 
             let safe_transaction = create_safe_tx(contract_address, calldata, nonce._0);
 
@@ -260,6 +264,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         {
             let mut provider = provider.lock().await;
             increment_feeds_round_indexes(&updated_feeds_ids, net, &mut provider).await;
+            provider.inc_num_tx_in_progress();
         }
     }
 }
