@@ -9,17 +9,17 @@
     "check-pending-tx": "yarn ts src/scripts/check-pending-tx.ts"
   },
   "dependencies": {
-    "@types/node": "^22.10.1",
-    "axios": "^1.7.9",
-    "chalk": "^5.3.0",
+    "@types/node": "^22.15.2",
+    "axios": "^1.9.0",
+    "chalk": "^5.4.1",
     "chalk-template": "^1.1.0",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
     "web3": "^4.15.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@blocksense/base-utils": "workspace:*",
     "@types/yargs": "^17.0.33",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.3"
   }
 }
