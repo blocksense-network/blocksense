@@ -23,7 +23,7 @@ use tokio::{
         RwLock,
     },
     task::{spawn, Builder, JoinHandle},
-    time::{sleep, Duration},
+    time::{sleep, timeout, Duration},
 };
 use tracing::Instrument;
 use url::Url;
@@ -300,7 +300,7 @@ impl TriggerExecutor for OracleTrigger {
 
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
-        let (signal_data_feed_sender, _) = channel(16);
+        let (signal_data_feed_sender, _) = channel(64);
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
         let mut feeds_config = HashMap::new();
         //TODO(adikov): Move all the logic to a different struct and handle
@@ -456,14 +456,32 @@ impl OracleTrigger {
                 intersection.len()
             );
 
-            let payload = match Self::execute_wasm(engine.clone(), &component, intersection).await {
-                Ok(payload) => {
-                    tracing::trace!("Component `{component_id}` executed successfully");
-                    payload
+            let payload = match timeout(
+                Duration::from_secs(component.interval_time_in_seconds),
+                Self::execute_wasm(engine.clone(), &component, intersection),
+            )
+            .await
+            {
+                Ok(result) => {
+                    match result {
+                        Ok(payload) => {
+                            tracing::trace!("Component `{component_id}` executed successfully");
+                            payload
+                        }
+                        Err(error) => {
+                            tracing::error!(
+                                "Component - ({component_id}) execution ended with error {}",
+                                error
+                            );
+                            //TODO(adikov): We need to come up with proper way of handling errors in wasm
+                            //components.
+                            continue;
+                        }
+                    }
                 }
                 Err(error) => {
                     tracing::error!(
-                        "Component - ({component_id}) execution ended with error {}",
+                        "Component - ({component_id}) execution ended with timout - {}",
                         error
                     );
                     //TODO(adikov): We need to come up with proper way of handling errors in wasm
