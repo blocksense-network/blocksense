@@ -213,6 +213,10 @@ jobs:
         run: yarn install
 
       - name: Build
+        env:
+          NEXT_PUBLIC_NFT_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_NFT_CLIENT_ID }}
+          NEXT_PUBLIC_NFT_SMART_CONTRACT_ADDRESS: ${{ secrets.NEXT_PUBLIC_NFT_SMART_CONTRACT_ADDRESS }}
+          NEXT_PUBLIC_NFT_PRIVATE_KEY: ${{ secrets.NEXT_PUBLIC_NFT_PRIVATE_KEY }}
         id: build
         run: ${{ matrix.build_command }}
 
