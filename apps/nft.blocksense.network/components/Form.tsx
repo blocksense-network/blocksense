@@ -1,28 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import { motion } from 'motion/react';
 import { MintForm } from './MintForm';
 import { SuccessForm } from './SuccessForm';
 
 export const Form = () => {
-  const [inView, setInView] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry) {
-          setInView(entry.isIntersecting);
-        }
-      },
-      { threshold: 0.1 },
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => {
-      if (ref.current) observer.unobserve(ref.current);
-    };
-  }, []);
 
   const onSuccess = () => {
     setShowSuccess(true);
@@ -30,27 +14,34 @@ export const Form = () => {
 
   return (
     <section className="form md:p-20 px-5 py-8" id="mint-form">
-      <article
-        ref={ref}
-        className="form__article max-w-[32.75rem] mx-auto flex flex-col items-center justify-center md:gap-12 gap-8"
-      >
-        <h2 className="form__title text-center">
+      <article className="form__article max-w-[32.75rem] mx-auto flex flex-col items-center justify-center md:gap-12 gap-8">
+        <motion.h2
+          className="form__title text-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
+        >
           Join the crew and receive your NFT <br /> by completing all the steps:
-        </h2>
-        <div
-          className={`transition-all ease-out transform duration-1000 ${
-            inView ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-          } delay-200`}
+        </motion.h2>
+
+        <motion.div
+          className="w-full"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
         >
           <MintForm onSuccessAction={onSuccess} />
-        </div>
-        <div
-          className={`transition-all ease-out transform duration-1000 ${
-            showSuccess ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-          } delay-500`}
+        </motion.div>
+
+        <motion.div
+          animate={{
+            opacity: showSuccess ? 1 : 0,
+            scale: showSuccess ? 1 : 0.95,
+          }}
+          transition={{ duration: 1, delay: 0.5 }}
         >
           {showSuccess && <SuccessForm />}
-        </div>
+        </motion.div>
       </article>
     </section>
   );
