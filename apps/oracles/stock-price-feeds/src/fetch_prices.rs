@@ -8,7 +8,10 @@ use futures::stream::{FuturesUnordered, StreamExt};
 use blocksense_sdk::traits::prices_fetcher::{fetch, TradingPairSymbol};
 
 use crate::{
-    providers::{alpha_vantage::AlphaVantagePriceFetcher, yahoo_finance::YFPriceFetcher},
+    providers::{
+        alpha_vantage::AlphaVantagePriceFetcher, twelvedata::TwelveDataPriceFetcher,
+        yahoo_finance::YFPriceFetcher,
+    },
     types::{
         Capabilities, PairToResults, ProviderPriceData, ProvidersSymbols, ResourceData,
         ResourcePairData,
@@ -21,6 +24,7 @@ use crate::{
 pub struct SymbolsData {
     pub alpha_vantage: Vec<TradingPairSymbol>,
     pub yahoo_finance: Vec<TradingPairSymbol>,
+    pub twelvedata: Vec<TradingPairSymbol>,
 }
 
 impl SymbolsData {
@@ -32,6 +36,10 @@ impl SymbolsData {
                 .unwrap_or_default(),
             yahoo_finance: providers_symbols
                 .get("YahooFinance")
+                .cloned()
+                .unwrap_or_default(),
+            twelvedata: providers_symbols
+                .get("twelvedata")
                 .cloned()
                 .unwrap_or_default(),
         })
@@ -56,6 +64,10 @@ pub async fn fetch_all_prices(
         fetch::<YFPriceFetcher>(
             &symbols.yahoo_finance,
             get_api_key(capabilities, "YAHOO_FINANCE_API_KEY"),
+        ),
+        fetch::<TwelveDataPriceFetcher>(
+            &symbols.twelvedata,
+            get_api_key(capabilities, "TWELVEDATA_API_KEY"),
         ),
     ]);
 
