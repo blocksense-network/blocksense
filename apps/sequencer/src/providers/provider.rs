@@ -165,9 +165,7 @@ async fn get_rpc_providers(
         );
 
         for c in &rpc_provider.contracts {
-            rpc_provider
-            .log_if_contract_exists(&c.name)
-            .await;
+            rpc_provider.log_if_contract_exists(&c.name).await;
         }
 
         let rpc_provider = Arc::new(Mutex::new(rpc_provider));
@@ -512,14 +510,22 @@ impl RpcProvider {
         let signer = &self.signer;
         let provider = &self.provider;
         let provider_metrics = &self.provider_metrics;
-
-        let mut bytecode = self
+        let contract = self
             .get_contract(contract_name)
-            .ok_or(eyre!("{contract_name} contract is not set!"))?
-            .byte_code
-            .ok_or(eyre!(
-                "Byte code unavailable for contract named {contract_name}"
-            ))?;
+            .ok_or(eyre!("{contract_name} contract is not set!"))?;
+
+        if let Some(addr) = contract.address {
+            let read_byte_code = self
+                .read_contract_bytecode(&addr, Duration::from_secs(1))
+                .await?;
+            return Ok(format!(
+                "Contract {contract_name} on address {addr} has byte code {}",
+                read_byte_code
+            ));
+        }
+        let mut bytecode = contract.byte_code.ok_or(eyre!(
+            "Byte code unavailable for contract named {contract_name}"
+        ))?;
 
         // Deploy the contract.
         let network = self.network.clone();
@@ -581,8 +587,10 @@ impl RpcProvider {
         addr: &Address,
         timeout_duration: Duration,
     ) -> Result<Bytes> {
-        Ok(actix_web::rt::time::timeout(timeout_duration, self.provider.get_code_at(*addr))
-            .await??)
+        Ok(
+            actix_web::rt::time::timeout(timeout_duration, self.provider.get_code_at(*addr))
+                .await??,
+        )
     }
 
     pub fn url(&self) -> Url {
@@ -600,7 +608,9 @@ impl RpcProvider {
                 Ok(byte_code) => {
                     let exists = byte_code.len() > 0;
                     if exists {
-                        if let Some(expected_byte_code) = self.get_contract(contract_name).and_then(|x| x.byte_code) {
+                        if let Some(expected_byte_code) =
+                            self.get_contract(contract_name).and_then(|x| x.byte_code)
+                        {
                             let a = byte_code.0.to_vec();
                             let same_byte_code = expected_byte_code.eq(&a);
                             if same_byte_code {

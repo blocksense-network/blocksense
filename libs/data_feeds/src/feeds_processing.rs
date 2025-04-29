@@ -178,7 +178,7 @@ impl PublishedFeedUpdate {
         digits_in_fraction: usize,
         data: &[u8],
     ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-        if data.len() == 0 {
+        if data.is_empty() {
             return Err(PublishedFeedUpdate::error(
                 feed_id,
                 "Data shows no published updates on chain",
