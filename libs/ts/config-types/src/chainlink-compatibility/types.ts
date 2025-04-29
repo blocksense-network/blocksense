@@ -81,7 +81,7 @@ export type ChainlinkCompatibilityData =
 export const BlocksenseFeedsCompatibilitySchema = S.Record({
   key: S.String,
   value: S.Struct({
-    id: S.Number,
+    id: S.BigInt,
     description: S.String,
     chainlink_compatibility: ChainlinkCompatibilityDataSchema,
   }),
@@ -92,7 +92,7 @@ export type BlocksenseFeedsCompatibility =
 
 export const ChainlinkAddressToBlocksenseIdSchema = S.Record({
   key: S.String,
-  value: S.NullishOr(S.Number),
+  value: S.NullishOr(S.BigInt),
 }).annotations({ identifier: 'ChainlinkAddressToBlocksenseId' });
 
 export type ChainlinkAddressToBlocksenseId =

@@ -69,7 +69,7 @@ async function getBlocksenseFeedsCompatibility(
 
       acc = {
         ...acc,
-        [dataFeedId]: {
+        [`${dataFeedId}`]: {
           id: dataFeedId,
           description: feedName,
           chainlink_compatibility: {
