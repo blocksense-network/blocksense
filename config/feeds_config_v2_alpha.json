@@ -1,7 +1,7 @@
 {
   "feeds": [
     {
-      "id": 0,
+      "id": "0",
       "full_name": "BTC / USD",
       "description": "Bitcoin",
       "type": "price-feed",
@@ -142,7 +142,7 @@
       }
     },
     {
-      "id": 3,
+      "id": "3",
       "full_name": "ETH / USD",
       "description": "Ethereum",
       "type": "price-feed",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "id": 13,
+      "id": "13",
       "full_name": "BNB / USD",
       "description": "BNB",
       "type": "price-feed",
@@ -388,7 +388,7 @@
       }
     },
     {
-      "id": 16,
+      "id": "16",
       "full_name": "SOL / USD",
       "description": "Solana",
       "type": "price-feed",
@@ -531,7 +531,7 @@
       }
     },
     {
-      "id": 35,
+      "id": "35",
       "full_name": "LINK / USD",
       "description": "Chainlink",
       "type": "price-feed",
@@ -664,7 +664,7 @@
       }
     },
     {
-      "id": 91,
+      "id": "91",
       "full_name": "UNI / USD",
       "description": "Uniswap",
       "type": "price-feed",
@@ -795,7 +795,7 @@
       }
     },
     {
-      "id": 114,
+      "id": "114",
       "full_name": "AAVE / USD",
       "description": "Aave",
       "type": "price-feed",
@@ -915,7 +915,7 @@
       }
     },
     {
-      "id": 121,
+      "id": "121",
       "full_name": "TAO / USD",
       "description": "Bittensor",
       "type": "price-feed",
@@ -1007,7 +1007,7 @@
       }
     },
     {
-      "id": 347,
+      "id": "347",
       "full_name": "1INCH / USD",
       "description": "1inch",
       "type": "price-feed",

@@ -1,4 +1,4 @@
-import { parseEthereumAddress } from '@blocksense/base-utils';
+import { assertNotNull, parseEthereumAddress } from '@blocksense/base-utils';
 import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import Safe from '@safe-global/protocol-kit';
 import {
@@ -34,6 +34,7 @@ task('deploy-contracts', '[UTILS] Deploy contracts to the network').setAction(
 
     const ContractsConfigV2 = {
       coreContracts: {},
+      CLAggregatorAdapter: {},
     } as ContractsConfigV2;
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
@@ -84,13 +85,18 @@ task('deploy-contracts', '[UTILS] Deploy contracts to the network').setAction(
       }
 
       if (contract.name === ContractNames.CLAggregatorAdapter) {
-        (ContractsConfigV2[contract.name] ??= []).push({
-          description: contract.feedRegistryInfo?.description ?? '',
-          base: contract.feedRegistryInfo?.base ?? null,
-          quote: contract.feedRegistryInfo?.quote ?? null,
+        const registryInfo = assertNotNull(
+          contract.feedRegistryInfo,
+          `CLAggregatorAdapter without registry info: ${contract}`,
+        );
+        const name = registryInfo.description;
+        ContractsConfigV2.CLAggregatorAdapter[name] = {
+          feedId: registryInfo.feedId,
+          base: registryInfo.base,
+          quote: registryInfo.quote,
           address: parseEthereumAddress(contractAddress),
           constructorArgs: contract.argsValues,
-        });
+        };
       } else {
         ContractsConfigV2.coreContracts[contract.name] = {
           address: parseEthereumAddress(contractAddress),
