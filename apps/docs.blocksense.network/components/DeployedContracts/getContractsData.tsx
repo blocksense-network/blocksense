@@ -1,20 +1,22 @@
-import DEPLOYMENT_INFO from '@/artifacts/deployment_data.json';
+import { entries } from '@blocksense/base-utils/array-iter';
+import { NetworkName } from '@blocksense/base-utils/evm';
 
-import { parseNetworkName } from '@blocksense/base-utils/evm';
-import { DeploymentConfigV2 } from '@blocksense/config-types';
+import {
+  DeploymentConfigV2,
+  readAllEvmDeployments,
+} from '@blocksense/config-types';
 import {
   CoreContract,
-  decodeDeploymentConfigArray,
+  ProxyContractData,
 } from '@/src/deployed-contracts/types';
 
-const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
+const getCoreContractsData = (
+  networksData: Record<NetworkName, DeploymentConfigV2>,
+) => {
   const parsedCoreContracts: CoreContract[] = [];
 
-  networksData.map(data => {
-    if (!data) return;
-    if (data.name === 'local') return;
-    const networkName = parseNetworkName(data.name);
-    const coreContracts = data.contracts.coreContracts;
+  entries(networksData).map(([network, { contracts }]) => {
+    const coreContracts = contracts.coreContracts;
     const skipContracts = ['AccessControl', 'OnlySequencerGuard'];
 
     Object.entries(coreContracts).forEach(([contractName, contractsData]) => {
@@ -23,13 +25,13 @@ const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
       );
 
       if (existingContract) {
-        existingContract.networks.push(networkName);
+        existingContract.networks.push(network);
       } else {
         if (contractsData && !skipContracts.includes(contractName)) {
           parsedCoreContracts.push({
             contract: contractName,
             address: contractsData.address,
-            networks: [networkName],
+            networks: [network],
           });
         }
       }
@@ -38,30 +40,25 @@ const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
   return parsedCoreContracts;
 };
 
-const getProxyContractsContent = (networksData: DeploymentConfigV2[]) => {
-  const supportedNetworks = networksData
-    .map(data => {
-      if (!data) return [];
-      if (data.name === 'local') return [];
-      const networkName = parseNetworkName(data.name);
-      const { CLAggregatorAdapter } = data.contracts;
-
-      return CLAggregatorAdapter.map(proxy => {
-        let id = proxy.constructorArgs[2];
-        return {
+function getProxyContractsContent(
+  networksData: Record<NetworkName, DeploymentConfigV2>,
+): ProxyContractData[] {
+  return entries(networksData)
+    .map(([network, { contracts }]) => {
+      return entries(contracts.CLAggregatorAdapter).map(
+        ([description, proxy]) => ({
           ...proxy,
-          id,
-          network: networkName,
-        };
-      });
+          feedId: proxy.feedId.toString(),
+          description,
+          network,
+        }),
+      );
     })
     .flat();
+}
 
-  return supportedNetworks;
-};
-
-export function getContractsData() {
-  const networksData = decodeDeploymentConfigArray(DEPLOYMENT_INFO);
+export async function getContractsData() {
+  const networksData = await readAllEvmDeployments(['local']);
   const parsedCoreContracts = getCoreContractsData(networksData);
   const parsedProxyContracts = getProxyContractsContent(networksData);
 
