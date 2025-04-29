@@ -6,8 +6,9 @@ use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
 use blocksense_utils::time::current_unix_time;
 use tokio::sync::mpsc::UnboundedReceiver;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 
+use crate::providers::eth_send_utils::decrement_feeds_round_indexes;
 use crate::providers::provider::GNOSIS_SAFE_CONTRACT_NAME;
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
@@ -44,8 +45,16 @@ pub async fn aggregation_batch_consensus_loop(
 
                         let mut batches_awaiting_consensus =
                             sequencer_state.batches_awaiting_consensus.write().await;
-                        batches_awaiting_consensus
+                        let timed_out_batches = batches_awaiting_consensus
                             .clear_batches_older_than(latest_block_height as u64, timeout_period_blocks);
+
+                        for (net, t) in timed_out_batches {
+                            let providers = sequencer_state.providers.read().await;
+                            let mut provider = providers.get(net.as_str()).unwrap().lock().await;
+                            let ids_vec: Vec<_> = t.updated_feeds_ids.iter().copied().collect();
+                            warn!("Tiemed out batch {t:?} while collectiong reporters' signatures for net {net}. Decreasing the round counters for feed_ids: {ids_vec:?}");
+                            decrement_feeds_round_indexes(&ids_vec, net.as_str(), &mut provider).await
+                        }
 
                         // Loop to process all completed futures for sending TX-s.
                         // Once all available completed futures are processed, control
@@ -154,6 +163,8 @@ pub async fn aggregation_batch_consensus_loop(
                                     if latest_nonce._0 != safe_tx.nonce {
                                         eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_nonce._0, safe_tx.nonce);
                                     }
+
+                                    info!("About to post tx {safe_tx:?} for network {net}, Blocksense block height: {block_height}");
 
                                     let receipt = match contract.execTransaction(
                                         safe_tx.to,
