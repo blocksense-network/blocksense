@@ -15,10 +15,16 @@ import { prepareDeploymentData } from '@/src/deployed-contracts/utils';
 import { decodeDeploymentConfigArray } from '@/src/deployed-contracts/types';
 
 export function generateStaticParams() {
-  const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
-  return feedsConfig.feeds.map(feed => ({
-    feed: String(feed.id),
-  }));
+  console.log('Generating static params for data feeds...');
+  try {
+    const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
+    return feedsConfig.feeds.map(feed => ({
+      feed: String(feed.id),
+    }));
+  } catch (error) {
+    console.error('Error decoding feeds config:', error);
+    throw error;
+  }
 }
 
 type DataFeedProps = {

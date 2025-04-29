@@ -8,7 +8,12 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 
-import { getEnvString, getOptionalEnvString } from '@blocksense/base-utils';
+import {
+  assertNotNull,
+  getEnvString,
+  getOptionalEnvString,
+} from '@blocksense/base-utils';
+
 import { ContractNames, NetworkConfig } from '../types';
 import { executeMultisigTransaction } from './multisig-tx-exec';
 
@@ -39,7 +44,10 @@ export async function setUpAccessControl({
   const transactions: SafeTransactionDataPartial[] = [];
 
   const guard = new Contract(
-    deployData.coreContracts.OnlySequencerGuard!.address,
+    assertNotNull(
+      deployData.coreContracts.OnlySequencerGuard,
+      'OnlySequencerGuard is not specified in the deployment data',
+    ).address,
     artifacts.readArtifactSync(ContractNames.OnlySequencerGuard).abi,
     adminSigner,
   );
