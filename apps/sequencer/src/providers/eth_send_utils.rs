@@ -74,10 +74,16 @@ fn legacy_serialize_updates(
             }
         };
 
-        let (key, val) = update.encode(
+        let (key, val) = match update.encode(
             digits_in_fraction as usize,
             update.end_slot_timestamp as u64,
-        );
+        ) {
+            Ok((k, v)) => (k, v),
+            Err(e) => {
+                error!("Error converting value for feed id {} to bytes {}. Skipping inclusion in block!", update.feed_id, e);
+                continue;
+            }
+        };
 
         num_reported_feeds += 1;
         result += to_hex_string(key, None).as_str();

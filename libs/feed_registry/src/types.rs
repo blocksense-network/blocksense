@@ -1,3 +1,4 @@
+use anyhow::bail;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
@@ -202,7 +203,7 @@ impl FeedType {
         }
     }
 
-    pub fn as_bytes(&self, digits_in_fraction: usize, timestamp: u64) -> Vec<u8> {
+    pub fn as_bytes(&self, digits_in_fraction: usize, timestamp: u64) -> anyhow::Result<Vec<u8>> {
         match self {
             FeedType::Numerical(val) => {
                 let truncate =
@@ -217,7 +218,7 @@ impl FeedType {
                 let integer = match val_split[0].parse::<BigUint>() {
                     Ok(v) => v,
                     Err(err) => {
-                        panic!("FeedType::as_bytes error: {err:?}. Value was {val}. Formatted like {str_val:?}");
+                        bail!("FeedType::as_bytes error: {err:?}. Value was {val}. Formatted like {str_val:?}");
                     }
                 };
 
@@ -248,10 +249,10 @@ impl FeedType {
                 bytes_vec.drain(..8);
                 bytes_vec.extend(timestamp.to_be_bytes());
 
-                bytes_vec
+                Ok(bytes_vec)
             }
-            FeedType::Text(s) => s.as_bytes().to_vec(),
-            FeedType::Bytes(bytes) => bytes.clone(),
+            FeedType::Text(s) => Ok(s.as_bytes().to_vec()),
+            FeedType::Bytes(bytes) => Ok(bytes.clone()),
         }
     }
 

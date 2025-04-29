@@ -125,10 +125,19 @@ pub async fn adfs_serialize_updates(
 
         round %= MAX_HISTORY_ELEMENTS_PER_FEED;
 
-        let (_key, val) = update.encode(
+        let (_key, val) = match update.encode(
             digits_in_fraction as usize,
             update.end_slot_timestamp as u64,
-        ); // Key is not needed. It is the bytes of the feed_id
+        ) {
+            Ok((k, v)) => (k, v),
+            Err(e) => {
+                error!(
+                    "Got an error trying to encode value of feed ID {}: {}",
+                    update.feed_id, e
+                );
+                continue;
+            }
+        }; // Key is not needed. It is the bytes of the feed_id
 
         let id = U256::from(update.feed_id);
         let round = U256::from(round);

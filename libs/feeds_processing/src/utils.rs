@@ -43,7 +43,14 @@ pub fn check_signature(
         .collect();
 
     if let Ok(result) = feed_result {
-        byte_buffer.extend(result.as_bytes(18, timestamp as u64));
+        match result.as_bytes(18, timestamp as u64) {
+            Ok(bytes) => {
+                byte_buffer.extend(bytes);
+            }
+            Err(e) => {
+                warn!("Could not convert vlaue of feed id {feed_id} to bytes: {e}");
+            }
+        };
     }
     verify_signature(pub_key, signature, &byte_buffer)
 }
