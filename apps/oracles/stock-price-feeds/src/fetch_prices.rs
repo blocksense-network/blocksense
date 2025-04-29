@@ -9,8 +9,8 @@ use blocksense_sdk::traits::prices_fetcher::{fetch, TradingPairSymbol};
 
 use crate::{
     providers::{
-        alpha_vantage::AlphaVantagePriceFetcher, twelvedata::TwelveDataPriceFetcher,
-        yahoo_finance::YFPriceFetcher,
+        alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
+        twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
     },
     types::{
         Capabilities, PairToResults, ProviderPriceData, ProvidersSymbols, ResourceData,
@@ -25,6 +25,7 @@ pub struct SymbolsData {
     pub alpha_vantage: Vec<TradingPairSymbol>,
     pub yahoo_finance: Vec<TradingPairSymbol>,
     pub twelvedata: Vec<TradingPairSymbol>,
+    pub fmp: Vec<TradingPairSymbol>,
 }
 
 impl SymbolsData {
@@ -42,6 +43,7 @@ impl SymbolsData {
                 .get("twelvedata")
                 .cloned()
                 .unwrap_or_default(),
+            fmp: providers_symbols.get("FMP").cloned().unwrap_or_default(),
         })
     }
 }
@@ -69,6 +71,7 @@ pub async fn fetch_all_prices(
             &symbols.twelvedata,
             get_api_key(capabilities, "TWELVEDATA_API_KEY"),
         ),
+        fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_key(capabilities, "FMP_API_KEY")),
     ]);
 
     let before_fetch = Instant::now();
