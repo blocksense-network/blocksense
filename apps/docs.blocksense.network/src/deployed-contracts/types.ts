@@ -22,7 +22,7 @@ export const decodeCoreContracts = S.decodeUnknownSync(
 const ProxyContractDataSchema = S.mutable(
   S.Struct({
     description: S.String,
-    id: S.String,
+    feedId: S.String,
     network: networkName,
     base: S.NullishOr(ethereumAddress),
     quote: S.NullishOr(ethereumAddress),
