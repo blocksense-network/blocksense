@@ -33,7 +33,8 @@ source = "../../../target/wasm32-wasip1/release/stock_price_feeds.wasm"
 allowed_outbound_hosts = [
   "https://www.alphavantage.co",
   "https://yfapi.net",
-  "https://api.twelvedata.com"
+  "https://api.twelvedata.com",
+  "https://financialmodelingprep.com"
 ]
 
 [[trigger.oracle.capabilities]]
@@ -47,6 +48,10 @@ id = "YAHOO_FINANCE_API_KEY"
 [[trigger.oracle.capabilities]]
 data = "209306be327d49c6bdb0f8420288d36b"
 id = "TWELVEDATA_API_KEY"
+
+[[trigger.oracle.capabilities]]
+data = "9uPKNVxmxKyIjUXhwgI6m3FIwBnsc2vA"
+id = "FMP_API_KEY"
 
 [component.stock-price-feeds.build]
 command = "cargo build --target wasm32-wasip1 --release"
