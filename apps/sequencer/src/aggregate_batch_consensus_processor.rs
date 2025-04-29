@@ -1,5 +1,6 @@
 use actix_web::web::Data;
 use alloy::hex::ToHexExt;
+use alloy::providers::Provider;
 use blocksense_config::BlockConfig;
 use blocksense_feed_registry::{registry::SlotTimeTracker, types::Repeatability};
 use blocksense_gnosis_safe::data_types::ReporterResponse;
@@ -9,7 +10,7 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::decrement_feeds_round_indexes;
-use crate::providers::provider::GNOSIS_SAFE_CONTRACT_NAME;
+use crate::providers::provider::{parse_eth_address, GNOSIS_SAFE_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
 use blocksense_gnosis_safe::utils::SafeMultisig;
@@ -35,6 +36,8 @@ pub async fn aggregation_batch_consensus_loop(
             let mut collected_futures = FuturesUnordered::new();
 
             loop {
+                let sequencer_state = sequencer_state.clone();
+
                 tokio::select! {
                     // The first future is a timer that ticks according to the block generation period.
                     _ = block_height_tracker.await_end_of_current_slot(&Repeatability::Periodic) => {
@@ -144,14 +147,27 @@ pub async fn aggregation_batch_consensus_loop(
                             tokio::task::Builder::new()
                                 .name(format!("safe_tx_sender network={net} block={block_height}").as_str())
                                 .spawn_local(async move {
+
+                                    let mut transaction_retries_count = 0;
+
                                     let block_height = signed_aggregate.block_height;
                                     let net = &signed_aggregate.network;
                                     let providers = sequencer_state_clone.providers.read().await;
+
+                                    let providers_config_guard = sequencer_state.sequencer_config.read().await;
+                                    let providers_config = &providers_config_guard.providers;
+
                                     let provider = providers.get(net).unwrap().lock().await;
+                                    let signer = &provider.signer;
+
+                                    let _transaction_retries_count_limit = provider.transaction_retries_count_limit as u64;
+                                    let transaction_retry_timeout_secs = provider.transaction_retry_timeout_secs as u64;
+                                    let retry_fee_increment_fraction = provider.retry_fee_increment_fraction;
+
                                     let safe_address = provider.get_contract_address(GNOSIS_SAFE_CONTRACT_NAME).unwrap_or(Address::default());
                                     let contract = SafeMultisig::new(safe_address, &provider.provider);
 
-                                    let latest_nonce = match contract.nonce().call().await {
+                                    let latest_safe_nonce = match contract.nonce().call().await {
                                         Ok(n) => n,
                                         Err(e) => {
                                             eyre::bail!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}! Blocksense block height: {block_height}");
@@ -160,37 +176,161 @@ pub async fn aggregation_batch_consensus_loop(
 
                                     let safe_tx = quorum.safe_tx;
 
-                                    if latest_nonce._0 != safe_tx.nonce {
-                                        eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_nonce._0, safe_tx.nonce);
+                                    if latest_safe_nonce._0 != safe_tx.nonce {
+                                        eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_safe_nonce._0, safe_tx.nonce);
                                     }
 
                                     info!("About to post tx {safe_tx:?} for network {net}, Blocksense block height: {block_height}");
 
-                                    let receipt = match contract.execTransaction(
-                                        safe_tx.to,
-                                        safe_tx.value,
-                                        safe_tx.data,
-                                        safe_tx.operation,
-                                        safe_tx.safeTxGas,
-                                        safe_tx.baseGas,
-                                        safe_tx.gasPrice,
-                                        safe_tx.gasToken,
-                                        safe_tx.refundReceiver,
-                                        Bytes::copy_from_slice(&signature_bytes),
-                                    )
-                                    .send()
-                                    .await {
-                                        Ok(v) => {
-                                            info!("Posted tx for network {net}, Blocksense block height: {block_height}! Waiting for receipt ...");
-                                            let receipt = v.get_receipt().await;
-                                            info!("Got receipt for network {net}, Blocksense block height: {block_height}! {:?}", receipt);
-                                            receipt
-                                        }
-                                        Err(e) => {
-                                            eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
-                                        }
-                                    };
+                                    let receipt = loop {
+                                        let tx_to_send = contract.execTransaction(
+                                            safe_tx.to,
+                                            safe_tx.value,
+                                            safe_tx.data.clone(),
+                                            safe_tx.operation,
+                                            safe_tx.safeTxGas,
+                                            safe_tx.baseGas,
+                                            safe_tx.gasPrice,
+                                            safe_tx.gasToken,
+                                            safe_tx.refundReceiver,
+                                            Bytes::copy_from_slice(&signature_bytes),
+                                        );
 
+                                        let receipt_result = if transaction_retries_count == 0 {
+                                            tx_to_send
+                                        } else {
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                                            let provider_settings = if let Some(provider_settings) = providers_config.get(net) {
+                                                let is_enabled_value = provider_settings.is_enabled;
+                                                {
+                                                    let _provider_metrics = provider.provider_metrics.clone();
+                                                }
+                                                if !is_enabled_value {
+                                                    eyre::bail!("Network `{net}` is not enabled; skipping it during reporting");
+                                                } else {
+                                                    info!("Network `{net}` is enabled; reporting...");
+                                                }
+                                                provider_settings
+                                            } else {
+                                                eyre::bail!(
+                                                    "Network `{net}` is not configured in sequencer; skipping it during reporting"
+                                                );
+                                            };
+
+                                            let (sender_address, _is_impersonated) = match &provider_settings.impersonated_anvil_account {
+                                                Some(impersonated_anvil_account) => {
+                                                    debug!(
+                                                        "Using impersonated anvil account with address: {}",
+                                                        impersonated_anvil_account
+                                                    );
+                                                    (parse_eth_address(impersonated_anvil_account).unwrap(), true)
+                                                }
+                                                None => {
+                                                    debug!("Using signer address: {}", signer.address());
+                                                    (signer.address(), false)
+                                                }
+                                            };
+
+                                            debug!("Getting nonce for network {net} and address {sender_address}...");
+                                            let nonce = match actix_web::rt::time::timeout(
+                                                Duration::from_secs(transaction_retry_timeout_secs),
+                                                provider.provider.get_transaction_count(sender_address).latest(),
+                                            )
+                                            .await
+                                            {
+                                                Ok(nonce_result) => match nonce_result {
+                                                    Ok(nonce) => {
+                                                        debug!("Got nonce={nonce} for network {net} and address {sender_address}");
+                                                        nonce
+                                                    }
+                                                    Err(err) => {
+                                                        debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
+                                                        return Err(err.into());
+                                                    }
+                                                },
+                                                Err(err) => {
+                                                    warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
+                                                    transaction_retries_count += 1;
+                                                    continue;
+                                                }
+                                            };
+
+                                            let price_increment =
+                                                1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
+
+                                            debug!("Getting gas_price for network {net}...");
+                                            let gas_price = match actix_web::rt::time::timeout(
+                                                Duration::from_secs(transaction_retry_timeout_secs),
+                                                provider.provider.get_gas_price(),
+                                            )
+                                            .await
+                                            {
+                                                Ok(gas_price_result) => match gas_price_result {
+                                                    Ok(gas_price) => {
+                                                        debug!("Got gas_price={gas_price} for network {net}");
+                                                        gas_price
+                                                    }
+                                                    Err(err) => {
+                                                        debug!("Failed to get gas_price for network {net} due to {err}");
+                                                        return Err(err.into());
+                                                    }
+                                                },
+                                                Err(err) => {
+                                                    warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
+                                                    transaction_retries_count += 1;
+                                                    continue;
+                                                }
+                                            };
+
+                                            debug!("Getting priority_fee for network {net}...");
+                                            let mut priority_fee = match actix_web::rt::time::timeout(
+                                                Duration::from_secs(transaction_retry_timeout_secs),
+                                                provider.provider.get_max_priority_fee_per_gas(),
+                                            )
+                                            .await
+                                            {
+                                                Ok(priority_fee_result) => match priority_fee_result {
+                                                    Ok(priority_fee) => {
+                                                        debug!("Got priority_fee={priority_fee} for network {net}");
+                                                        priority_fee
+                                                    }
+                                                    Err(err) => {
+                                                        debug!("Failed to get priority_fee for network {net} due to {err}");
+                                                        return Err(err.into());
+                                                    }
+                                                },
+                                                Err(err) => {
+                                                    warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
+                                                    transaction_retries_count += 1;
+                                                    continue;
+                                                }
+                                            };
+
+                                            priority_fee = (priority_fee as f64 * price_increment) as u128;
+                                            let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
+                                            max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
+
+                                            tx_to_send
+                                                .max_priority_fee_per_gas(priority_fee)
+                                                .max_fee_per_gas(max_fee_per_gas)
+                                                .nonce(nonce)
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                        };
+
+                                        let receipt = match receipt_result.send().await {
+                                            Ok(v) => {
+                                                info!("Posted tx for network {net}, Blocksense block height: {block_height}! Waiting for receipt ...");
+                                                let receipt = v.get_receipt().await;
+                                                info!("Got receipt for network {net}, Blocksense block height: {block_height}! {:?}", receipt);
+                                                receipt
+                                            }
+                                            Err(e) => {
+                                                eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
+                                            }
+                                        };
+                                        break receipt;
+                                    };
                                     Ok(receipt)
                                 }).expect("Failed to spawn tx sender for network {net} Blocksense block height: {block_height}!")
                         );
