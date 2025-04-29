@@ -46,7 +46,7 @@ task('deploy', 'Deploy contracts')
       return { base, quote };
     };
 
-    const chainsDeployment: Record<NetworkName, DeploymentConfigV2> = {} as any;
+    const chainsDeployment = {} as Record<NetworkName, DeploymentConfigV2>;
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
@@ -180,7 +180,7 @@ task('deploy', 'Deploy contracts')
           salt: create2ContractSalts.clFeedRegistry,
           value: 0n,
         },
-        ...dataFeedConfig.map(data => {
+        ...dataFeedConfig.map((data): DeployContract => {
           return {
             name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint32', 'address'],
@@ -193,6 +193,7 @@ task('deploy', 'Deploy contracts')
             salt: create2ContractSalts.clAggregatorProxy,
             value: 0n,
             feedRegistryInfo: {
+              feedId: data.id,
               description: `${data.full_name} (${data.id})`,
               base: data.base,
               quote: data.quote,
