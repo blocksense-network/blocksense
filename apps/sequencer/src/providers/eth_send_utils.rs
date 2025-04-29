@@ -675,7 +675,7 @@ async fn log_round_counters(
     debug!(debug_string);
 }
 
-async fn increment_feeds_round_indexes(
+pub async fn increment_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
     net: &str,
     provider: &mut RpcProvider,
@@ -703,7 +703,7 @@ async fn increment_feeds_round_indexes(
 }
 // Since we update the round counters when we post the tx and before we
 // receive its receipt if the tx fails we need to decrease the round indexes.
-async fn decrement_feeds_round_indexes(
+pub async fn decrement_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
     net: &str,
     provider: &mut RpcProvider,
