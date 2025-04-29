@@ -1944,6 +1944,7 @@ __metadata:
     "@types/node": "npm:^22.10.2"
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
+    tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
     typescript: "npm:5.8.3"
     vitest: "npm:^3.1.2"
@@ -1958,6 +1959,7 @@ __metadata:
     "@types/node": "npm:^22.10.2"
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
+    tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
     typescript: "npm:5.8.3"
     vitest: "npm:^3.1.2"
@@ -2001,6 +2003,7 @@ __metadata:
     prettier-plugin-solidity: "npm:^1.4.1"
     solidity-coverage: "npm:^0.8.12"
     ts-node: "npm:^10.9.2"
+    tslib: "npm:^2.8.1"
     typechain: "npm:^8.3.2"
   languageName: unknown
   linkType: soft
@@ -2226,6 +2229,7 @@ __metadata:
     prettier-plugin-solidity: "npm:^1.4.1"
     solidity-ast: "npm:^0.4.59"
     ts-node: "npm:^10.9.2"
+    tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
     typescript: "npm:5.8.3"
     web3-types: "npm:^1.10.0"
