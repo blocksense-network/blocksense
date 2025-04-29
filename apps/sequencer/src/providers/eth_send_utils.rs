@@ -759,6 +759,7 @@ async fn increment_feeds_round_metrics(
 mod tests {
     use super::*;
 
+    use crate::providers::multicall::Multicall;
     use crate::providers::provider::init_shared_rpc_providers;
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::rpc::types::eth::TransactionInput;
@@ -808,11 +809,21 @@ mod tests {
         let network = "ETH131";
         let key_path = get_test_private_key_path();
 
-        let cfg = get_test_config_with_single_provider(
+        let mut cfg = get_test_config_with_single_provider(
             network,
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
+        let p_entry = cfg.providers.entry(network.to_string());
+        p_entry.and_modify(|p| {
+            p.contracts
+                .iter_mut()
+                .find(|x| x.name == HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .and_then(|x| {
+                    x.address = None;
+                    Some(x)
+                });
+        });
         let feeds_config = AllFeedsConfig { feeds: vec![] };
         // give some time for cleanup env variables
         let providers = init_shared_rpc_providers(
@@ -1102,19 +1113,37 @@ mod tests {
     async fn test_eth_batch_send_to_multidata_contracts_and_read_value() {
         let metrics_prefix = "test_eth_batch_send_to_multidata_contracts_and_read_value";
 
-        /////////////////////////////////////////////////////////////////////
-        // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
-        /////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////
+        // BIG STEP ONE - Setup Anvil and deploy HistoricalDataFeedStoreV2 and Multicall
+        ///////////////////////////////////////////////////////////////////////////////////
 
         // setup
         let key_path = get_test_private_key_path();
         let anvil_network1 = Anvil::new().try_spawn().unwrap();
         let network1 = "ETH17787";
-        let sequencer_config = get_test_config_with_multiple_providers(vec![(
+        let mut sequencer_config = get_test_config_with_multiple_providers(vec![(
             network1,
             key_path.as_path(),
             anvil_network1.endpoint().as_str(),
         )]);
+        let p_entry = sequencer_config.providers.entry(network1.to_string());
+        p_entry.and_modify(|p| {
+            p.contracts
+                .iter_mut()
+                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
+                .and_then(|x| {
+                    x.address = None;
+                    x.byte_code = Some(Multicall::BYTECODE.to_string());
+                    Some(x)
+                });
+            p.contracts
+                .iter_mut()
+                .find(|x| x.name == HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .and_then(|x| {
+                    x.address = None;
+                    Some(x)
+                });
+        });
 
         let mut feed = test_feed_config(1, 0);
 
