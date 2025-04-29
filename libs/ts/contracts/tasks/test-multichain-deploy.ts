@@ -153,7 +153,7 @@ task(
 
   const dataFeedConfig = feeds.map(feed => {
     const compatibilityData =
-      chainlinkCompatibility.blocksenseFeedsCompatibility[feed.id];
+      chainlinkCompatibility.blocksenseFeedsCompatibility[`${feed.id}`];
     const { base, quote } = compatibilityData?.chainlink_compatibility ?? {
       base: null,
       quote: null,

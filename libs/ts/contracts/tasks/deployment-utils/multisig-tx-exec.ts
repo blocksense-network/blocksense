@@ -111,7 +111,7 @@ const executeTransaction = async (
     throw new Error('Safe contract not found');
   }
 
-  const contractData: any = safeContract.encode('execTransaction', args);
+  const contractData: any = (safeContract.encode as any)('execTransaction');
   return config.ledgerAccount!.sendTransaction({
     to: safeContract.getAddress(),
     value: 0,
