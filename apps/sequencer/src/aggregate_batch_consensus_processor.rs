@@ -171,6 +171,7 @@ pub async fn aggregation_batch_consensus_loop(
                                         Ok(n) => n,
                                         Err(e) => {
                                             decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
+                                            provider.dec_num_tx_in_progress();
                                             eyre::bail!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}! Blocksense block height: {block_height}");
                                         }
                                     };
@@ -178,6 +179,8 @@ pub async fn aggregation_batch_consensus_loop(
                                     let safe_tx = quorum.safe_tx;
 
                                     if latest_safe_nonce._0 != safe_tx.nonce {
+                                        decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
+                                        provider.dec_num_tx_in_progress();
                                         eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_safe_nonce._0, safe_tx.nonce);
                                     }
 
@@ -187,6 +190,7 @@ pub async fn aggregation_batch_consensus_loop(
 
                                         if transaction_retries_count > transaction_retries_count_limit {
                                             decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
+                                            provider.dec_num_tx_in_progress();
                                             eyre::bail!("Failed to post tx after {transaction_retries_count} retries for network {net}: (timed out)! Blocksense block height: {block_height}");
                                         }
 
@@ -211,6 +215,7 @@ pub async fn aggregation_batch_consensus_loop(
                                                 provider_settings
                                             } else {
                                                 decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
+                                                provider.dec_num_tx_in_progress();
                                                 eyre::bail!(
                                                     "Logical error! Network `{net}` is not configured in sequencer; skipping it during reporting"
                                                 );
@@ -264,11 +269,13 @@ pub async fn aggregation_batch_consensus_loop(
                                             }
                                             Err(e) => {
                                                 decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
+                                                provider.dec_num_tx_in_progress();
                                                 eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
                                             }
                                         };
                                         break receipt;
                                     };
+                                    provider.dec_num_tx_in_progress();
                                     Ok(receipt)
                                 }).expect("Failed to spawn tx sender for network {net} Blocksense block height: {block_height}!")
                         );
