@@ -23,7 +23,8 @@
     "hardhat": "^2.22.17",
     "prettier": "^3.4.2",
     "prettier-plugin-solidity": "^1.4.1",
-    "solidity-ast": "^0.4.59"
+    "solidity-ast": "^0.4.59",
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
