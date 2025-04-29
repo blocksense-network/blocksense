@@ -194,7 +194,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
             modalBg: 'hsl(0, 0%, 15%)',
             borderColor: 'hsl(0, 2%, 26%)',
             separatorLine: 'hsl(0, 2%, 26%)',
-            accentText: 'hsl(64, 100%, 50%)',
+            accentText: 'hsl(0, 0%, 100%)',
             success: 'hsl(0, 0%, 85%)',
           },
         })}

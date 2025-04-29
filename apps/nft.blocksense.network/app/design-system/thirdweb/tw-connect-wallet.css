@@ -6,14 +6,10 @@
   font-weight: 600 !important;
   letter-spacing: -0.02rem !important;
   line-height: 120% !important;
-  background-color: #eeff00 !important;
+  background-color: #ffffff !important;
   color: #262626 !important;
   transition: background-color 0.3s ease !important;
   margin-top: 1rem !important;
-}
-
-.tw-connect-wallet:hover {
-  background-color: #eeff00 !important;
 }
 
 .tw-connect-wallet:disabled,
@@ -61,9 +57,11 @@
 
 [data-test='connected-wallet-details'] {
   background-color: #262626 !important;
+  border: none !important;
+  width: 100% !important;
   min-height: 1rem !important;
   margin-top: 1rem !important;
-  width: 100% !important;
-  text-align: center !important;
+  display: flex !important;
   justify-content: center !important;
+  align-items: center !important;
 }
