@@ -4,7 +4,7 @@ import { Schema } from 'effect';
 
 import { configDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import { NetworkName } from '@blocksense/base-utils/evm';
+import { NetworkName, parseNetworkName } from '@blocksense/base-utils/evm';
 
 import { FeedsConfigSchema, NewFeedsConfigSchema } from './data-feeds-config';
 import { ChainlinkCompatibilityConfigSchema } from './chainlink-compatibility';
@@ -56,6 +56,28 @@ export function readEvmDeployment(
       ? Promise.reject(err)
       : null,
   );
+}
+
+export function readAllEvmDeployments(
+  excludedNetworks: NetworkName[],
+): Promise<Record<NetworkName, DeploymentConfigV2>> {
+  const { readAllJSONFiles } = selectDirectory(
+    configDirs.evm_contracts_deployment_v2,
+  );
+
+  return readAllJSONFiles()
+    .then(allFiles =>
+      allFiles.filter(({ base }) => !excludedNetworks.includes(base as any)),
+    )
+    .then(allFiles =>
+      allFiles.map(({ base, content }) => {
+        const data = Schema.decodeUnknownSync(DeploymentConfigSchemaV2)(
+          content,
+        );
+        return [parseNetworkName(base), data];
+      }),
+    )
+    .then(allFiles => Object.fromEntries(allFiles));
 }
 
 export function writeEvmDeployment(

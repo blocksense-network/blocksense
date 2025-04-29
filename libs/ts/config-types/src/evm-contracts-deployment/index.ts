@@ -16,7 +16,7 @@ const ContractDataSchema = S.Struct({
 
 export const CLAggregatorAdapterDataSchema = S.Struct({
   ...ContractDataSchema.fields,
-  description: S.String,
+  feedId: S.BigInt, // bigint encoded as string in JSON
   base: S.NullOr(ethereumAddress),
   quote: S.NullOr(ethereumAddress),
 });
@@ -49,7 +49,12 @@ const ContractsConfigSchemaV2 = S.mutable(
         AdminExecutorModule: S.UndefinedOr(ContractDataSchema),
       }),
     ),
-    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
+    CLAggregatorAdapter: S.mutable(
+      S.Record({
+        key: S.String,
+        value: CLAggregatorAdapterDataSchema,
+      }),
+    ),
     SequencerMultisig: ethereumAddress,
     AdminMultisig: ethereumAddress,
   }),
@@ -71,7 +76,7 @@ export const DeploymentConfigSchemaV1 = S.mutable(
 
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
-    name: networkName,
+    network: networkName,
     chainId: chainId,
     contracts: ContractsConfigSchemaV2,
   }),
