@@ -18,6 +18,7 @@ import { Input } from './Input';
 import { NetworkLink } from './NetworkLink';
 import { Separator } from './Separator';
 import { CopyInput } from './CopyInput';
+import { MintAlert } from './MintAlert';
 import { ConnectButton, darkTheme } from 'thirdweb/react';
 import { client, getNftBalance, mintNFT } from '@/mint';
 
@@ -200,6 +201,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
           Mint My NFT
         </Button>
       )}
+      <MintAlert className="mint-alert" message="You already have a token" />
     </form>
   );
 };
