@@ -59,5 +59,24 @@
             ./modules/process-compose.nix
           ];
         });
+
+      checks = {
+        services-started = pkgs.testers.runNixOSTest {
+          name = "services-started";
+          nodes.machine = {
+            imports = [
+              self.nixosModules.blocksense-systemd
+              ./example-setup-01.nix
+            ];
+          };
+          testScript = ''
+            machine.start();
+            machine.wait_for_unit("blocksense-reporter-a.service");
+            machine.wait_for_unit("blocksense-sequencer.service");
+            machine.wait_for_unit("blocksense-anvil-ethereum-sepolia.service");
+            machine.wait_for_unit("blocksense-anvil-ink-sepolia.service");
+          '';
+        };
+      };
     };
 }
