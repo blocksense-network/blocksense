@@ -4,23 +4,17 @@ import Safe from '@safe-global/protocol-kit';
 
 import { NetworkConfig, ContractNames, DeployContract } from './types';
 import {
-  getNetworkNameByChainId,
   isNetworkName,
+  NetworkName,
   parseChainId,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 
-import {
-  configDir,
-  configDirs,
-  getOptionalEnvString,
-} from '@blocksense/base-utils/env';
-import { selectDirectory } from '@blocksense/base-utils/fs';
+import { getOptionalEnvString } from '@blocksense/base-utils/env';
 
-import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
-import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { predictAddress } from './utils';
+import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -34,15 +28,9 @@ task('deploy', 'Deploy contracts')
       configs.push(await run('init-chain', { networkName: network }));
     }
 
-    const { decodeJSON } = selectDirectory(configDir);
-    const { feeds } = await decodeJSON(
-      { name: 'feeds_config_v2' },
-      NewFeedsConfigSchema,
-    );
-
-    const chainlinkCompatibility = await decodeJSON(
-      { name: 'chainlink_compatibility_v2' },
-      ChainlinkCompatibilityConfigSchema,
+    const { feeds } = await readConfig('feeds_config_v2');
+    const chainlinkCompatibility = await readConfig(
+      'chainlink_compatibility_v2',
     );
 
     let dataFeedConfig = feeds.map(feed => {
@@ -61,7 +49,7 @@ task('deploy', 'Deploy contracts')
       };
     });
 
-    const chainsDeployment: DeploymentConfigV2 = {} as DeploymentConfigV2;
+    const chainsDeployment: Record<NetworkName, DeploymentConfigV2> = {} as any;
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
@@ -200,13 +188,13 @@ task('deploy', 'Deploy contracts')
         contracts,
       });
 
-      const networkName = getNetworkNameByChainId(chainId);
       deployData.coreContracts.OnlySequencerGuard ??= {
         address: parseEthereumAddress(ethers.ZeroAddress),
         constructorArgs: [],
       };
 
       chainsDeployment[networkName] = {
+        name: networkName,
         chainId,
         contracts: {
           ...deployData,
@@ -254,20 +242,9 @@ task('deploy', 'Deploy contracts')
 
 const saveDeployment = async (
   configs: NetworkConfig[],
-  chainsDeployment: DeploymentConfigV2,
+  chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
 ) => {
-  const { writeJSON } = selectDirectory(configDirs.evm_contracts_deployment_v2);
-
-  for (const config of configs) {
-    const networkName = getNetworkNameByChainId(
-      parseChainId(config.network.chainId),
-    );
-
-    const deploymentData = {
-      name: networkName,
-      ...chainsDeployment[networkName],
-    };
-
-    await writeJSON({ name: networkName, content: deploymentData });
+  for (const { networkName } of configs) {
+    await writeEvmDeployment(networkName, chainsDeployment[networkName]);
   }
 };
