@@ -10,7 +10,7 @@ import { Schema as S } from 'effect';
 import { getEnvString, getOptionalEnvString } from '../env/functions';
 import { EthereumAddress, TxHash } from './hex-types';
 import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
-import { NumberFromSelfBigIntOrString } from '../numeric';
+import { NumberFromSelfBigIntOrString } from '../schemas';
 
 const networks = [
   'local',
