@@ -1,13 +1,12 @@
 import { task } from 'hardhat/config';
 
 import {
-  configDirs,
   entriesOf,
   EthereumAddress,
-  selectDirectory,
+  parseNetworkName,
 } from '@blocksense/base-utils';
 
-import { DeploymentConfigSchemaV2 } from '@blocksense/config-types/evm-contracts-deployment';
+import { readEvmDeployment } from '@blocksense/config-types';
 import { ethers } from 'ethers';
 
 type VerifyTaskArgs = {
@@ -17,6 +16,11 @@ type VerifyTaskArgs = {
 
 task('etherscan-verify', 'Verify contracts on Etherscan').setAction(
   async (_, { run, network }) => {
+    const deploymentData = await readEvmDeployment(
+      parseNetworkName(network.name),
+      true,
+    );
+
     const verify = ({ address, constructorArgs }: VerifyTaskArgs) =>
       run('verify:verify', {
         address,
@@ -28,17 +32,6 @@ task('etherscan-verify', 'Verify contracts on Etherscan').setAction(
           throw e;
         }
       });
-    const { decodeJSON } = selectDirectory(
-      configDirs.evm_contracts_deployment_v2,
-    );
-    const deploymentData = await decodeJSON(
-      { name: network.name },
-      DeploymentConfigSchemaV2,
-    );
-    if (!deploymentData) {
-      console.error(`Deployment data not found for network: '${network.name}'`);
-      process.exit(1);
-    }
 
     for (const [contractName, data] of entriesOf(
       deploymentData.contracts.coreContracts,
