@@ -2,7 +2,10 @@
 import { describe, it, expect } from 'vitest';
 
 import { Schema as S } from 'effect';
-import { NumberFromSelfBigIntOrString } from './schemas';
+import {
+  NumberFromSelfBigIntOrString,
+  fromCommaSeparatedString,
+} from './schemas';
 
 describe('schemas', () => {
   describe('NumberFromSelfBigIntOrString', () => {
@@ -54,6 +57,41 @@ describe('schemas', () => {
         decode(BigInt(Number.MAX_SAFE_INTEGER) + BigInt(1)),
       ).toThrowError();
       expect(() => decode('9007199254740992')).toThrowError();
+    });
+  });
+
+  describe('fromCommaSeparatedString', () => {
+    it('should create a schema for comma-separated values', () => {
+      const CommaSeparatedNumbers = fromCommaSeparatedString(
+        S.NumberFromString,
+      );
+
+      const decode = S.decodeUnknownSync(CommaSeparatedNumbers);
+
+      expect(decode('')).toEqual([]);
+      expect(decode('1')).toEqual([1]);
+      expect(decode('1,2')).toEqual([1, 2]);
+      expect(decode('1,2,3')).toEqual([1, 2, 3]);
+
+      expect(decode('    ')).toEqual([]);
+      expect(decode('  1 ')).toEqual([1]);
+      expect(decode(' 1 ,2 ')).toEqual([1, 2]);
+      expect(decode(' 1 , 2 ,3 ')).toEqual([1, 2, 3]);
+
+      expect(() => decode('1,abc,3')).toThrowError();
+    });
+
+    it('should handle empty strings', () => {
+      const CommaSeparatedNumbers = fromCommaSeparatedString(
+        S.NumberFromString,
+      );
+
+      const encode = S.encodeSync(CommaSeparatedNumbers);
+
+      expect(encode([])).toEqual('');
+      expect(encode([1])).toEqual('1');
+      expect(encode([1, 2])).toEqual('1,2');
+      expect(encode([1, 2, 3])).toEqual('1,2,3');
     });
   });
 });
