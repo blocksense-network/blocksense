@@ -57,10 +57,10 @@
       "import": "./dist/esm/logging.mjs",
       "types": "./src/logging.ts"
     },
-    "./numeric": {
-      "require": "./dist/cjs/numeric.cjs",
-      "import": "./dist/esm/numeric.mjs",
-      "types": "./src/numeric.ts"
+    "./schemas": {
+      "require": "./dist/cjs/schemas.cjs",
+      "import": "./dist/esm/schemas.mjs",
+      "types": "./src/schemas.ts"
     },
     "./string": {
       "require": "./dist/cjs/string.cjs",
