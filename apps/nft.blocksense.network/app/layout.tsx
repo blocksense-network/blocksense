@@ -4,6 +4,7 @@ import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { ThirdwebProvider } from 'thirdweb/react';
 
 import { Navbar } from '../components/Navbar';
+import { CookieBanner } from '../components/CookieBanner';
 import { Footer } from '../components/Footer';
 import { geist, geistMono } from '../src/geist';
 import './globals.css';
@@ -90,6 +91,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
           <Navbar />
           <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
           <Footer />
+          <CookieBanner />
         </ThirdwebProvider>
       </body>
     </html>
