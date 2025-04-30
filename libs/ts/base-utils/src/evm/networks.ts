@@ -13,7 +13,7 @@ import {
   KebabToScreamingSnakeCase,
   kebabToScreamingSnakeCase,
 } from '../string';
-import { NumberFromSelfBigIntOrString } from '../numeric';
+import { NumberFromSelfBigIntOrString } from '../schemas';
 
 const networks = [
   'local',
