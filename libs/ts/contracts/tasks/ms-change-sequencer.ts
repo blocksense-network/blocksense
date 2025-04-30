@@ -1,13 +1,6 @@
-import {
-  configDir,
-  getNetworkNameByChainId,
-  isNetworkName,
-  parseChainId,
-  selectDirectory,
-} from '@blocksense/base-utils';
+import { isNetworkName } from '@blocksense/base-utils';
 import { task } from 'hardhat/config';
 import { NetworkConfig } from './types';
-import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import Safe, { SigningMethod } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import {
@@ -15,6 +8,7 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 import { adjustVInSignature } from '@safe-global/protocol-kit/dist/src/utils';
+import { readEvmDeployment } from '@blocksense/config-types';
 
 task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
@@ -31,26 +25,19 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
       configs.push(await run('init-chain', { networkName: network }));
     }
 
-    const fileName = 'evm_contracts_deployment_v2';
-    const { readJSON } = selectDirectory(configDir);
-
-    const deployedData: DeploymentConfigV2 = await readJSON({
-      name: fileName,
-    });
-
     for (const config of configs) {
-      const networkName = getNetworkNameByChainId(
-        parseChainId(config.network.chainId),
-      );
-
-      const deployment = deployedData[networkName]?.contracts!;
-
-      const safeAddress = deployment.AdminMultisig;
+      const { networkName } = config;
+      const {
+        contracts: {
+          AdminMultisig,
+          coreContracts: { AccessControl },
+        },
+      } = await readEvmDeployment(networkName, true);
 
       const adminMultisig = await Safe.init({
         provider: config.rpc,
         signer: config.adminMultisig.signer?.privateKey,
-        safeAddress,
+        safeAddress: AdminMultisig,
         contractNetworks: {
           [config.network.chainId.toString()]: config.safeAddresses,
         },
@@ -62,7 +49,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
       });
 
       const safeTxSetAccessControl: SafeTransactionDataPartial = {
-        to: deployment.coreContracts.AccessControl.address,
+        to: AccessControl.address,
         value: '0',
         data: ethers.solidityPacked(
           ['address', 'bool'],
@@ -90,7 +77,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
 
       // Send the transaction to the Transaction Service with the signature from Owner A
       await apiKit.proposeTransaction({
-        safeAddress,
+        safeAddress: AdminMultisig,
         safeTransactionData: tx.data,
         safeTxHash,
         senderAddress: await signer.getAddress(),
