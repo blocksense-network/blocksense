@@ -50,10 +50,11 @@
       };
 
       devenv.shells = lib.genAttrs allEnvironmentNames (name: {
-        imports = [
-          self.nixosModules.blocksense-process-compose
-          ./${name}.nix
-        ];
-      });
+          imports = [
+            self.nixosModules.blocksense-process-compose
+            ./${name}.nix
+            ./modules/process-compose.nix
+          ];
+        });
     };
 }
