@@ -56,12 +56,16 @@
 }
 
 [data-test='connected-wallet-details'] {
-  background-color: #262626 !important;
-  border: none !important;
+  background-color: #ffffff !important;
+  border-radius: 2rem !important;
   width: 100% !important;
-  min-height: 1rem !important;
+  min-height: 1.5rem !important;
   margin-top: 1rem !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+}
+
+.tw-connected-wallet__address {
+  color: #000000 !important;
 }

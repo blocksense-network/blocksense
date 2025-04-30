@@ -172,15 +172,6 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
           />
         </section>
       </FormStepContainer>
-      {account && (
-        <Button
-          onClick={onMintClick}
-          isLoading={mintLoading}
-          className="mint-form_button w-full md:mt-8 mt-6 transition-all duration-500 ease-in-out opacity-100 translate-y-0"
-        >
-          Mint My NFT
-        </Button>
-      )}
       <ConnectButton
         client={client}
         wallets={wallets}
@@ -200,6 +191,15 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
           },
         })}
       />
+      {account && (
+        <Button
+          onClick={onMintClick}
+          isLoading={mintLoading}
+          className="mint-form_button w-full mt-4 transition-all duration-500 ease-in-out opacity-100 translate-y-0"
+        >
+          Mint My NFT
+        </Button>
+      )}
     </form>
   );
 };
