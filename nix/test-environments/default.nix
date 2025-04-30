@@ -56,6 +56,7 @@
           imports = [
             self.nixosModules.blocksense-process-compose
             ./${name}.nix
+            ./modules/process-compose.nix
           ];
         });
     };
