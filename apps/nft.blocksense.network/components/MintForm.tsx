@@ -52,35 +52,36 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
 
   const [retweetCode, setRetweetCode] = useState('');
   const [mintLoading, setMintLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const account = useActiveAccount();
 
   useEffect(() => {
     if (account?.address) {
-      getNftBalance(account.address).then(setBalance);
+      getNftBalance(account.address).then(balance => {
+        setBalance(balance);
+        if (balance > 0 && !alertMessage) {
+          setAlertMessage('You already have a token!');
+        }
+      });
     }
-  }, [account]);
-
-  //TODO: Handle this better
-  if (nftBalance > 0) {
-    alert('You already have a token!');
-    return;
-  }
+  }, [account, alertMessage]);
 
   const mint = useCallback(async () => {
     if (!account) {
-      alert('Please connect your wallet first.');
+      setAlertMessage('Please connect your wallet first.');
       return;
     }
 
     setMintLoading(true);
+    setAlertMessage('');
 
     try {
       const metadata = await mintNFT(account);
       onSuccessAction(metadata);
     } catch (error: any) {
       console.error(error);
-      alert('Failed to mint NFT: ' + error.message);
+      setAlertMessage('Failed to mint NFT: ' + error.message);
     } finally {
       setMintLoading(false);
     }
@@ -201,7 +202,9 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
           Mint My NFT
         </Button>
       )}
-      <MintAlert className="mint-alert" message="You already have a token" />
+      {alertMessage && (
+        <MintAlert className="mint-alert" message={alertMessage} />
+      )}
     </form>
   );
 };
