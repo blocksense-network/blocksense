@@ -1,5 +1,10 @@
 import { isTestnet } from '@blocksense/base-utils/evm';
-import { pairToString } from '@blocksense/config-types';
+
+import { pairToString } from '@blocksense/config-types/data-feeds-config';
+import {
+  parseNetworkFilename,
+  chainlinkNetworkNameToChainId,
+} from '@blocksense/config-types/chainlink-compatibility';
 
 import {
   AggregatedFeedInfo,
@@ -11,14 +16,9 @@ import {
 } from '../../../data-services/fetchers/chainlink/chainlink_feeds';
 import { SimplifiedFeed } from '../types';
 import {
-  parseNetworkFilename,
-  chainlinkNetworkNameToChainId,
-} from '../../../chainlink-compatibility/types';
-import {
   ChainLinkFeedInfo,
   RawDataFeeds,
 } from '../../../data-services/fetchers/chainlink/types';
-
 export function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,
 ): SimplifiedFeed {
