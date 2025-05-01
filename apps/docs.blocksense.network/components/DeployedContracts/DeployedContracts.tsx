@@ -1,9 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Callout } from '@blocksense/ui/Callout';
-import { parseNetworkName } from '@blocksense/base-utils/evm';
+import {
+  isNetwork,
+  NetworkName,
+  parseNetworkName,
+} from '@blocksense/base-utils/evm';
 
 import { capitalizeWords } from '@/src/utils';
 import {
