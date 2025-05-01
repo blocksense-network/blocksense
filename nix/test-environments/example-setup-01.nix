@@ -109,7 +109,6 @@ in
         ink-sepolia = {
           private-key-path = "${testKeysDir}/sequencer-private-key";
           contract-address = upgradeableProxyADFSContractAddressInk;
-          safe-address = "0x23BC561ea93063B0cD12b6E3c690D40c93e29692";
           contract-version = 2;
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
@@ -134,60 +133,72 @@ in
         id = 0;
         default-exec-interval = 30;
         secret-key-path = "${testKeysDir}/reporter_secret_key";
-        api-keys = { };
+        api-keys = {
+          ALPHAVANTAGE_API_KEY = "${testKeysDir}/ALPHAVANTAGE_API_KEY";
+          YAHOO_FINANCE_API_KEY = "${testKeysDir}/YAHOO_FINANCE_API_KEY";
+        };
       };
     };
 
     oracles = {
-      crypto-price-feeds = {
-        exec-interval = 40;
-        allowed-outbound-hosts = [
-          "https://api.kraken.com"
-          "https://api.bybit.com"
-          "https://api.coinbase.com"
-          "https://api.exchange.coinbase.com"
-          "https://api1.binance.com"
-          "https://api.kucoin.com"
-          "https://api.mexc.com"
-          "https://api.crypto.com"
-          "https://api.binance.us"
-          "https://api.gemini.com"
-          "https://api-pub.bitfinex.com"
-          "https://api.upbit.com"
-          "https://api.bitget.com"
-          "https://api.gateio.ws"
-          "https://www.okx.com"
-        ];
-      };
+      # crypto-price-feeds = {
+      #   exec-interval = 40;
+      #   allowed-outbound-hosts = [
+      #     "https://api.kraken.com"
+      #     "https://api.bybit.com"
+      #     "https://api.coinbase.com"
+      #     "https://api.exchange.coinbase.com"
+      #     "https://api1.binance.com"
+      #     "https://api.kucoin.com"
+      #     "https://api.mexc.com"
+      #     "https://api.crypto.com"
+      #     "https://api.binance.us"
+      #     "https://api.gemini.com"
+      #     "https://api-pub.bitfinex.com"
+      #     "https://api.upbit.com"
+      #     "https://api.bitget.com"
+      #     "https://api.gateio.ws"
+      #     "https://www.okx.com"
+      #   ];
+      # };
 
-      exsat-holdings = {
-        exec-interval = 300;
-        allowed-outbound-hosts = [
-          "https://raw.githubusercontent.com"
-          "https://rpc-us.exsat.network"
-          "https://blockchain.info"
-          "https://mempool.space"
-        ];
-      };
+      # exsat-holdings = {
+      #   exec-interval = 300;
+      #   allowed-outbound-hosts = [
+      #     "https://raw.githubusercontent.com"
+      #     "https://rpc-us.exsat.network"
+      #     "https://blockchain.info"
+      #     "https://mempool.space"
+      #   ];
+      # };
 
-      gecko-terminal = {
-        exec-interval = 10;
-        allowed-outbound-hosts = [
-          "https://api.geckoterminal.com"
-        ];
-      };
+      # gecko-terminal = {
+      #   exec-interval = 10;
+      #   allowed-outbound-hosts = [
+      #     "https://api.geckoterminal.com"
+      #   ];
+      # };
 
-      eth-rpc = {
-        exec-interval = 10;
-        allowed-outbound-hosts = [
-          "https://eth.llamarpc.com"
-          "https://rpc.eth.gateway.fm"
-        ];
-      };
+      # eth-rpc = {
+      #   exec-interval = 10;
+      #   allowed-outbound-hosts = [
+      #     "https://eth.llamarpc.com"
+      #     "https://rpc.eth.gateway.fm"
+      #   ];
+      # };
 
       stock-price-feeds = {
         exec-interval = 60;
-        allowed-outbound-hosts = [ ];
+        allowed-outbound-hosts = [
+          "https://www.alphavantage.co"
+          "https://yfapi.net"
+          "https://api.twelvedata.com"
+          "https://financialmodelingprep.com"
+        ];
+        api-keys = [
+          "ALPHAVANTAGE_API_KEY"
+          "YAHOO_FINANCE_API_KEY"
+        ];
       };
     };
   };
