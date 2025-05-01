@@ -1,5 +1,4 @@
 import { tuple, fromEntries } from '@blocksense/base-utils/array-iter';
-import { selectDirectory } from '@blocksense/base-utils/fs';
 import { parseEthereumAddress, zeroAddress } from '@blocksense/base-utils/evm';
 
 import { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
@@ -9,11 +8,10 @@ import {
   ChainlinkCompatibilityConfig,
   isSupportedCurrencySymbol,
   currencySymbolToDenominationAddress,
+  parseNetworkFilename,
+  chainlinkNetworkNameToChainId,
 } from '@blocksense/config-types/chainlink-compatibility';
 
-import { parseNetworkFilename, chainlinkNetworkNameToChainId } from './types';
-
-import { artifactsDir } from '../paths';
 import { RawDataFeeds } from '../data-services/fetchers/chainlink/types';
 import { FeedRegistryEventsPerAggregator } from '../chainlink-compatibility/types';
 
