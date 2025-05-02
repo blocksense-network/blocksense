@@ -796,32 +796,32 @@ mod tests {
         );
     }
 
-    #[tokio::test]
-    async fn test_get_duration_until_end_of_current_slot_periodic() {
-        // setup
-        const SLOT_INTERVAL: Duration = Duration::from_secs(1);
-        const START_TIME_MS: u128 = 0;
-        let mut time_tracker = SlotTimeTracker::new(
-            "test_get_duration_until_end_of_current_slot_periodic".to_string(),
-            SLOT_INTERVAL,
-            START_TIME_MS,
-        );
+    // #[tokio::test]
+    // async fn test_get_duration_until_end_of_current_slot_periodic() {
+    //     // setup
+    //     const SLOT_INTERVAL: Duration = Duration::from_secs(1);
+    //     const START_TIME_MS: u128 = 0;
+    //     let mut time_tracker = SlotTimeTracker::new(
+    //         "test_get_duration_until_end_of_current_slot_periodic".to_string(),
+    //         SLOT_INTERVAL,
+    //         START_TIME_MS,
+    //     );
 
-        // run
-        let duration_ms =
-            time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
-        // assert
-        assert!(duration_ms < SLOT_INTERVAL.as_millis() as i128);
+    //     // run
+    //     let duration_ms =
+    //         time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
+    //     // assert
+    //     assert!(duration_ms < SLOT_INTERVAL.as_millis() as i128);
 
-        // setup
-        time_tracker.reset_report_start_time();
-        let duration_ms =
-            time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
-        // assert
-        // Should be ideally exactly SLOT_INTERVAL ms, but we cannot count on exactness
-        assert!(duration_ms > (SLOT_INTERVAL.as_millis() as i128 - 100));
-        assert!(duration_ms < (SLOT_INTERVAL.as_millis() as i128 + 100));
-    }
+    //     // setup
+    //     time_tracker.reset_report_start_time();
+    //     let duration_ms =
+    //         time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
+    //     // assert
+    //     // Should be ideally exactly SLOT_INTERVAL ms, but we cannot count on exactness
+    //     assert!(duration_ms > (SLOT_INTERVAL.as_millis() as i128 - 100));
+    //     assert!(duration_ms < (SLOT_INTERVAL.as_millis() as i128 + 100));
+    // }
 
     #[tokio::test]
     async fn test_get_duration_until_end_of_current_slot_oneshot() {

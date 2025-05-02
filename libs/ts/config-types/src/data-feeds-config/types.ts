@@ -2,6 +2,7 @@ import { Schema as S } from 'effect';
 
 import {
   cryptoPriceFeedsArgsSchema,
+  ethRpcArgsSchema,
   geckoTerminalArgsSchema,
   stockPriceFeedsArgsSchema,
 } from './oracles';
@@ -197,6 +198,7 @@ export const NewFeedSchema = S.mutable(
           stockPriceFeedsArgsSchema,
           cryptoPriceFeedsArgsSchema,
           geckoTerminalArgsSchema,
+          ethRpcArgsSchema,
         ),
         compatibility_info: S.UndefinedOr(
           S.Struct({

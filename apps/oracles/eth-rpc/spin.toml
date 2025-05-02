@@ -20,13 +20,29 @@ component = "eth-rpc"
 id = "100001"
 stride = 0
 decimals = 0
-data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":[]}'
+data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":["https://eth.llamarpc.com", "https://ethereum-rpc.publicnode.com", "https://rpc.eth.gateway.fm"]}'
+
+[[trigger.oracle.data_feeds]]
+id = "100002"
+stride = 0
+decimals = 0
+data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":["https://eth.llamarpc.com", "https://rpc.eth.gateway.fm", "https://ethereum-rpc.publicnode.com"]}'
+
+[[trigger.oracle.data_feeds]]
+id = "100003"
+stride = 0
+decimals = 0
+data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":["https://binance.llamarpc.com","https://bsc.meowrpc.com", "https://bsc.drpc.org"]}'
 
 [component.eth-rpc]
 source = "../../../target/wasm32-wasip1/release/eth_rpc.wasm"
 allowed_outbound_hosts = [
   "https://eth.llamarpc.com",
   "https://rpc.eth.gateway.fm",
+  "https://ethereum-rpc.publicnode.com",
+  "https://binance.llamarpc.com",
+  "https://bsc.meowrpc.com",
+  "https://bsc.drpc.org"
 ]
 
 [component.eth-rpc.build]
