@@ -1,87 +1,80 @@
-import { Addressable, ContractRunner } from 'ethers';
-import { ethers } from 'hardhat';
+import { ContractRunner } from 'ethers';
 import { CLFeedRegistryAdapter__factory } from 'libs/ts/contracts/typechain';
 
-interface RegistryConfig {
+export interface RegistryConfig {
   address: string;
   abiJson: any;
   provider: ContractRunner;
 }
 
-export const getDecimals = async (
-  config: RegistryConfig,
-  base: string,
-  quote: string,
-) => {
-  const registry = CLFeedRegistryAdapter__factory.connect(config.address);
-  const decimals = await registry.decimals(base, quote);
+export const functions = {
+  getDecimals: async (config: RegistryConfig, base: string, quote: string) => {
+    const registry = CLFeedRegistryAdapter__factory.connect(config.address);
+    const decimals = await registry.decimals(base, quote);
 
-  return decimals;
-};
+    return decimals;
+  },
 
-export const getDescription = async (
-  config: RegistryConfig,
-  base: string,
-  quote: string,
-) => {
-  const registry = CLFeedRegistryAdapter__factory.connect(config.address);
-  const description = await registry.description(base, quote);
+  getDescription: async (
+    config: RegistryConfig,
+    base: string,
+    quote: string,
+  ) => {
+    const registry = CLFeedRegistryAdapter__factory.connect(config.address);
+    const description = await registry.description(base, quote);
 
-  return description;
-};
+    return description;
+  },
 
-export const getLatestAnswer = async (
-  config: RegistryConfig,
-  base: string,
-  quote: string,
-) => {
-  const registry = CLFeedRegistryAdapter__factory.connect(config.address);
-  const latestAnswer = await registry.latestAnswer(base, quote);
+  getLatestAnswer: async (
+    config: RegistryConfig,
+    base: string,
+    quote: string,
+  ) => {
+    const registry = CLFeedRegistryAdapter__factory.connect(config.address);
+    const latestAnswer = await registry.latestAnswer(base, quote);
 
-  return latestAnswer;
-};
+    return latestAnswer;
+  },
 
-export const getLatestRound = async (
-  config: RegistryConfig,
-  base: string,
-  quote: string,
-) => {
-  const registry = CLFeedRegistryAdapter__factory.connect(config.address);
-  const latestRound = await registry.latestRound(base, quote);
+  getLatestRound: async (
+    config: RegistryConfig,
+    base: string,
+    quote: string,
+  ) => {
+    const registry = CLFeedRegistryAdapter__factory.connect(config.address);
+    const latestRound = await registry.latestRound(base, quote);
 
-  return latestRound;
-};
+    return latestRound;
+  },
 
-export const getRoundData = async (
-  config: RegistryConfig,
-  base: string,
-  quote: string,
-  roundId: number,
-) => {
-  const registry = CLFeedRegistryAdapter__factory.connect(config.address);
-  const roundData = await registry.getRoundData(base, quote, roundId);
+  getRoundData: async (
+    config: RegistryConfig,
+    base: string,
+    quote: string,
+    roundId: number,
+  ) => {
+    const registry = CLFeedRegistryAdapter__factory.connect(config.address);
+    const roundData = await registry.getRoundData(base, quote, roundId);
 
-  return roundData;
-};
+    return roundData;
+  },
 
-export const getLatestRoundData = async (
-  config: RegistryConfig,
-  base: string,
-  quote: string,
-) => {
-  const registry = CLFeedRegistryAdapter__factory.connect(config.address);
-  const latestRoundData = await registry.latestRoundData(base, quote);
+  getLatestRoundData: async (
+    config: RegistryConfig,
+    base: string,
+    quote: string,
+  ) => {
+    const registry = CLFeedRegistryAdapter__factory.connect(config.address);
+    const latestRoundData = await registry.latestRoundData(base, quote);
 
-  return latestRoundData;
-};
+    return latestRoundData;
+  },
 
-export const getFeed = async (
-  config: RegistryConfig,
-  base: string,
-  quote: string,
-) => {
-  const registry = CLFeedRegistryAdapter__factory.connect(config.address);
-  const feed = await registry.getFeed(base, quote);
+  getFeed: async (config: RegistryConfig, base: string, quote: string) => {
+    const registry = CLFeedRegistryAdapter__factory.connect(config.address);
+    const feed = await registry.getFeed(base, quote);
 
-  return feed;
+    return feed;
+  },
 };
