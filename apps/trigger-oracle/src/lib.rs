@@ -1,7 +1,9 @@
 mod custom_serde;
+mod execution;
 
 use clap::Args;
 use custom_serde::serialize_string_as_json;
+use futures::future::join_all;
 use serde::{Deserialize, Serialize};
 
 use std::{
@@ -9,20 +11,17 @@ use std::{
     collections::{HashMap, HashSet},
     hash::{Hash, Hasher},
     sync::Arc,
-    time::Instant,
 };
 
 use http::uri::Scheme;
 use hyper::Request;
 use tokio::{
     sync::{
-        broadcast::{
-            channel, error::RecvError, Receiver as BroadcastReceiver, Sender as BroadcastSender,
-        },
+        broadcast::error::RecvError,
         mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
         RwLock,
     },
-    task::{spawn, Builder, JoinHandle},
+    task::{Builder, JoinHandle, JoinSet},
     time::{sleep, Duration},
 };
 use tracing::Instrument;
@@ -33,7 +32,6 @@ use rdkafka::consumer::{Consumer, StreamConsumer};
 use rdkafka::Message;
 use tokio_stream::StreamExt;
 
-use outbound_http::OutboundHttpComponent;
 use spin_app::MetadataKey;
 use spin_core::{async_trait, InstancePre, OutboundWasiHttpHandler};
 use spin_outbound_networking::{AllowedHostsConfig, OutboundUrl};
@@ -45,24 +43,9 @@ use wasmtime_wasi_http::{
 };
 
 use blocksense_config::FeedStrideAndDecimals;
-use blocksense_crypto::JsonSerializableSignature;
-use blocksense_data_feeds::{
-    feeds_processing::VotedFeedUpdate, generate_signature::generate_signature,
-};
-use blocksense_feed_registry::{
-    registry::SlotTimeTracker,
-    types::{DataFeedPayload, FeedError, FeedType, PayloadMetaData, Repeatability},
-};
+use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
 use blocksense_feeds_processing::utils::validate;
-use blocksense_metrics::{
-    actix_server::handle_prometheus_metrics,
-    metrics::{
-        REPORTER_BATCH_COUNTER, REPORTER_FAILED_SEQ_REQUESTS, REPORTER_FAILED_WASM_EXECS,
-        REPORTER_FEED_COUNTER, REPORTER_WASM_EXECUTION_TIME_GAUGE,
-    },
-    TextEncoder,
-};
-use blocksense_utils::time::current_unix_time;
+use blocksense_metrics::metrics::{REPORTER_FAILED_SEQ_REQUESTS, REPORTER_FEED_COUNTER};
 
 use blocksense_gnosis_safe::{
     data_types::{ConsensusSecondRoundBatch, ReporterResponse},
@@ -76,6 +59,8 @@ wasmtime::component::bindgen!({
 });
 
 use blocksense::oracle::oracle_types as oracle;
+
+use crate::execution::schedule_execution_tasks;
 
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
@@ -270,19 +255,10 @@ impl TriggerExecutor for OracleTrigger {
         })
     }
 
-    async fn run(self, config: Self::RunConfig) -> anyhow::Result<()> {
+    async fn run(self, _config: Self::RunConfig) -> anyhow::Result<()> {
         tracing::trace!("Starting Blocksense Reporter");
 
         let engine = Arc::new(self.engine);
-        if config.test {
-            tracing::trace!("Running in test mode");
-            for component in self.queue_components.values() {
-                let settings: Vec<DataFeedSetting> =
-                    component.oracle_settings.clone().into_iter().collect();
-                Self::execute_wasm(engine.clone(), component, settings).await?;
-            }
-            return Ok(());
-        }
         tracing::trace!("Running in production mode");
 
         // This trigger spawns threads, which Ctrl+C does not kill.  So
@@ -299,8 +275,6 @@ impl TriggerExecutor for OracleTrigger {
             .expect("ctrl-c watcher failed to start");
 
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
-        let (data_feed_sender, data_feed_receiver) = unbounded_channel();
-        let (signal_data_feed_sender, _) = channel(16);
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
         let mut feeds_config = HashMap::new();
         //TODO(adikov): Move all the logic to a different struct and handle
@@ -323,33 +297,25 @@ impl TriggerExecutor for OracleTrigger {
             "Components: {}",
             &serde_json::to_string_pretty(&components).unwrap(),
         );
-        tracing::trace!("Starting oracle scripts");
-        let mut loops: Vec<_> = self
-            .queue_components
-            .into_values()
-            .map(|component| {
-                Self::start_oracle_loop(
-                    engine.clone(),
-                    signal_data_feed_sender.subscribe(),
-                    data_feed_sender.clone(),
-                    &component,
-                )
-            })
-            .collect();
-
-        tracing::trace!("Starting orchestrator");
-        let mut orchestrators = Self::start_orchestrators(
-            components,
-            signal_data_feed_sender.clone(),
-            self.prometheus_url,
-        );
-        loops.append(&mut orchestrators);
-
         let url = Url::parse(&self.sequencer.clone())?;
-        let sequencer_aggregated_consensus_url = url.join("/post_aggregated_consensus_vote")?;
+
+        let mut join_set = JoinSet::new();
+
+        schedule_execution_tasks(
+            &mut join_set,
+            engine,
+            url.clone(),
+            self.secret_key.clone(),
+            self.reporter_id,
+            components.clone(),
+            data_feed_results.clone(),
+        );
+
+        let mut loops = Vec::new();
 
         if let Some(endpoint) = self.kafka_endpoint {
             let (aggregated_consensus_sender, aggregated_consensus_receiver) = unbounded_channel();
+
             tracing::trace!("Starting secondary signature");
             loops.push(Self::start_secondary_signature_listener(
                 endpoint,
@@ -361,228 +327,47 @@ impl TriggerExecutor for OracleTrigger {
                 aggregated_consensus_receiver,
                 feeds_config,
                 data_feed_results.clone(),
-                sequencer_aggregated_consensus_url,
+                url.join("/post_aggregated_consensus_vote")?,
                 self.second_consensus_secret_key,
                 self.reporter_id,
             )));
         }
 
-        tracing::trace!("Starting sender to sequencer");
-        let sequencer_post_batch_url = url.join("/post_reports_batch")?;
-        let manager = Self::start_manager(
-            data_feed_receiver,
-            data_feed_results,
-            &sequencer_post_batch_url,
-            &self.secret_key,
-            self.reporter_id,
-        );
-        loops.push(manager);
+        join_set.join_all().await;
 
-        loop {
-            let (tr, _, rest) = futures::future::select_all(loops).await;
+        Ok(())
 
-            match tr.expect("await returns ok") {
-                TerminationReason::ExitRequested => {
-                    tracing::trace!("Exit requested => exiting");
-                    return Ok(());
-                }
-                TerminationReason::SequencerExitRequested => {
-                    tracing::trace!("Sequencer exit requested => exiting");
-                    return Ok(());
-                }
-                TerminationReason::ReceivedBadSignal(err) => {
-                    tracing::error!("Oracle script runner received bad signal: {err:?}");
-                    tracing::trace!("Continuing to run the other runners");
-                    loops = rest;
-                }
-                TerminationReason::Other(message) => {
-                    tracing::error!("Unexpected termination reason: {message}");
-                    return Err(anyhow::anyhow!("{message}"));
-                }
-            }
-        }
+        //loop {
+        //    let (tr, _, rest) = futures::future::select_all(loops).await;
+        //
+        //    match tr.expect("await returns ok") {
+        //        TerminationReason::ExitRequested => {
+        //            tracing::trace!("Exit requested => exiting");
+        //            return Ok(());
+        //        }
+        //        TerminationReason::SequencerExitRequested => {
+        //            tracing::trace!("Sequencer exit requested => exiting");
+        //            return Ok(());
+        //        }
+        //        TerminationReason::ReceivedBadSignal(err) => {
+        //            tracing::error!("Oracle script runner received bad signal: {err:?}");
+        //            tracing::trace!("Continuing to run the other runners");
+        //            loops = rest;
+        //        }
+        //        TerminationReason::Other(message) => {
+        //            tracing::error!("Unexpected termination reason: {message}");
+        //            return Err(anyhow::anyhow!("{message}"));
+        //        }
+        //    }
+        //}
     }
 }
 
 impl OracleTrigger {
-    fn start_oracle_loop(
-        engine: Arc<TriggerAppEngine<Self>>,
-        signal_receiver: BroadcastReceiver<HashSet<DataFeedSetting>>,
-        payload_sender: UnboundedSender<(String, Payload)>,
-        component: &Component,
-    ) -> JoinHandle<TerminationReason> {
-        let future = Self::execute(engine, signal_receiver, payload_sender, component.clone());
-        let task_name = format!("processor for {}", component.id);
-        Builder::new()
-            .name(&task_name)
-            .spawn(future)
-            .unwrap_or_else(|_| panic!("{task_name} failed to start"))
-    }
-
-    async fn execute(
-        engine: Arc<TriggerAppEngine<Self>>,
-        mut signal_receiver: BroadcastReceiver<HashSet<DataFeedSetting>>,
-        payload_sender: UnboundedSender<(String, Payload)>,
-        component: Component,
-    ) -> TerminationReason {
-        let component_id = component.id.clone();
-        tracing::trace!("Starting processing loop `{component_id}`");
-        loop {
-            let feeds = match signal_receiver.recv().await {
-                Ok(feeds) => feeds,
-                Err(err) => {
-                    return TerminationReason::ReceivedBadSignal(err);
-                }
-            };
-            tracing::trace!(
-                "Oracle script `{}` received a set of {} active feeds",
-                component.id,
-                feeds.len()
-            );
-
-            let intersection: Vec<_> = component
-                .oracle_settings
-                .intersection(&feeds)
-                .cloned()
-                .collect();
-
-            if intersection.is_empty() {
-                tracing::trace!("Empty intersection between component {component_id}");
-                continue;
-            }
-            tracing::trace!(
-                "Intersection for {} has size {}",
-                &component.id,
-                intersection.len()
-            );
-
-            let payload = match Self::execute_wasm(engine.clone(), &component, intersection).await {
-                Ok(payload) => {
-                    tracing::trace!("Component `{component_id}` executed successfully");
-                    payload
-                }
-                Err(error) => {
-                    tracing::error!(
-                        "Component - ({component_id}) execution ended with error {}",
-                        error
-                    );
-                    //TODO(adikov): We need to come up with proper way of handling errors in wasm
-                    //components.
-                    continue;
-                }
-            };
-            tracing::trace!("Sending update to sequencer for `{component_id}`...");
-            match payload_sender.send((component.id.clone(), payload)) {
-                Ok(_) => {
-                    tracing::trace!("Sent update to sequencer for `{component_id}`");
-                    continue;
-                }
-                Err(err) => {
-                    tracing::error!(
-                        "Failed to send update to sequencer for `{component_id}` due to {err}"
-                    );
-                    break;
-                }
-            };
-        }
-        tracing::info!("End of execution for `{component_id}`");
-        TerminationReason::Other("Oracle execution loop terminated".to_string())
-    }
-
-    fn start_orchestrators(
-        components: HashMap<String, Component>,
-        signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
-        prometheus_url: Option<String>,
-    ) -> Vec<tokio::task::JoinHandle<TerminationReason>> {
-        let mut join_handles = vec![];
-        for (key, component) in components {
-            let time_interval =
-                tokio::time::Duration::from_secs(component.interval_time_in_seconds);
-            let future = Self::signal_data_feeds(
-                key.clone(),
-                time_interval,
-                component.oracle_settings.clone(),
-                signal_sender.clone(),
-                prometheus_url.clone(),
-            );
-            join_handles.push(
-                tokio::task::Builder::new()
-                    .name(format!("orchestrator-{}", key).as_str())
-                    .spawn(future)
-                    .expect("orchestrator failed to start"),
-            );
-        }
-
-        join_handles
-    }
-
-    async fn signal_data_feeds(
-        oracle_id: String,
-        time_interval: tokio::time::Duration,
-        oracle_settings: HashSet<DataFeedSetting>,
-        signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
-        prometheus_url: Option<String>,
-    ) -> TerminationReason {
-        tracing::trace!("Task orchestrator-{} started", oracle_id);
-        //TODO(adikov): Implement proper logic and remove dummy values
-        let time_tracker = SlotTimeTracker::new("feed_update".into(), time_interval, 0);
-
-        loop {
-            REPORTER_BATCH_COUNTER.inc();
-            let batch_count = REPORTER_BATCH_COUNTER.get();
-            tracing::trace!(
-                "Orchestrator-{} entering sleep [batch_count={batch_count}]",
-                oracle_id
-            );
-
-            time_tracker
-                .await_end_of_current_slot(&Repeatability::Periodic)
-                .await;
-
-            tracing::trace!(
-                "Orchestrator-{} woke up [batch_count={batch_count}]",
-                oracle_id
-            );
-
-            tracing::trace!(
-                "Signal {} data feeds [batch_count={batch_count}]",
-                oracle_settings.len()
-            );
-            let _ = signal_sender.send(oracle_settings.clone());
-
-            if prometheus_url.is_none() {
-                tracing::trace!("Prometheus URL not set; looping back [batch_count={batch_count}]");
-                continue;
-            }
-
-            let prometheus_url = prometheus_url
-                .clone()
-                .expect("Prometheus URL should be provided.");
-            tracing::trace!(
-                "Sending metrics to prometheus at {prometheus_url} [batch_count={batch_count}]"
-            );
-            let metrics_result = handle_prometheus_metrics(
-                &reqwest::Client::new(),
-                &prometheus_url,
-                &TextEncoder::new(),
-            )
-            .await;
-
-            match metrics_result {
-                Ok(_) => {
-                    tracing::trace!("Sent metrics to prometheus [batch_count={batch_count}]");
-                }
-                Err(e) => {
-                    tracing::error!(
-                        "Error handling Prometheus metrics: {e:?} [batch_count={batch_count}]"
-                    );
-                }
-            }
-        }
-        // unreachable!("No breaks in orchestrator loop");
-
-        //TerminationReason::Other("Signal data feed loop terminated".to_string())
-    }
+    // broadcast settings
+    // -> task listens to broadcasts and filters settings for current component and unions
+    // -> task gets the union of settings for current component
+    // -> signal a condition variable that we have non-empty union
 
     fn start_secondary_signature_listener(
         kafka_report_endpoint: String,
@@ -680,107 +465,6 @@ impl OracleTrigger {
         TerminationReason::Other("Signal secondary consensus loop terminated".to_string())
     }
 
-    #[allow(clippy::too_many_arguments)]
-    fn start_manager(
-        payload_rx: UnboundedReceiver<(String, Payload)>,
-        latest_votes: DataFeedResults,
-        sequencer_post_batch_url: &Url,
-        secret_key: &str,
-        reporter_id: u64,
-    ) -> JoinHandle<TerminationReason> {
-        let process_payload_future = Self::process_payload(
-            payload_rx,
-            latest_votes.clone(),
-            sequencer_post_batch_url.to_owned(),
-            secret_key.to_owned(),
-            reporter_id,
-        );
-
-        spawn(process_payload_future)
-    }
-
-    async fn process_payload(
-        mut rx: UnboundedReceiver<(String, Payload)>,
-        latest_votes: DataFeedResults,
-        sequencer_url: Url,
-        secret_key: String,
-        reporter_id: u64,
-    ) -> TerminationReason {
-        tracing::trace!("Task sender to sequencer started");
-        while let Some((_component_id, payload)) = rx.recv().await {
-            tracing::trace!(
-                "Sender to sequencer received payload of size {}",
-                payload.values.len()
-            );
-            let timestamp = current_unix_time();
-            let mut batch_payload = vec![];
-            for oracle::DataFeedResult { id, value } in payload.values {
-                let result = match value {
-                    oracle::DataFeedResultValue::Numerical(value) => Ok(FeedType::Numerical(value)),
-                    oracle::DataFeedResultValue::Text(value) => Ok(FeedType::Text(value)),
-                    oracle::DataFeedResultValue::Error(error_string) => {
-                        Err(FeedError::APIError(error_string))
-                    }
-                    oracle::DataFeedResultValue::None => {
-                        tracing::warn!("Encountered None result for feed id {id}");
-                        //TODO(adikov): Handle properly None result
-                        continue;
-                    }
-                };
-
-                let signature =
-                    generate_signature(&secret_key, id.as_str(), timestamp, &result).unwrap();
-
-                batch_payload.push(DataFeedPayload {
-                    payload_metadata: PayloadMetaData {
-                        reporter_id,
-                        feed_id: id,
-                        timestamp,
-                        signature: JsonSerializableSignature { sig: signature },
-                    },
-                    result,
-                });
-            }
-            //TODO(adikov): Potential better implementation would be to send results to the
-            //sequencer every few seconds in which we can gather batches of data feed payloads.
-
-            tracing::trace!(
-                "Sending to url - {}; {} batches",
-                sequencer_url.clone(),
-                batch_payload.len()
-            );
-            let client = reqwest::Client::new();
-            match client
-                .post(sequencer_url.clone())
-                .json(&batch_payload)
-                .send()
-                .await
-            {
-                Ok(res) => {
-                    let status = res.status();
-                    let contents = res.text().await.unwrap();
-                    tracing::trace!("Sequencer responded with status={status} and text={contents}",);
-
-                    let mut latest_votes = latest_votes.write().await;
-                    update_latest_votes(&mut latest_votes, batch_payload);
-                }
-                Err(e) => {
-                    //TODO(adikov): Add code from the error - e.status()
-                    REPORTER_FAILED_SEQ_REQUESTS
-                        .with_label_values(&["404"])
-                        .inc();
-
-                    tracing::error!("Sequencer failed to respond with; err={e}");
-                }
-            };
-            tracing::trace!("Sender to sequencer waiting for new payload...");
-        }
-
-        tracing::trace!("Task sender to sequencer ending");
-
-        TerminationReason::SequencerExitRequested
-    }
-
     async fn process_aggregated_consensus(
         mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
         feeds_config: HashMap<u32, FeedStrideAndDecimals>,
@@ -861,94 +545,6 @@ impl OracleTrigger {
         }
         TerminationReason::SequencerExitRequested
     }
-
-    async fn execute_wasm(
-        engine: Arc<TriggerAppEngine<Self>>,
-        component: &Component,
-        feeds: Vec<DataFeedSetting>,
-    ) -> anyhow::Result<Payload> {
-        let component_id = component.id.clone();
-        tracing::trace!("Loading guest for `{component_id }`");
-
-        // Load the guest...
-        let (instance, mut store) = engine.prepare_instance(&component_id).await?;
-        let instance = BlocksenseOracle::new(&mut store, &instance)?;
-
-        tracing::trace!("Successfully loaded guest for `{component_id}`");
-
-        // We are getting the spin configuration from the Outbound HTTP host component similar to
-        // `set_http_origin_from_request` in spin http trigger.
-        if let Some(outbound_http_handle) = engine
-            .engine
-            .find_host_component_handle::<Arc<OutboundHttpComponent>>()
-        {
-            let outbound_http_data = store
-                .host_components_data()
-                .get_or_insert(outbound_http_handle);
-            store.as_mut().data_mut().as_mut().allowed_hosts =
-                outbound_http_data.allowed_hosts.clone();
-        }
-
-        // ...and call the entry point
-        tracing::trace!(
-            "Triggering application: {}; component_id: {component_id}",
-            &engine.app_name
-        );
-
-        let wit_settings = oracle::Settings {
-            data_feeds: feeds
-                .iter()
-                .cloned()
-                .map(|feed| oracle::DataFeed {
-                    id: feed.id,
-                    data: feed.data,
-                })
-                .collect(),
-            capabilities: component
-                .capabilities
-                .iter()
-                .cloned()
-                .map(|capability| oracle::Capability {
-                    id: capability.id,
-                    data: capability.data,
-                })
-                .collect(),
-        };
-
-        let start_time = Instant::now();
-        tracing::trace!("Calling handle oracle request for `{component_id}`");
-        let result = instance
-            .call_handle_oracle_request(&mut store, &wit_settings)
-            .await;
-        let elapsed_time_ms = start_time.elapsed().as_millis();
-        tracing::trace!("Oracle request for `{component_id}` completed in {elapsed_time_ms}ms");
-        REPORTER_WASM_EXECUTION_TIME_GAUGE
-            .with_label_values(&[&component_id.clone()])
-            .set(elapsed_time_ms as i64);
-
-        match result {
-            Ok(Ok(payload)) => {
-                tracing::info!("Component {component_id} completed okay");
-                // TODO(stanm): increment metric for successful executions
-
-                Ok(payload)
-            }
-            Ok(Err(e)) => {
-                tracing::warn!("Component {component_id} returned error {:?}", e);
-                REPORTER_FAILED_WASM_EXECS
-                    .with_label_values(&[&component_id.clone()])
-                    .inc();
-                Err(anyhow::anyhow!("Component {component_id} returned error")) // TODO: more details when WIT provides them
-            }
-            Err(e) => {
-                tracing::error!("error running component {component_id}: {:?}", e);
-                REPORTER_FAILED_WASM_EXECS
-                    .with_label_values(&[&component_id.clone()])
-                    .inc();
-                Err(anyhow::anyhow!("Error executing component {component_id}"))
-            }
-        }
-    }
 }
 
 #[derive(Default)]
@@ -1024,25 +620,5 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
         Ok(HostFutureIncomingResponse::Pending(
             wasmtime_wasi::runtime::spawn(response_handle),
         ))
-    }
-}
-
-fn update_latest_votes(
-    latest_votes: &mut HashMap<u32, VotedFeedUpdate>,
-    batch: Vec<DataFeedPayload>,
-) {
-    for vote in batch {
-        let feed_id = vote.payload_metadata.feed_id.parse().unwrap();
-
-        if let Ok(value) = vote.result {
-            _ = latest_votes.insert(
-                feed_id,
-                VotedFeedUpdate {
-                    feed_id,
-                    value,
-                    end_slot_timestamp: vote.payload_metadata.timestamp,
-                },
-            );
-        }
     }
 }

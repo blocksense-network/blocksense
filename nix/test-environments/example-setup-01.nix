@@ -177,13 +177,13 @@ in
         ];
       };
 
-      eth-rpc = {
-        exec-interval = 10;
-        allowed-outbound-hosts = [
-          "https://eth.llamarpc.com"
-          "https://rpc.eth.gateway.fm"
-        ];
-      };
+      # eth-rpc = {
+      #   exec-interval = 10;
+      #   allowed-outbound-hosts = [
+      #     "https://eth.llamarpc.com"
+      #     "https://rpc.eth.gateway.fm"
+      #   ];
+      # };
 
       stock-price-feeds = {
         exec-interval = 60;
