@@ -21,7 +21,7 @@
   "scripts": {
     "clean": "git clean -fdx -e .env",
     "build": "hardhat compile && yarn build:tsc",
-    "build:tsc": "yarn run rollup:build-workspace",
+    "build:tsc": "yarn run -T tsc -p tsconfig.json",
     "sol-reflect": "hardhat reflect",
     "test": "hardhat test",
     "test:fork": "FORKING=true hardhat test --grep '@fork'",

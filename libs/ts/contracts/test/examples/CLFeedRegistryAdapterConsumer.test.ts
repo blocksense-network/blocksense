@@ -1,7 +1,10 @@
 import { artifacts, ethers } from 'hardhat';
 import { CLFeedRegistryAdapterConsumer } from '../../typechain';
 import { deployContract, TOKENS } from '../experiments/utils/helpers/common';
-import * as utils from './utils/clFeedRegistryAdapterConsumer';
+import {
+  RegistryConfig,
+  functions,
+} from './utils/clFeedRegistryAdapterConsumer';
 import { expect } from 'chai';
 import {
   CLAdapterWrapper,
@@ -77,39 +80,42 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
       );
   });
 
-  [
-    { title: 'get decimals', fnName: 'getDecimals' },
-    { title: 'get description', fnName: 'getDescription' },
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
-    { title: 'get feed', fnName: 'getFeed' },
-  ].forEach(data => {
+  (
+    [
+      { title: 'get decimals', fnName: 'getDecimals' } as const,
+      { title: 'get description', fnName: 'getDescription' } as const,
+      { title: 'get latest answer', fnName: 'getLatestAnswer' } as const,
+      { title: 'get latest round', fnName: 'getLatestRound' } as const,
+      { title: 'get latest round data', fnName: 'getLatestRoundData' } as const,
+      { title: 'get feed', fnName: 'getFeed' },
+    ] satisfies { title: string; fnName: FunctionName }[]
+  ).forEach(data => {
     it('Should ' + data.title, async function () {
-      await getAndCompareData(
-        [
-          [TOKENS.ETH, TOKENS.USD],
-          [TOKENS.BTC, TOKENS.USD],
-        ],
-        data.fnName as keyof typeof utils,
-      );
+      await getAndCompareData(data.fnName, [
+        [TOKENS.ETH, TOKENS.USD],
+        [TOKENS.BTC, TOKENS.USD],
+      ]);
     });
   });
 
   it('Should get round data', async function () {
-    await getAndCompareData(
-      [
-        [TOKENS.ETH, TOKENS.USD, 1],
-        [TOKENS.BTC, TOKENS.USD, 1],
-      ],
-      'getRoundData',
-    );
+    await getAndCompareData('getRoundData', [
+      [TOKENS.ETH, TOKENS.USD, 1],
+      [TOKENS.BTC, TOKENS.USD, 1],
+    ]);
   });
 
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
-  ) => {
+  type Functions = typeof functions;
+  type FunctionName = keyof Functions;
+  type FunctionParameters<F extends FunctionName> =
+    Parameters<Functions[F]> extends [RegistryConfig, ...infer Rest]
+      ? Rest
+      : never;
+
+  async function getAndCompareData<F extends FunctionName>(
+    functionName: F,
+    data: FunctionParameters<F>,
+  ) {
     const contractData1 = await clFeedRegistryAdapterConsumer.getFunction(
       functionName,
     )(...data[0]);
@@ -122,10 +128,11 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
       abiJson: (await artifacts.readArtifact('CLFeedRegistryAdapterExp')).abi,
       provider: feedRegistry.contract.runner!,
     };
-    const utilData1 = await utils[functionName](config, ...data[0]);
-    const utilData2 = await utils[functionName](config, ...data[1]);
+    const args = data[0][0];
+    const utilData1 = await functions[functionName](config, ...data);
+    const utilData2 = await functions[functionName](config, ...data[1]);
 
     expect(contractData1).to.deep.equal(utilData1);
     expect(contractData2).to.deep.equal(utilData2);
-  };
+  }
 });
