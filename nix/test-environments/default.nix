@@ -1,10 +1,13 @@
-{ self, ... }:
+{
+  self,
+  lib,
+  ...
+}:
 {
   perSystem =
     {
       pkgs,
       config,
-      lib,
       ...
     }:
     let
@@ -107,18 +110,19 @@
       };
 
       checks = {
-        services-started = pkgs.testers.runNixOSTest {
-          name = "services-started";
+        example-setup-01 = pkgs.testers.runNixOSTest {
+          name = "example-setup-01";
           nodes.machine = {
             imports = [
               self.nixosModules.blocksense-systemd
               ./example-setup-01.nix
+              self.nixosModules.example-setup-vm
             ];
           };
           testScript = ''
             machine.start();
-            machine.wait_for_unit("blocksense-reporter-a.service");
             machine.wait_for_unit("blocksense-sequencer.service");
+            machine.wait_for_unit("blocksense-reporter-a.service");
             machine.wait_for_unit("blocksense-anvil-ethereum-sepolia.service");
             machine.wait_for_unit("blocksense-anvil-ink-sepolia.service");
           '';
