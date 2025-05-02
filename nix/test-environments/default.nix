@@ -60,7 +60,7 @@
           ];
         });
 
-      checks = {
+      legacyPackages.nixosTests = {
         example-setup-01 = pkgs.testers.runNixOSTest {
           name = "example-setup-01";
           nodes.machine = {
