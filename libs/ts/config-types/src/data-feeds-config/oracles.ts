@@ -42,3 +42,17 @@ export const stockPriceFeedsArgsSchema = S.mutable(
     providers: S.Array(S.String),
   }),
 );
+
+// `eth-rpc` Oracle related Types
+// Schema for a single URL string
+const UrlSchema = S.String.pipe(
+  S.pattern(/^https?:\/\/[^\s/$.?#].[^\s]*$/),
+  S.annotations({
+    identifier: 'HttpUrl',
+    description: 'A valid HTTP/HTTPS URL',
+  }),
+);
+
+export const ethRpcArgsSchema = S.mutable(S.Array(UrlSchema)).annotations({
+  identifier: 'EthRpcOracleArgs',
+});

@@ -12,6 +12,7 @@ use blocksense_sdk::{
 };
 use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::str::FromStr;
 use url::Url;
 
@@ -22,6 +23,14 @@ sol!(
     #[sol(rpc)]
     YnETHx,
     "src/abi/YnETHx.json"
+);
+
+sol!(
+    #[allow(missing_docs)]
+    #[allow(clippy::too_many_arguments)]
+    #[sol(rpc)]
+    YieldFiyUSD,
+    "src/abi/YieldFiyUSD.json"
 );
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -51,6 +60,14 @@ pub struct ResponseEthCall {
     pub id: Option<u64>,
     pub error: Option<ResponseEthCallError>,
     pub result: Option<String>,
+    #[serde(default)]
+    pub rpc_url: Option<String>,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct ResponsePerFeed {
+    pub feed_id: u128,
+    pub res: ResponseEthCall,
 }
 
 fn convert(x: [u8; 32]) -> ([u8; 16], [u8; 16]) {
@@ -109,38 +126,105 @@ impl RequestEthCall {
     }
 }
 
-async fn fetch_all(_resourses: &[FeedConfig]) -> Result<ResponseEthCall> {
-    //let rpc_url = "https://rpc.eth.gateway.fm".parse()?;
-    let rpc_url: Url = "https://eth.llamarpc.com".parse()?;
-    let yn_eth_x_contract_address = address!("0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb");
+type FetchedDataForFeed = HashMap<u64, ResponseEthCall>;
+type MyProvider = alloy::providers::fillers::FillProvider<
+    alloy::providers::fillers::JoinFill<
+        alloy::providers::Identity,
+        alloy::providers::fillers::JoinFill<
+            alloy::providers::fillers::GasFiller,
+            alloy::providers::fillers::JoinFill<
+                alloy::providers::fillers::BlobGasFiller,
+                alloy::providers::fillers::JoinFill<
+                    alloy::providers::fillers::NonceFiller,
+                    alloy::providers::fillers::ChainIdFiller,
+                >,
+            >,
+        >,
+    >,
+    alloy::providers::RootProvider,
+>;
 
-    // Create a provider, in order to create instance of the contract
-    let provider = ProviderBuilder::new().on_http(rpc_url.clone());
-    let contact = YnETHx::new(yn_eth_x_contract_address, provider);
+fn yn_ethx_call(provider: MyProvider, id: u64) -> RequestEthCall {
+    let address = address!("0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb");
+    let contact = YnETHx::new(address, provider.clone());
     let shares = U256::from(1_000_000_000_000_000_000_u64);
-
     let x = contact.convertToAssets(shares);
     let calldata = x.calldata().clone();
-    let eth_call = RequestEthCall::latest(&calldata, &yn_eth_x_contract_address, 12345);
-
-    let value: ResponseEthCall = http_post_json(rpc_url.as_str(), eth_call).await?;
-    Ok(value)
+    RequestEthCall::latest(&calldata, &address, id)
 }
 
-fn process_results(resourses: &[FeedConfig], results: &ResponseEthCall) -> Result<Payload> {
+fn yn_bnbx_call(provider: MyProvider, id: u64) -> RequestEthCall {
+    let address = address!("0x32c830f5c34122c6afb8ae87aba541b7900a2c5f");
+    let contact = YnETHx::new(address, provider.clone());
+    let shares = U256::from(1_000_000_000_000_000_000_u64);
+    let x = contact.convertToAssets(shares);
+    let calldata = x.calldata().clone();
+    RequestEthCall::latest(&calldata, &address, id)
+}
+
+fn yield_fi_yusd_call(provider: MyProvider, id: u64) -> RequestEthCall {
+    let address = address!("0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb");
+    let contact = YieldFiyUSD::new(address, provider.clone());
+    let x = contact.exchangeRate();
+    let calldata = x.calldata().clone();
+    RequestEthCall::latest(&calldata, &address, id)
+}
+
+async fn fetch_all(resourses: &[FeedConfig]) -> Result<FetchedDataForFeed> {
+    let mut res = FetchedDataForFeed::new();
+    for feed_config in resourses {
+        if let Some(value) = fetch_value_for_feed(feed_config).await? {
+            res.insert(feed_config.feed_id, value);
+        }
+    }
+    Ok(res)
+}
+
+async fn fetch_value_for_feed(
+    feed_config: &FeedConfig,
+) -> Result<Option<ResponseEthCall>, anyhow::Error> {
+    let mut last_value = None;
+    for rpc_url_candidate in &feed_config.arguments {
+        let rpc_url: Url = rpc_url_candidate.as_str().parse()?;
+        let provider = ProviderBuilder::new().on_http(rpc_url.clone());
+        let eth_call = match feed_config.feed_id {
+            100001 => yn_ethx_call(provider.clone(), 12345 + 998),
+            100002 => yield_fi_yusd_call(provider.clone(), 12345 + 128),
+            100003 => yn_bnbx_call(provider.clone(), 12345 + 129),
+            _ => {
+                break;
+            }
+        };
+        let mut value: ResponseEthCall = http_post_json(rpc_url.as_str(), eth_call).await?;
+        value.rpc_url = Some(rpc_url_candidate.to_string());
+        if value.error.is_none() {
+            return Ok(Some(value));
+        } else {
+            last_value = Some(value);
+        }
+    }
+    Ok(last_value)
+}
+
+fn process_results(results: &FetchedDataForFeed) -> Result<Payload> {
     let mut payload: Payload = Payload::new();
-    let value = match results.result_as_f64() {
-        Ok(x) => DataFeedResultValue::Numerical(x),
-        Err(e) => DataFeedResultValue::Error(e.to_string()),
-    };
-    payload.values.push(DataFeedResult {
-        id: resourses[0].feed_id.to_string(),
-        value,
-    });
+    for (feed_id, r) in results {
+        let value = match r.result_as_f64() {
+            Ok(x) => DataFeedResultValue::Numerical(x),
+            Err(e) => DataFeedResultValue::Error(e.to_string()),
+        };
+        payload.values.push(DataFeedResult {
+            id: feed_id.to_string(),
+            value,
+        });
+    }
     Ok(payload)
 }
 
-fn print_results(_resourses: &[FeedConfig], payload: &Payload) {
+fn print_results(results: &FetchedDataForFeed, payload: &Payload) {
+    let mut keys = results.keys().cloned().collect::<Vec<u64>>();
+    keys.sort();
+
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
 
@@ -148,15 +232,27 @@ fn print_results(_resourses: &[FeedConfig], payload: &Payload) {
         Cell::new("Feed ID").style_spec("bc"),
         Cell::new("Method").style_spec("bc"),
         Cell::new("Value").style_spec("bc"),
+        Cell::new("RPC Url").style_spec("bc"),
     ]));
 
-    for p in payload.values.iter() {
-        let id = p.id.clone();
-        let value = format!("{:?}", p.value);
+    for key in keys {
+        let description = match key {
+            100001 => "YnETHx -> convertToAssets",
+            100002 => "YToken -> exchangeRate",
+            100003 => "YnBNBx -> convertToAssets",
+            _ => "unknown",
+        };
+        let rpc_url = format!("{:?}", results.get(&key).unwrap().rpc_url);
+        let value = payload
+            .values
+            .iter()
+            .find(|p| p.id == key.to_string())
+            .map_or("missing".to_string(), |x| format!("{:?}", x.value));
         table.add_row(Row::new(vec![
-            Cell::new(&id.to_string()).style_spec("r"),
-            Cell::new("YnETHx -> convertToAssets").style_spec("r"),
+            Cell::new(&key.to_string()).style_spec("r"),
+            Cell::new(description).style_spec("l"),
             Cell::new(&value).style_spec("r"),
+            Cell::new(&rpc_url).style_spec("r"),
         ]));
     }
 
@@ -168,8 +264,8 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("Starting oracle component - YnETHx Terminal");
     let resources = get_resources_from_settings(&settings)?;
     let results = fetch_all(&resources).await?;
-    let payload = process_results(&resources, &results)?;
-    print_results(&resources, &payload);
+    let payload = process_results(&results)?;
+    print_results(&results, &payload);
     Ok(payload)
 }
 
@@ -183,6 +279,7 @@ pub struct Pair {
 struct FeedConfig {
     #[serde(default)]
     pub feed_id: u64,
+    pub arguments: Vec<String>,
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
