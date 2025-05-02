@@ -303,3 +303,27 @@ jobs:
             | 🌱 [Documentation](${{ needs.deploy_websites.outputs.docsDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
             | 📖 [Docs UI Components](${{ needs.deploy_websites.outputs.docsUiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
             | 📝 [UI Components](${{ needs.deploy_websites.outputs.uiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
+
+  nixos-test:
+    runs-on: [self-hosted, nixos, x86-64-v3]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v17
+        if: ${{ runner.environment == 'github-hosted' }}
+        with:
+          extra-conf: accept-flake-config = true
+
+      - uses: cachix/cachix-action@v16
+        with:
+          name: ${{ vars.CACHIX_CACHE }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
+          env >> "$GITHUB_ENV"
+
+      - name: Run NixOS tests
+        run: nix eval --json .#legacyPackages.x86_64-linux.nixosTests --apply "builtins.attrNames" | jq -r '.[]' | xargs -I {} nix build -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests.{}
