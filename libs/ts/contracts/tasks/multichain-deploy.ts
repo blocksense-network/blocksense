@@ -18,6 +18,7 @@ import { padNumber } from '@blocksense/base-utils/string';
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { predictAddress } from './utils';
 import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
+import { initChain } from './deployment-utils/init-chain';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -28,7 +29,7 @@ task('deploy', 'Deploy contracts')
       if (!isNetworkName(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await run('init-chain', { networkName: network }));
+      configs.push(await initChain(ethers, network));
     }
 
     const { feeds } = await readConfig('feeds_config_v2');
