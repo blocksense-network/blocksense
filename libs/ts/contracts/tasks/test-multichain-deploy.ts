@@ -14,6 +14,7 @@ import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
 import { Feed, WriteOp } from '../test/utils/wrappers/types';
 
 import { expect } from 'chai';
+import { initChain } from './deployment-utils/init-chain';
 
 task(
   'test-deploy',
@@ -35,7 +36,7 @@ task(
 
   const networkName = 'local';
 
-  const config: NetworkConfig = await run('init-chain', { networkName });
+  const config = await initChain(ethers, networkName);
 
   if (!config.deployWithSequencerMultisig) {
     console.log('Test needs sequencer multisig set!');
