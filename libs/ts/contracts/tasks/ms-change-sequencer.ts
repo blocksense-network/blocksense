@@ -9,12 +9,13 @@ import {
 } from '@safe-global/safe-core-sdk-types';
 import { adjustVInSignature } from '@safe-global/protocol-kit/dist/src/utils';
 import { readEvmDeployment } from '@blocksense/config-types';
+import { initChain } from './deployment-utils/init-chain';
 
 task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
   .addParam('sequencerAddress', 'Sequencer address')
   .addParam('setRole', 'Enable/Disable sequencer address role in AC')
-  .setAction(async (args, { ethers, run }) => {
+  .setAction(async (args, { ethers }) => {
     console.log('args', args);
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
@@ -22,7 +23,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
       if (!isNetworkName(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await run('init-chain', { networkName: network }));
+      configs.push(await initChain(ethers, network));
     }
 
     for (const config of configs) {
