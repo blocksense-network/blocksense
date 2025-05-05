@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -83,6 +83,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       suppressHydrationWarning
     >
       <GoogleTagManager gtmId="GTM-WB9ZRVTV" />
+      <GoogleAnalytics gaId="G-7E3PF0WSSM" />
       <body className="nft-drop-layout__body">
         <Navbar />
         <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
