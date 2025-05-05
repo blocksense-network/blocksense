@@ -16,13 +16,38 @@ jobs:
         include:
           - downstream-repo: 'blocksense-network/infra'
     steps:
+      - name: Compare nix outputs
+        id: compare
+        run: |
+          # Define your command here (replace this example)
+          CMD="nix eval --raw .\#nixosConfigurations.example-setup-01.config.system.build.toplevel.outPath1"
+
+          # Get current output
+          CURRENT_OUTPUT=$(eval "$CMD")
+          echo "Current output: $CURRENT_OUTPUT"
+
+          # Get previous commit output
+          git checkout ${{ github.event.before }}
+          PREVIOUS_OUTPUT=$(eval "$CMD")
+          echo "Previous output: $PREVIOUS_OUTPUT"
+          git checkout -
+
+          # Set output variable
+          if [ "$CURRENT_OUTPUT" != "$PREVIOUS_OUTPUT" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
       - uses: tibdex/github-app-token@v2.1.0
+        if: steps.compare.outputs.changed == 'true'
         id: generate-token
         with:
           app_id: ${{ secrets.NIX_FLAKE_UPDATE_PR_BOT_APP_ID }}
           private_key: ${{ secrets.NIX_FLAKE_UPDATE_PR_BOT_APP_PRIVATE_KEY }}
 
       - name: Trigger Downstream Pipeline
+        if: steps.compare.outputs.changed == 'true'
         run: |
           curl -L -X POST \
             -H "Accept: application/vnd.github+json" \
