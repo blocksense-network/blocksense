@@ -36,9 +36,12 @@ in
 {
   flake.nixosModules.example-setup-vm = {
     nix.settings.sandbox = false;
-    networking.useHostResolvConf = true;
-    systemd.services.network-online.enable = true;
-    systemd.targets.network-online.wantedBy = lib.mkForce [ "mult-user.target" ];
+    networking.useNetworkd = true;
+    systemd = {
+      network.enable = true;
+      network.wait-online.enable = false;
+      services.network-online.enable = true;
+    };
     environment.defaultPackages = [ self.legacyPackages.x86_64-linux.foundry ];
   };
   flake.nixosConfigurations = {

@@ -326,4 +326,4 @@ jobs:
           env >> "$GITHUB_ENV"
 
       - name: Run NixOS tests
-        run: nix eval --json .#legacyPackages.x86_64-linux.nixosTests --apply "builtins.attrNames" | jq -r '.[]' | xargs -I {} nix build -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests.{}
+        run: nix eval --json .#legacyPackages.x86_64-linux.nixosTests --apply "builtins.attrNames" | jq -r '.[]' | xargs -I {} nix build --option sandbox false -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests.{}
