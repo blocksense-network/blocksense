@@ -27,3 +27,10 @@ export const DiscordUserInfoResponseSchema = S.Array(
     user: S.Struct({ id: S.String, username: S.String }),
   }),
 );
+
+export const ParticipantPayloadSchema = S.Struct({
+  xHandle: S.String,
+  discordUsername: S.String,
+  walletAddress: S.String,
+  walletSignature: S.String,
+});

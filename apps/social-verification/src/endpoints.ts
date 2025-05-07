@@ -23,6 +23,7 @@ import {
   XUserInfoResponseSchema,
 } from './types';
 import { fetchAndDecodeJSON } from './utils';
+import { cons } from 'effect/List';
 
 type ApiEndpoint<RequestA, RequestI, ResponseA, ResponseI> = {
   method: HttpMethod;
@@ -93,6 +94,17 @@ export const VerifyApiLive = HttpApiBuilder.api(verifyApi).pipe(
       handlers.handle('generateMintSignature', ({ payload }) =>
         server.generateMintSignature(payload),
       ),
+    ),
+  ),
+  Layer.provide(
+    HttpApiBuilder.group(verifyApi, 'participants', handlers =>
+      handlers
+        .handle('saveParticipant', ({ payload }) =>
+          server.saveParticipant(payload),
+        )
+        .handle('checkParticipant', ({ payload }) =>
+          server.checkParticipant(payload),
+        ),
     ),
   ),
 );
@@ -305,6 +317,76 @@ export const server: ApiServer<Api> = {
         catch: error => {
           console.error('Error getting mint signature:', error);
           throw new Error('Error getting mint signature');
+        },
+      });
+    }),
+
+  saveParticipant: payload =>
+    Effect.contextWithEffect(context => {
+      const env = getEnv(context);
+
+      return Effect.tryPromise({
+        try: async () => {
+          const db = env.DB;
+
+          console.log(
+            `Inserting participant data.\n` + JSON.stringify(payload),
+          );
+
+          const insertQuery =
+            'INSERT INTO participants (x_handle, discord_username, wallet_address, wallet_signature) VALUES (?, ?, ?, ?)';
+          const insertResult = await db
+            .prepare(insertQuery)
+            .bind(
+              payload.xHandle,
+              payload.discordUsername,
+              payload.walletAddress,
+              payload.walletSignature,
+            )
+            .all();
+
+          console.log(`Successfully inserted participant data`);
+
+          return { isSuccessful: insertResult.success };
+        },
+        catch: error => {
+          console.error('Error inserting data into database:', error);
+          throw new Error('Failed to insert data into database');
+        },
+      });
+    }),
+
+  checkParticipant: payload =>
+    Effect.contextWithEffect(context => {
+      const env = getEnv(context);
+
+      return Effect.tryPromise({
+        try: async () => {
+          const db = env.DB;
+
+          console.log(`Checking participant data:\n` + JSON.stringify(payload));
+
+          const selectQuery =
+            'SELECT * FROM participants WHERE x_handle = ? AND discord_username = ? AND wallet_address = ? AND wallet_signature = ?';
+          const selectResult = await db
+            .prepare(selectQuery)
+            .bind(
+              payload.xHandle,
+              payload.discordUsername,
+              payload.walletAddress,
+              payload.walletSignature,
+            )
+            .all();
+
+          const isParticipant = selectResult.results.length > 0;
+
+          console.log(`Participant check result: ${isParticipant}`);
+
+          return { isParticipant: isParticipant };
+        },
+        catch: error => {
+          console.error('Error checking data in database:', error);
+          throw new Error('Failed to check data in database');
         },
       });
     }),

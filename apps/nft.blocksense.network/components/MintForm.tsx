@@ -63,6 +63,35 @@ const mintNftBackend = (accountAddress: string) =>
     }),
   );
 
+type ParticipantPayload = {
+  xHandle: string;
+  discordUsername: string;
+  walletAddress: string;
+  walletSignature: string;
+};
+
+const saveParticipant = (payload: ParticipantPayload) =>
+  Effect.runPromise(
+    Effect.gen(function* () {
+      const client = yield* apiClient;
+      const response = yield* client.participants.saveParticipant({
+        payload,
+      });
+      return response;
+    }),
+  );
+
+const checkParticipant = (payload: ParticipantPayload) =>
+  Effect.runPromise(
+    Effect.gen(function* () {
+      const client = yield* apiClient;
+      const response = yield* client.participants.checkParticipant({
+        payload,
+      });
+      return response;
+    }),
+  );
+
 const separatorClassName = 'mint-form__separator md:my-8 my-6';
 
 type MintFormProps = {
@@ -104,6 +133,22 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
     }
 
     setMintLoading(true);
+
+    const participantsPayload = {
+      xHandle,
+      discordUsername: discord,
+      walletAddress: account.address,
+      walletSignature: retweetCode,
+    };
+
+    const { isParticipant } = await checkParticipant(participantsPayload);
+
+    if (isParticipant) {
+      setRetweetError('You have already minted your NFT');
+      setMintLoading(false);
+      return;
+    }
+
     try {
       const { payload, signature } = await mintNftBackend(account.address);
       await mintNFT(account, payload, signature);
@@ -113,6 +158,8 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
         discord,
         retweetCode,
       });
+
+      await saveParticipant(participantsPayload);
 
       onSuccessAction();
     } catch (err: any) {
