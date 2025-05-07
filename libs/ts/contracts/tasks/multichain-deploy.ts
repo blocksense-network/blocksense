@@ -19,6 +19,7 @@ import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deplo
 import { predictAddress } from './utils';
 import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
 import { initChain } from './deployment-utils/init-chain';
+import { deployContracts } from './deployment-utils/deploy-contracts';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -177,7 +178,7 @@ task('deploy', 'Deploy contracts')
             name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
-              data.description,
+              data.full_name,
               data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
@@ -226,10 +227,12 @@ task('deploy', 'Deploy contracts')
         });
       }
 
-      const deployData = await run('deploy-contracts', {
+      const deployData = await deployContracts({
         config,
         adminMultisig,
         contracts,
+        run,
+        artifacts,
       });
 
       deployData.coreContracts.OnlySequencerGuard ??= {
@@ -238,14 +241,14 @@ task('deploy', 'Deploy contracts')
       };
 
       chainsDeployment[networkName] = {
-        name: networkName,
+        network: networkName,
         chainId,
         contracts: {
           ...deployData,
           AdminMultisig: adminMultisigAddress,
           SequencerMultisig:
             sequencerMultisigAddress === ethers.ZeroAddress
-              ? undefined
+              ? null
               : sequencerMultisigAddress,
         },
       };
@@ -289,11 +292,11 @@ function fmtEth(balance: bigint) {
   return `${formatEther(balance)} ETH (${balance} wei)`;
 }
 
-const saveDeployment = async (
+async function saveDeployment(
   configs: NetworkConfig[],
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
-) => {
+) {
   for (const { networkName } of configs) {
     await writeEvmDeployment(networkName, chainsDeployment[networkName]);
   }
-};
+}
