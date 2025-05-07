@@ -65,6 +65,7 @@
     "typechain": "^8.3.2"
   },
   "dependencies": {
+    "effect": "^3.14.19",
     "tslib": "^2.8.1"
   }
 }
