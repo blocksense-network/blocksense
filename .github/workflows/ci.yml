@@ -322,8 +322,8 @@ jobs:
 
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Run NixOS tests
-        run: nix eval --json .#legacyPackages.x86_64-linux.nixosTests --apply "builtins.attrNames" | jq -r '.[]' | xargs -I {} nix build --option sandbox false -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests.{}
+        run: just run-tests
