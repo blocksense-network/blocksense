@@ -43,6 +43,24 @@ start-blocksense:
   just build-blocksense
   process-compose up
 
+eval-machine machine commit="working-tree":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  if [[ "{{ commit }}" == "working-tree" ]]; then
+    NIX_TARGET="{{ root-dir }}"
+  else
+    NIX_TARGET="github:blocksense-network/blocksense?rev={{commit}}"
+  fi
+  nix eval --raw "${NIX_TARGET}#nixosConfigurations.{{machine}}.config.system.build.toplevel.outPath"
+
+run-tests:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  nix eval --json .#legacyPackages.x86_64-linux.nixosTests --apply "builtins.attrNames" | \
+    jq -r '.[]' | \
+    xargs -I {} \
+    nix build --option sandbox false -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests.{}
+
 clean:
   git clean -fdx \
     -e .env \
