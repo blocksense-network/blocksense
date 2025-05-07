@@ -7,16 +7,29 @@
     "noImplicitOverride": false,
     "noPropertyAccessFromIndexSignature": false,
     "moduleResolution": "NodeNext",
+    "allowJs": false,
     "outDir": "dist",
     "rootDirs": [
       "@types",
       "scripts",
+      "tasks",
       "test",
       "typechain",
     ],
   },
-  "include": [ "**/*.ts", "**/*.d.ts" ],
-  "exclude": [ "artifacts", "cache", "dist" ],
+  "include": [
+    "@types/**/*.d.ts",
+    "scripts/*.ts",
+    "tasks/**/*.ts",
+    "test/**/*.ts",
+    "typechain/*.ts"
+  ],
+  "exclude": [
+    "artifacts",
+    "cache",
+    "contracts",
+    "dist"
+  ],
   "files": [
     "./hardhat.config.ts"
   ]

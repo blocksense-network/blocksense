@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv';
-
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
@@ -9,7 +7,7 @@ import 'solidity-coverage';
 import '@typechain/hardhat';
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
-import '../sol-reflector/src';
+import '@blocksense/sol-reflector';
 
 import { fromEntries } from '@blocksense/base-utils/array-iter';
 import {
@@ -20,8 +18,6 @@ import {
 
 import './tasks';
 import { getOptionalEnvString } from '@blocksense/base-utils';
-
-dotenv.config();
 
 const config: HardhatUserConfig = {
   reflect: {

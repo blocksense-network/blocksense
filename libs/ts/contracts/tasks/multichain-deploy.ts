@@ -19,6 +19,7 @@ import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deplo
 import { predictAddress } from './utils';
 import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
 import { initChain } from './deployment-utils/init-chain';
+import { deployContracts } from './deployment-utils/deploy-contracts';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -37,10 +38,10 @@ task('deploy', 'Deploy contracts')
       'chainlink_compatibility_v2',
     );
 
-    const getCLRegistryPair = (feedId: number | bigint) => {
-      const { base, quote } =
-        chainlinkCompatibility.blocksenseFeedsCompatibility[feedId.toString()]
-          .chainlink_compatibility;
+    const getCLRegistryPair = (feedId: bigint) => {
+      const data =
+        chainlinkCompatibility.blocksenseFeedsCompatibility[feedId.toString()];
+      const { base, quote } = data.chainlink_compatibility;
       return { base, quote };
     };
 
@@ -67,10 +68,7 @@ task('deploy', 'Deploy contracts')
       const create2ContractSalts = {
         accessControl: ethers.id('accessControl'),
         adfs: ethers.id('aggregatedDataFeedStore'),
-        proxy: getOptionalEnvString(
-          'ADFS_UPGRADEABLE_PROXY_SALT',
-          ethers.id('upgradeableProxy'),
-        ),
+        proxy: config.adfsUpgradeableProxySalt,
         safeGuard: ethers.id('onlySafeGuard'),
         safeModule: ethers.id('adminExecutorModule'),
         clFeedRegistry: ethers.id('registry'),
@@ -113,16 +111,6 @@ task('deploy', 'Deploy contracts')
       const adminMultisigAddress = parseEthereumAddress(
         await adminMultisig.getAddress(),
       );
-
-      // const accessControlSalt = ethers.id('accessControl');
-      // const adfsSalt = ethers.id('aggregatedDataFeedStore');
-      // // env variable can be set to achieve an address that starts with '0xADF5'
-      // const proxySalt = getOptionalEnvString(
-      //   'ADFS_UPGRADEABLE_PROXY_SALT',
-      //   ethers.id('upgradeableProxy'),
-      // );
-      // const safeGuardSalt = ethers.id('onlySafeGuard');
-      // const safeModuleSalt = ethers.id('adminExecutorModule');
 
       const accessControlAddress = await predictAddress(
         artifacts,
@@ -174,7 +162,7 @@ task('deploy', 'Deploy contracts')
             name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
-              data.description,
+              data.full_name,
               data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
@@ -223,10 +211,12 @@ task('deploy', 'Deploy contracts')
         });
       }
 
-      const deployData = await run('deploy-contracts', {
+      const deployData = await deployContracts({
         config,
         adminMultisig,
         contracts,
+        run,
+        artifacts,
       });
 
       deployData.coreContracts.OnlySequencerGuard ??= {
@@ -235,14 +225,14 @@ task('deploy', 'Deploy contracts')
       };
 
       chainsDeployment[networkName] = {
-        name: networkName,
+        network: networkName,
         chainId,
         contracts: {
           ...deployData,
           AdminMultisig: adminMultisigAddress,
           SequencerMultisig:
             sequencerMultisigAddress === ethers.ZeroAddress
-              ? undefined
+              ? null
               : sequencerMultisigAddress,
         },
       };
@@ -286,11 +276,11 @@ function fmtEth(balance: bigint) {
   return `${formatEther(balance)} ETH (${balance} wei)`;
 }
 
-const saveDeployment = async (
+async function saveDeployment(
   configs: NetworkConfig[],
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
-) => {
+) {
   for (const { networkName } of configs) {
     await writeEvmDeployment(networkName, chainsDeployment[networkName]);
   }
-};
+}

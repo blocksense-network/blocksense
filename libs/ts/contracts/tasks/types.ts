@@ -1,21 +1,23 @@
+import { HexDataString } from '@blocksense/base-utils/buffer-and-hex';
 import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { JsonRpcProvider, Network, Signer, Wallet } from 'ethers';
 
 export interface MultisigConfig {
   signer?: Wallet;
-  owners: EthereumAddress[];
+  owners: readonly EthereumAddress[];
   threshold: number;
 }
 
-interface NetworkConfigBase {
+export interface NetworkConfigBase {
   rpc: string;
   provider: JsonRpcProvider;
   network: Network;
   networkName: NetworkName;
+  adfsUpgradeableProxySalt: HexDataString;
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
   adminMultisig: MultisigConfig;
-  feedIds: 'all' | number[];
+  feedIds: 'all' | readonly bigint[];
   safeAddresses: {
     multiSendAddress: EthereumAddress;
     multiSendCallOnlyAddress: EthereumAddress;
@@ -30,13 +32,13 @@ interface NetworkConfigBase {
   };
 }
 
-interface NetworkConfigWithLedger extends NetworkConfigBase {
+export interface NetworkConfigWithLedger extends NetworkConfigBase {
   ledgerAccount: Signer;
   sequencerMultisig: Omit<MultisigConfig, 'signer'> & { signer?: undefined };
   adminMultisig: Omit<MultisigConfig, 'signer'> & { signer?: undefined };
 }
 
-interface NetworkConfigWithoutLedger extends NetworkConfigBase {
+export interface NetworkConfigWithoutLedger extends NetworkConfigBase {
   ledgerAccount?: undefined;
   sequencerMultisig: MultisigConfig;
   adminMultisig: MultisigConfig;
