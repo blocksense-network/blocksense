@@ -4,7 +4,8 @@
     "lib": [
       "ES2022",
       "DOM",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "ES2024.Promise" // polyfilled in @blocksense/base-utils
     ],
     "noEmit": true,
     "allowJs": true,
