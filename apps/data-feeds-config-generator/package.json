@@ -33,7 +33,7 @@
     "@octokit/rest": "^21.1.1",
     "@types/keccak": "^3",
     "@types/node": "^22.10.2",
-    "effect": "^3.12.1",
+    "effect": "^3.15.1",
     "glob": "^11.0.0",
     "keccak": "^3.0.4",
     "keccak256": "^1.0.6",
