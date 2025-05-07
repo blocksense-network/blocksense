@@ -19,18 +19,13 @@ jobs:
       - name: Compare nix outputs
         id: compare
         run: |
-          # Define your command here (replace this example)
-          CMD="nix eval --raw .\#nixosConfigurations.example-setup-01.config.system.build.toplevel.outPath1"
-
           # Get current output
-          CURRENT_OUTPUT=$(eval "$CMD")
-          echo "Current output: $CURRENT_OUTPUT"
+          CURRENT_OUTPUT="$(just eval-machine "example-setup-01")"
+          echo "After: '$CURRENT_OUTPUT'"
 
           # Get previous commit output
-          git checkout ${{ github.event.before }}
-          PREVIOUS_OUTPUT=$(eval "$CMD")
-          echo "Previous output: $PREVIOUS_OUTPUT"
-          git checkout -
+          PREVIOUS_OUTPUT="$(just eval-machine "example-setup-01" "${{ github.event.before }}")"
+          echo "Before: '$PREVIOUS_OUTPUT'"
 
           # Set output variable
           if [ "$CURRENT_OUTPUT" != "$PREVIOUS_OUTPUT" ]; then

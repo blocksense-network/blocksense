@@ -21,9 +21,6 @@ let
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
 {
-  services.kafka = {
-    enable = true;
-  };
   services.blocksense = {
     enable = true;
 
