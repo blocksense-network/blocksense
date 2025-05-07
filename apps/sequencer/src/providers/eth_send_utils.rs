@@ -1058,7 +1058,6 @@ mod tests {
             .deploy_contract(network1, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
             .await
             .expect("contract deployment failed");
-
         // assert
         // validate contract was deployed at expected address
         let extracted_address = extract_address(&msg);
@@ -1133,7 +1132,7 @@ mod tests {
                 .find(|x| x.name == MULTICALL_CONTRACT_NAME)
                 .and_then(|x| {
                     x.address = None;
-                    x.byte_code = Some(Multicall::BYTECODE.to_string());
+                    x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
                     Some(x)
                 });
             p.contracts
