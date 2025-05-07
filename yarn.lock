@@ -1994,6 +1994,7 @@ __metadata:
     "@types/node": "npm:^22.10.2"
     chai: "npm:4"
     dotenv: "npm:^16.4.7"
+    effect: "npm:^3.15.1"
     ejs: "npm:^3.1.10"
     ethers: "npm:^6.13.4"
     hardhat: "npm:^2.22.17"
