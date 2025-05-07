@@ -2,8 +2,13 @@
   pkgs,
   self',
   config,
+  lib,
+  inputs',
   ...
 }:
+let
+  ldLibraryPath = lib.makeLibraryPath self'.legacyPackages.commonLibDeps;
+in
 {
   env = {
     SEQUENCER_CONFIG_DIR = config.devenv.root + "/apps/sequencer";
@@ -13,6 +18,8 @@
   };
 
   enterShell = ''
+    export LD_LIBRARY_PATH="${ldLibraryPath}:$LD_LIBRARY_PATH"
+
     if [ "''${CMC_API_KEY:-}" != "" ]; then
       echo "$CMC_API_KEY" > nix/test-environments/test-keys/CMC_API_KEY
     fi
@@ -24,7 +31,7 @@
 
   packages = self'.packages.blocksense-rs.buildInputs ++ [
     self'.legacyPackages.cargoWrapped
-    self'.legacyPackages.spinWrapped
+    inputs'.nixpkgs-unstable.legacyPackages.fermyon-spin
     self'.legacyPackages.rustToolchain
     pkgs.cargo-tarpaulin
   ];
