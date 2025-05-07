@@ -8,7 +8,7 @@ export interface MultisigConfig {
   threshold: number;
 }
 
-interface NetworkConfigBase {
+export interface NetworkConfigBase {
   rpc: string;
   provider: JsonRpcProvider;
   network: Network;
@@ -32,13 +32,13 @@ interface NetworkConfigBase {
   };
 }
 
-interface NetworkConfigWithLedger extends NetworkConfigBase {
+export interface NetworkConfigWithLedger extends NetworkConfigBase {
   ledgerAccount: Signer;
   sequencerMultisig: Omit<MultisigConfig, 'signer'> & { signer?: undefined };
   adminMultisig: Omit<MultisigConfig, 'signer'> & { signer?: undefined };
 }
 
-interface NetworkConfigWithoutLedger extends NetworkConfigBase {
+export interface NetworkConfigWithoutLedger extends NetworkConfigBase {
   ledgerAccount?: undefined;
   sequencerMultisig: MultisigConfig;
   adminMultisig: MultisigConfig;
