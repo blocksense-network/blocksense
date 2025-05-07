@@ -190,7 +190,7 @@ task('deploy', 'Deploy contracts')
             name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
-              data.description,
+              data.full_name,
               data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
@@ -253,14 +253,14 @@ task('deploy', 'Deploy contracts')
       };
 
       chainsDeployment[networkName] = {
-        name: networkName,
+        network: networkName,
         chainId,
         contracts: {
           ...deployData,
           AdminMultisig: adminMultisigAddress,
           SequencerMultisig:
             sequencerMultisigAddress === ethers.ZeroAddress
-              ? undefined
+              ? null
               : sequencerMultisigAddress,
         },
       };
@@ -310,11 +310,11 @@ function fmtEth(balance: bigint) {
   return `${formatEther(balance)} ETH (${balance} wei)`;
 }
 
-const saveDeployment = async (
+async function saveDeployment(
   configs: NetworkConfig[],
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
-) => {
+) {
   for (const { networkName } of configs) {
     await writeEvmDeployment(networkName, chainsDeployment[networkName]);
   }
-};
+}
