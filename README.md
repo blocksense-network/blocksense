@@ -5,7 +5,7 @@
       <pre>The programmable oracle for trustless compute.</pre>
     </td>
     <td valign="center">
-      <a href="https://docs.blocksense.network" target="_blank">
+      <a href="https://blocksense.network" target="_blank">
         <img src="./docs/assets/img/blocksense-logo.jpg" align="center" width="120">
       </a>
     </td>
