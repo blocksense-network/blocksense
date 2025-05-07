@@ -32,7 +32,7 @@ export async function registerCLAdapters({
   console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
   console.log('------------------------------------------------------------');
 
-  const signer = config.adminMultisig.signer || config.ledgerAccount!;
+  const signer = config.deployer;
 
   const registry = new Contract(
     deployData.coreContracts.CLFeedRegistryAdapter.address,

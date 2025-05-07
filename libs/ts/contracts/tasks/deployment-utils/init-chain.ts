@@ -1,106 +1,114 @@
-import type { Network, Signer } from 'ethers';
-import { Wallet, JsonRpcProvider, id } from 'ethers';
+import { Schema as S } from 'effect';
 
+import { type ethers as EthersType, Wallet, JsonRpcProvider, id } from 'ethers';
 import type { HardhatEthersHelpers } from '@nomicfoundation/hardhat-ethers/types';
 
 import {
-  getRpcUrl,
-  kebabToScreamingSnakeCase,
+  withTimeout,
   parseEthereumAddress,
-  getOptionalEnvString,
-  getEnvString,
   NetworkName,
+  fromCommaSeparatedString,
+  ethereumAddress,
+  asVarSchema,
+  hexDataString,
+  networkName,
   parseHexDataString,
 } from '@blocksense/base-utils';
 
-import { awaitTimeout } from '../utils';
-import { NetworkConfig } from '../types';
+import {
+  DeploymentEnvSchema,
+  parseDeploymentEnvConfig,
+  validateAndPrintDeploymentEnvConfig,
+} from '@blocksense/base-utils/evm/functions';
+
+import type { NetworkConfig } from '../types';
+
+const sharedPerNetworkKind = {
+  deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
+  deployerAddress: ethereumAddress,
+  deployerPrivateKey: hexDataString,
+
+  adfsUpgradeableProxySalt: asVarSchema(hexDataString),
+
+  adminMultisigThreshold: S.NumberFromString,
+  adminMultisigOwners: fromCommaSeparatedString(ethereumAddress),
+
+  sequencerAddress: ethereumAddress,
+
+  reporterMultisigEnable: asVarSchema(S.BooleanFromString),
+  reporterMultisigThreshold: S.NumberFromString,
+  reporterMultisigSigners: asVarSchema(
+    fromCommaSeparatedString(ethereumAddress),
+  ),
+};
+
+const envSchema = {
+  global: {
+    NETWORKS: fromCommaSeparatedString(networkName),
+  },
+
+  perNetworkKind: sharedPerNetworkKind,
+
+  perNetworkName: {
+    rpcUrl: S.URL,
+    feedIds: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
+
+    ...sharedPerNetworkKind,
+  },
+} satisfies DeploymentEnvSchema;
 
 export async function initChain(
-  ethers: HardhatEthersHelpers,
+  ethers: typeof EthersType & HardhatEthersHelpers,
   networkName: NetworkName,
 ): Promise<NetworkConfig> {
-  const rpc = getRpcUrl(networkName);
+  const parsedEnv = parseDeploymentEnvConfig(envSchema, networkName);
+
+  parsedEnv.mergedConfig.adfsUpgradeableProxySalt ??= parseHexDataString(
+    id('upgradeableProxy'),
+  );
+
+  const { mergedConfig: envCfg } =
+    validateAndPrintDeploymentEnvConfig(parsedEnv);
+
+  const rpc = envCfg.rpcUrl.toString();
   const provider = new JsonRpcProvider(rpc);
-
-  let network: Network | undefined;
-  try {
-    network = await Promise.race([
-      provider.getNetwork(),
-      awaitTimeout(5000, 'provider.getNetwork() timed out after 5 seconds'),
-    ]);
-
-    if (!network) {
-      throw new Error(`Network not initialized`);
-    }
-  } catch (err) {
-    console.log(err);
-    process.exit(1);
-  }
-
-  const envSequencerOwners =
-    process.env['REPORTER_ADDRESSES_' + kebabToScreamingSnakeCase(networkName)];
-  const sequencerOwners = envSequencerOwners
-    ? envSequencerOwners
-        .split(',')
-        .map(address => parseEthereumAddress(address))
-    : [];
-
-  const envAdminOwners =
-    process.env[
-      'ADMIN_EXTRA_SIGNERS_' + kebabToScreamingSnakeCase(networkName)
-    ];
-  const adminOwners = envAdminOwners
-    ? envAdminOwners.split(',').map(address => parseEthereumAddress(address))
-    : [];
-
-  const deploySequencerMultisig = JSON.parse(
-    getOptionalEnvString(
-      'DEPLOY_WITH_SEQUENCER_MULTISIG_' +
-        kebabToScreamingSnakeCase(networkName),
-      'true',
-    ),
-  );
-
-  const adfsUpgradeableProxySalt = parseHexDataString(
-    getOptionalEnvString('ADFS_UPGRADEABLE_PROXY_SALT', id('upgradeableProxy')),
-  );
-
-  let ledgerAccount: Signer | undefined;
-  let admin: Wallet | undefined;
-
-  const ledgerAccountAddress = getOptionalEnvString('LEDGER_ACCOUNT', '');
-  if (ledgerAccountAddress) {
-    ledgerAccount = await ethers.getSigner(ledgerAccountAddress);
-  } else {
-    admin = new Wallet(getEnvString('ADMIN_SIGNER_PRIVATE_KEY'), provider);
-  }
-
-  const feedIds = getOptionalEnvString(
-    'FEED_IDS_' + kebabToScreamingSnakeCase(networkName),
-    '',
+  const network = await withTimeout(
+    () => provider.getNetwork(),
+    5000,
+    new Error(`Failed to connect to network: '${rpc}'`),
   );
 
   return {
+    deployerAddress: envCfg.deployerAddress,
+    ...(envCfg.deployerAddressIsLedger
+      ? {
+          deployer: await ethers.getSigner(envCfg.deployerAddress),
+          deployerIsLedger: true,
+        }
+      : {
+          deployer: new Wallet(envCfg.deployerPrivateKey, provider),
+          deployerIsLedger: false,
+        }),
+
     rpc,
     provider,
     network,
     networkName,
-    adfsUpgradeableProxySalt,
+    adfsUpgradeableProxySalt: envCfg.adfsUpgradeableProxySalt,
+
+    sequencerAddress: envCfg.sequencerAddress,
+
+    deployWithSequencerMultisig: envCfg.reporterMultisigEnable,
+
     sequencerMultisig: {
-      signer: admin,
-      owners: sequencerOwners,
-      threshold: +getOptionalEnvString('REPORTER_THRESHOLD', '1'),
+      owners: envCfg.reporterMultisigSigners,
+      threshold: envCfg.reporterMultisigThreshold,
     },
-    deployWithSequencerMultisig: deploySequencerMultisig,
     adminMultisig: {
-      signer: admin,
-      owners: adminOwners,
-      threshold: +getOptionalEnvString('ADMIN_THRESHOLD', '1'),
+      owners: envCfg.adminMultisigOwners,
+      threshold: envCfg.adminMultisigThreshold,
     },
-    ledgerAccount,
-    feedIds:
-      feedIds === 'all' ? 'all' : feedIds.split(',').map(id => BigInt(id)),
+    feedIds: envCfg.feedIds,
     safeAddresses: {
       multiSendAddress: parseEthereumAddress(
         '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
@@ -135,5 +143,5 @@ export async function initChain(
         '0x1d31F259eE307358a26dFb23EB365939E8641195',
       ),
     },
-  };
+  } satisfies NetworkConfig;
 }

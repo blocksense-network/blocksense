@@ -54,7 +54,7 @@ task(
   const adminMultisig = await Safe.init({
     provider: config.rpc,
     safeAddress: adminMultisigAddr,
-    signer: config.adminMultisig.signer?.privateKey,
+    signer: config.deployerIsLedger ? undefined : config.deployer.privateKey,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
     },
