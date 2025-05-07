@@ -1840,7 +1840,7 @@ __metadata:
   resolution: "@blocksense/base-utils@workspace:libs/ts/base-utils"
   dependencies:
     "@types/node": "npm:^22.10.2"
-    effect: "npm:^3.12.1"
+    effect: "npm:^3.14.19"
     glob: "npm:^11.0.0"
     tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
@@ -1855,7 +1855,7 @@ __metadata:
   dependencies:
     "@blocksense/base-utils": "workspace:*"
     "@types/node": "npm:^22.10.2"
-    effect: "npm:^3.12.1"
+    effect: "npm:^3.14.19"
     glob: "npm:^11.0.0"
     tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
@@ -1916,7 +1916,7 @@ __metadata:
     "@octokit/rest": "npm:^21.1.1"
     "@types/keccak": "npm:^3"
     "@types/node": "npm:^22.10.2"
-    effect: "npm:^3.12.1"
+    effect: "npm:^3.14.19"
     glob: "npm:^11.0.0"
     keccak: "npm:^3.0.4"
     keccak256: "npm:^1.0.6"
@@ -1946,7 +1946,7 @@ __metadata:
     autoprefixer: "npm:^10.4.20"
     clsx: "npm:^2.1.1"
     cmdk: "npm:1.0.4"
-    effect: "npm:^3.12.1"
+    effect: "npm:^3.14.19"
     fast-glob: "npm:^3.3.2"
     next: "npm:^15.1.4"
     nextra: "npm:^4.1.1"
@@ -2057,7 +2057,7 @@ __metadata:
     "@types/node": "npm:^22.10.2"
     "@types/react": "npm:^18.3.3"
     clsx: "npm:^2.1.1"
-    effect: "npm:^3.12.1"
+    effect: "npm:^3.14.19"
     next: "npm:^15.1.4"
     postcss: "npm:^8.4.49"
     prettier: "npm:^3.4.2"
@@ -7440,6 +7440,13 @@ __metadata:
   version: 0.19.0
   resolution: "@solidity-parser/parser@npm:0.19.0"
   checksum: 10c0/2f4c885bb32ca95ea41120f0d972437b4191d26aa63ea62b7904d075e1b90f4290996407ef84a46a20f66e4268f41fb07fc0edc7142afc443511e8c74b37c6e9
+  languageName: node
+  linkType: hard
+
+"@standard-schema/spec@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@standard-schema/spec@npm:1.0.0"
+  checksum: 10c0/a1ab9a8bdc09b5b47aa8365d0e0ec40cc2df6437be02853696a0e377321653b0d3ac6f079a8c67d5ddbe9821025584b1fb71d9cc041a6666a96f1fadf2ece15f
   languageName: node
   linkType: hard
 
@@ -13214,12 +13221,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"effect@npm:^3.12.1":
-  version: 3.12.1
-  resolution: "effect@npm:3.12.1"
+"effect@npm:^3.14.19":
+  version: 3.14.19
+  resolution: "effect@npm:3.14.19"
   dependencies:
+    "@standard-schema/spec": "npm:^1.0.0"
     fast-check: "npm:^3.23.1"
-  checksum: 10c0/40fc3ec78c4d6968efba1ed393b6dce09c6bb070e2790bc0bb12f495b66792a1a0b2392c33ac57a7b025be84152add3917a143ec004d3f17ed68516dd3155422
+  checksum: 10c0/e1a7c0f81bb509a2468085710b3c3be1148ad2321de42652a08eb5cf9ed4b2583398d0885a26027df7ef16a4db9fba69861342e9bc9ff60bd1594b3bba266851
   languageName: node
   linkType: hard
 
