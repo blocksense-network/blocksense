@@ -20,6 +20,7 @@ describe('EncodePackedDecoder @skip-coverage', function () {
 
   before(() => {
     hre.config.solidity.compilers[0].settings.viaIR = true;
+    hre.config.solidity.compilers[0].settings.evmVersion = 'cancun';
   });
 
   async function generateAndDeployDecoder(fields: utils.TupleField) {
@@ -62,6 +63,7 @@ describe('EncodePackedDecoder @skip-coverage', function () {
 
   after(() => {
     hre.config.solidity.compilers[0].settings.viaIR = false;
+    hre.config.solidity.compilers[0].settings.evmVersion = '';
   });
 
   it('should correctly decode packed sports data with boolean fields', async () => {
