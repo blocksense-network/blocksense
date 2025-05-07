@@ -1,6 +1,7 @@
 'use client';
 
 import { ChangeEvent, MouseEvent, useState } from 'react';
+import { sendGAEvent } from '@next/third-parties/google';
 
 import { Button } from './Button';
 import { FormStepTitle } from './FormStepTitle';
@@ -32,6 +33,18 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
 
   const onMintClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
+    sendGAEvent('event', 'mintButtonClicked', {
+      xHandle,
+      discord,
+      retweetCode,
+    });
+
+    sendGAEvent('event', 'mintedNFT', {
+      xHandle,
+      discord,
+      retweetCode,
+    });
 
     setRetweetCode('');
     // setMintLoading(true);

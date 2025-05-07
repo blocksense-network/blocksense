@@ -1,10 +1,11 @@
-import './globals.css';
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 
-import { geist, geistMono } from '../src/geist';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
+import { geist, geistMono } from '../src/geist';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: {
@@ -73,31 +74,6 @@ export const metadata: Metadata = {
   },
 };
 
-const GTMScript = () => (
-  <script
-    dangerouslySetInnerHTML={{
-      __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-      })(window,document,'script','dataLayer','GTM-WB9ZRVTV');`,
-    }}
-  />
-);
-
-const GTMNoScript = () => (
-  <div
-    dangerouslySetInnerHTML={{
-      __html: `
-        <noscript>
-          <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WB9ZRVTV"
-            height="0" width="0" style="display:none;visibility:hidden"></iframe>
-        </noscript>
-      `,
-    }}
-  />
-);
-
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html
@@ -106,11 +82,9 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        <GTMScript />
-      </head>
+      <GoogleTagManager gtmId="GTM-WB9ZRVTV" />
+      <GoogleAnalytics gaId="G-7E3PF0WSSM" />
       <body className="nft-drop-layout__body">
-        <GTMNoScript />
         <Navbar />
         <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
         <Footer />
