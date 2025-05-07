@@ -94,8 +94,7 @@ export async function deployContracts({
         contract.feedRegistryInfo,
         `CLAggregatorAdapter without registry info: ${contract}`,
       );
-      const name = registryInfo.description;
-      ContractsConfigV2.CLAggregatorAdapter[name] = {
+      ContractsConfigV2.CLAggregatorAdapter[`${registryInfo.feedId}`] = {
         feedId: registryInfo.feedId,
         base: registryInfo.base,
         quote: registryInfo.quote,
