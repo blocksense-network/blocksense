@@ -190,7 +190,7 @@ task('deploy', 'Deploy contracts')
             name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
-              data.description,
+              data.full_name,
               data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
@@ -310,11 +310,11 @@ function fmtEth(balance: bigint) {
   return `${formatEther(balance)} ETH (${balance} wei)`;
 }
 
-const saveDeployment = async (
+async function saveDeployment(
   configs: NetworkConfig[],
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
-) => {
+) {
   for (const { networkName } of configs) {
     await writeEvmDeployment(networkName, chainsDeployment[networkName]);
   }
-};
+}
