@@ -22,6 +22,12 @@ stride = 0
 decimals = 0
 data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":[]}'
 
+[[trigger.oracle.data_feeds]]
+id = "100002"
+stride = 0
+decimals = 0
+data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":[]}'
+
 [component.eth-rpc]
 source = "../../../target/wasm32-wasip1/release/eth_rpc.wasm"
 allowed_outbound_hosts = [
