@@ -23,9 +23,6 @@ let
   apiKeysDir = "${reporterStateDir}/test-keys";
 in
 {
-  services.kafka = {
-    enable = true;
-  };
   services.blocksense = {
     enable = true;
 
