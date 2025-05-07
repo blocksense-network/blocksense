@@ -65,7 +65,8 @@ pub fn parse_eth_address(addr: &str) -> Option<Address> {
 pub struct Contract {
     pub name: String,
     pub address: Option<Address>,
-    pub byte_code: Option<Vec<u8>>,
+    pub creation_byte_code: Option<Vec<u8>>,
+    pub deployed_byte_code: Option<Vec<u8>>,
     pub contract_version: u16,
 }
 impl Contract {
@@ -74,14 +75,19 @@ impl Contract {
             .address
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
-        let byte_code = config
-            .byte_code
+        let creation_byte_code = config
+            .creation_byte_code
             .as_ref()
             .and_then(|byte_code| hex::decode(byte_code.clone()).ok());
+        let deployed_byte_code = config
+            .deployed_byte_code
+            .as_ref()
+            .and_then(|byte_code| hex::decode(byte_code.clone()).ok());        
         Ok(Contract {
             name: config.name.clone(),
             address,
-            byte_code,
+            creation_byte_code,
+            deployed_byte_code,
             contract_version: config.contract_version,
         })
     }
@@ -182,6 +188,7 @@ async fn get_rpc_providers(
     providers
 }
 
+#[derive(Debug)]
 pub struct LatestRound {
     _feed_id: u128,
     _round: u16,
@@ -371,12 +378,12 @@ impl RpcProvider {
         ]);
 
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+        let adfs_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
 
         let contract = MulticallInstance::new(multicall, self.provider.clone());
 
         let calldata: Vec<Multicall::Call> = vec![Multicall::Call {
-            target: data_feed,
+            target: adfs_address,
             callData: call_data,
         }];
 
@@ -523,8 +530,8 @@ impl RpcProvider {
                 read_byte_code
             ));
         }
-        let mut bytecode = contract.byte_code.ok_or(eyre!(
-            "Byte code unavailable for contract named {contract_name}"
+        let mut bytecode = contract.creation_byte_code.ok_or(eyre!(
+            "Byte code unavailable to create contract named {contract_name}"
         ))?;
 
         // Deploy the contract.
@@ -552,13 +559,10 @@ impl RpcProvider {
             .from(signer.address())
             .with_chain_id(chain_id)
             .with_deploy_code(bytecode);
-
         let deploy_time = Instant::now();
-        let contract_address = provider
-            .send_transaction(tx)
-            .await?
-            .get_receipt()
-            .await?
+        let pending_transaction = provider.send_transaction(tx).await?;
+        let transaction_reciept = pending_transaction.get_receipt().await?;
+        let contract_address = transaction_reciept
             .contract_address
             .expect("Failed to get contract address");
 
@@ -609,7 +613,7 @@ impl RpcProvider {
                     let exists = byte_code.len() > 0;
                     if exists {
                         if let Some(expected_byte_code) =
-                            self.get_contract(contract_name).and_then(|x| x.byte_code)
+                            self.get_contract(contract_name).and_then(|x| x.deployed_byte_code)
                         {
                             let a = byte_code.0.to_vec();
                             let same_byte_code = expected_byte_code.eq(&a);
@@ -715,6 +719,7 @@ mod tests {
     use alloy::consensus::Transaction;
     use alloy::providers::Provider as AlloyProvider;
     use blocksense_config::{get_test_config_with_single_provider, test_feed_config};
+    use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
@@ -827,25 +832,47 @@ mod tests {
 
     #[tokio::test]
     async fn fork_test_provider() -> Result<()> {
+        let metrics_prefix = "fork_test_provider";
+
         let span = info_span!("fork_test_provider");
         let _guard = span.enter();
 
         let network = "ETH";
         let fork_url = "https://rpc-gel-sepolia.inkonchain.com";
         let anvil = Anvil::new().fork(fork_url).try_spawn()?;
+
+        //let fork_url = "https://rpc-gel-sepolia.inkonchain.com";
+        //let anvil = Anvil::new().try_spawn()?;
+
         let key_path = get_test_private_key_path();
 
-        let cfg =
+        let sequencer_config =
             get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
+        
         //let feeds_config = AllFeedsConfig { feeds: vec![] };
         let feed_1_config = test_feed_config(31, 8);
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };
-        let providers = get_rpc_providers(&cfg, "fork_test_provider_", &feeds_config).await;
+
+
+        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+            sequencer_config,
+            metrics_prefix,
+            feeds_config,
+        )
+        .await;
+
+        // run
+        // let msg = sequencer_state
+        //     .deploy_contract(network, ADFS_CONTRACT_NAME)
+        //     .await
+        //     .expect("Data feed publishing contract deployment failed!");
+
         {
-            let rpc_provider_guard = providers.get(network).unwrap().lock().await;
-            let block_number = rpc_provider_guard
+            let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
+            let mut rpc_provider = rpc_provider_mutex.lock().await;
+            let block_number = rpc_provider
                 .provider
                 .get_block_number()
                 .await
@@ -853,8 +880,13 @@ mod tests {
             //println!("Block number from provider = {number}");
             let block_num_at_time_of_writing_this_test = 16500374_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_updates = rpc_provider_guard.get_latest_values(&[31]).await.unwrap();
-            println!("last update on chain {last_updates:?}");
+            let last_updates = rpc_provider.get_latest_values(&[31]).await.unwrap();
+            //println!("last update on chain {last_updates:?}");
+            //let last_round = rpc_provider_guard.get_latest_round(&0, 18).await;
+            //println!("last rounds on chain {last_round:?}");
+            let m = rpc_provider.deploy_contract(ADFS_CONTRACT_NAME).await;
+            //let m = rpc_provider.deploy_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME).await;
+            println!("{:?}", &m);
         }
 
         // let alice = anvil.addresses()[7];
