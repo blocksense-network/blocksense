@@ -1,4 +1,8 @@
-{ self', cfg, ... }:
+{
+  self',
+  cfg,
+  ...
+}:
 {
   config,
   lib,
@@ -6,11 +10,11 @@
 }:
 let
   inherit (self'.apps)
-    sequencer
-    blocksense
     blockchain_reader
     aggregate_consensus_reader
     ;
+
+  mkCargoTargetExePath = executable-name: "${config.devenv.root}/target/release/${executable-name}";
 
   logsConfig = {
     fields_order = [
@@ -74,10 +78,13 @@ let
           command = ''
             mkdir -p "${working_dir}" &&
             cd "${working_dir}" &&
-            ${blocksense.program} node build --up \
+            ${mkCargoTargetExePath "blocksense"} node build --up \
               --from ${cfg.config-files."reporter_config_${name}".path}
           '';
-          environment = [ "RUST_LOG=${log-level}" ];
+          environment = [
+            "RUST_LOG=${log-level}"
+            "SPIN_DATA_DIR=${config.devenv.root}/target/spin-artifacts"
+          ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
           };
@@ -89,7 +96,7 @@ let
 
   sequencerInstance = {
     blocksense-sequencer.process-compose = {
-      command = "${sequencer.program}";
+      command = mkCargoTargetExePath "sequencer";
       readiness_probe = {
         exec.command = ''
           curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
