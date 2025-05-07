@@ -213,36 +213,49 @@ export const sszEncodeData = async (
 export const sszSchema = async (
   fields: PrimitiveField | TupleField,
 ): Promise<Schema[]> => {
-  // console.log('fields', fields);
   const ssz = await import('@chainsafe/ssz');
 
   const extractFieldsFromSchema = (
     fields: Record<string, any> | any[],
     inputFields: PrimitiveField | TupleField,
-    extraData?: { fieldName: string; type: string },
+    extraData?: {
+      fieldName: string;
+      type: string;
+      isNested: boolean;
+      prevType: {
+        type: string;
+        length?: number;
+      };
+    },
   ) => {
     const result: any[] = [];
 
     for (const field of Object.values(fields)) {
-      // console.log('field', field);
+      const types = parseTypeName(field.typeName);
+
       const data: Schema = {
         isBasic: field.isBasic,
         isDynamic: field.isList ?? false, // all non-container types
+        isNested: extraData?.isNested ?? false,
         typeName: field.typeName,
         fixedSize: field.fixedSize,
         fixedEnd: field.fixedEnd,
         type: extraData?.type ?? field.type ?? '',
         fieldName: extraData?.fieldName ?? field.fieldName,
         length: field.length,
+        prevType: extraData?.prevType,
+        types,
       };
 
       if (field.fields) {
-        console.log('\n ----> container\n');
-        Object.values(field.fields).forEach((f: Schema, i: number) => {
-          f.fieldName =
-            Object.keys(field.jsonKeyToFieldName)[i] ?? field.fieldName;
-          f.type = findFieldTypeByName(inputFields, f.fieldName) ?? field.type;
-        });
+        Object.values(field.fields as Schema[]).forEach(
+          (f: Schema, i: number) => {
+            f.fieldName =
+              Object.keys(field.jsonKeyToFieldName)[i] ?? field.fieldName;
+            f.type =
+              findFieldTypeByName(inputFields, f.fieldName) ?? field.type;
+          },
+        );
         data.fields = extractFieldsFromSchema(field.fields, inputFields);
         data.isFixedLen = field.isFixedLen;
         data.isDynamic = field.isFixedLen.some((x: boolean) => x === false);
@@ -261,6 +274,50 @@ export const sszSchema = async (
         field instanceof ssz.ListCompositeType ||
         field instanceof ssz.ListBasicType
       ) {
+        let type = field.type ?? data.type;
+        const listsLength = (field.typeName.match(/List/g) ?? []).length;
+        const vectorsLength = (field.typeName.match(/Vector/g) ?? []).length;
+        const dynamicCount = listsLength + vectorsLength;
+        const dimensions = type.match(/\[\d*\]/g) || [];
+        const lastDimension = dimensions[dimensions.length - 1];
+        const isFixed = field.typeName.startsWith('Vector');
+
+        if (
+          lastDimension &&
+          ((!isFixed && lastDimension === '[]') ||
+            (isFixed && lastDimension.match(/^\[(\d+)\]$/)![1]))
+        ) {
+          type = type.replace(/\[\d*\]$/g, '');
+        }
+
+        // data is a primitive type with single dynamic dimension
+        const isPrimitiveDynamic = !!(
+          listsLength === 1 && field.typeName.includes('ByteVector')
+        );
+        const isContainerDynamic = !!(
+          listsLength && field.typeName.includes('Container')
+        );
+        const isNestedDynamic = !!(
+          dynamicCount > 1 &&
+          listsLength &&
+          field.typeName.startsWith('List')
+        );
+
+        data.isNested ||=
+          !isPrimitiveDynamic && (isNestedDynamic || isContainerDynamic);
+
+        if (data.isNested && !isFixed) {
+          let lastDynamicDim = -1;
+          for (let i = dimensions.length - 1; i >= 0; i--) {
+            if (dimensions[i] !== '[]') {
+              break;
+            }
+            lastDynamicDim = i;
+          }
+
+          data.isLastDynamic = lastDynamicDim === dimensions.length - 1;
+        }
+
         data.fields = extractFieldsFromSchema(
           {
             data: field.elementType,
@@ -268,11 +325,23 @@ export const sszSchema = async (
           inputFields,
           {
             fieldName: field.fieldName ?? data.fieldName,
-            type: field.type ?? data.type,
+            type,
+            isNested: data.isNested,
+            prevType: data.types[0],
           },
         );
+        if (data.fields.length === 1 && data.fields[0].isDynamic) {
+          data.isDynamic = true;
+        }
+
+        if (!data.fixedSize) {
+          let size = 0;
+          data.fields.forEach((f: Schema) => {
+            size += f.fixedSize;
+          });
+          data.fixedSize = size;
+        }
       } else if (field.elementType instanceof ssz.ContainerType) {
-        console.log('\n ----> tuple\n');
         const tuple = field.elementType;
         data.isBasic = tuple.isBasic;
         data.isFixedLen = tuple.isFixedLen;
@@ -280,10 +349,32 @@ export const sszSchema = async (
         data.fieldRangesFixedLen = tuple.fieldRangesFixedLen;
         data.variableOffsetsPosition = tuple.variableOffsetsPosition;
         data.fields = extractFieldsFromSchema(tuple.fields, inputFields);
-        data.fields.forEach((f: Schema, i: number) => {
-          f.fieldName = Object.keys(tuple.jsonKeyToFieldName)[i];
-          f.type = findFieldTypeByName(inputFields, f.fieldName);
-        });
+        if (!data.fixedSize) {
+          let size = 0;
+          data.fields.forEach((f: Schema, i: number) => {
+            f.fieldName = Object.keys(tuple.jsonKeyToFieldName)[i];
+            f.type = findFieldTypeByName(inputFields, f.fieldName);
+            size += f.fixedSize;
+          });
+          data.fixedSize = size;
+        } else {
+          data.fields.forEach((f: Schema, i: number) => {
+            f.fieldName = Object.keys(tuple.jsonKeyToFieldName)[i];
+            f.type = findFieldTypeByName(inputFields, f.fieldName);
+          });
+        }
+      } else {
+        let type = field.type ?? data.type;
+        const dynamicCount =
+          (field.typeName.match(/\wList/g) ?? []).length +
+          (field.typeName.match(/Vector/g) ?? []).length;
+        // `type` must have dynamicCount-1 times `[]`
+        const matches = type.match(/\[\d*\]/g) || [];
+        if (matches.length === dynamicCount) {
+          type = type.replace(/\[\d*\]$/g, '');
+        }
+
+        data.type = type;
       }
       result.push(data);
     }
@@ -325,4 +416,49 @@ const findFieldTypeByName = (
   }
 
   return '';
+};
+
+const parseTypeName = (typeName: string) => {
+  if (!typeName) return [];
+
+  const result: Schema['types'] = [];
+
+  const parse = (str: string): void => {
+    const match = /^(\w+)(?:\[(.*)\])?$/.exec(str.trim());
+    if (!match) return;
+
+    const [, type, params] = match;
+    const entry: Schema['types'][0] = { type, length: undefined };
+    result.push(entry);
+
+    if (!params) return;
+
+    let depth = 0,
+      part = '',
+      args: string[] = [];
+    for (let i = 0; i < params.length; i++) {
+      const char = params[i];
+      if (char === '[') depth++;
+      else if (char === ']') depth--;
+
+      if (char === ',' && depth === 0) {
+        args.push(part.trim());
+        part = '';
+      } else {
+        part += char;
+      }
+    }
+    if (part) args.push(part.trim());
+
+    for (const arg of args) {
+      if (!/^\d+$/.test(arg)) {
+        parse(arg);
+      } else if (type !== 'List') {
+        entry.length = +arg;
+      }
+    }
+  };
+
+  parse(typeName);
+  return result;
 };

@@ -14,7 +14,7 @@ export const generateDecoder = async (
   fields: TupleField,
 ) => {
   const schema: Schema[] = await sszSchema(fields);
-  console.log('schema', JSON.stringify(schema, null, 2));
+  console.log('==>> schema', JSON.stringify(schema, null, 2));
   const template = await fs.readFile(templatePath, 'utf-8');
 
   const structs = organizeFieldsIntoStructs(fields);
@@ -43,6 +43,7 @@ export const generateDecoder = async (
     },
   );
 
+  // console.log('generatedCode', generatedCode);
   // return;
 
   const formattedCode = await prettier.format(generatedCode, {
