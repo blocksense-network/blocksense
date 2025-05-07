@@ -141,6 +141,37 @@ start-oracle oracle-name trigger-oracle-build-type="--use-local-cargo-artifacts"
 build-blocksense:
   @{{root-dir}}/scripts/build-blocksense.sh
 
+[group('blocksense')]
+[doc('Start Blocksense')]
+start-blocksense:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  just build-blocksense
+  process-compose up
+
+[group('General')]
+[doc('Evaluate a Nix expression for a specific machine')]
+eval-machine machine commit="working-tree":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  if [[ "{{ commit }}" == "working-tree" ]]; then
+    NIX_TARGET="{{ root-dir }}"
+  else
+    NIX_TARGET="github:blocksense-network/blocksense?rev={{commit}}"
+  fi
+  nix eval --raw "${NIX_TARGET}#nixosConfigurations.{{machine}}.config.system.build.toplevel.outPath"
+
+[group('General')]
+[doc('Run NixOS integration tests')]
+run-tests:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  nix eval --json .#legacyPackages.x86_64-linux.nixosTests --apply "builtins.attrNames" | \
+    jq -r '.[]' | \
+    xargs -I {} \
+    nix build --option sandbox false -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests.{}
+
 [group('General')]
 [doc('Run a command to clean the repository of untracked files')]
 clean:
