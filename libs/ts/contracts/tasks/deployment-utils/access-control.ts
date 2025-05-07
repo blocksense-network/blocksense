@@ -36,7 +36,7 @@ task('access-control', '[UTILS] Set up access control').setAction(
     // to await import
 
     const { OnlySequencerGuard__factory } = await import(
-      '../../dist/contracts/typechain/index.js'
+      '../../dist/typechain/index.js'
     );
 
     const guard = OnlySequencerGuard__factory.connect(

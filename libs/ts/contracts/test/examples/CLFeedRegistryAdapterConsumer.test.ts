@@ -114,7 +114,7 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
 
   async function getAndCompareData<F extends FunctionName>(
     functionName: F,
-    data: FunctionParameters<F>,
+    data: FunctionParameters<F>[],
   ) {
     const contractData1 = await clFeedRegistryAdapterConsumer.getFunction(
       functionName,
@@ -128,9 +128,15 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
       abiJson: (await artifacts.readArtifact('CLFeedRegistryAdapterExp')).abi,
       provider: feedRegistry.contract.runner!,
     };
-    const args = data[0][0];
-    const utilData1 = await functions[functionName](config, ...data);
-    const utilData2 = await functions[functionName](config, ...data[1]);
+    const args = data[0];
+    const utilData1 = await functions[functionName](
+      config,
+      ...(data[0] as any),
+    );
+    const utilData2 = await functions[functionName](
+      config,
+      ...(data[1] as any),
+    );
 
     expect(contractData1).to.deep.equal(utilData1);
     expect(contractData2).to.deep.equal(utilData2);

@@ -1,53 +1,71 @@
 import { Addressable, ContractRunner } from 'ethers';
-import { ethers } from 'hardhat';
+import { get } from 'http';
 import { CLAggregatorAdapter__factory } from 'libs/ts/contracts/typechain';
 
-interface AggregatorConfig {
-  address: string;
+export interface AggregatorConfig {
+  address: string | Addressable;
   abiJson: any;
   provider: ContractRunner;
 }
 
-export const getDecimals = async (config: AggregatorConfig) => {
-  const aggregator = CLAggregatorAdapter__factory.connect(config.address);
-  const decimals = await aggregator.decimals();
+async function getAddress(config: AggregatorConfig): Promise<string> {
+  return typeof config.address === 'string'
+    ? config.address
+    : await config.address.getAddress();
+}
 
-  return decimals;
-};
+export const functions = {
+  getDecimals: async (config: AggregatorConfig) => {
+    const aggregator = CLAggregatorAdapter__factory.connect(
+      await getAddress(config),
+    );
+    const decimals = await aggregator.decimals();
 
-export const getDescription = async (config: AggregatorConfig) => {
-  const aggregator = CLAggregatorAdapter__factory.connect(config.address);
-  const description = await aggregator.description();
-  return description;
-};
+    return decimals;
+  },
 
-export const getLatestAnswer = async (config: AggregatorConfig) => {
-  const aggregator = CLAggregatorAdapter__factory.connect(config.address);
-  const latestAnswer = await aggregator.latestAnswer();
+  getDescription: async (config: AggregatorConfig) => {
+    const aggregator = CLAggregatorAdapter__factory.connect(
+      await getAddress(config),
+    );
+    const description = await aggregator.description();
 
-  return latestAnswer;
-};
+    return description;
+  },
 
-export const getLatestRound = async (config: AggregatorConfig) => {
-  const aggregator = CLAggregatorAdapter__factory.connect(config.address);
-  const latestRound = await aggregator.latestRound();
+  getLatestAnswer: async (config: AggregatorConfig) => {
+    const aggregator = CLAggregatorAdapter__factory.connect(
+      await getAddress(config),
+    );
+    const latestAnswer = await aggregator.latestAnswer();
 
-  return latestRound;
-};
+    return latestAnswer;
+  },
 
-export const getRoundData = async (
-  config: AggregatorConfig,
-  roundId: number,
-) => {
-  const aggregator = CLAggregatorAdapter__factory.connect(config.address);
-  const roundData = await aggregator.getRoundData(roundId);
+  getLatestRound: async (config: AggregatorConfig) => {
+    const aggregator = CLAggregatorAdapter__factory.connect(
+      await getAddress(config),
+    );
+    const latestRound = await aggregator.latestRound();
 
-  return roundData;
-};
+    return latestRound;
+  },
 
-export const getLatestRoundData = async (config: AggregatorConfig) => {
-  const aggregator = CLAggregatorAdapter__factory.connect(config.address);
-  const latestRoundData = await aggregator.latestRoundData();
+  getRoundData: async (config: AggregatorConfig, ...rest: number[]) => {
+    const aggregator = CLAggregatorAdapter__factory.connect(
+      await getAddress(config),
+    );
+    const roundData = await aggregator.getRoundData(rest[0]);
 
-  return latestRoundData;
+    return roundData;
+  },
+
+  getLatestRoundData: async (config: AggregatorConfig) => {
+    const aggregator = CLAggregatorAdapter__factory.connect(
+      await getAddress(config),
+    );
+    const latestRoundData = await aggregator.latestRoundData();
+
+    return latestRoundData;
+  },
 };

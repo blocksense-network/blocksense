@@ -285,9 +285,6 @@ async function saveDeployment(
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
 ) {
   for (const { networkName } of configs) {
-    chainsDeployment[networkName].contracts.CLAggregatorAdapter[
-      'BTC / USD (0)'
-    ]!.feedId = 0 as any;
     await writeEvmDeployment(networkName, chainsDeployment[networkName]);
   }
 }

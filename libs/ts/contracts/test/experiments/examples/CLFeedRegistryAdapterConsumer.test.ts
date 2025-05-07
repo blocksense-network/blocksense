@@ -8,6 +8,10 @@ import {
 } from '../utils/wrappers';
 import * as utils from '../../examples/utils/clFeedRegistryAdapterConsumer';
 import { expect } from 'chai';
+import {
+  functions,
+  RegistryConfig,
+} from '../../examples/utils/clFeedRegistryAdapterConsumer';
 
 const data = [
   {
@@ -74,38 +78,39 @@ describe('[Experiments] Example: CLFeedRegistryAdapterConsumer', function () {
   });
 
   [
-    { title: 'get decimals', fnName: 'getDecimals' },
-    { title: 'get description', fnName: 'getDescription' },
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
-    { title: 'get feed', fnName: 'getFeed' },
+    { title: 'get decimals', fnName: 'getDecimals' } as const,
+    { title: 'get description', fnName: 'getDescription' } as const,
+    { title: 'get latest answer', fnName: 'getLatestAnswer' } as const,
+    { title: 'get latest round', fnName: 'getLatestRound' } as const,
+    { title: 'get latest round data', fnName: 'getLatestRoundData' } as const,
+    { title: 'get feed', fnName: 'getFeed' } as const,
   ].forEach(data => {
     it('Should ' + data.title, async function () {
-      await getAndCompareData(
-        [
-          [TOKENS.ETH, TOKENS.USD],
-          [TOKENS.BTC, TOKENS.USD],
-        ],
-        data.fnName as keyof typeof utils,
-      );
+      await getAndCompareData(data.fnName, [
+        [TOKENS.ETH, TOKENS.USD],
+        [TOKENS.BTC, TOKENS.USD],
+      ]);
     });
   });
 
   it('Should get round data', async function () {
-    await getAndCompareData(
-      [
-        [TOKENS.ETH, TOKENS.USD, 1],
-        [TOKENS.BTC, TOKENS.USD, 1],
-      ],
-      'getRoundData',
-    );
+    await getAndCompareData('getRoundData', [
+      [TOKENS.ETH, TOKENS.USD, 1],
+      [TOKENS.BTC, TOKENS.USD, 1],
+    ]);
   });
 
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
-  ) => {
+  type Functions = typeof functions;
+  type FunctionName = keyof Functions;
+  type FunctionParameters<F extends FunctionName> =
+    Parameters<Functions[F]> extends [RegistryConfig, ...infer Rest]
+      ? Rest
+      : never;
+
+  async function getAndCompareData<F extends FunctionName>(
+    functionName: F,
+    data: FunctionParameters<F>[],
+  ) {
     const contractData1 = await clFeedRegistryAdapterConsumer.getFunction(
       functionName,
     )(...data[0]);
@@ -118,10 +123,16 @@ describe('[Experiments] Example: CLFeedRegistryAdapterConsumer', function () {
       abiJson: (await artifacts.readArtifact('CLFeedRegistryAdapterExp')).abi,
       provider: feedRegistry.contract.runner!,
     };
-    const utilData1 = await utils[functionName](config, ...data[0]);
-    const utilData2 = await utils[functionName](config, ...data[1]);
+    const utilData1 = await functions[functionName](
+      config,
+      ...(data[0] as any),
+    );
+    const utilData2 = await functions[functionName](
+      config,
+      ...(data[1] as any),
+    );
 
     expect(contractData1).to.deep.equal(utilData1);
     expect(contractData2).to.deep.equal(utilData2);
-  };
+  }
 });

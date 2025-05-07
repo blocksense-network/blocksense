@@ -9,6 +9,10 @@ import {
   UpgradeableProxyADFSWrapper,
 } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
+import {
+  functions,
+  AggregatorConfig,
+} from './utils/clAggregatorAdapterConsumer';
 
 describe('Example: CLAggregatorAdapterConsumer', function () {
   let clAggregatorAdapter: CLAdapterWrapper;
@@ -42,25 +46,28 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
   });
 
   [
-    { title: 'get decimals', fnName: 'getDecimals' },
-    { title: 'get description', fnName: 'getDescription' },
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
+    { title: 'get decimals', fnName: 'getDecimals' } as const,
+    { title: 'get description', fnName: 'getDescription' } as const,
+    { title: 'get latest answer', fnName: 'getLatestAnswer' } as const,
+    { title: 'get latest round', fnName: 'getLatestRound' } as const,
+    { title: 'get latest round data', fnName: 'getLatestRoundData' } as const,
   ].forEach(data => {
     it('Should ' + data.title, async function () {
-      await getAndCompareData([], data.fnName as keyof typeof utils);
+      await getAndCompareData(data.fnName, []);
     });
   });
 
   it('Should get round data', async function () {
-    await getAndCompareData([1], 'getRoundData');
+    await getAndCompareData('getRoundData', [1]);
   });
 
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
-  ) => {
+  type Functions = typeof functions;
+  type FunctionName = keyof Functions;
+
+  async function getAndCompareData<F extends FunctionName>(
+    functionName: F,
+    data: number[],
+  ) {
     const contractData = await clAggregatorAdapterConsumer.getFunction(
       functionName,
     )(...data);
@@ -70,8 +77,8 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
       abiJson: (await artifacts.readArtifact('CLAggregatorAdapter')).abi,
       provider: clAggregatorAdapter.contract.runner!,
     };
-    const utilData = await utils[functionName](config, ...data);
+    const utilData = await functions[functionName](config, ...data);
 
     expect(contractData).to.deep.equal(utilData);
-  };
+  }
 });
