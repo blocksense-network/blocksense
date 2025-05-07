@@ -57,10 +57,10 @@
       "import": "./dist/esm/logging.mjs",
       "types": "./src/logging.ts"
     },
-    "./numeric": {
-      "require": "./dist/cjs/numeric.cjs",
-      "import": "./dist/esm/numeric.mjs",
-      "types": "./src/numeric.ts"
+    "./schemas": {
+      "require": "./dist/cjs/schemas.cjs",
+      "import": "./dist/esm/schemas.mjs",
+      "types": "./src/schemas.ts"
     },
     "./string": {
       "require": "./dist/cjs/string.cjs",
@@ -83,9 +83,10 @@
     "glob": "^11.0.0",
     "tsx": "^4.19.2",
     "typescript": "5.8.3",
-    "vitest": "^3.0.2"
+    "vitest": "^3.1.2"
   },
   "dependencies": {
-    "effect": "^3.12.1"
+    "effect": "^3.14.19",
+    "tslib": "^2.8.1"
   }
 }

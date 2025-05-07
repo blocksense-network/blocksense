@@ -1,23 +1,34 @@
 {
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "es2020",
     "module": "NodeNext",
+    "isolatedModules": false,
+    "strictPropertyInitialization": true,
+    "noImplicitOverride": false,
+    "noPropertyAccessFromIndexSignature": false,
     "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
+    "allowJs": false,
+    "outDir": "dist",
     "rootDirs": [
-      "./scripts",
-      "./test",
+      "@types",
+      "scripts",
+      "tasks",
+      "test",
+      "typechain",
     ],
   },
   "include": [
-    "./scripts",
-    "./test",
-    "./typechain",
-    "./@types",
+    "@types/**/*.d.ts",
+    "scripts/*.ts",
+    "tasks/**/*.ts",
+    "test/**/*.ts",
+    "typechain/*.ts"
+  ],
+  "exclude": [
+    "artifacts",
+    "cache",
+    "contracts",
+    "dist"
   ],
   "files": [
     "./hardhat.config.ts"

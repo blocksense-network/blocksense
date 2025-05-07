@@ -31,9 +31,12 @@ task('access-control', '[UTILS] Set up access control').setAction(
     const abiCoder = new ethers.AbiCoder();
     const transactions: SafeTransactionDataPartial[] = [];
 
-    const guard = new ethers.Contract(
-      deployData.coreContracts.OnlySequencerGuard.address,
-      artifacts.readArtifactSync(ContractNames.OnlySequencerGuard).abi,
+    const { OnlySequencerGuard__factory } = await import(
+      '../../dist/typechain/index.js'
+    );
+
+    const guard = OnlySequencerGuard__factory.connect(
+      deployData.coreContracts.OnlySequencerGuard!.address,
       adminSigner,
     );
     if (sequencerMultisig) {

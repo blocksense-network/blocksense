@@ -39,3 +39,38 @@ export async function everyAsync<T>(
   const boolArray = await Promise.all(array.map(asyncPredicate));
   return boolArray.every(b => b);
 }
+
+/**
+ * Executes an asynchronous function and applies a timeout.
+ * If the provided asynchronous function (`asyncFn`) does not resolve or reject
+ * within the `timeoutMillis` duration, the returned Promise will reject
+ * with the `timeoutError`.
+ *
+ * @template T - The type of the value that the `asyncFn` promise resolves to.
+ * @param asyncFn - A function that returns a Promise. This is the asynchronous
+ *                  operation to be executed with a timeout.
+ * @param timeoutMillis - The maximum time in milliseconds to wait for `asyncFn`
+ *                        to complete.
+ * @param timeoutError - (Optional) The error to be thrown if the operation
+ *                       times out. Defaults to an `Error` instance indicating
+ *                       that the operation timed out after `timeoutMillis` ms.
+ * @returns A Promise that resolves with the result of `asyncFn` if it completes
+ *          within the timeout period. It rejects with `timeoutError` if the
+ *          timeout is reached, or with any error thrown by `asyncFn` itself
+ *          if `asyncFn` rejects before the timeout.
+ */
+export async function withTimeout<T>(
+  asyncFn: () => Promise<T>,
+  timeoutMillis: number,
+  timeoutError = new Error(`Operation timed out after ${timeoutMillis} ms`),
+): Promise<T> {
+  const { promise, reject } = Promise.withResolvers<T>();
+
+  const timeoutId = setTimeout(() => reject(timeoutError), timeoutMillis);
+
+  try {
+    return await Promise.race([asyncFn(), promise]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}

@@ -8,7 +8,7 @@ import { ChainLinkFeedInfo } from '../../../data-services/fetchers/chainlink/typ
 import {
   chainlinkNetworkNameToChainId,
   parseNetworkFilename,
-} from '../../../chainlink-compatibility/types';
+} from '@blocksense/config-types/chainlink-compatibility';
 import { SimplifiedFeed } from '../types';
 
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';

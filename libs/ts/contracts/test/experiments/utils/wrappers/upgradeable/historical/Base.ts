@@ -5,7 +5,7 @@ import { IHistoricalWrapper } from '../../../../utils/wrappers/interfaces/IHisto
 export abstract class UpgradeableProxyHistoricalBaseWrapper<
   U extends BaseContract,
 > extends UpgradeableProxyBaseWrapper<U> {
-  public override implementation!: IHistoricalWrapper<U>;
+  public declare implementation: IHistoricalWrapper<U>;
 
   public async checkSetTimestamps(
     keys: number[],

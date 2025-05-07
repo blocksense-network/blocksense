@@ -12,7 +12,7 @@ const KuCoinAssetInfoSchema = S.mutable(
   }),
 );
 
-export type KuCoinAssetInfo = S.Schema.Type<typeof KuCoinAssetInfoSchema>;
+export type KuCoinAssetInfo = typeof KuCoinAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from KuCoin Exchange.
@@ -29,7 +29,7 @@ export const KuCoinInfoRespSchema = S.mutable(
   }),
 );
 
-export type KuCoinInfoResp = S.Schema.Type<typeof KuCoinInfoRespSchema>;
+export type KuCoinInfoResp = typeof KuCoinInfoRespSchema.Type;
 
 export const KuCoinPriceSchema = S.mutable(
   S.Struct({
@@ -44,4 +44,4 @@ export const KuCoinPriceSchema = S.mutable(
   }),
 );
 
-export type KuCoinPrice = S.Schema.Type<typeof KuCoinPriceSchema>;
+export type KuCoinPrice = typeof KuCoinPriceSchema.Type;
