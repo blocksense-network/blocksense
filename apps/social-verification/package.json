@@ -22,16 +22,16 @@
     "ts": "yarn node --import tsx"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.7.5",
-    "@cloudflare/workers-types": "^4.20250423.0",
-    "tsx": "^4.19.3",
+    "@cloudflare/vitest-pool-workers": "^0.8.27",
+    "@cloudflare/workers-types": "^4.20250508.0",
+    "tsx": "^4.19.4",
     "typescript": "^5.5.2",
-    "vitest": "~3.0.7",
+    "vitest": "~3.1.3",
     "wrangler": "^4.13.0"
   },
   "dependencies": {
-    "@effect/platform": "^0.80.13",
-    "effect": "^3.14.13",
-    "thirdweb": "^5.95.3"
+    "@effect/platform": "^0.80.21",
+    "effect": "^3.14.21",
+    "thirdweb": "^5.98.0"
   }
 }
