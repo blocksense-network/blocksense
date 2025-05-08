@@ -6,17 +6,17 @@
     "type": "module",
     "module": "esnext",
     "dependencies": {
-        "@aztec/aztec.js": "0.67.1",
+        "@aztec/aztec.js": "0.86.0",
         "tslib": "^2.8.1",
-        "vite": "^6.0.7"
+        "vite": "^6.3.5"
     },
     "devDependencies": {
-        "@aztec/accounts": "0.67.1",
-        "@aztec/builder": "0.67.1",
-        "@aztec/noir-contracts.js": "0.67.1",
-        "@babel/preset-typescript": "^7.26.0",
-        "@types/node": "^22.10.2",
+        "@aztec/accounts": "0.86.0",
+        "@aztec/builder": "0.86.0",
+        "@aztec/noir-contracts.js": "0.86.0",
+        "@babel/preset-typescript": "^7.27.1",
+        "@types/node": "^22.15.16",
         "typescript": "5.8.3",
-        "vitest": "^3.0.2"
+        "vitest": "^3.1.3"
     }
 }
