@@ -62,23 +62,11 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
   return (
     <form className="mint-form border border-[var(--gray-dark)] md:rounded-3xl rounded-2xl md:p-8 px-4 py-6">
       <FormStepContainer>
-        <FormStepTitle title="Follow us on X" number={1} />
-        <NetworkLink
-          title="Blocksense Network"
-          description="@blocksense_"
-          link="https://x.com/blocksense_"
-        />
-      </FormStepContainer>
-
-      <Separator className={separatorClassName} />
-
-      <FormStepContainer>
-        <FormStepTitle title="Join our Discord community" number={2} />
-        <NetworkLink
-          title="Community"
-          description="+20k members"
-          link="https://discord.com/invite/mYujUXwrMr"
-        />
+        <FormStepTitle title="Follow us on X and join our Discord" number={1} />
+        <section className="flex md:flex-row flex-col md:gap-4 gap-2">
+          <NetworkLink type="x" />
+          <NetworkLink type="discord" />
+        </section>
       </FormStepContainer>
 
       <Separator className={separatorClassName} />
@@ -86,7 +74,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       <FormStepContainer>
         <FormStepTitle
           title="Enter your social handles for verification"
-          number={3}
+          number={2}
         />
         <section className="flex flex-col md:gap-[0.875rem] gap-2">
           <Input
@@ -119,7 +107,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       <FormStepContainer>
         <FormStepTitle
           title="Copy your unique generated code and retweet our announcement with it"
-          number={4}
+          number={3}
         />
         <section className="flex flex-col md:gap-[0.875rem] gap-2">
           <CopyInput
@@ -127,10 +115,6 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
             placeholder="Code"
             id="retweet-code"
             readOnly
-          />
-          <NetworkLink
-            title="Retweet our announcement"
-            link={`https://x.com/intent/post?text=${retweetCode}%20https://x.com/blocksense_/status/tweet_id`} //TODO: Add correct tweet_id
           />
         </section>
       </FormStepContainer>
