@@ -3,10 +3,11 @@ mod providers;
 mod types;
 mod utils;
 
-use anyhow::{Context, Result};
+use std::{collections::HashMap, fmt::Write};
+
+use anyhow::{Context, Error, Result};
 use itertools::Itertools;
 use prettytable::{format, Cell, Row, Table};
-use std::{collections::HashMap, fmt::Write};
 
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
@@ -15,13 +16,25 @@ use blocksense_sdk::{
 };
 
 use fetch_prices::fetch_all_prices;
-
 use types::{
     Capabilities, FeedConfigData, PairToResults, ProvidersSymbols, ResourceData, ResourcePairData,
 };
+use utils::are_markets_open;
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
+    match are_markets_open() {
+        Ok(true) => {}
+        Ok(false) => {
+            println!("❌ Markets are closed. Prices can't be fetched.");
+            return Err(Error::msg("Markets are closed. Prices can't be fetched."));
+        }
+        Err(err) => {
+            eprintln!("Error checking market hours: {}", err);
+            return Err(err);
+        }
+    }
+
     println!("Starting oracle component - Stock Price Feeds");
 
     let capabilities = get_capabilities_from_settings(&settings)?;

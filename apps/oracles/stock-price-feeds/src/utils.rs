@@ -1,3 +1,8 @@
+use anyhow::{Error, Result};
+use chrono::Datelike;
+use chrono::{NaiveTime, Utc};
+use chrono_tz::US::Eastern;
+
 use crate::types::Capabilities;
 
 pub fn get_api_key<'a>(capabilities: Option<&'a Capabilities>, key: &str) -> Option<&'a str> {
@@ -21,4 +26,25 @@ pub fn print_missing_network_price_data<T>(
         },
         if volume.is_none() { "volume" } else { "" },
     );
+}
+
+pub fn are_markets_open() -> Result<bool> {
+    let now_et = Utc::now().with_timezone(&Eastern);
+
+    let weekday = now_et.weekday();
+    let current_time = now_et.time();
+
+    let market_hours_start_time =
+        NaiveTime::from_hms_opt(9, 30, 0).ok_or_else(|| Error::msg("Invalid market start time"))?;
+    let market_hours_end_time =
+        NaiveTime::from_hms_opt(16, 0, 0).ok_or_else(|| Error::msg("Invalid market end time"))?;
+
+    if weekday == chrono::Weekday::Sat
+        || weekday == chrono::Weekday::Sun
+        || current_time < market_hours_start_time
+        || current_time > market_hours_end_time
+    {
+        return Ok(false);
+    }
+    Ok(true)
 }
