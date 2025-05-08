@@ -82,7 +82,7 @@ const AboutDesktop = () => {
             />
           </motion.section>
           <motion.aside
-            className="about__details max-w-[22.688rem] mx-auto"
+            className="about__details max-w-[22.75rem]"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.36 }}
@@ -111,7 +111,7 @@ const AboutMobile = () => {
         <h2 className="about__title mb-[1.5rem] leading-[120%]">
           What's next for a flag-carrying pirate like you?
         </h2>
-        <p className="about__description max-w-[27rem]">
+        <p className="about__description max-w-[32rem]">
           Congrats! Your proof-of-membership pirate NFT should now be in your
           wallet.
           <br />
