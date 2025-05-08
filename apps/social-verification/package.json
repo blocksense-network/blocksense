@@ -3,6 +3,16 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
+  "exports": {
+    "./api": {
+      "import": "./src/api.ts",
+      "types": "./src/api.ts"
+    },
+    "./types": {
+      "import": "./src/types.ts",
+      "types": "./src/types.ts"
+    }
+  },
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
