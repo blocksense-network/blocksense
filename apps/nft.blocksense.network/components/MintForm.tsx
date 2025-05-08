@@ -7,7 +7,14 @@ import { ConnectButton, darkTheme, useActiveAccount } from 'thirdweb/react';
 import { signMessage } from 'thirdweb/utils';
 import { createWallet } from 'thirdweb/wallets';
 
-import { apiClient } from 'service/client';
+import {
+  checkParticipant,
+  hasXUserRetweeted,
+  isDiscordUserMemberOfGuild,
+  isXUserFollowing,
+  mintNftBackend,
+  saveParticipant,
+} from 'service/client';
 import { Button } from './Button';
 import { FormStepTitle } from './FormStepTitle';
 import { FormStepContainer } from './FormStepContainer';
@@ -18,79 +25,6 @@ import { CopyInput } from './CopyInput';
 import { client, mintNFT } from '@/mint';
 
 const wallets = [createWallet('io.metamask'), createWallet('walletConnect')];
-
-const isDiscordUserMemberOfGuild = (username: string) =>
-  Effect.runPromise(
-    Effect.gen(function* () {
-      const client = yield* apiClient;
-      const response = yield* client.discord.isDiscordUserMemberOfGuild({
-        payload: { username },
-      });
-      return response;
-    }),
-  );
-
-const isXUserFollowing = (username: string) =>
-  Effect.runPromise(
-    Effect.gen(function* () {
-      const client = yield* apiClient;
-      const response = yield* client.x.isXUserFollowing({
-        payload: { username },
-      });
-      return response;
-    }),
-  );
-
-const hasXUserRetweeted = (userId: string, retweetCode: string) =>
-  Effect.runPromise(
-    Effect.gen(function* () {
-      const client = yield* apiClient;
-      const response = yield* client.x.hasXUserRetweeted({
-        payload: { userId, retweetCode },
-      });
-      return response;
-    }),
-  );
-
-const mintNftBackend = (accountAddress: string) =>
-  Effect.runPromise(
-    Effect.gen(function* () {
-      const client = yield* apiClient;
-      const response = yield* client.mint.generateMintSignature({
-        payload: { accountAddress },
-      });
-      return response;
-    }),
-  );
-
-type ParticipantPayload = {
-  xHandle: string;
-  discordUsername: string;
-  walletAddress: string;
-  walletSignature: string;
-};
-
-const saveParticipant = (payload: ParticipantPayload) =>
-  Effect.runPromise(
-    Effect.gen(function* () {
-      const client = yield* apiClient;
-      const response = yield* client.participants.saveParticipant({
-        payload,
-      });
-      return response;
-    }),
-  );
-
-const checkParticipant = (payload: ParticipantPayload) =>
-  Effect.runPromise(
-    Effect.gen(function* () {
-      const client = yield* apiClient;
-      const response = yield* client.participants.checkParticipant({
-        payload,
-      });
-      return response;
-    }),
-  );
 
 const separatorClassName = 'mint-form__separator md:my-8 my-6';
 
