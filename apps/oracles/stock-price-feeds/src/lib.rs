@@ -33,10 +33,10 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     println!("Starting oracle component - Stock Price Feeds");
 
-    let capabilities = get_capabilities_from_settings(&settings)?;
+    let capabilities = get_capabilities_from_settings(&settings);
     let resources = get_resources_from_settings(&settings)?;
 
-    let results = fetch_all_prices(&resources, Some(&capabilities)).await?;
+    let results = fetch_all_prices(&resources, &capabilities).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);
@@ -64,12 +64,12 @@ fn process_results(results: &PairToResults) -> Result<Payload> {
     Ok(payload)
 }
 
-fn get_capabilities_from_settings(settings: &Settings) -> Result<Capabilities> {
-    Ok(settings
+fn get_capabilities_from_settings(settings: &Settings) -> Capabilities {
+    settings
         .capabilities
         .iter()
         .map(|cap| (cap.id.to_string(), cap.data.to_string()))
-        .collect())
+        .collect()
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
