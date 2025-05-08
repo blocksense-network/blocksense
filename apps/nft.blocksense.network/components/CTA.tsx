@@ -5,6 +5,7 @@ import Image from 'next/image';
 
 import { Button } from 'components/Button';
 import bgCtaDesktop from '/public/images/bg-cta-desktop.png';
+import bgCtaMobile from '/public/images/bg-cta-mobile.png';
 
 export const CTA = () => {
   return (
@@ -18,7 +19,7 @@ export const CTA = () => {
 const CTADesktop = () => {
   return (
     <motion.section
-      className="cta cta-desktop p-8 hidden md:block"
+      className="cta cta-desktop py-8 px-20 hidden md:block"
       initial="hidden"
       whileInView="visible"
       viewport={{ amount: 0.5 }}
@@ -38,7 +39,7 @@ const CTADesktop = () => {
         }}
         transition={{ duration: 1 }}
       >
-        <div className="cta__overlay absolute inset-0 bg-gradient-to-b from-[rgba(43,41,41,0)] via-[rgba(43,41,41,0)] to-[rgba(38,38,38,0.7)] z-20" />
+        <div className="cta__overlay absolute inset-0 bg-gradient-to-b from-[rgba(43,41,41,0)] via-[rgba(43,41,41,0)] to-[rgba(38,38,38,0.7)]" />
         <article className="cta__inner relative flex items-center max-w-[34.9375rem] z-30">
           <motion.section
             className="cta__content flex flex-col justify-center items-start text-left"
@@ -136,11 +137,11 @@ const CTAMobile = () => {
         </nav>
       </article>
       <Image
-        src={bgCtaDesktop}
+        src={bgCtaMobile}
         alt="CTA Background Mobile"
         priority
         quality={100}
-        className="object-cover mt-[-3rem]"
+        className="object-cover w-full rounded-b-2xl mt-[-10rem]"
         unoptimized
       />
     </motion.section>
