@@ -283,9 +283,6 @@ library Blocksense {
   ) internal view returns (bytes32 returnData) {
     // using assembly staticcall costs less gas than using a view function
     assembly {
-      // get free memory pointer
-      let ptr := mload(0x40)
-
       // store selector in memory at location 0
       mstore(0x00, selector)
 
@@ -295,7 +292,7 @@ library Blocksense {
         dataFeedStore, // address to call
         0x00, // location of data to call
         19, // size of data to call - usually it is 17b but for _getRoundData it is 19b because of the 2 bytes of the round
-        ptr, // where to store the return data
+        returnData, // where to store the return data
         32 // how much data to store
       )
 
@@ -304,8 +301,8 @@ library Blocksense {
         revert(0, 0)
       }
 
-      // assign loaded return value at memory location ptr to returnData
-      returnData := mload(ptr)
+      // assign loaded return value to returnData
+      returnData := mload(returnData)
     }
   }
 
@@ -326,10 +323,6 @@ library Blocksense {
     returnData = new bytes32[](length);
     // using assembly staticcall costs less gas than using a view function
     assembly {
-      // get free memory pointer
-      let ptr := mload(0x40)
-      length := shl(5, length)
-
       // store selector in memory at location 0
       mstore(0x00, selector)
 
@@ -339,24 +332,13 @@ library Blocksense {
         dataFeedStore, // address to call
         0x00, // location of data to call
         selectorLength, // size of data to call - usually it is 19b but for _getRoundData it is 21b because of the 2 bytes of the round
-        ptr, // where to store the return data
-        length // how much data to store
+        add(returnData, 32), // where to store the return data
+        shl(5, length) // how much data to store
       )
 
       // revert if call failed
       if iszero(success) {
         revert(0, 0)
-      }
-
-      let array := add(returnData, 32)
-
-      // assign loaded return value at memory location ptr to returnData
-      for {
-        let i := 0
-      } lt(i, length) {
-        i := add(i, 32)
-      } {
-        mstore(add(array, i), mload(add(ptr, i)))
       }
     }
   }
@@ -379,10 +361,6 @@ library Blocksense {
     returnData = new bytes32[](length);
     // using assembly staticcall costs less gas than using a view function
     assembly {
-      // get free memory pointer
-      let ptr := mload(0x40)
-      length := add(shl(5, length), 32)
-
       // store selector in memory at location 0
       mstore(0x00, selector)
 
@@ -392,8 +370,8 @@ library Blocksense {
         dataFeedStore, // address to call
         0x00, // location of data to call
         selectorLength, // size of data to call - usually it is 19b but for _getRoundData it is 21b because of the 2 bytes of the round
-        ptr, // where to store the return data
-        length // how much data to store
+        returnData, // where to store the return data
+        add(shl(5, length), 32) // how much data to store
       )
 
       // revert if call failed
@@ -403,16 +381,8 @@ library Blocksense {
 
       // load return value from memory at location ptr
       // round is stored in the first 32 bytes of the returned 64 bytes
-      round := mload(ptr)
-
-      // assign loaded return value at memory location ptr to returnData
-      for {
-        let i := 32
-      } gt(length, i) {
-        i := add(i, 32)
-      } {
-        mstore(add(returnData, i), mload(add(ptr, i)))
-      }
+      round := mload(returnData)
+      mstore(returnData, length)
     }
   }
 
