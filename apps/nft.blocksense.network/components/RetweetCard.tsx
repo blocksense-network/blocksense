@@ -18,7 +18,7 @@ export const RetweetCard = ({
   return (
     <article className="retweet-card__container flex flex-col gap-2">
       <a
-        href={`https://x.com/intent/post?text=${retweetCode}%20https://x.com/blocksense_/status/tweet_id`} //TODO: Add correct tweet_id
+        href={`https://x.com/intent/post?text=${retweetCode}%20https://x.com/blocksense_/status/${process.env['NEXT_PUBLIC_X_BLOCKSENSE_TWEET_ID']}`}
         target="_blank"
         rel="noopener noreferrer"
         className="network_link"
