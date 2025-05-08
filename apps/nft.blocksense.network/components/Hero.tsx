@@ -36,8 +36,8 @@ const HeroDesktop = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
           >
-            <h1 className="text-[2.5rem] leading-tight">
-              Join the Blocksense <br /> crew with your pirate NFT
+            <h1>
+              Join the Blocksense crew <br /> with your pirate NFT
             </h1>
             <ClaimNFTButton className="w-fit" />
           </motion.section>
@@ -84,7 +84,8 @@ const HeroMobile = () => {
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7, delay: 0.1 }}
       >
-        Join the Blocksense <br /> crew with your pirate NFT
+        Join the Blocksense <br /> crew with your <br className="sm:hidden" />
+        pirate NFT
       </motion.h1>
       <motion.div
         initial={{ opacity: 0, y: -50 }}
