@@ -7,6 +7,7 @@ import {
   HttpApiMiddleware,
   HttpApiSecurity,
 } from '@effect/platform';
+
 import { ParticipantPayloadSchema } from './types';
 
 export class Authorization extends HttpApiMiddleware.Tag<Authorization>()(

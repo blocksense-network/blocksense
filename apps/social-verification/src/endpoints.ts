@@ -3,7 +3,6 @@ import {
   Effect as E,
   Effect,
   Layer,
-  pipe,
   Redacted,
   Schema as S,
 } from 'effect';
@@ -24,7 +23,6 @@ import {
   XUserInfoResponseSchema,
 } from './types';
 import { fetchAndDecodeJSON } from './utils';
-import { cons } from 'effect/List';
 
 type ApiEndpoint<RequestA, RequestI, ResponseA, ResponseI> = {
   method: HttpMethod;
@@ -119,6 +117,9 @@ export const server: ApiServer<Api> = {
   isXUserFollowing: payload =>
     Effect.contextWithEffect(context => {
       const env = getEnv(context);
+      const socialDataApiKey = env['SOCIAL_DATA_API_KEY'];
+      const xBlocksenseAccountId = env['X_BLOCKSENSE_ACCOUNT_ID'];
+
       const username = payload.username;
 
       return Effect.tryPromise({
@@ -128,7 +129,7 @@ export const server: ApiServer<Api> = {
             `https://api.socialdata.tools/twitter/user/${username}`,
             {
               headers: {
-                Authorization: `Bearer ${env['SOCIAL_DATA_API_KEY']}`,
+                Authorization: `Bearer ${socialDataApiKey}`,
               },
             },
           );
@@ -144,10 +145,10 @@ export const server: ApiServer<Api> = {
 
           const xUserFollowingResponse = await fetchAndDecodeJSON(
             XUserFollowingResponseSchema,
-            `https://api.socialdata.tools/twitter/user/${userId}/following/${env['X_BLOCKSENSE_ACCOUNT_ID']}`,
+            `https://api.socialdata.tools/twitter/user/${userId}/following/${xBlocksenseAccountId}`,
             {
               headers: {
-                Authorization: `Bearer ${env['SOCIAL_DATA_API_KEY']}`,
+                Authorization: `Bearer ${socialDataApiKey}`,
               },
             },
           );
@@ -174,8 +175,10 @@ export const server: ApiServer<Api> = {
   hasXUserRetweeted: payload =>
     Effect.contextWithEffect(context => {
       const env = getEnv(context);
-      const userId = payload.userId;
       const tweetId = env['X_BLOCKSENSE_TWEET_ID'];
+      const socialDataApiKey = env['SOCIAL_DATA_API_KEY'];
+
+      const userId = payload.userId;
 
       return Effect.tryPromise({
         try: async () => {
@@ -184,7 +187,7 @@ export const server: ApiServer<Api> = {
             `https://api.socialdata.tools/twitter/user/${userId}/tweets`,
             {
               headers: {
-                Authorization: `Bearer ${env['SOCIAL_DATA_API_KEY']}`,
+                Authorization: `Bearer ${socialDataApiKey}`,
               },
             },
           );
@@ -229,16 +232,18 @@ export const server: ApiServer<Api> = {
   isDiscordUserMemberOfGuild: payload =>
     Effect.contextWithEffect(context => {
       const env = getEnv(context);
+      const discordBotToken = env['DISCORD_BOT_TOKEN'];
+      const discordGuildId = env['DISCORD_BLOCKSENSE_GUILD_ID'];
       const username = payload.username;
 
       return Effect.tryPromise({
         try: async () => {
           const discordResponse = await fetchAndDecodeJSON(
             DiscordUserInfoResponseSchema,
-            `https://discord.com/api/v10/guilds/${env['DISCORD_BLOCKSENSE_GUILD_ID']}/members/search?query=${username}`,
+            `https://discord.com/api/v10/guilds/${discordGuildId}/members/search?query=${username}`,
             {
               headers: {
-                Authorization: `Bot ${env['DISCORD_BOT_TOKEN']}`,
+                Authorization: `Bot ${discordBotToken}`,
               },
             },
           );
@@ -372,8 +377,13 @@ export const server: ApiServer<Api> = {
 
           console.log(`Checking participant data:\n` + JSON.stringify(payload));
 
-          const selectQuery =
-            'SELECT * FROM participants WHERE x_handle = ? AND discord_username = ? AND wallet_address = ? AND wallet_signature = ?';
+          const selectQuery = `
+          SELECT * FROM participants
+          WHERE x_handle = ?
+            OR discord_username = ?
+            OR wallet_address = ?
+            OR wallet_signature = ?
+          `;
           const selectResult = await db
             .prepare(selectQuery)
             .bind(

@@ -1,7 +1,6 @@
 'use client';
 
 import { Effect } from 'effect';
-import { Schema as S } from 'effect';
 
 import {
   FetchHttpClient,
