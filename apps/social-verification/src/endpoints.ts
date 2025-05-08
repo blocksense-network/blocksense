@@ -3,11 +3,12 @@ import {
   Effect as E,
   Effect,
   Layer,
+  pipe,
   Redacted,
   Schema as S,
 } from 'effect';
 import { Tag } from 'effect/Context';
-import { NotFound } from '@effect/platform/HttpApiError';
+import { NotFound, Unauthorized } from '@effect/platform/HttpApiError';
 import { HttpMethod } from '@effect/platform/HttpMethod';
 import { HttpApiBuilder } from '@effect/platform';
 import { createThirdwebClient, getContract } from 'thirdweb';
@@ -56,13 +57,18 @@ const cors = HttpApiBuilder.middlewareCors({
 export const AuthorizationLive = Layer.effect(
   Authorization,
   Effect.gen(function* () {
-    const context = yield* Effect.context();
-    yield* Effect.log('creating Authorization middleware');
-
+    console.log('Creating Authorization middleware');
     return {
-      apiKey: apiKey =>
-        Effect.gen(function* () {
-          yield* Effect.log('checking api key', Redacted.value(apiKey));
+      apiKey: (apiKey: Redacted.Redacted<string>) =>
+        Effect.contextWith(context => {
+          const expectedApiKey = getEnv(context)['API_KEY'];
+
+          if (expectedApiKey !== Redacted.value(apiKey)) {
+            console.log('Unauthorized access attempt');
+            throw new Unauthorized();
+          }
+
+          console.log('Authorized access');
         }),
     };
   }),
