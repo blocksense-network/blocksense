@@ -77,7 +77,7 @@ const HeroDesktop = () => {
 
 const HeroMobile = () => {
   return (
-    <article className="md:hidden flex flex-col gap-[2.188rem] px-5 pt-[2.172rem] pb-12">
+    <article className="md:hidden flex flex-col gap-[2.188rem] px-5 pt-[2.172rem] pb-12 overflow-x-hidden">
       <motion.h1
         className="text-[2rem]"
         initial={{ opacity: 0, x: -50 }}
