@@ -10,6 +10,7 @@ import { Input } from './Input';
 import { NetworkLink } from './NetworkLink';
 import { Separator } from './Separator';
 import { CopyInput } from './CopyInput';
+import { RetweetCard } from './RetweetCard';
 
 const separatorClassName = 'mint-form__separator md:my-8 my-6';
 
@@ -116,6 +117,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
             id="retweet-code"
             readOnly
           />
+          <RetweetCard retweetCode={retweetCode} />
         </section>
       </FormStepContainer>
 
