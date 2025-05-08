@@ -2150,6 +2150,7 @@ __metadata:
   resolution: "@blocksense/nft.blocksense.network@workspace:apps/nft.blocksense.network"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
+    "@blocksense/social-verification": "workspace:*"
     "@blocksense/ui": "workspace:*"
     "@effect/platform": "npm:^0.80.13"
     "@next/third-parties": "npm:^15.3.1"
@@ -2213,7 +2214,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/social-verification@workspace:apps/social-verification":
+"@blocksense/social-verification@workspace:*, @blocksense/social-verification@workspace:apps/social-verification":
   version: 0.0.0-use.local
   resolution: "@blocksense/social-verification@workspace:apps/social-verification"
   dependencies:
