@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
+
 import { MintForm } from './MintForm';
 import { SuccessForm } from './SuccessForm';
 
@@ -16,12 +17,12 @@ export const Form = () => {
     <section className="form md:p-20 px-5 py-8" id="mint-form">
       <article className="form__article max-w-[32.75rem] mx-auto flex flex-col items-center justify-center md:gap-12 gap-8">
         <motion.h2
-          className="form__title text-center"
+          className="form__title md:text-center md:px-[0.015rem]"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
         >
-          Join the crew and receive your NFT <br /> by completing all the steps:
+          Join the crew and receive your NFT by completing all the steps:
         </motion.h2>
 
         <motion.div
