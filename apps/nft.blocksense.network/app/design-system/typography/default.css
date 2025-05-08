@@ -70,4 +70,8 @@
   a {
     text-decoration: none;
   }
+
+  .footer__copyright {
+    font-family: var(--font-geist-mono);
+  }
 }
