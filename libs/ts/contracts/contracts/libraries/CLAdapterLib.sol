@@ -154,9 +154,6 @@ library CLAdapterLib {
   ) internal view returns (bytes32 returnData) {
     // using assembly staticcall costs less gas than using a view function
     assembly {
-      // get free memory pointer
-      let ptr := mload(0x40)
-
       // store selector in memory at location 0
       mstore(0x00, selector)
 
@@ -166,7 +163,7 @@ library CLAdapterLib {
         dataFeedStore, // address to call
         0x00, // location of data to call
         19, // size of data to call - usually it is 17b but for _getRoundData it is 19b because of the 2 bytes of the roundId
-        ptr, // where to store the return data
+        returnData, // where to store the return data
         32 // how much data to store
       )
 
@@ -175,8 +172,8 @@ library CLAdapterLib {
         revert(0, 0)
       }
 
-      // assign loaded return value at memory location ptr to returnData
-      returnData := mload(ptr)
+      // assign loaded return value to returnData
+      returnData := mload(returnData)
     }
   }
 
