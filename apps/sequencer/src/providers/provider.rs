@@ -306,6 +306,16 @@ impl RpcProvider {
         updates.updates = mem::take(&mut res);
     }
 
+    pub fn get_latest_contract_version(&self) -> u16 {
+        if let Some(_v) = self.get_contract(ADFS_CONTRACT_NAME).map(|x| x.contract_version) {
+            return 2;
+        }
+        if let Some(_v) = self.get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME).map(|x| x.contract_version) {
+            return 1;
+        }
+        0
+    }
+
     pub fn peg_stable_coins_to_value(&self, updates: &mut BatchedAggegratesToSend) {
         for u in updates.updates.iter_mut() {
             if let FeedType::Numerical(value) = u.value {
@@ -348,6 +358,14 @@ impl RpcProvider {
         for c in self.contracts.iter_mut() {
             if c.name == name {
                 c.address = Some(*address);
+            }
+        }
+    }
+
+    pub fn set_deployed_code(&mut self, name: &str, deployed_code: &Bytes) {
+        for c in self.contracts.iter_mut() {
+            if c.name == name {
+                c.deployed_byte_code = Some(deployed_code.0.to_vec());
             }
         }
     }
@@ -520,10 +538,10 @@ impl RpcProvider {
         let contract = self
             .get_contract(contract_name)
             .ok_or(eyre!("{contract_name} contract is not set!"))?;
-
+        let timeout_duration  = Duration::from_secs(1);
         if let Some(addr) = contract.address {
             let read_byte_code = self
-                .read_contract_bytecode(&addr, Duration::from_secs(1))
+                .read_contract_bytecode(&addr, timeout_duration)
                 .await?;
             return Ok(format!(
                 "Contract {contract_name} on address {addr} has byte code {}",
@@ -562,9 +580,7 @@ impl RpcProvider {
         let deploy_time = Instant::now();
         let pending_transaction = provider.send_transaction(tx).await?;
         let transaction_reciept = pending_transaction.get_receipt().await?;
-        let contract_address = transaction_reciept
-            .contract_address
-            .expect("Failed to get contract address");
+        let contract_address = transaction_reciept.contract_address.ok_or(eyre!("Failed to get contract address"))?;
 
         info!(
             "Deployed {:?} contract at address: {:?} took {} ms\n",
@@ -573,6 +589,15 @@ impl RpcProvider {
             deploy_time.elapsed().as_millis()
         );
         self.set_contract_address(contract_name, &contract_address);
+
+        match self.read_contract_bytecode(&contract_address, timeout_duration).await {
+            Ok(read_byte_code) =>  {
+                self.set_deployed_code(contract_name, &read_byte_code);
+            }
+            Err(e) => {
+                error!("Can't read deployed code for contract {contract_name} Error -> {e}");
+            }
+        };
         Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
     }
 

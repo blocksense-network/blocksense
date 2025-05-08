@@ -135,13 +135,7 @@ pub async fn get_serialized_updates_for_network(
     if updates.updates.is_empty() {
         return Ok(Vec::new());
     }
-
-    let contract_version = provider
-        .get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
-        .ok_or(eyre!(
-            "{HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME} contract is not set!"
-        ))?
-        .contract_version;
+    let contract_version = provider.get_latest_contract_version();
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
