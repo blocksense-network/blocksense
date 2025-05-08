@@ -8,6 +8,8 @@ import {
   HttpApiSecurity,
 } from '@effect/platform';
 
+import { ParticipantPayloadSchema } from './types';
+
 export class Authorization extends HttpApiMiddleware.Tag<Authorization>()(
   'Authorization',
   {
@@ -74,6 +76,20 @@ export const verifyApi = HttpApi.make('verify')
           ),
       )
       .prefix('/mint'),
+  )
+  .add(
+    HttpApiGroup.make('participants')
+      .add(
+        HttpApiEndpoint.post('saveParticipant', '/save')
+          .setPayload(ParticipantPayloadSchema)
+          .addSuccess(S.Struct({ isSuccessful: S.Boolean })),
+      )
+      .add(
+        HttpApiEndpoint.post('checkParticipant', '/check')
+          .setPayload(ParticipantPayloadSchema)
+          .addSuccess(S.Struct({ isParticipant: S.Boolean })),
+      )
+      .prefix('/participants'),
   )
   .prefix('/verify')
   .middleware(Authorization);
