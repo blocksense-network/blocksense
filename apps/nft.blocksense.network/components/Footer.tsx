@@ -65,7 +65,7 @@ export const Footer = () => {
             <SocialNetworks />
           </motion.aside>
           <motion.p
-            className="footer__copyright not-italic text-sm text-[var(--gray-medium)] md:order-first"
+            className="footer__copyright md:order-first text-sm text-[var(--gray-medium)] leading-[0.875rem]"
             {...animationProps}
           >
             2025 © Blocksense Network
