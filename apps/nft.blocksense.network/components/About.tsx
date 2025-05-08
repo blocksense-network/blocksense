@@ -18,7 +18,7 @@ export const About = () => {
 const AboutDesktop = () => {
   return (
     <motion.section
-      className="hidden md:block px-20 relative py-[7.75rem]"
+      className="hidden md:block px-16 relative py-[7.75rem]"
       initial="hidden"
       whileInView="visible"
       viewport={{ amount: 0.1 }}

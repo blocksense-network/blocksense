@@ -19,7 +19,7 @@ export const CTA = () => {
 const CTADesktop = () => {
   return (
     <motion.section
-      className="cta cta-desktop py-8 px-20 hidden md:block"
+      className="cta cta-desktop py-8 px-16 hidden md:block"
       initial="hidden"
       whileInView="visible"
       viewport={{ amount: 0.5 }}

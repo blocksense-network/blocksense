@@ -21,7 +21,7 @@ const animationProps = {
 export const Footer = () => {
   return (
     <footer
-      className="footer text-[var(--white)] px-5 pt-12 pb-12 md:px-20 md:pt-16 md:pb-12"
+      className="footer text-[var(--white)] px-5 pt-12 pb-12 md:px-16 md:pt-16 md:pb-12"
       role="contentinfo"
     >
       <div className="max-w-[71.25rem] mx-auto">

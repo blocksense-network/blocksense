@@ -14,7 +14,7 @@ export const Form = () => {
   };
 
   return (
-    <section className="form md:p-20 px-5 py-8" id="mint-form">
+    <section className="form md:py-20 md:px-16 px-5 py-8" id="mint-form">
       <article className="form__article max-w-[32.75rem] mx-auto flex flex-col items-center justify-center md:gap-12 gap-8">
         <motion.h2
           className="form__title md:text-center md:px-[0.015rem]"
