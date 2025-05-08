@@ -35,7 +35,7 @@ export const Navbar = () => {
 const DesktopNavbar = () => {
   return (
     <motion.header
-      className="navbar hidden md:flex bg-[var(--black)/0.85] backdrop-blur-2xl z-10 fixed w-full text-[var(--white)] px-20 py-[1.125rem]"
+      className="navbar hidden md:flex bg-[var(--black)/0.85] backdrop-blur-2xl z-10 fixed w-full text-[var(--white)] px-16 py-[1.125rem]"
       {...animationProps}
     >
       <div className="w-full max-w-[71.25rem] mx-auto z-30 flex justify-between items-center">

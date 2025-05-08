@@ -19,7 +19,7 @@ export const Hero = () => {
 
 const HeroDesktop = () => {
   return (
-    <section className="hidden md:block relative px-20 pb-8 pt-[4.672rem]">
+    <section className="hidden md:block relative px-16 pb-8 pt-[4.672rem]">
       <Image
         src={heroVector}
         alt="Hero Vector"
