@@ -3,15 +3,8 @@
 import { motion } from 'motion/react';
 import Image from 'next/image';
 
-import aboutVector from '/public/images/about-vector.svg';
-import bsxParrot from '/public/images/bsx-parrot.png';
-import bsxPirate from '/public/images/bsx-pirate.png';
-import bsxRobot from '/public/images/bsx-robot.png';
-import bsxWarrior from '/public/images/bsx-warrior.png';
-
-import bsxParrotMobile from '/public/images/bsx-parrot-mobile.png';
-import bsxRobotMobile from '/public/images/bsx-robot-mobile.png';
-import bsxWarriorMobile from '/public/images/bsx-warrior-mobile.png';
+import heroesGrid from '/public/images/heroes-grid.png';
+import aboutPirateFlag from '/public/images/about-pirate-flag.png';
 
 export const About = () => {
   return (
@@ -34,14 +27,6 @@ const AboutDesktop = () => {
         visible: { opacity: 1 },
       }}
     >
-      <Image
-        src={aboutVector}
-        alt="About Vector"
-        fill
-        quality={100}
-        sizes="100vw"
-        className="z-[-1]"
-      />
       <section className="about about--desktop max-w-[59.125rem] mx-auto">
         <header className="about__row about__row--top flex justify-between gap-4 items-center mb-[4rem]">
           <motion.section
@@ -74,9 +59,9 @@ const AboutDesktop = () => {
             transition={{ duration: 0.8, delay: 0.36 }}
           >
             <Image
-              className="about__image max-w-max"
-              src={bsxPirate}
-              alt="Pirate NFT"
+              className="about__image max-w-[22.75rem]"
+              src={aboutPirateFlag}
+              alt="Pirate Flag NFT"
               quality={100}
               unoptimized
             />
@@ -84,34 +69,17 @@ const AboutDesktop = () => {
         </header>
         <article className="about__row about__row--bottom flex justify-between gap-4 items-center">
           <motion.section
-            className="about__gallery max-w-[30.75rem] flex gap-[1.25rem]"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.18 }}
           >
             <Image
-              src={bsxParrot}
-              alt="Blocksense Parrot"
-              className="about__image max-w-max"
+              src={heroesGrid}
+              alt="Blocksense Heroes Grid"
+              className="about__image max-w-[28.75rem]"
               quality={100}
               unoptimized
             />
-            <div className="about__stack flex flex-col gap-[1rem]">
-              <Image
-                src={bsxWarrior}
-                alt="Blocksense Warrior"
-                className="about__image max-w-max"
-                quality={100}
-                unoptimized
-              />
-              <Image
-                src={bsxRobot}
-                alt="Blocksense Robot"
-                className="about__image max-w-max"
-                quality={100}
-                unoptimized
-              />
-            </div>
           </motion.section>
           <motion.aside
             className="about__details max-w-[22.688rem] mx-auto"
@@ -163,9 +131,9 @@ const AboutMobile = () => {
         transition={{ duration: 0.8, delay: 0.36 }}
       >
         <Image
-          className="about__image w-full"
-          src={bsxPirate}
-          alt="Pirate NFT Mobile"
+          className="about__image"
+          src={aboutPirateFlag}
+          alt="Pirate Flag NFT"
           quality={100}
           unoptimized
         />
@@ -183,29 +151,14 @@ const AboutMobile = () => {
         </p>
       </motion.footer>
       <motion.div
-        className="about__gallery flex flex-col gap-4 w-full"
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.36 }}
       >
         <Image
-          src={bsxParrotMobile}
-          alt="Blocksense Parrot Mobile"
-          className="about__image w-full h-auto"
-          quality={100}
-          unoptimized
-        />
-        <Image
-          src={bsxWarriorMobile}
-          alt="Blocksense Warrior Mobile"
-          className="about__image w-full h-auto"
-          quality={100}
-          unoptimized
-        />
-        <Image
-          src={bsxRobotMobile}
-          alt="Blocksense Robot Mobile"
-          className="about__image w-full h-auto"
+          src={heroesGrid}
+          alt="Blocksense Heroes Grid"
+          className="about__image"
           quality={100}
           unoptimized
         />
