@@ -2159,6 +2159,7 @@ __metadata:
     "@types/react": "npm:^18.3.3"
     clsx: "npm:^2.1.1"
     effect: "npm:^3.14.13"
+    ethers: "npm:^6.14.0"
     motion: "npm:^12.9.2"
     next: "npm:^15.1.4"
     postcss: "npm:^8.4.49"
@@ -2172,6 +2173,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
     typescript: "npm:5.8.3"
+    web3: "npm:^4.16.0"
   languageName: unknown
   linkType: soft
 
@@ -16935,6 +16937,21 @@ __metadata:
     tslib: "npm:2.7.0"
     ws: "npm:8.17.1"
   checksum: 10c0/efcf9f39f841e38af68ec23cdbd745432c239c256aac4929842d1af04e55d7be0ff65e462f1cf3e93586f43f7bdcc0098fd56f2f7234f36d73e466521a5766ce
+  languageName: node
+  linkType: hard
+
+"ethers@npm:^6.14.0":
+  version: 6.14.0
+  resolution: "ethers@npm:6.14.0"
+  dependencies:
+    "@adraffy/ens-normalize": "npm:1.10.1"
+    "@noble/curves": "npm:1.2.0"
+    "@noble/hashes": "npm:1.3.2"
+    "@types/node": "npm:22.7.5"
+    aes-js: "npm:4.0.0-beta.5"
+    tslib: "npm:2.7.0"
+    ws: "npm:8.17.1"
+  checksum: 10c0/7da443719a21c0b071dbd7d47e50faa8fcacc746e2b5487a394992215457903b1d187279e7134b48414d2626d0dbbf58b20c3bb8d246c359aa0a7453b608d582
   languageName: node
   linkType: hard
 

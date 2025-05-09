@@ -23,6 +23,7 @@
     "@tailwindcss/postcss": "^4.0.7",
     "clsx": "^2.1.1",
     "effect": "^3.14.13",
+    "ethers": "^6.14.0",
     "motion": "^12.9.2",
     "next": "^15.1.4",
     "postcss": "^8.4.49",
@@ -32,6 +33,7 @@
     "tailwindcss": "^4.0.7",
     "tailwindcss-animate": "^1.0.7",
     "thirdweb": "^5.95.3",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "web3": "^4.16.0"
   }
 }

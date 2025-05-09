@@ -5,7 +5,7 @@ import { sendGAEvent } from '@next/third-parties/google';
 import { Effect } from 'effect';
 import { ConnectButton, darkTheme, useActiveAccount } from 'thirdweb/react';
 import { signMessage } from 'thirdweb/utils';
-import { createWallet } from 'thirdweb/wallets';
+import { createWallet, smartWallet } from 'thirdweb/wallets';
 
 import {
   checkParticipant,
@@ -23,7 +23,8 @@ import { NetworkLink } from './NetworkLink';
 import { Separator } from './Separator';
 import { CopyInput } from './CopyInput';
 import { RetweetCard } from './RetweetCard';
-import { client, mintNFT } from '@/mint';
+import { client, getTokenId, mintNFT } from '@/mint';
+import { arbitrum, sepolia } from 'thirdweb/chains';
 
 const wallets = [createWallet('io.metamask'), createWallet('walletConnect')];
 
@@ -78,15 +79,15 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
 
     const { isParticipant } = await checkParticipant(participantsPayload);
 
-    if (isParticipant) {
-      setRetweetError('You have already minted your NFT');
-      setMintLoading(false);
-      return;
-    }
+    // if (isParticipant) {
+    //   setRetweetError('You have already minted your NFT');
+    //   setMintLoading(false);
+    //   return;
+    // }
 
     try {
       const { payload, signature } = await mintNftBackend(account.address);
-      await mintNFT(account, payload, signature);
+      const transaction = await mintNFT(account, payload, signature);
 
       sendGAEvent('event', 'mintedNFT', {
         xHandle,
@@ -94,6 +95,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
         retweetCode,
       });
 
+      //TODO:(EmilIvanichkovv): Add the transaction to the DB
       await saveParticipant(participantsPayload);
 
       onSuccessAction();
