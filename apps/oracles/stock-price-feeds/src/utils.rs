@@ -1,5 +1,6 @@
 use anyhow::{Error, Result};
-use chrono::{Datelike, NaiveTime};
+use chrono::{Datelike, NaiveTime, TimeZone};
+use chrono_tz::US::Eastern;
 
 use crate::types::Capabilities;
 
@@ -58,4 +59,37 @@ fn test_get_api_key() {
 
     let result = get_api_key(None, "API_KEY");
     assert_eq!(result, None);
+}
+
+#[test]
+fn test_are_markets_open() {
+    let test_cases = [
+        // Weekdays - markets open
+        (2025, 5, 12, 9, 30, 0, true),   // Monday right at market open
+        (2025, 5, 13, 10, 0, 0, true),   // Tuesday
+        (2025, 5, 14, 12, 0, 0, true),   // Wednesday
+        (2025, 5, 15, 15, 40, 52, true), // Thursday
+        (2025, 5, 16, 16, 0, 0, true),   // Friday right at market close
+        // Weekdays - markets closed
+        (2025, 5, 12, 9, 29, 59, false), // Monday right before market open
+        (2025, 5, 13, 16, 0, 1, false),  // Tuesday right after market close
+        (2025, 5, 14, 3, 0, 0, false),   // Wednesday before market open
+        (2025, 5, 15, 17, 0, 0, false),  // Thursday after market close
+        (2025, 5, 16, 23, 30, 0, false), // Friday middle of the night
+        // Weekend - markets closed
+        (2025, 5, 10, 10, 0, 0, false), // Working hours but on Saturday
+        (2025, 5, 11, 10, 0, 0, false), // Working hours but on Sunday
+        (2025, 5, 10, 3, 0, 0, false),  // Non working hours but on Saturday
+        (2025, 5, 11, 3, 0, 0, false),  // Non working hours but on Sunday
+    ];
+
+    for &(year, month, day, hour, min, sec, expected_open) in &test_cases {
+        let mock_time = Eastern
+            .with_ymd_and_hms(year, month, day, hour, min, sec)
+            .single()
+            .unwrap();
+
+        let result = are_markets_open(mock_time).unwrap();
+        assert_eq!(result, expected_open);
+    }
 }
