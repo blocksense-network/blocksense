@@ -100,6 +100,17 @@ export const VerifyApiLive = HttpApiBuilder.api(verifyApi).pipe(
       ),
     ),
   ),
+  Layer.provide(
+    HttpApiBuilder.group(verifyApi, 'participants', handlers =>
+      handlers
+        .handle('saveParticipant', ({ payload }) =>
+          server.saveParticipant(payload),
+        )
+        .handle('checkParticipant', ({ payload }) =>
+          server.checkParticipant(payload),
+        ),
+    ),
+  ),
 );
 
 export const server: ApiServer<Api> = {
