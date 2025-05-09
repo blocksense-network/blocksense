@@ -5,7 +5,7 @@ import { sendGAEvent } from '@next/third-parties/google';
 import { Effect } from 'effect';
 import { ConnectButton, darkTheme, useActiveAccount } from 'thirdweb/react';
 import { signMessage } from 'thirdweb/utils';
-import { createWallet } from 'thirdweb/wallets';
+import { createWallet, smartWallet } from 'thirdweb/wallets';
 
 import {
   checkParticipant,
@@ -24,6 +24,7 @@ import { Separator } from './Separator';
 import { CopyInput } from './CopyInput';
 import { RetweetCard } from './RetweetCard';
 import { client, mintNFT } from '@/mint';
+import { sepolia } from 'thirdweb/chains';
 
 const wallets = [createWallet('io.metamask'), createWallet('walletConnect')];
 
@@ -84,9 +85,21 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       return;
     }
 
+    // 0x0d302f20a5f2e7575b33e496f2f38c6eb7cd2b7c6714204d54726220d9690f12
     try {
+      // Wrap with a sponsored smart wallet
+      const wallet = smartWallet({
+        chain: sepolia,
+        sponsorGas: true,
+      });
+      const smartAccount = await wallet.connect({
+        client,
+        personalAccount: account!,
+      });
+      console.log('smartAccount', smartAccount);
+
       const { payload, signature } = await mintNftBackend(account.address);
-      await mintNFT(account, payload, signature);
+      await mintNFT(smartAccount, payload, signature);
 
       sendGAEvent('event', 'mintedNFT', {
         xHandle,
