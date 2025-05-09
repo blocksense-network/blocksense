@@ -44,7 +44,7 @@ let
           timeout_seconds = 30;
         };
         log_configuration = logsConfig;
-        log_location = cfg.logsDir + "/anvil-${name}.log";
+        log_location = if (builtins.isNull cfg.logsDir) then null else cfg.logsDir + "/anvil-${name}.log";
       };
     }
   ) cfg.anvil;
@@ -82,7 +82,8 @@ let
             blocksense-sequencer.condition = "process_healthy";
           };
           log_configuration = logsConfig;
-          log_location = cfg.logsDir + "/reporter-${name}.log";
+          log_location =
+            if (builtins.isNull cfg.logsDir) then null else cfg.logsDir + "/reporter-${name}.log";
         };
     }
   ) cfg.reporters;
@@ -110,7 +111,7 @@ let
         "anvil-impersonate-and-fund-ink-sepolia".condition = "process_completed_successfully";
       };
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/sequencer.log";
+      log_location = if (builtins.isNull cfg.logsDir) then null else cfg.logsDir + "/sequencer.log";
     };
   };
 
@@ -120,7 +121,8 @@ let
       shutdown.signal = 9;
       depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/blockchain-reader.log";
+      log_location =
+        if (builtins.isNull cfg.logsDir) then null else cfg.logsDir + "/blockchain-reader.log";
     };
   };
 
@@ -130,7 +132,8 @@ let
       shutdown.signal = 9;
       depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/aggregate-consensus-reader.log";
+      log_location =
+        if (builtins.isNull cfg.logsDir) then null else cfg.logsDir + "/aggregate-consensus-reader.log";
     };
   };
 in

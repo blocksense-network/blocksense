@@ -33,6 +33,11 @@ start-oracle oracle-name:
   cd "{{root-dir}}/apps/oracles/{{oracle-name}}"
   RUST_LOG=trigger=info "${SPIN:-spin}" build --up
 
+get-machine-outpath commit machine:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  nix eval --raw "github:blocksense-network/blocksense?rev={{commit}}#nixosConfigurations.{{machine}}.config.system.build.toplevel.outPath"
+
 clean:
   git clean -fdx \
     -e .env \
