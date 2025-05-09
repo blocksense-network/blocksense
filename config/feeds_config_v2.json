@@ -53155,11 +53155,8 @@
         "arguments": {
           "providers": [
             "AlphaVantage",
-            "PolygonIO",
-            "Finnhum",
             "YahooFinance",
             "twelvedata",
-            "Tiingo",
             "FMP"
           ]
         }
@@ -53194,11 +53191,8 @@
         "arguments": {
           "providers": [
             "AlphaVantage",
-            "PolygonIO",
-            "Finnhum",
             "YahooFinance",
             "twelvedata",
-            "Tiingo",
             "FMP"
           ]
         }
