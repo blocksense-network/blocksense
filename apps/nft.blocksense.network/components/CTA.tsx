@@ -24,8 +24,8 @@ const CTADesktop = () => {
       whileInView="visible"
       viewport={{ amount: 0.5 }}
       variants={{
-        hidden: { opacity: 0, x: -50, scale: 0.95 },
-        visible: { opacity: 1, x: 0, scale: 1 },
+        hidden: { opacity: 0, y: 50, scale: 0.95 },
+        visible: { opacity: 1, y: 0, scale: 1 },
       }}
       transition={{ duration: 1 }}
     >
@@ -34,8 +34,8 @@ const CTADesktop = () => {
         initial="hidden"
         whileInView="visible"
         variants={{
-          hidden: { opacity: 0, x: -50, scale: 0.95 },
-          visible: { opacity: 1, x: 0, scale: 1 },
+          hidden: { opacity: 0, y: 50, scale: 0.95 },
+          visible: { opacity: 1, y: 0, scale: 1 },
         }}
         transition={{ duration: 1 }}
       >
@@ -101,7 +101,7 @@ const CTAMobile = () => {
       className="cta cta--mobile md:hidden bg-[var(--gray-dark)] my-12 rounded-2xl mx-5"
       initial="hidden"
       whileInView="visible"
-      viewport={{ amount: 0.5 }}
+      viewport={{ amount: 0.2 }}
       variants={{
         hidden: { opacity: 0, y: 50 },
         visible: { opacity: 1, y: 0 },

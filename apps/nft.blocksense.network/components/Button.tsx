@@ -11,8 +11,10 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantStyle = {
-  primary: 'bg-[var(--neon-yellow)]',
-  secondary: 'bg-[var(--white)]',
+  primary:
+    'bg-[var(--neon-yellow)] hover:bg-[var(--white)] transition-colors duration-350',
+  secondary:
+    'bg-[var(--white)] hover:bg-[var(--gray-light)] transition-colors duration-350',
 };
 
 export const Button = ({

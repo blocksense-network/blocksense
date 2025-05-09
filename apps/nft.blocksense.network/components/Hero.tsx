@@ -39,7 +39,7 @@ const HeroDesktop = () => {
             <h1>
               Join the Blocksense crew <br /> with your pirate NFT
             </h1>
-            <ClaimNFTButton className="w-fit" />
+            <ClaimNFTButton linkClassName="w-fit" />
           </motion.section>
           <motion.p
             className="flex-1 max-w-[27rem] pt-[0.75rem]"

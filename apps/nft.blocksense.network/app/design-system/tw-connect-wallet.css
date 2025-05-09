@@ -1,0 +1,26 @@
+.tw-connect-wallet {
+  padding: 1rem 2rem !important;
+  border-radius: 2.5rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.32px !important;
+  line-height: 100% !important;
+  background-color: #fff !important;
+  color: #2b2929 !important;
+  gap: 0.625rem !important;
+}
+
+[data-test='connected-wallet-details'] {
+  background-color: #fff !important;
+  border-radius: 2.5rem !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.tw-connected-wallet__address {
+  color: #2b2929 !important;
+}
+
+.tw-connected-wallet__balance {
+  color: var(--gray-medium) !important;
+}
