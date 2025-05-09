@@ -48,3 +48,18 @@ pub fn are_markets_open() -> Result<bool> {
     }
     Ok(true)
 }
+
+#[test]
+fn test_get_api_key() {
+    let mut capabilities = Capabilities::new();
+    capabilities.insert("API_KEY".to_string(), "test_key".to_string());
+
+    let result = get_api_key(Some(&capabilities), "API_KEY");
+    assert_eq!(result, Some("test_key"));
+
+    let result = get_api_key(Some(&capabilities), "NON_EXISTENT_KEY");
+    assert_eq!(result, None);
+
+    let result = get_api_key(None, "API_KEY");
+    assert_eq!(result, None);
+}
