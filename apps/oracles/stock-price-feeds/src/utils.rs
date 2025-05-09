@@ -1,7 +1,5 @@
 use anyhow::{Error, Result};
-use chrono::Datelike;
-use chrono::{NaiveTime, Utc};
-use chrono_tz::US::Eastern;
+use chrono::{Datelike, NaiveTime};
 
 use crate::types::Capabilities;
 
@@ -28,9 +26,7 @@ pub fn print_missing_network_price_data<T>(
     );
 }
 
-pub fn are_markets_open() -> Result<bool> {
-    let now_et = Utc::now().with_timezone(&Eastern);
-
+pub fn are_markets_open(now_et: chrono::DateTime<chrono_tz::Tz>) -> Result<bool> {
     let weekday = now_et.weekday();
     let current_time = now_et.time();
 

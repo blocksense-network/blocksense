@@ -14,6 +14,8 @@ use blocksense_sdk::{
     oracle_component,
     traits::prices_fetcher::PricePoint,
 };
+use chrono::Utc;
+use chrono_tz::US::Eastern;
 
 use fetch_prices::fetch_all_prices;
 use types::{
@@ -23,7 +25,8 @@ use utils::are_markets_open;
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    match are_markets_open() {
+    let now_et = Utc::now().with_timezone(&Eastern);
+    match are_markets_open(now_et) {
         Ok(true) => {}
         Ok(false) => {
             println!("❌ Markets are closed. Prices can't be fetched.");
