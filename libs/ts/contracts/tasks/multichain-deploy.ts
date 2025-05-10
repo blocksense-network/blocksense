@@ -12,7 +12,6 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import { padNumber } from '@blocksense/base-utils/string';
-import { getOptionalEnvString } from '@blocksense/base-utils/env';
 
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { predictAddress } from './utils';
@@ -64,10 +63,7 @@ task('deploy', 'Deploy contracts')
       const signerBalance = await config.provider.getBalance(signer);
 
       const create2ContractSalts = {
-        upgradeableProxy: getOptionalEnvString(
-          'ADFS_UPGRADEABLE_PROXY_SALT',
-          ethers.id('upgradeableProxy'),
-        ),
+        upgradeableProxy: config.adfsUpgradeableProxySalt,
         accessControl: ethers.id('accessControl'),
         adfs: ethers.id('aggregatedDataFeedStore'),
         safeGuard: ethers.id('onlySafeGuard'),
