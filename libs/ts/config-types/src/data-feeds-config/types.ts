@@ -178,14 +178,14 @@ export const NewFeedSchema = S.mutable(
       aggregation: S.Union(S.Literal('median')).annotations({
         identifier: 'QuorumAggregation',
       }),
-    }),
+    }).annotations({ identifier: 'FeedQuorum' }),
 
     schedule: S.Struct({
       interval_ms: S.Number,
       heartbeat_ms: S.Number,
       deviation_percentage: S.Number,
       first_report_start_unix_time_ms: S.Number,
-    }),
+    }).annotations({ identifier: 'FeedSchedule' }),
 
     // TODO: This field should be optional / different depending on the `type`.
     additional_feed_info: S.mutable(
@@ -199,7 +199,8 @@ export const NewFeedSchema = S.mutable(
           cexPriceFeedsArgsSchema,
           geckoTerminalArgsSchema,
           ethRpcArgsSchema,
-        ),
+        ).annotations({ identifier: 'OracleScriptArguments' }),
+
         compatibility_info: S.UndefinedOr(
           S.Struct({
             chainlink: S.String,
@@ -208,7 +209,7 @@ export const NewFeedSchema = S.mutable(
       }),
     ),
   }),
-);
+).annotations({ identifier: 'FeedV2' });
 
 export type NewFeed = typeof NewFeedSchema.Type;
 
@@ -219,7 +220,7 @@ export const NewFeedsConfigSchema = S.mutable(
   S.Struct({
     feeds: S.mutable(S.Array(NewFeedSchema)),
   }),
-);
+).annotations({ identifier: 'FeedsConfigV2' });
 
 /**
  * Type for the Data Feeds configuration.

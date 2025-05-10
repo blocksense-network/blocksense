@@ -19,6 +19,8 @@ export const CLAggregatorAdapterDataSchema = S.Struct({
   description: S.String,
   base: S.NullOr(ethereumAddress),
   quote: S.NullOr(ethereumAddress),
+}).annotations({
+  identifier: 'CLAggregatorAdapterData',
 });
 
 export type CLAggregatorAdapterData = typeof CLAggregatorAdapterDataSchema.Type;
@@ -35,7 +37,7 @@ const ContractsConfigSchemaV1 = S.mutable(
     CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
     SafeMultisig: ethereumAddress,
   }),
-);
+).annotations({ identifier: 'ContractsConfigV1' });
 
 const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
@@ -53,7 +55,7 @@ const ContractsConfigSchemaV2 = S.mutable(
     SequencerMultisig: ethereumAddress,
     AdminMultisig: ethereumAddress,
   }),
-);
+).annotations({ identifier: 'ContractsConfigV2' });
 
 export type ContractsConfigV2 = typeof ContractsConfigSchemaV2.Type;
 
@@ -67,7 +69,9 @@ export const DeploymentConfigSchemaV1 = S.mutable(
       }),
     ),
   }),
-);
+).annotations({
+  identifier: 'DeploymentConfigV1',
+});
 
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
@@ -75,6 +79,8 @@ export const DeploymentConfigSchemaV2 = S.mutable(
     chainId: chainId,
     contracts: ContractsConfigSchemaV2,
   }),
-);
+).annotations({
+  identifier: 'DeploymentConfigV2',
+});
 
 export type DeploymentConfigV2 = typeof DeploymentConfigSchemaV2.Type;
