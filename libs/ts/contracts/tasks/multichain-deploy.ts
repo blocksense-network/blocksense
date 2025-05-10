@@ -67,10 +67,7 @@ task('deploy', 'Deploy contracts')
       const create2ContractSalts = {
         accessControl: ethers.id('accessControl'),
         adfs: ethers.id('aggregatedDataFeedStore'),
-        proxy: getOptionalEnvString(
-          'ADFS_UPGRADEABLE_PROXY_SALT',
-          ethers.id('upgradeableProxy'),
-        ),
+        proxy: config.adfsUpgradeableProxySalt,
         safeGuard: ethers.id('onlySafeGuard'),
         safeModule: ethers.id('adminExecutorModule'),
         clFeedRegistry: ethers.id('registry'),
