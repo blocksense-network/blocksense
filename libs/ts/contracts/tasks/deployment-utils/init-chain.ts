@@ -1,5 +1,5 @@
 import type { Network, Signer } from 'ethers';
-import { Wallet, JsonRpcProvider } from 'ethers';
+import { Wallet, JsonRpcProvider, id } from 'ethers';
 
 import type { HardhatEthersHelpers } from '@nomicfoundation/hardhat-ethers/types';
 
@@ -10,6 +10,7 @@ import {
   getOptionalEnvString,
   getEnvString,
   NetworkName,
+  parseHexDataString,
 } from '@blocksense/base-utils';
 
 import { awaitTimeout } from '../utils';
@@ -61,6 +62,10 @@ export async function initChain(
     ),
   );
 
+  const adfsUpgradeableProxySalt = parseHexDataString(
+    getOptionalEnvString('ADFS_UPGRADEABLE_PROXY_SALT', id('upgradeableProxy')),
+  );
+
   let ledgerAccount: Signer | undefined;
   let admin: Wallet | undefined;
 
@@ -81,6 +86,7 @@ export async function initChain(
     provider,
     network,
     networkName,
+    adfsUpgradeableProxySalt,
     sequencerMultisig: {
       signer: admin,
       owners: sequencerOwners,

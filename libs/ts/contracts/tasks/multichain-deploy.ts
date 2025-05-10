@@ -3,7 +3,6 @@ import { task } from 'hardhat/config';
 
 import type Safe from '@safe-global/protocol-kit';
 
-import { getOptionalEnvString } from '@blocksense/base-utils/env';
 import {
   HexDataString,
   parseHexDataString,
@@ -76,10 +75,7 @@ task('deploy', 'Deploy contracts')
       const keccak256 = (str: string) => parseHexDataString(ethers.id(str));
 
       const create2ContractSalts = {
-        upgradeableProxy: getOptionalEnvString(
-          'ADFS_UPGRADEABLE_PROXY_SALT',
-          keccak256('upgradeableProxy'),
-        ) as HexDataString,
+        upgradeableProxy: config.adfsUpgradeableProxySalt,
         accessControl: keccak256('accessControl'),
         adfs: keccak256('aggregatedDataFeedStore'),
         safeGuard: keccak256('onlySafeGuard'),

@@ -13,6 +13,7 @@ interface NetworkConfigBase {
   provider: JsonRpcProvider;
   network: Network;
   networkName: NetworkName;
+  adfsUpgradeableProxySalt: HexDataString;
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
   adminMultisig: MultisigConfig;
