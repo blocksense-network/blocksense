@@ -1,0 +1,160 @@
+{
+  "network": "local",
+  "chainId": 99999999999,
+  "contracts": {
+    "coreContracts": {
+      "OnlySequencerGuard": {
+        "address": "0xdD9e99a28e51CeE7f7bC342fbb227E214844C3cd",
+        "constructorArgs": [
+          "0x220d20cd972f2cE5264c356d80356147DDA226d5",
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "AdminExecutorModule": {
+        "address": "0x8623e97Aa0e005B8A867BB8ccAf82b272Ea29B45",
+        "constructorArgs": [
+          "0x220d20cd972f2cE5264c356d80356147DDA226d5",
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+        ]
+      },
+      "AccessControl": {
+        "address": "0x235DFbb56294754625E3f662D719Ba4a39768ABb",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+        ]
+      },
+      "AggregatedDataFeedStore": {
+        "address": "0x85F4EEf82c815Dd540c63D8Aa776747102a97fB7",
+        "constructorArgs": [
+          "0x235DFbb56294754625E3f662D719Ba4a39768ABb"
+        ]
+      },
+      "UpgradeableProxyADFS": {
+        "address": "0x16385E3fC0F149557d132Bd838e627DC89aB26A8",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+        ]
+      },
+      "CLFeedRegistryAdapter": {
+        "address": "0x2C226d1c55373B55DD601AE92E9995d98C70B283",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      }
+    },
+    "CLAggregatorAdapter": {
+      "0": {
+        "feedId": "0",
+        "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0x301B2713394edf73Bbf76D8E5156Ec93105aAd58",
+        "constructorArgs": [
+          "BTC / USD",
+          8,
+          "0",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "3": {
+        "feedId": "3",
+        "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0xf1Cd0a46e7c2778cb860fcA3dd0DD7B3C00Bc726",
+        "constructorArgs": [
+          "ETH / USD",
+          8,
+          "3",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "13": {
+        "feedId": "13",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0xDe40282461B940bC885b1365580add1DcE766Bea",
+        "constructorArgs": [
+          "BNB / USD",
+          8,
+          "13",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "16": {
+        "feedId": "16",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0xE1ecaC9CbDCf8170200631CC5d08326992bC1b68",
+        "constructorArgs": [
+          "SOL / USD",
+          8,
+          "16",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "35": {
+        "feedId": "35",
+        "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0x28d9DD4FFc19D8fF8118Ee2de6b6eC925Da5041E",
+        "constructorArgs": [
+          "LINK / USD",
+          8,
+          "35",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "91": {
+        "feedId": "91",
+        "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0xAe0C31E26004ccDBD886FD0e95212C449d6Ac4A7",
+        "constructorArgs": [
+          "UNI / USD",
+          8,
+          "91",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "114": {
+        "feedId": "114",
+        "base": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0xd4BFF47A7D36DC42A8ADfa1e1a3EDE2aC9533dC2",
+        "constructorArgs": [
+          "AAVE / USD",
+          8,
+          "114",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "121": {
+        "feedId": "121",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0xb6F4744Ab1fA00fB5dBEC459976fAEEbA88847dE",
+        "constructorArgs": [
+          "TAO / USD",
+          18,
+          "121",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      },
+      "347": {
+        "feedId": "347",
+        "base": "0x111111111117dC0aa78b770fA6A738034120C302",
+        "quote": "0x0000000000000000000000000000000000000348",
+        "address": "0xBF06EB8bfd8abD2f933aCa3517F6AB3B24E125d1",
+        "constructorArgs": [
+          "1INCH / USD",
+          8,
+          "347",
+          "0x16385E3fC0F149557d132Bd838e627DC89aB26A8"
+        ]
+      }
+    },
+    "AdminMultisig": "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+    "SequencerMultisig": "0x220d20cd972f2cE5264c356d80356147DDA226d5"
+  }
+}
