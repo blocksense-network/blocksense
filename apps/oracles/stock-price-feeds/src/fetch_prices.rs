@@ -54,7 +54,7 @@ impl SymbolsData {
 */
 pub async fn fetch_all_prices(
     resources: &ResourceData,
-    capabilities: Option<&Capabilities>,
+    capabilities: &Capabilities,
 ) -> Result<PairToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
