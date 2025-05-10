@@ -157,6 +157,27 @@ export const isNetwork = S.is(network);
 export const parseNetwork = S.decodeUnknownSync(network);
 export type Network = typeof network.Type;
 
+export const networkKindSchema = S.Literal(
+  'local',
+  'testnet',
+  'mainnet',
+).annotations({ identifier: 'NetworkKind' });
+export type NetworkKind = typeof networkKindSchema.Type;
+
+export type NetworkNameToKind<N extends NetworkName> = N extends 'local'
+  ? 'local'
+  : (typeof networkMetadata)[N]['isTestnet'] extends true
+    ? 'testnet'
+    : 'mainnet';
+
+export function getNetworkKind<N extends NetworkName>(
+  network: N,
+): NetworkNameToKind<N> {
+  if (network === 'local') return 'local' as any;
+  if (isTestnet(network)) return 'testnet' as any;
+  return 'mainnet' as any;
+}
+
 export enum Currency {
   ETH = 'ETH',
   AVAX = 'AVAX',
