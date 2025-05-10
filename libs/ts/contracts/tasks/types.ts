@@ -3,7 +3,7 @@ import { JsonRpcProvider, Network, Signer, Wallet } from 'ethers';
 
 export interface MultisigConfig {
   signer?: Wallet;
-  owners: EthereumAddress[];
+  owners: readonly EthereumAddress[];
   threshold: number;
 }
 
@@ -15,7 +15,7 @@ interface NetworkConfigBase {
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
   adminMultisig: MultisigConfig;
-  feedIds: 'all' | number[];
+  feedIds: 'all' | readonly bigint[];
   safeAddresses: {
     multiSendAddress: EthereumAddress;
     multiSendCallOnlyAddress: EthereumAddress;
