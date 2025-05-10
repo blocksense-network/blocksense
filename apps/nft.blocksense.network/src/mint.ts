@@ -1,7 +1,7 @@
 import { createThirdwebClient, getContract, sendTransaction } from 'thirdweb';
 import { sepolia } from 'thirdweb/chains';
 import { Account } from 'thirdweb/wallets';
-import { mintWithSignature, balanceOf } from 'thirdweb/extensions/erc721';
+import { mintWithSignature } from 'thirdweb/extensions/erc721';
 
 import { assertNotNull } from '@blocksense/base-utils/assert';
 
@@ -19,16 +19,6 @@ const contract = getContract({
   chain: sepolia,
   address: CONTRACT_ADDRESS,
 });
-
-export const getNftBalance = async (
-  accountAddress: string,
-): Promise<bigint> => {
-  if (!accountAddress) return BigInt(0);
-  return await balanceOf({
-    contract,
-    owner: accountAddress,
-  });
-};
 
 export const mintNFT = async (
   account: Account,

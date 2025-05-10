@@ -7,11 +7,13 @@ import { Button } from './Button';
 
 type ClaimNFTButtonProps = {
   className?: string;
+  linkClassName?: string;
   onClick?: () => void;
 };
 
 export const ClaimNFTButton = ({
   className = '',
+  linkClassName = '',
   onClick,
 }: ClaimNFTButtonProps) => {
   const onClaimClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -33,7 +35,7 @@ export const ClaimNFTButton = ({
   };
 
   return (
-    <Link href="#mint-form">
+    <Link href="#mint-form" className={`claim-nft__link ${linkClassName}`}>
       <Button
         className={`button__claim-nft ${className}`}
         onClick={onClaimClick}
