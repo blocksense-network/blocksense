@@ -137,14 +137,16 @@ const chainIds = [
   2390, 167000, 167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
-export const networkName = S.Literal(...networks);
+export const networkName = S.Literal(...networks).annotations({
+  identifier: 'NetworkName',
+});
 export const isNetworkName = S.is(networkName);
 export const parseNetworkName = S.decodeUnknownSync(networkName);
 export type NetworkName = typeof networkName.Type;
 
 export const chainId = S.compose(
   NumberFromSelfBigIntOrString,
-  S.Literal(...chainIds),
+  S.Literal(...chainIds).annotations({ identifier: 'ChainId' }),
 );
 export const isChainId = S.is(chainId);
 export const parseChainId = S.decodeUnknownSync(chainId);

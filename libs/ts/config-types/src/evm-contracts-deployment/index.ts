@@ -19,6 +19,8 @@ export const CLAggregatorAdapterDataSchema = S.Struct({
   feedId: S.BigInt, // bigint encoded as string in JSON
   base: S.NullOr(ethereumAddress),
   quote: S.NullOr(ethereumAddress),
+}).annotations({
+  identifier: 'CLAggregatorAdapterData',
 });
 
 export type CLAggregatorAdapterData = typeof CLAggregatorAdapterDataSchema.Type;
@@ -58,7 +60,7 @@ const ContractsConfigSchemaV2 = S.mutable(
     SequencerMultisig: ethereumAddress,
     AdminMultisig: ethereumAddress,
   }),
-);
+).annotations({ identifier: 'ContractsConfigV2' });
 
 export type ContractsConfigV2 = typeof ContractsConfigSchemaV2.Type;
 
@@ -80,6 +82,8 @@ export const DeploymentConfigSchemaV2 = S.mutable(
     chainId: chainId,
     contracts: ContractsConfigSchemaV2,
   }),
-);
+).annotations({
+  identifier: 'DeploymentConfigV2',
+});
 
 export type DeploymentConfigV2 = typeof DeploymentConfigSchemaV2.Type;
