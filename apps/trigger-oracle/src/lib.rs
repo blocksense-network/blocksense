@@ -23,7 +23,7 @@ use tokio::{
         RwLock,
     },
     task::{spawn, Builder, JoinHandle},
-    time::{sleep, timeout, Duration},
+    time::{sleep, timeout, timeout_at, Duration},
 };
 use tracing::Instrument;
 use url::Url;
@@ -35,7 +35,7 @@ use tokio_stream::StreamExt;
 
 use outbound_http::OutboundHttpComponent;
 use spin_app::MetadataKey;
-use spin_core::{async_trait, InstancePre, OutboundWasiHttpHandler};
+use spin_core::{async_trait, InstancePre, OutboundWasiHttpHandler, Store};
 use spin_outbound_networking::{AllowedHostsConfig, OutboundUrl};
 use spin_trigger::{TriggerAppEngine, TriggerExecutor};
 
@@ -72,7 +72,7 @@ use blocksense_gnosis_safe::{
 wasmtime::component::bindgen!({
     path: "../../libs/sdk/wit",
     world: "blocksense-oracle",
-    async: true
+    async: true,
 });
 
 use blocksense::oracle::oracle_types as oracle;
@@ -933,18 +933,20 @@ impl OracleTrigger {
                 .collect(),
         };
 
-        let start_time = Instant::now();
-        tracing::trace!("Calling handle oracle request for `{component_id}`");
-        let result = instance
-            .call_handle_oracle_request(&mut store, &wit_settings)
-            .await;
-        let elapsed_time_ms = start_time.elapsed().as_millis();
-        tracing::trace!("Oracle request for `{component_id}` completed in {elapsed_time_ms}ms");
-        REPORTER_WASM_EXECUTION_TIME_GAUGE
-            .with_label_values(&[&component_id.clone()])
-            .set(elapsed_time_ms as i64);
+        let timeout_result =
+            execute_wasm_component_with_timeout(component, instance, store, wit_settings).await;
 
-        match result {
+        let execution_result = match timeout_result {
+            Ok(result) => result,
+            Err(elapsed) => {
+                anyhow::bail!(
+                    "Component {component_id} timed out after {}ms. Terminating...",
+                    elapsed.as_millis()
+                );
+            }
+        };
+
+        match execution_result {
             Ok(Ok(payload)) => {
                 tracing::info!("Component {component_id} completed okay");
                 // TODO(stanm): increment metric for successful executions
@@ -1063,4 +1065,45 @@ fn update_latest_votes(
             );
         }
     }
+}
+
+async fn execute_wasm_component_with_timeout(
+    component: &Component,
+    instance: BlocksenseOracle,
+    mut store: Store<HttpRuntimeData>,
+    wit_settings: oracle::Settings,
+) -> Result<wasmtime::Result<Result<Payload, Error>>, Duration> {
+    tracing::trace!("Calling handle oracle request for `{}`", component.id);
+
+    let start_time = Instant::now();
+
+    let deadline = start_time + Duration::from_secs(component.interval_time_in_seconds);
+    store.set_deadline(deadline);
+
+    let timeout_result = tokio::task::spawn_blocking(move || {
+        let local_runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .expect("Failed to create a dedicated Tokio runtime for guest call");
+
+        local_runtime.block_on(async move {
+            let wasm_exec_fut = instance.call_handle_oracle_request(&mut store, &wit_settings);
+            let result = timeout_at(deadline.into(), wasm_exec_fut).await;
+
+            result.map_err(|_| Instant::now() - start_time)
+        })
+    })
+    .await
+    .unwrap();
+
+    let elapsed_time_ms = start_time.elapsed().as_millis();
+    tracing::trace!(
+        "Oracle request for `{}` completed in {elapsed_time_ms}ms",
+        component.id
+    );
+    REPORTER_WASM_EXECUTION_TIME_GAUGE
+        .with_label_values(&[&component.id.clone()])
+        .set(elapsed_time_ms as i64);
+
+    timeout_result
 }
