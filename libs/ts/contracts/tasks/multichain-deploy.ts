@@ -42,7 +42,7 @@ task('deploy', 'Deploy contracts')
       'chainlink_compatibility_v2',
     );
 
-    const getCLRegistryPair = (feedId: number | bigint) => {
+    const getCLRegistryPair = (feedId: bigint) => {
       const { base, quote } = chainlinkCompatibility
         .blocksenseFeedsCompatibility[feedId.toString()]
         ?.chainlink_compatibility ?? {
