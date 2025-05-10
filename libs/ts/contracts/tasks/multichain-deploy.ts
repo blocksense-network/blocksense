@@ -42,7 +42,7 @@ task('deploy', 'Deploy contracts')
       'chainlink_compatibility_v2',
     );
 
-    const getCLRegistryPair = (feedId: number | bigint) => {
+    const getCLRegistryPair = (feedId: bigint) => {
       const { base, quote } = chainlinkCompatibility
         .blocksenseFeedsCompatibility[feedId.toString()]
         ?.chainlink_compatibility ?? {
@@ -263,7 +263,7 @@ task('deploy', 'Deploy contracts')
           AdminMultisig: adminMultisigAddress,
           SequencerMultisig:
             sequencerMultisigAddress === ethers.ZeroAddress
-              ? undefined
+              ? null
               : sequencerMultisigAddress,
         },
       };
@@ -299,7 +299,7 @@ task('deploy', 'Deploy contracts')
       if (!config.deployWithSequencerMultisig) {
         chainsDeployment[
           networkName
-        ].contracts.coreContracts.OnlySequencerGuard = undefined;
+        ].contracts.coreContracts.OnlySequencerGuard = null;
       }
     }
 
