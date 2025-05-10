@@ -3,7 +3,6 @@ import { task } from 'hardhat/config';
 
 import type Safe from '@safe-global/protocol-kit';
 
-import { getOptionalEnvString } from '@blocksense/base-utils/env';
 import {
   isNetworkName,
   NetworkName,
@@ -70,10 +69,7 @@ task('deploy', 'Deploy contracts')
       const signerBalance = await config.provider.getBalance(signer);
 
       const create2ContractSalts = {
-        upgradeableProxy: getOptionalEnvString(
-          'ADFS_UPGRADEABLE_PROXY_SALT',
-          ethers.id('upgradeableProxy'),
-        ),
+        upgradeableProxy: config.adfsUpgradeableProxySalt,
         accessControl: ethers.id('accessControl'),
         adfs: ethers.id('aggregatedDataFeedStore'),
         safeGuard: ethers.id('onlySafeGuard'),
