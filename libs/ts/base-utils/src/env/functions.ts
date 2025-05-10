@@ -1,9 +1,7 @@
 import { Either, Schema as S } from 'effect';
 
 import { assertNotNull } from '../assert';
-import { ethereumAddress, networkName, NetworkName } from '../evm';
 import { kebabToSnakeCase } from '../string';
-import { fromCommaSeparatedString } from '../schemas';
 
 /**
  * Retrieves the value of an environment variable.
@@ -34,18 +32,35 @@ export function getEnvStringNotAssert(varName: string): string {
   }
   return value;
 }
+export function parseRequiredEnv<T, S extends string>(
+  varName: string,
+  schema: VarSchema<T, S>,
+  env: NodeJS.ProcessEnv = process.env,
+): T {
+  return parseEnv(varName, schema, false, env)!;
+}
+
+export function parseOptionalEnv<T, S extends string>(
+  varName: string,
+  schema: VarSchema<T, S>,
+  env: NodeJS.ProcessEnv = process.env,
+): T | null {
+  return parseEnv(varName, schema, true, env);
+}
 
 export function parseEnv<T, S extends string>(
   varName: string,
-  schema: S.Schema<T, S> | S.Schema<T, S | undefined>,
+  schema: VarSchema<T, S>,
+  optional: boolean = false,
   env: NodeJS.ProcessEnv = process.env,
-): T {
-  const coercedSchema = schema as S.Any as S.Schema<T, string>;
-  const value = S.decodeUnknownEither(coercedSchema)(env[varName]);
+): T | null {
+  const value = S.decodeUnknownEither(schema)(env[varName]);
 
   if (Either.isLeft(value)) {
-    if (env[varName] == null)
+    if (env[varName] == null) {
+      if (optional) return null;
       throw new Error(`Env variable '${varName}' is missing.`);
+    }
 
     throw new Error(`Env variable '${varName}' is invalid`, {
       cause: value.left,
@@ -55,77 +70,35 @@ export function parseEnv<T, S extends string>(
   }
 }
 
-export function parsePerNetworkEnv<T, S extends string>(
-  varName: string,
-  network: NetworkName,
-  schema: S.Schema<T, S> | S.Schema<T, S | undefined>,
-  env: NodeJS.ProcessEnv = process.env,
-): T {
-  const fullVarName = kebabToSnakeCase(`${varName}_${network}`);
-  return parseEnv(fullVarName, schema as any as S.Schema<T, string>, env);
+export type VarSchema<T = any, S extends string = string> = S.Schema<T, S>;
+
+export function asEnvSchema<T, S extends string>(
+  schema: VarSchema<T, S>,
+): S.Schema<T, string> {
+  return schema as S.Any as VarSchema<T>;
 }
 
 export type EnvSchema = {
-  [key: string]: S.Schema<any, string> | S.Schema<any, string | undefined>;
+  [key: string]: VarSchema;
 };
 
 export type EnvTypeFromSchema<T extends EnvSchema> = {
-  [K in keyof T]: T[K] extends S.Schema<infer U, string> ? U : never;
+  [K in keyof T]: T[K] extends VarSchema<infer U> ? U | null : never;
 };
 
 export function parseEnvConfig<Env$ extends EnvSchema>(
   config: Env$,
+  suffix?: string,
   env: NodeJS.ProcessEnv = process.env,
 ): EnvTypeFromSchema<Env$> {
   const res = {} as EnvTypeFromSchema<Env$>;
 
   for (const key in config) {
-    res[key] = parseEnv(key, config[key], env);
+    const varName = kebabToSnakeCase(
+      (suffix ?? '').length ? `${key}_${suffix}` : key,
+    );
+    res[key] = parseEnv(varName, config[key], true, env);
   }
 
   return res;
-}
-
-export function parseNetworkEnvConfig<Env$ extends EnvSchema>(
-  config: Env$,
-  network: NetworkName,
-  env: NodeJS.ProcessEnv = process.env,
-): EnvTypeFromSchema<Env$> {
-  const res = {} as EnvTypeFromSchema<Env$>;
-
-  for (const key in config) {
-    res[key] = parsePerNetworkEnv(key, network, config[key], env);
-  }
-
-  return res;
-}
-
-export type DeploymentEnvSchema = {
-  shared: EnvSchema;
-  mainnet: EnvSchema;
-  testnet: EnvSchema;
-  perNetwork: EnvSchema;
-};
-
-export function parseDeploymentEnvConfig<Env$ extends DeploymentEnvSchema>(
-  config: Env$,
-  network: NetworkName,
-  env: NodeJS.ProcessEnv = process.env,
-): {
-  shared: EnvTypeFromSchema<Env$['shared']>;
-  mainnet: EnvTypeFromSchema<Env$['mainnet']>;
-  testnet: EnvTypeFromSchema<Env$['testnet']>;
-  perNetwork: EnvTypeFromSchema<Env$['perNetwork']>;
-} {
-  const shared = parseEnvConfig(config.shared, env);
-  const mainnet = parseEnvConfig(config.mainnet, env);
-  const testnet = parseEnvConfig(config.testnet, env);
-  const perNetwork = parseNetworkEnvConfig(config.perNetwork, network, env);
-  return { shared, mainnet, testnet, perNetwork };
-}
-
-export function asEnvSchema<T, S extends string>(
-  schema: S.Schema<T, S>,
-): S.Schema<T, string> {
-  return schema as S.Any as S.Schema<T, string>;
 }
