@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 
-import { Schema as S } from 'effect';
+import { Schema as S, Either } from 'effect';
 
 import { configDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
@@ -80,13 +80,21 @@ export function writeEvmDeployment(
   network: NetworkName,
   data: DeploymentConfigV2,
 ) {
-  const { writeJSON } = selectDirectory(configDirs.evm_contracts_deployment_v2);
-  if (!S.is(DeploymentConfigSchemaV2)(data)) {
-    throw new Error(
-      `Attempt to write invalid EVM deployment config for '${network}'.`,
-    );
+  const res = S.validateEither(DeploymentConfigSchemaV2)(data);
+
+  if (Either.isLeft(res)) {
+    throw new Error(`
+EVM contracts deployment v2 does not match schema:
+--------------------------------------------------
+${res.left}
+--------------------------------------------------
+`);
   }
-  return writeJSON({ name: network, content: data });
+  const { writeJSON } = selectDirectory(configDirs.evm_contracts_deployment_v2);
+  return writeJSON({
+    name: network,
+    content: S.encodeSync(DeploymentConfigSchemaV2)(data),
+  });
 }
 
 export type ConfigFileName = keyof typeof configFiles;
