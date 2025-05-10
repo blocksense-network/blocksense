@@ -3,7 +3,7 @@ import { JsonRpcProvider, Network, Signer, Wallet } from 'ethers';
 
 export interface MultisigConfig {
   signer?: Wallet;
-  owners: EthereumAddress[];
+  owners: readonly EthereumAddress[];
   threshold: number;
 }
 
