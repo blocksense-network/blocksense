@@ -25,31 +25,37 @@ import type {
   NetworkConfigWithoutLedger,
 } from '../types';
 
+const sharedPerNetworkKind = {
+  DEPLOYER_ADDRESS_IS_LEDGER: asEnvSchema(S.BooleanFromString),
+  DEPLOYER_ADDRESS: ethereumAddress,
+  DEPLOYER_PRIVATE_KEY: hexDataString,
+
+  ADFS_UPGRADEABLE_PROXY_SALT: asEnvSchema(hexDataString),
+
+  ADMIN_MULTISIG_THRESHOLD: S.NumberFromString,
+  ADMIN_MULTISIG_OWNERS: fromCommaSeparatedString(ethereumAddress),
+
+  SEQUENCER_ADDRESS: ethereumAddress,
+
+  REPORTER_MULTISIG_ENABLE: asEnvSchema(S.BooleanFromString),
+  REPORTER_MULTISIG_THRESHOLD: S.NullOr(S.NumberFromString),
+  REPORTER_MULTISIG_SIGNERS: S.NullOr(
+    fromCommaSeparatedString(ethereumAddress),
+  ),
+};
+
 const envSchema = {
-  shared: {
+  global: {
     NETWORKS: fromCommaSeparatedString(networkName),
   },
 
-  mainnet: {
-    LEDGER_ACCOUNT: S.UndefinedOr(ethereumAddress),
-    ADFS_UPGRADEABLE_PROXY_SALT_MAINNET: S.UndefinedOr(hexDataString),
-  },
+  perNetworkKind: sharedPerNetworkKind,
 
-  testnet: {
-    ADMIN_SIGNER_PRIVATE_KEY: S.UndefinedOr(hexDataString),
-    ADFS_UPGRADEABLE_PROXY_SALT_TESTNET: S.UndefinedOr(hexDataString),
-  },
-
-  perNetwork: {
+  perNetworkName: {
     RPC_URL: S.URL,
-
-    ADMIN_THRESHOLD: S.NumberFromString,
-    ADMIN_EXTRA_SIGNERS: fromCommaSeparatedString(ethereumAddress),
-    DEPLOY_WITH_SEQUENCER_MULTISIG: asEnvSchema(S.BooleanFromString),
-    SEQUENCER_ADDRESS: ethereumAddress,
-    REPORTER_THRESHOLD: S.NumberFromString,
-    REPORTER_ADDRESSES: fromCommaSeparatedString(ethereumAddress),
     FEED_IDS: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
+
+    ...sharedPerNetworkKind,
   },
 } satisfies DeploymentEnvSchema;
 
