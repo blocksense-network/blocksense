@@ -47,8 +47,8 @@ const ContractsConfigSchemaV2 = S.mutable(
         UpgradeableProxyADFS: ContractDataSchema,
         CLFeedRegistryAdapter: ContractDataSchema,
         AccessControl: ContractDataSchema,
-        OnlySequencerGuard: S.UndefinedOr(ContractDataSchema),
-        AdminExecutorModule: S.UndefinedOr(ContractDataSchema),
+        OnlySequencerGuard: S.NullOr(ContractDataSchema),
+        AdminExecutorModule: S.NullOr(ContractDataSchema),
       }),
     ),
     CLAggregatorAdapter: S.mutable(
@@ -57,7 +57,7 @@ const ContractsConfigSchemaV2 = S.mutable(
         value: CLAggregatorAdapterDataSchema,
       }),
     ),
-    SequencerMultisig: ethereumAddress,
+    SequencerMultisig: S.NullOr(ethereumAddress),
     AdminMultisig: ethereumAddress,
   }),
 ).annotations({ identifier: 'ContractsConfigV2' });
