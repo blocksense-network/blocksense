@@ -1,6 +1,5 @@
 use anyhow::{Error, Result};
-use chrono::Datelike;
-use chrono::{NaiveTime, Utc};
+use chrono::{Datelike, NaiveTime, TimeZone};
 use chrono_tz::US::Eastern;
 
 use crate::types::Capabilities;
@@ -28,9 +27,7 @@ pub fn print_missing_network_price_data<T>(
     );
 }
 
-pub fn are_markets_open() -> Result<bool> {
-    let now_et = Utc::now().with_timezone(&Eastern);
-
+pub fn are_markets_open(now_et: chrono::DateTime<chrono_tz::Tz>) -> Result<bool> {
     let weekday = now_et.weekday();
     let current_time = now_et.time();
 
@@ -47,4 +44,44 @@ pub fn are_markets_open() -> Result<bool> {
         return Ok(false);
     }
     Ok(true)
+}
+
+#[test]
+fn test_get_api_key() {
+    let mut capabilities = Capabilities::new();
+    capabilities.insert("API_KEY".to_string(), "test_key".to_string());
+
+    let result = get_api_key(Some(&capabilities), "API_KEY");
+    assert_eq!(result, Some("test_key"));
+
+    let result = get_api_key(Some(&capabilities), "NON_EXISTENT_KEY");
+    assert_eq!(result, None);
+
+    let result = get_api_key(None, "API_KEY");
+    assert_eq!(result, None);
+}
+
+#[test]
+fn test_are_markets_open() {
+    // Mock a time during market hours
+    let mock_time = Eastern
+        .with_ymd_and_hms(2025, 5, 9, 10, 0, 0)
+        .single()
+        .unwrap();
+    let weekday = mock_time.weekday();
+
+    if weekday == chrono::Weekday::Sat || weekday == chrono::Weekday::Sun {
+        assert!(!are_markets_open(mock_time).unwrap());
+    } else {
+        assert!(are_markets_open(mock_time).unwrap());
+    }
+
+    // Mock a time outside market hours
+    let mock_time = Eastern
+        .with_ymd_and_hms(2025, 5, 9, 8, 0, 0)
+        .single()
+        .unwrap();
+    let current_time = mock_time.time();
+    assert!(current_time < NaiveTime::from_hms_opt(9, 30, 0).unwrap());
+    assert!(!are_markets_open(mock_time).unwrap());
 }
