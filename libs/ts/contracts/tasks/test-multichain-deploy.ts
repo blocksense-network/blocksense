@@ -47,6 +47,10 @@ task(
     config.provider,
   );
 
+  if (!deployment.SequencerMultisig) {
+    throw new Error('Sequencer multisig not found in deployment');
+  }
+
   const sequencerMultisig = await Safe.init({
     provider: config.rpc,
     safeAddress: deployment.SequencerMultisig,
@@ -153,7 +157,7 @@ task(
 
   const dataFeedConfig = feeds.map(feed => {
     const compatibilityData =
-      chainlinkCompatibility.blocksenseFeedsCompatibility[feed.id];
+      chainlinkCompatibility.blocksenseFeedsCompatibility[`${feed.id}`];
     const { base, quote } = compatibilityData?.chainlink_compatibility ?? {
       base: null,
       quote: null,

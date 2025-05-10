@@ -104,8 +104,9 @@ async function getChainlinkAddressToBlocksenseId(
         result = {
           ...result,
           // Note: The address might not be an Ethereum address
-          [`${parseNetworkFilename(networkFile)}/${contractAddress}`]:
-            correspondingBlocksenseFeed ? correspondingBlocksenseFeed.id : null,
+          [`${networkFile}/${contractAddress}`]: correspondingBlocksenseFeed
+            ? correspondingBlocksenseFeed.id
+            : null,
         };
       });
 

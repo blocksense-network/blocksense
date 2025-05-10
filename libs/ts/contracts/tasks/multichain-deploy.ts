@@ -42,7 +42,7 @@ task('deploy', 'Deploy contracts')
       'chainlink_compatibility_v2',
     );
 
-    const getCLRegistryPair = (feedId: number | bigint) => {
+    const getCLRegistryPair = (feedId: bigint) => {
       const { base, quote } = chainlinkCompatibility
         .blocksenseFeedsCompatibility[feedId.toString()]
         ?.chainlink_compatibility ?? {
@@ -52,7 +52,7 @@ task('deploy', 'Deploy contracts')
       return { base, quote };
     };
 
-    const chainsDeployment: Record<NetworkName, DeploymentConfigV2> = {} as any;
+    const chainsDeployment = {} as Record<NetworkName, DeploymentConfigV2>;
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
@@ -189,6 +189,7 @@ task('deploy', 'Deploy contracts')
           value: 0n,
         },
         ...dataFeedConfig.map(data => {
+          const { base, quote } = getCLRegistryPair(data.id);
           return {
             name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint32', 'address'],
@@ -202,10 +203,10 @@ task('deploy', 'Deploy contracts')
             value: 0n,
             feedRegistryInfo: {
               description: `${data.full_name} (${data.id})`,
-              base: data.base,
-              quote: data.quote,
+              base,
+              quote,
             },
-          };
+          } satisfies DeployContract;
         }),
       ];
 
@@ -261,7 +262,7 @@ task('deploy', 'Deploy contracts')
           AdminMultisig: adminMultisigAddress,
           SequencerMultisig:
             sequencerMultisigAddress === ethers.ZeroAddress
-              ? undefined
+              ? null
               : sequencerMultisigAddress,
         },
       };
@@ -297,7 +298,7 @@ task('deploy', 'Deploy contracts')
       if (!config.deployWithSequencerMultisig) {
         chainsDeployment[
           networkName
-        ].contracts.coreContracts.OnlySequencerGuard = undefined;
+        ].contracts.coreContracts.OnlySequencerGuard = null;
       }
     }
 
@@ -308,11 +309,11 @@ function fmtEth(balance: bigint) {
   return `${formatEther(balance)} ETH (${balance} wei)`;
 }
 
-const saveDeployment = async (
+async function saveDeployment(
   configs: NetworkConfig[],
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
-) => {
+) {
   for (const { networkName } of configs) {
     await writeEvmDeployment(networkName, chainsDeployment[networkName]);
   }
-};
+}
