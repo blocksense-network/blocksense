@@ -1,3 +1,4 @@
+import { HexDataString } from '@blocksense/base-utils/buffer-and-hex';
 import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { JsonRpcProvider, Network, Signer, Wallet } from 'ethers';
 
@@ -12,6 +13,7 @@ interface NetworkConfigBase {
   provider: JsonRpcProvider;
   network: Network;
   networkName: NetworkName;
+  adfsUpgradeableProxySalt: HexDataString;
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
   adminMultisig: MultisigConfig;
