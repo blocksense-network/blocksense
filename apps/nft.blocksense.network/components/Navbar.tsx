@@ -49,7 +49,7 @@ const DesktopNavbar = () => {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="navbar__link"
+              className="navbar__link link"
               {...animationProps}
               transition={{
                 ...animationProps.transition,
@@ -107,10 +107,7 @@ const MobileNavbar = () => {
         </motion.div>
       </section>
       {isOpen && (
-        <motion.nav
-          className="fixed top-[3.85rem] left-0 w-full h-[calc(100vh-3.85rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto z-50"
-          {...animationProps}
-        >
+        <nav className="fixed top-[3.85rem] left-0 w-full h-[calc(100vh-3.85rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto z-50">
           <section className="flex flex-col gap-8 text-center w-full">
             {navLinks.map((link, i) => (
               <motion.a
@@ -119,7 +116,7 @@ const MobileNavbar = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={closeNavbar}
-                className="navbar__link"
+                className="navbar__link link"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{
@@ -146,7 +143,7 @@ const MobileNavbar = () => {
           >
             <SocialNetworks />
           </motion.div>
-        </motion.nav>
+        </nav>
       )}
     </header>
   );

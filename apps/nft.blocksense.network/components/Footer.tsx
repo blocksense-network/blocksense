@@ -46,7 +46,7 @@ export const Footer = () => {
                 >
                   <a
                     href={link.href}
-                    className="footer__link"
+                    className="footer__link link"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
