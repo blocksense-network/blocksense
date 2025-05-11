@@ -1,5 +1,5 @@
 import { createThirdwebClient, getContract, sendTransaction } from 'thirdweb';
-import { sepolia } from 'thirdweb/chains';
+import { arbitrum } from 'thirdweb/chains';
 import { Account } from 'thirdweb/wallets';
 import { mintWithSignature, balanceOf } from 'thirdweb/extensions/erc721';
 
@@ -16,7 +16,7 @@ export const client = createThirdwebClient({
 
 const contract = getContract({
   client,
-  chain: sepolia,
+  chain: arbitrum,
   address: CONTRACT_ADDRESS,
 });
 
