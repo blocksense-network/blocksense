@@ -10,6 +10,14 @@ export const Form = () => {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const onSuccess = () => {
+    const mintForm = document.getElementById('mint-form');
+    if (mintForm) {
+      const mintFormTop = mintForm.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: mintFormTop - 32,
+        behavior: 'smooth',
+      });
+    }
     setShowSuccess(true);
   };
 
@@ -24,25 +32,26 @@ export const Form = () => {
         >
           Join the crew and receive your NFT by completing all the steps:
         </motion.h2>
-
-        <motion.div
-          className="w-full"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.2 }}
-        >
-          <MintForm onSuccessAction={onSuccess} />
-        </motion.div>
-
-        <motion.div
-          animate={{
-            opacity: showSuccess ? 1 : 0,
-            scale: showSuccess ? 1 : 0.95,
-          }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          {showSuccess && <SuccessForm />}
-        </motion.div>
+        {!showSuccess && (
+          <motion.div
+            className="w-full"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
+            <MintForm onSuccessAction={onSuccess} />
+          </motion.div>
+        )}
+        {showSuccess && (
+          <motion.div
+            className="w-full"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
+            <SuccessForm />
+          </motion.div>
+        )}
       </article>
     </section>
   );
