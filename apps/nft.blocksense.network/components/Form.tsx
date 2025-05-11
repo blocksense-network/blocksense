@@ -8,8 +8,9 @@ import { SuccessForm } from './SuccessForm';
 
 export const Form = () => {
   const [showSuccess, setShowSuccess] = useState(false);
+  const [mintTransactionUrl, setMintTransactionUrl] = useState('');
 
-  const onSuccess = () => {
+  const onSuccess = (mintTransactionUrl: string) => {
     const mintForm = document.getElementById('mint-form');
     if (mintForm) {
       const mintFormTop = mintForm.getBoundingClientRect().top + window.scrollY;
@@ -18,6 +19,7 @@ export const Form = () => {
         behavior: 'smooth',
       });
     }
+    setMintTransactionUrl(mintTransactionUrl);
     setShowSuccess(true);
   };
 
@@ -49,7 +51,7 @@ export const Form = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
-            <SuccessForm />
+            <SuccessForm mintTransactionUrl={mintTransactionUrl} />
           </motion.div>
         )}
       </article>
