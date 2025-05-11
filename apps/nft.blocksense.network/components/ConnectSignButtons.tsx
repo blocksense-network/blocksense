@@ -2,6 +2,7 @@
 
 import { MouseEvent } from 'react';
 import { ConnectButton, darkTheme, useActiveAccount } from 'thirdweb/react';
+import { arbitrum } from 'thirdweb/chains';
 import { signMessage } from 'thirdweb/utils';
 import { createWallet } from 'thirdweb/wallets';
 
@@ -51,6 +52,7 @@ export const ConnectSignButtons = () => {
     <section className="flex flex-col gap-4">
       <ConnectButton
         client={getClient()}
+        chain={arbitrum}
         wallets={wallets}
         connectButton={{ label: 'Connect Your Wallet' }}
         connectModal={{
