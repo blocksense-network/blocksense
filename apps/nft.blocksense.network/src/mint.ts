@@ -1,6 +1,6 @@
 import { createThirdwebClient, getContract, sendTransaction } from 'thirdweb';
 import { arbitrum } from 'thirdweb/chains';
-import { Account } from 'thirdweb/wallets';
+import { Account, smartWallet } from 'thirdweb/wallets';
 import { mintWithSignature, balanceOf } from 'thirdweb/extensions/erc721';
 
 import { assertNotNull } from '@blocksense/base-utils/assert';
@@ -35,11 +35,21 @@ export const mintNFT = async (
   payload: any,
   signature: any,
 ) => {
+  const _smartWallet = smartWallet({
+    chain: arbitrum,
+    sponsorGas: true,
+  });
+
+  const smartAccount = await _smartWallet.connect({
+    client,
+    personalAccount: account!,
+  });
+
   const transaction = mintWithSignature({
     contract,
     payload,
     signature,
   });
 
-  await sendTransaction({ transaction, account });
+  await sendTransaction({ transaction, account: smartAccount });
 };
