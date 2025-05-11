@@ -122,7 +122,7 @@ export const hasXUserRetweeted = createApiRequestHandler<
   (userId, retweetCode) => ({ userId, retweetCode }),
 );
 
-export const mintNftBackend = createApiRequestHandler<
+export const generateMintSignature = createApiRequestHandler<
   [string],
   { accountAddress: string },
   MintNftResponse
