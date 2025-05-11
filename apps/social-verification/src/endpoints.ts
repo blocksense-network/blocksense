@@ -11,7 +11,7 @@ import { NotFound, Unauthorized } from '@effect/platform/HttpApiError';
 import { HttpMethod } from '@effect/platform/HttpMethod';
 import { HttpApiBuilder } from '@effect/platform';
 import { createThirdwebClient, getContract } from 'thirdweb';
-import { sepolia } from 'thirdweb/chains';
+import { arbitrum } from 'thirdweb/chains';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 import { generateMintSignature } from 'thirdweb/extensions/erc721';
 
@@ -299,7 +299,7 @@ export const server: ApiServer<Api> = {
 
           const contract = getContract({
             client,
-            chain: sepolia,
+            chain: arbitrum,
             address: CONTRACT_ADDRESS,
           });
 
