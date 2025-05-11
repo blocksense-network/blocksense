@@ -6,6 +6,15 @@
  */
 
 export type PrimitiveType = boolean | number | string | symbol | bigint;
+export type LiteralScalar = PrimitiveType | undefined | null;
+export type NonEmptyTuple<T> = [T, ...T[]];
+export type LiteralTuple = [Literal, ...Literal[]]; // NonEmptyTuple<Literal> does not work :(
+export type Literal =
+  | LiteralScalar
+  | LiteralTuple
+  | {
+      [key: string]: Literal;
+    };
 
 export type KeysOf<T> = Extract<keyof T, string>;
 export type ValuesOf<T> = T[KeysOf<T>];
