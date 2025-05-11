@@ -345,7 +345,7 @@ export const server: ApiServer<Api> = {
           );
 
           const insertQuery =
-            'INSERT INTO participants (x_handle, discord_username, wallet_address, wallet_signature) VALUES (?, ?, ?, ?)';
+            'INSERT INTO participants (x_handle, discord_username, wallet_address, wallet_signature, minting_tx) VALUES (?, ?, ?, ?, ?)';
           const insertResult = await db
             .prepare(insertQuery)
             .bind(
@@ -353,6 +353,7 @@ export const server: ApiServer<Api> = {
               payload.discordUsername,
               payload.walletAddress,
               payload.walletSignature,
+              payload.mintingTx,
             )
             .all();
 
@@ -394,11 +395,15 @@ export const server: ApiServer<Api> = {
             )
             .all();
 
-          const isParticipant = selectResult.results.length > 0;
+          const results = selectResult.results;
+          const isParticipant = results.length > 0;
+          const participantMintTx = isParticipant
+            ? results[0].minting_tx
+            : undefined;
 
           console.log(`Participant check result: ${isParticipant}`);
 
-          return { isParticipant: isParticipant };
+          return { isParticipant: isParticipant, mintingTx: participantMintTx };
         },
         catch: error => {
           console.error('Error checking data in database:', error);

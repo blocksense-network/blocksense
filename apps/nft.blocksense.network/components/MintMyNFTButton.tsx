@@ -13,6 +13,7 @@ import {
 } from 'service/client';
 import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Button } from './Button';
+import { ParticipantPayload } from '@blocksense/social-verification/types';
 
 type MintMyNFTButtonProps = {
   onSuccessAction: (mintTransactionUrl: string) => void;
@@ -96,14 +97,15 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       const isRetweeted = await verifyRetweet();
       if (!isRetweeted) return;
 
-      const participantsPayload = {
+      const participantsPayload: ParticipantPayload = {
         xHandle,
         discordUsername: discord,
         walletAddress: account.address,
         walletSignature: retweetCode,
       };
 
-      const { isParticipant } = await checkParticipant(participantsPayload);
+      const { isParticipant, mintingTx: mintingTxFromDB } =
+        await checkParticipant(participantsPayload);
 
       if (isParticipant) {
         setAlertMessage('You have already minted your NFT');
@@ -117,7 +119,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         setAlertMessage('Failed to generate mint signature');
         return;
       }
-      await mintNFT(account, payload, signature);
+      const mintingTx = await mintNFT(account, payload, signature);
 
       sendGAEvent('event', 'mintedNFT', {
         xHandle,
@@ -125,6 +127,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         retweetCode,
       });
 
+      participantsPayload.mintingTx = mintingTx;
       await saveParticipant(participantsPayload);
 
       onSuccessAction(`https://arbiscan.io/`); // TODO: Add transaction URL - tx/${url}
