@@ -2172,6 +2172,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     tsx: "npm:^4.19.2"
     typescript: "npm:5.8.3"
+    web3: "npm:^4.16.0"
   languageName: unknown
   linkType: soft
 
