@@ -5,9 +5,13 @@ import exploreIcon from '/public/icons/explore.svg';
 
 type SuccessFormProps = {
   mintTransactionUrl: string;
+  isAlreadyMinted: boolean;
 };
 
-export const SuccessForm = ({ mintTransactionUrl }: SuccessFormProps) => {
+export const SuccessForm = ({
+  mintTransactionUrl,
+  isAlreadyMinted,
+}: SuccessFormProps) => {
   return (
     <form className="success-form w-full mx-auto flex flex-col items-center justify-center md:gap-8 gap-6 md:p-8 p-6 bg-[var(--gray-dark)] md:rounded-3xl rounded-2xl text-center">
       <Image
@@ -17,7 +21,9 @@ export const SuccessForm = ({ mintTransactionUrl }: SuccessFormProps) => {
       />
       <article className="success-form__article flex flex-col md:gap-6 gap-5 justify-center items-center">
         <h3 className="success-form__title md:text-2xl text-base">
-          Thank you for completing all the steps.
+          {isAlreadyMinted
+            ? 'You have already minted your NFT'
+            : 'Thank you for completing all the steps.'}
         </h3>
         <p className="success-form__description md:max-w-[27.25rem] max-w-[18.875rem] md:text-base text-sm">
           Welcome to the Blocksense crew! <br />

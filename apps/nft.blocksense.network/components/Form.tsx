@@ -10,8 +10,9 @@ import { MintFormProvider } from '../app/contexts/MintFormContext';
 export const Form = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [mintTransactionUrl, setMintTransactionUrl] = useState('');
+  const [isAlreadyMinted, setIsAlreadyMinted] = useState(false);
 
-  const onSuccess = (mintTransactionUrl: string) => {
+  const onSuccess = (mintTransactionUrl: string, isMinted: boolean) => {
     const mintForm = document.getElementById('mint-form');
     if (mintForm) {
       const mintFormTop = mintForm.getBoundingClientRect().top + window.scrollY;
@@ -21,6 +22,7 @@ export const Form = () => {
       });
     }
     setMintTransactionUrl(mintTransactionUrl);
+    setIsAlreadyMinted(isMinted);
     setShowSuccess(true);
   };
 
@@ -54,7 +56,10 @@ export const Form = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
-            <SuccessForm mintTransactionUrl={mintTransactionUrl} />
+            <SuccessForm
+              mintTransactionUrl={mintTransactionUrl}
+              isAlreadyMinted={isAlreadyMinted}
+            />
           </motion.div>
         )}
       </article>
