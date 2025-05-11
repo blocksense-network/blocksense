@@ -885,53 +885,15 @@ impl OracleTrigger {
         component: &Component,
         feeds: Vec<DataFeedSetting>,
     ) -> anyhow::Result<Payload> {
-        let component_id = component.id.clone();
-        tracing::trace!("Loading guest for `{component_id }`");
+        let (instance, store) = setup_instance_and_store(&engine, &component.id).await?;
 
-        // Load the guest...
-        let (instance, mut store) = engine.prepare_instance(&component_id).await?;
-        let instance = BlocksenseOracle::new(&mut store, &instance)?;
-
-        tracing::trace!("Successfully loaded guest for `{component_id}`");
-
-        // We are getting the spin configuration from the Outbound HTTP host component similar to
-        // `set_http_origin_from_request` in spin http trigger.
-        if let Some(outbound_http_handle) = engine
-            .engine
-            .find_host_component_handle::<Arc<OutboundHttpComponent>>()
-        {
-            let outbound_http_data = store
-                .host_components_data()
-                .get_or_insert(outbound_http_handle);
-            store.as_mut().data_mut().as_mut().allowed_hosts =
-                outbound_http_data.allowed_hosts.clone();
-        }
-
-        // ...and call the entry point
         tracing::trace!(
-            "Triggering application: {}; component_id: {component_id}",
-            &engine.app_name
+            "Triggering application: {}; component_id: {}",
+            &engine.app_name,
+            component.id
         );
 
-        let wit_settings = oracle::Settings {
-            data_feeds: feeds
-                .iter()
-                .cloned()
-                .map(|feed| oracle::DataFeed {
-                    id: feed.id,
-                    data: feed.data,
-                })
-                .collect(),
-            capabilities: component
-                .capabilities
-                .iter()
-                .cloned()
-                .map(|capability| oracle::Capability {
-                    id: capability.id,
-                    data: capability.data,
-                })
-                .collect(),
-        };
+        let wit_settings = wit_settings_from_native_types(&feeds, &component.capabilities);
 
         let timeout_result =
             execute_wasm_component_with_timeout(component, instance, store, wit_settings).await;
@@ -940,7 +902,8 @@ impl OracleTrigger {
             Ok(result) => result,
             Err(elapsed) => {
                 anyhow::bail!(
-                    "Component {component_id} timed out after {}ms. Terminating...",
+                    "Component {} timed out after {}ms. Terminating...",
+                    component.id,
                     elapsed.as_millis()
                 );
             }
@@ -948,24 +911,28 @@ impl OracleTrigger {
 
         match execution_result {
             Ok(Ok(payload)) => {
-                tracing::info!("Component {component_id} completed okay");
+                tracing::info!("Component {} completed okay", component.id);
                 // TODO(stanm): increment metric for successful executions
 
                 Ok(payload)
             }
             Ok(Err(e)) => {
-                tracing::warn!("Component {component_id} returned error {:?}", e);
+                tracing::warn!("Component {} returned error {:?}", component.id, e);
                 REPORTER_FAILED_WASM_EXECS
-                    .with_label_values(&[&component_id.clone()])
+                    .with_label_values(&[&component.id.clone()])
                     .inc();
-                Err(anyhow::anyhow!("Component {component_id} returned error")) // TODO: more details when WIT provides them
+                Err(anyhow::anyhow!("Component {} returned error", component.id))
+                // TODO: more details when WIT provides them
             }
             Err(e) => {
-                tracing::error!("error running component {component_id}: {:?}", e);
+                tracing::error!("error running component {}: {:?}", component.id, e);
                 REPORTER_FAILED_WASM_EXECS
-                    .with_label_values(&[&component_id.clone()])
+                    .with_label_values(&[&component.id.clone()])
                     .inc();
-                Err(anyhow::anyhow!("Error executing component {component_id}"))
+                Err(anyhow::anyhow!(
+                    "Error executing component {}",
+                    component.id
+                ))
             }
         }
     }
@@ -1067,6 +1034,31 @@ fn update_latest_votes(
     }
 }
 
+async fn setup_instance_and_store(
+    engine: &TriggerAppEngine<OracleTrigger>,
+    component_id: &str,
+) -> anyhow::Result<(BlocksenseOracle, Store<HttpRuntimeData>)> {
+    tracing::trace!("Loading guest for `{component_id }`");
+    let (instance, mut store) = engine.prepare_instance(component_id).await?;
+    let instance = BlocksenseOracle::new(&mut store, &instance)?;
+
+    tracing::trace!("Successfully loaded guest for `{component_id}`");
+
+    // We are getting the spin configuration from the Outbound HTTP host component similar to
+    // `set_http_origin_from_request` in spin http trigger.
+    if let Some(outbound_http_handle) = engine
+        .engine
+        .find_host_component_handle::<Arc<OutboundHttpComponent>>()
+    {
+        let outbound_http_data = store
+            .host_components_data()
+            .get_or_insert(outbound_http_handle);
+        store.as_mut().data_mut().as_mut().allowed_hosts = outbound_http_data.allowed_hosts.clone();
+    }
+
+    Ok((instance, store))
+}
+
 async fn execute_wasm_component_with_timeout(
     component: &Component,
     instance: BlocksenseOracle,
@@ -1081,7 +1073,7 @@ async fn execute_wasm_component_with_timeout(
     store.set_deadline(deadline);
 
     let timeout_result = tokio::task::spawn_blocking(move || {
-        let local_runtime = tokio::runtime::Builder::new_current_thread()
+        let local_runtime = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()
             .expect("Failed to create a dedicated Tokio runtime for guest call");
@@ -1106,4 +1098,28 @@ async fn execute_wasm_component_with_timeout(
         .set(elapsed_time_ms as i64);
 
     timeout_result
+}
+
+fn wit_settings_from_native_types(
+    settings: &[DataFeedSetting],
+    capabilities: &[CapabilitySetting],
+) -> oracle::Settings {
+    oracle::Settings {
+        data_feeds: settings
+            .iter()
+            .cloned()
+            .map(|setting| oracle::DataFeed {
+                id: setting.id,
+                data: setting.data,
+            })
+            .collect(),
+        capabilities: capabilities
+            .iter()
+            .cloned()
+            .map(|capability| oracle::Capability {
+                id: capability.id,
+                data: capability.data,
+            })
+            .collect(),
+    }
 }
