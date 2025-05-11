@@ -1,5 +1,5 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { entries } from '@blocksense/base-utils/array-iter';
+import { entriesOf } from '@blocksense/base-utils/array-iter';
 import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
 import {
   KrakenAssetInfo,
@@ -26,7 +26,7 @@ export class KrakenAssetsFetcher
     const assets = (await fetchKrakenSymbolsInfo()).result;
     const prices = (await fetchKrakenPricesInfo()).result;
 
-    return entries(assets).map(([key, value]) => {
+    return entriesOf(assets).map(([key, value]) => {
       let price = prices[key];
       if (!price) {
         console.warn(`[Kraken] Price not found for pair: ${key}`);
