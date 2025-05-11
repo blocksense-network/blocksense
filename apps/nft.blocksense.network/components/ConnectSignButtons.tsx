@@ -5,7 +5,7 @@ import { ConnectButton, darkTheme, useActiveAccount } from 'thirdweb/react';
 import { signMessage } from 'thirdweb/utils';
 import { createWallet } from 'thirdweb/wallets';
 
-import { client } from '@/mint';
+import { getClient } from '@/mint';
 import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Button } from './Button';
 
@@ -50,7 +50,7 @@ export const ConnectSignButtons = () => {
   return (
     <section className="flex flex-col gap-4">
       <ConnectButton
-        client={client}
+        client={getClient()}
         wallets={wallets}
         connectButton={{ label: 'Connect Your Wallet' }}
         connectModal={{
