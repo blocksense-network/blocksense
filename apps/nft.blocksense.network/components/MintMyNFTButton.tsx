@@ -4,6 +4,9 @@ import { MouseEvent } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
 import { useActiveAccount } from 'thirdweb/react';
 
+import { ParticipantPayload } from '@blocksense/social-verification/types';
+import { getTxHashExplorerUrl, parseTxHash } from '@blocksense/base-utils/evm';
+
 import { mintNFT } from '@/mint';
 import {
   checkParticipant,
@@ -13,10 +16,12 @@ import {
 } from 'service/client';
 import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Button } from './Button';
-import { ParticipantPayload } from '@blocksense/social-verification/types';
 
 type MintMyNFTButtonProps = {
-  onSuccessAction: (mintTransactionUrl: string) => void;
+  onSuccessAction: (
+    mintTransactionUrl: string,
+    isAlreadyMinted: boolean,
+  ) => void;
 };
 
 export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
@@ -108,7 +113,13 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         await checkParticipant(participantsPayload);
 
       if (isParticipant) {
-        setAlertMessage('You have already minted your NFT');
+        onSuccessAction(
+          getTxHashExplorerUrl(
+            'arbitrum-mainnet',
+            parseTxHash(mintingTxFromDB),
+          ),
+          true,
+        );
         return;
       }
 
@@ -130,7 +141,10 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       participantsPayload.mintingTx = mintingTx;
       await saveParticipant(participantsPayload);
 
-      onSuccessAction(`https://arbiscan.io/`); // TODO: Add transaction URL - tx/${url}
+      onSuccessAction(
+        getTxHashExplorerUrl('arbitrum-mainnet', parseTxHash(mintingTx)),
+        false,
+      );
     } catch (err) {
       console.error(err);
       setAlertMessage('An error occurred while minting your NFT');

@@ -16,7 +16,10 @@ import { ConnectSignButtons } from './ConnectSignButtons';
 const separatorClassName = 'mint-form__separator md:my-8 my-6';
 
 type MintFormProps = {
-  onSuccessAction: (mintTransactionUrl: string) => void;
+  onSuccessAction: (
+    mintTransactionUrl: string,
+    isAlreadyMinted: boolean,
+  ) => void;
 };
 
 export const MintForm = ({ onSuccessAction }: MintFormProps) => {
