@@ -1,3 +1,5 @@
+import { Literal, LiteralTuple, NonEmptyTuple } from './type-level';
+
 export function keysOf<K extends string>(obj: Record<K, unknown>): K[] {
   return Object.keys(obj) as K[];
 }
@@ -16,6 +18,9 @@ export function fromEntries<K extends string, V>(
   return Object.fromEntries(entries) as Record<K, V>;
 }
 
-export function tuple<Args extends any[]>(...args: Args): Args {
+export function tuple<Args extends NonEmptyTuple<T>, T extends Literal>(
+  ...args: Args
+): Args;
+export function tuple<Args extends LiteralTuple>(...args: Args): Args {
   return args;
 }
