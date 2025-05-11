@@ -2,7 +2,7 @@ import { task } from 'hardhat/config';
 
 import {
   configDirs,
-  entries,
+  entriesOf,
   EthereumAddress,
   selectDirectory,
 } from '@blocksense/base-utils';
@@ -40,7 +40,7 @@ task('etherscan-verify', 'Verify contracts on Etherscan').setAction(
       process.exit(1);
     }
 
-    for (const [contractName, data] of entries(
+    for (const [contractName, data] of entriesOf(
       deploymentData.contracts.coreContracts,
     )) {
       if (data && data.address !== ethers.ZeroAddress) {
