@@ -93,7 +93,10 @@ type MintNftResponsePayload = {
 };
 type MintNftResponse = { signature: string; payload: MintNftResponsePayload };
 type SaveParticipantResponse = { isSuccessful: boolean };
-type CheckParticipantResponse = { isParticipant: boolean };
+type CheckParticipantResponse = {
+  isParticipant: boolean;
+  mintingTx?: string;
+};
 
 export const isDiscordUserMemberOfGuild = createApiRequestHandler<
   [string],

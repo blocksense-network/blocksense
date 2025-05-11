@@ -28,11 +28,14 @@ export const DiscordUserInfoResponseSchema = S.Array(
   }),
 );
 
-export const ParticipantPayloadSchema = S.Struct({
-  xHandle: S.String,
-  discordUsername: S.String,
-  walletAddress: S.String,
-  walletSignature: S.String,
-});
+export const ParticipantPayloadSchema = S.mutable(
+  S.Struct({
+    xHandle: S.String,
+    discordUsername: S.String,
+    walletAddress: S.String,
+    walletSignature: S.String,
+    mintingTx: S.optionalWith(S.String, { nullable: true }),
+  }),
+);
 
 export type ParticipantPayload = S.Schema.Type<typeof ParticipantPayloadSchema>;

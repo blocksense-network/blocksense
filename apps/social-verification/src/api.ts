@@ -87,7 +87,12 @@ export const verifyApi = HttpApi.make('verify')
       .add(
         HttpApiEndpoint.post('checkParticipant', '/check')
           .setPayload(ParticipantPayloadSchema)
-          .addSuccess(S.Struct({ isParticipant: S.Boolean })),
+          .addSuccess(
+            S.Struct({
+              isParticipant: S.Boolean,
+              mintingTx: S.optionalWith(S.String, { nullable: true }),
+            }),
+          ),
       )
       .prefix('/participants'),
   )
