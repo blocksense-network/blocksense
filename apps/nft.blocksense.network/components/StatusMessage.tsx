@@ -1,6 +1,6 @@
 import { HTMLAttributes } from 'react';
 
-export type StatusType = 'error' | 'success';
+export type StatusType = 'error' | 'success' | 'loading' | 'none';
 
 type StatusMessageProps = HTMLAttributes<HTMLParagraphElement> & {
   message?: string;
@@ -11,7 +11,7 @@ type StatusMessageProps = HTMLAttributes<HTMLParagraphElement> & {
 export const StatusMessage = ({
   message = '',
   className = '',
-  status,
+  status = 'none',
   ...props
 }: StatusMessageProps) => {
   if (!message) {

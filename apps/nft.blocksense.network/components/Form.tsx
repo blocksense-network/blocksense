@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 
 import { MintForm } from './MintForm';
 import { SuccessForm } from './SuccessForm';
+import { MintFormProvider } from '../app/contexts/MintFormContext';
 
 export const Form = () => {
   const [showSuccess, setShowSuccess] = useState(false);
@@ -41,7 +42,9 @@ export const Form = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2 }}
           >
-            <MintForm onSuccessAction={onSuccess} />
+            <MintFormProvider>
+              <MintForm onSuccessAction={onSuccess} />
+            </MintFormProvider>
           </motion.div>
         )}
         {showSuccess && (
