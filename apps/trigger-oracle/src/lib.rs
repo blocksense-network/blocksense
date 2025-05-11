@@ -58,7 +58,7 @@ use blocksense_metrics::{
     actix_server::handle_prometheus_metrics,
     metrics::{
         REPORTER_BATCH_COUNTER, REPORTER_FAILED_SEQ_REQUESTS, REPORTER_FAILED_WASM_EXECS,
-        REPORTER_FEED_COUNTER, REPORTER_WASM_EXECUTION_TIME_GAUGE,
+        REPORTER_FEED_COUNTER,
     },
     TextEncoder,
 };
@@ -1074,6 +1074,7 @@ async fn execute_wasm_component_with_timeout(
 
     let timeout_result = tokio::task::spawn_blocking(move || {
         let local_runtime = tokio::runtime::Builder::new_multi_thread()
+            .worker_threads(1)
             .enable_all()
             .build()
             .expect("Failed to create a dedicated Tokio runtime for guest call");
@@ -1087,17 +1088,17 @@ async fn execute_wasm_component_with_timeout(
     })
     .await
     .unwrap();
-
-    let elapsed_time_ms = start_time.elapsed().as_millis();
-    tracing::trace!(
-        "Oracle request for `{}` completed in {elapsed_time_ms}ms",
-        component.id
-    );
-    REPORTER_WASM_EXECUTION_TIME_GAUGE
-        .with_label_values(&[&component.id.clone()])
-        .set(elapsed_time_ms as i64);
-
     timeout_result
+
+    //let blocking_fut = tokio::task::spawn_blocking(move || {
+    //    instance.call_handle_oracle_request(&mut store, &wit_settings)
+    //});
+    //
+    //let res = timeout_at(deadline.into(), blocking_fut)
+    //    .await
+    //    .map_err(|_| Instant::now() - start_time);
+    //
+    //res.map(|inner_res| inner_res.unwrap())
 }
 
 fn wit_settings_from_native_types(
