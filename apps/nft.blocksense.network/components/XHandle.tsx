@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect } from 'react';
 
 import { isXUserFollowing } from 'service/client';
+import { clearXHandle } from '@/utils';
 import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Input } from './Input';
 
@@ -24,17 +25,12 @@ export const XHandle = () => {
   };
 
   const verifyXHandle = async () => {
-    if (xHandle[0] === '@') {
-      setXStatus({
-        type: 'error',
-        message: 'X handle should not start with @',
-      });
-      return;
-    }
+    const resultXHandle = clearXHandle(xHandle);
+    if (resultXHandle === '') return;
 
     setXStatus({ type: 'loading', message: '' });
     try {
-      const { isFollowing, userId } = await isXUserFollowing(xHandle);
+      const { isFollowing, userId } = await isXUserFollowing(resultXHandle);
       if (isFollowing && userId) {
         setXStatus({ type: 'success', message: 'You are following us on X' });
         setXUserId(userId);

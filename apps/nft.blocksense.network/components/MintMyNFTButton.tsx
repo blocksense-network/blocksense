@@ -8,6 +8,7 @@ import { ParticipantPayload } from '@blocksense/social-verification/types';
 import { getTxHashExplorerUrl, parseTxHash } from '@blocksense/base-utils/evm';
 
 import { mintNFT } from '@/mint';
+import { clearXHandle } from '@/utils';
 import {
   checkParticipant,
   hasXUserRetweeted,
@@ -102,8 +103,10 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       const isRetweeted = await verifyRetweet();
       if (!isRetweeted) return;
 
+      const resultXHandle = clearXHandle(xHandle);
+
       const participantsPayload: ParticipantPayload = {
-        xHandle,
+        xHandle: resultXHandle,
         discordUsername: discord,
         walletAddress: account.address,
         walletSignature: retweetCode,
@@ -133,7 +136,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       const mintingTx = await mintNFT(account, payload, signature);
 
       sendGAEvent('event', 'mintedNFT', {
-        xHandle,
+        xHandle: resultXHandle,
         discord,
         retweetCode,
       });
