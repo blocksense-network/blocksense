@@ -7,6 +7,7 @@ import { signMessage } from 'thirdweb/utils';
 import { createWallet } from 'thirdweb/wallets';
 
 import { getClient } from '@/mint';
+import { clearXHandle } from '@/utils';
 import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Button } from './Button';
 
@@ -35,7 +36,7 @@ export const ConnectSignButtons = () => {
     if (isSignDisabled) return;
 
     try {
-      const message = `🏴‍☠️ Ahoy! ${discord}, known as @${xHandle}, is part of the Blocksense crew now — welcome aboard!`;
+      const message = `🏴‍☠️ Ahoy! ${discord}, known as @${clearXHandle(xHandle)}, is part of the Blocksense crew now — welcome aboard!`;
       const signature = await signMessage({
         message,
         account,
