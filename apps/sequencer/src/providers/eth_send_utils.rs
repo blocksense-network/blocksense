@@ -4,7 +4,7 @@ use alloy::{
     network::TransactionBuilder,
     primitives::{Address, Bytes},
     providers::{Provider, ProviderBuilder},
-    rpc::types::eth::TransactionRequest,
+    rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
@@ -26,7 +26,9 @@ use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
 use blocksense_metrics::{
-    inc_metric, inc_vec_metric, metrics::FeedsMetrics, process_provider_getter, set_metric,
+    inc_metric, inc_vec_metric,
+    metrics::{FeedsMetrics, ProviderMetrics},
+    process_provider_getter, set_metric,
 };
 use futures::stream::FuturesUnordered;
 use paste::paste;
@@ -420,10 +422,25 @@ pub async fn eth_batch_send_to_contract(
 
     let transaction_time = tx_time.elapsed().as_millis();
     info!(
-        "Recvd transaction receipt that took {}ms from `{}`: {:?}",
+        "Recvd transaction receipt that took {}ms for {transaction_retries_count} retries from `{}`: {:?}",
         transaction_time, net, receipt
     );
 
+    log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
+
+    provider.update_history(&updates.updates);
+    drop(provider);
+    debug!("Released a read/write lock on provider state for network `{net}`");
+
+    Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+pub async fn log_gas_used(
+    net: &str,
+    receipt: &TransactionReceipt,
+    transaction_time: u128,
+    provider_metrics: &Arc<RwLock<ProviderMetrics>>,
+) {
     let gas_used_value = receipt.gas_used;
     set_metric!(provider_metrics, net, gas_used, gas_used_value);
 
@@ -446,12 +463,6 @@ pub async fn eth_batch_send_to_contract(
         transaction_confirmation_time,
         transaction_time
     );
-
-    provider.update_history(&updates.updates);
-    drop(provider);
-    debug!("Released a read/write lock on provider state for network `{net}`");
-
-    Ok((receipt.status().to_string(), feeds_to_update_ids))
 }
 
 pub async fn get_tx_retry_params(
