@@ -27,21 +27,17 @@ pub fn print_missing_network_price_data<T>(
     );
 }
 
-pub fn are_markets_open(now_et: chrono::DateTime<chrono_tz::Tz>) -> bool {
+pub fn markets_are_closed(now_et: chrono::DateTime<chrono_tz::Tz>) -> bool {
     let weekday = now_et.weekday();
     let current_time = now_et.time();
 
-    let market_hours_start_time = NaiveTime::from_hms_opt(9, 30, 0).unwrap();
-    let market_hours_end_time = NaiveTime::from_hms_opt(16, 0, 0).unwrap();
+    let start_time = NaiveTime::from_hms_opt(9, 30, 0).unwrap();
+    let end_time = NaiveTime::from_hms_opt(16, 0, 0).unwrap();
 
-    if weekday == chrono::Weekday::Sat
-        || weekday == chrono::Weekday::Sun
-        || current_time < market_hours_start_time
-        || current_time > market_hours_end_time
-    {
-        return false;
-    }
-    true
+    let is_weekend = matches!(weekday, chrono::Weekday::Sat | chrono::Weekday::Sun);
+    let is_outside_market_hours = current_time < start_time || current_time > end_time;
+
+    is_weekend || is_outside_market_hours
 }
 
 #[test]
@@ -61,34 +57,33 @@ fn test_get_api_key() {
 }
 
 #[test]
-fn test_are_markets_open() {
+fn test_markets_are_closed() {
     let test_cases = [
         // Weekdays - markets open
-        (2025, 5, 12, 9, 30, 0, true),   // Monday right at market open
-        (2025, 5, 13, 10, 0, 0, true),   // Tuesday
-        (2025, 5, 14, 12, 0, 0, true),   // Wednesday
-        (2025, 5, 15, 15, 40, 52, true), // Thursday
-        (2025, 5, 16, 16, 0, 0, true),   // Friday right at market close
+        (2025, 5, 12, 9, 30, 0, false), // Monday right at market open
+        (2025, 5, 13, 10, 0, 0, false), // Tuesday
+        (2025, 5, 14, 12, 0, 0, false), // Wednesday
+        (2025, 5, 15, 15, 40, 52, false), // Thursday
+        (2025, 5, 16, 16, 0, 0, false), // Friday right at market close
         // Weekdays - markets closed
-        (2025, 5, 12, 9, 29, 59, false), // Monday right before market open
-        (2025, 5, 13, 16, 0, 1, false),  // Tuesday right after market close
-        (2025, 5, 14, 3, 0, 0, false),   // Wednesday before market open
-        (2025, 5, 15, 17, 0, 0, false),  // Thursday after market close
-        (2025, 5, 16, 23, 30, 0, false), // Friday middle of the night
+        (2025, 5, 12, 9, 29, 59, true), // Monday right before market open
+        (2025, 5, 13, 16, 0, 1, true),  // Tuesday right after market close
+        (2025, 5, 14, 3, 0, 0, true),   // Wednesday before market open
+        (2025, 5, 15, 17, 0, 0, true),  // Thursday after market close
+        (2025, 5, 16, 23, 30, 0, true), // Friday middle of the night
         // Weekend - markets closed
-        (2025, 5, 10, 10, 0, 0, false), // Working hours but on Saturday
-        (2025, 5, 11, 10, 0, 0, false), // Working hours but on Sunday
-        (2025, 5, 10, 3, 0, 0, false),  // Non working hours but on Saturday
-        (2025, 5, 11, 3, 0, 0, false),  // Non working hours but on Sunday
+        (2025, 5, 10, 10, 0, 0, true), // Working hours but on Saturday
+        (2025, 5, 11, 10, 0, 0, true), // Working hours but on Sunday
+        (2025, 5, 10, 3, 0, 0, true),  // Non working hours but on Saturday
+        (2025, 5, 11, 3, 0, 0, true),  // Non working hours but on Sunday
     ];
 
-    for &(year, month, day, hour, min, sec, expected_open) in &test_cases {
+    for &(year, month, day, hour, min, sec, expected_closed) in &test_cases {
         let mock_time = Eastern
             .with_ymd_and_hms(year, month, day, hour, min, sec)
             .single()
             .unwrap();
 
-        let result = are_markets_open(mock_time);
-        assert_eq!(result, expected_open);
+        assert_eq!(markets_are_closed(mock_time), expected_closed);
     }
 }

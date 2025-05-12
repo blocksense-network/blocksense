@@ -21,12 +21,13 @@ use fetch_prices::fetch_all_prices;
 use types::{
     Capabilities, FeedConfigData, PairToResults, ProvidersSymbols, ResourceData, ResourcePairData,
 };
-use utils::are_markets_open;
+
+use crate::utils::markets_are_closed;
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     let now_et = Utc::now().with_timezone(&Eastern);
-    if !are_markets_open(now_et) {
+    if markets_are_closed(now_et) {
         println!("❌ Markets are closed. Prices can't be fetched.");
         return Err(Error::msg("Markets are closed. Prices can't be fetched."));
     }
