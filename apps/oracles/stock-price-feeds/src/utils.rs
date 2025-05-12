@@ -1,4 +1,4 @@
-use anyhow::{Error, Result};
+#![allow(unused_imports)]
 use chrono::{Datelike, NaiveTime, TimeZone};
 use chrono_tz::US::Eastern;
 
@@ -27,23 +27,21 @@ pub fn print_missing_network_price_data<T>(
     );
 }
 
-pub fn are_markets_open(now_et: chrono::DateTime<chrono_tz::Tz>) -> Result<bool> {
+pub fn are_markets_open(now_et: chrono::DateTime<chrono_tz::Tz>) -> bool {
     let weekday = now_et.weekday();
     let current_time = now_et.time();
 
-    let market_hours_start_time =
-        NaiveTime::from_hms_opt(9, 30, 0).ok_or_else(|| Error::msg("Invalid market start time"))?;
-    let market_hours_end_time =
-        NaiveTime::from_hms_opt(16, 0, 0).ok_or_else(|| Error::msg("Invalid market end time"))?;
+    let market_hours_start_time = NaiveTime::from_hms_opt(9, 30, 0).unwrap();
+    let market_hours_end_time = NaiveTime::from_hms_opt(16, 0, 0).unwrap();
 
     if weekday == chrono::Weekday::Sat
         || weekday == chrono::Weekday::Sun
         || current_time < market_hours_start_time
         || current_time > market_hours_end_time
     {
-        return Ok(false);
+        return false;
     }
-    Ok(true)
+    true
 }
 
 #[test]
@@ -89,7 +87,7 @@ fn test_are_markets_open() {
             .single()
             .unwrap();
 
-        let result = are_markets_open(mock_time).unwrap();
+        let result = are_markets_open(mock_time);
         assert_eq!(result, expected_open);
     }
 }
