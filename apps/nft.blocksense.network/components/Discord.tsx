@@ -21,19 +21,11 @@ export const Discord = () => {
   }, [discord]);
 
   const onDiscordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDiscord(e.target.value);
+    setDiscord(e.target.value.trim());
     setDiscordStatus({ type: 'none', message: '' });
   };
 
   const verifyDiscord = async () => {
-    if (discord[0] === '#') {
-      setDiscordStatus({
-        type: 'error',
-        message: 'Discord handle should not start with #',
-      });
-      return;
-    }
-
     setDiscordStatus({ type: 'loading', message: '' });
     try {
       const { isMember } = await isDiscordUserMemberOfGuild(discord);
