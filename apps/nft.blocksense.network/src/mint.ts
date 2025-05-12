@@ -18,6 +18,7 @@ export const mintNFT = async (
   account: Account,
   payload: any,
   signature: any,
+  setAlertMessage: (message: string) => void,
 ) => {
   const CONTRACT_ADDRESS = assertNotNull(
     process.env['NEXT_PUBLIC_NFT_SMART_CONTRACT_ADDRESS'],
@@ -52,6 +53,7 @@ export const mintNFT = async (
   });
 
   try {
+    setAlertMessage('Adding your NFT to your wallet...');
     await confirmAssetInAccount(account, CONTRACT_ADDRESS, transactionHash);
   } catch (e) {
     console.error('Error confirming asset in account');

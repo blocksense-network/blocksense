@@ -129,7 +129,12 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         return;
       }
 
-      const mintingTx = await mintNFT(account, payload, signature);
+      const mintingTx = await mintNFT(
+        account,
+        payload,
+        signature,
+        setAlertMessage,
+      );
 
       sendGAEvent('event', 'mintedNFT', {
         xHandle: resultXHandle,
