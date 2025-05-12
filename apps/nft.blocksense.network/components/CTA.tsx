@@ -63,7 +63,7 @@ const CTADesktop = () => {
                 transition={{ duration: 0.7 }}
               >
                 <Button variant="primary" className="cta__button">
-                  Start building
+                  Start Building
                 </Button>
               </motion.a>
               <motion.a
@@ -75,7 +75,7 @@ const CTADesktop = () => {
                 transition={{ duration: 0.7 }}
               >
                 <Button variant="secondary" className="cta__button">
-                  Let’s talk
+                  Let’s Talk
                 </Button>
               </motion.a>
             </nav>
