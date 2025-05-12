@@ -42,10 +42,18 @@ const main = async (): Promise<void> => {
       continue;
     }
     const web3 = new Web3(rpcUrl);
-    const balanceWei = await web3.eth.getBalance(address);
-    const balance = web3.utils.fromWei(balanceWei, 'ether');
-    const { currency } = networkMetadata[networkName];
-    console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
+    try {
+      const balanceWei = await web3.eth.getBalance(address);
+      const balance = web3.utils.fromWei(balanceWei, 'ether');
+      const { currency } = networkMetadata[networkName];
+      console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
+    } catch (error) {
+      console.error(
+        chalk.red(`Failed to fetch balance for ${networkName}:`),
+        (error as Error).message,
+      );
+      continue;
+    }
   }
 };
 
