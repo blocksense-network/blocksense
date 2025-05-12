@@ -123,6 +123,7 @@ pub async fn get_serialized_updates_for_network(
     provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
     feeds_rounds: &mut HashMap<u32, u64>,
+    feeds_repeatability: Repeatability,
 ) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider_mutex.lock().await;
@@ -135,7 +136,9 @@ pub async fn get_serialized_updates_for_network(
     if updates.updates.is_empty() {
         return Ok(Vec::new());
     }
-    let contract_version = provider.get_latest_contract_version();
+    println!("updates = {:?}", &updates);
+    println!("feed_configs = {:?}", &feeds_config);
+    let contract_version = provider.get_latest_contract_version(feeds_repeatability);
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
@@ -217,6 +220,7 @@ pub async fn eth_batch_send_to_contract(
         &provider_settings,
         feeds_config,
         &mut feeds_rounds,
+        feed_type
     )
     .await?;
 
@@ -874,9 +878,11 @@ mod tests {
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
-        let feed_1_config = test_feed_config(1, 0);
+        let mut feed_3_config = test_feed_config(3, 0);
+        println!("feed_3_config = {:?}", &feed_3_config);
+        
         let feeds_config = AllFeedsConfig {
-            feeds: vec![feed_1_config],
+            feeds: vec![feed_3_config],
         };
         let providers = init_shared_rpc_providers(
             &cfg,
@@ -959,6 +965,13 @@ mod tests {
             .unwrap_or_else(|| panic!("Config for network {net} not found!"))
             .clone();
         let feeds_config = Arc::new(RwLock::new(HashMap::<u32, FeedConfig>::new()));
+        // {
+        //     //let mut g = feeds_config.lock().await;
+        //     let feed_id= 3_u32;
+        //     let feed_config = feeds_config.write().await.entry(&feed_id).and_modify(|e|
+        //         e.feed_type 
+        //     )
+        // }
 
         let result = eth_batch_send_to_contract(
             net.clone(),
@@ -972,6 +985,7 @@ mod tests {
             0.1,
         )
         .await;
+        println!("Result = {result:?}");
         assert!(result.is_ok());
         // getter calldata will be:
         // 0x800000030000000000000000000000000000000000000000000000000000000000000002

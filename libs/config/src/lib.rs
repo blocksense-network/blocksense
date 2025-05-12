@@ -193,6 +193,7 @@ pub struct Provider {
     pub url: String,
     pub safe_address: Option<String>,
     pub safe_min_quorum: u32,
+    #[serde(alias = "transaction_retries_count_limit")] 
     pub transaction_retries_count_before_give_up: u32,
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
@@ -571,7 +572,7 @@ mod tests {
         assert!(provider_a.is_enabled);
         assert_eq!(&provider_a.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&provider_a.url, "http://127.0.0.1:8546");
-        assert_eq!(provider_a.transaction_retries_count_limit, 42_u32);
+        assert_eq!(provider_a.transaction_retries_count_before_give_up, 42_u32);
         assert_eq!(provider_a.transaction_retry_timeout_secs, 20_u32);
         assert_eq!(provider_a.retry_fee_increment_fraction, 0.1f64);
         assert_eq!(provider_a.transaction_gas_limit, 7500000_u32);
@@ -680,7 +681,7 @@ mod tests {
         // assert_eq!(p.event_contract_address, None);
         assert_eq!(&p.private_key_path, "/tmp/priv_key_test");
         assert_eq!(&p.url, "http://127.0.0.1:8546");
-        assert_eq!(p.transaction_retries_count_limit, 42_u32);
+        assert_eq!(p.transaction_retries_count_before_give_up, 42_u32);
         assert_eq!(p.transaction_retry_timeout_secs, 20_u32);
         assert_eq!(p.retry_fee_increment_fraction, 0.1f64);
         assert_eq!(p.transaction_gas_limit, 7500000_u32);
