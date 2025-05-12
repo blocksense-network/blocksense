@@ -220,7 +220,7 @@ pub async fn eth_batch_send_to_contract(
         &provider_settings,
         feeds_config,
         &mut feeds_rounds,
-        feed_type
+        feed_type,
     )
     .await?;
 
@@ -814,13 +814,13 @@ mod tests {
         );
         let p_entry = cfg.providers.entry(network.to_string());
         p_entry.and_modify(|p| {
-            p.contracts
+            if let Some(x) = p
+                .contracts
                 .iter_mut()
                 .find(|x| x.name == HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
-                .and_then(|x| {
-                    x.address = None;
-                    Some(x)
-                });
+            {
+                x.address = None;
+            }
         });
         let feeds_config = AllFeedsConfig { feeds: vec![] };
         // give some time for cleanup env variables
@@ -878,9 +878,7 @@ mod tests {
             key_path.as_path(),
             anvil.endpoint().as_str(),
         );
-        let mut feed_3_config = test_feed_config(3, 0);
-        println!("feed_3_config = {:?}", &feed_3_config);
-        
+        let feed_3_config = test_feed_config(3, 0);
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_3_config],
         };
@@ -969,7 +967,7 @@ mod tests {
         //     //let mut g = feeds_config.lock().await;
         //     let feed_id= 3_u32;
         //     let feed_config = feeds_config.write().await.entry(&feed_id).and_modify(|e|
-        //         e.feed_type 
+        //         e.feed_type
         //     )
         // }
 
@@ -1135,21 +1133,21 @@ mod tests {
         )]);
         let p_entry = sequencer_config.providers.entry(network1.to_string());
         p_entry.and_modify(|p| {
-            p.contracts
+            if let Some(x) = p
+                .contracts
                 .iter_mut()
                 .find(|x| x.name == MULTICALL_CONTRACT_NAME)
-                .and_then(|x| {
-                    x.address = None;
-                    x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
-                    Some(x)
-                });
-            p.contracts
+            {
+                x.address = None;
+                x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
+            }
+            if let Some(x) = p
+                .contracts
                 .iter_mut()
                 .find(|x| x.name == HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
-                .and_then(|x| {
-                    x.address = None;
-                    Some(x)
-                });
+            {
+                x.address = None;
+            }
         });
 
         let mut feed = test_feed_config(1, 0);

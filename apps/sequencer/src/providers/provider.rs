@@ -20,14 +20,15 @@ use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 
 use blocksense_config::{
     AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig, ADFS_CONTRACT_NAME,
-    HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+    HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
+    SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
 };
-use blocksense_feed_registry::types::Repeatability;
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
 use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
 use blocksense_feed_registry::types::FeedType;
+use blocksense_feed_registry::types::Repeatability;
 use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
 use eyre::{eyre, Result};
 use paste::paste;
@@ -82,7 +83,7 @@ impl Contract {
         let deployed_byte_code = config
             .deployed_byte_code
             .as_ref()
-            .and_then(|byte_code| hex::decode(byte_code.clone()).ok());        
+            .and_then(|byte_code| hex::decode(byte_code.clone()).ok());
         Ok(Contract {
             name: config.name.clone(),
             address,
@@ -307,21 +308,31 @@ impl RpcProvider {
     }
 
     pub fn get_latest_contract_version(&self, feeds_repeatability: Repeatability) -> u16 {
-        if self.is_deployed(ADFS_CONTRACT_NAME){
-            if let Some(contract) = self.get_contract(ADFS_CONTRACT_NAME).map(|x| x.contract_version) {
-                return 2;
+        if self.is_deployed(ADFS_CONTRACT_NAME) {
+            if let Some(contract) = self.get_contract(ADFS_CONTRACT_NAME) {
+                return contract.contract_version;
             }
         }
-        if  self.is_deployed(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)  && feeds_repeatability == Repeatability::Periodic {
-            if let Some(_v) = self.get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME).map(|x| x.contract_version) {
+        if self.is_deployed(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+            && feeds_repeatability == Repeatability::Periodic
+        {
+            if let Some(_v) = self
+                .get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .map(|x| x.contract_version)
+            {
                 return 1;
             }
         }
-        if  self.is_deployed(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)  && feeds_repeatability == Repeatability::Oneshot {
-            if let Some(_v) = self.get_contract(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME).map(|x| x.contract_version) {
+        if self.is_deployed(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+            && feeds_repeatability == Repeatability::Oneshot
+        {
+            if let Some(_v) = self
+                .get_contract(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .map(|x| x.contract_version)
+            {
                 return 1;
             }
-        } 
+        }
         0
     }
 
@@ -378,7 +389,6 @@ impl RpcProvider {
             }
         }
     }
-
 
     pub fn is_deployed(&self, name: &str) -> bool {
         for c in &self.contracts {
@@ -557,11 +567,9 @@ impl RpcProvider {
         let contract = self
             .get_contract(contract_name)
             .ok_or(eyre!("{contract_name} contract is not set!"))?;
-        let timeout_duration  = Duration::from_secs(1);
+        let timeout_duration = Duration::from_secs(1);
         if let Some(addr) = contract.address {
-            let read_byte_code = self
-                .read_contract_bytecode(&addr, timeout_duration)
-                .await?;
+            let read_byte_code = self.read_contract_bytecode(&addr, timeout_duration).await?;
             return Ok(format!(
                 "Contract {contract_name} on address {addr} has byte code {}",
                 read_byte_code
@@ -599,7 +607,9 @@ impl RpcProvider {
         let deploy_time = Instant::now();
         let pending_transaction = provider.send_transaction(tx).await?;
         let transaction_reciept = pending_transaction.get_receipt().await?;
-        let contract_address = transaction_reciept.contract_address.ok_or(eyre!("Failed to get contract address"))?;
+        let contract_address = transaction_reciept
+            .contract_address
+            .ok_or(eyre!("Failed to get contract address"))?;
 
         info!(
             "Deployed {:?} contract at address: {:?} took {} ms\n",
@@ -609,8 +619,11 @@ impl RpcProvider {
         );
         self.set_contract_address(contract_name, &contract_address);
 
-        match self.read_contract_bytecode(&contract_address, timeout_duration).await {
-            Ok(read_byte_code) =>  {
+        match self
+            .read_contract_bytecode(&contract_address, timeout_duration)
+            .await
+        {
+            Ok(read_byte_code) => {
                 self.set_deployed_code(contract_name, &read_byte_code);
             }
             Err(e) => {
@@ -654,10 +667,11 @@ impl RpcProvider {
                 .await;
             match result {
                 Ok(byte_code) => {
-                    let exists = byte_code.len() > 0;
+                    let exists = !byte_code.is_empty();
                     if exists {
-                        if let Some(expected_byte_code) =
-                            self.get_contract(contract_name).and_then(|x| x.deployed_byte_code)
+                        if let Some(expected_byte_code) = self
+                            .get_contract(contract_name)
+                            .and_then(|x| x.deployed_byte_code)
                         {
                             let a = byte_code.0.to_vec();
                             let same_byte_code = expected_byte_code.eq(&a);
@@ -760,10 +774,10 @@ mod tests {
     use tracing::info_span;
 
     use crate::providers::provider::get_rpc_providers;
+    use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::consensus::Transaction;
     use alloy::providers::Provider as AlloyProvider;
     use blocksense_config::{get_test_config_with_single_provider, test_feed_config};
-    use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
@@ -892,13 +906,12 @@ mod tests {
 
         let sequencer_config =
             get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
-        
+
         //let feeds_config = AllFeedsConfig { feeds: vec![] };
         let feed_1_config = test_feed_config(31, 8);
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };
-
 
         let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
@@ -916,16 +929,12 @@ mod tests {
         {
             let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
             let mut rpc_provider = rpc_provider_mutex.lock().await;
-            let block_number = rpc_provider
-                .provider
-                .get_block_number()
-                .await
-                .unwrap();
+            let block_number = rpc_provider.provider.get_block_number().await.unwrap();
             //println!("Block number from provider = {number}");
             let block_num_at_time_of_writing_this_test = 16500374_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
             let last_updates = rpc_provider.get_latest_values(&[31]).await.unwrap();
-            //println!("last update on chain {last_updates:?}");
+            println!("last update on chain {last_updates:?}");
             //let last_round = rpc_provider_guard.get_latest_round(&0, 18).await;
             //println!("last rounds on chain {last_round:?}");
             let m = rpc_provider.deploy_contract(ADFS_CONTRACT_NAME).await;
