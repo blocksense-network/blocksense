@@ -58,6 +58,8 @@ pub struct ResponseData {
     pub reverse: bool,
     #[serde(default)]
     pub min_volume_usd: Option<f64>,
+    #[serde(default)]
+    pub pool: String,
 }
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
@@ -121,6 +123,7 @@ async fn fetch_pools_data_for_network(
             v.feed_id = p.feed_id.clone();
             v.network = network.clone();
             v.min_volume_usd = p.min_volume_usd;
+            v.pool = p.pool.clone();
         }
     }
     Ok(value)
@@ -228,6 +231,7 @@ fn print_responses(reponses: &GeckoTerminalDataForFeed) {
         Cell::new("Price[USD]").style_spec("bc"),
         Cell::new("Volume[USD]").style_spec("bc"),
         Cell::new("Enough volume").style_spec("bc"),
+        Cell::new("Pool").style_spec("bc"),
     ]));
     let mut first_row = true;
     let mut feed_ids = reponses.keys().cloned().collect::<Vec<String>>();
@@ -254,6 +258,7 @@ fn print_responses(reponses: &GeckoTerminalDataForFeed) {
                     Cell::new(&price.to_string()).style_spec("r"),
                     Cell::new(&d.attributes.volume_usd.h24.to_string()).style_spec("r"),
                     Cell::new(&enough_volume).style_spec("r"),
+                    Cell::new(&d.pool).style_spec("l"),
                 ]));
             }
         }
