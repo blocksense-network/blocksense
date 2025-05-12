@@ -40,7 +40,7 @@ export const ClaimNFTButton = ({
         className={`button__claim-nft ${className}`}
         onClick={onClaimClick}
       >
-        Claim your very own pirate NFT
+        Claim Your Pirate NFT
       </Button>
     </Link>
   );

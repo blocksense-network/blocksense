@@ -26,7 +26,7 @@ export const RetweetCard = () => {
               className="retweet-card__blocksense-icon"
             />
             <p className="retweet-card__title text-[var(--white)] md:text-base text-sm">
-              Retweet our announcement
+              Retweet announcement
             </p>
           </article>
           <Image
