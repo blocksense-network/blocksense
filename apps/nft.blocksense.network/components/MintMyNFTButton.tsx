@@ -92,11 +92,6 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
     if (isMintDisabled) return;
 
     setMintLoading(true);
-    sendGAEvent('event', 'mintButtonClicked', {
-      xHandle,
-      discord,
-      retweetCode,
-    });
     setAlertMessage('');
 
     try {
@@ -139,6 +134,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         xHandle: resultXHandle,
         discord,
         retweetCode,
+        walletAddress: account.address,
       });
 
       participantsPayload.mintingTx = mintingTx;
