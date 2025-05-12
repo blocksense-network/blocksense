@@ -8,12 +8,15 @@ use blocksense_utils::time::current_unix_time;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
-use crate::providers::eth_send_utils::{decrement_feeds_round_indexes, get_tx_retry_params};
+use crate::providers::eth_send_utils::{
+    decrement_feeds_round_indexes, get_tx_retry_params, log_gas_used,
+};
 use crate::providers::provider::{parse_eth_address, GNOSIS_SAFE_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
 use blocksense_gnosis_safe::utils::SafeMultisig;
 use futures_util::stream::{FuturesUnordered, StreamExt};
+use std::time::Instant;
 use std::{io::Error, time::Duration};
 
 pub async fn aggregation_batch_consensus_loop(
@@ -186,6 +189,8 @@ pub async fn aggregation_batch_consensus_loop(
 
                                     info!("About to post tx {safe_tx:?} for network {net}, Blocksense block height: {block_height}");
 
+                                    let tx_time = Instant::now();
+
                                     let receipt = loop {
 
                                         if transaction_retries_count > transaction_retries_count_limit {
@@ -264,7 +269,19 @@ pub async fn aggregation_batch_consensus_loop(
                                             Ok(v) => {
                                                 info!("Posted tx for network {net}, Blocksense block height: {block_height}! Waiting for receipt ...");
                                                 let receipt = v.get_receipt().await;
-                                                info!("Got receipt for network {net}, Blocksense block height: {block_height}! {:?}", receipt);
+
+                                                let transaction_time = tx_time.elapsed().as_millis();
+                                                info!("Got receipt from network {net} that took {transaction_time}ms for {transaction_retries_count} retries, Blocksense block height: {block_height}! {receipt:?}");
+
+                                                match &receipt {
+                                                    Ok(receipt) => {
+                                                        log_gas_used(net, receipt, transaction_time, &provider.provider_metrics).await;
+                                                    }
+                                                    Err(e) => {
+                                                        warn!("Error in getting receipt from network {net} that took {transaction_time}ms for {transaction_retries_count} retries, Blocksense block height: {block_height}! {receipt:?}: {e}");
+                                                    }
+                                                }
+
                                                 receipt
                                             }
                                             Err(e) => {
