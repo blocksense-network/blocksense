@@ -73,7 +73,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       } else {
         setRetweetStatus({
           type: 'success',
-          message: 'User verified successfully',
+          message: 'You have retweeted our post with the code',
         });
         return true;
       }
@@ -128,6 +128,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         setAlertMessage('Failed to generate mint signature');
         return;
       }
+
       const mintingTx = await mintNFT(account, payload, signature);
 
       sendGAEvent('event', 'mintedNFT', {
