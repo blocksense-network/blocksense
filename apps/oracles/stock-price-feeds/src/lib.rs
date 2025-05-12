@@ -26,16 +26,9 @@ use utils::are_markets_open;
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     let now_et = Utc::now().with_timezone(&Eastern);
-    match are_markets_open(now_et) {
-        Ok(true) => {}
-        Ok(false) => {
-            println!("❌ Markets are closed. Prices can't be fetched.");
-            return Err(Error::msg("Markets are closed. Prices can't be fetched."));
-        }
-        Err(err) => {
-            eprintln!("Error checking market hours: {}", err);
-            return Err(err);
-        }
+    if !are_markets_open(now_et) {
+        println!("❌ Markets are closed. Prices can't be fetched.");
+        return Err(Error::msg("Markets are closed. Prices can't be fetched."));
     }
 
     println!("Starting oracle component - Stock Price Feeds");
