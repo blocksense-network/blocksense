@@ -272,7 +272,7 @@ export const server: ApiServer<Api> = {
       const PRIVATE_KEY = env['NFT_PRIVATE_KEY'];
 
       const metadata = {
-        name: 'Blocksense NFT Pirate',
+        name: 'Blocksense Pirate',
         description: 'Exclusive NFT for Blocksense supporters.',
         image: 'https://data.nft.blocksense.network/bsx-pirate-nft.png',
         attributes: [
