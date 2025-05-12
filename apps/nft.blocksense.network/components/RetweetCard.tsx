@@ -9,7 +9,10 @@ export const RetweetCard = () => {
   const { retweetCode, retweetStatus } = useMintFormContext();
 
   return (
-    <article className="retweet-card__container flex flex-col gap-2">
+    <article
+      className="retweet-card__container flex flex-col gap-2"
+      title="You can still add a message to the RT, but the code must remain intact."
+    >
       <a
         href={`https://x.com/intent/post?text=${retweetCode}%20https://x.com/blocksense_/status/${process.env['NEXT_PUBLIC_X_BLOCKSENSE_TWEET_ID']}`}
         target="_blank"
