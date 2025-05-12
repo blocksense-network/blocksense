@@ -20,9 +20,9 @@ use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 
 use blocksense_config::{
     AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig, ADFS_CONTRACT_NAME,
-    HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
+    HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
 };
-
+use blocksense_feed_registry::types::Repeatability;
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
@@ -306,13 +306,22 @@ impl RpcProvider {
         updates.updates = mem::take(&mut res);
     }
 
-    pub fn get_latest_contract_version(&self) -> u16 {
-        if let Some(_v) = self.get_contract(ADFS_CONTRACT_NAME).map(|x| x.contract_version) {
-            return 2;
+    pub fn get_latest_contract_version(&self, feeds_repeatability: Repeatability) -> u16 {
+        if self.is_deployed(ADFS_CONTRACT_NAME){
+            if let Some(contract) = self.get_contract(ADFS_CONTRACT_NAME).map(|x| x.contract_version) {
+                return 2;
+            }
         }
-        if let Some(_v) = self.get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME).map(|x| x.contract_version) {
-            return 1;
+        if  self.is_deployed(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)  && feeds_repeatability == Repeatability::Periodic {
+            if let Some(_v) = self.get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME).map(|x| x.contract_version) {
+                return 1;
+            }
         }
+        if  self.is_deployed(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)  && feeds_repeatability == Repeatability::Oneshot {
+            if let Some(_v) = self.get_contract(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME).map(|x| x.contract_version) {
+                return 1;
+            }
+        } 
         0
     }
 
@@ -368,6 +377,16 @@ impl RpcProvider {
                 c.deployed_byte_code = Some(deployed_code.0.to_vec());
             }
         }
+    }
+
+
+    pub fn is_deployed(&self, name: &str) -> bool {
+        for c in &self.contracts {
+            if c.name == name {
+                return c.deployed_byte_code.is_some();
+            }
+        }
+        false
     }
 
     pub async fn get_latest_round(

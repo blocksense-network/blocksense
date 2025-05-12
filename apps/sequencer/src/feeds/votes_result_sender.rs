@@ -11,7 +11,7 @@ use blocksense_config::{
     ADFS_CONTRACT_NAME, GNOSIS_SAFE_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
 };
 use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
-use blocksense_feed_registry::types::Repeatability::Periodic;
+use blocksense_feed_registry::types::Repeatability::{self, Periodic};
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
 use rdkafka::producer::FutureRecord;
@@ -152,6 +152,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             &provider_settings,
             feeds_config,
             &mut feeds_rounds,
+            Repeatability::Periodic,
         )
         .await
         {
