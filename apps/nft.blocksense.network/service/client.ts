@@ -78,7 +78,6 @@ const createApiRequestHandler = <
 
 type DiscordMemberResponse = { isMember: boolean };
 type XUserFollowingResponse = { isFollowing: boolean; userId: string | null };
-type XUserRetweetedResponse = { isRetweeted: boolean; isCodeCorrect: boolean };
 type MintNftResponsePayload = {
   uri: string;
   currency: string;
@@ -114,15 +113,6 @@ export const isXUserFollowing = createApiRequestHandler<
 >(
   (client, payload) => client.x.isXUserFollowing({ payload }),
   username => ({ username }),
-);
-
-export const hasXUserRetweeted = createApiRequestHandler<
-  [string, string],
-  { userId: string; retweetCode: string },
-  XUserRetweetedResponse
->(
-  (client, payload) => client.x.hasXUserRetweeted({ payload }),
-  (userId, retweetCode) => ({ userId, retweetCode }),
 );
 
 export const generateMintSignature = createApiRequestHandler<

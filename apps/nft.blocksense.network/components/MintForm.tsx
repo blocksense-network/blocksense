@@ -1,17 +1,21 @@
 'use client';
 
+import { arbitrum } from 'thirdweb/chains';
+import { ConnectButton, darkTheme } from 'thirdweb/react';
+import { createWallet } from 'thirdweb/wallets';
+
 import { FormStepTitle } from './FormStepTitle';
 import { FormStepContainer } from './FormStepContainer';
 import { NetworkLink } from './NetworkLink';
 import { Separator } from './Separator';
-import { RetweetCard } from './RetweetCard';
 import { AlertMessage } from './AlertMessage';
 import { XHandle } from './XHandle';
 import { Discord } from './Discord';
 import { MintMyNFTButton } from './MintMyNFTButton';
-import { ConnectSignButtons } from './ConnectSignButtons';
+import { getClient } from '@/mint';
 
 const separatorClassName = 'mint-form__separator md:my-8 my-6';
+const wallets = [createWallet('io.metamask'), createWallet('walletConnect')];
 
 type MintFormProps = {
   onSuccessAction: (
@@ -41,16 +45,26 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
             <XHandle />
             <Discord />
           </section>
-          <ConnectSignButtons />
+          <ConnectButton
+            client={getClient()}
+            chain={arbitrum}
+            wallets={wallets}
+            connectButton={{ label: 'Connect Your Wallet' }}
+            connectModal={{
+              size: 'compact',
+              showThirdwebBranding: false,
+            }}
+            theme={darkTheme({
+              colors: {
+                modalBg: 'hsl(0, 0%, 15%)',
+                borderColor: 'hsl(0, 2%, 26%)',
+                separatorLine: 'hsl(0, 2%, 26%)',
+                accentText: 'hsl(0, 0%, 100%)',
+                success: 'hsl(0, 0%, 85%)',
+              },
+            })}
+          />
         </section>
-      </FormStepContainer>
-      <Separator className={separatorClassName} />
-      <FormStepContainer>
-        <FormStepTitle
-          title="Share our announcement with your unique code"
-          number={3}
-        />
-        <RetweetCard />
       </FormStepContainer>
       <MintMyNFTButton onSuccessAction={onSuccessAction} />
       <AlertMessage />

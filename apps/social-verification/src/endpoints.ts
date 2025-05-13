@@ -18,7 +18,6 @@ import { generateMintSignature } from 'thirdweb/extensions/erc721';
 import { Authorization, verifyApi } from './api';
 import {
   DiscordUserInfoResponseSchema,
-  TweetsResponseSchema,
   XUserFollowingResponseSchema,
   XUserInfoResponseSchema,
 } from './types';
@@ -77,13 +76,9 @@ export const VerifyApiLive = HttpApiBuilder.api(verifyApi).pipe(
   Layer.provide(AuthorizationLive),
   Layer.provide(
     HttpApiBuilder.group(verifyApi, 'x', handlers =>
-      handlers
-        .handle('isXUserFollowing', ({ payload }) =>
-          server.isXUserFollowing(payload),
-        )
-        .handle('hasXUserRetweeted', ({ payload }) =>
-          server.hasXUserRetweeted(payload),
-        ),
+      handlers.handle('isXUserFollowing', ({ payload }) =>
+        server.isXUserFollowing(payload),
+      ),
     ),
   ),
   Layer.provide(
@@ -168,63 +163,6 @@ export const server: ApiServer<Api> = {
           }
           console.error(`Error getting info for user ${username}:`, error);
           throw new Error('Failed to fetch X user info');
-        },
-      });
-    }),
-
-  hasXUserRetweeted: payload =>
-    Effect.contextWithEffect(context => {
-      const env = getEnv(context);
-      const tweetId = env['X_BLOCKSENSE_TWEET_ID'];
-      const socialDataApiKey = env['SOCIAL_DATA_API_KEY'];
-
-      const userId = payload.userId;
-
-      return Effect.tryPromise({
-        try: async () => {
-          const xUserRetweetsResponse = await fetchAndDecodeJSON(
-            TweetsResponseSchema,
-            `https://api.socialdata.tools/twitter/user/${userId}/tweets`,
-            {
-              headers: {
-                Authorization: `Bearer ${socialDataApiKey}`,
-              },
-            },
-          );
-          console.log(`Successfully fetched retweet. userId: ${userId}`);
-
-          const targetRetweets = xUserRetweetsResponse.tweets.filter(
-            tweet => tweet.quoted_status?.id_str === tweetId,
-          );
-          if (!targetRetweets || targetRetweets.length === 0) {
-            console.error(
-              `No quoted retweets found for user ${userId} on tweet ${tweetId}`,
-            );
-            return { isRetweeted: false, isCodeCorrect: false };
-          }
-
-          const retweetContainsCode = targetRetweets.some(tweet =>
-            tweet.full_text.includes(payload.retweetCode),
-          );
-          if (!retweetContainsCode) {
-            console.error(
-              `Retweet does not contain the correct code for user ${userId} on tweet ${tweetId}`,
-            );
-            return { isRetweeted: true, isCodeCorrect: false };
-          }
-
-          console.log(
-            `Successfully verified quote retweet for user ${userId} on tweet ${tweetId} with code ${payload.retweetCode}`,
-          );
-
-          return {
-            isRetweeted: true,
-            isCodeCorrect: true,
-          };
-        },
-        catch: error => {
-          console.error(`Error fetching X user ${userId} retweets`, error);
-          throw new Error('Failed to fetch retweets');
         },
       });
     }),
@@ -345,14 +283,13 @@ export const server: ApiServer<Api> = {
           );
 
           const insertQuery =
-            'INSERT INTO participants (x_handle, discord_username, wallet_address, wallet_signature, minting_tx) VALUES (?, ?, ?, ?, ?)';
+            'INSERT INTO participants (x_handle, discord_username, wallet_address, minting_tx) VALUES (?, ?, ?, ?)';
           const insertResult = await db
             .prepare(insertQuery)
             .bind(
               payload.xHandle,
               payload.discordUsername,
               payload.walletAddress,
-              payload.walletSignature,
               payload.mintingTx,
             )
             .all();
@@ -383,7 +320,6 @@ export const server: ApiServer<Api> = {
           WHERE x_handle = ?
             OR discord_username = ?
             OR wallet_address = ?
-            OR wallet_signature = ?
           `;
           const selectResult = await db
             .prepare(selectQuery)
@@ -391,7 +327,6 @@ export const server: ApiServer<Api> = {
               payload.xHandle,
               payload.discordUsername,
               payload.walletAddress,
-              payload.walletSignature,
             )
             .all();
 

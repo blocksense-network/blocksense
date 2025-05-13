@@ -2,6 +2,7 @@ import Image from 'next/image';
 
 import successFormBlocksenseLogo from '/public/icons/success-form-blocksense-logo.svg';
 import exploreIcon from '/public/icons/explore.svg';
+import { RetweetCard } from './RetweetCard';
 
 type SuccessFormProps = {
   mintTransactionUrl: string;
@@ -45,6 +46,7 @@ export const SuccessForm = ({
             Explore your minting transaction
           </p>
         </a>
+        <RetweetCard />
       </article>
     </form>
   );

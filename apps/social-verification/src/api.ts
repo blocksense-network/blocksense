@@ -34,13 +34,6 @@ export const verifyApi = HttpApi.make('verify')
           )
           .addError(HttpApiError.NotFound),
       )
-      .add(
-        HttpApiEndpoint.post('hasXUserRetweeted', '/retweeted')
-          .setPayload(S.Struct({ userId: S.String, retweetCode: S.String }))
-          .addSuccess(
-            S.Struct({ isRetweeted: S.Boolean, isCodeCorrect: S.Boolean }),
-          ),
-      )
       .prefix('/x'),
   )
   .add(
