@@ -6,7 +6,8 @@ import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Input } from './Input';
 
 export const XHandle = () => {
-  const { xHandle, setXHandle, xStatus, setXStatus } = useMintFormContext();
+  const { xHandle, setXHandle, xStatus, setXStatus, mintLoading } =
+    useMintFormContext();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -19,6 +20,7 @@ export const XHandle = () => {
   }, [xHandle]);
 
   const onXHandleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (mintLoading) return;
     setXHandle(e.target.value);
     setXStatus({ type: 'none', message: '' });
   };
