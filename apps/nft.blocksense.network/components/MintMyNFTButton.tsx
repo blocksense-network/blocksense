@@ -86,6 +86,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         account,
         payload,
         signature,
+        participantsPayload,
         setAlertMessage,
       );
 
@@ -94,9 +95,6 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         discord,
         walletAddress: account.address,
       });
-
-      participantsPayload.mintingTx = mintingTx;
-      await saveParticipant(participantsPayload);
 
       onSuccessAction(
         getTxHashExplorerUrl('arbitrum-mainnet', parseTxHash(mintingTx)),

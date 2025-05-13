@@ -4,8 +4,10 @@ import { arbitrum } from 'thirdweb/chains';
 import { Account, smartWallet } from 'thirdweb/wallets';
 import { mintWithSignature } from 'thirdweb/extensions/erc721';
 
+import { ParticipantPayload } from '@blocksense/social-verification/types';
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { loopWhile } from '@blocksense/base-utils/async';
+import { saveParticipant } from 'service/client';
 
 export function getClient() {
   const CLIENT_ID = assertNotNull(process.env['NEXT_PUBLIC_NFT_CLIENT_ID']);
@@ -18,6 +20,7 @@ export const mintNFT = async (
   account: Account,
   payload: any,
   signature: any,
+  participantsPayload: ParticipantPayload,
   setAlertMessage: (message: string) => void,
 ) => {
   const CONTRACT_ADDRESS = assertNotNull(
@@ -51,6 +54,10 @@ export const mintNFT = async (
     transaction,
     account: smartAccount,
   });
+
+  participantsPayload.mintingTx = transactionHash;
+  await saveParticipant(participantsPayload);
+  console.info('NFT minted successfully!');
 
   try {
     setAlertMessage('Adding your NFT to your wallet...');
