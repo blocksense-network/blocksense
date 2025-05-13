@@ -6,3 +6,4 @@
 
 export * from './networks';
 export * from './hex-types';
+export * from './functions';
