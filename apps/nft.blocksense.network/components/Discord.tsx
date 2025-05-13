@@ -50,7 +50,7 @@ export const Discord = () => {
     <Input
       value={discord}
       onChange={onDiscordChange}
-      placeholder="Discord #"
+      placeholder="Discord Username"
       id="discord-handle"
       status={discordStatus.type}
       message={discordStatus.message}

@@ -48,7 +48,7 @@ export const XHandle = () => {
     <Input
       value={xHandle}
       onChange={onXHandleChange}
-      placeholder="X handle"
+      placeholder="X Handle"
       id="x-handle"
       status={xStatus.type}
       message={xStatus.message}
