@@ -1,100 +1,46 @@
-import assert from 'assert';
-import { Schema as S, Either, Equal } from 'effect';
-
-import { keysOf } from '../array-iter';
 import {
   EnvSchema,
-  EnvTypeFromSchema,
-  parseEnvConfig,
-  VarSchema,
+  LayeredEnvSchema,
+  LayeredEnvSchemaToConfig,
+  parseLayeredEnvConfig,
 } from '../env';
-import { NetworkName, getNetworkKind } from './networks';
+import { kebabToSnakeCase } from '../string';
+import { getNetworkKind, NetworkName } from './networks';
 
-export type DeploymentEnvSchema = {
-  global: EnvSchema;
-  perNetworkKind: EnvSchema;
-  perNetworkName: EnvSchema;
-};
+const deploymentEnvLayerPriority = [
+  'perNetworkName',
+  'perNetworkKind',
+  'global',
+] as const;
 
-export function parseDeploymentEnvConfig<Env$ extends DeploymentEnvSchema>(
-  config: Env$,
-  network: NetworkName,
+export type DeploymentEnvPriority = typeof deploymentEnvLayerPriority;
+
+export type DeploymentEnvSchema = LayeredEnvSchema<
+  DeploymentEnvPriority,
+  Record<DeploymentEnvPriority[number], EnvSchema>
+>['layers'];
+
+export function parseDeploymentEnvConfig<
+  EnvSchemaLayers extends Record<DeploymentEnvPriority[number], EnvSchema>,
+  Network extends NetworkName,
+>(
+  config: EnvSchemaLayers,
+  network: Network,
   env: NodeJS.ProcessEnv = process.env,
-): {
-  global: EnvTypeFromSchema<Env$['global']>;
-  perNetworkKind: EnvTypeFromSchema<Env$['perNetworkKind']>;
-  perNetworkName: EnvTypeFromSchema<Env$['perNetworkName']>;
-  mergedConfig: EnvTypeFromSchema<
-    Env$['global'] & Env$['perNetworkKind'] & Env$['perNetworkName']
-  >;
-} {
-  const layers = Object.entries(config);
-  const mergedConfigSchema = mergeSchemaLayers(layers);
+): LayeredEnvSchemaToConfig<DeploymentEnvPriority, EnvSchemaLayers> {
+  const netKind = getNetworkKind(network);
+  const suffixes: Record<DeploymentEnvPriority[number], string> = {
+    global: '',
+    perNetworkKind: kebabToSnakeCase(netKind),
+    perNetworkName: kebabToSnakeCase(network),
+  };
 
-  const networkKind = getNetworkKind(network);
-  const global = parseEnvConfig(config.global, '', env);
-  const perNetworkName = parseEnvConfig(config.perNetworkName, network, env);
-  const perNetworkKind = parseEnvConfig(
-    config.perNetworkKind,
-    networkKind,
+  return parseLayeredEnvConfig(
+    {
+      priority: ['perNetworkName', 'perNetworkKind', 'global'],
+      suffixes,
+      layers: config,
+    },
     env,
   );
-  const mergedConfig = mergeConfig([perNetworkName, perNetworkKind, global]);
-
-  // Validate the merged configuration against the schema
-  const validationResult = S.validateEither(S.Struct(mergedConfigSchema))(
-    mergedConfig,
-  );
-
-  if (Either.isLeft(validationResult)) {
-    throw new Error(
-      'Merged configuration is invalid:\n' + validationResult.left,
-    );
-  }
-
-  return {
-    mergedConfig: mergedConfig as any,
-    global,
-    perNetworkKind,
-    perNetworkName,
-  };
-}
-
-function mergeSchemaLayers(
-  layers: [string, EnvSchema][],
-): Record<string, VarSchema> {
-  const mergedConfigSchema: Record<string, VarSchema> = {};
-  for (const [layerName, layer] of layers) {
-    for (const key of keysOf(layer)) {
-      const schema = layer[key];
-      if (!(key in mergedConfigSchema)) {
-        mergedConfigSchema[key] = schema;
-      } else {
-        assert(
-          Equal.equals(schema, S.asSchema(mergedConfigSchema[key])),
-          `Schema for '${key}' is different at different layers:` +
-            `\n  ${schema} (at ${layerName})` +
-            `\n  ${mergedConfigSchema[key]}`,
-        );
-      }
-    }
-  }
-  return mergedConfigSchema;
-}
-
-export type Config = Record<string, unknown>;
-
-function mergeConfig(layers: Config[]) {
-  const mergedConfig = layers[0];
-  for (const key in mergedConfig) {
-    if (mergedConfig[key] !== null) continue;
-
-    for (const fallback of layers) {
-      if (fallback[key] !== null) {
-        mergedConfig[key] = fallback[key];
-        break;
-      }
-    }
-  }
-  return mergedConfig;
 }
