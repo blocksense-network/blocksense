@@ -53,6 +53,19 @@ export function kebabToCamelCase<Str extends string>(
 }
 
 /**
+ * Converts a camelCase string to SNAKE_CASE.
+ * @param str - The camelCase string to convert.
+ * @returns The SNAKE_CASE version of the input string.
+ * @example
+ * ```ts
+ * camelToSnakeCase('fooBar'); // 'FOO_BAR'
+ * ```
+ */
+export function camelCaseSnakeCase(str: string) {
+  return str.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase();
+}
+
+/**
  * Compares two strings for equality in a case-insensitive manner.
  *
  * @param a - The first string to compare.
@@ -68,4 +81,13 @@ export function equalsCaseInsensitive(a: string, b: string) {
 
 export function padNumber(num: number | bigint, size: number, padChar = ' ') {
   return num.toString().padStart(size, padChar);
+}
+
+export function envVarNameJoin(
+  ...parts: (string | null | undefined)[]
+): string {
+  return parts
+    .filter(x => x?.length ?? 0 > 0)
+    .map(part => camelCaseSnakeCase(part!))
+    .join('_');
 }
