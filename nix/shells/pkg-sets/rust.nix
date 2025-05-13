@@ -20,6 +20,10 @@ in
   enterShell = ''
     export LD_LIBRARY_PATH="${ldLibraryPath}:$LD_LIBRARY_PATH"
 
+    export RUSTC_WRAPPER="${lib.getExe pkgs.sccache}"
+    export SCCACHE_DIR="${config.devenv.root}/target/sccache-artifacts"
+    export RUSTFLAGS="--cfg tokio_unstable"
+
     if [ "''${CMC_API_KEY:-}" != "" ]; then
       echo "$CMC_API_KEY" > nix/test-environments/test-keys/CMC_API_KEY
     fi

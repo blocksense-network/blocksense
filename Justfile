@@ -34,7 +34,19 @@ start-oracle oracle-name:
   RUST_LOG=trigger=info "${SPIN:-spin}" build --up
 
 build-blocksense:
-  {{root-dir}}/scripts/build-blocksense.sh
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  source {{root-dir}}/scripts/utils/task-heading.sh
+
+  task_heading 'Building workspace'
+  cargo build --release
+
+  task_heading 'Installing trigger-oracle spin plugin'
+  $GIT_ROOT/scripts/install_trigger_oracle_plugin.sh 2>&1 | sed 's/^/    /'
+
+  task_heading 'Building oracle scripts'
+  just build-all-oracle-scripts
 
 start-blocksense:
   #!/usr/bin/env bash
@@ -42,6 +54,24 @@ start-blocksense:
 
   just build-blocksense
   process-compose up
+
+build-oracle-script name:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  cargo build \
+    --manifest-path {{root-dir}}/apps/oracles/{{name}}/Cargo.toml \
+    --target wasm32-wasip1 \
+    --target-dir {{root-dir}}/target
+
+build-all-oracle-scripts:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  for crate_dir in {{root-dir}}/apps/oracles/*/; do
+    crate_name=$(basename $(dirname $crate_dir$))
+    just build-oracle-script $crate_name
+  done
 
 clean:
   git clean -fdx \

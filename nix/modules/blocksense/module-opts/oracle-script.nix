@@ -28,8 +28,14 @@ with lib;
     };
 
     package = mkOption {
-      type = types.package;
-      description = "Package of the wasm component to execute.";
+      type = types.oneOf [
+        types.package
+        types.str
+      ];
+      description = ''
+        Package of the wasm component to execute.
+        Optionally it could be a string path leading to the location of the wasm file.
+      '';
       default = self'.legacyPackages.oracle-scripts.${config.id};
     };
 

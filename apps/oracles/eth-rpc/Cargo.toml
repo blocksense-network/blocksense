@@ -1,3 +1,5 @@
+[workspace]
+
 [package]
 name = "eth-rpc"
 authors = ["Yordan Madzhunkov"]
