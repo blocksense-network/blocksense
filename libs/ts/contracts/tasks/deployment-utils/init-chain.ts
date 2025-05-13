@@ -10,12 +10,13 @@ import {
   NetworkName,
   fromCommaSeparatedString,
   ethereumAddress,
-  asEnvSchema,
+  asVarSchema,
   hexDataString,
   isTestnet,
   networkName,
   DeploymentEnvSchema,
   parseDeploymentEnvConfig,
+  prettyPrintParsedEnvConfig,
 } from '@blocksense/base-utils';
 
 import type {
@@ -26,20 +27,20 @@ import type {
 } from '../types';
 
 const sharedPerNetworkKind = {
-  DEPLOYER_ADDRESS_IS_LEDGER: asEnvSchema(S.BooleanFromString),
+  DEPLOYER_ADDRESS_IS_LEDGER: asVarSchema(S.BooleanFromString),
   DEPLOYER_ADDRESS: ethereumAddress,
   DEPLOYER_PRIVATE_KEY: hexDataString,
 
-  ADFS_UPGRADEABLE_PROXY_SALT: asEnvSchema(hexDataString),
+  ADFS_UPGRADEABLE_PROXY_SALT: asVarSchema(hexDataString),
 
   ADMIN_MULTISIG_THRESHOLD: S.NumberFromString,
   ADMIN_MULTISIG_OWNERS: fromCommaSeparatedString(ethereumAddress),
 
   SEQUENCER_ADDRESS: ethereumAddress,
 
-  REPORTER_MULTISIG_ENABLE: asEnvSchema(S.BooleanFromString),
-  REPORTER_MULTISIG_THRESHOLD: S.NullOr(S.NumberFromString),
-  REPORTER_MULTISIG_SIGNERS: S.NullOr(
+  REPORTER_MULTISIG_ENABLE: asVarSchema(S.BooleanFromString),
+  REPORTER_MULTISIG_THRESHOLD: S.NumberFromString,
+  REPORTER_MULTISIG_SIGNERS: asVarSchema(
     fromCommaSeparatedString(ethereumAddress),
   ),
 };
@@ -49,21 +50,39 @@ const envSchema = {
     NETWORKS: fromCommaSeparatedString(networkName),
   },
 
-  perNetworkKind: sharedPerNetworkKind,
+  perNetworkKind: {
+    DEPLOYER_ADDRESS_IS_LEDGER: asVarSchema(S.BooleanFromString),
+    DEPLOYER_ADDRESS: ethereumAddress,
+    DEPLOYER_PRIVATE_KEY: hexDataString,
 
-  perNetworkName: {
-    RPC_URL: S.URL,
-    FEED_IDS: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
+    ADFS_UPGRADEABLE_PROXY_SALT: asVarSchema(hexDataString),
 
-    ...sharedPerNetworkKind,
+    ADMIN_MULTISIG_THRESHOLD: S.NumberFromString,
+    ADMIN_MULTISIG_OWNERS: fromCommaSeparatedString(ethereumAddress),
+
+    SEQUENCER_ADDRESS: ethereumAddress,
+
+    REPORTER_MULTISIG_ENABLE: asVarSchema(S.BooleanFromString),
+    REPORTER_MULTISIG_THRESHOLD: S.NumberFromString,
+    REPORTER_MULTISIG_SIGNERS: asVarSchema(
+      fromCommaSeparatedString(ethereumAddress),
+    ),
   },
+
+  perNetworkName: {},
+  //   RPC_URL: S.URL,
+  //   FEED_IDS: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
+
+  //   ...sharedPerNetworkKind,
+  // },
 } satisfies DeploymentEnvSchema;
 
 export async function initChain(
   ethers: typeof _ethers & HardhatEthersHelpers,
   networkName: NetworkName,
 ): Promise<NetworkConfig> {
-  const envConfig = parseDeploymentEnvConfig(envSchema, networkName);
+  const parsedConfig = parseDeploymentEnvConfig(envSchema, networkName);
+  prettyPrintParsedEnvConfig(parsedConfig);
 
   const rpc = envConfig.perNetwork.RPC_URL.toString();
   const provider = new JsonRpcProvider(rpc);
