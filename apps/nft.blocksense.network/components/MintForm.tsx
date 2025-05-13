@@ -1,5 +1,10 @@
 'use client';
 
+import { ConnectButton, darkTheme } from 'thirdweb/react';
+import { arbitrum } from 'thirdweb/chains';
+import { createWallet } from 'thirdweb/wallets';
+
+import { getClient } from '@/mint';
 import { FormStepTitle } from './FormStepTitle';
 import { FormStepContainer } from './FormStepContainer';
 import { NetworkLink } from './NetworkLink';
@@ -9,9 +14,10 @@ import { AlertMessage } from './AlertMessage';
 import { XHandle } from './XHandle';
 import { Discord } from './Discord';
 import { MintMyNFTButton } from './MintMyNFTButton';
-import { ConnectSignButtons } from './ConnectSignButtons';
 
 const separatorClassName = 'mint-form__separator md:my-8 my-6';
+
+const wallets = [createWallet('io.metamask'), createWallet('walletConnect')];
 
 type MintFormProps = {
   onSuccessAction: (
@@ -41,7 +47,25 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
             <XHandle />
             <Discord />
           </section>
-          <ConnectSignButtons />
+          <ConnectButton
+            client={getClient()}
+            chain={arbitrum}
+            wallets={wallets}
+            connectButton={{ label: 'Connect Your Wallet' }}
+            connectModal={{
+              size: 'compact',
+              showThirdwebBranding: false,
+            }}
+            theme={darkTheme({
+              colors: {
+                modalBg: 'hsl(0, 0%, 15%)',
+                borderColor: 'hsl(0, 2%, 26%)',
+                separatorLine: 'hsl(0, 2%, 26%)',
+                accentText: 'hsl(0, 0%, 100%)',
+                success: 'hsl(0, 0%, 85%)',
+              },
+            })}
+          />
         </section>
       </FormStepContainer>
       <Separator className={separatorClassName} />
