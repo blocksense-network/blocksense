@@ -1,7 +1,7 @@
-use crate::providers::eth_send_utils::increment_feeds_round_indexes;
 use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
+use crate::providers::eth_send_utils::{increment_feeds_round_indexes, log_provider_enabled};
 use crate::providers::provider::{GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
@@ -109,17 +109,23 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 continue;
             };
 
-            if !provider_settings.is_enabled {
+            if provider_settings.safe_address.is_none() {
+                info!("Network `{net}` not configured for second round consensus - skipping");
+                continue;
+            }
+
+            let is_enabled_value = provider_settings.is_enabled;
+
+            log_provider_enabled(net.as_str(), provider, is_enabled_value).await;
+
+            if !is_enabled_value {
                 warn!("Network `{net}` is not enabled; skipping it for second round consensus");
                 debug!("About to release a read lock on sequencer_config for `{net}` [continue 2]");
                 continue;
             } else {
                 info!("Network `{net}` is enabled; initiating second round consensus");
             }
-            if provider_settings.safe_address.is_none() {
-                info!("Network `{net}` not configured for second round consensus - skipping");
-                continue;
-            }
+
             debug!("About to release a read lock on sequencer_config for `{net}` [default]");
             provider_settings
         };
