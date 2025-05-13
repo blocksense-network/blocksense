@@ -7,7 +7,7 @@ import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Input } from './Input';
 
 export const Discord = () => {
-  const { discord, setDiscord, discordStatus, setDiscordStatus } =
+  const { discord, setDiscord, discordStatus, setDiscordStatus, mintLoading } =
     useMintFormContext();
 
   useEffect(() => {
@@ -21,6 +21,7 @@ export const Discord = () => {
   }, [discord]);
 
   const onDiscordChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (mintLoading) return;
     setDiscord(e.target.value.trim());
     setDiscordStatus({ type: 'none', message: '' });
   };
